@@ -21,12 +21,17 @@ import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxEdgeProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinEdgeProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MaxAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MinAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
 import java.io.File;
 import java.io.IOException;
@@ -87,10 +92,6 @@ public class GroupingBenchmark extends AbstractRunner
    */
   private static final String OPTION_VERTEX_AGGREGATION_KEYS = "vak";
   /**
-   * Used Vertex aggregation result keys
-   */
-  private static final String OPTION_VERTEX_AGGREGATION_RESULT_KEYS = "vark";
-  /**
    * Used EPGMEdge aggregator functions (min, max, count, none)
    */
   private static final String OPTION_EDGE_AGGREGATION_FUNCS = "eagg";
@@ -98,10 +99,6 @@ public class GroupingBenchmark extends AbstractRunner
    * Used vertex aggregation keys
    */
   private static final String OPTION_EDGE_AGGREGATION_KEYS = "eak";
-  /**
-   * Used Vertex aggregation result keys
-   */
-  private static final String OPTION_EDGE_AGGREGATION_RESULT_KEYS = "eark";
   /**
    * Grouping strategy
    */
@@ -139,10 +136,6 @@ public class GroupingBenchmark extends AbstractRunner
    */
   private static String VERTEX_AGGREGATOR_KEYS;
   /**
-   * Used vertex aggregator result keys
-   */
-  private static String VERTEX_AGGREGATOR_RESULT_KEYS;
-  /**
    * Used edge aggregators
    */
   private static String EDGE_AGGREGATORS;
@@ -150,10 +143,6 @@ public class GroupingBenchmark extends AbstractRunner
    * Used edge aggregator keys
    */
   private static String EDGE_AGGREGATOR_KEYS;
-  /**
-   * Used edge aggregator result keys
-   */
-  private static String EDGE_AGGREGATOR_RESULT_KEYS;
   /**
    * Uses VertexLabels
    */
@@ -191,14 +180,10 @@ public class GroupingBenchmark extends AbstractRunner
       true, "Applied aggregation function on vertices");
     OPTIONS.addOption(OPTION_VERTEX_AGGREGATION_KEYS,
       "vertex-aggregation-keys", true, "keys for vertex aggregation");
-    OPTIONS.addOption(OPTION_VERTEX_AGGREGATION_RESULT_KEYS,
-      "vertex-aggregation-result-keys", true, "keys for aggregation result");
     OPTIONS.addOption(OPTION_EDGE_AGGREGATION_FUNCS, "edge-aggregator", true,
       "Applied aggregation function on edges");
     OPTIONS.addOption(OPTION_EDGE_AGGREGATION_KEYS, "edge-aggregation-keys",
       true, "keys for edge aggregation");
-    OPTIONS.addOption(OPTION_EDGE_AGGREGATION_RESULT_KEYS,
-      "edge-aggregation-result-keys", true, "keys for aggregation result");
   }
 
   /**
@@ -235,18 +220,15 @@ public class GroupingBenchmark extends AbstractRunner
     }
 
     // initialize aggregators
-    List<PropertyValueAggregator> vAggregators = Lists.newArrayList();
-    List<PropertyValueAggregator> eAggregators = Lists.newArrayList();
+    List<AggregateFunction> vAggregators = Lists.newArrayList();
+    List<AggregateFunction> eAggregators = Lists.newArrayList();
 
     if (cmd.hasOption(OPTION_VERTEX_AGGREGATION_KEYS)) {
-      vAggregators =
-        getAggregators(VERTEX_AGGREGATORS, VERTEX_AGGREGATOR_KEYS,
-          VERTEX_AGGREGATOR_RESULT_KEYS);
+      vAggregators = getAggregators(VERTEX_AGGREGATORS, VERTEX_AGGREGATOR_KEYS);
     }
 
     if (cmd.hasOption(OPTION_EDGE_AGGREGATION_KEYS)) {
-      eAggregators = getAggregators(EDGE_AGGREGATORS, EDGE_AGGREGATOR_KEYS,
-        EDGE_AGGREGATOR_RESULT_KEYS);
+      eAggregators = getAggregators(EDGE_AGGREGATORS, EDGE_AGGREGATOR_KEYS);
     }
     // build grouping operator
     Grouping grouping = getOperator(STRATEGY,
@@ -317,11 +299,9 @@ public class GroupingBenchmark extends AbstractRunner
 
     // read if vertex or edge keys should be used
     boolean useVertexKey = cmd.hasOption(OPTION_VERTEX_GROUPING_KEY);
-    VERTEX_GROUPING_KEYS =
-      useVertexKey ? cmd.getOptionValue(OPTION_VERTEX_GROUPING_KEY) : null;
+    VERTEX_GROUPING_KEYS = useVertexKey ? cmd.getOptionValue(OPTION_VERTEX_GROUPING_KEY) : null;
     boolean useEdgeKey = cmd.hasOption(OPTION_EDGE_GROUPING_KEY);
-    EDGE_GROUPING_KEYS =
-      useEdgeKey ? cmd.getOptionValue(OPTION_EDGE_GROUPING_KEY) : null;
+    EDGE_GROUPING_KEYS = useEdgeKey ? cmd.getOptionValue(OPTION_EDGE_GROUPING_KEY) : null;
 
     // read vertex and edge labels
     USE_VERTEX_LABELS = cmd.hasOption(OPTION_USE_VERTEX_LABELS);
@@ -331,18 +311,13 @@ public class GroupingBenchmark extends AbstractRunner
     VERTEX_AGGREGATORS = cmd.getOptionValue(OPTION_VERTEX_AGGREGATION_FUNCS);
     boolean vertexAggKeys = cmd.hasOption(OPTION_VERTEX_AGGREGATION_KEYS);
     if (vertexAggKeys) {
-      VERTEX_AGGREGATOR_KEYS =
-        cmd.getOptionValue(OPTION_VERTEX_AGGREGATION_KEYS);
-      VERTEX_AGGREGATOR_RESULT_KEYS =
-        cmd.getOptionValue(OPTION_VERTEX_AGGREGATION_RESULT_KEYS);
+      VERTEX_AGGREGATOR_KEYS = cmd.getOptionValue(OPTION_VERTEX_AGGREGATION_KEYS);
     }
 
     EDGE_AGGREGATORS = cmd.getOptionValue(OPTION_EDGE_AGGREGATION_FUNCS);
     boolean edgeAggKeys = cmd.hasOption(OPTION_EDGE_AGGREGATION_KEYS);
     if (edgeAggKeys) {
       EDGE_AGGREGATOR_KEYS = cmd.getOptionValue(OPTION_EDGE_AGGREGATION_KEYS);
-      EDGE_AGGREGATOR_RESULT_KEYS =
-        cmd.getOptionValue(OPTION_EDGE_AGGREGATION_RESULT_KEYS);
     }
   }
 
@@ -362,36 +337,37 @@ public class GroupingBenchmark extends AbstractRunner
    *
    * @param aggs        aggregators as whole string
    * @param keys        aggregator keys as whole string
-   * @param resultKeys  aggregator result keys as whole string
    * @return List of PropertyValueAggregators
    */
-  private static List<PropertyValueAggregator> getAggregators(String
-    aggs, String keys, String resultKeys) {
-
-    List<PropertyValueAggregator> aggregatorList = Lists.newArrayList();
+  private static List<AggregateFunction> getAggregators(String aggs, String keys) {
+    List<AggregateFunction> aggregatorList = Lists.newArrayList();
 
     aggs = aggs.replace("\\s", "");
     keys = keys.replace("\\s", "");
-    resultKeys = resultKeys.replace("\\s", "");
 
     List<String> aggsList = Arrays.asList(TOKEN_SEPARATOR.split(aggs));
     List<String> keyList = Arrays.asList(TOKEN_SEPARATOR.split(keys));
-    List<String> resultKeyList = Arrays.asList(TOKEN_SEPARATOR.split
-      (resultKeys));
 
     if (!aggs.equals("none")) {
       for (int i = 0; i < aggsList.size(); i++) {
         switch (aggsList.get(i)) {
-        case "count" :
-          aggregatorList.add(new CountAggregator());
+        case "vertexCount" :
+          aggregatorList.add(new VertexCount());
           break;
-        case "max" :
-          aggregatorList.add(new MaxAggregator(keyList.get(i),
-            resultKeyList.get(i)));
+        case "vertexMax" :
+          aggregatorList.add(new MaxVertexProperty(keyList.get(i)));
           break;
-        case "min" :
-          aggregatorList.add(new MinAggregator(keyList.get(i),
-            resultKeyList.get(i)));
+        case "vertexMin" :
+          aggregatorList.add(new MinVertexProperty(keyList.get(i)));
+          break;
+        case "edgeCount" :
+          aggregatorList.add(new EdgeCount());
+          break;
+        case "edgeMax" :
+          aggregatorList.add(new MaxEdgeProperty(keyList.get(i)));
+          break;
+        case "edgeMin" :
+          aggregatorList.add(new MinEdgeProperty(keyList.get(i)));
           break;
         default:
           aggregatorList.add(null);
@@ -417,7 +393,7 @@ public class GroupingBenchmark extends AbstractRunner
   private static Grouping getOperator(GroupingStrategy strategy,
     List<String> vertexKeys, List<String> edgeKeys,
     boolean useVertexLabels, boolean useEdgeLabels,
-    List<PropertyValueAggregator> vAggs, List<PropertyValueAggregator> eAggs) {
+    List<AggregateFunction> vAggs, List<AggregateFunction> eAggs) {
 
     Grouping.GroupingBuilder builder =
       new Grouping.GroupingBuilder()
@@ -426,17 +402,17 @@ public class GroupingBenchmark extends AbstractRunner
         .useEdgeLabel(useEdgeLabels);
 
     if (vAggs.size() > 0) {
-      for (PropertyValueAggregator agg:vAggs) {
+      for (AggregateFunction agg:vAggs) {
         if (agg != null) {
-          builder.addVertexAggregator(agg);
+          builder.addVertexAggregator((VertexAggregateFunction) agg);
         }
       }
     }
 
     if (eAggs.size() > 0) {
-      for (PropertyValueAggregator agg: eAggs) {
+      for (AggregateFunction agg: eAggs) {
         if (agg != null) {
-          builder.addEdgeAggregator(agg);
+          builder.addEdgeAggregator((EdgeAggregateFunction) agg);
         }
       }
     }

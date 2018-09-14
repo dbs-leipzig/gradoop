@@ -22,8 +22,9 @@ import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import static java.util.Collections.emptyList;
@@ -74,14 +75,14 @@ public class Communities extends AbstractRunner {
     // group the vertices of the graph by their community, count vertices per group and edges
     // between groups
     LogicalGraph communities = graph.groupBy(singletonList(communityKey), // vertex grouping keys
-      singletonList(new CountAggregator("count")), // vertex aggregate functions
+      singletonList(new VertexCount()), // vertex aggregate functions
       emptyList(), // edge grouping keys
-      singletonList(new CountAggregator("count")), // edge aggregate functions
+      singletonList(new EdgeCount()), // edge aggregate functions
       GroupingStrategy.GROUP_REDUCE);
 
     // extract vertex induced subgraph only containing communities with more than 10 users
-    communities = communities
-      .vertexInducedSubgraph((vertex) -> vertex.getPropertyValue("count").getLong() > 10);
+    communities = communities.vertexInducedSubgraph((vertex) ->
+      vertex.getPropertyValue("vertexCount").getLong() > 10);
 
     // instantiate a data sink for the DOT format
     DataSink dataSink = new DOTDataSink(outputPath, false);
