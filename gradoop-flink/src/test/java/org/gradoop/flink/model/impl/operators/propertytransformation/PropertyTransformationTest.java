@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.propertytransformation;
 
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
@@ -67,16 +66,9 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
       "(:C { a : 42000L, b : 42 })-[:b { a : 42000L, b : 42 }]" +
       "->(:D { a: 42000L, c : 23 })]";
   /**
-   * The test graphs used for transformation and comparison.
+   * Simple property transformation that divides a value by 1000.
    */
-  protected static PropertyTransformationFunction DIVISION = new PropertyTransformationFunction() {
-	  @Override
-    public PropertyValue execute(PropertyValue property) {
-	  	PropertyValue p = new PropertyValue();
-	  	p.setLong(property.getLong() / 1000);
-      return p;
-    }
-  };
+  protected static PropertyTransformationFunction DIVISION = new DivideBy(1000L);
   /**
    * Executes a property transformation on graphHeads, vertices and edges and checks if the result
    * is correct.
