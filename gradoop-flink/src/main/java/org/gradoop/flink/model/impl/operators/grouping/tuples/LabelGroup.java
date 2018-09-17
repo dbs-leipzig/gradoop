@@ -217,7 +217,7 @@ public class LabelGroup
   }
 
   /**
-   * Aggregates the aggregate value by the values using the aggregate functions
+   * Aggregates the aggregate values by the values using the aggregate functions
    *
    * @param values values to aggregate with
    */
@@ -249,8 +249,8 @@ public class LabelGroup
    * aggregation. If the EPGM element does not have a property, it uses
    * {@code PropertyValue.NULL_VALUE} instead.
    *
-   * @param   element           attributed EPGM element
-   * @return  property values for aggregation
+   * @param element attributed EPGM element
+   * @return property values for aggregation
    */
   public PropertyValueList getIncrementValues(EPGMElement element) throws IOException {
     if (f3.isEmpty()) {

@@ -55,8 +55,7 @@ abstract class BuildBase implements Serializable {
   //----------------------------------------------------------------------------
 
   /**
-   * Returns true, if the label of the element shall be considered during
-   * summarization.
+   * Returns true, if the label of the element shall be considered during summarization.
    *
    * @return true, iff the element label shall be considered
    */

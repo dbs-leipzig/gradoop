@@ -43,7 +43,7 @@ public class ReduceEdgeGroupItems
   /**
    * Creates group reducer
    *
-   * @param useLabel        use edge label
+   * @param useLabel use edge label
    * @param epgmEdgeFactory edge factory
    */
   public ReduceEdgeGroupItems(boolean useLabel, EPGMEdgeFactory<Edge> epgmEdgeFactory) {
@@ -79,9 +79,6 @@ public class ReduceEdgeGroupItems
     collector.collect(superEdge);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<Edge> getProducedType() {

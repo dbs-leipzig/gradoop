@@ -48,10 +48,10 @@ abstract class ReduceVertexGroupItemBase extends BuildBase {
    * Creates one super vertex tuple representing the whole group. This tuple is
    * later used to create a super vertex for each group.
    *
-   * @param superVertexId       super vertex id
-   * @param groupLabel          group label
+   * @param superVertexId super vertex id
+   * @param groupLabel group label
    * @param groupPropertyValues group property values
-   * @param aggregateValues     aggregate values
+   * @param aggregateValues aggregate values
    * @return vertex group item representing the super vertex
    */
   protected VertexGroupItem createSuperVertexTuple(

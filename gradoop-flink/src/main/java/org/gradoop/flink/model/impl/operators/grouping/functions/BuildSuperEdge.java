@@ -30,14 +30,14 @@ abstract class BuildSuperEdge extends BuildBase {
   /**
    * Creates group reducer / combiner
    *
-   * @param useLabel    use edge label
+   * @param useLabel use edge label
    */
   public BuildSuperEdge(boolean useLabel) {
     super(useLabel);
   }
 
   /**
-   * Iterators the given edge group items and build a group representative item.
+   * Iterates the given edge group items and build a group representative item.
    *
    * @param edgeGroupItems edge group items
    * @return group representative item
