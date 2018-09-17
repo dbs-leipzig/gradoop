@@ -67,6 +67,11 @@ public class SamplingEvaluationConstants {
   public static final String FILE_AVERAGE_OUTGOING_DEGREE = "average_outgoing_degree";
 
   /**
+   * Filename for the saved weakly connected components value of the graph
+   */
+  public static final String FILE_WEAKLY_CONNECTED_COMPONENTS = "weakly_connected_components";
+
+  /**
    * private Constructor
    */
   private SamplingEvaluationConstants() { }
