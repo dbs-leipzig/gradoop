@@ -21,10 +21,10 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
-import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ import java.util.ListIterator;
 import java.util.stream.Collectors;
 
 /**
- * Stores grouping keys for a specific label.
+ * Stores grouping keys and aggregates for a specific label.
  *
  * f0: grouping label
  * f1: group label
@@ -159,13 +159,6 @@ public class LabelGroup
   }
 
   /**
-   * Reset the current aggregate values
-   */
-  public void resetAggregators() {
-    f4.clear();
-  }
-
-  /**
    * Adds an aggregate function to the current list of aggregators.
    *
    * @param aggregateFunction property value aggregate function
@@ -181,7 +174,7 @@ public class LabelGroup
    */
   public List<PropertyValue> getAggregateValues() {
     if (f4.size() < f3.size()) {
-      return f3.stream().map(LabelGroup::getDefaultAggregate).collect(Collectors.toList());
+      return f3.stream().map(AggregateUtil::getDefaultAggregate).collect(Collectors.toList());
     }
     return f4;
   }
@@ -207,6 +200,13 @@ public class LabelGroup
   }
 
   /**
+   * Resets the current aggregate values
+   */
+  public void resetAggregateValues() {
+    f4.clear();
+  }
+
+  /**
    * Returns the aggregate values as property value list
    *
    * @return aggregate values
@@ -217,7 +217,7 @@ public class LabelGroup
   }
 
   /**
-   * Aggregates the aggregate values by the values using the aggregate functions
+   * Aggregates the aggregate values with {@code values} using the aggregate functions
    *
    * @param values values to aggregate with
    */
@@ -246,8 +246,8 @@ public class LabelGroup
 
   /**
    * Returns the property values of the given element which are used for
-   * aggregation. If the EPGM element does not have a property, it uses
-   * {@code PropertyValue.NULL_VALUE} instead.
+   * aggregation. If the EPGM element does not have a property, it uses the
+   * default value or {@code PropertyValue.NULL_VALUE} instead.
    *
    * @param element attributed EPGM element
    * @return property values for aggregation
@@ -280,8 +280,8 @@ public class LabelGroup
                                                   Vertex vertex) {
     PropertyValue increment = aggregateFunction instanceof VertexAggregateFunction ?
       ((VertexAggregateFunction) aggregateFunction).getVertexIncrement(vertex) :
-      getDefaultAggregate(aggregateFunction);
-    return increment == null ? getDefaultAggregate(aggregateFunction) : increment;
+      AggregateUtil.getDefaultAggregate(aggregateFunction);
+    return increment == null ? AggregateUtil.getDefaultAggregate(aggregateFunction) : increment;
   }
 
   /**
@@ -294,22 +294,7 @@ public class LabelGroup
   private static PropertyValue getEdgeIncrement(AggregateFunction aggregateFunction, Edge edge) {
     PropertyValue increment = aggregateFunction instanceof EdgeAggregateFunction ?
       ((EdgeAggregateFunction) aggregateFunction).getEdgeIncrement(edge) :
-      getDefaultAggregate(aggregateFunction);
-    return increment == null ? getDefaultAggregate(aggregateFunction) : increment;
-  }
-
-  /**
-   * Returns the default aggregate value for the given aggregate function
-   * TODO move to aggregate util
-   *
-   * @param aggregateFunction aggregate function
-   * @return aggregate value
-   */
-  private static PropertyValue getDefaultAggregate(AggregateFunction aggregateFunction) {
-    if (aggregateFunction instanceof AggregateDefaultValue) {
-      return ((AggregateDefaultValue) aggregateFunction).getDefaultValue();
-    } else {
-      return PropertyValue.NULL_VALUE;
-    }
+      AggregateUtil.getDefaultAggregate(aggregateFunction);
+    return increment == null ? AggregateUtil.getDefaultAggregate(aggregateFunction) : increment;
   }
 }

@@ -70,9 +70,9 @@ abstract class BuildBase implements Serializable {
   /**
    * Adds the given group properties to the attributed element.
    *
-   * @param attributed          attributed element
+   * @param attributed attributed element
    * @param groupPropertyValues group property values
-   * @param vertexLabelGroup    vertex label group
+   * @param vertexLabelGroup vertex label group
    */
   protected void setGroupProperties(EPGMAttributed attributed,
     PropertyValueList groupPropertyValues, LabelGroup vertexLabelGroup) {
@@ -85,12 +85,12 @@ abstract class BuildBase implements Serializable {
   }
 
   //----------------------------------------------------------------------------
-  // Aggregation
+  // Aggregation properties
   //----------------------------------------------------------------------------
 
   /**
    * Sets the given property values as new properties at the given element.
-   *  @param element attributed element
+   * @param element attributed element
    * @param values aggregate values
    * @param valueAggregators aggregate functions
    */

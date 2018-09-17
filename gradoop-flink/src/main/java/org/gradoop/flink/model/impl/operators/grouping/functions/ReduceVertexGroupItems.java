@@ -85,7 +85,7 @@ public class ReduceVertexGroupItems
       groupLabel,
       groupPropertyValues,
       reuseTuple.getLabelGroup().getAggregateValueList());
-    superVertex.getLabelGroup().resetAggregators();
+    superVertex.getLabelGroup().resetAggregateValues();
     collector.collect(superVertex);
   }
 }

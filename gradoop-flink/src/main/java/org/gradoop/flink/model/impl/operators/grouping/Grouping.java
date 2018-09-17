@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -35,6 +34,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -345,10 +345,10 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     public GroupingBuilder() {
       this.useVertexLabel               = false;
       this.useEdgeLabel                 = false;
-      this.vertexLabelGroups            = Lists.newArrayList();
-      this.edgeLabelGroups              = Lists.newArrayList();
-      this.globalVertexAggregateFunctions = Lists.newArrayList();
-      this.globalEdgeAggregateFunctions = Lists.newArrayList();
+      this.vertexLabelGroups            = new ArrayList<>();
+      this.edgeLabelGroups              = new ArrayList<>();
+      this.globalVertexAggregateFunctions = new ArrayList<>();
+      this.globalEdgeAggregateFunctions = new ArrayList<>();
       this.defaultVertexLabelGroup      = new LabelGroup(
         Grouping.DEFAULT_VERTEX_LABEL_GROUP, GradoopConstants.DEFAULT_VERTEX_LABEL);
       this.defaultEdgeLabelGroup        = new LabelGroup(
@@ -445,7 +445,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     public GroupingBuilder addVertexLabelGroup(
       String label,
       List<String> groupingKeys) {
-      return addVertexLabelGroup(label, label, groupingKeys, Lists.newArrayList());
+      return addVertexLabelGroup(label, label, groupingKeys);
     }
 
     /**
@@ -477,7 +477,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       String label,
       String superVertexLabel,
       List<String> groupingKeys) {
-      return addVertexLabelGroup(label, superVertexLabel, groupingKeys, Lists.newArrayList());
+      return addVertexLabelGroup(label, superVertexLabel, groupingKeys);
     }
 
     /**
@@ -511,7 +511,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     public GroupingBuilder addEdgeLabelGroup(
       String label,
       List<String> groupingKeys) {
-      return addEdgeLabelGroup(label, label, groupingKeys, Lists.newArrayList());
+      return addEdgeLabelGroup(label, label, groupingKeys);
     }
 
     /**
@@ -543,7 +543,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       String label,
       String superEdgeLabel,
       List<String> groupingKeys) {
-      return addEdgeLabelGroup(label, superEdgeLabel, groupingKeys, Lists.newArrayList());
+      return addEdgeLabelGroup(label, superEdgeLabel, groupingKeys);
     }
 
     /**

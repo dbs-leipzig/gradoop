@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
-import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -27,6 +26,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -86,7 +86,7 @@ public class TransposeVertexGroupItems
 
     boolean isFirst = true;
 
-    Set<GradoopId> superVertexIds = Sets.newHashSet();
+    Set<GradoopId> superVertexIds = new HashSet<>();
 
     for (VertexGroupItem groupItem : vertexGroupItems) {
       if (isFirst) {
@@ -113,7 +113,7 @@ public class TransposeVertexGroupItems
     reuseOuterTuple.f1 = reuseInnerTuple;
 
     // collect single item representing the whole group
-    reuseOuterTuple.f0.getLabelGroup().resetAggregators();
+    reuseOuterTuple.f0.getLabelGroup().resetAggregateValues();
     out.collect(reuseOuterTuple);
   }
 }

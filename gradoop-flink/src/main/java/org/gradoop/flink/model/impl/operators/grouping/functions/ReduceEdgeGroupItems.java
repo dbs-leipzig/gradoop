@@ -74,7 +74,7 @@ public class ReduceEdgeGroupItems
       superEdge, edgeGroupItem.getGroupingValues(), edgeGroupItem.getLabelGroup());
     setAggregateProperties(superEdge, edgeGroupItem.getLabelGroup().getAggregateValueList(),
       edgeGroupItem.getLabelGroup().getAggregateFunctions());
-    edgeGroupItem.getLabelGroup().resetAggregators();
+    edgeGroupItem.getLabelGroup().resetAggregateValues();
 
     collector.collect(superEdge);
   }
