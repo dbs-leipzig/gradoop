@@ -477,7 +477,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       String label,
       String superVertexLabel,
       List<String> groupingKeys) {
-      return addVertexLabelGroup(label, superVertexLabel, groupingKeys);
+      return addVertexLabelGroup(label, superVertexLabel, groupingKeys, new ArrayList<>());
     }
 
     /**
@@ -543,7 +543,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       String label,
       String superEdgeLabel,
       List<String> groupingKeys) {
-      return addEdgeLabelGroup(label, superEdgeLabel, groupingKeys);
+      return addEdgeLabelGroup(label, superEdgeLabel, groupingKeys, new ArrayList<>());
     }
 
     /**
