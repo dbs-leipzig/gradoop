@@ -118,10 +118,10 @@ public class PageRankSampling extends SamplingAlgorithm {
       graph.getGraphHead(), pageRankGraph.getVertices(), pageRankGraph.getEdges());
 
     graph = graph
-      .aggregate(new MinVertexProperty(PAGE_RANK_SCORE_PROPERTY_KEY))
-      .aggregate(new MaxVertexProperty(PAGE_RANK_SCORE_PROPERTY_KEY))
-      .aggregate(new SumVertexProperty(PAGE_RANK_SCORE_PROPERTY_KEY))
-      .aggregate(new VertexCount());
+      .aggregate(new MinVertexProperty(PAGE_RANK_SCORE_PROPERTY_KEY),
+        new MaxVertexProperty(PAGE_RANK_SCORE_PROPERTY_KEY),
+        new SumVertexProperty(PAGE_RANK_SCORE_PROPERTY_KEY),
+        new VertexCount());
 
     DataSet<Vertex> scaledVertices = graph.getVertices()
       .crossWithTiny(graph.getGraphHead().first(1))
