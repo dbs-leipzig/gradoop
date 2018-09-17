@@ -404,7 +404,7 @@ public class GroupingBenchmark extends AbstractRunner
     if (vAggs.size() > 0) {
       for (AggregateFunction agg:vAggs) {
         if (agg != null) {
-          builder.addVertexAggregator((VertexAggregateFunction) agg);
+          builder.addVertexAggregateFunction((VertexAggregateFunction) agg);
         }
       }
     }
@@ -412,7 +412,7 @@ public class GroupingBenchmark extends AbstractRunner
     if (eAggs.size() > 0) {
       for (AggregateFunction agg: eAggs) {
         if (agg != null) {
-          builder.addEdgeAggregator((EdgeAggregateFunction) agg);
+          builder.addEdgeAggregateFunction((EdgeAggregateFunction) agg);
         }
       }
     }

@@ -68,7 +68,7 @@ public class BuildSuperVertex
     setAggregateProperties(
       supVertex,
       groupItem.getAggregateValues(),
-      groupItem.getLabelGroup().getAggregators());
+      groupItem.getLabelGroup().getAggregateFunctions());
 
     return supVertex;
   }

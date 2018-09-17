@@ -248,9 +248,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   /**
    * Build super edges by joining them with vertices and their super vertex.
    *
-   * @param graph                     input graph
-   * @param vertexToRepresentativeMap dataset containing tuples of vertex id
-   *                                  and super vertex id
+   * @param graph input graph
+   * @param vertexToRepresentativeMap dataset containing tuples of vertex id and super vertex id
    * @return super edges
    */
   protected DataSet<Edge> buildSuperEdges(
@@ -333,26 +332,26 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     /**
      * List of all global vertex aggregate functions.
      */
-    private List<VertexAggregateFunction> globalVertexAggregators;
+    private List<VertexAggregateFunction> globalVertexAggregateFunctions;
 
     /**
      * List of all global edge aggregate functions.
      */
-    private List<EdgeAggregateFunction> globalEdgeAggregators;
+    private List<EdgeAggregateFunction> globalEdgeAggregateFunctions;
 
     /**
      * Creates a new grouping builder
      */
     public GroupingBuilder() {
-      this.useVertexLabel           = false;
-      this.useEdgeLabel             = false;
-      this.vertexLabelGroups        = Lists.newArrayList();
-      this.edgeLabelGroups          = Lists.newArrayList();
-      this.globalVertexAggregators  = Lists.newArrayList();
-      this.globalEdgeAggregators    = Lists.newArrayList();
-      this.defaultVertexLabelGroup  = new LabelGroup(
+      this.useVertexLabel               = false;
+      this.useEdgeLabel                 = false;
+      this.vertexLabelGroups            = Lists.newArrayList();
+      this.edgeLabelGroups              = Lists.newArrayList();
+      this.globalVertexAggregateFunctions = Lists.newArrayList();
+      this.globalEdgeAggregateFunctions = Lists.newArrayList();
+      this.defaultVertexLabelGroup      = new LabelGroup(
         Grouping.DEFAULT_VERTEX_LABEL_GROUP, GradoopConstants.DEFAULT_VERTEX_LABEL);
-      this.defaultEdgeLabelGroup    = new LabelGroup(
+      this.defaultEdgeLabelGroup        = new LabelGroup(
         Grouping.DEFAULT_EDGE_LABEL_GROUP, GradoopConstants.DEFAULT_EDGE_LABEL);
 
       vertexLabelGroups.add(defaultVertexLabelGroup);
@@ -450,19 +449,19 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a vertex label group which defines the grouping keys and the aggregators for a
+     * Adds a vertex label group which defines the grouping keys and the aggregate functions for a
      * specific label. Note that a label may be used multiple times.
      *
      * @param label vertex label
      * @param groupingKeys keys used for grouping
-     * @param aggregators vertex aggregators
+     * @param aggregateFunctions vertex aggregate functions
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
       String label,
       List<String> groupingKeys,
-      List<AggregateFunction> aggregators) {
-      return addVertexLabelGroup(label, label, groupingKeys, aggregators);
+      List<AggregateFunction> aggregateFunctions) {
+      return addVertexLabelGroup(label, label, groupingKeys, aggregateFunctions);
     }
 
     /**
@@ -482,21 +481,22 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a vertex label group which defines the grouping keys and the aggregators for a
+     * Adds a vertex label group which defines the grouping keys and the aggregate functions for a
      * specific label. Note that a label may be used multiple times.
      *
      * @param label vertex label
      * @param superVertexLabel label of the group and therefore of the new super vertex
      * @param groupingKeys keys used for grouping
-     * @param aggregators vertex aggregators
+     * @param aggregateFunctions vertex aggregate functions
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
       String label,
       String superVertexLabel,
       List<String> groupingKeys,
-      List<AggregateFunction> aggregators) {
-      vertexLabelGroups.add(new LabelGroup(label, superVertexLabel, groupingKeys, aggregators));
+      List<AggregateFunction> aggregateFunctions) {
+      vertexLabelGroups.add(new LabelGroup(label, superVertexLabel, groupingKeys,
+        aggregateFunctions));
       return this;
     }
 
@@ -515,19 +515,19 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a vertex label group which defines the grouping keys and the aggregators for a
+     * Adds a vertex label group which defines the grouping keys and the aggregate functions for a
      * specific label. Note that a label may be used multiple times.
      *
      * @param label edge label
      * @param groupingKeys keys used for grouping
-     * @param aggregators edge aggregators
+     * @param aggregateFunctions edge aggregate functions
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
       String label,
       List<String> groupingKeys,
-      List<AggregateFunction> aggregators) {
-      return addEdgeLabelGroup(label, label, groupingKeys, aggregators);
+      List<AggregateFunction> aggregateFunctions) {
+      return addEdgeLabelGroup(label, label, groupingKeys, aggregateFunctions);
     }
 
     /**
@@ -547,21 +547,21 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * Adds a vertex label group which defines the grouping keys and the aggregators for a
+     * Adds a vertex label group which defines the grouping keys and the aggregate functions for a
      * specific label. Note that a label may be used multiple times.
      *
      * @param label edge label
      * @param superEdgeLabel label of the group and therefore of the new super edge
      * @param groupingKeys keys used for grouping
-     * @param aggregators edge aggregators
+     * @param aggregateFunctions edge aggregate functions
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
       String label,
       String superEdgeLabel,
       List<String> groupingKeys,
-      List<AggregateFunction> aggregators) {
-      edgeLabelGroups.add(new LabelGroup(label, superEdgeLabel, groupingKeys, aggregators));
+      List<AggregateFunction> aggregateFunctions) {
+      edgeLabelGroups.add(new LabelGroup(label, superEdgeLabel, groupingKeys, aggregateFunctions));
       return this;
     }
 
@@ -591,12 +591,12 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Add an aggregate function which is applied on all vertices represented by a single super
      * vertex which do not have a specific label group.
      *
-     * @param aggregator vertex aggregator
+     * @param aggregateFunction vertex aggregate function
      * @return this builder
      */
-    public GroupingBuilder addVertexAggregator(VertexAggregateFunction aggregator) {
-      Objects.requireNonNull(aggregator, "Aggregator must not be null");
-      defaultVertexLabelGroup.addAggregator(aggregator);
+    public GroupingBuilder addVertexAggregateFunction(VertexAggregateFunction aggregateFunction) {
+      Objects.requireNonNull(aggregateFunction, "Aggregate function must not be null");
+      defaultVertexLabelGroup.addAggregateFunction(aggregateFunction);
       return this;
     }
 
@@ -604,24 +604,25 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Add an aggregate function which is applied on all vertices represented by a single super
      * vertex.
      *
-     * @param aggregator vertex aggregator
+     * @param aggregateFunction vertex aggregate function
      * @return this builder
      */
-    public GroupingBuilder addGlobalVertexAggregator(VertexAggregateFunction aggregator) {
-      Objects.requireNonNull(aggregator, "Aggregator must not be null");
-      globalVertexAggregators.add(aggregator);
+    public GroupingBuilder addGlobalVertexAggregateFunction(
+      VertexAggregateFunction aggregateFunction) {
+      Objects.requireNonNull(aggregateFunction, "Aggregate function must not be null");
+      globalVertexAggregateFunctions.add(aggregateFunction);
       return this;
     }
 
     /**
      * Add an aggregate function which is applied on all edges represented by a single super edge.
      *
-     * @param aggregator edge aggregator
+     * @param aggregateFunction edge aggregate function
      * @return this builder
      */
-    public GroupingBuilder addGlobalEdgeAggregator(EdgeAggregateFunction aggregator) {
-      Objects.requireNonNull(aggregator, "Aggregator must not be null");
-      globalEdgeAggregators.add(aggregator);
+    public GroupingBuilder addGlobalEdgeAggregateFunction(EdgeAggregateFunction aggregateFunction) {
+      Objects.requireNonNull(aggregateFunction, "Aggregate function must not be null");
+      globalEdgeAggregateFunctions.add(aggregateFunction);
       return this;
     }
 
@@ -629,12 +630,12 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Add an aggregate function which is applied on all edges represented by a single super edge
      * which do not have a specific label group.
      *
-     * @param aggregator edge aggregator
+     * @param aggregateFunction edge aggregate function
      * @return this builder
      */
-    public GroupingBuilder addEdgeAggregator(EdgeAggregateFunction aggregator) {
-      Objects.requireNonNull(aggregator, "Aggregator must not be null");
-      defaultEdgeLabelGroup.addAggregator(aggregator);
+    public GroupingBuilder addEdgeAggregateFunction(EdgeAggregateFunction aggregateFunction) {
+      Objects.requireNonNull(aggregateFunction, "Aggregate function must not be null");
+      defaultEdgeLabelGroup.addAggregateFunction(aggregateFunction);
       return this;
     }
 
@@ -652,14 +653,14 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
 
       // adding the global aggregators to the associated label groups
       for (LabelGroup vertexLabelGroup : vertexLabelGroups) {
-        for (VertexAggregateFunction vertexAggregator : globalVertexAggregators) {
-          vertexLabelGroup.addAggregator(vertexAggregator);
+        for (VertexAggregateFunction aggregateFunction : globalVertexAggregateFunctions) {
+          vertexLabelGroup.addAggregateFunction(aggregateFunction);
         }
       }
 
       for (LabelGroup edgeLabelGroup : edgeLabelGroups) {
-        for (EdgeAggregateFunction edgeAggregator : globalEdgeAggregators) {
-          edgeLabelGroup.addAggregator(edgeAggregator);
+        for (EdgeAggregateFunction aggregateFunction : globalEdgeAggregateFunctions) {
+          edgeLabelGroup.addAggregateFunction(aggregateFunction);
         }
       }
 

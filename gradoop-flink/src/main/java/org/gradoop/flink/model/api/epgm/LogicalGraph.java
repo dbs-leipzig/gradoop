@@ -407,10 +407,10 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       builder.addEdgeGroupingKeys(edgeGroupingKeys);
     }
     if (vertexAggregateFunctions != null) {
-      vertexAggregateFunctions.forEach(builder::addVertexAggregator);
+      vertexAggregateFunctions.forEach(builder::addVertexAggregateFunction);
     }
     if (edgeAggregateFunctions != null) {
-      edgeAggregateFunctions.forEach(builder::addEdgeAggregator);
+      edgeAggregateFunctions.forEach(builder::addEdgeAggregateFunction);
     }
     return callForGraph(builder.build());
   }

@@ -138,8 +138,8 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
       .addEdgeGroupingKey(edgeKey)
       .useVertexLabel(useVertexLabels)
       .useEdgeLabel(useEdgeLabels)
-      .addVertexAggregator(new VertexCount())
-      .addEdgeAggregator(new EdgeCount())
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .build();
   }
 

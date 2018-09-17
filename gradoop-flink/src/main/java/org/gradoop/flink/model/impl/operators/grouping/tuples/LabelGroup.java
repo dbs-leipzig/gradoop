@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  * f0: grouping label
  * f1: group label
  * f2: property keys
- * f3: aggregation functions
+ * f3: aggregate functions
  * f4: aggregate values
  */
 public class LabelGroup
@@ -56,7 +56,7 @@ public class LabelGroup
    * Constructor to only define the label.
    *
    * @param groupingLabel label used for grouping
-   * @param groupLabel    label used after grouping
+   * @param groupLabel label used after grouping
    */
   public LabelGroup(String groupingLabel, String groupLabel) {
     this(groupingLabel, groupLabel, new ArrayList<>(), new ArrayList<>());
@@ -66,9 +66,9 @@ public class LabelGroup
    * Constructor with varargs.
    *
    * @param groupingLabel label used for grouping
-   * @param groupLabel    label used after grouping
+   * @param groupLabel label used after grouping
    * @param propertyKeys variable amount of grouping keys for the label
-   * @param aggregators  aggregate functions
+   * @param aggregators aggregate functions
    */
   public LabelGroup(
     String groupingLabel, String groupLabel,
@@ -145,17 +145,17 @@ public class LabelGroup
    *
    * @return list of aggregate functions
    */
-  public List<AggregateFunction> getAggregators() {
+  public List<AggregateFunction> getAggregateFunctions() {
     return f3;
   }
 
   /**
    * Sets the aggregate functions
    *
-   * @param aggregators aggregate functions
+   * @param aggregateFunctions aggregate functions
    */
-  public void setAggregators(List<AggregateFunction> aggregators) {
-    f3 = aggregators;
+  public void setAggregateFunctions(List<AggregateFunction> aggregateFunctions) {
+    f3 = aggregateFunctions;
   }
 
   /**
@@ -166,12 +166,12 @@ public class LabelGroup
   }
 
   /**
-   * Adds an aggregator to the current list of aggregators.
+   * Adds an aggregate function to the current list of aggregators.
    *
-   * @param aggregator property value aggregator
+   * @param aggregateFunction property value aggregate function
    */
-  public void addAggregator(AggregateFunction aggregator) {
-    f3.add(aggregator);
+  public void addAggregateFunction(AggregateFunction aggregateFunction) {
+    f3.add(aggregateFunction);
   }
 
   /**
@@ -231,7 +231,7 @@ public class LabelGroup
     ListIterator<PropertyValue> aggregateIt = f4.listIterator();
     PropertyValue value;
     PropertyValue aggregate;
-    for (AggregateFunction valueAggregator : getAggregators()) {
+    for (AggregateFunction valueAggregator : getAggregateFunctions()) {
       value = valueIt.next();
       if (!PropertyValue.NULL_VALUE.equals(value)) {
         aggregate = aggregateIt.next();
@@ -258,11 +258,11 @@ public class LabelGroup
     }
     List<PropertyValue> propertyValues;
     if (element instanceof Vertex) {
-      propertyValues = getAggregators().stream()
+      propertyValues = getAggregateFunctions().stream()
         .map(f -> getVertexIncrement(f, (Vertex) element))
         .collect(Collectors.toList());
     } else {
-      propertyValues = getAggregators().stream()
+      propertyValues = getAggregateFunctions().stream()
         .map(f -> getEdgeIncrement(f, (Edge) element))
         .collect(Collectors.toList());
     }

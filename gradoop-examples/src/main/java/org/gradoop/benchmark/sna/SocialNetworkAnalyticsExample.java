@@ -141,7 +141,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
       .setStrategy(GroupingStrategy.GROUP_COMBINE)
       .addVertexGroupingKey("name")
       .useEdgeLabel(true).useVertexLabel(true)
-      .addEdgeAggregator(new EdgeCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .build().execute(graph);
 
     // filter all edges below a fixed threshold
