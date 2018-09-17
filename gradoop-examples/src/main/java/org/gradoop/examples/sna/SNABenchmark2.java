@@ -205,10 +205,8 @@ public class SNABenchmark2 extends AbstractRunner implements
       .reduce(new ReduceCombination())
       // 7) group that graph by vertex properties
       .groupBy(Lists.newArrayList(city, gender))
-      // 8a) count vertices of grouped graph
-      .aggregate(new VertexCount())
-      // 8b) count edges of grouped graph
-      .aggregate(new EdgeCount());
+      // 8) count vertices and edges of grouped graph
+      .aggregate(new VertexCount(), new EdgeCount());
   }
 
   @Override

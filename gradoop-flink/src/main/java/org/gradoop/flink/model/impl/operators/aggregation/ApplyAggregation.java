@@ -36,29 +36,37 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.ApplyAggrega
 import org.gradoop.flink.model.impl.operators.aggregation.functions.CombinePartitionApplyAggregates;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.SetAggregateProperties;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Takes a collection of logical graphs and a user defined aggregate function as
- * input. The aggregate function is applied on each logical graph contained in
- * the collection and the aggregate is stored as an additional property at the
- * graphs.
+ * Takes a collection of logical graphs and user defined aggregate functions as
+ * input. The aggregate functions are applied on each logical graph contained in
+ * the collection and the aggregate is stored as additional properties at the graphs.
  */
 public class ApplyAggregation
   implements ApplicableUnaryGraphToGraphOperator {
 
   /**
-   * User-defined aggregate function which is applied on a graph collection.
+   * User-defined aggregate functions which get applied on a graph collection.
    */
-  private final AggregateFunction aggregateFunction;
+  private final Set<AggregateFunction> aggregateFunctions;
 
   /**
    * Creates a new operator instance.
    *
-   * @param aggregateFunction     function to compute aggregate value
+   * @param aggregateFunctions functions to compute aggregate values
    */
-  public ApplyAggregation(final AggregateFunction aggregateFunction) {
-    this.aggregateFunction = checkNotNull(aggregateFunction);
+  public ApplyAggregation(final AggregateFunction... aggregateFunctions) {
+    for (AggregateFunction aggFunc : aggregateFunctions) {
+      checkNotNull(aggFunc);
+    }
+    this.aggregateFunctions = new HashSet<>(Arrays.asList(aggregateFunctions));
   }
 
   /**
@@ -67,28 +75,18 @@ public class ApplyAggregation
   @Override
   public GraphCollection executeForGVELayout(GraphCollection collection) {
     DataSet<GraphHead> graphHeads = collection.getGraphHeads();
-    DataSet<Vertex> vertices = collection.getVertices();
-    DataSet<Edge> edges = collection.getEdges();
+    DataSet<GradoopId> graphIds = graphHeads.map(new Id<>());
 
-    DataSet<Tuple2<GradoopId, PropertyValue>> aggregate;
-
-    DataSet<GradoopId> graphIds = graphHeads
-      .map(new Id<>());
-
-    if (this.aggregateFunction instanceof VertexAggregateFunction) {
-      aggregate = aggregateVertices(vertices, graphIds);
-    } else {
-      aggregate = aggregateEdges(edges, graphIds);
-    }
-
-    aggregate = aggregate
-      .groupBy(0)
-      .reduceGroup(new CombinePartitionApplyAggregates(aggregateFunction));
+    DataSet<Tuple2<GradoopId, Map<String, PropertyValue>>> aggregate =
+      aggregateVertices(collection.getVertices(), graphIds)
+        .union(aggregateEdges(collection.getEdges(), graphIds))
+        .groupBy(0)
+        .reduceGroup(new CombinePartitionApplyAggregates(aggregateFunctions));
 
     graphHeads = graphHeads
       .coGroup(aggregate)
       .where(new Id<>()).equalTo(0)
-      .with(new SetAggregateProperties(aggregateFunction));
+      .with(new SetAggregateProperties(aggregateFunctions));
 
     return collection.getConfig().getGraphCollectionFactory()
       .fromDataSets(graphHeads, collection.getVertices(), collection.getEdges());
@@ -100,7 +98,7 @@ public class ApplyAggregation
   @Override
   public GraphCollection executeForTxLayout(GraphCollection collection) {
     DataSet<GraphTransaction> updatedTransactions = collection.getGraphTransactions()
-      .map(new AggregateTransactions(this.aggregateFunction));
+      .map(new AggregateTransactions(aggregateFunctions));
 
     return collection.getConfig().getGraphCollectionFactory().fromTransactions(updatedTransactions);
   }
@@ -112,14 +110,16 @@ public class ApplyAggregation
    * @param graphIds graph ids to aggregate
    * @return partition aggregate value
    */
-  private DataSet<Tuple2<GradoopId, PropertyValue>> aggregateVertices(
+  private DataSet<Tuple2<GradoopId, Map<String, PropertyValue>>> aggregateVertices(
     DataSet<Vertex> vertices, DataSet<GradoopId> graphIds) {
     return vertices
       .flatMap(new ElementsOfSelectedGraphs<>())
       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
       .groupBy(0)
-      .combineGroup(new ApplyAggregateVertices(
-        (VertexAggregateFunction) aggregateFunction));
+      .combineGroup(new ApplyAggregateVertices(aggregateFunctions.stream()
+        .filter(f -> f instanceof VertexAggregateFunction)
+        .map(VertexAggregateFunction.class::cast)
+        .collect(Collectors.toSet())));
   }
 
   /**
@@ -129,14 +129,16 @@ public class ApplyAggregation
    * @param graphIds graph ids to aggregate
    * @return partition aggregate value
    */
-  private DataSet<Tuple2<GradoopId, PropertyValue>> aggregateEdges(
+  private DataSet<Tuple2<GradoopId, Map<String, PropertyValue>>> aggregateEdges(
     DataSet<Edge> edges, DataSet<GradoopId> graphIds) {
     return edges
       .flatMap(new ElementsOfSelectedGraphs<>())
       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
       .groupBy(0)
-      .combineGroup(new ApplyAggregateEdges(
-        (EdgeAggregateFunction) aggregateFunction));
+      .combineGroup(new ApplyAggregateEdges(aggregateFunctions.stream()
+        .filter(f -> f instanceof EdgeAggregateFunction)
+        .map(EdgeAggregateFunction.class::cast)
+        .collect(Collectors.toSet())));
   }
 
   @Override

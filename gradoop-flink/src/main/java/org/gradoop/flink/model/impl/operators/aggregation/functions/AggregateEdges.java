@@ -24,43 +24,39 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
- * Aggregate function.
+ * Applies edge aggregate functions to the edges.
  */
 public class AggregateEdges
-  implements GroupCombineFunction<Edge, PropertyValue> {
+  implements GroupCombineFunction<Edge, Map<String, PropertyValue>> {
 
   /**
-   * Aggregate function.
+   * Aggregate functions.
    */
-  private final EdgeAggregateFunction aggFunc;
+  private final Set<EdgeAggregateFunction> aggregateFunctions;
 
   /**
    * Constructor.
    *
-   * @param aggFunc aggregate function
+   * @param aggregateFunctions aggregate functions
    */
-  public AggregateEdges(EdgeAggregateFunction aggFunc) {
-    this.aggFunc = aggFunc;
+  public AggregateEdges(Set<EdgeAggregateFunction> aggregateFunctions) {
+    this.aggregateFunctions = aggregateFunctions;
   }
 
   @Override
-  public void combine(
-    Iterable<Edge> edges, Collector<PropertyValue> out) throws Exception {
-    PropertyValue aggregate = null;
+  public void combine(Iterable<Edge> edges, Collector<Map<String, PropertyValue>> out) {
+    Map<String, PropertyValue> aggregate = new HashMap<>();
 
     for (Edge edge : edges) {
-      PropertyValue increment = aggFunc.getEdgeIncrement(edge);
-      if (increment != null) {
-        if (aggregate == null) {
-          aggregate = increment;
-        } else {
-          aggregate = aggFunc.aggregate(aggregate, increment);
-        }
-      }
+      aggregate = AggregateUtil.edgeIncrement(aggregate, edge, aggregateFunctions);
     }
 
-    if (aggregate != null) {
+    if (!aggregate.isEmpty()) {
       out.collect(aggregate);
     }
   }
