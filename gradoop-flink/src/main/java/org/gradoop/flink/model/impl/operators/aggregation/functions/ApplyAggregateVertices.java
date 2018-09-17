@@ -26,56 +26,52 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Aggregate function.
+ * Applies vertex aggregate functions to vertices with the same graph id.
+ * (graphId,vertex),.. => (graphId,[aggregateKey,aggregateValue]),..
  */
 public class ApplyAggregateVertices implements GroupCombineFunction
-  <Tuple2<GradoopId, Vertex>, Tuple2<GradoopId, PropertyValue>> {
+  <Tuple2<GradoopId, Vertex>, Tuple2<GradoopId, Map<String, PropertyValue>>> {
 
   /**
-   * Aggregate function.
+   * Aggregate functions.
    */
-  private final VertexAggregateFunction aggFunc;
+  private final Set<VertexAggregateFunction> aggregateFunctions;
   /**
    * Reuse tuple.
    */
-  private final Tuple2<GradoopId, PropertyValue> reusePair = new Tuple2<>();
+  private final Tuple2<GradoopId, Map<String, PropertyValue>> reusePair = new Tuple2<>();
 
   /**
    * Constructor.
    *
-   * @param aggFunc aggregate function
+   * @param aggregateFunctions aggregate functions
    */
-  public ApplyAggregateVertices(VertexAggregateFunction aggFunc) {
-    this.aggFunc = aggFunc;
+  public ApplyAggregateVertices(Set<VertexAggregateFunction> aggregateFunctions) {
+    this.aggregateFunctions = aggregateFunctions;
   }
 
   @Override
   public void combine(Iterable<Tuple2<GradoopId, Vertex>> vertices,
-    Collector<Tuple2<GradoopId, PropertyValue>> out) throws Exception {
+    Collector<Tuple2<GradoopId, Map<String, PropertyValue>>> out) {
 
     Iterator<Tuple2<GradoopId, Vertex>> iterator = vertices.iterator();
-
     Tuple2<GradoopId, Vertex> graphIdVertex = iterator.next();
-    Vertex vertex = graphIdVertex.f1;
-    PropertyValue aggregate = aggFunc.getVertexIncrement(vertex);
+
+    Map<String, PropertyValue> aggregate = AggregateUtil.vertexIncrement(new HashMap<>(),
+      graphIdVertex.f1, aggregateFunctions);
 
     while (iterator.hasNext()) {
-      vertex = iterator.next().f1;
-      PropertyValue increment = aggFunc.getVertexIncrement(vertex);
-
-      if (increment != null) {
-        if (aggregate == null) {
-          aggregate = increment;
-        } else {
-          aggregate = aggFunc.aggregate(aggregate, increment);
-        }
-      }
+      Vertex vertex = iterator.next().f1;
+      aggregate = AggregateUtil.vertexIncrement(aggregate, vertex, aggregateFunctions);
     }
 
-    if (aggregate != null) {
+    if (!aggregate.isEmpty()) {
       reusePair.f0 = graphIdVertex.f0;
       reusePair.f1 = aggregate;
       out.collect(reusePair);

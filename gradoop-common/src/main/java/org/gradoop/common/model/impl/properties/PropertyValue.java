@@ -197,6 +197,15 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     return new PropertyValue(value);
   }
 
+  /**
+   * Creates a deep copy of the property value.
+   *
+   * @return property value
+   */
+  public PropertyValue copy() {
+    return create(getObject());
+  }
+
   //----------------------------------------------------------------------------
   // Type checking
   //----------------------------------------------------------------------------
