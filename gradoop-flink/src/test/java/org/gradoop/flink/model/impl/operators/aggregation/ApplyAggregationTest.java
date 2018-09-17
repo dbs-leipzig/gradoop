@@ -365,7 +365,6 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     assertTrue("wrong number of output graph heads", graphHeadCount == 4);
   }
 
-
   @Test
   public void testCollectionHasVertexAndEdgeLabelTrue() throws Exception {
     GraphCollection collection = getSocialNetworkLoader()
@@ -420,5 +419,90 @@ public abstract class ApplyAggregationTest extends AggregationTest {
       assertFalse("Property hasVertexLabel_someLabel is true, should be false",
         graphHead.getPropertyValue(hasSomeLabel.getAggregatePropertyKey()).getBoolean());
     }
+  }
+
+  /**
+   * Test using multiple vertex aggregation functions on a graph collection
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testCollectionWithMultipleVertexAggregationFunctions() throws Exception {
+    GraphCollection collection = getSocialNetworkLoader()
+      .getGraphCollectionByVariables("g0", "g1", "g2", "g3");
+
+    SumVertexProperty sumVertexProperty = new SumVertexProperty("age");
+    MaxVertexProperty maxVertexProperty = new MaxVertexProperty("age");
+
+    GraphCollection expected = collection.apply(new ApplyAggregation(sumVertexProperty))
+      .apply(new ApplyAggregation(maxVertexProperty));
+    GraphCollection output = collection.apply(new ApplyAggregation(sumVertexProperty,
+      maxVertexProperty));
+
+    collectAndAssertTrue(expected.equalsByGraphData(output));
+  }
+
+  /**
+   * Test using multiple edge aggregation functions on a graph collection
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testCollectionWithMultipleEdgeAggregationFunctions() throws Exception {
+    GraphCollection collection = getSocialNetworkLoader()
+      .getGraphCollectionByVariables("g0", "g1", "g2", "g3");
+
+    SumEdgeProperty sumEdgeProperty = new SumEdgeProperty("since");
+    MaxEdgeProperty maxEdgeProperty = new MaxEdgeProperty("since");
+
+    GraphCollection expected = collection.apply(new ApplyAggregation(sumEdgeProperty))
+      .apply(new ApplyAggregation(maxEdgeProperty));
+    GraphCollection output = collection.apply(new ApplyAggregation(sumEdgeProperty,
+      maxEdgeProperty));
+
+    collectAndAssertTrue(expected.equalsByGraphData(output));
+  }
+
+  /**
+   * Test using multiple vertex and edge aggregation functions on a graph collection
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testCollectionWithMultipleDifferentAggregationFunctions() throws Exception {
+    GraphCollection collection = getSocialNetworkLoader()
+      .getGraphCollectionByVariables("g0", "g1", "g2", "g3");
+
+    VertexCount vertexCount = new VertexCount();
+    EdgeCount edgeCount = new EdgeCount();
+    MaxEdgeProperty maxEdgeProperty = new MaxEdgeProperty("since");
+
+    GraphCollection expected = collection.apply(new ApplyAggregation(vertexCount))
+      .apply(new ApplyAggregation(edgeCount)).apply(new ApplyAggregation(maxEdgeProperty));
+    GraphCollection output = collection.apply(new ApplyAggregation(vertexCount, edgeCount,
+      maxEdgeProperty));
+
+    collectAndAssertTrue(expected.equalsByGraphData(output));
+  }
+
+  /**
+   * Test using multiple aggregation functions on an empty graph collection
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testEmptyCollectionWithMultipleAggregationFunctions() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+    GraphCollection collection = loader.getGraphCollectionByVariables("g0")
+      .difference(loader.getGraphCollectionByVariables("g1"));
+
+    VertexCount vertexCount = new VertexCount();
+    EdgeCount edgeCount = new EdgeCount();
+
+    GraphCollection expected = collection.apply(new ApplyAggregation(vertexCount))
+      .apply(new ApplyAggregation(edgeCount));
+    GraphCollection output = collection.apply(new ApplyAggregation(vertexCount, edgeCount));
+
+    collectAndAssertTrue(expected.equalsByGraphData(output));
   }
 }

@@ -18,7 +18,6 @@ package org.gradoop.flink.model.api.epgm;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -151,16 +150,6 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   @Override
   public DataSet<Edge> getEdgesByLabel(String label) {
     return layout.getEdgesByLabel(label);
-  }
-
-  @Override
-  public DataSet<Edge> getOutgoingEdges(GradoopId vertexID) {
-    return layout.getOutgoingEdges(vertexID);
-  }
-
-  @Override
-  public DataSet<Edge> getIncomingEdges(GradoopId vertexID) {
-    return layout.getIncomingEdges(vertexID);
   }
 
   //----------------------------------------------------------------------------
@@ -358,8 +347,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph aggregate(AggregateFunction aggregateFunc) {
-    return callForGraph(new Aggregation(aggregateFunc));
+  public LogicalGraph aggregate(AggregateFunction... aggregateFunctions) {
+    return callForGraph(new Aggregation(aggregateFunctions));
   }
 
   /**

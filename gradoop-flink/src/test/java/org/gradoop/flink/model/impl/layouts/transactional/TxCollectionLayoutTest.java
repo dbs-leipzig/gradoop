@@ -145,29 +145,4 @@ public class TxCollectionLayoutTest extends GradoopFlinkTestBase {
       tx0.getEdges().stream().filter(e -> e.getLabel().equals("a")).collect(Collectors.toList()),
       layout.getEdgesByLabel("a").collect());
   }
-
-  @Test
-  public void getOutgoingEdges() throws Exception {
-    TxCollectionLayout layout = new TxCollectionLayout(
-      getExecutionEnvironment().fromElements(tx0, tx1));
-
-    Vertex v = tx0.getVertices().iterator().next();
-
-    GradoopTestUtils.validateEPGMGraphElementCollections(
-      tx0.getEdges().stream().filter(e -> e.getSourceId().equals(v.getId())).collect(Collectors.toList()),
-      layout.getOutgoingEdges(v.getId()).collect());
-  }
-
-  @Test
-  public void getIncomingEdges() throws Exception {
-    TxCollectionLayout layout = new TxCollectionLayout(
-      getExecutionEnvironment().fromElements(tx0, tx1));
-
-    Vertex v = tx0.getVertices().iterator().next();
-
-    GradoopTestUtils.validateEPGMGraphElementCollections(
-      tx0.getEdges().stream().filter(e -> e.getTargetId().equals(v.getId())).collect(Collectors.toList()),
-      layout.getIncomingEdges(v.getId()).collect());
-  }
-
 }
