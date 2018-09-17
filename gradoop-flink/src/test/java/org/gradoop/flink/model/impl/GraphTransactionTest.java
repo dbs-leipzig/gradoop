@@ -29,9 +29,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
   public void testTransformation() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    GraphCollection originalCollection = loader
-      .getDatabase()
-      .getCollection();
+    GraphCollection originalCollection = loader.getGraphCollection();
 
     DataSet<GraphTransaction> transactions = originalCollection.getGraphTransactions();
 
@@ -52,9 +50,7 @@ public class GraphTransactionTest extends GradoopFlinkTestBase {
   public void testTransformationWithCustomReducer() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    GraphCollection originalCollection = loader
-      .getDatabase()
-      .getCollection();
+    GraphCollection originalCollection = loader.getGraphCollection();
 
     DataSet<GraphTransaction> transactions = originalCollection.getGraphTransactions();
 

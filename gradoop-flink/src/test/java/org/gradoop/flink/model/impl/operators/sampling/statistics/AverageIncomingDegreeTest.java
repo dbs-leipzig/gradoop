@@ -19,31 +19,29 @@ import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 /**
- * Test-class for graph density computation.
+ * Test-class for average incoming degree computation.
  */
-public class GraphDensityTest extends GradoopFlinkTestBase {
+public class AverageIncomingDegreeTest extends GradoopFlinkTestBase {
 
   /**
-   * Tests the computation of graph density for a logical graph
+   * Tests the computation of the average incoming degree for a logical graph
    *
    * @throws Exception If loading of the example-graph fails
    */
   @Test
-  public void testGraphDensity() throws Exception {
+  public void testAverageIncomingDegree() throws Exception {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraph();
 
-    double density = graph.callForGraph(new GraphDensity())
+    long averageIncomingDegree = graph.callForGraph(new AverageIncomingDegree())
       .getGraphHead()
       .collect()
       .get(0)
-      .getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY).getDouble();
+      .getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_INCOMING_DEGREE).getLong();
 
-    // density should not be 0
-    assertTrue("Graph density is 0", density > 0.);
-    // density for social network graph should be (24 / 11 * 10) = 0.21818...
-    assertTrue("Computed graph density is incorrect", density == (24d / 110d));
+    // average incoming degree for social network graph should be (24 / 11) = 2.1818... -> 3
+    assertEquals("Computed average incoming degree is incorrect", 3L, averageIncomingDegree);
   }
 }

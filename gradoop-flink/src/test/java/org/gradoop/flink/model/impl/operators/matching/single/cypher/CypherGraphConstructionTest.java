@@ -27,7 +27,7 @@ public class CypherGraphConstructionTest extends GradoopFlinkTestBase {
   public void testEdgeConstruction() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph dbGraph = loader.getDatabase().getDatabaseGraph();
+    LogicalGraph dbGraph = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected0[" +
         "(alice)-[akb]->(bob)-[bkc]->(carol)," +
@@ -53,7 +53,7 @@ public class CypherGraphConstructionTest extends GradoopFlinkTestBase {
   public void testEdgeConstructionReducedPattern() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph dbGraph = loader.getDatabase().getDatabaseGraph();
+    LogicalGraph dbGraph = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected0[" +
         "(alice)-[:possible_friend]->(carol)" +
@@ -77,7 +77,7 @@ public class CypherGraphConstructionTest extends GradoopFlinkTestBase {
   public void testEdgeConstructionExtendedPattern() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    LogicalGraph dbGraph = loader.getDatabase().getDatabaseGraph();
+    LogicalGraph dbGraph = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected0[" +
             "(alice)-[:possible_friend]->(:possible_person)-[:possible_friend]->(carol)" +

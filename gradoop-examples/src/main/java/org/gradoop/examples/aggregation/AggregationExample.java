@@ -78,7 +78,7 @@ public class AggregationExample {
     loader.initDatabaseFromFile(EXAMPLE_DATA_FILE);
 
     // get LogicalGraph representation of the social network graph
-    LogicalGraph networkGraph = loader.getDatabase().getDatabaseGraph();
+    LogicalGraph networkGraph = loader.getLogicalGraph();
 
     // execute aggregations and graph-head transformations
     LogicalGraph result = networkGraph
