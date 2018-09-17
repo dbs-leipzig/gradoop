@@ -27,8 +27,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
-import org.gradoop.flink.model.impl.functions.epgm.BySourceId;
-import org.gradoop.flink.model.impl.functions.epgm.ByTargetId;
 import org.gradoop.flink.model.impl.functions.epgm.GraphElementExpander;
 import org.gradoop.flink.model.impl.functions.epgm.GraphVerticesEdges;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -145,15 +143,5 @@ public class GVELayout implements LogicalGraphLayout, GraphCollectionLayout {
   @Override
   public DataSet<Edge> getEdgesByLabel(String label) {
     return edges.filter(new ByLabel<>(label));
-  }
-
-  @Override
-  public DataSet<Edge> getOutgoingEdges(GradoopId vertexID) {
-    return edges.filter(new BySourceId<>(vertexID));
-  }
-
-  @Override
-  public DataSet<Edge> getIncomingEdges(GradoopId vertexID) {
-    return edges.filter(new ByTargetId<>(vertexID));
   }
 }
