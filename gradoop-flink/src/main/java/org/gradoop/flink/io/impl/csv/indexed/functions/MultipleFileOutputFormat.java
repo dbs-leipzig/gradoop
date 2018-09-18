@@ -387,6 +387,6 @@ public abstract class MultipleFileOutputFormat<IT>
    * @return cleaned filename
    */
   public static String cleanFilename(String filename) {
-    return filename.replaceAll("[<>:\"/\\\\|?*]", "_");
+    return filename.replaceAll("[<>:\"/\\\\|?*]", "_").toLowerCase();
   }
 }
