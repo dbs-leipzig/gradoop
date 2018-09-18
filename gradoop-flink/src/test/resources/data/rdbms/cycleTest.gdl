@@ -1,0 +1,13 @@
+(peter:Person {name: "Peter"})
+(karla:Person {name: "Karla"})
+(joachim:Person {name: "Joachim"})
+(steffen:Person {name: "Steffen"})
+(michael:Person {name: "Michael"})
+(sven:Person {name: "Sven"})
+
+(peter)-[gatte]->(karla)
+(karla)-[gatte]->(peter)
+(joachim)-[gatte]->(steffen)
+(steffen)-[gatte]->(joachim)
+(michael)-[gatte]->(sven)
+(sven)-[gatte]->(michael)
