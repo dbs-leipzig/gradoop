@@ -145,20 +145,20 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
    * If there is not already a writer for the label, it will map it to the tuple.
    *
    * @param fileName Name of the file for the tuple.
-   * @param t Tuple that will be mapped to writer.
+   * @param tuple Tuple that will be mapped to writer.
    * @throws IOException - Throne if creating writer or output stream fails.
    */
-  public void mapWriter(Tuple t, String fileName) throws IOException {
+  public void mapWriter(Tuple tuple, String fileName) throws IOException {
     fileName = cleanFilename(fileName);
     if (labelsToWriter.containsKey(fileName)) {
-      writeToCSV(t, labelsToWriter.get(fileName));
+      writeToCSV(tuple, labelsToWriter.get(fileName));
     } else {
       FSDataOutputStream stream = super.getAndCreateFileStream(fileName);
       Writer wrt = this.charsetName == null ? new OutputStreamWriter(
           new BufferedOutputStream(stream, 4096), "UTF8") :
             new OutputStreamWriter(new BufferedOutputStream(stream, 4096), this.charsetName);
       labelsToWriter.put(fileName, wrt);
-      writeToCSV(t, wrt);
+      writeToCSV(tuple, wrt);
     }
   }
 
@@ -167,42 +167,42 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
    * Separates record via record delimiter and every field in a record
    * with field delimiters.
    *
-   * @param t the tuple to write in the output file
-   * @param wrt the writer for the tuple
+   * @param tuple the tuple to write in the output file
+   * @param writer the writer for the tuple
    * @throws IOException - Thrown, if the records could not be added to to an I/O problem.
    */
-  public void writeToCSV(Tuple t, Writer wrt) throws IOException {
+  public void writeToCSV(Tuple tuple, Writer writer) throws IOException {
 
-    int numFields = t.getArity();
+    int numFields = tuple.getArity();
     for (int i = 0; i < numFields; i++) {
-      Object v = t.getField(i);
+      Object v = tuple.getField(i);
       if (v != null) {
         if (i != 0) {
-          wrt.write(this.fieldDelimiter);
+          writer.write(this.fieldDelimiter);
         }
 
         if (quoteStrings) {
           if (v instanceof String || v instanceof StringValue) {
-            wrt.write('"');
-            wrt.write(v.toString());
-            wrt.write('"');
+            writer.write('"');
+            writer.write(v.toString());
+            writer.write('"');
           } else {
-            wrt.write(v.toString());
+            writer.write(v.toString());
           }
         } else {
-          wrt.write(v.toString());
+          writer.write(v.toString());
         }
       } else {
         if (this.allowNullValues) {
           if (i != 0) {
-            wrt.write(this.fieldDelimiter);
+            writer.write(this.fieldDelimiter);
           }
         } else {
           throw new RuntimeException("Cannot write tuple with <null> value at position: " + i);
         }
       }
     }
-    wrt.write(this.recordDelimiter);
+    writer.write(this.recordDelimiter);
   }
 
   @Override

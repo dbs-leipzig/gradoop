@@ -25,7 +25,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests the string escaper
+ * Tests the string escaper.
  */
 public class StringEscaperTest {
   /**
@@ -43,7 +43,7 @@ public class StringEscaperTest {
   private static final String ESCAPED_STRING = "tes\t\\\\\\,f\\nsfg\\,\\:\\,d\\|";
 
   /**
-   * Test escaping a string
+   * Test escaping a string.
    */
   @Test
   public void testEscape() {
@@ -52,7 +52,7 @@ public class StringEscaperTest {
   }
 
   /**
-   * Test unescaping a string
+   * Test unescaping a string.
    */
   @Test
   public void testUnescape() {
@@ -61,7 +61,7 @@ public class StringEscaperTest {
   }
 
   /**
-   * Test splitting an escaped string
+   * Test splitting an escaped string.
    */
   @Test
   public void testSplit() {
@@ -83,7 +83,7 @@ public class StringEscaperTest {
   }
 
   /**
-   * Test splitting an escaped string with limit
+   * Test splitting an escaped string with limit.
    */
   @Test
   public void testSplitWithLimit() {
@@ -91,6 +91,7 @@ public class StringEscaperTest {
       .map(s -> StringEscaper.escape(s, ESCAPED_CHARACTERS))
       .toArray(String[]::new);
 
+    // Template to add the correct delimiter in the last string.
     String template = "ad\\,%s\\|\\n\\n df%<s\\\\c";
     String[] expected = {"", "\\,abc\\;\\;", template};
 
@@ -111,7 +112,7 @@ public class StringEscaperTest {
   }
 
   /**
-   * Test splitting an escaped string with the escape character in the delimiter
+   * Test splitting an escaped string with the escape character in the delimiter.
    */
   @Test(expected = IllegalArgumentException.class)
   public void testSplitWithIllegalDelimiter() {

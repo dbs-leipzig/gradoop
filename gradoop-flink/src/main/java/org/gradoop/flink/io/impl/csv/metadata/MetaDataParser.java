@@ -82,7 +82,7 @@ public class MetaDataParser {
 
   /**
    * Creates a {@link MetaData} object from the specified lines. The specified tuple is already
-   * separated into the label and the
+   * separated into the label and the metadata.
    *
    * @param metaDataStrings (label, meta-data) tuples
    * @return Meta Data object
@@ -260,7 +260,7 @@ public class MetaDataParser {
 
   /**
    * Parse function to translate string representation of a Map to a Map with
-   * key and value of type PropertyValue
+   * key and value of type PropertyValue.
    *
    * @param s the string to parse as map, e.g. "{myString1=myValue1,myString2=myValue2}"
    * @param keyParser the function to parse the keys
@@ -282,9 +282,9 @@ public class MetaDataParser {
   }
 
   /**
-   * Parse function to translate string representation of a Set to a set of PropertyValues
-   * Every PropertyValue has the type "string", because there is no parser for the items given
-   * Use {@link #parseListProperty(String, Function)} to specify a parsing function
+   * Parse function to translate string representation of a Set to a set of PropertyValues.
+   * Every PropertyValue has the type "string", because there is no parser for the items given.
+   * Use {@link #parseListProperty(String, Function)} to specify a parsing function.
    *
    * @param s the string to parse as set, e.g. "[myString1,myString2]"
    * @return the set represented by the argument
@@ -299,7 +299,7 @@ public class MetaDataParser {
   }
 
   /**
-   * Parse function to translate string representation of a Set to a set of PropertyValues
+   * Parse function to translate string representation of a Set to a set of PropertyValues.
    *
    * @param s the string to parse as set, e.g. "[myString1,myString2]"
    * @param itemParser the function to parse the set items
@@ -328,7 +328,7 @@ public class MetaDataParser {
   }
 
   /**
-   * Parse function to create a PropertyMetaData object from a property string
+   * Parse a property string to create a PropertyMetaData object.
    *
    * @param propertyString property string
    * @return property metadata
@@ -340,17 +340,17 @@ public class MetaDataParser {
       PROPERTY_TOKEN_DELIMITER);
     if (propertyTypeTokens.length == 2 &&
       propertyTypeTokens[0].equals(TypeString.LIST.getTypeString())) {
-      // it's a list with one additional data type (type of list items)
+      // It's a list with one additional data type (type of list items).
       return new PropertyMetaData(propertyLabel, propertyTokens[1],
         getListValueParser(propertyTypeTokens[1]));
     } else if (propertyTypeTokens.length == 2 &&
       propertyTypeTokens[0].equals(TypeString.SET.getTypeString())) {
-      // it's a set with one additional data type (type of set items)
+      // It's a set with one additional data type (type of set items).
       return new PropertyMetaData(propertyLabel, propertyTokens[1],
         getSetValueParser(propertyTypeTokens[1]));
     } else if (propertyTypeTokens.length == 3 &&
       propertyTypeTokens[0].equals(TypeString.MAP.getTypeString())) {
-      // it's a map with two additional data types (key type + value type)
+      // It's a map with two additional data types (key type + value type).
       return new PropertyMetaData(propertyLabel, propertyTokens[1],
           getMapValueParser(propertyTypeTokens[1], propertyTypeTokens[2]));
     } else {
@@ -498,7 +498,7 @@ public class MetaDataParser {
     }
 
     /**
-     * Returns the type string
+     * Returns the type string.
      *
      * @return type string
      */

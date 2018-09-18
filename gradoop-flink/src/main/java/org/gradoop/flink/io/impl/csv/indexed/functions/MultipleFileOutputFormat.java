@@ -134,6 +134,7 @@ public abstract class MultipleFileOutputFormat<IT>
 
   /**
    * Create a new instance of a MultipleFileOutputFormat.
+   *
    * @param outputPath The path to the file system.
    */
   public MultipleFileOutputFormat(Path outputPath) {
@@ -150,6 +151,7 @@ public abstract class MultipleFileOutputFormat<IT>
   /**
    * Initialize defaults for output format. Needs to be a static method because it is configured
    * for local cluster execution, see LocalFlinkMiniCluster.
+   *
    * @param configuration The configuration to load defaults from
    */
   private static void initDefaultsFromConfiguration(Configuration configuration) {
@@ -171,6 +173,7 @@ public abstract class MultipleFileOutputFormat<IT>
 
   /**
    * Set the path of the output file.
+   *
    * @param path The path to the output file.
    */
   public void setOutputFilePath(Path path) {
@@ -187,6 +190,7 @@ public abstract class MultipleFileOutputFormat<IT>
 
   /**
    * Set the write mode of the file.
+   *
    * @param mode The write mode.
    */
   public void setWriteMode(WriteMode mode) {
@@ -203,6 +207,7 @@ public abstract class MultipleFileOutputFormat<IT>
 
   /**
    * Sets the directory mode of the output.
+   *
    * @param mode The output directory mode.
    */
   public void setOutputDirectoryMode(OutputDirectoryMode mode) {
@@ -383,7 +388,7 @@ public abstract class MultipleFileOutputFormat<IT>
   /**
    * Clean filename of illegal characters.
    *
-   * @param filename filename
+   * @param filename filename to be cleaned
    * @return cleaned filename
    */
   public static String cleanFilename(String filename) {

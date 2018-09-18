@@ -26,10 +26,6 @@ import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -88,10 +84,10 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
   }
 
   /**
-   * Returns an escaped string representation suitable for csv
+   * Returns an escaped string representation suitable for CSV.
    *
    * @param p property value
-   * @return escaped csv string
+   * @return escaped CSV string
    */
   private String propertyValueToCsvString(PropertyValue p) {
     if (p.isList()) {
@@ -114,10 +110,10 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
   }
 
   /**
-   * Returns an escaped string representation of a primitive property value for csv
+   * Returns an escaped string representation of a primitive property value for CSV.
    *
    * @param p property value
-   * @return escaped csv string
+   * @return escaped CSV string
    */
   private String primitivePropertyValueToCSVString(PropertyValue p) {
     if (p.getType() == String.class) {

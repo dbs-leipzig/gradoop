@@ -66,10 +66,8 @@ public class MetaData {
     config) {
     return config.getExecutionEnvironment()
       .readTextFile(path)
-      .map(line -> {
-          String[] tokens = StringEscaper.split(line, CSVConstants.TOKEN_DELIMITER, 3);
-          return Tuple3.of(tokens[0], tokens[1], tokens[2]);
-        })
+      .map(line -> StringEscaper.split(line, CSVConstants.TOKEN_DELIMITER, 3))
+      .map(tokens -> Tuple3.of(tokens[0], tokens[1], tokens[2]))
       .returns(new TypeHint<Tuple3<String, String, String>>() { });
   }
 
@@ -80,7 +78,7 @@ public class MetaData {
    * @param path path to metadata csv file
    * @param hdfsConfig file system configuration
    * @return meta data
-   * @throws IOException
+   * @throws IOException on failure
    */
   public static MetaData fromFile(String path, Configuration hdfsConfig) throws IOException {
     FileSystem fs = FileSystem.get(hdfsConfig);

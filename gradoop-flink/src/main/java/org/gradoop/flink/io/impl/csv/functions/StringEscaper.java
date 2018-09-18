@@ -23,11 +23,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Escapes characters in strings and allows to split escaped strings
+ * Escapes characters in strings and allows to split escaped strings.
  */
 public class StringEscaper {
   /**
-   * Escape character
+   * Escape character.
    */
   private static final char ESCAPE_CHARACTER = '\\';
   /**
@@ -43,7 +43,7 @@ public class StringEscaper {
       .build();
 
   /**
-   * Escapes the {@code escapedCharacters} in a string
+   * Escapes the {@code escapedCharacters} in a string.
    *
    * @param string string to be escaped
    * @param escapedCharacters characters to be escaped
@@ -62,7 +62,7 @@ public class StringEscaper {
   }
 
   /**
-   * Unescapes the escaped characters in a string
+   * Unescapes the escaped characters in a string.
    *
    * @param escapedString string to be unescaped
    * @return unescaped string
@@ -84,10 +84,10 @@ public class StringEscaper {
   }
 
   /**
-   * Splits an escaped string while ignoring escaped delimiters.
+   * Splits an escaped string while ignoring escaped delimiters. Does not unescape.
    *
    * @param escapedString escaped string to be split
-   * @param delimiter  delimiter string
+   * @param delimiter delimiter string
    * @return string array with still escaped strings split by the delimiter
    * @throws IllegalArgumentException if the delimiter contains the escape character
    */
@@ -97,7 +97,7 @@ public class StringEscaper {
   }
 
   /**
-   * Splits an escaped string while ignoring escaped delimiters.
+   * Splits an escaped string while ignoring escaped delimiters. Does not unescape.
    *
    * @param escapedString escaped string to be split
    * @param delimiter delimiter string
@@ -153,7 +153,7 @@ public class StringEscaper {
   }
 
   /**
-   * Returns the escape sequence of a given character
+   * Returns the escape sequence of a given character.
    *
    * @param character character to be escaped
    * @return escape sequence
@@ -166,7 +166,7 @@ public class StringEscaper {
   }
 
   /**
-   * Returns the character of a given escape sequence
+   * Returns the character of a given escape sequence.
    *
    * @param sequence escape sequence
    * @return escaped character
