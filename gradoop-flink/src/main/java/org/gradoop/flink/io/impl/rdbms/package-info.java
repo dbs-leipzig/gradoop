@@ -13,24 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.gradoop.flink.io.impl.rdbms.functions;
-
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
-
 /**
- * Filters directed edges
+ * Contains all classes related to Rdbms input to Flink.
  */
-public class EdgeDirectionFilter implements FilterFunction<TableToEdge> {
-
-  /**
-   * serial version uid
-   */
-  private static final long serialVersionUID = 1L;
-
-  @Override
-  public boolean filter(TableToEdge table) throws Exception {
-    return table.isDirectionIndicator();
-  }
-}
+package org.gradoop.flink.io.impl.rdbms;

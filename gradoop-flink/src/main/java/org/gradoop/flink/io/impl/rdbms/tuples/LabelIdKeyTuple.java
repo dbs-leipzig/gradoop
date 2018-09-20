@@ -26,65 +26,72 @@ import org.gradoop.common.model.impl.id.GradoopId;
  */
 public class LabelIdKeyTuple extends Tuple3<String, GradoopId, String> {
 
-	private static final long serialVersionUID = 1L;
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Vertex label
-	 */
-	private String label;
+  /**
+   * Vertex label
+   */
+  private String label;
 
-	/**
-	 * Vertex id
-	 */
-	private GradoopId id;
+  /**
+   * Vertex id
+   */
+  private GradoopId id;
 
-	/**
-	 * Attribute value
-	 */
-	private String key;
+  /**
+   * Attribute value
+   */
+  private String key;
 
-	public LabelIdKeyTuple() {
-	}
+  /**
+   * Empty Constructor
+   */
+  public LabelIdKeyTuple() {
+  }
 
-	/**
-	 * 
-	 * @param label
-	 *            Vertex label (foreign key attribute name)
-	 * @param id
-	 *            Vertex id
-	 * @param key
-	 *            Attribute value
-	 */
-	public LabelIdKeyTuple(String label, GradoopId id, String key) {
-		this.label = label;
-		this.f0 = label;
-		this.id = id;
-		this.f1 = id;
-		this.key = key;
-		this.f2 = key;
-	}
+  /**
+   * Constructor
+   *
+   * @param label
+   *          Vertex label
+   * @param id
+   *          Valid gradoop id
+   * @param key
+   *          Key value string
+   */
+  public LabelIdKeyTuple(String label, GradoopId id, String key) {
+    this.label = label;
+    this.f0 = label;
+    this.id = id;
+    this.f1 = id;
+    this.key = key;
+    this.f2 = key;
+  }
 
-	public String getLabel() {
-		return label;
-	}
+  public String getLabel() {
+    return label;
+  }
 
-	public void setLabel(String label) {
-		this.label = label;
-	}
+  public void setLabel(String label) {
+    this.label = label;
+  }
 
-	public GradoopId getId() {
-		return id;
-	}
+  public GradoopId getId() {
+    return id;
+  }
 
-	public void setId(GradoopId id) {
-		this.id = id;
-	}
+  public void setId(GradoopId id) {
+    this.id = id;
+  }
 
-	public String getKey() {
-		return key;
-	}
+  public String getKey() {
+    return key;
+  }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+  public void setKey(String key) {
+    this.key = key;
+  }
 }

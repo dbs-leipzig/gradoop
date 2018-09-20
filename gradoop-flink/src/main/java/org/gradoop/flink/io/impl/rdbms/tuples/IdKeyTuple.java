@@ -23,48 +23,52 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * Tuple representing a gradoop id, key string pair
  */
 public class IdKeyTuple extends Tuple2<GradoopId, String> {
-	
-	private static final long serialVersionUID = 1L;
+   /**
+    * serial version uid
+    */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Gradoop id
-	 */
-	private GradoopId id;
-	
-	/**
-	 * Key string
-	 */
-	private String key;
+  /**
+   * Gradoop id
+   */
+  private GradoopId id;
 
-	public IdKeyTuple() {
-		
-	}
-	
-	/**
-	 * Constructor
-	 * @param id Gradoop id
-	 * @param key Key string
-	 */
-	public IdKeyTuple(GradoopId id, String key) {
-		this.id = id;
-		this.f0 = id;
-		this.key = key;
-		this.f1 = key;
-	}
+  /**
+   * Key string
+   */
+  private String key;
 
-	public GradoopId getId() {
-		return id;
-	}
+  /**
+   * Empty Constructor
+   */
+  public IdKeyTuple() {
+  }
 
-	public void setId(GradoopId id) {
-		this.id = id;
-	}
+ /**
+  * Constructor
+  * @param id Valid gradoop id
+  * @param key Key value string
+  */
+  public IdKeyTuple(GradoopId id, String key) {
+    this.id = id;
+    this.f0 = id;
+    this.key = key;
+    this.f1 = key;
+  }
 
-	public String getKey() {
-		return key;
-	}
+  public GradoopId getId() {
+    return id;
+  }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+  public void setId(GradoopId id) {
+    this.id = id;
+  }
+
+  public String getKey() {
+    return key;
+  }
+
+  public void setKey(String key) {
+    this.key = key;
+  }
 }

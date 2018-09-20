@@ -17,6 +17,7 @@ package org.gradoop.flink.io.impl.rdbms;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.apache.flink.api.java.DataSet;
@@ -41,95 +42,98 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  */
 public class RdbmsDataSource implements DataSource {
 
-	/**
-	 * Gradoop Flink configuration
-	 */
-	private GradoopFlinkConfig flinkConfig;
+  /**
+   * Gradoop Flink configuration
+   */
+  private GradoopFlinkConfig flinkConfig;
 
-	/**
-	 * Configuration for the relational database connection
-	 */
-	private RdbmsConfig rdbmsConfig;
+  /**
+   * Configuration for the relational database connection
+   */
+  private RdbmsConfig rdbmsConfig;
 
-	/**
-	 * Flink Execution Environment
-	 */
-	private ExecutionEnvironment env;
+  /**
+   * Flink Execution Environment
+   */
+  private ExecutionEnvironment env;
 
-	/**
-	 * Vertices
-	 */
-	private DataSet<Vertex> vertices;
+  /**
+   * Vertices
+   */
+  private DataSet<Vertex> vertices;
 
-	/**
-	 * Edges
-	 */
-	private DataSet<Edge> edges;
+  /**
+   * Edges
+   */
+  private DataSet<Edge> edges;
 
-	/**
-	 * Transforms a relational database into an EPGM instance
-	 * 
-	 * The datasource expects a standard jdbc url, e.g.
-	 * (jdbc:mysql://localhost/employees) and a valid path to a fitting jdbc driver
-	 * 
-	 * @param url
-	 *            Valid jdbc url (e.g. jdbc:mysql://localhost/employees)
-	 * @param user
-	 *            Username of relational database user
-	 * @param pw
-	 *            Password of relational database user
-	 * @param jdbcDriverPath
-	 *            Valid path to jdbc driver
-	 * @param jdbcDriverClassName
-	 *            Valid jdbc driver class name
-	 * @param config
-	 *            Gradoop Flink configuration
-	 */
-	public RdbmsDataSource(String url, String user, String pw, String jdbcDriverPath, String jdbcDriverClassName,
-			GradoopFlinkConfig flinkConfig) {
-		this.flinkConfig = flinkConfig;
-		this.env = flinkConfig.getExecutionEnvironment();
-		this.rdbmsConfig = new RdbmsConfig(null, url, user, pw, jdbcDriverPath, jdbcDriverClassName);
-	}
+  /**
+   * Transforms a relational database into an EPGM instance
+   *
+   * The data source expects a standard jdbc url, e.g.
+   * (jdbc:mysql://localhost/employees) and a valid path to a fitting jdbc driver
+   *
+   * @param url
+   *          Valid jdbc url (e.g. jdbc:mysql://localhost/employees)
+   * @param user
+   *          User name of relational database user
+   * @param pw
+   *          Password of relational database user
+   * @param jdbcDriverPath
+   *          Valid path to jdbc driver
+   * @param jdbcDriverClassName
+   *          Valid jdbc driver class name
+   * @param flinkConfig
+   *          Valid gradoop flink configuration
+   */
+  public RdbmsDataSource(String url, String user, String pw, String jdbcDriverPath,
+      String jdbcDriverClassName, GradoopFlinkConfig flinkConfig) {
+    this.flinkConfig = flinkConfig;
+    this.env = flinkConfig.getExecutionEnvironment();
+    this.rdbmsConfig = new RdbmsConfig(null, url, user, pw, jdbcDriverPath, jdbcDriverClassName);
+  }
 
-	@Override
-	public LogicalGraph getLogicalGraph() {
+  @Override
+  public LogicalGraph getLogicalGraph() {
 
-		Connection con = RdbmsConnect.connect(rdbmsConfig);
-		DataSet<Vertex> tempVertices = null;
-		MetaDataParser metadataParser = null;
+    Connection con = RdbmsConnect.connect(rdbmsConfig);
+    DataSet<Vertex> tempVertices = null;
+    MetaDataParser metadataParser = null;
 
-		try {
-			rdbmsConfig.setRdbms(con.getMetaData().getDatabaseProductName().toLowerCase());
+    try {
+      rdbmsConfig.setRdbms(con.getMetaData().getDatabaseProductName().toLowerCase());
 
-			metadataParser = new MetaDataParser(con);
-			metadataParser.parse();
+      metadataParser = new MetaDataParser(con);
+      metadataParser.parse();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
 
-			// tables going to convert to vertices
-			ArrayList<TableToNode> tablesToNodes = metadataParser.getTablesToNodes();
+    // tables going to convert to vertices
+    ArrayList<TableToNode> tablesToNodes = metadataParser.getTablesToNodes();
 
-			// tables going to convert to edges
-			ArrayList<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
+    // tables going to convert to edges
+    ArrayList<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
 
-			// creates vertices from rdbms table tuples
-			tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
+    // creates vertices from rdbms table tuples
+    tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
 
-			edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
+    try {
+      edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
-			// cleans vertices by deleting primary key and foreign key
-			// properties
-			vertices = tempVertices.map(new DeletePkFkProperties()).withBroadcastSet(env.fromCollection(tablesToNodes),
-					"tablesToNodes");
+    // cleans vertices by deleting primary key and foreign key
+    // properties
+    vertices = tempVertices.map(new DeletePkFkProperties())
+        .withBroadcastSet(env.fromCollection(tablesToNodes), "tablesToNodes");
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
+  }
 
-		return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
-	}
-
-	@Override
-	public GraphCollection getGraphCollection() throws IOException {
-		return flinkConfig.getGraphCollectionFactory().fromGraph(getLogicalGraph());
-	}
+  @Override
+  public GraphCollection getGraphCollection() throws IOException {
+    return flinkConfig.getGraphCollectionFactory().fromGraph(getLogicalGraph());
+  }
 }

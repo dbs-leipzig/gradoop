@@ -25,25 +25,26 @@ import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
  */
 public class PageinationQueryChooser {
 
-	/**
-	 * Chooses a fitting pageination prepared statement depending on connected
-	 * management system
-	 * 
-	 * @param rdbmsType
-	 *            Database identifier of connected database
-	 * @return Valid sql pageination prepared statement
-	 */
-	public static String choose(int rdbmsType) {
-		String pageinationQuery = "";
+  /**
+   * Chooses a fitting pageination prepared statement depending on connected
+   * management system
+   *
+   * @param rdbmsType
+   *          Database identifier of connected database
+   * @return Valid sql pageination prepared statement
+   */
+  public static String choose(int rdbmsType) {
+    String pageinationQuery = "";
 
-		switch (rdbmsType) {
-		case RdbmsConstants.MYSQL_TYPE_ID:
-			pageinationQuery = " LIMIT ? OFFSET ?";
-			break;
-		case RdbmsConstants.SQLSERVER_TYPE_ID:
-			pageinationQuery = " ORDER BY (1) OFFSET (?) ROWS FETCH NEXT (?) ROWS ONLY";
-			break;
-		}
-		return pageinationQuery;
-	}
+    switch (rdbmsType) {
+    case RdbmsConstants.MYSQL_TYPE_ID:
+    default:
+      pageinationQuery = " LIMIT ? OFFSET ?";
+      break;
+    case RdbmsConstants.SQLSERVER_TYPE_ID:
+      pageinationQuery = " ORDER BY (1) OFFSET (?) ROWS FETCH NEXT (?) ROWS ONLY";
+      break;
+    }
+    return pageinationQuery;
+  }
 }

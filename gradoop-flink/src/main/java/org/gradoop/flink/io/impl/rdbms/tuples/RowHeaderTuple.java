@@ -23,67 +23,68 @@ import org.apache.flink.api.java.tuple.Tuple3;
  */
 public class RowHeaderTuple extends Tuple3<String, String, Integer> {
 
-	private static final long serialVersionUID = 1L;
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Name of attribute
-	 */
-	private String name;
+  /**
+   * Name of attribute
+   */
+  private String name;
 
-	/**
-	 * Data type of attribute
-	 */
-	private String attType;
+  /**
+   * Data type of attribute
+   */
+  private String attType;
 
-	/**
-	 * Position of attribute in row
-	 */
-	private int pos;
+  /**
+   * Position of attribute in row
+   */
+  private int pos;
 
-	public RowHeaderTuple() {
+  /**
+   * Empty Constructor
+   */
+  public RowHeaderTuple() {
+  }
 
-	}
+ /**
+  * Constructor
+  * @param name Attribute name
+  * @param attType Attribute type
+  * @param pos Attributes' position in table
+  */
+  public RowHeaderTuple(String name, String attType, int pos) {
+    this.name = name;
+    this.f0 = name;
+    this.attType = attType;
+    this.f1 = attType;
+    this.pos = pos;
+    this.f2 = pos;
+  }
 
-	/**
-	 * Constructor
-	 * 
-	 * @param name
-	 *            Attribute name
-	 * @param attType
-	 *            Datatype of attribute
-	 * @param pos
-	 *            Position of attribute in row
-	 */
-	public RowHeaderTuple(String name, String attType, int pos) {
-		this.name = name;
-		this.f0 = name;
-		this.attType = attType;
-		this.f1 = attType;
-		this.pos = pos;
-		this.f2 = pos;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public String getAttType() {
+    return attType;
+  }
 
-	public String getAttType() {
-		return attType;
-	}
+  public void setAttType(String attType) {
+    this.attType = attType;
+  }
 
-	public void setAttType(String attType) {
-		this.attType = attType;
-	}
+  public int getPos() {
+    return pos;
+  }
 
-	public int getPos() {
-		return pos;
-	}
-
-	public void setPos(int pos) {
-		this.pos = pos;
-	}
+  public void setPos(int pos) {
+    this.pos = pos;
+  }
 }

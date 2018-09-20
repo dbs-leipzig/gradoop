@@ -17,6 +17,7 @@
 package org.gradoop.flink.io.impl.rdbms.functions;
 
 import java.util.ArrayList;
+
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.types.Row;
@@ -37,89 +38,88 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  */
 public class CreateEdges {
 
-	/**
-	 * Creates EPGM edges from foreign key respectively n:m relations
-	 * 
-	 * @param flinkConfig
-	 *            Gradoop Flink configuration
-	 * @param rdbmsConfig
-	 *            Relational database configuration
-	 * @param tablesToEdges
-	 *            List of relations going to convert to edges
-	 * @param vertices
-	 *            Dataset of already created vertices
-	 * @return Directed and undirected EPGM edges
-	 * @throws Exception
-	 */
-	public static DataSet<Edge> create(GradoopFlinkConfig flinkConfig, RdbmsConfig rdbmsConfig,
-			ArrayList<TableToEdge> tablesToEdges, DataSet<Vertex> vertices) throws Exception {
+  /**
+   * Creates EPGM edges from foreign key respectively n:m relations
+   *
+   * @param flinkConfig
+   *          Gradoop Flink configuration
+   * @param rdbmsConfig
+   *          Relational database configuration
+   * @param tablesToEdges
+   *          List of relations going to convert to edges
+   * @param vertices
+   *          Dataset of already created vertices
+   * @return Directed and undirected EPGM edges
+   * @throws Exception
+   */
+  public static DataSet<Edge> create(GradoopFlinkConfig flinkConfig, RdbmsConfig rdbmsConfig,
+      ArrayList<TableToEdge> tablesToEdges, DataSet<Vertex> vertices) throws Exception {
 
-		DataSet<Edge> edges = null;
-		EdgeFactory edgeFactory = flinkConfig.getEdgeFactory();
-		ExecutionEnvironment env = flinkConfig.getExecutionEnvironment();
+    DataSet<Edge> edges = null;
+    EdgeFactory edgeFactory = flinkConfig.getEdgeFactory();
+    ExecutionEnvironment env = flinkConfig.getExecutionEnvironment();
 
-		/*
-		 * Foreign key relations to edges
-		 */
-		DataSet<TableToEdge> dsTablesToEdges = env.fromCollection(tablesToEdges);
+    /*
+     * Foreign key relations to edges
+     */
+    DataSet<TableToEdge> dsTablesToEdges = env.fromCollection(tablesToEdges);
 
-		// Primary key table representation of foreign key relation
-		DataSet<LabelIdKeyTuple> pkEdges = dsTablesToEdges.filter(new EdgeDirectionFilter()).flatMap(new VerticesToPkTable())
-				.withBroadcastSet(vertices, "vertices").distinct("*");
+    // Primary key table representation of foreign key relation
+    DataSet<LabelIdKeyTuple> pkEdges = dsTablesToEdges.filter(new EdgeDirectionFilter())
+        .flatMap(new VerticesToPkTable()).withBroadcastSet(vertices, "vertices").distinct("*");
 
-		// Foreign key table representation of foreign key relation
-		DataSet<LabelIdKeyTuple> fkEdges = dsTablesToEdges.filter(new EdgeDirectionFilter()).flatMap(new VerticesToFkTable())
-				.withBroadcastSet(vertices, "vertices");
+    // Foreign key table representation of foreign key relation
+    DataSet<LabelIdKeyTuple> fkEdges = dsTablesToEdges.filter(new EdgeDirectionFilter())
+        .flatMap(new VerticesToFkTable()).withBroadcastSet(vertices, "vertices");
 
-		edges = pkEdges.join(fkEdges).where(0, 2).equalTo(0, 2).map(new JoinSetToEdges(edgeFactory));
+    edges = pkEdges.join(fkEdges).where(0, 2).equalTo(0, 2).map(new JoinSetToEdges(edgeFactory));
 
-		/*
-		 * N:M relations to edges
-		 */
-		int counter = 0;
-		for (TableToEdge table : tablesToEdges) {
-			if (!table.isDirectionIndicator()) {
+    /*
+     * N:M relations to edges
+     */
+    int counter = 0;
+    for (TableToEdge table : tablesToEdges) {
+      if (!table.isDirectionIndicator()) {
 
-				DataSet<Row> dsSQLResult = null;
+        DataSet<Row> dsSQLResult = null;
 
-				try {
-					dsSQLResult = FlinkConnect.connect(env, rdbmsConfig,
-							table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
+        try {
+          dsSQLResult = FlinkConnect.connect(env, rdbmsConfig, table.getRowCount(),
+              table.getSqlQuery(), table.getRowTypeInfo());
 
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
+        } catch (ClassNotFoundException e) {
+          e.printStackTrace();
+        }
 
-				// Represents the two foreign key attributes and belonging
-				// properties
-				DataSet<Fk1Fk2Props> fkPropsTable = dsSQLResult.map(new FKandProps(counter))
-						.withBroadcastSet(env.fromCollection(tablesToEdges),
-								"tables");
+        // Represents the two foreign key attributes and belonging
+        // properties
+        DataSet<Fk1Fk2Props> fkPropsTable = dsSQLResult.map(new FKandProps(counter))
+            .withBroadcastSet(env.fromCollection(tablesToEdges), "tables");
 
-				// Represents vertices in relation with foreign key one
-				DataSet<IdKeyTuple> idPkTableOne = vertices.filter(new VertexLabelFilter(table.getstartTableName()))
-						.map(new VertexToIdPkTuple());
+        // Represents vertices in relation with foreign key one
+        DataSet<IdKeyTuple> idPkTableOne = vertices
+            .filter(new VertexLabelFilter(table.getStartTableName())).map(new VertexToIdPkTuple());
 
-				// Represents vertices in relation with foreign key two
-				DataSet<IdKeyTuple> idPkTableTwo = vertices.filter(new VertexLabelFilter(table.getendTableName()))
-						.map(new VertexToIdPkTuple());
+        // Represents vertices in relation with foreign key two
+        DataSet<IdKeyTuple> idPkTableTwo = vertices
+            .filter(new VertexLabelFilter(table.getEndTableName())).map(new VertexToIdPkTuple());
 
-				DataSet<Edge> dsTupleEdges = fkPropsTable.join(idPkTableOne).where(0).equalTo(1)
-						.map(new Tuple2ToIdFkWithProps()).join(idPkTableTwo).where(1).equalTo(1)
-						.map(new Tuple3ToEdge(edgeFactory, table.getRelationshipType()));
+        DataSet<Edge> dsTupleEdges = fkPropsTable.join(idPkTableOne).where(0).equalTo(1)
+            .map(new Tuple2ToIdFkWithProps()).join(idPkTableTwo).where(1).equalTo(1)
+            .map(new Tuple3ToEdge(edgeFactory, table.getRelationshipType()));
 
-				if (edges == null) {
-					edges = dsTupleEdges;
-				} else {
-					edges = edges.union(dsTupleEdges);
-				}
+        if (edges == null) {
+          edges = dsTupleEdges;
+        } else {
+          edges = edges.union(dsTupleEdges);
+        }
 
-				// Creates other direction edges
-				edges = edges.union(dsTupleEdges.map(new EdgeToEdgeComplement(edgeFactory)));
-			}
-			counter++;
-		}
+        // Creates other direction edges
+        edges = edges.union(dsTupleEdges.map(new EdgeToEdgeComplement(edgeFactory)));
+      }
+      counter++;
+    }
 
-		return edges;
-	}
+    return edges;
+  }
 }

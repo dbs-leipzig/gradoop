@@ -26,82 +26,89 @@ import org.apache.flink.api.java.tuple.Tuple4;
  */
 public class FkTuple extends Tuple4<String, JDBCType, String, String> {
 
-	private static final long serialVersionUID = 1L;
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Foreign key name
-	 */
-	private String fkName;
+  /**
+   * Foreign key name
+   */
+  private String fkName;
 
-	/**
-	 * JDBC data type of foreign key name
-	 */
-	private JDBCType type;
+  /**
+   * JDBC data type of foreign key name
+   */
+  private JDBCType type;
 
-	/**
-	 * Column name of referenced table
-	 */
-	private String refdAttName;
+  /**
+   * Column name of referenced table
+   */
+  private String refdAttName;
 
-	/**
-	 * Name of referenced Table
-	 */
-	private String refdTableName;
+  /**
+   * Name of referenced Table
+   */
+  private String refdTableName;
 
-	public FkTuple() {
-	}
+  /**
+   * Empty Constructor
+   */
+  public FkTuple() {
+  }
 
-	/**
-	 * 
-	 * @param fkName
-	 *            Name of referencing foreign key attribute
-	 * @param type
-	 *            Jdbc type of referencing attribute
-	 * @param refdAttName
-	 *            Name of referenced primary key attribute
-	 * @param refdTableName
-	 *            name of referenced table
-	 */
-	public FkTuple(String fkName, JDBCType type, String refdAttName, String refdTableName) {
-		this.fkName = fkName;
-		this.f0 = fkName;
-		this.type = type;
-		this.f1 = type;
-		this.refdAttName = refdAttName;
-		this.f2 = refdAttName;
-		this.refdTableName = refdTableName;
-		this.f3 = refdTableName;
-	}
+  /**
+   * Constructor
+   *
+   * @param fkName
+   *          Foreign key name
+   * @param type
+   *          SQL Type of foreign key
+   * @param refdAttName
+   *          Name of referenced primary key
+   * @param refdTableName
+   *          Name of referenced primary key table
+   */
+  public FkTuple(String fkName, JDBCType type, String refdAttName, String refdTableName) {
+    this.fkName = fkName;
+    this.f0 = fkName;
+    this.type = type;
+    this.f1 = type;
+    this.refdAttName = refdAttName;
+    this.f2 = refdAttName;
+    this.refdTableName = refdTableName;
+    this.f3 = refdTableName;
+  }
 
-	public String getFkName() {
-		return fkName;
-	}
+  public String getFkName() {
+    return fkName;
+  }
 
-	public void setFkName(String fkName) {
-		this.fkName = fkName;
-	}
+  public void setFkName(String fkName) {
+    this.fkName = fkName;
+  }
 
-	public JDBCType getType() {
-		return type;
-	}
+  public JDBCType getType() {
+    return type;
+  }
 
-	public void setType(JDBCType type) {
-		this.type = type;
-	}
+  public void setType(JDBCType type) {
+    this.type = type;
+  }
 
-	public String getRefdAttName() {
-		return refdAttName;
-	}
+  public String getRefdAttName() {
+    return refdAttName;
+  }
 
-	public void setRefdAttName(String refdAttName) {
-		this.refdAttName = refdAttName;
-	}
+  public void setRefdAttName(String refdAttName) {
+    this.refdAttName = refdAttName;
+  }
 
-	public String getRefdTableName() {
-		return refdTableName;
-	}
+  public String getRefdTableName() {
+    return refdTableName;
+  }
 
-	public void setRefdTableName(String refdTableName) {
-		this.refdTableName = refdTableName;
-	}
+  public void setRefdTableName(String refdTableName) {
+    this.refdTableName = refdTableName;
+  }
 }

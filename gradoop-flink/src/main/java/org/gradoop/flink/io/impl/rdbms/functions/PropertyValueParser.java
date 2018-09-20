@@ -26,31 +26,31 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  */
 public class PropertyValueParser {
 
-	/**
-	 * Converts jdbc data type to matching EPGM property value if possible
-	 * 
-	 * @param att
-	 *            Database value
-	 * @return Gradoop property value
-	 */
-	public static PropertyValue parse(Object att) {
+  /**
+   * Converts jdbc data type to matching EPGM property value if possible
+   *
+   * @param att
+   *          Database value
+   * @return Gradoop property value
+   */
+  public static PropertyValue parse(Object att) {
 
-		PropertyValue propValue = null;
+    PropertyValue propValue = null;
 
-		if (att == null) {
-			propValue = PropertyValue.NULL_VALUE;
-		} else {
-			try {
-				if (att.getClass() == Date.class) {
-					propValue = PropertyValue
-							.create(((Date) att).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-				} else {
-					propValue = PropertyValue.create(att);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return propValue;
-	}
+    if (att == null) {
+      propValue = PropertyValue.NULL_VALUE;
+    } else {
+      try {
+        if (att.getClass() == Date.class) {
+          propValue = PropertyValue
+              .create(((Date) att).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        } else {
+          propValue = PropertyValue.create(att);
+        }
+      } catch (IllegalArgumentException e) {
+        e.printStackTrace();
+      }
+    }
+    return propValue;
+  }
 }

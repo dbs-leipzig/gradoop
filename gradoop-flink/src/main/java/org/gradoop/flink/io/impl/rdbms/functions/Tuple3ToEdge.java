@@ -28,34 +28,38 @@ import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 /**
  * Creates edges from joined foreign key sets
  */
-public class Tuple3ToEdge implements MapFunction<Tuple2<Tuple3<GradoopId, String, Properties>, IdKeyTuple>, Edge> {
+public class Tuple3ToEdge
+    implements MapFunction<Tuple2<Tuple3<GradoopId, String, Properties>, IdKeyTuple>, Edge> {
 
-	private static final long serialVersionUID = 1L;
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Gradoop edge factory
-	 */
-	EdgeFactory edgeFactory;
-	
-	/**
-	 * Name of converted table
-	 */
-	String tableName;
+  /**
+   * Gradoop edge factory
+   */
+  private EdgeFactory edgeFactory;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param tableName
-	 *            Name of converted table
-	 */
-	public Tuple3ToEdge(EdgeFactory edgeFactory, String tableName) {
-		this.edgeFactory = edgeFactory;
-		this.tableName = tableName;
-	}
+  /**
+   * Name of converted table
+   */
+  private String tableName;
 
-	@Override
-	public Edge map(Tuple2<Tuple3<GradoopId, String, Properties>, IdKeyTuple> value) throws Exception {
-		
-		return edgeFactory.initEdge(GradoopId.get(),tableName, value.f0.f0, value.f1.f0, value.f0.f2);
-	}
+  /**
+   * Creates edges from joined foreign key sets
+   * @param edgeFactory Valid gradoop edge factory
+   * @param tableName Name of rdbms table
+   */
+  public Tuple3ToEdge(EdgeFactory edgeFactory, String tableName) {
+    this.edgeFactory = edgeFactory;
+    this.tableName = tableName;
+  }
+
+  @Override
+  public Edge map(Tuple2<Tuple3<GradoopId, String, Properties>, IdKeyTuple> value)
+      throws Exception {
+
+    return edgeFactory.initEdge(GradoopId.get(), tableName, value.f0.f0, value.f1.f0, value.f0.f2);
+  }
 }

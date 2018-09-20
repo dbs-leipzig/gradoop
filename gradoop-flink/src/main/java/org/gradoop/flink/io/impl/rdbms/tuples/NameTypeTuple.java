@@ -25,49 +25,55 @@ import org.apache.flink.api.java.tuple.Tuple2;
  */
 public class NameTypeTuple extends Tuple2<String, JDBCType> {
 
-	private static final long serialVersionUID = 1L;
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Key string
-	 */
-	private String name;
+  /**
+   * Key string
+   */
+  private String name;
 
-	/**
-	 * JDBC data type
-	 */
-	private JDBCType type;
+  /**
+   * JDBC data type
+   */
+  private JDBCType type;
 
-	public NameTypeTuple() {
-	}
+  /**
+   * Empty Constructor
+   */
+  public NameTypeTuple() {
+  }
 
-	/**
-	 * Constructor
-	 * 
-	 * @param name
-	 *            Key string
-	 * @param type
-	 *            JDBC data type
-	 */
-	public NameTypeTuple(String name, JDBCType type) {
-		this.name = name;
-		this.f0 = name;
-		this.type = type;
-		this.f1 = type;
-	}
+  /**
+   * Constructor
+   *
+   * @param name
+   *          Attribute name
+   * @param type
+   *          Attribute sql type
+   */
+  public NameTypeTuple(String name, JDBCType type) {
+    this.name = name;
+    this.f0 = name;
+    this.type = type;
+    this.f1 = type;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public JDBCType getType() {
-		return type;
-	}
+  public JDBCType getType() {
+    return type;
+  }
 
-	public void setType(JDBCType type) {
-		this.type = type;
-	}
+  public void setType(JDBCType type) {
+    this.type = type;
+  }
 }

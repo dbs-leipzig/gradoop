@@ -25,25 +25,25 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
  * Concatenates multiple primary keys
  */
 public class PrimaryKeyConcatString {
-	/**
-	 * Concatenates multiple primary keys
-	 * 
-	 * @param tuple
-	 *            Tuple of a database table
-	 * @param rowheader
-	 *            Database rowheader
-	 * @return Concatenated primary key string
-	 */
-	public static String getPrimaryKeyString(Row tuple, RowHeader rowheader) {
+  /**
+   * Concatenates multiple primary keys
+   * 
+   * @param tuple
+   *          Tuple of a database table
+   * @param rowheader
+   *          Database rowheader
+   * @return Concatenated primary key string
+   */
+  public static String getPrimaryKeyString(Row tuple, RowHeader rowheader) {
 
-		String pkString = "";
+    String pkString = "";
 
-		for (RowHeaderTuple rht : rowheader.getRowHeader()) {
-			if (rht.getAttType().equals(RdbmsConstants.PK_FIELD)) {
-				pkString += tuple.getField(rht.getPos()).toString();
-			}
-		}
+    for (RowHeaderTuple rht : rowheader.getRowHeader()) {
+      if (rht.getAttType().equals(RdbmsConstants.PK_FIELD)) {
+        pkString += tuple.getField(rht.getPos()).toString();
+      }
+    }
 
-		return pkString;
-	}
+    return pkString;
+  }
 }
