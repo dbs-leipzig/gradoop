@@ -30,28 +30,37 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateVer
 import org.gradoop.flink.model.impl.operators.aggregation.functions.CombinePartitionAggregates;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.SetAggregateProperty;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Takes a logical graph and a user defined aggregate function as input. The
- * aggregate function is applied on the logical graph and the resulting
- * aggregate is stored as an additional property at the result graph.
+ * Takes a logical graph and user defined aggregate functions as input. The
+ * aggregate functions are applied on the logical graph and the resulting
+ * aggregate is stored as additional properties at the result graph.
  */
 public class Aggregation implements UnaryGraphToGraphOperator {
 
   /**
-   * User-defined aggregate function which is applied on a single logical graph.
+   * User-defined aggregate functions which are applied on a single logical graph.
    */
-  private final AggregateFunction aggregateFunction;
+  private final Set<AggregateFunction> aggregateFunctions;
 
   /**
    * Creates new aggregation.
    *
-   * @param aggregateFunction  user defined aggregation function which gets
-   *                             called on the input graph
+   * @param aggregateFunctions user defined aggregation functions which get
+   *                           called on the input graph
    */
-  public Aggregation(final AggregateFunction aggregateFunction) {
-    this.aggregateFunction = checkNotNull(aggregateFunction);
+  public Aggregation(final AggregateFunction... aggregateFunctions) {
+    for (AggregateFunction func : aggregateFunctions) {
+      checkNotNull(func);
+    }
+    this.aggregateFunctions = new HashSet<>(Arrays.asList(aggregateFunctions));
   }
 
   /**
@@ -59,31 +68,15 @@ public class Aggregation implements UnaryGraphToGraphOperator {
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-
     DataSet<Vertex> vertices = graph.getVertices();
     DataSet<Edge> edges = graph.getEdges();
 
-    DataSet<PropertyValue> aggregate;
-
-    if (this.aggregateFunction instanceof VertexAggregateFunction) {
-      aggregate = aggregateVertices(vertices);
-
-    } else {
-      aggregate = aggregateEdges(edges);
-    }
-
-    DataSet<PropertyValue> nullValue = graph
-      .getConfig()
-      .getExecutionEnvironment()
-      .fromElements(PropertyValue.NULL_VALUE);
-
-    aggregate = aggregate
-      .reduceGroup(new CombinePartitionAggregates(aggregateFunction))
-      .union(nullValue)
-      .reduceGroup(new SetNullIfEmpty());
+    DataSet<Map<String, PropertyValue>> aggregate = aggregateVertices(vertices)
+      .union(aggregateEdges(edges))
+      .reduceGroup(new CombinePartitionAggregates(aggregateFunctions));
 
     DataSet<GraphHead> graphHead = graph.getGraphHead()
-      .map(new SetAggregateProperty(aggregateFunction))
+      .map(new SetAggregateProperty(aggregateFunctions))
       .withBroadcastSet(aggregate, SetAggregateProperty.VALUE);
 
     return graph.getConfig().getLogicalGraphFactory()
@@ -91,27 +84,29 @@ public class Aggregation implements UnaryGraphToGraphOperator {
   }
 
   /**
-   * Applies an aggregate function to the partitions of a vertex data set.
+   * Applies vertex aggregate functions to the partitions of a vertex data set.
    *
    * @param vertices vertex data set
-   * @return partition aggregate value
+   * @return partition aggregate values mapped from their property key
    */
-  private DataSet<PropertyValue> aggregateVertices(DataSet<Vertex> vertices) {
-    return vertices
-      .combineGroup(new AggregateVertices(
-        (VertexAggregateFunction) aggregateFunction));
+  private DataSet<Map<String, PropertyValue>> aggregateVertices(DataSet<Vertex> vertices) {
+    return vertices.combineGroup(new AggregateVertices(aggregateFunctions.stream()
+      .filter(f -> f instanceof VertexAggregateFunction)
+      .map(VertexAggregateFunction.class::cast)
+      .collect(Collectors.toSet())));
   }
 
   /**
-   * Applies an aggregate function to the partitions of an edge data set.
+   * Applies edge aggregate functions to the partitions of an edge data set.
    *
    * @param edges edge data set
-   * @return partition aggregate value
+   * @return partition aggregate values
    */
-  private DataSet<PropertyValue> aggregateEdges(DataSet<Edge> edges) {
-    return edges
-      .combineGroup(new AggregateEdges(
-        (EdgeAggregateFunction) aggregateFunction));
+  private DataSet<Map<String, PropertyValue>> aggregateEdges(DataSet<Edge> edges) {
+    return edges.combineGroup(new AggregateEdges(aggregateFunctions.stream()
+      .filter(f -> f instanceof EdgeAggregateFunction)
+      .map(EdgeAggregateFunction.class::cast)
+      .collect(Collectors.toSet())));
   }
 
   /**
