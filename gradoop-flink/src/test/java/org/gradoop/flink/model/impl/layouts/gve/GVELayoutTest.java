@@ -141,16 +141,4 @@ public class GVELayoutTest extends GradoopFlinkTestBase {
     GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(e0),
       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getEdgesByLabel("a").collect());
   }
-
-  @Test
-  public void getOutgoingEdges() throws Exception {
-    GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(e0),
-      from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getOutgoingEdges(v0.getId()).collect());
-  }
-
-  @Test
-  public void getIncomingEdges() throws Exception {
-    GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(e0),
-      from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getIncomingEdges(v1.getId()).collect());
-  }
 }

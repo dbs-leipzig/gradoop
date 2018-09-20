@@ -389,14 +389,14 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
     FilterFunction<Edge> edgeFilterFunction, Subgraph.Strategy strategy);
 
   /**
-   * Applies the given aggregate function to the logical graph and stores the
-   * result of that function at the resulting graph using the given property
-   * key.
+   * Applies the given aggregate functions to the logical graph and stores the
+   * result of those functions at the resulting graph using the given property
+   * keys.
    *
-   * @param aggregateFunc computes an aggregate on the logical graph
-   * @return logical graph with additional property storing the aggregate
+   * @param aggregateFunctions computes aggregates on the logical graph
+   * @return logical graph with additional properties storing the aggregates
    */
-  LogicalGraph aggregate(AggregateFunction aggregateFunc);
+  LogicalGraph aggregate(AggregateFunction... aggregateFunctions);
 
   /**
    * Creates a new graph from a randomly chosen subset of nodes and their

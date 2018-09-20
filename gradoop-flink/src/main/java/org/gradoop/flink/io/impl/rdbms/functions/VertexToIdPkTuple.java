@@ -24,13 +24,16 @@ import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 /**
  * Creates tuples of gradoop id, primary key name from vertices
  */
-public class VertexToIdPkTuple implements MapFunction<Vertex,IdKeyTuple> {
+public class VertexToIdPkTuple implements MapFunction<Vertex, IdKeyTuple> {
 
-	private static final long serialVersionUID = 1L;
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 1L;
 
-	@Override
-	public IdKeyTuple map(Vertex v) throws Exception {
-		
-		return new IdKeyTuple(v.getId(),v.getProperties().get(RdbmsConstants.PK_ID).toString());
-	}
+  @Override
+  public IdKeyTuple map(Vertex v) throws Exception {
+
+    return new IdKeyTuple(v.getId(), v.getProperties().get(RdbmsConstants.PK_ID).toString());
+  }
 }

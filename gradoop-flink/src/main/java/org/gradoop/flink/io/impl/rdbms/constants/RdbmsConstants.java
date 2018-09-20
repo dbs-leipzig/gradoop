@@ -21,33 +21,33 @@ package org.gradoop.flink.io.impl.rdbms.constants;
  */
 public class RdbmsConstants {
 
-	/**
-	 * Vertex key identifier for primary keys
-	 */
-	public static final String PK_ID = "*#primary_key_identifier#*";
+  /**
+   * Vertex key identifier for primary keys
+   */
+  public static final String PK_ID = "*#primary_key_identifier#*";
 
-	/**
-	 * Field identifier for primary keys
-	 */
-	public static final String PK_FIELD = "pk";
+  /**
+   * Field identifier for primary keys
+   */
+  public static final String PK_FIELD = "pk";
 
-	/**
-	 * Field identifier for foreign keys
-	 */
-	public static final String FK_FIELD = "fk";
+  /**
+   * Field identifier for foreign keys
+   */
+  public static final String FK_FIELD = "fk";
 
-	/**
-	 * Field identifier for further attributes
-	 */
-	public static final String ATTRIBUTE_FIELD = "att";
+  /**
+   * Field identifier for further attributes
+   */
+  public static final String ATTRIBUTE_FIELD = "att";
 
-	/**
-	 * Database Identifier for mysql,mariadb,postgresql,h2,...
-	 */
-	public static final int MYSQL_TYPE_ID = 0;
+  /**
+   * Database Identifier for mysql,mariadb,postgresql,h2,...
+   */
+  public static final int MYSQL_TYPE_ID = 0;
 
-	/**
-	 * Database Identifier for oracle,sqlserver,derby
-	 */
-	public static final int SQLSERVER_TYPE_ID = 1;
+  /**
+   * Database Identifier for oracle,sqlserver,derby
+   */
+  public static final int SQLSERVER_TYPE_ID = 1;
 }

@@ -24,25 +24,25 @@ import java.sql.SQLException;
  */
 public class RdbmsConnect {
 
-	/**
-	 * Establishes a connection to a relational database via jdbc.
-	 * 
-	 * @param config
-	 *            Configuration of relational database
-	 * @return Valid connection to a relational database
-	 */
-	public static Connection connect(RdbmsConfig config) {
+  /**
+   * Establishes a connection to a relational database via jdbc.
+   * 
+   * @param config
+   *          Configuration of relational database
+   * @return Valid connection to a relational database
+   */
+  public static Connection connect(RdbmsConfig config) {
 
-		Connection connection = null;
+    Connection connection = null;
 
-		try {
-			RegisterDriver.register(config);
-			connection = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPw());
+    try {
+      RegisterDriver.register(config);
+      connection = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPw());
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
 
-		return connection;
-	}
+    return connection;
+  }
 }

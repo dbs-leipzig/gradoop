@@ -26,32 +26,32 @@ import java.sql.Statement;
  */
 public class TableRowSize {
 
-	/**
-	 * Queries a relational database to get the number of rows
-	 * 
-	 * @param con
-	 *            Valid jdbc database connection
-	 * @param tableName
-	 *            Name of database table
-	 * @return Number of rows of database
-	 * @throws SQLException
-	 */
-	public static int getTableRowSize(Connection con, String tableName) {
-		int rowNumber = 0;
-		Statement st;
-		try {
-			st = con.createStatement();
+  /**
+   * Queries a relational database to get the number of rows
+   * 
+   * @param con
+   *          Valid jdbc database connection
+   * @param tableName
+   *          Name of database table
+   * @return Number of rows of database
+   * @throws SQLException
+   */
+  public static int getTableRowSize(Connection con, String tableName) {
+    int rowNumber = 0;
+    Statement st;
+    try {
+      st = con.createStatement();
 
-			ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM " + tableName);
-			if (rs.next()) {
-				rowNumber = rs.getInt(1);
-			} else {
-				rowNumber = 0;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		return rowNumber;
-	}
+      ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM " + tableName);
+      if (rs.next()) {
+        rowNumber = rs.getInt(1);
+      } else {
+        rowNumber = 0;
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return rowNumber;
+  }
 }

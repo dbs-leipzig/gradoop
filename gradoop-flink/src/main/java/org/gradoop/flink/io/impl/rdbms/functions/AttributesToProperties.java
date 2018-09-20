@@ -27,47 +27,47 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
  */
 public class AttributesToProperties {
 
-	/**
-	 * Converts relational attributes to epgm properties
-	 * 
-	 * @param tuple
-	 *            Row of relational database
-	 * @param rowheader
-	 *            Rowheader of database table
-	 * @return Epgm Properties
-	 */
-	public static Properties getProperties(Row tuple, RowHeader rowheader) {
+  /**
+   * Converts relational attributes to epgm properties
+   *
+   * @param tuple
+   *          Row of relational database
+   * @param rowheader
+   *          Rowheader of database table
+   * @return Epgm Properties
+   */
+  public static Properties getProperties(Row tuple, RowHeader rowheader) {
 
-		Properties props = new Properties();
+    Properties props = new Properties();
 
-		for (RowHeaderTuple rht : rowheader.getRowHeader()) {
-			try {
-				props.set(rht.getName(), PropertyValueParser.parse((tuple.getField((rht.getPos())))));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+    for (RowHeaderTuple rht : rowheader.getRowHeader()) {
+      try {
+        props.set(rht.getName(), PropertyValueParser.parse(tuple.getField(rht.getPos())));
+      } catch (IllegalArgumentException e) {
+        e.printStackTrace();
+      }
+    }
 
-		return props;
-	}
+    return props;
+  }
 
-	/**
-	 * Converts relational attributes to epgm properties without foreign key
-	 * attributes
-	 * 
-	 * @param tuple
-	 *            Row of relational database
-	 * @param rowheader
-	 *            Rowheader of database table
-	 * @return Epgm Properties without foreign key attributes
-	 */
-	public static Properties getPropertiesWithoutFKs(Row tuple, RowHeader rowheader) {
-		Properties props = new Properties();
-		for (RowHeaderTuple rht : rowheader.getRowHeader()) {
-			if (!rht.getAttType().equals(RdbmsConstants.FK_FIELD)) {
-				props.set(rht.getName(), PropertyValueParser.parse((tuple.getField((rht.getPos())))));
-			}
-		}
-		return props;
-	}
+  /**
+   * Converts relational attributes to epgm properties without foreign key
+   * attributes
+   *
+   * @param tuple
+   *          Row of relational database
+   * @param rowheader
+   *          Rowheader of database table
+   * @return Epgm Properties without foreign key attributes
+   */
+  public static Properties getPropertiesWithoutFKs(Row tuple, RowHeader rowheader) {
+    Properties props = new Properties();
+    for (RowHeaderTuple rht : rowheader.getRowHeader()) {
+      if (!rht.getAttType().equals(RdbmsConstants.FK_FIELD)) {
+        props.set(rht.getName(), PropertyValueParser.parse(tuple.getField(rht.getPos())));
+      }
+    }
+    return props;
+  }
 }

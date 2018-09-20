@@ -26,21 +26,25 @@ import java.sql.SQLException;
  * Registers jdbc driver
  */
 public class RegisterDriver {
-	
-	/**
-	 * Registers a jdbc driver 
-	 * @param config Database configuration
-	 */
-	public static void register(RdbmsConfig config) {
-		
-		try {
-			URL driverUrl = new URL("jar:file:" + config.getJdbcDriverPath() + "!/");
-			URLClassLoader ucl = new URLClassLoader(new URL[] { driverUrl });
-			Driver driver = (Driver) Class.forName(config.getJdbcDriverClassName(), true, ucl).newInstance();
-			DriverManager.registerDriver(new DriverShim(driver));
 
-		} catch (SQLException | MalformedURLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+  /**
+   * Registers a jdbc driver
+   *
+   * @param config
+   *          Database configuration
+   */
+  public static void register(RdbmsConfig config) {
+
+    try {
+      URL driverUrl = new URL("jar:file:" + config.getJdbcDriverPath() + "!/");
+      URLClassLoader ucl = new URLClassLoader(new URL[] { driverUrl });
+      Driver driver = (Driver) Class.forName(config.getJdbcDriverClassName(), true, ucl)
+          .newInstance();
+      DriverManager.registerDriver(new DriverShim(driver));
+
+    } catch (SQLException | MalformedURLException | InstantiationException | IllegalAccessException |
+        ClassNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
 }

@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.flink.io.impl.rdbms.functions;
 
 import java.util.ArrayList;
@@ -17,32 +32,41 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
  */
 public class DeletePkFkProperties extends RichMapFunction<Vertex, Vertex> {
 
-	private static final long serialVersionUID = 1L;
-	List<TableToNode> tablesToNodes;
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 1L;
 
-	@Override
-	public Vertex map(Vertex v) throws Exception {
-		Properties newProps = new Properties();
+  /**
+   * List of tables to nodes representation
+   */
+  private List<TableToNode> tablesToNodes;
 
-		for (TableToNode table : tablesToNodes) {
-			if (table.getTableName().equals(v.getLabel())) {
-				ArrayList<String> foreignKeys = new ArrayList<String>();
-				for (RowHeaderTuple rht : table.getRowheader().getForeignKeyHeader()) {
-					foreignKeys.add(rht.f0);
-				}
-				for (Property oldProp : v.getProperties()) {
-					if (!foreignKeys.contains(oldProp.getKey()) && !oldProp.getKey().equals(RdbmsConstants.PK_ID)) {
-						newProps.set(oldProp);
-					}
-				}
-			}
-		}
+  @Override
+  public Vertex map(Vertex v) throws Exception {
+    Properties newProps = new Properties();
 
-		v.setProperties(newProps);
-		return v;
-	}
+    for (TableToNode table : tablesToNodes) {
+      if (table.getTableName().equals(v.getLabel())) {
+        ArrayList<String> foreignKeys = new ArrayList<String>();
+        for (RowHeaderTuple rht : table.getRowheader().getForeignKeyHeader()) {
+          foreignKeys.add(rht.f0);
+        }
+        for (Property oldProp : v.getProperties()) {
+          if (!foreignKeys.contains(oldProp.getKey())
+              && !oldProp.getKey().equals(RdbmsConstants.PK_ID)) {
+            newProps.set(oldProp);
+          }
+        }
+      }
+    }
 
-	public void open(Configuration parameters) throws Exception {
-		this.tablesToNodes = getRuntimeContext().getBroadcastVariable("tablesToNodes");
-	}
+    v.setProperties(newProps);
+    return v;
+  }
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    this.tablesToNodes = getRuntimeContext().getBroadcastVariable("tablesToNodes");
+  }
 }

@@ -24,50 +24,56 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Sets aggregate values of a graph heads.
  */
 public class SetAggregateProperties implements
-  CoGroupFunction<GraphHead, Tuple2<GradoopId, PropertyValue>, GraphHead> {
+  CoGroupFunction<GraphHead, Tuple2<GradoopId, Map<String, PropertyValue>>, GraphHead> {
 
   /**
-   * aggregate property key
+   * default values used to replace aggregate values in case of NULL.
    */
-  private final String propertyKey;
-  /**
-   * default value used to replace aggregate value in case of NULL.
-   */
-  private final PropertyValue defaultValue;
+  private final Map<String, PropertyValue> defaultValues;
 
   /**
    * Constructor.
    *
-   * @param aggregateFunction aggregate function
+   * @param aggregateFunctions aggregate functions
    */
-  public SetAggregateProperties(final AggregateFunction aggregateFunction) {
-    checkNotNull(aggregateFunction);
-    this.propertyKey = aggregateFunction.getAggregatePropertyKey();
-    this.defaultValue = aggregateFunction instanceof AggregateDefaultValue ?
-      ((AggregateDefaultValue) aggregateFunction).getDefaultValue() :
-      PropertyValue.NULL_VALUE;
+  public SetAggregateProperties(final Set<AggregateFunction> aggregateFunctions) {
+    for (AggregateFunction func : aggregateFunctions) {
+      checkNotNull(func);
+    }
+
+    defaultValues = new HashMap<>();
+
+    for (AggregateFunction func : aggregateFunctions) {
+      defaultValues.put(func.getAggregatePropertyKey(),
+        func instanceof AggregateDefaultValue ?
+          ((AggregateDefaultValue) func).getDefaultValue() :
+          PropertyValue.NULL_VALUE);
+    }
   }
 
   @Override
   public void coGroup(Iterable<GraphHead> left,
-    Iterable<Tuple2<GradoopId, PropertyValue>> right, Collector<GraphHead> out
-  ) throws Exception {
+    Iterable<Tuple2<GradoopId, Map<String, PropertyValue>>> right, Collector<GraphHead> out) {
 
     for (GraphHead leftElem : left) {
       boolean rightEmpty = true;
-      for (Tuple2<GradoopId, PropertyValue> rightElem : right) {
-        leftElem.setProperty(propertyKey, rightElem.f1);
+      for (Tuple2<GradoopId, Map<String, PropertyValue>> rightElem : right) {
+        rightElem.f1.forEach(leftElem::setProperty);
         out.collect(leftElem);
         rightEmpty = false;
       }
       if (rightEmpty) {
-        leftElem.setProperty(propertyKey, defaultValue);
+        defaultValues.forEach(leftElem::setProperty);
         out.collect(leftElem);
       }
     }

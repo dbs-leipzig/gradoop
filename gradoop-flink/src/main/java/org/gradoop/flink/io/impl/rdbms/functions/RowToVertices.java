@@ -34,68 +34,73 @@ import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
  */
 public class RowToVertices extends RichMapFunction<Row, Vertex> {
 
-	private static final long serialVersionUID = 1L;
+  /**
+   * serial versoin uid
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * EPGM vertex factory
-	 */
-	private VertexFactory vertexFactory;
+  /**
+   * EPGM vertex factory
+   */
+  private VertexFactory vertexFactory;
 
-	/**
-	 * List of all instances converted to vertices
-	 */
-	private List<TableToNode> tables;
+  /**
+   * List of all instances converted to vertices
+   */
+  private List<TableToNode> tables;
 
-	/**
-	 * Current table
-	 */
-	private TableToNode currentTable;
+  /**
+   * Current table
+   */
+  private TableToNode currentTable;
 
-	/**
-	 * Current rowheader
-	 */
-	private RowHeader rowheader;
+  /**
+   * Current rowheader
+   */
+  private RowHeader rowheader;
 
-	/**
-	 * Name of current database table
-	 */
-	private String tableName;
+  /**
+   * Name of current database table
+   */
+  private String tableName;
 
-	/**
-	 * Current position of iteration
-	 */
-	private int tablePos;
+  /**
+   * Current position of iteration
+   */
+  private int tablePos;
 
-	/**
-	 * Creates an Epgm vertex from a database row
-	 * 
-	 * @param vertexFactory
-	 *            Gradoop vertex factory
-	 * @param tableName
-	 *            Name of database table
-	 * @param tablePos
-	 *            Position of database in list
-	 */
-	public RowToVertices(VertexFactory vertexFactory, String tableName, int tablePos) {
-		this.vertexFactory = vertexFactory;
-		this.tableName = tableName;
-		this.tablePos = tablePos;
-	}
+  /**
+   * Creates an Epgm vertex from a database row
+   *
+   * @param vertexFactory
+   *          Gradoop vertex factory
+   * @param tableName
+   *          Name of database table
+   * @param tablePos
+   *          Position of database in list
+   */
+  public RowToVertices(VertexFactory vertexFactory, String tableName, int tablePos) {
+    this.vertexFactory = vertexFactory;
+    this.tableName = tableName;
+    this.tablePos = tablePos;
+  }
 
-	@Override
-	public Vertex map(Row tuple) throws Exception {
-		this.currentTable = tables.get(tablePos);
-		this.rowheader = currentTable.getRowheader();
+  @Override
+  public Vertex map(Row tuple) throws Exception {
+    this.currentTable = tables.get(tablePos);
+    this.rowheader = currentTable.getRowheader();
 
-		GradoopId id = GradoopId.get();
-		String label = tableName;
-		Properties properties = AttributesToProperties.getProperties(tuple, rowheader);
-		properties.set(RdbmsConstants.PK_ID, PrimaryKeyConcatString.getPrimaryKeyString(tuple, rowheader));
+    GradoopId id = GradoopId.get();
+    String label = tableName;
+    Properties properties = AttributesToProperties.getProperties(tuple, rowheader);
+    properties.set(RdbmsConstants.PK_ID,
+        PrimaryKeyConcatString.getPrimaryKeyString(tuple, rowheader));
 
-		return vertexFactory.initVertex(id, label, properties);
-	}
+    return vertexFactory.initVertex(id, label, properties);
+  }
 
-	public void open(Configuration parameters) throws Exception {
-		this.tables = getRuntimeContext().getBroadcastVariable("tablesToNodes");
-	}
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    this.tables = getRuntimeContext().getBroadcastVariable("tablesToNodes");
+  }
 }

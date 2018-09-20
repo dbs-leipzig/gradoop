@@ -24,25 +24,28 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  */
 public class VertexLabelFilter implements FilterFunction<Vertex> {
 
-	private static final long serialVersionUID = 1L;
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 1L;
 
-	/**
-	 * Label to search for
-	 */
-	String label;
+  /**
+   * Label to search for
+   */
+  private String label;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param label
-	 *            Label to search for
-	 */
-	public VertexLabelFilter(String label) {
-		this.label = label;
-	}
+  /**
+   * Filters by vertex labels
+   *
+   * @param label
+   *          Epgm vertex label string
+   */
+  public VertexLabelFilter(String label) {
+    this.label = label;
+  }
 
-	@Override
-	public boolean filter(Vertex v) {
-		return v.getLabel().equals(label);
-	}
+  @Override
+  public boolean filter(Vertex v) {
+    return v.getLabel().equals(label);
+  }
 }

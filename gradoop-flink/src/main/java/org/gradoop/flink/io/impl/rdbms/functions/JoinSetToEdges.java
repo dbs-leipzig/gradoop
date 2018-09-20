@@ -24,24 +24,37 @@ import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.flink.io.impl.rdbms.tuples.LabelIdKeyTuple;
 
 /**
- * Creates edges from joined primary key tables respectively foreign key tables of foreign key relations
+ * Creates edges from joined primary key tables respectively foreign key tables
+ * of foreign key relations
  */
-public class JoinSetToEdges extends RichMapFunction<Tuple2<LabelIdKeyTuple,LabelIdKeyTuple>,Edge> {
-	
-	private static final long serialVersionUID = 1L;
-	
-	EdgeFactory edgeFactory;
-	
-	public JoinSetToEdges(EdgeFactory edgeFactory) {
-		this.edgeFactory = edgeFactory;
-	}
+public class JoinSetToEdges
+    extends RichMapFunction<Tuple2<LabelIdKeyTuple, LabelIdKeyTuple>, Edge> {
 
-	@Override
-	public Edge map(Tuple2<LabelIdKeyTuple,LabelIdKeyTuple> preEdge) throws Exception {
-		GradoopId id = GradoopId.get();
-		GradoopId sourceVertexId = preEdge.f1.f1;
-		GradoopId targetVertexId = preEdge.f0.f1;
-		String label = preEdge.f0.f0;
-		return edgeFactory.initEdge(id, label, sourceVertexId, targetVertexId);
-	}
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Gradoop edge factory
+   */
+  private EdgeFactory edgeFactory;
+
+  /**
+   * Valid gradoop edge factory
+   *
+   * @param edgeFactory
+   */
+  public JoinSetToEdges(EdgeFactory edgeFactory) {
+    this.edgeFactory = edgeFactory;
+  }
+
+  @Override
+  public Edge map(Tuple2<LabelIdKeyTuple, LabelIdKeyTuple> preEdge) throws Exception {
+    GradoopId id = GradoopId.get();
+    GradoopId sourceVertexId = preEdge.f1.f1;
+    GradoopId targetVertexId = preEdge.f0.f1;
+    String label = preEdge.f0.f0;
+    return edgeFactory.initEdge(id, label, sourceVertexId, targetVertexId);
+  }
 }

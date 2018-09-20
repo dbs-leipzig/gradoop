@@ -26,48 +26,48 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
  */
 public class RowHeader {
 
-	/**
-	 * List of single rowheader tuples
-	 */
-	private ArrayList<RowHeaderTuple> rowHeader;
+  /**
+   * List of single rowheader tuples
+   */
+  private ArrayList<RowHeaderTuple> rowHeader;
 
-	/**
-	 * Empty constructor
-	 */
-	public RowHeader() {
-		rowHeader = new ArrayList<RowHeaderTuple>();
-	}
+  /**
+   * Empty constructor
+   */
+  public RowHeader() {
+    rowHeader = new ArrayList<RowHeaderTuple>();
+  }
 
-	/**
-	 * Constructor
-	 * 
-	 * @param rowHeader
-	 *            List of rowheader tuples
-	 */
-	public RowHeader(ArrayList<RowHeaderTuple> rowHeader) {
-		this.rowHeader = rowHeader;
-	}
+  /**
+   * Constructor
+   * 
+   * @param rowHeader
+   *          List of rowheader tuples
+   */
+  public RowHeader(ArrayList<RowHeaderTuple> rowHeader) {
+    this.rowHeader = rowHeader;
+  }
 
-	/**
-	 * Collects just rowheader tuples of foreign key attributes
-	 * 
-	 * @return List of rowheader tuples of foreign key attributes
-	 */
-	public ArrayList<RowHeaderTuple> getForeignKeyHeader() {
-		ArrayList<RowHeaderTuple> fkHeader = new ArrayList<RowHeaderTuple>();
-		for (RowHeaderTuple rht : this.rowHeader) {
-			if (rht.getAttType().equals(RdbmsConstants.FK_FIELD)) {
-				fkHeader.add(rht);
-			}
-		}
-		return fkHeader;
-	}
+  /**
+   * Collects just rowheader tuples of foreign key attributes
+   * 
+   * @return List of rowheader tuples of foreign key attributes
+   */
+  public ArrayList<RowHeaderTuple> getForeignKeyHeader() {
+    ArrayList<RowHeaderTuple> fkHeader = new ArrayList<RowHeaderTuple>();
+    for (RowHeaderTuple rht : this.rowHeader) {
+      if (rht.getAttType().equals(RdbmsConstants.FK_FIELD)) {
+        fkHeader.add(rht);
+      }
+    }
+    return fkHeader;
+  }
 
-	public ArrayList<RowHeaderTuple> getRowHeader() {
-		return rowHeader;
-	}
+  public ArrayList<RowHeaderTuple> getRowHeader() {
+    return rowHeader;
+  }
 
-	public void setRowHeader(ArrayList<RowHeaderTuple> rowHeader) {
-		this.rowHeader = rowHeader;
-	}
+  public void setRowHeader(ArrayList<RowHeaderTuple> rowHeader) {
+    this.rowHeader = rowHeader;
+  }
 }

@@ -26,17 +26,28 @@ import org.gradoop.common.model.impl.pojo.EdgeFactory;
  */
 public class EdgeToEdgeComplement implements MapFunction<Edge, Edge> {
 
-	private static final long serialVersionUID = 1L;
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 1L;
 
-	EdgeFactory edgeFactory;
+  /**
+   * Gradoop edge factory
+   */
+  private EdgeFactory edgeFactory;
 
-	public EdgeToEdgeComplement(EdgeFactory edgeFactory) {
-		this.edgeFactory = edgeFactory;
-	}
+  /**
+   * Creates other direction edge
+   * @param edgeFactory Valid gradoop edge factory
+   */
+  public EdgeToEdgeComplement(EdgeFactory edgeFactory) {
+    this.edgeFactory = edgeFactory;
+  }
 
-	@Override
-	public Edge map(Edge e) throws Exception {
+  @Override
+  public Edge map(Edge e) throws Exception {
 
-		return edgeFactory.initEdge(GradoopId.get(), e.getLabel(), e.getTargetId(), e.getSourceId(), e.getProperties());
-	}
+    return edgeFactory.initEdge(GradoopId.get(), e.getLabel(), e.getTargetId(), e.getSourceId(),
+        e.getProperties());
+  }
 }

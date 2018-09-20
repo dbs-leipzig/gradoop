@@ -28,44 +28,52 @@ import java.util.logging.Logger;
  * Generic jdbc driver
  */
 public class DriverShim implements Driver {
-	private Driver driver;
 
-	public DriverShim(Driver driver) {
-		this.driver = driver;
-	}
+  /**
+   * Valid java sql driver
+   */
+  private Driver driver;
 
-	@Override
-	public boolean acceptsURL(String url) throws SQLException {
-		return this.driver.acceptsURL(url);
-	}
+  /**
+   * Creates a generic jddbc driver.
+   * @param driver Valid java sql driver
+   */
+  public DriverShim(Driver driver) {
+    this.driver = driver;
+  }
 
-	@Override
-	public Connection connect(String url, Properties props) throws SQLException {
-		return this.driver.connect(url, props);
-	}
+  @Override
+  public boolean acceptsURL(String url) throws SQLException {
+    return this.driver.acceptsURL(url);
+  }
 
-	@Override
-	public int getMajorVersion() {
-		return this.driver.getMajorVersion();
-	}
+  @Override
+  public Connection connect(String url, Properties props) throws SQLException {
+    return this.driver.connect(url, props);
+  }
 
-	@Override
-	public int getMinorVersion() {
-		return this.driver.getMinorVersion();
-	}
+  @Override
+  public int getMajorVersion() {
+    return this.driver.getMajorVersion();
+  }
 
-	@Override
-	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-		return this.driver.getParentLogger();
-	}
+  @Override
+  public int getMinorVersion() {
+    return this.driver.getMinorVersion();
+  }
 
-	@Override
-	public DriverPropertyInfo[] getPropertyInfo(String url, Properties props) throws SQLException {
-		return this.driver.getPropertyInfo(url, props);
-	}
+  @Override
+  public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+    return this.driver.getParentLogger();
+  }
 
-	@Override
-	public boolean jdbcCompliant() {
-		return this.driver.jdbcCompliant();
-	}
+  @Override
+  public DriverPropertyInfo[] getPropertyInfo(String url, Properties props) throws SQLException {
+    return this.driver.getPropertyInfo(url, props);
+  }
+
+  @Override
+  public boolean jdbcCompliant() {
+    return this.driver.jdbcCompliant();
+  }
 }

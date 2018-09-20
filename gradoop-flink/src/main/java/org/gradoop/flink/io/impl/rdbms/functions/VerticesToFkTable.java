@@ -31,26 +31,33 @@ import org.gradoop.flink.io.impl.rdbms.tuples.LabelIdKeyTuple;
  */
 public class VerticesToFkTable extends RichFlatMapFunction<TableToEdge, LabelIdKeyTuple> {
 
-	private static final long serialVersionUID = 1L;
-	
-	List<Vertex> vertices;
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 1L;
 
-	@Override
-	public void flatMap(TableToEdge table, Collector<LabelIdKeyTuple> out) throws Exception {
-		String label = table.getStartAttribute().f0;
-		GradoopId id;
-		String key;
+  /**
+   * List of converted vertices
+   */
+  private List<Vertex> vertices;
 
-		for (Vertex v : vertices) {
-			if (v.getLabel().equals(table.getstartTableName())) {
-				id = v.getId();
-				key = v.getProperties().get(table.getStartAttribute().f0).toString();
-				out.collect(new LabelIdKeyTuple(label, id, key));
-			}
-		}
-	}
+  @Override
+  public void flatMap(TableToEdge table, Collector<LabelIdKeyTuple> out) throws Exception {
+    String label = table.getStartAttribute().f0;
+    GradoopId id;
+    String key;
 
-	public void open(Configuration parameters) throws Exception {
-		this.vertices = getRuntimeContext().getBroadcastVariable("vertices");
-	}
+    for (Vertex v : vertices) {
+      if (v.getLabel().equals(table.getStartTableName())) {
+        id = v.getId();
+        key = v.getProperties().get(table.getStartAttribute().f0).toString();
+        out.collect(new LabelIdKeyTuple(label, id, key));
+      }
+    }
+  }
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+    this.vertices = getRuntimeContext().getBroadcastVariable("vertices");
+  }
 }
