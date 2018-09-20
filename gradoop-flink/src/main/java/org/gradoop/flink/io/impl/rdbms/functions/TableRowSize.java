@@ -28,7 +28,7 @@ public class TableRowSize {
 
   /**
    * Queries a relational database to get the number of rows
-   * 
+   *
    * @param con
    *          Valid jdbc database connection
    * @param tableName

@@ -29,7 +29,7 @@ public class RdbmsConfig {
   /**
    * Management system identifier
    */
-  static public int RDBMSTYPE;
+  private int rdbmsType;
 
   /**
    * Valid jdbc url
@@ -55,6 +55,8 @@ public class RdbmsConfig {
    * Valid and fitting jdbc driver class name
    */
   private String jdbcDriverClassName;
+
+
 
   /**
    * Constructor
@@ -83,11 +85,7 @@ public class RdbmsConfig {
   }
 
   public int getRdbmsType() {
-    return RDBMSTYPE;
-  }
-
-  public void setRdbmsType(int rdbmsType) {
-    RdbmsConfig.RDBMSTYPE = rdbmsType;
+    return rdbmsType;
   }
 
   public String getRdbms() {
@@ -100,7 +98,7 @@ public class RdbmsConfig {
    */
   public void setRdbms(String rdbms) {
     this.rdbms = rdbms;
-    RdbmsConfig.RDBMSTYPE = RdbmsTypeChooser.choose(rdbms);
+    this.rdbmsType = RdbmsTypeChooser.choose(rdbms);
   }
 
   public String getUrl() {

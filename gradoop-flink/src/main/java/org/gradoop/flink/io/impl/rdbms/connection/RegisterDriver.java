@@ -42,8 +42,8 @@ public class RegisterDriver {
           .newInstance();
       DriverManager.registerDriver(new DriverShim(driver));
 
-    } catch (SQLException | MalformedURLException | InstantiationException | IllegalAccessException |
-        ClassNotFoundException e) {
+    } catch (SQLException | MalformedURLException | InstantiationException |
+        IllegalAccessException | ClassNotFoundException e) {
       e.printStackTrace();
     }
   }

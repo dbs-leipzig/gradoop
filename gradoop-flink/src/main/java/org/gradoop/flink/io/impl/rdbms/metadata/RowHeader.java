@@ -40,7 +40,7 @@ public class RowHeader {
 
   /**
    * Constructor
-   * 
+   *
    * @param rowHeader
    *          List of rowheader tuples
    */
@@ -50,7 +50,7 @@ public class RowHeader {
 
   /**
    * Collects just rowheader tuples of foreign key attributes
-   * 
+   *
    * @return List of rowheader tuples of foreign key attributes
    */
   public ArrayList<RowHeaderTuple> getForeignKeyHeader() {

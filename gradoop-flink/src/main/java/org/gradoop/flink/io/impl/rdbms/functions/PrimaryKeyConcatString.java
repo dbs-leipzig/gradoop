@@ -27,7 +27,7 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 public class PrimaryKeyConcatString {
   /**
    * Concatenates multiple primary keys
-   * 
+   *
    * @param tuple
    *          Tuple of a database table
    * @param rowheader

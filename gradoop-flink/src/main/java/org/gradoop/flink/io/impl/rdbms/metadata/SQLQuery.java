@@ -18,7 +18,6 @@ package org.gradoop.flink.io.impl.rdbms.metadata;
 
 import java.util.ArrayList;
 
-import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConfig;
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
@@ -39,16 +38,18 @@ public class SQLQuery {
    *          List of foreign keys
    * @param furtherAttributes
    *          List of further attributes
+   * @param rdbmsType
+   *          Management type of connected rdbms
    * @return Valid sql string for querying needed data for tuple-to-vertex
    *         conversation
    */
   public static String getNodeTableQuery(String tableName, ArrayList<NameTypeTuple> primaryKeys,
-      ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes) {
+      ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes, int rdbmsType) {
 
     String sqlQuery = "SELECT ";
 
     for (NameTypeTuple pk : primaryKeys) {
-      if (RdbmsConfig.RDBMSTYPE == RdbmsConstants.SQLSERVER_TYPE_ID) {
+      if (rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
         sqlQuery = sqlQuery + "[" + pk.f0 + "]" + ",";
       } else {
         sqlQuery = sqlQuery + pk.f0 + ",";
@@ -56,7 +57,7 @@ public class SQLQuery {
     }
 
     for (FkTuple fk : foreignKeys) {
-      if (RdbmsConfig.RDBMSTYPE == RdbmsConstants.SQLSERVER_TYPE_ID) {
+      if (rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
         sqlQuery = sqlQuery + "[" + fk.f0 + "]" + ",";
       } else {
         sqlQuery += fk.f0 + ",";
@@ -64,7 +65,7 @@ public class SQLQuery {
     }
 
     for (NameTypeTuple att : furtherAttributes) {
-      if (RdbmsConfig.RDBMSTYPE == RdbmsConstants.SQLSERVER_TYPE_ID) {
+      if (rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
         sqlQuery = sqlQuery + "[" + att.f0 + "]" + ",";
       } else {
         sqlQuery += att.f0 + ",";
@@ -85,13 +86,15 @@ public class SQLQuery {
    *          Name of second foreign key attribute
    * @param furtherAttributes
    *          List of further attributes
+   * @param rdbmsType
+   *          Management type of connected rdbms
    * @return Valid sql string for querying needed data for tuple-to-edge
    *         conversation
    */
   public static String getNtoMEdgeTableQuery(String tableName, String startAttribute,
-      String endAttribute, ArrayList<NameTypeTuple> furtherAttributes) {
+      String endAttribute, ArrayList<NameTypeTuple> furtherAttributes, int rdbmsType) {
 
-    if (RdbmsConfig.RDBMSTYPE == RdbmsConstants.SQLSERVER_TYPE_ID) {
+    if (rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
       startAttribute = "[" + startAttribute + "]";
       endAttribute = "[" + endAttribute + "]";
     }
@@ -99,7 +102,7 @@ public class SQLQuery {
     String sqlQuery = "SELECT " + startAttribute + "," + endAttribute + ",";
 
     for (NameTypeTuple att : furtherAttributes) {
-      if (RdbmsConfig.RDBMSTYPE == RdbmsConstants.SQLSERVER_TYPE_ID) {
+      if (rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
         sqlQuery += "[" + att.f0 + "]" + ",";
       } else {
         sqlQuery += att.f0 + ",";

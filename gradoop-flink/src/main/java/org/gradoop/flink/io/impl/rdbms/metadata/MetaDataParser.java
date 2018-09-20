@@ -37,6 +37,11 @@ public class MetaDataParser {
   private Connection con;
 
   /**
+   * Management type of connected rdbms
+   */
+  private int rdbmsType;
+
+  /**
    * Relational database metadata
    */
   private DatabaseMetaData metadata;
@@ -52,10 +57,13 @@ public class MetaDataParser {
    *
    * @param con
    *          Database connection
+   * @param rdbmsType
+   *          Management type of connected rdbms
    * @throws SQLException
    */
-  public MetaDataParser(Connection con) throws SQLException {
+  public MetaDataParser(Connection con, int rdbmsType) throws SQLException {
     this.con = con;
+    this.rdbmsType = rdbmsType;
     this.metadata = con.getMetaData();
     this.tableBase = new ArrayList<RdbmsTableBase>();
   }
@@ -150,11 +158,11 @@ public class MetaDataParser {
       while (rsAttributes.next()) {
 
         // catches unsupported data types
-        if (!pkfkAttributes.contains(rsAttributes.getString("COLUMN_NAME"))
-            && JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.OTHER
-            && JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.ARRAY
-            && JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.LONGNVARCHAR
-            && JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.NVARCHAR) {
+        if (!pkfkAttributes.contains(rsAttributes.getString("COLUMN_NAME")) &&
+            JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.OTHER &&
+            JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.ARRAY &&
+            JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.LONGNVARCHAR &&
+            JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.NVARCHAR) {
 
           NameTypeTuple att = new NameTypeTuple(rsAttributes.getString("COLUMN_NAME"),
               JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")));
@@ -193,7 +201,7 @@ public class MetaDataParser {
     for (RdbmsTableBase tables : tableBase) {
       if (!(tables.getForeignKeys().size() == 2) || !(tables.getPrimaryKeys().size() == 2)) {
 
-        tablesToNodes.add(new TableToNode(tables.getTableName(), tables.getPrimaryKeys(),
+        tablesToNodes.add(new TableToNode(rdbmsType, tables.getTableName(), tables.getPrimaryKeys(),
             tables.getForeignKeys(), tables.getFurtherAttributes(), tables.getRowCount()));
       }
     }
@@ -226,11 +234,10 @@ public class MetaDataParser {
           NameTypeTuple fkAttTwo = new NameTypeTuple(table.getForeignKeys().get(1).f0,
               table.getForeignKeys().get(1).f1);
 
-          tablesToEdges.add(new TableToEdge(tableName, refdTableNameOne, refdTableNameTwo, fkAttOne,
-              fkAttTwo, null, table.getFurtherAttributes(), false, rowCount));}
-
-        // foreign keys going to convert to edges
-        else {
+          tablesToEdges.add(new TableToEdge(rdbmsType, tableName, refdTableNameOne, 
+              refdTableNameTwo, fkAttOne, fkAttTwo, null, table.getFurtherAttributes(), 
+              false, rowCount));
+        } else {
           for (FkTuple fk : table.getForeignKeys()) {
 
             String refdTableName = fk.getRefdTableName();
@@ -238,8 +245,8 @@ public class MetaDataParser {
             NameTypeTuple startAtt = new NameTypeTuple(fk.f0, fk.f1);
             NameTypeTuple endAtt = new NameTypeTuple(fk.f2, null);
 
-            tablesToEdges.add(new TableToEdge(null, tableName, refdTableName, startAtt, endAtt,
-                table.getPrimaryKeys(), null, true, rowCount));
+            tablesToEdges.add(new TableToEdge(rdbmsType, null, tableName, refdTableName, 
+                startAtt, endAtt, table.getPrimaryKeys(), null, true, rowCount));
           }
         }
       }

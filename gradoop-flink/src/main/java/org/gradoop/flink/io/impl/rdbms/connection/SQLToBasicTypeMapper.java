@@ -20,6 +20,7 @@ import java.sql.JDBCType;
 
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 
 /**
  * JDBC type to BasiTypeInfo Mapper
@@ -31,9 +32,11 @@ public class SQLToBasicTypeMapper {
    *
    * @param jdbcType
    *          Jdbc Type of attribute
+   * @param rdbmsType
+   *          Management type of connected rdbms
    * @return Flink type information
    */
-  public static TypeInformation<?> getTypeInfo(JDBCType jdbcType) {
+  public static TypeInformation<?> getTypeInfo(JDBCType jdbcType, int rdbmsType) {
     TypeInformation<?> typeInfo = null;
 
     switch (jdbcType.name()) {
@@ -60,14 +63,14 @@ public class SQLToBasicTypeMapper {
       typeInfo = BasicTypeInfo.BOOLEAN_TYPE_INFO;
       break;
     case "TINYINT":
-      if (RdbmsConfig.RDBMSTYPE == 0) {
+      if (rdbmsType == RdbmsConstants.MYSQL_TYPE_ID) {
         typeInfo = BasicTypeInfo.INT_TYPE_INFO;
       } else {
         typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
       }
       break;
     case "SMALLINT":
-      if (RdbmsConfig.RDBMSTYPE == 0) {
+      if (rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
         typeInfo = BasicTypeInfo.INT_TYPE_INFO;
       } else {
         typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
@@ -92,13 +95,13 @@ public class SQLToBasicTypeMapper {
       typeInfo = BasicTypeInfo.DOUBLE_TYPE_INFO;
       break;
     case "BINARY":
-      typeInfo = BasicTypeInfo.of(byte[].class);
+      typeInfo = TypeInformation.of(byte[].class);
       break;
     case "VARBINARY":
-      typeInfo = BasicTypeInfo.of(byte[].class);
+      typeInfo = TypeInformation.of(byte[].class);
       break;
     case "LONGVARBINARY":
-      typeInfo = BasicTypeInfo.of(byte[].class);
+      typeInfo = TypeInformation.of(byte[].class);
       break;
     case "DATE":
       typeInfo = BasicTypeInfo.DATE_TYPE_INFO;
@@ -110,10 +113,10 @@ public class SQLToBasicTypeMapper {
       typeInfo = BasicTypeInfo.DATE_TYPE_INFO;
       break;
     case "CLOB":
-      typeInfo = BasicTypeInfo.of(java.sql.Clob.class);
+      typeInfo = TypeInformation.of(java.sql.Clob.class);
       break;
     case "BLOB":
-      typeInfo = BasicTypeInfo.of(java.sql.Blob.class);
+      typeInfo = TypeInformation.of(java.sql.Blob.class);
       break;
     case "DISTINCT":
       typeInfo = BasicTypeInfo.INT_TYPE_INFO;

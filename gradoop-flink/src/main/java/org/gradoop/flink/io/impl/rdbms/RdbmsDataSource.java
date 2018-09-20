@@ -103,7 +103,7 @@ public class RdbmsDataSource implements DataSource {
     try {
       rdbmsConfig.setRdbms(con.getMetaData().getDatabaseProductName().toLowerCase());
 
-      metadataParser = new MetaDataParser(con);
+      metadataParser = new MetaDataParser(con, rdbmsConfig.getRdbmsType());
       metadataParser.parse();
     } catch (SQLException e) {
       e.printStackTrace();
@@ -118,11 +118,7 @@ public class RdbmsDataSource implements DataSource {
     // creates vertices from rdbms table tuples
     tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
 
-    try {
-      edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
 
     // cleans vertices by deleting primary key and foreign key
     // properties
