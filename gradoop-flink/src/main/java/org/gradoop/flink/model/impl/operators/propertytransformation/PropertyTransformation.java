@@ -91,7 +91,7 @@ public class PropertyTransformation implements UnaryGraphToGraphOperator {
   }
 
   /**
-   * Valued constructor.
+   * Creates a new property transformation operator instance.
    *
    * @param propertyKey                      property key
    * @param graphHeadTransformationFunction  transformation function which shall be applied to a

@@ -18,6 +18,13 @@ package org.gradoop.flink.model.impl.operators.propertytransformation;
 import org.gradoop.common.model.impl.properties.PropertyValue;	
 import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;	
 
+/**
+ * A sample property transformation function which can be used for the property transformation
+ * operator.
+ *
+ * @see org.gradoop.flink.model.impl.operators.propertytransformation.PropertyTransformation
+ * @see org.gradoop.flink.model.api.functions.PropertyTransformationFunction
+ */
 public class DivideBy implements PropertyTransformationFunction {	
   /**	
    * Avoid object instantiation.	
@@ -29,7 +36,7 @@ public class DivideBy implements PropertyTransformationFunction {
   private long divisor;	
   
   /**	
-   * Valued constructor.	
+   * Creates a new instance of DivideBy which can be used for property transformation.
    *	
    * @param divisor divisor for the property value	
    */	

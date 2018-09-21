@@ -56,7 +56,8 @@ public class BasePropertyTransformationFunction<EL extends Element>
   private boolean keepHistory;
 
   /**
-   * Valued constructor.
+   * Creates a new BasePropertyTransformationFunction which can be used in the property
+   * transformation operator.
    *
    * @param propertyKey                property key
    * @param transformationFunction     transformation function which shall be applied to a property
