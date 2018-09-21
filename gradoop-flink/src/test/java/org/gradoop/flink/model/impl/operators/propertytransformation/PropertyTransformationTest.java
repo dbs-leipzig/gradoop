@@ -30,41 +30,41 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
    * The test graphs used for transformation and comparison.
    */
   protected static final String TEST_GRAPH =
-      "g0:A  { a : 42000L } [(:A { a : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
-      "->(:B { a: 42000L, c : 23 })]" +
-      "g1:B  { a : 42000L } [(:A { a : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
-      "->(:B { a: 42000L, c : 23 })(:C { a : 42000L, b : 42 })-[:b { a : 42000L, b : 42 }]" +
-      "->(:D { a: 42000L, c : 23 })]" +
+      "g0:A  { a : 3000L } [(:A { a : 3000L, b : 3 })-[:a { a : 3000L, b : 3 }]" +
+      "->(:B { a: 3000L, c : 23 })]" +
+      "g1:B  { a : 3000L } [(:A { a : 3000L, b : 3 })-[:a { a : 3000L, b : 3 }]" +
+      "->(:B { a: 3000L, c : 23 })(:C { a : 3000L, b : 3 })-[:b { a : 3000L, b : 3 }]" +
+      "->(:D { a: 3000L, c : 23 })]" +
       // full graph transformation
-      "g01:A  { a : 42L, a__1 : 42000L } [(:A { a : 42L, a__1 : 42000L, b : 42 })" +
-      "-[:a { a : 42L, a__1 : 42000L, b : 42 }]->(:B { a: 42L, a__1 : 42000L, c : 23 })]" +
+      "g01:A  { a : 3L, a__1 : 3000L } [(:A { a : 3L, a__1 : 3000L, b : 3 })" +
+      "-[:a { a : 3L, a__1 : 3000L, b : 3 }]->(:B { a: 3L, a__1 : 3000L, c : 23 })]" +
       // graph head only transformation
-      "g02:A { a : 42L, a__1 : 42000L } [(:A { a : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
-      "->(:B { a: 42000L, c : 23 })]" +
-      "g12:A { a : 42L } [(:A { a : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
-      "->(:B { a: 42000L, c : 23 })]" +
-      "g22:A { dividedA : 42L, a : 42000L } [(:A { a : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
-      "->(:B { a: 42000L, c : 23 })]" +
+      "g02:A { a : 3L, a__1 : 3000L } [(:A { a : 3000L, b : 3 })-[:a { a : 3000L, b : 3 }]" +
+      "->(:B { a: 3000L, c : 23 })]" +
+      "g12:A { a : 3L } [(:A { a : 3000L, b : 3 })-[:a { a : 3000L, b : 3 }]" +
+      "->(:B { a: 3000L, c : 23 })]" +
+      "g22:A { dividedA : 3L, a : 3000L } [(:A { a : 3000L, b : 3 })-[:a { a : 3000L, b : 3 }]" +
+      "->(:B { a: 3000L, c : 23 })]" +
       // vertex only transformation
-      "g03:A { a : 42000L } [(:A { a : 42L, a__1 : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
-      "->(:B { a: 42L, a__1 : 42000L, c : 23 })]" +
-      "g13:A { a : 42000L } [(:A { a : 42L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
-      "->(:B { a: 42L, c : 23 })]" +
-      "g23:A { a : 42000L } [(:A { dividedA : 42L, a : 42000L, b : 42 })" +
-      "-[:a { a : 42000L, b : 42 }]->(:B { dividedA: 42L, a : 42000L, c : 23 })]" +
-      "g33:A { a : 42000L } [(:A { a : 42L, a__1 : 42000L, b : 42 })-[:a { a : 42000L, b : 42 }]" +
-      "->(:B { a : 42000L, c : 23 })]" +
+      "g03:A { a : 3000L } [(:A { a : 3L, a__1 : 3000L, b : 3 })-[:a { a : 3000L, b : 3 }]" +
+      "->(:B { a: 3L, a__1 : 3000L, c : 23 })]" +
+      "g13:A { a : 3000L } [(:A { a : 3L, b : 3 })-[:a { a : 3000L, b : 3 }]" +
+      "->(:B { a: 3L, c : 23 })]" +
+      "g23:A { a : 3000L } [(:A { dividedA : 3L, a : 3000L, b : 3 })" +
+      "-[:a { a : 3000L, b : 3 }]->(:B { dividedA: 3L, a : 3000L, c : 23 })]" +
+      "g33:A { a : 3000L } [(:A { a : 3L, a__1 : 3000L, b : 3 })-[:a { a : 3000L, b : 3 }]" +
+      "->(:B { a : 3000L, c : 23 })]" +
       // edge only transformation
-      "g04:A { a : 42000L } [(:A { a : 42000L, b : 42 })-[:a { a : 42L, a__1 : 42000L, b : 42 }]" +
-      "->(:B { a: 42000L, c : 23 })]" +
-      "g14:A { a : 42000L } [(:A { a : 42000L, b : 42 })-[:a { a : 42L, b : 42 }]" +
-      "->(:B { a: 42000L, c : 23 })]" +
-      "g24:A { a : 42000L }  [(:A { a : 42000L, b : 42 })" +
-      "-[:a { dividedA : 42L, a : 42000L, b : 42 }]->(:B { a: 42000L, c : 23 })]" +
-      "g34:B  { a : 42000L } [(:A { a : 42000L, b : 42 })" +
-      "-[:a { a : 42L, a__1 : 42000L, b : 42 }]->(:B { a: 42000L, c : 23 })" +
-      "(:C { a : 42000L, b : 42 })-[:b { a : 42000L, b : 42 }]" +
-      "->(:D { a: 42000L, c : 23 })]";
+      "g04:A { a : 3000L } [(:A { a : 3000L, b : 3 })-[:a { a : 3L, a__1 : 3000L, b : 3 }]" +
+      "->(:B { a: 3000L, c : 23 })]" +
+      "g14:A { a : 3000L } [(:A { a : 3000L, b : 3 })-[:a { a : 3L, b : 3 }]" +
+      "->(:B { a: 3000L, c : 23 })]" +
+      "g24:A { a : 3000L }  [(:A { a : 3000L, b : 3 })" +
+      "-[:a { dividedA : 3L, a : 3000L, b : 3 }]->(:B { a: 3000L, c : 23 })]" +
+      "g34:B  { a : 3000L } [(:A { a : 3000L, b : 3 })" +
+      "-[:a { a : 3L, a__1 : 3000L, b : 3 }]->(:B { a: 3000L, c : 23 })" +
+      "(:C { a : 3000L, b : 3 })-[:b { a : 3000L, b : 3 }]" +
+      "->(:D { a: 3000L, c : 23 })]";
   /**
    * Simple property transformation that divides a value by 1000.
    */
@@ -83,8 +83,15 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g01");
 
-    LogicalGraph result = original.callForGraph(new PropertyTransformation("a",
-    		DIVISION, DIVISION, DIVISION, null, null, true));
+    LogicalGraph result = original.callForGraph(
+      new PropertyTransformation(
+        "a",
+        DIVISION,
+        DIVISION,
+        DIVISION,
+        null,
+        null,
+        true));
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
@@ -102,8 +109,15 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g02");
 
-    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", DIVISION, null,
-        null, null, null, true));
+    LogicalGraph result = original.callForGraph(
+      new PropertyTransformation(
+        "a",
+        DIVISION,
+        null,
+        null,
+        null,
+        null,
+        true));
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
@@ -122,7 +136,11 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g12");
 
-    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", DIVISION, null,
+    LogicalGraph result = original.callForGraph(
+      new PropertyTransformation(
+        "a",
+        DIVISION,
+        null,
         null));
 
     collectAndAssertTrue(result.equalsByData(expected));
@@ -142,8 +160,15 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g22");
 
-    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", DIVISION, null,
-        null, null, "dividedA", true));
+    LogicalGraph result = original.callForGraph(
+      new PropertyTransformation(
+        "a",
+        DIVISION,
+        null,
+        null,
+        null,
+        "dividedA",
+        true));
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
@@ -161,8 +186,15 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g03");
 
-    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null, DIVISION,
-        null, null, null, true));
+    LogicalGraph result = original.callForGraph(
+      new PropertyTransformation(
+        "a",
+        null,
+        DIVISION,
+        null,
+        null,
+        null,
+        true));
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
@@ -181,7 +213,11 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g13");
 
-    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null, DIVISION,
+    LogicalGraph result = original.callForGraph(
+      new PropertyTransformation(
+        "a",
+        null,
+        DIVISION,
         null));
     
     collectAndAssertTrue(result.equalsByData(expected));
@@ -201,8 +237,15 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g23");
 
-    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null, DIVISION,
-        null, null, "dividedA", true));
+    LogicalGraph result = original.callForGraph(
+      new PropertyTransformation(
+        "a",
+        null,
+        DIVISION,
+        null,
+        null,
+        "dividedA",
+        true));
     
     collectAndAssertTrue(result.equalsByData(expected));
   }
@@ -221,8 +264,15 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g33");
 
-    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null, DIVISION,
-        null, "A", null, true));
+    LogicalGraph result = original.callForGraph(
+      new PropertyTransformation(
+        "a",
+        null,
+        DIVISION,
+        null,
+        "A",
+        null,
+        true));
     
     collectAndAssertTrue(result.equalsByData(expected));
   }
@@ -240,8 +290,15 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g04");
 
-    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null, null,
-        DIVISION, null, null, true));
+    LogicalGraph result = original.callForGraph(
+      new PropertyTransformation(
+        "a",
+        null,
+        null,
+        DIVISION,
+        null,
+        null,
+        true));
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
@@ -260,7 +317,11 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g14");
 
-    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null, null,
+    LogicalGraph result = original.callForGraph(
+      new PropertyTransformation(
+        "a",
+        null,
+        null,
         DIVISION));
 
     collectAndAssertTrue(result.equalsByData(expected));
@@ -280,8 +341,15 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g24");
 
-    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null, null,
-    		DIVISION, null, "dividedA", true));
+    LogicalGraph result = original.callForGraph(
+      new PropertyTransformation(
+        "a",
+        null,
+        null,
+        DIVISION,
+        null,
+        "dividedA",
+        true));
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
@@ -300,8 +368,15 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g34");
 
-    LogicalGraph result = original.callForGraph(new PropertyTransformation("a", null, null,
-    		DIVISION, "a", null, true));
+    LogicalGraph result = original.callForGraph(
+      new PropertyTransformation(
+        "a",
+        null,
+        null,
+        DIVISION,
+        "a",
+        null,
+        true));
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
