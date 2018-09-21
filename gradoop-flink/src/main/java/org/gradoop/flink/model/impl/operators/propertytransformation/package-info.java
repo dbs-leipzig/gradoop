@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains the interface for the drilling functions which are applied to the properties.
+ * Contains all implementations of the graph property transformation operators.
  */
-package org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions;
+package org.gradoop.flink.model.impl.operators.propertytransformation;
