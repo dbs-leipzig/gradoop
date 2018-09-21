@@ -28,9 +28,6 @@ import org.gradoop.flink.io.impl.rdbms.tuples.LabelIdKeyTuple;
 
 /**
  * Collects label,gradoop id, primary key value of vertices
- *
- * @author hr73vexy
- *
  */
 public class VerticesToPkTable extends RichFlatMapFunction<TableToEdge, LabelIdKeyTuple> {
 

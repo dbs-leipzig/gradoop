@@ -53,8 +53,8 @@ public class DeletePkFkProperties extends RichMapFunction<Vertex, Vertex> {
           foreignKeys.add(rht.f0);
         }
         for (Property oldProp : v.getProperties()) {
-          if (!foreignKeys.contains(oldProp.getKey())
-              && !oldProp.getKey().equals(RdbmsConstants.PK_ID)) {
+          if (!foreignKeys.contains(oldProp.getKey()) &&
+              !oldProp.getKey().equals(RdbmsConstants.PK_ID)) {
             newProps.set(oldProp);
           }
         }

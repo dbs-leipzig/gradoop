@@ -26,7 +26,7 @@ public class RdbmsConnect {
 
   /**
    * Establishes a connection to a relational database via jdbc.
-   * 
+   *
    * @param config
    *          Configuration of relational database
    * @return Valid connection to a relational database

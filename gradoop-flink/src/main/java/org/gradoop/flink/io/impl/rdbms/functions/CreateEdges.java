@@ -53,7 +53,7 @@ public class CreateEdges {
    * @throws Exception
    */
   public static DataSet<Edge> create(GradoopFlinkConfig flinkConfig, RdbmsConfig rdbmsConfig,
-      ArrayList<TableToEdge> tablesToEdges, DataSet<Vertex> vertices) throws Exception {
+      ArrayList<TableToEdge> tablesToEdges, DataSet<Vertex> vertices) {
 
     DataSet<Edge> edges = null;
     EdgeFactory edgeFactory = flinkConfig.getEdgeFactory();
