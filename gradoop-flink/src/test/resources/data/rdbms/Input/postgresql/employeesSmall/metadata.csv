@@ -1,0 +1,5 @@
+v;public.departments;dept_name:string,dept_no:string
+v;public.employees;birth_date:localdate,emp_no:int,first_name:string,gender:string,hire_date:localdate,last_name:string
+v;public.titles;from_date:localdate,title:string,to_date:localdate
+e;emp_no;
+e;public.dept_manager;from_date:localdate,to_date:localdate
