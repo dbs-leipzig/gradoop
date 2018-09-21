@@ -38,11 +38,4 @@ CREATE TABLE titles (
     PRIMARY KEY (emp_no,title, from_date)
 );
 
-source load_employees (Kopie).dump
-
-source load_departments.dump ;
-
-source load_dept_manager.dump ;
-
-source load_titles (Kopie).dump
 
