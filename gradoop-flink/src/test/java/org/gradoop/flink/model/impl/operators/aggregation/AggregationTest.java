@@ -300,7 +300,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testSingleGraphHasVertexLabelEmptyString() throws Exception {
-    LogicalGraph graph = getLoaderFromString("g0[(v0:)-[e0]->(v1:)")
+    LogicalGraph graph = getLoaderFromString("g0[(v0)-[e0]->(v1)]")
       .getLogicalGraphByVariable("g0");
     HasVertexLabel hasLabel = new HasVertexLabel("");
     graph = graph.aggregate(hasLabel);
@@ -308,7 +308,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
 
     assertTrue("Property hasVertexLabel_ not set",
       graphHead.hasProperty(hasLabel.getAggregatePropertyKey()));
-    assertFalse("Property hasVertexLabel_ is true, should be false",
+    assertTrue("Property hasVertexLabel_ is false, should be true",
       graphHead.getPropertyValue(hasLabel.getAggregatePropertyKey()).getBoolean());
   }
 
