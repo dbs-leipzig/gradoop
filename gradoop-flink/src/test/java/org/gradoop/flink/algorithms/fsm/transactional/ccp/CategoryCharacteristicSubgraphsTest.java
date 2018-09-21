@@ -57,10 +57,8 @@ public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {
     HasLabel hasVertexLabelC = new HasVertexLabel("C");
     HasLabel hasVertexLabelD = new HasVertexLabel("D");
 
-    collection = collection
-      .apply(new ApplyAggregation(hasVertexLabelB))
-      .apply(new ApplyAggregation(hasVertexLabelC))
-      .apply(new ApplyAggregation(hasVertexLabelD));
+    collection = collection.apply(new ApplyAggregation(hasVertexLabelB, hasVertexLabelC,
+      hasVertexLabelD));
 
     GraphCollection bGraphs = collection
       .select(hasVertexLabelB)
