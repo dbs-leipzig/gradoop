@@ -133,10 +133,6 @@ org.gradoop.flink.model.impl.operators.difference
 org.gradoop.flink.model.impl.operators.difference.functions
 org.gradoop.flink.model.impl.operators.distinction
 org.gradoop.flink.model.impl.operators.distinction.functions
-org.gradoop.flink.model.impl.operators.drilling
-org.gradoop.flink.model.impl.operators.drilling.functions
-org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions
-org.gradoop.flink.model.impl.operators.drilling.functions.transformations
 org.gradoop.flink.model.impl.operators.equality
 org.gradoop.flink.model.impl.operators.exclusion
 org.gradoop.flink.model.impl.operators.fusion
@@ -206,6 +202,7 @@ org.gradoop.flink.model.impl.operators.neighborhood
 org.gradoop.flink.model.impl.operators.neighborhood.functions
 org.gradoop.flink.model.impl.operators.neighborhood.keyselector
 org.gradoop.flink.model.impl.operators.overlap
+org.gradoop.flink.model.impl.operators.propertytransformation
 org.gradoop.flink.model.impl.operators.sampling
 org.gradoop.flink.model.impl.operators.sampling.functions
 org.gradoop.flink.model.impl.operators.sampling.statistics
