@@ -15,7 +15,7 @@ public class PostgresWrapper {
       private EmbeddedPostgres embeddedPostgres;
       /** The URL to connect on */
       private String connectionUrl;
-
+      
       /**
        * Start PostgreSQL running
        * @throws IOException if an error occurs starting Postgres
