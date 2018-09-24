@@ -1,0 +1,14 @@
+expected [
+	(peter:public.person {name: "Peter"}),
+	(karla:public.person {name: "Karla"}),
+	(joachim:public.person {name: "Joachim"}),
+	(steffen:public.person {name: "Steffen"}),
+	(michael:public.person {name: "Michael"}),
+	(sven:public.person {name: "Sven"}),
+	(peter)-[gatte]->(karla),
+	(karla)-[gatte]->(peter),
+	(joachim)-[gatte]->(steffen),
+	(steffen)-[gatte]->(joachim),
+	(michael)-[gatte]->(sven),
+	(sven)-[gatte]->(michael)
+]

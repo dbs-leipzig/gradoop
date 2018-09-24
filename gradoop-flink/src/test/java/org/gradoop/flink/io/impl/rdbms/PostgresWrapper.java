@@ -1,5 +1,6 @@
 package org.gradoop.flink.io.impl.rdbms;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -25,6 +26,7 @@ public class PostgresWrapper {
               int port = getFreePort();
               embeddedPostgres = new EmbeddedPostgres();
               connectionUrl = embeddedPostgres.start("localhost", port, "dbName", "userName", "password");
+              embeddedPostgres.getProcess().get().importFromFile(new File(RdbmsDataImportTest.class.getResource("/data/rdbms/inpute/")));
           }
       }
 
