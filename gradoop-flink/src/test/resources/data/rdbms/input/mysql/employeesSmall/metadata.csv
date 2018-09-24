@@ -1,5 +1,0 @@
-v;departments;dept_name:string,dept_no:string
-v;employees;birth_date:localdate,emp_no:int,first_name:string,gender:string,hire_date:localdate,last_name:string
-v;titles;from_date:localdate,title:string,to_date:localdate
-e;emp_no;
-e;dept_manager;from_date:localdate,to_date:localdate

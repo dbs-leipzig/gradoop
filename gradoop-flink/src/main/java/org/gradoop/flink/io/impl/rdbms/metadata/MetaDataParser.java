@@ -234,8 +234,8 @@ public class MetaDataParser {
           NameTypeTuple fkAttTwo = new NameTypeTuple(table.getForeignKeys().get(1).f0,
               table.getForeignKeys().get(1).f1);
 
-          tablesToEdges.add(new TableToEdge(rdbmsType, tableName, refdTableNameOne, 
-              refdTableNameTwo, fkAttOne, fkAttTwo, null, table.getFurtherAttributes(), 
+          tablesToEdges.add(new TableToEdge(rdbmsType, tableName, refdTableNameOne,
+              refdTableNameTwo, fkAttOne, fkAttTwo, null, table.getFurtherAttributes(),
               false, rowCount));
         } else {
           for (FkTuple fk : table.getForeignKeys()) {
@@ -245,12 +245,44 @@ public class MetaDataParser {
             NameTypeTuple startAtt = new NameTypeTuple(fk.f0, fk.f1);
             NameTypeTuple endAtt = new NameTypeTuple(fk.f2, null);
 
-            tablesToEdges.add(new TableToEdge(rdbmsType, null, tableName, refdTableName, 
+            tablesToEdges.add(new TableToEdge(rdbmsType, null, tableName, refdTableName,
                 startAtt, endAtt, table.getPrimaryKeys(), null, true, rowCount));
           }
         }
       }
     }
     return tablesToEdges;
+  }
+
+  public Connection getCon() {
+    return con;
+  }
+
+  public void setCon(Connection con) {
+    this.con = con;
+  }
+
+  public int getRdbmsType() {
+    return rdbmsType;
+  }
+
+  public void setRdbmsType(int rdbmsType) {
+    this.rdbmsType = rdbmsType;
+  }
+
+  public DatabaseMetaData getMetadata() {
+    return metadata;
+  }
+
+  public void setMetadata(DatabaseMetaData metadata) {
+    this.metadata = metadata;
+  }
+
+  public ArrayList<RdbmsTableBase> getTableBase() {
+    return tableBase;
+  }
+
+  public void setTableBase(ArrayList<RdbmsTableBase> tableBase) {
+    this.tableBase = tableBase;
   }
 }

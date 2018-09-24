@@ -1,4 +1,35 @@
--- Data for small employees db
+CREATE TYPE gender AS ENUM ('M','F');
+CREATE TABLE employees (
+    emp_no      INT             NOT NULL,
+    birth_date  DATE            NOT NULL,
+    first_name  VARCHAR(14)     NOT NULL,
+    last_name   VARCHAR(16)     NOT NULL,
+    current_gender      gender  	NOT NULL,    
+    hire_date   DATE            NOT NULL,
+    PRIMARY KEY (emp_no)
+);
+CREATE TABLE departments (
+    dept_no     CHAR(4)         NOT NULL,
+    dept_name   VARCHAR(40)     NOT NULL,
+    PRIMARY KEY (dept_no)
+);
+CREATE TABLE dept_manager (
+   emp_no       INT             NOT NULL,
+   dept_no      CHAR(4)         NOT NULL,
+   from_date    DATE            NOT NULL,
+   to_date      DATE            NOT NULL,
+   FOREIGN KEY (emp_no) references employees (emp_no),
+   FOREIGN KEY (dept_no) REFERENCES departments (dept_no) ON DELETE CASCADE,
+   PRIMARY KEY (emp_no,dept_no)
+); 
+CREATE TABLE titles (
+    emp_no      INT             NOT NULL,
+    title       VARCHAR(50)     NOT NULL,
+    from_date   DATE            NOT NULL,
+    to_date     DATE,
+    FOREIGN KEY (emp_no) REFERENCES employees (emp_no) ON DELETE CASCADE,
+    PRIMARY KEY (emp_no,title, from_date)
+);
 INSERT INTO employees VALUES 
 (110022,'1956-09-12','Margareta','Markovitch','M','1985-01-01'),
 (110039,'1963-06-21','Vishwani','Minakawa','M','1986-04-12'),
@@ -23,7 +54,6 @@ INSERT INTO employees VALUES
 (10007,'1957-05-23','Tzvetan','Zielinski','F','1989-02-10'),
 (10008,'1958-02-19','Saniya','Kalloufi','M','1994-09-15'),
 (10009,'1952-04-19','Sumant','Peac','F','1985-02-18');
-
 INSERT INTO departments VALUES 
 ('d001','Marketing'),
 ('d002','Finance'),
@@ -34,7 +64,6 @@ INSERT INTO departments VALUES
 ('d007','Sales'),
 ('d008','Research'),
 ('d009','Customer Service');
-
 INSERT INTO dept_manager VALUES 
 (110022,'d001','1985-01-01','1991-10-01'),
 (110039,'d001','1991-10-01','9999-01-01'),
@@ -48,9 +77,8 @@ INSERT INTO dept_manager VALUES
 (110420,'d004','1996-08-30','9999-01-01'),
 (110511,'d005','1985-01-01','1992-04-25'),
 (110567,'d005','1992-04-25','9999-01-01'),
-(110725,'d006','1985-01-01','1989-05-06')
+(110725,'d006','1985-01-01','1989-05-06'),
 (111939,'d009','1996-01-03','9999-01-01');
-
 INSERT INTO titles VALUES
 -- dept_manager titles
 (110022,'Manager','1985-01-01','1991-10-01'),
@@ -96,5 +124,3 @@ INSERT INTO titles VALUES
 (10008,'Assistant Engineer','1998-03-11','2000-07-31'),
 (10009,'Assistant Engineer','1985-02-18','1990-02-18'),
 (10009,'Engineer','1990-02-18','1995-02-18');
-
-

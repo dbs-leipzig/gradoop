@@ -29,57 +29,56 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  */
 public class RdbmsExample implements ProgramDescription {
 
-	/**
-	 * Converts a relational database to an epgm graph
-	 *
-	 * @param args[0]:
-	 *            Jdbc url
-	 * @param args[1]:
-	 *            User name of database user
-	 * @param args[2]:
-	 *            Password of database user
-	 * @param args[3]:
-	 *            Valid path to a fitting jdbc driver
-	 * @param args[4]:
-	 *            Valid jdbc driver class name
-	 * @param args[5]:
-	 *            Valid path to output directory
-	 */
-	public static void main(String[] args) throws Exception {
+  /**
+   * Converts a relational database to an epgm graph
+   *
+   * args[0]:Valid jdbc url.
+   * args[1]:User name of database user.
+   * args[2]:Password of database user.
+   * args[3]:Valid path to a fitting jdbc driver.
+   * args[4]:Valid jdbc driver class name.
+   * args[5]:Valid path to output directory.
+   *
+   * @param args program arguments
+   */
+  public static void main(String[] args) throws Exception {
 
-		if (args.length != 6) {
-			throw new IllegalArgumentException(
-					"Please provide url, user, pasword, path to jdbc driver jar, jdbc driver class name, output directory");
-		}
-		final String url = args[0];
-		final String user = args[1];
-		final String pw = args[2];
-		final String jdbcDriverPath = args[3];
-		final String jdbcDriverClassName = args[4];
-		final String outputPath = args[5];
+    if (args.length != 6) {
+      throw new IllegalArgumentException(
+          "Please provide url, user, pasword, path to jdbc driver jar, jdbc driver class name, " +
+          "output directory");
+    }
+    final String url = args[0];
+    final String user = args[1];
+    final String pw = args[2];
+    final String jdbcDriverPath = args[3];
+    final String jdbcDriverClassName = args[4];
+    final String outputPath = args[5];
 
-		// init Flink execution environment
-		ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+    // init Flink execution environment
+    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
-		// create default Gradoop config
-		GradoopFlinkConfig gfc = GradoopFlinkConfig.createConfig(env);
+    // create default Gradoop config
+    GradoopFlinkConfig gfc = GradoopFlinkConfig.createConfig(env);
 
-		// create DataSource
-		RdbmsDataSource dataSource = new RdbmsDataSource(url, user, pw, jdbcDriverPath, jdbcDriverClassName, gfc);
+    // create DataSource
+    RdbmsDataSource dataSource = new RdbmsDataSource(url, user, pw, jdbcDriverPath,
+        jdbcDriverClassName, gfc);
 
-		// get logical graph of datasource
-		LogicalGraph schema = dataSource.getLogicalGraph();
+    // get logical graph of datasource
+    LogicalGraph schema = dataSource.getLogicalGraph();
 
-		// write conversion result to given path with timestamp and db name
-		schema.writeTo(new CSVDataSink(outputPath, gfc));
+    // write conversion result to given path with timestamp and db name
+    schema.writeTo(new CSVDataSink(outputPath, gfc));
 
-		// execute program
-		env.execute();
-	}
+    // execute program
+    env.execute();
+  }
 
-	@Override
-	public String getDescription() {
-		return "Data import for relational databases, implementing a relational database to epgm graph database conversion.";
-	}
+  @Override
+  public String getDescription() {
+    return "Data import for relational databases, " +
+        "implementing a relational database to epgm graph database conversion.";
+  }
 
 }

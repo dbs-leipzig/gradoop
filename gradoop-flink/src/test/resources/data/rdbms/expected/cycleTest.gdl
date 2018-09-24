@@ -1,14 +1,8 @@
-expected [
-	(peter:public.person {name: "Peter"}),
-	(karla:public.person {name: "Karla"}),
-	(joachim:public.person {name: "Joachim"}),
-	(steffen:public.person {name: "Steffen"}),
-	(michael:public.person {name: "Michael"}),
-	(sven:public.person {name: "Sven"}),
-	(peter)-[gatte]->(karla),
-	(karla)-[gatte]->(peter),
-	(joachim)-[gatte]->(steffen),
-	(steffen)-[gatte]->(joachim),
-	(michael)-[gatte]->(sven),
-	(sven)-[gatte]->(michael)
+[
+	(:person {pnr:0, name: "Peter"})-[:gatte]->(:person {pnr:1, name: "Karla"}),
+	(:person {pnr:1, name: "Karla"})-[:gatte]->(:person {pnr:0, name: "Peter"}),
+	(:person {pnr:2, name: "Joachim"})-[:gatte]->(:person {pnr:3, name: "Steffen"}),
+	(:person {pnr:3, name: "Steffen"})-[:gatte]->(:person {pnr:2, name: "Joachim"}),
+	(:person {pnr:4, name: "Michael"})-[:gatte]->(:person {pnr:5, name: "Sven"}),
+	(:person {pnr:5, name: "Sven"})-[:gatte]->(:person {pnr:4, name: "Michael"})
 ]
