@@ -164,9 +164,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
     INPUT_PATH      = cmd.getOptionValue(OPTION_INPUT_PATH);
     OUTPUT_PATH     = cmd.getOptionValue(OPTION_OUTPUT_PATH);
     CSV_PATH        = cmd.getOptionValue(OPTION_CSV_PATH);
-    if (cmd.hasOption(OPTION_STATISTICS_PATH)) {
-      STATISTICS_PATH = cmd.getOptionValue(OPTION_STATISTICS_PATH);
-    }
+    STATISTICS_PATH = cmd.getOptionValue(OPTION_STATISTICS_PATH);
   }
 
   /**
