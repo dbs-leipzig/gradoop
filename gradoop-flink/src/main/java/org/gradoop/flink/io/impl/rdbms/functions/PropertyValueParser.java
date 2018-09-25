@@ -40,15 +40,13 @@ public class PropertyValueParser {
     if (att == null) {
       propValue = PropertyValue.NULL_VALUE;
     } else {
-      try {
-        if (att.getClass() == Date.class) {
-          propValue = PropertyValue
-              .create(((Date) att).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        } else {
-          propValue = PropertyValue.create(att);
-        }
-      } catch (IllegalArgumentException e) {
-        e.printStackTrace();
+      if (att.getClass() == Date.class) {
+        propValue = PropertyValue
+            .create(((Date) att).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+      } else if (att.getClass() == byte[].class) {
+        propValue = PropertyValue.create(String.valueOf(att));
+      } else {
+        propValue = PropertyValue.create(att);
       }
     }
     return propValue;

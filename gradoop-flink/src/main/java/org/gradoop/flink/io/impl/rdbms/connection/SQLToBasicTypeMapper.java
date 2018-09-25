@@ -70,7 +70,7 @@ public class SQLToBasicTypeMapper {
       }
       break;
     case "SMALLINT":
-      if (rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
+      if (rdbmsType == RdbmsConstants.MYSQL_TYPE_ID) {
         typeInfo = BasicTypeInfo.INT_TYPE_INFO;
       } else {
         typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
