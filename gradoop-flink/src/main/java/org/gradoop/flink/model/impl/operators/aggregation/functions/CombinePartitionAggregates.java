@@ -21,37 +21,47 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * partitionAggregateValue,.. => globalAggregateValue
+ * Aggregates the aggregate values of different partitions
  */
 public class CombinePartitionAggregates
-  implements GroupReduceFunction<PropertyValue, PropertyValue> {
+  implements GroupReduceFunction<Map<String, PropertyValue>, Map<String, PropertyValue>> {
 
   /**
-   * Aggregate Function
+   * Aggregate Functions
    */
-  private final AggregateFunction aggregateFunction;
+  private final Set<AggregateFunction> aggregateFunctions;
 
   /**
    * Constructor.
    *
-   * @param aggregateFunction aggregate function
+   * @param aggregateFunctions aggregate functions
    */
-  public CombinePartitionAggregates(AggregateFunction aggregateFunction) {
-    this.aggregateFunction = aggregateFunction;
+  public CombinePartitionAggregates(Set<AggregateFunction> aggregateFunctions) {
+    this.aggregateFunctions = aggregateFunctions;
   }
 
   @Override
-  public void reduce(Iterable<PropertyValue> partitionAggregates,
-    Collector<PropertyValue> out) throws Exception {
+  public void reduce(Iterable<Map<String, PropertyValue>> partitionAggregates,
+    Collector<Map<String, PropertyValue>> out) throws Exception {
 
-    Iterator<PropertyValue> iterator = partitionAggregates.iterator();
-
-    PropertyValue aggregate = iterator.next();
+    Iterator<Map<String, PropertyValue>> iterator = partitionAggregates.iterator();
+    Map<String, PropertyValue> aggregate = iterator.next();
 
     while (iterator.hasNext()) {
-      aggregateFunction.aggregate(aggregate, iterator.next());
+      Map<String, PropertyValue> next = iterator.next();
+
+      for (AggregateFunction aggFunc : aggregateFunctions) {
+        String propertyKey = aggFunc.getAggregatePropertyKey();
+        PropertyValue nextAgg = next.get(propertyKey);
+        if (nextAgg != null) {
+          aggregate.compute(propertyKey, (key, agg) -> agg == null ?
+            nextAgg : aggFunc.aggregate(agg, nextAgg));
+        }
+      }
     }
 
     out.collect(aggregate);
