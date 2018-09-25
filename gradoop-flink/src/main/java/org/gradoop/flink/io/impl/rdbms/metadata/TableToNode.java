@@ -130,7 +130,7 @@ public class TableToNode {
         i++;
       }
     } catch (IllegalArgumentException e) {
-      e.printStackTrace();
+      System.err.println("Empty attribute set. Error Message : " + e.getMessage());
     }
 
     return new RowTypeInfo(fieldTypes);

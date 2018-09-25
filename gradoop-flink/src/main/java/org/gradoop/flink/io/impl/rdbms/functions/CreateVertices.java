@@ -15,14 +15,15 @@
  */
 package org.gradoop.flink.io.impl.rdbms.functions;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.flink.io.impl.rdbms.connection.FlinkConnect;
+import org.gradoop.flink.io.impl.rdbms.connection.FlinkDatabaseInputHelper;
 import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConfig;
+import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -39,7 +40,8 @@ public class CreateVertices {
    * @return DataSet of Epgm vertices
    */
   public static DataSet<Vertex> create(GradoopFlinkConfig flinkConfig, RdbmsConfig rdbmsConfig,
-      ArrayList<TableToNode> tablesToNodes) {
+      MetaDataParser metadataParser) {
+    List<TableToNode> tablesToNodes = metadataParser.getTablesToNodes();
 
     DataSet<Vertex> vertices = null;
     VertexFactory vertexFactory = flinkConfig.getVertexFactory();
@@ -48,7 +50,7 @@ public class CreateVertices {
 
     for (TableToNode table : tablesToNodes) {
       try {
-        DataSet<Row> dsSQLResult = FlinkConnect.connect(flinkConfig.getExecutionEnvironment(),
+        DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper.getInput(flinkConfig.getExecutionEnvironment(),
             rdbmsConfig, table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
 
         if (vertices == null) {
@@ -64,7 +66,7 @@ public class CreateVertices {
         }
 
       } catch (ClassNotFoundException e) {
-        e.printStackTrace();
+        System.err.println("Can not query database via flink input. Error Message : " + e.getMessage());
       }
       counter++;
     }

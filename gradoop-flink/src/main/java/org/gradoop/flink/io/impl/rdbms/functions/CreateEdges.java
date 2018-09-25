@@ -16,7 +16,7 @@
 
 package org.gradoop.flink.io.impl.rdbms.functions;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -24,8 +24,9 @@ import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.io.impl.rdbms.connection.FlinkConnect;
+import org.gradoop.flink.io.impl.rdbms.connection.FlinkDatabaseInputHelper;
 import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConfig;
+import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.impl.rdbms.tuples.Fk1Fk2Props;
 import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
@@ -53,8 +54,9 @@ public class CreateEdges {
    * @throws Exception
    */
   public static DataSet<Edge> create(GradoopFlinkConfig flinkConfig, RdbmsConfig rdbmsConfig,
-      ArrayList<TableToEdge> tablesToEdges, DataSet<Vertex> vertices) {
-
+      MetaDataParser metadataParser, DataSet<Vertex> vertices) {
+    List<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
+    
     DataSet<Edge> edges = null;
     EdgeFactory edgeFactory = flinkConfig.getEdgeFactory();
     ExecutionEnvironment env = flinkConfig.getExecutionEnvironment();
@@ -84,7 +86,7 @@ public class CreateEdges {
         DataSet<Row> dsSQLResult = null;
 
         try {
-          dsSQLResult = FlinkConnect.connect(env, rdbmsConfig, table.getRowCount(),
+          dsSQLResult = FlinkDatabaseInputHelper.getInput(env, rdbmsConfig, table.getRowCount(),
               table.getSqlQuery(), table.getRowTypeInfo());
 
         } catch (ClassNotFoundException e) {

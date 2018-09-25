@@ -18,27 +18,27 @@ package org.gradoop.flink.io.impl.rdbms;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConfig;
-import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConnect;
+import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConnectionHelper;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateEdges;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateVertices;
 import org.gradoop.flink.io.impl.rdbms.functions.DeletePkFkProperties;
 import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
-import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
-import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * A graph data import for relational databases.
+ * A graph data import for relational databases. This data import was tested
+ * with mysql,mariadb,postgresql and sql-server management systems. The
+ * execution is currently limited to 64 database tables going to convert to epgm
+ * vertices (64 non n:m relations). This due to Flink's union operator
+ * limitation of max. 64 nodes. The data importer do not support following data
+ * types: ARRAY,NVARCHAR,LONGNVARCHAR.
  */
 public class RdbmsDataSource implements DataSource {
 
@@ -51,21 +51,6 @@ public class RdbmsDataSource implements DataSource {
    * Configuration for the relational database connection
    */
   private RdbmsConfig rdbmsConfig;
-
-  /**
-   * Flink Execution Environment
-   */
-  private ExecutionEnvironment env;
-
-  /**
-   * Vertices
-   */
-  private DataSet<Vertex> vertices;
-
-  /**
-   * Edges
-   */
-  private DataSet<Edge> edges;
 
   /**
    * Transforms a relational database into an EPGM instance
@@ -89,15 +74,15 @@ public class RdbmsDataSource implements DataSource {
   public RdbmsDataSource(String url, String user, String pw, String jdbcDriverPath,
       String jdbcDriverClassName, GradoopFlinkConfig flinkConfig) {
     this.flinkConfig = flinkConfig;
-    this.env = flinkConfig.getExecutionEnvironment();
     this.rdbmsConfig = new RdbmsConfig(null, url, user, pw, jdbcDriverPath, jdbcDriverClassName);
   }
 
   @Override
   public LogicalGraph getLogicalGraph() {
+    DataSet<Vertex> vertices;
+    DataSet<Edge> edges;
 
-    Connection con = RdbmsConnect.connect(rdbmsConfig);
-    DataSet<Vertex> tempVertices = null;
+    Connection con = RdbmsConnectionHelper.getConnection(rdbmsConfig);
     MetaDataParser metadataParser = null;
 
     try {
@@ -106,24 +91,19 @@ public class RdbmsDataSource implements DataSource {
       metadataParser = new MetaDataParser(con, rdbmsConfig.getRdbmsType());
       metadataParser.parse();
     } catch (SQLException e) {
-      e.printStackTrace();
+      System.err.println("Cant query metadata from database : " + rdbmsConfig.getUrl() + ". caused by : " + e.getMessage());
     }
 
-    // tables going to convert to vertices
-    ArrayList<TableToNode> tablesToNodes = metadataParser.getTablesToNodes();
-
-    // tables going to convert to edges
-    ArrayList<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
-
     // creates vertices from rdbms table tuples
-    tempVertices = CreateVertices.create(flinkConfig, rdbmsConfig, tablesToNodes);
+    vertices = CreateVertices.create(flinkConfig, rdbmsConfig, metadataParser);
 
-    edges = CreateEdges.create(flinkConfig, rdbmsConfig, tablesToEdges, tempVertices);
+    edges = CreateEdges.create(flinkConfig, rdbmsConfig, metadataParser, vertices);
 
     // cleans vertices by deleting primary key and foreign key
     // properties
-    vertices = tempVertices.map(new DeletePkFkProperties())
-        .withBroadcastSet(env.fromCollection(tablesToNodes), "tablesToNodes");
+    vertices = vertices.map(new DeletePkFkProperties()).withBroadcastSet(
+        flinkConfig.getExecutionEnvironment().fromCollection(metadataParser.getTablesToNodes()),
+        "tablesToNodes");
 
     return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
   }

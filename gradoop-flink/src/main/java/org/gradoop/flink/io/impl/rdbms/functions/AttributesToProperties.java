@@ -44,7 +44,7 @@ public class AttributesToProperties {
       try {
         props.set(rht.getName(), PropertyValueParser.parse(tuple.getField(rht.getPos())));
       } catch (IllegalArgumentException e) {
-        e.printStackTrace();
+        System.err.println("Tuple Value was null. Error Message : " + e.getMessage());
       }
     }
 

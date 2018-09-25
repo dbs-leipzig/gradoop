@@ -44,7 +44,7 @@ public class RegisterDriver {
 
     } catch (SQLException | MalformedURLException | InstantiationException |
         IllegalAccessException | ClassNotFoundException e) {
-      e.printStackTrace();
+      System.err.println("Not possible to register generic driver. Maybe caused by wrong driverurl. Error Message : " + e.getMessage());
     }
   }
 }

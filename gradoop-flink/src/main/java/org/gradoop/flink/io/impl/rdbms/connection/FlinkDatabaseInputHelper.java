@@ -25,10 +25,11 @@ import org.apache.flink.types.Row;
 /**
  * Queries the relational data
  */
-public class FlinkConnect {
+public class FlinkDatabaseInputHelper {
 
   /**
-   * Connects to a relational database and querying data in a distributed manner.
+   * Provides an flink input to a relational database and querying data in a
+   * distributed manner.
    *
    * @param env
    *          Flink Execution Environment
@@ -43,7 +44,7 @@ public class FlinkConnect {
    * @return DataSet of type row, consisting of queried relational data
    * @throws ClassNotFoundException
    */
-  public static DataSet<Row> connect(ExecutionEnvironment env, RdbmsConfig rdbmsConfig,
+  public static DataSet<Row> getInput(ExecutionEnvironment env, RdbmsConfig rdbmsConfig,
       int rowCount, String sqlQuery, RowTypeInfo typeInfo) throws ClassNotFoundException {
 
     int parallelism = env.getParallelism();

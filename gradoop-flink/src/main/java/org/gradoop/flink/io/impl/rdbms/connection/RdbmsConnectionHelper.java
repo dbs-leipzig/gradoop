@@ -22,7 +22,7 @@ import java.sql.SQLException;
 /**
  * Connection to relational database
  */
-public class RdbmsConnect {
+public class RdbmsConnectionHelper {
 
   /**
    * Establishes a connection to a relational database via jdbc.
@@ -31,7 +31,7 @@ public class RdbmsConnect {
    *          Configuration of relational database
    * @return Valid connection to a relational database
    */
-  public static Connection connect(RdbmsConfig config) {
+  public static Connection getConnection(RdbmsConfig config) {
 
     Connection connection = null;
 
@@ -40,7 +40,7 @@ public class RdbmsConnect {
       connection = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPw());
 
     } catch (SQLException e) {
-      e.printStackTrace();
+      System.err.println("Can not establish connection to database " + config.getUrl() + ". Caused by : " + e.getMessage());
     }
 
     return connection;

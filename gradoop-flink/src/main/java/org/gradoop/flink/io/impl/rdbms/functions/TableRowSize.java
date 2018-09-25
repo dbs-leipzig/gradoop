@@ -49,7 +49,7 @@ public class TableRowSize {
         rowNumber = 0;
       }
     } catch (SQLException e) {
-      e.printStackTrace();
+      System.err.println("Can not query row size of database. Error Message : " + e.getMessage());
     }
 
     return rowNumber;
