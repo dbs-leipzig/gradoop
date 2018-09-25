@@ -92,8 +92,8 @@ public class StringEscaperTest {
       .toArray(String[]::new);
 
     // Template to add the correct delimiter in the last string.
-    String template = "ad\\,%s\\|\\n\\n df%<s\\\\c";
-    String[] expected = {"", "\\,abc\\;\\;", template};
+    String template = input[2] + "%s" + input[3] + "%<s" + input[4];
+    String[] expected = {input[0], input[1], ""};
 
     String delimiter = ",";
     expected[2] = String.format(template, delimiter);

@@ -84,7 +84,7 @@ public class StringEscaper {
   }
 
   /**
-   * Splits an escaped string while ignoring escaped delimiters. Does not unescape.
+   * Splits an escaped string while ignoring escaped delimiters. Does not unescape the tokens.
    *
    * @param escapedString escaped string to be split
    * @param delimiter delimiter string
@@ -97,7 +97,7 @@ public class StringEscaper {
   }
 
   /**
-   * Splits an escaped string while ignoring escaped delimiters. Does not unescape.
+   * Splits an escaped string while ignoring escaped delimiters. Does not unescape the tokens.
    *
    * @param escapedString escaped string to be split
    * @param delimiter delimiter string

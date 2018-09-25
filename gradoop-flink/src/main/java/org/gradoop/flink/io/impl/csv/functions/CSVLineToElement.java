@@ -26,7 +26,6 @@ import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Base class for reading an {@link Element} from CSV. Handles the {@link MetaData} which is
@@ -84,8 +83,6 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
 
   /**
    * Splits the specified string.
-   *
-   * Note: Using {@link Pattern#split(CharSequence)} leads to a significant performance loss.
    *
    * @param s string
    * @param limit resulting array length

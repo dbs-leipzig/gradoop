@@ -386,7 +386,8 @@ public abstract class MultipleFileOutputFormat<IT>
   }
 
   /**
-   * Clean filename of illegal characters.
+   * Replace illegal filename characters (<, >, :, ", /, \, |, ?, *) with '_'
+   * and change the string to lower case.
    *
    * @param filename filename to be cleaned
    * @return cleaned filename

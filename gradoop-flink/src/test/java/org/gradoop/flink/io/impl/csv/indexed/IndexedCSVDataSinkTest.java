@@ -93,7 +93,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
    * Test IndexedCSVDataSink to properly separate the metadata
    * of edges and vertices using the same label.
    *
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Test
   public void testWriteWithSameLabel() throws Exception {
@@ -172,7 +172,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
 
   /**
    * Test writing and reading a graph with different labels that result in the same
-   * indexed CSV path, because of illegal filename characters in windows.
+   * indexed CSV path because of illegal filename characters in windows.
    *
    * @throws Exception on failure
    */

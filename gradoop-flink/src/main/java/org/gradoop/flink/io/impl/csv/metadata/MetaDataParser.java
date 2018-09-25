@@ -67,7 +67,7 @@ public class MetaDataParser {
     map.put(TypeString.FLOAT.getTypeString(), Float::parseFloat);
     map.put(TypeString.DOUBLE.getTypeString(), Double::parseDouble);
     map.put(TypeString.BOOLEAN.getTypeString(), Boolean::parseBoolean);
-    map.put(TypeString.STRING.getTypeString(), StringEscaper::unescape);
+    map.put(TypeString.STRING.getTypeString(), MetaDataParser::parseStringProperty);
     map.put(TypeString.BIGDECIMAL.getTypeString(), BigDecimal::new);
     map.put(TypeString.GRADOOPID.getTypeString(), GradoopId::fromString);
     map.put(TypeString.MAP.getTypeString(), MetaDataParser::parseMapProperty);
@@ -96,8 +96,13 @@ public class MetaDataParser {
       if (tuple.f2.length() > 0) {
         String[] propertyStrings = StringEscaper.split(tuple.f2, PROPERTY_DELIMITER);
         propertyMetaDataList = new ArrayList<>(propertyStrings.length);
-        for (String propertyString : propertyStrings) {
-          propertyMetaDataList.add(parsePropertyMetaData(propertyString));
+        for (String propertyMetaData : propertyStrings) {
+          String[] propertyMetaDataTokens = StringEscaper.split(propertyMetaData,
+            PROPERTY_TOKEN_DELIMITER, 2);
+          propertyMetaDataList.add(new PropertyMetaData(
+            StringEscaper.unescape(propertyMetaDataTokens[0]),
+            propertyMetaDataTokens[1],
+            getPropertyValueParser(propertyMetaDataTokens[1])));
         }
       } else {
         propertyMetaDataList = new ArrayList<>(0);
@@ -137,6 +142,31 @@ public class MetaDataParser {
 
   /**
    * Creates a parsing function for the given property type.
+   *
+   * @param propertyType string specifying the property type
+   * @return parsing function for the specific type
+   */
+  private static Function<String, Object> getPropertyValueParser(String propertyType) {
+    String[] propertyTypeTokens = StringEscaper.split(propertyType, PROPERTY_TOKEN_DELIMITER);
+    if (propertyTypeTokens.length == 2 &&
+      propertyTypeTokens[0].equals(TypeString.LIST.getTypeString())) {
+      // It's a list with one additional data type (type of list items).
+      return getListValueParser(propertyTypeTokens[1]);
+    } else if (propertyTypeTokens.length == 2 &&
+      propertyTypeTokens[0].equals(TypeString.SET.getTypeString())) {
+      // It's a set with one additional data type (type of set items).
+      return getSetValueParser(propertyTypeTokens[1]);
+    } else if (propertyTypeTokens.length == 3 &&
+      propertyTypeTokens[0].equals(TypeString.MAP.getTypeString())) {
+      // It's a map with two additional data types (key type + value type).
+      return getMapValueParser(propertyTypeTokens[1], propertyTypeTokens[2]);
+    } else {
+      return getValueParser(propertyType);
+    }
+  }
+
+  /**
+   * Creates a parsing function for the given primitive property type.
    *
    * @param type property type
    * @return parsing function
@@ -312,6 +342,17 @@ public class MetaDataParser {
       .map(PropertyValue::create)
       .collect(Collectors.toSet());
   }
+
+  /**
+   * Parse function to translate CSV strings to strings.
+   *
+   * @param s the string to parse
+   * @return the unescaped string
+   */
+  private static Object parseStringProperty(String s) {
+    return StringEscaper.unescape(s);
+  }
+
   /**
    * Parse function to create null from the null string representation.
    *
@@ -324,38 +365,6 @@ public class MetaDataParser {
       return null;
     } else {
       throw new IllegalArgumentException("Only null represents a null string.");
-    }
-  }
-
-  /**
-   * Parse a property string to create a PropertyMetaData object.
-   *
-   * @param propertyString property string
-   * @return property metadata
-   */
-  private static PropertyMetaData parsePropertyMetaData(String propertyString) {
-    String[] propertyTokens = StringEscaper.split(propertyString, PROPERTY_TOKEN_DELIMITER, 2);
-    String propertyLabel = StringEscaper.unescape(propertyTokens[0]);
-    String[] propertyTypeTokens = StringEscaper.split(propertyTokens[1],
-      PROPERTY_TOKEN_DELIMITER);
-    if (propertyTypeTokens.length == 2 &&
-      propertyTypeTokens[0].equals(TypeString.LIST.getTypeString())) {
-      // It's a list with one additional data type (type of list items).
-      return new PropertyMetaData(propertyLabel, propertyTokens[1],
-        getListValueParser(propertyTypeTokens[1]));
-    } else if (propertyTypeTokens.length == 2 &&
-      propertyTypeTokens[0].equals(TypeString.SET.getTypeString())) {
-      // It's a set with one additional data type (type of set items).
-      return new PropertyMetaData(propertyLabel, propertyTokens[1],
-        getSetValueParser(propertyTypeTokens[1]));
-    } else if (propertyTypeTokens.length == 3 &&
-      propertyTypeTokens[0].equals(TypeString.MAP.getTypeString())) {
-      // It's a map with two additional data types (key type + value type).
-      return new PropertyMetaData(propertyLabel, propertyTokens[1],
-          getMapValueParser(propertyTypeTokens[1], propertyTypeTokens[2]));
-    } else {
-      return new PropertyMetaData(propertyLabel, propertyTokens[1],
-        getValueParser(propertyTokens[1]));
     }
   }
 
