@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.utils.converter.deprecated.sources;
+package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -47,7 +47,8 @@ import java.util.stream.Collectors;
  *   |- studyAy.csv    # contains all edges with label 'studyAt'
  *   |- metadata.csv   # Meta data for all data contained in the graph
  */
-public class OldIndexedCSVDataSource extends CSVBase implements DataSource {
+@Deprecated
+public class LogicalGraphIndexedCSVDataSource extends CSVBase implements DataSource {
   /**
    * HDFS Configuration
    */
@@ -58,9 +59,8 @@ public class OldIndexedCSVDataSource extends CSVBase implements DataSource {
    *
    * @param csvPath root path of csv files
    * @param config gradoop configuration
-   * @throws IOException
    */
-  public OldIndexedCSVDataSource(String csvPath, GradoopFlinkConfig config) throws IOException {
+  public LogicalGraphIndexedCSVDataSource(String csvPath, GradoopFlinkConfig config) {
     this(csvPath, config, new Configuration());
   }
 
@@ -70,10 +70,9 @@ public class OldIndexedCSVDataSource extends CSVBase implements DataSource {
    * @param csvPath root path of csv files
    * @param conf gradoop configuration
    * @param hdfsConf HDFS configuration
-   * @throws IOException
    */
-  public OldIndexedCSVDataSource(String csvPath, GradoopFlinkConfig conf, Configuration hdfsConf)
-    throws IOException {
+  public LogicalGraphIndexedCSVDataSource(
+    String csvPath, GradoopFlinkConfig conf, Configuration hdfsConf) {
     super(csvPath, conf);
     Objects.requireNonNull(hdfsConf);
     this.hdfsConfig = hdfsConf;

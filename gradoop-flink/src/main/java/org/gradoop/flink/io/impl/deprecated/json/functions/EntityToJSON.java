@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.json.functions;
+package org.gradoop.flink.io.impl.deprecated.json.functions;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.io.impl.json.JSONConstants;
+import org.gradoop.flink.io.impl.deprecated.json.JSONConstants;
 import org.gradoop.common.model.api.entities.EPGMAttributed;
 import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.common.model.impl.id.GradoopId;

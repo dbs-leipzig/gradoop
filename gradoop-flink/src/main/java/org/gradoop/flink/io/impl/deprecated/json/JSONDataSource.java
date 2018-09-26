@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.json;
+package org.gradoop.flink.io.impl.deprecated.json;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
@@ -23,9 +23,9 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.json.functions.JSONToEdge;
-import org.gradoop.flink.io.impl.json.functions.JSONToGraphHead;
-import org.gradoop.flink.io.impl.json.functions.JSONToVertex;
+import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToEdge;
+import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToGraphHead;
+import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToVertex;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;

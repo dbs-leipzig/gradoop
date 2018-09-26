@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.json;
+package org.gradoop.flink.io.impl.deprecated.json;
 
 /**
  * Constants needed for the JSON IO classes.

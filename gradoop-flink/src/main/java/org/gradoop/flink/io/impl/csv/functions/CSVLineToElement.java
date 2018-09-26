@@ -88,7 +88,8 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
   }
 
   /**
-   * Parses the CSV string that contains gradoop ids.
+   * Parses the CSV string that contains GraphHead ids.
+   *
    * @param gradoopIdsString The csv token string.
    * @return gradoop ids contained in the string
    */

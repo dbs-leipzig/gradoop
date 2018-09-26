@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.utils.converter.deprecated.sources;
+package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;
 
 
 import org.apache.flink.api.java.DataSet;
@@ -38,7 +38,8 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  *   |- edges.csv    # all edge data
  *   |- metadata.csv # Meta data for all data contained in the graph
  */
-public class OldCSVDataSource extends CSVBase implements DataSource {
+@Deprecated
+public class LogicalGraphCSVDataSource extends CSVBase implements DataSource {
 
   /**
    * Creates a new CSV data source.
@@ -46,7 +47,7 @@ public class OldCSVDataSource extends CSVBase implements DataSource {
    * @param csvPath path to the directory containing the CSV files
    * @param config Gradoop Flink configuration
    */
-  public OldCSVDataSource(String csvPath, GradoopFlinkConfig config) {
+  public LogicalGraphCSVDataSource(String csvPath, GradoopFlinkConfig config) {
     super(csvPath, config);
   }
 

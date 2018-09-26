@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.json;
+package org.gradoop.flink.io.impl.deprecated.json;
 
 import org.apache.flink.core.fs.FileSystem;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.json.functions.EdgeToJSON;
-import org.gradoop.flink.io.impl.json.functions.GraphHeadToJSON;
-import org.gradoop.flink.io.impl.json.functions.VertexToJSON;
+import org.gradoop.flink.io.impl.deprecated.json.functions.EdgeToJSON;
+import org.gradoop.flink.io.impl.deprecated.json.functions.GraphHeadToJSON;
+import org.gradoop.flink.io.impl.deprecated.json.functions.VertexToJSON;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;

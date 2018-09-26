@@ -13,48 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.json.functions;
+package org.gradoop.flink.io.impl.deprecated.json.functions;
 
 import org.apache.flink.api.java.io.TextOutputFormat;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.flink.io.impl.json.JSONConstants;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.io.impl.deprecated.json.JSONConstants;
+import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Converts an edge into the following format:
+ * Converts a vertex into the following format:
  * <p>
  * {
  * "id":0,
- * "source":1,
- * "target":2,
- * "data":{"since":2015},
- * "meta":{"label":"friendOf","graphs":[0,1,2,3]}
+ * "data":{"name":"Alice","gender":"female","age":42},
+ * "meta":{"label":"Employee","graphs":[0,1,2,3]}
  * }
  *
- * @param <E> EPGM edge type
+ * @param <V> EPGM vertex type
  */
-public class EdgeToJSON<E extends Edge>
+public class VertexToJSON<V extends Vertex>
   extends EntityToJSON
-  implements TextOutputFormat.TextFormatter<E> {
+  implements TextOutputFormat.TextFormatter<V> {
 
   /**
-   * Creates a JSON string representation from a given edge.
+   * Creates a JSON string representation from a given vertex.
    *
-   * @param e edge
+   * @param v vertex
    * @return JSON string representation
    */
   @Override
-  public String format(E e) {
+  public String format(V v) {
     JSONObject json = new JSONObject();
     try {
-      json.put(JSONConstants.IDENTIFIER, e.getId());
-      json.put(JSONConstants.EDGE_SOURCE, e.getSourceId());
-      json.put(JSONConstants.EDGE_TARGET, e.getTargetId());
-      json.put(JSONConstants.DATA, writeProperties(e));
-      json.put(JSONConstants.META, writeGraphElementMeta(e));
-    } catch (JSONException ex) {
-      ex.printStackTrace();
+      json.put(JSONConstants.IDENTIFIER, v.getId());
+      json.put(JSONConstants.DATA, writeProperties(v));
+      json.put(JSONConstants.META, writeGraphElementMeta(v));
+    } catch (JSONException e) {
+      e.printStackTrace();
     }
     return json.toString();
   }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.utils.converter.deprecated.sources;
+package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
@@ -94,7 +94,7 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
    * @param limit resulting array length
    * @return tokens
    */
-  public String[] split(String s, int limit) {
+  protected String[] split(String s, int limit) {
     return s.split(CSVConstants.TOKEN_DELIMITER, limit);
   }
 }

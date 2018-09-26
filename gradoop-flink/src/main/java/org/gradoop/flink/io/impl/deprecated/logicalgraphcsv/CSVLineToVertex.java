@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.utils.converter.deprecated.sources;
+package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;
 
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -22,13 +22,12 @@ import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 
 /**
- * /**
  * Creates a {@link Vertex} from a CSV string. The function uses a
  * {@link MetaData} object to correctly parse the property values.
  *
  * The string needs to be encoded in the following format:
  *
- * vertex-id;vertex-label;value_1|value_2|...|value_n
+ * {@code vertex-id;vertex-label;value_1|value_2|...|value_n}
  */
 public class CSVLineToVertex extends CSVLineToElement<Vertex> {
   /**

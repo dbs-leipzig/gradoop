@@ -16,4 +16,4 @@
 /**
  * Deprecated sources and necessary classes to read the old csv data.
  */
-package org.gradoop.utils.converter.deprecated.sources;
+package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;

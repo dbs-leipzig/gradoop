@@ -27,7 +27,7 @@ import org.gradoop.flink.io.impl.csv.metadata.MetaData;
  *
  * The string needs to be encoded in the following format:
  *
- * edge-id;source-id;target-id;edge-label;value_1|value_2|...|value_n
+ * {@code edge-id;[graph-ids];source-id;target-id;edge-label;value_1|value_2|...|value_n}
  */
 public class CSVLineToEdge extends CSVLineToElement<Edge> {
   /**
