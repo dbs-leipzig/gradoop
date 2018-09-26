@@ -123,7 +123,7 @@ public class FlinkAsciiGraphLoader {
    * @return logical graph of vertex and edge space
    */
   public LogicalGraph getLogicalGraph() {
-    return getLogicalGraph(false);
+    return config.getLogicalGraphFactory().fromCollections(getVertices(), getEdges());
   }
 
   /**
