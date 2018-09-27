@@ -9,15 +9,17 @@ import java.util.HashSet;
 @Warmup(time = 1)
 @Measurement(time = 1)
 @State(Scope.Thread)
-public class PropertyValueBooleanBenchmark {
+public class PropertyValueSetBenchmark {
 
-    private PropertyValue BOOLEAN_VALUE;
+    private HashSet<PropertyValue> SET;
+    private PropertyValue SET_VALUE;
     private PropertyValue VALUE;
 
     @Setup
     public void setup() {
         VALUE = new PropertyValue();
-        BOOLEAN_VALUE = PropertyValue.fromRawBytes(new byte[] {0x1, 0xf});
+        SET = new HashSet<>(Arrays.asList(PropertyValue.create("A"), PropertyValue.create("B"), PropertyValue.create("C")));
+        SET_VALUE = PropertyValue.create(SET);
     }
 
     @Benchmark
@@ -27,26 +29,26 @@ public class PropertyValueBooleanBenchmark {
 
     @Benchmark
     public void set() {
-        VALUE.setBoolean(true);
+        VALUE.setSet(SET);
     }
 
     @Benchmark
     public void is() {
-        BOOLEAN_VALUE.isBoolean();
+        SET_VALUE.isSet();
     }
 
     @Benchmark
     public void get() {
-        BOOLEAN_VALUE.getBoolean();
+        SET_VALUE.getSet();
     }
 
     @Benchmark
     public void setObject() {
-        VALUE.setObject(Boolean.TRUE);
+        VALUE.setObject(SET);
     }
 
     @Benchmark
     public void getType() {
-        BOOLEAN_VALUE.getType();
+        SET_VALUE.getType();
     }
 }
