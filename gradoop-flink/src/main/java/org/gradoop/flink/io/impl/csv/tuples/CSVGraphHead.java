@@ -22,26 +22,32 @@ import org.apache.flink.api.java.tuple.Tuple3;
  */
 public class CSVGraphHead extends Tuple3<String, String, String> implements CSVElement {
 
+  @Override
   public String getId() {
     return f0;
   }
 
+  @Override
   public void setId(String id) {
     f0 = id;
   }
 
+  @Override
   public String getLabel() {
     return f1;
   }
 
+  @Override
   public void setLabel(String label) {
     f1 = label;
   }
 
+  @Override
   public String getProperties() {
     return f2;
   }
 
+  @Override
   public void setProperties(String properties) {
     f2 = properties;
   }

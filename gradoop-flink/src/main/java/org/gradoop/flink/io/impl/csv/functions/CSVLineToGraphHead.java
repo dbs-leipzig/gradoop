@@ -39,14 +39,12 @@ public class CSVLineToGraphHead extends CSVLineToElement<GraphHead> {
   /**
    * Creates a CSVLineToGraphHead converter
    *
-   * @param graphHeadFactory The factory method that is used to create the graph heads.
+   * @param graphHeadFactory The factory class that is used to create the graph heads.
    */
   public CSVLineToGraphHead(EPGMGraphHeadFactory<GraphHead> graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   public GraphHead map(String csvLine) throws Exception {
     String[] tokens = split(csvLine, 3);

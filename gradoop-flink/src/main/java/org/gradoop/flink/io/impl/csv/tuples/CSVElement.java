@@ -21,7 +21,7 @@ package org.gradoop.flink.io.impl.csv.tuples;
 public interface CSVElement {
   /**
    * Returns the elements label.
-   * @return label
+   * @return label of the element
    */
   String getLabel();
 
@@ -30,4 +30,28 @@ public interface CSVElement {
    * @param label new label
    */
   void setLabel(String label);
+
+  /**
+   * Returns the elements id.
+   * @return element id
+   */
+  String getId();
+
+  /**
+   * Sets an Id for the elements
+    * @param id new element id
+   */
+  void setId(String id);
+
+  /**
+   * Returns a string that represents the elements properties.
+   * @return element properties
+   */
+  String getProperties();
+
+  /**
+   * Sets a property string for the element
+   * @param properties string that represents the elements properties
+   */
+  void setProperties(String properties);
 }

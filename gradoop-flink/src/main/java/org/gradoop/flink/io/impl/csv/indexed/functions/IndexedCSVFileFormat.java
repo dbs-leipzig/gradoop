@@ -207,8 +207,8 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
   @Override
   public void writeRecord(T record) throws IOException {
     String label = ((CSVElement) record).getLabel();
-    if (label.equals("")) {
-      throw new RuntimeException("IndexedCSVDataSink requires a label for every element.");
+    if (label.isEmpty()) {
+      throw new IllegalArgumentException("IndexedCSVDataSink requires a label for every element.");
     }
     mapWriter(record, label);
   }

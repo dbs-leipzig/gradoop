@@ -22,34 +22,48 @@ import org.apache.flink.api.java.tuple.Tuple4;
  */
 public class CSVVertex extends Tuple4<String, String, String, String> implements CSVElement {
 
+  @Override
   public String getId() {
     return f0;
   }
 
+  @Override
   public void setId(String id) {
     f0 = id;
   }
 
+  /**
+   * Returns the gradoop ids of the graphs that the vertex belongs to.
+   * @return graph gradoop ids
+   */
   public String getGradoopIds() {
     return f1;
   }
 
+  /**
+   * Sets the gradoop ids of the graphs which contain this vertex.
+   * @param gradoopIds graph gradoop ids
+   */
   public void setGradoopIds(String gradoopIds) {
     f1 = gradoopIds;
   }
 
+  @Override
   public String getLabel() {
     return f2;
   }
 
+  @Override
   public void setLabel(String label) {
     f2 = label;
   }
 
+  @Override
   public String getProperties() {
     return f3;
   }
 
+  @Override
   public void setProperties(String properties) {
     f3 = properties;
   }
