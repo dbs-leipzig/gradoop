@@ -19,7 +19,6 @@ import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
-import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 
 /**
  * Creates an {@link Edge} from a CSV string. The function uses a

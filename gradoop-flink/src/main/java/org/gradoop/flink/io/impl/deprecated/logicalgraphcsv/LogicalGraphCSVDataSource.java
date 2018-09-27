@@ -21,8 +21,6 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.CSVBase;
-import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -39,7 +37,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  *   |- metadata.csv # Meta data for all data contained in the graph
  */
 @Deprecated
-public class LogicalGraphCSVDataSource extends CSVBase implements DataSource {
+public class LogicalGraphCSVDataSource extends LogicalGraphCSVBase implements DataSource {
 
   /**
    * Creates a new CSV data source.

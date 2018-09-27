@@ -21,8 +21,6 @@ import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
-import org.gradoop.flink.io.impl.csv.metadata.MetaData;
-import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
 
 import java.util.List;

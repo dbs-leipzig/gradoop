@@ -28,13 +28,17 @@ public class CSVConstants {
    */
   public static final String VALUE_DELIMITER = "|";
   /**
-   * Used to separate the graph ids of edges and vertices.
-   */
-  public static final String GRAPH_ID_SEPARATOR = ",";
-  /**
    * Used to separate lines in the output CSV files.
    */
   public static final String ROW_DELIMITER = System.getProperty("line.separator");
+  /**
+   * Used to separate entries of list types in the CSV files
+   */
+  public static final String LIST_DELIMITER = ",";
+  /**
+   * Used to separate key and value of maps in the CSV files.
+   */
+  public static final String MAP_SEPARATOR = "=";
   /**
    * Used to tag a graph head entity.
    */
