@@ -94,10 +94,9 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
    * @return gradoop ids contained in the string
    */
   GradoopIdSet parseGradoopIds(String gradoopIdsString) {
-    int lastCharIndex = gradoopIdsString.length() - 1;
     String[] gradoopIds = gradoopIdsString
-      .substring(1, lastCharIndex)
-      .split(CSVConstants.GRAPH_ID_SEPARATOR);
+      .substring(1, gradoopIdsString.length() - 1)
+      .split(CSVConstants.LIST_DELIMITER);
 
     GradoopIdSet gradoopIdSet = new GradoopIdSet();
     for (String g: gradoopIds) {

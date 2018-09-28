@@ -101,21 +101,24 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
 
 
     Map<String, DataSet<GraphHead>> graphHeads = metaData.getGraphLabels().stream()
-      .map(l -> Tuple2.of(l, env.readTextFile(getGraphHeadCSVPath(l))
+      .map(label -> Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))
         .map(new CSVLineToGraphHead(graphHeadFactory))
-        .withBroadcastSet(MetaData.fromFile(getMetaDataPath(), getConfig()), BC_METADATA)))
+        .withBroadcastSet(MetaData.fromFile(getMetaDataPath(), getConfig()), BC_METADATA)
+        .filter(graphHead -> graphHead.getLabel().equals(label))))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
 
     Map<String, DataSet<Vertex>> vertices = metaData.getVertexLabels().stream()
-      .map(l -> Tuple2.of(l, env.readTextFile(getVertexCSVPath(l))
+      .map(label -> Tuple2.of(label, env.readTextFile(getVertexCSVPath(label))
         .map(new CSVLineToVertex(vertexFactory))
-        .withBroadcastSet(MetaData.fromFile(getMetaDataPath(), getConfig()), BC_METADATA)))
+        .withBroadcastSet(MetaData.fromFile(getMetaDataPath(), getConfig()), BC_METADATA)
+        .filter(vertex -> vertex.getLabel().equals(label))))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
 
     Map<String, DataSet<Edge>> edges = metaData.getEdgeLabels().stream()
-      .map(l -> Tuple2.of(l, env.readTextFile(getEdgeCSVPath(l))
+      .map(label -> Tuple2.of(label, env.readTextFile(getEdgeCSVPath(label))
         .map(new CSVLineToEdge(edgeFactory))
-        .withBroadcastSet(MetaData.fromFile(getMetaDataPath(), getConfig()), BC_METADATA)))
+        .withBroadcastSet(MetaData.fromFile(getMetaDataPath(), getConfig()), BC_METADATA)
+        .filter(edge -> edge.getLabel().equals(label))))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
 
     return getConfig().getGraphCollectionFactory().fromIndexedDataSets(graphHeads, vertices, edges);

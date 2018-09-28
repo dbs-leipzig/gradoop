@@ -37,7 +37,7 @@ public class EdgeToCSVEdge extends ElementToCSV<Edge, CSVEdge> {
   @Override
   public CSVEdge map(Edge edge) throws Exception {
     csvEdge.setId(edge.getId().toString());
-    csvEdge.setGradoopIds(edge.getGraphIds().toString());
+    csvEdge.setGradoopIds(collectionToCsvString(edge.getGraphIds()));
     csvEdge.setSourceId(edge.getSourceId().toString());
     csvEdge.setTargetId(edge.getTargetId().toString());
     csvEdge.setLabel(edge.getLabel());

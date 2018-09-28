@@ -37,7 +37,7 @@ public class VertexToCSVVertex extends ElementToCSV<Vertex, CSVVertex> {
   @Override
   public CSVVertex map(Vertex vertex) throws Exception {
     csvVertex.setId(vertex.getId().toString());
-    csvVertex.setGradoopIds(vertex.getGraphIds().toString());
+    csvVertex.setGradoopIds(collectionToCsvString(vertex.getGraphIds()));
     csvVertex.setLabel(vertex.getLabel());
     csvVertex.setProperties(getPropertyString(vertex, CSVConstants.VERTEX_TYPE));
     return csvVertex;

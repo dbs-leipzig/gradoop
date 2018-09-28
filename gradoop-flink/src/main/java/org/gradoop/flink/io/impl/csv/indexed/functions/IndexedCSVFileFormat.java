@@ -148,7 +148,7 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
    * @throws IOException - Throne if creating writer or output stream fails.
    */
   public void mapWriter(Tuple t, String fileName) throws IOException {
-
+    fileName = cleanFilename(fileName);
     if (labelsToWriter.containsKey(fileName)) {
       writeToCSV(t, labelsToWriter.get(fileName));
     } else {

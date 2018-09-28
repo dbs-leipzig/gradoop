@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.csv;
+package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;
 
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.functions.ElementToPropertyMetaData;
 import org.gradoop.flink.io.impl.csv.functions.ReducePropertyMetaData;
-import org.gradoop.flink.io.impl.csv.indexed.functions.MultipleFileOutputFormat;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -34,7 +33,7 @@ import java.util.Objects;
 /**
  * Base class for CSV data source and data sink.
  */
-public abstract class CSVBase {
+public abstract class LogicalGraphCSVBase {
   /**
    * Broadcast set identifier for meta data.
    */
@@ -44,21 +43,13 @@ public abstract class CSVBase {
    */
   private static final String CSV_FILE_SUFFIX = ".csv";
   /**
-   * Path for indexed vertices
-   */
-  private static final String VERTEX_PATH = "vertices";
-  /**
    * CSV file for vertices.
    */
   private static final String VERTEX_FILE = "vertices" + CSV_FILE_SUFFIX;
   /**
-   * Path for indexed graph heads.
+   * Path for indexed vertices
    */
-  private static final String GRAPH_HEAD_PATH = "graphs";
-  /**
-   * CSV file containing the graph heads.
-   */
-  private static final String GRAPH_HEAD_FILE = "graphs" + CSV_FILE_SUFFIX;
+  private static final String VERTEX_PATH = "vertices";
   /**
    * Path for indexed edges
    */
@@ -86,15 +77,15 @@ public abstract class CSVBase {
    * @param csvPath directory to the CSV files
    * @param config Gradoop Flink configuration
    */
-  protected CSVBase(String csvPath, GradoopFlinkConfig config) {
+  protected LogicalGraphCSVBase(String csvPath, GradoopFlinkConfig config) {
     Objects.requireNonNull(csvPath);
     Objects.requireNonNull(config);
     this.csvRoot = csvPath.endsWith(File.separator) ? csvPath : csvPath + File.separator;
     this.config = config;
   }
 
-  protected String getGraphHeadPath() {
-    return csvRoot + GRAPH_HEAD_PATH;
+  protected String getVertexCSVPath() {
+    return csvRoot + VERTEX_FILE;
   }
 
   protected String getVertexPath() {
@@ -105,35 +96,6 @@ public abstract class CSVBase {
     return csvRoot + EDGE_PATH;
   }
 
-  protected String getGraphHeadCSVPath() {
-    return csvRoot + GRAPH_HEAD_FILE;
-  }
-
-  protected String getVertexCSVPath() {
-    return csvRoot + VERTEX_FILE;
-  }
-
-  protected String getEdgeCSVPath() {
-    return csvRoot + EDGE_FILE;
-  }
-
-  /**
-   * Returns the path to the vertex file containing only vertices with the specified label.
-   *
-   * @param label vertex label
-   * @return path to csv file
-   */
-  protected String getGraphHeadCSVPath(String label) {
-    Objects.requireNonNull(label);
-    label = MultipleFileOutputFormat.cleanFilename(label);
-    return csvRoot +
-      GRAPH_HEAD_PATH +
-      CSVConstants.DIRECTORY_SEPARATOR +
-      label +
-      CSVConstants.DIRECTORY_SEPARATOR +
-      CSVConstants.SIMPLE_FILE;
-  }
-
   /**
    * Returns the path to the vertex file containing only vertices with the specified label.
    *
@@ -142,13 +104,16 @@ public abstract class CSVBase {
    */
   protected String getVertexCSVPath(String label) {
     Objects.requireNonNull(label);
-    label = MultipleFileOutputFormat.cleanFilename(label);
     return csvRoot +
       VERTEX_PATH +
       CSVConstants.DIRECTORY_SEPARATOR +
       label +
       CSVConstants.DIRECTORY_SEPARATOR +
       CSVConstants.SIMPLE_FILE;
+  }
+
+  protected String getEdgeCSVPath() {
+    return csvRoot + EDGE_FILE;
   }
 
   /**
@@ -159,7 +124,6 @@ public abstract class CSVBase {
    */
   protected String getEdgeCSVPath(String label) {
     Objects.requireNonNull(label);
-    label = MultipleFileOutputFormat.cleanFilename(label);
     return csvRoot +
       EDGE_PATH +
       CSVConstants.DIRECTORY_SEPARATOR +
@@ -185,18 +149,6 @@ public abstract class CSVBase {
   protected DataSet<Tuple3<String, String, String>> createMetaData(LogicalGraph graph) {
     return createMetaData(graph.getVertices())
       .union(createMetaData(graph.getEdges()));
-  }
-
-  /**
-   * Creates the meta data for the given graph collection.
-   *
-   * @param graphs graph collection
-   * @return meta data information
-   */
-  protected DataSet<Tuple3<String, String, String>> createMetaData(GraphCollection graphs) {
-    return createMetaData(graphs.getVertices())
-      .union(createMetaData(graphs.getEdges()))
-      .union(createMetaData(graphs.getGraphHeads()));
   }
 
   /**

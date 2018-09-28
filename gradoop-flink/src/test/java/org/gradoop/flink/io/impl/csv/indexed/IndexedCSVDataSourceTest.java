@@ -22,7 +22,6 @@ import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.junit.Test;
-import sun.rmi.runtime.Log;
 
 public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
 

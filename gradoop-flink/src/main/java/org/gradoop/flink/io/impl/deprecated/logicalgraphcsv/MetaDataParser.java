@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.csv.metadata;
+package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.io.impl.csv.CSVConstants;
+import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -44,6 +44,10 @@ public class MetaDataParser {
    * Used to separate property meta data.
    */
   private static final String PROPERTY_DELIMITER = ",";
+  /**
+   * Used to separate list items
+   */
+  private static final String LIST_DELIMITER = ", ";
   /**
    * Used to separate property tokens (property-key, property-type)
    */
@@ -239,8 +243,8 @@ public class MetaDataParser {
    */
   private static Object parseListProperty(String s) {
     // no item type given, so use string as type
-    s = s.substring(1, s.length() - 1);
-    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
+    s = s.replace("[", "").replace("]", "");
+    return Arrays.stream(s.split(LIST_DELIMITER))
       .map(PropertyValue::create)
       .collect(Collectors.toList());
   }
@@ -253,8 +257,8 @@ public class MetaDataParser {
    * @return the list represented by the argument
    */
   private static Object parseListProperty(String s, Function<String, Object> itemParser) {
-    s = s.substring(1, s.length() - 1);
-    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
+    s = s.replace("[", "").replace("]", "");
+    return Arrays.stream(s.split(LIST_DELIMITER))
       .map(itemParser)
       .map(PropertyValue::create)
       .collect(Collectors.toList());
@@ -271,9 +275,9 @@ public class MetaDataParser {
    */
   private static Object parseMapProperty(String s) {
     // no key type and value type given, so use string as types
-    s = s.substring(1, s.length() - 1);
-    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
-      .map(st -> st.split(CSVConstants.MAP_SEPARATOR))
+    s = s.replace("{", "").replace("}", "");
+    return Arrays.stream(s.split(LIST_DELIMITER))
+      .map(st -> st.split("="))
       .collect(Collectors.toMap(e -> PropertyValue.create(e[0]), e -> PropertyValue.create(e[1])));
   }
 
@@ -291,9 +295,9 @@ public class MetaDataParser {
     Function<String, Object> keyParser,
     Function<String, Object> valueParser
   ) {
-    s = s.substring(1, s.length() - 1);
-    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
-      .map(st -> st.split(CSVConstants.MAP_SEPARATOR))
+    s = s.replace("{", "").replace("}", "");
+    return Arrays.stream(s.split(LIST_DELIMITER))
+      .map(st -> st.split("="))
       .map(strings -> {
           Object[] objects = new Object[2];
           objects[0] = keyParser.apply(strings[0]);
@@ -313,8 +317,8 @@ public class MetaDataParser {
    */
   private static Object parseSetProperty(String s) {
     // no item type given, so use string as type
-    s = s.substring(1, s.length() - 1);
-    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
+    s = s.replace("[", "").replace("]", "");
+    return Arrays.stream(s.split(LIST_DELIMITER))
       .map(PropertyValue::create)
       .collect(Collectors.toSet());
   }
@@ -327,8 +331,8 @@ public class MetaDataParser {
    * @return the set represented by the argument
    */
   private static Object parseSetProperty(String s, Function<String, Object> itemParser) {
-    s = s.substring(1, s.length() - 1);
-    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
+    s = s.replace("[", "").replace("]", "");
+    return Arrays.stream(s.split(LIST_DELIMITER))
       .map(itemParser)
       .map(PropertyValue::create)
       .collect(Collectors.toSet());
