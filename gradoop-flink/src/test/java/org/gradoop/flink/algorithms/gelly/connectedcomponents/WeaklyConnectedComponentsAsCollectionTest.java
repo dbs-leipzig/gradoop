@@ -21,7 +21,7 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-public class WeaklyConnectedComponentsTest extends GradoopFlinkTestBase {
+public class WeaklyConnectedComponentsAsCollectionTest extends GradoopFlinkTestBase {
 
   private static final String propertyKey = "componentId";
 
@@ -41,7 +41,7 @@ public class WeaklyConnectedComponentsTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(graph);
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
     GraphCollection result = input
-      .callForCollection(new WeaklyConnectedComponents(propertyKey, 10));
+      .callForCollection(new WeaklyConnectedComponentsAsCollection(propertyKey, 10));
     GraphCollection components = input.splitBy("component");
 
     collectAndAssertTrue(result.equalsByGraphElementIds(components));
