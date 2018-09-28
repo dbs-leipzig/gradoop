@@ -16,7 +16,6 @@
 package org.gradoop.benchmark.sampling;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Option;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -34,7 +33,7 @@ import java.io.PrintWriter;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A dedicated program to evaluate sampling algorithms on the basis of ldbc generated social network
+ * A dedicated program to evaluate sampling algorithms on the basis of a social network
  * graphs
  */
 public class SamplingBenchmark extends AbstractRunner implements ProgramDescription {
@@ -86,24 +85,12 @@ public class SamplingBenchmark extends AbstractRunner implements ProgramDescript
 
 
   static {
-    OPTIONS.addOption(Option.builder(OPTION_INPUT_PATH)
-      .longOpt("input")
-      .hasArg()
-      .desc("Path to directory containing csv files to be processed")
-      .required()
-      .build());
-    OPTIONS.addOption(Option.builder(OPTION_SELECTED_ALGORITHM)
-      .longOpt("algorithm")
-      .hasArg()
-      .desc("Positive integer selecting a sampling algorithm")
-      .required()
-      .build());
-    OPTIONS.addOption(Option.builder(OPTION_CONSTRUCTOR_PARAMS)
-      .longOpt("params")
-      .hasArgs()
-      .desc("Whitespace separated list of algorithm parameters")
-      .required()
-      .build());
+    OPTIONS.addRequiredOption(OPTION_INPUT_PATH, "input", true, "Path to directory containing csv" +
+      " files to be processed");
+    OPTIONS.addRequiredOption(OPTION_SELECTED_ALGORITHM, "algorithm", true, "Positive integer " +
+      "selecting a sampling algorithm");
+    OPTIONS.addRequiredOption(OPTION_CONSTRUCTOR_PARAMS, "params", true, "Whitespace separated " +
+      "list of algorithm parameters");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output", true,
       "Path to directory where resulting graph sample, benchmark file and graph " +
         "statistics are written to. (Defaults to " + OUTPUT_PATH_DEFAULT + ")");
