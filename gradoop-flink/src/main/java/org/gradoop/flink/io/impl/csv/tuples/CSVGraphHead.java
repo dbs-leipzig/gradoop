@@ -18,7 +18,7 @@ package org.gradoop.flink.io.impl.csv.tuples;
 import org.apache.flink.api.java.tuple.Tuple3;
 
 /**
- * Tuple representing an edge in a CSV file.
+ * Tuple representing an graph head in a CSV file.
  */
 public class CSVGraphHead extends Tuple3<String, String, String> implements CSVElement {
 
