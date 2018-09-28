@@ -56,7 +56,8 @@ public class CSVDataSource extends CSVBase implements DataSource {
   /**
    * {@inheritDoc}
    *
-   * graph heads will be disposed.
+   * graph heads will be disposed at the moment. The following issue attempts to provide
+   * alternatives to keep graph heads: https://github.com/dbs-leipzig/gradoop/issues/974
    */
   @Override
   public LogicalGraph getLogicalGraph() {
