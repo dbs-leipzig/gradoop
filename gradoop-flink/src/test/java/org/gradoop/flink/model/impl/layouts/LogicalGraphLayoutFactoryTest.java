@@ -24,6 +24,7 @@ import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -153,7 +154,7 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
   }
 
   @Test
-  public void testFromCollections() throws Exception {
+  public void testFromCollectionsWithGraphHead() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     GraphHead graphHead = loader.getGraphHeadByVariable("g0");
@@ -178,6 +179,35 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
     validateEPGMElementCollections(loader.getEdgesByGraphVariables("g0"), loadedEdges);
     validateEPGMGraphElementCollections(loader.getVerticesByGraphVariables("g0"), loadedVertices);
     validateEPGMGraphElementCollections(loader.getEdgesByGraphVariables("g0"), loadedEdges);
+  }
+
+  /**
+   * Check if the {@link LogicalGraphLayoutFactory#fromCollections(Collection, Collection)}
+   * method returns the same graph as
+   * {@link LogicalGraphLayoutFactory#fromDataSets(DataSet, DataSet)} using datasets
+   * created from the same collections.
+   *
+   * @throws Exception on failure.
+   */
+  @Test
+  public void testFromCollectionsWithoutGraphHead() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+
+    Collection<Vertex> vertices = loader.getVertices();
+    Collection<Edge> edges = loader.getEdges();
+    LogicalGraphLayout fromCollections = getFactory().fromCollections(vertices, edges);
+
+    DataSet<Vertex> vertexDataSet = getExecutionEnvironment().fromCollection(vertices);
+    DataSet<Edge> edgeDataSet = getExecutionEnvironment().fromCollection(edges);
+    LogicalGraphLayout fromDataSets = getFactory().fromDataSets(vertexDataSet, edgeDataSet);
+
+    LogicalGraph graphFromCollections = getConfig().getLogicalGraphFactory()
+      .fromDataSets(fromCollections.getGraphHead(), fromCollections.getVertices(),
+        fromCollections.getEdges());
+    LogicalGraph graphFromDataSets = getConfig().getLogicalGraphFactory()
+      .fromDataSets(fromDataSets.getGraphHead(), fromDataSets.getVertices(),
+        fromDataSets.getEdges());
+    collectAndAssertTrue(graphFromCollections.equalsByData(graphFromDataSets));
   }
 
   @Test
