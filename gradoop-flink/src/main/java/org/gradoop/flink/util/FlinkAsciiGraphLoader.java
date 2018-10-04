@@ -119,11 +119,12 @@ public class FlinkAsciiGraphLoader {
   /**
    * Returns a logical graph containing the complete vertex and edge space of
    * the database.
+   * This is equivalent to {@link #getLogicalGraph(boolean) getLogicalGraph(true)}.
    *
    * @return logical graph of vertex and edge space
    */
   public LogicalGraph getLogicalGraph() {
-    return config.getLogicalGraphFactory().fromCollections(getVertices(), getEdges());
+    return getLogicalGraph(true);
   }
 
   /**
@@ -136,17 +137,15 @@ public class FlinkAsciiGraphLoader {
    * @return logical graph of vertex and edge space
    */
   public LogicalGraph getLogicalGraph(boolean withGraphContainment) {
-    GraphHead graphHead = config.getGraphHeadFactory()
-      .createGraphHead(GradoopConstants.DB_GRAPH_LABEL);
-
     if (withGraphContainment) {
-      ExecutionEnvironment env = config.getExecutionEnvironment();
-
-      return config.getLogicalGraphFactory().fromDataSets(env.fromElements(graphHead),
-        env.fromCollection(getVertices()).map(new AddToGraph<>(graphHead)),
-        env.fromCollection(getEdges()).map(new AddToGraph<>(graphHead)));
-
+      return config.getLogicalGraphFactory().fromCollections(getVertices(), getEdges())
+        .transformGraphHead((head, transformed) -> {
+          head.setLabel(GradoopConstants.DB_GRAPH_LABEL);
+          return head;
+        });
     } else {
+      GraphHead graphHead = config.getGraphHeadFactory()
+        .createGraphHead(GradoopConstants.DB_GRAPH_LABEL);
       return config.getLogicalGraphFactory().fromCollections(graphHead, getVertices(), getEdges());
     }
   }
