@@ -15,34 +15,58 @@
  */
 package org.gradoop.flink.io.impl.csv.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple4;
 
 /**
  * Tuple representing a vertex in a CSV file.
  */
-public class CSVVertex extends Tuple3<String, String, String> {
+public class CSVVertex extends Tuple4<String, String, String, String> implements CSVElement {
 
+  @Override
   public String getId() {
     return f0;
   }
 
+  @Override
   public void setId(String id) {
     f0 = id;
   }
 
-  public String getLabel() {
+  /**
+   * Returns the gradoop ids of the graphs that the vertex belongs to.
+   *
+   * @return graph gradoop ids
+   */
+  public String getGradoopIds() {
     return f1;
   }
 
-  public void setLabel(String label) {
-    f1 = label;
+  /**
+   * Sets the gradoop ids of the graphs which contain this vertex.
+   *
+   * @param gradoopIds graph gradoop ids
+   */
+  public void setGradoopIds(String gradoopIds) {
+    f1 = gradoopIds;
   }
 
-  public String getProperties() {
+  @Override
+  public String getLabel() {
     return f2;
   }
 
+  @Override
+  public void setLabel(String label) {
+    f2 = label;
+  }
+
+  @Override
+  public String getProperties() {
+    return f3;
+  }
+
+  @Override
   public void setProperties(String properties) {
-    f2 = properties;
+    f3 = properties;
   }
 }

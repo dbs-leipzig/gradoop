@@ -20,6 +20,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -43,10 +44,6 @@ public class MetaDataParser {
    * Used to separate property meta data.
    */
   private static final String PROPERTY_DELIMITER = ",";
-  /**
-   * Used to separate list items
-   */
-  private static final String LIST_DELIMITER = ", ";
   /**
    * Used to separate property tokens (property-key, property-type)
    */
@@ -86,7 +83,7 @@ public class MetaDataParser {
    * Creates a {@link MetaData} object from the specified lines. The specified tuple is already
    * separated into the label and the
    *
-   * @param metaDataStrings (label, meta-data) tuples
+   * @param metaDataStrings (element prefix (g,v,e), label, meta-data) tuples
    * @return Meta Data object
    */
   public static MetaData create(List<Tuple3<String, String, String>> metaDataStrings) {
@@ -242,8 +239,8 @@ public class MetaDataParser {
    */
   private static Object parseListProperty(String s) {
     // no item type given, so use string as type
-    s = s.replace("[", "").replace("]", "");
-    return Arrays.stream(s.split(LIST_DELIMITER))
+    s = s.substring(1, s.length() - 1);
+    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
       .map(PropertyValue::create)
       .collect(Collectors.toList());
   }
@@ -256,8 +253,8 @@ public class MetaDataParser {
    * @return the list represented by the argument
    */
   private static Object parseListProperty(String s, Function<String, Object> itemParser) {
-    s = s.replace("[", "").replace("]", "");
-    return Arrays.stream(s.split(LIST_DELIMITER))
+    s = s.substring(1, s.length() - 1);
+    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
       .map(itemParser)
       .map(PropertyValue::create)
       .collect(Collectors.toList());
@@ -274,9 +271,9 @@ public class MetaDataParser {
    */
   private static Object parseMapProperty(String s) {
     // no key type and value type given, so use string as types
-    s = s.replace("{", "").replace("}", "");
-    return Arrays.stream(s.split(LIST_DELIMITER))
-      .map(st -> st.split("="))
+    s = s.substring(1, s.length() - 1);
+    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
+      .map(st -> st.split(CSVConstants.MAP_SEPARATOR))
       .collect(Collectors.toMap(e -> PropertyValue.create(e[0]), e -> PropertyValue.create(e[1])));
   }
 
@@ -294,9 +291,9 @@ public class MetaDataParser {
     Function<String, Object> keyParser,
     Function<String, Object> valueParser
   ) {
-    s = s.replace("{", "").replace("}", "");
-    return Arrays.stream(s.split(LIST_DELIMITER))
-      .map(st -> st.split("="))
+    s = s.substring(1, s.length() - 1);
+    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
+      .map(st -> st.split(CSVConstants.MAP_SEPARATOR))
       .map(strings -> {
           Object[] objects = new Object[2];
           objects[0] = keyParser.apply(strings[0]);
@@ -316,8 +313,8 @@ public class MetaDataParser {
    */
   private static Object parseSetProperty(String s) {
     // no item type given, so use string as type
-    s = s.replace("[", "").replace("]", "");
-    return Arrays.stream(s.split(LIST_DELIMITER))
+    s = s.substring(1, s.length() - 1);
+    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
       .map(PropertyValue::create)
       .collect(Collectors.toSet());
   }
@@ -330,8 +327,8 @@ public class MetaDataParser {
    * @return the set represented by the argument
    */
   private static Object parseSetProperty(String s, Function<String, Object> itemParser) {
-    s = s.replace("[", "").replace("]", "");
-    return Arrays.stream(s.split(LIST_DELIMITER))
+    s = s.substring(1, s.length() - 1);
+    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
       .map(itemParser)
       .map(PropertyValue::create)
       .collect(Collectors.toSet());
