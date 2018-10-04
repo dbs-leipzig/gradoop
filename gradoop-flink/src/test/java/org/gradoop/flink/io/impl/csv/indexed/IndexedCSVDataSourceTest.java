@@ -23,8 +23,16 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.junit.Test;
 
+/**
+ * Test class for indexed csv data source
+ */
 public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
 
+  /**
+   * Test reading an indexed csv graph collection.
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testRead() throws Exception {
     String csvPath = VertexLabeledEdgeListDataSourceTest.class
@@ -44,6 +52,11 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(input.equalsByGraphElementData(expected));
   }
 
+  /**
+   * Test reading a single logical indexed csv graph.
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testReadSingleGraph() throws Exception {
     String csvPath = VertexLabeledEdgeListDataSourceTest.class
@@ -65,6 +78,11 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(input.equalsByElementData(expected));
   }
 
+  /**
+   * Test reading a indexed csv graph collection without edges.
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testEmptyEdgeRead() throws Exception {
     String csvPath = VertexLabeledEdgeListDataSourceTest.class

@@ -34,6 +34,7 @@ public class CSVEdge extends Tuple6<String, String, String, String, String, Stri
 
   /**
    * Returns the gradoop ids of the graphs that the edge belongs to.
+   *
    * @return graph gradoop ids
    */
   public String getGradoopIds() {
@@ -42,6 +43,7 @@ public class CSVEdge extends Tuple6<String, String, String, String, String, Stri
 
   /**
    * Sets the gradoop ids of the graphs which contain this edge.
+   *
    * @param gradoopIds graph gradoop ids
    */
   public void setGradoopIds(String gradoopIds) {
@@ -50,6 +52,7 @@ public class CSVEdge extends Tuple6<String, String, String, String, String, Stri
 
   /**
    * Returns the string that represents the source.
+   *
    * @return returns the source id.
    */
   public String getSourceId() {
@@ -58,6 +61,7 @@ public class CSVEdge extends Tuple6<String, String, String, String, String, Stri
 
   /**
    * Sets the string that represents the source.
+   *
    * @param sourceId represents the source id.
    */
   public void setSourceId(String sourceId) {
@@ -67,6 +71,7 @@ public class CSVEdge extends Tuple6<String, String, String, String, String, Stri
 
   /**
    * Returns the string that represents the target.
+   *
    * @return returns the target id.
    */
   public String getTargetId() {
@@ -75,6 +80,7 @@ public class CSVEdge extends Tuple6<String, String, String, String, String, Stri
 
   /**
    * Sets the string that represents the target.
+   *
    * @param targetId represents the target id.
    */
   public void setTargetId(String targetId) {

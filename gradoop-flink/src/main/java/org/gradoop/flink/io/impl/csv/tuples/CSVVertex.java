@@ -34,6 +34,7 @@ public class CSVVertex extends Tuple4<String, String, String, String> implements
 
   /**
    * Returns the gradoop ids of the graphs that the vertex belongs to.
+   *
    * @return graph gradoop ids
    */
   public String getGradoopIds() {
@@ -42,6 +43,7 @@ public class CSVVertex extends Tuple4<String, String, String, String> implements
 
   /**
    * Sets the gradoop ids of the graphs which contain this vertex.
+   *
    * @param gradoopIds graph gradoop ids
    */
   public void setGradoopIds(String gradoopIds) {

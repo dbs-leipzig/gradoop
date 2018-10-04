@@ -22,7 +22,6 @@ import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 
 /**
- * /**
  * Creates a {@link Vertex} from a CSV string. The function uses a
  * {@link MetaData} object to correctly parse the property values.
  *

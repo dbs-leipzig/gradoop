@@ -15,22 +15,30 @@
  */
 package org.gradoop.flink.io.impl.csv.conversion;
 
-  import org.gradoop.flink.io.api.DataSink;
-  import org.gradoop.flink.io.api.DataSource;
-  import org.gradoop.flink.io.impl.csv.CSVDataSink;
-  import org.gradoop.flink.io.impl.csv.CSVDataSource;
-  import org.gradoop.flink.io.impl.deprecated.logicalgraphcsv.LogicalGraphIndexedCSVDataSource;
-  import org.gradoop.flink.model.GradoopFlinkTestBase;
-  import org.gradoop.flink.model.api.epgm.LogicalGraph;
-  import org.junit.Rule;
-  import org.junit.Test;
-  import org.junit.rules.TemporaryFolder;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.csv.CSVDataSink;
+import org.gradoop.flink.io.impl.csv.CSVDataSource;
+import org.gradoop.flink.io.impl.deprecated.logicalgraphcsv.LogicalGraphIndexedCSVDataSource;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
+/**
+ * Test class for converting logical graph indexed csv to indexed csv
+ */
 public class LogicalGraphIndexedCSVToCSVTest extends GradoopFlinkTestBase {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+  /**
+   * Test converting logical graph indexed csv to indexed csv.
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testConversion() throws Exception {
     String csvPath = LogicalGraphCSVToCSVTest.class

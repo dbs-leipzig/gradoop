@@ -118,9 +118,9 @@ public abstract class CSVBase {
   }
 
   /**
-   * Returns the path to the vertex file containing only vertices with the specified label.
+   * Returns the path to the graph head file containing only graph heads with the specified label.
    *
-   * @param label vertex label
+   * @param label graph head label
    * @return path to csv file
    */
   protected String getGraphHeadCSVPath(String label) {

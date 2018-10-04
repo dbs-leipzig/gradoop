@@ -35,11 +35,19 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+/**
+ * Test class for an indexed csv data sink
+ */
 public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+  /**
+   * Test writing an indexed csv graph collection.
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testWrite() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
@@ -49,6 +57,11 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     checkIndexedCSVWrite(tmpPath, input);
   }
 
+  /**
+   * Test writing a logical csv graph.
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testWriteLogicalGraph() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
@@ -85,7 +98,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
    * Test IndexedCSVDataSink to properly separate the metadata
    * of edges and vertices using the same label.
    *
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Test
   public void testWriteWithSameLabel() throws Exception {
@@ -152,6 +165,11 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     checkIndexedCSVWrite(tmpPath, graph);
   }
 
+  /**
+   * Test writing a graph with an existing metadata.csv.
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testWriteWithExistingMetaData() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();

@@ -39,6 +39,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * csvRoot
  *   |- vertices.csv # all vertex data
  *   |- edges.csv    # all edge data
+ *   |- graphs.csv   # all graph head data
  *   |- metadata.csv # Meta data for all data contained in the graph
  */
 public class CSVDataSource extends CSVBase implements DataSource {
@@ -56,7 +57,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
   /**
    * {@inheritDoc}
    *
-   * graph heads will be disposed at the moment. The following issue attempts to provide
+   * Graph heads will be disposed at the moment. The following issue attempts to provide
    * alternatives to keep graph heads: https://github.com/dbs-leipzig/gradoop/issues/974
    */
   @Override
@@ -64,9 +65,6 @@ public class CSVDataSource extends CSVBase implements DataSource {
     return getGraphCollection().reduce(new ReduceCombination());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection getGraphCollection() {
     DataSet<Tuple3<String, String, String>> metaData =

@@ -26,11 +26,19 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+/**
+ * Test class for converting logical graph csv to csv
+ */
 public class LogicalGraphCSVToCSVTest extends GradoopFlinkTestBase {
 
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+  /**
+   * Test converting logical graph csv to csv.
+   *
+   * @throws Exception on failure
+   */
   @Test
   public void testConversion() throws Exception {
     String csvPath = LogicalGraphCSVToCSVTest.class
