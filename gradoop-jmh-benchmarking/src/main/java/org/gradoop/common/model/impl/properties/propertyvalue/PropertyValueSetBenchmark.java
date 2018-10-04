@@ -1,13 +1,19 @@
 package org.gradoop.common.model.impl.properties.propertyvalue;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.openjdk.jmh.annotations.*;
-
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Warmup;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-@Warmup(time = 1)
-@Measurement(time = 1)
+@Warmup(time = 1, timeUnit = TimeUnit.MILLISECONDS)
+@Measurement(time = 1, timeUnit = TimeUnit.MILLISECONDS)
 @State(Scope.Thread)
 public class PropertyValueSetBenchmark {
 
@@ -23,8 +29,8 @@ public class PropertyValueSetBenchmark {
     }
 
     @Benchmark
-    public void create() {
-        PropertyValue.create(Boolean.TRUE);
+    public PropertyValue create() {
+        return PropertyValue.create(SET);
     }
 
     @Benchmark
@@ -33,13 +39,13 @@ public class PropertyValueSetBenchmark {
     }
 
     @Benchmark
-    public void is() {
-        SET_VALUE.isSet();
+    public Boolean is() {
+        return SET_VALUE.isSet();
     }
 
     @Benchmark
-    public void get() {
-        SET_VALUE.getSet();
+    public Set<PropertyValue> get() {
+        return SET_VALUE.getSet();
     }
 
     @Benchmark
@@ -48,7 +54,7 @@ public class PropertyValueSetBenchmark {
     }
 
     @Benchmark
-    public void getType() {
-        SET_VALUE.getType();
+    public Class<?> getType() {
+        return SET_VALUE.getType();
     }
 }
