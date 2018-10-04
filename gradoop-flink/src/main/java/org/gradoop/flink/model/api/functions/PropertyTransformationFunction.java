@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.drilling.functions.drillfunctions;
+package org.gradoop.flink.model.api.functions;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.io.Serializable;
 
 /**
- * Interface for all drill functions which are used for drill down / drill up operations.
+ * Interface for all functions which are used for property transformation operations.
  */
-public interface DrillFunction extends Serializable {
+public interface PropertyTransformationFunction extends Serializable {
 
   /**
-   * Returns a changed property value based in the property before drilling.
+   * Returns a changed property value based on the value before the transformation.
    *
    * @param property current property
-   * @return property after drilling
+   * @return transformed property
    */
   PropertyValue execute(PropertyValue property);
 
