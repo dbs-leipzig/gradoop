@@ -17,6 +17,8 @@ package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
@@ -83,6 +85,24 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
       }
     }
     return properties;
+  }
+
+  /**
+   * Parses the CSV string that contains GraphHead ids.
+   *
+   * @param gradoopIdsString The csv token string.
+   * @return gradoop ids contained in the string
+   */
+  GradoopIdSet parseGradoopIds(String gradoopIdsString) {
+    String[] gradoopIds = gradoopIdsString
+      .substring(1, gradoopIdsString.length() - 1)
+      .split(CSVConstants.LIST_DELIMITER);
+
+    GradoopIdSet gradoopIdSet = new GradoopIdSet();
+    for (String g: gradoopIds) {
+      gradoopIdSet.add(GradoopId.fromString(g.trim()));
+    }
+    return gradoopIdSet;
   }
 
   /**

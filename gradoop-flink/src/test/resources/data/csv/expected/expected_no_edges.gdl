@@ -1,7 +1,11 @@
-expectedEmptyEdges [
- (v0:A {a:"foo",b:42,c:13.37f})
- (v1:A {a:"bar",b:23,c:19.84f})
- (v2:B {a:1234L,b:true,c:0.123d})
+expected1:g1 {a:"graph1",b:2.75d} [
+ (v2:B {a:1234L,b:true,c:0.123d}),
  (v3:B {a:5678L,b:false,c:4.123d})
+]
+expected2:g2 {a:"graph2",b:4} [
+ (v0:A {a:"foo",b:42,c:13.37f,d:NULL}),
+ (v1:A {a:"bar",b:23,c:19.84f}),
+ (v2),
+ (v3),
  (v4:B {a:2342L,c:19.84d})
 ]
