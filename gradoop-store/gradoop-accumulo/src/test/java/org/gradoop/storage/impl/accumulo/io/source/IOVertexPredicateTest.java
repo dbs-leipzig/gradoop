@@ -46,7 +46,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test01_writeAndQueryVertexByName() throws Throwable {
-    doTest(TEST01, (loader, store, config) -> {
+    storeInsertAndTest(TEST01, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = sample(loader.getVertices()
         .stream()
@@ -87,7 +87,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test02_findPersonByAge() throws Throwable {
-    doTest(TEST02, (loader, store, config) -> {
+    storeInsertAndTest(TEST02, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = loader.getVertices()
         .stream()
@@ -120,7 +120,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
    */
   @Test
   public void test03_findPersonByAge() throws Throwable {
-    doTest(TEST03, (loader, store, config) -> {
+    storeInsertAndTest(TEST03, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = loader.getVertices()
         .stream()

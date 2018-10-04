@@ -39,7 +39,7 @@ public class IOEdgePredicateTest extends AccumuloStoreTestBase {
 
   @Test
   public void queryEdgeByProperty() throws Throwable {
-    doTest(TEST01, (loader, store, config) -> {
+    storeInsertAndTest(TEST01, (loader, store, config) -> {
       List<Edge> storeEdges = loader.getEdges().stream()
         .filter(it -> {
           assert it.getProperties() != null;
@@ -67,7 +67,7 @@ public class IOEdgePredicateTest extends AccumuloStoreTestBase {
 
   @Test
   public void findEdgeByLabelRegex() throws Throwable {
-    doTest(TEST02, (loader, store, config) -> {
+    storeInsertAndTest(TEST02, (loader, store, config) -> {
       Pattern queryFormula = Pattern.compile("has.*+");
 
       //edge label query
