@@ -55,12 +55,13 @@ public class MetaData {
   }
 
   /**
-   * Reads the meta data from a specified file. Each line is spit into a (label, metadata) tuple
+   * Reads the meta data from a specified file. Each line is split into a
+   * (element prefix, label, metadata) tuple
    * and put into a dataset. The latter can be used to broadcast the metadata to the mappers.
    *
    * @param path path to metadata csv file
    * @param config gradoop configuration
-   * @return (label, metadata) tuple dataset
+   * @return (element prefix (g,v,e), label, metadata) tuple dataset
    */
   public static DataSet<Tuple3<String, String, String>> fromFile(String path, GradoopFlinkConfig
     config) {
@@ -91,6 +92,18 @@ public class MetaData {
         .map(tokens -> Tuple3.of(tokens[0], tokens[1], tokens[2]))
         .collect(Collectors.toList()));
     }
+  }
+
+  /**
+   * Returns the graph labels available in the meta data.
+   *
+   * @return graph labels
+   */
+  public Set<String> getGraphLabels() {
+    return metaData.keySet().stream()
+      .filter(key -> key.f0.equals(CSVConstants.GRAPH_TYPE))
+      .map(key -> key.f1)
+      .collect(Collectors.toSet());
   }
 
   /**

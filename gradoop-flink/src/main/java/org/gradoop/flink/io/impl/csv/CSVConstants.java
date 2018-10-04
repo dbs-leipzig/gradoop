@@ -44,11 +44,15 @@ public class CSVConstants {
    */
   public static final String MAP_SEPARATOR = "=";
   /**
-   * Used to specify entity type (vertex or edge)
+   * Used to tag a graph head entity.
+   */
+  public static final String GRAPH_TYPE = "g";
+  /**
+   * Used to tag a vertex entity.
    */
   public static final String VERTEX_TYPE = "v";
   /**
-   * Used to specify entity type (vertex or edge)
+   * Used to tag an edge entity.
    */
   public static final String EDGE_TYPE = "e";
   /**

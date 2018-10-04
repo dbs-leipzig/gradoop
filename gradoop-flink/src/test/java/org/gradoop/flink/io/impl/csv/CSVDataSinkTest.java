@@ -17,16 +17,20 @@ package org.gradoop.flink.io.impl.csv;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,9 +57,9 @@ public class CSVDataSinkTest extends CSVTestBase {
   public void testWrite() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    LogicalGraph input = getSocialNetworkLoader().getLogicalGraph(true);
+    GraphCollection graphCollection = getSocialNetworkLoader().getGraphCollection();
 
-    checkCSVWrite(tmpPath, input);
+    checkCSVWrite(tmpPath, graphCollection);
   }
 
   /**
@@ -125,10 +129,10 @@ public class CSVDataSinkTest extends CSVTestBase {
     String tmpPath = temporaryFolder.getRoot().getPath();
     ExecutionEnvironment env = getExecutionEnvironment();
 
-    String string1 = "abc;,|:\n=\\def";
-    String string2 = "def;,|:\n=\\ghi";
+    String string1 = "abc;,|:\n=\\ def";
+    String string2 = "def;,|:\n=\\ ghi";
 
-    List<PropertyValue> list = Arrays.asList(PropertyValue.create(string2), PropertyValue.create(string2));
+    List<PropertyValue> list = Arrays.asList(PropertyValue.create(string2), PropertyValue.create(string1));
     Set<PropertyValue> set = new HashSet<>(list);
     Map<PropertyValue, PropertyValue> map1 = new HashMap<PropertyValue, PropertyValue>() {{
       put(PropertyValue.create(string1), PropertyValue.create(string2));
@@ -145,22 +149,29 @@ public class CSVDataSinkTest extends CSVTestBase {
 
     Properties props = Properties.create();
     props.set(string1, string2);
-    props.set(string2, 13);
-    props.set("key3", string2);
-    props.set("key4", list);
-    props.set("key5", set);
-    props.set("key6", map1);
-    props.set("key7", map2);
-    props.set("key8", map3);
+    props.set(string2, GradoopTestUtils.BOOL_VAL_1);
+    props.set(GradoopTestUtils.KEY_2, string2);
+    props.set(GradoopTestUtils.KEY_3, list);
+    props.set(GradoopTestUtils.KEY_4, set);
+    props.set(GradoopTestUtils.KEY_5, map1);
+    props.set(GradoopTestUtils.KEY_5, map2);
+    props.set(GradoopTestUtils.KEY_6, map3);
+
+    GraphHead graphHead = new GraphHeadFactory().createGraphHead(string1, props);
+    DataSet<GraphHead> graphHeads = env.fromElements(graphHead);
 
     Vertex vertex = new VertexFactory().createVertex(string1, props);
-    DataSet<Vertex> vertices = env.fromElements(vertex);
+    DataSet<Vertex> vertices = env.fromElements(vertex)
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;label;properties");
 
     DataSet<Edge> edges = env.fromElements(new EdgeFactory()
-      .createEdge(string1, vertex.getId(), vertex.getId(), props));
+      .createEdge(string1, vertex.getId(), vertex.getId(), props))
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;label;properties");
 
     LogicalGraph graph = getConfig().getLogicalGraphFactory()
-      .fromDataSets(vertices, edges);
+      .fromDataSets(graphHeads, vertices, edges);
 
     checkCSVWrite(tmpPath, graph);
   }
@@ -174,12 +185,12 @@ public class CSVDataSinkTest extends CSVTestBase {
   public void testWriteWithExistingMetaData() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    String csvPath = VertexLabeledEdgeListDataSourceTest.class
-      .getResource("/data/csv/input")
+    String csvPath = CSVDataSinkTest.class
+      .getResource("/data/csv/input_graph_collection")
       .getFile();
 
-    String gdlPath = CSVDataSourceTest.class
-      .getResource("/data/csv/expected/expected.gdl")
+    String gdlPath = CSVDataSinkTest.class
+      .getResource("/data/csv/expected/expected_graph_collection.gdl")
       .getFile();
 
     LogicalGraph input = getLoaderFromFile(gdlPath).getLogicalGraphByVariable("expected");
@@ -196,7 +207,9 @@ public class CSVDataSinkTest extends CSVTestBase {
   }
 
   /**
-   * Test CSVDataSink to write a graph with all supported properties
+   * Test CSVDataSink to write a graph with all supported properties.
+   * CSVDataSource ignores the graph heads when using getLogicalGraph(),
+   * therefore the graph head is not tested for equality.
    *
    * @throws Exception on failure
    */
@@ -213,7 +226,7 @@ public class CSVDataSinkTest extends CSVTestBase {
     DataSource csvDataSource = new CSVDataSource(tmpPath, getConfig());
     LogicalGraph sourceLogicalGraph = csvDataSource.getLogicalGraph();
 
-    collectAndAssertTrue(logicalGraph.equalsByData(sourceLogicalGraph));
+    collectAndAssertTrue(logicalGraph.equalsByElementData(sourceLogicalGraph));
 
     sourceLogicalGraph.getEdges().collect().forEach(this::checkProperties);
     sourceLogicalGraph.getVertices().collect().forEach(this::checkProperties);
@@ -251,14 +264,25 @@ public class CSVDataSinkTest extends CSVTestBase {
    * @throws Exception on failure
    */
   private void checkCSVWrite(String tmpPath, LogicalGraph input) throws Exception {
+    checkCSVWrite(tmpPath, input.getConfig().getGraphCollectionFactory().fromGraph(input));
+  }
+
+  /**
+   * Test writing and reading the given graph to and from CSV
+   *
+   * @param tmpPath path to write csv
+   * @param input graph collection
+   * @throws Exception on failure
+   */
+  private void checkCSVWrite(String tmpPath, GraphCollection input) throws Exception {
     DataSink csvDataSink = new CSVDataSink(tmpPath, getConfig());
     csvDataSink.write(input, true);
 
     getExecutionEnvironment().execute();
 
     DataSource csvDataSource = new CSVDataSource(tmpPath, getConfig());
-    LogicalGraph output = csvDataSource.getLogicalGraph();
+    GraphCollection output = csvDataSource.getGraphCollection();
 
-    collectAndAssertTrue(input.equalsByElementData(output));
+    collectAndAssertTrue(input.equalsByGraphElementData(output));
   }
 }

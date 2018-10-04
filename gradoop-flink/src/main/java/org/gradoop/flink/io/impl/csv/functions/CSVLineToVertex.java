@@ -22,7 +22,6 @@ import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 
 /**
- * /**
  * Creates a {@link Vertex} from a CSV string. The function uses a
  * {@link MetaData} object to correctly parse the property values.
  *
@@ -47,11 +46,14 @@ public class CSVLineToVertex extends CSVLineToElement<Vertex> {
 
   @Override
   public Vertex map(String csvLine) throws Exception {
-    String[] tokens = split(csvLine, 3);
-    String label = StringEscaper.unescape(tokens[1]);
+    String[] tokens = split(csvLine, 4);
+    String label = StringEscaper.unescape(tokens[2]);
     return vertexFactory.initVertex(
       GradoopId.fromString(tokens[0]),
       label,
-      parseProperties(CSVConstants.VERTEX_TYPE, label, tokens[2]));
+      parseProperties(CSVConstants.VERTEX_TYPE, label, tokens[3]),
+      parseGradoopIds(tokens[1])
+    );
+
   }
 }

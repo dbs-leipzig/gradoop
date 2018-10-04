@@ -21,15 +21,19 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.hadoop.conf.Configuration;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVBase;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToEdge;
+import org.gradoop.flink.io.impl.csv.functions.CSVLineToGraphHead;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToVertex;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -83,11 +87,24 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
 
   @Override
   public LogicalGraph getLogicalGraph() throws IOException {
+    return getGraphCollection().reduce(new ReduceCombination());
+  }
+
+  @Override
+  public GraphCollection getGraphCollection() throws IOException {
     MetaData metaData = MetaData.fromFile(getMetaDataPath(), hdfsConfig);
 
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
+    GraphHeadFactory graphHeadFactory = getConfig().getGraphHeadFactory();
     VertexFactory vertexFactory = getConfig().getVertexFactory();
     EdgeFactory edgeFactory = getConfig().getEdgeFactory();
+
+    Map<String, DataSet<GraphHead>> graphHeads = metaData.getGraphLabels().stream()
+      .map(label -> Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))
+        .map(new CSVLineToGraphHead(graphHeadFactory))
+        .withBroadcastSet(MetaData.fromFile(getMetaDataPath(), getConfig()), BC_METADATA)
+        .filter(graphHead -> graphHead.getLabel().equals(label))))
+      .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
 
     Map<String, DataSet<Vertex>> vertices = metaData.getVertexLabels().stream()
       .map(label -> Tuple2.of(label, env.readTextFile(getVertexCSVPath(label))
@@ -103,11 +120,6 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
         .filter(edge -> edge.getLabel().equals(label))))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
 
-    return getConfig().getLogicalGraphFactory().fromIndexedDataSets(vertices, edges);
-  }
-
-  @Override
-  public GraphCollection getGraphCollection() throws IOException {
-    return getConfig().getGraphCollectionFactory().fromGraph(getLogicalGraph());
+    return getConfig().getGraphCollectionFactory().fromIndexedDataSets(graphHeads, vertices, edges);
   }
 }

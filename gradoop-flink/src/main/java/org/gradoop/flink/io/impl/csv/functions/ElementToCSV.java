@@ -26,6 +26,7 @@ import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
 
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
@@ -84,41 +85,45 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
   }
 
   /**
-   * Returns an escaped string representation suitable for CSV.
+   * Returns a CSV string representation of the property value.
    *
    * @param p property value
-   * @return escaped CSV string
+   * @return CSV string
    */
   private String propertyValueToCsvString(PropertyValue p) {
-    if (p.isList()) {
-      return String.format("[%s]", p.getList().stream()
-        .map(this::primitivePropertyValueToCSVString)
-        .collect(Collectors.joining(CSVConstants.LIST_DELIMITER)));
-    } else if (p.isSet()) {
-      return String.format("[%s]", p.getSet().stream()
-        .map(this::primitivePropertyValueToCSVString)
-        .collect(Collectors.joining(CSVConstants.LIST_DELIMITER)));
+    if (p.isList() || p.isSet()) {
+      return collectionToCsvString((Collection) p.getObject());
     } else if (p.isMap()) {
-      return String.format("{%s}", p.getMap().entrySet().stream()
-        .map(e -> primitivePropertyValueToCSVString(e.getKey()) +
-          CSVConstants.MAP_SEPARATOR +
-          primitivePropertyValueToCSVString(e.getValue()))
-        .collect(Collectors.joining(CSVConstants.LIST_DELIMITER)));
+      return p.getMap().entrySet().stream()
+        .map(e -> escape(e.getKey()) + CSVConstants.MAP_SEPARATOR + escape(e.getValue()))
+        .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, "{", "}"));
     } else {
-      return primitivePropertyValueToCSVString(p);
+      return escape(p);
     }
   }
 
   /**
-   * Returns an escaped string representation of a primitive property value for CSV.
+   * Returns a CSV string representation of a collection.
    *
-   * @param p property value
-   * @return escaped CSV string
+   * @param collection collection
+   * @return CSV string
    */
-  private String primitivePropertyValueToCSVString(PropertyValue p) {
-    if (p.getType() == String.class) {
-      return StringEscaper.escape(p.getString(), CSVConstants.ESCAPED_CHARACTERS);
+  String collectionToCsvString(Collection<?> collection) {
+    return collection.stream()
+      .map(o -> o instanceof PropertyValue ? escape((PropertyValue) o) : o.toString())
+      .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, "[", "]"));
+  }
+
+  /**
+   * Returns a escaped string representation of a property value.
+   *
+   * @param propertyValue property value to be escaped
+   * @return escaped string representation
+   */
+  private static String escape(PropertyValue propertyValue) {
+    if (propertyValue.isString()) {
+      return StringEscaper.escape(propertyValue.toString(), CSVConstants.ESCAPED_CHARACTERS);
     }
-    return p.toString();
+    return propertyValue.toString();
   }
 }
