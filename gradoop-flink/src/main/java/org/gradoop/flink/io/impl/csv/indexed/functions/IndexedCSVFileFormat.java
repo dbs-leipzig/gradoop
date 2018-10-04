@@ -20,8 +20,7 @@ import org.apache.flink.core.fs.FSDataOutputStream;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.types.StringValue;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
-import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
-import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
+import org.gradoop.flink.io.impl.csv.tuples.CSVElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,7 +148,7 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
    * @throws IOException - Throne if creating writer or output stream fails.
    */
   public void mapWriter(Tuple t, String fileName) throws IOException {
-
+    fileName = cleanFilename(fileName);
     if (labelsToWriter.containsKey(fileName)) {
       writeToCSV(t, labelsToWriter.get(fileName));
     } else {
@@ -207,13 +206,11 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
 
   @Override
   public void writeRecord(T record) throws IOException {
-    if (record.getClass().equals(CSVVertex.class)) {
-      String label = ((CSVVertex) record).getLabel();
-      mapWriter(record, label);
-    } else if (record.getClass().equals(CSVEdge.class)) {
-      String label = ((CSVEdge) record).getLabel();
-      mapWriter(record, label);
+    String label = ((CSVElement) record).getLabel();
+    if (label.isEmpty()) {
+      throw new IllegalArgumentException("IndexedCSVDataSink requires a label for every element.");
     }
+    mapWriter(record, label);
   }
 
   @Override
