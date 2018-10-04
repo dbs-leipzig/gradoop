@@ -27,7 +27,7 @@ import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
  *
  * label
  */
-@FunctionAnnotation.ForwardedFields("label->f1")
+@FunctionAnnotation.ForwardedFields("label->f2")
 public class VertexToCSVVertex extends ElementToCSV<Vertex, CSVVertex> {
   /**
    * Reduce object instantiations.
@@ -37,6 +37,7 @@ public class VertexToCSVVertex extends ElementToCSV<Vertex, CSVVertex> {
   @Override
   public CSVVertex map(Vertex vertex) throws Exception {
     csvVertex.setId(vertex.getId().toString());
+    csvVertex.setGradoopIds(collectionToCsvString(vertex.getGraphIds()));
     csvVertex.setLabel(vertex.getLabel());
     csvVertex.setProperties(getPropertyString(vertex, CSVConstants.VERTEX_TYPE));
     return csvVertex;

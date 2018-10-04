@@ -26,6 +26,7 @@ import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
 
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
@@ -78,8 +79,38 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
     // Only properties with matching type get returned
     // to prevent writing values with the wrong type metadata
     if (p != null && MetaDataParser.getTypeString(p).equals(propertyMetaData.getTypeString())) {
-      return p.toString();
+      return propertyValueToCsvString(p);
     }
     return EMPTY_STRING;
+  }
+
+  /**
+   * Returns a CSV string representation of the property value.
+   *
+   * @param p property value
+   * @return CSV string
+   */
+  private String propertyValueToCsvString(PropertyValue p) {
+    if (p.isList() || p.isSet()) {
+      return collectionToCsvString((Collection) p.getObject());
+    } else if (p.isMap()) {
+      return p.getMap().entrySet().stream()
+        .map(e -> e.getKey().toString() + CSVConstants.MAP_SEPARATOR + e.getValue().toString())
+        .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, "{", "}"));
+    } else {
+      return p.toString();
+    }
+  }
+
+  /**
+   * Returns a CSV string representation of a collection.
+   *
+   * @param collection collection
+   * @return CSV string
+   */
+  String collectionToCsvString(Collection<?> collection) {
+    return collection.stream()
+      .map(Object::toString)
+      .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, "[", "]"));
   }
 }

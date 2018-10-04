@@ -20,11 +20,13 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -83,6 +85,21 @@ public class GraphCollectionFactory {
   public GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
     DataSet<Edge> edges) {
     return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, edges), config);
+  }
+
+  /**
+   * Creates a graph collection from the given datasets. The method assumes, that all vertices and
+   * edges are already assigned to the specified graph heads.
+   *
+   * @param graphHeads label indexed graph head dataset (1-element)
+   * @param vertices label indexed vertex datasets
+   * @param edges label indexed edge datasets
+   * @return graph collection
+   */
+  public GraphCollection fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
+    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
+    GraphCollectionLayout layout = layoutFactory.fromIndexedDataSets(graphHeads, vertices, edges);
+    return new GraphCollection(layout, config);
   }
 
   /**

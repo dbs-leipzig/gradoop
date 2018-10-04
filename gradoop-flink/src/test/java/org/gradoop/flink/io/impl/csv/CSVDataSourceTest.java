@@ -17,6 +17,7 @@ package org.gradoop.flink.io.impl.csv;
 
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.junit.Test;
 
@@ -25,19 +26,19 @@ public class CSVDataSourceTest extends CSVTestBase {
   @Test
   public void testRead() throws Exception {
     String csvPath = VertexLabeledEdgeListDataSourceTest.class
-      .getResource("/data/csv/input")
+      .getResource("/data/csv/input_graph_collection")
       .getFile();
 
     String gdlPath = CSVDataSourceTest.class
-      .getResource("/data/csv/expected/expected.gdl")
+      .getResource("/data/csv/expected/expected_graph_collection.gdl")
       .getFile();
 
     DataSource dataSource = new CSVDataSource(csvPath, getConfig());
-    LogicalGraph input = dataSource.getLogicalGraph();
-    LogicalGraph expected = getLoaderFromFile(gdlPath)
-      .getLogicalGraphByVariable("expected");
+    GraphCollection input = dataSource.getGraphCollection();
+    GraphCollection expected = getLoaderFromFile(gdlPath)
+      .getGraphCollectionByVariables("expected1", "expected2");
 
-    collectAndAssertTrue(input.equalsByElementData(expected));
+    collectAndAssertTrue(input.equalsByGraphElementData(expected));
   }
 
   /**
@@ -57,7 +58,7 @@ public class CSVDataSourceTest extends CSVTestBase {
     DataSource dataSource = new CSVDataSource(csvPath, getConfig());
     LogicalGraph sourceLogicalGraph = dataSource.getLogicalGraph();
 
-    collectAndAssertTrue(sourceLogicalGraph.equalsByData(expected));
+    collectAndAssertTrue(sourceLogicalGraph.equalsByElementData(expected));
 
     dataSource.getLogicalGraph().getEdges().collect()
       .forEach(this::checkProperties);
