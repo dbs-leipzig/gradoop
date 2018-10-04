@@ -380,4 +380,15 @@ public abstract class MultipleFileOutputFormat<IT>
       }
     }
   }
+
+  /**
+   * Replace illegal filename characters (<, >, :, ", /, \, |, ?, *) with '_'
+   * and change the string to lower case.
+   *
+   * @param filename filename to be cleaned
+   * @return cleaned filename
+   */
+  public static String cleanFilename(String filename) {
+    return filename.replaceAll("[<>:\"/\\\\|?*]", "_").toLowerCase();
+  }
 }
