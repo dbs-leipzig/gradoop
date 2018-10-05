@@ -2,57 +2,76 @@ package org.gradoop.common.model.impl.properties.propertyvalue;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Warmup;
-import java.util.concurrent.TimeUnit;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-@Warmup(time = 1, timeUnit = TimeUnit.MILLISECONDS)
-@Measurement(time = 1, timeUnit = TimeUnit.MILLISECONDS)
-@State(Scope.Thread)
-public class PropertyValueGradoopIdBenchmark {
+public class PropertyValueGradoopIdBenchmark extends AbstractPropertyValueBenchmark {
 
   private PropertyValue VALUE;
   private PropertyValue GRADOOP_ID_VALUE;
   private GradoopId GRADOOP_ID;
 
-  @Setup
+  @Override
   public void setup() {
     VALUE = new PropertyValue();
-    GRADOOP_ID_VALUE = PropertyValue.fromRawBytes(new byte[] {PropertyValue.TYPE_GRADOOP_ID, 0xf});
     GRADOOP_ID = GradoopId.get();
+    GRADOOP_ID_VALUE = PropertyValue.create(GRADOOP_ID);
   }
 
-  @Benchmark
+  @Override
   public PropertyValue create() {
     return PropertyValue.create(GRADOOP_ID);
   }
 
-  @Benchmark
+  @Override
   public void set() {
     VALUE.setGradoopId(GRADOOP_ID);
   }
 
-  @Benchmark
+  @Override
   public Boolean is() {
     return GRADOOP_ID_VALUE.isGradoopId();
   }
 
-  @Benchmark
+  @Override
   public GradoopId get() {
     return GRADOOP_ID_VALUE.getGradoopId();
   }
 
-  @Benchmark
+  @Override
   public void setObject() {
     VALUE.setObject(GRADOOP_ID);
   }
 
-  @Benchmark
+  @Override
   public Class<?> getType() {
     return GRADOOP_ID_VALUE.getType();
+  }
+
+  /**
+   * You can run this test:
+   *
+   * a) Via the command line:
+   *    $ mvn clean install
+   *    $ java -jar target/benchmarks.jar PropertyValueGradoopIdBenchmark
+   *
+   * b) Via the Java API:
+   *    (see the JMH homepage for possible caveats when running from IDE:
+   *     http://openjdk.java.net/projects/code-tools/jmh/)
+   *
+   * If you want to write the benchmark results to a csv file, add -rff <filename>.csv to the
+   * program call.
+   *
+   * @param args Program arguments
+   * @throws RunnerException when something went wrong
+   */
+  public static void main(String[] args) throws RunnerException {
+    Options opt = new OptionsBuilder()
+      .include(PropertyValueBooleanBenchmark.class.getSimpleName())
+      .build();
+
+    new Runner(opt).run();
   }
 }

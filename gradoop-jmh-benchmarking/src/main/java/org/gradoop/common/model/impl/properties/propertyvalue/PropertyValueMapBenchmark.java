@@ -1,60 +1,79 @@
 package org.gradoop.common.model.impl.properties.propertyvalue;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-@Warmup(time = 1, timeUnit = TimeUnit.MILLISECONDS)
-@Measurement(time = 1, timeUnit = TimeUnit.MILLISECONDS)
-@State(Scope.Thread)
-public class PropertyValueMapBenchmark {
+public class PropertyValueMapBenchmark extends AbstractPropertyValueBenchmark {
 
   private PropertyValue VALUE;
   private PropertyValue MAP_VALUE;
   private Map<PropertyValue, PropertyValue> MAP;
 
-  @Setup
+  @Override
   public void setup() {
     VALUE = new PropertyValue();
-    MAP_VALUE = PropertyValue.fromRawBytes(new byte[] {PropertyValue.TYPE_MAP, 0xf});
     MAP = new HashMap<>();
     MAP.put(PropertyValue.create("A"), PropertyValue.create("B"));
+    MAP_VALUE = PropertyValue.create(MAP);
   }
 
-  @Benchmark
+  @Override
   public PropertyValue create() {
     return PropertyValue.create(MAP);
   }
 
-  @Benchmark
+  @Override
   public void set() {
     VALUE.setMap(MAP);
   }
 
-  @Benchmark
+  @Override
   public Boolean is() {
     return MAP_VALUE.isMap();
   }
 
-  @Benchmark
+  @Override
   public Map<PropertyValue, PropertyValue> get() {
     return MAP_VALUE.getMap();
   }
 
-  @Benchmark
+  @Override
   public void setObject() {
     VALUE.setObject(MAP);
   }
 
-  @Benchmark
+  @Override
   public Class<?> getType() {
     return MAP_VALUE.getType();
+  }
+
+  /**
+   * You can run this test:
+   *
+   * a) Via the command line:
+   *    $ mvn clean install
+   *    $ java -jar target/benchmarks.jar PropertyValueMapBenchmark
+   *
+   * b) Via the Java API:
+   *    (see the JMH homepage for possible caveats when running from IDE:
+   *     http://openjdk.java.net/projects/code-tools/jmh/)
+   *
+   * If you want to write the benchmark results to a csv file, add -rff <filename>.csv to the
+   * program call.
+   *
+   * @param args Program arguments
+   * @throws RunnerException when something went wrong
+   */
+  public static void main(String[] args) throws RunnerException {
+    Options opt = new OptionsBuilder()
+      .include(PropertyValueBooleanBenchmark.class.getSimpleName())
+      .build();
+
+    new Runner(opt).run();
   }
 }

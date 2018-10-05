@@ -1,57 +1,76 @@
 package org.gradoop.common.model.impl.properties.propertyvalue;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Warmup;
-import java.util.concurrent.TimeUnit;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-@Warmup(time = 1, timeUnit = TimeUnit.MILLISECONDS)
-@Measurement(time = 1, timeUnit = TimeUnit.MILLISECONDS)
-@State(Scope.Thread)
-public class PropertyValueDoubleBenchmark {
+public class PropertyValueDoubleBenchmark extends AbstractPropertyValueBenchmark {
 
   private PropertyValue VALUE;
   private PropertyValue DOUBLE_VALUE;
   private Double DOUBLE;
 
-  @Setup
+  @Override
   public void setup() {
     VALUE = new PropertyValue();
-    DOUBLE_VALUE = PropertyValue.fromRawBytes(new byte[] {PropertyValue.TYPE_DOUBLE, 0x3f});
     DOUBLE = 1.5;
+    DOUBLE_VALUE = PropertyValue.create(DOUBLE);
   }
 
-  @Benchmark
+  @Override
   public PropertyValue create() {
     return PropertyValue.create(1.5);
   }
 
-  @Benchmark
+  @Override
   public void set() {
     VALUE.setDouble(DOUBLE);
   }
 
-  @Benchmark
+  @Override
   public Boolean is() {
     return DOUBLE_VALUE.isDouble();
   }
 
-  @Benchmark
+  @Override
   public Double get() {
     return DOUBLE_VALUE.getDouble();
   }
 
-  @Benchmark
+  @Override
   public void setObject() {
     VALUE.setObject(DOUBLE);
   }
 
-  @Benchmark
+  @Override
   public Class<?> getType() {
     return DOUBLE_VALUE.getType();
+  }
+
+  /**
+   * You can run this test:
+   *
+   * a) Via the command line:
+   *    $ mvn clean install
+   *    $ java -jar target/benchmarks.jar PropertyValueDoubleBenchmark
+   *
+   * b) Via the Java API:
+   *    (see the JMH homepage for possible caveats when running from IDE:
+   *     http://openjdk.java.net/projects/code-tools/jmh/)
+   *
+   * If you want to write the benchmark results to a csv file, add -rff <filename>.csv to the
+   * program call.
+   *
+   * @param args Program arguments
+   * @throws RunnerException when something went wrong
+   */
+  public static void main(String[] args) throws RunnerException {
+    Options opt = new OptionsBuilder()
+      .include(PropertyValueBooleanBenchmark.class.getSimpleName())
+      .build();
+
+    new Runner(opt).run();
   }
 }
