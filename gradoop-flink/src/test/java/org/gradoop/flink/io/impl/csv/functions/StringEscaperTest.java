@@ -61,7 +61,7 @@ public class StringEscaperTest {
   }
 
   /**
-   * Test splitting an escaped string.
+   * Test splitting an escaped string while ignoring escaped delimiters.
    */
   @Test
   public void testSplit() {
@@ -83,7 +83,7 @@ public class StringEscaperTest {
   }
 
   /**
-   * Test splitting an escaped string with limit.
+   * Test splitting an escaped string with limit while ignoring escaped delimiters.
    */
   @Test
   public void testSplitWithLimit() {

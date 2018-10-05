@@ -66,7 +66,7 @@ public class CSVDataSinkTest extends CSVTestBase {
    * Test CSVDataSink to write a graph with different property types
    * using the same label on different elements with the same label.
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteWithDifferentPropertyTypes() throws Exception {
@@ -89,10 +89,9 @@ public class CSVDataSinkTest extends CSVTestBase {
   }
 
   /**
-   * Test CSVDataSink to properly separate the metadata
-   * of edges and vertices using the same label.
+   * Test writing and reading a graph that uses the same label for vertices and edges.
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteWithSameLabel() throws Exception {
@@ -120,9 +119,11 @@ public class CSVDataSinkTest extends CSVTestBase {
   }
 
   /**
-   * Test CSVDataSink to properly escape strings and labels.
+   * Test CSVDataSink to escape strings and labels that contain delimiter characters.
+   * Escape characters get inserted before delimiter characters that are part of strings or labels.
+   * Whitespace gets replaced by their control character sequence.
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteWithDelimiterCharacters() throws Exception {
@@ -177,9 +178,10 @@ public class CSVDataSinkTest extends CSVTestBase {
   }
 
   /**
-   * Test CSVDataSink using existing a metadata.csv
+   * Test writing and reading a graph with a existing metadata file instead of aggregating
+   * new metadata from the graph.
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteWithExistingMetaData() throws Exception {
@@ -211,7 +213,7 @@ public class CSVDataSinkTest extends CSVTestBase {
    * CSVDataSource ignores the graph heads when using getLogicalGraph(),
    * therefore the graph head is not tested for equality.
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteExtendedProperties() throws Exception {
@@ -235,7 +237,7 @@ public class CSVDataSinkTest extends CSVTestBase {
   /**
    * Test the content of the metadata.csv file
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteMetadataCsv() throws Exception {
@@ -261,7 +263,7 @@ public class CSVDataSinkTest extends CSVTestBase {
    *
    * @param tmpPath path to write csv
    * @param input logical graph
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   private void checkCSVWrite(String tmpPath, LogicalGraph input) throws Exception {
     checkCSVWrite(tmpPath, input.getConfig().getGraphCollectionFactory().fromGraph(input));
@@ -272,7 +274,7 @@ public class CSVDataSinkTest extends CSVTestBase {
    *
    * @param tmpPath path to write csv
    * @param input graph collection
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   private void checkCSVWrite(String tmpPath, GraphCollection input) throws Exception {
     DataSink csvDataSink = new CSVDataSink(tmpPath, getConfig());
