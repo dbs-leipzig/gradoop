@@ -18,7 +18,7 @@ public class PostgresWrapper {
 
   /**
    * Start PostgreSQL running
-   * 
+   *
    * @throws IOException
    *           if an error occurs starting Postgres
    */
@@ -44,7 +44,7 @@ public class PostgresWrapper {
 
   /**
    * Get the URL to use to connect to the database
-   * 
+   *
    * @return the connection URL
    */
   public String getConnectionUrl() {
@@ -53,7 +53,7 @@ public class PostgresWrapper {
 
   /**
    * Get a free port to listen on
-   * 
+   *
    * @return the port
    * @throws IOException
    *           if an error occurs finding a port

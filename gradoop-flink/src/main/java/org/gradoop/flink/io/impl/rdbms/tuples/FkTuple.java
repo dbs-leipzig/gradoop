@@ -60,14 +60,10 @@ public class FkTuple extends Tuple4<String, JDBCType, String, String> {
   /**
    * Constructor
    *
-   * @param fkName
-   *          Foreign key name
-   * @param type
-   *          SQL Type of foreign key
-   * @param refdAttName
-   *          Name of referenced primary key
-   * @param refdTableName
-   *          Name of referenced primary key table
+   * @param fkName Foreign key name
+   * @param type SQL Type of foreign key
+   * @param refdAttName Name of referenced primary key
+   * @param refdTableName Name of referenced primary key table
    */
   public FkTuple(String fkName, JDBCType type, String refdAttName, String refdTableName) {
     this.fkName = fkName;
@@ -78,6 +74,37 @@ public class FkTuple extends Tuple4<String, JDBCType, String, String> {
     this.f2 = refdAttName;
     this.refdTableName = refdTableName;
     this.f3 = refdTableName;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((fkName == null) ? 0 : fkName.hashCode());
+    result = prime * result + ((refdAttName == null) ? 0 : refdAttName.hashCode());
+    result = prime * result + ((refdTableName == null) ? 0 : refdTableName.hashCode());
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    return result;
+  }
+
+  /**
+   * Checks if two FkTuple tuples are equal
+   *
+   * @param t object to check equality
+   * @return <code>true</code> if Object equals FkTuple; <code>false</code>
+   *         otherwise
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    FkTuple fkt = (FkTuple) o;
+    return this.f0.equals(fkt.f0) && this.f1.equals(fkt.f1) && this.f2.equals(fkt.f2) &&
+        this.f3.equals(fkt.f3);
   }
 
   public String getFkName() {

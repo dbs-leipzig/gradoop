@@ -21,6 +21,7 @@ import java.util.List;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.types.Row;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.impl.rdbms.tuples.Fk1Fk2Props;
@@ -60,8 +61,7 @@ public class FKandProps extends RichMapFunction<Row, Fk1Fk2Props> {
    * Creates a tuple of foreign key one, foreign key two and belonging properties
    * from row
    *
-   * @param tablePos
-   *          Current position of iteration
+   * @param tablePos Current position of iteration
    */
   public FKandProps(int tablePos) {
     this.tablePos = tablePos;
@@ -80,6 +80,6 @@ public class FKandProps extends RichMapFunction<Row, Fk1Fk2Props> {
 
   @Override
   public void open(Configuration parameters) throws Exception {
-    this.tables = getRuntimeContext().getBroadcastVariable("tables");
+    this.tables = getRuntimeContext().getBroadcastVariable(RdbmsConstants.BROADCAST_VARIABLE);
   }
 }

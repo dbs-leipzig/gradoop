@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
@@ -44,17 +45,19 @@ public class DeletePkFkProperties extends RichMapFunction<Vertex, Vertex> {
 
   @Override
   public Vertex map(Vertex v) throws Exception {
-    Properties newProps = new Properties();
+    Properties newProps = Properties.create();
 
     for (TableToNode table : tablesToNodes) {
       if (table.getTableName().equals(v.getLabel())) {
-        ArrayList<String> foreignKeys = new ArrayList<String>();
-        for (RowHeaderTuple rht : table.getRowheader().getForeignKeyHeader()) {
-          foreignKeys.add(rht.f0);
+        ArrayList<String> foreignKeys = Lists.newArrayList();
+        for (RowHeaderTuple rht : table.getRowheader().getRowHeader()) {
+          if (rht.getAttType().equals(RdbmsConstants.FK_FIELD)) {
+            foreignKeys.add(rht.f0);
+          }
         }
         for (Property oldProp : v.getProperties()) {
-          if (!foreignKeys.contains(oldProp.getKey()) &&
-              !oldProp.getKey().equals(RdbmsConstants.PK_ID)) {
+          if (!oldProp.getKey().equals(RdbmsConstants.PK_ID) &&
+              !foreignKeys.contains(oldProp.getKey())) {
             newProps.set(oldProp);
           }
         }
@@ -67,6 +70,7 @@ public class DeletePkFkProperties extends RichMapFunction<Vertex, Vertex> {
 
   @Override
   public void open(Configuration parameters) throws Exception {
-    this.tablesToNodes = getRuntimeContext().getBroadcastVariable("tablesToNodes");
+    this.tablesToNodes = getRuntimeContext()
+        .getBroadcastVariable(RdbmsConstants.BROADCAST_VARIABLE);
   }
 }

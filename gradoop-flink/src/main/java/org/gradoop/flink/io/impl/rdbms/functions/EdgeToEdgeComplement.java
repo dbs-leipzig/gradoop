@@ -38,6 +38,7 @@ public class EdgeToEdgeComplement implements MapFunction<Edge, Edge> {
 
   /**
    * Creates other direction edge
+   *
    * @param edgeFactory Valid gradoop edge factory
    */
   public EdgeToEdgeComplement(EdgeFactory edgeFactory) {

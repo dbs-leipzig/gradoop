@@ -11,7 +11,7 @@ import java.util.List;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants.RdbmsType;
 import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.RdbmsTableBase;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
@@ -35,7 +35,7 @@ public class RdbmsDataImportTest extends GradoopFlinkTestBase {
 
     con = DriverManager.getConnection(pw.getConnectionUrl());
 
-    metadataParser = new MetaDataParser(con, RdbmsConstants.MYSQL_TYPE_ID);
+    metadataParser = new MetaDataParser(con, RdbmsType.MYSQL_TYPE);
     metadataParser.parse();
 
     gdlPath = RdbmsDataImportTest.class.getResource("/data/rdbms/expected/cycleTest.gdl").getFile();

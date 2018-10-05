@@ -17,6 +17,7 @@ package org.gradoop.flink.io.impl.rdbms.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.Property;
 
 /**
  * Tuple for n:m relation conversion f0 : Foreign key one f1 : Foreign key two
@@ -53,12 +54,9 @@ public class Fk1Fk2Props extends Tuple3<String, String, Properties> {
   /**
    * Constructor
    *
-   * @param fk1
-   *          Name of foreign key one
-   * @param fk2
-   *          Name of foreign key two
-   * @param props
-   *          Relation belonging properties
+   * @param fk1 Name of foreign key one
+   * @param fk2 Name of foreign key two
+   * @param props Relation belonging properties
    */
   public Fk1Fk2Props(String fk1, String fk2, Properties props) {
     this.fk1 = fk1;
@@ -67,6 +65,43 @@ public class Fk1Fk2Props extends Tuple3<String, String, Properties> {
     this.f1 = fk2;
     this.props = props;
     this.f2 = props;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((fk1 == null) ? 0 : fk1.hashCode());
+    result = prime * result + ((fk2 == null) ? 0 : fk2.hashCode());
+    result = prime * result + ((props == null) ? 0 : props.hashCode());
+    return result;
+  }
+
+  /**
+   * Checks if two Fk1Fk2Props tuples are equal
+   *
+   * @param t object to check equality
+   * @return <code>true</code> if Object equals Fk1Fk2Props; <code>false</code>
+   *         otherwise
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Fk1Fk2Props ffp = (Fk1Fk2Props) o;
+    boolean equal = true;
+    if (this.f0.equals(ffp.f0) && this.f1.equals(ffp.f1)) {
+      for (Property p : props) {
+        if (!ffp.f2.get(p.getKey()).equals(p.getValue())) {
+          equal = false;
+        }
+      }
+    }
+    return equal;
   }
 
   public String getFk1() {

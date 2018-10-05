@@ -43,8 +43,7 @@ public class JoinSetToEdges
   /**
    * Valid gradoop edge factory
    *
-   * @param edgeFactory
-   *             Valid gradoop edge factory
+   * @param edgeFactory Valid gradoop edge factory
    */
   public JoinSetToEdges(EdgeFactory edgeFactory) {
     this.edgeFactory = edgeFactory;

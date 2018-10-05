@@ -16,6 +16,7 @@
 
 package org.gradoop.flink.io.impl.rdbms.metadata;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
@@ -24,8 +25,12 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 /**
  * Rowheader of a row based relational data representation
  */
-public class RowHeader {
+public class RowHeader implements Serializable {
 
+  /**
+   * Serian version uid
+   */
+  private static final long serialVersionUID = 1L;
   /**
    * List of single rowheader tuples
    */
@@ -41,8 +46,7 @@ public class RowHeader {
   /**
    * Constructor
    *
-   * @param rowHeader
-   *          List of rowheader tuples
+   * @param rowHeader List of rowheader tuples
    */
   public RowHeader(ArrayList<RowHeaderTuple> rowHeader) {
     this.rowHeader = rowHeader;

@@ -15,9 +15,14 @@
  */
 package org.gradoop.flink.io.impl.rdbms.connection;
 
+import org.apache.log4j.Logger;
+
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -30,21 +35,34 @@ public class RegisterDriver {
   /**
    * Registers a jdbc driver
    *
-   * @param config
-   *          Database configuration
+   * @param config Database configuration
    */
   public static void register(RdbmsConfig config) {
+    AccessController.doPrivileged(new PrivilegedAction<Object>() {
+      @Override
+      public Object run() {
+        // privileged code goes here, for example:
+        Logger log = Logger.getLogger(RegisterDriver.class);
+        try {
+          URL driverUrl = new URL("jar:file:" + config.getJdbcDriverPath() + "!/");
+          URLClassLoader ucl = new URLClassLoader(new URL[] { driverUrl });
+          Driver driver = (Driver) Class.forName(config.getJdbcDriverClassName(), true, ucl)
+              .getDeclaredConstructor().newInstance();
+          DriverManager.registerDriver(new DriverShim(driver));
 
-    try {
-      URL driverUrl = new URL("jar:file:" + config.getJdbcDriverPath() + "!/");
-      URLClassLoader ucl = new URLClassLoader(new URL[] { driverUrl });
-      Driver driver = (Driver) Class.forName(config.getJdbcDriverClassName(), true, ucl)
-          .newInstance();
-      DriverManager.registerDriver(new DriverShim(driver));
-
-    } catch (SQLException | MalformedURLException | InstantiationException |
-        IllegalAccessException | ClassNotFoundException e) {
-      System.err.println("Not possible to register generic driver. Maybe caused by wrong driverurl. Error Message : " + e.getMessage());
-    }
+        } catch (SQLException e) {
+          System.err.println("Cannot register jdbc driver !");
+          log.error(e);
+        } catch (MalformedURLException e) {
+          System.err.println("Wrong path to jdbc driver !");
+          log.error(e);
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException |
+            IllegalArgumentException | InvocationTargetException | NoSuchMethodException |
+            SecurityException e) {
+          log.error(e);
+        }
+        return null;
+      }
+    });
   }
 }

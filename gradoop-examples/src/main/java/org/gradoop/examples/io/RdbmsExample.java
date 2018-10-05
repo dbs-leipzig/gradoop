@@ -32,12 +32,14 @@ public class RdbmsExample implements ProgramDescription {
   /**
    * Converts a relational database to an epgm graph
    *
+   * <pre>
    * args[0]:Valid jdbc url.
    * args[1]:User name of database user.
    * args[2]:Password of database user.
-   * args[3]:Valid path to a fitting jdbc driver.
+   * args[3]:Valid path to a proper jdbc driver.
    * args[4]:Valid jdbc driver class name.
    * args[5]:Valid path to output directory.
+   * </pre>
    *
    * @param args program arguments
    */

@@ -16,24 +16,31 @@
 
 package org.gradoop.flink.io.impl.rdbms.metadata;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.gradoop.flink.io.impl.rdbms.connection.SQLToBasicTypeMapper;
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants.RdbmsType;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 
 /**
  * Stores metadata for tuple-to-edge conversation
  */
-public class TableToEdge {
+public class TableToEdge implements Serializable {
+
+  /**
+   * Serial version uid
+   */
+  private static final long serialVersionUID = 1L;
 
   /**
    * Management type of connecte rdbms
    */
-  private int rdbmsType;
+  private RdbmsType rdbmsType;
 
   /**
    * Relationship type
@@ -91,30 +98,25 @@ public class TableToEdge {
   private RowHeader rowheader;
 
   /**
+   * Flink type information for database table columns
+   */
+  private RowTypeInfo rowTypeInfo;
+
+  /**
    * Conctructor
    *
-   * @param rdbmsType
-   *        Management type of connected rdbms
-   * @param relationshipType
-   *          Relationship type
-   * @param startTableName
-   *          Name of relation start table
-   * @param endTableName
-   *          Name of relation end table
-   * @param startAttribute
-   *          Name and type of relation start attribute
-   * @param endAttribute
-   *          Name and datatype of relation end attribute
-   * @param primaryKeys
-   *          List of primary key names and datatypes
-   * @param furtherAttributes
-   *          List of further attribute names and datatypes
-   * @param directionIndicator
-   *          Direction indicator
-   * @param rowCount
-   *          Number of rows
+   * @param rdbmsType Management type of connected rdbms
+   * @param relationshipType Relationship type
+   * @param startTableName Name of relation start table
+   * @param endTableName Name of relation end table
+   * @param startAttribute Name and type of relation start attribute
+   * @param endAttribute Name and datatype of relation end attribute
+   * @param primaryKeys List of primary key names and datatypes
+   * @param furtherAttributes List of further attribute names and datatypes
+   * @param directionIndicator Direction indicator
+   * @param rowCount Number of rows
    */
-  public TableToEdge(int rdbmsType, String relationshipType, String startTableName,
+  public TableToEdge(RdbmsType rdbmsType, String relationshipType, String startTableName,
       String endTableName, NameTypeTuple startAttribute, NameTypeTuple endAttribute,
       ArrayList<NameTypeTuple> primaryKeys, ArrayList<NameTypeTuple> furtherAttributes,
       boolean directionIndicator, int rowCount) {
@@ -128,37 +130,49 @@ public class TableToEdge {
     this.furtherAttributes = furtherAttributes;
     this.directionIndicator = directionIndicator;
     this.rowCount = rowCount;
-    this.rowheader = new RowHeader();
     if (!directionIndicator) {
-      this.sqlQuery = SQLQuery.getNtoMEdgeTableQuery(relationshipType, startAttribute.f0,
-          endAttribute.f0, furtherAttributes, rdbmsType);
+      this.init();
     }
   }
 
   /**
-   * Creates a valid type information for belonging sql query
-   *
-   * @return Row type information for belonging sql query
+   * assigns proper sql query and generates belonging flink row type information
+   * and row header
    */
-  public RowTypeInfo getRowTypeInfo() {
+  public void init() {
     TypeInformation<?>[] fieldTypes = null;
 
     if (!directionIndicator) {
+      this.sqlQuery = SQLQuery.getNtoMEdgeTableQuery(relationshipType, startAttribute.f0,
+          endAttribute.f0, furtherAttributes, rdbmsType);
+
+      rowheader = new RowHeader();
+
       fieldTypes = new TypeInformation<?>[furtherAttributes.size() + 2];
       fieldTypes[0] = SQLToBasicTypeMapper.getTypeInfo(startAttribute.f1, rdbmsType);
       rowheader.getRowHeader()
           .add(new RowHeaderTuple(startAttribute.f0, RdbmsConstants.FK_FIELD, 0));
       fieldTypes[1] = SQLToBasicTypeMapper.getTypeInfo(endAttribute.f1, rdbmsType);
-      rowheader.getRowHeader().add(new RowHeaderTuple(endAttribute.f0, RdbmsConstants.FK_FIELD, 1));
+      rowheader.getRowHeader()
+          .add(new RowHeaderTuple(endAttribute.f0, RdbmsConstants.FK_FIELD, 1));
 
       int i = 2;
       for (NameTypeTuple att : furtherAttributes) {
         fieldTypes[i] = SQLToBasicTypeMapper.getTypeInfo(att.f1, rdbmsType);
-        rowheader.getRowHeader().add(new RowHeaderTuple(att.f0, RdbmsConstants.ATTRIBUTE_FIELD, i));
+        rowheader.getRowHeader()
+            .add(new RowHeaderTuple(att.f0, RdbmsConstants.ATTRIBUTE_FIELD, i));
         i++;
       }
     }
-    return new RowTypeInfo(fieldTypes);
+    this.rowTypeInfo = new RowTypeInfo(fieldTypes);
+  }
+
+  public RdbmsType getRdbmsType() {
+    return rdbmsType;
+  }
+
+  public void setRdbmsType(RdbmsType rdbmsType) {
+    this.rdbmsType = rdbmsType;
   }
 
   public String getRelationshipType() {
@@ -247,5 +261,17 @@ public class TableToEdge {
 
   public void setRowheader(RowHeader rowheader) {
     this.rowheader = rowheader;
+  }
+
+  public RowTypeInfo getRowTypeInfo() {
+    return rowTypeInfo;
+  }
+
+  public void setFieldTypes(RowTypeInfo rowTypeInfo) {
+    this.rowTypeInfo = rowTypeInfo;
+  }
+
+  public static long getSerialversionuid() {
+    return serialVersionUID;
   }
 }

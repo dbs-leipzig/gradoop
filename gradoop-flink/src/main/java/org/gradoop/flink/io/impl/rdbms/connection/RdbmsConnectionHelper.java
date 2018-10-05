@@ -19,6 +19,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
+
 /**
  * Connection to relational database
  */
@@ -27,20 +29,20 @@ public class RdbmsConnectionHelper {
   /**
    * Establishes a connection to a relational database via jdbc.
    *
-   * @param config
-   *          Configuration of relational database
+   * @param config Configuration of relational database
    * @return Valid connection to a relational database
    */
   public static Connection getConnection(RdbmsConfig config) {
 
     Connection connection = null;
+    Logger log = Logger.getLogger(RdbmsConnectionHelper.class);
 
     try {
       RegisterDriver.register(config);
       connection = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPw());
-
     } catch (SQLException e) {
-      System.err.println("Can not establish connection to database " + config.getUrl() + ". Caused by : " + e.getMessage());
+      System.err.println("Cannot establish database connection !");
+      log.error(e);
     }
 
     return connection;

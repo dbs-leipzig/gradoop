@@ -27,8 +27,8 @@ import org.gradoop.flink.io.impl.rdbms.tuples.IdKeyTuple;
 /**
  * Creates tuples of gradoop id (fk1), key value (fk2) and belonging properties
  */
-public class Tuple2ToIdFkWithProps
-    implements MapFunction<Tuple2<Fk1Fk2Props, IdKeyTuple>, Tuple3<GradoopId, String, Properties>> {
+public class Tuple2ToIdFkWithProps implements
+    MapFunction<Tuple2<Fk1Fk2Props, IdKeyTuple>, Tuple3<GradoopId, String, Properties>> {
 
   /**
    * serial version uid

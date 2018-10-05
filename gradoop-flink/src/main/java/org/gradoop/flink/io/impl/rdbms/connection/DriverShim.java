@@ -25,7 +25,8 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
- * Generic jdbc driver
+ * Implements a jdbc driver. Needed for registering a generic jdbc driver in
+ * class loader.
  */
 public class DriverShim implements Driver {
 
@@ -35,43 +36,90 @@ public class DriverShim implements Driver {
   private Driver driver;
 
   /**
-   * Creates a generic jddbc driver.
-   * @param driver Valid java sql driver
+   * Constructs a new wrapper around a Driver.
+   *
+   * @param driver Database driver to wrap
    */
   public DriverShim(Driver driver) {
     this.driver = driver;
   }
 
+  /**
+   * Wraps the underlying driver's call to acceptsURL. Returns whether or not the
+   * driver can open a connection to the given URL.
+   *
+   * @param url the URL of the database
+   * @return true if the wrapped driver can connect to the specified URL
+   * @throws SQLException thrown if there is an error connecting to the database
+   */
   @Override
   public boolean acceptsURL(String url) throws SQLException {
     return this.driver.acceptsURL(url);
   }
 
+  /**
+   * Wraps the call to the underlying driver's connect method.
+   *
+   * @param url the URL of the database
+   * @param info a collection of string/value pairs
+   * @return a Connection object
+   * @throws SQLException thrown if there is an error connecting to the database
+   */
   @Override
   public Connection connect(String url, Properties props) throws SQLException {
     return this.driver.connect(url, props);
   }
 
+  /**
+   * Returns the wrapped driver's major version number.
+   *
+   * @return the wrapped driver's major version number
+   */
   @Override
   public int getMajorVersion() {
     return this.driver.getMajorVersion();
   }
 
+  /**
+   * Returns the wrapped driver's minor version number.
+   *
+   * @return the wrapped driver's minor version number
+   */
   @Override
   public int getMinorVersion() {
     return this.driver.getMinorVersion();
   }
 
+  /**
+   * Wraps the call to the underlying driver's getParentLogger method.
+   *
+   * @return the parent's Logger
+   * @throws SQLFeatureNotSupportedException thrown if the feature is not
+   *           supported
+   */
   @Override
   public Logger getParentLogger() throws SQLFeatureNotSupportedException {
     return this.driver.getParentLogger();
   }
 
+  /**
+   * Wraps the call to the underlying driver's getPropertyInfo method.
+   *
+   * @param url the URL of the database
+   * @param info a collection of string/value pairs
+   * @return an array of DriverPropertyInfo objects
+   * @throws SQLException thrown if there is an error accessing the database
+   */
   @Override
   public DriverPropertyInfo[] getPropertyInfo(String url, Properties props) throws SQLException {
     return this.driver.getPropertyInfo(url, props);
   }
 
+  /**
+   * Returns whether or not the wrapped driver is jdbcCompliant.
+   *
+   * @return true if the wrapped driver is JDBC compliant; otherwise false
+   */
   @Override
   public boolean jdbcCompliant() {
     return this.driver.jdbcCompliant();

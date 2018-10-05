@@ -16,12 +16,14 @@
 
 package org.gradoop.flink.io.impl.rdbms.metadata;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.gradoop.flink.io.impl.rdbms.connection.SQLToBasicTypeMapper;
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants.RdbmsType;
 import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
@@ -29,12 +31,17 @@ import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
 /**
  * Stores metadata for tuple-to-vertex conversation
  */
-public class TableToNode {
+public class TableToNode implements Serializable {
+
+  /**
+   * Serial version uid
+   */
+  private static final long serialVersionUID = 1L;
 
   /**
    * Management type of connected rdbms
    */
-  private int rdbmsType;
+  private RdbmsType rdbmsType;
 
   /**
    * Name of database table
@@ -72,22 +79,21 @@ public class TableToNode {
   private RowHeader rowheader;
 
   /**
+   * Flink type information for belonging database value
+   */
+  private RowTypeInfo rowTypeInfo;
+
+  /**
    * Constructor
    *
-   *@param rdbmsType
-   *          Management type of connected rdbms
-   * @param tableName
-   *          Name of database table
-   * @param primaryKeys
-   *          List of primary key names and datatypes
-   * @param foreignKeys
-   *          List of foreign key names and datatypes
-   * @param furtherAttributes
-   *          List of further attribute names and datatypes
-   * @param rowCount
-   *          Number of database rows
+   * @param rdbmsType Management type of connected rdbms
+   * @param tableName Name of database table
+   * @param primaryKeys List of primary key names and datatypes
+   * @param foreignKeys List of foreign key names and datatypes
+   * @param furtherAttributes List of further attribute names and datatypes
+   * @param rowCount Number of database rows
    */
-  public TableToNode(int rdbmsType, String tableName, ArrayList<NameTypeTuple> primaryKeys,
+  public TableToNode(RdbmsType rdbmsType, String tableName, ArrayList<NameTypeTuple> primaryKeys,
       ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes, int rowCount) {
     this.rdbmsType = rdbmsType;
     this.tableName = tableName;
@@ -95,61 +101,52 @@ public class TableToNode {
     this.foreignKeys = foreignKeys;
     this.furtherAttributes = furtherAttributes;
     this.rowCount = rowCount;
-    this.sqlQuery = SQLQuery.getNodeTableQuery(tableName, primaryKeys, foreignKeys,
-        furtherAttributes, rdbmsType);
-    this.rowheader = new RowHeader();
+    this.init();
   }
 
   /**
-   * Creates a valid type information for belonging sql query
-   *
-   * @return Row type information for belonging sql query
+   * Creates sql query for querying database, belonging rowheader and belonging
+   * flink type information
    */
-  public RowTypeInfo getRowTypeInfo() {
-    int i = 0;
+  public void init() {
+    this.sqlQuery = SQLQuery.getNodeTableQuery(tableName, primaryKeys, foreignKeys,
+        furtherAttributes, rdbmsType);
+
+    rowheader = new RowHeader();
+
     TypeInformation<?>[] fieldTypes = new TypeInformation[primaryKeys.size() + foreignKeys.size() +
         furtherAttributes.size()];
 
+    int i = 0;
     try {
       for (NameTypeTuple pk : primaryKeys) {
-        new SQLToBasicTypeMapper();
         fieldTypes[i] = SQLToBasicTypeMapper.getTypeInfo(pk.f1, rdbmsType);
         rowheader.getRowHeader().add(new RowHeaderTuple(pk.f0, RdbmsConstants.PK_FIELD, i));
         i++;
       }
       for (FkTuple fk : foreignKeys) {
-        new SQLToBasicTypeMapper();
         fieldTypes[i] = SQLToBasicTypeMapper.getTypeInfo(fk.f1, rdbmsType);
         rowheader.getRowHeader().add(new RowHeaderTuple(fk.f0, RdbmsConstants.FK_FIELD, i));
         i++;
       }
       for (NameTypeTuple att : furtherAttributes) {
-        new SQLToBasicTypeMapper();
         fieldTypes[i] = SQLToBasicTypeMapper.getTypeInfo(att.f1, rdbmsType);
-        rowheader.getRowHeader().add(new RowHeaderTuple(att.f0, RdbmsConstants.ATTRIBUTE_FIELD, i));
+        rowheader.getRowHeader()
+            .add(new RowHeaderTuple(att.f0, RdbmsConstants.ATTRIBUTE_FIELD, i));
         i++;
       }
     } catch (IllegalArgumentException e) {
       System.err.println("Empty attribute set. Error Message : " + e.getMessage());
     }
-
-    return new RowTypeInfo(fieldTypes);
+    this.rowTypeInfo = new RowTypeInfo(fieldTypes);
   }
 
-  public ArrayList<FkTuple> getForeignKeys() {
-    return foreignKeys;
+  public RdbmsType getRdbmsType() {
+    return rdbmsType;
   }
 
-  public void setForeignKeys(ArrayList<FkTuple> foreignKeys) {
-    this.foreignKeys = foreignKeys;
-  }
-
-  public RowHeader getRowheader() {
-    return rowheader;
-  }
-
-  public void setRowheader(RowHeader rowheader) {
-    this.rowheader = rowheader;
+  public void setRdbmsType(RdbmsType rdbmsType) {
+    this.rdbmsType = rdbmsType;
   }
 
   public String getTableName() {
@@ -166,6 +163,14 @@ public class TableToNode {
 
   public void setPrimaryKeys(ArrayList<NameTypeTuple> primaryKeys) {
     this.primaryKeys = primaryKeys;
+  }
+
+  public ArrayList<FkTuple> getForeignKeys() {
+    return foreignKeys;
+  }
+
+  public void setForeignKeys(ArrayList<FkTuple> foreignKeys) {
+    this.foreignKeys = foreignKeys;
   }
 
   public ArrayList<NameTypeTuple> getFurtherAttributes() {
@@ -190,5 +195,21 @@ public class TableToNode {
 
   public void setSqlQuery(String sqlQuery) {
     this.sqlQuery = sqlQuery;
+  }
+
+  public RowHeader getRowheader() {
+    return rowheader;
+  }
+
+  public void setRowheader(RowHeader rowheader) {
+    this.rowheader = rowheader;
+  }
+
+  public RowTypeInfo getRowTypeInfo() {
+    return rowTypeInfo;
+  }
+
+  public void setRowTypeInfo(RowTypeInfo rowTypeInfo) {
+    this.rowTypeInfo = rowTypeInfo;
   }
 }

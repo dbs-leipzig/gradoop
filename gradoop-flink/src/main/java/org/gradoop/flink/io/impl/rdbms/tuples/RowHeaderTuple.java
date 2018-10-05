@@ -49,12 +49,13 @@ public class RowHeaderTuple extends Tuple3<String, String, Integer> {
   public RowHeaderTuple() {
   }
 
- /**
-  * Constructor
-  * @param name Attribute name
-  * @param attType Attribute type
-  * @param pos Attributes' position in table
-  */
+  /**
+   * Constructor
+   *
+   * @param name Attribute name
+   * @param attType Attribute type
+   * @param pos Attributes' position in table
+   */
   public RowHeaderTuple(String name, String attType, int pos) {
     this.name = name;
     this.f0 = name;
@@ -62,6 +63,35 @@ public class RowHeaderTuple extends Tuple3<String, String, Integer> {
     this.f1 = attType;
     this.pos = pos;
     this.f2 = pos;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((attType == null) ? 0 : attType.hashCode());
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + pos;
+    return result;
+  }
+
+  /**
+   * Checks if two RowHeaderTuple tuples are equal
+   *
+   * @param t object to check equality
+   * @return <code>true</code> if Object equals RowHeaderTuple; <code>false</code>
+   *         otherwise
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    RowHeaderTuple rht = (RowHeaderTuple) o;
+    return this.f0.equals(rht.f0) && this.f1.equals(rht.f1) && this.f2 == rht.f2;
   }
 
   public String getName() {

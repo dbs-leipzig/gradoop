@@ -29,8 +29,7 @@ public class PropertyValueParser {
   /**
    * Converts jdbc data type to matching EPGM property value if possible
    *
-   * @param att
-   *          Database value
+   * @param att Database value
    * @return Gradoop property value
    */
   public static PropertyValue parse(Object att) {

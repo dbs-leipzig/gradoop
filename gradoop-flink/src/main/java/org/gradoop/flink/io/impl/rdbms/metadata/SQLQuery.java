@@ -18,7 +18,7 @@ package org.gradoop.flink.io.impl.rdbms.metadata;
 
 import java.util.ArrayList;
 
-import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants.RdbmsType;
 import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 
@@ -30,85 +30,76 @@ public class SQLQuery {
   /**
    * Creates a sql query for vertex conversion
    *
-   * @param tableName
-   *          Name of database table
-   * @param primaryKeys
-   *          List of primary keys
-   * @param foreignKeys
-   *          List of foreign keys
-   * @param furtherAttributes
-   *          List of further attributes
-   * @param rdbmsType
-   *          Management type of connected rdbms
+   * @param tableName Name of database table
+   * @param primaryKeys List of primary keys
+   * @param foreignKeys List of foreign keys
+   * @param furtherAttributes List of further attributes
+   * @param rdbmsType Management type of connected rdbms
    * @return Valid sql string for querying needed data for tuple-to-vertex
    *         conversation
    */
   public static String getNodeTableQuery(String tableName, ArrayList<NameTypeTuple> primaryKeys,
-      ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes, int rdbmsType) {
+      ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes,
+      RdbmsType rdbmsType) {
 
-    String sqlQuery = "SELECT ";
+    StringBuilder sqlQuery = new StringBuilder("SELECT ");
 
     for (NameTypeTuple pk : primaryKeys) {
-      if (rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
-        sqlQuery = sqlQuery + "[" + pk.f0 + "]" + ",";
+      if (rdbmsType == RdbmsType.SQLSERVER_TYPE) {
+        sqlQuery = sqlQuery.append("[" + pk.f0 + "]" + ",");
       } else {
-        sqlQuery = sqlQuery + pk.f0 + ",";
+        sqlQuery = sqlQuery.append(pk.f0 + ",");
       }
     }
 
     for (FkTuple fk : foreignKeys) {
-      if (rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
-        sqlQuery = sqlQuery + "[" + fk.f0 + "]" + ",";
+      if (rdbmsType == RdbmsType.SQLSERVER_TYPE) {
+        sqlQuery = sqlQuery.append("[" + fk.f0 + "]" + ",");
       } else {
-        sqlQuery += fk.f0 + ",";
+        sqlQuery = sqlQuery.append(fk.f0 + ",");
       }
     }
 
     for (NameTypeTuple att : furtherAttributes) {
-      if (rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
-        sqlQuery = sqlQuery + "[" + att.f0 + "]" + ",";
+      if (rdbmsType == RdbmsType.SQLSERVER_TYPE) {
+        sqlQuery = sqlQuery.append("[" + att.f0 + "]" + ",");
       } else {
-        sqlQuery += att.f0 + ",";
+        sqlQuery = sqlQuery.append(att.f0 + ",");
       }
     }
 
-    return sqlQuery.substring(0, sqlQuery.length() - 1) + " FROM " + tableName;
+    return sqlQuery.toString().substring(0, sqlQuery.length() - 1) + " FROM " + tableName;
   }
 
   /**
    * Creates a sql query for tuple to edge conversation
    *
-   * @param tableName
-   *          Name of database table
-   * @param startAttribute
-   *          Name of first foreign key attribute
-   * @param endAttribute
-   *          Name of second foreign key attribute
-   * @param furtherAttributes
-   *          List of further attributes
-   * @param rdbmsType
-   *          Management type of connected rdbms
+   * @param tableName Name of database table
+   * @param startAttribute Name of first foreign key attribute
+   * @param endAttribute Name of second foreign key attribute
+   * @param furtherAttributes List of further attributes
+   * @param rdbmsType Management type of connected rdbms
    * @return Valid sql string for querying needed data for tuple-to-edge
    *         conversation
    */
   public static String getNtoMEdgeTableQuery(String tableName, String startAttribute,
-      String endAttribute, ArrayList<NameTypeTuple> furtherAttributes, int rdbmsType) {
+      String endAttribute, ArrayList<NameTypeTuple> furtherAttributes, RdbmsType rdbmsType) {
 
-    if (rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
+    if (rdbmsType == RdbmsType.SQLSERVER_TYPE) {
       startAttribute = "[" + startAttribute + "]";
       endAttribute = "[" + endAttribute + "]";
     }
 
-    String sqlQuery = "SELECT " + startAttribute + "," + endAttribute + ",";
+    StringBuilder sqlQuery = new StringBuilder(
+        "SELECT " + startAttribute + "," + endAttribute + ",");
 
     for (NameTypeTuple att : furtherAttributes) {
-      if (rdbmsType == RdbmsConstants.SQLSERVER_TYPE_ID) {
-        sqlQuery += "[" + att.f0 + "]" + ",";
+      if (rdbmsType == RdbmsType.SQLSERVER_TYPE) {
+        sqlQuery = sqlQuery.append("[" + att.f0 + "]" + ",");
       } else {
-        sqlQuery += att.f0 + ",";
+        sqlQuery = sqlQuery.append(att.f0 + ",");
       }
     }
-
-    return sqlQuery.substring(0, sqlQuery.length() - 1) + " FROM " + tableName;
+    return sqlQuery.toString().substring(0, sqlQuery.length() - 1) + " FROM " + tableName;
   }
 }

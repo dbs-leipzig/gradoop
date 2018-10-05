@@ -49,16 +49,42 @@ public class NameTypeTuple extends Tuple2<String, JDBCType> {
   /**
    * Constructor
    *
-   * @param name
-   *          Attribute name
-   * @param type
-   *          Attribute sql type
+   * @param name Attribute name
+   * @param type Attribute sql type
    */
   public NameTypeTuple(String name, JDBCType type) {
     this.name = name;
     this.f0 = name;
     this.type = type;
     this.f1 = type;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    return result;
+  }
+
+  /**
+   * Checks if two NameTypeTuple tuples are equal
+   *
+   * @param t object to check equality
+   * @return <code>true</code> if Object equals NameTypeTuple; <code>false</code>
+   *         otherwise
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    NameTypeTuple ntt = (NameTypeTuple) o;
+    return this.f0.equals(ntt.f0) && this.f1.equals(ntt.f1);
   }
 
   public String getName() {

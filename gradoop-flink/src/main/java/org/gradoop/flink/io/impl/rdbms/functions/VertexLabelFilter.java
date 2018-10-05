@@ -37,8 +37,7 @@ public class VertexLabelFilter implements FilterFunction<Vertex> {
   /**
    * Filters by vertex labels
    *
-   * @param label
-   *          Epgm vertex label string
+   * @param label Epgm vertex label string
    */
   public VertexLabelFilter(String label) {
     this.label = label;

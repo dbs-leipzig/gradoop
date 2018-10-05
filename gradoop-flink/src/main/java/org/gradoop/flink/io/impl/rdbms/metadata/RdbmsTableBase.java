@@ -54,16 +54,11 @@ public class RdbmsTableBase {
   /**
    * Constructor
    *
-   * @param tableName
-   *          Name of database table
-   * @param primaryKeys
-   *          List of primary keys
-   * @param foreignKeys
-   *          List of foreign keys
-   * @param furtherAttributes
-   *          List of further attributes
-   * @param rowCount
-   *          Number of rows
+   * @param tableName Name of database table
+   * @param primaryKeys List of primary keys
+   * @param foreignKeys List of foreign keys
+   * @param furtherAttributes List of further attributes
+   * @param rowCount Number of rows
    */
   public RdbmsTableBase(String tableName, ArrayList<NameTypeTuple> primaryKeys,
       ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes, int rowCount) {

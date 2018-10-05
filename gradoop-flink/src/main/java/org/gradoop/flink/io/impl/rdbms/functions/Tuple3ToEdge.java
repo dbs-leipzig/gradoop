@@ -48,6 +48,7 @@ public class Tuple3ToEdge
 
   /**
    * Creates edges from joined foreign key sets
+   *
    * @param edgeFactory Valid gradoop edge factory
    * @param tableName Name of rdbms table
    */

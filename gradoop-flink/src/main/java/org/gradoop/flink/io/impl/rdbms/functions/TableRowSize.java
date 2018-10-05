@@ -29,29 +29,25 @@ public class TableRowSize {
   /**
    * Queries a relational database to get the number of rows
    *
-   * @param con
-   *          Valid jdbc database connection
-   * @param tableName
-   *          Name of database table
+   * @param con Valid jdbc database connection
+   * @param tableName Name of database table
    * @return Number of rows of database
    * @throws SQLException
    */
-  public static int getTableRowSize(Connection con, String tableName) {
-    int rowNumber = 0;
-    Statement st;
+  public static int getTableRowCount(Connection con, String tableName) throws SQLException {
+    int rowCount = 0;
+    Statement st = con.createStatement();
     try {
-      st = con.createStatement();
-
       ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM " + tableName);
       if (rs.next()) {
-        rowNumber = rs.getInt(1);
+        rowCount = rs.getInt(1);
+        rs.close();
       } else {
-        rowNumber = 0;
+        rowCount = 0;
       }
-    } catch (SQLException e) {
-      System.err.println("Can not query row size of database. Error Message : " + e.getMessage());
+    } finally {
+      st.close();
     }
-
-    return rowNumber;
+    return rowCount;
   }
 }

@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.io.impl.rdbms.connection.FlinkDatabaseInputHelper;
 import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConfig;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -34,9 +35,10 @@ public class CreateVertices {
 
   /**
    * Creates Epgm vertices from database table tuples
+   *
    * @param flinkConfig Valid gradoop flink config
    * @param rdbmsConfig Valid rdbms config
-   * @param tablesToNodes List of tables to nodes
+   * @param metadataParser Metadata of connected relational database
    * @return DataSet of Epgm vertices
    */
   public static DataSet<Vertex> create(GradoopFlinkConfig flinkConfig, RdbmsConfig rdbmsConfig,
@@ -49,25 +51,21 @@ public class CreateVertices {
     int counter = 0;
 
     for (TableToNode table : tablesToNodes) {
-      try {
-        DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper.getInput(flinkConfig.getExecutionEnvironment(),
-            rdbmsConfig, table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
+      DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper.getInput(
+          flinkConfig.getExecutionEnvironment(), rdbmsConfig, table.getRowCount(),
+          table.getSqlQuery(), table.getRowTypeInfo());
 
-        if (vertices == null) {
-          vertices = dsSQLResult
-              .map(new RowToVertices(vertexFactory, table.getTableName(), counter))
-              .withBroadcastSet(flinkConfig.getExecutionEnvironment().fromCollection(tablesToNodes),
-                  "tablesToNodes");
-        } else {
-          vertices = vertices.union(dsSQLResult
-              .map(new RowToVertices(vertexFactory, table.getTableName(), counter))
-              .withBroadcastSet(flinkConfig.getExecutionEnvironment().fromCollection(tablesToNodes),
-                  "tablesToNodes"));
-        }
-
-      } catch (ClassNotFoundException e) {
-        System.err.println("Can not query database via flink input. Error Message : " + e.getMessage());
+      if (vertices == null) {
+        vertices = dsSQLResult.map(new RowToVertices(vertexFactory, table.getTableName(), counter))
+            .withBroadcastSet(flinkConfig.getExecutionEnvironment().fromCollection(tablesToNodes),
+                RdbmsConstants.BROADCAST_VARIABLE);
+      } else {
+        vertices = vertices.union(dsSQLResult
+            .map(new RowToVertices(vertexFactory, table.getTableName(), counter))
+            .withBroadcastSet(flinkConfig.getExecutionEnvironment().fromCollection(tablesToNodes),
+                RdbmsConstants.BROADCAST_VARIABLE));
       }
+
       counter++;
     }
     return vertices;

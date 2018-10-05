@@ -55,12 +55,9 @@ public class LabelIdKeyTuple extends Tuple3<String, GradoopId, String> {
   /**
    * Constructor
    *
-   * @param label
-   *          Vertex label
-   * @param id
-   *          Valid gradoop id
-   * @param key
-   *          Key value string
+   * @param label Vertex label
+   * @param id Valid gradoop id
+   * @param key Key value string
    */
   public LabelIdKeyTuple(String label, GradoopId id, String key) {
     this.label = label;
@@ -69,6 +66,35 @@ public class LabelIdKeyTuple extends Tuple3<String, GradoopId, String> {
     this.f1 = id;
     this.key = key;
     this.f2 = key;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((key == null) ? 0 : key.hashCode());
+    result = prime * result + ((label == null) ? 0 : label.hashCode());
+    return result;
+  }
+
+  /**
+   * Checks if two LabelIdKeyTuple tuples are equal
+   *
+   * @param t object to check equality
+   * @return <code>true</code> if Object equals LabelIdKeyTuple;
+   *         <code>false</code> otherwise
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    LabelIdKeyTuple lik = (LabelIdKeyTuple) o;
+    return this.f0.equals(lik.f0) && this.f1 == lik.f1 && this.f2.equals(lik.f2);
   }
 
   public String getLabel() {

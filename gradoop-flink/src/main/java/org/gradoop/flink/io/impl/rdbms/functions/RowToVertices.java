@@ -72,12 +72,9 @@ public class RowToVertices extends RichMapFunction<Row, Vertex> {
   /**
    * Creates an Epgm vertex from a database row
    *
-   * @param vertexFactory
-   *          Gradoop vertex factory
-   * @param tableName
-   *          Name of database table
-   * @param tablePos
-   *          Position of database in list
+   * @param vertexFactory Gradoop vertex factory
+   * @param tableName Name of database table
+   * @param tablePos Position of database in list
    */
   public RowToVertices(VertexFactory vertexFactory, String tableName, int tablePos) {
     this.vertexFactory = vertexFactory;
@@ -101,6 +98,6 @@ public class RowToVertices extends RichMapFunction<Row, Vertex> {
 
   @Override
   public void open(Configuration parameters) throws Exception {
-    this.tables = getRuntimeContext().getBroadcastVariable("tablesToNodes");
+    this.tables = getRuntimeContext().getBroadcastVariable(RdbmsConstants.BROADCAST_VARIABLE);
   }
 }

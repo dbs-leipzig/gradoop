@@ -28,24 +28,18 @@ import org.apache.flink.types.Row;
 public class FlinkDatabaseInputHelper {
 
   /**
-   * Provides an flink input to a relational database and querying data in a
+   * Provides a flink input to a relational database and querying data in a
    * distributed manner.
    *
-   * @param env
-   *          Flink Execution Environment
-   * @param rdbmsConfig
-   *          Configuration of the used database management system
-   * @param rowCount
-   *          Number of table rows
-   * @param sqlQuery
-   *          Valid sql query
-   * @param typeInfo
-   *          Database row type information
-   * @return DataSet of type row, consisting of queried relational data
-   * @throws ClassNotFoundException
+   * @param env flink execution environment
+   * @param rdbmsConfig configuration of the used database management system
+   * @param rowCount number of table rows
+   * @param sqlQuery valid sql query
+   * @param typeInfo database row type information
+   * @return a row DataSet, represents database table data
    */
   public static DataSet<Row> getInput(ExecutionEnvironment env, RdbmsConfig rdbmsConfig,
-      int rowCount, String sqlQuery, RowTypeInfo typeInfo) throws ClassNotFoundException {
+      int rowCount, String sqlQuery, RowTypeInfo typeInfo) {
 
     int parallelism = env.getParallelism();
 

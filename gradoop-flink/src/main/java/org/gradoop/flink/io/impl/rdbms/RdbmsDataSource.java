@@ -18,12 +18,14 @@ package org.gradoop.flink.io.impl.rdbms;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConfig;
 import org.gradoop.flink.io.impl.rdbms.connection.RdbmsConnectionHelper;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateEdges;
 import org.gradoop.flink.io.impl.rdbms.functions.CreateVertices;
 import org.gradoop.flink.io.impl.rdbms.functions.DeletePkFkProperties;
@@ -53,23 +55,17 @@ public class RdbmsDataSource implements DataSource {
   private RdbmsConfig rdbmsConfig;
 
   /**
-   * Transforms a relational database into an EPGM instance
+   * Transforms a relational database into an EPGM instance.
    *
    * The data source expects a standard jdbc url, e.g.
-   * (jdbc:mysql://localhost/employees) and a valid path to a fitting jdbc driver
+   * (jdbc:mysql://localhost/employees) and a valid path to a proper jdbc driver.
    *
-   * @param url
-   *          Valid jdbc url (e.g. jdbc:mysql://localhost/employees)
-   * @param user
-   *          User name of relational database user
-   * @param pw
-   *          Password of relational database user
-   * @param jdbcDriverPath
-   *          Valid path to jdbc driver
-   * @param jdbcDriverClassName
-   *          Valid jdbc driver class name
-   * @param flinkConfig
-   *          Valid gradoop flink configuration
+   * @param url Valid jdbc url (e.g. jdbc:mysql://localhost/employees)
+   * @param user User name of relational database user
+   * @param pw Password of relational database user
+   * @param jdbcDriverPath Valid path to jdbc driver
+   * @param jdbcDriverClassName Valid jdbc driver class name
+   * @param flinkConfig Valid gradoop flink configuration
    */
   public RdbmsDataSource(String url, String user, String pw, String jdbcDriverPath,
       String jdbcDriverClassName, GradoopFlinkConfig flinkConfig) {
@@ -86,13 +82,14 @@ public class RdbmsDataSource implements DataSource {
     MetaDataParser metadataParser = null;
 
     try {
-      rdbmsConfig.setRdbms(con.getMetaData().getDatabaseProductName().toLowerCase());
-
+      rdbmsConfig.setRdbmsType(con.getMetaData().getDatabaseProductName().toLowerCase());
       metadataParser = new MetaDataParser(con, rdbmsConfig.getRdbmsType());
       metadataParser.parse();
     } catch (SQLException e) {
-      System.err.println("Cant query metadata from database : " + rdbmsConfig.getUrl() + ". caused by : " + e.getMessage());
+      throw new RuntimeException(e);
     }
+
+
 
     // creates vertices from rdbms table tuples
     vertices = CreateVertices.create(flinkConfig, rdbmsConfig, metadataParser);
@@ -103,7 +100,7 @@ public class RdbmsDataSource implements DataSource {
     // properties
     vertices = vertices.map(new DeletePkFkProperties()).withBroadcastSet(
         flinkConfig.getExecutionEnvironment().fromCollection(metadataParser.getTablesToNodes()),
-        "tablesToNodes");
+        RdbmsConstants.BROADCAST_VARIABLE);
 
     return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
   }

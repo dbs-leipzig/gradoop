@@ -23,9 +23,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * Tuple representing a gradoop id, key string pair
  */
 public class IdKeyTuple extends Tuple2<GradoopId, String> {
-   /**
-    * serial version uid
-    */
+  /**
+   * serial version uid
+   */
   private static final long serialVersionUID = 1L;
 
   /**
@@ -44,16 +44,45 @@ public class IdKeyTuple extends Tuple2<GradoopId, String> {
   public IdKeyTuple() {
   }
 
- /**
-  * Constructor
-  * @param id Valid gradoop id
-  * @param key Key value string
-  */
+  /**
+   * Constructor
+   *
+   * @param id Valid gradoop id
+   * @param key Key value string
+   */
   public IdKeyTuple(GradoopId id, String key) {
     this.id = id;
     this.f0 = id;
     this.key = key;
     this.f1 = key;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((key == null) ? 0 : key.hashCode());
+    return result;
+  }
+
+  /**
+   * Checks if two IdKeyTuple tuples are equal
+   *
+   * @param t object to check equality
+   * @return <code>true</code> if Object equals IdKeyTuple; <code>false</code>
+   *         otherwise
+   */
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    IdKeyTuple idk = (IdKeyTuple) o;
+    return this.f0.equals(idk.f0) && this.f1.equals(idk.f1);
   }
 
   public GradoopId getId() {

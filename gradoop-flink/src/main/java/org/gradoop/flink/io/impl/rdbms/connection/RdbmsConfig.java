@@ -16,67 +16,61 @@
 
 package org.gradoop.flink.io.impl.rdbms.connection;
 
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants.RdbmsType;
+
 /**
  * Stores database management system parameters
  */
 public class RdbmsConfig {
 
   /**
-   * Used database management system
+   * Name of used relational database management system
    */
-  private String rdbms;
+  private final String rdbmsName;
 
   /**
    * Management system identifier
    */
-  private int rdbmsType;
+  private RdbmsType rdbmsType;
 
   /**
    * Valid jdbc url
    */
-  private String url;
+  private final String url;
 
   /**
    * Username of database management system user
    */
-  private String user;
+  private final String user;
 
   /**
    * Password of database management system user
    */
-  private String pw;
+  private final String pw;
 
   /**
    * Valid path to a fitting jdbc driver jar
    */
-  private String jdbcDriverPath;
+  private final String jdbcDriverPath;
 
   /**
    * Valid and fitting jdbc driver class name
    */
-  private String jdbcDriverClassName;
-
-
+  private final String jdbcDriverClassName;
 
   /**
    * Constructor
    *
-   * @param rdbms
-   *          Database management system
-   * @param url
-   *          Valid jdbc url
-   * @param user
-   *          User name of database management system user
-   * @param pw
-   *          Password of database management system user
-   * @param jdbcDriverPath
-   *          Valid path to a fitting jdbc driver jar
-   * @param jdbcDriverClassName
-   *          Valid and fitting jdbc driver class name
+   * @param rdbmsName Database management system
+   * @param url Valid jdbc url
+   * @param user User name of database management system user
+   * @param pw Password of database management system user
+   * @param jdbcDriverPath Valid path to a fitting jdbc driver jar
+   * @param jdbcDriverClassName Valid and fitting jdbc driver class name
    */
-  public RdbmsConfig(String rdbms, String url, String user, String pw, String jdbcDriverPath,
+  public RdbmsConfig(String rdbmsName, String url, String user, String pw, String jdbcDriverPath,
       String jdbcDriverClassName) {
-    this.rdbms = rdbms;
+    this.rdbmsName = rdbmsName;
     this.url = url;
     this.user = user;
     this.pw = pw;
@@ -84,60 +78,59 @@ public class RdbmsConfig {
     this.jdbcDriverClassName = jdbcDriverClassName;
   }
 
-  public int getRdbmsType() {
+  /**
+   * @return Relational database management system type.
+   */
+  public RdbmsType getRdbmsType() {
     return rdbmsType;
   }
 
-  public String getRdbms() {
-    return rdbms;
+  /**
+   * @param rdbmsName Name of connected relational database management system.
+   */
+  public void setRdbmsType(String rdbmsName) {
+    this.rdbmsType = RdbmsTypeChooser.choose(rdbmsName);
   }
 
   /**
-   * Assigns a rdbms type depending on connected management system.
-   * @param rdbms Name of rdbms management system
+   * @return Name if relational database management system.
    */
-  public void setRdbms(String rdbms) {
-    this.rdbms = rdbms;
-    this.rdbmsType = RdbmsTypeChooser.choose(rdbms);
+  public String getRdbmsName() {
+    return rdbmsName;
   }
 
+  /**
+   * @return Relational database url.
+   */
   public String getUrl() {
     return url;
   }
 
-  public void setUrl(String url) {
-    this.url = url;
-  }
-
+  /**
+   * @return Relational database user name.
+   */
   public String getUser() {
     return user;
   }
 
-  public void setUser(String user) {
-    this.user = user;
-  }
-
+  /**
+   * @return Relational database user password.
+   */
   public String getPw() {
     return pw;
   }
 
-  public void setPw(String pw) {
-    this.pw = pw;
-  }
-
+  /**
+   * @return Path of used jdbc driver.
+   */
   public String getJdbcDriverPath() {
     return jdbcDriverPath;
   }
 
-  public void setJdbcDriverPath(String jdbcDriverPath) {
-    this.jdbcDriverPath = jdbcDriverPath;
-  }
-
+  /**
+   * @return Used jdbc driver class name.
+   */
   public String getJdbcDriverClassName() {
     return jdbcDriverClassName;
-  }
-
-  public void setJdbcDriverClassName(String jdbcDriverClassName) {
-    this.jdbcDriverClassName = jdbcDriverClassName;
   }
 }

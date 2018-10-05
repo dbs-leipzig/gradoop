@@ -42,12 +42,21 @@ public class RdbmsConstants {
   public static final String ATTRIBUTE_FIELD = "att";
 
   /**
-   * Database Identifier for mysql,mariadb,postgresql,h2,...
+   * Broadcast variable constant
    */
-  public static final int MYSQL_TYPE_ID = 0;
+  public static final String BROADCAST_VARIABLE = "broadcastVariable";
 
   /**
-   * Database Identifier for oracle,sqlserver,derby
+   * Database management system identifier
    */
-  public static final int SQLSERVER_TYPE_ID = 1;
+  public static enum RdbmsType {
+    /**
+     * Identifier for mysql,mariadb,postgresql,h2,hsqldb management systems
+     */
+    MYSQL_TYPE,
+    /**
+     * Identifier for sql-server, oracle,derby,sql:2018 standard management systems
+     */
+    SQLSERVER_TYPE
+  }
 }

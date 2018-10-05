@@ -17,6 +17,7 @@
 package org.gradoop.flink.io.impl.rdbms.functions;
 
 import org.apache.flink.types.Row;
+import org.apache.log4j.Logger;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
@@ -30,21 +31,20 @@ public class AttributesToProperties {
   /**
    * Converts relational attributes to epgm properties
    *
-   * @param tuple
-   *          Row of relational database
-   * @param rowheader
-   *          Rowheader of database table
+   * @param tuple Row of relational database
+   * @param rowheader Rowheader of database table
    * @return Epgm Properties
    */
   public static Properties getProperties(Row tuple, RowHeader rowheader) {
 
-    Properties props = new Properties();
+    Logger log = Logger.getLogger(AttributesToProperties.class);
+    Properties props = Properties.create();
 
     for (RowHeaderTuple rht : rowheader.getRowHeader()) {
       try {
         props.set(rht.getName(), PropertyValueParser.parse(tuple.getField(rht.getPos())));
       } catch (IllegalArgumentException e) {
-        System.err.println("Tuple Value was null. Error Message : " + e.getMessage());
+        log.error("Empty value field in column " + rht.getName() + e);
       }
     }
 
@@ -55,10 +55,8 @@ public class AttributesToProperties {
    * Converts relational attributes to epgm properties without foreign key
    * attributes
    *
-   * @param tuple
-   *          Row of relational database
-   * @param rowheader
-   *          Rowheader of database table
+   * @param tuple Row of relational database
+   * @param rowheader Rowheader of database table
    * @return Epgm Properties without foreign key attributes
    */
   public static Properties getPropertiesWithoutFKs(Row tuple, RowHeader rowheader) {

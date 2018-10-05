@@ -20,7 +20,7 @@ import java.sql.JDBCType;
 
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants.RdbmsType;
 
 /**
  * JDBC type to BasiTypeInfo Mapper
@@ -30,32 +30,23 @@ public class SQLToBasicTypeMapper {
   /**
    * Maps jdbc types to flink compatible BasicTypeInfos
    *
-   * @param jdbcType
-   *          Jdbc Type of attribute
-   * @param rdbmsType
-   *          Management type of connected rdbms
+   * @param jdbcType Jdbc Type of attribute
+   * @param rdbmsType Management type of connected rdbms
    * @return Flink type information
    */
-  public static TypeInformation<?> getTypeInfo(JDBCType jdbcType, int rdbmsType) {
+  public static TypeInformation<?> getTypeInfo(JDBCType jdbcType, RdbmsType rdbmsType) {
     TypeInformation<?> typeInfo = null;
 
     switch (jdbcType.name()) {
 
+    default:
     case "CHAR":
-      typeInfo = BasicTypeInfo.STRING_TYPE_INFO;
-      break;
     case "VARCHAR":
-      typeInfo = BasicTypeInfo.STRING_TYPE_INFO;
-      break;
     case "NVARCHAR":
-      typeInfo = BasicTypeInfo.STRING_TYPE_INFO;
-      break;
     case "LONGVARCHAR":
       typeInfo = BasicTypeInfo.STRING_TYPE_INFO;
       break;
     case "NUMERIC":
-      typeInfo = BasicTypeInfo.BIG_DEC_TYPE_INFO;
-      break;
     case "DECIMAL":
       typeInfo = BasicTypeInfo.BIG_DEC_TYPE_INFO;
       break;
@@ -63,19 +54,20 @@ public class SQLToBasicTypeMapper {
       typeInfo = BasicTypeInfo.BOOLEAN_TYPE_INFO;
       break;
     case "TINYINT":
-      if (rdbmsType == RdbmsConstants.MYSQL_TYPE_ID) {
+      if (rdbmsType == RdbmsType.MYSQL_TYPE) {
         typeInfo = BasicTypeInfo.INT_TYPE_INFO;
       } else {
         typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
       }
       break;
     case "SMALLINT":
-      if (rdbmsType == RdbmsConstants.MYSQL_TYPE_ID) {
+      if (rdbmsType == RdbmsType.MYSQL_TYPE) {
         typeInfo = BasicTypeInfo.INT_TYPE_INFO;
       } else {
         typeInfo = BasicTypeInfo.SHORT_TYPE_INFO;
       }
       break;
+    case "DISTINCT":
     case "INTEGER":
       typeInfo = BasicTypeInfo.INT_TYPE_INFO;
       break;
@@ -83,11 +75,7 @@ public class SQLToBasicTypeMapper {
       typeInfo = BasicTypeInfo.LONG_TYPE_INFO;
       break;
     case "REAL":
-      typeInfo = BasicTypeInfo.FLOAT_TYPE_INFO;
-      break;
     case "FLOAT":
-      typeInfo = BasicTypeInfo.FLOAT_TYPE_INFO;
-      break;
     case "MONEY":
       typeInfo = BasicTypeInfo.FLOAT_TYPE_INFO;
       break;
@@ -104,11 +92,7 @@ public class SQLToBasicTypeMapper {
       typeInfo = TypeInformation.of(byte[].class);
       break;
     case "DATE":
-      typeInfo = BasicTypeInfo.DATE_TYPE_INFO;
-      break;
     case "TIME":
-      typeInfo = BasicTypeInfo.DATE_TYPE_INFO;
-      break;
     case "TIMESTAMP":
       typeInfo = BasicTypeInfo.DATE_TYPE_INFO;
       break;
@@ -118,20 +102,6 @@ public class SQLToBasicTypeMapper {
     case "BLOB":
       typeInfo = TypeInformation.of(java.sql.Blob.class);
       break;
-    case "DISTINCT":
-      typeInfo = BasicTypeInfo.INT_TYPE_INFO;
-      break;
-    case "STRUCT":
-      System.err.println("No Typemapping for Type : STRUCT");
-      break;
-    case "REF":
-      System.err.println("No Typemapping for Type : REF");
-      break;
-    case "JAVA_OBJECT":
-      System.err.println("No Typemapping for Type : JAVA_OBJECT");
-      break;
-    default:
-      typeInfo = BasicTypeInfo.STRING_TYPE_INFO;
     }
 
     return typeInfo;

@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.io.impl.rdbms.connection;
 
-import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants.RdbmsType;
 
 /**
  * Manages assigning of relational database management type
@@ -25,29 +25,28 @@ public class RdbmsTypeChooser {
   /**
    * Assigns connected database with management type
    *
-   * @param rdbms
-   *          Name of datanase management system
+   * @param rdbms Name of datanase management system
    * @return Database management system type
    */
-  public static int choose(String rdbms) {
+  public static RdbmsType choose(String rdbms) {
 
-    int rdbmsType;
+    RdbmsType rdbmsType;
 
     switch (rdbms) {
 
+    default:
     case "posrgresql":
     case "mysql":
     case "h2":
     case "sqlite":
     case "hsqldb":
-    default:
-      rdbmsType = RdbmsConstants.MYSQL_TYPE_ID;
+      rdbmsType = RdbmsType.MYSQL_TYPE;
       break;
 
     case "derby":
     case "microsoft sql server":
     case "oracle":
-      rdbmsType = RdbmsConstants.SQLSERVER_TYPE_ID;
+      rdbmsType = RdbmsType.SQLSERVER_TYPE;
       break;
     }
 
