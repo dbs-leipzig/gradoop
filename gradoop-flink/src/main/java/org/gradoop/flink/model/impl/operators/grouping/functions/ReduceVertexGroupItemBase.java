@@ -19,8 +19,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 
-import java.io.IOException;
-
 /**
  * Base class for reducer/combiner implementations on vertices.
  */
@@ -57,7 +55,7 @@ abstract class ReduceVertexGroupItemBase extends BuildBase {
   protected VertexGroupItem createSuperVertexTuple(
     GradoopId superVertexId, String groupLabel,
     PropertyValueList groupPropertyValues,
-    PropertyValueList aggregateValues) throws IOException {
+    PropertyValueList aggregateValues) {
     reuseVertexGroupItem.setVertexId(superVertexId);
     reuseVertexGroupItem.setGroupLabel(groupLabel);
     reuseVertexGroupItem.setGroupingValues(groupPropertyValues);

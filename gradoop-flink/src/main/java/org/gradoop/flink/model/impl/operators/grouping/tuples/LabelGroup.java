@@ -36,11 +36,13 @@ import java.util.stream.Collectors;
 /**
  * Stores grouping keys and aggregates for a specific label.
  *
+ * <pre>
  * f0: grouping label
  * f1: group label
  * f2: property keys
  * f3: aggregate functions
  * f4: aggregate values
+ * </pre>
  */
 public class LabelGroup
   extends Tuple5<String, String, List<String>, List<AggregateFunction>, List<PropertyValue>> {
@@ -261,10 +263,12 @@ public class LabelGroup
       propertyValues = getAggregateFunctions().stream()
         .map(f -> getVertexIncrement(f, (Vertex) element))
         .collect(Collectors.toList());
-    } else {
+    } else if (element instanceof Edge) {
       propertyValues = getAggregateFunctions().stream()
         .map(f -> getEdgeIncrement(f, (Edge) element))
         .collect(Collectors.toList());
+    } else {
+      propertyValues = new ArrayList<>();
     }
     return PropertyValueList.fromPropertyValues(propertyValues);
   }
