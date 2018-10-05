@@ -18,8 +18,8 @@ package org.gradoop.examples.io;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.io.impl.json.JSONDataSink;
-import org.gradoop.flink.io.impl.json.JSONDataSource;
+import org.gradoop.flink.io.impl.deprecated.json.JSONDataSink;
+import org.gradoop.flink.io.impl.deprecated.json.JSONDataSource;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
@@ -64,7 +64,7 @@ import static java.util.Collections.singletonList;
  * }
  *
  * An example graph collection can be found under src/main/resources/data.json.
- * For further information, have a look at the {@link org.gradoop.flink.io.impl.json}
+ * For further information, have a look at the {@link org.gradoop.flink.io.impl.deprecated.json}
  * package.
  */
 public class JSONExample extends AbstractRunner implements ProgramDescription {
