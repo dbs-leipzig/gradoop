@@ -1,57 +1,76 @@
 package org.gradoop.common.model.impl.properties.propertyvalue;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Warmup;
-import java.util.concurrent.TimeUnit;
+import org.openjdk.jmh.runner.Runner;
+import org.openjdk.jmh.runner.RunnerException;
+import org.openjdk.jmh.runner.options.Options;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-@Warmup(time = 1, timeUnit = TimeUnit.MILLISECONDS)
-@Measurement(time = 1, timeUnit = TimeUnit.MILLISECONDS)
-@State(Scope.Thread)
-public class PropertyValueIntegerBenchmark {
+public class PropertyValueIntegerBenchmark extends AbstractPropertyValueBenchmark {
 
   private PropertyValue VALUE;
   private PropertyValue INTEGER_VALUE;
   private Integer INTEGER;
 
-  @Setup
+  @Override
   public void setup() {
     VALUE = new PropertyValue();
-    INTEGER_VALUE = PropertyValue.fromRawBytes(new byte[] {PropertyValue.TYPE_INTEGER, 0xf});
     INTEGER = 15;
+    INTEGER_VALUE = PropertyValue.create(INTEGER);
   }
 
-  @Benchmark
+  @Override
   public PropertyValue create() {
     return PropertyValue.create(1);
   }
 
-  @Benchmark
+  @Override
   public void set() {
     VALUE.setInt(INTEGER);
   }
 
-  @Benchmark
+  @Override
   public Boolean is() {
     return INTEGER_VALUE.isInt();
   }
 
-  @Benchmark
+  @Override
   public Integer get() {
     return INTEGER_VALUE.getInt();
   }
 
-  @Benchmark
+  @Override
   public void setObject() {
     VALUE.setObject(INTEGER);
   }
 
-  @Benchmark
+  @Override
   public Class<?> getType() {
     return INTEGER_VALUE.getType();
+  }
+
+  /**
+   * You can run this test:
+   *
+   * a) Via the command line:
+   *    $ mvn clean install
+   *    $ java -jar target/benchmarks.jar PropertyValueIntegerBenchmark
+   *
+   * b) Via the Java API:
+   *    (see the JMH homepage for possible caveats when running from IDE:
+   *     http://openjdk.java.net/projects/code-tools/jmh/)
+   *
+   * If you want to write the benchmark results to a csv file, add -rff <filename>.csv to the
+   * program call.
+   *
+   * @param args Program arguments
+   * @throws RunnerException when something went wrong
+   */
+  public static void main(String[] args) throws RunnerException {
+    Options opt = new OptionsBuilder()
+      .include(PropertyValueBooleanBenchmark.class.getSimpleName())
+      .build();
+
+    new Runner(opt).run();
   }
 }
