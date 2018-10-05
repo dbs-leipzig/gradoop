@@ -36,7 +36,7 @@ public class CollectGradoopIds implements
   public void reduce(Iterable<Tuple2<GradoopId, GradoopId>> mappings,
     Collector<Tuple2<GradoopId, GradoopIdSet>> collector) throws Exception {
 
-    Boolean first = true;
+    boolean first = true;
     GradoopId vertexId = null;
     GradoopIdSet btgIds = new GradoopIdSet();
 
@@ -54,7 +54,7 @@ public class CollectGradoopIds implements
   public void combine(Iterable<Tuple2<GradoopId, GradoopIdSet>> mappings,
     Collector<Tuple2<GradoopId, GradoopIdSet>> collector) throws Exception {
 
-    Boolean first = true;
+    boolean first = true;
     GradoopId vertexId = null;
     GradoopIdSet btgIds = null;
 
