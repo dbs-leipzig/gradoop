@@ -78,6 +78,9 @@ org.gradoop.flink.io.impl.csv.indexed
 org.gradoop.flink.io.impl.csv.indexed.functions
 org.gradoop.flink.io.impl.csv.metadata
 org.gradoop.flink.io.impl.csv.tuples
+org.gradoop.flink.io.impl.deprecated.json
+org.gradoop.flink.io.impl.deprecated.json.functions
+org.gradoop.flink.io.impl.deprecated.logicalgraphcsv
 org.gradoop.flink.io.impl.dot
 org.gradoop.flink.io.impl.dot.functions
 org.gradoop.flink.io.impl.edgelist
@@ -87,8 +90,6 @@ org.gradoop.flink.io.impl.gdl.functions
 org.gradoop.flink.io.impl.graph
 org.gradoop.flink.io.impl.graph.functions
 org.gradoop.flink.io.impl.graph.tuples
-org.gradoop.flink.io.impl.json
-org.gradoop.flink.io.impl.json.functions
 org.gradoop.flink.io.impl.statistics
 org.gradoop.flink.io.impl.tlf
 org.gradoop.flink.io.impl.tlf.constants
