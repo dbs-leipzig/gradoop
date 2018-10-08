@@ -66,6 +66,7 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
     long edgesBefore = social.getEdges().count();
     long edgesToChange = social.getEdges().filter(new ByLabel<>(toInvertLabel)).count();
     long edgesAfter = invertedEdgeGraph.getEdges().count();
+
     Assert.assertEquals(edgesToChange, 4); // we have 4 "hasInterest" edges
     Assert.assertEquals(edgesBefore, edgesAfter); // ensures no new edges are created
 
@@ -105,5 +106,11 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
           tags.contains(sourceName) && persons.contains(targetName));
       persons.remove(targetName);
     }
+
+    Assert.assertEquals(edgesToChange, 4);
+    Assert.assertEquals(edgesBefore, edgesAfter);
+
+    long invertedEdgeCount = invertedEdgeGraph.getEdges().filter(new ByLabel<>(invertedLabel)).count();
+    Assert.assertEquals(edgesToChange, invertedEdgeCount);
   }
 }

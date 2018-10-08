@@ -41,7 +41,7 @@ public class InvertEdges implements TransformationFunction<Edge> {
    *
    * @param forEdgeLabel The label of the edges that should be inverted.
    * @param newLabel The label of the inverted edges.
-   */
+    */
   public InvertEdges(String forEdgeLabel, String newLabel) {
     this.forEdgeLabel = Preconditions.checkNotNull(forEdgeLabel);
     this.newLabel = Preconditions.checkNotNull(newLabel);
