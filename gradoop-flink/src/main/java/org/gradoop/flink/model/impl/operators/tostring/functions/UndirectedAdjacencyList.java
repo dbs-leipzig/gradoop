@@ -36,7 +36,7 @@ public class UndirectedAdjacencyList implements
   public void reduce(Iterable<EdgeString> outgoingEdgeLabels,
     Collector<VertexString> collector) throws Exception {
 
-    Boolean first = true;
+    boolean first = true;
     GradoopId vertexId = null;
     GradoopId graphId = null;
 
