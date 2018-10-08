@@ -47,10 +47,11 @@ public class CSVLineToGraphHead extends CSVLineToElement<GraphHead> {
   @Override
   public GraphHead map(String csvLine) throws Exception {
     String[] tokens = split(csvLine, 3);
+    String label = StringEscaper.unescape(tokens[1]);
     return graphHeadFactory.initGraphHead(
       GradoopId.fromString(tokens[0]),
-      tokens[1],
-      parseProperties(CSVConstants.GRAPH_TYPE, tokens[1], tokens[2])
+      label,
+      parseProperties(CSVConstants.GRAPH_TYPE, label, tokens[2])
     );
   }
 }

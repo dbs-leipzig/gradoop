@@ -22,15 +22,15 @@ import java.util.function.Function;
  */
 public class PropertyMetaData {
   /**
-   * Property key
+   * Property key.
    */
   private String key;
   /**
-   * Property type string
+   * Property type string.
    */
   private String typeString;
   /**
-   * A function that parses a string to the typed property value
+   * A function that parses a string to the typed property value.
    */
   private Function<String, Object> valueParser;
 
@@ -57,7 +57,7 @@ public class PropertyMetaData {
   }
 
   /**
-   * Returns the property type string
+   * Returns the property type string.
    *
    * @return property type string
    */
