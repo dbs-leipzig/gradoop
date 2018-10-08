@@ -141,8 +141,8 @@ public class GDLEncoder {
       StringBuilder edgesString = new StringBuilder();
 
       for (Vertex v : vertices) {
-        Boolean containedInGraph = v.getGraphIds().contains(gh.getId());
-        Boolean firstOccurrence = !usedVertexIds.contains(v.getId());
+        boolean containedInGraph = v.getGraphIds().contains(gh.getId());
+        boolean firstOccurrence = !usedVertexIds.contains(v.getId());
 
         if (containedInGraph && firstOccurrence) {
           String vertexString = vertexToGDLString(v, idToVertexName);
@@ -153,7 +153,7 @@ public class GDLEncoder {
 
       for (Edge e : edges) {
         if (e.getGraphIds().contains(gh.getId())) {
-          Boolean firstOccurrence = !usedEdgeIds.contains(e.getId());
+          boolean firstOccurrence = !usedEdgeIds.contains(e.getId());
           String edgeString = edgeToGDLString(e, idToVertexName, idToEdgeName, firstOccurrence);
           usedEdgeIds.add(e.getId());
           edgesString.append(edgeString).append(System.lineSeparator());
@@ -265,7 +265,7 @@ public class GDLEncoder {
     Edge e,
     Map<GradoopId, String> idToVertexName,
     Map<GradoopId, String> idToEdgeName,
-    Boolean firstOccurrence) {
+    boolean firstOccurrence) {
     String result;
     if (firstOccurrence) {
       result =  String.format("(%s)-[%s:%s%s]->(%s)",

@@ -105,10 +105,10 @@ public class Employee extends Person {
     vertex.setProperty(FoodBrokerPropertyKeys.GENDER_KEY, gender);
 
     //update quality and set type
-    Float quality = vertex.getPropertyValue(FoodBrokerPropertyKeys.QUALITY_KEY).getFloat();
-    Double assistantRatio = getFoodBrokerConfig().getMasterDataTypeAssistantRatio(getClassName());
-    Double normalRatio = getFoodBrokerConfig().getMasterDataTypeNormalRatio(getClassName());
-    Double rnd = random.nextDouble();
+    float quality = vertex.getPropertyValue(FoodBrokerPropertyKeys.QUALITY_KEY).getFloat();
+    double assistantRatio = getFoodBrokerConfig().getMasterDataTypeAssistantRatio(getClassName());
+    double normalRatio = getFoodBrokerConfig().getMasterDataTypeNormalRatio(getClassName());
+    double rnd = random.nextDouble();
     if (rnd <= assistantRatio) {
       quality *= getFoodBrokerConfig().getMasterDataTypeAssistantInfluence();
       vertex.setProperty(
