@@ -17,12 +17,15 @@ package org.gradoop.flink.io.impl.csv.indexed;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
@@ -35,6 +38,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Test class for an indexed csv data sink
  */
@@ -46,7 +56,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
   /**
    * Test writing an indexed csv graph collection.
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWrite() throws Exception {
@@ -60,7 +70,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
   /**
    * Test writing a logical csv graph.
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteLogicalGraph() throws Exception {
@@ -75,7 +85,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
    * Test IndexedCSVDataSink to write a graph with different property types
    * using the same label on different elements with the same label.
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteWithDifferentPropertyTypes() throws Exception {
@@ -95,17 +105,16 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test IndexedCSVDataSink to properly separate the metadata
-   * of edges and vertices using the same label.
+   * Test writing and reading a graph that uses the same label for vertices and edges.
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteWithSameLabel() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
     // The properties are incompatible to get a conversion error
-    // if the metadata is not separated
+    // if the metadata is not separated.
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "single:graph1[" +
       "(v1:B {keya:2})" +
@@ -128,9 +137,9 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
 
   /**
    * Test writing and reading a graph with different labels that result in the same
-   * indexed CSV path because of illegal filename characters in windows.
+   * indexed CSV path because of replaced illegal filename characters in windows.
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testDifferentLabelsInSameFile() throws Exception {
@@ -145,8 +154,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     // This results in the path "vertices/b_c" because < and > are illegal filename characters.
     Vertex vertex1 = new VertexFactory().createVertex("B<C");
     Vertex vertex2 = new VertexFactory().createVertex("B>C");
-    DataSet<Vertex> vertices = env.fromElements(vertex1, vertex2);
-    vertices = vertices
+    DataSet<Vertex> vertices = env.fromElements(vertex1, vertex2)
       .map(new AddToGraph<>(graphHead1))
       .map(new AddToGraph<>(graphHead2))
       .withForwardedFields("id;label;properties");
@@ -154,8 +162,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     // This results in the path "edges/c_d" because < and > are illegal filename characters.
     Edge edge1 = new EdgeFactory().createEdge("c<d", vertex1.getId(), vertex2.getId());
     Edge edge2 = new EdgeFactory().createEdge("c>d", vertex2.getId(), vertex1.getId());
-    DataSet<Edge> edges = env.fromElements(edge1, edge2);
-    edges = edges
+    DataSet<Edge> edges = env.fromElements(edge1, edge2)
       .map(new AddToGraph<>(graphHead1))
       .withForwardedFields("id;label;properties");
 
@@ -166,9 +173,70 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test writing a graph with an existing metadata.csv.
+   * Test IndexedCSVDataSink to escape strings and labels that contain delimiter characters.
+   * Escape characters get inserted before delimiter characters that are part of strings or labels.
+   * Whitespace gets replaced by their control character sequence.
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
+   */
+  @Test
+  public void testWriteWithDelimiterCharacters() throws Exception {
+    String tmpPath = temporaryFolder.getRoot().getPath();
+    ExecutionEnvironment env = getExecutionEnvironment();
+
+    String string1 = "abc;,|:\n=\\ def";
+    String string2 = "def;,|:\n=\\ ghi";
+
+    List<PropertyValue> list = Arrays.asList(PropertyValue.create(string2),
+      PropertyValue.create(string1));
+    Set<PropertyValue> set = new HashSet<>(list);
+    Map<PropertyValue, PropertyValue> map1 = new HashMap<PropertyValue, PropertyValue>() {{
+      put(PropertyValue.create(string1), PropertyValue.create(string2));
+      put(PropertyValue.create("key"), PropertyValue.create(string1));
+    }};
+    Map<PropertyValue, PropertyValue> map2 = new HashMap<PropertyValue, PropertyValue>() {{
+      put(PropertyValue.create(string1), PropertyValue.create(1));
+      put(PropertyValue.create("key"), PropertyValue.create(2));
+    }};
+    Map<PropertyValue, PropertyValue> map3 = new HashMap<PropertyValue, PropertyValue>() {{
+      put(PropertyValue.create(1), PropertyValue.create(string2));
+      put(PropertyValue.create(2), PropertyValue.create(string1));
+    }};
+
+    Properties props = Properties.create();
+    props.set(string1, string2);
+    props.set(string2, GradoopTestUtils.BOOL_VAL_1);
+    props.set(GradoopTestUtils.KEY_2, string2);
+    props.set(GradoopTestUtils.KEY_3, list);
+    props.set(GradoopTestUtils.KEY_4, set);
+    props.set(GradoopTestUtils.KEY_5, map1);
+    props.set(GradoopTestUtils.KEY_5, map2);
+    props.set(GradoopTestUtils.KEY_6, map3);
+
+    GraphHead graphHead = new GraphHeadFactory().createGraphHead(string1, props);
+    DataSet<GraphHead> graphHeads = env.fromElements(graphHead);
+
+    Vertex vertex = new VertexFactory().createVertex(string1, props);
+    DataSet<Vertex> vertices = env.fromElements(vertex)
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;label;properties");
+
+    Edge edge = new EdgeFactory().createEdge(string1, vertex.getId(), vertex.getId(), props);
+    DataSet<Edge> edges = env.fromElements(edge)
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;label;properties");
+
+    LogicalGraph graph = getConfig().getLogicalGraphFactory()
+      .fromDataSets(graphHeads, vertices, edges);
+
+    checkIndexedCSVWrite(tmpPath, graph);
+  }
+
+  /**
+   * Test writing and reading a graph with a existing metadata file instead of aggregating
+   * new metadata from the graph.
+   *
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteWithExistingMetaData() throws Exception {
@@ -197,11 +265,11 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test writing and reading the given graph to and from IndexedCSV
+   * Test writing and reading the given graph to and from IndexedCSV.
    *
    * @param tmpPath path to write csv
    * @param input logical graph
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   private void checkIndexedCSVWrite(String tmpPath, LogicalGraph input) throws Exception {
     checkIndexedCSVWrite(tmpPath, input.getConfig().getGraphCollectionFactory().fromGraph(input));
@@ -212,7 +280,7 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
    *
    * @param tmpPath path to write csv
    * @param input graph collection
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   private void checkIndexedCSVWrite(String tmpPath, GraphCollection input) throws Exception {
     DataSink indexedCSVDataSink = new IndexedCSVDataSink(tmpPath, getConfig());
