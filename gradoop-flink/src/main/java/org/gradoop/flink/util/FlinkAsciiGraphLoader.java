@@ -24,7 +24,7 @@ import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
+import org.gradoop.flink.model.impl.functions.epgm.RenameLabel;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -119,11 +119,12 @@ public class FlinkAsciiGraphLoader {
   /**
    * Returns a logical graph containing the complete vertex and edge space of
    * the database.
+   * This is equivalent to {@link #getLogicalGraph(boolean) getLogicalGraph(true)}.
    *
    * @return logical graph of vertex and edge space
    */
   public LogicalGraph getLogicalGraph() {
-    return getLogicalGraph(false);
+    return getLogicalGraph(true);
   }
 
   /**
@@ -136,17 +137,13 @@ public class FlinkAsciiGraphLoader {
    * @return logical graph of vertex and edge space
    */
   public LogicalGraph getLogicalGraph(boolean withGraphContainment) {
-    GraphHead graphHead = config.getGraphHeadFactory()
-      .createGraphHead(GradoopConstants.DB_GRAPH_LABEL);
-
     if (withGraphContainment) {
-      ExecutionEnvironment env = config.getExecutionEnvironment();
-
-      return config.getLogicalGraphFactory().fromDataSets(env.fromElements(graphHead),
-        env.fromCollection(getVertices()).map(new AddToGraph<>(graphHead)),
-        env.fromCollection(getEdges()).map(new AddToGraph<>(graphHead)));
-
+      return config.getLogicalGraphFactory().fromCollections(getVertices(), getEdges())
+        .transformGraphHead(new RenameLabel<>(GradoopConstants.DEFAULT_GRAPH_LABEL,
+          GradoopConstants.DB_GRAPH_LABEL));
     } else {
+      GraphHead graphHead = config.getGraphHeadFactory()
+        .createGraphHead(GradoopConstants.DB_GRAPH_LABEL);
       return config.getLogicalGraphFactory().fromCollections(graphHead, getVertices(), getEdges());
     }
   }
