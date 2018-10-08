@@ -15,12 +15,10 @@
  */
 package org.gradoop.flink.model.impl;
 
-import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -53,7 +51,7 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
     Collection<Vertex> inputVertices = loader.getVertices();
 
-    List<Vertex> outputVertices = loader.getLogicalGraph().getVertices().collect();
+    List<Vertex> outputVertices = loader.getLogicalGraph(false).getVertices().collect();
 
     validateEPGMElementCollections(inputVertices, outputVertices);
     validateEPGMGraphElementCollections(inputVertices, outputVertices);
@@ -66,7 +64,7 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
     Collection<Edge> inputEdges = loader.getEdges();
 
-    List<Edge> outputEdges = loader.getLogicalGraph().getEdges().collect();
+    List<Edge> outputEdges = loader.getLogicalGraph(false).getEdges().collect();
 
     validateEPGMElementCollections(inputEdges, outputEdges);
     validateEPGMGraphElementCollections(inputEdges, outputEdges);

@@ -26,6 +26,7 @@ import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
 
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
@@ -78,8 +79,51 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
     // Only properties with matching type get returned
     // to prevent writing values with the wrong type metadata
     if (p != null && MetaDataParser.getTypeString(p).equals(propertyMetaData.getTypeString())) {
-      return p.toString();
+      return propertyValueToCsvString(p);
     }
     return EMPTY_STRING;
+  }
+
+  /**
+   * Returns a CSV string representation of the property value.
+   *
+   * @param p property value
+   * @return CSV string
+   */
+  private String propertyValueToCsvString(PropertyValue p) {
+    if (p.isList() || p.isSet()) {
+      return collectionToCsvString((Collection) p.getObject());
+    } else if (p.isMap()) {
+      return p.getMap().entrySet().stream()
+        .map(e -> escape(e.getKey()) + CSVConstants.MAP_SEPARATOR + escape(e.getValue()))
+        .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, "{", "}"));
+    } else {
+      return escape(p);
+    }
+  }
+
+  /**
+   * Returns a CSV string representation of a collection.
+   *
+   * @param collection collection
+   * @return CSV string
+   */
+  String collectionToCsvString(Collection<?> collection) {
+    return collection.stream()
+      .map(o -> o instanceof PropertyValue ? escape((PropertyValue) o) : o.toString())
+      .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, "[", "]"));
+  }
+
+  /**
+   * Returns a escaped string representation of a property value.
+   *
+   * @param propertyValue property value to be escaped
+   * @return escaped string representation
+   */
+  private static String escape(PropertyValue propertyValue) {
+    if (propertyValue.isString()) {
+      return StringEscaper.escape(propertyValue.toString(), CSVConstants.ESCAPED_CHARACTERS);
+    }
+    return propertyValue.toString();
   }
 }

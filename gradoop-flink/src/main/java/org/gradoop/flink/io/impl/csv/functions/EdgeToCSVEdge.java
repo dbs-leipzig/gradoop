@@ -27,7 +27,7 @@ import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
  *
  * label
  */
-@FunctionAnnotation.ForwardedFields("label->f3")
+@FunctionAnnotation.ForwardedFields("label->f4")
 public class EdgeToCSVEdge extends ElementToCSV<Edge, CSVEdge> {
   /**
    * Reduce object instantiations
@@ -37,9 +37,10 @@ public class EdgeToCSVEdge extends ElementToCSV<Edge, CSVEdge> {
   @Override
   public CSVEdge map(Edge edge) throws Exception {
     csvEdge.setId(edge.getId().toString());
+    csvEdge.setGradoopIds(collectionToCsvString(edge.getGraphIds()));
     csvEdge.setSourceId(edge.getSourceId().toString());
     csvEdge.setTargetId(edge.getTargetId().toString());
-    csvEdge.setLabel(edge.getLabel());
+    csvEdge.setLabel(StringEscaper.escape(edge.getLabel(), CSVConstants.ESCAPED_CHARACTERS));
     csvEdge.setProperties(getPropertyString(edge, CSVConstants.EDGE_TYPE));
     return csvEdge;
   }

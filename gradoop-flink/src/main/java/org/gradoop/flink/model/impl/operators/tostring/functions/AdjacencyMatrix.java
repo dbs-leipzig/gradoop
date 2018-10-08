@@ -36,7 +36,7 @@ public class AdjacencyMatrix implements
   public void reduce(Iterable<VertexString> vertexLabels,
     Collector<GraphHeadString> collector) throws Exception {
 
-    Boolean first = true;
+    boolean first = true;
     GradoopId graphId = null;
 
     List<String> matrixRows = new ArrayList<>();

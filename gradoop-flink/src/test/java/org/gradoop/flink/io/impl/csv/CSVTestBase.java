@@ -21,6 +21,7 @@ import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -114,8 +115,13 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
   protected LogicalGraph getExtendedLogicalGraph() {
     GradoopId idUser = GradoopId.get();
     GradoopId idPost = GradoopId.get();
-    GradoopIdSet heads = GradoopIdSet.fromExisting();
+    GradoopId idForum = GradoopId.get();
+    GradoopIdSet heads = GradoopIdSet.fromExisting(idForum);
     Properties properties = Properties.createFromMap(PROPERTY_MAP);
+
+    DataSet<GraphHead> graphHead = getExecutionEnvironment().fromElements(
+      new GraphHead(idForum, "Forum", properties)
+    );
 
     DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(
       new Vertex(idUser, "User", properties, heads),
@@ -126,7 +132,7 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
       new Edge(GradoopId.get(), "creatorOf", idUser, idPost, properties, heads)
     );
 
-    return getConfig().getLogicalGraphFactory().fromDataSets(vertices, edges);
+    return getConfig().getLogicalGraphFactory().fromDataSets(graphHead, vertices, edges);
   }
 
   /**
