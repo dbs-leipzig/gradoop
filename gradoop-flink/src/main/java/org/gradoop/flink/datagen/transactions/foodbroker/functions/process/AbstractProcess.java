@@ -333,7 +333,7 @@ public abstract class AbstractProcess extends AbstractRichFunction {
   protected Float getAdditionalInfluence(
     GradoopId firstMasterDataId, String firstMasterDataMap,
     GradoopId secondMasterDataId, String secondMasterDataMap) {
-    Float influence = 1.0f;
+    float influence = 1.0f;
     String firstCity = "1";
     String firstHolding = "1";
     String secondCity = "2";
