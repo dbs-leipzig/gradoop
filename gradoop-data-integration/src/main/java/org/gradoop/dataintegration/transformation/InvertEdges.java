@@ -26,7 +26,14 @@ import org.gradoop.flink.model.api.functions.TransformationFunction;
  */
 public class InvertEdges implements TransformationFunction<Edge> {
 
+  /**
+   * label of the edges that should be inverted
+   */
   private final String forEdgeLabel;
+
+  /**
+   * label of the inverted edges
+   */
   private final String newLabel;
 
   /**
