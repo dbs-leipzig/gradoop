@@ -37,7 +37,8 @@ public class GraphHeadToCSVGraphHead extends ElementToCSV<GraphHead, CSVGraphHea
   @Override
   public CSVGraphHead map(GraphHead graphHead) throws Exception {
     csvGraphHead.setId(graphHead.getId().toString());
-    csvGraphHead.setLabel(graphHead.getLabel());
+    csvGraphHead.setLabel(StringEscaper.escape(graphHead.getLabel(),
+      CSVConstants.ESCAPED_CHARACTERS));
     csvGraphHead.setProperties(getPropertyString(graphHead, CSVConstants.GRAPH_TYPE));
     return csvGraphHead;
   }

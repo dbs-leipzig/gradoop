@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
  */
 public class IndexedCSVDataSource extends CSVBase implements DataSource {
   /**
-   * HDFS Configuration
+   * HDFS Configuration.
    */
   private final Configuration hdfsConfig;
 
@@ -64,7 +64,7 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
    *
    * @param csvPath root path of csv files
    * @param config gradoop configuration
-   * @throws IOException
+   * @throws IOException on failure
    */
   public IndexedCSVDataSource(String csvPath, GradoopFlinkConfig config) throws IOException {
     this(csvPath, config, new Configuration());
@@ -76,7 +76,7 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
    * @param csvPath root path of csv files
    * @param conf gradoop configuration
    * @param hdfsConf HDFS configuration
-   * @throws IOException
+   * @throws IOException on failure
    */
   public IndexedCSVDataSource(String csvPath, GradoopFlinkConfig conf, Configuration hdfsConf)
     throws IOException {
@@ -98,7 +98,6 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
     GraphHeadFactory graphHeadFactory = getConfig().getGraphHeadFactory();
     VertexFactory vertexFactory = getConfig().getVertexFactory();
     EdgeFactory edgeFactory = getConfig().getEdgeFactory();
-
 
     Map<String, DataSet<GraphHead>> graphHeads = metaData.getGraphLabels().stream()
       .map(label -> Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))
