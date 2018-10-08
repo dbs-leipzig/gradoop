@@ -95,10 +95,10 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
       return collectionToCsvString((Collection) p.getObject());
     } else if (p.isMap()) {
       return p.getMap().entrySet().stream()
-        .map(e -> e.getKey().toString() + CSVConstants.MAP_SEPARATOR + e.getValue().toString())
+        .map(e -> escape(e.getKey()) + CSVConstants.MAP_SEPARATOR + escape(e.getValue()))
         .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, "{", "}"));
     } else {
-      return p.toString();
+      return escape(p);
     }
   }
 
@@ -110,7 +110,20 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
    */
   String collectionToCsvString(Collection<?> collection) {
     return collection.stream()
-      .map(Object::toString)
+      .map(o -> o instanceof PropertyValue ? escape((PropertyValue) o) : o.toString())
       .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, "[", "]"));
+  }
+
+  /**
+   * Returns a escaped string representation of a property value.
+   *
+   * @param propertyValue property value to be escaped
+   * @return escaped string representation
+   */
+  private static String escape(PropertyValue propertyValue) {
+    if (propertyValue.isString()) {
+      return StringEscaper.escape(propertyValue.toString(), CSVConstants.ESCAPED_CHARACTERS);
+    }
+    return propertyValue.toString();
   }
 }

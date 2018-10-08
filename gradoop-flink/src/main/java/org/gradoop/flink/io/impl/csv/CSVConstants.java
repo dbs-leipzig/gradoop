@@ -15,16 +15,20 @@
  */
 package org.gradoop.flink.io.impl.csv;
 
+import com.google.common.collect.ImmutableSet;
+
+import java.util.Set;
+
 /**
  * Constants needed for CSV parsing.
  */
 public class CSVConstants {
   /**
-   * Used to separate the tokens (id, label, values) in the CSV file.
+   * Used to separate the tokens (id, label, values) in the CSV files.
    */
   public static final String TOKEN_DELIMITER = ";";
   /**
-   * Used to separate the property values in the CSV file.
+   * Used to separate the property values in the CSV files.
    */
   public static final String VALUE_DELIMITER = "|";
   /**
@@ -59,4 +63,9 @@ public class CSVConstants {
    * File name for indexed data
    */
   public static final String SIMPLE_FILE = "data.csv";
+  /**
+   * Characters to be escaped in csv strings
+   */
+  public static final Set<Character> ESCAPED_CHARACTERS = ImmutableSet
+    .of('\\', ';', ',', '|', ':', '\n', '=');
 }

@@ -28,7 +28,6 @@ import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Base class for reading an {@link Element} from CSV. Handles the {@link MetaData} which is
@@ -41,10 +40,6 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
    * Stores the properties for the {@link Element} to be parsed.
    */
   private final Properties properties;
-  /**
-   * Needed for splitting the input.
-   */
-  private final String valueDelimiter = Pattern.quote(CSVConstants.VALUE_DELIMITER);
   /**
    * Meta data that provides parsers for a specific {@link Element}.
    */
@@ -75,7 +70,8 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
    * @return parsed properties
    */
   Properties parseProperties(String type, String label, String propertyValueString) {
-    String[] propertyValues = propertyValueString.split(valueDelimiter);
+    String[] propertyValues = StringEscaper
+      .split(propertyValueString, CSVConstants.VALUE_DELIMITER);
     List<PropertyMetaData> metaDataList = metaData.getPropertyMetaData(type, label);
     properties.clear();
     for (int i = 0; i < propertyValues.length; i++) {
@@ -108,13 +104,11 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
   /**
    * Splits the specified string.
    *
-   * Note: Using {@link Pattern#split(CharSequence)} leads to a significant performance loss.
-   *
    * @param s string
    * @param limit resulting array length
    * @return tokens
    */
   public String[] split(String s, int limit) {
-    return s.split(CSVConstants.TOKEN_DELIMITER, limit);
+    return StringEscaper.split(s, CSVConstants.TOKEN_DELIMITER, limit);
   }
 }
