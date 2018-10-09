@@ -15,6 +15,8 @@
  */
 package org.gradoop.examples.patternmatching;
 
+import java.net.URLDecoder;
+
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
@@ -51,7 +53,8 @@ public class CypherExample {
     // create a Gradoop config
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
     // create a datasource
-    CSVDataSource csvDataSource = new CSVDataSource(DATA_PATH, config);
+    CSVDataSource csvDataSource = new CSVDataSource(
+        URLDecoder.decode(DATA_PATH, "UTF-8"), config);
     // load graph statistics
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(STATISTICS_PATH);
 

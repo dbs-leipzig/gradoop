@@ -15,6 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.statistics;
 
+import java.net.URLDecoder;
+
 import org.junit.BeforeClass;
 
 public class GraphStatisticsLocalFSReaderTest extends GraphStatisticsTest {
@@ -22,6 +24,8 @@ public class GraphStatisticsLocalFSReaderTest extends GraphStatisticsTest {
   @BeforeClass
   public static void setUp() throws Exception {
     TEST_STATISTICS = GraphStatisticsLocalFSReader.read(
-      GraphStatisticsLocalFSReaderTest.class.getResource("/data/json/sna/statistics").getFile());
+      URLDecoder.decode(
+          GraphStatisticsLocalFSReaderTest.class.getResource("/data/json/sna/statistics")
+          .getFile(), "UTF-8"));
   }
 }

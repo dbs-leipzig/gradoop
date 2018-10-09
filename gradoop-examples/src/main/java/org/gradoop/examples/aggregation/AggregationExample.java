@@ -15,6 +15,8 @@
  */
 package org.gradoop.examples.aggregation;
 
+import java.net.URLDecoder;
+
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.aggregation.functions.AddPropertyMeanAgeToGraphHead;
 import org.gradoop.examples.aggregation.functions.AggregateListOfNames;
@@ -75,7 +77,7 @@ public class AggregationExample {
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(GradoopFlinkConfig.createConfig(env));
 
     // load data
-    loader.initDatabaseFromFile(EXAMPLE_DATA_FILE);
+    loader.initDatabaseFromFile(URLDecoder.decode(EXAMPLE_DATA_FILE, "UTF-8"));
 
     // get LogicalGraph representation of the social network graph
     LogicalGraph networkGraph = loader.getLogicalGraph();

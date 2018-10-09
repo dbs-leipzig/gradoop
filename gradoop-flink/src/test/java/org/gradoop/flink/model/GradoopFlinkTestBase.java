@@ -38,6 +38,8 @@ import scala.concurrent.duration.FiniteDuration;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
@@ -234,4 +236,15 @@ public abstract class GradoopFlinkTestBase {
       .fromElements(dummy)
       .filter(new False<>());
   }
+  
+  protected String getFilePath(String filename) throws UnsupportedEncodingException {
+    return URLDecoder.decode(getClass().getResource(filename).getFile(), "UTF-8");
+  }
+  
+  protected boolean leInsensitiveCompare(String s1, String s2) {
+    s1 = s1.replaceAll("\r\n", "\n");
+    s2 = s2.replaceAll("\r\n", "\n");
+    return s1.equals(s2);
+  }
+  
 }

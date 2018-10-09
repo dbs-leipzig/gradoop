@@ -28,7 +28,6 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
@@ -242,11 +241,9 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
   public void testWriteWithExistingMetaData() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    String csvPath = VertexLabeledEdgeListDataSourceTest.class
-      .getResource("/data/csv/input_indexed").getFile();
+    String csvPath = getFilePath("/data/csv/input_indexed");
 
-    String gdlPath = IndexedCSVDataSourceTest.class
-      .getResource("/data/csv/expected/expected_graph_collection.gdl").getFile();
+    String gdlPath = getFilePath("/data/csv/expected/expected_graph_collection.gdl");
 
     GraphCollection input = getLoaderFromFile(gdlPath).getGraphCollectionByVariables("expected1",
       "expected2");

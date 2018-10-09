@@ -27,6 +27,7 @@ import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +57,8 @@ public class SubgraphExample {
     // Create Gradoop config.
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(executionEnvironment);
     // Read the input graph.
-    LogicalGraph inputGraph = new CSVDataSource(DATA_PATH, config).getLogicalGraph();
+    LogicalGraph inputGraph = new CSVDataSource(
+        URLDecoder.decode(DATA_PATH, "UTF-8"), config).getLogicalGraph();
 
     // Create a filter for vertices accepting:
     // 1. Vertices with label "Forum" and a property "title" set to "Graph Processing"

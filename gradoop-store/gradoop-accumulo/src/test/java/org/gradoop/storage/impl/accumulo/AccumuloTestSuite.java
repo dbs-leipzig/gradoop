@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.URLDecoder;
 
 import static org.gradoop.storage.config.GradoopAccumuloConfig.ACCUMULO_INSTANCE;
 import static org.gradoop.storage.config.GradoopAccumuloConfig.ACCUMULO_PASSWD;
@@ -130,7 +131,8 @@ public class AccumuloTestSuite {
     tmp.create();
     File tmpFolder = tmp.newFolder();
     MiniAccumuloConfig config = new MiniAccumuloConfig(tmpFolder, PASSWD);
-    config.setNativeLibPaths(AccumuloTestSuite.class.getResource("/").getFile());
+    config.setNativeLibPaths(
+        URLDecoder.decode(AccumuloTestSuite.class.getResource("/").getFile(), "UTF-8"));
     accumulo = new MiniAccumuloCluster(config);
     accumulo.start();
     LOG.info("create mini accumulo start success!");
