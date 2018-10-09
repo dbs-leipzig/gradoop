@@ -15,16 +15,20 @@
  */
 package org.gradoop.flink.io.impl.csv;
 
+import com.google.common.collect.ImmutableSet;
+
+import java.util.Set;
+
 /**
  * Constants needed for CSV parsing.
  */
 public class CSVConstants {
   /**
-   * Used to separate the tokens (id, label, values) in the CSV file.
+   * Used to separate the tokens (id, label, values) in the CSV files.
    */
   public static final String TOKEN_DELIMITER = ";";
   /**
-   * Used to separate the property values in the CSV file.
+   * Used to separate the property values in the CSV files.
    */
   public static final String VALUE_DELIMITER = "|";
   /**
@@ -32,11 +36,23 @@ public class CSVConstants {
    */
   public static final String ROW_DELIMITER = System.getProperty("line.separator");
   /**
-   * Used to specify entity type (vertex or edge)
+   * Used to separate entries of list types in the CSV files
+   */
+  public static final String LIST_DELIMITER = ",";
+  /**
+   * Used to separate key and value of maps in the CSV files.
+   */
+  public static final String MAP_SEPARATOR = "=";
+  /**
+   * Used to tag a graph head entity.
+   */
+  public static final String GRAPH_TYPE = "g";
+  /**
+   * Used to tag a vertex entity.
    */
   public static final String VERTEX_TYPE = "v";
   /**
-   * Used to specify entity type (vertex or edge)
+   * Used to tag an edge entity.
    */
   public static final String EDGE_TYPE = "e";
   /**
@@ -47,4 +63,9 @@ public class CSVConstants {
    * File name for indexed data
    */
   public static final String SIMPLE_FILE = "data.csv";
+  /**
+   * Characters to be escaped in csv strings
+   */
+  public static final Set<Character> ESCAPED_CHARACTERS = ImmutableSet
+    .of('\\', ';', ',', '|', ':', '\n', '=');
 }

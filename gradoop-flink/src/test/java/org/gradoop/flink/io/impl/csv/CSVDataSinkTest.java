@@ -15,10 +15,22 @@
  */
 package org.gradoop.flink.io.impl.csv;
 
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.GradoopTestUtils;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,7 +38,16 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+/**
+ * Tests CSVDataSink
+ */
 public class CSVDataSinkTest extends CSVTestBase {
 
   @Rule
@@ -36,18 +57,16 @@ public class CSVDataSinkTest extends CSVTestBase {
   public void testWrite() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    LogicalGraph input = getSocialNetworkLoader()
-      .getDatabase()
-      .getDatabaseGraph(true);
+    GraphCollection graphCollection = getSocialNetworkLoader().getGraphCollection();
 
-    checkCSVWrite(tmpPath, input);
+    checkCSVWrite(tmpPath, graphCollection);
   }
 
   /**
    * Test CSVDataSink to write a graph with different property types
    * using the same label on different elements with the same label.
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteWithDifferentPropertyTypes() throws Exception {
@@ -70,10 +89,9 @@ public class CSVDataSinkTest extends CSVTestBase {
   }
 
   /**
-   * Test CSVDataSink to properly separate the metadata
-   * of edges and vertices using the same label.
+   * Test writing and reading a graph that uses the same label for vertices and edges.
    *
-   * @throws Exception
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteWithSameLabel() throws Exception {
@@ -100,16 +118,81 @@ public class CSVDataSinkTest extends CSVTestBase {
     checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("multiple"));
   }
 
+  /**
+   * Test CSVDataSink to escape strings and labels that contain delimiter characters.
+   * Escape characters get inserted before delimiter characters that are part of strings or labels.
+   * Whitespace gets replaced by their control character sequence.
+   *
+   * @throws Exception if the execution or IO fails.
+   */
+  @Test
+  public void testWriteWithDelimiterCharacters() throws Exception {
+    String tmpPath = temporaryFolder.getRoot().getPath();
+    ExecutionEnvironment env = getExecutionEnvironment();
+
+    String string1 = "abc;,|:\n=\\ def";
+    String string2 = "def;,|:\n=\\ ghi";
+
+    List<PropertyValue> list = Arrays.asList(PropertyValue.create(string2), PropertyValue.create(string1));
+    Set<PropertyValue> set = new HashSet<>(list);
+    Map<PropertyValue, PropertyValue> map1 = new HashMap<PropertyValue, PropertyValue>() {{
+      put(PropertyValue.create(string1), PropertyValue.create(string2));
+      put(PropertyValue.create("key"), PropertyValue.create(string1));
+    }};
+    Map<PropertyValue, PropertyValue> map2 = new HashMap<PropertyValue, PropertyValue>() {{
+      put(PropertyValue.create(string1), PropertyValue.create(1));
+      put(PropertyValue.create("key"), PropertyValue.create(2));
+    }};
+    Map<PropertyValue, PropertyValue> map3 = new HashMap<PropertyValue, PropertyValue>() {{
+      put(PropertyValue.create(1), PropertyValue.create(string2));
+      put(PropertyValue.create(2), PropertyValue.create(string1));
+    }};
+
+    Properties props = Properties.create();
+    props.set(string1, string2);
+    props.set(string2, GradoopTestUtils.BOOL_VAL_1);
+    props.set(GradoopTestUtils.KEY_2, string2);
+    props.set(GradoopTestUtils.KEY_3, list);
+    props.set(GradoopTestUtils.KEY_4, set);
+    props.set(GradoopTestUtils.KEY_5, map1);
+    props.set(GradoopTestUtils.KEY_5, map2);
+    props.set(GradoopTestUtils.KEY_6, map3);
+
+    GraphHead graphHead = new GraphHeadFactory().createGraphHead(string1, props);
+    DataSet<GraphHead> graphHeads = env.fromElements(graphHead);
+
+    Vertex vertex = new VertexFactory().createVertex(string1, props);
+    DataSet<Vertex> vertices = env.fromElements(vertex)
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;label;properties");
+
+    DataSet<Edge> edges = env.fromElements(new EdgeFactory()
+      .createEdge(string1, vertex.getId(), vertex.getId(), props))
+      .map(new AddToGraph<>(graphHead))
+      .withForwardedFields("id;label;properties");
+
+    LogicalGraph graph = getConfig().getLogicalGraphFactory()
+      .fromDataSets(graphHeads, vertices, edges);
+
+    checkCSVWrite(tmpPath, graph);
+  }
+
+  /**
+   * Test writing and reading a graph with a existing metadata file instead of aggregating
+   * new metadata from the graph.
+   *
+   * @throws Exception if the execution or IO fails.
+   */
   @Test
   public void testWriteWithExistingMetaData() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    String csvPath = VertexLabeledEdgeListDataSourceTest.class
-      .getResource("/data/csv/input")
+    String csvPath = CSVDataSinkTest.class
+      .getResource("/data/csv/input_graph_collection")
       .getFile();
 
-    String gdlPath = CSVDataSourceTest.class
-      .getResource("/data/csv/expected/expected.gdl")
+    String gdlPath = CSVDataSinkTest.class
+      .getResource("/data/csv/expected/expected_graph_collection.gdl")
       .getFile();
 
     LogicalGraph input = getLoaderFromFile(gdlPath).getLogicalGraphByVariable("expected");
@@ -126,9 +209,11 @@ public class CSVDataSinkTest extends CSVTestBase {
   }
 
   /**
-   * Test CSVDataSink to write a graph with all supported properties
+   * Test CSVDataSink to write a graph with all supported properties.
+   * CSVDataSource ignores the graph heads when using getLogicalGraph(),
+   * therefore the graph head is not tested for equality.
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteExtendedProperties() throws Exception {
@@ -143,7 +228,7 @@ public class CSVDataSinkTest extends CSVTestBase {
     DataSource csvDataSource = new CSVDataSource(tmpPath, getConfig());
     LogicalGraph sourceLogicalGraph = csvDataSource.getLogicalGraph();
 
-    collectAndAssertTrue(logicalGraph.equalsByData(sourceLogicalGraph));
+    collectAndAssertTrue(logicalGraph.equalsByElementData(sourceLogicalGraph));
 
     sourceLogicalGraph.getEdges().collect().forEach(this::checkProperties);
     sourceLogicalGraph.getVertices().collect().forEach(this::checkProperties);
@@ -152,7 +237,7 @@ public class CSVDataSinkTest extends CSVTestBase {
   /**
    * Test the content of the metadata.csv file
    *
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   @Test
   public void testWriteMetadataCsv() throws Exception {
@@ -178,17 +263,28 @@ public class CSVDataSinkTest extends CSVTestBase {
    *
    * @param tmpPath path to write csv
    * @param input logical graph
-   * @throws Exception on failure
+   * @throws Exception if the execution or IO fails.
    */
   private void checkCSVWrite(String tmpPath, LogicalGraph input) throws Exception {
+    checkCSVWrite(tmpPath, input.getConfig().getGraphCollectionFactory().fromGraph(input));
+  }
+
+  /**
+   * Test writing and reading the given graph to and from CSV
+   *
+   * @param tmpPath path to write csv
+   * @param input graph collection
+   * @throws Exception if the execution or IO fails.
+   */
+  private void checkCSVWrite(String tmpPath, GraphCollection input) throws Exception {
     DataSink csvDataSink = new CSVDataSink(tmpPath, getConfig());
     csvDataSink.write(input, true);
 
     getExecutionEnvironment().execute();
 
     DataSource csvDataSource = new CSVDataSource(tmpPath, getConfig());
-    LogicalGraph output = csvDataSource.getLogicalGraph();
+    GraphCollection output = csvDataSource.getGraphCollection();
 
-    collectAndAssertTrue(input.equalsByElementData(output));
+    collectAndAssertTrue(input.equalsByGraphElementData(output));
   }
 }

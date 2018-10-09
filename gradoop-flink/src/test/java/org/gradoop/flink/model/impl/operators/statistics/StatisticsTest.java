@@ -35,7 +35,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexCount() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     Long vertexCount = new VertexCount()
       .execute(db)
@@ -47,7 +47,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testEdgeCount() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     Long edgeCount = new EdgeCount()
       .execute(db)
@@ -59,7 +59,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexLabelDistribution() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     Map<String, Long> cache = new HashMap<>();
 
@@ -78,7 +78,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testEdgeLabelDistribution() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<String>> result = new EdgeLabelDistribution()
       .execute(db)
@@ -99,7 +99,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexDegrees() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<GradoopId>> result = new VertexDegrees()
       .execute(db)
@@ -120,7 +120,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testOutgoingVertexDegrees() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<GradoopId>> result = new OutgoingVertexDegrees()
       .execute(db)
@@ -141,7 +141,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testIncomingVertexDegrees() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<GradoopId>> result = new IncomingVertexDegrees()
       .execute(db)
@@ -162,7 +162,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexDegreeDistribution() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<Long>> result = new VertexDegreeDistribution()
       .execute(db)
@@ -182,7 +182,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testOutgoingVertexDegreeDistribution() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<Long>> result = new OutgoingVertexDegreeDistribution()
       .execute(db)
@@ -202,7 +202,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testIncomingVertexDegreeDistribution() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<Long>> result = new IncomingVertexDegreeDistribution()
       .execute(db)
@@ -222,7 +222,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testDistinctSourceIds() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     Long result = new DistinctSourceIds()
       .execute(db)
@@ -234,7 +234,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testDistinctTargetIds() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     Long result = new DistinctTargetIds()
       .execute(db)
@@ -246,7 +246,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testDistinctSourceIdsByEdgeLabel() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<String>> result = new DistinctSourceIdsByEdgeLabel()
       .execute(db)
@@ -267,7 +267,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testDistinctTargetIdsByEdgeLabel() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<String>> result = new DistinctTargetIdsByEdgeLabel()
       .execute(db)
@@ -288,7 +288,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testSourceLabelAndEdgeLabelDistribution() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<Tuple2<String, String>>> result = new SourceLabelAndEdgeLabelDistribution()
       .execute(db)
@@ -309,7 +309,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testTargetLabelAndEdgeLabelDistribution() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<Tuple2<String, String>>> result = new TargetLabelAndEdgeLabelDistribution()
       .execute(db)
@@ -331,7 +331,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testDistinctEdgePropertyValuesByLabelAndPropertyName() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<Tuple2<String, String>>> result =
       new DistinctEdgePropertiesByLabel()
@@ -348,7 +348,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testDistinctVertexPropertyValuesByLabelAndPropertyName() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<Tuple2<String, String>>> result =
       new DistinctVertexPropertiesByLabel()
@@ -372,7 +372,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testDistinctEdgePropertyValuesByPropertyName() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<String>> result =
       new DistinctEdgeProperties()
@@ -388,7 +388,7 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
   @Test
   public void testDistinctVertexPropertyValuesByPropertyName() throws Exception {
-    LogicalGraph db = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph db = getSocialNetworkLoader().getLogicalGraph();
 
     List<WithCount<String>> result =
       new DistinctVertexProperties()

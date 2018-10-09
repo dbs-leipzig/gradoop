@@ -35,7 +35,7 @@ public class MultiEdgeStringCombiner implements
     Collector<EdgeString> collector) throws Exception {
 
     List<String> labels = new ArrayList<>();
-    Boolean first = true;
+    boolean first = true;
     EdgeString combinedLabel = null;
 
     for (EdgeString edgeString : iterable) {

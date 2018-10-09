@@ -28,19 +28,22 @@ import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
  * Calls the graph density computation for a logical graph.
  * Writes the result to a csv-file named {@value SamplingEvaluationConstants#FILE_DENSITY} in
  * the output directory, containing a single line with the graph density value, e.g.:
- *
+ * <pre>
  * BOF
  * 0.281
  * EOF
+ * </pre>
  */
 public class GraphDensityRunner extends AbstractRunner implements ProgramDescription {
 
   /**
    * Calls the graph density computation for the graph.
    *
+   * <pre>
    * args[0] - path to graph
    * args[1] - format of graph (csv, json, indexed)
    * args[2] - output path
+   * </pre>
    *
    * @param args command line arguments
    * @throws Exception in case of read/write failure
