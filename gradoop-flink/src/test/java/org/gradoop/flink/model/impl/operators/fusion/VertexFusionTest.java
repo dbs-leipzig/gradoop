@@ -15,8 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.fusion;
 
-import org.gradoop.flink.io.impl.dot.DOTDataSink;
-import org.gradoop.flink.io.impl.json.JSONDataSink;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;

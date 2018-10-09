@@ -81,8 +81,7 @@ public class SNABenchmark1 extends AbstractRunner implements
         vertex -> vertex.getLabel().equals("Person"),
         edge -> edge.getLabel().equals("knows"))
       .groupBy(Arrays.asList("gender", "city"))
-      .aggregate(new VertexCount())
-      .aggregate(new EdgeCount());
+      .aggregate(new VertexCount(), new EdgeCount());
   }
 
   @Override

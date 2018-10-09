@@ -15,12 +15,10 @@
  */
 package org.gradoop.flink.model.impl;
 
-import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -53,11 +51,7 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
     Collection<Vertex> inputVertices = loader.getVertices();
 
-    List<Vertex> outputVertices = loader
-      .getDatabase()
-      .getDatabaseGraph()
-      .getVertices()
-      .collect();
+    List<Vertex> outputVertices = loader.getLogicalGraph(false).getVertices().collect();
 
     validateEPGMElementCollections(inputVertices, outputVertices);
     validateEPGMGraphElementCollections(inputVertices, outputVertices);
@@ -70,60 +64,9 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
     Collection<Edge> inputEdges = loader.getEdges();
 
-    List<Edge> outputEdges = loader
-      .getDatabase()
-      .getDatabaseGraph()
-      .getEdges()
-      .collect();
+    List<Edge> outputEdges = loader.getLogicalGraph(false).getEdges().collect();
 
     validateEPGMElementCollections(inputEdges, outputEdges);
     validateEPGMGraphElementCollections(inputEdges, outputEdges);
-  }
-
-  @Test
-  public void testGetOutgoingEdges() throws Exception {
-    String graphVariable = "g0";
-    String vertexVariable = "eve";
-    String[] edgeVariables = new String[] {"eka", "ekb"};
-    testOutgoingAndIncomingEdges(
-      graphVariable, vertexVariable, edgeVariables, true);
-  }
-
-  @Test
-  public void testGetIncomingEdges() throws Exception {
-    String graphVariable = "g0";
-    String vertexVariable = "alice";
-    String[] edgeVariables = new String[] {"bka", "eka"};
-    testOutgoingAndIncomingEdges(
-      graphVariable, vertexVariable, edgeVariables, false);
-  }
-
-  //----------------------------------------------------------------------------
-  // Helper methods
-  //----------------------------------------------------------------------------
-
-  private void testOutgoingAndIncomingEdges(String graphVariable,
-    String vertexVariable, String[] edgeVariables, boolean testOutgoing)
-    throws Exception {
-    FlinkAsciiGraphLoader
-      loader = getSocialNetworkLoader();
-
-    LogicalGraph g0 =
-      loader.getLogicalGraphByVariable(graphVariable);
-
-    Vertex v = loader.getVertexByVariable(vertexVariable);
-
-    Collection<Edge> inputE =
-      Lists.newArrayListWithCapacity(edgeVariables.length);
-
-    for (String edgeVariable : edgeVariables) {
-      inputE.add(loader.getEdgeByVariable(edgeVariable));
-    }
-
-    List<Edge> outputE = (testOutgoing)
-      ? g0.getOutgoingEdges(v.getId()).collect()
-      : g0.getIncomingEdges(v.getId()).collect();
-
-    validateEPGMElementCollections(inputE, outputE);
   }
 }

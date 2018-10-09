@@ -44,7 +44,7 @@ public final class GradoopConstants {
    */
   public static final GradoopId DB_GRAPH_ID = GradoopId.fromString("598349bcda43031d1ea62d3b");
   /**
-   * Default label of an EPGM database graph.
+   * Default label of an database graph.
    */
   public static final String DB_GRAPH_LABEL = "_DB";
 }

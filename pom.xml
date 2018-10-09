@@ -7,7 +7,7 @@
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.4.1</version>
+    <version>0.4.2</version>
 
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
@@ -131,6 +131,7 @@
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.kryo.version>4.0.2</dep.kryo.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
+        <dep.mockito.version>2.21.0</dep.mockito.version>
 
         <log4j.properties>log4j-test.properties</log4j.properties>
         <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
@@ -160,6 +161,11 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>${plugin.maven-javadoc.version}</version>
+                        <configuration>
+                            <quiet>true</quiet>
+                            <doclint>none</doclint>
+                            <detectOfflineLinks>false</detectOfflineLinks>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -700,6 +706,14 @@
                 <version>${dep.junit.version}</version>
                 <scope>test</scope>
             </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${dep.mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 </project>

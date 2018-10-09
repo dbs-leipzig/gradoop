@@ -143,16 +143,6 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
     return layout.getEdgesByLabel(label);
   }
 
-  @Override
-  public DataSet<Edge> getOutgoingEdges(GradoopId vertexID) {
-    return layout.getOutgoingEdges(vertexID);
-  }
-
-  @Override
-  public DataSet<Edge> getIncomingEdges(GradoopId vertexID) {
-    return layout.getIncomingEdges(vertexID);
-  }
-
   /**
    * {@inheritDoc}
    */
@@ -455,12 +445,14 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
     return callForCollection(new GroupByIsomorphism(func));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeTo(DataSink dataSink) throws IOException {
     dataSink.write(this);
+  }
+
+  @Override
+  public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
+    dataSink.write(this, overWrite);
   }
 
   /**

@@ -22,7 +22,6 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 import org.junit.Test;
@@ -71,10 +70,15 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    */
   int maxIteration = 20;
   /**
-   * Whether to sample vertices with scaled PageRank-score
-   * greater (true) or equal/smaller (false) the sampleSize
+   * Whether to sample vertices with PageRank-score greater (true) or equal/smaller (false) the
+   * sampleSize
    */
   boolean sampleGreaterThanThreshold = true;
+  /**
+   * Whether to sample all vertices (true) or none of them (false), in case all vertices got the
+   * same PageRank-score.
+   */
+  boolean keepVerticesIfSameScore;
   /**
    * The vertex degree type. Distinguishes in-degree, out-degree or the sum of both.
    */
@@ -147,11 +151,13 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    * @param maxIteration The iteration number used by Flinks PageRank-algorithm, e.g. 20
    */
   public ParametrizedTestForGraphSampling(String testName, long seed, float sampleSize,
-    double dampeningFactor, int maxIteration, boolean sampleGreaterThanThreshold) {
+    double dampeningFactor, int maxIteration, boolean sampleGreaterThanThreshold,
+    boolean keepVerticesIfSameScore) {
     this(testName, seed, sampleSize);
     this.dampeningFactor = dampeningFactor;
     this.maxIteration = maxIteration;
     this.sampleGreaterThanThreshold = sampleGreaterThanThreshold;
+    this.keepVerticesIfSameScore = keepVerticesIfSameScore;
   }
 
   /**
@@ -200,7 +206,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    */
   @Test
   public void samplingTest() throws Exception {
-    LogicalGraph dbGraph = getSocialNetworkLoader().getDatabase().getDatabaseGraph();
+    LogicalGraph dbGraph = getSocialNetworkLoader().getLogicalGraph();
     LogicalGraph newGraph = getSamplingOperator().sample(dbGraph);
 
     validateGraph(dbGraph, newGraph);

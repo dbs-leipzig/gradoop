@@ -78,18 +78,19 @@ public class AggregationExample {
     loader.initDatabaseFromFile(EXAMPLE_DATA_FILE);
 
     // get LogicalGraph representation of the social network graph
-    LogicalGraph networkGraph = loader.getDatabase().getDatabaseGraph();
+    LogicalGraph networkGraph = loader.getLogicalGraph();
 
     // execute aggregations and graph-head transformations
     LogicalGraph result = networkGraph
       // extract subgraph with edges and vertices which are of interest
       .vertexInducedSubgraph(new ByLabel<>(LABEL_PERSON))
       // apply custom VertexAggregateFunction
-      .aggregate(new AggregateListOfNames())
-      // aggregate sum of vertices in order to obtain total amount of persons
-      .aggregate(new VertexCount())
-      // sum up values of the vertex property "birthday"
-      .aggregate(new SumVertexProperty(PROPERTY_KEY_BIRTHDAY))
+      .aggregate(
+        new AggregateListOfNames(),
+        // aggregate sum of vertices in order to obtain total amount of persons
+        new VertexCount(),
+        // sum up values of the vertex property "birthday"
+        new SumVertexProperty(PROPERTY_KEY_BIRTHDAY))
       // add computed property "meanAge" to the graph head
       .transformGraphHead(new AddPropertyMeanAgeToGraphHead());
 
