@@ -15,11 +15,11 @@
  */
 package org.gradoop.flink.io.impl.rdbms.connection;
 
+import org.apache.log4j.Logger;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
-import org.apache.log4j.Logger;
 
 /**
  * Connection to relational database

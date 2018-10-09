@@ -16,11 +16,11 @@
 
 package org.gradoop.flink.io.impl.rdbms.metadata;
 
-import java.util.ArrayList;
-
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants.RdbmsType;
 import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
+
+import java.util.ArrayList;
 
 /**
  * Provides sql queries

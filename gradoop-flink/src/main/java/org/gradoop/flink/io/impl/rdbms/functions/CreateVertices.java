@@ -15,8 +15,6 @@
  */
 package org.gradoop.flink.io.impl.rdbms.functions;
 
-import java.util.List;
-
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -27,6 +25,8 @@ import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.util.List;
 
 /**
  * Creates Epgm vertices from database tables

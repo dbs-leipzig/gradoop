@@ -15,10 +15,6 @@
  */
 package org.gradoop.flink.io.impl.rdbms;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -33,6 +29,10 @@ import org.gradoop.flink.io.impl.rdbms.metadata.MetaDataParser;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * A graph data import for relational databases. This data import was tested
@@ -89,8 +89,6 @@ public class RdbmsDataSource implements DataSource {
       throw new RuntimeException(e);
     }
 
-
-
     // creates vertices from rdbms table tuples
     vertices = CreateVertices.create(flinkConfig, rdbmsConfig, metadataParser);
 
@@ -102,7 +100,11 @@ public class RdbmsDataSource implements DataSource {
         flinkConfig.getExecutionEnvironment().fromCollection(metadataParser.getTablesToNodes()),
         RdbmsConstants.BROADCAST_VARIABLE);
 
-    return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
+    if (edges == null) {
+      return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices);
+    } else {
+      return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
+    }
   }
 
   @Override

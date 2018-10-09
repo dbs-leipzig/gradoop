@@ -16,11 +16,11 @@
 
 package org.gradoop.flink.io.impl.rdbms.metadata;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Rowheader of a row based relational data representation

@@ -16,9 +16,9 @@
 
 package org.gradoop.flink.io.impl.rdbms.tuples;
 
-import java.sql.JDBCType;
-
 import org.apache.flink.api.java.tuple.Tuple2;
+
+import java.sql.JDBCType;
 
 /**
  * Tuple representing a key string and belonging data type pair

@@ -16,8 +16,6 @@
 
 package org.gradoop.flink.io.impl.rdbms.functions;
 
-import java.util.List;
-
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
@@ -26,6 +24,8 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.impl.rdbms.tuples.LabelIdKeyTuple;
+
+import java.util.List;
 
 /**
  * Collects label,gradoop id, primary key value of vertices

@@ -16,11 +16,11 @@
 
 package org.gradoop.flink.io.impl.rdbms.connection;
 
-import java.sql.JDBCType;
-
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants.RdbmsType;
+
+import java.sql.JDBCType;
 
 /**
  * JDBC type to BasiTypeInfo Mapper

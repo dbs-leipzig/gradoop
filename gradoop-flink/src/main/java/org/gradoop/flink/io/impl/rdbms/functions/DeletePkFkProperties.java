@@ -15,9 +15,6 @@
  */
 package org.gradoop.flink.io.impl.rdbms.functions;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
@@ -27,6 +24,9 @@ import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Cleans Epgm vertices by deleting primary key and foreign key propeties

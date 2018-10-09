@@ -16,9 +16,6 @@
 
 package org.gradoop.flink.io.impl.rdbms.metadata;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.gradoop.flink.io.impl.rdbms.connection.SQLToBasicTypeMapper;
@@ -27,6 +24,9 @@ import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants.RdbmsType;
 import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 import org.gradoop.flink.io.impl.rdbms.tuples.RowHeaderTuple;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Stores metadata for tuple-to-vertex conversation

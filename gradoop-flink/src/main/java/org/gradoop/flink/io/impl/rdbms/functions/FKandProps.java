@@ -16,8 +16,6 @@
 
 package org.gradoop.flink.io.impl.rdbms.functions;
 
-import java.util.List;
-
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.types.Row;
@@ -25,6 +23,8 @@ import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.impl.rdbms.tuples.Fk1Fk2Props;
+
+import java.util.List;
 
 /**
  * Creates a tuple of foreign key one, foreign key two and belonging properties

@@ -57,20 +57,20 @@ public class RdbmsExample implements ProgramDescription {
     final String jdbcDriverClassName = args[4];
     final String outputPath = args[5];
 
-    // init Flink execution environment
+    // initialize Flink execution environment
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
-    // create default Gradoop config
+    // create default Gradoop configuration
     GradoopFlinkConfig gfc = GradoopFlinkConfig.createConfig(env);
 
     // create DataSource
     RdbmsDataSource dataSource = new RdbmsDataSource(url, user, pw, jdbcDriverPath,
         jdbcDriverClassName, gfc);
 
-    // get logical graph of datasource
+    // get logical graph of data source
     LogicalGraph schema = dataSource.getLogicalGraph();
 
-    // write conversion result to given path with timestamp and db name
+    // write conversion result to output path
     schema.writeTo(new CSVDataSink(outputPath, gfc));
 
     // execute program

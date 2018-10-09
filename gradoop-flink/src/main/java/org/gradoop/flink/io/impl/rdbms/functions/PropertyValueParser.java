@@ -16,10 +16,10 @@
 
 package org.gradoop.flink.io.impl.rdbms.functions;
 
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
 import java.time.ZoneId;
 import java.util.Date;
-
-import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
  * Converts the jdbc data type to matching EPGM property value if possible

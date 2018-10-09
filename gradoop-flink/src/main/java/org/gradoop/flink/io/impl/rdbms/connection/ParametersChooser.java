@@ -16,9 +16,9 @@
 
 package org.gradoop.flink.io.impl.rdbms.connection;
 
-import java.io.Serializable;
-
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants.RdbmsType;
+
+import java.io.Serializable;
 
 /**
  * Chooses fitting parameters for database pageination

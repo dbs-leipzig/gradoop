@@ -16,8 +16,6 @@
 
 package org.gradoop.flink.io.impl.rdbms.functions;
 
-import java.util.List;
-
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.types.Row;
@@ -28,6 +26,8 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.flink.io.impl.rdbms.metadata.RowHeader;
 import org.gradoop.flink.io.impl.rdbms.metadata.TableToNode;
+
+import java.util.List;
 
 /**
  * Creates one EPGM vertex from one row

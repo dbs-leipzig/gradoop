@@ -15,18 +15,18 @@
  */
 package org.gradoop.flink.io.impl.rdbms.metadata;
 
+import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
+import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants.RdbmsType;
+import org.gradoop.flink.io.impl.rdbms.functions.TableRowSize;
+import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
+import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
-import org.gradoop.flink.io.impl.rdbms.constants.RdbmsConstants.RdbmsType;
-import org.gradoop.flink.io.impl.rdbms.functions.TableRowSize;
-import org.gradoop.flink.io.impl.rdbms.tuples.FkTuple;
-import org.gradoop.flink.io.impl.rdbms.tuples.NameTypeTuple;
 
 /**
  * Relational database schema.

@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.io.impl.rdbms.tuples;
 
-import java.sql.JDBCType;
-
 import org.apache.flink.api.java.tuple.Tuple4;
+
+import java.sql.JDBCType;
 
 /**
  * Represents a foreign key f0 : attribute name of referencing foreign key f1 :
