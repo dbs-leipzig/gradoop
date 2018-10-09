@@ -44,8 +44,8 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
       .getFile();
 
     DataSource dataSource = new IndexedCSVDataSource(csvPath, getConfig());
-
     GraphCollection input = dataSource.getGraphCollection();
+
     GraphCollection expected = getLoaderFromFile(gdlPath)
       .getGraphCollectionByVariables("expected1", "expected2");
 
@@ -68,7 +68,6 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
       .getFile();
 
     DataSource dataSource = new IndexedCSVDataSource(csvPath, getConfig());
-
     LogicalGraph input = dataSource.getLogicalGraph();
 
     GraphCollection graphCollection = getLoaderFromFile(gdlPath)
@@ -95,6 +94,7 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
 
     DataSource dataSource = new IndexedCSVDataSource(csvPath, getConfig());
     GraphCollection input = dataSource.getGraphCollection();
+
     GraphCollection expected = getLoaderFromFile(gdlPath)
       .getGraphCollectionByVariables("expected1", "expected2");
 

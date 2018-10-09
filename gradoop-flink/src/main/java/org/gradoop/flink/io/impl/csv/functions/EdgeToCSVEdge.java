@@ -40,7 +40,7 @@ public class EdgeToCSVEdge extends ElementToCSV<Edge, CSVEdge> {
     csvEdge.setGradoopIds(collectionToCsvString(edge.getGraphIds()));
     csvEdge.setSourceId(edge.getSourceId().toString());
     csvEdge.setTargetId(edge.getTargetId().toString());
-    csvEdge.setLabel(edge.getLabel());
+    csvEdge.setLabel(StringEscaper.escape(edge.getLabel(), CSVConstants.ESCAPED_CHARACTERS));
     csvEdge.setProperties(getPropertyString(edge, CSVConstants.EDGE_TYPE));
     return csvEdge;
   }

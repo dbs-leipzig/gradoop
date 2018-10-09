@@ -21,6 +21,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
+import org.gradoop.flink.io.impl.csv.functions.StringEscaper;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -66,7 +67,7 @@ public class MetaDataParser {
     map.put(TypeString.FLOAT.getTypeString(), Float::parseFloat);
     map.put(TypeString.DOUBLE.getTypeString(), Double::parseDouble);
     map.put(TypeString.BOOLEAN.getTypeString(), Boolean::parseBoolean);
-    map.put(TypeString.STRING.getTypeString(), s -> s);
+    map.put(TypeString.STRING.getTypeString(), MetaDataParser::parseStringProperty);
     map.put(TypeString.BIGDECIMAL.getTypeString(), BigDecimal::new);
     map.put(TypeString.GRADOOPID.getTypeString(), GradoopId::fromString);
     map.put(TypeString.MAP.getTypeString(), MetaDataParser::parseMapProperty);
@@ -81,7 +82,7 @@ public class MetaDataParser {
 
   /**
    * Creates a {@link MetaData} object from the specified lines. The specified tuple is already
-   * separated into the label and the
+   * separated into the label and the metadata.
    *
    * @param metaDataStrings (element prefix (g,v,e), label, meta-data) tuples
    * @return Meta Data object
@@ -93,40 +94,21 @@ public class MetaDataParser {
     for (Tuple3<String, String, String> tuple : metaDataStrings) {
       List<PropertyMetaData> propertyMetaDataList;
       if (tuple.f2.length() > 0) {
-        String[] propertyStrings = tuple.f2.split(PROPERTY_DELIMITER);
+        String[] propertyStrings = StringEscaper.split(tuple.f2, PROPERTY_DELIMITER);
         propertyMetaDataList = new ArrayList<>(propertyStrings.length);
-        for (String propertyString : propertyStrings) {
-          String[] propertyMetadata = propertyString.split(PROPERTY_TOKEN_DELIMITER, 2);
-          String[] propertyTypeTokens = propertyMetadata[1].split(PROPERTY_TOKEN_DELIMITER);
-          if (propertyTypeTokens.length == 2 &&
-            propertyTypeTokens[0].equals(TypeString.LIST.getTypeString())) {
-            // it's a list with one additional data type (type of list items)
-            propertyMetaDataList.add(new PropertyMetaData(
-              propertyMetadata[0], propertyMetadata[1], getListValueParser(propertyTypeTokens[1])));
-          } else if (propertyTypeTokens.length == 2 &&
-            propertyTypeTokens[0].equals(TypeString.SET.getTypeString())) {
-            // it's a set with one additional data type (type of set items)
-            propertyMetaDataList.add(new PropertyMetaData(
-              propertyMetadata[0], propertyMetadata[1], getSetValueParser(propertyTypeTokens[1])));
-          } else if (propertyTypeTokens.length == 3 &&
-            propertyTypeTokens[0].equals(TypeString.MAP.getTypeString())) {
-            // it's a map with two additional data types (key type + value type)
-            propertyMetaDataList.add(
-              new PropertyMetaData(
-                propertyMetadata[0],
-                propertyMetadata[1],
-                getMapValueParser(propertyTypeTokens[1], propertyTypeTokens[2])
-              )
-            );
-          } else {
-            propertyMetaDataList.add(new PropertyMetaData(
-              propertyMetadata[0], propertyMetadata[1], getValueParser(propertyMetadata[1])));
-          }
+        for (String propertyMetaData : propertyStrings) {
+          String[] propertyMetaDataTokens = StringEscaper.split(propertyMetaData,
+            PROPERTY_TOKEN_DELIMITER, 2);
+          propertyMetaDataList.add(new PropertyMetaData(
+            StringEscaper.unescape(propertyMetaDataTokens[0]),
+            propertyMetaDataTokens[1],
+            getPropertyValueParser(propertyMetaDataTokens[1])));
         }
       } else {
         propertyMetaDataList = new ArrayList<>(0);
       }
-      metaDataMap.put(new Tuple2<>(tuple.f0, tuple.f1), propertyMetaDataList);
+      metaDataMap.put(new Tuple2<>(tuple.f0, StringEscaper.unescape(tuple.f1)),
+        propertyMetaDataList);
     }
 
     return new MetaData(metaDataMap);
@@ -141,7 +123,9 @@ public class MetaDataParser {
    */
   public static String getPropertyMetaData(Property property) {
     return String.format("%s%s%s",
-      property.getKey(), PROPERTY_TOKEN_DELIMITER, getTypeString(property.getValue()));
+      StringEscaper.escape(property.getKey(), CSVConstants.ESCAPED_CHARACTERS),
+      PROPERTY_TOKEN_DELIMITER,
+      getTypeString(property.getValue())); // no need to escape
   }
 
   /**
@@ -158,6 +142,31 @@ public class MetaDataParser {
 
   /**
    * Creates a parsing function for the given property type.
+   *
+   * @param propertyType string specifying the property type
+   * @return parsing function for the specific type
+   */
+  private static Function<String, Object> getPropertyValueParser(String propertyType) {
+    String[] propertyTypeTokens = StringEscaper.split(propertyType, PROPERTY_TOKEN_DELIMITER);
+    if (propertyTypeTokens.length == 2 &&
+      propertyTypeTokens[0].equals(TypeString.LIST.getTypeString())) {
+      // It's a list with one additional data type (type of list items).
+      return getListValueParser(propertyTypeTokens[1]);
+    } else if (propertyTypeTokens.length == 2 &&
+      propertyTypeTokens[0].equals(TypeString.SET.getTypeString())) {
+      // It's a set with one additional data type (type of set items).
+      return getSetValueParser(propertyTypeTokens[1]);
+    } else if (propertyTypeTokens.length == 3 &&
+      propertyTypeTokens[0].equals(TypeString.MAP.getTypeString())) {
+      // It's a map with two additional data types (key type + value type).
+      return getMapValueParser(propertyTypeTokens[1], propertyTypeTokens[2]);
+    } else {
+      return getValueParser(propertyType);
+    }
+  }
+
+  /**
+   * Creates a parsing function for the given primitive property type.
    *
    * @param type property type
    * @return parsing function
@@ -234,13 +243,14 @@ public class MetaDataParser {
    * Every PropertyValue has the type "string", because there is no parser for the items given
    * Use {@link #parseListProperty(String, Function)} to specify a parsing function
    *
-   * @param s the string to parse as list, e.g. "[myString1, myString2]"
+   * @param s the string to parse as list, e.g. "[myString1,myString2]"
    * @return the list represented by the argument
    */
   private static Object parseListProperty(String s) {
     // no item type given, so use string as type
     s = s.substring(1, s.length() - 1);
-    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
+    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
+      .map(StringEscaper::unescape)
       .map(PropertyValue::create)
       .collect(Collectors.toList());
   }
@@ -248,13 +258,13 @@ public class MetaDataParser {
   /**
    * Parse function to translate string representation of a List to a list of PropertyValues
    *
-   * @param s the string to parse as list, e.g. "[myString1, myString2]"
+   * @param s the string to parse as list, e.g. "[myString1,myString2]"
    * @param itemParser the function to parse the list items
    * @return the list represented by the argument
    */
   private static Object parseListProperty(String s, Function<String, Object> itemParser) {
     s = s.substring(1, s.length() - 1);
-    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
+    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
       .map(itemParser)
       .map(PropertyValue::create)
       .collect(Collectors.toList());
@@ -266,34 +276,32 @@ public class MetaDataParser {
    * are no parsers for the keys and values given. Use
    * {@link #parseMapProperty(String, Function, Function)} to specify both parsing functions.
    *
-   * @param s the string to parse as map, e.g. "{myString1=myValue1, myString2=myValue2}"
+   * @param s the string to parse as map, e.g. "{myString1=myValue1,myString2=myValue2}"
    * @return the map represented by the argument
    */
   private static Object parseMapProperty(String s) {
     // no key type and value type given, so use string as types
     s = s.substring(1, s.length() - 1);
-    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
-      .map(st -> st.split(CSVConstants.MAP_SEPARATOR))
-      .collect(Collectors.toMap(e -> PropertyValue.create(e[0]), e -> PropertyValue.create(e[1])));
+    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
+      .map(st -> StringEscaper.split(st, CSVConstants.MAP_SEPARATOR))
+      .collect(Collectors.toMap(e -> PropertyValue.create(StringEscaper.unescape(e[0])),
+        e -> PropertyValue.create(StringEscaper.unescape(e[1]))));
   }
 
   /**
    * Parse function to translate string representation of a Map to a Map with
-   * key and value of type PropertyValue
+   * key and value of type PropertyValue.
    *
-   * @param s the string to parse as map, e.g. "{myString1=myValue1, myString2=myValue2}"
+   * @param s the string to parse as map, e.g. "{myString1=myValue1,myString2=myValue2}"
    * @param keyParser the function to parse the keys
    * @param valueParser the function to parse the values
    * @return the map represented by the argument
    */
-  private static Object parseMapProperty(
-    String s,
-    Function<String, Object> keyParser,
-    Function<String, Object> valueParser
-  ) {
+  private static Object parseMapProperty(String s, Function<String, Object> keyParser,
+    Function<String, Object> valueParser) {
     s = s.substring(1, s.length() - 1);
-    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
-      .map(st -> st.split(CSVConstants.MAP_SEPARATOR))
+    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
+      .map(st -> StringEscaper.split(st, CSVConstants.MAP_SEPARATOR))
       .map(strings -> {
           Object[] objects = new Object[2];
           objects[0] = keyParser.apply(strings[0]);
@@ -304,35 +312,47 @@ public class MetaDataParser {
   }
 
   /**
-   * Parse function to translate string representation of a Set to a set of PropertyValues
-   * Every PropertyValue has the type "string", because there is no parser for the items given
-   * Use {@link #parseListProperty(String, Function)} to specify a parsing function
+   * Parse function to translate string representation of a Set to a set of PropertyValues.
+   * Every PropertyValue has the type "string", because there is no parser for the items given.
+   * Use {@link #parseListProperty(String, Function)} to specify a parsing function.
    *
-   * @param s the string to parse as set, e.g. "[myString1, myString2]"
+   * @param s the string to parse as set, e.g. "[myString1,myString2]"
    * @return the set represented by the argument
    */
   private static Object parseSetProperty(String s) {
     // no item type given, so use string as type
     s = s.substring(1, s.length() - 1);
-    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
+    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
+      .map(StringEscaper::unescape)
       .map(PropertyValue::create)
       .collect(Collectors.toSet());
   }
 
   /**
-   * Parse function to translate string representation of a Set to a set of PropertyValues
+   * Parse function to translate string representation of a Set to a set of PropertyValues.
    *
-   * @param s the string to parse as set, e.g. "[myString1, myString2]"
+   * @param s the string to parse as set, e.g. "[myString1,myString2]"
    * @param itemParser the function to parse the set items
    * @return the set represented by the argument
    */
   private static Object parseSetProperty(String s, Function<String, Object> itemParser) {
     s = s.substring(1, s.length() - 1);
-    return Arrays.stream(s.split(CSVConstants.LIST_DELIMITER))
+    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
       .map(itemParser)
       .map(PropertyValue::create)
       .collect(Collectors.toSet());
   }
+
+  /**
+   * Parse function to translate CSV strings to strings.
+   *
+   * @param s the string to parse
+   * @return the unescaped string
+   */
+  private static Object parseStringProperty(String s) {
+    return StringEscaper.unescape(s);
+  }
+
   /**
    * Parse function to create null from the null string representation.
    *
@@ -487,7 +507,7 @@ public class MetaDataParser {
     }
 
     /**
-     * Returns the type string
+     * Returns the type string.
      *
      * @return type string
      */

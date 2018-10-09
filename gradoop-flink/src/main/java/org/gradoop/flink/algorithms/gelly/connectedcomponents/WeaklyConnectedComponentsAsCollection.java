@@ -15,27 +15,23 @@
  */
 package org.gradoop.flink.algorithms.gelly.connectedcomponents;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 
 /**
- * Split a {@link LogicalGraph} into a {@link GraphCollection} of its weakly connected components.
+ * Computes the weakly connected components of a graph. Uses the gradoop wrapper
+ * {@link AnnotateWeaklyConnectedComponents} of Flinks ConnectedComponents.
+ * Splits the resulting {@link LogicalGraph} into a {@link GraphCollection} of its weakly connected
+ * components.
  */
-public class WeaklyConnectedComponents implements UnaryGraphToCollectionOperator {
+public class WeaklyConnectedComponentsAsCollection implements UnaryGraphToCollectionOperator {
 
   /**
    * Default property key to temporarily store the component id.
    */
-  private static final String DEFAULT_PROPERTY_KEY = "_wcc_component_id";
-
-  /**
-   * Maximum number of iterations for;
-   */
-  private final int maxIterations;
+  private static final String DEFAULT_PROPERTY_KEY = "wcc_component_id";
 
   /**
    * Property key to temporarily store the component id.
@@ -43,12 +39,17 @@ public class WeaklyConnectedComponents implements UnaryGraphToCollectionOperator
   private final String propertyKey;
 
   /**
-   * Initialize the operator using the default property key.
+   * Maximum number of iterations.
+   */
+  private final int maxIterations;
+
+  /**
+   * Initialize the operator.
    *
    * @param maxIterations Maximum number of iterations for
    *                      {@link AnnotateWeaklyConnectedComponents}.
    */
-  public WeaklyConnectedComponents(int maxIterations) {
+  public WeaklyConnectedComponentsAsCollection(int maxIterations) {
     this(DEFAULT_PROPERTY_KEY, maxIterations);
   }
 
@@ -59,25 +60,27 @@ public class WeaklyConnectedComponents implements UnaryGraphToCollectionOperator
    * @param maxIterations Maximum number of iteration for
    *                      {@link AnnotateWeaklyConnectedComponents}.
    */
-  public WeaklyConnectedComponents(String propertyKey, int maxIterations) {
-    this.maxIterations = maxIterations;
+  public WeaklyConnectedComponentsAsCollection(String propertyKey, int maxIterations) {
     this.propertyKey = propertyKey;
+    this.maxIterations = maxIterations;
   }
-
 
   @Override
   public GraphCollection execute(LogicalGraph graph) {
-    LogicalGraph withWccAnnotations = graph
-      .callForGraph(new AnnotateWeaklyConnectedComponents(propertyKey, maxIterations));
-    GraphCollection split = withWccAnnotations.splitBy(propertyKey);
-    DataSet<Vertex> vertices = split.getVertices()
-      .map(new PropertyRemover<>(propertyKey));
-    return graph.getConfig().getGraphCollectionFactory().fromDataSets(split.getGraphHeads(),
-      vertices, split.getEdges());
+
+    LogicalGraph graphWithWccIds = graph.callForGraph(new AnnotateWeaklyConnectedComponents(
+      propertyKey, maxIterations));
+
+    GraphCollection split = graphWithWccIds.splitBy(propertyKey);
+
+    return graph.getConfig().getGraphCollectionFactory().fromDataSets(
+      split.getGraphHeads(),
+      split.getVertices().map(new PropertyRemover<>(propertyKey)),
+      split.getEdges().map(new PropertyRemover<>(propertyKey)));
   }
 
   @Override
   public String getName() {
-    return WeaklyConnectedComponents.class.getName();
+    return WeaklyConnectedComponentsAsCollection.class.getName();
   }
 }
