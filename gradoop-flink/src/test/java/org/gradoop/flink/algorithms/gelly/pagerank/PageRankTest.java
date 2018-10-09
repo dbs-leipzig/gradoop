@@ -42,7 +42,6 @@ public class PageRankTest extends GradoopFlinkTestBase {
   @Test
   public void testPageRankExecution() throws Exception {
     LogicalGraph input = getSocialNetworkLoader().getLogicalGraphByVariable("g0");
-    input.print();
     long inputVertexCount = input.getVertices().count();
     LogicalGraph result = new PageRank(PROPERTY_KEY, 0.3, 20).execute(input);
     List<Vertex> resultVertices = result.getVertices().collect();

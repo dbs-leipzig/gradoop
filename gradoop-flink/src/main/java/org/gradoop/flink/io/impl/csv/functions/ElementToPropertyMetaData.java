@@ -20,6 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
@@ -50,14 +51,18 @@ public class ElementToPropertyMetaData<E extends Element>
 
   @Override
   public Tuple3<String, String, Set<String>> map(E e) throws Exception {
-    if (e.getClass() == Edge.class) {
+    Class<? extends Element> type = e.getClass();
+
+    if (type == Edge.class) {
       reuseTuple.f0 = CSVConstants.EDGE_TYPE;
-    } else if (e.getClass() == Vertex.class) {
+    } else if (type == Vertex.class) {
       reuseTuple.f0 = CSVConstants.VERTEX_TYPE;
+    } else if (type == GraphHead.class) {
+      reuseTuple.f0 = CSVConstants.GRAPH_TYPE;
     } else {
       throw new Exception("Unsupported element class");
     }
-    reuseTuple.f1 = e.getLabel();
+    reuseTuple.f1 = StringEscaper.escape(e.getLabel(), CSVConstants.ESCAPED_CHARACTERS);
     reuseTuple.f2.clear();
     if (e.getProperties() != null) {
       for (Property property : e.getProperties()) {
