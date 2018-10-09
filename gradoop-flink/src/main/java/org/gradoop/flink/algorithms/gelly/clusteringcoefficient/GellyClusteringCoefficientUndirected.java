@@ -52,8 +52,8 @@ public class GellyClusteringCoefficientUndirected extends ClusteringCoefficientB
    * for an undirected graph.
    */
   @Override
-  protected LogicalGraph executeInternal(Graph<GradoopId, NullValue, NullValue> gellyGraph) throws
-    Exception {
+  protected LogicalGraph executeInternal(Graph<GradoopId, NullValue, NullValue> gellyGraph)
+    throws Exception {
 
     DataSet<Vertex> resultVertices = new org.apache.flink.graph.library.clustering.undirected
       .LocalClusteringCoefficient<GradoopId, NullValue, NullValue>().run(gellyGraph)

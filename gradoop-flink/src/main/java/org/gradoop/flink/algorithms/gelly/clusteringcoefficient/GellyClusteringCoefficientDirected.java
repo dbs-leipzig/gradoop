@@ -52,8 +52,8 @@ public class GellyClusteringCoefficientDirected extends ClusteringCoefficientBas
    * for a directed graph.
    */
   @Override
-  protected LogicalGraph executeInternal(Graph<GradoopId, NullValue, NullValue> gellyGraph) throws
-    Exception {
+  protected LogicalGraph executeInternal(Graph<GradoopId, NullValue, NullValue> gellyGraph)
+    throws Exception {
 
     DataSet<Vertex> resultVertices = new org.apache.flink.graph.library.clustering.directed
       .LocalClusteringCoefficient<GradoopId, NullValue, NullValue>().run(gellyGraph)
@@ -62,12 +62,10 @@ public class GellyClusteringCoefficientDirected extends ClusteringCoefficientBas
       .with(new LocalCCResultTupleToVertexJoin());
 
     AverageClusteringCoefficient average = new org.apache.flink.graph.library.clustering.directed
-      .AverageClusteringCoefficient<GradoopId, NullValue, NullValue>()
-      .run(gellyGraph);
+      .AverageClusteringCoefficient<GradoopId, NullValue, NullValue>().run(gellyGraph);
 
     GlobalClusteringCoefficient global = new org.apache.flink.graph.library.clustering.directed
-      .GlobalClusteringCoefficient<GradoopId, NullValue, NullValue>()
-      .run(gellyGraph);
+      .GlobalClusteringCoefficient<GradoopId, NullValue, NullValue>().run(gellyGraph);
 
     currentGraph.getConfig().getExecutionEnvironment().execute();
 
