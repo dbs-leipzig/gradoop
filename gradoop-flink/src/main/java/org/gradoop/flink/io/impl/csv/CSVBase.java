@@ -125,15 +125,7 @@ public abstract class CSVBase {
    * @return path to csv file
    */
   protected String getGraphHeadCSVPath(String label) {
-    Objects.requireNonNull(label);
-    label = MultipleFileOutputFormat
-      .cleanFilename(StringEscaper.escape(label, CSVConstants.ESCAPED_CHARACTERS));
-    return csvRoot +
-      GRAPH_HEAD_PATH +
-      CSVConstants.DIRECTORY_SEPARATOR +
-      label +
-      CSVConstants.DIRECTORY_SEPARATOR +
-      CSVConstants.SIMPLE_FILE;
+    return getElementCSVPath(label, getGraphHeadPath());
   }
 
   /**
@@ -143,15 +135,7 @@ public abstract class CSVBase {
    * @return path to csv file
    */
   protected String getVertexCSVPath(String label) {
-    Objects.requireNonNull(label);
-    label = MultipleFileOutputFormat
-      .cleanFilename(StringEscaper.escape(label, CSVConstants.ESCAPED_CHARACTERS));
-    return csvRoot +
-      VERTEX_PATH +
-      CSVConstants.DIRECTORY_SEPARATOR +
-      label +
-      CSVConstants.DIRECTORY_SEPARATOR +
-      CSVConstants.SIMPLE_FILE;
+    return getElementCSVPath(label, getVertexPath());
   }
 
   /**
@@ -161,11 +145,25 @@ public abstract class CSVBase {
    * @return path to csv file
    */
   protected String getEdgeCSVPath(String label) {
+    return getElementCSVPath(label, getEdgePath());
+  }
+
+  /**
+   * Returns the path to the element file containing only elements with the specified label.
+   *
+   * @param label element label
+   * @param elementPath path of the element (e.g. "edge")
+   * @return path to csv file
+   */
+  private String getElementCSVPath(String label, String elementPath) {
     Objects.requireNonNull(label);
-    label = MultipleFileOutputFormat
-      .cleanFilename(StringEscaper.escape(label, CSVConstants.ESCAPED_CHARACTERS));
-    return csvRoot +
-      EDGE_PATH +
+    if (label.isEmpty()) {
+      label = CSVConstants.DEFAULT_DIRECTORY;
+    } else {
+      label = MultipleFileOutputFormat
+        .cleanFilename(StringEscaper.escape(label, CSVConstants.ESCAPED_CHARACTERS));
+    }
+    return elementPath +
       CSVConstants.DIRECTORY_SEPARATOR +
       label +
       CSVConstants.DIRECTORY_SEPARATOR +
