@@ -71,7 +71,5 @@ public class SubgraphExample {
 
     // Print result graph
     filteredGraph.print();
-
-    executionEnvironment.execute();
   }
 }
