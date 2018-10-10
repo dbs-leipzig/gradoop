@@ -94,26 +94,56 @@ public abstract class CSVBase {
     this.config = config;
   }
 
+  /**
+   * Returns the path to the graph head directory.
+   *
+   * @return graph head path
+   */
   protected String getGraphHeadPath() {
     return csvRoot + GRAPH_HEAD_PATH;
   }
 
+  /**
+   * Returns the path to the vertex directory.
+   *
+   * @return vertex path
+   */
   protected String getVertexPath() {
     return csvRoot + VERTEX_PATH;
   }
 
+  /**
+   * Returns the path to the edge directory.
+   *
+   * @return edge path
+   */
   protected String getEdgePath() {
     return csvRoot + EDGE_PATH;
   }
 
+  /**
+   * Returns the path to the graph head file.
+   *
+   * @return graph head file path
+   */
   protected String getGraphHeadCSVPath() {
     return csvRoot + GRAPH_HEAD_FILE;
   }
 
+  /**
+   * Returns the path to the vertex file.
+   *
+   * @return vertex file path
+   */
   protected String getVertexCSVPath() {
     return csvRoot + VERTEX_FILE;
   }
 
+  /**
+   * Returns the path to the edge file.
+   *
+   * @return edge file path
+   */
   protected String getEdgeCSVPath() {
     return csvRoot + EDGE_FILE;
   }

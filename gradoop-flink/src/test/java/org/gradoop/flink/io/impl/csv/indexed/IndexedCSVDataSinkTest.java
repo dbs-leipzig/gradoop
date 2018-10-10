@@ -241,21 +241,19 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
   public void testWriteWithEmptyLabel() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    // The properties are incompatible to get a conversion error
-    // if the metadata is not separated.
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "g0[" +
       "(v1 {keya:2})" +
       "(v2)" +
       "(v3:_)" +
       "]" +
-      "g1[" +
+      "g1 {key:\"property\"}[" +
       "(v4)-[e1 {keya:1}]->(v4)" +
       "(v4)-[e2]->(v4)" +
       "(v4)-[e3:_ {keya:false}]->(v4)" +
       "]" +
-      "g2:_[" +
-      "(v5 {graph:hasALabel])" +
+      "g2:_ {graph:\"hasALabel\"}[" +
+      "(v5)" +
       "]");
 
     GraphCollection graphCollection = loader.getGraphCollectionByVariables("g0", "g1", "g2");
