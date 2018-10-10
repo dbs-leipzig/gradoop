@@ -43,7 +43,7 @@ public class ReduceEdgeGroupItems
   /**
    * Creates group reducer
    *
-   * @param useLabel        use edge label
+   * @param useLabel use edge label
    * @param epgmEdgeFactory edge factory
    */
   public ReduceEdgeGroupItems(boolean useLabel, EPGMEdgeFactory<Edge> epgmEdgeFactory) {
@@ -72,15 +72,13 @@ public class ReduceEdgeGroupItems
 
     setGroupProperties(
       superEdge, edgeGroupItem.getGroupingValues(), edgeGroupItem.getLabelGroup());
-    setAggregateValues(superEdge, edgeGroupItem.getLabelGroup().getAggregators());
-    resetAggregators(edgeGroupItem.getLabelGroup().getAggregators());
+    setAggregateProperties(superEdge, edgeGroupItem.getLabelGroup().getAggregateValueList(),
+      edgeGroupItem.getLabelGroup().getAggregateFunctions());
+    edgeGroupItem.getLabelGroup().resetAggregateValues();
 
     collector.collect(superEdge);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<Edge> getProducedType() {

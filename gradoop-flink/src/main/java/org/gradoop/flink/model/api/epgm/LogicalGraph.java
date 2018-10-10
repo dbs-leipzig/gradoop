@@ -44,7 +44,6 @@ import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
@@ -411,8 +410,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    */
   @Override
   public LogicalGraph groupBy(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
+    List<String> vertexGroupingKeys, List<VertexAggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<EdgeAggregateFunction> edgeAggregateFunctions,
     GroupingStrategy groupingStrategy) {
 
     Objects.requireNonNull(vertexGroupingKeys, "missing vertex grouping key(s)");
@@ -427,10 +426,10 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
       builder.addEdgeGroupingKeys(edgeGroupingKeys);
     }
     if (vertexAggregateFunctions != null) {
-      vertexAggregateFunctions.forEach(builder::addVertexAggregator);
+      vertexAggregateFunctions.forEach(builder::addVertexAggregateFunction);
     }
     if (edgeAggregateFunctions != null) {
-      edgeAggregateFunctions.forEach(builder::addEdgeAggregator);
+      edgeAggregateFunctions.forEach(builder::addEdgeAggregateFunction);
     }
     return callForGraph(builder.build());
   }

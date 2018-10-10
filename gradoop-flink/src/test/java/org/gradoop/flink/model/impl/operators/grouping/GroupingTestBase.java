@@ -18,11 +18,15 @@ package org.gradoop.flink.model.impl.operators.grouping;
 import com.google.common.collect.Lists;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxEdgeProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinEdgeProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumEdgeProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping.GroupingBuilder;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MaxAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MinAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.SumAggregator;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -44,22 +48,22 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(pL:Person {city : \"Leipzig\", count : 2L})" +
-      "(pD:Person {city : \"Dresden\", count : 3L})" +
-      "(pB:Person {city : \"Berlin\", count : 1L})" +
-      "(pD)-[:knows {since : 2014, count : 2L}]->(pD)" +
-      "(pD)-[:knows {since : 2013, count : 2L}]->(pL)" +
-      "(pD)-[:knows {since : 2015, count : 1L}]->(pL)" +
-      "(pL)-[:knows {since : 2014, count : 2L}]->(pL)" +
-      "(pL)-[:knows {since : 2013, count : 1L}]->(pD)" +
-      "(pB)-[:knows {since : 2015, count : 2L}]->(pD)" +
+      "(pL:Person {city : \"Leipzig\", vertexCount : 2L})" +
+      "(pD:Person {city : \"Dresden\", vertexCount : 3L})" +
+      "(pB:Person {city : \"Berlin\", vertexCount : 1L})" +
+      "(pD)-[:knows {since : 2014, edgeCount : 2L}]->(pD)" +
+      "(pD)-[:knows {since : 2013, edgeCount : 2L}]->(pL)" +
+      "(pD)-[:knows {since : 2015, edgeCount : 1L}]->(pL)" +
+      "(pL)-[:knows {since : 2014, edgeCount : 2L}]->(pL)" +
+      "(pL)-[:knows {since : 2013, edgeCount : 1L}]->(pD)" +
+      "(pB)-[:knows {since : 2015, edgeCount : 2L}]->(pD)" +
       "]");
 
     LogicalGraph output = input.groupBy(
       Arrays.asList(Grouping.LABEL_SYMBOL, "city"),
-      Arrays.asList(new CountAggregator("count")),
+      Arrays.asList(new VertexCount()),
       Arrays.asList(Grouping.LABEL_SYMBOL, "since"),
-      Arrays.asList(new CountAggregator("count")),
+      Arrays.asList(new EdgeCount()),
       getStrategy()
     );
 
@@ -74,18 +78,18 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("g2");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(leipzig {city : \"Leipzig\", count : 2L})" +
-      "(dresden {city : \"Dresden\", count : 2L})" +
-      "(leipzig)-[{count : 2L}]->(leipzig)" +
-      "(leipzig)-[{count : 1L}]->(dresden)" +
-      "(dresden)-[{count : 2L}]->(dresden)" +
-      "(dresden)-[{count : 1L}]->(leipzig)" +
+      "(leipzig {city : \"Leipzig\", vertexCount : 2L})" +
+      "(dresden {city : \"Dresden\", vertexCount : 2L})" +
+      "(leipzig)-[{edgeCount : 2L}]->(leipzig)" +
+      "(leipzig)-[{edgeCount : 1L}]->(dresden)" +
+      "(dresden)-[{edgeCount : 2L}]->(dresden)" +
+      "(dresden)-[{edgeCount : 1L}]->(leipzig)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .addVertexGroupingKey("city")
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -104,20 +108,20 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(leipzig {city : \"Leipzig\", count : 2L})" +
-      "(dresden {city : \"Dresden\", count : 3L})" +
-      "(berlin  {city : \"Berlin\",  count : 1L})" +
-      "(dresden)-[{count : 2L}]->(dresden)" +
-      "(dresden)-[{count : 3L}]->(leipzig)" +
-      "(leipzig)-[{count : 2L}]->(leipzig)" +
-      "(leipzig)-[{count : 1L}]->(dresden)" +
-      "(berlin)-[{count : 2L}]->(dresden)" +
+      "(leipzig {city : \"Leipzig\", vertexCount : 2L})" +
+      "(dresden {city : \"Dresden\", vertexCount : 3L})" +
+      "(berlin  {city : \"Berlin\",  vertexCount : 1L})" +
+      "(dresden)-[{edgeCount : 2L}]->(dresden)" +
+      "(dresden)-[{edgeCount : 3L}]->(leipzig)" +
+      "(leipzig)-[{edgeCount : 2L}]->(leipzig)" +
+      "(leipzig)-[{edgeCount : 1L}]->(dresden)" +
+      "(berlin)-[{edgeCount : 2L}]->(dresden)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .addVertexGroupingKey("city")
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -136,27 +140,27 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(leipzigF {city : \"Leipzig\", gender : \"f\", count : 1L})" +
-      "(leipzigM {city : \"Leipzig\", gender : \"m\", count : 1L})" +
-      "(dresdenF {city : \"Dresden\", gender : \"f\", count : 2L})" +
-      "(dresdenM {city : \"Dresden\", gender : \"m\", count : 1L})" +
-      "(berlinM  {city : \"Berlin\", gender : \"m\",  count : 1L})" +
-      "(leipzigF)-[{count : 1L}]->(leipzigM)" +
-      "(leipzigM)-[{count : 1L}]->(leipzigF)" +
-      "(leipzigM)-[{count : 1L}]->(dresdenF)" +
-      "(dresdenF)-[{count : 1L}]->(leipzigF)" +
-      "(dresdenF)-[{count : 2L}]->(leipzigM)" +
-      "(dresdenF)-[{count : 1L}]->(dresdenM)" +
-      "(dresdenM)-[{count : 1L}]->(dresdenF)" +
-      "(berlinM)-[{count : 1L}]->(dresdenF)" +
-      "(berlinM)-[{count : 1L}]->(dresdenM)" +
+      "(leipzigF {city : \"Leipzig\", gender : \"f\", vertexCount : 1L})" +
+      "(leipzigM {city : \"Leipzig\", gender : \"m\", vertexCount : 1L})" +
+      "(dresdenF {city : \"Dresden\", gender : \"f\", vertexCount : 2L})" +
+      "(dresdenM {city : \"Dresden\", gender : \"m\", vertexCount : 1L})" +
+      "(berlinM  {city : \"Berlin\", gender : \"m\",  vertexCount : 1L})" +
+      "(leipzigF)-[{edgeCount : 1L}]->(leipzigM)" +
+      "(leipzigM)-[{edgeCount : 1L}]->(leipzigF)" +
+      "(leipzigM)-[{edgeCount : 1L}]->(dresdenF)" +
+      "(dresdenF)-[{edgeCount : 1L}]->(leipzigF)" +
+      "(dresdenF)-[{edgeCount : 2L}]->(leipzigM)" +
+      "(dresdenF)-[{edgeCount : 1L}]->(dresdenM)" +
+      "(dresdenM)-[{edgeCount : 1L}]->(dresdenF)" +
+      "(berlinM)-[{edgeCount : 1L}]->(dresdenF)" +
+      "(berlinM)-[{edgeCount : 1L}]->(dresdenM)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .addVertexGroupingKey("city")
       .addVertexGroupingKey("gender")
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -172,16 +176,16 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("g3");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(dresden {city : \"Dresden\", count : 2L})" +
-      "(others  {city : " + NULL_STRING + ", count : 1L})" +
-      "(others)-[{count : 3L}]->(dresden)" +
-      "(dresden)-[{count : 1L}]->(dresden)" +
+      "(dresden {city : \"Dresden\", vertexCount : 2L})" +
+      "(others  {city : " + NULL_STRING + ", vertexCount : 1L})" +
+      "(others)-[{edgeCount : 3L}]->(dresden)" +
+      "(dresden)-[{edgeCount : 1L}]->(dresden)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .addVertexGroupingKey("city")
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -197,19 +201,19 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("g3");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(dresdenF {city : \"Dresden\", gender : \"f\", count : 1L})" +
-      "(dresdenM {city : \"Dresden\", gender : \"m\", count : 1L})" +
-      "(others  {city : " + NULL_STRING + ", gender : " + NULL_STRING + ", count : 1L})" +
-      "(others)-[{count : 2L}]->(dresdenM)" +
-      "(others)-[{count : 1L}]->(dresdenF)" +
-      "(dresdenF)-[{count : 1L}]->(dresdenM)" +
+      "(dresdenF {city : \"Dresden\", gender : \"f\", vertexCount : 1L})" +
+      "(dresdenM {city : \"Dresden\", gender : \"m\", vertexCount : 1L})" +
+      "(others  {city : " + NULL_STRING + ", gender : " + NULL_STRING + ", vertexCount : 1L})" +
+      "(others)-[{edgeCount : 2L}]->(dresdenM)" +
+      "(others)-[{edgeCount : 1L}]->(dresdenF)" +
+      "(dresdenF)-[{edgeCount : 1L}]->(dresdenM)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .addVertexGroupingKey("city")
       .addVertexGroupingKey("gender")
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -228,22 +232,22 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(leipzig {city : \"Leipzig\", count : 2L})" +
-      "(dresden {city : \"Dresden\", count : 3L})" +
-      "(berlin  {city : \"Berlin\",  count : 1L})" +
-      "(dresden)-[{since : 2014, count : 2L}]->(dresden)" +
-      "(dresden)-[{since : 2013, count : 2L}]->(leipzig)" +
-      "(dresden)-[{since : 2015, count : 1L}]->(leipzig)" +
-      "(leipzig)-[{since : 2014, count : 2L}]->(leipzig)" +
-      "(leipzig)-[{since : 2013, count : 1L}]->(dresden)" +
-      "(berlin)-[{since : 2015, count : 2L}]->(dresden)" +
+      "(leipzig {city : \"Leipzig\", vertexCount : 2L})" +
+      "(dresden {city : \"Dresden\", vertexCount : 3L})" +
+      "(berlin  {city : \"Berlin\",  vertexCount : 1L})" +
+      "(dresden)-[{since : 2014, edgeCount : 2L}]->(dresden)" +
+      "(dresden)-[{since : 2013, edgeCount : 2L}]->(leipzig)" +
+      "(dresden)-[{since : 2015, edgeCount : 1L}]->(leipzig)" +
+      "(leipzig)-[{since : 2014, edgeCount : 2L}]->(leipzig)" +
+      "(leipzig)-[{since : 2013, edgeCount : 1L}]->(dresden)" +
+      "(berlin)-[{since : 2015, edgeCount : 2L}]->(dresden)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .addVertexGroupingKey("city")
       .addEdgeGroupingKey("since")
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -276,26 +280,26 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     );
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00 {a : 0,count : 3L})" +
-      "(v01 {a : 1,count : 3L})" +
-      "(v00)-[{a : 0,b : 1,count : 1L}]->(v00)" +
-      "(v00)-[{a : 0,b : 2,count : 1L}]->(v00)" +
-      "(v00)-[{a : 0,b : 3,count : 1L}]->(v00)" +
-      "(v01)-[{a : 2,b : 0,count : 1L}]->(v01)" +
-      "(v01)-[{a : 2,b : 1,count : 1L}]->(v01)" +
-      "(v01)-[{a : 2,b : 3,count : 1L}]->(v01)" +
-      "(v00)-[{a : 0,b : 1,count : 1L}]->(v01)" +
-      "(v00)-[{a : 0,b : 2,count : 1L}]->(v01)" +
-      "(v01)-[{a : 1,b : 2,count : 1L}]->(v00)" +
-      "(v01)-[{a : 1,b : 3,count : 1L}]->(v00)" +
+      "(v00 {a : 0,vertexCount : 3L})" +
+      "(v01 {a : 1,vertexCount : 3L})" +
+      "(v00)-[{a : 0,b : 1,edgeCount : 1L}]->(v00)" +
+      "(v00)-[{a : 0,b : 2,edgeCount : 1L}]->(v00)" +
+      "(v00)-[{a : 0,b : 3,edgeCount : 1L}]->(v00)" +
+      "(v01)-[{a : 2,b : 0,edgeCount : 1L}]->(v01)" +
+      "(v01)-[{a : 2,b : 1,edgeCount : 1L}]->(v01)" +
+      "(v01)-[{a : 2,b : 3,edgeCount : 1L}]->(v01)" +
+      "(v00)-[{a : 0,b : 1,edgeCount : 1L}]->(v01)" +
+      "(v00)-[{a : 0,b : 2,edgeCount : 1L}]->(v01)" +
+      "(v01)-[{a : 1,b : 2,edgeCount : 1L}]->(v00)" +
+      "(v01)-[{a : 1,b : 3,edgeCount : 1L}]->(v00)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .addVertexGroupingKey("a")
       .addEdgeGroupingKey("a")
       .addEdgeGroupingKey("b")
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(loader.getLogicalGraphByVariable("input"));
@@ -328,20 +332,20 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       );
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00 {a : 0,b : 0,count : 1L})" +
-      "(v01 {a : 0,b : 1,count : 2L})" +
-      "(v10 {a : 1,b : 0,count : 2L})" +
-      "(v11 {a : 1,b : 1,count : 1L})" +
-      "(v00)-[{a : 0,b : 1,count : 1L}]->(v01)" +
-      "(v00)-[{a : 0,b : 2,count : 1L}]->(v01)" +
-      "(v01)-[{a : 0,b : 3,count : 1L}]->(v01)" +
-      "(v01)-[{a : 0,b : 1,count : 1L}]->(v10)" +
-      "(v01)-[{a : 0,b : 2,count : 1L}]->(v10)" +
-      "(v11)-[{a : 2,b : 1,count : 1L}]->(v10)" +
-      "(v10)-[{a : 2,b : 3,count : 1L}]->(v11)" +
-      "(v10)-[{a : 2,b : 0,count : 1L}]->(v10)" +
-      "(v10)-[{a : 1,b : 3,count : 1L}]->(v01)" +
-      "(v11)-[{a : 1,b : 2,count : 1L}]->(v01)" +
+      "(v00 {a : 0,b : 0,vertexCount : 1L})" +
+      "(v01 {a : 0,b : 1,vertexCount : 2L})" +
+      "(v10 {a : 1,b : 0,vertexCount : 2L})" +
+      "(v11 {a : 1,b : 1,vertexCount : 1L})" +
+      "(v00)-[{a : 0,b : 1,edgeCount : 1L}]->(v01)" +
+      "(v00)-[{a : 0,b : 2,edgeCount : 1L}]->(v01)" +
+      "(v01)-[{a : 0,b : 3,edgeCount : 1L}]->(v01)" +
+      "(v01)-[{a : 0,b : 1,edgeCount : 1L}]->(v10)" +
+      "(v01)-[{a : 0,b : 2,edgeCount : 1L}]->(v10)" +
+      "(v11)-[{a : 2,b : 1,edgeCount : 1L}]->(v10)" +
+      "(v10)-[{a : 2,b : 3,edgeCount : 1L}]->(v11)" +
+      "(v10)-[{a : 2,b : 0,edgeCount : 1L}]->(v10)" +
+      "(v10)-[{a : 1,b : 3,edgeCount : 1L}]->(v01)" +
+      "(v11)-[{a : 1,b : 2,edgeCount : 1L}]->(v01)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
@@ -349,8 +353,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("b")
       .addEdgeGroupingKey("a")
       .addEdgeGroupingKey("b")
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(loader.getLogicalGraphByVariable("input"));
@@ -366,19 +370,19 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("g3");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(dresden {city : \"Dresden\", count : 2L})" +
-      "(others  {city : " + NULL_STRING + ", count : 1L})" +
-      "(others)-[{since : 2013, count : 1L}]->(dresden)" +
-      "(others)-[{since : " + NULL_STRING + ", count : 2L}]->(dresden)" +
-      "(dresden)-[{since : 2014, count : 1L}]->(dresden)" +
+      "(dresden {city : \"Dresden\", vertexCount : 2L})" +
+      "(others  {city : " + NULL_STRING + ", vertexCount : 1L})" +
+      "(others)-[{since : 2013, edgeCount : 1L}]->(dresden)" +
+      "(others)-[{since : " + NULL_STRING + ", edgeCount : 2L}]->(dresden)" +
+      "(dresden)-[{since : 2014, edgeCount : 1L}]->(dresden)" +
       "]");
 
     LogicalGraph output =
       new GroupingBuilder()
         .addVertexGroupingKey("city")
         .addEdgeGroupingKey("since")
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
+        .addVertexAggregateFunction(new VertexCount())
+        .addEdgeAggregateFunction(new EdgeCount())
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -394,19 +398,19 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(p:Person  {count : 6L})" +
-      "(t:Tag     {count : 3L})" +
-      "(f:Forum   {count : 2L})" +
-      "(p)-[{count : 10L}]->(p)" +
-      "(f)-[{count :  6L}]->(p)" +
-      "(p)-[{count :  4L}]->(t)" +
-      "(f)-[{count :  4L}]->(t)" +
+      "(p:Person  {vertexCount : 6L})" +
+      "(t:Tag     {vertexCount : 3L})" +
+      "(f:Forum   {vertexCount : 2L})" +
+      "(p)-[{edgeCount : 10L}]->(p)" +
+      "(f)-[{edgeCount :  6L}]->(p)" +
+      "(p)-[{edgeCount :  4L}]->(t)" +
+      "(f)-[{edgeCount :  4L}]->(t)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .useVertexLabel(true)
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -425,21 +429,21 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(l:Person {city : \"Leipzig\", count : 2L})" +
-      "(d:Person {city : \"Dresden\", count : 3L})" +
-      "(b:Person {city : \"Berlin\",  count : 1L})" +
-      "(d)-[{count : 2L}]->(d)" +
-      "(d)-[{count : 3L}]->(l)" +
-      "(l)-[{count : 2L}]->(l)" +
-      "(l)-[{count : 1L}]->(d)" +
-      "(b)-[{count : 2L}]->(d)" +
+      "(l:Person {city : \"Leipzig\", vertexCount : 2L})" +
+      "(d:Person {city : \"Dresden\", vertexCount : 3L})" +
+      "(b:Person {city : \"Berlin\",  vertexCount : 1L})" +
+      "(d)-[{edgeCount : 2L}]->(d)" +
+      "(d)-[{edgeCount : 3L}]->(l)" +
+      "(l)-[{edgeCount : 2L}]->(l)" +
+      "(l)-[{edgeCount : 1L}]->(d)" +
+      "(b)-[{edgeCount : 2L}]->(d)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("city")
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -455,29 +459,29 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(pL:Person {city : \"Leipzig\", count : 2L})" +
-      "(pD:Person {city : \"Dresden\", count : 3L})" +
-      "(pB:Person {city : \"Berlin\",  count : 1L})" +
-      "(t:Tag {city : " + NULL_STRING + ",   count : 3L})" +
-      "(f:Forum {city : " + NULL_STRING + ", count : 2L})" +
-      "(pD)-[{count : 2L}]->(pD)" +
-      "(pD)-[{count : 3L}]->(pL)" +
-      "(pL)-[{count : 2L}]->(pL)" +
-      "(pL)-[{count : 1L}]->(pD)" +
-      "(pB)-[{count : 2L}]->(pD)" +
-      "(pB)-[{count : 1L}]->(t)" +
-      "(pD)-[{count : 2L}]->(t)" +
-      "(pL)-[{count : 1L}]->(t)" +
-      "(f)-[{count : 3L}]->(pD)" +
-      "(f)-[{count : 3L}]->(pL)" +
-      "(f)-[{count : 4L}]->(t)" +
+      "(pL:Person {city : \"Leipzig\", vertexCount : 2L})" +
+      "(pD:Person {city : \"Dresden\", vertexCount : 3L})" +
+      "(pB:Person {city : \"Berlin\",  vertexCount : 1L})" +
+      "(t:Tag {city : " + NULL_STRING + ",   vertexCount : 3L})" +
+      "(f:Forum {city : " + NULL_STRING + ", vertexCount : 2L})" +
+      "(pD)-[{edgeCount : 2L}]->(pD)" +
+      "(pD)-[{edgeCount : 3L}]->(pL)" +
+      "(pL)-[{edgeCount : 2L}]->(pL)" +
+      "(pL)-[{edgeCount : 1L}]->(pD)" +
+      "(pB)-[{edgeCount : 2L}]->(pD)" +
+      "(pB)-[{edgeCount : 1L}]->(t)" +
+      "(pD)-[{edgeCount : 2L}]->(t)" +
+      "(pL)-[{edgeCount : 1L}]->(t)" +
+      "(f)-[{edgeCount : 3L}]->(pD)" +
+      "(f)-[{edgeCount : 3L}]->(pL)" +
+      "(f)-[{edgeCount : 4L}]->(t)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("city")
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -496,17 +500,17 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(p:Person {count : 6L})" +
-      "(p)-[{since : 2014, count : 4L}]->(p)" +
-      "(p)-[{since : 2013, count : 3L}]->(p)" +
-      "(p)-[{since : 2015, count : 3L}]->(p)" +
+      "(p:Person {vertexCount : 6L})" +
+      "(p)-[{since : 2014, edgeCount : 4L}]->(p)" +
+      "(p)-[{since : 2013, edgeCount : 3L}]->(p)" +
+      "(p)-[{since : 2015, edgeCount : 3L}]->(p)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .useVertexLabel(true)
       .addEdgeGroupingKey("since")
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -522,23 +526,23 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(p:Person  {count : 6L})" +
-      "(t:Tag     {count : 3L})" +
-      "(f:Forum   {count : 2L})" +
-      "(p)-[{since : 2014, count : 4L}]->(p)" +
-      "(p)-[{since : 2013, count : 3L}]->(p)" +
-      "(p)-[{since : 2015, count : 3L}]->(p)" +
-      "(f)-[{since : 2013, count : 1L}]->(p)" +
-      "(p)-[{since : " + NULL_STRING + ", count : 4L}]->(t)" +
-      "(f)-[{since : " + NULL_STRING + ", count : 4L}]->(t)" +
-      "(f)-[{since : " + NULL_STRING + ", count : 5L}]->(p)" +
+      "(p:Person  {vertexCount : 6L})" +
+      "(t:Tag     {vertexCount : 3L})" +
+      "(f:Forum   {vertexCount : 2L})" +
+      "(p)-[{since : 2014, edgeCount : 4L}]->(p)" +
+      "(p)-[{since : 2013, edgeCount : 3L}]->(p)" +
+      "(p)-[{since : 2015, edgeCount : 3L}]->(p)" +
+      "(f)-[{since : 2013, edgeCount : 1L}]->(p)" +
+      "(p)-[{since : " + NULL_STRING + ", edgeCount : 4L}]->(t)" +
+      "(f)-[{since : " + NULL_STRING + ", edgeCount : 4L}]->(t)" +
+      "(f)-[{since : " + NULL_STRING + ", edgeCount : 5L}]->(p)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .useVertexLabel(true)
       .addEdgeGroupingKey("since")
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -557,23 +561,23 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(l:Person {city : \"Leipzig\", count : 2L})" +
-      "(d:Person {city : \"Dresden\", count : 3L})" +
-      "(b:Person {city : \"Berlin\",  count : 1L})" +
-      "(d)-[{since : 2014, count : 2L}]->(d)" +
-      "(d)-[{since : 2013, count : 2L}]->(l)" +
-      "(d)-[{since : 2015, count : 1L}]->(l)" +
-      "(l)-[{since : 2014, count : 2L}]->(l)" +
-      "(l)-[{since : 2013, count : 1L}]->(d)" +
-      "(b)-[{since : 2015, count : 2L}]->(d)" +
+      "(l:Person {city : \"Leipzig\", vertexCount : 2L})" +
+      "(d:Person {city : \"Dresden\", vertexCount : 3L})" +
+      "(b:Person {city : \"Berlin\",  vertexCount : 1L})" +
+      "(d)-[{since : 2014, edgeCount : 2L}]->(d)" +
+      "(d)-[{since : 2013, edgeCount : 2L}]->(l)" +
+      "(d)-[{since : 2015, edgeCount : 1L}]->(l)" +
+      "(l)-[{since : 2014, edgeCount : 2L}]->(l)" +
+      "(l)-[{since : 2013, edgeCount : 1L}]->(d)" +
+      "(b)-[{since : 2015, edgeCount : 2L}]->(d)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("city")
       .addEdgeGroupingKey("since")
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -589,22 +593,22 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(p:Person  {count : 6L})" +
-      "(t:Tag     {count : 3L})" +
-      "(f:Forum   {count : 2L})" +
-      "(f)-[:hasModerator {count :  2L}]->(p)" +
-      "(p)-[:hasInterest  {count :  4L}]->(t)" +
-      "(f)-[:hasMember    {count :  4L}]->(p)" +
-      "(f)-[:hasTag       {count :  4L}]->(t)" +
-      "(p)-[:knows        {count : 10L}]->(p)" +
+      "(p:Person  {vertexCount : 6L})" +
+      "(t:Tag     {vertexCount : 3L})" +
+      "(f:Forum   {vertexCount : 2L})" +
+      "(f)-[:hasModerator {edgeCount :  2L}]->(p)" +
+      "(p)-[:hasInterest  {edgeCount :  4L}]->(t)" +
+      "(f)-[:hasMember    {edgeCount :  4L}]->(p)" +
+      "(f)-[:hasTag       {edgeCount :  4L}]->(t)" +
+      "(p)-[:knows        {edgeCount : 10L}]->(p)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .useVertexLabel(true)
       .useEdgeLabel(true)
       .setStrategy(getStrategy())
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .build()
       .execute(input);
 
@@ -622,22 +626,22 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(l:Person {city : \"Leipzig\", count : 2L})" +
-      "(d:Person {city : \"Dresden\", count : 3L})" +
-      "(b:Person {city : \"Berlin\",  count : 1L})" +
-      "(d)-[:knows {count : 2L}]->(d)" +
-      "(d)-[:knows {count : 3L}]->(l)" +
-      "(l)-[:knows {count : 2L}]->(l)" +
-      "(l)-[:knows {count : 1L}]->(d)" +
-      "(b)-[:knows {count : 2L}]->(d)" +
+      "(l:Person {city : \"Leipzig\", vertexCount : 2L})" +
+      "(d:Person {city : \"Dresden\", vertexCount : 3L})" +
+      "(b:Person {city : \"Berlin\",  vertexCount : 1L})" +
+      "(d)-[:knows {edgeCount : 2L}]->(d)" +
+      "(d)-[:knows {edgeCount : 3L}]->(l)" +
+      "(l)-[:knows {edgeCount : 2L}]->(l)" +
+      "(l)-[:knows {edgeCount : 1L}]->(d)" +
+      "(b)-[:knows {edgeCount : 2L}]->(d)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .addVertexGroupingKey("city")
       .useVertexLabel(true)
       .useEdgeLabel(true)
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -653,32 +657,32 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(pL:Person {city : \"Leipzig\", count : 2L})" +
-      "(pD:Person {city : \"Dresden\", count : 3L})" +
-      "(pB:Person {city : \"Berlin\", count : 1L})" +
-      "(t:Tag   {city : " + NULL_STRING + ", count : 3L})" +
-      "(f:Forum {city : " + NULL_STRING + ", count : 2L})" +
-      "(pD)-[:knows {count : 2L}]->(pD)" +
-      "(pD)-[:knows {count : 3L}]->(pL)" +
-      "(pL)-[:knows {count : 2L}]->(pL)" +
-      "(pL)-[:knows {count : 1L}]->(pD)" +
-      "(pB)-[:knows {count : 2L}]->(pD)" +
-      "(pB)-[:hasInterest {count : 1L}]->(t)" +
-      "(pD)-[:hasInterest {count : 2L}]->(t)" +
-      "(pL)-[:hasInterest {count : 1L}]->(t)" +
-      "(f)-[:hasModerator {count : 1L}]->(pD)" +
-      "(f)-[:hasModerator {count : 1L}]->(pL)" +
-      "(f)-[:hasMember {count : 2L}]->(pD)" +
-      "(f)-[:hasMember {count : 2L}]->(pL)" +
-      "(f)-[:hasTag {count : 4L}]->(t)" +
+      "(pL:Person {city : \"Leipzig\", vertexCount : 2L})" +
+      "(pD:Person {city : \"Dresden\", vertexCount : 3L})" +
+      "(pB:Person {city : \"Berlin\", vertexCount : 1L})" +
+      "(t:Tag   {city : " + NULL_STRING + ", vertexCount : 3L})" +
+      "(f:Forum {city : " + NULL_STRING + ", vertexCount : 2L})" +
+      "(pD)-[:knows {edgeCount : 2L}]->(pD)" +
+      "(pD)-[:knows {edgeCount : 3L}]->(pL)" +
+      "(pL)-[:knows {edgeCount : 2L}]->(pL)" +
+      "(pL)-[:knows {edgeCount : 1L}]->(pD)" +
+      "(pB)-[:knows {edgeCount : 2L}]->(pD)" +
+      "(pB)-[:hasInterest {edgeCount : 1L}]->(t)" +
+      "(pD)-[:hasInterest {edgeCount : 2L}]->(t)" +
+      "(pL)-[:hasInterest {edgeCount : 1L}]->(t)" +
+      "(f)-[:hasModerator {edgeCount : 1L}]->(pD)" +
+      "(f)-[:hasModerator {edgeCount : 1L}]->(pL)" +
+      "(f)-[:hasMember {edgeCount : 2L}]->(pD)" +
+      "(f)-[:hasMember {edgeCount : 2L}]->(pL)" +
+      "(f)-[:hasTag {edgeCount : 4L}]->(t)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .addVertexGroupingKey("city")
       .useVertexLabel(true)
       .useEdgeLabel(true)
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -697,18 +701,18 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(p:Person {count : 6L})" +
-      "(p)-[:knows {since : 2013, count : 3L}]->(p)" +
-      "(p)-[:knows {since : 2014, count : 4L}]->(p)" +
-      "(p)-[:knows {since : 2015, count : 3L}]->(p)" +
+      "(p:Person {vertexCount : 6L})" +
+      "(p)-[:knows {since : 2013, edgeCount : 3L}]->(p)" +
+      "(p)-[:knows {since : 2014, edgeCount : 4L}]->(p)" +
+      "(p)-[:knows {since : 2015, edgeCount : 3L}]->(p)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
       .addEdgeGroupingKey("since")
       .useVertexLabel(true)
       .useEdgeLabel(true)
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -724,17 +728,17 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(p:Person  {count : 6L})" +
-      "(t:Tag     {count : 3L})" +
-      "(f:Forum   {count : 2L})" +
-      "(p)-[:knows {since : 2014, count : 4L}]->(p)" +
-      "(p)-[:knows {since : 2013, count : 3L}]->(p)" +
-      "(p)-[:knows {since : 2015, count : 3L}]->(p)" +
-      "(f)-[:hasModerator {since : 2013, count : 1L}]->(p)" +
-      "(f)-[:hasModerator {since : " + NULL_STRING + ", count : 1L}]->(p)" +
-      "(p)-[:hasInterest  {since : " + NULL_STRING + ", count : 4L}]->(t)" +
-      "(f)-[:hasMember    {since : " + NULL_STRING + ", count : 4L}]->(p)" +
-      "(f)-[:hasTag       {since : " + NULL_STRING + ", count : 4L}]->(t)" +
+      "(p:Person  {vertexCount : 6L})" +
+      "(t:Tag     {vertexCount : 3L})" +
+      "(f:Forum   {vertexCount : 2L})" +
+      "(p)-[:knows {since : 2014, edgeCount : 4L}]->(p)" +
+      "(p)-[:knows {since : 2013, edgeCount : 3L}]->(p)" +
+      "(p)-[:knows {since : 2015, edgeCount : 3L}]->(p)" +
+      "(f)-[:hasModerator {since : 2013, edgeCount : 1L}]->(p)" +
+      "(f)-[:hasModerator {since : " + NULL_STRING + ", edgeCount : 1L}]->(p)" +
+      "(p)-[:hasInterest  {since : " + NULL_STRING + ", edgeCount : 4L}]->(t)" +
+      "(f)-[:hasMember    {since : " + NULL_STRING + ", edgeCount : 4L}]->(p)" +
+      "(f)-[:hasTag       {since : " + NULL_STRING + ", edgeCount : 4L}]->(t)" +
 
       "]");
 
@@ -742,8 +746,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addEdgeGroupingKey("since")
       .useVertexLabel(true)
       .useEdgeLabel(true)
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -762,15 +766,15 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .combine(loader.getLogicalGraphByVariable("g2"));
 
     loader.appendToDatabaseFromString("expected[" +
-      "(pL:Person {city : \"Leipzig\", count : 2L})" +
-      "(pD:Person {city : \"Dresden\", count : 3L})" +
-      "(pB:Person {city : \"Berlin\", count : 1L})" +
-      "(pD)-[:knows {since : 2014, count : 2L}]->(pD)" +
-      "(pD)-[:knows {since : 2013, count : 2L}]->(pL)" +
-      "(pD)-[:knows {since : 2015, count : 1L}]->(pL)" +
-      "(pL)-[:knows {since : 2014, count : 2L}]->(pL)" +
-      "(pL)-[:knows {since : 2013, count : 1L}]->(pD)" +
-      "(pB)-[:knows {since : 2015, count : 2L}]->(pD)" +
+      "(pL:Person {city : \"Leipzig\", vertexCount : 2L})" +
+      "(pD:Person {city : \"Dresden\", vertexCount : 3L})" +
+      "(pB:Person {city : \"Berlin\", vertexCount : 1L})" +
+      "(pD)-[:knows {since : 2014, edgeCount : 2L}]->(pD)" +
+      "(pD)-[:knows {since : 2013, edgeCount : 2L}]->(pL)" +
+      "(pD)-[:knows {since : 2015, edgeCount : 1L}]->(pL)" +
+      "(pL)-[:knows {since : 2014, edgeCount : 2L}]->(pL)" +
+      "(pL)-[:knows {since : 2013, edgeCount : 1L}]->(pD)" +
+      "(pB)-[:knows {since : 2015, edgeCount : 2L}]->(pD)" +
       "]");
 
     LogicalGraph output = new GroupingBuilder()
@@ -778,8 +782,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addEdgeGroupingKey("since")
       .useVertexLabel(true)
       .useEdgeLabel(true)
-      .addVertexAggregator(new CountAggregator("count"))
-      .addEdgeAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
+      .addEdgeAggregateFunction(new EdgeCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -796,25 +800,25 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraph();
 
     loader.appendToDatabaseFromString("expected[" +
-      "(pL:Person {city : \"Leipzig\", count : 2L})" +
-      "(pD:Person {city : \"Dresden\", count : 3L})" +
-      "(pB:Person {city : \"Berlin\", count : 1L})" +
-      "(t:Tag   {city : " + NULL_STRING + ", count : 3L})" +
-      "(f:Forum {city : " + NULL_STRING + ", count : 2L})" +
-      "(pD)-[:knows {since : 2014, count : 2L}]->(pD)" +
-      "(pD)-[:knows {since : 2013, count : 2L}]->(pL)" +
-      "(pD)-[:knows {since : 2015, count : 1L}]->(pL)" +
-      "(pL)-[:knows {since : 2014, count : 2L}]->(pL)" +
-      "(pL)-[:knows {since : 2013, count : 1L}]->(pD)" +
-      "(pB)-[:knows {since : 2015, count : 2L}]->(pD)" +
-      "(pB)-[:hasInterest {since : " + NULL_STRING + ", count : 1L}]->(t)" +
-      "(pD)-[:hasInterest {since : " + NULL_STRING + ", count : 2L}]->(t)" +
-      "(pL)-[:hasInterest {since : " + NULL_STRING + ", count : 1L}]->(t)" +
-      "(f)-[:hasModerator {since : 2013, count : 1L}]->(pD)" +
-      "(f)-[:hasModerator {since : " + NULL_STRING + ", count : 1L}]->(pL)" +
-      "(f)-[:hasMember {since : " + NULL_STRING + ", count : 2L}]->(pD)" +
-      "(f)-[:hasMember {since : " + NULL_STRING + ", count : 2L}]->(pL)" +
-      "(f)-[:hasTag {since : " + NULL_STRING + ", count : 4L}]->(t)" +
+      "(pL:Person {city : \"Leipzig\", vertexCount : 2L})" +
+      "(pD:Person {city : \"Dresden\", vertexCount : 3L})" +
+      "(pB:Person {city : \"Berlin\", vertexCount : 1L})" +
+      "(t:Tag   {city : " + NULL_STRING + ", vertexCount : 3L})" +
+      "(f:Forum {city : " + NULL_STRING + ", vertexCount : 2L})" +
+      "(pD)-[:knows {since : 2014, edgeCount : 2L}]->(pD)" +
+      "(pD)-[:knows {since : 2013, edgeCount : 2L}]->(pL)" +
+      "(pD)-[:knows {since : 2015, edgeCount : 1L}]->(pL)" +
+      "(pL)-[:knows {since : 2014, edgeCount : 2L}]->(pL)" +
+      "(pL)-[:knows {since : 2013, edgeCount : 1L}]->(pD)" +
+      "(pB)-[:knows {since : 2015, edgeCount : 2L}]->(pD)" +
+      "(pB)-[:hasInterest {since : " + NULL_STRING + ", edgeCount : 1L}]->(t)" +
+      "(pD)-[:hasInterest {since : " + NULL_STRING + ", edgeCount : 2L}]->(t)" +
+      "(pL)-[:hasInterest {since : " + NULL_STRING + ", edgeCount : 1L}]->(t)" +
+      "(f)-[:hasModerator {since : 2013, edgeCount : 1L}]->(pD)" +
+      "(f)-[:hasModerator {since : " + NULL_STRING + ", edgeCount : 1L}]->(pL)" +
+      "(f)-[:hasMember {since : " + NULL_STRING + ", edgeCount : 2L}]->(pD)" +
+      "(f)-[:hasMember {since : " + NULL_STRING + ", edgeCount : 2L}]->(pL)" +
+      "(f)-[:hasTag {since : " + NULL_STRING + ", edgeCount : 4L}]->(t)" +
       "]");
 
     LogicalGraph output =
@@ -823,8 +827,8 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addEdgeGroupingKey("since")
         .useVertexLabel(true)
         .useEdgeLabel(true)
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
+        .addVertexAggregateFunction(new VertexCount())
+        .addEdgeAggregateFunction(new EdgeCount())
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -899,18 +903,18 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Blue {count : 3L})" +
-      "(v01:Red  {count : 3L})" +
-      "(v00)-[{count : 3L}]->(v00)" +
-      "(v00)-[{count : 2L}]->(v01)" +
-      "(v01)-[{count : 3L}]->(v01)" +
+      "(v00:Blue {vertexCount : 3L})" +
+      "(v01:Red  {vertexCount : 3L})" +
+      "(v00)-[{edgeCount : 3L}]->(v00)" +
+      "(v00)-[{edgeCount : 2L}]->(v01)" +
+      "(v01)-[{edgeCount : 3L}]->(v01)" +
       "]");
 
     LogicalGraph output =
       new GroupingBuilder()
         .useVertexLabel(true)
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new CountAggregator("count"))
+        .addVertexAggregateFunction(new VertexCount())
+        .addEdgeAggregateFunction(new EdgeCount())
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -941,18 +945,18 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Blue {sumA :  9})" +
-      "(v01:Red  {sumA : 10})" +
-      "(v00)-[{sumB : 5}]->(v00)" +
-      "(v00)-[{sumB : 4}]->(v01)" +
-      "(v01)-[{sumB : 5}]->(v01)" +
+      "(v00:Blue {sum_a :  9})" +
+      "(v01:Red  {sum_a : 10})" +
+      "(v00)-[{sum_b : 5}]->(v00)" +
+      "(v00)-[{sum_b : 4}]->(v01)" +
+      "(v01)-[{sum_b : 5}]->(v01)" +
       "]");
 
     LogicalGraph output =
       new GroupingBuilder()
         .useVertexLabel(true)
-        .addVertexAggregator(new SumAggregator("a", "sumA"))
-        .addEdgeAggregator(new SumAggregator("b", "sumB"))
+        .addVertexAggregateFunction(new SumVertexProperty("a"))
+        .addEdgeAggregateFunction(new SumEdgeProperty("b"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -983,18 +987,18 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Blue {sumA :  7})" +
-      "(v01:Red  {sumA : 10})" +
-      "(v00)-[{sumB : 3}]->(v00)" +
-      "(v00)-[{sumB : 4}]->(v01)" +
-      "(v01)-[{sumB : 5}]->(v01)" +
+      "(v00:Blue {sum_a :  7})" +
+      "(v01:Red  {sum_a : 10})" +
+      "(v00)-[{sum_b : 3}]->(v00)" +
+      "(v00)-[{sum_b : 4}]->(v01)" +
+      "(v01)-[{sum_b : 5}]->(v01)" +
       "]");
 
     LogicalGraph output =
       new GroupingBuilder()
         .useVertexLabel(true)
-        .addVertexAggregator(new SumAggregator("a", "sumA"))
-        .addEdgeAggregator(new SumAggregator("b", "sumB"))
+        .addVertexAggregateFunction(new SumVertexProperty("a"))
+        .addEdgeAggregateFunction(new SumEdgeProperty("b"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1025,18 +1029,18 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Blue {sumA :  " + NULL_STRING + "})" +
-      "(v01:Red  {sumA :  " + NULL_STRING + "})" +
-      "(v00)-[{sumB : " + NULL_STRING + "}]->(v00)" +
-      "(v00)-[{sumB : " + NULL_STRING + "}]->(v01)" +
-      "(v01)-[{sumB : " + NULL_STRING + "}]->(v01)" +
+      "(v00:Blue {sum_a :  " + NULL_STRING + "})" +
+      "(v01:Red  {sum_a :  " + NULL_STRING + "})" +
+      "(v00)-[{sum_b : " + NULL_STRING + "}]->(v00)" +
+      "(v00)-[{sum_b : " + NULL_STRING + "}]->(v01)" +
+      "(v01)-[{sum_b : " + NULL_STRING + "}]->(v01)" +
       "]");
 
     LogicalGraph output =
       new GroupingBuilder()
         .useVertexLabel(true)
-        .addVertexAggregator(new SumAggregator("a", "sumA"))
-        .addEdgeAggregator(new SumAggregator("b", "sumB"))
+        .addVertexAggregateFunction(new SumVertexProperty("a"))
+        .addEdgeAggregateFunction(new SumEdgeProperty("b"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1067,18 +1071,18 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Blue {minA : 2})" +
-      "(v01:Red  {minA : 2})" +
-      "(v00)-[{minB : 1}]->(v00)" +
-      "(v00)-[{minB : 1}]->(v01)" +
-      "(v01)-[{minB : 1}]->(v01)" +
+      "(v00:Blue {min_a : 2})" +
+      "(v01:Red  {min_a : 2})" +
+      "(v00)-[{min_b : 1}]->(v00)" +
+      "(v00)-[{min_b : 1}]->(v01)" +
+      "(v01)-[{min_b : 1}]->(v01)" +
       "]");
 
     LogicalGraph output =
       new GroupingBuilder()
         .useVertexLabel(true)
-        .addVertexAggregator(new MinAggregator("a", "minA"))
-        .addEdgeAggregator(new MinAggregator("b", "minB"))
+        .addVertexAggregateFunction(new MinVertexProperty("a"))
+        .addEdgeAggregateFunction(new MinEdgeProperty("b"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1109,18 +1113,18 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Blue {minA : 3})" +
-      "(v01:Red  {minA : 4})" +
-      "(v00)-[{minB : 2}]->(v00)" +
-      "(v00)-[{minB : 3}]->(v01)" +
-      "(v01)-[{minB : 1}]->(v01)" +
+      "(v00:Blue {min_a : 3})" +
+      "(v01:Red  {min_a : 4})" +
+      "(v00)-[{min_b : 2}]->(v00)" +
+      "(v00)-[{min_b : 3}]->(v01)" +
+      "(v01)-[{min_b : 1}]->(v01)" +
       "]");
 
     LogicalGraph output =
       new GroupingBuilder()
         .useVertexLabel(true)
-        .addVertexAggregator(new MinAggregator("a", "minA"))
-        .addEdgeAggregator(new MinAggregator("b", "minB"))
+        .addVertexAggregateFunction(new MinVertexProperty("a"))
+        .addEdgeAggregateFunction(new MinEdgeProperty("b"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1151,18 +1155,18 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Blue {minA :  " + NULL_STRING + "})" +
-      "(v01:Red  {minA :  " + NULL_STRING + "})" +
-      "(v00)-[{minB : " + NULL_STRING + "}]->(v00)" +
-      "(v00)-[{minB : " + NULL_STRING + "}]->(v01)" +
-      "(v01)-[{minB : " + NULL_STRING + "}]->(v01)" +
+      "(v00:Blue {min_a :  " + NULL_STRING + "})" +
+      "(v01:Red  {min_a :  " + NULL_STRING + "})" +
+      "(v00)-[{min_b : " + NULL_STRING + "}]->(v00)" +
+      "(v00)-[{min_b : " + NULL_STRING + "}]->(v01)" +
+      "(v01)-[{min_b : " + NULL_STRING + "}]->(v01)" +
       "]");
 
     LogicalGraph output =
       new GroupingBuilder()
         .useVertexLabel(true)
-        .addVertexAggregator(new MinAggregator("a", "minA"))
-        .addEdgeAggregator(new MinAggregator("b", "minB"))
+        .addVertexAggregateFunction(new MinVertexProperty("a"))
+        .addEdgeAggregateFunction(new MinEdgeProperty("b"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1193,18 +1197,18 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Blue {maxA : 4})" +
-      "(v01:Red  {maxA : 4})" +
-      "(v00)-[{maxB : 2}]->(v00)" +
-      "(v00)-[{maxB : 3}]->(v01)" +
-      "(v01)-[{maxB : 3}]->(v01)" +
+      "(v00:Blue {max_a : 4})" +
+      "(v01:Red  {max_a : 4})" +
+      "(v00)-[{max_b : 2}]->(v00)" +
+      "(v00)-[{max_b : 3}]->(v01)" +
+      "(v01)-[{max_b : 3}]->(v01)" +
       "]");
 
     LogicalGraph output =
       new GroupingBuilder()
         .useVertexLabel(true)
-        .addVertexAggregator(new MaxAggregator("a", "maxA"))
-        .addEdgeAggregator(new MaxAggregator("b", "maxB"))
+        .addVertexAggregateFunction(new MaxVertexProperty("a"))
+        .addEdgeAggregateFunction(new MaxEdgeProperty("b"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1235,18 +1239,18 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Blue {maxA : 3})" +
-      "(v01:Red  {maxA : 4})" +
-      "(v00)-[{maxB : 2}]->(v00)" +
-      "(v00)-[{maxB : 1}]->(v01)" +
-      "(v01)-[{maxB : 1}]->(v01)" +
+      "(v00:Blue {max_a : 3})" +
+      "(v01:Red  {max_a : 4})" +
+      "(v00)-[{max_b : 2}]->(v00)" +
+      "(v00)-[{max_b : 1}]->(v01)" +
+      "(v01)-[{max_b : 1}]->(v01)" +
       "]");
 
     LogicalGraph output =
       new GroupingBuilder()
         .useVertexLabel(true)
-        .addVertexAggregator(new MaxAggregator("a", "maxA"))
-        .addEdgeAggregator(new MaxAggregator("b", "maxB"))
+        .addVertexAggregateFunction(new MaxVertexProperty("a"))
+        .addEdgeAggregateFunction(new MaxEdgeProperty("b"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1277,18 +1281,18 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input  =  loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Blue {maxA :  " + NULL_STRING + "})" +
-      "(v01:Red  {maxA :  " + NULL_STRING + "})" +
-      "(v00)-[{maxB : " + NULL_STRING + "}]->(v00)" +
-      "(v00)-[{maxB : " + NULL_STRING + "}]->(v01)" +
-      "(v01)-[{maxB : " + NULL_STRING + "}]->(v01)" +
+      "(v00:Blue {max_a :  " + NULL_STRING + "})" +
+      "(v01:Red  {max_a :  " + NULL_STRING + "})" +
+      "(v00)-[{max_b : " + NULL_STRING + "}]->(v00)" +
+      "(v00)-[{max_b : " + NULL_STRING + "}]->(v01)" +
+      "(v01)-[{max_b : " + NULL_STRING + "}]->(v01)" +
       "]");
 
     LogicalGraph output =
       new GroupingBuilder()
         .useVertexLabel(true)
-        .addVertexAggregator(new MaxAggregator("a", "maxA"))
-        .addEdgeAggregator(new MaxAggregator("b", "maxB"))
+        .addVertexAggregateFunction(new MaxVertexProperty("a"))
+        .addEdgeAggregateFunction(new MaxEdgeProperty("b"))
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1319,24 +1323,24 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Blue {minA : 2,maxA : 4,sumA : 9,count : 3L})" +
-      "(v01:Red  {minA : 2,maxA : 4,sumA : 10,count : 3L})" +
-      "(v00)-[{minB : 1,maxB : 2,sumB : 5,count : 3L}]->(v00)" +
-      "(v00)-[{minB : 1,maxB : 3,sumB : 4,count : 2L}]->(v01)" +
-      "(v01)-[{minB : 1,maxB : 3,sumB : 5,count : 3L}]->(v01)" +
+      "(v00:Blue {min_a : 2,max_a : 4,sum_a : 9,vertexCount : 3L})" +
+      "(v01:Red  {min_a : 2,max_a : 4,sum_a : 10,vertexCount : 3L})" +
+      "(v00)-[{min_b : 1,max_b : 2,sum_b : 5,edgeCount : 3L}]->(v00)" +
+      "(v00)-[{min_b : 1,max_b : 3,sum_b : 4,edgeCount : 2L}]->(v01)" +
+      "(v01)-[{min_b : 1,max_b : 3,sum_b : 5,edgeCount : 3L}]->(v01)" +
       "]");
 
     LogicalGraph output =
       new GroupingBuilder()
         .useVertexLabel(true)
-        .addVertexAggregator(new MinAggregator("a", "minA"))
-        .addVertexAggregator(new MaxAggregator("a", "maxA"))
-        .addVertexAggregator(new SumAggregator("a", "sumA"))
-        .addVertexAggregator(new CountAggregator("count"))
-        .addEdgeAggregator(new MinAggregator("b", "minB"))
-        .addEdgeAggregator(new MaxAggregator("b", "maxB"))
-        .addEdgeAggregator(new SumAggregator("b", "sumB"))
-        .addEdgeAggregator(new CountAggregator("count"))
+        .addVertexAggregateFunction(new MinVertexProperty("a"))
+        .addVertexAggregateFunction(new MaxVertexProperty("a"))
+        .addVertexAggregateFunction(new SumVertexProperty("a"))
+        .addVertexAggregateFunction(new VertexCount())
+        .addEdgeAggregateFunction(new MinEdgeProperty("b"))
+        .addEdgeAggregateFunction(new MaxEdgeProperty("b"))
+        .addEdgeAggregateFunction(new SumEdgeProperty("b"))
+        .addEdgeAggregateFunction(new EdgeCount())
         .setStrategy(getStrategy())
         .build()
         .execute(input);
@@ -1448,10 +1452,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {count : 1L, topic : \"rdf\"})" +
-      "(v01:Forum {count : 1L, topic : \"graph\"})" +
-      "(v02:User {gender : \"male\", sum : 70})" +
-      "(v03:User {gender : \"female\", sum : 20})" +
+      "(v00:Forum {vertexCount : 1L, topic : \"rdf\"})" +
+      "(v01:Forum {vertexCount : 1L, topic : \"graph\"})" +
+      "(v02:User {gender : \"male\", sum_age : 70})" +
+      "(v03:User {gender : \"female\", sum_age : 20})" +
       "(v02)-->(v00)" +
       "(v02)-->(v01)" +
       "(v02)-->(v02)" +
@@ -1463,9 +1467,9 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .addVertexGroupingKey("topic")
-      .addVertexAggregator(new CountAggregator("count"))
+      .addVertexAggregateFunction(new VertexCount())
       .addVertexLabelGroup("User", Lists.newArrayList("gender"),
-        Lists.newArrayList(new SumAggregator("age", "sum")))
+        Lists.newArrayList(new SumVertexProperty("age")))
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1482,10 +1486,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {count : 1L, topic : \"rdf\"})" +
-      "(v01:Forum {count : 1L, topic : \"graph\"})" +
-      "(v02:User {count : 3L, gender : \"male\"})" +
-      "(v03:User {count : 1L, gender : \"female\"})" +
+      "(v00:Forum {vertexCount : 1L, topic : \"rdf\"})" +
+      "(v01:Forum {vertexCount : 1L, topic : \"graph\"})" +
+      "(v02:User {vertexCount : 3L, gender : \"male\"})" +
+      "(v03:User {vertexCount : 1L, gender : \"female\"})" +
       "(v02)-->(v00)" +
       "(v02)-->(v01)" +
       "(v02)-->(v02)" +
@@ -1496,7 +1500,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
-      .addGlobalVertexAggregator(new CountAggregator("count"))
+      .addGlobalVertexAggregateFunction(new VertexCount())
       .addVertexGroupingKey("topic")
       .addVertexLabelGroup("User", Lists.newArrayList("gender"))
       .setStrategy(getStrategy())
@@ -1558,12 +1562,12 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     loader.appendToDatabaseFromString("expected[" +
-      "(v00:Forum {count : 1L,topic : \"rdf\"})" +
-      "(v01:Forum {count : 1L,topic : \"graph\"})" +
-      "(v02:User  {count : 3L,gender : \"male\", max : 30})" +
-      "(v03:User  {count : 1L,gender : \"female\", max : 20})" +
-      "(v04:UserAge  {count : 3L,age : 20, sum : 60})" +
-      "(v05:UserAge  {count : 1L,age : 30, sum : 30})" +
+      "(v00:Forum {vertexCount : 1L,topic : \"rdf\"})" +
+      "(v01:Forum {vertexCount : 1L,topic : \"graph\"})" +
+      "(v02:User  {vertexCount : 3L,gender : \"male\", max_age : 30})" +
+      "(v03:User  {vertexCount : 1L,gender : \"female\", max_age : 20})" +
+      "(v04:UserAge  {vertexCount : 3L,age : 20, sum_age : 60})" +
+      "(v05:UserAge  {vertexCount : 1L,age : 30, sum_age : 30})" +
       "(v02)-->(v00)" +
       "(v02)-->(v01)" +
       "(v02)-->(v02)" +
@@ -1586,10 +1590,10 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .useVertexLabel(true)
       .addVertexGroupingKey("topic")
       .addVertexLabelGroup("User", Lists.newArrayList("gender"),
-        Lists.newArrayList(new CountAggregator("count"), new MaxAggregator("age", "max")))
+        Lists.newArrayList(new VertexCount(), new MaxVertexProperty("age")))
       .addVertexLabelGroup("User", "UserAge", Lists.newArrayList("age"),
-        Lists.newArrayList(new CountAggregator("count"), new SumAggregator("age", "sum")))
-      .addVertexAggregator(new CountAggregator("count"))
+        Lists.newArrayList(new VertexCount(), new SumVertexProperty("age")))
+      .addVertexAggregateFunction(new VertexCount())
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1690,19 +1694,19 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Forum)" +
       "(v01:User)" +
-      "(v01)-[:member {until : 2014, min : 2014}]->(v00)" +
-      "(v01)-[:member {until : 2013, min : 2013}]->(v00)" +
-      "(v01)-[:knows {since : 2014, sum : 4028}]->(v01)" +
-      "(v01)-[:knows {since : 2013, sum : 6039}]->(v01)" +
+      "(v01)-[:member {until : 2014, min_until : 2014}]->(v00)" +
+      "(v01)-[:member {until : 2013, min_until : 2013}]->(v00)" +
+      "(v01)-[:knows {since : 2014, sum_since : 4028}]->(v01)" +
+      "(v01)-[:knows {since : 2013, sum_since : 6039}]->(v01)" +
       "]");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .useEdgeLabel(true)
       .addEdgeGroupingKey("until")
-      .addEdgeAggregator(new MinAggregator("until", "min"))
+      .addEdgeAggregateFunction(new MinEdgeProperty("until"))
       .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
-        Lists.newArrayList(new SumAggregator("since", "sum")))
+        Lists.newArrayList(new SumEdgeProperty("since")))
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1720,20 +1724,20 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Forum)" +
       "(v01:User)" +
-      "(v01)-[:member {count : 2L, until : 2014, min : 2014}]->(v00)" +
-      "(v01)-[:member {count : 3L, until : 2013, min : 2013}]->(v00)" +
-      "(v01)-[:knows {count : 2L, since : 2014, sum : 4028}]->(v01)" +
-      "(v01)-[:knows {count : 3L, since : 2013, sum : 6039}]->(v01)" +
+      "(v01)-[:member {edgeCount : 2L, until : 2014, min_until : 2014}]->(v00)" +
+      "(v01)-[:member {edgeCount : 3L, until : 2013, min_until : 2013}]->(v00)" +
+      "(v01)-[:knows {edgeCount : 2L, since : 2014, sum_since : 4028}]->(v01)" +
+      "(v01)-[:knows {edgeCount : 3L, since : 2013, sum_since : 6039}]->(v01)" +
       "]");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .addGlobalEdgeAggregator(new CountAggregator("count"))
+      .addGlobalEdgeAggregateFunction(new EdgeCount())
       .useVertexLabel(true)
       .useEdgeLabel(true)
       .addEdgeGroupingKey("until")
-      .addEdgeAggregator(new MinAggregator("until", "min"))
+      .addEdgeAggregateFunction(new MinEdgeProperty("until"))
       .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
-        Lists.newArrayList(new SumAggregator("since", "sum")))
+        Lists.newArrayList(new SumEdgeProperty("since")))
       .setStrategy(getStrategy())
       .build()
       .execute(input);
@@ -1780,21 +1784,21 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString("expected[" +
       "(v00:Forum)" +
       "(v01:User)" +
-      "(v01)-[:member {until : 2014, min : 2014}]->(v00)" +
-      "(v01)-[:member {until : 2013, min : 2013}]->(v00)" +
-      "(v01)-[:knows {since : 2014, sum : 4028}]->(v01)" +
-      "(v01)-[:knows {since : 2013, sum : 6039}]->(v01)" +
-      "(v01)-[:knowsMax {max : 2014}]->(v01)" +
+      "(v01)-[:member {until : 2014, min_until : 2014}]->(v00)" +
+      "(v01)-[:member {until : 2013, min_until : 2013}]->(v00)" +
+      "(v01)-[:knows {since : 2014, sum_since : 4028}]->(v01)" +
+      "(v01)-[:knows {since : 2013, sum_since : 6039}]->(v01)" +
+      "(v01)-[:knowsMax {max_since : 2014}]->(v01)" +
       "]");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
-        Lists.newArrayList(new SumAggregator("since", "sum")))
+        Lists.newArrayList(new SumEdgeProperty("since")))
       .addEdgeLabelGroup("knows", "knowsMax", Lists.newArrayList(),
-        Lists.newArrayList(new MaxAggregator("since", "max")))
+        Lists.newArrayList(new MaxEdgeProperty("since")))
       .addEdgeLabelGroup("member", Lists.newArrayList("until"),
-        Lists.newArrayList(new MinAggregator("until", "min")))
+        Lists.newArrayList(new MinEdgeProperty("until")))
       .setStrategy(getStrategy())
       .build()
       .execute(input);

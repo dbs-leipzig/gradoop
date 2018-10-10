@@ -54,14 +54,14 @@ public interface GroupItem {
   /**
    * Returns the aggregate values of the group item.
    *
-   * @return property value list of aggregates
+   * @return property value list of aggregate values
    */
   PropertyValueList getAggregateValues();
 
   /**
    * Sets the aggregate values of the group item.
    *
-   * @param aggregateValues property value list of aggregates
+   * @param aggregateValues property value list of aggregate values
    */
   void setAggregateValues(PropertyValueList aggregateValues);
 

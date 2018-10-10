@@ -31,7 +31,6 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
@@ -515,8 +514,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @see Grouping
    */
   LogicalGraph groupBy(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
+    List<String> vertexGroupingKeys, List<VertexAggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<EdgeAggregateFunction> edgeAggregateFunctions,
     GroupingStrategy groupingStrategy);
 
   /**
