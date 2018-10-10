@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
@@ -238,7 +239,8 @@ public abstract class GradoopFlinkTestBase {
   }
   
   protected String getFilePath(String filename) throws UnsupportedEncodingException {
-    return URLDecoder.decode(getClass().getResource(filename).getFile(), "UTF-8");
+    return URLDecoder.decode(
+        getClass().getResource(filename).getFile(), StandardCharsets.UTF_8.name());
   }
   
   protected boolean leInsensitiveCompare(String s1, String s2) {

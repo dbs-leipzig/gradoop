@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.statistics;
 
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -43,7 +44,8 @@ public class GraphStatisticsHDFSReaderTest extends GraphStatisticsTest {
 
 
     // copy test resources to HDFS
-    Path localPath = new Path(URLDecoder.decode("/data/json/sna/statistics", "UTF-8"));
+    Path localPath = new Path(
+        URLDecoder.decode("/data/json/sna/statistics", StandardCharsets.UTF_8.name()));
     Path remotePath = new Path("/");
     utility.getTestFileSystem().copyFromLocalFile(localPath, remotePath);
 

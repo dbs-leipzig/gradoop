@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.junit.Test;
 
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 import static org.junit.Assert.*;
@@ -44,7 +45,8 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testFromFile() throws Exception {
     String file = URLDecoder
-        .decode(getClass().getResource("/data/gdl/example.gdl").getFile(), "UTF-8");
+        .decode(getClass().getResource("/data/gdl/example.gdl").getFile(),
+                StandardCharsets.UTF_8.name());
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromFile(file, config);
 

@@ -36,6 +36,7 @@ import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation
 
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import static java.math.BigDecimal.ROUND_HALF_UP;
 import static java.math.BigDecimal.ZERO;
@@ -152,7 +153,8 @@ public class FrequentLossPatterns
     // (1) read data from source
 
     String csvPath = URLDecoder.decode(
-        FrequentLossPatterns.class.getResource("/data/csv/foodbroker").getFile(), "UTF-8");
+        FrequentLossPatterns.class.getResource("/data/csv/foodbroker").getFile(),
+        StandardCharsets.UTF_8.name());
 
     LogicalGraph iig = readLogicalGraph(csvPath);
 

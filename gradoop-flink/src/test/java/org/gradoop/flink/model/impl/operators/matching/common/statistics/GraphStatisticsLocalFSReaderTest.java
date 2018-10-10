@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.statistics;
 
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.BeforeClass;
 
@@ -26,6 +27,6 @@ public class GraphStatisticsLocalFSReaderTest extends GraphStatisticsTest {
     TEST_STATISTICS = GraphStatisticsLocalFSReader.read(
       URLDecoder.decode(
           GraphStatisticsLocalFSReaderTest.class.getResource("/data/json/sna/statistics")
-          .getFile(), "UTF-8"));
+          .getFile(), StandardCharsets.UTF_8.name()));
   }
 }
