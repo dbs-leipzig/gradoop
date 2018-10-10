@@ -31,7 +31,7 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Sets aggregate values of a graph heads.
+ * Sets aggregate values of graph heads.
  */
 public class SetAggregateProperties implements
   CoGroupFunction<GraphHead, Tuple2<GradoopId, Map<String, PropertyValue>>, GraphHead> {

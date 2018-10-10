@@ -22,11 +22,8 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateEdges;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateVertices;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateElements;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.CombinePartitionAggregates;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.SetAggregateProperty;
 
@@ -63,9 +60,6 @@ public class Aggregation implements UnaryGraphToGraphOperator {
     this.aggregateFunctions = new HashSet<>(Arrays.asList(aggregateFunctions));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     DataSet<Vertex> vertices = graph.getVertices();
@@ -90,9 +84,8 @@ public class Aggregation implements UnaryGraphToGraphOperator {
    * @return partition aggregate values mapped from their property key
    */
   private DataSet<Map<String, PropertyValue>> aggregateVertices(DataSet<Vertex> vertices) {
-    return vertices.combineGroup(new AggregateVertices(aggregateFunctions.stream()
-      .filter(f -> f instanceof VertexAggregateFunction)
-      .map(VertexAggregateFunction.class::cast)
+    return vertices.combineGroup(new AggregateElements<>(aggregateFunctions.stream()
+      .filter(AggregateFunction::aggregatesVertices)
       .collect(Collectors.toSet())));
   }
 
@@ -103,15 +96,11 @@ public class Aggregation implements UnaryGraphToGraphOperator {
    * @return partition aggregate values
    */
   private DataSet<Map<String, PropertyValue>> aggregateEdges(DataSet<Edge> edges) {
-    return edges.combineGroup(new AggregateEdges(aggregateFunctions.stream()
-      .filter(f -> f instanceof EdgeAggregateFunction)
-      .map(EdgeAggregateFunction.class::cast)
+    return edges.combineGroup(new AggregateElements<>(aggregateFunctions.stream()
+      .filter(AggregateFunction::aggregatesEdges)
       .collect(Collectors.toSet())));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return Aggregation.class.getName();

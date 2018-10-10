@@ -15,16 +15,16 @@
  */
 package org.gradoop.flink.model.api.functions;
 
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 
 import java.io.Serializable;
 
 /**
- * Describes an aggregate function as input for the
- * {@link Aggregation} operator.
+ * Describes an aggregate function as input for the {@link Aggregation} operator.
  */
-public interface AggregateFunction extends Serializable {
+public interface AggregateFunction<T extends Element> extends Serializable {
 
   /**
    * Describes the aggregation logic.
@@ -39,7 +39,36 @@ public interface AggregateFunction extends Serializable {
   /**
    * Sets the property key used to store the aggregate value.
    *
+   * @param aggregatePropertyKey aggregate property key
+   */
+  void setAggregatePropertyKey(String aggregatePropertyKey);
+
+  /**
+   * Returns the property key used to store the aggregate value.
+   *
    * @return aggregate property key
    */
   String getAggregatePropertyKey();
+
+  /**
+   * Describes the increment of an element that should be added to the aggregate.
+   *
+   * @param element element
+   * @return increment, may be NULL, which is handled in the operator
+   */
+  PropertyValue getIncrement(T element);
+
+  /**
+   * Returns whether this function aggregates vertices.
+   *
+   * @return true, if it aggregates vertices
+   */
+  boolean aggregatesVertices();
+
+  /**
+   * Returns whether this function aggregates edges.
+   *
+   * @return true, if it aggregates edges
+   */
+  boolean aggregatesEdges();
 }
