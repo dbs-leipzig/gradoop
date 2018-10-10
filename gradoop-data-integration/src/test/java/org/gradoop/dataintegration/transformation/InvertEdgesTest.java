@@ -15,27 +15,45 @@
  */
 package org.gradoop.dataintegration.transformation;
 
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
+import org.gradoop.flink.model.impl.functions.filters.And;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.*;
 
 /**
  * Tests for the invert edge operator.
  */
 public class InvertEdgesTest extends GradoopFlinkTestBase {
 
+  /**
+   * Test to ensure that the first label is never null.
+   */
   @Test(expected = NullPointerException.class)
   public void firstNullArgumentTest() {
     new InvertEdges(null, "foo");
   }
 
+  /**
+   * Test to ensure that the second label is never null.
+   */
   @Test(expected = NullPointerException.class)
   public void secondNullArgumentTest() {
     new InvertEdges("foo", null);
   }
 
+  /**
+   * Test whether edges are inverted correctly.
+   *
+   * @throws Exception If test data can't be loaded.
+   */
   @Test
   public void testInvert() throws Exception {
     final String toInvertLabel = "hasInterest";
@@ -48,14 +66,42 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
     long edgesBefore = social.getEdges().count();
     long edgesToChange = social.getEdges().filter(new ByLabel<>(toInvertLabel)).count();
     long edgesAfter = invertedEdgeGraph.getEdges().count();
-    Assert.assertEquals(edgesToChange, 4);
-    Assert.assertEquals(edgesBefore, edgesAfter);
-
-    long invertedEdgeCount = invertedEdgeGraph.getEdges().filter(new ByLabel<>(invertedLabel)).count();
-    Assert.assertEquals(edgesToChange, invertedEdgeCount);
+    Assert.assertEquals(edgesToChange, 4); // we have 4 "hasInterest" edges
+    Assert.assertEquals(edgesBefore, edgesAfter); // ensures no new edges are created
 
     long oldEdgeCount = invertedEdgeGraph.getEdges().filter(new ByLabel<>(toInvertLabel)).count();
-    Assert.assertEquals(oldEdgeCount, 0);
+    Assert.assertEquals(oldEdgeCount, 0); // no edges with the old label should exist
 
+    /*
+     * We now have to check whether all of these hasInterest edges are inverted.
+     * (eve)-[:hasInterest]->(databases)
+     * (alice)-[:hasInterest]->(databases)
+     * (frank)-[:hasInterest]->(hadoop)
+     * (dave)-[:hasInterest]->(hadoop)
+     */
+    List<Vertex> vertices = new ArrayList<>();
+    invertedEdgeGraph.getVertices()
+        .filter(new And<>(new ByLabel<>("Person"), new ByLabel<>("Tag")))
+        .output(new LocalCollectionOutputFormat<>(vertices));
+
+    List<Edge> newEdges = new ArrayList<>();
+    invertedEdgeGraph
+        .getEdgesByLabel(invertedLabel)
+        .output(new LocalCollectionOutputFormat<>(newEdges));
+
+    Map<GradoopId, String> idMap = new HashMap<>();
+    vertices.forEach(v -> idMap.put(v.getId(), v.getPropertyValue("name").getString()));
+
+    Set<String> tags = new HashSet<>(Arrays.asList("Databases", "Hadoop"));
+    Set<String> persons = new HashSet<>(Arrays.asList("Eve", "Alice", "Frank", "Dave"));
+
+    for(Edge e : newEdges) {
+      String sourceName = idMap.get(e.getSourceId());
+      String targetName = idMap.get(e.getTargetId());
+
+      Assert.assertTrue("source: " + sourceName + " | target: " + targetName,
+          tags.contains(sourceName) && persons.contains(targetName));
+      persons.remove(targetName);
+    }
   }
 }

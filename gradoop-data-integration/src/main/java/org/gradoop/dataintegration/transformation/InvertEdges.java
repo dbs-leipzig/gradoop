@@ -21,26 +21,26 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
 /**
- * Each a given edge label each edge gets its label changed + source and target
- * swapped.
+ * An edge transformation that swaps the source and target of an edge with a given label and
+ * renames it.
  */
 public class InvertEdges implements TransformationFunction<Edge> {
 
   /**
-   * label of the edges that should be inverted
+   * The label of the edges that should be inverted.
    */
   private final String forEdgeLabel;
 
   /**
-   * label of the inverted edges
+   * The label of the inverted edges.
    */
   private final String newLabel;
 
   /**
-   * The constructor.
+   * Constructs a new InvertEdges edge transformation function.
    *
-   * @param forEdgeLabel - the label if the edges that should be inverted
-   * @param newLabel     - the label of the newly created edges
+   * @param forEdgeLabel The label of the edges that should be inverted.
+   * @param newLabel The label of the inverted edges.
    */
   public InvertEdges(String forEdgeLabel, String newLabel) {
     this.forEdgeLabel = Preconditions.checkNotNull(forEdgeLabel);
