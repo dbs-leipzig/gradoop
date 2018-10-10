@@ -16,14 +16,12 @@
 package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
 
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
- * Aggregate function returning the maximum of a specified property over all
- * vertices.
+ * Aggregate function returning the maximum of a specified property over all vertices.
  */
-public class MaxVertexProperty extends MaxProperty<Vertex> implements VertexAggregateFunction {
+public class MaxVertexProperty extends BaseMaxProperty<Vertex> implements VertexAggregateFunction {
 
   /**
    * Constructor.
@@ -32,5 +30,15 @@ public class MaxVertexProperty extends MaxProperty<Vertex> implements VertexAggr
    */
   public MaxVertexProperty(String propertyKey) {
     super(propertyKey);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param propertyKey property key to aggregate
+   * @param aggregatePropertyKey aggregate property key
+   */
+  public MaxVertexProperty(String propertyKey, String aggregatePropertyKey) {
+    super(propertyKey, aggregatePropertyKey);
   }
 }

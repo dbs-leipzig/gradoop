@@ -22,7 +22,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
  * Aggregate function returning the minimum of a specified property over all
  * vertices.
  */
-public class MinVertexProperty extends MinProperty<Vertex> implements VertexAggregateFunction {
+public class MinVertexProperty extends BaseMinProperty<Vertex> implements VertexAggregateFunction {
 
   /**
    * Constructor.
@@ -31,5 +31,15 @@ public class MinVertexProperty extends MinProperty<Vertex> implements VertexAggr
    */
   public MinVertexProperty(String propertyKey) {
     super(propertyKey);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param propertyKey property key to aggregate
+   * @param aggregatePropertyKey aggregate property key
+   */
+  public MinVertexProperty(String propertyKey, String aggregatePropertyKey) {
+    super(propertyKey, aggregatePropertyKey);
   }
 }

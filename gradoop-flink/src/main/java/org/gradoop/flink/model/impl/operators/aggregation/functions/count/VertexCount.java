@@ -23,10 +23,18 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
  */
 public class VertexCount extends BaseCount<Vertex> implements VertexAggregateFunction {
 
+  /**
+   * Constructor.
+   */
   public VertexCount() {
     super("vertexCount");
   }
 
+  /**
+   * Constructor.
+   *
+   * @param aggregatePropertyKey aggregate property key
+   */
   public VertexCount(String aggregatePropertyKey) {
     super(aggregatePropertyKey);
   }

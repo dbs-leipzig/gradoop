@@ -34,6 +34,8 @@ import java.util.Set;
 /**
  * Applies vertex aggregate functions to vertices with the same graph id.
  * (graphId,vertex),.. => (graphId,[aggregateKey,aggregateValue]),..
+ *
+ * @param <T> element type
  */
 public class ApplyAggregateElements<T extends Element> implements GroupCombineFunction
   <Tuple2<GradoopId, T>, Tuple2<GradoopId, Map<String, PropertyValue>>> {

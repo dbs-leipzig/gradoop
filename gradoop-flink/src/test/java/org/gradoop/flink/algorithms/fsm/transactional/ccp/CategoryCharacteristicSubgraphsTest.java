@@ -28,7 +28,7 @@ import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.functions.utils.AddCount;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasLabel;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.BaseHasLabel;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasVertexLabel;
 import org.gradoop.flink.model.impl.operators.subgraph.ApplySubgraph;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
@@ -53,9 +53,9 @@ public class CategoryCharacteristicSubgraphsTest extends GradoopFlinkTestBase {
     GraphCollection collection = getConfig().getGraphCollectionFactory()
       .fromTransactions(transactions);
 
-    HasLabel hasVertexLabelB = new HasVertexLabel("B");
-    HasLabel hasVertexLabelC = new HasVertexLabel("C");
-    HasLabel hasVertexLabelD = new HasVertexLabel("D");
+    BaseHasLabel hasVertexLabelB = new HasVertexLabel("B");
+    BaseHasLabel hasVertexLabelC = new HasVertexLabel("C");
+    BaseHasLabel hasVertexLabelD = new HasVertexLabel("D");
 
     collection = collection.apply(new ApplyAggregation(hasVertexLabelB, hasVertexLabelC,
       hasVertexLabelD));

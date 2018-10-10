@@ -21,14 +21,15 @@ import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
- * Superclass of aggregate functions determining a predicate support.
+ * Interface of aggregate functions determining a predicate support.
  * e.g., graph contains a vertex labelled by "User"
+ *
+ * @param <T> element type
  */
-public abstract class Or<T extends Element> implements AggregateFunction<T> {
+public interface Or<T extends Element> extends AggregateFunction<T> {
 
   @Override
-  public PropertyValue aggregate(
-    PropertyValue aggregate, PropertyValue increment) {
+  default PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
     return PropertyValueUtils.Boolean.or(aggregate, increment);
   }
 }

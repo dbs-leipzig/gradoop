@@ -15,43 +15,32 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.containment;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
+import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
 
 /**
- * superclass of aggregate and filter functions that check vertex or edge label
- * presence in a graph.
+ * Aggregate and filter function to check presence of an element label in a graph.
  *
  * Usage: First, aggregate and, second, filter using the same UDF instance.
  */
-public abstract class HasLabel<T extends Element> extends Or<T>
-  implements AggregateFunction<T>, FilterFunction<GraphHead> {
-
-  /**
-   * label to check presence of
-   */
-  protected final String label;
+public class HasLabel extends BaseHasLabel<Element> implements ElementAggregateFunction {
 
   /**
    * Constructor.
    *
-   * @param label label to check presence of
+   * @param label element label to check presence of
    */
   public HasLabel(String label) {
-    this.label = label;
+    super(label, "hasLabel_" + label);
   }
 
-  @Override
-  public PropertyValue getIncrement(T element) {
-    return PropertyValue.create(element.getLabel().equals(label));
-  }
-
-  @Override
-  public boolean filter(GraphHead graphHead) throws Exception {
-    return graphHead.getPropertyValue(getAggregatePropertyKey()).getBoolean();
+  /**
+   * Constructor.
+   *
+   * @param label element label to check presence of
+   * @param aggregatePropertyKey aggregate property key
+   */
+  public HasLabel(String label, String aggregatePropertyKey) {
+    super(label, aggregatePropertyKey);
   }
 }

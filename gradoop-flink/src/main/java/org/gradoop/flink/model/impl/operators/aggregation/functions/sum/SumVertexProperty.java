@@ -19,10 +19,9 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
- * Aggregate function returning the sum of a specified property over all
- * vertices.
+ * Aggregate function returning the sum of a specified property over all vertices.
  */
-public class SumVertexProperty extends SumProperty<Vertex> implements VertexAggregateFunction {
+public class SumVertexProperty extends BaseSumProperty<Vertex> implements VertexAggregateFunction {
 
   /**
    * Constructor.
@@ -31,5 +30,15 @@ public class SumVertexProperty extends SumProperty<Vertex> implements VertexAggr
    */
   public SumVertexProperty(String propertyKey) {
     super(propertyKey);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param propertyKey property key to aggregate
+   * @param aggregatePropertyKey aggregate property key
+   */
+  public SumVertexProperty(String propertyKey, String aggregatePropertyKey) {
+    super(propertyKey, aggregatePropertyKey);
   }
 }

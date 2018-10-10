@@ -23,6 +23,8 @@ import java.io.Serializable;
 
 /**
  * Describes an aggregate function as input for the {@link Aggregation} operator.
+ *
+ * @param <T> element type
  */
 public interface AggregateFunction<T extends Element> extends Serializable {
 

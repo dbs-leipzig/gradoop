@@ -15,21 +15,31 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 
 /**
- * Aggregate function returning the sum of a specified property over all edges.
+ * Superclass if aggregate functions that sum property values of elements.
+ *
+ * @param <T> element type
  */
-public class SumEdgeProperty extends BaseSumProperty<Edge> implements EdgeAggregateFunction {
+public abstract class BaseSumProperty<T extends Element> extends BaseAggregateFunction<T>
+  implements Sum<T> {
+
+  /**
+   * Property key whose value should be aggregated.
+   */
+  private String propertyKey;
 
   /**
    * Constructor.
    *
    * @param propertyKey property key to aggregate
    */
-  public SumEdgeProperty(String propertyKey) {
-    super(propertyKey);
+  public BaseSumProperty(String propertyKey) {
+    super("sum_" + propertyKey);
+    this.propertyKey = propertyKey;
   }
 
   /**
@@ -38,7 +48,13 @@ public class SumEdgeProperty extends BaseSumProperty<Edge> implements EdgeAggreg
    * @param propertyKey property key to aggregate
    * @param aggregatePropertyKey aggregate property key
    */
-  public SumEdgeProperty(String propertyKey, String aggregatePropertyKey) {
-    super(propertyKey, aggregatePropertyKey);
+  public BaseSumProperty(String propertyKey, String aggregatePropertyKey) {
+    super(aggregatePropertyKey);
+    this.propertyKey = propertyKey;
+  }
+
+  @Override
+  public PropertyValue getIncrement(T element) {
+    return element.getPropertyValue(propertyKey);
   }
 }

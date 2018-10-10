@@ -376,7 +376,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testEmptySingleGraphWithMultipleAggregationFunctions() throws Exception {
-    LogicalGraph graph = getLoaderFromString("").getLogicalGraph();
+    LogicalGraph graph = getLoaderFromString("g[]").getLogicalGraphByVariable("g");
 
     VertexCount vertexCount = new VertexCount();
     MinEdgeProperty minEdgeProperty = new MinEdgeProperty(VERTEX_PROPERTY);

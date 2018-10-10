@@ -26,7 +26,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Applies aggregate functions to the elements.
+ * Applies aggregate functions to the elements.#
+ *
+ * @param <T> element type
  */
 public class AggregateElements<T extends Element>
   implements GroupCombineFunction<T, Map<String, PropertyValue>> {

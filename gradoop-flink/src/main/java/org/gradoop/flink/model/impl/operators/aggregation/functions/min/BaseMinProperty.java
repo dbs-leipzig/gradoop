@@ -13,38 +13,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
+package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
 
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.Sum;
 
 /**
- * Superclass of counting aggregate functions.
+ * Superclass of aggregate functions that determine a minimal property value.
  *
  * @param <T> element type
  */
-public abstract class BaseCount<T extends Element> extends BaseAggregateFunction<T>
-  implements Sum<T>, AggregateDefaultValue {
+public abstract class BaseMinProperty<T extends Element> extends BaseAggregateFunction<T>
+  implements Min<T> {
+
+  /**
+   * Property key whose value should be aggregated.
+   */
+  private String propertyKey;
 
   /**
    * Constructor.
    *
+   * @param propertyKey property key to aggregate
+   */
+  public BaseMinProperty(String propertyKey) {
+    super("min_" + propertyKey);
+    this.propertyKey = propertyKey;
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param propertyKey property key to aggregate
    * @param aggregatePropertyKey aggregate property key
    */
-  public BaseCount(String aggregatePropertyKey) {
+  public BaseMinProperty(String propertyKey, String aggregatePropertyKey) {
     super(aggregatePropertyKey);
+    this.propertyKey = propertyKey;
   }
 
   @Override
   public PropertyValue getIncrement(T element) {
-    return PropertyValue.create(1L);
-  }
-
-  @Override
-  public PropertyValue getDefaultValue() {
-    return PropertyValue.create(0L);
+    return element.getPropertyValue(propertyKey);
   }
 }

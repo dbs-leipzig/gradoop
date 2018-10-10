@@ -13,29 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
+package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
 
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.PropertyValueUtils;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
- * Aggregate function returning the element count of a graph / graph collection.
+ * Interface of aggregate functions that determine a maximal value.
+ *
+ * @param <T> element type
  */
-public class Count extends BaseCount<Element> implements ElementAggregateFunction {
+public interface Max<T extends Element> extends AggregateFunction<T> {
 
-  /**
-   * Constructor.
-   */
-  public Count() {
-    super("count");
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param aggregatePropertyKey aggregate property key
-   */
-  public Count(String aggregatePropertyKey) {
-    super(aggregatePropertyKey);
+  @Override
+  default PropertyValue aggregate(
+    PropertyValue aggregate, PropertyValue increment) {
+    return PropertyValueUtils.Numeric.max(aggregate, increment);
   }
 }

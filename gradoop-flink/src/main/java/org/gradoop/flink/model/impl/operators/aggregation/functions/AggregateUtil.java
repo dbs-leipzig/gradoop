@@ -33,6 +33,7 @@ class AggregateUtil {
    * @param aggregate aggregate map to be incremented
    * @param element element to increment with
    * @param aggregateFunctions aggregate functions
+   * @param <T> element type
    * @return incremented aggregate map
    */
   @SuppressWarnings("unchecked")
