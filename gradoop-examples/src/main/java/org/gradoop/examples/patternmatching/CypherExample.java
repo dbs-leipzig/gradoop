@@ -65,9 +65,9 @@ public class CypherExample {
       "(u2:Person)<-[:hasMember]-(f)" +
       "WHERE u1.name = \"Alice\"", statistics);
 
-    // this just prints the graph heads to system out
+    // Print the graph to system out
     // alternatively, one can use a org.gradoop.flink.io.api.DataSink to store the whole collection
     // or use the result in subsequent analytical steps
-    matches.getGraphHeads().print();
+    matches.print();
   }
 }

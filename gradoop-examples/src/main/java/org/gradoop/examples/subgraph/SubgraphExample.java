@@ -73,18 +73,9 @@ public class SubgraphExample {
     // Use these filters with a subgraph call:
     LogicalGraph filteredGraph = inputGraph.subgraph(vertexFilter, edgeFilter);
 
-    // Collect vertices and edges to a local collection to output them both:
-    List<Vertex> resultVertices = new ArrayList<>();
-    List<Edge> resultEdges = new ArrayList<>();
-    filteredGraph.getVertices().output(new LocalCollectionOutputFormat<>(resultVertices));
-    filteredGraph.getEdges().output(new LocalCollectionOutputFormat<>(resultEdges));
+    // Print result graph
+    filteredGraph.print();
+
     executionEnvironment.execute();
-
-    // Print results:
-    System.out.println("Vertices:");
-    resultVertices.forEach(System.out::println);
-    System.out.println("Edges:");
-    resultEdges.forEach(System.out::println);
-
   }
 }
