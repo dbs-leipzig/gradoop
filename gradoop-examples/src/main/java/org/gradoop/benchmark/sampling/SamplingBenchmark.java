@@ -20,58 +20,73 @@ import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.CSVDataSink;
-import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A dedicated program to evaluate sampling algorithms on the basis of a social network
- * graphs
+ * A dedicated program to evaluate sampling algorithms on the basis of a social network graphs.
  */
 public class SamplingBenchmark extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Required option to declare the path to the directory containing csv files to be processed
+   * Required option to declare the path to the directory containing csv files to be processed.
    */
   private static final String OPTION_INPUT_PATH = "i";
   /**
-   * Option to declare the path to output directory
+   * Option to declare the format of the input data.
+   */
+  private static final String OPTION_INPUT_FORMAT = "f";
+  /**
+   * Option to declare the path to output directory.
    */
   private static final String OPTION_OUTPUT_PATH = "o";
   /**
-   * Option to define to-be-evaluated sampling algorithm
+   * Option to define the to-be-evaluated sampling algorithm.
+   *
+   * Available mappings:
+   * 0 ---> PageRankSampling
+   * 1 ---> RandomEdgeSampling
+   * 2 ---> RandomLimitedDegreeVertexSampling
+   * 3 ---> RandomNonUniformVertexSampling
+   * 4 ---> RandomVertexEdgeSampling
+   * 5 ---> RandomVertexNeighborhoodSampling
+   * 6 ---> RandomVertexSampling
    */
   private static final String OPTION_SELECTED_ALGORITHM = "a";
   /**
-   * Option to declare list of parameters that are passed on to a constructor
+   * Option to declare list of parameters that are passed on to a constructor.
    */
   private static final String OPTION_CONSTRUCTOR_PARAMS = "p";
   /**
-   * Used input path
+   * Used input path.
    */
   private static String INPUT_PATH;
   /**
-   * Used output path
+   * Used output path.
    */
   private static String OUTPUT_PATH;
   /**
-   * Output path default
+   * Format of used input data.
+   */
+  private static String INPUT_FORMAT;
+  /**
+   * Default format of input data.
+   */
+  private static final String INPUT_FORMAT_DEFAULT = "csv";
+  /**
+   * Output path default.
    */
   private static final String OUTPUT_PATH_DEFAULT = "./sampling_benchmark/";
   /**
-   * Output path suffix defining where resulting graph sample is written to
+   * Output path suffix defining where resulting graph sample is written to.
    */
   private static final String OUTPUT_PATH_GRAPH_SAMPLE_SUFFIX = "graph_sample/";
   /**
-   * Output path suffix defining where resulting benchmark file is written to
+   * Output path suffix defining where resulting benchmark file is written to.
    */
   private static final String OUTPUT_PATH_BENCHMARK_SUFFIX = "benchmark";
   /**
@@ -85,15 +100,17 @@ public class SamplingBenchmark extends AbstractRunner implements ProgramDescript
 
 
   static {
-    OPTIONS.addRequiredOption(OPTION_INPUT_PATH, "input", true, "Path to directory containing csv" +
-      " files to be processed");
-    OPTIONS.addRequiredOption(OPTION_SELECTED_ALGORITHM, "algorithm", true, "Positive integer " +
-      "selecting a sampling algorithm");
-    OPTIONS.addRequiredOption(OPTION_CONSTRUCTOR_PARAMS, "params", true, "Whitespace separated " +
-      "list of algorithm parameters");
+    OPTIONS.addRequiredOption(OPTION_INPUT_PATH, "input", true,
+      "Path to directory containing csv files to be processed");
+    OPTIONS.addRequiredOption(OPTION_SELECTED_ALGORITHM, "algorithm", true,
+      "Positive integer selecting a sampling algorithm");
+    OPTIONS.addRequiredOption(OPTION_CONSTRUCTOR_PARAMS, "params", true,
+      "Whitespace separated list of algorithm parameters");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output", true,
       "Path to directory where resulting graph sample, benchmark file and graph " +
         "statistics are written to. (Defaults to " + OUTPUT_PATH_DEFAULT + ")");
+    OPTIONS.addOption(OPTION_INPUT_FORMAT, "format", true,
+      "Format of the input data. Defaults to 'csv'");
   }
 
   /**
@@ -113,30 +130,20 @@ public class SamplingBenchmark extends AbstractRunner implements ProgramDescript
 
     readCMDArguments(cmd);
 
-    // set flink environment
-    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    GradoopFlinkConfig conf = GradoopFlinkConfig.createConfig(env);
-
-    // read logical graph
-    DataSource source = new CSVDataSource(INPUT_PATH, conf);
-    LogicalGraph graph = source.getLogicalGraph();
+    LogicalGraph graph = readLogicalGraph(INPUT_PATH, INPUT_FORMAT);
 
     // instantiate selected sampling algorithm and create sample
     SamplingAlgorithm algorithm = SamplingBuilder.buildSelectedSamplingAlgorithm(
       SELECTED_ALGORITHM, CONSTRUCTOR_PARAMS);
     LogicalGraph graphSample = algorithm.execute(graph);
 
-    // write data to sink, overwrite if necessary
-    DataSink sink = new CSVDataSink(OUTPUT_PATH + OUTPUT_PATH_GRAPH_SAMPLE_SUFFIX, conf);
-    sink.write(graphSample, true);
-
-    env.execute();
-
-    writeBenchmark(env, algorithm);
+    // write graph sample and benchmark data
+    writeLogicalGraph(graphSample, OUTPUT_PATH + OUTPUT_PATH_GRAPH_SAMPLE_SUFFIX);
+    writeBenchmark(graphSample.getConfig().getExecutionEnvironment(), algorithm);
   }
 
   /**
-   * Reads the given arguments from command line
+   * Reads the given arguments from command line.
    *
    * @param cmd command line
    */
@@ -145,10 +152,12 @@ public class SamplingBenchmark extends AbstractRunner implements ProgramDescript
     SELECTED_ALGORITHM  = Integer.parseInt(cmd.getOptionValue(OPTION_SELECTED_ALGORITHM));
     CONSTRUCTOR_PARAMS  = cmd.getOptionValues(OPTION_CONSTRUCTOR_PARAMS);
     OUTPUT_PATH         = cmd.getOptionValue(OPTION_OUTPUT_PATH, OUTPUT_PATH_DEFAULT);
+    INPUT_FORMAT        = cmd.getOptionValue(OPTION_INPUT_FORMAT, INPUT_FORMAT_DEFAULT);
   }
 
   /**
-   * Method to crate and add lines to a benchmark file
+   * Method to crate and add lines to a benchmark file.
+   *
    * @param env given ExecutionEnvironment
    * @param sampling sampling algorithm under test
    * @throws IOException exception during file writing

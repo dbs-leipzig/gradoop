@@ -90,7 +90,7 @@ public abstract class AbstractRunner {
    * @throws IOException on failure
    */
   protected static LogicalGraph readLogicalGraph(String directory, String format)
-    throws IOException {
+      throws IOException {
     return getDataSource(directory, format).getLogicalGraph();
   }
 
@@ -103,7 +103,7 @@ public abstract class AbstractRunner {
    * @throws IOException on failure
    */
   protected static GraphCollection readGraphCollection(String directory, String format)
-    throws IOException {
+      throws IOException {
     return getDataSource(directory, format).getGraphCollection();
   }
 
@@ -127,8 +127,8 @@ public abstract class AbstractRunner {
    * @throws Exception on failure
    */
   protected static void writeLogicalGraph(LogicalGraph graph, String directory, String format)
-    throws Exception {
-    graph.writeTo(getDataSink(directory, format, graph.getConfig()));
+      throws Exception {
+    graph.writeTo(getDataSink(directory, format, graph.getConfig()), true);
     getExecutionEnvironment().execute();
   }
 
@@ -140,7 +140,7 @@ public abstract class AbstractRunner {
    * @throws Exception on failure
    */
   protected static void writeGraphCollection(GraphCollection collection, String directory)
-    throws Exception {
+      throws Exception {
     writeGraphCollection(collection, directory, DEFAULT_FORMAT);
   }
 
@@ -155,7 +155,7 @@ public abstract class AbstractRunner {
   protected static void writeGraphCollection(GraphCollection collection,
                                              String directory,
                                              String format)
-    throws Exception {
+      throws Exception {
     collection.writeTo(getDataSink(directory, format, collection.getConfig()));
     getExecutionEnvironment().execute();
   }

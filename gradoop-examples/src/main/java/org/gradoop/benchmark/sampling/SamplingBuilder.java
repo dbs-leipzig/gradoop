@@ -53,7 +53,8 @@ class SamplingBuilder {
     private final String name;
 
     /**
-     * Enum constructor
+     * Enum constructor.
+     *
      * @param name simplified class name
      */
     Algorithm(String name) {
@@ -74,8 +75,7 @@ class SamplingBuilder {
    * @param constructorParams Array containing parameters used to construct a sampling algorithm.
    * @return SamplingAlgorithm specified by const SELECTED_ALGORITHM.
    */
-  static SamplingAlgorithm buildSelectedSamplingAlgorithm(
-    int ordinal, String[] constructorParams) {
+  static SamplingAlgorithm buildSelectedSamplingAlgorithm(int ordinal, String[] constructorParams) {
 
     performSanityCheck(ordinal);
 
@@ -183,7 +183,7 @@ class SamplingBuilder {
 
   /**
    * Helper function used to create an exception that is specific to function
-   * buildSelectedSamplingAlgorithm()
+   * buildSelectedSamplingAlgorithm().
    *
    * @param name Name of the sampling class.
    * @param amountArgs Array of strings containing all possible argument counts for a given sampling
@@ -204,6 +204,7 @@ class SamplingBuilder {
 
   /**
    * Checks if the provided value corresponds to an enum ordinal.
+   *
    * @param ordinal Integer referring to an ordinal.
    */
   private static void performSanityCheck(int ordinal) {
