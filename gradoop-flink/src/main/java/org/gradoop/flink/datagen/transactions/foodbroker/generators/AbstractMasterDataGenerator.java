@@ -70,9 +70,9 @@ public abstract class AbstractMasterDataGenerator
 
     Integer count = foodBrokerConfig.getMasterDataCount(className);
 
-    Integer goodCount = (int) Math.round(count * goodRatio);
-    Integer badCount = (int) Math.round(count * badRatio);
-    Integer normalCount = count - goodCount - badCount;
+    int goodCount = (int) Math.round(count * goodRatio);
+    int badCount = (int) Math.round(count * badRatio);
+    int normalCount = count - goodCount - badCount;
 
     List<MasterDataSeed> seedList = new ArrayList<>();
 

@@ -1,0 +1,7 @@
+v;A;a:string,b:int,c:float,d:null
+v;B;a:long,b:boolean,c:double
+e;a;a:int,b:float
+e;b;a:long
+e;creatorOf;key0:boolean,key1:int,key2:long,key3:float,key4:double,key5:string,key6:gradoopid,key7:localdate,key8:localtime,key9:localdatetime,keya:bigdecimal,keyb:map:string:double,keyc:list:string,keyd:list:int,keye:short,keyf:null,keyg:set:string,keyh:set:int
+v;User;key0:boolean,key1:int,key2:long,key3:float,key4:double,key5:string,key6:gradoopid,key7:localdate,key8:localtime,key9:localdatetime,keya:bigdecimal,keyb:map:string:double,keyc:list:string,keyd:list:int,keye:short,keyf:null,keyg:set:string,keyh:set:int
+v;Post;key0:boolean,key1:int,key2:long,key3:float,key4:double,key5:string,key6:gradoopid,key7:localdate,key8:localtime,key9:localdatetime,keya:bigdecimal,keyb:map:string:double,keyc:list:string,keyd:list:int,keye:short,keyf:null,keyg:set:string,keyh:set:int

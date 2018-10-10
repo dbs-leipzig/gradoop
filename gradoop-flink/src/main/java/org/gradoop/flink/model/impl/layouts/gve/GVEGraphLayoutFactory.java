@@ -130,19 +130,7 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory implements LogicalGrap
   public LogicalGraphLayout fromCollections(Collection<Vertex> vertices, Collection<Edge> edges) {
     Objects.requireNonNull(vertices, "Vertex collection was null");
     Objects.requireNonNull(edges, "Edge collection was null");
-
-    GraphHead graphHead = getConfig().getGraphHeadFactory().createGraphHead();
-
-    DataSet<Vertex> vertexDataSet = createVertexDataSet(vertices)
-      .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;label;properties");
-
-    DataSet<Edge> edgeDataSet = createEdgeDataSet(edges)
-      .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;sourceId;targetId;label;properties");
-
-    return fromDataSets(
-      createGraphHeadDataSet(new ArrayList<>(0)), vertexDataSet, edgeDataSet);
+    return fromDataSets(createVertexDataSet(vertices), createEdgeDataSet(edges));
   }
 
   @Override
