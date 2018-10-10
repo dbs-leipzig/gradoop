@@ -32,6 +32,7 @@
         <module>gradoop-examples</module>
         <module>gradoop-checkstyle</module>
         <module>gradoop-store</module>
+        <module>gradoop-data-integration</module>
     </modules>
 
     <developers>
@@ -88,6 +89,12 @@
             <timezone>+1</timezone>
             <organization>University of Leipzig</organization>
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
+        </developer>
+        <developer>
+            <id>mkricke</id>
+            <name>Matthias Kricke</name>
+            <timezone>+1</timezone>
+            <organization>University of Leipzig</organization>
         </developer>
     </developers>
 
