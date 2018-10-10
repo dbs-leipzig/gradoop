@@ -37,13 +37,6 @@ public interface AggregateFunction<T extends Element> extends Serializable {
   PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment);
 
   /**
-   * Sets the property key used to store the aggregate value.
-   *
-   * @param aggregatePropertyKey aggregate property key
-   */
-  void setAggregatePropertyKey(String aggregatePropertyKey);
-
-  /**
    * Returns the property key used to store the aggregate value.
    *
    * @return aggregate property key

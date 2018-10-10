@@ -16,14 +16,13 @@
 package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
 
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
  * Aggregate function returning the maximum of a specified property over all
  * edges.
  */
-public class MaxEdgeProperty extends MaxProperty implements EdgeAggregateFunction {
+public class MaxEdgeProperty extends MaxProperty<Edge> implements EdgeAggregateFunction {
 
   /**
    * Constructor.
@@ -32,10 +31,5 @@ public class MaxEdgeProperty extends MaxProperty implements EdgeAggregateFunctio
    */
   public MaxEdgeProperty(String propertyKey) {
     super(propertyKey);
-  }
-
-  @Override
-  public PropertyValue getEdgeIncrement(Edge edge) {
-    return edge.getPropertyValue(propertyKey);
   }
 }

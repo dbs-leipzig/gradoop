@@ -48,7 +48,7 @@ public class AggregateListOfWccEdges implements EdgeAggregateFunction {
   }
 
   @Override
-  public PropertyValue getEdgeIncrement(Edge edge) {
+  public PropertyValue getIncrement(Edge edge) {
     List<PropertyValue> valueList = new ArrayList<>();
     valueList.add(PropertyValue.create(edge.getPropertyValue(wccPropertyKey).toString()));
     return PropertyValue.create(valueList);

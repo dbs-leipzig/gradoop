@@ -13,20 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
+package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
 
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
-import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 
 /**
- * Superclass of aggregate functions that determine a maximal value.
+ * Superclass of counting aggregate functions.
  */
-public abstract class Max implements AggregateFunction {
+public abstract class BaseCount<T extends Element> extends BaseAggregateFunction<T>
+  implements AggregateDefaultValue {
+
+  public BaseCount(String aggregatePropertyKey) {
+    super(aggregatePropertyKey);
+  }
 
   @Override
   public PropertyValue aggregate(
     PropertyValue aggregate, PropertyValue increment) {
-    return PropertyValueUtils.Numeric.max(aggregate, increment);
+    return PropertyValueUtils.Numeric.add(aggregate, increment);
+  }
+
+  @Override
+  public PropertyValue getIncrement(T element) {
+    return PropertyValue.create(1L);
+  }
+
+  @Override
+  public PropertyValue getDefaultValue() {
+    return PropertyValue.create(0L);
   }
 }

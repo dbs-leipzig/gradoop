@@ -48,7 +48,7 @@ public class AggregateListOfWccVertices implements VertexAggregateFunction {
   }
 
   @Override
-  public PropertyValue getVertexIncrement(Vertex vertex) {
+  public PropertyValue getIncrement(Vertex vertex) {
     List<PropertyValue> valueList = new ArrayList<>();
     valueList.add(PropertyValue.create(vertex.getPropertyValue(wccPropertyKey).toString()));
     return PropertyValue.create(valueList);

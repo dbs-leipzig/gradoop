@@ -16,7 +16,9 @@
 package org.gradoop.flink.model.impl.operators.aggregation.functions.containment;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
 
@@ -26,8 +28,8 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
  *
  * Usage: First, aggregate and, second, filter using the same UDF instance.
  */
-public abstract class HasLabel extends Or
-  implements AggregateFunction, FilterFunction<GraphHead> {
+public abstract class HasLabel<T extends Element> extends Or<T>
+  implements AggregateFunction<T>, FilterFunction<GraphHead> {
 
   /**
    * label to check presence of
@@ -41,6 +43,11 @@ public abstract class HasLabel extends Or
    */
   public HasLabel(String label) {
     this.label = label;
+  }
+
+  @Override
+  public PropertyValue getIncrement(T element) {
+    return PropertyValue.create(element.getLabel().equals(label));
   }
 
   @Override
