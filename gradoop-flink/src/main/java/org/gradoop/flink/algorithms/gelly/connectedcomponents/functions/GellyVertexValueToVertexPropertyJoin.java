@@ -20,30 +20,30 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Stores the component id (as a {@link GradoopId} of one of the components vertices) as a property
- * in the vertex.
+ * Stores the gelly vertex value (a {@link GradoopId}) as property with the given property key in
+ * the gradoop vertex.
  */
-public class ConnectedComponentToAttribute
+public class GellyVertexValueToVertexPropertyJoin
   implements JoinFunction<org.apache.flink.graph.Vertex<GradoopId, GradoopId>, Vertex, Vertex> {
 
   /**
-   * Property to store the component id in.
+   * Property key to store the gelly vertex value.
    */
-  private final String componentProperty;
+  private final String propertyKey;
 
   /**
-   * Stores the connected components result as a Property.
+   * Stores the gelly vertex value as a property.
    *
-   * @param componentProperty Property name.
+   * @param propertyKey Property key to store the gelly vertex value
    */
-  public ConnectedComponentToAttribute(String componentProperty) {
-    this.componentProperty = componentProperty;
+  public GellyVertexValueToVertexPropertyJoin(String propertyKey) {
+    this.propertyKey = propertyKey;
   }
 
   @Override
   public Vertex join(org.apache.flink.graph.Vertex<GradoopId, GradoopId> gellyVertex,
     Vertex gradoopVertex) {
-    gradoopVertex.setProperty(componentProperty, gellyVertex.getValue());
+    gradoopVertex.setProperty(propertyKey, gellyVertex.getValue());
     return gradoopVertex;
   }
 }

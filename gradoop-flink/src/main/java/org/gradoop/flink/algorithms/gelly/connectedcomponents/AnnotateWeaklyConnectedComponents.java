@@ -19,18 +19,24 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
-import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.ConnectedComponentToAttribute;
+import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.GellyVertexValueToVertexPropertyJoin;
+import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.VertexPropertyToEdgePropertyJoin;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithGradoopId;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 
 /**
- * A gradoop operator wrapping {@link org.apache.flink.graph.library.ConnectedComponents}.
+ * A gradoop operator wrapping Flinks ScatterGatherIteration-Algorithm for ConnectedComponents
+ * {@link org.apache.flink.graph.library.ConnectedComponents}.
  * The result will be the same {@link LogicalGraph} with a component id assigned to each vertex
- * as a Property.
+ * as a property. If {@link #annotateEdges} is set to {@code true}, the component id is assigned to
+ * each edge as a property, too.
  */
 public class AnnotateWeaklyConnectedComponents extends GellyAlgorithm<GradoopId, NullValue> {
 
@@ -45,7 +51,12 @@ public class AnnotateWeaklyConnectedComponents extends GellyAlgorithm<GradoopId,
   private final int maxIterations;
 
   /**
-   * Constructor for connected components with a maximum number of iterations.
+   * Whether to write the component property to the edges
+   */
+  private final boolean annotateEdges;
+
+  /**
+   * Constructor for connected components with property key and a maximum number of iterations.
    *
    * @param propertyKey   Property key to store the component id in.
    * @param maxIterations The maximum number of iterations.
@@ -54,24 +65,51 @@ public class AnnotateWeaklyConnectedComponents extends GellyAlgorithm<GradoopId,
     super(new VertexToGellyVertexWithGradoopId(), new EdgeToGellyEdgeWithNullValue());
     this.propertyKey = propertyKey;
     this.maxIterations = maxIterations;
+    this.annotateEdges = false;
+  }
+
+  /**
+   * Constructor for connected components with property key and a maximum number of iterations
+   * and a boolean to determine, if the component property is written to edges, too.
+   *
+   * @param propertyKey   Property key to store the component id in.
+   * @param maxIterations The maximum number of iterations.
+   * @param annotateEdges Whether to write the component property to the edges
+   */
+  public AnnotateWeaklyConnectedComponents(String propertyKey, int maxIterations,
+    boolean annotateEdges) {
+    super(new VertexToGellyVertexWithGradoopId(), new EdgeToGellyEdgeWithNullValue());
+    this.propertyKey = propertyKey;
+    this.maxIterations = maxIterations;
+    this.annotateEdges = annotateEdges;
   }
 
   @Override
   protected LogicalGraph executeInGelly(Graph<GradoopId, GradoopId, NullValue> graph)
     throws Exception {
-    DataSet<Vertex> newVertices = new org.apache.flink.graph.library.ConnectedComponents<GradoopId,
-      GradoopId, NullValue>(maxIterations)
-      .run(graph)
+    DataSet<Vertex> annotatedVertices = new org.apache.flink.graph.library.ConnectedComponents<
+      GradoopId, GradoopId, NullValue>(maxIterations).run(graph)
       .join(currentGraph.getVertices())
-      .where(0)
-      .equalTo(new Id<>())
-      .with(new ConnectedComponentToAttribute(propertyKey));
-    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices,
-      currentGraph.getEdges());
+      .where(0).equalTo(new Id<>())
+      .with(new GellyVertexValueToVertexPropertyJoin(propertyKey));
+
+    DataSet<Edge> edges = currentGraph.getEdges();
+
+    if (annotateEdges) {
+      edges = edges.join(annotatedVertices)
+        .where(new SourceId<>()).equalTo(new Id<>())
+        .with(new VertexPropertyToEdgePropertyJoin(propertyKey))
+        .join(annotatedVertices)
+        .where(new TargetId<>()).equalTo(new Id<>())
+        .with(new VertexPropertyToEdgePropertyJoin(propertyKey));
+    }
+
+    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
+      currentGraph.getGraphHead(), annotatedVertices, edges);
   }
 
   @Override
   public String getName() {
-    return getClass().getName();
+    return AnnotateWeaklyConnectedComponents.class.getName();
   }
 }
