@@ -73,9 +73,9 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
 
   @Override
   public GraphTransaction map(GraphTransaction graphTransaction) throws Exception {
-
-    Map<String, PropertyValue> aggregate = aggregateVertices(graphTransaction);
-    aggregate.putAll(aggregateEdges(graphTransaction));
+    Map<String, PropertyValue> aggregate = new HashMap<>();
+    aggregate = aggregateVertices(aggregate, graphTransaction);
+    aggregate = aggregateEdges(aggregate, graphTransaction);
 
     aggregateDefaultValues.forEach(aggregate::putIfAbsent);
 
@@ -89,9 +89,8 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
    * @param graphTransaction graph transaction
    * @return final vertex aggregate value
    */
-  private Map<String, PropertyValue> aggregateVertices(GraphTransaction graphTransaction) {
-    Map<String, PropertyValue> aggregate = new HashMap<>();
-
+  private Map<String, PropertyValue> aggregateVertices(Map<String, PropertyValue> aggregate,
+                                                       GraphTransaction graphTransaction) {
     for (Vertex vertex : graphTransaction.getVertices()) {
       aggregate = AggregateUtil.increment(aggregate, vertex, vertexAggregateFunctions);
     }
@@ -104,9 +103,8 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
    * @param graphTransaction graph transaction
    * @return final edge aggregate value
    */
-  private Map<String, PropertyValue> aggregateEdges(GraphTransaction graphTransaction) {
-    Map<String, PropertyValue> aggregate = new HashMap<>();
-
+  private Map<String, PropertyValue> aggregateEdges(Map<String, PropertyValue> aggregate,
+                                                    GraphTransaction graphTransaction) {
     for (Edge edge : graphTransaction.getEdges()) {
       aggregate = AggregateUtil.increment(aggregate, edge, edgeAggregateFunctions);
     }
