@@ -26,7 +26,7 @@ public class GraphStatisticsLocalFSReaderTest extends GraphStatisticsTest {
   public static void setUp() throws Exception {
     TEST_STATISTICS = GraphStatisticsLocalFSReader.read(
       URLDecoder.decode(
-          GraphStatisticsLocalFSReaderTest.class.getResource("/data/json/sna/statistics")
-          .getFile(), StandardCharsets.UTF_8.name()));
+        GraphStatisticsLocalFSReaderTest.class.getResource("/data/json/sna/statistics")
+        .getFile(), StandardCharsets.UTF_8.name()));
   }
 }

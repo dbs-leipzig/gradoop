@@ -44,9 +44,9 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testFromFile() throws Exception {
-    String file = URLDecoder
-        .decode(getClass().getResource("/data/gdl/example.gdl").getFile(),
-                StandardCharsets.UTF_8.name());
+    String file = URLDecoder.decode(
+      getClass().getResource("/data/gdl/example.gdl").getFile(), 
+      StandardCharsets.UTF_8.name());
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromFile(file, config);
 
@@ -63,7 +63,8 @@ public class AsciiGraphLoaderTest {
     validateCaches(asciiGraphLoader, 0, 0, 0);
 
     for (GraphHead graphHead : asciiGraphLoader.getGraphHeads()) {
-      assertEquals("Graph has wrong label",
+      assertEquals(
+        "Graph has wrong label",
         GradoopConstants.DEFAULT_GRAPH_LABEL, graphHead.getLabel());
     }
   }

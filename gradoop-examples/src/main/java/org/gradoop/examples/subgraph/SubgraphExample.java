@@ -55,7 +55,7 @@ public class SubgraphExample {
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(executionEnvironment);
     // Read the input graph.
     LogicalGraph inputGraph = new CSVDataSource(
-        URLDecoder.decode(DATA_PATH, StandardCharsets.UTF_8.name()), config).getLogicalGraph();
+      URLDecoder.decode(DATA_PATH, StandardCharsets.UTF_8.name()), config).getLogicalGraph();
 
     // Create a filter for vertices accepting:
     // 1. Vertices with label "Forum" and a property "title" set to "Graph Processing"

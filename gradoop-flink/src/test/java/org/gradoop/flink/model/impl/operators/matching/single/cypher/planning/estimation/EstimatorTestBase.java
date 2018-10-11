@@ -29,8 +29,8 @@ public abstract class EstimatorTestBase {
   @BeforeClass
   public static void setUp() throws Exception {
     String path = URLDecoder.decode(
-        JoinEstimatorTest.class.getResource("/data/json/sna/statistics").getFile(),
-        StandardCharsets.UTF_8.name());
+      JoinEstimatorTest.class.getResource("/data/json/sna/statistics").getFile(),
+      StandardCharsets.UTF_8.name());
     STATS = GraphStatisticsLocalFSReader.read(path);
   }
 }

@@ -238,15 +238,14 @@ public abstract class GradoopFlinkTestBase {
       .filter(new False<>());
   }
   
-  protected String getFilePath(String filename) throws UnsupportedEncodingException {
+  /**
+   * Returns the encoded file path to a resource.
+   *
+   * @param  relPath the relative path to the resource
+   * @return encoded file path
+   */
+  protected String getFilePath(String relPath) throws UnsupportedEncodingException {
     return URLDecoder.decode(
-        getClass().getResource(filename).getFile(), StandardCharsets.UTF_8.name());
+      getClass().getResource(relPath).getFile(), StandardCharsets.UTF_8.name());
   }
-  
-  protected boolean leInsensitiveCompare(String s1, String s2) {
-    s1 = s1.replaceAll("\r\n", "\n");
-    s2 = s2.replaceAll("\r\n", "\n");
-    return s1.equals(s2);
-  }
-  
 }

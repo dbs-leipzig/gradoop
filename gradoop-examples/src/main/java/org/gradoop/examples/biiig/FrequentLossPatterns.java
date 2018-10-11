@@ -153,8 +153,8 @@ public class FrequentLossPatterns
     // (1) read data from source
 
     String csvPath = URLDecoder.decode(
-        FrequentLossPatterns.class.getResource("/data/csv/foodbroker").getFile(),
-        StandardCharsets.UTF_8.name());
+      FrequentLossPatterns.class.getResource("/data/csv/foodbroker").getFile(),
+      StandardCharsets.UTF_8.name());
 
     LogicalGraph iig = readLogicalGraph(csvPath);
 

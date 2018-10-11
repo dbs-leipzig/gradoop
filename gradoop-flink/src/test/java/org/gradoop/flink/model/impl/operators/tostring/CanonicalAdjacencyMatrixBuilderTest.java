@@ -47,7 +47,7 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
     String expectation = FileUtils.readFileToString(
       FileUtils.getFile(getFilePath("/data/expected/cam_test_directed")));
 
-    assertTrue(leInsensitiveCompare(expectation, result));
+    assertTrue(expectation.equals(result));
   }
 
   @Test
@@ -69,7 +69,7 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
     String expectation = FileUtils.readFileToString(
       FileUtils.getFile(getFilePath("/data/expected/cam_test_undirected")));
 
-    assertTrue(leInsensitiveCompare(expectation, result));
+    assertTrue(expectation.equals(result));
   }
 
 }

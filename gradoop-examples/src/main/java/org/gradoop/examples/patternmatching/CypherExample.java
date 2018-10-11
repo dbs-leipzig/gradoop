@@ -55,7 +55,7 @@ public class CypherExample {
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
     // create a datasource
     CSVDataSource csvDataSource = new CSVDataSource(
-        URLDecoder.decode(DATA_PATH, StandardCharsets.UTF_8.name()), config);
+      URLDecoder.decode(DATA_PATH, StandardCharsets.UTF_8.name()), config);
     // load graph statistics
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(STATISTICS_PATH);
 

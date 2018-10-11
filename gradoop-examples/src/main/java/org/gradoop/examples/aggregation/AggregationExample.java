@@ -79,7 +79,7 @@ public class AggregationExample {
 
     // load data
     loader.initDatabaseFromFile(
-        URLDecoder.decode(EXAMPLE_DATA_FILE, StandardCharsets.UTF_8.name()));
+      URLDecoder.decode(EXAMPLE_DATA_FILE, StandardCharsets.UTF_8.name()));
 
     // get LogicalGraph representation of the social network graph
     LogicalGraph networkGraph = loader.getLogicalGraph();

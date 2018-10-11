@@ -133,8 +133,8 @@ public class AccumuloTestSuite {
     File tmpFolder = tmp.newFolder();
     MiniAccumuloConfig config = new MiniAccumuloConfig(tmpFolder, PASSWD);
     config.setNativeLibPaths(
-        URLDecoder.decode(AccumuloTestSuite.class.getResource("/").getFile(),
-        StandardCharsets.UTF_8.name()));
+      URLDecoder.decode(AccumuloTestSuite.class.getResource("/").getFile(),
+      StandardCharsets.UTF_8.name()));
     accumulo = new MiniAccumuloCluster(config);
     accumulo.start();
     LOG.info("create mini accumulo start success!");

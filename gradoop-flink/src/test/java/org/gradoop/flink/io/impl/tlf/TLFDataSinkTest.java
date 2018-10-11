@@ -37,7 +37,7 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
   public void testWrite() throws Exception {
     String tlfFileImport = getFilePath("/data/tlf/io_test.tlf");
 
-    String tlfFileExport = getFilePath("/data/tlf") + "/io_test_output";
+    String tlfFileExport = getFilePath("/data/tlf/io_test_output");
 
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport, getConfig());
@@ -58,7 +58,7 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
   public void testWriteWithoutEdges() throws Exception {
     String tlfFileImport = getFilePath("/data/tlf/io_test_string_without_edges.tlf");
 
-    String tlfFileExport = getFilePath("/data/tlf") + "/io_test_output";
+    String tlfFileExport = getFilePath("/data/tlf/io_test_output");
 
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport, getConfig());
@@ -79,10 +79,10 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
   public void testWriteWithoutEdgesWithDictionaries() throws Exception {
     String tlfFileImport = getFilePath("/data/tlf/io_test_string_without_edges.tlf");
 
-    String tlfFileExport = getFilePath("/data/tlf") + "/io_test_output";
+    String tlfFileExport = getFilePath("/data/tlf/io_test_output");
 
-    String tlfVertexDictionaryFileExport = getFilePath("/data/tlf")
-        + "/dictionaries/io_test_output_vertex_dictionary";
+    String tlfVertexDictionaryFileExport =
+      getFilePath("/data/tlf/dictionaries/io_test_output_vertex_dictionary");
 
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport, getConfig());
@@ -109,10 +109,10 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
     String tlfFileImport = getFilePath("/data/tlf/io_test.tlf");
     String tlfVertexDictionaryFileImport = getFilePath("/data/tlf/io_test_vertex_dictionary.tlf");
 
-    String tlfFileExport = getFilePath("/data/tlf") + "/io_test_output";
+    String tlfFileExport = getFilePath("/data/tlf/io_test_output");
 
-    String tlfVertexDictionaryFileExport = getFilePath("/data/tlf")
-        + "/dictionaries/io_test_output_vertex_dictionary";
+    String tlfVertexDictionaryFileExport =
+      getFilePath("/data/tlf/dictionaries/io_test_output_vertex_dictionary");
 
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport,
@@ -151,13 +151,13 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
     String tlfVertexDictionaryFileImport = getFilePath("/data/tlf/io_test_vertex_dictionary.tlf");
     String tlfEdgeDictionaryFileImport = getFilePath("/data/tlf/io_test_edge_dictionary.tlf");
 
-    String tlfFileExport = getFilePath("/data/tlf") + "/io_test_output";
+    String tlfFileExport = getFilePath("/data/tlf/io_test_output");
 
-    String tlfVertexDictionaryFileExport = getFilePath("/data/tlf")
-      + "/dictionaries/io_test_output_vertex_dictionary";
+    String tlfVertexDictionaryFileExport =
+      getFilePath("/data/tlf/dictionaries/io_test_output_vertex_dictionary");
 
-    String tlfEdgeDictionaryFileExport = getFilePath("/data/tlf")
-      + "/dictionaries/io_test_output_edge_dictionary";
+    String tlfEdgeDictionaryFileExport =
+        getFilePath("/data/tlf/dictionaries/io_test_output_edge_dictionary");
 
     // read from inputfile
     DataSource dataSource = new TLFDataSource(tlfFileImport,
