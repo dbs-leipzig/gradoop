@@ -20,6 +20,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
+import org.gradoop.flink.model.impl.epgm.EPGMLogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Collection;
@@ -67,7 +68,7 @@ public class LogicalGraphFactory {
    * @return Logical graph
    */
   public LogicalGraph fromDataSets(DataSet<Vertex> vertices) {
-    return new LogicalGraph(layoutFactory.fromDataSets(vertices), config);
+    return new EPGMLogicalGraph(layoutFactory.fromDataSets(vertices), config);
   }
 
   /**
@@ -81,7 +82,7 @@ public class LogicalGraphFactory {
    * @return Logical graph
    */
   public LogicalGraph fromDataSets(DataSet<Vertex> vertices, DataSet<Edge> edges) {
-    return new LogicalGraph(layoutFactory.fromDataSets(vertices, edges), config);
+    return new EPGMLogicalGraph(layoutFactory.fromDataSets(vertices, edges), config);
   }
 
   /**
@@ -97,7 +98,7 @@ public class LogicalGraphFactory {
    */
   public LogicalGraph fromDataSets(DataSet<GraphHead> graphHead, DataSet<Vertex> vertices,
     DataSet<Edge> edges) {
-    return new LogicalGraph(layoutFactory.fromDataSets(graphHead, vertices, edges), config);
+    return new EPGMLogicalGraph(layoutFactory.fromDataSets(graphHead, vertices, edges), config);
   }
 
   /**
@@ -110,7 +111,7 @@ public class LogicalGraphFactory {
    */
   public LogicalGraph fromIndexedDataSets(Map<String, DataSet<Vertex>> vertices,
     Map<String, DataSet<Edge>> edges) {
-    return new LogicalGraph(layoutFactory.fromIndexedDataSets(vertices, edges), config);
+    return new EPGMLogicalGraph(layoutFactory.fromIndexedDataSets(vertices, edges), config);
   }
 
   /**
@@ -124,7 +125,7 @@ public class LogicalGraphFactory {
    */
   public LogicalGraph fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
     Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
-    return new LogicalGraph(layoutFactory.fromIndexedDataSets(graphHeads, vertices, edges), config);
+    return new EPGMLogicalGraph(layoutFactory.fromIndexedDataSets(graphHeads, vertices, edges), config);
   }
 
   /**
@@ -137,7 +138,7 @@ public class LogicalGraphFactory {
    */
   public LogicalGraph fromCollections(GraphHead graphHead, Collection<Vertex> vertices,
     Collection<Edge> edges) {
-    return new LogicalGraph(layoutFactory.fromCollections(graphHead, vertices, edges), config);
+    return new EPGMLogicalGraph(layoutFactory.fromCollections(graphHead, vertices, edges), config);
   }
 
   /**
@@ -149,7 +150,7 @@ public class LogicalGraphFactory {
    * @return Logical graph
    */
   public LogicalGraph fromCollections(Collection<Vertex> vertices, Collection<Edge> edges) {
-    return new LogicalGraph(layoutFactory.fromCollections(vertices, edges), config);
+    return new EPGMLogicalGraph(layoutFactory.fromCollections(vertices, edges), config);
   }
 
   /**
@@ -158,6 +159,6 @@ public class LogicalGraphFactory {
    * @return empty graph
    */
   public LogicalGraph createEmptyGraph() {
-    return new LogicalGraph(layoutFactory.createEmptyGraph(), config);
+    return new EPGMLogicalGraph(layoutFactory.createEmptyGraph(), config);
   }
 }

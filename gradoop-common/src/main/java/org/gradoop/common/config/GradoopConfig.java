@@ -53,7 +53,6 @@ public class GradoopConfig
   /**
    * Creates a new Configuration.
    */
-  @SuppressWarnings("unchecked")
   protected GradoopConfig() {
     this.graphHeadFactory = new GraphHeadFactory();
     this.vertexFactory = new VertexFactory();

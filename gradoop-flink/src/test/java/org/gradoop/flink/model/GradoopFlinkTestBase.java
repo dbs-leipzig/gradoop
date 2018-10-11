@@ -28,6 +28,8 @@ import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalGraphCollectionLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalGraphLayoutFactory;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.AfterClass;
@@ -70,6 +72,16 @@ public abstract class GradoopFlinkTestBase {
 
   private GraphCollectionLayoutFactory collectionLayoutFactory;
 
+  /**
+   * Factory to create a temporal graph layout.
+   */
+  private TemporalGraphLayoutFactory temporalGraphLayoutFactory;
+
+  /**
+   * Factory to create a temporal graph collection layout.
+   */
+  private TemporalGraphCollectionLayoutFactory temporalGraphCollectionLayoutFactory;
+
   public GradoopFlinkTestBase() {
     TestEnvironment testEnv = new TestEnvironment(CLUSTER, DEFAULT_PARALLELISM, false);
     // makes ExecutionEnvironment.getExecutionEnvironment() return this instance
@@ -77,6 +89,8 @@ public abstract class GradoopFlinkTestBase {
     this.env = testEnv;
     setGraphLayoutFactory(new GVEGraphLayoutFactory());
     setCollectionLayoutFactory(new GVECollectionLayoutFactory());
+    this.temporalGraphLayoutFactory = new TemporalGraphLayoutFactory();
+    this.temporalGraphCollectionLayoutFactory = new TemporalGraphCollectionLayoutFactory();
   }
 
   /**
@@ -97,7 +111,9 @@ public abstract class GradoopFlinkTestBase {
     if (config == null) {
       setConfig(GradoopFlinkConfig.createConfig(getExecutionEnvironment(),
         getGraphLayoutFactory(),
-        getCollectionLayoutFactory()));
+        getCollectionLayoutFactory(),
+        this.temporalGraphLayoutFactory,
+        this.temporalGraphCollectionLayoutFactory));
     }
     return config;
   }

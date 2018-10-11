@@ -22,6 +22,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.impl.epgm.EPGMGraphCollection;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -71,7 +72,7 @@ public class GraphCollectionFactory {
    * @return Graph collection
    */
   public GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices) {
-    return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices), config);
+    return new EPGMGraphCollection(layoutFactory.fromDataSets(graphHeads, vertices), config);
   }
 
   /**
@@ -84,7 +85,7 @@ public class GraphCollectionFactory {
    */
   public GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
     DataSet<Edge> edges) {
-    return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, edges), config);
+    return new EPGMGraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, edges), config);
   }
 
   /**
@@ -99,7 +100,7 @@ public class GraphCollectionFactory {
   public GraphCollection fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
     Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
     GraphCollectionLayout layout = layoutFactory.fromIndexedDataSets(graphHeads, vertices, edges);
-    return new GraphCollection(layout, config);
+    return new EPGMGraphCollection(layout, config);
   }
 
   /**
@@ -112,7 +113,7 @@ public class GraphCollectionFactory {
    */
   public GraphCollection fromCollections(Collection<GraphHead> graphHeads,
     Collection<Vertex> vertices, Collection<Edge> edges) {
-    return new GraphCollection(layoutFactory.fromCollections(graphHeads, vertices, edges), config);
+    return new EPGMGraphCollection(layoutFactory.fromCollections(graphHeads, vertices, edges), config);
   }
 
   /**
@@ -122,7 +123,7 @@ public class GraphCollectionFactory {
    * @return 1-element graph collection
    */
   public GraphCollection fromGraph(LogicalGraph logicalGraphLayout) {
-    return new GraphCollection(layoutFactory.fromGraphLayout(logicalGraphLayout), config);
+    return new EPGMGraphCollection(layoutFactory.fromGraphLayout(logicalGraphLayout), config);
   }
 
   /**
@@ -134,7 +135,7 @@ public class GraphCollectionFactory {
    * @return graph collection
    */
   public GraphCollection fromTransactions(DataSet<GraphTransaction> transactions) {
-    return new GraphCollection(layoutFactory.fromTransactions(transactions), config);
+    return new EPGMGraphCollection(layoutFactory.fromTransactions(transactions), config);
   }
 
   /**
@@ -150,7 +151,7 @@ public class GraphCollectionFactory {
   public GraphCollection fromTransactions(DataSet<GraphTransaction> transactions,
     GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
     GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
-    return new GraphCollection(layoutFactory
+    return new EPGMGraphCollection(layoutFactory
       .fromTransactions(transactions, vertexMergeReducer, edgeMergeReducer), config);
   }
 
@@ -160,6 +161,6 @@ public class GraphCollectionFactory {
    * @return empty graph collection layout
    */
   public GraphCollection createEmptyCollection() {
-    return new GraphCollection(layoutFactory.createEmptyCollection(), config);
+    return new EPGMGraphCollection(layoutFactory.createEmptyCollection(), config);
   }
 }
