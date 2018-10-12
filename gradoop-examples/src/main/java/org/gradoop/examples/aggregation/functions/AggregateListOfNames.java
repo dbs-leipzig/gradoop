@@ -37,7 +37,7 @@ public class AggregateListOfNames implements VertexAggregateFunction {
   private static final String PROPERTY_KEY_LIST_OF_NAMES = "list_of_names";
 
   @Override
-  public PropertyValue getVertexIncrement(Vertex vertex) {
+  public PropertyValue getIncrement(Vertex vertex) {
     return PropertyValue.create(vertex.getPropertyValue(PROPERTY_KEY_NAME).toString());
   }
 

@@ -221,8 +221,7 @@ public class FrequentLossPatterns
   /**
    * Calculate the financial result of business transaction graphs.
    */
-  private static class Result
-    extends Sum implements VertexAggregateFunction {
+  private static class Result implements Sum<Vertex>, VertexAggregateFunction {
 
     /**
      * Property key for revenue values.
@@ -235,7 +234,7 @@ public class FrequentLossPatterns
 
 
     @Override
-    public PropertyValue getVertexIncrement(Vertex vertex) {
+    public PropertyValue getIncrement(Vertex vertex) {
       PropertyValue increment;
 
       if (vertex.hasProperty(REVENUE_KEY)) {
@@ -243,8 +242,7 @@ public class FrequentLossPatterns
 
       } else if (vertex.hasProperty(EXPENSE_KEY)) {
         PropertyValue expense = vertex.getPropertyValue(EXPENSE_KEY);
-        increment = PropertyValueUtils.Numeric
-          .multiply(expense, PropertyValue.create(-1));
+        increment = PropertyValueUtils.Numeric.multiply(expense, PropertyValue.create(-1));
 
       } else {
         increment = PropertyValue.create(0);
@@ -262,11 +260,10 @@ public class FrequentLossPatterns
   /**
    * Counts master data vertices less than the number of transactional vertices.
    */
-  private static class DetermineMasterDataSurplus
-    extends Sum implements VertexAggregateFunction {
+  private static class DetermineMasterDataSurplus implements Sum<Vertex>, VertexAggregateFunction {
 
     @Override
-    public PropertyValue getVertexIncrement(Vertex vertex) {
+    public PropertyValue getIncrement(Vertex vertex) {
       return vertex.getLabel().startsWith(MASTER_PREFIX) ?
         PropertyValue.create(1) : PropertyValue.create(-1);
     }

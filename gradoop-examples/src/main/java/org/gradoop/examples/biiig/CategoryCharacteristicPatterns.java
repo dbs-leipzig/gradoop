@@ -29,7 +29,7 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.Sum;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -151,10 +151,9 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
   }
 
   /**
-   * Aggregate function to determine "isClosed" measure
+   * Aggregate function to determine "isClosed" measure.
    */
-  private static class IsClosedAggregateFunction extends Or
-    implements VertexAggregateFunction {
+  private static class IsClosedAggregateFunction implements Or<Vertex>, VertexAggregateFunction {
 
     @Override
     public String getAggregatePropertyKey() {
@@ -162,7 +161,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     }
 
     @Override
-    public PropertyValue getVertexIncrement(Vertex vertex) {
+    public PropertyValue getIncrement(Vertex vertex) {
       boolean isClosedQuotation =
         vertex.getLabel().equals("Quotation") &&
           !vertex.getPropertyValue("status").toString().equals("open");
@@ -175,12 +174,11 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
    * Aggregate function to count sales orders per graph.
    */
   private static class CountSalesOrdersAggregateFunction
-    extends Count implements VertexAggregateFunction {
+    implements Sum<Vertex>, VertexAggregateFunction {
 
     @Override
-    public PropertyValue getVertexIncrement(Vertex vertex) {
-      return PropertyValue.create(
-        vertex.getLabel().equals("SalesOrder") ? 1 : 0);
+    public PropertyValue getIncrement(Vertex vertex) {
+      return PropertyValue.create(vertex.getLabel().equals("SalesOrder") ? 1 : 0);
     }
 
     @Override
