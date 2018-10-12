@@ -44,27 +44,33 @@ public class SQLQuery {
 
     StringBuilder sqlQuery = new StringBuilder("SELECT ");
 
-    for (NameTypeTuple pk : primaryKeys) {
-      if (rdbmsType == RdbmsType.SQLSERVER_TYPE) {
-        sqlQuery = sqlQuery.append("[" + pk.f0 + "]" + ",");
-      } else {
-        sqlQuery = sqlQuery.append(pk.f0 + ",");
+    if (!primaryKeys.isEmpty()) {
+      for (NameTypeTuple pk : primaryKeys) {
+        if (rdbmsType == RdbmsType.SQLSERVER_TYPE) {
+          sqlQuery = sqlQuery.append("[" + pk.f0 + "]" + ",");
+        } else {
+          sqlQuery = sqlQuery.append(pk.f0 + ",");
+        }
       }
     }
 
-    for (FkTuple fk : foreignKeys) {
-      if (rdbmsType == RdbmsType.SQLSERVER_TYPE) {
-        sqlQuery = sqlQuery.append("[" + fk.f0 + "]" + ",");
-      } else {
-        sqlQuery = sqlQuery.append(fk.f0 + ",");
+    if (!foreignKeys.isEmpty()) {
+      for (FkTuple fk : foreignKeys) {
+        if (rdbmsType == RdbmsType.SQLSERVER_TYPE) {
+          sqlQuery = sqlQuery.append("[" + fk.f0 + "]" + ",");
+        } else {
+          sqlQuery = sqlQuery.append(fk.f0 + ",");
+        }
       }
     }
 
-    for (NameTypeTuple att : furtherAttributes) {
-      if (rdbmsType == RdbmsType.SQLSERVER_TYPE) {
-        sqlQuery = sqlQuery.append("[" + att.f0 + "]" + ",");
-      } else {
-        sqlQuery = sqlQuery.append(att.f0 + ",");
+    if (!furtherAttributes.isEmpty()) {
+      for (NameTypeTuple att : furtherAttributes) {
+        if (rdbmsType == RdbmsType.SQLSERVER_TYPE) {
+          sqlQuery = sqlQuery.append("[" + att.f0 + "]" + ",");
+        } else {
+          sqlQuery = sqlQuery.append(att.f0 + ",");
+        }
       }
     }
 
@@ -93,13 +99,16 @@ public class SQLQuery {
     StringBuilder sqlQuery = new StringBuilder(
         "SELECT " + startAttribute + "," + endAttribute + ",");
 
-    for (NameTypeTuple att : furtherAttributes) {
-      if (rdbmsType == RdbmsType.SQLSERVER_TYPE) {
-        sqlQuery = sqlQuery.append("[" + att.f0 + "]" + ",");
-      } else {
-        sqlQuery = sqlQuery.append(att.f0 + ",");
+    if (!furtherAttributes.isEmpty()) {
+      for (NameTypeTuple att : furtherAttributes) {
+        if (rdbmsType == RdbmsType.SQLSERVER_TYPE) {
+          sqlQuery = sqlQuery.append("[" + att.f0 + "]" + ",");
+        } else {
+          sqlQuery = sqlQuery.append(att.f0 + ",");
+        }
       }
     }
+
     return sqlQuery.toString().substring(0, sqlQuery.length() - 1) + " FROM " + tableName;
   }
 }

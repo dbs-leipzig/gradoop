@@ -56,12 +56,12 @@ public class CreateVertices {
           table.getSqlQuery(), table.getRowTypeInfo());
 
       if (vertices == null) {
-        vertices = dsSQLResult.map(new RowToVertices(vertexFactory, table.getTableName(), counter))
+        vertices = dsSQLResult.map(new RowToVertex(vertexFactory, table.getTableName(), counter))
             .withBroadcastSet(flinkConfig.getExecutionEnvironment().fromCollection(tablesToNodes),
                 RdbmsConstants.BROADCAST_VARIABLE);
       } else {
         vertices = vertices.union(dsSQLResult
-            .map(new RowToVertices(vertexFactory, table.getTableName(), counter))
+            .map(new RowToVertex(vertexFactory, table.getTableName(), counter))
             .withBroadcastSet(flinkConfig.getExecutionEnvironment().fromCollection(tablesToNodes),
                 RdbmsConstants.BROADCAST_VARIABLE));
       }

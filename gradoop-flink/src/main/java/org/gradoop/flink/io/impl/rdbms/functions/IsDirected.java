@@ -17,34 +17,20 @@
 package org.gradoop.flink.io.impl.rdbms.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.io.impl.rdbms.metadata.TableToEdge;
 
 /**
- * Filters vertices by label
+ * Filters directed edges
  */
-public class VertexLabelFilter implements FilterFunction<Vertex> {
+public class IsDirected implements FilterFunction<TableToEdge> {
 
   /**
    * serial version uid
    */
   private static final long serialVersionUID = 1L;
 
-  /**
-   * Label to search for
-   */
-  private String label;
-
-  /**
-   * Filters by vertex labels
-   *
-   * @param label Epgm vertex label string
-   */
-  public VertexLabelFilter(String label) {
-    this.label = label;
-  }
-
   @Override
-  public boolean filter(Vertex v) {
-    return v.getLabel().equals(label);
+  public boolean filter(TableToEdge table) throws Exception {
+    return table.isDirectionIndicator();
   }
 }

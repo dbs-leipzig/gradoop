@@ -35,6 +35,7 @@ public class SQLToBasicTypeMapper {
    * @return Flink type information
    */
   public static TypeInformation<?> getTypeInfo(JDBCType jdbcType, RdbmsType rdbmsType) {
+
     TypeInformation<?> typeInfo = null;
 
     switch (jdbcType.name()) {

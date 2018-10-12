@@ -37,14 +37,14 @@ public class AttributesToProperties {
    */
   public static Properties getProperties(Row tuple, RowHeader rowheader) {
 
-    Logger log = Logger.getLogger(AttributesToProperties.class);
+    Logger logger = Logger.getLogger(AttributesToProperties.class);
     Properties props = Properties.create();
 
     for (RowHeaderTuple rht : rowheader.getRowHeader()) {
       try {
         props.set(rht.getName(), PropertyValueParser.parse(tuple.getField(rht.getPos())));
-      } catch (IllegalArgumentException e) {
-        log.error("Empty value field in column " + rht.getName() + e);
+      } catch (IndexOutOfBoundsException e) {
+        logger.warn("Empty value field in column " + rht.getName());
       }
     }
 

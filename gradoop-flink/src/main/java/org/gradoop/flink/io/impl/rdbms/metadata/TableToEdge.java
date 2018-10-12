@@ -157,13 +157,16 @@ public class TableToEdge implements Serializable {
           .add(new RowHeaderTuple(endAttribute.f0, RdbmsConstants.FK_FIELD, 1));
 
       int i = 2;
-      for (NameTypeTuple att : furtherAttributes) {
-        fieldTypes[i] = SQLToBasicTypeMapper.getTypeInfo(att.f1, rdbmsType);
-        rowheader.getRowHeader()
-            .add(new RowHeaderTuple(att.f0, RdbmsConstants.ATTRIBUTE_FIELD, i));
-        i++;
+      if (!furtherAttributes.isEmpty()) {
+        for (NameTypeTuple att : furtherAttributes) {
+          fieldTypes[i] = SQLToBasicTypeMapper.getTypeInfo(att.f1, rdbmsType);
+          rowheader.getRowHeader()
+              .add(new RowHeaderTuple(att.f0, RdbmsConstants.ATTRIBUTE_FIELD, i));
+          i++;
+        }
       }
     }
+
     this.rowTypeInfo = new RowTypeInfo(fieldTypes);
   }
 

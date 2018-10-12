@@ -67,12 +67,12 @@ public class CreateEdges {
       DataSet<TableToEdge> dsTablesToEdges = env.fromCollection(tablesToEdges);
 
       // Primary key table representation of foreign key relation
-      DataSet<LabelIdKeyTuple> pkEdges = dsTablesToEdges.filter(new EdgeDirectionFilter())
+      DataSet<LabelIdKeyTuple> pkEdges = dsTablesToEdges.filter(new IsDirected())
           .flatMap(new VerticesToPkTable())
           .withBroadcastSet(vertices, RdbmsConstants.BROADCAST_VARIABLE).distinct("*");
 
       // Foreign key table representation of foreign key relation
-      DataSet<LabelIdKeyTuple> fkEdges = dsTablesToEdges.filter(new EdgeDirectionFilter())
+      DataSet<LabelIdKeyTuple> fkEdges = dsTablesToEdges.filter(new IsDirected())
           .flatMap(new VerticesToFkTable())
           .withBroadcastSet(vertices, RdbmsConstants.BROADCAST_VARIABLE);
 

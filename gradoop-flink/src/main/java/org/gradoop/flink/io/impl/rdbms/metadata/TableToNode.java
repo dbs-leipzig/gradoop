@@ -118,26 +118,31 @@ public class TableToNode implements Serializable {
         furtherAttributes.size()];
 
     int i = 0;
-    try {
+    if (!primaryKeys.isEmpty()) {
       for (NameTypeTuple pk : primaryKeys) {
         fieldTypes[i] = SQLToBasicTypeMapper.getTypeInfo(pk.f1, rdbmsType);
         rowheader.getRowHeader().add(new RowHeaderTuple(pk.f0, RdbmsConstants.PK_FIELD, i));
         i++;
       }
+    }
+
+    if (!foreignKeys.isEmpty()) {
       for (FkTuple fk : foreignKeys) {
         fieldTypes[i] = SQLToBasicTypeMapper.getTypeInfo(fk.f1, rdbmsType);
         rowheader.getRowHeader().add(new RowHeaderTuple(fk.f0, RdbmsConstants.FK_FIELD, i));
         i++;
       }
+    }
+
+    if (!furtherAttributes.isEmpty()) {
       for (NameTypeTuple att : furtherAttributes) {
         fieldTypes[i] = SQLToBasicTypeMapper.getTypeInfo(att.f1, rdbmsType);
         rowheader.getRowHeader()
             .add(new RowHeaderTuple(att.f0, RdbmsConstants.ATTRIBUTE_FIELD, i));
         i++;
       }
-    } catch (IllegalArgumentException e) {
-      System.err.println("Empty attribute set. Error Message : " + e.getMessage());
     }
+
     this.rowTypeInfo = new RowTypeInfo(fieldTypes);
   }
 

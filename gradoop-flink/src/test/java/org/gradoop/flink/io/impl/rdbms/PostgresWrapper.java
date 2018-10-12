@@ -28,7 +28,7 @@ public class PostgresWrapper {
       embeddedPostgres = new EmbeddedPostgres();
       connectionUrl = embeddedPostgres.start("localhost", port, "dbName", "userName", "password");
       embeddedPostgres.getProcess().get().importFromFile(new File(RdbmsDataImportTest.class
-          .getResource("/data/rdbms/input/employees_small.sql").getFile()));
+          .getResource("/data/rdbms/input/husband.sql").getFile()));
     }
   }
 

@@ -16,6 +16,7 @@
 package org.gradoop.flink.io.impl.rdbms;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.log4j.Logger;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSource;
@@ -75,6 +76,8 @@ public class RdbmsDataSource implements DataSource {
 
   @Override
   public LogicalGraph getLogicalGraph() {
+    Logger logger = Logger.getLogger(RdbmsDataSource.class);
+
     DataSet<Vertex> vertices;
     DataSet<Edge> edges;
 
@@ -86,7 +89,7 @@ public class RdbmsDataSource implements DataSource {
       metadataParser = new MetaDataParser(con, rdbmsConfig.getRdbmsType());
       metadataParser.parse();
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      logger.error(e);
     }
 
     // creates vertices from rdbms table tuples

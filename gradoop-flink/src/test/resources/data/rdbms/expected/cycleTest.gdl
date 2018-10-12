@@ -1,8 +1,8 @@
-[
-	(:person {pnr:0, name: "Peter"})-[:gatte]->(:person {pnr:1, name: "Karla"}),
-	(:person {pnr:1, name: "Karla"})-[:gatte]->(:person {pnr:0, name: "Peter"}),
-	(:person {pnr:2, name: "Joachim"})-[:gatte]->(:person {pnr:3, name: "Steffen"}),
-	(:person {pnr:3, name: "Steffen"})-[:gatte]->(:person {pnr:2, name: "Joachim"}),
-	(:person {pnr:4, name: "Michael"})-[:gatte]->(:person {pnr:5, name: "Sven"}),
-	(:person {pnr:5, name: "Sven"})-[:gatte]->(:person {pnr:4, name: "Michael"})
+expected [
+	(peter:person {pnr:0, name: "Peter"})-[:gatte]->(karla:person {pnr:1, name: "Karla"}),
+	(karla)-[:gatte]->(peter),
+	(jo:person {pnr:2, name: "Joachim"})-[:gatte]->(steffen:person {pnr:3, name: "Steffen"}),
+	(steffen)-[:gatte]->(jo),
+	(sandra:person {pnr:4, name: "Sandra"})-[:gatte]->(petra:person {pnr:5, name: "Petra"}),
+	(petra)-[:gatte]->(sandra)
 ]

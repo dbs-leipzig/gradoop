@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Creates one EPGM vertex from one row
  */
-public class RowToVertices extends RichMapFunction<Row, Vertex> {
+public class RowToVertex extends RichMapFunction<Row, Vertex> {
 
   /**
    * serial versoin uid
@@ -76,7 +76,7 @@ public class RowToVertices extends RichMapFunction<Row, Vertex> {
    * @param tableName Name of database table
    * @param tablePos Position of database in list
    */
-  public RowToVertices(VertexFactory vertexFactory, String tableName, int tablePos) {
+  public RowToVertex(VertexFactory vertexFactory, String tableName, int tablePos) {
     this.vertexFactory = vertexFactory;
     this.tableName = tableName;
     this.tablePos = tablePos;

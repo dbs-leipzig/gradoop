@@ -49,12 +49,14 @@ public class DeletePkFkProperties extends RichMapFunction<Vertex, Vertex> {
 
     for (TableToNode table : tablesToNodes) {
       if (table.getTableName().equals(v.getLabel())) {
+
         ArrayList<String> foreignKeys = Lists.newArrayList();
         for (RowHeaderTuple rht : table.getRowheader().getRowHeader()) {
           if (rht.getAttType().equals(RdbmsConstants.FK_FIELD)) {
             foreignKeys.add(rht.f0);
           }
         }
+
         for (Property oldProp : v.getProperties()) {
           if (!oldProp.getKey().equals(RdbmsConstants.PK_ID) &&
               !foreignKeys.contains(oldProp.getKey())) {

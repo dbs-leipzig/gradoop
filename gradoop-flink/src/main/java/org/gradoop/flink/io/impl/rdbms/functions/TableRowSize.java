@@ -37,6 +37,7 @@ public class TableRowSize {
   public static int getTableRowCount(Connection con, String tableName) throws SQLException {
     int rowCount = 0;
     Statement st = con.createStatement();
+
     try {
       ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM " + tableName);
       if (rs.next()) {
@@ -48,6 +49,7 @@ public class TableRowSize {
     } finally {
       st.close();
     }
+
     return rowCount;
   }
 }

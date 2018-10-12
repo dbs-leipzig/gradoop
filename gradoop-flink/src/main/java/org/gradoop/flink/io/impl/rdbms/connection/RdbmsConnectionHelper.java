@@ -34,15 +34,14 @@ public class RdbmsConnectionHelper {
    */
   public static Connection getConnection(RdbmsConfig config) {
 
+    Logger logger = Logger.getLogger(RdbmsConnectionHelper.class);
     Connection connection = null;
-    Logger log = Logger.getLogger(RdbmsConnectionHelper.class);
 
     try {
       RegisterDriver.register(config);
       connection = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPw());
     } catch (SQLException e) {
-      System.err.println("Cannot establish database connection !");
-      log.error(e);
+      logger.error("Cannot establish database connection : " + e);
     }
 
     return connection;

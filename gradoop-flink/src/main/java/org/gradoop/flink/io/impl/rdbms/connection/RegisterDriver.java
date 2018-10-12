@@ -39,10 +39,12 @@ public class RegisterDriver {
    */
   public static void register(RdbmsConfig config) {
     AccessController.doPrivileged(new PrivilegedAction<Object>() {
+
       @Override
       public Object run() {
         // privileged code goes here, for example:
-        Logger log = Logger.getLogger(RegisterDriver.class);
+        Logger logger = Logger.getLogger(RegisterDriver.class);
+
         try {
           URL driverUrl = new URL("jar:file:" + config.getJdbcDriverPath() + "!/");
           URLClassLoader ucl = new URLClassLoader(new URL[] { driverUrl });
@@ -52,14 +54,14 @@ public class RegisterDriver {
 
         } catch (SQLException e) {
           System.err.println("Cannot register jdbc driver !");
-          log.error(e);
+          logger.error(e);
         } catch (MalformedURLException e) {
           System.err.println("Wrong path to jdbc driver !");
-          log.error(e);
+          logger.error(e);
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException |
             IllegalArgumentException | InvocationTargetException | NoSuchMethodException |
             SecurityException e) {
-          log.error(e);
+          logger.error(e);
         }
         return null;
       }
