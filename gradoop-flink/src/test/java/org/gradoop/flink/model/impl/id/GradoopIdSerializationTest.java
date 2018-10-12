@@ -73,6 +73,7 @@ public class GradoopIdSerializationTest extends GradoopFlinkTestBase {
    * Test if {@link GradoopId}s are serialized correctly using their implementation of
    * {@link CopyableValue#write(DataOutputView)} and {@link CopyableValue#read(DataInputView)}.
    */
+  @Test
   public void testGradoopIdSerializationAsValue() throws Exception {
     GradoopId inputId = GradoopId.get();
     assertEquals(inputId, GradoopTestUtils.writeAndReadValue(GradoopId.class, inputId));
