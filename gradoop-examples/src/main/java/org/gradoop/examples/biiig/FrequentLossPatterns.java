@@ -211,9 +211,7 @@ public class FrequentLossPatterns
     // trigger execution
     getExecutionEnvironment().execute();
 
-    String cmd = "dot -Tps " + dotPath + " -o " + psPath;
-
-    Runtime.getRuntime().exec(cmd);
+    new ProcessBuilder("dot", "-Tps", dotPath, "-o", psPath).inheritIO().start();
   }
 
   // AGGREGATE FUNCTIONS
