@@ -15,8 +15,6 @@
  */
 package org.gradoop.flink.io.impl.csv.conversion;
 
-import java.net.URLDecoder;
-
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;

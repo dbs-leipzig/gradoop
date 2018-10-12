@@ -35,13 +35,6 @@ import java.nio.charset.StandardCharsets;
  * @see org.gradoop.flink.model.impl.functions.filters.CombinableFilter
  */
 public class SubgraphExample {
-
-  /**
-   * Path of the input graph.
-   */
-  private static final String DATA_PATH =
-    SubgraphExample.class.getResource("/data/csv/sna").getFile();
-
   /**
    * Run an example subgraph operation on the example social media graph.
    *
@@ -55,7 +48,8 @@ public class SubgraphExample {
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(executionEnvironment);
     // Read the input graph.
     LogicalGraph inputGraph = new CSVDataSource(
-      URLDecoder.decode(DATA_PATH, StandardCharsets.UTF_8.name()), config).getLogicalGraph();
+      URLDecoder.decode(SubgraphExample.class.getResource("/data/csv/sna").getFile(),
+        StandardCharsets.UTF_8.name()), config).getLogicalGraph();
 
     // Create a filter for vertices accepting:
     // 1. Vertices with label "Forum" and a property "title" set to "Graph Processing"

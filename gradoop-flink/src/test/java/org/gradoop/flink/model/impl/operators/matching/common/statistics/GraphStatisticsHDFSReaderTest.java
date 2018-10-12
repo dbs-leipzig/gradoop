@@ -41,8 +41,6 @@ public class GraphStatisticsHDFSReaderTest extends GraphStatisticsTest {
       utility.startMiniCluster().waitForActiveAndReadyMaster();
     }
 
-
-
     // copy test resources to HDFS
     Path localPath = new Path(
       URLDecoder.decode(

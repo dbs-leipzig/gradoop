@@ -17,7 +17,6 @@ package org.gradoop.storage.impl.accumulo;
 
 import org.apache.accumulo.minicluster.MiniAccumuloCluster;
 import org.apache.accumulo.minicluster.MiniAccumuloConfig;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.storage.config.GradoopAccumuloConfig;
 import org.gradoop.storage.impl.accumulo.basic.StoreTest;
 import org.gradoop.storage.impl.accumulo.io.IOBasicTest;
