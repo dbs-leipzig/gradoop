@@ -19,6 +19,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
@@ -28,6 +29,12 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.storage.common.predicate.query.Query;
+import org.gradoop.storage.config.GradoopHBaseConfig;
+import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
+import org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
+import org.gradoop.storage.impl.hbase.io.HBaseDataSource;
+import org.gradoop.storage.utils.HBaseFilters;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,9 +46,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class SubgraphBenchmark extends AbstractRunner implements ProgramDescription {
   /**
-   * Option to declare path to indexed input graph
+   * Option to declare path to input graph. Using a store, the path is the table prefix without '.'.
    */
   private static final String OPTION_INPUT_PATH = "i";
+  /**
+   * Option to declare input graph format (indexed, hbase)
+   */
+  private static final String OPTION_INPUT_FORMAT = "f";
   /**
    * Option to declare path to output graph
    */
@@ -63,9 +74,17 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
    */
   private static final String OPTION_EDGE_LABEL = "el";
   /**
-   * Used input path
+   * Option to declare using predicate pushdown for graph store
+   */
+  private static final String OPTION_USE_PREDICATE_PUSHDOWN = "r";
+  /**
+   * Used input path or table prefix (HBase)
    */
   private static String INPUT_PATH;
+  /**
+   * Used input format (indexed, hbase)
+   */
+  private static String INPUT_FORMAT;
   /**
    * Used output path
    */
@@ -86,10 +105,16 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
    * Used verification flag
    */
   private static boolean VERIFICATION;
+  /**
+   * Used to indicate the usage of predicate pushdown
+   */
+  private static boolean USE_PREDICATE_PUSHDOWN;
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true,
-      "Path to indexed source files.");
+      "Path to csv source files or table prefix (if HBase is chosen as format).");
+    OPTIONS.addOption(OPTION_INPUT_FORMAT, "format", true,
+      "Input graph format (indexed, hbase).");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output", true,
       "Path to output file");
     OPTIONS.addOption(OPTION_CSV_PATH, "csv", true,
@@ -100,12 +125,16 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
       "Used vertex label");
     OPTIONS.addOption(OPTION_EDGE_LABEL, "edge-label", true,
       "Used edge label");
+    OPTIONS.addOption(OPTION_USE_PREDICATE_PUSHDOWN, "predicatepushdown", false,
+      "Flag to enable predicate pushdown for store.");
   }
 
   /**
    * Main program to run the benchmark. Arguments are the available options.
    *
-   * @param args program arguments
+   * @param args program arguments, e.g.:
+   *             -i hdfs:///mygraph -f indexed -o hdfs:///output -c /home/user/result.csv -v
+   *             -vl person -el knows
    * @throws Exception in case of Error
    */
   public static void main(String[] args) throws Exception {
@@ -126,7 +155,29 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
     GradoopFlinkConfig conf = GradoopFlinkConfig.createConfig(env);
 
     // read graph
-    DataSource source = new IndexedCSVDataSource(INPUT_PATH, conf);
+    DataSource source;
+    switch (INPUT_FORMAT) {
+    case "indexed":
+      source = new IndexedCSVDataSource(INPUT_PATH, conf);
+      break;
+    case "hbase":
+      HBaseEPGMStore hBaseEPGMStore = HBaseEPGMStoreFactory.createOrOpenEPGMStore(
+        HBaseConfiguration.create(),
+        GradoopHBaseConfig.getDefaultConfig(),
+        INPUT_PATH + ".");
+      source = new HBaseDataSource(hBaseEPGMStore, conf);
+      // Apply predicate if flag is set
+      if (USE_PREDICATE_PUSHDOWN) {
+        source = ((HBaseDataSource) source).applyVertexPredicate(Query.elements().fromAll()
+          .where(HBaseFilters.labelIn(VERTEX_LABEL)));
+        source = ((HBaseDataSource) source).applyEdgePredicate(Query.elements().fromAll()
+          .where(HBaseFilters.labelIn(EDGE_LABEL)));
+      }
+      break;
+    default :
+      throw new IllegalArgumentException("Unsupported format: " + INPUT_FORMAT);
+    }
+
     LogicalGraph graph = source.getLogicalGraph();
 
     // compute subgraph -> verify results (join) vs no verify (filter)
@@ -154,11 +205,15 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
    */
   private static void readCMDArguments(CommandLine cmd) {
     INPUT_PATH   = cmd.getOptionValue(OPTION_INPUT_PATH);
+    // Set indexed as default format
+    INPUT_FORMAT = cmd.hasOption(OPTION_INPUT_FORMAT) ?
+      cmd.getOptionValue(OPTION_INPUT_FORMAT) : "indexed";
     OUTPUT_PATH  = cmd.getOptionValue(OPTION_OUTPUT_PATH);
     CSV_PATH     = cmd.getOptionValue(OPTION_CSV_PATH);
     VERTEX_LABEL = cmd.getOptionValue(OPTION_VERTEX_LABEL);
     EDGE_LABEL   = cmd.getOptionValue(OPTION_EDGE_LABEL);
     VERIFICATION = cmd.hasOption(OPTION_VERIFICATION);
+    USE_PREDICATE_PUSHDOWN = cmd.hasOption(OPTION_USE_PREDICATE_PUSHDOWN);
   }
 
   /**
@@ -187,12 +242,26 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
   private static void writeCSV(ExecutionEnvironment env) throws IOException {
 
     String head = String
-      .format("%s|%s|%s|%s|%s|%s%n", "Parallelism", "dataset", "vertex-label", "edge-label",
-        "verification", "Runtime(s)");
+      .format("%s|%s|%s|%s|%s|%s|%s|%s%n",
+        "Parallelism",
+        "dataset",
+        "format",
+        "vertex-label",
+        "edge-label",
+        "verification",
+        "predPushdown",
+        "Runtime(s)");
 
     String tail = String
-      .format("%s|%s|%s|%s|%s|%s%n", env.getParallelism(), INPUT_PATH, VERTEX_LABEL, EDGE_LABEL,
-        VERIFICATION, env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS));
+      .format("%s|%s|%s|%s|%s|%s|%s|%s%n",
+        env.getParallelism(),
+        INPUT_PATH,
+        INPUT_FORMAT,
+        VERTEX_LABEL,
+        EDGE_LABEL,
+        VERIFICATION,
+        USE_PREDICATE_PUSHDOWN,
+        env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS));
 
     File f = new File(CSV_PATH);
     if (f.exists() && !f.isDirectory()) {

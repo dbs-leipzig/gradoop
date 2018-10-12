@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.gradoop.benchmark.subgraph.SubgraphBenchmark;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSource;
@@ -29,6 +30,10 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsHDFSReader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.storage.config.GradoopHBaseConfig;
+import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
+import org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
+import org.gradoop.storage.impl.hbase.io.HBaseDataSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,9 +45,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class CypherBenchmark extends AbstractRunner implements ProgramDescription {
   /**
-   * Option to declare path to indexed input graph
+   * Option to declare path to input graph. Using a store, the path is the table prefix without '.'.
    */
   private static final String OPTION_INPUT_PATH = "i";
+  /**
+   * Option to declare input graph format (indexed, hbase)
+   */
+  private static final String OPTION_INPUT_FORMAT = "f";
   /**
    * Option do declare path to statistics
    */
@@ -60,9 +69,18 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    */
   private static final String OPTION_FIRST_NAME = "n";
   /**
+   * Option to enable predicate pushdown for store input.
+   */
+  private static final String OPTION_USE_PREDICATE_PUSHDOWN = "r";
+
+  /**
    * Used input path
    */
   private static String INPUT_PATH;
+  /**
+   * Used input format (indexed, hbase)
+   */
+  private static String INPUT_FORMAT;
   /**
    * Used to indicate if statistics are used
    */
@@ -83,10 +101,16 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    * Used first name for query (q1,q2,q3)
    */
   private static String FIRST_NAME;
+  /**
+   * Used to indicate the usage of predicate pushdown
+   */
+  private static boolean USE_PREDICATE_PUSHDOWN;
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true,
-      "Input path to indexed source files.");
+      "Input path to source files or table prefix of store.");
+    OPTIONS.addOption(OPTION_INPUT_FORMAT, "format", true,
+      "Input graph format (indexed, hbase).");
     OPTIONS.addOption(OPTION_CSV_PATH, "csv", true,
       "Output path to csv statistics output");
     OPTIONS.addOption(OPTION_QUERY, "query", true,
@@ -95,12 +119,16 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
       "Used first Name in Cypher Query");
     OPTIONS.addOption(OPTION_STATISTICS_PATH, "statistics", true,
       "Input path to previously generated statistics.");
+    OPTIONS.addOption(OPTION_USE_PREDICATE_PUSHDOWN, "predicatepushdown", false,
+      "Flag to use predicate pushdown for store.");
   }
 
   /**
    * Main program to run the benchmark. Arguments are the available options.
    *
-   * @param args program arguments
+   * @param args program arguments, e.g.:
+   *             -i hdfs:///mygraph -f indexed -c /home/user/result.csv -q q1 -n "Carlos"
+   *             -s hdfs:///mygraph/stats
    * @throws Exception IO or execution Exception
    */
   public static void main(String[] args) throws Exception {
@@ -120,7 +148,28 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 
     // read graph
-    DataSource source = new IndexedCSVDataSource(INPUT_PATH, config);
+    DataSource source;
+    switch (INPUT_FORMAT) {
+    case "indexed":
+      source = new IndexedCSVDataSource(INPUT_PATH, config);
+      break;
+    case "hbase":
+      HBaseEPGMStore hBaseEPGMStore = HBaseEPGMStoreFactory.createOrOpenEPGMStore(
+        HBaseConfiguration.create(),
+        GradoopHBaseConfig.getDefaultConfig(),
+        INPUT_PATH + ".");
+      source = new HBaseDataSource(hBaseEPGMStore, config);
+      // Apply predicate
+      if (USE_PREDICATE_PUSHDOWN) {
+        source = ((HBaseDataSource) source)
+          .applyVertexPredicate(Predicates.HBase.getVertexFilter(QUERY, FIRST_NAME));
+        source = ((HBaseDataSource) source)
+          .applyEdgePredicate(Predicates.HBase.getEdgeFilter(QUERY));
+      }
+      break;
+    default :
+      throw new IllegalArgumentException("Unsupported format: " + INPUT_FORMAT);
+    }
     LogicalGraph graph = source.getLogicalGraph();
 
     // prepare collection
@@ -171,11 +220,15 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    */
   private static void readCMDArguments(CommandLine cmd) {
     INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
+    // Set indexed as default format
+    INPUT_FORMAT = cmd.hasOption(OPTION_INPUT_FORMAT) ?
+      cmd.getOptionValue(OPTION_INPUT_FORMAT) : "indexed";
     CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
     QUERY = cmd.getOptionValue(OPTION_QUERY);
     HAS_STATISTICS = cmd.hasOption(OPTION_STATISTICS_PATH);
     STATISTICS_INPUT_PATH = cmd.getOptionValue(OPTION_STATISTICS_PATH);
     FIRST_NAME = cmd.getOptionValue(OPTION_FIRST_NAME);
+    USE_PREDICATE_PUSHDOWN = cmd.hasOption(OPTION_USE_PREDICATE_PUSHDOWN);
   }
 
   /**
@@ -210,18 +263,22 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    */
   private static void writeCSV(ExecutionEnvironment env) throws IOException {
 
-    String head = String.format("%s|%s|%s|%s|%s%n",
+    String head = String.format("%s|%s|%s|%s|%s|%s|%s%n",
       "Parallelism",
       "dataset",
+      "format",
       "query",
       "usedStatistics",
+      "predPushdown",
       "Runtime(s)");
 
-    String tail = String.format("%s|%s|%s|%s|%s%n",
+    String tail = String.format("%s|%s|%s|%s%s|%s||%s%n",
       env.getParallelism(),
       INPUT_PATH,
+      INPUT_FORMAT,
       QUERY,
       HAS_STATISTICS,
+      USE_PREDICATE_PUSHDOWN,
       env.getLastJobExecutionResult().getNetRuntime(TimeUnit.SECONDS));
 
     File f = new File(CSV_PATH);
