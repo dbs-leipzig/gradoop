@@ -29,7 +29,7 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.Sum;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.BaseCount;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -173,17 +173,19 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
   /**
    * Aggregate function to count sales orders per graph.
    */
-  private static class CountSalesOrdersAggregateFunction
-    implements Sum<Vertex>, VertexAggregateFunction {
+  private static class CountSalesOrdersAggregateFunction extends BaseCount<Vertex>
+    implements VertexAggregateFunction {
+
+    /**
+     * Constructor.
+     */
+    public CountSalesOrdersAggregateFunction() {
+      super("soCount");
+    }
 
     @Override
     public PropertyValue getIncrement(Vertex vertex) {
       return PropertyValue.create(vertex.getLabel().equals("SalesOrder") ? 1 : 0);
-    }
-
-    @Override
-    public String getAggregatePropertyKey() {
-      return "soCount";
     }
   }
 

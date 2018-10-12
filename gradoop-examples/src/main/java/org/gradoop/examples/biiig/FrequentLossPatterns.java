@@ -237,15 +237,12 @@ public class FrequentLossPatterns
 
       if (vertex.hasProperty(REVENUE_KEY)) {
         increment = vertex.getPropertyValue(REVENUE_KEY);
-
       } else if (vertex.hasProperty(EXPENSE_KEY)) {
         PropertyValue expense = vertex.getPropertyValue(EXPENSE_KEY);
         increment = PropertyValueUtils.Numeric.multiply(expense, PropertyValue.create(-1));
-
       } else {
         increment = PropertyValue.create(0);
       }
-
       return increment;
     }
 
