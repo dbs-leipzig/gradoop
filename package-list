@@ -13,6 +13,8 @@ org.gradoop.common.model.impl.id
 org.gradoop.common.model.impl.pojo
 org.gradoop.common.model.impl.properties
 org.gradoop.common.util
+org.gradoop.dataintegration.importer
+org.gradoop.dataintegration.transformation
 org.gradoop.examples
 org.gradoop.examples.aggregation
 org.gradoop.examples.aggregation.functions
