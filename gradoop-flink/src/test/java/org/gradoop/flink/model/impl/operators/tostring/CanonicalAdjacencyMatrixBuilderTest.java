@@ -32,8 +32,7 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
   public void testDirected() throws Exception {
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(getConfig());
 
-    loader.initDatabaseFromFile(CanonicalAdjacencyMatrixBuilderTest.class
-        .getResource("/data/gdl/cam_test.gdl").getFile());
+    loader.initDatabaseFromFile(getFilePath("/data/gdl/cam_test.gdl"));
 
     GraphCollection g = loader.getGraphCollection();
 
@@ -46,8 +45,7 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
     String result = cam.execute(g).collect().get(0);
 
     String expectation = FileUtils.readFileToString(
-      FileUtils.getFile(CanonicalAdjacencyMatrixBuilderTest.class
-        .getResource("/data/expected/cam_test_directed").getFile()));
+      FileUtils.getFile(getFilePath("/data/expected/cam_test_directed")));
 
     assertTrue(expectation.equals(result));
   }
@@ -56,8 +54,7 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
   public void testUndirected() throws Exception {
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(getConfig());
 
-    loader.initDatabaseFromFile(CanonicalAdjacencyMatrixBuilderTest.class
-      .getResource("/data/gdl/cam_test.gdl").getFile());
+    loader.initDatabaseFromFile(getFilePath("/data/gdl/cam_test.gdl"));
 
     GraphCollection g = loader.getGraphCollection();
 
@@ -70,8 +67,7 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
     String result = cam.execute(g).collect().get(0);
 
     String expectation = FileUtils.readFileToString(
-      FileUtils.getFile(CanonicalAdjacencyMatrixBuilderTest.class
-        .getResource("/data/expected/cam_test_undirected").getFile()));
+      FileUtils.getFile(getFilePath("/data/expected/cam_test_undirected")));
 
     assertTrue(expectation.equals(result));
   }

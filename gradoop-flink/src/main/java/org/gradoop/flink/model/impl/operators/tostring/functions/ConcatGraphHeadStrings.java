@@ -46,6 +46,6 @@ public class ConcatGraphHeadStrings
 
     Collections.sort(graphLabels);
 
-    collector.collect(StringUtils.join(graphLabels, "\n"));
+    collector.collect(StringUtils.join(graphLabels, System.lineSeparator()));
   }
 }
