@@ -31,8 +31,7 @@ public class GellyTriangleCountingTest extends GradoopFlinkTestBase {
   /**
    * Test triangle counting for cases:
    * <pre>
-   *   - no edges
-   *   - 1 triplet
+   *   - open triplet
    *   - 2 triangles in a directed graph
    *   - 2 triangles in an undirected graph
    *   - 8 triangles in directed social graph from {@link GradoopTestUtils#SOCIAL_NETWORK_GDL_FILE}
@@ -42,73 +41,55 @@ public class GellyTriangleCountingTest extends GradoopFlinkTestBase {
   public void testTriangleCounting() throws Exception {
 
     String graphString =
-      "noEdges[" +
-      "/* 2 not connected vertices */" +
-      "(v0 {id:0, value:\"A\"})" +
-      "(v1 {id:1, value:\"B\"})" +
-      "]" +
-      "triplet[" +
-      "/* 1 open triplet */" +
+      "/* all vertices */" +
       "(v0 {id:0, value:\"A\"})" +
       "(v1 {id:1, value:\"B\"})" +
       "(v2 {id:2, value:\"C\"})" +
+      "(v3 {id:3, value:\"D\"})" +
+      "(v4 {id:4, value:\"E\"})" +
+      "(v5 {id:5, value:\"F\"})" +
+      "triplet[" +
+      "/* 1 open triplet */" +
       "(v0)-[e0]->(v1)" +
       "(v0)-[e1]->(v2)" +
       "]" +
       "trianglesDirected[" +
       "/* 2 triangles in directed graph */" +
-      "(v0 {id:0, value:\"A\"})" +
-      "(v1 {id:1, value:\"B\"})" +
-      "(v2 {id:2, value:\"C\"})" +
-      "(v0)-[e0]->(v1)" +
-      "(v0)-[e1]->(v2)" +
-      "(v1)-[e2]->(v2)" +
-      "(v3 {id:3, value:\"D\"})" +
-      "(v4 {id:4, value:\"E\"})" +
-      "(v5 {id:5, value:\"F\"})" +
-      "(v0)-[e3]->(v3)" +
-      "(v3)-[e4]->(v4)" +
+      "(v0)-[e2]->(v1)" +
+      "(v0)-[e3]->(v2)" +
+      "(v1)-[e4]->(v2)" +
+      "(v0)-[e5]->(v3)" +
+      "(v3)-[e6]->(v4)" +
       "(v4)-[e7]->(v5)" +
-      "(v5)-[e9]->(v3)" +
+      "(v5)-[e8]->(v3)" +
       "]" +
       "trianglesUndirected[" +
       "/* 2 triangles in undirected graph */" +
-      "(v0 {id:0, value:\"A\"})" +
-      "(v1 {id:1, value:\"B\"})" +
-      "(v2 {id:2, value:\"C\"})" +
-      "(v0)-[e0]->(v1)" +
-      "(v1)-[e1]->(v0)" +
-      "(v0)-[e2]->(v2)" +
-      "(v2)-[e3]->(v0)" +
-      "(v1)-[e4]->(v2)" +
-      "(v2)-[e5]->(v1)" +
-      "(v0)-[e6]->(v3 {id:3, value:\"D\"})" +
-      "(v3)-[e7]->(v0)" +
-      "(v4 {id:4, value:\"E\"})" +
-      "(v5 {id:5, value:\"F\"})" +
-      "(v3)-[e8]->(v4)" +
-      "(v4)-[e9]->(v3)" +
-      "(v4)-[e10]->(v5)" +
-      "(v5)-[e11]->(v4)" +
-      "(v5)-[e12]->(v3)" +
-      "(v3)-[e13]->(v5)" +
+      "(v0)-[e9]->(v1)" +
+      "(v1)-[e10]->(v0)" +
+      "(v0)-[e11]->(v2)" +
+      "(v2)-[e12]->(v0)" +
+      "(v1)-[e13]->(v2)" +
+      "(v2)-[e14]->(v1)" +
+      "(v0)-[e15]->(v3)" +
+      "(v3)-[e16]->(v0)" +
+      "(v3)-[e17]->(v4)" +
+      "(v4)-[e18]->(v3)" +
+      "(v4)-[e19]->(v5)" +
+      "(v5)-[e20]->(v4)" +
+      "(v5)-[e21]->(v3)" +
+      "(v3)-[e22]->(v5)" +
       "]";
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(graphString);
 
-    LogicalGraph noEdgeGraph = loader.getLogicalGraphByVariable("noEdges");
     LogicalGraph tripletGraph = loader.getLogicalGraphByVariable("triplet");
     LogicalGraph trianglesDirectedGraph = loader.getLogicalGraphByVariable("trianglesDirected");
     LogicalGraph trianglesUndirectedGraph = loader.getLogicalGraphByVariable("trianglesUndirected");
 
-    noEdgeGraph = noEdgeGraph.callForGraph(new GellyTriangleCounting());
     tripletGraph = tripletGraph.callForGraph(new GellyTriangleCounting());
     trianglesDirectedGraph = trianglesDirectedGraph.callForGraph(new GellyTriangleCounting());
     trianglesUndirectedGraph = trianglesUndirectedGraph.callForGraph(new GellyTriangleCounting());
-
-    assertEquals("Wrong number of triangles for no edges, should be 0L",0L,
-      noEdgeGraph.getGraphHead().collect().get(0).getPropertyValue(
-        GellyTriangleCounting.PROPERTY_KEY_TRIANGLES).getLong());
 
     assertEquals("Wrong number of triangles for triplet, should be 0L",0L,
       tripletGraph.getGraphHead().collect().get(0).getPropertyValue(

@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
-import org.gradoop.flink.algorithms.gelly.trianglecounting.functions.WritePropertyToGraphHeadMap;
+import org.gradoop.flink.algorithms.gelly.functions.WritePropertyToGraphHeadMap;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 
 /**
@@ -43,7 +43,8 @@ public class GellyTriangleCounting extends GellyAlgorithm<NullValue, NullValue> 
   public static final String PROPERTY_KEY_TRIANGLES = "triangle_count";
 
   /**
-   * Constructor
+   * Creates an instance of GellyTriangleCounting.
+   * Calls constructor of super class {@link GellyAlgorithm}.
    */
   public GellyTriangleCounting() {
     super(new VertexToGellyVertexWithNullValue(),

@@ -13,32 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.gelly.trianglecounting.functions;
+package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * Writes the given property value to the graph head.
+ * MapFunction, that writes a given property value to the GraphHead.
  */
 public class WritePropertyToGraphHeadMap implements MapFunction<GraphHead, GraphHead> {
 
   /**
-   * Key for value
+   * PropertyKey to access the value
    */
   private final String propertyKey;
 
   /**
-   * Value to write
+   * PropertyValue to store in GraphHead
    */
   private final PropertyValue propertyValue;
 
   /**
-   * Constructor
+   * Creates an instance of a MapFunction, that writes a given property value to the GraphHead.
    *
-   * @param propertyKey Key for value
-   * @param propertyValue Value to write
+   * @param propertyKey PropertyKey to access the value
+   * @param propertyValue PropertyValue to store in GraphHead
    */
   public WritePropertyToGraphHeadMap(String propertyKey, PropertyValue propertyValue) {
     this.propertyKey = propertyKey;
