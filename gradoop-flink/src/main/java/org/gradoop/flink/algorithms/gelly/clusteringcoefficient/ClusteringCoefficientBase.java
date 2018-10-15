@@ -28,9 +28,11 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
  * coefficient algorithm. Implementations compute the local, average and global clustering
  * coefficient of a graph, where:
  * <pre>
- *   local - connectivity of a single vertex regarding its neighbors with value between 0.0 and 1.0
+ *   local - connectedness of a single vertex regarding the connections of its neighborhood, with
+ *           value between 0.0 (no edges between neighbors) and 1.0 (neighbors fully connected)
  *   average - mean over all local values
- *   global - connectivity of the graph as triangle to triplet ratio with value between 0.0 and 1.0
+ *   global - connectedness of the graph as ratio from closed triplets (triangles) to all triplets
+ *            with value between 0.0 (no closed triplets) and 1.0 (all triplets closed)
  * </pre>
  */
 public abstract class ClusteringCoefficientBase extends GellyAlgorithm<NullValue, NullValue> {
@@ -51,7 +53,8 @@ public abstract class ClusteringCoefficientBase extends GellyAlgorithm<NullValue
   public static final String PROPERTY_KEY_GLOBAL = "clustering_coefficient_global";
 
   /**
-   * Constructor
+   * Creates an instance of the ClusteringCoefficientBase wrapper class.
+   * Calls constructor of super class {@link GellyAlgorithm}
    */
   public ClusteringCoefficientBase() {
     super(new VertexToGellyVertexWithNullValue(),
@@ -59,8 +62,8 @@ public abstract class ClusteringCoefficientBase extends GellyAlgorithm<NullValue
   }
 
   @Override
-  protected LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph) throws
-    Exception {
+  protected LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
+    throws Exception {
     return executeInternal(graph);
   }
 
@@ -75,9 +78,6 @@ public abstract class ClusteringCoefficientBase extends GellyAlgorithm<NullValue
   protected abstract LogicalGraph executeInternal(Graph<GradoopId, NullValue, NullValue> gellyGraph)
     throws Exception;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return ClusteringCoefficientBase.class.getName();

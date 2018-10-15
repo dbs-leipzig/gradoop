@@ -30,7 +30,8 @@ import static org.junit.Assert.assertEquals;
 public class GellyClusteringCoefficientUndirectedTest extends GellyClusteringCoefficientTestBase {
 
   /**
-   * Constructor
+   * Creates an instance of GellyClusteringCoefficientUndirectedTest.
+   * Calls constructor of super class.
    */
   public GellyClusteringCoefficientUndirectedTest() {
     super();
@@ -45,7 +46,7 @@ public class GellyClusteringCoefficientUndirectedTest extends GellyClusteringCoe
   public void testSpecific() throws Exception {
 
     String graphString = "halfConnected[" +
-      "/* fully connected clique */" +
+      "/* half connected graph */" +
       "(v0 {id:0, value:\"A\"})" +
       "(v1 {id:1, value:\"B\"})" +
       "(v2 {id:2, value:\"C\"})" +

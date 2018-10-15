@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions.LocalCCResultTupleToVertexJoin;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions.LocalDirectedCCResultToTupleMap;
-import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions.WritePropertyToGraphHeadMap;
+import org.gradoop.flink.algorithms.gelly.functions.WritePropertyToGraphHeadMap;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
@@ -39,7 +39,8 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 public class GellyClusteringCoefficientDirected extends ClusteringCoefficientBase {
 
   /**
-   * Constructor
+   * Creates an instance of the GellyClusteringCoefficientDirected wrapper class.
+   * Calls constructor of super class {@link ClusteringCoefficientBase}.
    */
   public GellyClusteringCoefficientDirected() {
     super();
@@ -57,7 +58,8 @@ public class GellyClusteringCoefficientDirected extends ClusteringCoefficientBas
 
     DataSet<Vertex> resultVertices = new org.apache.flink.graph.library.clustering.directed
       .LocalClusteringCoefficient<GradoopId, NullValue, NullValue>().run(gellyGraph)
-      .map(new LocalDirectedCCResultToTupleMap()).join(currentGraph.getVertices())
+      .map(new LocalDirectedCCResultToTupleMap())
+      .join(currentGraph.getVertices())
       .where(0).equalTo(new Id<>())
       .with(new LocalCCResultTupleToVertexJoin());
 
@@ -82,9 +84,6 @@ public class GellyClusteringCoefficientDirected extends ClusteringCoefficientBas
       resultHead, resultVertices, currentGraph.getEdges());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return GellyClusteringCoefficientDirected.class.getName();
