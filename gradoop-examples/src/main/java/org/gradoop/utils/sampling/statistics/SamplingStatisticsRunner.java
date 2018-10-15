@@ -48,6 +48,7 @@ public class SamplingStatisticsRunner extends AbstractRunner implements ProgramD
     AverageDegreeRunner.main(args);
     AverageIncomingDegreeRunner.main(args);
     AverageOutgoingDegreeRunner.main(args);
+    ConnectedComponentsDistributionRunner.main(args);
   }
 
   @Override
