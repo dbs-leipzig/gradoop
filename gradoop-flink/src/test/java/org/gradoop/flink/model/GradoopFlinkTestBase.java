@@ -38,6 +38,9 @@ import scala.concurrent.duration.FiniteDuration;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
@@ -233,5 +236,16 @@ public abstract class GradoopFlinkTestBase {
     return getExecutionEnvironment()
       .fromElements(dummy)
       .filter(new False<>());
+  }
+  
+  /**
+   * Returns the encoded file path to a resource.
+   *
+   * @param  relPath the relative path to the resource
+   * @return encoded file path
+   */
+  protected String getFilePath(String relPath) throws UnsupportedEncodingException {
+    return URLDecoder.decode(
+      getClass().getResource(relPath).getFile(), StandardCharsets.UTF_8.name());
   }
 }
