@@ -5,6 +5,11 @@ dist: trusty
 os:
   - linux
   - osx
+  - windows
+  
+allow_failures:
+  - osx
+  - windows
 
 cache:
   directories:
