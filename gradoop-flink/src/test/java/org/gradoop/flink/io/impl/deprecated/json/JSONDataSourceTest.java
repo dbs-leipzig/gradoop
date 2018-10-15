@@ -33,12 +33,9 @@ public class JSONDataSourceTest extends GradoopFlinkTestBase {
 
   @Test
   public void testRead() throws Exception {
-    String graphFile =
-      JSONDataSourceTest.class.getResource("/data/json/sna/graphs.json").getFile();
-    String vertexFile =
-      JSONDataSourceTest.class.getResource("/data/json/sna/nodes.json").getFile();
-    String edgeFile =
-      JSONDataSourceTest.class.getResource("/data/json/sna/edges.json").getFile();
+    String graphFile = getFilePath("/data/json/sna/graphs.json");
+    String vertexFile = getFilePath("/data/json/sna/nodes.json");
+    String edgeFile = getFilePath("/data/json/sna/edges.json");
 
     DataSource dataSource = new JSONDataSource(graphFile, vertexFile, edgeFile, getConfig());
 
