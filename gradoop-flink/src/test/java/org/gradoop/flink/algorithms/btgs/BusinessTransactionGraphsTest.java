@@ -28,9 +28,7 @@ public class BusinessTransactionGraphsTest  extends GradoopFlinkTestBase {
 
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(getConfig());
 
-    loader.initDatabaseFromFile(
-      BusinessTransactionGraphsTest.class
-        .getResource("/data/gdl/iig_btgs.gdl").getFile());
+    loader.initDatabaseFromFile(getFilePath("/data/gdl/iig_btgs.gdl"));
 
     LogicalGraph iig = loader.getLogicalGraphByVariable("iig");
 

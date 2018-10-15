@@ -28,7 +28,6 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
@@ -233,6 +232,34 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
   }
 
   /**
+   * Test writing and reading a graph collection with empty strings as labels.
+   *
+   * @throws Exception if the execution or IO fails.
+   */
+  @Test
+  public void testWriteWithEmptyLabel() throws Exception {
+    String tmpPath = temporaryFolder.getRoot().getPath();
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(
+      "g0[" +
+      "(v1 {keya:2})" +
+      "(v2)" +
+      "(v3:_)" +
+      "]" +
+      "g1 {key:\"property\"}[" +
+      "(v4)-[e1 {keya:1}]->(v4)" +
+      "(v4)-[e2]->(v4)" +
+      "(v4)-[e3:_ {keya:false}]->(v4)" +
+      "]" +
+      "g2:_ {graph:\"hasALabel\"}[" +
+      "(v5)" +
+      "]");
+
+    GraphCollection graphCollection = loader.getGraphCollectionByVariables("g0", "g1", "g2");
+    checkIndexedCSVWrite(tmpPath, graphCollection);
+  }
+
+  /**
    * Test writing and reading a graph with a existing metadata file instead of aggregating
    * new metadata from the graph.
    *
@@ -242,11 +269,9 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
   public void testWriteWithExistingMetaData() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    String csvPath = VertexLabeledEdgeListDataSourceTest.class
-      .getResource("/data/csv/input_indexed").getFile();
+    String csvPath = getFilePath("/data/csv/input_indexed");
 
-    String gdlPath = IndexedCSVDataSourceTest.class
-      .getResource("/data/csv/expected/expected_graph_collection.gdl").getFile();
+    String gdlPath = getFilePath("/data/csv/expected/expected_graph_collection.gdl");
 
     GraphCollection input = getLoaderFromFile(gdlPath).getGraphCollectionByVariables("expected1",
       "expected2");
