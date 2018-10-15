@@ -24,7 +24,6 @@ import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
-import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
@@ -50,7 +49,7 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
    */
   private static final String OPTION_INPUT_PATH = "i";
   /**
-   * Option to declare input graph format (indexed, hbase)
+   * Option to declare input graph format (csv, indexed, hbase)
    */
   private static final String OPTION_INPUT_FORMAT = "f";
   /**
@@ -82,7 +81,7 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
    */
   private static String INPUT_PATH;
   /**
-   * Used input format (indexed, hbase)
+   * Used input format (csv, indexed, hbase)
    */
   private static String INPUT_FORMAT;
   /**
@@ -114,7 +113,7 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true,
       "Path to csv source files or table prefix (if HBase is chosen as format).");
     OPTIONS.addOption(OPTION_INPUT_FORMAT, "format", true,
-      "Input graph format (indexed, hbase).");
+      "Input graph format (csv, indexed, hbase).");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output", true,
       "Path to output file");
     OPTIONS.addOption(OPTION_CSV_PATH, "csv", true,
@@ -156,11 +155,8 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
 
     // read graph
     DataSource source;
-    switch (INPUT_FORMAT) {
-    case "indexed":
-      source = new IndexedCSVDataSource(INPUT_PATH, conf);
-      break;
-    case "hbase":
+
+    if (INPUT_FORMAT.equals("hbase")) {
       HBaseEPGMStore hBaseEPGMStore = HBaseEPGMStoreFactory.createOrOpenEPGMStore(
         HBaseConfiguration.create(),
         GradoopHBaseConfig.getDefaultConfig(),
@@ -173,9 +169,8 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
         source = ((HBaseDataSource) source).applyEdgePredicate(Query.elements().fromAll()
           .where(HBaseFilters.labelIn(EDGE_LABEL)));
       }
-      break;
-    default :
-      throw new IllegalArgumentException("Unsupported format: " + INPUT_FORMAT);
+    } else {
+      source = getDataSource(INPUT_PATH, INPUT_FORMAT);
     }
 
     LogicalGraph graph = source.getLogicalGraph();

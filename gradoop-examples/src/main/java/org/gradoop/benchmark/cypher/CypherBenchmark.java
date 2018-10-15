@@ -24,7 +24,6 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.gradoop.benchmark.subgraph.SubgraphBenchmark;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
@@ -49,7 +48,7 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    */
   private static final String OPTION_INPUT_PATH = "i";
   /**
-   * Option to declare input graph format (indexed, hbase)
+   * Option to declare input graph format (csv, indexed, hbase)
    */
   private static final String OPTION_INPUT_FORMAT = "f";
   /**
@@ -78,7 +77,7 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    */
   private static String INPUT_PATH;
   /**
-   * Used input format (indexed, hbase)
+   * Used input format (csv, indexed, hbase)
    */
   private static String INPUT_FORMAT;
   /**
@@ -110,7 +109,7 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true,
       "Input path to source files or table prefix of store.");
     OPTIONS.addOption(OPTION_INPUT_FORMAT, "format", true,
-      "Input graph format (indexed, hbase).");
+      "Input graph format (csv, indexed, hbase).");
     OPTIONS.addOption(OPTION_CSV_PATH, "csv", true,
       "Output path to csv statistics output");
     OPTIONS.addOption(OPTION_QUERY, "query", true,
@@ -149,11 +148,8 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
 
     // read graph
     DataSource source;
-    switch (INPUT_FORMAT) {
-    case "indexed":
-      source = new IndexedCSVDataSource(INPUT_PATH, config);
-      break;
-    case "hbase":
+
+    if (INPUT_FORMAT.equals("hbase")) {
       HBaseEPGMStore hBaseEPGMStore = HBaseEPGMStoreFactory.createOrOpenEPGMStore(
         HBaseConfiguration.create(),
         GradoopHBaseConfig.getDefaultConfig(),
@@ -166,10 +162,10 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
         source = ((HBaseDataSource) source)
           .applyEdgePredicate(Predicates.HBase.getEdgeFilter(QUERY));
       }
-      break;
-    default :
-      throw new IllegalArgumentException("Unsupported format: " + INPUT_FORMAT);
+    } else {
+      source = getDataSource(INPUT_PATH, INPUT_FORMAT);
     }
+
     LogicalGraph graph = source.getLogicalGraph();
 
     // prepare collection

@@ -212,7 +212,7 @@ public abstract class AbstractRunner {
    * @return DataSource for EPGM Data
    * @throws IOException on failure
    */
-  private static DataSource getDataSource(String directory, String format) throws IOException {
+  protected static DataSource getDataSource(String directory, String format) throws IOException {
     directory = appendSeparator(directory);
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
     format = format.toLowerCase();
