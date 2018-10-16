@@ -106,6 +106,14 @@
         </developerConnection>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>dbleipzig</id>
+            <name>DB Leipzig Archiva</name>
+            <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
+        </repository>
+    </repositories>
+
     <distributionManagement>
         <snapshotRepository>
             <id>release_artifacts_gradoop</id>
@@ -158,6 +166,7 @@
         <plugin.maven-site.version>3.4</plugin.maven-site.version>
         <plugin.maven-scm-publish.version>1.1</plugin.maven-scm-publish.version>
         <plugin.maven-jacoco.version>0.8.1</plugin.maven-jacoco.version>
+        <dep.okapi.version>0.2.1-SNAPSHOT</dep.okapi.version>
     </properties>
 
     <profiles>
@@ -357,6 +366,15 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <configuration>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${plugin.maven-compiler.version}</version>
@@ -501,7 +519,9 @@
                                 <goal>report</goal>
                             </goals>
                             <configuration>
-                                <outputDirectory>${session.executionRootDirectory}/target/coverage-reports/${project.name}</outputDirectory>
+                                <outputDirectory>
+                                    ${session.executionRootDirectory}/target/coverage-reports/${project.name}
+                                </outputDirectory>
                                 <title>${project.name}</title>
                                 <footer>Code Coverage Report for Gradoop ${project.version}</footer>
                             </configuration>
@@ -612,6 +632,19 @@
                 <groupId>com.esotericsoftware</groupId>
                 <artifactId>kryo-shaded</artifactId>
                 <version>${dep.kryo.version}</version>
+            </dependency>
+
+            <!-- CAPF -->
+            <dependency>
+                <groupId>org.opencypher</groupId>
+                <artifactId>flink-cypher</artifactId>
+                <version>${dep.okapi.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.opencypher</groupId>
+                <artifactId>spark-cypher</artifactId>
+                <version>${dep.okapi.version}</version>
             </dependency>
 
             <!-- Others -->
