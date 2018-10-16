@@ -22,7 +22,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
-import org.gradoop.flink.model.impl.functions.filters.And;
 import org.gradoop.flink.model.impl.functions.filters.Or;
 import org.junit.Assert;
 import org.junit.Test;

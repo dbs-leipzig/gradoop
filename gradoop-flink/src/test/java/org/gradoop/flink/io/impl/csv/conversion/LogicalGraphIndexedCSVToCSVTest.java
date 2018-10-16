@@ -41,9 +41,7 @@ public class LogicalGraphIndexedCSVToCSVTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testConversion() throws Exception {
-    String csvPath = LogicalGraphCSVToCSVTest.class
-      .getResource("/data/csv/input_indexed_deprecated")
-      .getFile();
+    String csvPath = getFilePath("/data/csv/input_indexed_deprecated");
 
     DataSource lgIndexedCSVDataSource = new LogicalGraphIndexedCSVDataSource(csvPath, getConfig());
 
