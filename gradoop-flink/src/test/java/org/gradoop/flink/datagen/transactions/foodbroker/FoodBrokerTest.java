@@ -136,7 +136,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   @Test
   public void testLargeSetStatistics() throws Exception {
 
-    String configPath = FoodBroker.class.getResource("/foodbroker/config.json").getFile();
+    String configPath = getFilePath("/foodbroker/config.json");
 
     FoodBrokerConfig config = FoodBrokerConfig.fromFile(configPath);
 
@@ -248,8 +248,7 @@ public class FoodBrokerTest extends GradoopFlinkTestBase {
   private void generateCollection() throws IOException, JSONException {
 
     if (cases == null) {
-      String configPath =
-          FoodBrokerTest.class.getResource("/foodbroker/config.json").getFile();
+      String configPath = getFilePath("/foodbroker/config.json");
 
       FoodBrokerConfig config = FoodBrokerConfig.fromFile(configPath);
 

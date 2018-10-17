@@ -94,26 +94,56 @@ public abstract class CSVBase {
     this.config = config;
   }
 
+  /**
+   * Returns the path to the graph head directory.
+   *
+   * @return graph head path
+   */
   protected String getGraphHeadPath() {
     return csvRoot + GRAPH_HEAD_PATH;
   }
 
+  /**
+   * Returns the path to the vertex directory.
+   *
+   * @return vertex path
+   */
   protected String getVertexPath() {
     return csvRoot + VERTEX_PATH;
   }
 
+  /**
+   * Returns the path to the edge directory.
+   *
+   * @return edge path
+   */
   protected String getEdgePath() {
     return csvRoot + EDGE_PATH;
   }
 
+  /**
+   * Returns the path to the graph head file.
+   *
+   * @return graph head file path
+   */
   protected String getGraphHeadCSVPath() {
     return csvRoot + GRAPH_HEAD_FILE;
   }
 
+  /**
+   * Returns the path to the vertex file.
+   *
+   * @return vertex file path
+   */
   protected String getVertexCSVPath() {
     return csvRoot + VERTEX_FILE;
   }
 
+  /**
+   * Returns the path to the edge file.
+   *
+   * @return edge file path
+   */
   protected String getEdgeCSVPath() {
     return csvRoot + EDGE_FILE;
   }
@@ -125,15 +155,7 @@ public abstract class CSVBase {
    * @return path to csv file
    */
   protected String getGraphHeadCSVPath(String label) {
-    Objects.requireNonNull(label);
-    label = MultipleFileOutputFormat
-      .cleanFilename(StringEscaper.escape(label, CSVConstants.ESCAPED_CHARACTERS));
-    return csvRoot +
-      GRAPH_HEAD_PATH +
-      CSVConstants.DIRECTORY_SEPARATOR +
-      label +
-      CSVConstants.DIRECTORY_SEPARATOR +
-      CSVConstants.SIMPLE_FILE;
+    return getElementCSVPath(label, getGraphHeadPath());
   }
 
   /**
@@ -143,15 +165,7 @@ public abstract class CSVBase {
    * @return path to csv file
    */
   protected String getVertexCSVPath(String label) {
-    Objects.requireNonNull(label);
-    label = MultipleFileOutputFormat
-      .cleanFilename(StringEscaper.escape(label, CSVConstants.ESCAPED_CHARACTERS));
-    return csvRoot +
-      VERTEX_PATH +
-      CSVConstants.DIRECTORY_SEPARATOR +
-      label +
-      CSVConstants.DIRECTORY_SEPARATOR +
-      CSVConstants.SIMPLE_FILE;
+    return getElementCSVPath(label, getVertexPath());
   }
 
   /**
@@ -161,11 +175,25 @@ public abstract class CSVBase {
    * @return path to csv file
    */
   protected String getEdgeCSVPath(String label) {
+    return getElementCSVPath(label, getEdgePath());
+  }
+
+  /**
+   * Returns the path to the element file containing only elements with the specified label.
+   *
+   * @param label element label
+   * @param elementPath path of the element (e.g. "edge")
+   * @return path to csv file
+   */
+  private String getElementCSVPath(String label, String elementPath) {
     Objects.requireNonNull(label);
-    label = MultipleFileOutputFormat
-      .cleanFilename(StringEscaper.escape(label, CSVConstants.ESCAPED_CHARACTERS));
-    return csvRoot +
-      EDGE_PATH +
+    if (label.isEmpty()) {
+      label = CSVConstants.DEFAULT_DIRECTORY;
+    } else {
+      label = MultipleFileOutputFormat
+        .cleanFilename(StringEscaper.escape(label, CSVConstants.ESCAPED_CHARACTERS));
+    }
+    return elementPath +
       CSVConstants.DIRECTORY_SEPARATOR +
       label +
       CSVConstants.DIRECTORY_SEPARATOR +
