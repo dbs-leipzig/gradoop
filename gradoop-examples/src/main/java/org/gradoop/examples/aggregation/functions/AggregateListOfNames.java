@@ -20,7 +20,6 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 
-
 /**
  * Custom vertex aggregate function that stores all values of the property 'name' over a set of
  * vertices as a comma separated list in a property named 'list_of_names'.
@@ -35,7 +34,7 @@ public class AggregateListOfNames extends BaseAggregateFunction<Vertex>
   private static final String PROPERTY_KEY_NAME = "name";
 
   /**
-   * Constructor.
+   * Creates a new instance of a AggregateListOfNames aggregate function.
    */
   public AggregateListOfNames() {
     super("list_of_names");

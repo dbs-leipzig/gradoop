@@ -66,9 +66,6 @@ public class ApplyAggregation
     this.aggregateFunctions = new HashSet<>(Arrays.asList(aggregateFunctions));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection executeForGVELayout(GraphCollection collection) {
     DataSet<GraphHead> graphHeads = collection.getGraphHeads();
@@ -89,9 +86,6 @@ public class ApplyAggregation
       .fromDataSets(graphHeads, collection.getVertices(), collection.getEdges());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection executeForTxLayout(GraphCollection collection) {
     DataSet<GraphTransaction> updatedTransactions = collection.getGraphTransactions()

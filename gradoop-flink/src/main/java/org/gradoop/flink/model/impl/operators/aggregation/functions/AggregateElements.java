@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Applies aggregate functions to the elements.#
+ * Applies aggregate functions to the elements.
  *
  * @param <T> element type
  */
@@ -39,7 +39,7 @@ public class AggregateElements<T extends Element>
   private final Set<AggregateFunction> aggregateFunctions;
 
   /**
-   * Constructor.
+   * Creates a new instance of a AggregateElements group combine function.
    *
    * @param aggregateFunctions aggregate functions
    */

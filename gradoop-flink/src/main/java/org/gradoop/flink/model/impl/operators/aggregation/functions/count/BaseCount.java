@@ -30,7 +30,7 @@ public abstract class BaseCount<T extends Element> extends BaseAggregateFunction
   implements Sum<T>, AggregateDefaultValue {
 
   /**
-   * Constructor.
+   * Creates a new instance of a BaseCount aggregate function.
    *
    * @param aggregatePropertyKey aggregate property key
    */

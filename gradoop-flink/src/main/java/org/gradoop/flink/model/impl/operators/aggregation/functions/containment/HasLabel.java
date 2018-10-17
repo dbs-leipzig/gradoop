@@ -26,7 +26,7 @@ import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
 public class HasLabel extends BaseHasLabel<Element> implements ElementAggregateFunction {
 
   /**
-   * Constructor.
+   * Creates a new instance of a HasLabel aggregate function.
    *
    * @param label element label to check presence of
    */
@@ -35,7 +35,7 @@ public class HasLabel extends BaseHasLabel<Element> implements ElementAggregateF
   }
 
   /**
-   * Constructor.
+   * Creates a new instance of a HasLabel aggregate function..
    *
    * @param label element label to check presence of
    * @param aggregatePropertyKey aggregate property key

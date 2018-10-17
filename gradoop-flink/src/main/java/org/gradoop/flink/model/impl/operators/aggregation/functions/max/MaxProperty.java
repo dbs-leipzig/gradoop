@@ -24,7 +24,7 @@ import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
 public class MaxProperty extends BaseMaxProperty<Element> implements ElementAggregateFunction {
 
   /**
-   * Constructor.
+   * Creates a new instance of a MaxProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    */
@@ -33,7 +33,7 @@ public class MaxProperty extends BaseMaxProperty<Element> implements ElementAggr
   }
 
   /**
-   * Constructor.
+   * Creates a new instance of a MaxProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    * @param aggregatePropertyKey aggregate property key

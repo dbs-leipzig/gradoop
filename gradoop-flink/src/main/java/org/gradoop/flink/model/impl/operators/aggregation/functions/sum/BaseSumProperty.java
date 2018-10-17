@@ -33,22 +33,22 @@ public abstract class BaseSumProperty<T extends Element> extends BaseAggregateFu
   private String propertyKey;
 
   /**
-   * Constructor.
+   * Creates a new instance of a BaseSumProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    */
-  public BaseSumProperty(String propertyKey) {
+  BaseSumProperty(String propertyKey) {
     super("sum_" + propertyKey);
     this.propertyKey = propertyKey;
   }
 
   /**
-   * Constructor.
+   * Creates a new instance of a BaseSumProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    * @param aggregatePropertyKey aggregate property key
    */
-  public BaseSumProperty(String propertyKey, String aggregatePropertyKey) {
+  BaseSumProperty(String propertyKey, String aggregatePropertyKey) {
     super(aggregatePropertyKey);
     this.propertyKey = propertyKey;
   }

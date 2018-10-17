@@ -38,7 +38,7 @@ public class AggregateListOfWccEdges implements EdgeAggregateFunction {
   private final String listOfWccIDsPropertyKey;
 
   /**
-   * Constructor for aggregation
+   * Creates a new instance of a AggregateListOfWccEdges aggregate function.
    *
    * @param wccPropertyKey Property key to retrieve property values
    */

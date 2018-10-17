@@ -40,12 +40,12 @@ public abstract class BaseHasLabel<T extends Element> extends BaseAggregateFunct
   protected final String label;
 
   /**
-   * Constructor.
+   * Creates a new instance of a BaseHasLabel aggregate function.
    *
    * @param label label to check presence of
    * @param aggregatePropertyKey aggregate property key
    */
-  public BaseHasLabel(String label, String aggregatePropertyKey) {
+  BaseHasLabel(String label, String aggregatePropertyKey) {
     super(aggregatePropertyKey);
     this.label = label;
   }

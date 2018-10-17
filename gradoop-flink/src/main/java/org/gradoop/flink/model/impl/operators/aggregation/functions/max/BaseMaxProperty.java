@@ -33,22 +33,22 @@ public abstract class BaseMaxProperty<T extends Element> extends BaseAggregateFu
   protected final String propertyKey;
 
   /**
-   * Constructor.
+   * Creates a new instance of a BaseMaxProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    */
-  public BaseMaxProperty(String propertyKey) {
+  BaseMaxProperty(String propertyKey) {
     super("max_" + propertyKey);
     this.propertyKey = propertyKey;
   }
 
   /**
-   * Constructor.
+   * Creates a new instance of a BaseMaxProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    * @param aggregatePropertyKey aggregate property key
    */
-  public BaseMaxProperty(String propertyKey, String aggregatePropertyKey) {
+  BaseMaxProperty(String propertyKey, String aggregatePropertyKey) {
     super(aggregatePropertyKey);
     this.propertyKey = propertyKey;
   }

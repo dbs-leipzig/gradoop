@@ -24,7 +24,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 public class SumVertexProperty extends BaseSumProperty<Vertex> implements VertexAggregateFunction {
 
   /**
-   * Constructor.
+   * Creates a new instance of a SumVertexProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    */
@@ -33,7 +33,7 @@ public class SumVertexProperty extends BaseSumProperty<Vertex> implements Vertex
   }
 
   /**
-   * Constructor.
+   * Creates a new instance of a SumVertexProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    * @param aggregatePropertyKey aggregate property key

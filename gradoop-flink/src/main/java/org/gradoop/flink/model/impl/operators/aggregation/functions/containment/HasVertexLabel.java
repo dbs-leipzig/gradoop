@@ -26,7 +26,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 public class HasVertexLabel extends BaseHasLabel<Vertex> implements VertexAggregateFunction {
 
   /**
-   * Constructor.
+   * Creates a new instance of a HasVertexLabel aggregate function.
    *
    * @param label vertex label to check presence of
    */
@@ -35,7 +35,7 @@ public class HasVertexLabel extends BaseHasLabel<Vertex> implements VertexAggreg
   }
 
   /**
-   * Constructor.
+   * Creates a new instance of a HasVertexLabel aggregate function.
    *
    * @param label vertex label to check presence of
    * @param aggregatePropertyKey aggregate property key

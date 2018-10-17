@@ -24,7 +24,7 @@ import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
 public class SumProperty extends BaseSumProperty<Element> implements ElementAggregateFunction {
 
   /**
-   * Constructor.
+   * Creates a new instance of a SumProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    */
@@ -33,7 +33,7 @@ public class SumProperty extends BaseSumProperty<Element> implements ElementAggr
   }
 
   /**
-   * Constructor.
+   * Creates a new instance of a SumProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    * @param aggregatePropertyKey aggregate property key

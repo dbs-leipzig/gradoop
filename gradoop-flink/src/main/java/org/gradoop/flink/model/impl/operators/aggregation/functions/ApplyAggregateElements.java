@@ -50,7 +50,7 @@ public class ApplyAggregateElements<T extends Element> implements GroupCombineFu
   private final Tuple2<GradoopId, Map<String, PropertyValue>> reusePair = new Tuple2<>();
 
   /**
-   * Constructor.
+   * Creates a new instance of a ApplyAggregateElements group combine function.
    *
    * @param aggregateFunctions aggregate functions
    */

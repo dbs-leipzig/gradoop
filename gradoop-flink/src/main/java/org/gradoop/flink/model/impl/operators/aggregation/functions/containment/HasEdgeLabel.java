@@ -26,7 +26,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 public class HasEdgeLabel extends BaseHasLabel<Edge> implements EdgeAggregateFunction {
 
   /**
-   * Constructor.
+   * Creates a new instance of a HasEdgeLabel aggregate function.
    *
    * @param label edge label to check presence of
    */
@@ -35,7 +35,7 @@ public class HasEdgeLabel extends BaseHasLabel<Edge> implements EdgeAggregateFun
   }
 
   /**
-   * Constructor.
+   * Creates a new instance of a HasEdgeLabel aggregate function.
    *
    * @param label edge label to check presence of
    * @param aggregatePropertyKey aggregate property key

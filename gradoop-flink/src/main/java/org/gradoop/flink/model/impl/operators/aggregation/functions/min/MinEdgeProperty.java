@@ -25,7 +25,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 public class MinEdgeProperty extends BaseMinProperty<Edge> implements EdgeAggregateFunction {
 
   /**
-   * Constructor.
+   * Creates a new instance of a MinEdgeProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    */
@@ -34,7 +34,7 @@ public class MinEdgeProperty extends BaseMinProperty<Edge> implements EdgeAggreg
   }
 
   /**
-   * Constructor.
+   * Creates a new instance of a MinEdgeProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    * @param aggregatePropertyKey aggregate property key

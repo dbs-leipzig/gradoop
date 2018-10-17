@@ -30,7 +30,7 @@ public abstract class BaseAggregateFunction<T extends Element> implements Aggreg
   private String aggregatePropertyKey;
 
   /**
-   * Constructor.
+   * Creates a new instance of a base aggregate function.
    *
    * @param aggregatePropertyKey aggregate property key
    */

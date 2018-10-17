@@ -47,7 +47,7 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
   private final Map<String, PropertyValue> aggregateDefaultValues;
 
   /**
-   * Creates a new instance.
+   * Creates a new instance of a AggregateTransactions map function.
    *
    * @param aggregateFunctions vertex or edge aggregate functions with possible default value
    */

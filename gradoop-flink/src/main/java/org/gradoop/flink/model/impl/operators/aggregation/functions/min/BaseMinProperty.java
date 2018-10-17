@@ -33,22 +33,22 @@ public abstract class BaseMinProperty<T extends Element> extends BaseAggregateFu
   private String propertyKey;
 
   /**
-   * Constructor.
+   * Creates a new instance of a BaseMinProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    */
-  public BaseMinProperty(String propertyKey) {
+  BaseMinProperty(String propertyKey) {
     super("min_" + propertyKey);
     this.propertyKey = propertyKey;
   }
 
   /**
-   * Constructor.
+   * Creates a new instance of a BaseMinProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    * @param aggregatePropertyKey aggregate property key
    */
-  public BaseMinProperty(String propertyKey, String aggregatePropertyKey) {
+  BaseMinProperty(String propertyKey, String aggregatePropertyKey) {
     super(aggregatePropertyKey);
     this.propertyKey = propertyKey;
   }

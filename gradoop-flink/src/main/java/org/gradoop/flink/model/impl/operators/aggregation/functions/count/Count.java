@@ -24,14 +24,14 @@ import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
 public class Count extends BaseCount<Element> implements ElementAggregateFunction {
 
   /**
-   * Constructor.
+   * Creates a new instance of a Count aggregate function.
    */
   public Count() {
     super("count");
   }
 
   /**
-   * Constructor.
+   * Creates a new instance of a Count aggregate function.
    *
    * @param aggregatePropertyKey aggregate property key
    */

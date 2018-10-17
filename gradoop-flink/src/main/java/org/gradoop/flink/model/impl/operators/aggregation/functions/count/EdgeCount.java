@@ -24,14 +24,14 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 public class EdgeCount extends BaseCount<Edge> implements EdgeAggregateFunction {
 
   /**
-   * Constructor.
+   * Creates a new instance of a EdgeCount aggregate function.
    */
   public EdgeCount() {
     super("edgeCount");
   }
 
   /**
-   * Constructor.
+   * Creates a new instance of a EdgeCount aggregate function.
    *
    * @param aggregatePropertyKey aggregate property key
    */

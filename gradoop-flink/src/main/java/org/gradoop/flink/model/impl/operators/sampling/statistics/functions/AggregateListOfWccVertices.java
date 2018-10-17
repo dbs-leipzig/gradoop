@@ -38,7 +38,7 @@ public class AggregateListOfWccVertices implements VertexAggregateFunction {
   private final String listOfWccIDsPropertyKey;
 
   /**
-   * Constructor for aggregation
+   * Creates a new instance of a AggregateListOfWccVertices aggregate function.
    *
    * @param wccPropertyKey Property key to retrieve property values
    */

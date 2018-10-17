@@ -176,9 +176,9 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     implements VertexAggregateFunction {
 
     /**
-     * Constructor.
+     * Creates a new instance of a CountSalesOrderAggregateFunction aggregate function.
      */
-    public CountSalesOrdersAggregateFunction() {
+    CountSalesOrdersAggregateFunction() {
       super("soCount");
     }
 

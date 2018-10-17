@@ -42,7 +42,7 @@ public class SetAggregateProperties implements
   private final Map<String, PropertyValue> defaultValues;
 
   /**
-   * Constructor.
+   * Creates a new instance of a SetAggregateProperties coGroup function.
    *
    * @param aggregateFunctions aggregate functions
    */

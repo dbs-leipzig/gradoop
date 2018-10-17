@@ -25,7 +25,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 public class MinVertexProperty extends BaseMinProperty<Vertex> implements VertexAggregateFunction {
 
   /**
-   * Constructor.
+   * Creates a new instance of a MinVertexProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    */
@@ -34,7 +34,7 @@ public class MinVertexProperty extends BaseMinProperty<Vertex> implements Vertex
   }
 
   /**
-   * Constructor.
+   * Creates a new instance of a MinVertexProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    * @param aggregatePropertyKey aggregate property key
