@@ -24,12 +24,12 @@ import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 public interface EdgeAggregateFunction extends AggregateFunction<Edge> {
 
   @Override
-  default boolean aggregatesVertices() {
+  default boolean isVertexAggregation() {
     return false;
   }
 
   @Override
-  default boolean aggregatesEdges() {
+  default boolean isEdgeAggregation() {
     return true;
   }
 }

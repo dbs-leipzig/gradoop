@@ -108,7 +108,7 @@ public class ApplyAggregation
       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
       .groupBy(0)
       .combineGroup(new ApplyAggregateElements<>(aggregateFunctions.stream()
-        .filter(AggregateFunction::aggregatesVertices)
+        .filter(AggregateFunction::isVertexAggregation)
         .collect(Collectors.toSet())));
   }
 
@@ -126,7 +126,7 @@ public class ApplyAggregation
       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
       .groupBy(0)
       .combineGroup(new ApplyAggregateElements<>(aggregateFunctions.stream()
-        .filter(AggregateFunction::aggregatesEdges)
+        .filter(AggregateFunction::isEdgeAggregation)
         .collect(Collectors.toSet())));
   }
 

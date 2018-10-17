@@ -58,12 +58,12 @@ public interface AggregateFunction<T extends Element> extends Serializable {
    *
    * @return true, if it aggregates vertices
    */
-  boolean aggregatesVertices();
+  boolean isVertexAggregation();
 
   /**
    * Returns whether this function aggregates edges.
    *
    * @return true, if it aggregates edges
    */
-  boolean aggregatesEdges();
+  boolean isEdgeAggregation();
 }

@@ -55,11 +55,11 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
     // initialization logic to avoid instanceOf checking during execution
 
     vertexAggregateFunctions = aggregateFunctions.stream()
-      .filter(AggregateFunction::aggregatesVertices)
+      .filter(AggregateFunction::isVertexAggregation)
       .collect(Collectors.toSet());
 
     edgeAggregateFunctions = aggregateFunctions.stream()
-      .filter(AggregateFunction::aggregatesEdges)
+      .filter(AggregateFunction::isEdgeAggregation)
       .collect(Collectors.toSet());
 
     aggregateDefaultValues = new HashMap<>();

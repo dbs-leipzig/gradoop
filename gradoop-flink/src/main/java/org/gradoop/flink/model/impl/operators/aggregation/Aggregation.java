@@ -85,7 +85,7 @@ public class Aggregation implements UnaryGraphToGraphOperator {
    */
   private DataSet<Map<String, PropertyValue>> aggregateVertices(DataSet<Vertex> vertices) {
     return vertices.combineGroup(new AggregateElements<>(aggregateFunctions.stream()
-      .filter(AggregateFunction::aggregatesVertices)
+      .filter(AggregateFunction::isVertexAggregation)
       .collect(Collectors.toSet())));
   }
 
@@ -97,7 +97,7 @@ public class Aggregation implements UnaryGraphToGraphOperator {
    */
   private DataSet<Map<String, PropertyValue>> aggregateEdges(DataSet<Edge> edges) {
     return edges.combineGroup(new AggregateElements<>(aggregateFunctions.stream()
-      .filter(AggregateFunction::aggregatesEdges)
+      .filter(AggregateFunction::isEdgeAggregation)
       .collect(Collectors.toSet())));
   }
 
