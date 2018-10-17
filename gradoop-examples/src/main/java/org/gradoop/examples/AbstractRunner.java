@@ -205,16 +205,30 @@ public abstract class AbstractRunner {
   }
 
   /**
-   * Returns an EPGM DataSource for a given directory and format.
+   * Returns an EPGM DataSource for a given directory and format with a new gradoop flink config.
    *
    * @param directory input path
    * @param format format in which the data is stored (csv, indexed, json)
    * @return DataSource for EPGM Data
    * @throws IOException on failure
    */
-  protected static DataSource getDataSource(String directory, String format) throws IOException {
+  private static DataSource getDataSource(String directory, String format) throws IOException {
+    return getDataSource(directory, format,
+      GradoopFlinkConfig.createConfig(getExecutionEnvironment()));
+  }
+
+  /**
+   * Returns an EPGM DataSource for a given directory and format.
+   *
+   * @param directory input path
+   * @param format format in which the data is stored (csv, indexed, json)
+   * @param config the gradoop flink configuration
+   * @return DataSource for EPGM Data
+   * @throws IOException on failure
+   */
+  protected static DataSource getDataSource(String directory, String format,
+    GradoopFlinkConfig config) throws IOException {
     directory = appendSeparator(directory);
-    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
     format = format.toLowerCase();
 
     switch (format) {

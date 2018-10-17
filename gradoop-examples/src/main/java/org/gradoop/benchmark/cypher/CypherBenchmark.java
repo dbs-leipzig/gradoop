@@ -163,7 +163,7 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
           .applyEdgePredicate(Predicates.HBase.getEdgeFilter(QUERY));
       }
     } else {
-      source = getDataSource(INPUT_PATH, INPUT_FORMAT);
+      source = getDataSource(INPUT_PATH, INPUT_FORMAT, config);
     }
 
     LogicalGraph graph = source.getLogicalGraph();
@@ -268,7 +268,7 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
       "predPushdown",
       "Runtime(s)");
 
-    String tail = String.format("%s|%s|%s|%s%s|%s||%s%n",
+    String tail = String.format("%s|%s|%s|%s|%s|%s|%s%n",
       env.getParallelism(),
       INPUT_PATH,
       INPUT_FORMAT,

@@ -150,7 +150,7 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
     readCMDArguments(cmd);
 
     // create gradoop config
-    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+    ExecutionEnvironment env = getExecutionEnvironment();
     GradoopFlinkConfig conf = GradoopFlinkConfig.createConfig(env);
 
     // read graph
@@ -170,7 +170,7 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
           .where(HBaseFilters.labelIn(EDGE_LABEL)));
       }
     } else {
-      source = getDataSource(INPUT_PATH, INPUT_FORMAT);
+      source = getDataSource(INPUT_PATH, INPUT_FORMAT, conf);
     }
 
     LogicalGraph graph = source.getLogicalGraph();
