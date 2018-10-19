@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The abstract base class for all output format using multiple files.
+ * The abstract base class for all output formats using multiple files.
  * This format will (for each record to write) determine a subdirectory, create a
  * new OutputFormat for that directory and write the record using the newly created format.
  * Those formats will be created as soon as the first record is to be written to that directory
@@ -66,7 +66,7 @@ public abstract class MultipleFileOutputFormat<IT> implements OutputFormat<IT>,
   protected int numTasks;
 
   /**
-   * The parallelism of this sink.
+   * The parallelism of this format.
    */
   protected int parallelism;
 
@@ -151,16 +151,15 @@ public abstract class MultipleFileOutputFormat<IT> implements OutputFormat<IT>,
   /**
    * Create or load an {@link OutputFormat} to use for a specific directory.
    * The directory should be a subdirectory of the root directory of this output format.
-   * The {@link OutputFormat#open(int, int)} should be called on the format.
    *
-   * @param directory The (sub-)directory were the output format operates.
+   * @param directory The (sub-)directory where the output format operates.
    * @return The output format used to write in that directory.
    * @throws IOException when the initialization of the new format fails.
    */
   protected abstract OutputFormat<IT> createFormatForDirectory(Path directory) throws IOException;
 
   /**
-   * Get the appropriate subdirectory of the record.
+   * Get the appropriate subdirectory for a record.
    * This is expected to return a relative path from the root directory.
    *
    * @param record The record to write.
@@ -169,7 +168,7 @@ public abstract class MultipleFileOutputFormat<IT> implements OutputFormat<IT>,
   protected abstract String getDirectoryForRecord(IT record);
 
   /**
-   * Replace illegal filename characters (<, >, :, ", /, \, |, ?, *) with '_'
+   * Replace illegal filename characters ({@code <, >, :, ", /, \, |, ?, *}) with {@code '_'}
    * and change the string to lower case.
    *
    * @param filename filename to be cleaned
