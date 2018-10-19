@@ -15,375 +15,158 @@
  */
 package org.gradoop.flink.io.impl.csv.indexed.functions;
 
-import org.apache.flink.annotation.Public;
 import org.apache.flink.api.common.io.CleanupWhenUnsuccessful;
 import org.apache.flink.api.common.io.InitializeOnMaster;
-import org.apache.flink.api.common.io.RichOutputFormat;
-import org.apache.flink.configuration.ConfigConstants;
+import org.apache.flink.api.common.io.OutputFormat;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.configuration.GlobalConfiguration;
-import org.apache.flink.core.fs.FSDataOutputStream;
 import org.apache.flink.core.fs.FileSystem;
-import org.apache.flink.core.fs.FileSystem.WriteMode;
 import org.apache.flink.core.fs.Path;
-import org.gradoop.flink.io.impl.csv.CSVConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map.Entry;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The abstract base class for all Rich output formats that are file based. Contains the logic to
- * open/close the target file streams. Feature to open several files concurrent.
+ * The abstract base class for all output format using multiple files.
+ * This format will (for each record to write) determine a subdirectory, create a
+ * new OutputFormat for that directory and write the record using the newly created format.
+ * Those formats will be created as soon as the first record is to be written to that directory
+ * and they will not be initialized automatically.
+ * <br>
+ * <i>Warning:</i> The {@link #configure(Configuration)}, {@link #open(int, int)},
+ * {@link #close()} and {@link #initializeGlobal(int)} methods will not invoke the respective
+ * methods of the new output formats, their parameters will just be stored as
+ * {@link #configuration}, {@link #taskNumber}, {@link #numTasks}, {@link #parallelism}
+ * respectively. Make sure to initialize each output format in
+ * {@link #createFormatForDirectory(Path)}.
  *
- * @param <IT> used output format
- *
- * references to: org.apache.flink.api.common.io.FileOutputFormat;
+ * @param <IT> The type of the records to write.
  */
-//
-// NOTE: The code in this file is based on code from the
-// Apache Flink project, licensed under the Apache License v 2.0
-//
-// (https://github.com/apache/flink/blob/master/flink-core/src/main/java/org/apache/flink/api
-// /common/io/FileOutputFormat.java)
-
-@Public
-public abstract class MultipleFileOutputFormat<IT>
-  extends RichOutputFormat<IT> implements InitializeOnMaster, CleanupWhenUnsuccessful {
+public abstract class MultipleFileOutputFormat<IT> implements OutputFormat<IT>,
+  CleanupWhenUnsuccessful, InitializeOnMaster {
 
   /**
-   * Behavior for creating output directories.
+   * The configuration set with {@link #configure(Configuration)}.
    */
-  public static enum OutputDirectoryMode {
-
-    /** A directory is always created, regardless of number of write tasks. */
-    ALWAYS,
-
-    /** A directory is only created for parallel output tasks,
-     * i.e., number of output tasks &gt; 1.
-     * If number of output tasks = 1, the output is written to a single file. */
-    PARONLY
-  }
-
-  // -----------------------------------------------------------------------------
+  protected Configuration configuration;
 
   /**
-   * The key under which the name of the target path is stored in the configuration.
+   * The write mode of this format.
    */
-  public static final String FILE_PARAMETER_KEY = "flink.output.file";
+  protected FileSystem.WriteMode writeMode;
 
   /**
-   * The write mode of the output.
+   * The number of this write task.
    */
-  private static WriteMode DEFAULT_WRITE_MODE;
+  protected int taskNumber;
 
   /**
-   * The output directory mode
+   * The number of tasks used by the sink.
    */
-  private static OutputDirectoryMode DEFAULT_OUTPUT_DIRECTORY_MODE;
+  protected int numTasks;
 
   /**
-   * Separator for directories
+   * The parallelism of this sink.
    */
-  private static String DIRECTORY_SEPARATOR = CSVConstants.DIRECTORY_SEPARATOR;
+  protected int parallelism;
 
   /**
-   * The LOG for logging messages in this class.
+   * The root output directory.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(MultipleFileOutputFormat.class);
+  protected Path rootOutputPath;
 
   /**
-   * The path of the file to be written.
+   * Stores {@link OutputFormat}s used internally for each subdirectory determined by
+   * {@link #getDirectoryForRecord(Object)}.
    */
-  protected Path outputFilePath;
-
-  // --------------------------------------------------------------------------------------------
-
-  /** Map all open streams to the file name */
-  protected HashMap<String, FSDataOutputStream> streams;
+  private Map<String, OutputFormat<IT>> formatsPerSubdirectory;
 
   /**
-   * The file system for the output.
-   */
-  protected transient FileSystem fs;
-
-  /** The path that is actually written to
-   * (may a a file in a the directory defined by {@code outputFilePath} )
-   */
-  private transient Path actualFilePath;
-
-  /** Flag indicating whether this format actually created a file,
-   * which should be removed on cleanup.
-   */
-  private transient boolean fileCreated;
-
-  // --------------------------------------------------------------------------------------------
-
-  /**
-   * The write mode of the output.
-   */
-  private WriteMode writeMode;
-
-  /**
-   * The output directory mode
-   */
-  private OutputDirectoryMode outputDirectoryMode;
-
-  /**
-   * Create a new instance of a MultipleFileOutputFormat.
+   * Creates a new output format with multiple output files.
    *
-   * @param outputPath The path to the file system.
+   * @param rootPath The root directory where all files will be stored.
    */
-  public MultipleFileOutputFormat(Path outputPath) {
-    this.outputFilePath = outputPath;
-    this.streams = new HashMap<>();
-  }
-
-  // --------------------------------------------------------------------------------------------
-
-  static {
-    initDefaultsFromConfiguration(GlobalConfiguration.loadConfiguration());
-  }
-
-  /**
-   * Initialize defaults for output format. Needs to be a static method because it is configured
-   * for local cluster execution, see LocalFlinkMiniCluster.
-   *
-   * @param configuration The configuration to load defaults from
-   */
-  private static void initDefaultsFromConfiguration(Configuration configuration) {
-    final boolean overwrite = configuration.getBoolean(
-        ConfigConstants.FILESYSTEM_DEFAULT_OVERWRITE_KEY,
-        ConfigConstants.DEFAULT_FILESYSTEM_OVERWRITE);
-
-    DEFAULT_WRITE_MODE = overwrite ? WriteMode.OVERWRITE : WriteMode.NO_OVERWRITE;
-
-    final boolean alwaysCreateDirectory = configuration.getBoolean(
-      ConfigConstants.FILESYSTEM_OUTPUT_ALWAYS_CREATE_DIRECTORY_KEY,
-      ConfigConstants.DEFAULT_FILESYSTEM_ALWAYS_CREATE_DIRECTORY);
-
-    DEFAULT_OUTPUT_DIRECTORY_MODE = alwaysCreateDirectory ?
-        OutputDirectoryMode.ALWAYS : OutputDirectoryMode.PARONLY;
-  }
-
-  //--------------------------------------------------------------------------------
-
-  /**
-   * Set the path of the output file.
-   *
-   * @param path The path to the output file.
-   */
-  public void setOutputFilePath(Path path) {
-    if (path == null) {
-      throw new IllegalArgumentException("Output file path may not be null.");
-    }
-
-    this.outputFilePath = path;
-  }
-
-  public Path getOutputFilePath() {
-    return this.outputFilePath;
-  }
-
-  /**
-   * Set the write mode of the file.
-   *
-   * @param mode The write mode.
-   */
-  public void setWriteMode(WriteMode mode) {
-    if (mode == null) {
-      throw new NullPointerException();
-    }
-
-    this.writeMode = mode;
-  }
-
-  public WriteMode getWriteMode() {
-    return this.writeMode;
-  }
-
-  /**
-   * Sets the directory mode of the output.
-   *
-   * @param mode The output directory mode.
-   */
-  public void setOutputDirectoryMode(OutputDirectoryMode mode) {
-    if (mode == null) {
-      throw new NullPointerException();
-    }
-
-    this.outputDirectoryMode = mode;
-  }
-
-  public OutputDirectoryMode getOutputDirectoryMode() {
-    return this.outputDirectoryMode;
-  }
-
-  // ----------------------------------------------------------------
-
-  @Override
-  public void configure(Configuration parameters) {
-    // get the output file path, if it was not yet set
-    if (this.outputFilePath == null) {
-      // get the file parameter
-      String filePath = parameters.getString(FILE_PARAMETER_KEY, null);
-      if (filePath == null) {
-        throw new IllegalArgumentException(
-            "The output path has been specified neither via constructor/setters" +
-            ", nor via the Configuration.");
-      }
-
-      try {
-        this.outputFilePath = new Path(filePath);
-      } catch (IllegalArgumentException ex) {
-        throw new IllegalArgumentException(
-           "Could not create a valid URI from the given file path name: " + ex.getMessage());
-      }
-    }
-
-    // check if have not been set and use the defaults in that case
-    if (this.writeMode == null) {
-      this.writeMode = DEFAULT_WRITE_MODE;
-    }
-
-    if (this.outputDirectoryMode == null) {
-      this.outputDirectoryMode = DEFAULT_OUTPUT_DIRECTORY_MODE;
-    }
-  }
-
-  @Override
-  public void open(int taskNumber, int numTasks) throws IOException {
-    if (taskNumber < 0 || numTasks < 1) {
-      throw new IllegalArgumentException("TaskNumber: " + taskNumber + ", numTasks: " + numTasks);
-    }
-
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("Opening stream for output (" + (taskNumber + 1) + "/" + numTasks +
-          "). WriteMode=" + writeMode + ", OutputDirectoryMode=" + outputDirectoryMode);
-    }
-
-    Path p = this.outputFilePath;
-    if (p == null) {
-      throw new IOException("The file path is null.");
-    }
-
-    fs = p.getFileSystem();
-
-    // if this is a local file system, we need to initialize the local output directory here
-    if (!fs.isDistributedFS()) {
-
-      if (numTasks == 1 && outputDirectoryMode == OutputDirectoryMode.PARONLY) {
-        // output should go to a single file
-
-       /* prepare local output path. checks for write mode and removes existing files
-          in case of OVERWRITE mode */
-        if (!fs.initOutPathLocalFS(p, writeMode, false)) {
-          // output preparation failed! Cancel task.
-          throw new IOException("Output path '" + p.toString() +
-              "' could not be initialized. Canceling task...");
-        }
-      } else {
-        // numTasks > 1 || outDirMode == OutputDirectoryMode.ALWAYS
-
-        if (!fs.initOutPathLocalFS(p, writeMode, true)) {
-          // output preparation failed! Cancel task.
-          throw new IOException("Output directory '" + p.toString() +
-              "' could not be created. Canceling task...");
-        }
-      }
-    }
-  }
-
-  /**
-   * Get the stream to a specific filename. If no stream for this file already exist
-   * it will create a new stream to the actual file path in the file system
-   * for a file with this filename.
-   *
-   * Output is written to: outputPath/label/data.csv
-   *
-   * @param label the name of the file
-   * @return the output stream for the path
-   * @throws IOException - Thrown, if the output could not be opened due to an I/O problem.
-   */
-  public FSDataOutputStream getAndCreateFileStream(String label) throws IOException {
-    if (!streams.containsKey(label)) {
-      actualFilePath = new Path(
-        this.outputFilePath,
-        DIRECTORY_SEPARATOR + label + DIRECTORY_SEPARATOR + CSVConstants.SIMPLE_FILE);
-      streams.put(label, fs.create(actualFilePath, writeMode));
-    }
-    return streams.get(label);
+  public MultipleFileOutputFormat(Path rootPath) {
+    this.rootOutputPath = rootPath;
+    formatsPerSubdirectory = new ConcurrentHashMap<>();
   }
 
   @Override
   public void close() throws IOException {
-    for (Entry<String, FSDataOutputStream> e : streams.entrySet()) {
-      final FSDataOutputStream s = e.getValue();
-      if (s != null) {
-        e.setValue(null);
-        s.close();
-      }
+    for (OutputFormat<IT> outputFormat : formatsPerSubdirectory.values()) {
+      outputFormat.close();
     }
+    formatsPerSubdirectory.clear();
+  }
+
+  @Override
+  public void configure(Configuration parameters) {
+    this.configuration = parameters;
+  }
+
+  @Override
+  public void initializeGlobal(int parallelism) throws IOException {
+    this.parallelism = parallelism;
+  }
+
+  @Override
+  public void open(int taskNumber, int numTasks) {
+    this.taskNumber = taskNumber;
+    this.numTasks = numTasks;
   }
 
   /**
-   * Initialization of the distributed file system if it is used.
+   * Set the write mode of this format.
    *
-   * @param parallelism The task parallelism.
+   * @param writeMode The new write mode.
    */
-  @Override
-  public void initializeGlobal(int parallelism) throws IOException {
-    final Path path = getOutputFilePath();
-    final FileSystem fileSystem = path.getFileSystem();
-
-    // only distributed file systems can be initialized at start-up time.
-    if (fileSystem.isDistributedFS()) {
-
-      final WriteMode wm = getWriteMode();
-      final OutputDirectoryMode outDirMode = getOutputDirectoryMode();
-
-      if (parallelism == 1 && outDirMode == OutputDirectoryMode.PARONLY) {
-        // output is not written in parallel and should be written to a single file.
-        // prepare distributed output path
-        if (!fileSystem.initOutPathDistFS(path, wm, false)) {
-          // output preparation failed! Cancel task.
-          throw new IOException("Output path could not be initialized.");
-        }
-
-      } else {
-        // output should be written to a directory
-
-        // only distributed file systems can be initialized at start-up time.
-        if (!fileSystem.initOutPathDistFS(path, wm, true)) {
-          throw new IOException("Output directory could not be created.");
-        }
-      }
-    }
+  public void setWriteMode(FileSystem.WriteMode writeMode) {
+    this.writeMode = writeMode;
   }
 
   @Override
-  public void tryCleanupOnError() {
-    if (this.fileCreated) {
-      this.fileCreated = false;
-
-      try {
-        close();
-      } catch (IOException e) {
-        LOG.error("Could not properly close FileOutputFormat.", e);
-      }
-
-      try {
-        FileSystem.get(this.actualFilePath.toUri()).delete(actualFilePath, false);
-      } catch (FileNotFoundException e) {
-        // ignore, may not be visible yet or may be already removed
-      } catch (IOException ex) {
-        LOG.error("Could not remove the incomplete file " + actualFilePath + '.', ex);
+  public void tryCleanupOnError() throws Exception {
+    for (OutputFormat<IT> outputFormat : formatsPerSubdirectory.values()) {
+      if (outputFormat instanceof CleanupWhenUnsuccessful) {
+        ((CleanupWhenUnsuccessful) outputFormat).tryCleanupOnError();
       }
     }
+    rootOutputPath.getFileSystem().delete(rootOutputPath, false);
   }
+
+
+  @Override
+  public void writeRecord(IT record) throws IOException {
+    String subDirectory = getDirectoryForRecord(record);
+    OutputFormat<IT> format;
+    if (formatsPerSubdirectory.containsKey(subDirectory)) {
+      format = formatsPerSubdirectory.get(subDirectory);
+    } else {
+      format = createFormatForDirectory(new Path(rootOutputPath, subDirectory));
+      formatsPerSubdirectory.put(subDirectory, format);
+    }
+    format.writeRecord(record);
+  }
+
+  /**
+   * Create or load an {@link OutputFormat} to use for a specific directory.
+   * The directory should be a subdirectory of the root directory of this output format.
+   * The {@link OutputFormat#open(int, int)} should be called on the format.
+   *
+   * @param directory The (sub-)directory were the output format operates.
+   * @return The output format used to write in that directory.
+   * @throws IOException when the initialization of the new format fails.
+   */
+  protected abstract OutputFormat<IT> createFormatForDirectory(Path directory) throws IOException;
+
+  /**
+   * Get the appropriate subdirectory of the record.
+   * This is expected to return a relative path from the root directory.
+   *
+   * @param record The record to write.
+   * @return The output directory to store the record in.
+   */
+  protected abstract String getDirectoryForRecord(IT record);
 
   /**
    * Replace illegal filename characters (<, >, :, ", /, \, |, ?, *) with '_'
