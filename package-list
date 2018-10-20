@@ -2,6 +2,7 @@ org.gradoop.benchmark
 org.gradoop.benchmark.cypher
 org.gradoop.benchmark.grouping
 org.gradoop.benchmark.patternmatching
+org.gradoop.benchmark.sampling
 org.gradoop.benchmark.sna
 org.gradoop.benchmark.sna.functions
 org.gradoop.benchmark.subgraph
@@ -51,6 +52,8 @@ org.gradoop.flink.algorithms.fsm.transactional.tle.interestingness
 org.gradoop.flink.algorithms.fsm.transactional.tle.pojos
 org.gradoop.flink.algorithms.fsm.transactional.tle.tuples
 org.gradoop.flink.algorithms.gelly
+org.gradoop.flink.algorithms.gelly.clusteringcoefficient
+org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions
 org.gradoop.flink.algorithms.gelly.connectedcomponents
 org.gradoop.flink.algorithms.gelly.connectedcomponents.functions
 org.gradoop.flink.algorithms.gelly.functions
@@ -62,6 +65,7 @@ org.gradoop.flink.algorithms.gelly.pagerank
 org.gradoop.flink.algorithms.gelly.pagerank.functions
 org.gradoop.flink.algorithms.gelly.shortestpaths
 org.gradoop.flink.algorithms.gelly.shortestpaths.functions
+org.gradoop.flink.algorithms.gelly.trianglecounting
 org.gradoop.flink.algorithms.gelly.vertexdegrees
 org.gradoop.flink.algorithms.gelly.vertexdegrees.functions
 org.gradoop.flink.datagen.transactions.foodbroker
