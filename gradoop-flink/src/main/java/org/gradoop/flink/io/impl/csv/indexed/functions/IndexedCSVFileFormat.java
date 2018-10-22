@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 /**
- * This is an OutputFormat to serialize {@link Tuple}s to text by there labels.
+ * This is an OutputFormat to serialize {@link Tuple}s to text by their labels.
  * The output is structured by record delimiters and field delimiters as common in CSV files.
  * Record delimiter separate records from each other ('\n' is common). Field
  * delimiters separate fields within a record.
@@ -49,11 +49,6 @@ public class IndexedCSVFileFormat<T extends Tuple & CSVElement> extends
    */
   public static final String DEFAULT_FIELD_DELIMITER = CSVConstants.TOKEN_DELIMITER;
 
-  /**
-   * The key under which the name of the target path is stored in the configuration.
-   */
-  public static final String FILE_PARAMETER_KEY = "flink.output.file";
-
   // --------------------------------------------------------------------------------
 
   /**
@@ -74,7 +69,7 @@ public class IndexedCSVFileFormat<T extends Tuple & CSVElement> extends
   private String recordDelimiter;
 
   /**
-   * The charset that is uses for the output encoding.
+   * The charset that is used for the output encoding.
    */
   private String charsetName = null;
 
