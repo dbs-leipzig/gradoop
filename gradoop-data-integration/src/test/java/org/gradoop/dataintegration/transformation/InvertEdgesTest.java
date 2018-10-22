@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
-import org.gradoop.flink.model.impl.functions.filters.And;
+import org.gradoop.flink.model.impl.functions.filters.Or;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -81,13 +81,15 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
      */
     List<Vertex> vertices = new ArrayList<>();
     invertedEdgeGraph.getVertices()
-        .filter(new And<>(new ByLabel<>("Person"), new ByLabel<>("Tag")))
+        .filter(new Or<>(new ByLabel<>("Person"), new ByLabel<>("Tag")))
         .output(new LocalCollectionOutputFormat<>(vertices));
 
     List<Edge> newEdges = new ArrayList<>();
     invertedEdgeGraph
         .getEdgesByLabel(invertedLabel)
         .output(new LocalCollectionOutputFormat<>(newEdges));
+
+    getConfig().getExecutionEnvironment().execute();
 
     Map<GradoopId, String> idMap = new HashMap<>();
     vertices.forEach(v -> idMap.put(v.getId(), v.getPropertyValue("name").getString()));
