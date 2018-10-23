@@ -6,7 +6,7 @@ os:
   - linux
   - osx
   - windows
-  
+
 matrix:
   allow_failures:
     - os: osx
@@ -20,5 +20,7 @@ before_cache:
   - rm -rf $HOME/.m2/repository/org/gradoop/
 
 language: java
+
+osx_image: xcode9.3
 
 jdk: oraclejdk8
