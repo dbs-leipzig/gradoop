@@ -2,14 +2,19 @@ package org.gradoop.utils.centrality;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.AggregateOperator;
+import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.operators.statistics.VertexCount;
 import org.gradoop.flink.model.impl.operators.statistics.VertexDegrees;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.utils.centrality.functions.AddDegreeJoinFunction;
+import org.gradoop.utils.centrality.functions.CalculateDegreeCentrality;
+import org.gradoop.utils.centrality.functions.DegreeDistanceFunction;
 
 public class DegreeCentrality extends AbstractRunner implements ProgramDescription {
 
@@ -17,25 +22,29 @@ public class DegreeCentrality extends AbstractRunner implements ProgramDescripti
 
   public static void main(String[] args) throws Exception {
 
-     // read logical Graph
-     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
+    // read logical Graph
+    LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
 
-     DataSet<WithCount<GradoopId>> degrees = new VertexDegrees().execute(graph);
+    DataSet<WithCount<GradoopId>> degrees = new VertexDegrees().execute(graph);
+    DataSet<Long> vertexCount = new VertexCount().execute(graph);
 
 
-     // broadcasting
-     DataSet<WithCount<GradoopId>> maxDegree = degrees.max(1);
+    // broadcasting
+    DataSet<WithCount<GradoopId>> maxDegree = degrees.max(1);
 
 
+    String broadcastName = "degree_max";
+    DataSet<Double> degree = degrees
+      .map(new DegreeDistanceFunction(broadcastName))
+      .withBroadcastSet(maxDegree, broadcastName)
+      .sum(0)
+      .crossWithTiny(vertexCount).with(new CalculateDegreeCentrality());
+    degree.print();
 
-     DataSet<Vertex> vertices = graph.getVertices()
-       .join(degrees)
-       .where(new Id<>()).equalTo(0)
-       .with(new AddDegreeJoinFunction(DEGREE_KEY));
+    // aggregiere Summe
+    //Dataset<Double> finalDegree = distances.sum(0).crossWithTiny(maxDegree).with(new BigDegreeCrossFunction());
 
-
-     // aggregiere Summe
 
 
 
@@ -45,4 +54,5 @@ public class DegreeCentrality extends AbstractRunner implements ProgramDescripti
   public String getDescription() {
     return DegreeCentrality.class.getName();
   }
+
 }
