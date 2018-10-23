@@ -15,11 +15,11 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.containment;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
 
@@ -27,12 +27,14 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
  * Superclass of aggregate and filter functions that check vertex or edge label
  * presence in a graph.
  *
- * Usage: First, aggregate and, second, filter using the same UDF instance.
+ * Usage:
+ * 1. aggregate
+ * 2. filter using the same UDF instance.
  *
  * @param <T> element type
  */
 public abstract class BaseHasLabel<T extends Element> extends BaseAggregateFunction<T>
-  implements Or<T>, AggregateFunction<T>, FilterFunction<GraphHead> {
+  implements Or<T>, AggregateFunction<T>, CombinableFilter<GraphHead> {
 
   /**
    * Label to check presence of.
