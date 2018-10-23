@@ -17,7 +17,6 @@ package org.gradoop.examples.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -26,9 +25,8 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * An example for the subgraph operator using combined filter functions.
@@ -37,13 +35,6 @@ import java.util.List;
  * @see org.gradoop.flink.model.impl.functions.filters.CombinableFilter
  */
 public class SubgraphExample {
-
-  /**
-   * Path of the input graph.
-   */
-  private static final String DATA_PATH =
-    SubgraphExample.class.getResource("/data/csv/sna").getFile();
-
   /**
    * Run an example subgraph operation on the example social media graph.
    *
@@ -56,7 +47,9 @@ public class SubgraphExample {
     // Create Gradoop config.
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(executionEnvironment);
     // Read the input graph.
-    LogicalGraph inputGraph = new CSVDataSource(DATA_PATH, config).getLogicalGraph();
+    LogicalGraph inputGraph = new CSVDataSource(
+      URLDecoder.decode(SubgraphExample.class.getResource("/data/csv/sna").getFile(),
+        StandardCharsets.UTF_8.name()), config).getLogicalGraph();
 
     // Create a filter for vertices accepting:
     // 1. Vertices with label "Forum" and a property "title" set to "Graph Processing"
@@ -73,18 +66,7 @@ public class SubgraphExample {
     // Use these filters with a subgraph call:
     LogicalGraph filteredGraph = inputGraph.subgraph(vertexFilter, edgeFilter);
 
-    // Collect vertices and edges to a local collection to output them both:
-    List<Vertex> resultVertices = new ArrayList<>();
-    List<Edge> resultEdges = new ArrayList<>();
-    filteredGraph.getVertices().output(new LocalCollectionOutputFormat<>(resultVertices));
-    filteredGraph.getEdges().output(new LocalCollectionOutputFormat<>(resultEdges));
-    executionEnvironment.execute();
-
-    // Print results:
-    System.out.println("Vertices:");
-    resultVertices.forEach(System.out::println);
-    System.out.println("Edges:");
-    resultEdges.forEach(System.out::println);
-
+    // Print result graph
+    filteredGraph.print();
   }
 }

@@ -56,15 +56,19 @@ public class CSVConstants {
    */
   public static final String EDGE_TYPE = "e";
   /**
-   * System constant file separator
+   * System constant file separator.
    */
   public static final String DIRECTORY_SEPARATOR = System.getProperty("file.separator");
   /**
-   * File name for indexed data
+   * File name for indexed data.
    */
   public static final String SIMPLE_FILE = "data.csv";
   /**
-   * Characters to be escaped in csv strings
+   * Directory to store empty labels with indexed CSV.
+   */
+  public static final String DEFAULT_DIRECTORY = "_";
+  /**
+   * Characters to be escaped in csv strings.
    */
   public static final Set<Character> ESCAPED_CHARACTERS = ImmutableSet
     .of('\\', ';', ',', '|', ':', '\n', '=');

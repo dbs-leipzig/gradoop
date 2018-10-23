@@ -148,7 +148,6 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
    * @throws IOException - Throne if creating writer or output stream fails.
    */
   public void mapWriter(Tuple tuple, String fileName) throws IOException {
-    fileName = cleanFilename(fileName);
     if (labelsToWriter.containsKey(fileName)) {
       writeToCSV(tuple, labelsToWriter.get(fileName));
     } else {
@@ -208,7 +207,9 @@ public class IndexedCSVFileFormat<T extends Tuple> extends MultipleFileOutputFor
   public void writeRecord(T record) throws IOException {
     String label = ((CSVElement) record).getLabel();
     if (label.isEmpty()) {
-      throw new IllegalArgumentException("IndexedCSVDataSink requires a label for every element.");
+      label = CSVConstants.DEFAULT_DIRECTORY;
+    } else {
+      label = cleanFilename(label);
     }
     mapWriter(record, label);
   }

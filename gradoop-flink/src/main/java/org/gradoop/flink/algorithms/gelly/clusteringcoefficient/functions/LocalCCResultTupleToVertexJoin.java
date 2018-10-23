@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.aggregation.functions;
+package org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
 
 /**
- * Wraps the result of a group-by-id-count into a property value
+ * Writes the local clustering coefficient from {@code Tuple2<GradoopId, Double>} to the
+ * corresponding epgm vertex as property.
  */
-@FunctionAnnotation.ForwardedFields("f0")
-@FunctionAnnotation.ReadFields("f1")
-public class GroupCountToPropertyValue implements
-  MapFunction<Tuple2<GradoopId, Long>, Tuple2<GradoopId, PropertyValue>> {
+public class LocalCCResultTupleToVertexJoin implements
+  JoinFunction<Tuple2<GradoopId, Double>, Vertex, Vertex> {
 
   @Override
-  public Tuple2<GradoopId, PropertyValue> map(
-    Tuple2<GradoopId, Long> pair) throws Exception {
-    return new Tuple2<>(pair.f0, PropertyValue.create(pair.f1));
+  public Vertex join(Tuple2<GradoopId, Double> resultTuple, Vertex vertex) throws Exception {
+    vertex.setProperty(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL, resultTuple.f1);
+    return vertex;
   }
 }
