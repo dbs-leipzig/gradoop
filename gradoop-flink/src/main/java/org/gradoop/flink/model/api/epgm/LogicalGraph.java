@@ -28,6 +28,12 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import org.gradoop.flink.model.api.functions.timeextractors.EdgeTimeIntervalExtractor;
+import org.gradoop.flink.model.api.functions.timeextractors.EdgeTimestampExtractor;
+import org.gradoop.flink.model.api.functions.timeextractors.GraphHeadTimeIntervalExtractor;
+import org.gradoop.flink.model.api.functions.timeextractors.GraphHeadTimestampExtractor;
+import org.gradoop.flink.model.api.functions.timeextractors.VertexTimeIntervalExtractor;
+import org.gradoop.flink.model.api.functions.timeextractors.VertexTimestampExtractor;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
@@ -91,22 +97,26 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
   //----------------------------------------------------------------------------
 
   @Deprecated
+  @Override
   default GraphCollection cypher(String query) {
     return cypher(query, new GraphStatistics(1, 1, 1, 1));
   }
 
   @Deprecated
+  @Override
   default GraphCollection cypher(String query, String constructionPattern) {
     return cypher(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
   }
 
   @Deprecated
+  @Override
   default GraphCollection cypher(String query, GraphStatistics graphStatistics) {
     return cypher(query, true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM,
       graphStatistics);
   }
 
   @Deprecated
+  @Override
   default GraphCollection cypher(String query, String constructionPattern,
     GraphStatistics graphStatistics) {
     return cypher(query, constructionPattern, true, MatchStrategy.HOMOMORPHISM,
@@ -114,12 +124,14 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
   }
 
   @Deprecated
+  @Override
   default GraphCollection cypher(String query, boolean attachData, MatchStrategy vertexStrategy,
     MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     return cypher(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
   }
 
   @Deprecated
+  @Override
   default GraphCollection cypher(String query, String constructionPattern, boolean attachData,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     return callForCollection(
@@ -127,30 +139,36 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
         edgeStrategy, graphStatistics));
   }
 
+  @Override
   default GraphCollection query(String query) {
     return query(query, new GraphStatistics(1, 1, 1, 1));
   }
 
+  @Override
   default GraphCollection query(String query, String constructionPattern) {
     return query(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
   }
 
+  @Override
   default GraphCollection query(String query, GraphStatistics graphStatistics) {
     return query(query, true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM,
       graphStatistics);
   }
 
+  @Override
   default GraphCollection query(String query, String constructionPattern,
     GraphStatistics graphStatistics) {
     return query(query, constructionPattern, true, MatchStrategy.HOMOMORPHISM,
       MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
+  @Override
   default GraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
     MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     return query(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
   }
 
+  @Override
   default GraphCollection query(String query, String constructionPattern, boolean attachData,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     return callForCollection(
@@ -158,10 +176,12 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
         edgeStrategy, graphStatistics));
   }
 
+  @Override
   default LogicalGraph copy() {
     return callForGraph(new Cloning());
   }
 
+  @Override
   default LogicalGraph transform(
     TransformationFunction<GraphHead> graphHeadTransformationFunction,
     TransformationFunction<Vertex> vertexTransformationFunction,
@@ -171,21 +191,24 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
         edgeTransformationFunction));
   }
 
+  @Override
   default LogicalGraph transformGraphHead(
     TransformationFunction<GraphHead> graphHeadTransformationFunction) {
     return transform(graphHeadTransformationFunction, null, null);
   }
 
+  @Override
   default LogicalGraph transformVertices(
     TransformationFunction<Vertex> vertexTransformationFunction) {
     return transform(null, vertexTransformationFunction, null);
   }
 
-  default LogicalGraph transformEdges(
-    TransformationFunction<Edge> edgeTransformationFunction) {
+  @Override
+  default LogicalGraph transformEdges(TransformationFunction<Edge> edgeTransformationFunction) {
     return transform(null, null, edgeTransformationFunction);
   }
 
+  @Override
   default LogicalGraph transformGraphHeadProperties(
     String propertyKey, PropertyTransformationFunction graphHeadPropTransformationFunction) {
     Objects.requireNonNull(propertyKey);
@@ -194,6 +217,7 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
       new PropertyTransformation(propertyKey, graphHeadPropTransformationFunction, null, null));
   }
 
+  @Override
   default LogicalGraph transformVertexProperties(String propertyKey,
     PropertyTransformationFunction vertexPropTransformationFunction) {
     Objects.requireNonNull(propertyKey);
@@ -202,6 +226,7 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
       new PropertyTransformation(propertyKey, null, vertexPropTransformationFunction, null));
   }
 
+  @Override
   default LogicalGraph transformEdgeProperties(String propertyKey,
     PropertyTransformationFunction edgePropTransformationFunction) {
     Objects.requireNonNull(propertyKey);
@@ -210,42 +235,48 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
       new PropertyTransformation(propertyKey, null, null, edgePropTransformationFunction));
   }
 
+  @Override
   default LogicalGraph vertexInducedSubgraph(
     FilterFunction<Vertex> vertexFilterFunction) {
     Objects.requireNonNull(vertexFilterFunction);
     return callForGraph(new Subgraph(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
   }
 
-  default LogicalGraph edgeInducedSubgraph(
-    FilterFunction<Edge> edgeFilterFunction) {
+  @Override
+  default LogicalGraph edgeInducedSubgraph(FilterFunction<Edge> edgeFilterFunction) {
     Objects.requireNonNull(edgeFilterFunction);
     return callForGraph(new Subgraph(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));
   }
 
+  @Override
   default LogicalGraph subgraph(
     FilterFunction<Vertex> vertexFilterFunction, FilterFunction<Edge> edgeFilterFunction,
     Subgraph.Strategy strategy) {
     return callForGraph(new Subgraph(vertexFilterFunction, edgeFilterFunction, strategy));
   }
 
-  default LogicalGraph aggregate(
-    AggregateFunction... aggregateFunctions) {
+  @Override
+  default LogicalGraph aggregate(AggregateFunction... aggregateFunctions) {
     return callForGraph(new Aggregation(aggregateFunctions));
   }
 
+  @Override
   default LogicalGraph sample(SamplingAlgorithm algorithm) {
     return callForGraph(algorithm);
   }
 
+  @Override
   default LogicalGraph groupBy(List<String> vertexGroupingKeys) {
     return groupBy(vertexGroupingKeys, null);
   }
 
+  @Override
   default LogicalGraph groupBy(List<String> vertexGroupingKeys,
     List<String> edgeGroupingKeys) {
     return groupBy(vertexGroupingKeys, null, edgeGroupingKeys, null, GroupingStrategy.GROUP_REDUCE);
   }
 
+  @Override
   default LogicalGraph groupBy(List<String> vertexGroupingKeys,
     List<PropertyValueAggregator> vertexAggregateFunctions, List<String> edgeGroupingKeys,
     List<PropertyValueAggregator> edgeAggregateFunctions, GroupingStrategy groupingStrategy) {
@@ -270,13 +301,15 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
     return callForGraph(builder.build());
   }
 
+  @Override
   default LogicalGraph reduceOnEdges(EdgeAggregateFunction function,
     Neighborhood.EdgeDirection edgeDirection) {
     return callForGraph(new ReduceEdgeNeighborhood(function, edgeDirection));
   }
 
-  default LogicalGraph reduceOnNeighbors(
-    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
+  @Override
+  default LogicalGraph reduceOnNeighbors(VertexAggregateFunction function,
+    Neighborhood.EdgeDirection edgeDirection) {
     return callForGraph(new ReduceVertexNeighborhood(function, edgeDirection));
   }
 
@@ -284,28 +317,34 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
   // Binary Operators
   //----------------------------------------------------------------------------
 
+  @Override
   default LogicalGraph combine(LogicalGraph otherGraph) {
     return callForGraph(new Combination(), otherGraph);
   }
 
+  @Override
   default LogicalGraph overlap(LogicalGraph otherGraph) {
     return callForGraph(new Overlap(), otherGraph);
   }
 
+  @Override
   default LogicalGraph exclude(LogicalGraph otherGraph) {
     return callForGraph(new Exclusion(), otherGraph);
   }
 
+  @Override
   default DataSet<Boolean> equalsByElementIds(LogicalGraph other) {
     return new GraphEquality(new GraphHeadToEmptyString(), new VertexToIdString(),
       new EdgeToIdString(), true).execute(this, other);
   }
 
+  @Override
   default DataSet<Boolean> equalsByElementData(LogicalGraph other) {
     return new GraphEquality(new GraphHeadToEmptyString(), new VertexToDataString(),
       new EdgeToDataString(), true).execute(this, other);
   }
 
+  @Override
   default DataSet<Boolean> equalsByData(LogicalGraph other) {
     return new GraphEquality(new GraphHeadToDataString(), new VertexToDataString(),
       new EdgeToDataString(), true).execute(this, other);
@@ -315,22 +354,27 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
   // Auxiliary Operators
   //----------------------------------------------------------------------------
 
+  @Override
   default LogicalGraph callForGraph(UnaryGraphToGraphOperator operator) {
     return operator.execute(this);
   }
 
+  @Override
   default LogicalGraph callForGraph(BinaryGraphToGraphOperator operator, LogicalGraph otherGraph) {
     return operator.execute(this, otherGraph);
   }
 
+  @Override
   default LogicalGraph callForGraph(GraphsToGraphOperator operator, LogicalGraph... otherGraphs) {
     return operator.execute(this, otherGraphs);
   }
 
+  @Override
   default GraphCollection callForCollection(UnaryGraphToCollectionOperator operator) {
     return operator.execute(this);
   }
 
+  @Override
   default GraphCollection splitBy(String propertyKey) {
     return callForCollection(new Split(new PropertyGetter<>(Lists.newArrayList(propertyKey))));
   }
@@ -341,28 +385,76 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
    *
    * @return the logical graph represented as temporal graph with empty valid time attributes
    */
-  TemporalGraph toTemporalGraph();
+  default TemporalGraph toTemporalGraph() {
+    return getConfig().getTemporalGraphFactory()
+      .fromNonTemporalDataSets(getVertices(), getEdges(), getGraphHead());
+  }
 
-  /* TODO: implement */
-  //TemporalGraph toTemporalGraph(TimestampExtractor timestampExtractor);
+  /**
+   * Converts the {@link LogicalGraph} to a {@link TemporalGraph} instance. By the provided
+   * timestamp extractors, it is possible to extract a temporal information from the data to
+   * define a timestamp that represents the beginning of the element's validity (valid time).
+   * The value of the validTo property remains a default value. Use
+   * {@link LogicalGraph#toTemporalGraph(GraphHeadTimeIntervalExtractor,
+   * VertexTimeIntervalExtractor, EdgeTimeIntervalExtractor)} to define the beginning and the end
+   * of the element's validity.
+   *
+   * @param graphHeadTimestampExtractor extractor function to pick the timestamp from graph heads
+   * @param vertexTimestampExtractor extractor function to pick the timestamp from vertices
+   * @param edgeTimestampExtractor extractor function to pick the timestamp from edges
+   * @return the logical graph represented as temporal graph with a timestamp as validFrom attribute
+   */
+  default TemporalGraph toTemporalGraph(
+    GraphHeadTimestampExtractor graphHeadTimestampExtractor,
+    VertexTimestampExtractor vertexTimestampExtractor,
+    EdgeTimestampExtractor edgeTimestampExtractor) {
 
-  /* TODO: implement */
-  //TemporalGraph toTemporalGraph(TimeIntervalExtractor timeIntervalExtractor);
+    return getConfig().getTemporalGraphFactory().fromDataSets(
+      getVertices().map(vertexTimestampExtractor),
+      getEdges().map(edgeTimestampExtractor),
+      getGraphHead().map(graphHeadTimestampExtractor));
+  }
+
+  /**
+   * Converts the {@link LogicalGraph} to a {@link TemporalGraph} instance. By the provided
+   * timestamp extractors, it is possible to extract temporal information from the data to
+   * define a time interval that represents the beginning and end of the element's validity
+   * (valid time).
+   * Use {@link LogicalGraph#toTemporalGraph(GraphHeadTimestampExtractor, VertexTimestampExtractor,
+   * EdgeTimestampExtractor)} to define only a timestamp as the beginning of the element's validity.
+   *
+   * @param graphHeadTimeIntervalExtractor extractor to pick the time interval from graph heads
+   * @param vertexTimeIntervalExtractor extractor to pick the time interval from vertices
+   * @param edgeTimeIntervalExtractor extractor to pick the time interval from edges
+   * @return the logical graph represented as temporal graph with a time interval as valid time
+   */
+  default TemporalGraph toTemporalGraph(
+    GraphHeadTimeIntervalExtractor graphHeadTimeIntervalExtractor,
+    VertexTimeIntervalExtractor vertexTimeIntervalExtractor,
+    EdgeTimeIntervalExtractor edgeTimeIntervalExtractor) {
+
+    return getConfig().getTemporalGraphFactory().fromDataSets(
+      getVertices().map(vertexTimeIntervalExtractor),
+      getEdges().map(edgeTimeIntervalExtractor),
+      getGraphHead().map(graphHeadTimeIntervalExtractor));
+  }
 
   //----------------------------------------------------------------------------
   // Utility methods
   //----------------------------------------------------------------------------
-
+  @Override
   default DataSet<Boolean> isEmpty() {
     return getVertices().map(new True<>()).distinct()
       .union(getConfig().getExecutionEnvironment().fromElements(false)).reduce(new Or())
       .map(new Not());
   }
 
+  @Override
   default void writeTo(DataSink dataSink) throws IOException {
     dataSink.write(this);
   }
 
+  @Override
   default void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
     dataSink.write(this, overWrite);
   }

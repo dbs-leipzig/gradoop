@@ -15,11 +15,36 @@
  */
 package org.gradoop.flink.model.api.tpgm;
 
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
+import org.gradoop.flink.model.api.layouts.TemporalLayout;
 
 /**
- * TODO: description
+ * A temporal (logical) graph is a base concept of the Temporal Property Graph Model (TPGM) that
+ * extends the Extended Property Graph Model (EPGM). The temporal graph inherits the main concepts
+ * of the {@link org.gradoop.flink.model.api.epgm.LogicalGraph} and extends them by temporal
+ * attributes. These attributes are two temporal information: the valid-time and transaction time.
+ * Both are represented by a Tuple2 of Long values that specify the beginning and end time as unix
+ * timestamp in milliseconds.
+ *
+ * transactionTime: (tx-from [ms], tx-to [ms])
+ * validTime: (val-from [ms], val-to [ms])
+ *
+ * Furthermore, a temporal graph provides operations that are performed on the underlying data.
+ * These operations result in either another temporal graph or in a {@link TemporalGraphCollection}.
+ *
+ * Analogous to a logical graph, a temporal graph is wrapping a layout - in this case the
+ * {@link TemporalLayout} - which defines, how the graph is represented in Apache Flink.
+ * Note that the {@link TemporalGraph} also implements that interface and just forward the calls to
+ * the layout. This is just for convenience and API synchronicity.
  */
-public interface TemporalGraph extends LogicalGraph, TemporalGraphOperators {
+public interface TemporalGraph extends TemporalLayout, TemporalGraphOperators {
+
+  /**
+   * Returns a dataset containing a single graph head associated with that temporal graph.
+   *
+   * @return 1-element dataset
+   */
+  DataSet<TemporalGraphHead> getGraphHead();
 
 }

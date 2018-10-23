@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.tpgm;
+package org.gradoop.flink.model.api.functions.timeextractors;
 
-import org.gradoop.flink.model.api.epgm.GraphBaseOperators;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
 
 /**
- * Defines the operators that are available on a {@link TemporalGraph}.
+ * Map function to extract temporal information from an EPGM edge to create a temporal edge
+ * with a timestamp as the beginning of the elements validity.
  */
-interface TemporalGraphOperators extends GraphBaseOperators {
+public interface EdgeTimestampExtractor extends TimestampExtractor<Edge, TemporalEdge> {
 
+  @Override
+  default TemporalEdge map(Edge value) throws Exception {
+    TemporalEdge temporalVertex = TemporalEdge.fromNonTemporalEdge(value);
+    temporalVertex.setValidFrom(getValidFrom(value));
+    return temporalVertex;
+  }
 }

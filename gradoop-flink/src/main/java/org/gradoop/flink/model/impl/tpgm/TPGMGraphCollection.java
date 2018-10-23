@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.model.api.tpgm.TemporalGraph;
+import org.gradoop.flink.model.api.tpgm.TemporalGraphCollection;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
@@ -29,9 +29,9 @@ import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalGVELayout;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * A concrete class representing a {@link TemporalGraph} in the TPGM.
+ * A concrete class representing a {@link TemporalGraphCollection} in the TPGM.
  */
-public class TPGMTemporalGraph implements TemporalGraph {
+public class TPGMGraphCollection implements TemporalGraphCollection {
 
   /**
    * Layout for that temporal graph.
@@ -48,7 +48,7 @@ public class TPGMTemporalGraph implements TemporalGraph {
    * @param layout the temporal graph layout representing the temporal graph
    * @param config Gradoop Flink configuration
    */
-  TPGMTemporalGraph(TemporalGVELayout layout, GradoopFlinkConfig config) {
+  TPGMGraphCollection(TemporalGVELayout layout, GradoopFlinkConfig config) {
     this.layout = Preconditions.checkNotNull(layout);
     this.config = Preconditions.checkNotNull(config);
   }
@@ -73,11 +73,6 @@ public class TPGMTemporalGraph implements TemporalGraph {
   @Override
   public void writeTo(DataSink dataSink, boolean overWrite) {
     throw new RuntimeException("Writing a temporal graph to a DataSink is not implemented yet.");
-  }
-
-  @Override
-  public DataSet<TemporalGraphHead> getGraphHead() {
-    return this.layout.getGraphHead();
   }
 
   @Override

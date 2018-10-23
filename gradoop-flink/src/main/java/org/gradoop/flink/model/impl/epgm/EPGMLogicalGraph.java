@@ -22,7 +22,6 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
-import org.gradoop.flink.model.api.tpgm.TemporalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -92,10 +91,5 @@ public class EPGMLogicalGraph implements LogicalGraph {
   @Override
   public DataSet<Edge> getEdgesByLabel(String label) {
     return layout.getEdgesByLabel(label);
-  }
-
-  @Override
-  public TemporalGraph toTemporalGraph() {
-    return config.getTemporalGraphFactory().fromDataSets(getVertices(), getEdges(), getGraphHead());
   }
 }

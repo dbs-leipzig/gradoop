@@ -23,13 +23,13 @@ import org.apache.flink.test.util.TestBaseUtils;
 import org.apache.flink.test.util.TestEnvironment;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalElement;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
-import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalGraphCollectionLayoutFactory;
-import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalGraphLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalLayoutFactory;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.AfterClass;
@@ -44,6 +44,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -73,14 +74,9 @@ public abstract class GradoopFlinkTestBase {
   private GraphCollectionLayoutFactory collectionLayoutFactory;
 
   /**
-   * Factory to create a temporal graph layout.
+   * Factory to create a temporal layout.
    */
-  private TemporalGraphLayoutFactory temporalGraphLayoutFactory;
-
-  /**
-   * Factory to create a temporal graph collection layout.
-   */
-  private TemporalGraphCollectionLayoutFactory temporalGraphCollectionLayoutFactory;
+  private TemporalLayoutFactory temporalGraphLayoutFactory;
 
   public GradoopFlinkTestBase() {
     TestEnvironment testEnv = new TestEnvironment(CLUSTER, DEFAULT_PARALLELISM, false);
@@ -89,8 +85,7 @@ public abstract class GradoopFlinkTestBase {
     this.env = testEnv;
     setGraphLayoutFactory(new GVEGraphLayoutFactory());
     setCollectionLayoutFactory(new GVECollectionLayoutFactory());
-    this.temporalGraphLayoutFactory = new TemporalGraphLayoutFactory();
-    this.temporalGraphCollectionLayoutFactory = new TemporalGraphCollectionLayoutFactory();
+    this.temporalGraphLayoutFactory = new TemporalLayoutFactory();
   }
 
   /**
@@ -112,8 +107,7 @@ public abstract class GradoopFlinkTestBase {
       setConfig(GradoopFlinkConfig.createConfig(getExecutionEnvironment(),
         getGraphLayoutFactory(),
         getCollectionLayoutFactory(),
-        this.temporalGraphLayoutFactory,
-        this.temporalGraphCollectionLayoutFactory));
+        this.temporalGraphLayoutFactory));
     }
     return config;
   }
@@ -249,5 +243,26 @@ public abstract class GradoopFlinkTestBase {
     return getExecutionEnvironment()
       .fromElements(dummy)
       .filter(new False<>());
+  }
+
+  /**
+   * Check if the temporal graph element has default time values for valid and transaction time.
+   *
+   * @param element the temporal graph element to check
+   */
+  protected void checkDefaultTemporalElement(TemporalElement element) {
+    assertEquals((Long) 0L, element.getValidFrom());
+    assertEquals((Long) 0L, element.getValidTo());
+    checkDefaultTxTimes(element);
+  }
+
+  /**
+   * Check if the temporal graph element has default time values for transaction time.
+   *
+   * @param element the temporal graph element to check
+   */
+  protected void checkDefaultTxTimes(TemporalElement element) {
+    assertTrue(element.getTxFrom() < System.currentTimeMillis());
+    assertEquals((Long) Long.MAX_VALUE, element.getTxTo());
   }
 }

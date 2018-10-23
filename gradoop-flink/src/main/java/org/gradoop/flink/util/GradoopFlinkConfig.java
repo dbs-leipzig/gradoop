@@ -26,8 +26,7 @@ import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
-import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalGraphCollectionLayoutFactory;
-import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalGraphLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalLayoutFactory;
 import org.gradoop.flink.model.impl.tpgm.TemporalGraphCollectionFactory;
 import org.gradoop.flink.model.impl.tpgm.TemporalGraphFactory;
 
@@ -53,8 +52,14 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    */
   private final GraphCollectionFactory graphCollectionFactory;
 
+  /**
+   * Creates instances of {@link org.gradoop.flink.model.api.tpgm.TemporalGraph}
+   */
   private final TemporalGraphFactory temporalGraphFactory;
 
+  /**
+   * Creates instances of {@link org.gradoop.flink.model.api.tpgm.TemporalGraphCollection}
+   */
   private final TemporalGraphCollectionFactory temporalGraphCollectionFactory;
 
   /**
@@ -63,13 +68,13 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    * @param executionEnvironment Flink execution environment
    * @param logicalGraphLayoutFactory Factory for creating logical graphs
    * @param graphCollectionLayoutFactory Factory for creating graph collections
+   * @param temporalLayoutFactory Factory for creating temporal graphs
    */
   protected GradoopFlinkConfig(
     ExecutionEnvironment executionEnvironment,
     LogicalGraphLayoutFactory logicalGraphLayoutFactory,
     GraphCollectionLayoutFactory graphCollectionLayoutFactory,
-    TemporalGraphLayoutFactory temporalGraphLayoutFactory,
-    TemporalGraphCollectionLayoutFactory temporalGraphCollectionLayoutFactory) {
+    TemporalLayoutFactory temporalLayoutFactory) {
     super();
 
     Objects.requireNonNull(executionEnvironment);
@@ -85,11 +90,12 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
     this.graphCollectionFactory = new GraphCollectionFactory(this);
     this.graphCollectionFactory.setLayoutFactory(graphCollectionLayoutFactory);
 
+    // init with temporal layout factories
     this.temporalGraphFactory = new TemporalGraphFactory(this);
-    this.temporalGraphFactory.setLayoutFactory(temporalGraphLayoutFactory);
+    this.temporalGraphFactory.setLayoutFactory(temporalLayoutFactory);
 
     this.temporalGraphCollectionFactory = new TemporalGraphCollectionFactory(this);
-    this.temporalGraphCollectionFactory.setLayoutFactory(temporalGraphCollectionLayoutFactory);
+    this.temporalGraphCollectionFactory.setLayoutFactory(temporalLayoutFactory);
   }
 
   /**
@@ -101,8 +107,7 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    */
   public static GradoopFlinkConfig createConfig(ExecutionEnvironment env) {
     return new GradoopFlinkConfig(env, new GVEGraphLayoutFactory(),
-      new GVECollectionLayoutFactory(), new TemporalGraphLayoutFactory(),
-      new TemporalGraphCollectionLayoutFactory());
+      new GVECollectionLayoutFactory(), new TemporalLayoutFactory());
   }
 
   /**
@@ -112,16 +117,14 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    * @param logicalGraphLayoutFactory factory to create logical graph layouts
    * @param graphCollectionLayoutFactory factory to create graph collection layouts
    * @param temporalGraphLayoutFactory factory to create temporal logical graph layouts
-   * @param temporalGraphCollectionLayoutFactory factory to create temporal graph collection layouts
    * @return Gradoop Flink configuration
    */
   public static GradoopFlinkConfig createConfig(ExecutionEnvironment env,
     LogicalGraphLayoutFactory logicalGraphLayoutFactory,
     GraphCollectionLayoutFactory graphCollectionLayoutFactory,
-    TemporalGraphLayoutFactory temporalGraphLayoutFactory,
-    TemporalGraphCollectionLayoutFactory temporalGraphCollectionLayoutFactory) {
+    TemporalLayoutFactory temporalGraphLayoutFactory) {
     return new GradoopFlinkConfig(env, logicalGraphLayoutFactory, graphCollectionLayoutFactory,
-      temporalGraphLayoutFactory, temporalGraphCollectionLayoutFactory);
+      temporalGraphLayoutFactory);
   }
 
   /**

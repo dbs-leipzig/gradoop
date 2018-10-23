@@ -22,38 +22,51 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
 
 /**
- * TODO: descriptions
+ * POJO Implementation of a TPGM graph head.
  */
 public class TemporalGraphHead extends TemporalElement implements EPGMGraphHead {
 
+  /**
+   * Default constructor to create an empty temporal graph head instance.
+   */
   public TemporalGraphHead() {
+    super();
   }
 
-  public TemporalGraphHead(GradoopId id, String label, Properties properties) {
-    super(id, label, properties);
-  }
-
-  public TemporalGraphHead(GradoopId id, String label, Properties properties, long validFrom) {
-    super(id, label, properties, validFrom);
-  }
-
-  public TemporalGraphHead(GradoopId id, String label, Properties properties, long validFrom,
-    long validTo) {
+  /**
+   * Creates a temporal graph head instance with a time interval that implies its validity.
+   *
+   * @param id the Gradoop identifier
+   * @param label the label
+   * @param properties the graph head properties
+   * @param validFrom the start of the edge validity as timestamp represented as long
+   * @param validTo the end of the edge validity as timestamp represented as long
+   */
+  public TemporalGraphHead(GradoopId id, String label, Properties properties, Long validFrom,
+    Long validTo) {
     super(id, label, properties, validFrom, validTo);
   }
 
-  public GraphHead toGraphHead() {
-    return new GraphHead(getId(), getLabel(), getProperties());
-  }
-
+  /**
+   * Static create method to avoid the usage of a factory class. Creates a temporal graph head
+   * instance with default values.
+   *
+   * @return a temporal graph head instance
+   */
   public static TemporalGraphHead createGraphHead() {
-    return new TemporalGraphHead(GradoopId.get(), GradoopConstants.DEFAULT_GRAPH_LABEL, null);
+    return new TemporalGraphHead(GradoopId.get(), GradoopConstants.DEFAULT_GRAPH_LABEL, null, null,
+      null);
   }
 
+  /**
+   * Helper function to create a TPGM graph head from an EPGM graph head.
+   * The id, label and all other information will be inherited.
+   *
+   * @param graphHead the EPGM graph head instance
+   * @return a TPGM graph head instance with default values at its valid times
+   */
   public static TemporalGraphHead fromNonTemporalGraphHead(GraphHead graphHead) {
-    return new TemporalGraphHead(
-      graphHead.getId(),
-      graphHead.getLabel(),
-      graphHead.getProperties());
+    return new TemporalGraphHead(graphHead.getId(), graphHead.getLabel(), graphHead.getProperties(),
+      null, null);
   }
 }

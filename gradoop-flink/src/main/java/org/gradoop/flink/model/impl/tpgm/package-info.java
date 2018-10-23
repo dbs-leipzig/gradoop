@@ -13,13 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.tpgm;
-
-import org.gradoop.flink.model.api.epgm.GraphBaseOperators;
-
 /**
- * Defines the operators that are available on a {@link TemporalGraph}.
+ * Contains concrete classes representing a temporal graph and a temporal graph collection in the
+ * TPGM and their factories.
  */
-interface TemporalGraphOperators extends GraphBaseOperators {
-
-}
+package org.gradoop.flink.model.impl.tpgm;

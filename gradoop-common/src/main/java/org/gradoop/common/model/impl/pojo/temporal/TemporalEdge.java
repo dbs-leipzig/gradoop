@@ -23,41 +23,45 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
 
 /**
- * TODO: descriptions
+ * POJO Implementation of a TPGM edge.
  */
 public class TemporalEdge extends TemporalGraphElement implements EPGMEdge {
 
   /**
-   * EPGMVertex identifier of the source vertex.
+   * Gradoop identifier of the source vertex.
    */
   private GradoopId sourceId;
 
   /**
-   * EPGMVertex identifier of the target vertex.
+   * Gradoop identifier of the target vertex.
    */
   private GradoopId targetId;
 
+  /**
+   * Default constructor to create an empty temporal edge instance.
+   */
   public TemporalEdge() {
+    super();
   }
 
+  /**
+   * Create a temporal edge instance with a time interval that implies its validity.
+   *
+   * @param id the Gradoop identifier of the edge
+   * @param label the label
+   * @param sourceId the Gradoop identifier of the source vertex
+   * @param targetId the Gradoop identifier of the target vertex
+   * @param properties the edge properties
+   * @param graphIds the Gradoop identifiers of the graph heads this edge is assigned to
+   * @param validFrom the start of the edge validity as timestamp represented as long
+   * @param validTo the end of the edge validity as timestamp represented as long
+   */
   public TemporalEdge(final GradoopId id, final String label, final GradoopId sourceId,
-    final GradoopId targetId, final Properties properties, GradoopIdSet graphIds) {
-    super(id, label, properties, graphIds);
+    final GradoopId targetId, final Properties properties, GradoopIdSet graphIds, Long validFrom,
+    Long validTo) {
+    super(id, label, properties, graphIds, validFrom, validTo);
     this.sourceId = sourceId;
     this.targetId = targetId;
-  }
-
-  public TemporalEdge(final GradoopId id, final String label, final GradoopId sourceId,
-    final GradoopId targetId, final Properties properties, GradoopIdSet graphIds, long validFrom) {
-    this(id, label, sourceId, targetId, properties, graphIds);
-    this.validFrom = validFrom;
-  }
-
-  public TemporalEdge(final GradoopId id, final String label, final GradoopId sourceId,
-    final GradoopId targetId, final Properties properties, GradoopIdSet graphIds, long validFrom,
-    long validTo) {
-    this(id, label, sourceId, targetId, properties, graphIds, validFrom);
-    this.validTo = validTo;
   }
 
   @Override
@@ -80,19 +84,29 @@ public class TemporalEdge extends TemporalGraphElement implements EPGMEdge {
     this.targetId = targetId;
   }
 
-  public Edge toEdge() {
-    return new Edge(getId(), getLabel(), getSourceId(), getTargetId(), getProperties(),
-      getGraphIds());
-  }
-
+  /**
+   * Static create method to avoid the usage of a factory class. Creates a temporal edge instance
+   * with default values.
+   *
+   * @param sourceId the Gradoop identifier of the source vertex
+   * @param targetId the Gradoop identifier of the target vertex
+   * @return a temporal edge instance
+   */
   public static TemporalEdge createEdge(GradoopId sourceId, GradoopId targetId) {
     return new TemporalEdge(GradoopId.get(), GradoopConstants.DEFAULT_EDGE_LABEL, sourceId,
-      targetId, null, null);
+      targetId, null, null, null, null);
   }
 
+  /**
+   * Helper function to create a TPGM edge from an EPGM edge.
+   * The ids, label and all other information will be inherited.
+   *
+   * @param edge the EPGM edge instance
+   * @return a TPGM edge instance with default values at its valid times
+   */
   public static TemporalEdge fromNonTemporalEdge(Edge edge) {
     return new TemporalEdge(edge.getId(), edge.getLabel(), edge.getSourceId(), edge.getTargetId(),
-      edge.getProperties(), edge.getGraphIds());
+      edge.getProperties(), edge.getGraphIds(), null, null);
 
   }
 }

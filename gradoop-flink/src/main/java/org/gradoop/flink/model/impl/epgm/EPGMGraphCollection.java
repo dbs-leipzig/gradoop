@@ -15,32 +15,15 @@
  */
 package org.gradoop.flink.model.impl.epgm;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
-import org.gradoop.flink.model.impl.functions.bool.Not;
-import org.gradoop.flink.model.impl.functions.bool.Or;
-import org.gradoop.flink.model.impl.functions.bool.True;
-import org.gradoop.flink.model.impl.functions.epgm.BySameId;
-import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
-import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
-import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
-import org.gradoop.flink.model.impl.operators.distinction.DistinctByIsomorphism;
-import org.gradoop.flink.model.impl.operators.distinction.GroupByIsomorphism;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -73,6 +56,11 @@ public class EPGMGraphCollection implements GraphCollection {
   //----------------------------------------------------------------------------
   // Data methods
   //----------------------------------------------------------------------------
+
+  @Override
+  public GradoopFlinkConfig getConfig() {
+    return config;
+  }
 
   @Override
   public boolean isGVELayout() {
@@ -122,98 +110,6 @@ public class EPGMGraphCollection implements GraphCollection {
   @Override
   public DataSet<GraphTransaction> getGraphTransactions() {
     return layout.getGraphTransactions();
-  }
-
-  //----------------------------------------------------------------------------
-  // Logical Graph / Graph Head Getters
-  //----------------------------------------------------------------------------
-
-  @Override
-  public LogicalGraph getGraph(final GradoopId graphID) {
-    // filter vertices and edges based on given graph id
-    DataSet<GraphHead> graphHead = getGraphHeads()
-      .filter(new BySameId<>(graphID));
-    DataSet<Vertex> vertices = getVertices()
-      .filter(new InGraph<>(graphID));
-    DataSet<Edge> edges = getEdges()
-      .filter(new InGraph<>(graphID));
-
-    return new EPGMLogicalGraph(
-      config.getLogicalGraphFactory().fromDataSets(graphHead, vertices, edges),
-      getConfig());
-  }
-
-  @Override
-  public GraphCollection getGraphs(final GradoopId... identifiers) {
-
-    GradoopIdSet graphIds = new GradoopIdSet();
-
-    Collections.addAll(graphIds, identifiers);
-
-    return getGraphs(graphIds);
-  }
-
-  @Override
-  public GraphCollection getGraphs(final GradoopIdSet identifiers) {
-
-    DataSet<GraphHead> newGraphHeads = this.getGraphHeads()
-      .filter((FilterFunction<GraphHead>) graphHead -> identifiers.contains(graphHead.getId()));
-
-    // build new vertex set
-    DataSet<Vertex> vertices = getVertices()
-      .filter(new InAnyGraph<>(identifiers));
-
-    // build new edge set
-    DataSet<Edge> edges = getEdges()
-      .filter(new InAnyGraph<>(identifiers));
-
-    return new EPGMGraphCollection(
-      getConfig().getGraphCollectionFactory().fromDataSets(newGraphHeads, vertices, edges),
-      getConfig());
-  }
-
-  //----------------------------------------------------------------------------
-  // Utility methods
-  //----------------------------------------------------------------------------
-
-  @Override
-  public GradoopFlinkConfig getConfig() {
-    return config;
-  }
-
-  @Override
-  public DataSet<Boolean> isEmpty() {
-    return getGraphHeads()
-      .map(new True<>())
-      .distinct()
-      .union(getConfig().getExecutionEnvironment().fromElements(false))
-      .reduce(new Or())
-      .map(new Not());
-  }
-
-  @Override
-  public GraphCollection distinctById() {
-    return callForCollection(new DistinctById());
-  }
-
-  @Override
-  public GraphCollection distinctByIsomorphism() {
-    return callForCollection(new DistinctByIsomorphism());
-  }
-
-  @Override
-  public GraphCollection groupByIsomorphism(GraphHeadReduceFunction func) {
-    return callForCollection(new GroupByIsomorphism(func));
-  }
-
-  @Override
-  public void writeTo(DataSink dataSink) throws IOException {
-    dataSink.write(this);
-  }
-
-  @Override
-  public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
-    dataSink.write(this, overWrite);
   }
 
 }

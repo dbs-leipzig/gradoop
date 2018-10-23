@@ -125,7 +125,9 @@ public class LogicalGraphFactory {
    */
   public LogicalGraph fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
     Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
-    return new EPGMLogicalGraph(layoutFactory.fromIndexedDataSets(graphHeads, vertices, edges), config);
+    return new EPGMLogicalGraph(
+      layoutFactory.fromIndexedDataSets(graphHeads, vertices, edges),
+      config);
   }
 
   /**

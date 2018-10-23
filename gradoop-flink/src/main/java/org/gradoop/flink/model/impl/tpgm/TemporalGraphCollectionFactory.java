@@ -15,29 +15,83 @@
  */
 package org.gradoop.flink.model.impl.tpgm;
 
+import org.apache.flink.api.java.DataSet;
 import org.apache.flink.util.Preconditions;
-import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalGraphCollectionLayoutFactory;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
+import org.gradoop.flink.model.api.tpgm.TemporalGraphCollection;
+import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalLayoutFactory;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * TODO: descriptions
+ * Responsible for create instances of {@link TemporalGraphCollection} based on a specific
+ * {@link org.gradoop.flink.model.api.layouts.TemporalLayout}.
  */
 public class TemporalGraphCollectionFactory {
-
   /**
-   * The factory to create a graph collection layout.
+   * The factory to create a temporal layout.
    */
-  private TemporalGraphCollectionLayoutFactory layoutFactory;
+  private TemporalLayoutFactory layoutFactory;
   /**
    * Gradoop Flink configuration.
    */
   private final GradoopFlinkConfig config;
 
+  /**
+   * Creates a new temporal graph collection factory instance.
+   *
+   * @param config the gradoop flink config
+   */
   public TemporalGraphCollectionFactory(GradoopFlinkConfig config) {
     this.config = Preconditions.checkNotNull(config);
   }
 
-  public void setLayoutFactory(TemporalGraphCollectionLayoutFactory layoutFactory) {
+  /**
+   * Set the temporal layout factory that is used to create the temporal graph layout.
+   *
+   * @param layoutFactory the factory that is used to create the temporal graph layout
+   */
+  public void setLayoutFactory(TemporalLayoutFactory layoutFactory) {
     this.layoutFactory = layoutFactory;
+  }
+
+  /**
+   * Creates a {@link TemporalGraphCollection} from datasets of an EPGM logical graph.
+   *
+   * The method assumes that the given vertices and edges are already assigned
+   * to the given graph head.
+   *
+
+   * @param vertices Vertex DataSet
+   * @param edges Edge DataSet
+   * @param graphHead 1-element GraphHead DataSet
+   * @return Temporal graph instance
+   */
+  public TemporalGraphCollection fromNonTemporalDataSets(DataSet<Vertex> vertices,
+    DataSet<Edge> edges, DataSet<GraphHead> graphHead) {
+    return new TPGMGraphCollection(layoutFactory
+      .fromNonTemporalDataSets(graphHead, vertices, edges), config);
+  }
+
+  /**
+   * Creates a {@link TemporalGraphCollection} from datasets of an TPGM graph collection.
+   *
+   * The method assumes that the given vertices and edges are already assigned
+   * to the given graph heads.
+   *
+
+   * @param temporalVertices Temporal vertex DataSet
+   * @param temporalEdges Temporal edge DataSet
+   * @param temporalGraphHead 1-element temporal GraphHead DataSet
+   * @return Temporal graph instance
+   */
+  public TemporalGraphCollection fromDataSets(DataSet<TemporalVertex> temporalVertices,
+    DataSet<TemporalEdge> temporalEdges, DataSet<TemporalGraphHead> temporalGraphHead) {
+    return new TPGMGraphCollection(layoutFactory
+      .fromDataSets(temporalGraphHead, temporalVertices, temporalEdges), config);
   }
 }

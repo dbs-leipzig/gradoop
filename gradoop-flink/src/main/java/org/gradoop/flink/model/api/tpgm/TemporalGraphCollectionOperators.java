@@ -18,8 +18,8 @@ package org.gradoop.flink.model.api.tpgm;
 import org.gradoop.flink.model.api.epgm.GraphBaseOperators;
 
 /**
- * Defines the operators that are available on a {@link TemporalGraph}.
+ * Defines the operators that are available on a {@link TemporalGraphCollection}.
  */
-interface TemporalGraphOperators extends GraphBaseOperators {
+interface TemporalGraphCollectionOperators extends GraphBaseOperators {
 
 }

@@ -21,7 +21,8 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
- * TODO: descriptions
+ * Abstract class representing an TPGM element that is contained in a temporal graph
+ * (i.e. vertices and edges).
  */
 public abstract class TemporalGraphElement extends TemporalElement implements EPGMGraphElement {
 
@@ -33,23 +34,22 @@ public abstract class TemporalGraphElement extends TemporalElement implements EP
   /**
    * Default constructor.
    */
-  protected TemporalGraphElement() {
+  public TemporalGraphElement() {
+    super();
   }
 
-  protected TemporalGraphElement(GradoopId id, String label, Properties properties,
-    GradoopIdSet graphIds) {
-    super(id, label, properties);
-    this.graphIds = graphIds;
-  }
-
-  protected TemporalGraphElement(GradoopId id, String label, Properties properties,
-    GradoopIdSet graphIds, long validFrom) {
-    super(id, label, properties, validFrom);
-    this.graphIds = graphIds;
-  }
-
-  protected TemporalGraphElement(GradoopId id, String label, Properties properties,
-    GradoopIdSet graphIds, long validFrom, long validTo) {
+  /**
+   * Creates an TPGM graph element using the given attributes.
+   *
+   * @param id the element identifier
+   * @param label the element label
+   * @param properties the element properties
+   * @param graphIds the identifiers of the graphs this element is contained in
+   * @param validFrom the beginning of the elements validity as unix timestamp in milliseconds
+   * @param validTo the end of the elements validity as unix timestamp in milliseconds
+   */
+  TemporalGraphElement(GradoopId id, String label, Properties properties,
+    GradoopIdSet graphIds, Long validFrom, Long validTo) {
     super(id, label, properties, validFrom, validTo);
     this.graphIds = graphIds;
   }

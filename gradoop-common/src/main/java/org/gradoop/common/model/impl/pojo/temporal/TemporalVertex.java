@@ -23,37 +23,52 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
 
 /**
- * TODO: descriptions
+ * POJO Implementation of a TPGM vertex.
  */
 public class TemporalVertex extends TemporalGraphElement implements EPGMVertex {
 
+  /**
+   * Default constructor creates an empty {@link TemporalVertex} instance.
+   */
   public TemporalVertex() {
+    super();
   }
 
-  public TemporalVertex(GradoopId id, String label, Properties properties, GradoopIdSet graphIds) {
-    super(id, label, properties, graphIds);
-  }
-
+  /**
+   * Creates a instance of a temporal vertex without temporal information.
+   *
+   * @param id the vertex identifier
+   * @param label the vertex label
+   * @param properties the vertex properties
+   * @param graphIds identifiers of graphs this vertex is contained in
+   * @param validFrom valid from unix timestamp in milliseconds
+   * @param validTo valid to unix timestamp in milliseconds
+   */
   public TemporalVertex(GradoopId id, String label, Properties properties, GradoopIdSet graphIds,
-    long validFrom) {
-    super(id, label, properties, graphIds, validFrom);
-  }
-
-  public TemporalVertex(GradoopId id, String label, Properties properties, GradoopIdSet graphIds,
-    long validFrom, long validTo) {
+    Long validFrom, Long validTo) {
     super(id, label, properties, graphIds, validFrom, validTo);
   }
 
-  public Vertex toVertex() {
-    return new Vertex(getId(), getLabel(), getProperties(), getGraphIds());
-  }
-
+  /**
+   * Static create method to avoid the usage of a factory class. Creates a temporal vertex instance
+   * with default values.
+   *
+   * @return a temporal vertex instance with default values at its valid times
+   */
   public static TemporalVertex createVertex() {
-    return new TemporalVertex(GradoopId.get(), GradoopConstants.DEFAULT_VERTEX_LABEL, null, null);
+    return new TemporalVertex(GradoopId.get(), GradoopConstants.DEFAULT_VERTEX_LABEL, null,
+      null, null, null);
   }
 
+  /**
+   * Helper function to create a TPGM vertex from an EPGM vertex.
+   * The id, label and all other information will be inherited.
+   *
+   * @param vertex the EPGM vertex instance
+   * @return a TPGM vertex instance with default values at its valid times
+   */
   public static TemporalVertex fromNonTemporalVertex(Vertex vertex) {
     return new TemporalVertex(vertex.getId(), vertex.getLabel(), vertex.getProperties(),
-      vertex.getGraphIds());
+      vertex.getGraphIds(), null, null);
   }
 }

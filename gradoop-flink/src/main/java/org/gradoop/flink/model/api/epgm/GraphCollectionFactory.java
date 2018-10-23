@@ -113,7 +113,9 @@ public class GraphCollectionFactory {
    */
   public GraphCollection fromCollections(Collection<GraphHead> graphHeads,
     Collection<Vertex> vertices, Collection<Edge> edges) {
-    return new EPGMGraphCollection(layoutFactory.fromCollections(graphHeads, vertices, edges), config);
+    return new EPGMGraphCollection(
+      layoutFactory.fromCollections(graphHeads, vertices, edges),
+      config);
   }
 
   /**

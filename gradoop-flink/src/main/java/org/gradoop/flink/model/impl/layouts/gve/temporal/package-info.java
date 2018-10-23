@@ -13,13 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.tpgm;
-
-import org.gradoop.flink.model.api.epgm.GraphBaseOperators;
-
 /**
- * Defines the operators that are available on a {@link TemporalGraph}.
+ * Contains the temporal GVE layout and its factory that can be used to create a graph or a
+ * collection. This layout represents a graph/collection by three separate datasets: one for
+ * graph (heads), one for vertices and one for edges.
  */
-interface TemporalGraphOperators extends GraphBaseOperators {
-
-}
+package org.gradoop.flink.model.impl.layouts.gve.temporal;

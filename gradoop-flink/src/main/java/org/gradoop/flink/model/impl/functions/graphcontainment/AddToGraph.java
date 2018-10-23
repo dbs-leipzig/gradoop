@@ -24,6 +24,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * Adds the given graph head identifier to the graph element.
  *
  * @param <GE> EPGM graph element
+ * @param <GH> EPGM graph head type
  */
 public class AddToGraph<GE extends EPGMGraphElement, GH extends EPGMGraphHead> implements
   MapFunction<GE, GE> {
@@ -34,7 +35,7 @@ public class AddToGraph<GE extends EPGMGraphElement, GH extends EPGMGraphHead> i
   private final GradoopId graphHeadId;
 
   /**
-   * Creates a new GraphContainmentUpdater
+   * Creates a new AddToGraph map function instance
    *
    * @param graphHead graph head used for updating
    */

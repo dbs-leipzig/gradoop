@@ -21,9 +21,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
-import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
-import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 import org.gradoop.flink.model.api.layouts.BaseLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -110,51 +107,6 @@ public abstract class BaseFactory implements BaseLayoutFactory {
       GradoopId dummyId = GradoopId.get();
       edgeSet = env
         .fromElements(getConfig().getEdgeFactory().createEdge(dummyId, dummyId))
-        .filter(new False<>());
-    } else {
-      edgeSet = env.fromCollection(edges);
-    }
-    return edgeSet;
-  }
-
-  protected DataSet<TemporalGraphHead> createTemporalGraphHeadDataSet(
-    Collection<TemporalGraphHead> graphHeads) {
-
-    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-
-    DataSet<TemporalGraphHead> graphHeadSet;
-    if (graphHeads.isEmpty()) {
-      graphHeadSet = env
-        .fromElements(TemporalGraphHead.createGraphHead())
-        .filter(new False<>());
-    } else {
-      graphHeadSet =  env.fromCollection(graphHeads);
-    }
-    return graphHeadSet;
-  }
-
-  protected DataSet<TemporalVertex> createTemporalVertexDataSet(Collection<TemporalVertex> vertices) {
-    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-
-    DataSet<TemporalVertex> vertexSet;
-    if (vertices.isEmpty()) {
-      vertexSet = env
-        .fromElements(TemporalVertex.createVertex())
-        .filter(new False<>());
-    } else {
-      vertexSet = env.fromCollection(vertices);
-    }
-    return vertexSet;
-  }
-
-  protected DataSet<TemporalEdge> createTemporalEdgeDataSet(Collection<TemporalEdge> edges) {
-    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-
-    DataSet<TemporalEdge> edgeSet;
-    if (edges.isEmpty()) {
-      GradoopId dummyId = GradoopId.get();
-      edgeSet = env
-        .fromElements(TemporalEdge.createEdge(dummyId, dummyId))
         .filter(new False<>());
     } else {
       edgeSet = env.fromCollection(edges);

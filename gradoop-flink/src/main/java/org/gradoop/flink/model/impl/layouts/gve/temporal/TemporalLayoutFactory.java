@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.layouts.gve.temporal;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -27,16 +26,23 @@ import org.gradoop.flink.model.api.layouts.BaseLayoutFactory;
 import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
 import org.gradoop.flink.model.impl.layouts.common.BaseFactory;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 /**
- * TODO: descriptions
+ * Factory class responsible to create a {@link TemporalGVELayout} from given datasets or
+ * collections.
  */
-public class TemporalGraphLayoutFactory extends BaseFactory implements BaseLayoutFactory {
+public class TemporalLayoutFactory extends BaseFactory implements BaseLayoutFactory {
 
-  public TemporalLayout fromDataSets(DataSet<TemporalVertex> vertices,
+  /**
+   * Create a temporal graph layout representing a logical graph by vertices and edges. A new graph
+   * head will be created and assigned to the given elements.
+   *
+   * @param vertices the temporal vertices
+   * @param edges the temporal edges
+   * @return a temporal graph layout representing the temporal graph data
+   */
+  public TemporalGVELayout fromDataSets(DataSet<TemporalVertex> vertices,
     DataSet<TemporalEdge> edges) {
     Objects.requireNonNull(vertices, "Temporal vertex DataSet is null.");
     Objects.requireNonNull(edges, "Temporal edge DataSet is null.");
@@ -49,58 +55,51 @@ public class TemporalGraphLayoutFactory extends BaseFactory implements BaseLayou
     // update vertices and edges with new graph head id
     vertices = vertices
       .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;label;properties;txFrom;txTo;validFrom;validTo");
+      .withForwardedFields("id;label;properties;transactionTime;validTime");
     edges = edges
       .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;sourceId;targetId;label;properties;txFrom;txTo;validFrom;validTo");
+      .withForwardedFields("id;sourceId;targetId;label;properties;transactionTime;validTime");
 
-    return new TemporalLayout(graphHeadSet, vertices, edges);
+    return new TemporalGVELayout(graphHeadSet, vertices, edges);
   }
 
-  public TemporalLayout fromDataSets(DataSet<TemporalGraphHead> graphHead,
+  /**
+   * Creates a temporal graph layout from given temporal graph head, vertex and edge datasets.
+   *
+   * The method assumes that the given vertices and edges are already assigned to the given
+   * graph head.
+   *
+   * @param graphHead   1-element GraphHead DataSet
+   * @param vertices    Vertex DataSet
+   * @param edges       Edge DataSet
+   * @return a temporal graph layout representing the temporal graph data
+   */
+  public TemporalGVELayout fromDataSets(DataSet<TemporalGraphHead> graphHead,
     DataSet<TemporalVertex> vertices, DataSet<TemporalEdge> edges) {
     Objects.requireNonNull(graphHead, "Temporal graphHead DataSet is null.");
     Objects.requireNonNull(vertices, "Temporal vertex DataSet is null.");
     Objects.requireNonNull(edges, "Temporal edge DataSet is null.");
-    return new TemporalLayout(graphHead, vertices, edges);
+    return new TemporalGVELayout(graphHead, vertices, edges);
   }
 
-  public TemporalLayout fromNonTemporalDataSets(DataSet<GraphHead> graphHead,
+  /**
+   * Creates a temporal graph layout from given non-temporal EPGM graph head, vertex and edge
+   * datasets.
+   *
+   * The method assumes that the given vertices and edges are already assigned to the given
+   * graph head.
+   *
+   * @param graphHead   1-element EPGM graph head DataSet
+   * @param vertices    EPGM vertex DataSet
+   * @param edges       EPGM edge DataSet
+   * @return a temporal graph layout representing the temporal graph data
+   */
+  public TemporalGVELayout fromNonTemporalDataSets(DataSet<GraphHead> graphHead,
     DataSet<Vertex> vertices, DataSet<Edge> edges) {
-    return new TemporalLayout(
+    return new TemporalGVELayout(
       graphHead.map(TemporalGraphHead::fromNonTemporalGraphHead),
       vertices.map(TemporalVertex::fromNonTemporalVertex),
       edges.map(TemporalEdge::fromNonTemporalEdge));
-  }
-
-  public TemporalLayout fromCollections(TemporalGraphHead graphHead,
-    Collection<TemporalVertex> vertices, Collection<TemporalEdge> edges) {
-    Objects.requireNonNull(vertices, "Temporal vertex collection is null.");
-
-    List<TemporalGraphHead> graphHeads;
-    if (graphHead == null) {
-      graphHeads = Lists.newArrayListWithCapacity(0);
-    } else {
-      graphHeads = Lists.newArrayList(graphHead);
-    }
-    if (edges == null) {
-      edges = Lists.newArrayListWithCapacity(0);
-    }
-
-    return fromDataSets(
-      createTemporalGraphHeadDataSet(graphHeads),
-      createTemporalVertexDataSet(vertices),
-      createTemporalEdgeDataSet(edges));
-  }
-
-  public TemporalLayout fromCollections(Collection<TemporalVertex> vertices,
-    Collection<TemporalEdge> edges) {
-    Objects.requireNonNull(vertices, "Temporal vertex collection is null.");
-
-    if (edges == null) {
-      edges = Lists.newArrayListWithCapacity(0);
-    }
-    return fromDataSets(createTemporalVertexDataSet(vertices), createTemporalEdgeDataSet(edges));
   }
 
 }
