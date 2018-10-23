@@ -112,4 +112,17 @@ public class GradoopIdTest {
 
     assertEquals(expectedId, newId);
   }
+
+  /**
+   * Test the {@link GradoopId#min(GradoopId, GradoopId)} method.
+   */
+  @Test
+  public void testMin() {
+    GradoopId first = GradoopId.get();
+    GradoopId second = GradoopId.get();
+    GradoopId min = GradoopId.min(first, second);
+    assertTrue("First ID is smaller then the minimum.", first.compareTo(min) >= 0);
+    assertTrue("Second ID is smaller then the minimum.", second.compareTo(min) >= 0);
+    assertTrue(first == min || second == min);
+  }
 }

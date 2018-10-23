@@ -15,6 +15,9 @@
  */
 package org.gradoop.examples.patternmatching;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
@@ -51,7 +54,8 @@ public class CypherExample {
     // create a Gradoop config
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
     // create a datasource
-    CSVDataSource csvDataSource = new CSVDataSource(DATA_PATH, config);
+    CSVDataSource csvDataSource = new CSVDataSource(
+      URLDecoder.decode(DATA_PATH, StandardCharsets.UTF_8.name()), config);
     // load graph statistics
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(STATISTICS_PATH);
 
@@ -65,9 +69,9 @@ public class CypherExample {
       "(u2:Person)<-[:hasMember]-(f)" +
       "WHERE u1.name = \"Alice\"", statistics);
 
-    // this just prints the graph heads to system out
+    // Print the graph to system out
     // alternatively, one can use a org.gradoop.flink.io.api.DataSink to store the whole collection
     // or use the result in subsequent analytical steps
-    matches.getGraphHeads().print();
+    matches.print();
   }
 }

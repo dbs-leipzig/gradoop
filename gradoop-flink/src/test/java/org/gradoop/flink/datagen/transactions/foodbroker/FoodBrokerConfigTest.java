@@ -22,7 +22,9 @@ import org.gradoop.flink.datagen.transactions.foodbroker.config.FoodBrokerConfig
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.List;
 import org.junit.Test;
 
@@ -104,8 +106,8 @@ public class FoodBrokerConfigTest extends GradoopFlinkTestBase {
     assertEquals(-0.01f, result, 0.00001f);
   }
 
-  private String getConfigPath() throws URISyntaxException {
-    return FoodBroker.class.getResource("/foodbroker/config.json").getFile();
+  private String getConfigPath() throws URISyntaxException, UnsupportedEncodingException {
+    return getFilePath("/foodbroker/config.json");
   }
 
   @Test

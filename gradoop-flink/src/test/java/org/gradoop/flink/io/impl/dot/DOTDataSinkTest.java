@@ -36,7 +36,7 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
   @Test
   public void testWrite() throws Exception {
 
-    String gdlFile = DOTDataSinkTest.class.getResource("/data/dot/input.gdl").getFile();
+    String gdlFile = getFilePath("/data/dot/input.gdl");
 
     // load from gdl
     FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlFile);

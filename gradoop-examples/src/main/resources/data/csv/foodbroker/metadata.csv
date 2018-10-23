@@ -1,3 +1,4 @@
+g;;
 v;Client;account:string,city:string,contactPhone:string,erpCustNum:string,name:string,num:string,quality:double,superType:string
 v;Customer;city:string,name:string,num:string,quality:double,superType:string
 v;DeliveryNote;date:long,num:string,superType:string,trackingCode:string
