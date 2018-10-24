@@ -70,6 +70,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmpt
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 import java.util.List;
@@ -90,196 +91,336 @@ import java.util.Objects;
  * represented in Apache Flink. Note that the LogicalGraph also implements that interface and
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
-public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators {
+public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
+  /**
+   * Layout for that logical graph.
+   */
+  private final LogicalGraphLayout layout;
+  /**
+   * Configuration
+   */
+  private final GradoopFlinkConfig config;
+
+  /**
+   * Creates a new logical graph based on the given parameters.
+   *
+   * @param layout representation of the logical graph
+   * @param config Gradoop Flink configuration
+   */
+  protected LogicalGraph(LogicalGraphLayout layout, GradoopFlinkConfig config) {
+    Objects.requireNonNull(layout);
+    Objects.requireNonNull(config);
+    this.layout = layout;
+    this.config = config;
+  }
+
+  //----------------------------------------------------------------------------
+  // Data methods
+  //----------------------------------------------------------------------------
+
+  @Override
+  public boolean isGVELayout() {
+    return layout.isGVELayout();
+  }
+
+  @Override
+  public boolean isIndexedGVELayout() {
+    return layout.isIndexedGVELayout();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public DataSet<GraphHead> getGraphHead() {
+    return layout.getGraphHead();
+  }
+
+  @Override
+  public GradoopFlinkConfig getConfig() {
+    return config;
+  }
+
+  @Override
+  public DataSet<Vertex> getVertices() {
+    return layout.getVertices();
+  }
+
+  @Override
+  public DataSet<Vertex> getVerticesByLabel(String label) {
+    return layout.getVerticesByLabel(label);
+  }
+
+  @Override
+  public DataSet<Edge> getEdges() {
+    return layout.getEdges();
+  }
+
+  @Override
+  public DataSet<Edge> getEdgesByLabel(String label) {
+    return layout.getEdgesByLabel(label);
+  }
 
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
 
-  @Deprecated
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection cypher(String query) {
+  @Deprecated
+  public GraphCollection cypher(String query) {
     return cypher(query, new GraphStatistics(1, 1, 1, 1));
   }
 
-  @Deprecated
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection cypher(String query, String constructionPattern) {
+  @Deprecated
+  public GraphCollection cypher(String query, String constructionPattern) {
     return cypher(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
   }
 
-  @Deprecated
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection cypher(String query, GraphStatistics graphStatistics) {
-    return cypher(query, true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM,
-      graphStatistics);
+  @Deprecated
+  public GraphCollection cypher(String query, GraphStatistics graphStatistics) {
+    return cypher(query, true,
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
-  @Deprecated
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection cypher(String query, String constructionPattern,
+  @Deprecated
+  public GraphCollection cypher(String query, String constructionPattern,
     GraphStatistics graphStatistics) {
-    return cypher(query, constructionPattern, true, MatchStrategy.HOMOMORPHISM,
-      MatchStrategy.ISOMORPHISM, graphStatistics);
+    return cypher(query, constructionPattern, true,
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
-  @Deprecated
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection cypher(String query, boolean attachData, MatchStrategy vertexStrategy,
+  @Deprecated
+  public GraphCollection cypher(String query, boolean attachData, MatchStrategy vertexStrategy,
     MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     return cypher(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
   }
 
-  @Deprecated
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection cypher(String query, String constructionPattern, boolean attachData,
+  @Deprecated
+  public GraphCollection cypher(String query, String constructionPattern, boolean attachData,
     MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-    return callForCollection(
-      new CypherPatternMatching(query, constructionPattern, attachData, vertexStrategy,
-        edgeStrategy, graphStatistics));
+    return callForCollection(new CypherPatternMatching(query, constructionPattern, attachData,
+      vertexStrategy, edgeStrategy, graphStatistics));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection query(String query) {
+  public GraphCollection query(String query) {
     return query(query, new GraphStatistics(1, 1, 1, 1));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection query(String query, String constructionPattern) {
+  public GraphCollection query(String query, String constructionPattern) {
     return query(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection query(String query, GraphStatistics graphStatistics) {
-    return query(query, true, MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM,
-      graphStatistics);
+  public GraphCollection query(String query, GraphStatistics graphStatistics) {
+    return query(query, true,
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection query(String query, String constructionPattern,
+  public GraphCollection query(String query, String constructionPattern,
     GraphStatistics graphStatistics) {
-    return query(query, constructionPattern, true, MatchStrategy.HOMOMORPHISM,
-      MatchStrategy.ISOMORPHISM, graphStatistics);
+    return query(query, constructionPattern, true,
+      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
+  public GraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
     MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     return query(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection query(String query, String constructionPattern, boolean attachData,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-    return callForCollection(
-      new CypherPatternMatching(query, constructionPattern, attachData, vertexStrategy,
-        edgeStrategy, graphStatistics));
+  public GraphCollection query(String query, String constructionPattern, boolean attachData,
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
+    GraphStatistics graphStatistics) {
+    return callForCollection(new CypherPatternMatching(query, constructionPattern, attachData,
+      vertexStrategy, edgeStrategy, graphStatistics));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph copy() {
+  public LogicalGraph copy() {
     return callForGraph(new Cloning());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph transform(
+  public LogicalGraph transform(
     TransformationFunction<GraphHead> graphHeadTransformationFunction,
     TransformationFunction<Vertex> vertexTransformationFunction,
     TransformationFunction<Edge> edgeTransformationFunction) {
-    return callForGraph(
-      new Transformation(graphHeadTransformationFunction, vertexTransformationFunction,
-        edgeTransformationFunction));
+    return callForGraph(new Transformation(
+      graphHeadTransformationFunction,
+      vertexTransformationFunction,
+      edgeTransformationFunction));
   }
 
   @Override
-  default LogicalGraph transformGraphHead(
+  public LogicalGraph transformGraphHead(
     TransformationFunction<GraphHead> graphHeadTransformationFunction) {
     return transform(graphHeadTransformationFunction, null, null);
   }
 
   @Override
-  default LogicalGraph transformVertices(
+  public LogicalGraph transformVertices(
     TransformationFunction<Vertex> vertexTransformationFunction) {
     return transform(null, vertexTransformationFunction, null);
   }
 
   @Override
-  default LogicalGraph transformEdges(TransformationFunction<Edge> edgeTransformationFunction) {
+  public LogicalGraph transformEdges(
+    TransformationFunction<Edge> edgeTransformationFunction) {
     return transform(null, null, edgeTransformationFunction);
   }
 
   @Override
-  default LogicalGraph transformGraphHeadProperties(
-    String propertyKey, PropertyTransformationFunction graphHeadPropTransformationFunction) {
+  public LogicalGraph transformGraphHeadProperties(
+    String propertyKey,
+    PropertyTransformationFunction graphHeadPropTransformationFunction) {
     Objects.requireNonNull(propertyKey);
     Objects.requireNonNull(graphHeadPropTransformationFunction);
-    return callForGraph(
-      new PropertyTransformation(propertyKey, graphHeadPropTransformationFunction, null, null));
+    return callForGraph(new PropertyTransformation(propertyKey,
+      graphHeadPropTransformationFunction, null, null));
   }
 
   @Override
-  default LogicalGraph transformVertexProperties(String propertyKey,
+  public LogicalGraph transformVertexProperties(
+    String propertyKey,
     PropertyTransformationFunction vertexPropTransformationFunction) {
     Objects.requireNonNull(propertyKey);
     Objects.requireNonNull(vertexPropTransformationFunction);
-    return callForGraph(
-      new PropertyTransformation(propertyKey, null, vertexPropTransformationFunction, null));
+    return callForGraph(new PropertyTransformation(propertyKey,
+      null, vertexPropTransformationFunction, null));
   }
 
   @Override
-  default LogicalGraph transformEdgeProperties(String propertyKey,
+  public LogicalGraph transformEdgeProperties(
+    String propertyKey,
     PropertyTransformationFunction edgePropTransformationFunction) {
     Objects.requireNonNull(propertyKey);
     Objects.requireNonNull(edgePropTransformationFunction);
-    return callForGraph(
-      new PropertyTransformation(propertyKey, null, null, edgePropTransformationFunction));
+    return callForGraph(new PropertyTransformation(propertyKey,
+      null, null, edgePropTransformationFunction));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph vertexInducedSubgraph(
+  public LogicalGraph vertexInducedSubgraph(
     FilterFunction<Vertex> vertexFilterFunction) {
     Objects.requireNonNull(vertexFilterFunction);
     return callForGraph(new Subgraph(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph edgeInducedSubgraph(FilterFunction<Edge> edgeFilterFunction) {
+  public LogicalGraph edgeInducedSubgraph(
+    FilterFunction<Edge> edgeFilterFunction) {
     Objects.requireNonNull(edgeFilterFunction);
     return callForGraph(new Subgraph(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph subgraph(
-    FilterFunction<Vertex> vertexFilterFunction, FilterFunction<Edge> edgeFilterFunction,
-    Subgraph.Strategy strategy) {
-    return callForGraph(new Subgraph(vertexFilterFunction, edgeFilterFunction, strategy));
+  public LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
+    FilterFunction<Edge> edgeFilterFunction, Subgraph.Strategy strategy) {
+    return callForGraph(
+      new Subgraph(vertexFilterFunction, edgeFilterFunction, strategy));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph aggregate(AggregateFunction... aggregateFunctions) {
+  public LogicalGraph aggregate(AggregateFunction... aggregateFunctions) {
     return callForGraph(new Aggregation(aggregateFunctions));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph sample(SamplingAlgorithm algorithm) {
+  public LogicalGraph sample(SamplingAlgorithm algorithm) {
     return callForGraph(algorithm);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph groupBy(List<String> vertexGroupingKeys) {
+  public LogicalGraph groupBy(List<String> vertexGroupingKeys) {
     return groupBy(vertexGroupingKeys, null);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph groupBy(List<String> vertexGroupingKeys,
-    List<String> edgeGroupingKeys) {
+  public LogicalGraph groupBy(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
     return groupBy(vertexGroupingKeys, null, edgeGroupingKeys, null, GroupingStrategy.GROUP_REDUCE);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph groupBy(List<String> vertexGroupingKeys,
-    List<PropertyValueAggregator> vertexAggregateFunctions, List<String> edgeGroupingKeys,
-    List<PropertyValueAggregator> edgeAggregateFunctions, GroupingStrategy groupingStrategy) {
+  public LogicalGraph groupBy(
+    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
+    GroupingStrategy groupingStrategy) {
 
     Objects.requireNonNull(vertexGroupingKeys, "missing vertex grouping key(s)");
     Objects.requireNonNull(groupingStrategy, "missing vertex grouping strategy");
@@ -301,15 +442,21 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
     return callForGraph(builder.build());
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph reduceOnEdges(EdgeAggregateFunction function,
-    Neighborhood.EdgeDirection edgeDirection) {
+  public LogicalGraph reduceOnEdges(
+    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
     return callForGraph(new ReduceEdgeNeighborhood(function, edgeDirection));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph reduceOnNeighbors(VertexAggregateFunction function,
-    Neighborhood.EdgeDirection edgeDirection) {
+  public LogicalGraph reduceOnNeighbors(
+    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
     return callForGraph(new ReduceVertexNeighborhood(function, edgeDirection));
   }
 
@@ -317,36 +464,60 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
   // Binary Operators
   //----------------------------------------------------------------------------
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph combine(LogicalGraph otherGraph) {
+  public LogicalGraph combine(LogicalGraph otherGraph) {
     return callForGraph(new Combination(), otherGraph);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph overlap(LogicalGraph otherGraph) {
+  public LogicalGraph overlap(LogicalGraph otherGraph) {
     return callForGraph(new Overlap(), otherGraph);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph exclude(LogicalGraph otherGraph) {
+  public LogicalGraph exclude(LogicalGraph otherGraph) {
     return callForGraph(new Exclusion(), otherGraph);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default DataSet<Boolean> equalsByElementIds(LogicalGraph other) {
-    return new GraphEquality(new GraphHeadToEmptyString(), new VertexToIdString(),
+  public DataSet<Boolean> equalsByElementIds(LogicalGraph other) {
+    return new GraphEquality(
+      new GraphHeadToEmptyString(),
+      new VertexToIdString(),
       new EdgeToIdString(), true).execute(this, other);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default DataSet<Boolean> equalsByElementData(LogicalGraph other) {
-    return new GraphEquality(new GraphHeadToEmptyString(), new VertexToDataString(),
+  public DataSet<Boolean> equalsByElementData(LogicalGraph other) {
+    return new GraphEquality(
+      new GraphHeadToEmptyString(),
+      new VertexToDataString(),
       new EdgeToDataString(), true).execute(this, other);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default DataSet<Boolean> equalsByData(LogicalGraph other) {
-    return new GraphEquality(new GraphHeadToDataString(), new VertexToDataString(),
+  public DataSet<Boolean> equalsByData(LogicalGraph other) {
+    return new GraphEquality(
+      new GraphHeadToDataString(),
+      new VertexToDataString(),
       new EdgeToDataString(), true).execute(this, other);
   }
 
@@ -354,29 +525,72 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
   // Auxiliary Operators
   //----------------------------------------------------------------------------
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph callForGraph(UnaryGraphToGraphOperator operator) {
+  public LogicalGraph callForGraph(UnaryGraphToGraphOperator operator) {
     return operator.execute(this);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph callForGraph(BinaryGraphToGraphOperator operator, LogicalGraph otherGraph) {
+  public LogicalGraph callForGraph(BinaryGraphToGraphOperator operator, LogicalGraph otherGraph) {
     return operator.execute(this, otherGraph);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph callForGraph(GraphsToGraphOperator operator, LogicalGraph... otherGraphs) {
+  public LogicalGraph callForGraph(GraphsToGraphOperator operator,
+    LogicalGraph... otherGraphs) {
     return operator.execute(this, otherGraphs);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection callForCollection(UnaryGraphToCollectionOperator operator) {
+  public GraphCollection callForCollection(UnaryGraphToCollectionOperator operator) {
     return operator.execute(this);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection splitBy(String propertyKey) {
+  public GraphCollection splitBy(String propertyKey) {
     return callForCollection(new Split(new PropertyGetter<>(Lists.newArrayList(propertyKey))));
+  }
+
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> isEmpty() {
+    return getVertices()
+      .map(new True<>())
+      .distinct()
+      .union(getConfig().getExecutionEnvironment().fromElements(false))
+      .reduce(new Or())
+      .map(new Not());
+  }
+
+  @Override
+  public void writeTo(DataSink dataSink) throws IOException {
+    dataSink.write(this);
+  }
+
+  @Override
+  public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
+    dataSink.write(this, overWrite);
   }
 
   /**
@@ -385,7 +599,7 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
    *
    * @return the logical graph represented as temporal graph with empty valid time attributes
    */
-  default TemporalGraph toTemporalGraph() {
+  public TemporalGraph toTemporalGraph() {
     return getConfig().getTemporalGraphFactory()
       .fromNonTemporalDataSets(getVertices(), getEdges(), getGraphHead());
   }
@@ -404,7 +618,7 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
    * @param edgeTimestampExtractor extractor function to pick the timestamp from edges
    * @return the logical graph represented as temporal graph with a timestamp as validFrom attribute
    */
-  default TemporalGraph toTemporalGraph(
+  public TemporalGraph toTemporalGraph(
     GraphHeadTimestampExtractor graphHeadTimestampExtractor,
     VertexTimestampExtractor vertexTimestampExtractor,
     EdgeTimestampExtractor edgeTimestampExtractor) {
@@ -428,7 +642,7 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
    * @param edgeTimeIntervalExtractor extractor to pick the time interval from edges
    * @return the logical graph represented as temporal graph with a time interval as valid time
    */
-  default TemporalGraph toTemporalGraph(
+  public TemporalGraph toTemporalGraph(
     GraphHeadTimeIntervalExtractor graphHeadTimeIntervalExtractor,
     VertexTimeIntervalExtractor vertexTimeIntervalExtractor,
     EdgeTimeIntervalExtractor edgeTimeIntervalExtractor) {
@@ -439,32 +653,12 @@ public interface LogicalGraph extends LogicalGraphLayout, LogicalGraphOperators 
       getGraphHead().map(graphHeadTimeIntervalExtractor));
   }
 
-  //----------------------------------------------------------------------------
-  // Utility methods
-  //----------------------------------------------------------------------------
-  @Override
-  default DataSet<Boolean> isEmpty() {
-    return getVertices().map(new True<>()).distinct()
-      .union(getConfig().getExecutionEnvironment().fromElements(false)).reduce(new Or())
-      .map(new Not());
-  }
-
-  @Override
-  default void writeTo(DataSink dataSink) throws IOException {
-    dataSink.write(this);
-  }
-
-  @Override
-  default void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
-    dataSink.write(this, overWrite);
-  }
-
   /**
    * Prints the GDL formatted graph to the standard output.
    *
    * @throws Exception forwarded from dataset print
    */
-  default void print() throws Exception {
+  public void print() throws Exception {
     GDLConsoleOutput.print(this);
   }
 }

@@ -16,8 +16,21 @@
 package org.gradoop.flink.model.api.tpgm;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.util.Preconditions;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.layouts.TemporalLayout;
+import org.gradoop.flink.model.impl.functions.bool.Not;
+import org.gradoop.flink.model.impl.functions.bool.Or;
+import org.gradoop.flink.model.impl.functions.bool.True;
+import org.gradoop.flink.model.impl.functions.epgm.EdgeFromTemporal;
+import org.gradoop.flink.model.impl.functions.epgm.GraphHeadFromTemporal;
+import org.gradoop.flink.model.impl.functions.epgm.VertexFromTemporal;
+import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalGVELayout;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * A temporal (logical) graph is a base concept of the Temporal Property Graph Model (TPGM) that
@@ -38,13 +51,96 @@ import org.gradoop.flink.model.api.layouts.TemporalLayout;
  * Note that the {@link TemporalGraph} also implements that interface and just forward the calls to
  * the layout. This is just for convenience and API synchronicity.
  */
-public interface TemporalGraph extends TemporalLayout, TemporalGraphOperators {
+public class TemporalGraph implements TemporalLayout, TemporalGraphOperators {
 
   /**
-   * Returns a dataset containing a single graph head associated with that temporal graph.
-   *
-   * @return 1-element dataset
+   * Layout for that temporal graph.
    */
-  DataSet<TemporalGraphHead> getGraphHead();
+  private final TemporalGVELayout layout;
+  /**
+   * Configuration
+   */
+  private final GradoopFlinkConfig config;
 
+  /**
+   * Creates a new temporal graph instance with the given layout and gradoop flink configuration.
+   *
+   * @param layout the temporal graph layout representing the temporal graph
+   * @param config Gradoop Flink configuration
+   */
+  TemporalGraph(TemporalGVELayout layout, GradoopFlinkConfig config) {
+    this.layout = Preconditions.checkNotNull(layout);
+    this.config = Preconditions.checkNotNull(config);
+  }
+
+  @Override
+  public GradoopFlinkConfig getConfig() {
+    return this.config;
+  }
+
+  @Override
+  public DataSet<Boolean> isEmpty() {
+    return getVertices().map(new True<>()).distinct()
+      .union(getConfig().getExecutionEnvironment().fromElements(false)).reduce(new Or())
+      .map(new Not());
+  }
+
+  @Override
+  public void writeTo(DataSink dataSink) {
+    throw new RuntimeException("Writing a temporal graph to a DataSink is not implemented yet.");
+  }
+
+  @Override
+  public void writeTo(DataSink dataSink, boolean overWrite) {
+    throw new RuntimeException("Writing a temporal graph to a DataSink is not implemented yet.");
+  }
+
+  @Override
+  public DataSet<TemporalGraphHead> getGraphHead() {
+    return this.layout.getGraphHead();
+  }
+
+  @Override
+  public DataSet<TemporalVertex> getVertices() {
+    return this.layout.getVertices();
+  }
+
+  @Override
+  public DataSet<TemporalVertex> getVerticesByLabel(String label) {
+    return this.layout.getVerticesByLabel(label);
+  }
+
+  @Override
+  public DataSet<TemporalEdge> getEdges() {
+    return this.layout.getEdges();
+  }
+
+  @Override
+  public DataSet<TemporalEdge> getEdgesByLabel(String label) {
+    return this.layout.getEdgesByLabel(label);
+  }
+
+  @Override
+  public DataSet<TemporalGraphHead> getGraphHeads() {
+    return this.layout.getGraphHeads();
+  }
+
+  @Override
+  public DataSet<TemporalGraphHead> getGraphHeadsByLabel(String label) {
+    return this.layout.getGraphHeadsByLabel(label);
+  }
+
+  /**
+   * Converts the {@link TemporalGraph} to a {@link LogicalGraph} instance by discarding all
+   * temporal information from the graph elements. All Ids (graphs, vertices, edges) are kept
+   * during the transformation.
+   *
+   * @return the logical graph instance
+   */
+  public LogicalGraph toLogicalGraph() {
+    return getConfig().getLogicalGraphFactory().fromDataSets(
+      getGraphHeads().map(new GraphHeadFromTemporal()),
+      getVertices().map(new VertexFromTemporal()),
+      getEdges().map(new EdgeFromTemporal()));
+  }
 }

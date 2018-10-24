@@ -24,6 +24,9 @@ import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 import org.gradoop.flink.model.api.layouts.BaseLayoutFactory;
 import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalEdgeFromNonTemporal;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalGraphHeadFromNonTemporal;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalVertexFromNonTemporal;
 import org.gradoop.flink.model.impl.layouts.common.BaseFactory;
 
 import java.util.Objects;
@@ -97,9 +100,9 @@ public class TemporalLayoutFactory extends BaseFactory implements BaseLayoutFact
   public TemporalGVELayout fromNonTemporalDataSets(DataSet<GraphHead> graphHead,
     DataSet<Vertex> vertices, DataSet<Edge> edges) {
     return new TemporalGVELayout(
-      graphHead.map(TemporalGraphHead::fromNonTemporalGraphHead),
-      vertices.map(TemporalVertex::fromNonTemporalVertex),
-      edges.map(TemporalEdge::fromNonTemporalEdge));
+      graphHead.map(new TemporalGraphHeadFromNonTemporal()),
+      vertices.map(new TemporalVertexFromNonTemporal()),
+      edges.map(new TemporalEdgeFromNonTemporal()));
   }
 
 }

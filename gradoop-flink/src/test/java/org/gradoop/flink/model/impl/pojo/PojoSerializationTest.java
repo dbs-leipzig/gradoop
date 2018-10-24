@@ -18,6 +18,9 @@ package org.gradoop.flink.model.impl.pojo;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.common.model.api.entities.EPGMEdge;
@@ -64,6 +67,58 @@ public class PojoSerializationTest extends GradoopFlinkTestBase {
     );
 
     Assert.assertEquals("EPGMGraphHead POJOs were not equal",
+      graphHeadIn, GradoopFlinkTestUtils.writeAndRead(graphHeadIn));
+  }
+
+  /**
+   * Test serialization of {@link TemporalVertex}
+   */
+  @Test
+  public void testTemporalVertexSerialization() throws Exception {
+    EPGMVertex vertexIn = new TemporalVertex(
+      GradoopId.get(),
+      "Person",
+      Properties.createFromMap(GradoopTestUtils.SUPPORTED_PROPERTIES),
+      GradoopIdSet.fromExisting(GradoopId.get()),
+      42L,
+      52L);
+
+    Assert.assertEquals("Temporal Vertex POJOs were not equal",
+      vertexIn, GradoopFlinkTestUtils.writeAndRead(vertexIn));
+  }
+
+  /**
+   * Test serialization of {@link TemporalEdge}
+   */
+  @Test
+  public void testTemporalEdgeSerialization() throws Exception {
+    EPGMEdge edgeIn =new TemporalEdge(
+      GradoopId.get(),
+      "knows",
+      GradoopId.get(),
+      GradoopId.get(),
+      Properties.createFromMap(GradoopTestUtils.SUPPORTED_PROPERTIES),
+      GradoopIdSet.fromExisting(GradoopId.get(), GradoopId.get()),
+      42L,
+      52L);
+
+    Assert.assertEquals("Temporal Edge POJOs were not equal",
+      edgeIn, GradoopFlinkTestUtils.writeAndRead(edgeIn));
+  }
+
+  /**
+   * Test serialization of {@link TemporalGraphHead}
+   */
+  @Test
+  public void testTemporalGraphHeadSerialization() throws Exception {
+    EPGMGraphHead graphHeadIn = new TemporalGraphHead(
+      GradoopId.get(),
+      "Community",
+      Properties.createFromMap(GradoopTestUtils.SUPPORTED_PROPERTIES),
+      42L,
+      52L);
+
+    Assert.assertEquals("Temporal GraphHead POJOs were not equal",
       graphHeadIn, GradoopFlinkTestUtils.writeAndRead(graphHeadIn));
   }
 

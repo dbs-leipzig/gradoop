@@ -58,6 +58,13 @@ public interface TemporalLayout {
   DataSet<TemporalEdge> getEdgesByLabel(String label);
 
   /**
+   * Returns a dataset containing a single graph head associated with that temporal graph.
+   *
+   * @return 1-element dataset
+   */
+  DataSet<TemporalGraphHead> getGraphHead();
+
+  /**
    * Returns the graph heads associated with the logical graphs in that collection.
    *
    * @return temporal graph heads

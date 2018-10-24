@@ -27,8 +27,8 @@ import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalLayoutFactory;
-import org.gradoop.flink.model.impl.tpgm.TemporalGraphCollectionFactory;
-import org.gradoop.flink.model.impl.tpgm.TemporalGraphFactory;
+import org.gradoop.flink.model.api.tpgm.TemporalGraphCollectionFactory;
+import org.gradoop.flink.model.api.tpgm.TemporalGraphFactory;
 
 import java.util.Objects;
 

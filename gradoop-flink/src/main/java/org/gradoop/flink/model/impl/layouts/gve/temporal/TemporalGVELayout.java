@@ -49,7 +49,7 @@ public class TemporalGVELayout implements TemporalLayout {
    * @param temporalVertices vertex dataset
    * @param temporalEdges edge dataset
    */
-  protected TemporalGVELayout(
+  TemporalGVELayout(
     DataSet<TemporalGraphHead> temporalGraphHeads,
     DataSet<TemporalVertex> temporalVertices,
     DataSet<TemporalEdge> temporalEdges) {
@@ -78,12 +78,7 @@ public class TemporalGVELayout implements TemporalLayout {
   public DataSet<TemporalEdge> getEdgesByLabel(String label) {
     return this.temporalEdges.filter(new ByLabel<>(label));
   }
-
-  /**
-   * Returns a dataset containing a single graph head associated with that temporal graph.
-   *
-   * @return 1-element dataset
-   */
+  @Override
   public DataSet<TemporalGraphHead> getGraphHead() {
     return this.temporalGraphHeads;
   }

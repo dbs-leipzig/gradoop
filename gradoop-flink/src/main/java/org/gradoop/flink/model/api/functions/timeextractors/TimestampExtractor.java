@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.api.functions.timeextractors;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalElement;
 
@@ -26,6 +27,7 @@ import org.gradoop.common.model.impl.pojo.temporal.TemporalElement;
  * @param <E> the type of the EPGM element
  * @param <TE> the type of the TPGM element
  */
+@FunctionAnnotation.ForwardedFields("id,label,properties")
 public interface TimestampExtractor<E extends Element, TE extends TemporalElement>
   extends MapFunction<E, TE> {
 

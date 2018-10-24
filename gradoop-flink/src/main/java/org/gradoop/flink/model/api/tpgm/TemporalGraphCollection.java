@@ -15,11 +15,26 @@
  */
 package org.gradoop.flink.model.api.tpgm;
 
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.util.Preconditions;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.layouts.TemporalLayout;
+import org.gradoop.flink.model.impl.functions.bool.Not;
+import org.gradoop.flink.model.impl.functions.bool.Or;
+import org.gradoop.flink.model.impl.functions.bool.True;
+import org.gradoop.flink.model.impl.functions.epgm.EdgeFromTemporal;
+import org.gradoop.flink.model.impl.functions.epgm.GraphHeadFromTemporal;
+import org.gradoop.flink.model.impl.functions.epgm.VertexFromTemporal;
+import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalGVELayout;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * A temporal (logical) graph collection is a base concept of the Temporal Property Graph Model
- * (TPGM) that extends the Extended Property Graph Model (EPGM). The temporal graph collection
+ * A temporal graph collection is a base concept of the Temporal Property Graph Model (TPGM)
+ * that extends the Extended Property Graph Model (EPGM). The temporal graph collection
  * inherits the main concepts of the {@link org.gradoop.flink.model.api.epgm.GraphCollection} and
  * extends them by temporal attributes. These attributes are two temporal information:
  * the valid-time and transaction time. Both are represented by a Tuple2 of Long values that specify
@@ -38,6 +53,95 @@ import org.gradoop.flink.model.api.layouts.TemporalLayout;
  * Note that the {@link TemporalGraphCollection} also implements that interface and just forward
  * the calls to the layout. This is just for convenience and API synchronicity.
  */
-public interface TemporalGraphCollection extends TemporalLayout, TemporalGraphCollectionOperators {
+public class TemporalGraphCollection implements TemporalLayout, TemporalGraphCollectionOperators {
+  /**
+   * Layout for that temporal graph.
+   */
+  private final TemporalGVELayout layout;
+  /**
+   * Gradoop Flink Configuration that holds all necessary factories and the execution environment.
+   */
+  private final GradoopFlinkConfig config;
 
+  /**
+   * Creates a new temporal graph instance with the given layout and gradoop flink configuration.
+   *
+   * @param layout the temporal graph layout representing the temporal graph
+   * @param config Gradoop Flink configuration
+   */
+  TemporalGraphCollection(TemporalGVELayout layout, GradoopFlinkConfig config) {
+    this.layout = Preconditions.checkNotNull(layout);
+    this.config = Preconditions.checkNotNull(config);
+  }
+
+  @Override
+  public GradoopFlinkConfig getConfig() {
+    return this.config;
+  }
+
+  @Override
+  public DataSet<Boolean> isEmpty() {
+    return getVertices().map(new True<>()).distinct()
+      .union(getConfig().getExecutionEnvironment().fromElements(false)).reduce(new Or())
+      .map(new Not());
+  }
+
+  @Override
+  public void writeTo(DataSink dataSink) {
+    throw new RuntimeException("Writing a temporal graph to a DataSink is not implemented yet.");
+  }
+
+  @Override
+  public void writeTo(DataSink dataSink, boolean overWrite) {
+    throw new RuntimeException("Writing a temporal graph to a DataSink is not implemented yet.");
+  }
+
+  @Override
+  public DataSet<TemporalVertex> getVertices() {
+    return this.layout.getVertices();
+  }
+
+  @Override
+  public DataSet<TemporalVertex> getVerticesByLabel(String label) {
+    return this.layout.getVerticesByLabel(label);
+  }
+
+  @Override
+  public DataSet<TemporalEdge> getEdges() {
+    return this.layout.getEdges();
+  }
+
+  @Override
+  public DataSet<TemporalEdge> getEdgesByLabel(String label) {
+    return this.layout.getEdgesByLabel(label);
+  }
+
+  @Override
+  public DataSet<TemporalGraphHead> getGraphHead() {
+    return this.layout.getGraphHead();
+  }
+
+  @Override
+  public DataSet<TemporalGraphHead> getGraphHeads() {
+    return this.layout.getGraphHeads();
+  }
+
+  @Override
+  public DataSet<TemporalGraphHead> getGraphHeadsByLabel(String label) {
+    return this.layout.getGraphHeadsByLabel(label);
+  }
+
+  /**
+   * Converts the {@link TemporalGraphCollection} to a {@link GraphCollection} instance by
+   * discarding all temporal information from the graph elements. All Ids (graphs, vertices,
+   * edges) are kept during the transformation.
+   *
+   * @return the graph collection instance
+   */
+  public GraphCollection toGraphCollection() {
+    return getConfig().getGraphCollectionFactory().fromDataSets(
+      getGraphHeads().map(new GraphHeadFromTemporal()),
+      getVertices().map(new VertexFromTemporal()),
+      getEdges().map(new EdgeFromTemporal()));
+  }
 }

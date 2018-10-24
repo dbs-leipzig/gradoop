@@ -23,7 +23,8 @@ import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.tpgm.TemporalGraph;
+import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.api.tpgm.TemporalGraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,146 +37,151 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test class for {@link TPGMTemporalGraph} and {@link TemporalGraph}.
+ * Test class for {@link GraphCollection} and {@link TemporalGraphCollection}.
  */
-public class TPGMTemporalGraphTest extends GradoopFlinkTestBase {
-
+public class TemporalGraphCollectionTest extends GradoopFlinkTestBase {
   /**
-   * Test temporal graph.
+   * Test temporal graph collection.
    */
-  private TemporalGraph testGraph;
+  private TemporalGraphCollection testTemporalCollection;
 
   /**
-   * Creates a test temporal graph from the social network loader
+   * Test graph collection
+   */
+  private GraphCollection testCollection;
+
+  /**
+   * Creates a test temporal graph collection from the social network loader
    *
    * @throws Exception if loading the graph fails
    */
   @Before
   public void setUp() throws Exception {
-    testGraph = getSocialNetworkLoader().getLogicalGraph().toTemporalGraph();
+    testCollection = getSocialNetworkLoader().getGraphCollectionByVariables("g1", "g2");
+    testTemporalCollection = testCollection.toTemporalGraph();
   }
 
   /**
-   * Test the {@link TemporalGraph#getConfig()} method.
+   * Test the {@link TemporalGraphCollection#getConfig()} method.
    */
   @Test
   public void testGetConfig() {
-    assertNotNull(testGraph.getConfig());
-    assertTrue(testGraph.getConfig() instanceof GradoopFlinkConfig);
+    assertNotNull(testTemporalCollection.getConfig());
+    assertTrue(testTemporalCollection.getConfig() instanceof GradoopFlinkConfig);
   }
 
   /**
-   * Test the {@link TemporalGraph#isEmpty()} method.
+   * Test the {@link TemporalGraphCollection#isEmpty()} method.
    */
   @Test
   public void testIsEmpty() throws Exception{
-    collectAndAssertFalse(testGraph.isEmpty());
+    collectAndAssertFalse(testTemporalCollection.isEmpty());
   }
 
   /**
-   * Test the {@link TemporalGraph#writeTo(DataSink)} method.
+   * Test the {@link TemporalGraphCollection#writeTo(DataSink)} method.
    */
   @Test(expected = RuntimeException.class)
   public void testWriteTo() throws IOException {
-    testGraph.writeTo(new DOTDataSink("x", true));
+    testTemporalCollection.writeTo(new DOTDataSink("x", true));
   }
 
   /**
-   * Test the {@link TemporalGraph#writeTo(DataSink, boolean)} method.
+   * Test the {@link TemporalGraphCollection#writeTo(DataSink, boolean)} method.
    */
   @Test(expected = RuntimeException.class)
   public void testWriteToOverwrite() throws IOException {
-    testGraph.writeTo(new DOTDataSink("x", true), true);
+    testTemporalCollection.writeTo(new DOTDataSink("x", true), true);
   }
 
   /**
-   * Test the {@link TemporalGraph#getVertices()} method.
+   * Test the {@link TemporalGraphCollection#getVertices()} method.
    */
   @Test
   public void testGetVertices() throws Exception {
     List<TemporalVertex> temporalVertices = Lists.newArrayList();
-    testGraph.getVertices().output(new LocalCollectionOutputFormat<>(temporalVertices));
+    testTemporalCollection.getVertices().output(new LocalCollectionOutputFormat<>(temporalVertices));
     getExecutionEnvironment().execute();
-    assertEquals(11, temporalVertices.size());
+    assertEquals(5, temporalVertices.size());
     temporalVertices.forEach(this::checkDefaultTemporalElement);
   }
 
   /**
-   * Test the {@link TemporalGraph#getVerticesByLabel(String)} method.
+   * Test the {@link TemporalGraphCollection#getVerticesByLabel(String)} method.
    */
   @Test
   public void testGetVerticesByLabel() throws Exception {
     List<TemporalVertex> temporalVertices = Lists.newArrayList();
-    testGraph.getVerticesByLabel("Person")
+    testTemporalCollection.getVerticesByLabel("Person")
       .output(new LocalCollectionOutputFormat<>(temporalVertices));
     getExecutionEnvironment().execute();
-    assertEquals(6, temporalVertices.size());
+    assertEquals(5, temporalVertices.size());
     temporalVertices.forEach(v -> assertEquals("Person", v.getLabel()));
     temporalVertices.forEach(this::checkDefaultTemporalElement);
   }
 
   /**
-   * Test the {@link TemporalGraph#getEdges()} method.
+   * Test the {@link TemporalGraphCollection#getEdges()} method.
    */
   @Test
   public void testGetEdges() throws Exception {
     List<TemporalEdge> temporalEdges = Lists.newArrayList();
-    testGraph.getEdges().output(new LocalCollectionOutputFormat<>(temporalEdges));
+    testTemporalCollection.getEdges().output(new LocalCollectionOutputFormat<>(temporalEdges));
     getExecutionEnvironment().execute();
-    assertEquals(24, temporalEdges.size());
+    assertEquals(8, temporalEdges.size());
     temporalEdges.forEach(this::checkDefaultTemporalElement);
   }
 
   /**
-   * Test the {@link TemporalGraph#getEdgesByLabel(String)} method.
+   * Test the {@link TemporalGraphCollection#getEdgesByLabel(String)} method.
    */
   @Test
   public void testGetEdgesByLabel() throws Exception {
     List<TemporalEdge> temporalEdges = Lists.newArrayList();
-    testGraph.getEdgesByLabel("hasMember").output(new LocalCollectionOutputFormat<>(temporalEdges));
+    testTemporalCollection.getEdgesByLabel("knows")
+      .output(new LocalCollectionOutputFormat<>(temporalEdges));
     getExecutionEnvironment().execute();
-    assertEquals(4, temporalEdges.size());
-    temporalEdges.forEach(e -> assertEquals("hasMember", e.getLabel()));
+    assertEquals(8, temporalEdges.size());
+    temporalEdges.forEach(e -> assertEquals("knows", e.getLabel()));
     temporalEdges.forEach(this::checkDefaultTemporalElement);
   }
 
   /**
-   * Test the {@link TemporalGraph#getGraphHead()} method.
-   */
-  @Test
-  public void testGetGraphHead() throws Exception {
-    List<TemporalGraphHead> temporalGraphHeads = Lists.newArrayList();
-    testGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(temporalGraphHeads));
-    getExecutionEnvironment().execute();
-    assertEquals(1, temporalGraphHeads.size());
-    assertEquals("_DB", temporalGraphHeads.get(0).getLabel());
-    temporalGraphHeads.forEach(this::checkDefaultTemporalElement);
-  }
-
-  /**
-   * Test the {@link TemporalGraph#getGraphHeads()} method.
+   * Test the {@link TemporalGraphCollection#getGraphHeads()} method.
    */
   @Test
   public void testGetGraphHeads() throws Exception {
     List<TemporalGraphHead> temporalGraphHeads = Lists.newArrayList();
-    testGraph.getGraphHeads().output(new LocalCollectionOutputFormat<>(temporalGraphHeads));
+    testTemporalCollection.getGraphHeads().output(new LocalCollectionOutputFormat<>(temporalGraphHeads));
     getExecutionEnvironment().execute();
-    assertEquals(1, temporalGraphHeads.size());
-    assertEquals("_DB", temporalGraphHeads.get(0).getLabel());
+    assertEquals(2, temporalGraphHeads.size());
+    assertEquals("Community", temporalGraphHeads.get(0).getLabel());
     temporalGraphHeads.forEach(this::checkDefaultTemporalElement);
   }
 
   /**
-   * Test the {@link TemporalGraph#getGraphHeadsByLabel(String)} method.
+   * Test the {@link TemporalGraphCollection#getGraphHeadsByLabel(String)} method.
    */
   @Test
   public void testGetGraphHeadsByLabel() throws Exception {
     List<TemporalGraphHead> temporalGraphHeads = Lists.newArrayList();
-    testGraph.getGraphHeadsByLabel("_DB")
+    testTemporalCollection.getGraphHeadsByLabel("Community")
       .output(new LocalCollectionOutputFormat<>(temporalGraphHeads));
     getExecutionEnvironment().execute();
-    assertEquals(1, temporalGraphHeads.size());
-    temporalGraphHeads.forEach(g -> assertEquals("_DB", g.getLabel()));
+    assertEquals(2, temporalGraphHeads.size());
+    temporalGraphHeads.forEach(g -> assertEquals("Community", g.getLabel()));
     temporalGraphHeads.forEach(this::checkDefaultTemporalElement);
+  }
+
+  /**
+   * Test the {@link TemporalGraphCollection#toGraphCollection()} method.
+   */
+  @Test
+  public void testToGraphCollection() throws Exception {
+    GraphCollection resultingCollection = testTemporalCollection.toGraphCollection();
+
+    collectAndAssertTrue(resultingCollection.equalsByGraphData(testCollection));
+    collectAndAssertTrue(resultingCollection.equalsByGraphElementData(testCollection));
+    collectAndAssertTrue(resultingCollection.equalsByGraphElementIds(testCollection));
   }
 }

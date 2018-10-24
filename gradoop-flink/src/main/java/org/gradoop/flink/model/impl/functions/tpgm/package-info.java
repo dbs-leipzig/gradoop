@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains concrete classes representing a temporal graph and a temporal graph collection in the
- * TPGM and their factories.
+ * Contains TPGM function implementations that are globally used.
  */
-package org.gradoop.flink.model.impl.tpgm;
+package org.gradoop.flink.model.impl.functions.tpgm;

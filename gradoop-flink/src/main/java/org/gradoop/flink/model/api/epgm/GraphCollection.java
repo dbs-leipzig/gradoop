@@ -40,14 +40,13 @@ import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.flink.model.api.tpgm.TemporalGraphCollection;
-import org.gradoop.flink.model.impl.epgm.EPGMGraphCollection;
-import org.gradoop.flink.model.impl.epgm.EPGMLogicalGraph;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
 import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
@@ -68,9 +67,10 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmpt
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.union.Union;
+import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Objects;
 
 /**
  * A graph collection graph is one of the base concepts of the Extended Property Graph Model. From
@@ -88,29 +88,184 @@ import java.util.Collections;
  * is represented in Apache Flink. Note that the GraphCollection also implements that interface and
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
-public interface GraphCollection extends GraphCollectionOperators, GraphCollectionLayout {
+public class GraphCollection implements GraphCollectionOperators, GraphCollectionLayout {
+  /**
+   * Layout for that graph collection
+   */
+  private final GraphCollectionLayout layout;
+  /**
+   * Configuration
+   */
+  private final GradoopFlinkConfig config;
+
+  /**
+   * Creates a graph collection from the given arguments.
+   *
+   * @param layout Graph collection layout
+   * @param config Gradoop Flink configuration
+   */
+  protected GraphCollection(GraphCollectionLayout layout, GradoopFlinkConfig config) {
+    Objects.requireNonNull(layout);
+    Objects.requireNonNull(config);
+    this.layout = layout;
+    this.config = config;
+  }
+
+  //----------------------------------------------------------------------------
+  // Data methods
+  //----------------------------------------------------------------------------
+
+  @Override
+  public boolean isGVELayout() {
+    return layout.isGVELayout();
+  }
+
+  @Override
+  public boolean isIndexedGVELayout() {
+    return layout.isIndexedGVELayout();
+  }
+
+  @Override
+  public boolean isTransactionalLayout() {
+    return layout.isTransactionalLayout();
+  }
+
+  @Override
+  public DataSet<Vertex> getVertices() {
+    return layout.getVertices();
+  }
+
+  @Override
+  public DataSet<Vertex> getVerticesByLabel(String label) {
+    return layout.getVerticesByLabel(label);
+  }
+
+  @Override
+  public DataSet<Edge> getEdges() {
+    return layout.getEdges();
+  }
+
+  @Override
+  public DataSet<Edge> getEdgesByLabel(String label) {
+    return layout.getEdgesByLabel(label);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public DataSet<GraphHead> getGraphHeads() {
+    return layout.getGraphHeads();
+  }
+
+  @Override
+  public DataSet<GraphHead> getGraphHeadsByLabel(String label) {
+    return layout.getGraphHeadsByLabel(label);
+  }
+
+  @Override
+  public DataSet<GraphTransaction> getGraphTransactions() {
+    return layout.getGraphTransactions();
+  }
+
+  //----------------------------------------------------------------------------
+  // Logical Graph / Graph Head Getters
+  //----------------------------------------------------------------------------
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public LogicalGraph getGraph(final GradoopId graphID) {
+    // filter vertices and edges based on given graph id
+    DataSet<GraphHead> graphHead = getGraphHeads()
+      .filter(new BySameId<>(graphID));
+    DataSet<Vertex> vertices = getVertices()
+      .filter(new InGraph<>(graphID));
+    DataSet<Edge> edges = getEdges()
+      .filter(new InGraph<>(graphID));
+
+    return new LogicalGraph(
+      config.getLogicalGraphFactory().fromDataSets(graphHead, vertices, edges),
+      getConfig());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection getGraphs(final GradoopId... identifiers) {
+
+    GradoopIdSet graphIds = new GradoopIdSet();
+
+    for (GradoopId id : identifiers) {
+      graphIds.add(id);
+    }
+
+    return getGraphs(graphIds);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection getGraphs(final GradoopIdSet identifiers) {
+
+    DataSet<GraphHead> newGraphHeads = this.getGraphHeads()
+      .filter(new FilterFunction<GraphHead>() {
+        @Override
+        public boolean filter(GraphHead graphHead) throws Exception {
+          return identifiers.contains(graphHead.getId());
+        }
+      });
+
+    // build new vertex set
+    DataSet<Vertex> vertices = getVertices()
+      .filter(new InAnyGraph<>(identifiers));
+
+    // build new edge set
+    DataSet<Edge> edges = getEdges()
+      .filter(new InAnyGraph<>(identifiers));
+
+    return new GraphCollection(
+      getConfig().getGraphCollectionFactory().fromDataSets(newGraphHeads, vertices, edges),
+      getConfig());
+  }
 
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection select(final FilterFunction<GraphHead> predicate) {
+  public GraphCollection select(final FilterFunction<GraphHead> predicate) {
     return callForCollection(new Selection(predicate));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection sortBy(String propertyKey, Order order) {
+  public GraphCollection sortBy(String propertyKey, Order order) {
     throw new NotImplementedException();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection limit(int n) {
+  public GraphCollection limit(int n) {
     return callForCollection(new Limit(n));
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection match(String pattern, PatternMatchingAlgorithm algorithm,
+  public GraphCollection match(
+    String pattern,
+    PatternMatchingAlgorithm algorithm,
     boolean returnEmbeddings) {
     return new TransactionalPatternMatching(
       pattern,
@@ -122,58 +277,85 @@ public interface GraphCollection extends GraphCollectionOperators, GraphCollecti
   // Binary Operators
   //----------------------------------------------------------------------------
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection union(GraphCollection otherCollection) {
+  public GraphCollection union(GraphCollection otherCollection) {
     return callForCollection(new Union(), otherCollection);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection intersect(GraphCollection otherCollection) {
+  public GraphCollection intersect(GraphCollection otherCollection) {
     return callForCollection(new Intersection(), otherCollection);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection intersectWithSmallResult(
+  public GraphCollection intersectWithSmallResult(
     GraphCollection otherCollection) {
     return callForCollection(new IntersectionBroadcast(),
       otherCollection);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection difference(GraphCollection otherCollection) {
+  public GraphCollection difference(GraphCollection otherCollection) {
     return callForCollection(new Difference(), otherCollection);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection differenceWithSmallResult(
+  public GraphCollection differenceWithSmallResult(
     GraphCollection otherCollection) {
     return callForCollection(new DifferenceBroadcast(),
       otherCollection);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default DataSet<Boolean> equalsByGraphIds(GraphCollection other) {
+  public DataSet<Boolean> equalsByGraphIds(GraphCollection other) {
     return new CollectionEqualityByGraphIds().execute(this, other);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default DataSet<Boolean> equalsByGraphElementIds(GraphCollection other) {
+  public DataSet<Boolean> equalsByGraphElementIds(GraphCollection other) {
     return new CollectionEquality(
       new GraphHeadToEmptyString(),
       new VertexToIdString(),
       new EdgeToIdString(), true).execute(this, other);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default DataSet<Boolean> equalsByGraphElementData(GraphCollection other) {
+  public DataSet<Boolean> equalsByGraphElementData(GraphCollection other) {
     return new CollectionEquality(
       new GraphHeadToEmptyString(),
       new VertexToDataString(),
       new EdgeToDataString(), true).execute(this, other);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default DataSet<Boolean> equalsByGraphData(GraphCollection other) {
+  public DataSet<Boolean> equalsByGraphData(GraphCollection other) {
     return new CollectionEquality(
       new GraphHeadToDataString(),
       new VertexToDataString(),
@@ -184,73 +366,100 @@ public interface GraphCollection extends GraphCollectionOperators, GraphCollecti
   // Auxiliary Operators
   //----------------------------------------------------------------------------
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection callForCollection(UnaryCollectionToCollectionOperator op) {
+  public GraphCollection callForCollection(
+    UnaryCollectionToCollectionOperator op) {
     return op.execute(this);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection callForCollection(BinaryCollectionToCollectionOperator op,
+  public GraphCollection callForCollection(
+    BinaryCollectionToCollectionOperator op,
     GraphCollection otherCollection) {
     return op.execute(this, otherCollection);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph callForGraph(UnaryCollectionToGraphOperator op) {
+  public LogicalGraph callForGraph(UnaryCollectionToGraphOperator op) {
     return op.execute(this);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default GraphCollection apply(ApplicableUnaryGraphToGraphOperator op) {
+  public GraphCollection apply(ApplicableUnaryGraphToGraphOperator op) {
     return callForCollection(op);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  default LogicalGraph reduce(ReducibleBinaryGraphToGraphOperator op) {
+  public LogicalGraph reduce(ReducibleBinaryGraphToGraphOperator op) {
     return callForGraph(op);
   }
 
   //----------------------------------------------------------------------------
-  // Logical Graph / Graph Head Getters
+  // Utility methods
   //----------------------------------------------------------------------------
 
   @Override
-  default LogicalGraph getGraph(final GradoopId graphID) {
-    // filter vertices and edges based on given graph id
-    DataSet<GraphHead> graphHead = getGraphHeads()
-      .filter(new BySameId<>(graphID));
-    DataSet<Vertex> vertices = getVertices()
-      .filter(new InGraph<>(graphID));
-    DataSet<Edge> edges = getEdges()
-      .filter(new InGraph<>(graphID));
+  public GradoopFlinkConfig getConfig() {
+    return config;
+  }
 
-    return new EPGMLogicalGraph(
-      getConfig().getLogicalGraphFactory().fromDataSets(graphHead, vertices, edges), getConfig());
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public DataSet<Boolean> isEmpty() {
+    return getGraphHeads()
+      .map(new True<>())
+      .distinct()
+      .union(getConfig().getExecutionEnvironment().fromElements(false))
+      .reduce(new Or())
+      .map(new Not());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection distinctById() {
+    return callForCollection(new DistinctById());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public GraphCollection distinctByIsomorphism() {
+    return callForCollection(new DistinctByIsomorphism());
   }
 
   @Override
-  default GraphCollection getGraphs(final GradoopId... identifiers) {
-    GradoopIdSet graphIds = new GradoopIdSet();
-    Collections.addAll(graphIds, identifiers);
-    return getGraphs(graphIds);
+  public GraphCollection groupByIsomorphism(GraphHeadReduceFunction func) {
+    return callForCollection(new GroupByIsomorphism(func));
   }
 
   @Override
-  default GraphCollection getGraphs(final GradoopIdSet identifiers) {
-    DataSet<GraphHead> newGraphHeads = this.getGraphHeads()
-      .filter((FilterFunction<GraphHead>) graphHead -> identifiers.contains(graphHead.getId()));
+  public void writeTo(DataSink dataSink) throws IOException {
+    dataSink.write(this);
+  }
 
-    // build new vertex set
-    DataSet<Vertex> vertices = getVertices()
-      .filter(new InAnyGraph<>(identifiers));
-
-    // build new edge set
-    DataSet<Edge> edges = getEdges()
-      .filter(new InAnyGraph<>(identifiers));
-
-    return new EPGMGraphCollection(
-      getConfig().getGraphCollectionFactory().fromDataSets(newGraphHeads, vertices, edges),
-      getConfig());
+  @Override
+  public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
+    dataSink.write(this, overWrite);
   }
 
   /**
@@ -261,7 +470,7 @@ public interface GraphCollection extends GraphCollectionOperators, GraphCollecti
    * @return the graph collection represented as temporal graph collection with empty valid time
    * attributes
    */
-  default TemporalGraphCollection toTemporalGraph() {
+  public TemporalGraphCollection toTemporalGraph() {
     return getConfig().getTemporalGraphCollectionFactory()
       .fromNonTemporalDataSets(getVertices(), getEdges(), getGraphHeads());
   }
@@ -282,7 +491,7 @@ public interface GraphCollection extends GraphCollectionOperators, GraphCollecti
    * @return the graph collection represented as temporal graph collection with a timestamp as
    * validFrom attribute
    */
-  default TemporalGraphCollection toTemporalGraph(
+  public TemporalGraphCollection toTemporalGraph(
     GraphHeadTimestampExtractor graphHeadTimestampExtractor,
     VertexTimestampExtractor vertexTimestampExtractor,
     EdgeTimestampExtractor edgeTimestampExtractor) {
@@ -308,7 +517,7 @@ public interface GraphCollection extends GraphCollectionOperators, GraphCollecti
    * @return the graph collection represented as temporal graph collection with a time interval as
    * valid time
    */
-  default TemporalGraphCollection toTemporalGraph(
+  public TemporalGraphCollection toTemporalGraph(
     GraphHeadTimeIntervalExtractor graphHeadTimeIntervalExtractor,
     VertexTimeIntervalExtractor vertexTimeIntervalExtractor,
     EdgeTimeIntervalExtractor edgeTimeIntervalExtractor) {
@@ -319,52 +528,12 @@ public interface GraphCollection extends GraphCollectionOperators, GraphCollecti
       getGraphHeads().map(graphHeadTimeIntervalExtractor));
   }
 
-  //----------------------------------------------------------------------------
-  // Utility methods
-  //----------------------------------------------------------------------------
-
-  @Override
-  default DataSet<Boolean> isEmpty() {
-    return getGraphHeads()
-      .map(new True<>())
-      .distinct()
-      .union(getConfig().getExecutionEnvironment().fromElements(false))
-      .reduce(new Or())
-      .map(new Not());
-  }
-
-  @Override
-  default GraphCollection distinctById() {
-    return callForCollection(new DistinctById());
-  }
-
-  @Override
-  default GraphCollection distinctByIsomorphism() {
-    return callForCollection(new DistinctByIsomorphism());
-  }
-
-  @Override
-  default GraphCollection groupByIsomorphism(GraphHeadReduceFunction func) {
-    return callForCollection(new GroupByIsomorphism(func));
-  }
-
-  @Override
-  default void writeTo(DataSink dataSink) throws IOException {
-    dataSink.write(this);
-  }
-
-  @Override
-  default void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
-    dataSink.write(this, overWrite);
-  }
-
   /**
    * Prints this graph collection to the console.
    *
    * @throws Exception forwarded DataSet print() Exception.
    */
-  default void print() throws Exception {
+  public void print() throws Exception {
     GDLConsoleOutput.print(this);
   }
-
 }
