@@ -22,28 +22,16 @@ import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.flink.types.Value;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.util.GradoopConstants;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents a single property value in the EPGM.
@@ -153,6 +141,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   private static final Map<Byte, Class> TYPE_MAPPING = LegacyPropertyValue.getTypeMap();
   private final LegacyPropertyValue legacyPropertyValue = new LegacyPropertyValue();
+  private Object value;
 
   /**
    * Default constructor.
@@ -168,6 +157,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @param value value with supported type
    */
   private PropertyValue(Object value) {
+    setObject(value);
     legacyPropertyValue.setObject(value);
   }
 
@@ -216,6 +206,10 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   // Type checking
   //----------------------------------------------------------------------------
 
+  public boolean is(Class c) {
+    return PropertyValueStrategy.PropertyValueStrategyFactory.get(c).is(value);
+  }
+
   /**
    * True, if the value represents {@code null}.
    *
@@ -231,7 +225,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return true, if {@code boolean} value
    */
   public boolean isBoolean() {
-    return legacyPropertyValue.isBoolean();
+    return is(Boolean.class);
   }
   /**
    * True, if the wrapped value is of type {@code short}.
@@ -360,13 +354,29 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   // Getter
   //----------------------------------------------------------------------------
 
+  public <T> T get(Class<T> c) {
+    PropertyValueStrategy strategy = PropertyValueStrategy.PropertyValueStrategyFactory.get(c);
+    if (strategy.is(value)) {
+      return (T) value;
+    }
+    return null;
+  }
+
   /**
    * Returns the wrapped value as object.
    *
    * @return value or {@code null} if the value is empty
    */
   public Object getObject() {
-    return legacyPropertyValue.getObject();
+    Object obj = null;
+    if (value != null) {
+      obj = get(value.getClass());
+    }
+    if (obj == null) {
+      obj = legacyPropertyValue.getObject();
+    }
+
+    return obj;
   }
   /**
    * Returns the wrapped value as {@code boolean}.
@@ -374,7 +384,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return {@code boolean} value
    */
   public boolean getBoolean() {
-    return legacyPropertyValue.getBoolean();
+    return get(Boolean.class);
   }
 
   /**
@@ -508,7 +518,10 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @throws UnsupportedTypeException if the type of the Object is not supported
    */
   public void setObject(Object value) {
-    legacyPropertyValue.setObject(value);
+    this.value = value;
+    if (value == null || !is(value.getClass())) {
+      legacyPropertyValue.setObject(value);
+    }
   }
   /**
    * Sets the wrapped value as {@code boolean} value.
@@ -516,7 +529,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @param booleanValue value
    */
   public void setBoolean(boolean booleanValue) {
-    legacyPropertyValue.setBoolean(booleanValue);
+    setObject(booleanValue);
   }
 
   /**
@@ -649,16 +662,32 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return Class object
    */
   public Class<?> getType() {
-    return legacyPropertyValue.getType();
+    Class<?> c = null;
+    if (value != null) {
+      c = PropertyValueStrategy.PropertyValueStrategyFactory.get(value.getClass()).getType();
+    }
+
+    if (c == null) {
+      c = legacyPropertyValue.getType();
+    }
+
+    return c;
   }
 
   public int getByteSize() {
-    return legacyPropertyValue.getByteSize();
+    return getRawBytes().length;
   }
 
   @SuppressWarnings("EI_EXPOSE_REP")
   public byte[] getRawBytes() {
-    return legacyPropertyValue.getRawBytes();
+    byte[] rawBytes = null;
+    if (value != null) {
+      rawBytes = PropertyValueStrategy.PropertyValueStrategyFactory.get(value.getClass()).getRawBytes(value);
+    }
+    if (rawBytes == null) {
+      rawBytes = legacyPropertyValue.getRawBytes();
+    }
+    return rawBytes;
   }
 
   /**
@@ -1647,4 +1676,5 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
               GradoopConstants.NULL_STRING;
     }
   }
+
 }
