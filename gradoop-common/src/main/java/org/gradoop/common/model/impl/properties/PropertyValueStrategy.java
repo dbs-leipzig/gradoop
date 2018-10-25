@@ -5,7 +5,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import java.util.HashMap;
 import java.util.Map;
 
-public interface PropertyValueStrategy {
+public interface PropertyValueStrategy<T> {
 
     class PropertyValueStrategyFactory {
 
@@ -34,9 +34,26 @@ public interface PropertyValueStrategy {
                 byteStrategyMap.put(strategy.getRawType(), strategy);
             }
         }
+
+        public static int compare(Object value, Object other) {
+            if (value != null) {
+                PropertyValueStrategy strategy = get(value.getClass());
+                if (strategy.is(other)) {
+                    return strategy.compare(value, other);
+                }
+            }
+            return 0;
+        }
     }
 
-    class BooleanStrategy implements PropertyValueStrategy {
+    int compare(T value, T other);
+
+    class BooleanStrategy implements PropertyValueStrategy<Boolean> {
+
+        @Override
+        public int compare(Boolean value, Boolean other) {
+            return Boolean.compare(value, other);
+        }
 
         @Override
         public boolean is(Object value) {
@@ -69,6 +86,11 @@ public interface PropertyValueStrategy {
 
     }
     class NoopPropertyValueStrategy implements PropertyValueStrategy {
+        @Override
+        public int compare(Object value, Object other) {
+            return 0;
+        }
+
         @Override
         public boolean is(Object value) {
             return false;
