@@ -31,7 +31,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.VertexToDegreeM
 
 /**
  * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
- * amount and all edges which source- and target-vertices where chosen. A degree-dependent value
+ * amount and all edges which source- and target-vertices were chosen. A degree-dependent value
  * is taken into account to have a bias towards high-degree vertices. There may retain some
  * unconnected vertices in the sampled graph.
  */
