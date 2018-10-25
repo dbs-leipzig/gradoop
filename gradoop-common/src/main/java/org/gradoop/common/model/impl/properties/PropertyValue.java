@@ -702,12 +702,16 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
 
   @Override
   public boolean equals(Object o) {
-    return legacyPropertyValue.equals(o);
+    return legacyPropertyValue.equals(o) || (o instanceof PropertyValue && Objects.equals(value, ((PropertyValue)o).value));
   }
 
   @Override
   public int hashCode() {
-    return legacyPropertyValue.hashCode();
+    byte[] rawBytes = null;
+    if (value != null) {
+      rawBytes = PropertyValueStrategy.PropertyValueStrategyFactory.get(value.getClass()).getRawBytes(value);
+    }
+    return rawBytes == null ? legacyPropertyValue.hashCode() : Arrays.hashCode(rawBytes);
   }
 
   @Override
