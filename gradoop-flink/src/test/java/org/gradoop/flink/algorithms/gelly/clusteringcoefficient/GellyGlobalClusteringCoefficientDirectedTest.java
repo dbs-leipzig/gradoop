@@ -17,34 +17,47 @@ package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 
 import org.apache.commons.math3.util.Precision;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Test-class for {@link GellyClusteringCoefficientDirected}
+ * Test-class for {@link GellyGlobalClusteringCoefficientDirected}
  */
-public class GellyClusteringCoefficientDirectedTest extends GellyClusteringCoefficientTestBase {
+public class GellyGlobalClusteringCoefficientDirectedTest
+  extends GellyClusteringCoefficientTestBase {
 
   /**
-   * Creates an instance of GellyClusteringCoefficientDirectedTest.
+   * Creates an instance of GellyGlobalClusteringCoefficientDirectedTest.
    * Calls constructor of super class.
    */
-  public GellyClusteringCoefficientDirectedTest() {
+  public GellyGlobalClusteringCoefficientDirectedTest() {
     super();
   }
 
   @Override
   public ClusteringCoefficientBase getCCAlgorithm() {
-    return new GellyClusteringCoefficientDirected();
+    return new GellyGlobalClusteringCoefficientDirected();
+  }
+
+  @Override
+  public void testFullyConnectedGraph(LogicalGraph graph) throws Exception {
+    GraphHead head = graph.getGraphHead().collect().get(0);
+    assertEquals("Wrong global value for fully connected graph, should be 1", 1d,
+      head.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL).getDouble(), 0.0);
+  }
+
+  @Override
+  public void testNonConnectedGraph(LogicalGraph graph) throws Exception {
+    GraphHead head = graph.getGraphHead().collect().get(0);
+    double global = head.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL).getDouble();
+    assertTrue("Wrong global value for not connected graph, should be 0 or NaN",
+      Double.isNaN(global));
   }
 
   @Override
   public void testSpecific() throws Exception {
-
     String graphString = "halfConnected[" +
       "/* half connected graph */" +
       "(v0 {id:0, value:\"A\"})" +
@@ -62,40 +75,19 @@ public class GellyClusteringCoefficientDirectedTest extends GellyClusteringCoeff
 
     validateGraphProperties(result);
 
-    List<Vertex> vertices = result.getVertices().collect();
     GraphHead head = result.getGraphHead().collect().get(0);
-
-    for (Vertex v : vertices) {
-      if (v.getPropertyValue("id").getInt() == 0) {
-        assertEquals("vertex with id 0 has wrong local value, should be 0.1666", (1d/6d),
-          v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
-      }
-      if (v.getPropertyValue("id").getInt() == 1) {
-        assertEquals("vertex with id 1 has wrong local value, should be 1", (1d/2d),
-          v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
-      }
-      if (v.getPropertyValue("id").getInt() == 2) {
-        assertEquals("vertex with id 2 has wrong local value, should be 1", (1d/2d),
-          v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
-      }
-      if (v.getPropertyValue("id").getInt() == 3) {
-        assertEquals("vertex with id 3 has wrong local value, should be 0 or NaN",
-          Double.NaN,
-          v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
-      }
-    }
-
-    double average = head.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_AVERAGE)
-      .getDouble();
-    assertEquals("graph has wrong average value, should be 0.2916",
-      Precision.round(((1d/6d) + (1d/2d) + (1d/2d) + 0d) / 4d, 4),
-      Precision.round(average, 4), 0.0);
 
     double global = head.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL)
       .getDouble();
     assertEquals("graph has wrong global value, should be 0.6",
       Precision.round(3d / 5d, 3),
       Precision.round(global, 3), 0.0);
+  }
 
+  @Override
+  public void validateGraphProperties(LogicalGraph graph) throws Exception {
+    GraphHead head = graph.getGraphHead().collect().get(0);
+    assertTrue("No global value stored in graph head",
+      head.hasProperty(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL));
   }
 }

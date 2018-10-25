@@ -19,29 +19,29 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
-import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyClusteringCoefficientDirected;
+import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyGlobalClusteringCoefficientDirected;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
- * Calls the computation of the average and global clustering coefficient for a directed logical
- * graph. Uses the Gradoop-Wrapper {@link GellyClusteringCoefficientDirected} of Flinks
- * ClusteringCoefficient-algorithm. Writes the average value to a csv-file named
- * {@value SamplingEvaluationConstants#FILE_CLUSTERING_COEFFICIENT_AVERAGE} and the global value
- * to a csv-file named {@value SamplingEvaluationConstants#FILE_CLUSTERING_COEFFICIENT_GLOBAL}
- * in the output directory, e.g.:
+ * Calls the computation of the global clustering coefficient for a directed logical graph.
+ * Uses the Gradoop-Wrapper {@link GellyGlobalClusteringCoefficientDirected} of Flinks
+ * ClusteringCoefficient-algorithm. Writes the global value to a csv-file named
+ * {@value SamplingEvaluationConstants#FILE_CLUSTERING_COEFFICIENT_GLOBAL} in the output directory,
+ * e.g.:
  * <pre>
  * BOF
  * 0.2916
  * EOF
  * </pre>
  */
-public class ClusteringCoefficientRunner extends AbstractRunner implements ProgramDescription {
+public class GlobalClusteringCoefficientRunner
+  extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Calls the computation of the average and global clustering coefficient for the graph.
+   * Calls the computation of the global clustering coefficient for the graph.
    *
    * <pre>
    * args[0] - path to graph
@@ -56,13 +56,7 @@ public class ClusteringCoefficientRunner extends AbstractRunner implements Progr
 
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
-    graph = new GellyClusteringCoefficientDirected().execute(graph);
-
-    DataSet<Double> average = graph.getGraphHead()
-      .map(gh -> gh.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_AVERAGE).getDouble());
-
-    StatisticWriter.writeCSV(average.map(new ObjectTo1<>()), appendSeparator(args[2]) +
-      SamplingEvaluationConstants.FILE_CLUSTERING_COEFFICIENT_AVERAGE);
+    graph = new GellyGlobalClusteringCoefficientDirected().execute(graph);
 
     DataSet<Double> global = graph.getGraphHead()
       .map(gh -> gh.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL).getDouble());
@@ -70,11 +64,11 @@ public class ClusteringCoefficientRunner extends AbstractRunner implements Progr
     StatisticWriter.writeCSV(global.map(new ObjectTo1<>()), appendSeparator(args[2]) +
       SamplingEvaluationConstants.FILE_CLUSTERING_COEFFICIENT_GLOBAL);
 
-    getExecutionEnvironment().execute("Sampling Statistics: Clustering coefficient");
+    getExecutionEnvironment().execute("Sampling Statistics: Global clustering coefficient");
   }
 
   @Override
   public String getDescription() {
-    return ClusteringCoefficientRunner.class.getName();
+    return AverageClusteringCoefficientRunner.class.getName();
   }
 }
