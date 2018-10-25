@@ -763,11 +763,14 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   @Override
   public void write(DataOutputView outputView) throws IOException {
-    // null?
-    // Write type.
-    // Write length for types with a variable length.
-    // write data
-    legacyPropertyValue.write(outputView);
+    if ( !PropertyValueStrategy.PropertyValueStrategyFactory.get(value).write(value, outputView) ) {
+
+      // null?
+      // Write type.
+      // Write length for types with a variable length.
+      // write data
+      legacyPropertyValue.write(outputView);
+    }
   }
 
   @Override
@@ -778,7 +781,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     // init new array
     // read type info
     // read data
-    legacyPropertyValue.read(inputView);
+      legacyPropertyValue.read(inputView);
   }
 
   @Override
