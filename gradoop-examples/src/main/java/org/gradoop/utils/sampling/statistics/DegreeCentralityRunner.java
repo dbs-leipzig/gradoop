@@ -13,6 +13,9 @@ import org.gradoop.flink.model.impl.operators.statistics.writer.DegreeCentrality
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
+/**
+ * Computes {@link DegreeCentrality} for a given logical graph.
+ */
 public class DegreeCentralityRunner extends AbstractRunner implements ProgramDescription {
 
   /**
@@ -24,10 +27,6 @@ public class DegreeCentralityRunner extends AbstractRunner implements ProgramDes
    * @throws Exception if something goes wrong
    */
   public static void main(String[] args) throws Exception {
-
-    DataSet<Double> dataSet = new DegreeCentrality()
-      .execute(readLogicalGraph(args[0], args[1]));
-    dataSet.print();
 
     StatisticWriter.writeCSV(new DegreeCentralityPreparer()
         .execute(readLogicalGraph(args[0], args[1])),

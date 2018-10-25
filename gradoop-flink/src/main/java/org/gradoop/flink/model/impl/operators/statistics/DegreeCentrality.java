@@ -10,12 +10,14 @@ import org.gradoop.flink.model.impl.operators.statistics.functions.CalculateDegr
 import org.gradoop.flink.model.impl.operators.statistics.functions.DegreeDistanceFunction;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
+/**
+ * Computes the degree centrality of a graph
+ */
 public class DegreeCentrality extends DegreeCentralityBase
   implements UnaryGraphToValueOperator<DataSet<Double>> {
 
   @Override
   public DataSet<Double> execute(LogicalGraph graph) {
-
 
     DataSet<WithCount<GradoopId>> degrees = new VertexDegrees().execute(graph);
     DataSet<Long> vertexCount = new VertexCount().execute(graph);
