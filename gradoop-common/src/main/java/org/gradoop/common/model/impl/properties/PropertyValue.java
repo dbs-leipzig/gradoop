@@ -167,7 +167,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @param bytes byte array
    */
   private PropertyValue(byte[] bytes) {
-    legacyPropertyValue.setBytes(bytes);
+    setBytes(bytes);
   }
 
   /**
@@ -696,6 +696,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   @SuppressWarnings("EI_EXPOSE_REP")
   public void setBytes(byte[] bytes) {
+    value = PropertyValueStrategy.PropertyValueStrategyFactory.fromRawBytes(bytes);
     legacyPropertyValue.setBytes(bytes);
   }
 
