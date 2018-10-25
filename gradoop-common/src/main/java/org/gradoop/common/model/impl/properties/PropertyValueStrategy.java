@@ -1,11 +1,17 @@
 package org.gradoop.common.model.impl.properties;
 
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public interface PropertyValueStrategy<T> {
+
+    boolean write(T value, DataOutputView outputView) throws IOException;
 
     class PropertyValueStrategyFactory {
 
@@ -51,11 +57,24 @@ public interface PropertyValueStrategy<T> {
             }
             return new byte[0];
         }
+
+        public static PropertyValueStrategy get(Object value) {
+            if (value != null) {
+                return get(value.getClass());
+            }
+            return INSTANCE.noopPropertyValueStrategy;
+        }
     }
 
     int compare(T value, T other);
 
     class BooleanStrategy implements PropertyValueStrategy<Boolean> {
+
+        @Override
+        public boolean write(Boolean value, DataOutputView outputView) throws IOException {
+            outputView.write( getRawBytes(value) );
+            return true;
+        }
 
         @Override
         public int compare(Boolean value, Boolean other) {
@@ -72,7 +91,7 @@ public interface PropertyValueStrategy<T> {
         }
 
         @Override
-        public Object get(byte[] bytes) {
+        public Boolean get(byte[] bytes) {
             return bytes[1] == -1;
         }
 
@@ -82,7 +101,7 @@ public interface PropertyValueStrategy<T> {
         }
 
         @Override
-        public byte[] getRawBytes(Object value) {
+        public byte[] getRawBytes(Boolean value) {
             byte[] rawBytes = new byte[PropertyValue.OFFSET + Bytes.SIZEOF_BOOLEAN];
             rawBytes[0] = getRawType();
             Bytes.putByte(rawBytes, PropertyValue.OFFSET, (byte) ((boolean)value ? -1 : 0));
@@ -93,6 +112,11 @@ public interface PropertyValueStrategy<T> {
 
     }
     class NoopPropertyValueStrategy implements PropertyValueStrategy {
+        @Override
+        public boolean write(Object value, DataOutputView outputView) {
+            return false;
+        }
+
         @Override
         public int compare(Object value, Object other) {
             return 0;
@@ -126,8 +150,8 @@ public interface PropertyValueStrategy<T> {
     }
     boolean is(Object value);
     Class<?> getType();
-    Object get(byte[] bytes);
+    T get(byte[] bytes);
 
     Byte getRawType();
-    byte[] getRawBytes(Object value);
+    byte[] getRawBytes(T value);
 }
