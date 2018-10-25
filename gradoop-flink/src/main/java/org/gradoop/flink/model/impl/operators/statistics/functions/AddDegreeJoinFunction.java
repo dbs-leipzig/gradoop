@@ -1,4 +1,4 @@
-package org.gradoop.utils.centrality.functions;
+package org.gradoop.flink.model.impl.operators.statistics.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.common.model.impl.id.GradoopId;

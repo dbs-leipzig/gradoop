@@ -93,6 +93,11 @@ public class SamplingEvaluationConstants {
   public static final String FILE_TRIANGLE_COUNT = "triangle_count";
 
   /**
+   * Filename for saved degree centrality value of the graph
+   */
+  public static final String FILE_DEGREE_CENTRALITY = "degree_centrality";
+
+  /**
    * private Constructor
    */
   private SamplingEvaluationConstants() { }

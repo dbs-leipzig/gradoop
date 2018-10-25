@@ -2,19 +2,14 @@ package org.gradoop.utils.centrality;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.AggregateOperator;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.statistics.VertexCount;
 import org.gradoop.flink.model.impl.operators.statistics.VertexDegrees;
 import org.gradoop.flink.model.impl.tuples.WithCount;
-import org.gradoop.utils.centrality.functions.AddDegreeJoinFunction;
-import org.gradoop.utils.centrality.functions.CalculateDegreeCentrality;
-import org.gradoop.utils.centrality.functions.DegreeDistanceFunction;
+import org.gradoop.flink.model.impl.operators.statistics.functions.CalculateDegreeCentrality;
+import org.gradoop.flink.model.impl.operators.statistics.functions.DegreeDistanceFunction;
 
 public class DegreeCentrality extends AbstractRunner implements ProgramDescription {
 
