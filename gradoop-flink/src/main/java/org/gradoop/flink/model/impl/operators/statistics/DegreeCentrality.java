@@ -10,7 +10,7 @@ import org.gradoop.flink.model.impl.operators.statistics.functions.CalculateDegr
 import org.gradoop.flink.model.impl.operators.statistics.functions.DegreeDistanceFunction;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
-public class DegreeCentrality
+public class DegreeCentrality extends DegreeCentralityBase
   implements UnaryGraphToValueOperator<DataSet<Double>> {
 
   @Override
@@ -22,11 +22,10 @@ public class DegreeCentrality
 
     // for broadcasting
     DataSet<WithCount<GradoopId>> maxDegree = degrees.max(1);
-    String broadcastName = "degree_max";
 
     DataSet<Double> degreeCentrality = degrees
-      .map(new DegreeDistanceFunction(broadcastName))
-      .withBroadcastSet(maxDegree, broadcastName)
+      .map(new DegreeDistanceFunction(super.broadcastName))
+      .withBroadcastSet(maxDegree, super.broadcastName)
       .sum(0)
       .crossWithTiny(vertexCount).with(new CalculateDegreeCentrality());
 
