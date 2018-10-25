@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -50,26 +51,26 @@ public class RollUpTest extends GradoopFlinkTestBase {
 
     //expected
     loader.initDatabaseFromString("g0:g0 {vertexRollUpGroupingKeys:\"age\"}[" +
-      "(v__0 {count:1L,age:20})" +
-      "(v__1 {count:2L,age:30})" +
-      "(v__2 {count:2L,age:35})" +
-      "(v__3 {count:1L,age:40})" +
-      "(v__2)-[e__0]->(v__0)" +
-      "(v__1)-[e__1]->(v__0)" +
-      "(v__3)-[e__2]->(v__1)" +
-      "(v__0)-[e__3]->(v__1)" +
-      "(v__2)-[e__4]->(v__1)" +
-      "(v__2)-[e__5]->(v__3)" +
-      "(v__1)-[e__6]->(v__1)" +
-      "(v__1)-[e__7]->(v__3)" +
+      "(v0 {count:1L,age:20})" +
+      "(v1 {count:2L,age:30})" +
+      "(v2 {count:2L,age:35})" +
+      "(v3 {count:1L,age:40})" +
+      "(v2)-[e0]->(v0)" +
+      "(v1)-[e1]->(v0)" +
+      "(v3)-[e2]->(v1)" +
+      "(v0)-[e3]->(v1)" +
+      "(v2)-[e4]->(v1)" +
+      "(v2)-[e5]->(v3)" +
+      "(v1)-[e6]->(v1)" +
+      "(v1)-[e7]->(v3)" +
       "]");
     GraphCollection expected = loader.getGraphCollection();
 
     List<String> vertexGK = new ArrayList<>(Arrays.asList("age"));
-    List<PropertyValueAggregator> vertexAGG = 
-      new ArrayList<>(Arrays.asList(new CountAggregator("count")));
-    List<String> edgeGK = new ArrayList<>();
-    List<PropertyValueAggregator> edgeAGG = new ArrayList<>();
+    List<PropertyValueAggregator> vertexAGG =
+      Collections.singletonList(new CountAggregator("count"));
+    List<String> edgeGK = Collections.emptyList();
+    List<PropertyValueAggregator> edgeAGG = Collections.emptyList();
     
     GraphCollection output = input.groupVerticesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
   
@@ -92,18 +93,17 @@ public class RollUpTest extends GradoopFlinkTestBase {
 
     //expected
     loader.initDatabaseFromString("g0:g0 {edgeRollUpGroupingKeys:\":label\"}[" +
-      "(v__0)" +
-      "(v__0)-[e_0:knows{count:10L}]->(v__0)" +
-      "(v__0)-[e_1:hasModerator{count:1L}]->(v__0)" +
-      "(v__0)-[e_2:hasMember{count:2L}]->(v__0)" +
+      "(v0)" +
+      "(v0)-[e_0:knows{count:10L}]->(v0)" +
+      "(v0)-[e_1:hasModerator{count:1L}]->(v0)" +
+      "(v0)-[e_2:hasMember{count:2L}]->(v0)" +
       "]");
     GraphCollection expected = loader.getGraphCollection();
 
-    List<String> vertexGK = new ArrayList<>();
-    List<PropertyValueAggregator> vertexAGG = new ArrayList<>();
-    List<String> edgeGK = new ArrayList<String>(Arrays.asList(Grouping.LABEL_SYMBOL));
-    List<PropertyValueAggregator> edgeAGG = 
-      new ArrayList<>(Arrays.asList(new CountAggregator("count")));
+    List<String> vertexGK = Collections.emptyList();
+    List<PropertyValueAggregator> vertexAGG = Collections.emptyList();
+    List<String> edgeGK = new ArrayList<>(Arrays.asList(Grouping.LABEL_SYMBOL));
+    List<PropertyValueAggregator> edgeAGG = Collections.singletonList(new CountAggregator("count"));
     
     GraphCollection output = input.groupEdgesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
     
@@ -127,71 +127,71 @@ public class RollUpTest extends GradoopFlinkTestBase {
     
     //expected
     loader.initDatabaseFromString("g0:g0 {vertexRollUpGroupingKeys:\"age,gender,city\"}[" +
-      "(v__2 {gender:\"f\",city:\"Dresden\",count:1L,age:30})" +
-      "(v__3 {gender:\"m\",city:\"Leipzig\",count:1L,age:30})" +
-      "(v__5 {gender:NULL,city:NULL,count:1L,age:NULL})" +
-      "(v__6 {gender:\"m\",city:\"Dresden\",count:1L,age:40})" +
-      "(v__12 {gender:\"f\",city:\"Leipzig\",count:1L,age:20})" +
-      "(v__13 {gender:\"m\",city:\"Berlin\",count:1L,age:35})" +
-      "(v__17 {gender:\"f\",city:\"Dresden\",count:1L,age:35})" +
-      "(v__2)-[e__1]->(v__3)" +
-      "(v__17)-[e__2]->(v__3)" +
-      "(v__13)-[e__3]->(v__6)" +
-      "(v__3)-[e__4]->(v__12)" +
-      "(v__12)-[e__12]->(v__3)" +
-      "(v__13)-[e__13]->(v__2)" +
-      "(v__6)-[e__17]->(v__2)" +
-      "(v__17)-[e__18]->(v__12)" +
-      "(v__5)-[e__30]->(v__2)" +
-      "(v__5)-[e__31]->(v__6)" +
-      "(v__2)-[e__32]->(v__6)" +
-      "(v__3)-[e__33]->(v__2)" +
+      "(v2 {gender:\"f\",city:\"Dresden\",count:1L,age:30})" +
+      "(v3 {gender:\"m\",city:\"Leipzig\",count:1L,age:30})" +
+      "(v5 {gender:NULL,city:NULL,count:1L,age:NULL})" +
+      "(v6 {gender:\"m\",city:\"Dresden\",count:1L,age:40})" +
+      "(v12 {gender:\"f\",city:\"Leipzig\",count:1L,age:20})" +
+      "(v13 {gender:\"m\",city:\"Berlin\",count:1L,age:35})" +
+      "(v17 {gender:\"f\",city:\"Dresden\",count:1L,age:35})" +
+      "(v2)-[e1]->(v3)" +
+      "(v17)-[e2]->(v3)" +
+      "(v13)-[e3]->(v6)" +
+      "(v3)-[e4]->(v12)" +
+      "(v12)-[e12]->(v3)" +
+      "(v13)-[e13]->(v2)" +
+      "(v6)-[e17]->(v2)" +
+      "(v17)-[e18]->(v12)" +
+      "(v5)-[e30]->(v2)" +
+      "(v5)-[e31]->(v6)" +
+      "(v2)-[e32]->(v6)" +
+      "(v3)-[e33]->(v2)" +
       "]" +
       "g1:g1 {vertexRollUpGroupingKeys:\"age,gender\"}[" +
-      "(v__4 {gender:\"m\",count:1L,age:30})" +
-      "(v__8 {gender:\"f\",count:1L,age:30})" +
-      "(v__9 {gender:\"f\",count:1L,age:35})" +
-      "(v__10 {gender:\"m\",count:1L,age:35})" +
-      "(v__11 {gender:\"m\",count:1L,age:40})" +
-      "(v__14 {gender:\"f\",count:1L,age:20})" +
-      "(v__18 {gender:NULL,count:1L,age:NULL})" +
-      "(v__4)-[e__5]->(v__8)" +
-      "(v__4)-[e__6]->(v__14)" +
-      "(v__9)-[e__7]->(v__4)" +
-      "(v__9)-[e__8]->(v__14)" +
-      "(v__18)-[e__14]->(v__11)" +
-      "(v__10)-[e__15]->(v__11)" +
-      "(v__11)-[e__16]->(v__8)" +
-      "(v__18)-[e__19]->(v__8)" +
-      "(v__8)-[e__20]->(v__4)" +
-      "(v__8)-[e__21]->(v__11)" +
-      "(v__10)-[e__22]->(v__8)" +
-      "(v__14)-[e__23]->(v__4)" +
+      "(v4 {gender:\"m\",count:1L,age:30})" +
+      "(v8 {gender:\"f\",count:1L,age:30})" +
+      "(v9 {gender:\"f\",count:1L,age:35})" +
+      "(v10 {gender:\"m\",count:1L,age:35})" +
+      "(v11 {gender:\"m\",count:1L,age:40})" +
+      "(v14 {gender:\"f\",count:1L,age:20})" +
+      "(v18 {gender:NULL,count:1L,age:NULL})" +
+      "(v4)-[e5]->(v8)" +
+      "(v4)-[e6]->(v14)" +
+      "(v9)-[e7]->(v4)" +
+      "(v9)-[e8]->(v14)" +
+      "(v18)-[e14]->(v11)" +
+      "(v10)-[e15]->(v11)" +
+      "(v11)-[e16]->(v8)" +
+      "(v18)-[e19]->(v8)" +
+      "(v8)-[e20]->(v4)" +
+      "(v8)-[e21]->(v11)" +
+      "(v10)-[e22]->(v8)" +
+      "(v14)-[e23]->(v4)" +
       "]" +
       "g2:g2 {vertexRollUpGroupingKeys:\"age\"}[" +
-      "(v__0 {count:2L,age:35})" +
-      "(v__1 {count:1L,age:40})" +
-      "(v__7 {count:1L,age:NULL})" +
-      "(v__15 {count:1L,age:20})" +
-      "(v__16 {count:2L,age:30})" +
-      "(v__16)-[e__0]->(v__16)" +
-      "(v__1)-[e__9]->(v__16)" +
-      "(v__7)-[e__10]->(v__1)" +
-      "(v__7)-[e__11]->(v__16)" +
-      "(v__0)-[e__24]->(v__1)" +
-      "(v__0)-[e__25]->(v__15)" +
-      "(v__0)-[e__26]->(v__16)" +
-      "(v__15)-[e__27]->(v__16)" +
-      "(v__16)-[e__28]->(v__1)" +
-      "(v__16)-[e__29]->(v__15)" +
+      "(v0 {count:2L,age:35})" +
+      "(v1 {count:1L,age:40})" +
+      "(v7 {count:1L,age:NULL})" +
+      "(v15 {count:1L,age:20})" +
+      "(v16 {count:2L,age:30})" +
+      "(v16)-[e0]->(v16)" +
+      "(v1)-[e9]->(v16)" +
+      "(v7)-[e10]->(v1)" +
+      "(v7)-[e11]->(v16)" +
+      "(v0)-[e24]->(v1)" +
+      "(v0)-[e25]->(v15)" +
+      "(v0)-[e26]->(v16)" +
+      "(v15)-[e27]->(v16)" +
+      "(v16)-[e28]->(v1)" +
+      "(v16)-[e29]->(v15)" +
       "]");
     GraphCollection expected = loader.getGraphCollection();
 
     List<String> vertexGK = new ArrayList<>(Arrays.asList("age", "gender", "city"));
-    List<PropertyValueAggregator> vertexAGG = 
-      new ArrayList<>(Arrays.asList(new CountAggregator("count")));
-    List<String> edgeGK = new ArrayList<>();
-    List<PropertyValueAggregator> edgeAGG = new ArrayList<>();
+    List<PropertyValueAggregator> vertexAGG =
+      Collections.singletonList(new CountAggregator("count"));
+    List<String> edgeGK = Collections.emptyList();
+    List<PropertyValueAggregator> edgeAGG = Collections.emptyList();
     
     GraphCollection output = input.groupVerticesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
     
@@ -215,35 +215,34 @@ public class RollUpTest extends GradoopFlinkTestBase {
     
     //expected
     loader.initDatabaseFromString("g0:g0 {edgeRollUpGroupingKeys:\":label,since,vertexCount\"}[" +
-      "(v__0)" +
-      "(v__0)-[e_0:hasModerator{count:1L,vertexCount:NULL,since:2013}]->(v__0)" +
-      "(v__0)-[e_1:knows{count:3L,vertexCount:NULL,since:2013}]->(v__0)" +
-      "(v__0)-[e_2:knows{count:4L,vertexCount:NULL,since:2014}]->(v__0)" +
-      "(v__0)-[e_3:knows{count:3L,vertexCount:NULL,since:2015}]->(v__0)" +
-      "(v__0)-[e_4:hasMember{count:2L,vertexCount:NULL,since:NULL}]->(v__0)" +
+      "(v0)" +
+      "(v0)-[e_0:hasModerator{count:1L,vertexCount:NULL,since:2013}]->(v0)" +
+      "(v0)-[e_1:knows{count:3L,vertexCount:NULL,since:2013}]->(v0)" +
+      "(v0)-[e_2:knows{count:4L,vertexCount:NULL,since:2014}]->(v0)" +
+      "(v0)-[e_3:knows{count:3L,vertexCount:NULL,since:2015}]->(v0)" +
+      "(v0)-[e_4:hasMember{count:2L,vertexCount:NULL,since:NULL}]->(v0)" +
       "]" +
       "g1:g1 {edgeRollUpGroupingKeys:\":label,since\"}[" +
-      "(v__2)" +
-      "(v__2)-[e_5:hasMember{count:2L,since:NULL}]->(v__2)" +
-      "(v__2)-[e_6:knows{count:3L,since:2013}]->(v__2)" +
-      "(v__2)-[e_7:knows{count:3L,since:2015}]->(v__2)" +
-      "(v__2)-[e_8:hasModerator{count:1L,since:2013}]->(v__2)" +
-      "(v__2)-[e_9:knows{count:4L,since:2014}]->(v__2)" +
+      "(v2)" +
+      "(v2)-[e_5:hasMember{count:2L,since:NULL}]->(v2)" +
+      "(v2)-[e_6:knows{count:3L,since:2013}]->(v2)" +
+      "(v2)-[e_7:knows{count:3L,since:2015}]->(v2)" +
+      "(v2)-[e_8:hasModerator{count:1L,since:2013}]->(v2)" +
+      "(v2)-[e_9:knows{count:4L,since:2014}]->(v2)" +
       "]" +
       "g2:g2 {edgeRollUpGroupingKeys:\":label\"}[" +
-      "(v__1)" +
-      "(v__1)-[e_10:hasMember{count:2L}]->(v__1)" +
-      "(v__1)-[e_11:hasModerator{count:1L}]->(v__1)" +
-      "(v__1)-[e_12:knows{count:10L}]->(v__1)" +
+      "(v1)" +
+      "(v1)-[e_10:hasMember{count:2L}]->(v1)" +
+      "(v1)-[e_11:hasModerator{count:1L}]->(v1)" +
+      "(v1)-[e_12:knows{count:10L}]->(v1)" +
       "]");
     GraphCollection expected = loader.getGraphCollection();
 
-    List<String> vertexGK = new ArrayList<>();
-    List<PropertyValueAggregator> vertexAGG = new ArrayList<>();
+    List<String> vertexGK = Collections.emptyList();
+    List<PropertyValueAggregator> vertexAGG = Collections.emptyList();
     List<String> edgeGK = new ArrayList<String>(Arrays.asList(Grouping.LABEL_SYMBOL,
       "since", "vertexCount"));
-    List<PropertyValueAggregator> edgeAGG = 
-      new ArrayList<>(Arrays.asList(new CountAggregator("count")));
+    List<PropertyValueAggregator> edgeAGG = Collections.singletonList(new CountAggregator("count"));
     
     GraphCollection output = input.groupEdgesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
 

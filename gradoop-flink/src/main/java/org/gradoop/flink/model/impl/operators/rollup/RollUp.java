@@ -234,8 +234,7 @@ public class RollUp implements UnaryGraphToCollectionOperator {
       collection = graph.getConfig().getGraphCollectionFactory()
         .fromDataSets(graphHeads, vertices, edges);
     } else {
-      collection = graph.getConfig().getGraphCollectionFactory()
-        .createEmptyCollection();
+      collection = graph.getConfig().getGraphCollectionFactory().createEmptyCollection();
     }
 
     return collection;
