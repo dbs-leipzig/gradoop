@@ -682,7 +682,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public byte[] getRawBytes() {
     byte[] rawBytes = null;
     if (value != null) {
-      rawBytes = PropertyValueStrategy.PropertyValueStrategyFactory.get(value.getClass()).getRawBytes(value);
+      rawBytes = PropertyValueStrategy.PropertyValueStrategyFactory.getRawBytes(value);
     }
     if (rawBytes == null) {
       rawBytes = legacyPropertyValue.getRawBytes();
@@ -709,7 +709,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public int hashCode() {
     byte[] rawBytes = null;
     if (value != null) {
-      rawBytes = PropertyValueStrategy.PropertyValueStrategyFactory.get(value.getClass()).getRawBytes(value);
+      rawBytes = PropertyValueStrategy.PropertyValueStrategyFactory.getRawBytes(value);
     }
     return rawBytes == null ? legacyPropertyValue.hashCode() : Arrays.hashCode(rawBytes);
   }
@@ -728,7 +728,11 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return byte size
    */
   public int byteSize() {
-    return legacyPropertyValue.byteSize();
+      byte[] rawBytes = null;
+      if (value != null) {
+          rawBytes = PropertyValueStrategy.PropertyValueStrategyFactory.getRawBytes(value);
+      }
+      return rawBytes == null ? legacyPropertyValue.byteSize() : rawBytes.length;
   }
 
   /**

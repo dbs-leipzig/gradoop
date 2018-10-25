@@ -44,6 +44,13 @@ public interface PropertyValueStrategy<T> {
             }
             return 0;
         }
+
+        public static byte[] getRawBytes(Object value) {
+            if (value != null) {
+                return get(value.getClass()).getRawBytes(value);
+            }
+            return new byte[0];
+        }
     }
 
     int compare(T value, T other);
