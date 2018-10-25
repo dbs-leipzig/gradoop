@@ -72,9 +72,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
     List<PropertyValueAggregator> edgeAGG = new ArrayList<>();
     
     GraphCollection output = input.groupVerticesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
-    
-    output.print();
-    
+  
     collectAndAssertTrue(
       output.equalsByGraphElementData(expected));
   }

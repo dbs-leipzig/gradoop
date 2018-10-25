@@ -459,9 +459,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   public GraphCollection groupVerticesByRollUp(
     List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
     List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions) {
-    Objects.requireNonNull(vertexGroupingKeys, "missing vertex grouping key(s)");
-
-    if (vertexGroupingKeys.isEmpty()) {
+    if (vertexGroupingKeys == null || vertexGroupingKeys.isEmpty()) {
       throw new IllegalArgumentException("missing vertex grouping key(s)");
     }
 
@@ -478,9 +476,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   public GraphCollection groupEdgesByRollUp(
     List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
     List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions) {
-    Objects.requireNonNull(edgeGroupingKeys, "missing edge grouping key(s)");
-
-    if (edgeGroupingKeys.isEmpty()) {
+    if (edgeGroupingKeys == null || edgeGroupingKeys.isEmpty()) {
       throw new IllegalArgumentException("missing edge grouping key(s)");
     }
 

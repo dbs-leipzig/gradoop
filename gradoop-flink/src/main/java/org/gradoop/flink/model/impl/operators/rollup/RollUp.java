@@ -22,12 +22,13 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.flink.model.impl.functions.epgm.SetLabelAndProperty;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
-import org.gradoop.flink.model.impl.operators.rollup.functions.GraphHeadUpdate;
 
 /**
  * The rollUp operator generates all combinations of the supplied vertex or edge grouping keys
@@ -41,28 +42,28 @@ public class RollUp implements UnaryGraphToCollectionOperator {
   /**
    * Used to distinguish between a rollUp on vertices or a rollUp on edges.
    */
-  public static enum RollUpType {
+  public enum RollUpType {
 
     /**
-     * Used for rollUp on vertices or a rollUp on edges.
+     * Used for rollUp on vertex grouping keys.
      */
     VERTEX_ROLLUP,
 
     /**
-     * Used for rollUp on edges.
+     * Used for rollUp on edge grouping keys.
      */
-    EDGE_ROLLUP;
+    EDGE_ROLLUP
   }
 
   /**
    * Property key used to store the grouping keys used for rollUp on vertices.
    */
-  public static final String VRGK_PROPERTYKEY = "vertexRollUpGroupingKeys";
+  public static final String VERTEX_GROUPING_KEYS_PROPERTY = "vertexRollUpGroupingKeys";
 
   /**
    * Property key used to store the grouping keys used for rollUp on edges.
    */
-  public static final String ERGK_PROPERTYKEY = "edgeRollUpGroupingKeys";
+  public static final String EDGE_GROUPING_KEYS_PROPERTY = "edgeRollUpGroupingKeys";
 
   /**
    * Stores grouping keys for vertices.
@@ -95,7 +96,8 @@ public class RollUp implements UnaryGraphToCollectionOperator {
   private final GroupingStrategy strategy;
 
   /**
-   * Creates rollUp operator instance.
+   * Creates a rollUp operator instance with {@link GroupingStrategy#GROUP_REDUCE} as grouping
+   * strategy.
    *
    * @param vertexGroupingKeys        grouping keys to group vertices
    * @param vertexAggregateFunctions  aggregate functions to apply on super vertices
@@ -150,10 +152,10 @@ public class RollUp implements UnaryGraphToCollectionOperator {
    * @return list containing all combinations of grouping keys
    */
   private List<List<String>> createGroupingKeyCombinations(List<String> groupingKeys) {
-    List<List<String>> combinations = new ArrayList<List<String>>();
+    List<List<String>> combinations = new ArrayList<>();
 
     while (!groupingKeys.isEmpty()) {
-      combinations.add(new ArrayList<String>(groupingKeys));
+      combinations.add(new ArrayList<>(groupingKeys));
 
       groupingKeys.remove(groupingKeys.size() - 1);
     }
@@ -182,8 +184,10 @@ public class RollUp implements UnaryGraphToCollectionOperator {
         LogicalGraph groupedGraph = graph.groupBy(combination, vertexAggregateFunctions,
           edgeGroupingKeys, edgeAggregateFunctions, strategy);
 
+        PropertyValue groupingKeys = PropertyValue.create(String.join(",", combination));
         DataSet<GraphHead> newGraphHead = groupedGraph.getGraphHead().map(
-          new GraphHeadUpdate(newGraphHeadLabel, VRGK_PROPERTYKEY, String.join(",", combination)));
+          new SetLabelAndProperty<>(
+            newGraphHeadLabel, VERTEX_GROUPING_KEYS_PROPERTY, groupingKeys));
 
         if (graphHeads == null && vertices == null && edges == null) {
           graphHeads = newGraphHead;
@@ -204,8 +208,10 @@ public class RollUp implements UnaryGraphToCollectionOperator {
         LogicalGraph groupedGraph = graph.groupBy(vertexGroupingKeys, vertexAggregateFunctions,
           combination, edgeAggregateFunctions, strategy);
 
+        PropertyValue groupingKeys = PropertyValue.create(String.join(",", combination));
         DataSet<GraphHead> newGraphHead = groupedGraph.getGraphHead().map(
-          new GraphHeadUpdate(newGraphHeadLabel, ERGK_PROPERTYKEY, String.join(",", combination)));
+          new SetLabelAndProperty<>(
+            newGraphHeadLabel, EDGE_GROUPING_KEYS_PROPERTY, groupingKeys));
 
         if (graphHeads == null && vertices == null && edges == null) {
           graphHeads = newGraphHead;
@@ -219,15 +225,15 @@ public class RollUp implements UnaryGraphToCollectionOperator {
       }
     }
 
-    // We initialized the DataSets with null, so it may be possible that they're still null here so
-    // we should check and return an empty collection in this case.
-    // But the overhead of creating an empty collection should only be done, if the DataSets really
-    // are null.
-    GraphCollection collection = null;
+    // We initialized the DataSets with null, so it may be possible that they're still null here,
+    // so we should check and return an empty collection in this case.
+    // But the overhead of creating an empty collection should only be done, if at least one of the
+    // DataSets is null.
+    GraphCollection collection;
     if (graphHeads != null && vertices != null && edges != null) {
       collection = graph.getConfig().getGraphCollectionFactory()
         .fromDataSets(graphHeads, vertices, edges);
-    } else if (graphHeads == null || vertices == null || edges == null) {
+    } else {
       collection = graph.getConfig().getGraphCollectionFactory()
         .createEmptyCollection();
     }
