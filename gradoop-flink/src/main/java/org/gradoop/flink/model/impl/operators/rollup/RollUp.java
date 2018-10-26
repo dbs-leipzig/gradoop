@@ -154,10 +154,11 @@ public class RollUp implements UnaryGraphToCollectionOperator {
   private List<List<String>> createGroupingKeyCombinations(List<String> groupingKeys) {
     List<List<String>> combinations = new ArrayList<>();
 
-    while (!groupingKeys.isEmpty()) {
-      combinations.add(new ArrayList<>(groupingKeys));
+    int elements = groupingKeys.size();
+    while (elements > 0) {
+      combinations.add(new ArrayList<>(groupingKeys.subList(0, elements)));
 
-      groupingKeys.remove(groupingKeys.size() - 1);
+      elements--;
     }
 
     return combinations;
