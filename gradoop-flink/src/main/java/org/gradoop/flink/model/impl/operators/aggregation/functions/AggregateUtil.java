@@ -36,7 +36,6 @@ class AggregateUtil {
    * @param <T> element type
    * @return incremented aggregate map
    */
-  @SuppressWarnings("unchecked")
   static <T extends Element> Map<String, PropertyValue> increment(
     Map<String, PropertyValue> aggregate,
     T element,
