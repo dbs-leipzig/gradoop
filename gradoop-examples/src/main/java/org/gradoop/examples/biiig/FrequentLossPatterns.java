@@ -17,6 +17,7 @@ package org.gradoop.examples.biiig;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -222,7 +223,7 @@ public class FrequentLossPatterns
   /**
    * Calculate the financial result of business transaction graphs.
    */
-  private static class Result implements Sum<Vertex>, VertexAggregateFunction {
+  private static class Result implements Sum, VertexAggregateFunction {
 
     /**
      * Property key for revenue values.
@@ -235,7 +236,7 @@ public class FrequentLossPatterns
 
 
     @Override
-    public PropertyValue getIncrement(Vertex vertex) {
+    public PropertyValue getIncrement(Element vertex) {
       PropertyValue increment;
 
       if (vertex.hasProperty(REVENUE_KEY)) {
@@ -258,10 +259,10 @@ public class FrequentLossPatterns
   /**
    * Counts master data vertices less than the number of transactional vertices.
    */
-  private static class DetermineMasterDataSurplus implements Sum<Vertex>, VertexAggregateFunction {
+  private static class DetermineMasterDataSurplus implements Sum, VertexAggregateFunction {
 
     @Override
-    public PropertyValue getIncrement(Vertex vertex) {
+    public PropertyValue getIncrement(Element vertex) {
       return vertex.getLabel().startsWith(MASTER_PREFIX) ?
         PropertyValue.create(1) : PropertyValue.create(-1);
     }

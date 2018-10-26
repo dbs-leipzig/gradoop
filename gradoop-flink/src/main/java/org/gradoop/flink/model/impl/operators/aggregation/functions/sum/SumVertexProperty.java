@@ -15,13 +15,12 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
 
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
  * Aggregate function returning the sum of a specified property over all vertices.
  */
-public class SumVertexProperty extends BaseSumProperty<Vertex> implements VertexAggregateFunction {
+public class SumVertexProperty extends BaseSumProperty implements VertexAggregateFunction {
 
   /**
    * Creates a new instance of a SumVertexProperty aggregate function.

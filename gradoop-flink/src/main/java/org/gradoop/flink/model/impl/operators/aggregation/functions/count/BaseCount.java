@@ -23,11 +23,9 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.Sum;
 
 /**
  * Superclass of counting aggregate functions.
- *
- * @param <T> element type
  */
-public abstract class BaseCount<T extends Element> extends BaseAggregateFunction<T>
-  implements Sum<T>, AggregateDefaultValue {
+public abstract class BaseCount extends BaseAggregateFunction
+  implements Sum, AggregateDefaultValue {
 
   /**
    * Creates a new instance of a BaseCount aggregate function.
@@ -39,7 +37,7 @@ public abstract class BaseCount<T extends Element> extends BaseAggregateFunction
   }
 
   @Override
-  public PropertyValue getIncrement(T element) {
+  public PropertyValue getIncrement(Element element) {
     return PropertyValue.create(1L);
   }
 

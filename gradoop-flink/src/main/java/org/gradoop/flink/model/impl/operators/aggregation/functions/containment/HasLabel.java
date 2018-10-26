@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.containment;
 
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
 
 /**
@@ -23,7 +22,7 @@ import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
  *
  * Usage: First, aggregate and, second, filter using the same UDF instance.
  */
-public class HasLabel extends BaseHasLabel<Element> implements ElementAggregateFunction {
+public class HasLabel extends BaseHasLabel implements ElementAggregateFunction {
 
   /**
    * Creates a new instance of a HasLabel aggregate function.

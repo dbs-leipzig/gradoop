@@ -15,13 +15,12 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
 
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
 
 /**
  * Aggregate function returning the maximum of a specified property over all elements.
  */
-public class MaxProperty extends BaseMaxProperty<Element> implements ElementAggregateFunction {
+public class MaxProperty extends BaseMaxProperty implements ElementAggregateFunction {
 
   /**
    * Creates a new instance of a MaxProperty aggregate function.

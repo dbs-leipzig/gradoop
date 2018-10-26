@@ -21,11 +21,8 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregat
 
 /**
  * Superclass of aggregate functions that determine a minimal property value.
- *
- * @param <T> element type
  */
-public abstract class BaseMinProperty<T extends Element> extends BaseAggregateFunction<T>
-  implements Min<T> {
+public abstract class BaseMinProperty extends BaseAggregateFunction implements Min {
 
   /**
    * Property key whose value should be aggregated.
@@ -54,7 +51,7 @@ public abstract class BaseMinProperty<T extends Element> extends BaseAggregateFu
   }
 
   @Override
-  public PropertyValue getIncrement(T element) {
+  public PropertyValue getIncrement(Element element) {
     return element.getPropertyValue(propertyKey);
   }
 }

@@ -15,17 +15,14 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
 
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
  * Interface of aggregate functions that determine a maximal value.
- *
- * @param <T> element type
  */
-public interface Max<T extends Element> extends AggregateFunction<T> {
+public interface Max extends AggregateFunction {
 
   @Override
   default PropertyValue aggregate(

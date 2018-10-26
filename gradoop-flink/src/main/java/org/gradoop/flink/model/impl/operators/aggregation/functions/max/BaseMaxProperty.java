@@ -21,11 +21,8 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregat
 
 /**
  * Superclass of aggregate functions that determine a maximal property value.
- *
- * @param <T> element type
  */
-public abstract class BaseMaxProperty<T extends Element> extends BaseAggregateFunction<T>
-  implements Max<T> {
+public abstract class BaseMaxProperty extends BaseAggregateFunction implements Max {
 
   /**
    * Property key whose value should be aggregated.
@@ -54,7 +51,7 @@ public abstract class BaseMaxProperty<T extends Element> extends BaseAggregateFu
   }
 
   @Override
-  public PropertyValue getIncrement(T element) {
+  public PropertyValue getIncrement(Element element) {
     return element.getPropertyValue(propertyKey);
   }
 }

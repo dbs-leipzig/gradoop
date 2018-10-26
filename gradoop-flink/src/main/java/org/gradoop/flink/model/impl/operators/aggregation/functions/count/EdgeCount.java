@@ -15,13 +15,12 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
 
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
  * Aggregate function returning the edge count of a graph / graph collection.
  */
-public class EdgeCount extends BaseCount<Edge> implements EdgeAggregateFunction {
+public class EdgeCount extends BaseCount implements EdgeAggregateFunction {
 
   /**
    * Creates a new instance of a EdgeCount aggregate function.

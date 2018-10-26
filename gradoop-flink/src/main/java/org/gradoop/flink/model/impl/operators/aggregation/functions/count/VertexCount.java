@@ -15,13 +15,12 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
 
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
  * Aggregate function returning the vertex count of a graph / graph collection.
  */
-public class VertexCount extends BaseCount<Vertex> implements VertexAggregateFunction {
+public class VertexCount extends BaseCount implements VertexAggregateFunction {
 
   /**
    * Creates a new instance of a VertexCount aggregate function.

@@ -15,13 +15,12 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
 
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
  * Aggregate function returning the sum of a specified property over all edges.
  */
-public class SumEdgeProperty extends BaseSumProperty<Edge> implements EdgeAggregateFunction {
+public class SumEdgeProperty extends BaseSumProperty implements EdgeAggregateFunction {
 
   /**
    * Creates a new instance of a SumEdgeProperty aggregate function.

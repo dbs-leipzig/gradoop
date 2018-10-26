@@ -15,15 +15,12 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
  * Base implementation of AggregateFunction providing a custom aggregate property key.
- *
- * @param <T> element type
  */
-public abstract class BaseAggregateFunction<T extends Element> implements AggregateFunction<T> {
+public abstract class BaseAggregateFunction implements AggregateFunction {
   /**
    * Key of the aggregate property.
    */

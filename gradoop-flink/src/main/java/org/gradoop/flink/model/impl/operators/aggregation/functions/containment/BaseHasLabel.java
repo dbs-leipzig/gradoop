@@ -30,11 +30,9 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
  * Usage:
  * 1. aggregate
  * 2. filter using the same UDF instance.
- *
- * @param <T> element type
  */
-public abstract class BaseHasLabel<T extends Element> extends BaseAggregateFunction<T>
-  implements Or<T>, AggregateFunction<T>, CombinableFilter<GraphHead> {
+public abstract class BaseHasLabel extends BaseAggregateFunction
+  implements Or, AggregateFunction, CombinableFilter<GraphHead> {
 
   /**
    * Label to check presence of.
@@ -53,7 +51,7 @@ public abstract class BaseHasLabel<T extends Element> extends BaseAggregateFunct
   }
 
   @Override
-  public PropertyValue getIncrement(T element) {
+  public PropertyValue getIncrement(Element element) {
     return PropertyValue.create(element.getLabel().equals(label));
   }
 

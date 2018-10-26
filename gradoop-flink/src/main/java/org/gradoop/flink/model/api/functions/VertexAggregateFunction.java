@@ -15,13 +15,12 @@
  */
 package org.gradoop.flink.model.api.functions;
 
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 
 /**
  * Describes a vertex aggregate function as input for the {@link Aggregation} operator.
  */
-public interface VertexAggregateFunction extends AggregateFunction<Vertex> {
+public interface VertexAggregateFunction extends AggregateFunction {
 
   @Override
   default boolean isVertexAggregation() {

@@ -15,17 +15,14 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
 
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
  * Interface of summing aggregate functions
- *
- * @param <T> element type
  */
-public interface Sum<T extends Element> extends AggregateFunction<T> {
+public interface Sum extends AggregateFunction {
 
   @Override
   default PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {

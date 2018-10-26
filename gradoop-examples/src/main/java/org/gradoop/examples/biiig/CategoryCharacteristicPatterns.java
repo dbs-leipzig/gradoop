@@ -18,7 +18,7 @@ package org.gradoop.examples.biiig;
 import org.apache.commons.io.IOUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.examples.utils.ExampleOutput;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
@@ -152,7 +152,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
   /**
    * Aggregate function to determine "isClosed" measure.
    */
-  private static class IsClosedAggregateFunction implements Or<Vertex>, VertexAggregateFunction {
+  private static class IsClosedAggregateFunction implements Or, VertexAggregateFunction {
 
     @Override
     public String getAggregatePropertyKey() {
@@ -160,7 +160,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     }
 
     @Override
-    public PropertyValue getIncrement(Vertex vertex) {
+    public PropertyValue getIncrement(Element vertex) {
       boolean isClosedQuotation =
         vertex.getLabel().equals("Quotation") &&
           !vertex.getPropertyValue("status").toString().equals("open");
@@ -172,7 +172,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
   /**
    * Aggregate function to count sales orders per graph.
    */
-  private static class CountSalesOrdersAggregateFunction extends BaseCount<Vertex>
+  private static class CountSalesOrdersAggregateFunction extends BaseCount
     implements VertexAggregateFunction {
 
     /**
@@ -183,7 +183,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     }
 
     @Override
-    public PropertyValue getIncrement(Vertex vertex) {
+    public PropertyValue getIncrement(Element vertex) {
       return PropertyValue.create(vertex.getLabel().equals("SalesOrder") ? 1 : 0);
     }
   }

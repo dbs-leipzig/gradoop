@@ -15,13 +15,12 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
 
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
 
 /**
  * Superclass of aggregate functions that determine a minimal property value.
  */
-public class MinProperty extends BaseMinProperty<Element> implements ElementAggregateFunction {
+public class MinProperty extends BaseMinProperty implements ElementAggregateFunction {
 
   /**
    * Creates a new instance of a MinProperty aggregate function.

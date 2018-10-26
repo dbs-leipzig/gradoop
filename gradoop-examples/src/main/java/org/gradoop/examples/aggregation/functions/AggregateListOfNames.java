@@ -15,7 +15,7 @@
  */
 package org.gradoop.examples.aggregation.functions;
 
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
@@ -25,8 +25,7 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregat
  * vertices as a comma separated list in a property named 'list_of_names'.
  * Used in {@link org.gradoop.examples.aggregation.AggregationExample}
  */
-public class AggregateListOfNames extends BaseAggregateFunction<Vertex>
-  implements VertexAggregateFunction {
+public class AggregateListOfNames extends BaseAggregateFunction implements VertexAggregateFunction {
 
   /**
    * Property key 'name'
@@ -41,7 +40,7 @@ public class AggregateListOfNames extends BaseAggregateFunction<Vertex>
   }
 
   @Override
-  public PropertyValue getIncrement(Vertex vertex) {
+  public PropertyValue getIncrement(Element vertex) {
     return PropertyValue.create(vertex.getPropertyValue(PROPERTY_KEY_NAME).toString());
   }
 

@@ -15,13 +15,12 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
 
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
 
 /**
  * Superclass if aggregate functions that sum property values of elements.
  */
-public class SumProperty extends BaseSumProperty<Element> implements ElementAggregateFunction {
+public class SumProperty extends BaseSumProperty implements ElementAggregateFunction {
 
   /**
    * Creates a new instance of a SumProperty aggregate function.

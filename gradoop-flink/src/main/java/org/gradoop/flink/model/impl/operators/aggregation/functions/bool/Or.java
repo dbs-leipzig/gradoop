@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.bool;
 
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -23,10 +22,8 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 /**
  * Interface of aggregate functions determining a predicate support.
  * e.g., graph contains a vertex labelled by "User"
- *
- * @param <T> element type
  */
-public interface Or<T extends Element> extends AggregateFunction<T> {
+public interface Or extends AggregateFunction {
 
   @Override
   default PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {

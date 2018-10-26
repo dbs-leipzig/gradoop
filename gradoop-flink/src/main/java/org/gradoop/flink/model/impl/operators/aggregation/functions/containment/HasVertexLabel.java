@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.containment;
 
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
@@ -23,7 +22,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
  *
  * Usage: First, aggregate and, second, filter using the same UDF instance.
  */
-public class HasVertexLabel extends BaseHasLabel<Vertex> implements VertexAggregateFunction {
+public class HasVertexLabel extends BaseHasLabel implements VertexAggregateFunction {
 
   /**
    * Creates a new instance of a HasVertexLabel aggregate function.

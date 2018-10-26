@@ -15,14 +15,13 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
 
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
  * Aggregate function returning the minimum of a specified property over all
  * edges.
  */
-public class MinEdgeProperty extends BaseMinProperty<Edge> implements EdgeAggregateFunction {
+public class MinEdgeProperty extends BaseMinProperty implements EdgeAggregateFunction {
 
   /**
    * Creates a new instance of a MinEdgeProperty aggregate function.

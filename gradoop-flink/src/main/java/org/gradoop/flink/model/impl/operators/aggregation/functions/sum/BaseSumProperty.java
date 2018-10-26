@@ -21,11 +21,8 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregat
 
 /**
  * Superclass if aggregate functions that sum property values of elements.
- *
- * @param <T> element type
  */
-public abstract class BaseSumProperty<T extends Element> extends BaseAggregateFunction<T>
-  implements Sum<T> {
+public abstract class BaseSumProperty extends BaseAggregateFunction implements Sum {
 
   /**
    * Property key whose value should be aggregated.
@@ -54,7 +51,7 @@ public abstract class BaseSumProperty<T extends Element> extends BaseAggregateFu
   }
 
   @Override
-  public PropertyValue getIncrement(T element) {
+  public PropertyValue getIncrement(Element element) {
     return element.getPropertyValue(propertyKey);
   }
 }

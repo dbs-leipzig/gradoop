@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.containment;
 
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
@@ -23,7 +22,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
  *
  * Usage: First, aggregate and, second, filter using the same UDF instance.
  */
-public class HasEdgeLabel extends BaseHasLabel<Edge> implements EdgeAggregateFunction {
+public class HasEdgeLabel extends BaseHasLabel implements EdgeAggregateFunction {
 
   /**
    * Creates a new instance of a HasEdgeLabel aggregate function.

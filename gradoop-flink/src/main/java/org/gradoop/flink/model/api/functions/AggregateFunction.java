@@ -23,10 +23,8 @@ import java.io.Serializable;
 
 /**
  * Describes an aggregate function as input for the {@link Aggregation} operator.
- *
- * @param <T> element type
  */
-public interface AggregateFunction<T extends Element> extends Serializable {
+public interface AggregateFunction extends Serializable {
 
   /**
    * Describes the aggregation logic.
@@ -51,7 +49,7 @@ public interface AggregateFunction<T extends Element> extends Serializable {
    * @param element element
    * @return increment, may be NULL, which is handled in the operator
    */
-  PropertyValue getIncrement(T element);
+  PropertyValue getIncrement(Element element);
 
   /**
    * Returns whether this function aggregates vertices.
