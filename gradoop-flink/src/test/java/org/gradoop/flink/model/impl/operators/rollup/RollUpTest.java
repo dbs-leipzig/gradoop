@@ -107,6 +107,8 @@ public class RollUpTest extends GradoopFlinkTestBase {
     
     GraphCollection output = input.groupEdgesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
     
+    output.print();
+    
     collectAndAssertTrue(
       output.equalsByGraphElementData(expected));
   }

@@ -175,54 +175,43 @@ public class RollUp implements UnaryGraphToCollectionOperator {
     DataSet<GraphHead> graphHeads = null;
     DataSet<Vertex> vertices = null;
     DataSet<Edge> edges = null;
+    List<List<String>> groupingKeyCombinations;
+    String groupingKeysPropertyKey;
 
     if (rollUpType == RollUpType.VERTEX_ROLLUP) {
-      List<List<String>> vertexGKCombinations = createGroupingKeyCombinations(vertexGroupingKeys);
+      groupingKeyCombinations = createGroupingKeyCombinations(vertexGroupingKeys);
+      groupingKeysPropertyKey = VERTEX_GROUPING_KEYS_PROPERTY;
+    } else {
+      groupingKeyCombinations = createGroupingKeyCombinations(edgeGroupingKeys);
+      groupingKeysPropertyKey = EDGE_GROUPING_KEYS_PROPERTY;
+    }
 
-      for (int c = 0; c <= vertexGKCombinations.size() - 1; c++) {
-        List<String> combination = vertexGKCombinations.get(c);
-        String newGraphHeadLabel = "g" + c;
-        LogicalGraph groupedGraph = graph.groupBy(combination, vertexAggregateFunctions,
+    for (int c = 0; c <= groupingKeyCombinations.size() - 1; c++) {
+      List<String> combination = groupingKeyCombinations.get(c);
+      String newGraphHeadLabel = "g" + c;
+      LogicalGraph groupedGraph;
+
+      if (rollUpType == RollUpType.VERTEX_ROLLUP) {
+        groupedGraph = graph.groupBy(combination, vertexAggregateFunctions,
           edgeGroupingKeys, edgeAggregateFunctions, strategy);
-
-        PropertyValue groupingKeys = PropertyValue.create(String.join(",", combination));
-        DataSet<GraphHead> newGraphHead = groupedGraph.getGraphHead().map(
-          new SetLabelAndProperty<>(
-            newGraphHeadLabel, VERTEX_GROUPING_KEYS_PROPERTY, groupingKeys));
-
-        if (graphHeads == null && vertices == null && edges == null) {
-          graphHeads = newGraphHead;
-          vertices = groupedGraph.getVertices();
-          edges = groupedGraph.getEdges();
-        } else if (graphHeads != null && vertices != null && edges != null) {
-          graphHeads = graphHeads.union(newGraphHead);
-          vertices = vertices.union(groupedGraph.getVertices());
-          edges = edges.union(groupedGraph.getEdges());
-        }
-      }
-    } else if (rollUpType == RollUpType.EDGE_ROLLUP) {
-      List<List<String>> edgeGKCombinations = createGroupingKeyCombinations(edgeGroupingKeys);
-
-      for (int c = 0; c <= edgeGKCombinations.size() - 1; c++) {
-        List<String> combination = edgeGKCombinations.get(c);
-        String newGraphHeadLabel = "g" + c;
-        LogicalGraph groupedGraph = graph.groupBy(vertexGroupingKeys, vertexAggregateFunctions,
+      } else {
+        groupedGraph = graph.groupBy(vertexGroupingKeys, vertexAggregateFunctions,
           combination, edgeAggregateFunctions, strategy);
+      }
 
-        PropertyValue groupingKeys = PropertyValue.create(String.join(",", combination));
-        DataSet<GraphHead> newGraphHead = groupedGraph.getGraphHead().map(
-          new SetLabelAndProperty<>(
-            newGraphHeadLabel, EDGE_GROUPING_KEYS_PROPERTY, groupingKeys));
+      PropertyValue groupingKeys = PropertyValue.create(String.join(",", combination));
+      DataSet<GraphHead> newGraphHead = groupedGraph.getGraphHead().map(
+        new SetLabelAndProperty<>(
+          newGraphHeadLabel, groupingKeysPropertyKey, groupingKeys));
 
-        if (graphHeads == null && vertices == null && edges == null) {
-          graphHeads = newGraphHead;
-          vertices = groupedGraph.getVertices();
-          edges = groupedGraph.getEdges();
-        } else if (graphHeads != null && vertices != null && edges != null) {
-          graphHeads = graphHeads.union(newGraphHead);
-          vertices = vertices.union(groupedGraph.getVertices());
-          edges = edges.union(groupedGraph.getEdges());
-        }
+      if (graphHeads == null && vertices == null && edges == null) {
+        graphHeads = newGraphHead;
+        vertices = groupedGraph.getVertices();
+        edges = groupedGraph.getEdges();
+      } else if (graphHeads != null && vertices != null && edges != null) {
+        graphHeads = graphHeads.union(newGraphHead);
+        vertices = vertices.union(groupedGraph.getVertices());
+        edges = edges.union(groupedGraph.getEdges());
       }
     }
 
