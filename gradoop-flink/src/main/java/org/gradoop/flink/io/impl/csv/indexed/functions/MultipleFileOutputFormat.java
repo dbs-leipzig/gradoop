@@ -86,7 +86,7 @@ public abstract class MultipleFileOutputFormat<IT> implements OutputFormat<IT>,
    *
    * @param rootPath The root directory where all files will be stored.
    */
-  public MultipleFileOutputFormat(Path rootPath) {
+  MultipleFileOutputFormat(Path rootPath) {
     this.rootOutputPath = rootPath;
     formatsPerSubdirectory = new ConcurrentHashMap<>();
   }

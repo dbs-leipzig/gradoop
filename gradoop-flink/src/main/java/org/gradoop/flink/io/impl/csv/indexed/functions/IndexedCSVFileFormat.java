@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.io.impl.csv.indexed.functions;
 
+import org.apache.flink.api.common.io.FileOutputFormat;
 import org.apache.flink.api.common.io.OutputFormat;
 import org.apache.flink.api.java.io.CsvOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple;
@@ -128,6 +129,7 @@ public class IndexedCSVFileFormat<T extends Tuple & CSVElement> extends
   @Override
   protected OutputFormat<T> createFormatForDirectory(Path directory) throws IOException {
     CsvOutputFormat<T> format = new CsvOutputFormat<>(directory, recordDelimiter, fieldDelimiter);
+    format.setOutputDirectoryMode(FileOutputFormat.OutputDirectoryMode.ALWAYS);
     format.initializeGlobal(parallelism);
     format.configure(configuration);
     format.open(taskNumber, numTasks);
