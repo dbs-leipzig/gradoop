@@ -35,4 +35,9 @@ public class DistinctVertexPropertiesByLabel
     LogicalGraph graph) {
     return graph.getVertices().flatMap(new ExtractPropertyValuesByLabel<>());
   }
+
+  @Override
+  public String getName() {
+    return DistinctVertexPropertiesByLabel.class.getName();
+  }
 }

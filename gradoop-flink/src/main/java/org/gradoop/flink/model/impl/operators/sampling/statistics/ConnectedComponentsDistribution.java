@@ -30,7 +30,8 @@ import org.gradoop.flink.model.impl.operators.sampling.statistics.functions.GetC
  * Writes a mapping to the graph head, containing the component id and the number of graph elements
  * (vertices and edges) associated with it.
  */
-public class ConnectedComponentsDistribution implements UnaryGraphToValueOperator {
+public class ConnectedComponentsDistribution
+  implements UnaryGraphToValueOperator<DataSet<Tuple3<String, Long, Long>>> {
 
   /**
    * Property key to store the component id.
@@ -107,5 +108,10 @@ public class ConnectedComponentsDistribution implements UnaryGraphToValueOperato
 
     return graphWithWccIds.getGraphHead().flatMap(
       new GetConnectedComponentDistributionFlatMap(propertyKey, annotateEdges));
+  }
+
+  @Override
+  public String getName() {
+    return ConnectedComponentsDistribution.class.getName();
   }
 }

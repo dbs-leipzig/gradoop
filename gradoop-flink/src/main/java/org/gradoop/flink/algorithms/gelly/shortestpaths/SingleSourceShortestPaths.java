@@ -20,7 +20,7 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
+import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithDouble;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
 import org.gradoop.flink.algorithms.gelly.shortestpaths.functions.SingleSourceShortestPathsAttribute;
@@ -31,7 +31,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
  * A gradoop operator wrapping {@link org.apache.flink.graph.library.SingleSourceShortestPaths}.
  *
  */
-public class SingleSourceShortestPaths extends GellyAlgorithm<NullValue, Double> {
+public class SingleSourceShortestPaths extends GradoopGellyAlgorithm<NullValue, Double> {
 
   /**
    * ID of the source vertex
@@ -63,7 +63,10 @@ public class SingleSourceShortestPaths extends GellyAlgorithm<NullValue, Double>
    */
   public SingleSourceShortestPaths(GradoopId srcVertexId, String propertyKeyEdge,
     int iterations, String propertyKeyVertex) {
-    super(new VertexToGellyVertexWithNullValue(), new EdgeToGellyEdgeWithDouble(propertyKeyEdge));
+    super(
+
+      new VertexToGellyVertexWithNullValue(),
+      new EdgeToGellyEdgeWithDouble(propertyKeyEdge));
     this.propertyKeyVertex = propertyKeyVertex;
     this.propertyKeyEdge = propertyKeyEdge;
     this.iterations = iterations;
@@ -71,7 +74,7 @@ public class SingleSourceShortestPaths extends GellyAlgorithm<NullValue, Double>
   }
 
   @Override
-  protected LogicalGraph executeInGelly(Graph<GradoopId, NullValue, Double> graph)
+  public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, Double> graph)
     throws Exception {
 
     DataSet<Vertex> newVertices = new org.apache.flink.graph.library.SingleSourceShortestPaths

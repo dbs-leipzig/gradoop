@@ -37,4 +37,9 @@ public class IncomingVertexDegrees
       .where(0).equalTo("*")
       .with(new SetOrCreateWithCount());
   }
+
+  @Override
+  public String getName() {
+    return IncomingVertexDegrees.class.getName();
+  }
 }
