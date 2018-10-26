@@ -15,12 +15,19 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
 
-import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 
 /**
  * Superclass of aggregate functions that determine a minimal property value.
  */
-public class MinProperty extends BaseMinProperty implements ElementAggregateFunction {
+public class MinProperty extends BaseAggregateFunction implements Min {
+
+  /**
+   * Property key whose value should be aggregated.
+   */
+  private String propertyKey;
 
   /**
    * Creates a new instance of a MinProperty aggregate function.
@@ -28,7 +35,8 @@ public class MinProperty extends BaseMinProperty implements ElementAggregateFunc
    * @param propertyKey property key to aggregate
    */
   public MinProperty(String propertyKey) {
-    super(propertyKey);
+    super("min_" + propertyKey);
+    this.propertyKey = propertyKey;
   }
 
   /**
@@ -38,6 +46,12 @@ public class MinProperty extends BaseMinProperty implements ElementAggregateFunc
    * @param aggregatePropertyKey aggregate property key
    */
   public MinProperty(String propertyKey, String aggregatePropertyKey) {
-    super(propertyKey, aggregatePropertyKey);
+    super(aggregatePropertyKey);
+    this.propertyKey = propertyKey;
+  }
+
+  @Override
+  public PropertyValue getIncrement(Element element) {
+    return element.getPropertyValue(propertyKey);
   }
 }

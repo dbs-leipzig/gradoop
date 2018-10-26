@@ -20,7 +20,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 /**
  * Aggregate function returning the edge count of a graph / graph collection.
  */
-public class EdgeCount extends BaseCount implements EdgeAggregateFunction {
+public class EdgeCount extends Count implements EdgeAggregateFunction {
 
   /**
    * Creates a new instance of a EdgeCount aggregate function.

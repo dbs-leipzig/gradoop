@@ -21,7 +21,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
  * Aggregate function returning the minimum of a specified property over all
  * vertices.
  */
-public class MinVertexProperty extends BaseMinProperty implements VertexAggregateFunction {
+public class MinVertexProperty extends MinProperty implements VertexAggregateFunction {
 
   /**
    * Creates a new instance of a MinVertexProperty aggregate function.

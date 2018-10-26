@@ -15,14 +15,29 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.containment;
 
-import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
 
 /**
- * Aggregate and filter function to check presence of an element label in a graph.
+ * Superclass of aggregate and filter functions that check vertex or edge label
+ * presence in a graph.
  *
- * Usage: First, aggregate and, second, filter using the same UDF instance.
+ * Usage:
+ * 1. aggregate
+ * 2. filter using the same UDF instance.
  */
-public class HasLabel extends BaseHasLabel implements ElementAggregateFunction {
+public class HasLabel extends BaseAggregateFunction
+  implements Or, AggregateFunction, CombinableFilter<GraphHead> {
+
+  /**
+   * Label to check presence of.
+   */
+  protected final String label;
 
   /**
    * Creates a new instance of a HasLabel aggregate function.
@@ -30,16 +45,27 @@ public class HasLabel extends BaseHasLabel implements ElementAggregateFunction {
    * @param label element label to check presence of
    */
   public HasLabel(String label) {
-    super(label, "hasLabel_" + label);
+    this(label, "hasLabel_" + label);
   }
 
   /**
-   * Creates a new instance of a HasLabel aggregate function..
+   * Creates a new instance of a HasLabel aggregate function.
    *
-   * @param label element label to check presence of
+   * @param label label to check presence of
    * @param aggregatePropertyKey aggregate property key
    */
   public HasLabel(String label, String aggregatePropertyKey) {
-    super(label, aggregatePropertyKey);
+    super(aggregatePropertyKey);
+    this.label = label;
+  }
+
+  @Override
+  public PropertyValue getIncrement(Element element) {
+    return PropertyValue.create(element.getLabel().equals(label));
+  }
+
+  @Override
+  public boolean filter(GraphHead graphHead) throws Exception {
+    return graphHead.getPropertyValue(getAggregatePropertyKey()).getBoolean();
   }
 }

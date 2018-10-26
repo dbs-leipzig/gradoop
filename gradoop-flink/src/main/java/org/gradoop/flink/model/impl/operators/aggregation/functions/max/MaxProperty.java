@@ -15,12 +15,19 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.max;
 
-import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 
 /**
- * Aggregate function returning the maximum of a specified property over all elements.
+ * Superclass of aggregate functions that determine a maximal property value.
  */
-public class MaxProperty extends BaseMaxProperty implements ElementAggregateFunction {
+public class MaxProperty extends BaseAggregateFunction implements Max {
+
+  /**
+   * Property key whose value should be aggregated.
+   */
+  protected final String propertyKey;
 
   /**
    * Creates a new instance of a MaxProperty aggregate function.
@@ -28,7 +35,8 @@ public class MaxProperty extends BaseMaxProperty implements ElementAggregateFunc
    * @param propertyKey property key to aggregate
    */
   public MaxProperty(String propertyKey) {
-    super(propertyKey);
+    super("max_" + propertyKey);
+    this.propertyKey = propertyKey;
   }
 
   /**
@@ -38,6 +46,12 @@ public class MaxProperty extends BaseMaxProperty implements ElementAggregateFunc
    * @param aggregatePropertyKey aggregate property key
    */
   public MaxProperty(String propertyKey, String aggregatePropertyKey) {
-    super(propertyKey, aggregatePropertyKey);
+    super(aggregatePropertyKey);
+    this.propertyKey = propertyKey;
+  }
+
+  @Override
+  public PropertyValue getIncrement(Element element) {
+    return element.getPropertyValue(propertyKey);
   }
 }

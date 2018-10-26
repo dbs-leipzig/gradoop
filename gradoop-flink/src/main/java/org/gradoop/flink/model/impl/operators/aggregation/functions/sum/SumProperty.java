@@ -15,12 +15,19 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
 
-import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 
 /**
  * Superclass if aggregate functions that sum property values of elements.
  */
-public class SumProperty extends BaseSumProperty implements ElementAggregateFunction {
+public class SumProperty extends BaseAggregateFunction implements Sum {
+
+  /**
+   * Property key whose value should be aggregated.
+   */
+  private String propertyKey;
 
   /**
    * Creates a new instance of a SumProperty aggregate function.
@@ -28,7 +35,8 @@ public class SumProperty extends BaseSumProperty implements ElementAggregateFunc
    * @param propertyKey property key to aggregate
    */
   public SumProperty(String propertyKey) {
-    super(propertyKey);
+    super("sum_" + propertyKey);
+    this.propertyKey = propertyKey;
   }
 
   /**
@@ -38,6 +46,12 @@ public class SumProperty extends BaseSumProperty implements ElementAggregateFunc
    * @param aggregatePropertyKey aggregate property key
    */
   public SumProperty(String propertyKey, String aggregatePropertyKey) {
-    super(propertyKey, aggregatePropertyKey);
+    super(aggregatePropertyKey);
+    this.propertyKey = propertyKey;
+  }
+
+  @Override
+  public PropertyValue getIncrement(Element element) {
+    return element.getPropertyValue(propertyKey);
   }
 }

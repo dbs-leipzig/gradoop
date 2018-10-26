@@ -21,7 +21,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
  * Aggregate function returning the minimum of a specified property over all
  * edges.
  */
-public class MinEdgeProperty extends BaseMinProperty implements EdgeAggregateFunction {
+public class MinEdgeProperty extends MinProperty implements EdgeAggregateFunction {
 
   /**
    * Creates a new instance of a MinEdgeProperty aggregate function.

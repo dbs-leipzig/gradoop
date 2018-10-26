@@ -20,7 +20,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 /**
  * Aggregate function returning the maximum of a specified property over all edges.
  */
-public class MaxEdgeProperty extends BaseMaxProperty implements EdgeAggregateFunction {
+public class MaxEdgeProperty extends MaxProperty implements EdgeAggregateFunction {
 
   /**
    * Creates a new instance of a MaxEdgeProperty aggregate function.

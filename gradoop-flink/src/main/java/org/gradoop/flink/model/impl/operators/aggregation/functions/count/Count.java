@@ -15,12 +15,16 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
 
-import org.gradoop.flink.model.api.functions.ElementAggregateFunction;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.Sum;
 
 /**
- * Aggregate function returning the element count of a graph / graph collection.
+ * Superclass of counting aggregate functions.
  */
-public class Count extends BaseCount implements ElementAggregateFunction {
+public class Count extends BaseAggregateFunction implements Sum, AggregateDefaultValue {
 
   /**
    * Creates a new instance of a Count aggregate function.
@@ -36,5 +40,15 @@ public class Count extends BaseCount implements ElementAggregateFunction {
    */
   public Count(String aggregatePropertyKey) {
     super(aggregatePropertyKey);
+  }
+
+  @Override
+  public PropertyValue getIncrement(Element element) {
+    return PropertyValue.create(1L);
+  }
+
+  @Override
+  public PropertyValue getDefaultValue() {
+    return PropertyValue.create(0L);
   }
 }

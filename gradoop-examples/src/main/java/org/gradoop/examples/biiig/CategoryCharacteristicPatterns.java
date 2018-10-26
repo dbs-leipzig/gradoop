@@ -29,7 +29,7 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.count.BaseCount;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -172,8 +172,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
   /**
    * Aggregate function to count sales orders per graph.
    */
-  private static class CountSalesOrdersAggregateFunction extends BaseCount
-    implements VertexAggregateFunction {
+  private static class CountSalesOrdersAggregateFunction extends VertexCount {
 
     /**
      * Creates a new instance of a CountSalesOrderAggregateFunction aggregate function.

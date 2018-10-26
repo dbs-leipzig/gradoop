@@ -22,7 +22,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
  *
  * Usage: First, aggregate and, second, filter using the same UDF instance.
  */
-public class HasEdgeLabel extends BaseHasLabel implements EdgeAggregateFunction {
+public class HasEdgeLabel extends HasLabel implements EdgeAggregateFunction {
 
   /**
    * Creates a new instance of a HasEdgeLabel aggregate function.
