@@ -58,13 +58,24 @@ public interface PropertyValueStrategy<T> {
             return new byte[0];
         }
 
+        public static PropertyValueStrategy get(byte value) {
+            return INSTANCE.byteStrategyMap.get(value);
+        }
+
         public static PropertyValueStrategy get(Object value) {
             if (value != null) {
                 return get(value.getClass());
             }
             return INSTANCE.noopPropertyValueStrategy;
         }
+
+        public static Object from(DataInputView inputView) throws IOException {
+            PropertyValueStrategy strategy = INSTANCE.byteStrategyMap.get(inputView.readByte());
+            return strategy == null ? null : strategy.get(inputView);
+        }
     }
+
+    T get(DataInputView inputView) throws IOException;
 
     int compare(T value, T other);
 
@@ -74,6 +85,11 @@ public interface PropertyValueStrategy<T> {
         public boolean write(Boolean value, DataOutputView outputView) throws IOException {
             outputView.write( getRawBytes(value) );
             return true;
+        }
+
+        @Override
+        public Boolean get(DataInputView inputView) throws IOException {
+            return inputView.readByte() == -1;
         }
 
         @Override
@@ -115,6 +131,11 @@ public interface PropertyValueStrategy<T> {
         @Override
         public boolean write(Object value, DataOutputView outputView) {
             return false;
+        }
+
+        @Override
+        public Object get(DataInputView inputView) throws IOException {
+            return null;
         }
 
         @Override

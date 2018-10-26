@@ -776,12 +776,19 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   @Override
   public void read(DataInputView inputView) throws IOException {
     // type
+    byte typeByte = inputView.readByte();
     // Apply bitmask to get the actual type.
-    // dynamic type?
-    // init new array
-    // read type info
-    // read data
-      legacyPropertyValue.read(inputView);
+    byte type = (byte) (~PropertyValue.FLAG_LARGE & typeByte);
+
+    PropertyValueStrategy strategy = PropertyValueStrategy.PropertyValueStrategyFactory.get(type);
+
+    if (strategy == null) {
+      value = null;
+      legacyPropertyValue.readObject(inputView, typeByte, type);
+    } else {
+      value = strategy.get(inputView);
+    }
+
   }
 
   @Override
@@ -789,7 +796,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     return legacyPropertyValue.toString();
   }
 
-  public static class LegacyPropertyValue implements Comparable<PropertyValue>, Serializable, Value {
+  public static class LegacyPropertyValue implements Comparable<PropertyValue>, Serializable {
     /**
      * Stores the type and the value
      */
@@ -1613,7 +1620,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
      * @param outputView data output to write data to
      * @throws IOException
      */
-    @Override
     public void write(DataOutputView outputView) throws IOException {
       // null?
       // Write type.
@@ -1635,13 +1641,8 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
       outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);
     }
 
-    @Override
-    public void read(DataInputView inputView) throws IOException {
+    private void readObject(DataInputView inputView, byte typeByte, byte type) throws IOException {
       int length = 0;
-      // type
-      byte typeByte = inputView.readByte();
-      // Apply bitmask to get the actual type.
-      byte type = (byte) (~PropertyValue.FLAG_LARGE & typeByte);
       // dynamic type?
       if (type == PropertyValue.TYPE_STRING || type == PropertyValue.TYPE_BIG_DECIMAL || type == PropertyValue.TYPE_MAP ||
               type == PropertyValue.TYPE_LIST || type == PropertyValue.TYPE_SET) {
