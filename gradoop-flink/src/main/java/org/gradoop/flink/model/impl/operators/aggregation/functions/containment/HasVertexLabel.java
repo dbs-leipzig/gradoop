@@ -20,7 +20,11 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 /**
  * Aggregate and filter function to check presence of a vertex label in a graph.
  *
- * Usage: First, aggregate and, second, filter using the same UDF instance.
+ * <pre>
+ * Usage:
+ * 1. aggregate
+ * 2. filter using the same UDF instance.
+ * </pre>
  */
 public class HasVertexLabel extends HasLabel implements VertexAggregateFunction {
 
