@@ -3,7 +3,6 @@ package org.gradoop.flink.model.impl.operators.sampling.statistics;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.statistics.DegreeCentrality;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -52,7 +51,7 @@ public class DegreeCentralityTest extends GradoopFlinkTestBase {
   public void testStar() throws Exception {
     LogicalGraph graph = getLoaderFromString(graphString).getLogicalGraphByVariable("g0");
     DataSet<Double> dataSet = new DegreeCentrality().execute(graph);
-    assertEquals(1.0, dataSet.collect().get(0).doubleValue(), 0.001);
+    assertEquals(1.0, dataSet.collect().get(0), 0.001);
   }
 
   /**
@@ -63,7 +62,7 @@ public class DegreeCentralityTest extends GradoopFlinkTestBase {
   public void testPath() throws Exception {
     LogicalGraph graph = getLoaderFromString(graphString).getLogicalGraphByVariable("g1");
     DataSet<Double> dataSet = new DegreeCentrality().execute(graph);
-    assertEquals(0.167, dataSet.collect().get(0).doubleValue(), 0.001);
+    assertEquals(0.167, dataSet.collect().get(0), 0.001);
   }
 
   /**
@@ -74,7 +73,7 @@ public class DegreeCentralityTest extends GradoopFlinkTestBase {
   public void testCommunity() throws Exception {
     LogicalGraph graph = getLoaderFromString(graphString).getLogicalGraphByVariable("g2");
     DataSet<Double> dataSet = new DegreeCentrality().execute(graph);
-    assertEquals(0.167, dataSet.collect().get(0).doubleValue(), 0.001);
+    assertEquals(0.167, dataSet.collect().get(0), 0.001);
   }
 
 }
