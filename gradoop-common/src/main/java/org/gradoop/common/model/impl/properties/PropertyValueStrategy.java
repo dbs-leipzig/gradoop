@@ -2,7 +2,6 @@ package org.gradoop.common.model.impl.properties;
 
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
-import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
@@ -13,22 +12,25 @@ public interface PropertyValueStrategy<T> {
 
     boolean write(T value, DataOutputView outputView) throws IOException;
 
+    T read(DataInputView inputView) throws IOException;
+
+    int compare(T value, T other);
+
+    boolean is(Object value);
+
+    Class<T> getType();
+
+    T get(byte[] bytes);
+
+    Byte getRawType();
+
+    byte[] getRawBytes(T value);
+
     class PropertyValueStrategyFactory {
 
-        public static PropertyValueStrategyFactory INSTANCE =  new PropertyValueStrategyFactory();
-
-        public static PropertyValueStrategy get(Class c) {
-            PropertyValueStrategy strategy = INSTANCE.classStrategyMap.get(c);
-            return strategy == null ? INSTANCE.noopPropertyValueStrategy : strategy ;
-        }
-        public static Object fromRawBytes(byte[] bytes) {
-            PropertyValueStrategy strategy = INSTANCE.byteStrategyMap.get(bytes[0]);
-            return strategy == null ? null : strategy.get(bytes);
-        }
+        public static PropertyValueStrategyFactory INSTANCE = new PropertyValueStrategyFactory();
         private final Map<Class, PropertyValueStrategy> classStrategyMap;
-
         private final Map<Byte, PropertyValueStrategy> byteStrategyMap;
-
         private final NoopPropertyValueStrategy noopPropertyValueStrategy = new NoopPropertyValueStrategy();
 
         private PropertyValueStrategyFactory() {
@@ -39,6 +41,16 @@ public interface PropertyValueStrategy<T> {
             for (PropertyValueStrategy strategy : classStrategyMap.values()) {
                 byteStrategyMap.put(strategy.getRawType(), strategy);
             }
+        }
+
+        public static PropertyValueStrategy get(Class c) {
+            PropertyValueStrategy strategy = INSTANCE.classStrategyMap.get(c);
+            return strategy == null ? INSTANCE.noopPropertyValueStrategy : strategy;
+        }
+
+        public static Object fromRawBytes(byte[] bytes) {
+            PropertyValueStrategy strategy = INSTANCE.byteStrategyMap.get(bytes[0]);
+            return strategy == null ? null : strategy.get(bytes);
         }
 
         public static int compare(Object value, Object other) {
@@ -71,24 +83,20 @@ public interface PropertyValueStrategy<T> {
 
         public static Object from(DataInputView inputView) throws IOException {
             PropertyValueStrategy strategy = INSTANCE.byteStrategyMap.get(inputView.readByte());
-            return strategy == null ? null : strategy.get(inputView);
+            return strategy == null ? null : strategy.read(inputView);
         }
     }
-
-    T get(DataInputView inputView) throws IOException;
-
-    int compare(T value, T other);
 
     class BooleanStrategy implements PropertyValueStrategy<Boolean> {
 
         @Override
         public boolean write(Boolean value, DataOutputView outputView) throws IOException {
-            outputView.write( getRawBytes(value) );
+            outputView.write(getRawBytes(value));
             return true;
         }
 
         @Override
-        public Boolean get(DataInputView inputView) throws IOException {
+        public Boolean read(DataInputView inputView) throws IOException {
             return inputView.readByte() == -1;
         }
 
@@ -101,8 +109,9 @@ public interface PropertyValueStrategy<T> {
         public boolean is(Object value) {
             return value instanceof Boolean;
         }
+
         @Override
-        public Class<?> getType() {
+        public Class<Boolean> getType() {
             return Boolean.class;
         }
 
@@ -120,13 +129,13 @@ public interface PropertyValueStrategy<T> {
         public byte[] getRawBytes(Boolean value) {
             byte[] rawBytes = new byte[PropertyValue.OFFSET + Bytes.SIZEOF_BOOLEAN];
             rawBytes[0] = getRawType();
-            Bytes.putByte(rawBytes, PropertyValue.OFFSET, (byte) ((boolean)value ? -1 : 0));
+            Bytes.putByte(rawBytes, PropertyValue.OFFSET, (byte) ((boolean) value ? -1 : 0));
             return rawBytes;
         }
 
 
-
     }
+
     class NoopPropertyValueStrategy implements PropertyValueStrategy {
         @Override
         public boolean write(Object value, DataOutputView outputView) {
@@ -134,7 +143,7 @@ public interface PropertyValueStrategy<T> {
         }
 
         @Override
-        public Object get(DataInputView inputView) throws IOException {
+        public Object read(DataInputView inputView) throws IOException {
             return null;
         }
 
@@ -147,6 +156,7 @@ public interface PropertyValueStrategy<T> {
         public boolean is(Object value) {
             return false;
         }
+
         @Override
         public Class<?> getType() {
             return null;
@@ -169,10 +179,4 @@ public interface PropertyValueStrategy<T> {
 
 
     }
-    boolean is(Object value);
-    Class<?> getType();
-    T get(byte[] bytes);
-
-    Byte getRawType();
-    byte[] getRawBytes(T value);
 }

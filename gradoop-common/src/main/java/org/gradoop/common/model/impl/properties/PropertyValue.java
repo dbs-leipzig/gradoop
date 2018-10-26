@@ -786,7 +786,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
       value = null;
       legacyPropertyValue.readObject(inputView, typeByte, type);
     } else {
-      value = strategy.get(inputView);
+      value = strategy.read(inputView);
     }
 
   }
