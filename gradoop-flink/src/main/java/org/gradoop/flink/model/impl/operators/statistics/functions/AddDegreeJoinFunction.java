@@ -40,9 +40,7 @@ public class AddDegreeJoinFunction implements JoinFunction<Vertex, WithCount<Gra
 
   @Override
   public Vertex join(Vertex vertex, WithCount<GradoopId> gradoopIdWithCount) throws Exception {
-
     vertex.setProperty(degreeKey, gradoopIdWithCount.f1);
-
     return vertex;
   }
 }

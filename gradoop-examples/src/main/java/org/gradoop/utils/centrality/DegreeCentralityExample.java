@@ -45,18 +45,13 @@ public class DegreeCentralityExample extends AbstractRunner implements ProgramDe
    * @throws Exception if something goes wrong
    */
   public static void main(String[] args) throws Exception {
-
     // read logical Graph
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
-
-
     DataSet<WithCount<GradoopId>> degrees = new VertexDegrees().execute(graph);
     DataSet<Long> vertexCount = new VertexCount().execute(graph);
 
-
     // broadcasting
     DataSet<WithCount<GradoopId>> maxDegree = degrees.max(1);
-
 
     String broadcastName = "degree_max";
     DataSet<Double> degree = degrees
@@ -65,12 +60,10 @@ public class DegreeCentralityExample extends AbstractRunner implements ProgramDe
       .sum(0)
       .crossWithTiny(vertexCount).with(new CalculateDegreeCentrality());
     degree.print();
-
   }
 
   @Override
   public String getDescription() {
     return DegreeCentralityExample.class.getName();
   }
-
 }
