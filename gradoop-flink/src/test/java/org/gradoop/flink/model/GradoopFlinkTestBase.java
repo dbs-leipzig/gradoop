@@ -265,8 +265,8 @@ public abstract class GradoopFlinkTestBase {
    * @param element the temporal graph element to check
    */
   protected void checkDefaultTemporalElement(TemporalElement element) {
-    assertEquals((Long) 0L, element.getValidFrom());
-    assertEquals((Long) 0L, element.getValidTo());
+    assertEquals(TemporalElement.DEFAULT_VALID_TIME, element.getValidFrom());
+    assertEquals(TemporalElement.DEFAULT_VALID_TIME, element.getValidTo());
     checkDefaultTxTimes(element);
   }
 
@@ -277,6 +277,6 @@ public abstract class GradoopFlinkTestBase {
    */
   protected void checkDefaultTxTimes(TemporalElement element) {
     assertTrue(element.getTxFrom() < System.currentTimeMillis());
-    assertEquals((Long) Long.MAX_VALUE, element.getTxTo());
+    assertEquals(TemporalElement.DEFAULT_TX_TO, element.getTxTo());
   }
 }

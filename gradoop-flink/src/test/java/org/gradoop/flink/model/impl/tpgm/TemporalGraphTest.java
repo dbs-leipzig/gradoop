@@ -29,7 +29,6 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -83,7 +82,7 @@ public class TemporalGraphTest extends GradoopFlinkTestBase {
    * Test the {@link TemporalGraph#writeTo(DataSink)} method.
    */
   @Test(expected = RuntimeException.class)
-  public void testWriteTo() throws IOException {
+  public void testWriteTo() {
     testGraph.writeTo(new DOTDataSink("x", true));
   }
 
@@ -91,7 +90,7 @@ public class TemporalGraphTest extends GradoopFlinkTestBase {
    * Test the {@link TemporalGraph#writeTo(DataSink, boolean)} method.
    */
   @Test(expected = RuntimeException.class)
-  public void testWriteToOverwrite() throws IOException {
+  public void testWriteToOverwrite() {
     testGraph.writeTo(new DOTDataSink("x", true), true);
   }
 

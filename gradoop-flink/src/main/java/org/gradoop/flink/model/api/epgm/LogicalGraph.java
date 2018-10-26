@@ -28,12 +28,14 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
-import org.gradoop.flink.model.api.functions.timeextractors.EdgeTimeIntervalExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.EdgeTimestampExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.GraphHeadTimeIntervalExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.GraphHeadTimestampExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.VertexTimeIntervalExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.VertexTimestampExtractor;
+import org.gradoop.flink.model.api.functions.timeextractors.TimeIntervalExtractor;
+import org.gradoop.flink.model.impl.functions.timeextractors.EdgeTimeIntervalExtractor;
+import org.gradoop.flink.model.impl.functions.timeextractors.EdgeTimestampExtractor;
+import org.gradoop.flink.model.impl.functions.timeextractors.GraphHeadTimeIntervalExtractor;
+import org.gradoop.flink.model.impl.functions.timeextractors.GraphHeadTimestampExtractor;
+import org.gradoop.flink.model.api.functions.timeextractors.TimestampExtractor;
+import org.gradoop.flink.model.impl.functions.timeextractors.VertexTimeIntervalExtractor;
+import org.gradoop.flink.model.impl.functions.timeextractors.VertexTimestampExtractor;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
@@ -609,8 +611,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * timestamp extractors, it is possible to extract a temporal information from the data to
    * define a timestamp that represents the beginning of the element's validity (valid time).
    * The value of the validTo property remains a default value. Use
-   * {@link LogicalGraph#toTemporalGraph(GraphHeadTimeIntervalExtractor,
-   * VertexTimeIntervalExtractor, EdgeTimeIntervalExtractor)} to define the beginning and the end
+   * {@link LogicalGraph#toTemporalGraph(TimeIntervalExtractor, TimeIntervalExtractor,
+   * TimeIntervalExtractor)}  to define the beginning and the end
    * of the element's validity.
    *
    * @param graphHeadTimestampExtractor extractor function to pick the timestamp from graph heads
@@ -619,14 +621,14 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * @return the logical graph represented as temporal graph with a timestamp as validFrom attribute
    */
   public TemporalGraph toTemporalGraph(
-    GraphHeadTimestampExtractor graphHeadTimestampExtractor,
-    VertexTimestampExtractor vertexTimestampExtractor,
-    EdgeTimestampExtractor edgeTimestampExtractor) {
+    TimestampExtractor<GraphHead> graphHeadTimestampExtractor,
+    TimestampExtractor<Vertex> vertexTimestampExtractor,
+    TimestampExtractor<Edge> edgeTimestampExtractor) {
 
     return getConfig().getTemporalGraphFactory().fromDataSets(
-      getVertices().map(vertexTimestampExtractor),
-      getEdges().map(edgeTimestampExtractor),
-      getGraphHead().map(graphHeadTimestampExtractor));
+      getVertices().map(new VertexTimestampExtractor(vertexTimestampExtractor)),
+      getEdges().map(new EdgeTimestampExtractor(edgeTimestampExtractor)),
+      getGraphHead().map(new GraphHeadTimestampExtractor(graphHeadTimestampExtractor)));
   }
 
   /**
@@ -634,8 +636,8 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * timestamp extractors, it is possible to extract temporal information from the data to
    * define a time interval that represents the beginning and end of the element's validity
    * (valid time).
-   * Use {@link LogicalGraph#toTemporalGraph(GraphHeadTimestampExtractor, VertexTimestampExtractor,
-   * EdgeTimestampExtractor)} to define only a timestamp as the beginning of the element's validity.
+   * Use {@link LogicalGraph#toTemporalGraph(TimestampExtractor, TimestampExtractor,
+   * TimestampExtractor)}  to define only a timestamp as the beginning of the element's validity.
    *
    * @param graphHeadTimeIntervalExtractor extractor to pick the time interval from graph heads
    * @param vertexTimeIntervalExtractor extractor to pick the time interval from vertices
@@ -643,14 +645,14 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * @return the logical graph represented as temporal graph with a time interval as valid time
    */
   public TemporalGraph toTemporalGraph(
-    GraphHeadTimeIntervalExtractor graphHeadTimeIntervalExtractor,
-    VertexTimeIntervalExtractor vertexTimeIntervalExtractor,
-    EdgeTimeIntervalExtractor edgeTimeIntervalExtractor) {
+    TimeIntervalExtractor<GraphHead> graphHeadTimeIntervalExtractor,
+    TimeIntervalExtractor<Vertex> vertexTimeIntervalExtractor,
+    TimeIntervalExtractor<Edge> edgeTimeIntervalExtractor) {
 
     return getConfig().getTemporalGraphFactory().fromDataSets(
-      getVertices().map(vertexTimeIntervalExtractor),
-      getEdges().map(edgeTimeIntervalExtractor),
-      getGraphHead().map(graphHeadTimeIntervalExtractor));
+      getVertices().map(new VertexTimeIntervalExtractor(vertexTimeIntervalExtractor)),
+      getEdges().map(new EdgeTimeIntervalExtractor(edgeTimeIntervalExtractor)),
+      getGraphHead().map(new GraphHeadTimeIntervalExtractor(graphHeadTimeIntervalExtractor)));
   }
 
   /**

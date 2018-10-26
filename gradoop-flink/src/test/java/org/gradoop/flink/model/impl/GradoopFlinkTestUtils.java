@@ -33,12 +33,10 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.functions.timeextractors.EdgeTimeIntervalExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.EdgeTimestampExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.GraphHeadTimeIntervalExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.GraphHeadTimestampExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.VertexTimeIntervalExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.VertexTimestampExtractor;
+import org.gradoop.flink.model.api.functions.timeextractors.TimeIntervalExtractor;
+import org.gradoop.flink.model.impl.functions.timeextractors.EdgeTimeIntervalExtractor;
+import org.gradoop.flink.model.impl.functions.timeextractors.GraphHeadTimeIntervalExtractor;
+import org.gradoop.flink.model.impl.functions.timeextractors.VertexTimeIntervalExtractor;
 import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
@@ -232,38 +230,11 @@ public class GradoopFlinkTestUtils {
   }
 
   /**
-   * Get an instance of a {@link GraphHeadTimestampExtractor} for testing purposes.
-   *
-   * @return a timestamp extractor
-   */
-  public static GraphHeadTimestampExtractor getGraphHeadTimestampExtractor() {
-    return new TestGraphHeadTimestampExtractor();
-  }
-
-  /**
-   * Get an instance of a {@link VertexTimestampExtractor} for testing purposes.
-   *
-   * @return a timestamp extractor
-   */
-  public static VertexTimestampExtractor getVertexTimestampExtractor() {
-    return new TestVertexTimestampExtractor();
-  }
-
-  /**
-   * Get an instance of a {@link EdgeTimestampExtractor} for testing purposes.
-   *
-   * @return a timestamp extractor
-   */
-  public static EdgeTimestampExtractor getEdgeTimestampExtractor() {
-    return new TestEdgeTimestampExtractor();
-  }
-
-  /**
    * Get an instance of a {@link GraphHeadTimeIntervalExtractor} for testing purposes.
    *
    * @return a time interval extractor
    */
-  public static GraphHeadTimeIntervalExtractor getGraphHeadTimeIntervalExtractor() {
+  public static TimeIntervalExtractor<GraphHead> getGraphHeadTimeIntervalExtractor() {
     return new TestGraphHeadTimeIntervalExtractor();
   }
 
@@ -272,7 +243,7 @@ public class GradoopFlinkTestUtils {
    *
    * @return a time interval extractor
    */
-  public static VertexTimeIntervalExtractor getVertexTimeIntervalExtractor() {
+  public static TimeIntervalExtractor<Vertex> getVertexTimeIntervalExtractor() {
     return new TestVertexTimeIntervalExtractor();
   }
 
@@ -281,45 +252,15 @@ public class GradoopFlinkTestUtils {
    *
    * @return a time interval extractor
    */
-  public static EdgeTimeIntervalExtractor getEdgeTimeIntervalExtractor() {
+  public static TimeIntervalExtractor<Edge> getEdgeTimeIntervalExtractor() {
     return new TestEdgeTimeIntervalExtractor();
-  }
-
-  /**
-   * Test class for timestamp extraction.
-   */
-  private static class TestGraphHeadTimestampExtractor implements GraphHeadTimestampExtractor {
-    @Override
-    public Long getValidFrom(GraphHead element) {
-      return 42L;
-    }
-  }
-
-  /**
-   * Test class for timestamp extraction.
-   */
-  private static class TestVertexTimestampExtractor implements VertexTimestampExtractor {
-    @Override
-    public Long getValidFrom(Vertex element) {
-      return 52L;
-    }
-  }
-
-  /**
-   * Test class for timestamp extraction.
-   */
-  private static class TestEdgeTimestampExtractor implements EdgeTimestampExtractor {
-    @Override
-    public Long getValidFrom(Edge element) {
-      return 62L;
-    }
   }
 
   /**
    * Test class for time interval extraction.
    */
   private static class TestGraphHeadTimeIntervalExtractor
-    implements GraphHeadTimeIntervalExtractor {
+    implements TimeIntervalExtractor<GraphHead> {
     @Override
     public Long getValidFrom(GraphHead element) {
       return 42L;
@@ -334,7 +275,7 @@ public class GradoopFlinkTestUtils {
   /**
    * Test class for time interval extraction.
    */
-  private static class TestVertexTimeIntervalExtractor implements VertexTimeIntervalExtractor {
+  private static class TestVertexTimeIntervalExtractor implements TimeIntervalExtractor<Vertex> {
     @Override
     public Long getValidFrom(Vertex element) {
       return 52L;
@@ -349,7 +290,7 @@ public class GradoopFlinkTestUtils {
   /**
    * Test class for time interval extraction.
    */
-  private static class TestEdgeTimeIntervalExtractor implements EdgeTimeIntervalExtractor {
+  private static class TestEdgeTimeIntervalExtractor implements TimeIntervalExtractor<Edge> {
     @Override
     public Long getValidFrom(Edge element) {
       return 62L;

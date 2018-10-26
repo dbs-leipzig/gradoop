@@ -21,16 +21,13 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalElement;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.functions.timeextractors.EdgeTimeIntervalExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.EdgeTimestampExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.GraphHeadTimeIntervalExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.GraphHeadTimestampExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.VertexTimeIntervalExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.VertexTimestampExtractor;
+import org.gradoop.flink.model.api.functions.timeextractors.TimeIntervalExtractor;
+import org.gradoop.flink.model.api.functions.timeextractors.TimestampExtractor;
 import org.gradoop.flink.model.api.tpgm.TemporalGraph;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -152,8 +149,8 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test the {@link LogicalGraph#toTemporalGraph(GraphHeadTimestampExtractor,
-   * VertexTimestampExtractor, EdgeTimestampExtractor)} function.
+   * Test the {@link LogicalGraph#toTemporalGraph(TimestampExtractor, TimestampExtractor,
+   * TimestampExtractor)}  function.
    *
    * @throws Exception if the test execution fails
    */
@@ -161,12 +158,11 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
   public void testToTemporalGraphWithTimestampExtractor() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
     LogicalGraph graph = loader.getLogicalGraph();
+    Long validFrom = 42L;
 
     // Call the function to test
-    TemporalGraph temporalGraph = graph.toTemporalGraph(
-      GradoopFlinkTestUtils.getGraphHeadTimestampExtractor(),
-      GradoopFlinkTestUtils.getVertexTimestampExtractor(),
-      GradoopFlinkTestUtils.getEdgeTimestampExtractor());
+    TemporalGraph temporalGraph = graph
+      .toTemporalGraph(gh -> validFrom, v -> validFrom, e -> validFrom);
 
     // use collections as data sink
     Collection<Vertex> vertices = Lists.newArrayList();
@@ -205,14 +201,23 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     temporalGraphHeads.forEach(this::checkDefaultTxTimes);
 
     // Check if the validFrom values are equal with the expected ones
-    temporalGraphHeads.forEach(tg -> assertEquals((Long) 42L, tg.getValidFrom()));
-    temporalVertices.forEach(tv -> assertEquals((Long) 52L, tv.getValidFrom()));
-    temporalEdges.forEach(te -> assertEquals((Long) 62L, te.getValidFrom()));
+    temporalGraphHeads.forEach(tg -> assertEquals(validFrom, tg.getValidFrom()));
+    temporalVertices.forEach(tv -> assertEquals(validFrom, tv.getValidFrom()));
+    temporalEdges.forEach(te -> assertEquals(validFrom, te.getValidFrom()));
+
+    // Check if the validTo values are equal with the default ones
+    temporalGraphHeads
+      .forEach(tg -> assertEquals(TemporalElement.DEFAULT_VALID_TIME, tg.getValidTo()));
+    temporalVertices
+      .forEach(tv -> assertEquals(TemporalElement.DEFAULT_VALID_TIME, tv.getValidTo()));
+    temporalEdges
+      .forEach(te -> assertEquals(TemporalElement.DEFAULT_VALID_TIME, te.getValidTo()));
+
   }
 
   /**
-   * Test the {@link LogicalGraph#toTemporalGraph(GraphHeadTimeIntervalExtractor,
-   * VertexTimeIntervalExtractor, EdgeTimeIntervalExtractor)} function.
+   * Test the {@link LogicalGraph#toTemporalGraph(TimeIntervalExtractor, TimeIntervalExtractor,
+   * TimeIntervalExtractor)}  function.
    *
    * @throws Exception if the test execution fails
    */
