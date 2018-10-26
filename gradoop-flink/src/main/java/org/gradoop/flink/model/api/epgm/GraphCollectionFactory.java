@@ -124,6 +124,26 @@ public class GraphCollectionFactory {
   public GraphCollection fromGraph(LogicalGraph logicalGraphLayout) {
     return new GraphCollection(layoutFactory.fromGraphLayout(logicalGraphLayout), config);
   }
+  
+  /**
+   * Creates a graph collection from a given logical graph collection.
+   * @param logicalGraphLayoutCollection input graph collection
+   * @return multi-element graph collection
+   */
+  public GraphCollection fromGraphs(Collection<LogicalGraph> logicalGraphLayoutCollection) {
+    GraphCollection graphCollection = null;
+    if (!logicalGraphLayoutCollection.isEmpty()) {
+      for (LogicalGraph lgl : logicalGraphLayoutCollection) {
+        if (graphCollection == null) {
+          graphCollection = new GraphCollection(layoutFactory.fromGraphLayout(lgl), config);
+        } else {
+          graphCollection = graphCollection
+              .union(new GraphCollection(layoutFactory.fromGraphLayout(lgl), config));
+        }
+      }
+    }
+    return graphCollection;
+  }
 
   /**
    * Creates a graph collection from a graph transaction dataset.
