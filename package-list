@@ -68,14 +68,6 @@ org.gradoop.flink.algorithms.gelly.shortestpaths.functions
 org.gradoop.flink.algorithms.gelly.trianglecounting
 org.gradoop.flink.algorithms.gelly.vertexdegrees
 org.gradoop.flink.algorithms.gelly.vertexdegrees.functions
-org.gradoop.flink.datagen.transactions.foodbroker
-org.gradoop.flink.datagen.transactions.foodbroker.config
-org.gradoop.flink.datagen.transactions.foodbroker.functions
-org.gradoop.flink.datagen.transactions.foodbroker.functions.masterdata
-org.gradoop.flink.datagen.transactions.foodbroker.functions.process
-org.gradoop.flink.datagen.transactions.foodbroker.generators
-org.gradoop.flink.datagen.transactions.foodbroker.tuples
-org.gradoop.flink.datagen.transactions.predictable
 org.gradoop.flink.io.api
 org.gradoop.flink.io.impl
 org.gradoop.flink.io.impl.csv
