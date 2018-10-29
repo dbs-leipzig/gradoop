@@ -25,7 +25,6 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.Pro
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
