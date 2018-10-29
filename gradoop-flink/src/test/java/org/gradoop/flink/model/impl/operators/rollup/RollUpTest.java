@@ -50,7 +50,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
       .reduce(new ReduceCombination());
 
     //expected
-    loader.initDatabaseFromString("g0:g0 {vertexRollUpGroupingKeys:\"age\"}[" +
+    loader.initDatabaseFromString("g0 {vertexRollUpGroupingKeys:\"age\"}[" +
       "(v0 {count:1L,age:20})" +
       "(v1 {count:2L,age:30})" +
       "(v2 {count:2L,age:35})" +
@@ -74,8 +74,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
     
     GraphCollection output = input.groupVerticesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
   
-    collectAndAssertTrue(
-      output.equalsByGraphElementData(expected));
+    collectAndAssertTrue(output.equalsByGraphData(expected));
   }
   
   /**
@@ -92,7 +91,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
       .reduce(new ReduceCombination());
 
     //expected
-    loader.initDatabaseFromString("g0:g0 {edgeRollUpGroupingKeys:\":label\"}[" +
+    loader.initDatabaseFromString("g0 {edgeRollUpGroupingKeys:\":label\"}[" +
       "(v0)" +
       "(v0)-[e_0:knows{count:10L}]->(v0)" +
       "(v0)-[e_1:hasModerator{count:1L}]->(v0)" +
@@ -106,11 +105,8 @@ public class RollUpTest extends GradoopFlinkTestBase {
     List<PropertyValueAggregator> edgeAGG = Collections.singletonList(new CountAggregator("count"));
     
     GraphCollection output = input.groupEdgesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
-    
-    output.print();
-    
-    collectAndAssertTrue(
-      output.equalsByGraphElementData(expected));
+
+    collectAndAssertTrue(output.equalsByGraphData(expected));
   }
   
   /**
@@ -128,7 +124,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
       .reduce(new ReduceCombination());
     
     //expected
-    loader.initDatabaseFromString("g0:g0 {vertexRollUpGroupingKeys:\"age,gender,city\"}[" +
+    loader.initDatabaseFromString("g0 {vertexRollUpGroupingKeys:\"age,gender,city\"}[" +
       "(v2 {gender:\"f\",city:\"Dresden\",count:1L,age:30})" +
       "(v3 {gender:\"m\",city:\"Leipzig\",count:1L,age:30})" +
       "(v5 {gender:NULL,city:NULL,count:1L,age:NULL})" +
@@ -149,7 +145,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
       "(v2)-[e32]->(v6)" +
       "(v3)-[e33]->(v2)" +
       "]" +
-      "g1:g1 {vertexRollUpGroupingKeys:\"age,gender\"}[" +
+      "g1 {vertexRollUpGroupingKeys:\"age,gender\"}[" +
       "(v4 {gender:\"m\",count:1L,age:30})" +
       "(v8 {gender:\"f\",count:1L,age:30})" +
       "(v9 {gender:\"f\",count:1L,age:35})" +
@@ -170,7 +166,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
       "(v10)-[e22]->(v8)" +
       "(v14)-[e23]->(v4)" +
       "]" +
-      "g2:g2 {vertexRollUpGroupingKeys:\"age\"}[" +
+      "g2 {vertexRollUpGroupingKeys:\"age\"}[" +
       "(v0 {count:2L,age:35})" +
       "(v1 {count:1L,age:40})" +
       "(v7 {count:1L,age:NULL})" +
@@ -197,8 +193,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
     
     GraphCollection output = input.groupVerticesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
     
-    collectAndAssertTrue(
-      output.equalsByGraphElementData(expected));
+    collectAndAssertTrue(output.equalsByGraphData(expected));
   }
   
   /**
@@ -216,7 +211,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
       .reduce(new ReduceCombination());
     
     //expected
-    loader.initDatabaseFromString("g0:g0 {edgeRollUpGroupingKeys:\":label,since,vertexCount\"}[" +
+    loader.initDatabaseFromString("g0 {edgeRollUpGroupingKeys:\":label,since,vertexCount\"}[" +
       "(v0)" +
       "(v0)-[e_0:hasModerator{count:1L,vertexCount:NULL,since:2013}]->(v0)" +
       "(v0)-[e_1:knows{count:3L,vertexCount:NULL,since:2013}]->(v0)" +
@@ -224,7 +219,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
       "(v0)-[e_3:knows{count:3L,vertexCount:NULL,since:2015}]->(v0)" +
       "(v0)-[e_4:hasMember{count:2L,vertexCount:NULL,since:NULL}]->(v0)" +
       "]" +
-      "g1:g1 {edgeRollUpGroupingKeys:\":label,since\"}[" +
+      "g1 {edgeRollUpGroupingKeys:\":label,since\"}[" +
       "(v2)" +
       "(v2)-[e_5:hasMember{count:2L,since:NULL}]->(v2)" +
       "(v2)-[e_6:knows{count:3L,since:2013}]->(v2)" +
@@ -232,7 +227,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
       "(v2)-[e_8:hasModerator{count:1L,since:2013}]->(v2)" +
       "(v2)-[e_9:knows{count:4L,since:2014}]->(v2)" +
       "]" +
-      "g2:g2 {edgeRollUpGroupingKeys:\":label\"}[" +
+      "g2 {edgeRollUpGroupingKeys:\":label\"}[" +
       "(v1)" +
       "(v1)-[e_10:hasMember{count:2L}]->(v1)" +
       "(v1)-[e_11:hasModerator{count:1L}]->(v1)" +
@@ -248,7 +243,6 @@ public class RollUpTest extends GradoopFlinkTestBase {
     
     GraphCollection output = input.groupEdgesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
 
-    collectAndAssertTrue(
-      output.equalsByGraphElementData(expected));
+    collectAndAssertTrue(output.equalsByGraphData(expected));
   }
 }
