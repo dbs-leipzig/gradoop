@@ -1,0 +1,579 @@
+Index: gradoop-flink/src/main/java/org/gradoop/flink/model/api/epgm/LogicalGraph.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- gradoop-flink/src/main/java/org/gradoop/flink/model/api/epgm/LogicalGraph.java	(revision f5fcd26e9e00ab0838ed17c955268a353506c9d9)
++++ gradoop-flink/src/main/java/org/gradoop/flink/model/api/epgm/LogicalGraph.java	(date 1540804484000)
+@@ -53,8 +53,8 @@
+ import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
+ import org.gradoop.flink.model.impl.operators.overlap.Overlap;
+ import org.gradoop.flink.model.impl.operators.propertytransformation.PropertyTransformation;
+-import org.gradoop.flink.model.impl.operators.rollup.RollUp;
+-import org.gradoop.flink.model.impl.operators.rollup.RollUp.RollUpType;
++import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
++import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
+ import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
+ import org.gradoop.flink.model.impl.operators.split.Split;
+ import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
+@@ -460,16 +460,11 @@
+     List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+     List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions) {
+     if (vertexGroupingKeys == null || vertexGroupingKeys.isEmpty()) {
+-      throw new IllegalArgumentException("missing vertex grouping key(s)");
++      throw new IllegalArgumentException("Missing vertex grouping key(s).");
+     }
+ 
+-    return callForCollection(
+-      new RollUp(
+-        vertexGroupingKeys,
+-        vertexAggregateFunctions,
+-        edgeGroupingKeys,
+-        edgeAggregateFunctions,
+-        RollUpType.VERTEX_ROLLUP));
++    return callForCollection(new VertexRollUp(vertexGroupingKeys, vertexAggregateFunctions,
++      edgeGroupingKeys, edgeAggregateFunctions));
+   }
+ 
+   @Override
+@@ -477,16 +472,11 @@
+     List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+     List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions) {
+     if (edgeGroupingKeys == null || edgeGroupingKeys.isEmpty()) {
+-      throw new IllegalArgumentException("missing edge grouping key(s)");
++      throw new IllegalArgumentException("Missing edge grouping key(s).");
+     }
+ 
+-    return callForCollection(
+-      new RollUp(
+-        vertexGroupingKeys,
+-        vertexAggregateFunctions,
+-        edgeGroupingKeys,
+-        edgeAggregateFunctions,
+-        RollUpType.EDGE_ROLLUP));
++    return callForCollection(new EdgeRollUp(vertexGroupingKeys, vertexAggregateFunctions,
++      edgeGroupingKeys, edgeAggregateFunctions));
+   }
+ 
+   //----------------------------------------------------------------------------
+Index: gradoop-flink/src/main/java/org/gradoop/flink/model/impl/functions/epgm/SetLabelAndProperty.java
+===================================================================
+--- gradoop-flink/src/main/java/org/gradoop/flink/model/impl/functions/epgm/SetLabelAndProperty.java	(revision f5fcd26e9e00ab0838ed17c955268a353506c9d9)
++++ gradoop-flink/src/main/java/org/gradoop/flink/model/impl/functions/epgm/SetProperty.java	(date 1540803566000)
+@@ -20,23 +20,18 @@
+ import org.gradoop.common.model.impl.properties.PropertyValue;
+ 
+ /**
+- * The SetLabelAndProperty MapFunction assigns a new label to an element and creates a property
+- * using the supplied property key and value.
++ * The SetProperty MapFunction assigns a new property to a given graph element using the supplied
++ * property key and value.
+  *
+  * @param <E> gradoop element
+  */
+-public class SetLabelAndProperty<E extends Element> implements MapFunction<E, E> {
++public class SetProperty<E extends Element> implements MapFunction<E, E> {
+ 
+   /**
+    * serialVersionUID
+    */
+   private static final long serialVersionUID = 42L;
+ 
+-  /**
+-   * New label of the element.
+-   */
+-  private String label;
+-
+   /**
+    * Property key used to set the value.
+    */
+@@ -48,29 +43,25 @@
+   private PropertyValue propertyValue;
+ 
+   /**
+-   * Creates an instance of SetLabelAndProperty.
++   * Creates an instance of SetProperty.
+    *
+-   * @param label         new grapHead label
+    * @param propertyKey   property key used to store the grouping keys
+    * @param propertyValue property value to be set
+    */
+-  public SetLabelAndProperty(String label, String propertyKey, PropertyValue propertyValue) {
+-    this.label = label;
++  public SetProperty(String propertyKey, PropertyValue propertyValue) {
+     this.propertyKey = propertyKey;
+     this.propertyValue = propertyValue;
+   }
+ 
+   /**
+-   * Updates the element's label and creates the property.
++   * Adds a new property to the element.
+    *
+-   * @param element  original element to be updated
++   * @param element original element to be updated
+    * @return updated element
+    */
+   @Override
+   public E map(E element) throws Exception {
+-    element.setLabel(label);
+     element.setProperty(propertyKey, propertyValue);
+-
+     return element;
+   }
+ }
+Index: gradoop-flink/src/main/java/org/gradoop/flink/model/impl/operators/rollup/RollUp.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- gradoop-flink/src/main/java/org/gradoop/flink/model/impl/operators/rollup/RollUp.java	(revision f5fcd26e9e00ab0838ed17c955268a353506c9d9)
++++ gradoop-flink/src/main/java/org/gradoop/flink/model/impl/operators/rollup/RollUp.java	(date 1540804989000)
+@@ -26,7 +26,7 @@
+ import org.gradoop.flink.model.api.epgm.GraphCollection;
+ import org.gradoop.flink.model.api.epgm.LogicalGraph;
+ import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+-import org.gradoop.flink.model.impl.functions.epgm.SetLabelAndProperty;
++import org.gradoop.flink.model.impl.functions.epgm.SetProperty;
+ import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+ import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
+ 
+@@ -35,133 +35,55 @@
+  * according to the definition of the rollUp operation in SQL and uses them together with all
+  * opposed grouping keys for separate grouping operations. For example, specifying the grouping
+  * keys A, B and C leads to three differently grouped graphs {A,B,C},{A,B},{A} within the resulting
+- * graph collection.
++ * graph collection. The grouping can be applied using the vertex or edge grouping keys depending on
++ * the implementations of the used sub class.
+  */
+-public class RollUp implements UnaryGraphToCollectionOperator {
+-
+-  /**
+-   * Used to distinguish between a rollUp on vertices or a rollUp on edges.
+-   */
+-  public enum RollUpType {
+-
+-    /**
+-     * Used for rollUp on vertex grouping keys.
+-     */
+-    VERTEX_ROLLUP,
+-
+-    /**
+-     * Used for rollUp on edge grouping keys.
+-     */
+-    EDGE_ROLLUP
+-  }
+-
+-  /**
+-   * Property key used to store the grouping keys used for rollUp on vertices.
+-   */
+-  public static final String VERTEX_GROUPING_KEYS_PROPERTY = "vertexRollUpGroupingKeys";
+-
+-  /**
+-   * Property key used to store the grouping keys used for rollUp on edges.
+-   */
+-  public static final String EDGE_GROUPING_KEYS_PROPERTY = "edgeRollUpGroupingKeys";
+-
++public abstract class RollUp implements UnaryGraphToCollectionOperator {
+   /**
+    * Stores grouping keys for vertices.
+    */
+-  private final List<String> vertexGroupingKeys;
++  protected final List<String> vertexGroupingKeys;
+ 
+   /**
+    * Stores aggregation functions for vertices.
+    */
+-  private final List<PropertyValueAggregator> vertexAggregateFunctions;
++  protected final List<PropertyValueAggregator> vertexAggregateFunctions;
+ 
+   /**
+    * Stores grouping keys for edges.
+    */
+-  private final List<String> edgeGroupingKeys;
++  protected final List<String> edgeGroupingKeys;
+ 
+   /**
+    * Stores aggregation functions for edges.
+    */
+-  private final List<PropertyValueAggregator> edgeAggregateFunctions;
+-
+-  /**
+-   * Stores the type of rollUp to be executed.
+-   */
+-  private final RollUpType rollUpType;
++  protected final List<PropertyValueAggregator> edgeAggregateFunctions;
+ 
+   /**
+    * Stores the strategy used for grouping.
+    */
+-  private final GroupingStrategy strategy;
++  protected GroupingStrategy strategy;
+ 
+   /**
+    * Creates a rollUp operator instance with {@link GroupingStrategy#GROUP_REDUCE} as grouping
+-   * strategy.
+-   *
+-   * @param vertexGroupingKeys        grouping keys to group vertices
+-   * @param vertexAggregateFunctions  aggregate functions to apply on super vertices
+-   * @param edgeGroupingKeys          grouping keys to group edges
+-   * @param edgeAggregateFunctions    aggregate functions to apply on super edges
+-   * @param rollUpType                type of rollUp to be executed
+-   */
+-  public RollUp(
+-    List<String> vertexGroupingKeys,
+-    List<PropertyValueAggregator> vertexAggregateFunctions,
+-    List<String> edgeGroupingKeys,
+-    List<PropertyValueAggregator> edgeAggregateFunctions,
+-    RollUpType rollUpType) {
+-    this(
+-      vertexGroupingKeys,
+-      vertexAggregateFunctions,
+-      edgeGroupingKeys,
+-      edgeAggregateFunctions,
+-      rollUpType,
+-      GroupingStrategy.GROUP_REDUCE);
+-  }
+-
+-  /**
+-   * Creates rollUp operator instance.
++   * strategy. Use {@link RollUp#setGroupingStrategy(GroupingStrategy)} to define a different
++   * grouping strategy.
+    *
+-   * @param vertexGroupingKeys       grouping keys to group vertices
+-   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
+-   * @param edgeGroupingKeys         grouping keys to group edges
+-   * @param edgeAggregateFunctions   aggregate functions to apply on super edges
+-   * @param rollUpType               type of rollUp to be executed
+-   * @param strategy                 strategy used for grouping
++   * @param vertexGroupingKeys        grouping keys to group vertices
++   * @param vertexAggregateFunctions  aggregate functions to apply on super vertices
++   * @param edgeGroupingKeys          grouping keys to group edges
++   * @param edgeAggregateFunctions    aggregate functions to apply on super edges
+    */
+-  public RollUp(
++  RollUp(
+     List<String> vertexGroupingKeys,
+     List<PropertyValueAggregator> vertexAggregateFunctions,
+     List<String> edgeGroupingKeys,
+-    List<PropertyValueAggregator> edgeAggregateFunctions,
+-    RollUpType rollUpType,
+-    GroupingStrategy strategy) {
++    List<PropertyValueAggregator> edgeAggregateFunctions) {
+     this.vertexGroupingKeys = vertexGroupingKeys;
+     this.vertexAggregateFunctions = vertexAggregateFunctions;
+     this.edgeGroupingKeys = edgeGroupingKeys;
+     this.edgeAggregateFunctions = edgeAggregateFunctions;
+-    this.rollUpType = rollUpType;
+-    this.strategy = strategy;
+-  }
+-
+-  /**
+-   * Creates all combinations of the supplied grouping keys.
+-   *
+-   * @param groupingKeys list of all grouping keys to be combined
+-   * @return list containing all combinations of grouping keys
+-   */
+-  private List<List<String>> createGroupingKeyCombinations(List<String> groupingKeys) {
+-    List<List<String>> combinations = new ArrayList<>();
+-
+-    int elements = groupingKeys.size();
+-    while (elements > 0) {
+-      combinations.add(new ArrayList<>(groupingKeys.subList(0, elements)));
+-
+-      elements--;
+-    }
+-
+-    return combinations;
++    this.strategy = GroupingStrategy.GROUP_REDUCE;
+   }
+ 
+   /**
+@@ -175,43 +97,28 @@
+     DataSet<GraphHead> graphHeads = null;
+     DataSet<Vertex> vertices = null;
+     DataSet<Edge> edges = null;
+-    List<List<String>> groupingKeyCombinations;
+-    String groupingKeysPropertyKey;
+-
+-    if (rollUpType == RollUpType.VERTEX_ROLLUP) {
+-      groupingKeyCombinations = createGroupingKeyCombinations(vertexGroupingKeys);
+-      groupingKeysPropertyKey = VERTEX_GROUPING_KEYS_PROPERTY;
+-    } else {
+-      groupingKeyCombinations = createGroupingKeyCombinations(edgeGroupingKeys);
+-      groupingKeysPropertyKey = EDGE_GROUPING_KEYS_PROPERTY;
+-    }
++    List<List<String>> groupingKeyCombinations = getGroupingKeyCombinations();
+ 
+-    for (int c = 0; c <= groupingKeyCombinations.size() - 1; c++) {
+-      List<String> combination = groupingKeyCombinations.get(c);
+-      String newGraphHeadLabel = "g" + c;
+-      LogicalGraph groupedGraph;
++    // for each permutation execute a grouping
++    for (List<String> combination : groupingKeyCombinations) {
++      // apply the grouping
++      LogicalGraph groupedGraph = applyGrouping(graph, combination);
+ 
+-      if (rollUpType == RollUpType.VERTEX_ROLLUP) {
+-        groupedGraph = graph.groupBy(combination, vertexAggregateFunctions,
+-          edgeGroupingKeys, edgeAggregateFunctions, strategy);
+-      } else {
+-        groupedGraph = graph.groupBy(vertexGroupingKeys, vertexAggregateFunctions,
+-          combination, edgeAggregateFunctions, strategy);
+-      }
+-
++      // add a property to the grouped graph's head to specify the used keys
+       PropertyValue groupingKeys = PropertyValue.create(String.join(",", combination));
+-      DataSet<GraphHead> newGraphHead = groupedGraph.getGraphHead().map(
+-        new SetLabelAndProperty<>(
+-          newGraphHeadLabel, groupingKeysPropertyKey, groupingKeys));
++      DataSet<GraphHead> newGraphHead =
++        groupedGraph.getGraphHead().map(new SetProperty<>(getGraphPropertyKey(), groupingKeys));
+ 
+-      if (graphHeads == null && vertices == null && edges == null) {
+-        graphHeads = newGraphHead;
+-        vertices = groupedGraph.getVertices();
+-        edges = groupedGraph.getEdges();
+-      } else if (graphHeads != null && vertices != null && edges != null) {
++      if (graphHeads != null && vertices != null && edges != null) {
++        // in later iterations union the datasets of the grouped elements with the existing ones
+         graphHeads = graphHeads.union(newGraphHead);
+         vertices = vertices.union(groupedGraph.getVertices());
+         edges = edges.union(groupedGraph.getEdges());
++      } else {
++        // in the first iteration, fill the datasets
++        graphHeads = newGraphHead;
++        vertices = groupedGraph.getVertices();
++        edges = groupedGraph.getEdges();
+       }
+     }
+ 
+@@ -230,8 +137,58 @@
+     return collection;
+   }
+ 
+-  @Override
+-  public String getName() {
+-    return RollUp.class.getName();
++  /**
++   * Creates all combinations of the supplied grouping keys.
++   *
++   * @param groupingKeys list of all grouping keys to be combined
++   * @return list containing all combinations of grouping keys
++   */
++  List<List<String>> createGroupingKeyCombinations(List<String> groupingKeys) {
++    List<List<String>> combinations = new ArrayList<>();
++    int elements = groupingKeys.size();
++
++    while (elements > 0) {
++      combinations.add(new ArrayList<>(groupingKeys.subList(0, elements)));
++      elements--;
++    }
++
++    return combinations;
+   }
++
++  /**
++   * Set the grouping strategy that will be used for each grouping.
++   * {@link GroupingStrategy#GROUP_REDUCE} is used as default.
++   *
++   * @param strategy the strategy to use
++   */
++  public void setGroupingStrategy(GroupingStrategy strategy) {
++    this.strategy = strategy;
++  }
++
++  /**
++   * Get the property key that is added to each graph head of the grouped graphs inside the
++   * resulting collection to specify which property keys are used to group the graph.
++   *
++   * @return the property key as string
++   */
++  abstract String getGraphPropertyKey();
++
++  /**
++   * Apply the groupBy-operator to the given logical graph and use the given grouping keys as vertex
++   * or edge grouping keys (depends on the child class).
++   *
++   * @param graph the graph the group-By operator is applied on
++   * @param groupingKeys the vertex or edge grouping keys to use
++   * @return the grouped graph
++   */
++  abstract LogicalGraph applyGrouping(LogicalGraph graph, List<String> groupingKeys);
++
++  /**
++   * Returns all vertex or edge grouping key combinations as list. Internally the
++   * {@link RollUp#createGroupingKeyCombinations(List)} function is used to create the combinations.
++   * The child class decides, whether the vertex or edge keys are used.
++   *
++   * @return a list of all vertex or edge grouping key combinations used for rollup grouping
++   */
++  abstract List<List<String>> getGroupingKeyCombinations();
+ }
+Index: gradoop-flink/src/main/java/org/gradoop/flink/model/impl/operators/rollup/EdgeRollUp.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- gradoop-flink/src/main/java/org/gradoop/flink/model/impl/operators/rollup/EdgeRollUp.java	(date 1540803242000)
++++ gradoop-flink/src/main/java/org/gradoop/flink/model/impl/operators/rollup/EdgeRollUp.java	(date 1540803242000)
+@@ -0,0 +1,75 @@
++/*
++ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.gradoop.flink.model.impl.operators.rollup;
++
++import org.gradoop.flink.model.api.epgm.LogicalGraph;
++import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
++import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
++
++import java.util.List;
++
++/**
++ * Applies the groupBy-operator multiple times on a logical graph using different combinations of
++ * the given edge grouping keys according to the definition of the rollUp operation in SQL.
++ *
++ * See the description of the abstract class {@link RollUp} for further details.
++ */
++public class EdgeRollUp extends RollUp {
++  /**
++   * Property key used to store the grouping keys used for rollUp on edges.
++   */
++  private static final String EDGE_GROUPING_KEYS_PROPERTY = "edgeRollUpGroupingKeys";
++
++  /**
++   * Creates a edgeRollUp operator instance with {@link GroupingStrategy#GROUP_REDUCE} as grouping
++   * strategy. Use {@link RollUp#setGroupingStrategy(GroupingStrategy)} to define a different
++   * grouping strategy.
++   *
++   * @param vertexGroupingKeys grouping keys to group vertices
++   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
++   * @param edgeGroupingKeys grouping keys to group edges
++   * @param edgeAggregateFunctions aggregate functions to apply on super edges
++   */
++  public EdgeRollUp(
++    List<String> vertexGroupingKeys,
++    List<PropertyValueAggregator> vertexAggregateFunctions,
++    List<String> edgeGroupingKeys,
++    List<PropertyValueAggregator> edgeAggregateFunctions
++  ) {
++    super(vertexGroupingKeys, vertexAggregateFunctions, edgeGroupingKeys, edgeAggregateFunctions);
++  }
++
++  @Override
++  String getGraphPropertyKey() {
++    return EDGE_GROUPING_KEYS_PROPERTY;
++  }
++
++  @Override
++  LogicalGraph applyGrouping(LogicalGraph graph, List<String> groupingKeys) {
++    return graph.groupBy(vertexGroupingKeys, vertexAggregateFunctions, groupingKeys,
++      edgeAggregateFunctions, strategy);
++  }
++
++  @Override
++  List<List<String>> getGroupingKeyCombinations() {
++    return createGroupingKeyCombinations(edgeGroupingKeys);
++  }
++
++  @Override
++  public String getName() {
++    return VertexRollUp.class.getName();
++  }
++}
+Index: gradoop-flink/src/main/java/org/gradoop/flink/model/impl/operators/rollup/VertexRollUp.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- gradoop-flink/src/main/java/org/gradoop/flink/model/impl/operators/rollup/VertexRollUp.java	(date 1540803242000)
++++ gradoop-flink/src/main/java/org/gradoop/flink/model/impl/operators/rollup/VertexRollUp.java	(date 1540803242000)
+@@ -0,0 +1,77 @@
++/*
++ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package org.gradoop.flink.model.impl.operators.rollup;
++
++import org.gradoop.flink.model.api.epgm.LogicalGraph;
++import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
++import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
++  .PropertyValueAggregator;
++
++import java.util.List;
++
++/**
++ * Applies the groupBy-operator multiple times on a logical graph using different combinations of
++ * the given vertex grouping keys according to the definition of the rollUp operation in SQL.
++ *
++ * See the description of the abstract class {@link RollUp} for further details.
++ */
++public class VertexRollUp extends RollUp {
++
++  /**
++   * Property key used to store the grouping keys used for rollUp on vertices.
++   */
++  private static final String VERTEX_GROUPING_KEYS_PROPERTY = "vertexRollUpGroupingKeys";
++
++  /**
++   * Creates a vertexRollUp operator instance with {@link GroupingStrategy#GROUP_REDUCE} as grouping
++   * strategy. Use {@link RollUp#setGroupingStrategy(GroupingStrategy)} to define a different
++   * grouping strategy.
++   *
++   * @param vertexGroupingKeys grouping keys to group vertices
++   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
++   * @param edgeGroupingKeys grouping keys to group edges
++   * @param edgeAggregateFunctions aggregate functions to apply on super edges
++   */
++  public VertexRollUp(
++    List<String> vertexGroupingKeys,
++    List<PropertyValueAggregator> vertexAggregateFunctions,
++    List<String> edgeGroupingKeys,
++    List<PropertyValueAggregator> edgeAggregateFunctions
++  ) {
++    super(vertexGroupingKeys, vertexAggregateFunctions, edgeGroupingKeys, edgeAggregateFunctions);
++  }
++
++  @Override
++  String getGraphPropertyKey() {
++    return VERTEX_GROUPING_KEYS_PROPERTY;
++  }
++
++  @Override
++  LogicalGraph applyGrouping(LogicalGraph graph, List<String> groupingKeys) {
++    return graph.groupBy(groupingKeys, vertexAggregateFunctions, edgeGroupingKeys,
++      edgeAggregateFunctions, strategy);
++  }
++
++  @Override
++  List<List<String>> getGroupingKeyCombinations() {
++    return createGroupingKeyCombinations(vertexGroupingKeys);
++  }
++
++  @Override
++  public String getName() {
++    return VertexRollUp.class.getName();
++  }
++}

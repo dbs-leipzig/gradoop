@@ -20,22 +20,17 @@ import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * The SetLabelAndProperty MapFunction assigns a new label to an element and creates a property
- * using the supplied property key and value.
+ * The SetProperty MapFunction assigns a new property to a given graph element using the supplied
+ * property key and value.
  *
  * @param <E> gradoop element
  */
-public class SetLabelAndProperty<E extends Element> implements MapFunction<E, E> {
+public class SetProperty<E extends Element> implements MapFunction<E, E> {
 
   /**
    * serialVersionUID
    */
   private static final long serialVersionUID = 42L;
-
-  /**
-   * New label of the element.
-   */
-  private String label;
 
   /**
    * Property key used to set the value.
@@ -48,29 +43,25 @@ public class SetLabelAndProperty<E extends Element> implements MapFunction<E, E>
   private PropertyValue propertyValue;
 
   /**
-   * Creates an instance of SetLabelAndProperty.
+   * Creates an instance of SetProperty.
    *
-   * @param label         new grapHead label
    * @param propertyKey   property key used to store the grouping keys
    * @param propertyValue property value to be set
    */
-  public SetLabelAndProperty(String label, String propertyKey, PropertyValue propertyValue) {
-    this.label = label;
+  public SetProperty(String propertyKey, PropertyValue propertyValue) {
     this.propertyKey = propertyKey;
     this.propertyValue = propertyValue;
   }
 
   /**
-   * Updates the element's label and creates the property.
+   * Adds a new property to the element.
    *
-   * @param element  original element to be updated
+   * @param element original element to be updated
    * @return updated element
    */
   @Override
   public E map(E element) throws Exception {
-    element.setLabel(label);
     element.setProperty(propertyKey, propertyValue);
-
     return element;
   }
 }

@@ -53,8 +53,8 @@ import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhoo
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.propertytransformation.PropertyTransformation;
-import org.gradoop.flink.model.impl.operators.rollup.RollUp;
-import org.gradoop.flink.model.impl.operators.rollup.RollUp.RollUpType;
+import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
+import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.gradoop.flink.model.impl.operators.split.Split;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
@@ -460,16 +460,11 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
     List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions) {
     if (vertexGroupingKeys == null || vertexGroupingKeys.isEmpty()) {
-      throw new IllegalArgumentException("missing vertex grouping key(s)");
+      throw new IllegalArgumentException("Missing vertex grouping key(s).");
     }
 
-    return callForCollection(
-      new RollUp(
-        vertexGroupingKeys,
-        vertexAggregateFunctions,
-        edgeGroupingKeys,
-        edgeAggregateFunctions,
-        RollUpType.VERTEX_ROLLUP));
+    return callForCollection(new VertexRollUp(vertexGroupingKeys, vertexAggregateFunctions,
+      edgeGroupingKeys, edgeAggregateFunctions));
   }
 
   @Override
@@ -477,16 +472,11 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
     List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions) {
     if (edgeGroupingKeys == null || edgeGroupingKeys.isEmpty()) {
-      throw new IllegalArgumentException("missing edge grouping key(s)");
+      throw new IllegalArgumentException("Missing edge grouping key(s).");
     }
 
-    return callForCollection(
-      new RollUp(
-        vertexGroupingKeys,
-        vertexAggregateFunctions,
-        edgeGroupingKeys,
-        edgeAggregateFunctions,
-        RollUpType.EDGE_ROLLUP));
+    return callForCollection(new EdgeRollUp(vertexGroupingKeys, vertexAggregateFunctions,
+      edgeGroupingKeys, edgeAggregateFunctions));
   }
 
   //----------------------------------------------------------------------------
