@@ -185,7 +185,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
       "]");
     GraphCollection expected = loader.getGraphCollection();
 
-    List<String> vertexGK = new ArrayList<>(Arrays.asList("age", "gender", "city"));
+    List<String> vertexGK = Arrays.asList("age", "gender", "city");
     List<PropertyValueAggregator> vertexAGG =
       Collections.singletonList(new CountAggregator("count"));
     List<String> edgeGK = Collections.emptyList();
