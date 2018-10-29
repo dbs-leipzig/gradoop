@@ -18,7 +18,6 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 
 /**
@@ -29,20 +28,23 @@ import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 public class VertexFromTemporal implements MapFunction<TemporalVertex, Vertex> {
 
   /**
-   * The factory to init the EPGM Vertex
+   * Used to reduce instantiations
    */
-  private VertexFactory vertexFactory;
+  private Vertex reuse;
 
   /**
-   * Creates an instance of the EdgeFromTemporal map function
+   * Creates an instance of the VertexFromTemporal map function
    */
   public VertexFromTemporal() {
-    this.vertexFactory = new VertexFactory();
+    this.reuse = new Vertex();
   }
 
   @Override
   public Vertex map(TemporalVertex value) throws Exception {
-    return vertexFactory
-      .initVertex(value.getId(), value.getLabel(), value.getProperties(), value.getGraphIds());
+    reuse.setId(value.getId());
+    reuse.setLabel(value.getLabel());
+    reuse.setProperties(value.getProperties());
+    reuse.setGraphIds(value.getGraphIds());
+    return reuse;
   }
 }

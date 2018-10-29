@@ -18,7 +18,6 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
 
 /**
@@ -29,19 +28,22 @@ import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
 public class GraphHeadFromTemporal implements MapFunction<TemporalGraphHead, GraphHead> {
 
   /**
-   * The factory to init the EPGM GraphHead
+   * Used to reduce instantiations
    */
-  private GraphHeadFactory factory;
+  private GraphHead reuse;
 
   /**
    * Creates an instance of the GraphHeadFromTemporal map function
    */
   public GraphHeadFromTemporal() {
-    this.factory = new GraphHeadFactory();
+    this.reuse = new GraphHead();
   }
 
   @Override
   public GraphHead map(TemporalGraphHead value) throws Exception {
-    return factory.initGraphHead(value.getId(), value.getLabel(), value.getProperties());
+    reuse.setId(value.getId());
+    reuse.setLabel(value.getLabel());
+    reuse.setProperties(value.getProperties());
+    return reuse;
   }
 }

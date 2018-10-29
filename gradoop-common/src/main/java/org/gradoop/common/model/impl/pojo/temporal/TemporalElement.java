@@ -28,11 +28,11 @@ import org.gradoop.common.model.impl.properties.Properties;
 public abstract class TemporalElement extends Element implements EPGMElement {
 
   /**
-   * The default value for unset valid times.
+   * The default value for unset valid times (validFrom and validTo).
    */
   public static final Long DEFAULT_VALID_TIME = 0L;
   /**
-   * The default value for unset valid times.
+   * The default value for unset end of transaction time.
    */
   public static final Long DEFAULT_TX_TO = Long.MAX_VALUE;
   /**
@@ -47,7 +47,7 @@ public abstract class TemporalElement extends Element implements EPGMElement {
   private Tuple2<Long, Long> validTime;
 
   /**
-   * Default constructor.
+   * Default constructor. Needed because of Flink's POJO rules.
    */
   public TemporalElement() {
     transactionTime = new Tuple2<>();
@@ -165,5 +165,16 @@ public abstract class TemporalElement extends Element implements EPGMElement {
    */
   public Long getTxTo() {
     return this.transactionTime.f1;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("%s%s%s[tx%s,val%s]{%s}",
+      id,
+      label == null || label.equals("") ? "" : ":",
+      label,
+      getTransactionTime(),
+      getValidTime(),
+      properties == null ? "" : properties);
   }
 }

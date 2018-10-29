@@ -106,7 +106,7 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
    * @param layout Graph collection layout
    * @param config Gradoop Flink configuration
    */
-  protected GraphCollection(GraphCollectionLayout layout, GradoopFlinkConfig config) {
+  GraphCollection(GraphCollectionLayout layout, GradoopFlinkConfig config) {
     Objects.requireNonNull(layout);
     Objects.requireNonNull(config);
     this.layout = layout;

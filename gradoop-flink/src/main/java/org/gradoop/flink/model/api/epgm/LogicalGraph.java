@@ -109,7 +109,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * @param layout representation of the logical graph
    * @param config Gradoop Flink configuration
    */
-  protected LogicalGraph(LogicalGraphLayout layout, GradoopFlinkConfig config) {
+  LogicalGraph(LogicalGraphLayout layout, GradoopFlinkConfig config) {
     Objects.requireNonNull(layout);
     Objects.requireNonNull(config);
     this.layout = layout;
@@ -277,8 +277,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    */
   @Override
   public GraphCollection query(String query, String constructionPattern, boolean attachData,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
-    GraphStatistics graphStatistics) {
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     return callForCollection(new CypherPatternMatching(query, constructionPattern, attachData,
       vertexStrategy, edgeStrategy, graphStatistics));
   }

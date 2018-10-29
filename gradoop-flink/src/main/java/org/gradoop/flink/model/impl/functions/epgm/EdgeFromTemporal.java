@@ -18,7 +18,6 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
 
 /**
@@ -29,20 +28,25 @@ import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
 public class EdgeFromTemporal implements MapFunction<TemporalEdge, Edge> {
 
   /**
-   * The factory to init the EPGM Edge
+   * Used to reduce instantiations
    */
-  private EdgeFactory factory;
+  private Edge reuse;
 
   /**
    * Creates an instance of the EdgeFromTemporal map function
    */
   public EdgeFromTemporal() {
-    this.factory = new EdgeFactory();
+    this.reuse = new Edge();
   }
 
   @Override
   public Edge map(TemporalEdge value) throws Exception {
-    return factory.initEdge(value.getId(), value.getLabel(), value.getSourceId(),
-      value.getTargetId(), value.getProperties(), value.getGraphIds());
+    reuse.setId(value.getId());
+    reuse.setLabel(value.getLabel());
+    reuse.setSourceId(value.getSourceId());
+    reuse.setTargetId(value.getTargetId());
+    reuse.setProperties(value.getProperties());
+    reuse.setGraphIds(value.getGraphIds());
+    return reuse;
   }
 }
