@@ -237,7 +237,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
 
     List<String> vertexGK = Collections.emptyList();
     List<PropertyValueAggregator> vertexAGG = Collections.emptyList();
-    List<String> edgeGK = new ArrayList<>(Arrays.asList(Grouping.LABEL_SYMBOL,
+    List<String> edgeGK = Arrays.asList(Grouping.LABEL_SYMBOL,
       "since", "vertexCount"));
     List<PropertyValueAggregator> edgeAGG = Collections.singletonList(new CountAggregator("count"));
     
