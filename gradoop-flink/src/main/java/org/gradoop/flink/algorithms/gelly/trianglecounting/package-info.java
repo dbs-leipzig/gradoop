@@ -13,20 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.matching.common.statistics;
-
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
-import org.junit.BeforeClass;
-
-public class GraphStatisticsLocalFSReaderTest extends GraphStatisticsTest {
-
-  @BeforeClass
-  public static void setUp() throws Exception {
-    TEST_STATISTICS = GraphStatisticsLocalFSReader.read(
-      URLDecoder.decode(
-        GraphStatisticsLocalFSReaderTest.class.getResource("/data/json/sna/statistics")
-        .getFile(), StandardCharsets.UTF_8.name()));
-  }
-}
+/**
+ * Contains classes related to the Triangle Counting algorithm.
+ */
+package org.gradoop.flink.algorithms.gelly.trianglecounting;

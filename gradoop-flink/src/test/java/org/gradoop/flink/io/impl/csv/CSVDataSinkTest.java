@@ -187,13 +187,9 @@ public class CSVDataSinkTest extends CSVTestBase {
   public void testWriteWithExistingMetaData() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    String csvPath = CSVDataSinkTest.class
-      .getResource("/data/csv/input_graph_collection")
-      .getFile();
+    String csvPath = getFilePath("/data/csv/input_graph_collection");
 
-    String gdlPath = CSVDataSinkTest.class
-      .getResource("/data/csv/expected/expected_graph_collection.gdl")
-      .getFile();
+    String gdlPath = getFilePath("/data/csv/expected/expected_graph_collection.gdl");
 
     LogicalGraph input = getLoaderFromFile(gdlPath).getLogicalGraphByVariable("expected");
 
