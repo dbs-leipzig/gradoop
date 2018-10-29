@@ -47,7 +47,7 @@ public class SetProperty<E extends Element> implements MapFunction<E, E> {
   /**
    * Creates an instance of SetProperty.
    *
-   * @param propertyKey   property key used to store the grouping keys
+   * @param propertyKey the property key
    * @param propertyValue property value to be set
    */
   public SetProperty(String propertyKey, PropertyValue propertyValue) {
