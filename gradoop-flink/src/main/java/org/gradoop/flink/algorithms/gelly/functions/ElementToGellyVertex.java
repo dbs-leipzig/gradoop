@@ -19,11 +19,11 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Vertex;
 
 /**
- * Convert class I to a Gelly Vertex.
+ * Convert class I to a Gelly Vertex with K key and VV value.
  *
- * @param <I> Input type.
- * @param <K> Key type of the output gelly vertex.
- * @param <VV> Value type of the output gelly vertex.
+ * @param <I>   Input type.
+ * @param <K>   Key type of the output gelly vertex.
+ * @param <VV>  Value type of the output gelly vertex.
  */
 public interface ElementToGellyVertex<I, K, VV> extends MapFunction<I, Vertex<K, VV>> {
 }

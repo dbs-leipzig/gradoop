@@ -25,8 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * Builds edge triples with long id's.
  */
 public class CreateLongTargetIds
-  implements JoinFunction<Tuple4<Long, GradoopId, Long, GradoopId>,
-  Tuple2<Long, GradoopId>,
+  implements JoinFunction<Tuple4<Long, GradoopId, Long, GradoopId>, Tuple2<Long, GradoopId>,
   Tuple4<Long, GradoopId, Long, Long>> {
 
   /**

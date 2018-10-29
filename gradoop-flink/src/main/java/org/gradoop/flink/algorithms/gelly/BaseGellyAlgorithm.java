@@ -20,12 +20,12 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
 
 /**
- * Base Class for Gelly Algorithms.
+ * Base class for Algorithms executed in Flink Gelly.
  *
- * @param <K> Key type of output gelly graph.
- * @param <VV> Value type of output gelly vertex.
- * @param <EV> Value type of output gelly edge.
- * @param <O> Output type.
+ * @param <K>   Key type of output gelly graph.
+ * @param <VV>  Value type of output gelly vertex.
+ * @param <EV>  Value type of output gelly edge.
+ * @param <O>   Output type.
  */
 public abstract class BaseGellyAlgorithm<K, VV, EV, O> implements UnaryGraphToValueOperator<O> {
 

@@ -100,7 +100,7 @@ public class ValueConnectedComponentsTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Parses the results into a ComponentID,Count(v) Map.
+   * Parses the results into a {@code Map<ComponentID,Count(v)>}.
    *
    * @param vertexComponentList lists of vertices with its corresponding component id
    * @return parsed map.

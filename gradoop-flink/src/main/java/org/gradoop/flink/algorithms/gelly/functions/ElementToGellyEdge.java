@@ -19,11 +19,11 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Edge;
 
 /**
- * Convert class I to a Gelly Edge.
+ * Convert class I to a Gelly Edge with K key and EV value.
  *
- * @param <I> Input type.
- * @param <K> Key type of the output gelly edge.
- * @param <EV> Value type of the output gelly vertex.
+ * @param <I>   Input type.
+ * @param <K>   Key type of the output gelly edge.
+ * @param <EV>  Value type of the output gelly vertex.
  */
 public interface ElementToGellyEdge<I, K, EV> extends MapFunction<I, Edge<K, EV>> {
 }

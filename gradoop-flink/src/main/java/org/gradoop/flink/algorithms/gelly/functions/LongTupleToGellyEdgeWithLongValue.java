@@ -21,9 +21,9 @@ import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Map function to create gelly edge with long key and long value.
+ * Map function to create gelly edge from long tuple.
  */
-public class LongLongToGellyEdgeWithLongValue
+public class LongTupleToGellyEdgeWithLongValue
   implements ElementToGellyEdge<Tuple4<Long, GradoopId, Long, Long>, Long, NullValue> {
 
   /**
@@ -34,7 +34,7 @@ public class LongLongToGellyEdgeWithLongValue
   /**
    * Constructor.
    */
-  public LongLongToGellyEdgeWithLongValue() {
+  public LongTupleToGellyEdgeWithLongValue() {
     reuse = new Edge<>();
     reuse.setValue(NullValue.getInstance());
   }

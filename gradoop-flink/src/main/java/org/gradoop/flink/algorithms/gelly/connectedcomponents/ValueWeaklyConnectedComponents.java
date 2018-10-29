@@ -27,8 +27,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.gelly.BaseGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.CreateLongSourceIds;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.CreateLongTargetIds;
-import org.gradoop.flink.algorithms.gelly.functions.LongLongToGellyEdgeWithLongValue;
-import org.gradoop.flink.algorithms.gelly.functions.LongLongToGellyVertexWithLongValue;
+import org.gradoop.flink.algorithms.gelly.functions.LongTupleToGellyEdgeWithLongValue;
+import org.gradoop.flink.algorithms.gelly.functions.LongTupleToGellyVertexWithLongValue;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.MapVertexIdComponentId;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -37,7 +37,6 @@ import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 /**
  * A gradoop operator wrapping Flinks ScatterGatherIteration-Algorithm for ConnectedComponents
  * {@link org.apache.flink.graph.library.ConnectedComponents}.
- * The Results are kept in a set for further processing.
  */
 public class ValueWeaklyConnectedComponents
   extends BaseGellyAlgorithm<Long, Long, NullValue, DataSet<Tuple2<Long, Long>>> {
@@ -51,7 +50,7 @@ public class ValueWeaklyConnectedComponents
   /**
    * Constructor.
    *
-   * @param k Max number of gelly iterations.
+   * @param k Max number of Gelly iterations.
    */
   public ValueWeaklyConnectedComponents(int k) {
     this.maxIteration = k;
@@ -70,7 +69,7 @@ public class ValueWeaklyConnectedComponents
       DataSetUtils.zipWithUniqueId(graph.getVertices().map(new Id<>()));
 
     DataSet<Vertex<Long, Long>> vertices = uniqueVertexID
-        .map(new LongLongToGellyVertexWithLongValue());
+        .map(new LongTupleToGellyVertexWithLongValue());
 
     DataSet<Edge<Long, NullValue>> edges =
       uniqueVertexID
@@ -80,7 +79,7 @@ public class ValueWeaklyConnectedComponents
       .join(uniqueVertexID)
       .where(3).equalTo(1)
       .with(new CreateLongTargetIds())
-      .map(new LongLongToGellyEdgeWithLongValue());
+      .map(new LongTupleToGellyEdgeWithLongValue());
 
     return Graph.fromDataSet(vertices, edges, graph.getConfig().getExecutionEnvironment());
   }

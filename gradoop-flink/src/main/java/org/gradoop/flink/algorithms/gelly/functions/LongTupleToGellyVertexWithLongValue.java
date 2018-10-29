@@ -20,9 +20,9 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Map function to create gelly vertices with long key and long value.
+ * Map function to create gelly vertices from long tuple.
  */
-public class LongLongToGellyVertexWithLongValue
+public class LongTupleToGellyVertexWithLongValue
   implements ElementToGellyVertex<Tuple2<Long, GradoopId>, Long, Long> {
 
   /**
@@ -33,7 +33,7 @@ public class LongLongToGellyVertexWithLongValue
   /**
    * Constructor
    */
-  public LongLongToGellyVertexWithLongValue() {
+  public LongTupleToGellyVertexWithLongValue() {
     this.vertex = new Vertex<>();
   }
 
