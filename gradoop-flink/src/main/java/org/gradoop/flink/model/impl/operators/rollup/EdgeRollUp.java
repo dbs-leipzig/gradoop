@@ -70,6 +70,6 @@ public class EdgeRollUp extends RollUp {
 
   @Override
   public String getName() {
-    return VertexRollUp.class.getName();
+    return EdgeRollUp.class.getName();
   }
 }
