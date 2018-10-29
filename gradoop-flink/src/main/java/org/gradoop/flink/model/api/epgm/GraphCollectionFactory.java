@@ -22,6 +22,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -116,33 +117,29 @@ public class GraphCollectionFactory {
   }
 
   /**
-   * Creates a graph collection from a given logical graph.
+   * Creates a graph collection from one or more given logical graphs.
    *
-   * @param logicalGraphLayout  input graph
-   * @return 1-element graph collection
+   * @param logicalGraphLayouts one or more logical graphs
+   * @return one- or multi-element graph collection
    */
-  public GraphCollection fromGraph(LogicalGraph logicalGraphLayout) {
-    return new GraphCollection(layoutFactory.fromGraphLayout(logicalGraphLayout), config);
-  }
-  
-  /**
-   * Creates a graph collection from a given logical graph collection.
-   * @param logicalGraphLayoutCollection input graph collection
-   * @return multi-element graph collection
-   */
-  public GraphCollection fromGraphs(Collection<LogicalGraph> logicalGraphLayoutCollection) {
-    GraphCollection graphCollection = null;
-    if (!logicalGraphLayoutCollection.isEmpty()) {
-      for (LogicalGraph lgl : logicalGraphLayoutCollection) {
-        if (graphCollection == null) {
-          graphCollection = new GraphCollection(layoutFactory.fromGraphLayout(lgl), config);
-        } else {
-          graphCollection = graphCollection
-              .union(new GraphCollection(layoutFactory.fromGraphLayout(lgl), config));
-        }
+  public GraphCollection fromGraph(LogicalGraph... logicalGraphLayouts) {
+    DataSet<GraphHead> graphHeads = null;
+    DataSet<Vertex> vertices = null;
+    DataSet<Edge> edges = null;
+
+    for (LogicalGraph lgl : logicalGraphLayouts) {
+      if (graphHeads == null) {
+        graphHeads = lgl.getGraphHead();
+        vertices = lgl.getVertices();
+        edges = lgl.getEdges();
+      } else {
+        graphHeads = graphHeads.union(lgl.getGraphHead());
+        vertices = vertices.union(lgl.getVertices());
+        edges = edges.union(lgl.getEdges());
       }
     }
-    return graphCollection;
+    return new GraphCollection(layoutFactory.fromDataSets(graphHeads.distinct(new Id<GraphHead>()),
+        vertices.distinct(new Id<Vertex>()), edges.distinct(new Id<Edge>())), config);
   }
 
   /**
