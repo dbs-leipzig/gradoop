@@ -17,8 +17,8 @@ package org.gradoop.examples.io;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.dataintegration.importer.rdbmsimporter.RdbmsDataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
-import org.gradoop.flink.io.impl.rdbms.RdbmsDataSource;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -62,7 +62,7 @@ public class RdbmsExample implements ProgramDescription {
 
     // create default Gradoop configuration
     GradoopFlinkConfig gfc = GradoopFlinkConfig.createConfig(env);
-
+     
     // create DataSource
     RdbmsDataSource dataSource = new RdbmsDataSource(url, user, pw, jdbcDriverPath,
         jdbcDriverClassName, gfc);

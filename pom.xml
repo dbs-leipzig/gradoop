@@ -540,6 +540,12 @@
                 <artifactId>gradoop-store-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            
+            <dependency>
+                <groupId>org.gradoop</groupId>
+                <artifactId>gradoop-data-integration</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- Flink -->
             <dependency>
