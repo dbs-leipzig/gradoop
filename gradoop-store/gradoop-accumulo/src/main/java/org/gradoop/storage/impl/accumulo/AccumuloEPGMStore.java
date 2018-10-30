@@ -156,7 +156,7 @@ public class AccumuloEPGMStore implements
    */
   public Connector createConnector() throws AccumuloSecurityException, AccumuloException {
     return new ZooKeeperInstance(
-      /*instannce*/config.get(GradoopAccumuloConfig.ACCUMULO_INSTANCE, AccumuloDefault.INSTANCE),
+      /*instance*/config.get(GradoopAccumuloConfig.ACCUMULO_INSTANCE, AccumuloDefault.INSTANCE),
       /*zookeepers*/config.get(GradoopAccumuloConfig.ZOOKEEPER_HOSTS, AccumuloDefault.ZOOKEEPERS)
     ).getConnector(
       /*user*/config.get(GradoopAccumuloConfig.ACCUMULO_USER, AccumuloDefault.USER),

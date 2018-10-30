@@ -19,7 +19,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
@@ -29,10 +28,9 @@ import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.storage.common.predicate.query.Query;
-import org.gradoop.storage.config.GradoopHBaseConfig;
-import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
-import org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
+import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
 import org.gradoop.storage.impl.hbase.io.HBaseDataSource;
+import org.gradoop.storage.utils.AccumuloFilters;
 import org.gradoop.storage.utils.HBaseFilters;
 
 import java.io.File;
@@ -49,7 +47,7 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
    */
   private static final String OPTION_INPUT_PATH = "i";
   /**
-   * Option to declare input graph format (csv, indexed, hbase)
+   * Option to declare input graph format (csv, indexed, hbase, accumulo)
    */
   private static final String OPTION_INPUT_FORMAT = "f";
   /**
@@ -77,11 +75,11 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
    */
   private static final String OPTION_USE_PREDICATE_PUSHDOWN = "r";
   /**
-   * Used input path or table prefix (HBase)
+   * Used input path or table prefix (HBase, Accumulo)
    */
   private static String INPUT_PATH;
   /**
-   * Used input format (csv, indexed, hbase)
+   * Used input format (csv, indexed, hbase, accumulo)
    */
   private static String INPUT_FORMAT;
   /**
@@ -111,9 +109,9 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
 
   static {
     OPTIONS.addOption(OPTION_INPUT_PATH, "input", true,
-      "Path to csv source files or table prefix (if HBase is chosen as format).");
+      "Path to csv source files or table prefix (if a store is chosen as format).");
     OPTIONS.addOption(OPTION_INPUT_FORMAT, "format", true,
-      "Input graph format (csv, indexed, hbase).");
+      "Input graph format (csv, indexed, hbase, accumulo).");
     OPTIONS.addOption(OPTION_OUTPUT_PATH, "output", true,
       "Path to output file");
     OPTIONS.addOption(OPTION_CSV_PATH, "csv", true,
@@ -154,23 +152,24 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
     GradoopFlinkConfig conf = GradoopFlinkConfig.createConfig(env);
 
     // read graph
-    DataSource source;
+    DataSource source = getDataSource(INPUT_PATH, INPUT_FORMAT, conf);
 
-    if (INPUT_FORMAT.equals("hbase")) {
-      HBaseEPGMStore hBaseEPGMStore = HBaseEPGMStoreFactory.createOrOpenEPGMStore(
-        HBaseConfiguration.create(),
-        GradoopHBaseConfig.getDefaultConfig(),
-        INPUT_PATH + ".");
-      source = new HBaseDataSource(hBaseEPGMStore, conf);
-      // Apply predicate if flag is set
-      if (USE_PREDICATE_PUSHDOWN) {
-        source = ((HBaseDataSource) source).applyVertexPredicate(Query.elements().fromAll()
-          .where(HBaseFilters.labelIn(VERTEX_LABEL)));
-        source = ((HBaseDataSource) source).applyEdgePredicate(Query.elements().fromAll()
-          .where(HBaseFilters.labelIn(EDGE_LABEL)));
+    if (USE_PREDICATE_PUSHDOWN) {
+      switch (INPUT_FORMAT) {
+      case FORMAT_HBASE:
+        source = ((HBaseDataSource) source).applyVertexPredicate(
+          Query.elements().fromAll().where(HBaseFilters.labelIn(VERTEX_LABEL)));
+        source = ((HBaseDataSource) source).applyEdgePredicate(
+          Query.elements().fromAll().where(HBaseFilters.labelIn(EDGE_LABEL)));
+        break;
+
+      case FORMAT_ACCUMULO:
+        source = ((AccumuloDataSource) source).applyVertexPredicate(
+          Query.elements().fromAll().where(AccumuloFilters.labelIn(VERTEX_LABEL)));
+        source = ((AccumuloDataSource) source).applyEdgePredicate(
+          Query.elements().fromAll().where(AccumuloFilters.labelIn(EDGE_LABEL)));
+        break;
       }
-    } else {
-      source = getDataSource(INPUT_PATH, INPUT_FORMAT, conf);
     }
 
     LogicalGraph graph = source.getLogicalGraph();
@@ -200,9 +199,7 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
    */
   private static void readCMDArguments(CommandLine cmd) {
     INPUT_PATH   = cmd.getOptionValue(OPTION_INPUT_PATH);
-    // Set indexed as default format
-    INPUT_FORMAT = cmd.hasOption(OPTION_INPUT_FORMAT) ?
-      cmd.getOptionValue(OPTION_INPUT_FORMAT) : "indexed";
+    INPUT_FORMAT = cmd.getOptionValue(OPTION_INPUT_FORMAT);
     OUTPUT_PATH  = cmd.getOptionValue(OPTION_OUTPUT_PATH);
     CSV_PATH     = cmd.getOptionValue(OPTION_CSV_PATH);
     VERTEX_LABEL = cmd.getOptionValue(OPTION_VERTEX_LABEL);
@@ -217,6 +214,9 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
    * @param cmd command line
    */
   private static void performSanityCheck(CommandLine cmd) {
+    if (!cmd.hasOption(OPTION_INPUT_FORMAT)) {
+      throw new IllegalArgumentException("Define a graph input format.");
+    }
     if (!cmd.hasOption(OPTION_INPUT_PATH)) {
       throw new IllegalArgumentException("Define a graph input directory.");
     }

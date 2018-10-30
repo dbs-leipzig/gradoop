@@ -1,0 +1,5 @@
+#Accumulo Configuration Properties
+accumulo.user=root
+accumulo.password=password
+accumulo.instance=gradoop
+zookeeper.hosts=localhost:2181

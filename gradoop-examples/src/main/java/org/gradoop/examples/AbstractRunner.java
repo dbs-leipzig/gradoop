@@ -21,6 +21,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
@@ -34,9 +35,21 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.flink.io.impl.deprecated.logicalgraphcsv.LogicalGraphCSVDataSource;
 import org.gradoop.flink.io.impl.deprecated.logicalgraphcsv.LogicalGraphIndexedCSVDataSource;
+import org.gradoop.storage.config.GradoopAccumuloConfig;
+import org.gradoop.storage.config.GradoopHBaseConfig;
+import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
+import org.gradoop.storage.impl.accumulo.io.AccumuloDataSink;
+import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
+import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
+import org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
+import org.gradoop.storage.impl.hbase.io.HBaseDataSink;
+import org.gradoop.storage.impl.hbase.io.HBaseDataSource;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * Base class for example runners.
@@ -47,13 +60,37 @@ public abstract class AbstractRunner {
    */
   protected static final Options OPTIONS = new Options();
   /**
+   * Csv graph source/sink format
+   */
+  protected static final String FORMAT_CSV = "csv";
+  /**
+   * (Label) Indexed CSV graph source/sink format
+   */
+  protected static final String FORMAT_INDEXED = "indexed";
+  /**
+   * Json graph source/sink format
+   */
+  protected static final String FORMAT_JSON = "json";
+  /**
+   * HBase store as graph source/sink format
+   */
+  protected static final String FORMAT_HBASE = "hbase";
+  /**
+   * Accumulo store as graph source/sink format
+   */
+  protected static final String FORMAT_ACCUMULO = "accumulo";
+  /**
    * Graph format used as default
    */
-  protected static final String DEFAULT_FORMAT = "csv";
+  protected static final String DEFAULT_FORMAT = FORMAT_CSV;
   /**
    * Flink execution environment.
    */
   private static ExecutionEnvironment ENV;
+
+  private static HBaseEPGMStore HBASE_STORE;
+
+  private static AccumuloEPGMStore ACCUMULO_STORE;
 
   /**
    * Parses the program arguments and performs sanity checks.
@@ -78,8 +115,9 @@ public abstract class AbstractRunner {
    *
    * @param directory path to EPGM database
    * @return EPGM logical graph
+   * @throws Exception on failure during graph loading
    */
-  protected static LogicalGraph readLogicalGraph(String directory) throws IOException {
+  protected static LogicalGraph readLogicalGraph(String directory) throws Exception {
     return readLogicalGraph(directory, DEFAULT_FORMAT);
   }
 
@@ -89,10 +127,10 @@ public abstract class AbstractRunner {
    * @param directory path to EPGM database
    * @param format format in which the graph is stored (csv, indexed, json)
    * @return EPGM logical graph
-   * @throws IOException on failure
+   * @throws Exception on failure
    */
   protected static LogicalGraph readLogicalGraph(String directory, String format)
-    throws IOException {
+    throws Exception {
     return getDataSource(directory, format).getLogicalGraph();
   }
 
@@ -102,10 +140,10 @@ public abstract class AbstractRunner {
    * @param directory path to EPGM database
    * @param format format in which the graph collection is stored (csv, indexed, json)
    * @return EPGM graph collection
-   * @throws IOException on failure
+   * @throws Exception on failure
    */
   protected static GraphCollection readGraphCollection(String directory, String format)
-    throws IOException {
+    throws Exception {
     return getDataSource(directory, format).getGraphCollection();
   }
 
@@ -210,9 +248,9 @@ public abstract class AbstractRunner {
    * @param directory input path
    * @param format format in which the data is stored (csv, indexed, json)
    * @return DataSource for EPGM Data
-   * @throws IOException on failure
+   * @throws Exception on failure
    */
-  private static DataSource getDataSource(String directory, String format) throws IOException {
+  private static DataSource getDataSource(String directory, String format) throws Exception {
     return getDataSource(directory, format,
       GradoopFlinkConfig.createConfig(getExecutionEnvironment()));
   }
@@ -220,28 +258,36 @@ public abstract class AbstractRunner {
   /**
    * Returns an EPGM DataSource for a given directory and format.
    *
-   * @param directory input path
-   * @param format format in which the data is stored (csv, indexed, json)
+   * @param directory input path (or table prefix for store formats, e.g. "mytable.")
+   * @param format format in which the data is stored (csv, indexed, json, hbase, accumulo)
    * @param config the gradoop flink configuration
    * @return DataSource for EPGM Data
-   * @throws IOException on failure
+   * @throws Exception on failure
    */
   protected static DataSource getDataSource(String directory, String format,
-    GradoopFlinkConfig config) throws IOException {
-    directory = appendSeparator(directory);
+    GradoopFlinkConfig config) throws Exception {
     format = format.toLowerCase();
 
     switch (format) {
-    case "json":
+    case FORMAT_JSON:
+      directory = appendSeparator(directory);
       return new JSONDataSource(directory, config);
-    case "csv":
+    case FORMAT_CSV:
+      directory = appendSeparator(directory);
       return new CSVDataSource(directory, config);
-    case "indexed":
+    case FORMAT_INDEXED:
+      directory = appendSeparator(directory);
       return new IndexedCSVDataSource(directory, config);
     case "lgcsv":
+      directory = appendSeparator(directory);
       return new LogicalGraphCSVDataSource(directory, config);
     case "lgindexed":
+      directory = appendSeparator(directory);
       return new LogicalGraphIndexedCSVDataSource(directory, config);
+    case FORMAT_HBASE:
+      return new HBaseDataSource(getHBaseStore(directory), config);
+    case FORMAT_ACCUMULO:
+      return new AccumuloDataSource(getAccumuloStore(directory), config);
     default:
       throw new IllegalArgumentException("Unsupported format: " + format);
     }
@@ -250,24 +296,100 @@ public abstract class AbstractRunner {
   /**
    * Returns an EPGM DataSink for a given directory and format.
    *
-   * @param directory output path
-   * @param format output format (csv, indexed, json)
+   * @param directory output path (or table prefix for store formats, e.g. "mytable.")
+   * @param format output format (csv, indexed, json, hbase, accumulo)
    * @param config gradoop config
    * @return DataSink for EPGM Data
+   * @throws Exception if creation of the sink fails
    */
-  private static DataSink getDataSink(String directory, String format, GradoopFlinkConfig config) {
-    directory = appendSeparator(directory);
+  private static DataSink getDataSink(String directory, String format, GradoopFlinkConfig config)
+  throws Exception{
     format = format.toLowerCase();
 
     switch (format) {
-    case "json":
+    case FORMAT_JSON:
+      directory = appendSeparator(directory);
       return new JSONDataSink(directory, config);
-    case "csv":
+    case FORMAT_CSV:
+      directory = appendSeparator(directory);
       return new CSVDataSink(directory, config);
-    case "indexed":
+    case FORMAT_INDEXED:
+      directory = appendSeparator(directory);
       return new IndexedCSVDataSink(directory, config);
+    case FORMAT_HBASE:
+      return new HBaseDataSink(getHBaseStore(directory), config);
+    case FORMAT_ACCUMULO:
+      return new AccumuloDataSink(getAccumuloStore(directory), config);
     default:
       throw new IllegalArgumentException("Unsupported format: " + format);
     }
+  }
+
+  /**
+   * Get an HBase EPGM store instance that uses the given table prefix.
+   *
+   * @param prefix the table prefix to use (e.g. "mytable.")
+   * @return the store instance
+   */
+  private static HBaseEPGMStore getHBaseStore(String prefix) {
+    if (HBASE_STORE == null) {
+      HBASE_STORE = HBaseEPGMStoreFactory
+        .createOrOpenEPGMStore(
+          HBaseConfiguration.create(),
+          GradoopHBaseConfig.getDefaultConfig(),
+          prefix);
+    }
+    return HBASE_STORE;
+  }
+
+  /**
+   * Get an Accumulo EPGM store instance that uses the given table prefix.
+   * It reads properties from file "accumulo.properties" in resource path.
+   *
+   * @param prefix the table prefix to use (e.g. "mytable.")
+   * @return the store instance
+   * @throws Exception if creating the store fails
+   */
+  private static AccumuloEPGMStore getAccumuloStore(String prefix) throws Exception {
+    if (ACCUMULO_STORE == null) {
+      Properties prop = new Properties();
+      String propFileName = "accumulo.properties";
+
+      InputStream inputStream = AbstractRunner.class.getClassLoader()
+        .getResourceAsStream(propFileName);
+
+      if (inputStream != null) {
+        prop.load(inputStream);
+      } else {
+        throw new FileNotFoundException("Property file '" + propFileName +
+          "' not found in the classpath.");
+      }
+
+      if (!prop.containsKey(GradoopAccumuloConfig.ACCUMULO_USER) ||
+        !prop.containsKey(GradoopAccumuloConfig.ACCUMULO_PASSWD) ||
+        !prop.containsKey(GradoopAccumuloConfig.ACCUMULO_INSTANCE) ||
+        !prop.containsKey(GradoopAccumuloConfig.ZOOKEEPER_HOSTS)) {
+        throw new IllegalArgumentException("One of the following properties is missing in file '" +
+          propFileName + "': '" + GradoopAccumuloConfig.ACCUMULO_USER + "','" +
+          GradoopAccumuloConfig.ACCUMULO_PASSWD + "','" +
+          GradoopAccumuloConfig.ACCUMULO_INSTANCE + "','" +
+          GradoopAccumuloConfig.ZOOKEEPER_HOSTS + "'.");
+      }
+
+      // get the property values
+      String user = prop.getProperty(GradoopAccumuloConfig.ACCUMULO_USER);
+      String password = prop.getProperty(GradoopAccumuloConfig.ACCUMULO_PASSWD);
+      String accumuloInstance = prop.getProperty(GradoopAccumuloConfig.ACCUMULO_INSTANCE);
+      String zookeeperHosts = prop.getProperty(GradoopAccumuloConfig.ZOOKEEPER_HOSTS);
+
+      ACCUMULO_STORE = new AccumuloEPGMStore(
+        GradoopAccumuloConfig.getDefaultConfig()
+          .set(GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX, prefix)
+          .set(GradoopAccumuloConfig.ACCUMULO_USER, user)
+          .set(GradoopAccumuloConfig.ACCUMULO_INSTANCE, accumuloInstance)
+          .set(GradoopAccumuloConfig.ZOOKEEPER_HOSTS, zookeeperHosts)
+          .set(GradoopAccumuloConfig.ACCUMULO_PASSWD, password));
+    }
+    return ACCUMULO_STORE;
   }
 }
