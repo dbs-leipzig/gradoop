@@ -53,6 +53,8 @@ import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhoo
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.propertytransformation.PropertyTransformation;
+import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
+import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.gradoop.flink.model.impl.operators.split.Split;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
@@ -451,6 +453,30 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   public LogicalGraph reduceOnNeighbors(
     VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
     return callForGraph(new ReduceVertexNeighborhood(function, edgeDirection));
+  }
+
+  @Override
+  public GraphCollection groupVerticesByRollUp(
+    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions) {
+    if (vertexGroupingKeys == null || vertexGroupingKeys.isEmpty()) {
+      throw new IllegalArgumentException("Missing vertex grouping key(s).");
+    }
+
+    return callForCollection(new VertexRollUp(vertexGroupingKeys, vertexAggregateFunctions,
+      edgeGroupingKeys, edgeAggregateFunctions));
+  }
+
+  @Override
+  public GraphCollection groupEdgesByRollUp(
+    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions) {
+    if (edgeGroupingKeys == null || edgeGroupingKeys.isEmpty()) {
+      throw new IllegalArgumentException("Missing edge grouping key(s).");
+    }
+
+    return callForCollection(new EdgeRollUp(vertexGroupingKeys, vertexAggregateFunctions,
+      edgeGroupingKeys, edgeAggregateFunctions));
   }
 
   //----------------------------------------------------------------------------
