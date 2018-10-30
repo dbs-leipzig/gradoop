@@ -34,9 +34,6 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.api.epgm.GraphCollection;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.timeextractors.TimeIntervalExtractor;
-import org.gradoop.flink.model.impl.functions.timeextractors.EdgeTimeIntervalExtractor;
-import org.gradoop.flink.model.impl.functions.timeextractors.GraphHeadTimeIntervalExtractor;
-import org.gradoop.flink.model.impl.functions.timeextractors.VertexTimeIntervalExtractor;
 import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
@@ -230,7 +227,7 @@ public class GradoopFlinkTestUtils {
   }
 
   /**
-   * Get an instance of a {@link GraphHeadTimeIntervalExtractor} for testing purposes.
+   * Get an instance of a {@link TimeIntervalExtractor<GraphHead>} for testing purposes.
    *
    * @return a time interval extractor
    */
@@ -239,7 +236,7 @@ public class GradoopFlinkTestUtils {
   }
 
   /**
-   * Get an instance of a {@link VertexTimeIntervalExtractor} for testing purposes.
+   * Get an instance of a {@link TimeIntervalExtractor<Vertex>} for testing purposes.
    *
    * @return a time interval extractor
    */
@@ -248,7 +245,7 @@ public class GradoopFlinkTestUtils {
   }
 
   /**
-   * Get an instance of a {@link EdgeTimeIntervalExtractor} for testing purposes.
+   * Get an instance of a {@link TimeIntervalExtractor<Edge>}for testing purposes.
    *
    * @return a time interval extractor
    */

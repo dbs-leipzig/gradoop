@@ -21,13 +21,11 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
-import org.gradoop.common.model.impl.pojo.temporal.TemporalElement;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.timeextractors.TimeIntervalExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.TimestampExtractor;
 import org.gradoop.flink.model.api.tpgm.TemporalGraph;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -146,73 +144,6 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     temporalVertices.forEach(this::checkDefaultTemporalElement);
     temporalEdges.forEach(this::checkDefaultTemporalElement);
     temporalGraphHeads.forEach(this::checkDefaultTemporalElement);
-  }
-
-  /**
-   * Test the {@link LogicalGraph#toTemporalGraph(TimestampExtractor, TimestampExtractor,
-   * TimestampExtractor)}  function.
-   *
-   * @throws Exception if the test execution fails
-   */
-  @Test
-  public void testToTemporalGraphWithTimestampExtractor() throws Exception {
-    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
-    LogicalGraph graph = loader.getLogicalGraph();
-    Long validFrom = 42L;
-
-    // Call the function to test
-    TemporalGraph temporalGraph = graph
-      .toTemporalGraph(gh -> validFrom, v -> validFrom, e -> validFrom);
-
-    // use collections as data sink
-    Collection<Vertex> vertices = Lists.newArrayList();
-    Collection<Edge> edges = Lists.newArrayList();
-    Collection<GraphHead> graphHeads = Lists.newArrayList();
-
-    Collection<TemporalVertex> temporalVertices = Lists.newArrayList();
-    Collection<TemporalEdge> temporalEdges = Lists.newArrayList();
-    Collection<TemporalGraphHead> temporalGraphHeads = Lists.newArrayList();
-
-    graph.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
-    graph.getEdges().output(new LocalCollectionOutputFormat<>(edges));
-    graph.getGraphHead().output(new LocalCollectionOutputFormat<>(graphHeads));
-
-    temporalGraph.getVertices().output(new LocalCollectionOutputFormat<>(temporalVertices));
-    temporalGraph.getEdges().output(new LocalCollectionOutputFormat<>(temporalEdges));
-    temporalGraph.getGraphHead().output(new LocalCollectionOutputFormat<>(temporalGraphHeads));
-
-    getExecutionEnvironment().execute();
-
-    assertEquals(11, vertices.size());
-    assertEquals(24, edges.size());
-    assertEquals(1, graphHeads.size());
-
-    assertEquals(11, temporalVertices.size());
-    assertEquals(24, temporalEdges.size());
-    assertEquals(1, temporalGraphHeads.size());
-
-    validateEPGMElementCollections(vertices, temporalVertices);
-    validateEPGMElementCollections(edges, temporalEdges);
-    validateEPGMElementCollections(graphHeads, temporalGraphHeads);
-
-    // Check if there are default transaction times set
-    temporalVertices.forEach(this::checkDefaultTxTimes);
-    temporalEdges.forEach(this::checkDefaultTxTimes);
-    temporalGraphHeads.forEach(this::checkDefaultTxTimes);
-
-    // Check if the validFrom values are equal with the expected ones
-    temporalGraphHeads.forEach(tg -> assertEquals(validFrom, tg.getValidFrom()));
-    temporalVertices.forEach(tv -> assertEquals(validFrom, tv.getValidFrom()));
-    temporalEdges.forEach(te -> assertEquals(validFrom, te.getValidFrom()));
-
-    // Check if the validTo values are equal with the default ones
-    temporalGraphHeads
-      .forEach(tg -> assertEquals(TemporalElement.DEFAULT_VALID_TIME, tg.getValidTo()));
-    temporalVertices
-      .forEach(tv -> assertEquals(TemporalElement.DEFAULT_VALID_TIME, tv.getValidTo()));
-    temporalEdges
-      .forEach(te -> assertEquals(TemporalElement.DEFAULT_VALID_TIME, te.getValidTo()));
-
   }
 
   /**

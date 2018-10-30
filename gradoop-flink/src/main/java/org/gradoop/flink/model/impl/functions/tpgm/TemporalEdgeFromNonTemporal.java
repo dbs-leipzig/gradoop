@@ -17,18 +17,67 @@ package org.gradoop.flink.model.impl.functions.tpgm;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
+import org.gradoop.flink.model.api.functions.timeextractors.TimeIntervalExtractor;
 
 /**
- * Initializes a {@link TemporalEdge} from a {@link Edge} instance by setting default temporal
+ * Initializes a {@link TemporalEdge} from a {@link Edge} instance by setting either
+ * default temporal information or, if a timeIntervalExtractor is given, by the extracted time
  * information.
  */
 @FunctionAnnotation.ForwardedFields("id;sourceId;targetId;label;properties;graphIds")
 public class TemporalEdgeFromNonTemporal implements MapFunction<Edge, TemporalEdge> {
+  /**
+   * The user defined timestamp extractor.
+   */
+  private TimeIntervalExtractor<Edge> timeIntervalExtractor;
+  /**
+   * Reuse this instance to reduce instantiations.
+   */
+  private TemporalEdge reuse;
 
+  /**
+   * Creates an instance of the TemporalEdgeFromNonTemporal map function. The temporal instance
+   * will have default temporal information.
+   */
+  public TemporalEdgeFromNonTemporal() {
+    this.reuse = TemporalEdge.createEdge(GradoopId.get(), GradoopId.get());
+  }
+
+  /**
+   * Creates an instance of the TemporalEdgeFromNonTemporal map function. The temporal instance
+   * will have valid times extracted from the non-temporal instance by the given
+   * timeIntervalExtractor.
+   *
+   * @param timeIntervalExtractor the extractor instance fetches the validFrom and validTo values
+   */
+  public TemporalEdgeFromNonTemporal(TimeIntervalExtractor<Edge> timeIntervalExtractor) {
+    this();
+    this.timeIntervalExtractor = timeIntervalExtractor;
+  }
+
+  /**
+   * Creates a temporal edge instance from the non-temporal. Id's, label and properties will
+   * be kept. If a timeIntervalExtractor is given, the valid time interval will be set with the
+   * extracted information.
+   *
+   * @param value the non-temporal element
+   * @return the temporal element
+   */
   @Override
   public TemporalEdge map(Edge value) throws Exception {
-    return TemporalEdge.fromNonTemporalEdge(value);
+    reuse.setId(value.getId());
+    reuse.setLabel(value.getLabel());
+    reuse.setSourceId(value.getSourceId());
+    reuse.setTargetId(value.getTargetId());
+    reuse.setProperties(value.getProperties());
+    reuse.setGraphIds(value.getGraphIds());
+    if (timeIntervalExtractor != null) {
+      reuse.setValidFrom(timeIntervalExtractor.getValidFrom(value));
+      reuse.setValidTo(timeIntervalExtractor.getValidTo(value));
+    }
+    return reuse;
   }
 }

@@ -28,13 +28,6 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.functions.timeextractors.TimeIntervalExtractor;
-import org.gradoop.flink.model.api.functions.timeextractors.TimestampExtractor;
-import org.gradoop.flink.model.impl.functions.timeextractors.EdgeTimeIntervalExtractor;
-import org.gradoop.flink.model.impl.functions.timeextractors.EdgeTimestampExtractor;
-import org.gradoop.flink.model.impl.functions.timeextractors.GraphHeadTimeIntervalExtractor;
-import org.gradoop.flink.model.impl.functions.timeextractors.GraphHeadTimestampExtractor;
-import org.gradoop.flink.model.impl.functions.timeextractors.VertexTimeIntervalExtractor;
-import org.gradoop.flink.model.impl.functions.timeextractors.VertexTimestampExtractor;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
@@ -48,6 +41,9 @@ import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalEdgeFromNonTemporal;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalGraphHeadFromNonTemporal;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalVertexFromNonTemporal;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
@@ -479,37 +475,9 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
 
   /**
    * Converts the {@link GraphCollection} to a {@link TemporalGraphCollection} instance.
-   * By the provided timestamp extractors, it is possible to extract a temporal information from the
-   * data to define a timestamp that represents the beginning of the element's validity
-   * (valid time).
-   * The value of the validTo property remains a default value.
-   * Use {@link GraphCollection#toTemporalGraph(TimeIntervalExtractor, TimeIntervalExtractor,
-   * TimeIntervalExtractor)}  to define the beginning and the end of the element's validity.
-   *
-   * @param graphHeadTimestampExtractor extractor function to pick the timestamp from graph heads
-   * @param vertexTimestampExtractor extractor function to pick the timestamp from vertices
-   * @param edgeTimestampExtractor extractor function to pick the timestamp from edges
-   * @return the graph collection represented as temporal graph collection with a timestamp as
-   * validFrom attribute
-   */
-  public TemporalGraphCollection toTemporalGraph(
-    TimestampExtractor<GraphHead> graphHeadTimestampExtractor,
-    TimestampExtractor<Vertex> vertexTimestampExtractor,
-    TimestampExtractor<Edge> edgeTimestampExtractor) {
-
-    return getConfig().getTemporalGraphCollectionFactory().fromDataSets(
-      getVertices().map(new VertexTimestampExtractor(vertexTimestampExtractor)),
-      getEdges().map(new EdgeTimestampExtractor(edgeTimestampExtractor)),
-      getGraphHeads().map(new GraphHeadTimestampExtractor(graphHeadTimestampExtractor)));
-  }
-
-  /**
-   * Converts the {@link GraphCollection} to a {@link TemporalGraphCollection} instance.
    * By the provided timestamp extractors, it is possible to extract temporal information from the
    * data to define a time interval that represents the beginning and end of the element's validity
    * (valid time).
-   * Use {@link GraphCollection#toTemporalGraph(TimestampExtractor, TimestampExtractor,
-   * TimestampExtractor)}  to define only a timestamp as the beginning of the element's validity.
    *
    * @param graphHeadTimeIntervalExtractor extractor to pick the time interval from graph heads
    * @param vertexTimeIntervalExtractor extractor to pick the time interval from vertices
@@ -523,9 +491,9 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
     TimeIntervalExtractor<Edge> edgeTimeIntervalExtractor) {
 
     return getConfig().getTemporalGraphCollectionFactory().fromDataSets(
-      getVertices().map(new VertexTimeIntervalExtractor(vertexTimeIntervalExtractor)),
-      getEdges().map(new EdgeTimeIntervalExtractor(edgeTimeIntervalExtractor)),
-      getGraphHeads().map(new GraphHeadTimeIntervalExtractor(graphHeadTimeIntervalExtractor)));
+      getVertices().map(new TemporalVertexFromNonTemporal(vertexTimeIntervalExtractor)),
+      getEdges().map(new TemporalEdgeFromNonTemporal(edgeTimeIntervalExtractor)),
+      getGraphHeads().map(new TemporalGraphHeadFromNonTemporal(graphHeadTimeIntervalExtractor)));
   }
 
   /**

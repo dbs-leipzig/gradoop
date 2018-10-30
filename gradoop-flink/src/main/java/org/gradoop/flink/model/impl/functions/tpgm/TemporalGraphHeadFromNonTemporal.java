@@ -19,15 +19,61 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
+import org.gradoop.flink.model.api.functions.timeextractors.TimeIntervalExtractor;
 
 /**
- * Initializes a {@link TemporalGraphHead} from a {@link GraphHead} instance by setting default temporal
+ * Initializes a {@link TemporalGraphHead} from a {@link GraphHead} instance by setting either
+ * default temporal information or, if a timeIntervalExtractor is given, by the extracted time
  * information.
  */
 @FunctionAnnotation.ForwardedFields("id;label;properties")
 public class TemporalGraphHeadFromNonTemporal implements MapFunction<GraphHead, TemporalGraphHead> {
+  /**
+   * The user defined interval extractor, might be {@code null}.
+   */
+  private TimeIntervalExtractor<GraphHead> timeIntervalExtractor;
+  /**
+   * Reuse this instance to reduce instantiations.
+   */
+  private TemporalGraphHead reuse;
+
+  /**
+   * Creates an instance of the TemporalGraphHeadFromNonTemporal map function. The temporal instance
+   * will have default temporal information.
+   */
+  public TemporalGraphHeadFromNonTemporal() {
+    this.reuse = TemporalGraphHead.createGraphHead();
+  }
+
+  /**
+   * Creates an instance of the TemporalGraphHeadFromNonTemporal map function. The temporal instance
+   * will have valid times extracted from the non-temporal instance by the given
+   * timeIntervalExtractor.
+   *
+   * @param timeIntervalExtractor the extractor instance fetches the validFrom and validTo values
+   */
+  public TemporalGraphHeadFromNonTemporal(TimeIntervalExtractor<GraphHead> timeIntervalExtractor) {
+    this();
+    this.timeIntervalExtractor = timeIntervalExtractor;
+  }
+
+  /**
+   * Creates a temporal graph head instance from the non-temporal. Id's, label and properties will
+   * be kept. If a timeIntervalExtractor is given, the valid time interval will be set with the
+   * extracted information.
+   *
+   * @param value the non-temporal element
+   * @return the temporal element
+   */
   @Override
-  public TemporalGraphHead map(GraphHead value) throws Exception {
-    return TemporalGraphHead.fromNonTemporalGraphHead(value);
+  public TemporalGraphHead map(GraphHead value) {
+    reuse.setId(value.getId());
+    reuse.setLabel(value.getLabel());
+    reuse.setProperties(value.getProperties());
+    if (timeIntervalExtractor != null) {
+      reuse.setValidFrom(timeIntervalExtractor.getValidFrom(value));
+      reuse.setValidTo(timeIntervalExtractor.getValidTo(value));
+    }
+    return reuse;
   }
 }
