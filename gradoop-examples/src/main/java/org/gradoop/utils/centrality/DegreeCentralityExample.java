@@ -17,48 +17,26 @@ package org.gradoop.utils.centrality;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.statistics.VertexCount;
-import org.gradoop.flink.model.impl.operators.statistics.VertexDegrees;
-import org.gradoop.flink.model.impl.tuples.WithCount;
-import org.gradoop.flink.model.impl.operators.statistics.functions.CalculateDegreeCentrality;
-import org.gradoop.flink.model.impl.operators.statistics.functions.DegreeDistanceFunction;
+import org.gradoop.flink.model.impl.operators.sampling.statistics.DegreeCentrality;
 
 /**
- * example class calculating degree centrality of a graph
+ * Example class calculating degree centrality of a graph
  */
 public class DegreeCentralityExample extends AbstractRunner implements ProgramDescription {
 
   /**
-   * name of property key degree
-   */
-  private static final String DEGREE_KEY = "degree";
-
-  /**
    * args[0] - path to input directory
-   * args[1] - input format (json, csv)
+   * args[1] - input format (json, lgcsv)
    * args[2] - path to output directory
    *
    * @param args arguments
    * @throws Exception if something goes wrong
    */
   public static void main(String[] args) throws Exception {
-    // read logical Graph
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
-    DataSet<WithCount<GradoopId>> degrees = new VertexDegrees().execute(graph);
-    DataSet<Long> vertexCount = new VertexCount().execute(graph);
-
-    // broadcasting
-    DataSet<WithCount<GradoopId>> maxDegree = degrees.max(1);
-
-    String broadcastName = "degree_max";
-    DataSet<Double> degree = degrees
-      .map(new DegreeDistanceFunction(broadcastName))
-      .withBroadcastSet(maxDegree, broadcastName)
-      .sum(0)
-      .crossWithTiny(vertexCount).with(new CalculateDegreeCentrality());
+    DataSet<Double> degree = new DegreeCentrality().execute(graph);
     degree.print();
   }
 

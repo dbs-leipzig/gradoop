@@ -44,8 +44,9 @@ public class DegreeCentralityTest extends GradoopFlinkTestBase {
     "]";
 
   /**
-   * test star graph for degree centrality
-   * @throws Exception
+   * Test star graph for degree centrality
+   *
+   * @throws Exception throws any Exception
    */
   @Test
   public void testStar() throws Exception {
@@ -55,8 +56,9 @@ public class DegreeCentralityTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * test star graph for degree centrality
-   * @throws Exception
+   * Test path graph for degree centrality
+   *
+   * @throws Exception throws any Exception
    */
   @Test
   public void testPath() throws Exception {
@@ -66,8 +68,9 @@ public class DegreeCentralityTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * test star graph for degree centrality
-   * @throws Exception
+   * Test community graph for degree centrality
+   *
+   * @throws Exception throws any Exception
    */
   @Test
   public void testCommunity() throws Exception {

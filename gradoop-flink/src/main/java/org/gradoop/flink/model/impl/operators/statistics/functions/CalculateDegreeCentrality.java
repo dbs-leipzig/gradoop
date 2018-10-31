@@ -25,13 +25,15 @@ public class CalculateDegreeCentrality implements CrossFunction<Tuple1<Long>, Lo
 
 
   /**
+   * Calculates the degree centrality of the graph
+   * using the sum of all distances and the vertex count.
+   *
    * @param val1 sum of degree distances of the vertices
    * @param vertexCount number of vertices
    * @return degree centrality of graph
-   * @throws Exception throws any Exception
    */
   @Override
-  public Double cross(Tuple1<Long> val1, Long vertexCount) throws Exception {
+  public Double cross(Tuple1<Long> val1, Long vertexCount) {
     long sum = val1.f0;
     return (double) sum / ((vertexCount - 2) * (vertexCount - 1));
   }

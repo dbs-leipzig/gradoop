@@ -23,25 +23,28 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
  * Calculates the distance of max degree and the degree of each value
+ * @inheritDoc
  */
 public class DegreeDistanceFunction extends RichMapFunction<WithCount<GradoopId>, Tuple1<Long>> {
 
   /**
-   * storing max degree from broadcast
+   * Storing max degree from broadcast
    */
   private WithCount<GradoopId>  maxDegree;
 
   /**
-   * name of broadcast variable
+   * Name of broadcast variable
    */
   private final String broadcastName;
 
   /**
-   * tuple for reuse storing distances
+   * Tuple for reuse storing distances
    */
   private Tuple1<Long> reuse;
 
   /**
+   * Constructor
+   *
    * @param broadcastName name of broadcast variable
    */
   public DegreeDistanceFunction(String broadcastName) {
@@ -50,8 +53,10 @@ public class DegreeDistanceFunction extends RichMapFunction<WithCount<GradoopId>
   }
 
   /**
+   * Function called to store broadcasted max degree.
+   *
    * @param parameter parameter
-   * @throws Exception
+   * @throws Exception throws any Exception
    */
   @Override
   public void open(Configuration parameter) throws Exception {
@@ -61,6 +66,13 @@ public class DegreeDistanceFunction extends RichMapFunction<WithCount<GradoopId>
       .get(0);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @param value degree of vertex
+   * @return degree distance
+   * @throws Exception throws any Exception
+   */
   @Override
   public Tuple1<Long> map(WithCount<GradoopId> value) throws Exception {
     reuse.f0 = maxDegree.f1 - value.f1;

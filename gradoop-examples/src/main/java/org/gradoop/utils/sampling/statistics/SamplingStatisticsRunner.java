@@ -52,6 +52,7 @@ public class SamplingStatisticsRunner extends AbstractRunner implements ProgramD
     AverageClusteringCoefficientRunner.main(args);
     GlobalClusteringCoefficientRunner.main(args);
     TriangleCountingRunner.main(args);
+    DegreeCentralityRunner.main(args);
   }
 
   @Override

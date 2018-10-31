@@ -23,13 +23,14 @@ import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.DegreeCentrality;
 
 /**
- * Computes {@link DegreeCentrality} for a given logical graph and write it in a CSV file.
+ * Computes {@link DegreeCentrality} for a given logical graph.
  */
 public class DegreeCentralityPreparer implements
   UnaryGraphToValueOperator<MapOperator<Double, Tuple1<Double>>> {
 
   /**
-   * Prepares the statistic for the vertex count calculator.
+   * Prepares the statistic for the degree centrality and wraps it into a {@link Tuple1}.
+   *
    * @param graph the logical graph for the calculation.
    * @return tuple with degree centrality value of graph
    */
