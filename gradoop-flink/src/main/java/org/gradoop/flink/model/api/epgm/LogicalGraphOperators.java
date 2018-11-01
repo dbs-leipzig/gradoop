@@ -572,6 +572,38 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    */
   DataSet<Boolean> equalsByData(LogicalGraph other);
 
+  /**
+   * Generates all combinations of the supplied vertex grouping keys according to the definition of
+   * the rollUp operation in SQL and uses them together with all edge grouping keys for separate
+   * grouping operations. For example, specifying the vertex grouping keys A, B and C leads to
+   * three differently grouped graphs {A,B,C},{A,B},{A} within the resulting graph collection.
+   *
+   * @param vertexGroupingKeys grouping keys to group vertices
+   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
+   * @param edgeGroupingKeys grouping keys to group edges
+   * @param edgeAggregateFunctions aggregate functions to apply on super edges
+   * @return graph collection containing all resulting graphs
+   */
+  GraphCollection groupVerticesByRollUp(
+    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions);
+
+  /**
+   * Generates all combinations of the supplied edge grouping keys according to the definition of
+   * the rollUp operation in SQL and uses them together with all vertex grouping keys for separate
+   * grouping operations. For example, specifying the edge grouping keys A, B and C leads to
+   * three differently grouped graphs {A,B,C},{A,B},{A} within the resulting graph collection.
+   *
+   * @param vertexGroupingKeys grouping keys to group vertices
+   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
+   * @param edgeGroupingKeys grouping keys to group edges
+   * @param edgeAggregateFunctions aggregate functions to apply on super edges
+   * @return graph collection containing all resulting graphs
+   */
+  GraphCollection groupEdgesByRollUp(
+    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions);
+
   //----------------------------------------------------------------------------
   // Binary Operators
   //----------------------------------------------------------------------------
