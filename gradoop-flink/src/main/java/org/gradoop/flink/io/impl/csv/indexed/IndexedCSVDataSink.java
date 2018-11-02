@@ -53,7 +53,6 @@ public class IndexedCSVDataSink extends CSVBase implements DataSink {
    *
    * @param csvPath directory to write to
    * @param config Gradoop Flink configuration
-   * @throws IOException
    */
   public IndexedCSVDataSink(String csvPath, GradoopFlinkConfig config) {
     this(csvPath, null, config);

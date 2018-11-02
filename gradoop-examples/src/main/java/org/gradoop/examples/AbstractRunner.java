@@ -87,9 +87,13 @@ public abstract class AbstractRunner {
    * Flink execution environment.
    */
   private static ExecutionEnvironment ENV;
-
+  /**
+   * HBase store instance
+   */
   private static HBaseEPGMStore HBASE_STORE;
-
+  /**
+   * Accumulo store instance
+   */
   private static AccumuloEPGMStore ACCUMULO_STORE;
 
   /**
@@ -168,7 +172,7 @@ public abstract class AbstractRunner {
    */
   protected static void writeLogicalGraph(LogicalGraph graph, String directory, String format)
     throws Exception {
-    graph.writeTo(getDataSink(directory, format, graph.getConfig()));
+    graph.writeTo(getDataSink(directory, format, graph.getConfig()), true);
     getExecutionEnvironment().execute();
   }
 
