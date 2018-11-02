@@ -20,7 +20,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.gradoop.benchmark.subgraph.SubgraphBenchmark;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSource;
@@ -29,9 +28,7 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsHDFSReader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.gradoop.storage.config.GradoopHBaseConfig;
-import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
-import org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
+import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
 import org.gradoop.storage.impl.hbase.io.HBaseDataSource;
 
 import java.io.File;
@@ -147,23 +144,25 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 
     // read graph
-    DataSource source;
+    DataSource source = getDataSource(INPUT_PATH, INPUT_FORMAT, config);
 
-    if (INPUT_FORMAT.equals("hbase")) {
-      HBaseEPGMStore hBaseEPGMStore = HBaseEPGMStoreFactory.createOrOpenEPGMStore(
-        HBaseConfiguration.create(),
-        GradoopHBaseConfig.getDefaultConfig(),
-        INPUT_PATH + ".");
-      source = new HBaseDataSource(hBaseEPGMStore, config);
-      // Apply predicate
-      if (USE_PREDICATE_PUSHDOWN) {
+    // apply predicates to store sources if pushdown is enabled
+    if (USE_PREDICATE_PUSHDOWN) {
+      switch (INPUT_FORMAT) {
+      case FORMAT_HBASE:
         source = ((HBaseDataSource) source)
           .applyVertexPredicate(Predicates.HBase.getVertexFilter(QUERY, FIRST_NAME));
         source = ((HBaseDataSource) source)
           .applyEdgePredicate(Predicates.HBase.getEdgeFilter(QUERY));
+        break;
+
+      case FORMAT_ACCUMULO:
+        source = ((AccumuloDataSource) source)
+          .applyVertexPredicate(Predicates.Accumulo.getVertexFilter(QUERY, FIRST_NAME));
+        source = ((AccumuloDataSource) source)
+          .applyEdgePredicate(Predicates.Accumulo.getEdgeFilter(QUERY));
+        break;
       }
-    } else {
-      source = getDataSource(INPUT_PATH, INPUT_FORMAT, config);
     }
 
     LogicalGraph graph = source.getLogicalGraph();
@@ -216,9 +215,7 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
    */
   private static void readCMDArguments(CommandLine cmd) {
     INPUT_PATH = cmd.getOptionValue(OPTION_INPUT_PATH);
-    // Set indexed as default format
-    INPUT_FORMAT = cmd.hasOption(OPTION_INPUT_FORMAT) ?
-      cmd.getOptionValue(OPTION_INPUT_FORMAT) : "indexed";
+    INPUT_FORMAT = cmd.getOptionValue(OPTION_INPUT_FORMAT);
     CSV_PATH = cmd.getOptionValue(OPTION_CSV_PATH);
     QUERY = cmd.getOptionValue(OPTION_QUERY);
     HAS_STATISTICS = cmd.hasOption(OPTION_STATISTICS_PATH);
@@ -235,6 +232,9 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
   private static void performSanityCheck(CommandLine cmd) {
     if (!cmd.hasOption(OPTION_INPUT_PATH)) {
       throw new IllegalArgumentException("Define a graph input directory.");
+    }
+    if (!cmd.hasOption(OPTION_INPUT_FORMAT)) {
+      throw new IllegalArgumentException("Define a graph input format.");
     }
     if (!cmd.hasOption(OPTION_CSV_PATH)) {
       throw new IllegalArgumentException("Path to CSV-File need to be set.");

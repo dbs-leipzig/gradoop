@@ -154,6 +154,7 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
     // read graph
     DataSource source = getDataSource(INPUT_PATH, INPUT_FORMAT, conf);
 
+    // apply predicates to store sources if pushdown is enabled
     if (USE_PREDICATE_PUSHDOWN) {
       switch (INPUT_FORMAT) {
       case FORMAT_HBASE:
