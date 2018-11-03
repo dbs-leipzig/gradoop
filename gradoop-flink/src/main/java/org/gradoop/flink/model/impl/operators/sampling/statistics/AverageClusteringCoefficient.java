@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.sampling.statistics;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
-import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyVertexClusteringCoefficientDirected;
+import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyLocalClusteringCoefficientDirected;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
@@ -28,7 +28,7 @@ import org.gradoop.flink.model.impl.operators.sampling.statistics.functions.AddA
 /**
  * Calculates the average local clustering coefficient of a graph and writes it to the graph head.
  * Uses the Gradoop EPGM model wrapper for Flink Gellys implementation of the local clustering
- * coefficient algorithm for directed graphs {@link GellyVertexClusteringCoefficientDirected}
+ * coefficient algorithm for directed graphs {@link GellyLocalClusteringCoefficientDirected}
  */
 public class AverageClusteringCoefficient implements UnaryGraphToGraphOperator {
 
@@ -44,7 +44,7 @@ public class AverageClusteringCoefficient implements UnaryGraphToGraphOperator {
     SumVertexProperty localCCAggregate = new SumVertexProperty(
       ClusteringCoefficientBase.PROPERTY_KEY_LOCAL);
 
-    graph = new GellyVertexClusteringCoefficientDirected().execute(graph)
+    graph = new GellyLocalClusteringCoefficientDirected().execute(graph)
       .aggregate(vertexCountAggregate, localCCAggregate);
 
     DataSet<GraphHead> graphHead = graph.getGraphHead().map(new AddAverageCCValueToGraphHeadMap(

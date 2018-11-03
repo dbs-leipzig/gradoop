@@ -24,27 +24,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test-class for {@link GellyVertexClusteringCoefficientUndirected}
+ * Test-class for {@link GellyLocalClusteringCoefficientDirected}
  */
-public class GellyVertexClusteringCoefficientUndirectedTest
+public class GellyLocalClusteringCoefficientDirectedTest
   extends GellyClusteringCoefficientTestBase {
-
-  /**
-   * Creates an instance of GellyVertexClusteringCoefficientDirectedTest.
-   * Calls constructor of super class.
-   */
-  public GellyVertexClusteringCoefficientUndirectedTest() {
-    super();
-  }
 
   @Override
   public ClusteringCoefficientBase getCCAlgorithm() {
-    return new GellyVertexClusteringCoefficientUndirected();
+    return new GellyLocalClusteringCoefficientDirected();
   }
 
   @Override
-  public void testFullyConnectedGraph(LogicalGraph graph) throws Exception {
-    List<Vertex> vertices = graph.getVertices().collect();
+  public void testFullyConnectedGraph() throws Exception {
+    validateGraphProperties(fullGraph);
+    List<Vertex> vertices = fullGraph.getVertices().collect();
     for (Vertex v : vertices) {
       assertEquals("Wrong local value for clique-vertex '" + v.getId().toString() +
           "', should be 1", 1d,
@@ -53,8 +46,9 @@ public class GellyVertexClusteringCoefficientUndirectedTest
   }
 
   @Override
-  public void testNonConnectedGraph(LogicalGraph graph) throws Exception {
-    List<Vertex> vertices = graph.getVertices().collect();
+  public void testNonConnectedGraph() throws Exception {
+    validateGraphProperties(nonConnectedGraph);
+    List<Vertex> vertices = nonConnectedGraph.getVertices().collect();
     for (Vertex v : vertices) {
       assertEquals("Wrong local value for not connected vertex: " + v.getId().toString() +
           ", should be 0",0d,
@@ -71,16 +65,13 @@ public class GellyVertexClusteringCoefficientUndirectedTest
       "(v2 {id:2, value:\"C\"})" +
       "(v3 {id:3, value:\"D\"})" +
       "(v0)-[e0]->(v1)" +
-      "(v1)-[e1]->(v0)" +
-      "(v0)-[e2]->(v2)" +
-      "(v2)-[e3]->(v0)" +
-      "(v0)-[e4]->(v3)" +
-      "(v3)-[e5]->(v0)" +
-      "(v1)-[e6]->(v2)" +
-      "(v2)-[e7]->(v1)" +
+      "(v0)-[e1]->(v2)" +
+      "(v0)-[e2]->(v3)" +
+      "(v1)-[e3]->(v2)" +
       "]";
 
-    LogicalGraph graph = getLoaderFromString(graphString).getLogicalGraphByVariable("halfConnected");
+    LogicalGraph graph = getLoaderFromString(graphString)
+      .getLogicalGraphByVariable("halfConnected");
     LogicalGraph result = graph.callForGraph(getCCAlgorithm());
 
     validateGraphProperties(result);
@@ -88,19 +79,19 @@ public class GellyVertexClusteringCoefficientUndirectedTest
     List<Vertex> vertices = result.getVertices().collect();
     for (Vertex v : vertices) {
       if (v.getPropertyValue("id").getInt() == 0) {
-        assertEquals("vertex with id 0 has wrong local value, should be 0.3333", (1d/3d),
+        assertEquals("vertex with id 0 has wrong local value, should be 0.1666", (1d/6d),
           v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
       }
       if (v.getPropertyValue("id").getInt() == 1) {
-        assertEquals("vertex with id 1 has wrong local value, should be 1", 1d,
+        assertEquals("vertex with id 1 has wrong local value, should be 0.5", (1d/2d),
           v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
       }
       if (v.getPropertyValue("id").getInt() == 2) {
-        assertEquals("vertex with id 2 has wrong local value, should be 1", 1d,
+        assertEquals("vertex with id 2 has wrong local value, should be 0.5", (1d/2d),
           v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
       }
       if (v.getPropertyValue("id").getInt() == 3) {
-        assertEquals("vertex with id 3 has wrong local value, should be 0d", 0.0,
+        assertEquals("vertex with id 3 has wrong local value, should be 0", 0.0,
           v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
       }
     }

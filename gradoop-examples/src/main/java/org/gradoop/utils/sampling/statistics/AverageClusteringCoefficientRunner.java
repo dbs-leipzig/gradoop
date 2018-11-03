@@ -18,7 +18,7 @@ package org.gradoop.utils.sampling.statistics;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyVertexClusteringCoefficientDirected;
+import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyLocalClusteringCoefficientDirected;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.AverageClusteringCoefficient;
@@ -28,7 +28,7 @@ import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 /**
  * Calls the computation of the average clustering coefficient for a directed logical graph.
  * Uses {@link AverageClusteringCoefficient} which calls the Gradoop-Wrapper
- * {@link GellyVertexClusteringCoefficientDirected} of Flinks ClusteringCoefficient-algorithm.
+ * {@link GellyLocalClusteringCoefficientDirected} of Flinks ClusteringCoefficient-algorithm.
  * Writes the average value to a csv-file named
  * {@value SamplingEvaluationConstants#FILE_CLUSTERING_COEFFICIENT_AVERAGE} in the output directory,
  * e.g.:

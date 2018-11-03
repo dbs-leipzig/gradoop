@@ -18,6 +18,7 @@ package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -26,22 +27,25 @@ import org.junit.Test;
 public abstract class GellyClusteringCoefficientTestBase extends GradoopFlinkTestBase {
 
   /**
-   * GraphLoader used for test-cases
+   * A fully connected graph for testing
    */
-  protected FlinkAsciiGraphLoader loader;
+  LogicalGraph fullGraph;
 
   /**
-   * Constructor
+   * A not connected graph for testing
    */
-  public GellyClusteringCoefficientTestBase() {
+  LogicalGraph nonConnectedGraph;
 
-    String graphString =
-      "/* vertices */" +
+  /**
+   * Initialize the graphs for testing
+   */
+  @Before
+  public void initGraphs() {
+    String graphString = "clique[" +
+      "/* fully connected clique */" +
       "(v0 {id:0, value:\"A\"})" +
       "(v1 {id:1, value:\"B\"})" +
       "(v2 {id:2, value:\"C\"})" +
-      "clique[" +
-      "/* fully connected clique */" +
       "(v0)-[e0]->(v1)" +
       "(v1)-[e1]->(v0)" +
       "(v0)-[e2]->(v2)" +
@@ -51,9 +55,17 @@ public abstract class GellyClusteringCoefficientTestBase extends GradoopFlinkTes
       "]" +
       "nonConnected[" +
       "/* not connected vertices */" +
+      "(v3 {id:3, value:\"D\"})" +
+      "(v4 {id:4, value:\"E\"})" +
+      "(v5 {id:5, value:\"F\"})" +
       "]";
 
-    this.loader = getLoaderFromString(graphString);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(graphString);
+    fullGraph = loader.getLogicalGraphByVariable("clique");
+    fullGraph = fullGraph.callForGraph(getCCAlgorithm());
+
+    nonConnectedGraph = loader.getLogicalGraphByVariable("nonConnected");
+    nonConnectedGraph = nonConnectedGraph.callForGraph(getCCAlgorithm());
   }
 
   /**
@@ -64,42 +76,25 @@ public abstract class GellyClusteringCoefficientTestBase extends GradoopFlinkTes
   public abstract ClusteringCoefficientBase getCCAlgorithm();
 
   /**
-   * Runs the specified tests
+   * Checks if clustering coefficient properties are written
    */
-  @Test
-  public void runTests() throws Exception {
-    LogicalGraph fullGraph = loader.getLogicalGraphByVariable("clique");
-    fullGraph = fullGraph.callForGraph(getCCAlgorithm());
-    validateGraphProperties(fullGraph);
-    testFullyConnectedGraph(fullGraph);
-
-    LogicalGraph nonConnectedGraph = loader.getLogicalGraphByVariable("nonConnected");
-    nonConnectedGraph = nonConnectedGraph.callForGraph(getCCAlgorithm());
-    validateGraphProperties(nonConnectedGraph);
-    testNonConnectedGraph(nonConnectedGraph);
-
-    testSpecific();
-  }
+  public abstract void validateGraphProperties(LogicalGraph graph) throws Exception;
 
   /**
    * Test for a fully connected graph
    */
-  public abstract void testFullyConnectedGraph(LogicalGraph graph) throws Exception;
+  @Test
+  public abstract void testFullyConnectedGraph() throws Exception;
 
   /**
    * Test for a graph with no connections
    */
-  public abstract void testNonConnectedGraph(LogicalGraph graph) throws Exception;
+  @Test
+  public abstract void testNonConnectedGraph() throws Exception;
 
   /**
    * Test for a specific graph regarding directed vs. undirected
    */
+  @Test
   public abstract void testSpecific() throws Exception;
-
-  /**
-   * Checks if clustering coefficient properties are written
-   *
-   * @param graph Graph with properties
-   */
-  public abstract void validateGraphProperties(LogicalGraph graph) throws Exception;
 }

@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 
-import org.apache.commons.math3.util.Precision;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 
@@ -28,30 +27,25 @@ import static org.junit.Assert.assertTrue;
 public class GellyGlobalClusteringCoefficientUndirectedTest
   extends GellyClusteringCoefficientTestBase {
 
-  /**
-   * Creates an instance of GellyGlobalClusteringCoefficientUndirectedTest.
-   * Calls constructor of super class.
-   */
-  public GellyGlobalClusteringCoefficientUndirectedTest() {
-    super();
-  }
-
   @Override
   public ClusteringCoefficientBase getCCAlgorithm() {
     return new GellyGlobalClusteringCoefficientUndirected();
   }
 
   @Override
-  public void testFullyConnectedGraph(LogicalGraph graph) throws Exception {
-    GraphHead head = graph.getGraphHead().collect().get(0);
+  public void testFullyConnectedGraph() throws Exception {
+    validateGraphProperties(fullGraph);
+    GraphHead head = fullGraph.getGraphHead().collect().get(0);
     assertEquals("Wrong global value for fully connected graph, should be 1", 1d,
       head.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL).getDouble(), 0.0);
   }
 
   @Override
-  public void testNonConnectedGraph(LogicalGraph graph) throws Exception {
-    GraphHead head = graph.getGraphHead().collect().get(0);
-    double global = head.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL).getDouble();
+  public void testNonConnectedGraph() throws Exception {
+    validateGraphProperties(nonConnectedGraph);
+    GraphHead head = nonConnectedGraph.getGraphHead().collect().get(0);
+    double global = head.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL)
+      .getDouble();
     assertTrue("Wrong global value for not connected graph, should be 0 or NaN",
       Double.isNaN(global));
   }
@@ -74,7 +68,8 @@ public class GellyGlobalClusteringCoefficientUndirectedTest
       "(v2)-[e7]->(v1)" +
       "]";
 
-    LogicalGraph graph = getLoaderFromString(graphString).getLogicalGraphByVariable("halfConnected");
+    LogicalGraph graph = getLoaderFromString(graphString)
+      .getLogicalGraphByVariable("halfConnected");
     LogicalGraph result = graph.callForGraph(getCCAlgorithm());
 
     validateGraphProperties(result);
@@ -84,8 +79,7 @@ public class GellyGlobalClusteringCoefficientUndirectedTest
     double global = head.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL)
       .getDouble();
     assertEquals("graph has wrong global value, should be 0.6",
-      Precision.round(3d / 5d, 3),
-      Precision.round(global, 3), 0.0);
+      3d / 5d, global, 0.0);
   }
 
   @Override

@@ -31,13 +31,13 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
  * {@link org.apache.flink.graph.library.clustering.undirected.LocalClusteringCoefficient}.
  * Returns the initial {@link LogicalGraph} with local values written to the vertices.
  */
-public class GellyVertexClusteringCoefficientUndirected extends ClusteringCoefficientBase {
+public class GellyLocalClusteringCoefficientUndirected extends ClusteringCoefficientBase {
 
   /**
-   * Creates an instance of the GellyVertexClusteringCoefficientUndirected wrapper class.
+   * Creates an instance of the GellyLocalClusteringCoefficientUndirected wrapper class.
    * Calls constructor of super class {@link ClusteringCoefficientBase}.
    */
-  public GellyVertexClusteringCoefficientUndirected() {
+  public GellyLocalClusteringCoefficientUndirected() {
     super();
   }
 
@@ -64,6 +64,6 @@ public class GellyVertexClusteringCoefficientUndirected extends ClusteringCoeffi
 
   @Override
   public String getName() {
-    return GellyVertexClusteringCoefficientUndirected.class.getName();
+    return GellyLocalClusteringCoefficientUndirected.class.getName();
   }
 }

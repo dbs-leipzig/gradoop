@@ -15,11 +15,11 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling.statistics;
 
-import org.apache.commons.math3.util.Precision;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -33,56 +33,49 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
   /**
    * GraphLoader used for test-cases
    */
-  protected FlinkAsciiGraphLoader loader;
+  private FlinkAsciiGraphLoader loader;
 
   /**
-   * Constructor
+   * Initialize the graphs for testing
    */
-  public AverageClusteringCoefficientTest() {
-
-    String graphString =
-      "/* vertices */" +
-      "(v0 {id:0, value:\"A\"})" +
-      "(v1 {id:1, value:\"B\"})" +
-      "(v2 {id:2, value:\"C\"})" +
-      "clique[" +
-      "/* fully connected clique */" +
-      "(v0)-[e0]->(v1)" +
-      "(v1)-[e1]->(v0)" +
-      "(v0)-[e2]->(v2)" +
-      "(v2)-[e3]->(v0)" +
-      "(v1)-[e4]->(v2)" +
-      "(v2)-[e5]->(v1)" +
-      "]" +
-      "nonConnected[" +
-      "/* not connected vertices */" +
-      "]" +
-      "halfConnected[" +
-      "/* half connected graph */" +
-      "(v3 {id:3, value:\"D\"})" +
-      "(v0)-[e6]->(v1)" +
-      "(v0)-[e7]->(v2)" +
-      "(v0)-[e8]->(v3)" +
-      "(v1)-[e9]->(v2)" +
-      "]";
+  @Before
+  public void initGraphs() {
+    String graphString = "/* vertices */" +
+        "(v0 {id:0, value:\"A\"})" +
+        "(v1 {id:1, value:\"B\"})" +
+        "(v2 {id:2, value:\"C\"})" +
+        "clique[" +
+        "/* fully connected clique */" +
+        "(v0)-[e0]->(v1)" +
+        "(v1)-[e1]->(v0)" +
+        "(v0)-[e2]->(v2)" +
+        "(v2)-[e3]->(v0)" +
+        "(v1)-[e4]->(v2)" +
+        "(v2)-[e5]->(v1)" +
+        "]" +
+        "nonConnected[" +
+        "/* not connected vertices */" +
+        "(v3 {id:3, value:\"D\"})" +
+        "(v4 {id:4, value:\"E\"})" +
+        "(v5 {id:5, value:\"F\"})" +
+        "]" +
+        "halfConnected[" +
+        "/* half connected graph */" +
+        "(v6 {id:6, value:\"G\"})" +
+        "(v0)-[e6]->(v1)" +
+        "(v0)-[e7]->(v2)" +
+        "(v0)-[e8]->(v6)" +
+        "(v1)-[e9]->(v2)" +
+        "]";
 
     this.loader = getLoaderFromString(graphString);
   }
 
   /**
-   * Runs the specified tests
-   */
-  @Test
-  public void runTests() throws Exception {
-    testFullyConnectedGraph();
-    testNonConnectedGraph();
-    testHalfConnectedGraph();
-  }
-
-  /**
    * Test for a fully connected graph
    */
-  private void testFullyConnectedGraph() throws Exception {
+  @Test
+  public void testFullyConnectedGraph() throws Exception {
 
     LogicalGraph graph = loader.getLogicalGraphByVariable("clique");
     LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient());
@@ -90,14 +83,16 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
 
     GraphHead head = result.getGraphHead().collect().get(0);
 
-    assertEquals("Wrong average value for fully connected graph, should be 1", 1d,
-      head.getPropertyValue(AverageClusteringCoefficient.PROPERTY_KEY_AVERAGE).getDouble(), 0.0);
+    assertEquals("Wrong average value for fully connected graph, should be 1",
+      1d, head.getPropertyValue(AverageClusteringCoefficient.PROPERTY_KEY_AVERAGE)
+        .getDouble(), 0.0);
   }
 
   /**
    * Test for a graph with no connections
    */
-  private void testNonConnectedGraph() throws Exception {
+  @Test
+  public void testNonConnectedGraph() throws Exception {
 
     LogicalGraph graph = loader.getLogicalGraphByVariable("nonConnected");
     LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient());
@@ -105,12 +100,17 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
 
     GraphHead head = result.getGraphHead().collect().get(0);
 
-    double average = head.getPropertyValue(AverageClusteringCoefficient.PROPERTY_KEY_AVERAGE).getDouble();
+    double average = head.getPropertyValue(AverageClusteringCoefficient.PROPERTY_KEY_AVERAGE)
+      .getDouble();
     assertEquals("Wrong average value for not connected graph, should be 0.0",
       0.0, average, 0.0);
   }
 
-  private void testHalfConnectedGraph() throws Exception {
+  /**
+   * Test for a half connected graph
+   */
+  @Test
+  public void testHalfConnectedGraph() throws Exception {
 
     LogicalGraph graph = loader.getLogicalGraphByVariable("halfConnected");
     LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient());
@@ -118,13 +118,10 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
 
     GraphHead head = result.getGraphHead().collect().get(0);
 
-    assertEquals(4L, result.getVertices().count());
-
     double average = head.getPropertyValue(AverageClusteringCoefficient.PROPERTY_KEY_AVERAGE)
       .getDouble();
     assertEquals("graph has wrong average value, should be 0.2916",
-      Precision.round(((1d/6d) + (1d/2d) + (1d/2d) + 0d) / 4d, 4),
-      Precision.round(average, 4), 0.0);
+      ((1d/6d) + (1d/2d) + (1d/2d) + 0d) / 4d, average, 0.0);
   }
 
   /**
@@ -133,9 +130,7 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
    * @param graph Graph with properties
    */
   private void validateGraphProperties(LogicalGraph graph) throws Exception {
-
     GraphHead head = graph.getGraphHead().collect().get(0);
-
     assertTrue("No average value stored in graph head",
       head.hasProperty(AverageClusteringCoefficient.PROPERTY_KEY_AVERAGE));
   }
