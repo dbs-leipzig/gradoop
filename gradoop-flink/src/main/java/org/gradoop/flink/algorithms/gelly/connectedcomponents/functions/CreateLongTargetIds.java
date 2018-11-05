@@ -16,6 +16,7 @@
 package org.gradoop.flink.algorithms.gelly.connectedcomponents.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -24,6 +25,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * Join function to receive structural information of the graph.
  * Builds edge triples with long id's.
  */
+@FunctionAnnotation.ForwardedFieldsFirst({"f0->f0", "f1->f1", "f2->f2"})
+@FunctionAnnotation.ForwardedFieldsSecond("f0->f3")
 public class CreateLongTargetIds
   implements JoinFunction<Tuple4<Long, GradoopId, Long, GradoopId>, Tuple2<Long, GradoopId>,
   Tuple4<Long, GradoopId, Long, Long>> {

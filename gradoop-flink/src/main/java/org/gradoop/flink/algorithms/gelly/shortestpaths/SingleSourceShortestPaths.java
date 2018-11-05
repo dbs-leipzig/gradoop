@@ -64,7 +64,6 @@ public class SingleSourceShortestPaths extends GradoopGellyAlgorithm<NullValue, 
   public SingleSourceShortestPaths(GradoopId srcVertexId, String propertyKeyEdge,
     int iterations, String propertyKeyVertex) {
     super(
-
       new VertexToGellyVertexWithNullValue(),
       new EdgeToGellyEdgeWithDouble(propertyKeyEdge));
     this.propertyKeyVertex = propertyKeyVertex;

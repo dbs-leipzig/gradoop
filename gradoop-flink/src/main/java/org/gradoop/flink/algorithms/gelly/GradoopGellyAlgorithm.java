@@ -42,7 +42,7 @@ public abstract class GradoopGellyAlgorithm<VV, EV>
   protected LogicalGraph currentGraph;
 
   /**
-   * Function mapping to edge to gelly edge.
+   * Function mapping edge to gelly edge.
    */
   private final EdgeToGellyEdge<EV> toGellyEdge;
 
