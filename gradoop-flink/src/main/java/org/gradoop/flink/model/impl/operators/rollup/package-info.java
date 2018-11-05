@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains all implementations of the graph property transformation operator.
+ * Contains all implementations of the graph rollUp operator.
  */
-package org.gradoop.flink.model.impl.operators.propertytransformation;
+package org.gradoop.flink.model.impl.operators.rollup;
