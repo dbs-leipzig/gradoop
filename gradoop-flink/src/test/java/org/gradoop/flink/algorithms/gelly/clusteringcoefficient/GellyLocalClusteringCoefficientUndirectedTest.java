@@ -15,36 +15,49 @@
  */
 package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 
-import org.apache.commons.math3.util.Precision;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.LogicalGraph;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Test-class for {@link GellyClusteringCoefficientUndirected}
+ * Test-class for {@link GellyLocalClusteringCoefficientUndirected}
  */
-public class GellyClusteringCoefficientUndirectedTest extends GellyClusteringCoefficientTestBase {
-
-  /**
-   * Creates an instance of GellyClusteringCoefficientUndirectedTest.
-   * Calls constructor of super class.
-   */
-  public GellyClusteringCoefficientUndirectedTest() {
-    super();
-  }
+public class GellyLocalClusteringCoefficientUndirectedTest
+  extends GellyClusteringCoefficientTestBase {
 
   @Override
   public ClusteringCoefficientBase getCCAlgorithm() {
-    return new GellyClusteringCoefficientUndirected();
+    return new GellyLocalClusteringCoefficientUndirected();
+  }
+
+  @Override
+  public void testFullyConnectedGraph() throws Exception {
+    validateGraphProperties(fullGraph);
+    List<Vertex> vertices = fullGraph.getVertices().collect();
+    for (Vertex v : vertices) {
+      assertEquals("Wrong local value for clique-vertex '" + v.getId().toString() +
+          "', should be 1", 1d,
+        v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
+    }
+  }
+
+  @Override
+  public void testNonConnectedGraph() throws Exception {
+    validateGraphProperties(nonConnectedGraph);
+    List<Vertex> vertices = nonConnectedGraph.getVertices().collect();
+    for (Vertex v : vertices) {
+      assertEquals("Wrong local value for not connected vertex: " + v.getId().toString() +
+          ", should be 0",0d,
+        v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
+    }
   }
 
   @Override
   public void testSpecific() throws Exception {
-
     String graphString = "halfConnected[" +
       "/* half connected graph */" +
       "(v0 {id:0, value:\"A\"})" +
@@ -61,14 +74,13 @@ public class GellyClusteringCoefficientUndirectedTest extends GellyClusteringCoe
       "(v2)-[e7]->(v1)" +
       "]";
 
-    LogicalGraph graph = getLoaderFromString(graphString).getLogicalGraphByVariable("halfConnected");
+    LogicalGraph graph = getLoaderFromString(graphString)
+      .getLogicalGraphByVariable("halfConnected");
     LogicalGraph result = graph.callForGraph(getCCAlgorithm());
 
     validateGraphProperties(result);
 
     List<Vertex> vertices = result.getVertices().collect();
-    GraphHead head = result.getGraphHead().collect().get(0);
-
     for (Vertex v : vertices) {
       if (v.getPropertyValue("id").getInt() == 0) {
         assertEquals("vertex with id 0 has wrong local value, should be 0.3333", (1d/3d),
@@ -83,22 +95,18 @@ public class GellyClusteringCoefficientUndirectedTest extends GellyClusteringCoe
           v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
       }
       if (v.getPropertyValue("id").getInt() == 3) {
-        assertEquals("vertex with id 3 has wrong local value, should be 0 or NaN",
-          Double.NaN,
+        assertEquals("vertex with id 3 has wrong local value, should be 0", 0.0,
           v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
       }
     }
+  }
 
-    double average = head.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_AVERAGE)
-      .getDouble();
-    assertEquals("graph has wrong average value, should be 0.583",
-      Precision.round((1d + 1d + (1d/3d) + 0d) / 4d, 3),
-      Precision.round(average, 3), 0.0);
-
-    double global = head.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL)
-      .getDouble();
-    assertEquals("graph has wrong global value, should be 0.6",
-      Precision.round(3d / 5d, 3),
-      Precision.round(global, 3), 0.0);
+  @Override
+  public void validateGraphProperties(LogicalGraph graph) throws Exception {
+    List<Vertex> vertices = graph.getVertices().collect();
+    for (Vertex v : vertices) {
+      assertTrue("No local value stored in vertex: " + v.getId().toString(),
+        v.hasProperty(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL));
+    }
   }
 }
