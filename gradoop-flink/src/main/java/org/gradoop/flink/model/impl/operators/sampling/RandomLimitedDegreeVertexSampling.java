@@ -31,7 +31,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 /**
  * Computes a vertex sampling of the graph. Retains all vertices with a degree greater than a given
  * degree threshold and degree type. Also retains randomly chosen vertices with a degree smaller
- * or equal this threshold. Retains all edges which source- and target-vertices where chosen.
+ * or equal this threshold. Retains all edges which source- and target-vertices were chosen.
  */
 public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
 

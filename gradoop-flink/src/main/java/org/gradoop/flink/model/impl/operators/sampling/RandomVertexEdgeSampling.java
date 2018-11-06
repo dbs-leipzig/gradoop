@@ -19,7 +19,7 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 
 /**
  * Computes an edge sampling of the graph. First selects randomly chosen vertices of a given
- * relative amount and all edges which source- and target-vertices where chosen. Then randomly
+ * relative amount and all edges which source- and target-vertices were chosen. Then randomly
  * chooses edges from this set of edges and their associated source- and target-vertices.
  * No unconnected vertices will retain in the sampled graph.
  */
