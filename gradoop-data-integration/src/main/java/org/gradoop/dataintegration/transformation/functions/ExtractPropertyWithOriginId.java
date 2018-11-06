@@ -36,19 +36,19 @@ public class ExtractPropertyWithOriginId implements FlatMapFunction<Vertex, Tupl
    * @param originalPropertyName The property key of the property value.
    */
   public ExtractPropertyWithOriginId(String originalPropertyName) {
-      this.originalPropertyName = originalPropertyName;
-    }
+    this.originalPropertyName = originalPropertyName;
+  }
 
   /**
    * {@inheritDoc}
    */
   @Override
   public void flatMap(Vertex vertex, Collector<Tuple2<PropertyValue, GradoopId>> out) {
-    if (vertex.getProperties() != null
-        && vertex.getProperties().containsKey(originalPropertyName)) {
+    if (vertex.getProperties() != null &&
+        vertex.getProperties().containsKey(originalPropertyName)) {
       PropertyValue pv = vertex.getPropertyValue(originalPropertyName);
-      if(pv.isList()) {
-        for(PropertyValue value : pv.getList()) {
+      if (pv.isList()) {
+        for (PropertyValue value : pv.getList()) {
           out.collect(new Tuple2<>(value, vertex.getId()));
         }
       } else {

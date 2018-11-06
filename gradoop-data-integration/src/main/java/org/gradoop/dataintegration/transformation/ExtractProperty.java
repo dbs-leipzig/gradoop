@@ -17,6 +17,7 @@ package org.gradoop.dataintegration.transformation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Preconditions;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -41,28 +42,29 @@ import java.util.List;
 public class ExtractProperty implements UnaryGraphToGraphOperator {
 
   /** The vertices the extraction is executed for. */
-  private final String forVerticesOfLabel;
+  private String forVerticesOfLabel;
 
   /** The property key at the original vertex. */
-  private final String originalPropertyName;
+  private String originalPropertyName;
 
   /** The label of the extracted vertex. */
-  private final String newVertexLabel;
+  private String newVertexLabel;
 
   /** The property name of the extracted property at the new vertex. */
-  private final String newPropertyName;
+  private String newPropertyName;
 
   /** The direction of the created edge(s). */
-  private final EdgeDirection edgeDirection;
+  private EdgeDirection edgeDirection;
 
   /** The label of the newly created edge(s). */
-  private final String edgeLabel;
+  private String edgeLabel;
 
   /**
    * If true, all property values got condensed based on their equality.
    * So that every newly created vertex has a unique property value.
+   * The default value is 'true'.
    */
-  private boolean condense;
+  private boolean condense = true;
 
   /**
    * Constructs a new {@link UnaryGraphToGraphOperator} which extracts properties from vertices into
@@ -75,13 +77,8 @@ public class ExtractProperty implements UnaryGraphToGraphOperator {
    */
   public ExtractProperty(String forVerticesOfLabel, String originalPropertyName,
                          String newVertexLabel, String newPropertyName) {
-    this.forVerticesOfLabel = forVerticesOfLabel;
-    this.originalPropertyName = originalPropertyName;
-    this.newVertexLabel = newVertexLabel;
-    this.newPropertyName = newPropertyName;
-    this.edgeDirection = EdgeDirection.NONE;
-    this.edgeLabel = null;
-    this.condense = true;
+    init(forVerticesOfLabel, originalPropertyName, newVertexLabel, newPropertyName,
+        EdgeDirection.NONE, null);
   }
 
   /**
@@ -98,12 +95,31 @@ public class ExtractProperty implements UnaryGraphToGraphOperator {
   public ExtractProperty(String forVerticesOfLabel, String originalPropertyName,
                          String newVertexLabel, String newPropertyName,
                          EdgeDirection edgeDirection, String edgeLabel) {
-    this.forVerticesOfLabel = forVerticesOfLabel;
-    this.originalPropertyName = originalPropertyName;
-    this.newVertexLabel = newVertexLabel;
-    this.newPropertyName = newPropertyName;
-    this.edgeDirection = edgeDirection;
-    this.edgeLabel = edgeLabel;
+    init(forVerticesOfLabel, originalPropertyName, newVertexLabel, newPropertyName,
+        edgeDirection, edgeLabel);
+  }
+
+  /**
+   * Used for the initialization of this class.
+   *
+   * @param forVerticesOfLabel The vertices the extraction is executed for.
+   * @param originalPropertyName The property key at the original vertex.
+   * @param newVertexLabel The label of the extracted vertex.
+   * @param newPropertyName The property name of the extracted property at the new vertex.
+   * @param edgeDirection The direction of the created edge(s).
+   * @param edgeLabel The label of the newly created edge.
+   */
+  private void init(String forVerticesOfLabel, String originalPropertyName,
+                    String newVertexLabel, String newPropertyName,
+                    EdgeDirection edgeDirection, String edgeLabel) {
+    this.forVerticesOfLabel = Preconditions.checkNotNull(forVerticesOfLabel);
+    this.originalPropertyName = Preconditions.checkNotNull(originalPropertyName);
+    this.newVertexLabel = Preconditions.checkNotNull(newVertexLabel);
+    this.newPropertyName = Preconditions.checkNotNull(newPropertyName);
+    this.edgeDirection = Preconditions.checkNotNull(edgeDirection);
+    if (!edgeDirection.equals(EdgeDirection.NONE)) {
+      this.edgeLabel = Preconditions.checkNotNull(edgeLabel);
+    }
   }
 
   /**
@@ -132,7 +148,7 @@ public class ExtractProperty implements UnaryGraphToGraphOperator {
 
     // extract the new vertices
     DataSet<Tuple2<Vertex, List<GradoopId>>> newVerticesAndOriginIds;
-    if(condense) {
+    if (condense) {
       newVerticesAndOriginIds = candidates
           .groupBy(0)
           .reduceGroup(new CreateNewVertexWithEqualityCondense(newVertexLabel, newPropertyName));

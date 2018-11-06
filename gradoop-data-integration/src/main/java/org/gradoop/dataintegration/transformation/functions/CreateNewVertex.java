@@ -54,7 +54,8 @@ public class CreateNewVertex implements FlatMapFunction<Tuple2<PropertyValue, Gr
    * {@inheritDoc}
    */
   @Override
-  public void flatMap(Tuple2<PropertyValue, GradoopId> value, Collector<Tuple2<Vertex, List<GradoopId>>> out) {
+  public void flatMap(Tuple2<PropertyValue, GradoopId> value,
+                      Collector<Tuple2<Vertex, List<GradoopId>>> out) {
     Vertex vertex = vertexFactory.createVertex(newVertexLabel);
     vertex.setProperty(newPropertyName, value.f0);
 

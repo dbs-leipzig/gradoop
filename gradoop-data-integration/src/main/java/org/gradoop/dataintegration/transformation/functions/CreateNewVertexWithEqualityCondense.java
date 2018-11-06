@@ -56,7 +56,8 @@ public class CreateNewVertexWithEqualityCondense implements GroupReduceFunction<
    * {@inheritDoc}
    */
   @Override
-  public void reduce(Iterable<Tuple2<PropertyValue, GradoopId>> values, Collector<Tuple2<Vertex, List<GradoopId>>> out) {
+  public void reduce(Iterable<Tuple2<PropertyValue, GradoopId>> values,
+                     Collector<Tuple2<Vertex, List<GradoopId>>> out) {
     List<GradoopId> sources = new ArrayList<>();
     PropertyValue pv = null;
 
