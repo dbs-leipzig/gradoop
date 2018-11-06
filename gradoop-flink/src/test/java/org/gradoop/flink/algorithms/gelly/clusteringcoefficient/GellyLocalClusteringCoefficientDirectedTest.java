@@ -80,15 +80,15 @@ public class GellyLocalClusteringCoefficientDirectedTest
     for (Vertex v : vertices) {
       if (v.getPropertyValue("id").getInt() == 0) {
         assertEquals("vertex with id 0 has wrong local value, should be 0.1666", (1d/6d),
-          v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
+          v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.00001);
       }
       if (v.getPropertyValue("id").getInt() == 1) {
         assertEquals("vertex with id 1 has wrong local value, should be 0.5", (1d/2d),
-          v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
+          v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.00001);
       }
       if (v.getPropertyValue("id").getInt() == 2) {
         assertEquals("vertex with id 2 has wrong local value, should be 0.5", (1d/2d),
-          v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
+          v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.00001);
       }
       if (v.getPropertyValue("id").getInt() == 3) {
         assertEquals("vertex with id 3 has wrong local value, should be 0", 0.0,
