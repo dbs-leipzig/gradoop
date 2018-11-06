@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.algorithms.gelly.functions;
 
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.types.NullValue;
@@ -23,6 +24,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Map function to create gelly edge from long tuple.
  */
+@FunctionAnnotation.ForwardedFields({"f2->f0", "f3->f1"})
 public class LongTupleToGellyEdgeWithLongValue
   implements ElementToGellyEdge<Tuple4<Long, GradoopId, Long, Long>, Long, NullValue> {
 
@@ -32,7 +34,7 @@ public class LongTupleToGellyEdgeWithLongValue
   private Edge<Long, NullValue> reuse;
 
   /**
-   * Constructor.
+   * Creates an instance of this map function to create gelly edges.
    */
   public LongTupleToGellyEdgeWithLongValue() {
     reuse = new Edge<>();
@@ -44,11 +46,9 @@ public class LongTupleToGellyEdgeWithLongValue
    *
    * @param tuple identifier of source and target vertex id's.
    * @return gelly edge.
-   * @throws Exception in case of failure.
    */
   @Override
-  public Edge<Long, NullValue> map(
-    Tuple4<Long, GradoopId, Long, Long> tuple) throws Exception {
+  public Edge<Long, NullValue> map(Tuple4<Long, GradoopId, Long, Long> tuple) {
     reuse.setSource(tuple.f2);
     reuse.setTarget(tuple.f3);
     return reuse;

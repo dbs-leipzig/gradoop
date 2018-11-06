@@ -33,15 +33,15 @@ public class ValueConnectedComponentsDistribution
   /**
    * Max iterations.
    */
-  private final int k;
+  private final int maxIteration;
 
   /**
-   * Constructor.
+   * Creates an instance of this operator to calculate the connected components distribution.
    *
    * @param maxiIteration max iteration count.
    */
   public ValueConnectedComponentsDistribution(int maxiIteration) {
-    this.k = maxiIteration;
+    this.maxIteration = maxiIteration;
   }
 
   /**
@@ -49,7 +49,7 @@ public class ValueConnectedComponentsDistribution
    */
   @Override
   public DataSet<Tuple2<Long, Long>> execute(LogicalGraph graph) {
-    return new ValueWeaklyConnectedComponents(k).execute(graph);
+    return new ValueWeaklyConnectedComponents(maxIteration).execute(graph);
   }
 
   /**

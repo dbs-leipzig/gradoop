@@ -48,14 +48,13 @@ public class ValueWeaklyConnectedComponents
    */
   private int maxIteration;
 
-
   /**
-   * Constructor.
+   * Creates an instance of this operator to calculate the connected components of a graph.
    *
-   * @param k Max number of Gelly iterations.
+   * @param maxIteration Max number of Gelly iterations.
    */
-  public ValueWeaklyConnectedComponents(int k) {
-    this.maxIteration = k;
+  public ValueWeaklyConnectedComponents(int maxIteration) {
+    this.maxIteration = maxIteration;
   }
 
   /**

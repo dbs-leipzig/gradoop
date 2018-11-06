@@ -26,8 +26,7 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 
 /**
- * Base class for Algorithms executed in Flink Gelly that returns a LogicalGraph
- * {@link LogicalGraph}.
+ * Base class for Algorithms executed in Flink Gelly that returns a {@link LogicalGraph}.
  *
  * @param <VV> Value type for gelly vertices.
  * @param <EV> Value type for gelly edges.

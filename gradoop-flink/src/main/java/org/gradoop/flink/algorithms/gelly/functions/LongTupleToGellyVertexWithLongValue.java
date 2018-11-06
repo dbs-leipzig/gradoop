@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.algorithms.gelly.functions;
 
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -22,6 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Map function to create gelly vertices from long tuple.
  */
+@FunctionAnnotation.ForwardedFields({"f0->f0", "f0->f1"})
 public class LongTupleToGellyVertexWithLongValue
   implements ElementToGellyVertex<Tuple2<Long, GradoopId>, Long, Long> {
 
@@ -42,12 +44,9 @@ public class LongTupleToGellyVertexWithLongValue
    *
    * @param tuple given unique vertex id
    * @return gelly vertex
-   * @throws Exception in case of failure
-   *
-   * {@inheritDoc}
    */
   @Override
-  public Vertex<Long, Long> map(Tuple2<Long, GradoopId> tuple) throws Exception {
+  public Vertex<Long, Long> map(Tuple2<Long, GradoopId> tuple) {
     vertex.setId(tuple.f0);
     vertex.setValue(tuple.f0);
     return vertex;

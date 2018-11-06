@@ -37,7 +37,7 @@ public class CreateLongTargetIds
   private Tuple4<Long, GradoopId, Long, Long> reuse;
 
   /**
-   * Constructor.
+   * Creates an instance of this join function.
    */
   public CreateLongTargetIds() {
     reuse = new Tuple4<>();
@@ -49,12 +49,10 @@ public class CreateLongTargetIds
    * @param edgeTuple intermediate join result.
    * @param uniqueVertex unique vertex identifier.
    * @return tuple <vertexID<Long>>,vertexID<GradoopID>>,sourceID<Long>>,targetID<Long>>
-   * @throws Exception in case of failure.
    */
   @Override
   public Tuple4<Long, GradoopId, Long, Long> join(
-    Tuple4<Long, GradoopId, Long, GradoopId> edgeTuple,
-    Tuple2<Long, GradoopId> uniqueVertex) throws Exception {
+    Tuple4<Long, GradoopId, Long, GradoopId> edgeTuple, Tuple2<Long, GradoopId> uniqueVertex) {
     reuse.f0 = edgeTuple.f0;
     reuse.f1 = edgeTuple.f1;
     reuse.f2 = edgeTuple.f2;

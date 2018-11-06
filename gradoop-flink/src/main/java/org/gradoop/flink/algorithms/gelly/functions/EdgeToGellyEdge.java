@@ -23,6 +23,5 @@ import org.gradoop.common.model.impl.pojo.Edge;
  *
  * @param <EV> Value type of the output gelly edge.
  */
-public interface EdgeToGellyEdge<EV>
-  extends ElementToGellyEdge<Edge, GradoopId, EV> {
+public interface EdgeToGellyEdge<EV> extends ElementToGellyEdge<Edge, GradoopId, EV> {
 }

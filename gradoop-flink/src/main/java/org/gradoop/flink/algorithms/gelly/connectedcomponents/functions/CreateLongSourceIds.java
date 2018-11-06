@@ -37,7 +37,7 @@ public class CreateLongSourceIds
   private Tuple4<Long, GradoopId, Long, GradoopId> reuse;
 
   /**
-   * Constructor.
+   * Creates an instance of this join function.
    */
   public CreateLongSourceIds() {
     reuse = new Tuple4<>();
@@ -49,13 +49,9 @@ public class CreateLongSourceIds
    * @param tuple holds information about long id and gradoop id of a vertex
    * @param edge holds information about source and target vertices
    * @return tuple <vertexID<Long>>,vertexID<GradoopID>>,sourceID<Long>>,targetID<GradoopID>>
-   * @throws Exception in case of failure.
-   *
-   * {@inheritDoc}
    */
   @Override
-  public Tuple4<Long, GradoopId, Long, GradoopId> join(Tuple2<Long, GradoopId> tuple, Edge edge)
-    throws Exception {
+  public Tuple4<Long, GradoopId, Long, GradoopId> join(Tuple2<Long, GradoopId> tuple, Edge edge) {
     reuse.f0 = tuple.f0;
     reuse.f1 = tuple.f1;
     reuse.f2 = tuple.f0;
