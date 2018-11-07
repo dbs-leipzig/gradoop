@@ -150,12 +150,6 @@
             <artifactId>flink-hadoop-compatibility_2.11</artifactId>
         </dependency>
 
-        <dependency>
-			<groupId>org.apache.flink</groupId>
-			<artifactId>flink-jdbc</artifactId>
-			<version>1.5.2</version>
-		</dependency>
-		
         <!-- Test dependencies -->
 
         <!-- Gradoop -->

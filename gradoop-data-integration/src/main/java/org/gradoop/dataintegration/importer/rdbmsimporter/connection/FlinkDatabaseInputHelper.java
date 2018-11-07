@@ -45,7 +45,7 @@ public class FlinkDatabaseInputHelper {
 
     // run jdbc input format with pagination
     JDBCInputFormat jdbcInput = JDBCInputFormat.buildJDBCInputFormat()
-        .setDrivername("org.gradoop.flink.io.impl.rdbms.connection.DriverShim")
+        .setDrivername("org.gradoop.dataintegration.importer.rdbmsimporter.connection.DriverShim")
         .setDBUrl(rdbmsConfig.getUrl()).setUsername(rdbmsConfig.getUser())
         .setPassword(rdbmsConfig.getPw())
         .setQuery(sqlQuery + PageinationQueryChooser.choose(rdbmsConfig.getRdbmsType()))
