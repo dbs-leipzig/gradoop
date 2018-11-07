@@ -29,4 +29,9 @@ public class EdgeCount implements UnaryGraphToValueOperator<DataSet<Long>> {
   public DataSet<Long> execute(LogicalGraph graph) {
     return Count.count(graph.getEdges());
   }
+
+  @Override
+  public String getName() {
+    return EdgeCount.class.getName();
+  }
 }

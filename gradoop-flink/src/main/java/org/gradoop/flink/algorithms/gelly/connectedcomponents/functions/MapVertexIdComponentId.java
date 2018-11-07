@@ -13,25 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.statistics;
+package org.gradoop.flink.algorithms.gelly.connectedcomponents.functions;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
-import org.gradoop.flink.model.impl.operators.count.Count;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.graph.Vertex;
 
 /**
- * Computes the number of vertices in the given graph.
+ * Map function to pass the gelly vertex as tuple.
  */
-public class VertexCount implements UnaryGraphToValueOperator<DataSet<Long>> {
+public class MapVertexIdComponentId implements MapFunction<Vertex<Long, Long>, Tuple2<Long, Long>> {
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public DataSet<Long> execute(LogicalGraph graph) {
-    return Count.count(graph.getVertices());
-  }
-
-  @Override
-  public String getName() {
-    return VertexCount.class.getName();
+  public Tuple2<Long, Long> map(Vertex<Long, Long> gellyVertex) throws Exception {
+    return gellyVertex;
   }
 }

@@ -22,7 +22,7 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
  *
  * @param <T> result type
  */
-public interface UnaryGraphToValueOperator<T> {
+public interface UnaryGraphToValueOperator<T> extends Operator {
   /**
    * Executes the operator.
    *
