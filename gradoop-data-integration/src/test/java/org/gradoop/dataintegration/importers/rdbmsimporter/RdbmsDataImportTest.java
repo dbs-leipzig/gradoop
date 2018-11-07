@@ -58,6 +58,9 @@ public class RdbmsDataImportTest extends GradoopFlinkTestBase {
     metadataParser = new MetaDataParser(con, RdbmsType.MYSQL_TYPE);
     metadataParser.parse();
 
+    System.out.println(RdbmsDataImportTest.class
+        .getResource("/data/rdbms/expected/cycleTest.gdl").getFile());
+    
     gdlPath = RdbmsDataImportTest.class
         .getResource("/data/rdbms/expected/cycleTest.gdl").getFile();
   }

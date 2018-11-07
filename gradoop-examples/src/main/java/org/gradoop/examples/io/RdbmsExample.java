@@ -62,7 +62,7 @@ public class RdbmsExample implements ProgramDescription {
 
     // create default Gradoop configuration
     GradoopFlinkConfig gfc = GradoopFlinkConfig.createConfig(env);
-     
+
     // create DataSource
     RdbmsDataSource dataSource = new RdbmsDataSource(url, user, pw, jdbcDriverPath,
         jdbcDriverClassName, gfc);

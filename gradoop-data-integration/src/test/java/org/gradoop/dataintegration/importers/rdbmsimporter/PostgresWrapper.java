@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.gradoop.dataintegration.importers.rdbmsimporter;
 
 import java.io.File;
@@ -42,6 +43,8 @@ public class PostgresWrapper {
       int port = getFreePort();
       embeddedPostgres = new EmbeddedPostgres();
       connectionUrl = embeddedPostgres.start("localhost", port, "dbName", "userName", "password");
+      System.out.println(new File(RdbmsDataImportTest.class
+          .getResource("/data/rdbms/input/husband.sql").getFile()));
       embeddedPostgres.getProcess().get().importFromFile(new File(RdbmsDataImportTest.class
           .getResource("/data/rdbms/input/husband.sql").getFile()));
     }

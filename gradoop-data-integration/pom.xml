@@ -165,6 +165,12 @@
         
         <!-- Rdbms Importer -->
         <dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-jdbc</artifactId>
+			<version>1.5.2</version>
+		</dependency>
+        
+        <dependency>
 			<groupId>ru.yandex.qatools.embed</groupId>
 			<artifactId>postgresql-embedded</artifactId>
 			<version>2.9</version>
