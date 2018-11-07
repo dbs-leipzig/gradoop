@@ -35,4 +35,9 @@ public class DistinctEdgePropertiesByLabel
     LogicalGraph graph) {
     return graph.getEdges().flatMap(new ExtractPropertyValuesByLabel<>());
   }
+
+  @Override
+  public String getName() {
+    return DistinctEdgePropertiesByLabel.class.getName();
+  }
 }

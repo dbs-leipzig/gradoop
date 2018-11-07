@@ -41,4 +41,9 @@ public class EdgeValueDistribution<T> extends ValueDistribution<Edge, T> {
   public DataSet<WithCount<T>> execute(LogicalGraph graph) {
     return compute(graph.getEdges());
   }
+
+  @Override
+  public String getName() {
+    return EdgeValueDistribution.class.getName();
+  }
 }

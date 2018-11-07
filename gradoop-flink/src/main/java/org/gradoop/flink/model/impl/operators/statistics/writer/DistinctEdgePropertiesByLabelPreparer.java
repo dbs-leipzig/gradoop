@@ -44,4 +44,9 @@ Tuple3<String, String, Long>>> {
         .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
         .returns(new TypeHint<Tuple3<String, String, Long>>() { });
   }
+
+  @Override
+  public String getName() {
+    return DistinctEdgePropertiesByLabelPreparer.class.getName();
+  }
 }

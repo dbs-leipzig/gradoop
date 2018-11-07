@@ -34,4 +34,9 @@ public class DistinctTargetIds implements UnaryGraphToValueOperator<DataSet<Long
         .distinct()
     );
   }
+
+  @Override
+  public String getName() {
+    return DistinctTargetIds.class.getName();
+  }
 }

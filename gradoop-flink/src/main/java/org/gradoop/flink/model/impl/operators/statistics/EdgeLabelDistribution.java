@@ -34,4 +34,9 @@ public class EdgeLabelDistribution
   public DataSet<WithCount<String>> execute(LogicalGraph graph) {
     return new EdgeValueDistribution<>(new Label<>()).execute(graph);
   }
+
+  @Override
+  public String getName() {
+    return EdgeLabelDistribution.class.getName();
+  }
 }

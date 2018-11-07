@@ -42,4 +42,9 @@ public class TargetLabelAndEdgeLabelDistribution
       .with(new BothLabels()))
       .map(new Tuple2ToWithCount<>());
   }
+
+  @Override
+  public String getName() {
+    return TargetLabelAndEdgeLabelDistribution.class.getName();
+  }
 }
