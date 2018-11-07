@@ -17,51 +17,34 @@ package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 
 /**
- * Responsible to create instances of {@link GraphCollection} based on a specific
+ * Responsible to create instances of graph collections with type {@link GC} based on a specific
  * {@link org.gradoop.flink.model.api.layouts.GraphCollectionLayout}.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <GC> the type of the graph collection that will be created with this factory
  */
-public class GraphCollectionFactory {
-  /**
-   * Creates the layout from given data.
-   */
-  private GraphCollectionLayoutFactory layoutFactory;
+public interface SingleGraphCollectionFactory<G extends EPGMGraphHead, V extends EPGMVertex,
+  E extends EPGMEdge, GC extends SingleGraphCollection> {
 
-  /**
-   * Gradoop Flink configuration.
-   */
-  private final GradoopFlinkConfig config;
-
-  /**
-   * Creates a new factory.
-   *
-   * @param config Gradoop Flink configuration
-   */
-  public GraphCollectionFactory(GradoopFlinkConfig config) {
-    this.config = config;
-  }
   /**
    * Sets the layout factory that is responsible for creating a graph collection layout.
    *
    * @param layoutFactory graph collection layout factory
    */
-  public void setLayoutFactory(GraphCollectionLayoutFactory layoutFactory) {
-    Objects.requireNonNull(layoutFactory);
-    this.layoutFactory = layoutFactory;
-    this.layoutFactory.setGradoopFlinkConfig(config);
-  }
+  void setLayoutFactory(GraphCollectionLayoutFactory<G, V, E> layoutFactory);
 
   /**
    * Creates a collection from the given datasets.
@@ -70,9 +53,7 @@ public class GraphCollectionFactory {
    * @param vertices    Vertex DataSet
    * @return Graph collection
    */
-  public GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices) {
-    return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices), config);
-  }
+  GC fromDataSets(DataSet<G> graphHeads, DataSet<V> vertices);
 
   /**
    * Creates a collection layout from the given datasets.
@@ -82,10 +63,7 @@ public class GraphCollectionFactory {
    * @param edges       Edge DataSet
    * @return Graph collection
    */
-  public GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
-    DataSet<Edge> edges) {
-    return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, edges), config);
-  }
+  GC fromDataSets(DataSet<G> graphHeads, DataSet<V> vertices, DataSet<E> edges);
 
   /**
    * Creates a graph collection from the given datasets. The method assumes, that all vertices and
@@ -96,11 +74,8 @@ public class GraphCollectionFactory {
    * @param edges label indexed edge datasets
    * @return graph collection
    */
-  public GraphCollection fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
-    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
-    GraphCollectionLayout layout = layoutFactory.fromIndexedDataSets(graphHeads, vertices, edges);
-    return new GraphCollection(layout, config);
-  }
+  GC fromIndexedDataSets(Map<String, DataSet<G>> graphHeads, Map<String, DataSet<V>> vertices,
+    Map<String, DataSet<E>> edges);
 
   /**
    * Creates a collection layout from the given collections.
@@ -110,10 +85,7 @@ public class GraphCollectionFactory {
    * @param edges       Edge collection
    * @return Graph collection
    */
-  public GraphCollection fromCollections(Collection<GraphHead> graphHeads,
-    Collection<Vertex> vertices, Collection<Edge> edges) {
-    return new GraphCollection(layoutFactory.fromCollections(graphHeads, vertices, edges), config);
-  }
+  GC fromCollections(Collection<G> graphHeads, Collection<V> vertices, Collection<E> edges);
 
   /**
    * Creates a graph collection from a given logical graph.
@@ -121,9 +93,7 @@ public class GraphCollectionFactory {
    * @param logicalGraphLayout  input graph
    * @return 1-element graph collection
    */
-  public GraphCollection fromGraph(LogicalGraph logicalGraphLayout) {
-    return new GraphCollection(layoutFactory.fromGraphLayout(logicalGraphLayout), config);
-  }
+  GC fromGraph(LogicalGraph logicalGraphLayout);
 
   /**
    * Creates a graph collection from a graph transaction dataset.
@@ -133,9 +103,7 @@ public class GraphCollectionFactory {
    * @param transactions  transaction dataset
    * @return graph collection
    */
-  public GraphCollection fromTransactions(DataSet<GraphTransaction> transactions) {
-    return new GraphCollection(layoutFactory.fromTransactions(transactions), config);
-  }
+  GC fromTransactions(DataSet<GraphTransaction> transactions);
 
   /**
    * Creates a graph collection layout from graph transactions.
@@ -147,19 +115,15 @@ public class GraphCollectionFactory {
    * @param edgeMergeReducer    edge merge function
    * @return graph collection
    */
-  public GraphCollection fromTransactions(DataSet<GraphTransaction> transactions,
-    GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
-    GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
-    return new GraphCollection(layoutFactory
-      .fromTransactions(transactions, vertexMergeReducer, edgeMergeReducer), config);
-  }
+  GC fromTransactions(
+    DataSet<GraphTransaction> transactions,
+    GroupReduceFunction<V, V> vertexMergeReducer,
+    GroupReduceFunction<E, E> edgeMergeReducer);
 
   /**
    * Creates an empty graph collection layout.
    *
    * @return empty graph collection layout
    */
-  public GraphCollection createEmptyCollection() {
-    return new GraphCollection(layoutFactory.createEmptyCollection(), config);
-  }
+  GC createEmptyCollection();
 }

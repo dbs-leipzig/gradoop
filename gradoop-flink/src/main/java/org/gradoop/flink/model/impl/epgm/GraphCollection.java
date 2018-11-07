@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.epgm;
+package org.gradoop.flink.model.impl.epgm;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.common.functions.FilterFunction;
@@ -26,6 +26,9 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
+import org.gradoop.flink.model.api.epgm.SingleGraphCollection;
+import org.gradoop.flink.model.api.epgm.SingleGraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.GraphCollectionOperators;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
@@ -81,11 +84,13 @@ import java.util.Objects;
  * is represented in Apache Flink. Note that the GraphCollection also implements that interface and
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
-public class GraphCollection implements GraphCollectionOperators, GraphCollectionLayout {
+public class GraphCollection implements
+  SingleGraphCollection<GraphHead, Vertex, Edge, GraphCollection>,
+  GraphCollectionLayout<GraphHead, Vertex, Edge>, GraphCollectionOperators {
   /**
    * Layout for that graph collection
    */
-  private final GraphCollectionLayout layout;
+  private final GraphCollectionLayout<GraphHead, Vertex, Edge> layout;
   /**
    * Configuration
    */
@@ -97,11 +102,10 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
    * @param layout Graph collection layout
    * @param config Gradoop Flink configuration
    */
-  GraphCollection(GraphCollectionLayout layout, GradoopFlinkConfig config) {
-    Objects.requireNonNull(layout);
-    Objects.requireNonNull(config);
-    this.layout = layout;
-    this.config = config;
+  GraphCollection(GraphCollectionLayout<GraphHead, Vertex, Edge> layout,
+    GradoopFlinkConfig config) {
+    this.layout = Objects.requireNonNull(layout);
+    this.config = Objects.requireNonNull(config);
   }
 
   //----------------------------------------------------------------------------
@@ -219,8 +223,7 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
     DataSet<Edge> edges = getEdges()
       .filter(new InAnyGraph<>(identifiers));
 
-    return new GraphCollection(
-      getConfig().getGraphCollectionFactory().fromDataSets(newGraphHeads, vertices, edges),
+    return new GraphCollection(getFactory().fromDataSets(newGraphHeads, vertices, edges),
       getConfig());
   }
 
@@ -409,6 +412,11 @@ public class GraphCollection implements GraphCollectionOperators, GraphCollectio
   @Override
   public GradoopFlinkConfig getConfig() {
     return config;
+  }
+
+  @Override
+  public SingleGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection> getFactory() {
+    return config.getGraphCollectionFactory();
   }
 
   /**

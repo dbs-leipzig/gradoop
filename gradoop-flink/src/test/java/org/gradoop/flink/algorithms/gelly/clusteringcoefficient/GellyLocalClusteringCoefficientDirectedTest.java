@@ -16,7 +16,7 @@
 package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 import java.util.List;
 

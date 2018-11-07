@@ -26,8 +26,8 @@ import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
 import org.gradoop.flink.io.impl.csv.tuples.CSVGraphHead;
 import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;

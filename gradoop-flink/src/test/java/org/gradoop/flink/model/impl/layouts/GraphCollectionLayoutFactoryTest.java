@@ -16,7 +16,6 @@
 package org.gradoop.flink.model.impl.layouts;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
@@ -26,24 +25,21 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
-import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElements;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
 import static org.junit.Assert.assertEquals;
 
 public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestBase {
 
-  protected abstract GraphCollectionLayoutFactory getFactory();
+  protected abstract GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> getFactory();
 
   @Test
   public void testFromDataSets() throws Exception {
@@ -60,7 +56,7 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
     DataSet<Edge> edgeDataSet = getExecutionEnvironment()
       .fromCollection(edges);
 
-    GraphCollectionLayout collectionLayout = getFactory()
+    GraphCollectionLayout<GraphHead, Vertex, Edge> collectionLayout = getFactory()
       .fromDataSets(graphHeadDataSet, vertexDataSet, edgeDataSet);
 
     Collection<GraphHead> loadedGraphHeads  = Lists.newArrayList();
@@ -96,7 +92,7 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
       .collect(Collectors.groupingBy(Edge::getLabel)).entrySet().stream()
       .collect(Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
 
-    GraphCollectionLayout collectionLayout = getFactory()
+    GraphCollectionLayout<GraphHead, Vertex, Edge> collectionLayout = getFactory()
       .fromIndexedDataSets(indexedGraphHeads, indexedVertices, indexedEdges);
 
     Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
@@ -123,7 +119,7 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
   public void testFromDataSetsWithoutGraphHead() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("()-[]->(),[()]");
 
-    GraphCollectionLayout collectionLayout = getFactory()
+    GraphCollectionLayout<GraphHead, Vertex, Edge> collectionLayout = getFactory()
       .fromDataSets(
         getExecutionEnvironment().fromCollection(loader.getGraphHeads()),
         getExecutionEnvironment().fromCollection(loader.getVertices()),
@@ -150,7 +146,7 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
   public void testFromCollections() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    GraphCollectionLayout collectionLayout = getFactory()
+    GraphCollectionLayout<GraphHead, Vertex, Edge> collectionLayout = getFactory()
       .fromCollections(loader.getGraphHeads(),
         loader.getVertices(),
         loader.getEdges());
@@ -190,7 +186,7 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
 
     DataSet<GraphTransaction> transactions = getExecutionEnvironment().fromElements(g0, g1, g2);
 
-    GraphCollectionLayout collectionLayout = getFactory().fromTransactions(transactions);
+    GraphCollectionLayout<GraphHead, Vertex, Edge> collectionLayout = getFactory().fromTransactions(transactions);
 
     Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
     Collection<Vertex> loadedVertices = Lists.newArrayList();
@@ -211,7 +207,7 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
 
   @Test
   public void testCreateEmptyCollection() throws Exception {
-    GraphCollectionLayout graphCollectionLayout = getFactory().createEmptyCollection();
+    GraphCollectionLayout<GraphHead, Vertex, Edge> graphCollectionLayout = getFactory().createEmptyCollection();
 
     Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
     Collection<Vertex> loadedVertices = Lists.newArrayList();

@@ -20,7 +20,7 @@ import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasEdgeLabel;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasVertexLabel;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;

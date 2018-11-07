@@ -17,7 +17,8 @@ package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 import java.io.IOException;
 
@@ -28,13 +29,6 @@ import java.io.IOException;
  * @see GraphCollection
  */
 public interface GraphBaseOperators {
-
-  /**
-   * Returns the Gradoop Flink configuration.
-   *
-   * @return Gradoop Flink configuration
-   */
-  GradoopFlinkConfig getConfig();
 
   //----------------------------------------------------------------------------
   // Utility methods

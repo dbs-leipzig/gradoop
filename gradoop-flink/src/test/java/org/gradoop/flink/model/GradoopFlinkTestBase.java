@@ -23,6 +23,9 @@ import org.apache.flink.test.util.TestBaseUtils;
 import org.apache.flink.test.util.TestEnvironment;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
@@ -69,17 +72,17 @@ public abstract class GradoopFlinkTestBase {
    */
   private GradoopFlinkConfig config;
 
-  private LogicalGraphLayoutFactory graphLayoutFactory;
+  private LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> graphLayoutFactory;
 
-  private GraphCollectionLayoutFactory collectionLayoutFactory;
+  private GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> collectionLayoutFactory;
 
   public GradoopFlinkTestBase() {
     TestEnvironment testEnv = new TestEnvironment(CLUSTER, DEFAULT_PARALLELISM, false);
     // makes ExecutionEnvironment.getExecutionEnvironment() return this instance
     testEnv.setAsContext();
     this.env = testEnv;
-    setGraphLayoutFactory(new GVEGraphLayoutFactory());
-    setCollectionLayoutFactory(new GVECollectionLayoutFactory());
+    this.graphLayoutFactory = new GVEGraphLayoutFactory();
+    this.collectionLayoutFactory = new GVECollectionLayoutFactory();
   }
 
   /**
@@ -99,8 +102,8 @@ public abstract class GradoopFlinkTestBase {
   protected GradoopFlinkConfig getConfig() {
     if (config == null) {
       setConfig(GradoopFlinkConfig.createConfig(getExecutionEnvironment(),
-        getGraphLayoutFactory(),
-        getCollectionLayoutFactory()));
+        graphLayoutFactory,
+        collectionLayoutFactory));
     }
     return config;
   }
@@ -112,19 +115,8 @@ public abstract class GradoopFlinkTestBase {
     this.config = config;
   }
 
-  protected LogicalGraphLayoutFactory getGraphLayoutFactory() {
-    return graphLayoutFactory;
-  }
-
-  protected void setGraphLayoutFactory(LogicalGraphLayoutFactory graphLayoutFactory) {
-    this.graphLayoutFactory = graphLayoutFactory;
-  }
-
-  protected GraphCollectionLayoutFactory getCollectionLayoutFactory() {
-    return collectionLayoutFactory;
-  }
-
-  protected void setCollectionLayoutFactory(GraphCollectionLayoutFactory collectionLayoutFactory) {
+  protected void setCollectionLayoutFactory(
+    GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> collectionLayoutFactory) {
     this.collectionLayoutFactory = collectionLayoutFactory;
   }
 

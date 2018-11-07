@@ -15,14 +15,16 @@
  */
 package org.gradoop.flink.model.impl.layouts.gve;
 
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.LogicalGraphLayoutFactoryTest;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.junit.Test;
 
 public class GVEGraphLayoutFactoryTest extends LogicalGraphLayoutFactoryTest {
   @Override
-  protected LogicalGraphLayoutFactory getFactory() {
+  protected LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> getFactory() {
     GVEGraphLayoutFactory logicalGraphLayoutFactory = new GVEGraphLayoutFactory();
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
     config.setLogicalGraphLayoutFactory(logicalGraphLayoutFactory);

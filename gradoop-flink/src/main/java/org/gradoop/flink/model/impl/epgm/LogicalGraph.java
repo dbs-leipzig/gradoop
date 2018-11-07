@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.epgm;
+package org.gradoop.flink.model.impl.epgm;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
@@ -23,6 +23,9 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
+import org.gradoop.flink.model.api.epgm.SingleGraph;
+import org.gradoop.flink.model.api.epgm.SingleGraphFactory;
+import org.gradoop.flink.model.api.epgm.LogicalGraphOperators;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
@@ -86,11 +89,12 @@ import java.util.Objects;
  * represented in Apache Flink. Note that the LogicalGraph also implements that interface and
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
-public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
+public class LogicalGraph implements SingleGraph<GraphHead, Vertex, Edge, LogicalGraph>,
+  LogicalGraphLayout<GraphHead, Vertex, Edge>, LogicalGraphOperators {
   /**
    * Layout for that logical graph.
    */
-  private final LogicalGraphLayout layout;
+  private final LogicalGraphLayout<GraphHead, Vertex, Edge> layout;
   /**
    * Configuration
    */
@@ -102,7 +106,7 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
    * @param layout representation of the logical graph
    * @param config Gradoop Flink configuration
    */
-  LogicalGraph(LogicalGraphLayout layout, GradoopFlinkConfig config) {
+  LogicalGraph(LogicalGraphLayout<GraphHead, Vertex, Edge> layout, GradoopFlinkConfig config) {
     Objects.requireNonNull(layout);
     Objects.requireNonNull(config);
     this.layout = layout;
@@ -114,6 +118,16 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
   //----------------------------------------------------------------------------
 
   @Override
+  public GradoopFlinkConfig getConfig() {
+    return config;
+  }
+
+  @Override
+  public SingleGraphFactory<GraphHead, Vertex, Edge, LogicalGraph> getFactory() {
+    return config.getLogicalGraphFactory();
+  }
+
+  @Override
   public boolean isGVELayout() {
     return layout.isGVELayout();
   }
@@ -123,16 +137,9 @@ public class LogicalGraph implements LogicalGraphLayout, LogicalGraphOperators {
     return layout.isIndexedGVELayout();
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public DataSet<GraphHead> getGraphHead() {
     return layout.getGraphHead();
-  }
-
-  @Override
-  public GradoopFlinkConfig getConfig() {
-    return config;
   }
 
   @Override

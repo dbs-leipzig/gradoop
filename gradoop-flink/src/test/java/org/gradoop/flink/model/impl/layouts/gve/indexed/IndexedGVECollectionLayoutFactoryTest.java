@@ -15,14 +15,18 @@
  */
 package org.gradoop.flink.model.impl.layouts.gve.indexed;
 
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.GraphCollectionLayoutFactoryTest;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 public class IndexedGVECollectionLayoutFactoryTest extends GraphCollectionLayoutFactoryTest {
   @Override
-  protected GraphCollectionLayoutFactory getFactory() {
-    GraphCollectionLayoutFactory graphCollectionLayoutFactory = new IndexedGVECollectionLayoutFactory();
+  protected GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> getFactory() {
+    GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> graphCollectionLayoutFactory =
+      new IndexedGVECollectionLayoutFactory();
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
     config.setGraphCollectionLayoutFactory(graphCollectionLayoutFactory);
     return graphCollectionLayoutFactory;
