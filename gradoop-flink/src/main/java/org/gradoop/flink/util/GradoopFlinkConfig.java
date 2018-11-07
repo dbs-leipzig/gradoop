@@ -24,8 +24,8 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
-import org.gradoop.flink.model.api.epgm.SingleGraphCollectionFactory;
-import org.gradoop.flink.model.api.epgm.SingleGraphFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
@@ -46,12 +46,12 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
   /**
    * Creates instances of {@link LogicalGraph}
    */
-  private final SingleGraphFactory<GraphHead, Vertex, Edge, LogicalGraph> logicalGraphFactory;
+  private final BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph> logicalGraphFactory;
 
   /**
    * Creates instances of {@link GraphCollection}
    */
-  private final SingleGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection>
+  private final BaseGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection>
     graphCollectionFactory;
 
   /**

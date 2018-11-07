@@ -34,8 +34,8 @@ import java.util.Map;
  * @param <E> the edge type
  * @param <LG> the type of the logical graph that will be created with this factory
  */
-public interface SingleGraphFactory<G extends EPGMGraphHead, V extends EPGMVertex,
-  E extends EPGMEdge, LG extends SingleGraph> {
+public interface BaseGraphFactory<G extends EPGMGraphHead, V extends EPGMVertex,
+  E extends EPGMEdge, LG extends BaseGraph> {
 
   /**
    * Sets the layout factory that is responsible for creating a graph layout.

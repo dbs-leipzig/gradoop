@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.SingleGraphFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -32,7 +32,7 @@ import java.util.Objects;
  * {@link org.gradoop.flink.model.api.layouts.LogicalGraphLayout}.
  */
 public class LogicalGraphFactory
-  implements SingleGraphFactory<GraphHead, Vertex, Edge, LogicalGraph> {
+  implements BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph> {
   /**
    * Creates the layout from given data.
    */

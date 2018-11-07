@@ -20,7 +20,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.SingleGraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -35,7 +35,7 @@ import java.util.Objects;
  * {@link GraphCollectionLayout}.
  */
 public class GraphCollectionFactory
-  implements SingleGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection> {
+  implements BaseGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection> {
   /**
    * Creates the layout from given data.
    */

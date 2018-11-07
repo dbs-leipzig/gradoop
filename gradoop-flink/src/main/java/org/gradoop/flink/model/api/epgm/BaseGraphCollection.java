@@ -21,15 +21,15 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * Default interface of a EPGM logical graph instance.
+ * Default interface of a EPGM graph collection instance.
  *
  * @param <G> type of the graph head
  * @param <V> the vertex type
  * @param <E> the edge type
- * @param <LG> the type of the logical graph that will be created with a provided factory
+ * @param <GC> the type of the graph collection that will be created with a provided factory
  */
-public interface SingleGraph<G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge,
-  LG extends SingleGraph> {
+public interface BaseGraphCollection<G extends EPGMGraphHead, V extends EPGMVertex,
+  E extends EPGMEdge, GC extends BaseGraphCollection> {
   /**
    * Returns the Gradoop Flink configuration.
    *
@@ -38,9 +38,9 @@ public interface SingleGraph<G extends EPGMGraphHead, V extends EPGMVertex, E ex
   GradoopFlinkConfig getConfig();
 
   /**
-   * Get the factory that is responsible to create an instance of {@link LG}.
+   * Get the factory that is responsible to create an instance of {@link GC}.
    *
-   * @return a factory that can be used to create a {@link LG} instance
+   * @return a factory that can be used to create a {@link GC} instance
    */
-  SingleGraphFactory<G, V, E, LG> getFactory();
+  BaseGraphCollectionFactory<G, V, E, GC> getFactory();
 }

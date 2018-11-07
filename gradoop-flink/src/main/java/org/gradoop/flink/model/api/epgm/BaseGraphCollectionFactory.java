@@ -36,8 +36,8 @@ import java.util.Map;
  * @param <E> the edge type
  * @param <GC> the type of the graph collection that will be created with this factory
  */
-public interface SingleGraphCollectionFactory<G extends EPGMGraphHead, V extends EPGMVertex,
-  E extends EPGMEdge, GC extends SingleGraphCollection> {
+public interface BaseGraphCollectionFactory<G extends EPGMGraphHead, V extends EPGMVertex,
+  E extends EPGMEdge, GC extends BaseGraphCollection> {
 
   /**
    * Sets the layout factory that is responsible for creating a graph collection layout.
