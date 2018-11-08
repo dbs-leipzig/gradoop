@@ -20,7 +20,7 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
+import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
 import org.gradoop.flink.algorithms.gelly.hits.functions.HITSToAttributes;
@@ -36,7 +36,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
  * <p>
  * The Results are stored as properties of the vertices (with given keys).
  */
-public class HITS extends GellyAlgorithm<NullValue, NullValue> {
+public class HITS extends GradoopGellyAlgorithm<NullValue, NullValue> {
 
   /**
    * Property key to store the authority score.
@@ -102,7 +102,7 @@ public class HITS extends GellyAlgorithm<NullValue, NullValue> {
 
 
   @Override
-  protected LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
+  public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
     throws Exception {
 
     DataSet<Vertex> newVertices = hits.runInternal(graph)

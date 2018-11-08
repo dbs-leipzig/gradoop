@@ -29,4 +29,9 @@ public class VertexCount implements UnaryGraphToValueOperator<DataSet<Long>> {
   public DataSet<Long> execute(LogicalGraph graph) {
     return Count.count(graph.getVertices());
   }
+
+  @Override
+  public String getName() {
+    return VertexCount.class.getName();
+  }
 }

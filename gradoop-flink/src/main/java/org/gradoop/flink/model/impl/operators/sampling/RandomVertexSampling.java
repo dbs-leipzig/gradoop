@@ -26,9 +26,9 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
 
 /**
- * Takes a logical graph and a user defined aggregate function as input. The
- * aggregate function is applied on the logical graph and the resulting
- * aggregate is stored as an additional property at the result graph.
+ * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
+ * amount. Retains all edges which source- and target-vertices were chosen. There may retain some
+ * unconnected vertices in the sampled graph.
  */
 public class RandomVertexSampling extends SamplingAlgorithm {
   /**

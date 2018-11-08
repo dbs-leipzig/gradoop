@@ -34,4 +34,9 @@ public class DistinctSourceIds implements UnaryGraphToValueOperator<DataSet<Long
         .distinct()
     );
   }
+
+  @Override
+  public String getName() {
+    return DistinctSourceIds.class.getName();
+  }
 }

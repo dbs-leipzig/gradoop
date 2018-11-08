@@ -22,7 +22,7 @@ import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
+import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.WritePropertyToGraphHeadMap;
@@ -35,7 +35,7 @@ import org.gradoop.flink.model.api.epgm.LogicalGraph;
  * Returns the initial {@code LogicalGraph} with the number of triangles written as property to the
  * {@code GraphHead}. The value is accessed via the property key in {@link #PROPERTY_KEY_TRIANGLES}.
  */
-public class GellyTriangleCounting extends GellyAlgorithm<NullValue, NullValue> {
+public class GellyTriangleCounting extends GradoopGellyAlgorithm<NullValue, NullValue> {
 
   /**
    * Property key to access the value for counted triangles in the graph head
@@ -44,7 +44,7 @@ public class GellyTriangleCounting extends GellyAlgorithm<NullValue, NullValue> 
 
   /**
    * Creates an instance of GellyTriangleCounting.
-   * Calls constructor of super class {@link GellyAlgorithm}.
+   * Calls constructor of super class {@link GradoopGellyAlgorithm}.
    */
   public GellyTriangleCounting() {
     super(new VertexToGellyVertexWithNullValue(),
@@ -52,7 +52,7 @@ public class GellyTriangleCounting extends GellyAlgorithm<NullValue, NullValue> 
   }
 
   @Override
-  protected LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
+  public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
     throws Exception {
     DataSet<Tuple3<GradoopId, GradoopId, GradoopId>> triangles =
       new org.apache.flink.graph.library.TriangleEnumerator<GradoopId, NullValue, NullValue>()
