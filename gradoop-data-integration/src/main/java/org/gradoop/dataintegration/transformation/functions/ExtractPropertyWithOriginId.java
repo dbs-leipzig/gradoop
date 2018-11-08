@@ -28,31 +28,41 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  */
 public class ExtractPropertyWithOriginId implements FlatMapFunction<Vertex, Tuple2<PropertyValue, GradoopId>> {
 
-  /** The property key of the property value. */
+  /**
+   * The property key of the property value.
+   */
   private final String originalPropertyName;
 
   /**
+   * Reduce object instantiation.
+   */
+  private final Tuple2<PropertyValue, GradoopId> reuseTuple;
+
+  /**
    * The constructor for extracting property value and its origin id.
+   *
    * @param originalPropertyName The property key of the property value.
    */
   public ExtractPropertyWithOriginId(String originalPropertyName) {
     this.originalPropertyName = originalPropertyName;
+    this.reuseTuple = new Tuple2<>();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void flatMap(Vertex vertex, Collector<Tuple2<PropertyValue, GradoopId>> out) {
     if (vertex.getProperties() != null &&
-        vertex.getProperties().containsKey(originalPropertyName)) {
+      vertex.getProperties().containsKey(originalPropertyName)) {
       PropertyValue pv = vertex.getPropertyValue(originalPropertyName);
+      reuseTuple.f1 = vertex.getId();
+
       if (pv.isList()) {
         for (PropertyValue value : pv.getList()) {
-          out.collect(new Tuple2<>(value, vertex.getId()));
+          reuseTuple.f0 = value;
+          out.collect(reuseTuple);
         }
       } else {
-        out.collect(new Tuple2<>(pv, vertex.getId()));
+        reuseTuple.f0 = pv;
+        out.collect(reuseTuple);
       }
     }
   }

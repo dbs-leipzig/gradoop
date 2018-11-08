@@ -15,9 +15,8 @@
  */
 package org.gradoop.dataintegration.transformation.functions;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
@@ -29,36 +28,50 @@ import java.util.List;
 /**
  * Creates a new {@link Vertex} containing the given attribute {@link PropertyValue} and its origin.
  */
-public class CreateNewVertex implements FlatMapFunction<Tuple2<PropertyValue, GradoopId>, Tuple2<Vertex, List<GradoopId>>> {
-  /** The new vertex label. */
+public class CreateNewVertex implements MapFunction<Tuple2<PropertyValue, GradoopId>, Tuple2<Vertex, List<GradoopId>>> {
+  /**
+   * The new vertex label.
+   */
   private final String newVertexLabel;
 
-  /** The new property key */
+  /**
+   * The new property key
+   */
   private final String newPropertyName;
 
-  /** The Factory the vertices are created with. */
+  /**
+   * The Factory the vertices are created with.
+   */
   private final VertexFactory vertexFactory;
 
   /**
-   * The constructor for creating new vertices with their origin Ids.
-   * @param newVertexLabel The new vertex Label.
-   * @param newPropertyName The new property key.
+   * Reduce object instantiation.
    */
-  public CreateNewVertex(String newVertexLabel, String newPropertyName) {
-    this.vertexFactory = new VertexFactory();
-    this.newVertexLabel = newVertexLabel;
-    this.newPropertyName = newPropertyName;
-  }
+  private final Tuple2<Vertex, List<GradoopId>> reuseTuple;
 
   /**
-   * {@inheritDoc}
+   * The constructor for creating new vertices with their origin Ids.
+   *
+   * @param factory The Factory the vertices are created with.
+   * @param newVertexLabel  The new vertex Label.
+   * @param newPropertyName The new property key.
    */
-  @Override
-  public void flatMap(Tuple2<PropertyValue, GradoopId> value,
-                      Collector<Tuple2<Vertex, List<GradoopId>>> out) {
-    Vertex vertex = vertexFactory.createVertex(newVertexLabel);
-    vertex.setProperty(newPropertyName, value.f0);
+  public CreateNewVertex(VertexFactory factory, String newVertexLabel, String newPropertyName) {
+    this.vertexFactory = factory;
+    this.newVertexLabel = newVertexLabel;
+    this.newPropertyName = newPropertyName;
 
-    out.collect(new Tuple2<>(vertex, Collections.singletonList(value.f1)));
+    this.reuseTuple = new Tuple2<>();
+  }
+
+  @Override
+  public Tuple2<Vertex, List<GradoopId>> map(Tuple2<PropertyValue, GradoopId> tuple) {
+    Vertex vertex = vertexFactory.createVertex(newVertexLabel);
+    vertex.setProperty(newPropertyName, tuple.f0);
+
+    reuseTuple.f0 = vertex;
+    reuseTuple.f1 = Collections.singletonList(tuple.f1);
+
+    return reuseTuple;
   }
 }

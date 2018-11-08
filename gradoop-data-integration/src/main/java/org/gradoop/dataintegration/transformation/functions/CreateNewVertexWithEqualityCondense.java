@@ -32,29 +32,42 @@ import java.util.List;
  */
 public class CreateNewVertexWithEqualityCondense implements GroupReduceFunction<Tuple2<PropertyValue, GradoopId>, Tuple2<Vertex, List<GradoopId>>> {
 
-  /** The new vertex label. */
+  /**
+   * The new vertex label.
+   */
   private final String newVertexLabel;
 
-  /** The new property key. */
+  /**
+   * The new property key.
+   */
   private final String newPropertyName;
 
-  /** The factory new vertices are created with. */
+  /**
+   * The factory new vertices are created with.
+   */
   private final VertexFactory vertexFactory;
 
   /**
-   * The constructor for condensation of same property values to one newly created vertex.
-   * @param newVertexLabel The new vertex label.
-   * @param newPropertyName The new property key.
-   */
-  public CreateNewVertexWithEqualityCondense(String newVertexLabel, String newPropertyName) {
-    this.vertexFactory = new VertexFactory();
-    this.newVertexLabel = newVertexLabel;
-    this.newPropertyName = newPropertyName;
-  }
+    * Reduce object instantiation.
+    */
+  private final Tuple2<Vertex, List<GradoopId>> reuseTuple;
 
   /**
-   * {@inheritDoc}
+   * The constructor for condensation of same property values to one newly created vertex.
+   *
+   * @param factory The factory new vertices are created with.
+   * @param newVertexLabel  The new vertex label.
+   * @param newPropertyName The new property key.
    */
+  public CreateNewVertexWithEqualityCondense(VertexFactory factory, String newVertexLabel,
+                                             String newPropertyName) {
+    this.vertexFactory = factory;
+    this.newVertexLabel = newVertexLabel;
+    this.newPropertyName = newPropertyName;
+
+    this.reuseTuple = new Tuple2<>();
+  }
+
   @Override
   public void reduce(Iterable<Tuple2<PropertyValue, GradoopId>> values,
                      Collector<Tuple2<Vertex, List<GradoopId>>> out) {
@@ -72,6 +85,9 @@ public class CreateNewVertexWithEqualityCondense implements GroupReduceFunction<
     Vertex vertex = vertexFactory.createVertex(newVertexLabel);
     vertex.setProperty(newPropertyName, pv);
 
-    out.collect(new Tuple2<>(vertex, sources));
+    reuseTuple.f0 = vertex;
+    reuseTuple.f1 = sources;
+
+    out.collect(reuseTuple);
   }
 }

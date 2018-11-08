@@ -85,13 +85,13 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
      */
     List<Vertex> vertices = new ArrayList<>();
     invertedEdgeGraph.getVertices()
-        .filter(new Or<>(new ByLabel<>("Person"), new ByLabel<>("Tag")))
-        .output(new LocalCollectionOutputFormat<>(vertices));
+      .filter(new Or<>(new ByLabel<>("Person"), new ByLabel<>("Tag")))
+      .output(new LocalCollectionOutputFormat<>(vertices));
 
     List<Edge> newEdges = new ArrayList<>();
     invertedEdgeGraph
-        .getEdgesByLabel(invertedLabel)
-        .output(new LocalCollectionOutputFormat<>(newEdges));
+      .getEdgesByLabel(invertedLabel)
+      .output(new LocalCollectionOutputFormat<>(newEdges));
 
     getConfig().getExecutionEnvironment().execute();
 
@@ -101,12 +101,12 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
     Set<String> tags = new HashSet<>(Arrays.asList("Databases", "Hadoop"));
     Set<String> persons = new HashSet<>(Arrays.asList("Eve", "Alice", "Frank", "Dave"));
 
-    for(Edge e : newEdges) {
+    for (Edge e : newEdges) {
       String sourceName = idMap.get(e.getSourceId());
       String targetName = idMap.get(e.getTargetId());
 
       Assert.assertTrue("source: " + sourceName + " | target: " + targetName,
-          tags.contains(sourceName) && persons.contains(targetName));
+        tags.contains(sourceName) && persons.contains(targetName));
       persons.remove(targetName);
     }
   }

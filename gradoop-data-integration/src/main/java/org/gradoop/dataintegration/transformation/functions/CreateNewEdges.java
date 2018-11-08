@@ -31,41 +31,45 @@ import java.util.List;
  * Ids of other vertices).
  */
 public class CreateNewEdges implements FlatMapFunction<Tuple2<Vertex, List<GradoopId>>, Edge> {
-  /** The edge factory which is used for the creation of new edges. */
+  /**
+   * The edge factory which is used for the creation of new edges.
+   */
   private final EdgeFactory edgeFactory;
 
-  /** The direction of the created edge(s). */
+  /**
+   * The direction of the created edge(s).
+   */
   private final EdgeDirection edgeDirection;
 
-  /** The label of the newly created edge(s). */
+  /**
+   * The label of the newly created edge(s).
+   */
   private final String edgeLabel;
 
   /**
    * Creates a new {@link FlatMapFunction} that creates edges between f0 (Vertex) and all entries
    * in f1 (Gradoop Ids of other vertices).
    *
+   * @param factory The edge factory which is used for the creation of new edges.
    * @param edgeDirection The direction of the created edge(s).
-   * @param edgeLabel The label of the newly created edge(s).
+   * @param edgeLabel     The label of the newly created edge(s).
    */
-  public CreateNewEdges(EdgeDirection edgeDirection, String edgeLabel) {
+  public CreateNewEdges(EdgeFactory factory, EdgeDirection edgeDirection, String edgeLabel) {
     this.edgeDirection = edgeDirection;
     this.edgeLabel = edgeLabel;
-    this.edgeFactory = new EdgeFactory();
+    this.edgeFactory = factory;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void flatMap(Tuple2<Vertex, List<GradoopId>> value, Collector<Edge> out) {
     for (GradoopId sourceId : value.f1) {
       if (edgeDirection.equals(EdgeDirection.BIDIRECTIONAL) ||
-          edgeDirection.equals(EdgeDirection.NEWVERTEX_TO_ORIGIN)) {
+        edgeDirection.equals(EdgeDirection.NEWVERTEX_TO_ORIGIN)) {
         out.collect(edgeFactory.createEdge(edgeLabel, value.f0.getId(), sourceId));
       }
 
       if (edgeDirection.equals(EdgeDirection.BIDIRECTIONAL) ||
-          edgeDirection.equals(EdgeDirection.ORIGIN_TO_NEWVERTEX)) {
+        edgeDirection.equals(EdgeDirection.ORIGIN_TO_NEWVERTEX)) {
         out.collect(edgeFactory.createEdge(edgeLabel, sourceId, value.f0.getId()));
       }
     }

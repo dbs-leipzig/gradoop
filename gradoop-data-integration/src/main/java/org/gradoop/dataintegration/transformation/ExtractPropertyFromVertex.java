@@ -39,24 +39,36 @@ import java.util.List;
  * which can be connected to the vertex it was created from. If the property is a list every
  * element of the list is a new vertex.
  */
-public class ExtractProperty implements UnaryGraphToGraphOperator {
+public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
 
-  /** The vertices the extraction is executed for. */
+  /**
+   * The vertices the extraction is executed for.
+   */
   private String forVerticesOfLabel;
 
-  /** The property key at the original vertex. */
+  /**
+   * The property key at the original vertex.
+   */
   private String originalPropertyName;
 
-  /** The label of the extracted vertex. */
+  /**
+   * The label of the extracted vertex.
+   */
   private String newVertexLabel;
 
-  /** The property name of the extracted property at the new vertex. */
+  /**
+   * The property name of the extracted property at the new vertex.
+   */
   private String newPropertyName;
 
-  /** The direction of the created edge(s). */
+  /**
+   * The direction of the created edge(s).
+   */
   private EdgeDirection edgeDirection;
 
-  /** The label of the newly created edge(s). */
+  /**
+   * The label of the newly created edge(s).
+   */
   private String edgeLabel;
 
   /**
@@ -70,48 +82,31 @@ public class ExtractProperty implements UnaryGraphToGraphOperator {
    * Constructs a new {@link UnaryGraphToGraphOperator} which extracts properties from vertices into
    * newly created vertices.
    *
-   * @param forVerticesOfLabel The vertices the extraction is executed for.
+   * @param forVerticesOfLabel   The vertices the extraction is executed for.
    * @param originalPropertyName The property key at the original vertex.
-   * @param newVertexLabel The label of the extracted vertex.
-   * @param newPropertyName The property name of the extracted property at the new vertex.
+   * @param newVertexLabel       The label of the extracted vertex.
+   * @param newPropertyName      The property name of the extracted property at the new vertex.
    */
-  public ExtractProperty(String forVerticesOfLabel, String originalPropertyName,
-                         String newVertexLabel, String newPropertyName) {
-    init(forVerticesOfLabel, originalPropertyName, newVertexLabel, newPropertyName,
-        EdgeDirection.NONE, null);
+  public ExtractPropertyFromVertex(String forVerticesOfLabel, String originalPropertyName,
+                                   String newVertexLabel, String newPropertyName) {
+    this(forVerticesOfLabel, originalPropertyName, newVertexLabel, newPropertyName,
+      EdgeDirection.NONE, null);
   }
 
   /**
    * Constructs a new {@link UnaryGraphToGraphOperator} which extracts properties from vertices into
    * newly created vertices and connects original and new vertex with each other.
    *
-   * @param forVerticesOfLabel The vertices the extraction is executed for.
+   * @param forVerticesOfLabel   The vertices the extraction is executed for.
    * @param originalPropertyName The property key at the original vertex.
-   * @param newVertexLabel The label of the extracted vertex.
-   * @param newPropertyName The property name of the extracted property at the new vertex.
-   * @param edgeDirection The direction of the created edge(s).
-   * @param edgeLabel The label of the newly created edge.
+   * @param newVertexLabel       The label of the extracted vertex.
+   * @param newPropertyName      The property name of the extracted property at the new vertex.
+   * @param edgeDirection        The direction of the created edge(s).
+   * @param edgeLabel            The label of the newly created edge.
    */
-  public ExtractProperty(String forVerticesOfLabel, String originalPropertyName,
-                         String newVertexLabel, String newPropertyName,
-                         EdgeDirection edgeDirection, String edgeLabel) {
-    init(forVerticesOfLabel, originalPropertyName, newVertexLabel, newPropertyName,
-        edgeDirection, edgeLabel);
-  }
-
-  /**
-   * Used for the initialization of this class.
-   *
-   * @param forVerticesOfLabel The vertices the extraction is executed for.
-   * @param originalPropertyName The property key at the original vertex.
-   * @param newVertexLabel The label of the extracted vertex.
-   * @param newPropertyName The property name of the extracted property at the new vertex.
-   * @param edgeDirection The direction of the created edge(s).
-   * @param edgeLabel The label of the newly created edge.
-   */
-  private void init(String forVerticesOfLabel, String originalPropertyName,
-                    String newVertexLabel, String newPropertyName,
-                    EdgeDirection edgeDirection, String edgeLabel) {
+  public ExtractPropertyFromVertex(String forVerticesOfLabel, String originalPropertyName,
+                                   String newVertexLabel, String newPropertyName,
+                                   EdgeDirection edgeDirection, String edgeLabel) {
     this.forVerticesOfLabel = Preconditions.checkNotNull(forVerticesOfLabel);
     this.originalPropertyName = Preconditions.checkNotNull(originalPropertyName);
     this.newVertexLabel = Preconditions.checkNotNull(newVertexLabel);
@@ -125,6 +120,7 @@ public class ExtractProperty implements UnaryGraphToGraphOperator {
   /**
    * This method sets whether property value based condensation should be executed or not.
    * The default value is 'true'.
+   *
    * @param condense If true, all property values got condensed based on their equality.
    *                 So that every newly created vertex has a unique property value.
    */
@@ -132,53 +128,50 @@ public class ExtractProperty implements UnaryGraphToGraphOperator {
     this.condense = condense;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph execute(LogicalGraph logicalGraph) {
     // filter the vertices by the given label
     DataSet<Vertex> filteredVertices = logicalGraph
-        .getVertices()
-        .filter(new ByLabel<>(forVerticesOfLabel));
+      .getVertices()
+      .filter(new ByLabel<>(forVerticesOfLabel));
 
     // calculate new vertices and store the origin for linking
     DataSet<Tuple2<PropertyValue, GradoopId>> candidates = filteredVertices
-        .flatMap(new ExtractPropertyWithOriginId(originalPropertyName));
+      .flatMap(new ExtractPropertyWithOriginId(originalPropertyName));
 
     // extract the new vertices
     DataSet<Tuple2<Vertex, List<GradoopId>>> newVerticesAndOriginIds;
     if (condense) {
       newVerticesAndOriginIds = candidates
-          .groupBy(0)
-          .reduceGroup(new CreateNewVertexWithEqualityCondense(newVertexLabel, newPropertyName));
+        .groupBy(0)
+        .reduceGroup(new CreateNewVertexWithEqualityCondense(
+          logicalGraph.getConfig().getVertexFactory(), newVertexLabel, newPropertyName));
     } else {
       newVerticesAndOriginIds = candidates
-          .flatMap(new CreateNewVertex(newVertexLabel, newPropertyName));
+        .map(new CreateNewVertex(logicalGraph.getConfig().getVertexFactory(), newVertexLabel,
+          newPropertyName));
     }
 
     DataSet<Vertex> vertices = newVerticesAndOriginIds
-        .map(new Value0Of2<>())
-        .union(logicalGraph.getVertices());
+      .map(new Value0Of2<>())
+      .union(logicalGraph.getVertices());
 
     // the newly created vertices should be linked to the original vertices
     DataSet<Edge> edges = logicalGraph.getEdges();
     if (!edgeDirection.equals(EdgeDirection.NONE)) {
       edges = newVerticesAndOriginIds
-          .flatMap(new CreateNewEdges(edgeDirection, edgeLabel))
-          .union(edges);
+        .flatMap(new CreateNewEdges(logicalGraph.getConfig().getEdgeFactory(), edgeDirection,
+          edgeLabel))
+        .union(edges);
     }
 
     return logicalGraph.getConfig()
-        .getLogicalGraphFactory()
-        .fromDataSets(logicalGraph.getGraphHead(), vertices, edges);
+      .getLogicalGraphFactory()
+      .fromDataSets(logicalGraph.getGraphHead(), vertices, edges);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
-    return "ExtractPropertyFromVertex";
+    return ExtractPropertyFromVertex.class.getName();
   }
 }

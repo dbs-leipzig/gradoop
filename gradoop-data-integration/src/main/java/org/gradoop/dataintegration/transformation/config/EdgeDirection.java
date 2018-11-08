@@ -19,15 +19,23 @@ package org.gradoop.dataintegration.transformation.config;
  * This ENUM represents possible edge directions for newly created edges.
  */
 public enum EdgeDirection {
-  /** No edge is created. */
+  /**
+   * No edge is created.
+   */
   NONE,
 
-  /** The edge points from the original vertex to the new one. */
+  /**
+   * The edge points from the original vertex to the new one.
+   */
   ORIGIN_TO_NEWVERTEX,
 
-  /** The edge points from the newly created vertex to the original vertex. */
+  /**
+   * The edge points from the newly created vertex to the original vertex.
+   */
   NEWVERTEX_TO_ORIGIN,
 
-  /** Two edges are created between the orignal and the new vertex. */
-  BIDIRECTIONAL;
+  /**
+   * Two edges are created between the orignal and the new vertex.
+   */
+  BIDIRECTIONAL
 }
