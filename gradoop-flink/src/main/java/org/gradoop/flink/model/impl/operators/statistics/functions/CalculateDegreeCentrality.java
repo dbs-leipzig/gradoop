@@ -26,7 +26,7 @@ public class CalculateDegreeCentrality implements CrossFunction<Tuple1<Long>, Lo
 
   /**
    * Calculates the degree centrality of the graph
-   * using the sum of all distances and the vertex count.
+   * using the function: (Sum(d(max) - d(i)) / (v_count -2) * (v_count-1)
    *
    * @param val1 sum of degree distances of the vertices
    * @param vertexCount number of vertices

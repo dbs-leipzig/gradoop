@@ -22,8 +22,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * Calculates the distance of max degree and the degree of each value
- * @inheritDoc
+ * Calculates the distance of max degree and the degree of each vertex
+ *
+ * {@inheritDoc}
  */
 public class DegreeDistanceFunction extends RichMapFunction<WithCount<GradoopId>, Tuple1<Long>> {
 
@@ -43,7 +44,8 @@ public class DegreeDistanceFunction extends RichMapFunction<WithCount<GradoopId>
   private Tuple1<Long> reuse;
 
   /**
-   * Constructor
+   * Creates an instance of {@link DegreeDistanceFunction}
+   * to calculate the distance of max degree degree and the degree of each vertex
    *
    * @param broadcastName name of broadcast variable
    */
@@ -67,6 +69,9 @@ public class DegreeDistanceFunction extends RichMapFunction<WithCount<GradoopId>
   }
 
   /**
+   * Mapping function converting degree of vertex
+   * to distance of max degree and degree of vertex
+   *
    * {@inheritDoc}
    *
    * @param value degree of vertex

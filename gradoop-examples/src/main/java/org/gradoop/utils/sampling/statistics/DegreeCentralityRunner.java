@@ -24,10 +24,14 @@ import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
  * Computes {@link DegreeCentrality} for a given logical graph.
+ * It writes the result as a single value into an csv-file:
+ * {@value SamplingEvaluationConstants#FILE_DEGREE_CENTRALITY}
  */
 public class DegreeCentralityRunner extends AbstractRunner implements ProgramDescription {
 
   /**
+   * Calls the {@link DegreeCentrality} computation for a given logical graph.
+   *
    * args[0] - path to input directory
    * args[1] - input format (json, csv)
    * args[2] - path to output directory

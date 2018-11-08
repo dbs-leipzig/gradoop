@@ -20,7 +20,7 @@ package org.gradoop.flink.model.impl.operators.sampling.statistics;
  */
 public class DegreeCentralityBase {
   /**
-   * name for broadcasting variable
+   * Name for broadcasting variable
    */
   public static final String BROADCAST_NAME = "degree_max";
 }

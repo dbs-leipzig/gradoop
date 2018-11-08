@@ -23,7 +23,8 @@ import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.DegreeCentrality;
 
 /**
- * Computes {@link DegreeCentrality} for a given logical graph.
+ * Prepares the result of the {@link DegreeCentrality} Computation to be used as a {@link Double}
+ * value.
  */
 public class DegreeCentralityPreparer implements
   UnaryGraphToValueOperator<MapOperator<Double, Tuple1<Double>>> {
@@ -39,5 +40,10 @@ public class DegreeCentralityPreparer implements
     return new DegreeCentrality()
       .execute(graph)
       .map(new ObjectTo1<>());
+  }
+
+  @Override
+  public String getName() {
+    return DegreeCentralityPreparer.class.getName();
   }
 }
