@@ -111,6 +111,8 @@
                                 <includes>
                                     <!-- libs that are not provided by flink binary -->
                                     <include>org.apache.hbase:hbase-common</include>
+                                    <include>org.apache.accumulo:*</include>
+                                    <include>org.apache.thrift:*</include>
                                     <include>org.apache.flink:flink-gelly_2.11</include>
                                     <include>org.gradoop:*</include>
                                     <include>com.github.s1ck:gdl</include>

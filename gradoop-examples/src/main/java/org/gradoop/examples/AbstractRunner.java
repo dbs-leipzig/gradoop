@@ -307,7 +307,7 @@ public abstract class AbstractRunner {
    * @throws Exception if creation of the sink fails
    */
   private static DataSink getDataSink(String directory, String format, GradoopFlinkConfig config)
-  throws Exception{
+    throws Exception {
     format = format.toLowerCase();
 
     switch (format) {

@@ -170,6 +170,9 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
         source = ((AccumuloDataSource) source).applyEdgePredicate(
           Query.elements().fromAll().where(AccumuloFilters.labelIn(EDGE_LABEL)));
         break;
+      default:
+        throw new IllegalArgumentException("The flag to enable predicate pushdown is only valid" +
+          " with the input formats: [hbase,accumulo].");
       }
     }
 

@@ -162,6 +162,9 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
         source = ((AccumuloDataSource) source)
           .applyEdgePredicate(Predicates.Accumulo.getEdgeFilter(QUERY));
         break;
+      default:
+        throw new IllegalArgumentException("The flag to enable predicate pushdown is only valid" +
+          " with the input formats: [hbase,accumulo].");
       }
     }
 
