@@ -26,8 +26,8 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Factory interface responsible for create instances of logical graphs with type {@link LG}
- * based on a specific {@link org.gradoop.flink.model.api.layouts.LogicalGraphLayout}.
+ * Factory interface that is responsible for creating instances of logical graphs with type
+ * {@link LG} based on a specific {@link org.gradoop.flink.model.api.layouts.LogicalGraphLayout}.
  *
  * @param <G> type of the graph head
  * @param <V> the vertex type
@@ -48,15 +48,15 @@ public interface BaseGraphFactory<
   void setLayoutFactory(LogicalGraphLayoutFactory<G, V, E> layoutFactory);
 
   /**
-   * Creates a logical graph from the given arguments.
+   * Creates a logical graph from the given vertices.
    *
-   * @param vertices  Vertex dataset
+   * @param vertices the vertex dataset
    * @return Logical graph
    */
   LG fromDataSets(DataSet<V> vertices);
 
   /**
-   * Creates a logical graph from the given argument.
+   * Creates a logical graph from the given vertices and edges.
    *
    * The method creates a new graph head element and assigns the vertices and
    * edges to that graph.
@@ -68,7 +68,7 @@ public interface BaseGraphFactory<
   LG fromDataSets(DataSet<V> vertices, DataSet<E> edges);
 
   /**
-   * Creates a logical graph from the given arguments.
+   * Creates a logical graph from the given graph head, vertices and edges.
    *
    * The method assumes that the given vertices and edges are already assigned
    * to the given graph head.
@@ -92,19 +92,19 @@ public interface BaseGraphFactory<
     Map<String, DataSet<E>> edges);
 
   /**
-   * Creates a logical graph from the given datasets. The method assumes, that all vertices and
+   * Creates a logical graph from the given datasets. The method assumes that all vertices and
    * edges are already assigned to the specified graph head.
    *
-   * @param graphHeads label indexed graph head dataset (1-element)
+   * @param graphHead label indexed graph head dataset (1-element)
    * @param vertices label indexed vertex datasets
    * @param edges label indexed edge datasets
    * @return Logical graph
    */
-  LG fromIndexedDataSets(Map<String, DataSet<G>> graphHeads,
+  LG fromIndexedDataSets(Map<String, DataSet<G>> graphHead,
     Map<String, DataSet<V>> vertices, Map<String, DataSet<E>> edges);
 
   /**
-   * Creates a logical graph from the given arguments.
+   * Creates a logical graph from the given single graph head, vertex and edge collections.
    *
    * @param graphHead Graph head associated with the logical graph
    * @param vertices  Vertex collection
@@ -114,7 +114,7 @@ public interface BaseGraphFactory<
   LG fromCollections(G graphHead, Collection<V> vertices, Collection<E> edges);
 
   /**
-   * Creates a logical graph from the given arguments. A new graph head is
+   * Creates a logical graph from the given vertex and edge collections. A new graph head is
    * created and all vertices and edges are assigned to that graph.
    *
    * @param vertices    Vertex collection

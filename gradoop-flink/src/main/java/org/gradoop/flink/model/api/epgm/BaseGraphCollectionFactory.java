@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Responsible to create instances of graph collections with type {@link GC} based on a specific
+ * Responsible for creating instances of graph collections with type {@link GC} based on a specific
  * {@link org.gradoop.flink.model.api.layouts.GraphCollectionLayout}.
  *
  * @param <G> type of the graph head
@@ -69,7 +69,7 @@ public interface BaseGraphCollectionFactory<
   GC fromDataSets(DataSet<G> graphHeads, DataSet<V> vertices, DataSet<E> edges);
 
   /**
-   * Creates a graph collection from the given datasets. The method assumes, that all vertices and
+   * Creates a graph collection from the given datasets. The method assumes that all vertices and
    * edges are already assigned to the specified graph heads.
    *
    * @param graphHeads label indexed graph head dataset
@@ -124,9 +124,9 @@ public interface BaseGraphCollectionFactory<
     GroupReduceFunction<E, E> edgeMergeReducer);
 
   /**
-   * Creates an empty graph collection layout.
+   * Creates an empty graph collection.
    *
-   * @return empty graph collection layout
+   * @return empty graph collection
    */
   GC createEmptyCollection();
 }

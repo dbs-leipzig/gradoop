@@ -69,13 +69,10 @@ public class GVECollectionLayoutFactory extends GVEBaseFactory
     Collection<GraphHead> graphHeads,
     Collection<Vertex> vertices,
     Collection<Edge> edges) {
-    Objects.requireNonNull(graphHeads, "GraphHead collection was null");
-    Objects.requireNonNull(vertices, "Vertex collection was null");
-    Objects.requireNonNull(edges, "Edge collection was null");
     return fromDataSets(
-      createGraphHeadDataSet(graphHeads),
-      createVertexDataSet(vertices),
-      createEdgeDataSet(edges));
+      createGraphHeadDataSet(Objects.requireNonNull(graphHeads, "GraphHead collection was null")),
+      createVertexDataSet(Objects.requireNonNull(vertices, "Vertex collection was null")),
+      createEdgeDataSet(Objects.requireNonNull(edges, "Edge collection was null")));
   }
 
   @Override

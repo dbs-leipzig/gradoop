@@ -86,7 +86,7 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    *
    * @param env Flink execution environment.
    *
-   * @return Gradoop Flink configuration
+   * @return the Gradoop Flink configuration
    */
   public static GradoopFlinkConfig createConfig(ExecutionEnvironment env) {
     return new GradoopFlinkConfig(env,

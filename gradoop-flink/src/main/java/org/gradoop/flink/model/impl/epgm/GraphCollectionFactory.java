@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Responsible to create instances of {@link GraphCollection} based on a specific
+ * Responsible for creating instances of {@link GraphCollection} based on a specific
  * {@link GraphCollectionLayout}.
  */
 public class GraphCollectionFactory
@@ -42,7 +42,7 @@ public class GraphCollectionFactory
   private GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> layoutFactory;
 
   /**
-   * Gradoop Flink configuration.
+   * The Gradoop Flink configuration.
    */
   private final GradoopFlinkConfig config;
 

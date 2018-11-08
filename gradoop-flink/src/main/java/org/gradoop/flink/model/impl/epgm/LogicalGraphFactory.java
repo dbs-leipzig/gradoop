@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Responsible for create instances of {@link LogicalGraph} based on a specific
+ * Responsible for creating instances of {@link LogicalGraph} based on a specific
  * {@link org.gradoop.flink.model.api.layouts.LogicalGraphLayout}.
  */
 public class LogicalGraphFactory
@@ -38,14 +38,14 @@ public class LogicalGraphFactory
    */
   private LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> layoutFactory;
   /**
-   * Gradoop Flink configuration.
+   * The Gradoop Flink configuration.
    */
   private final GradoopFlinkConfig config;
 
   /**
    * Creates a new factory.
    *
-   * @param config Configuration
+   * @param config the Gradoop Flink configuration
    */
   public LogicalGraphFactory(GradoopFlinkConfig config) {
     this.config = config;
@@ -81,9 +81,9 @@ public class LogicalGraphFactory
   }
 
   @Override
-  public LogicalGraph fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
+  public LogicalGraph fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHead,
     Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
-    return new LogicalGraph(layoutFactory.fromIndexedDataSets(graphHeads, vertices, edges), config);
+    return new LogicalGraph(layoutFactory.fromIndexedDataSets(graphHead, vertices, edges), config);
   }
 
   @Override

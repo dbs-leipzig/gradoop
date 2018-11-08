@@ -99,8 +99,8 @@ public class GraphCollection implements
   /**
    * Creates a graph collection from the given arguments.
    *
-   * @param layout Graph collection layout
-   * @param config Gradoop Flink configuration
+   * @param layout the graph collection layout
+   * @param config the Gradoop Flink configuration
    */
   GraphCollection(GraphCollectionLayout<GraphHead, Vertex, Edge> layout,
     GradoopFlinkConfig config) {

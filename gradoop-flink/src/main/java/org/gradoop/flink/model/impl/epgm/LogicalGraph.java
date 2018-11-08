@@ -104,7 +104,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
    * Creates a new logical graph based on the given parameters.
    *
    * @param layout representation of the logical graph
-   * @param config Gradoop Flink configuration
+   * @param config the Gradoop Flink configuration
    */
   LogicalGraph(LogicalGraphLayout<GraphHead, Vertex, Edge> layout, GradoopFlinkConfig config) {
     Objects.requireNonNull(layout);

@@ -36,12 +36,12 @@ public interface BaseGraph<
   /**
    * Returns the Gradoop Flink configuration.
    *
-   * @return Gradoop Flink configuration
+   * @return the Gradoop Flink configuration
    */
   GradoopFlinkConfig getConfig();
 
   /**
-   * Get the factory that is responsible to create an instance of {@link LG}.
+   * Get the factory that is responsible for creating an instance of {@link LG}.
    *
    * @return a factory that can be used to create a {@link LG} instance
    */
