@@ -41,6 +41,17 @@ public class DegreeCentralityTest extends GradoopFlinkTestBase {
       "(v4)-[]->(v5)"+
       "(v4)-[]->(v6)"+
       "(v5)-[]->(v6)"+
+    "]" +
+    "g3[" +
+      "(v0)-[]->(v1)"+
+      "(v0)-[]->(v2)"+
+      "(v0)-[]->(v3)"+
+      "(v0)-[]->(v4)"+
+      "(v0)-[]->(v5)"+
+      "(v0)-[]->(v6)"+
+      "(v6)-[]->(v7)"+
+      "(v6)-[]->(v8)"+
+      "(v6)-[]->(v9)"+
     "]";
 
   /**
@@ -79,4 +90,15 @@ public class DegreeCentralityTest extends GradoopFlinkTestBase {
     assertEquals(0.167, dataSet.collect().get(0), 0.001);
   }
 
+  /**
+   * Test connected stars graph for degree centrality
+   *
+   * @throws Exception throws any Exception
+   */
+  @Test
+  public void testConnectedStars() throws Exception {
+    LogicalGraph graph = getLoaderFromString(graphString).getLogicalGraphByVariable("g3");
+    DataSet<Double> dataSet = new DegreeCentrality().execute(graph);
+    assertEquals(0.583, dataSet.collect().get(0), 0.001);
+  }
 }
