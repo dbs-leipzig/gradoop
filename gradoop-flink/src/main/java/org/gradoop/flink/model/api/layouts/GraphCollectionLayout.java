@@ -29,7 +29,9 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
  * @param <V> the vertex type
  * @param <E> the edge type
  */
-public interface GraphCollectionLayout<G extends EPGMGraphHead, V extends EPGMVertex,
+public interface GraphCollectionLayout<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
   E extends EPGMEdge> extends Layout<V, E> {
 
   /**

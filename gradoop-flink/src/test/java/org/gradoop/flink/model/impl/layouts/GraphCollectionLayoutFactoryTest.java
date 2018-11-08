@@ -39,6 +39,11 @@ import static org.junit.Assert.assertEquals;
 
 public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestBase {
 
+  /**
+   * Get the factory to test.
+   *
+   * @return the factory that should be tested.
+   */
   protected abstract GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> getFactory();
 
   @Test

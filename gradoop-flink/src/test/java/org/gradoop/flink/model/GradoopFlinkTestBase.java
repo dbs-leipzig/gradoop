@@ -72,10 +72,19 @@ public abstract class GradoopFlinkTestBase {
    */
   private GradoopFlinkConfig config;
 
+  /**
+   * The factory to create a logical graph layout.
+   */
   private LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> graphLayoutFactory;
 
+  /**
+   * The factory to create a graph collection layout.
+   */
   private GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> collectionLayoutFactory;
 
+  /**
+   * Creates a new instance of {@link GradoopFlinkTestBase}.
+   */
   public GradoopFlinkTestBase() {
     TestEnvironment testEnv = new TestEnvironment(CLUSTER, DEFAULT_PARALLELISM, false);
     // makes ExecutionEnvironment.getExecutionEnvironment() return this instance

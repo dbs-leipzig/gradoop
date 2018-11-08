@@ -32,7 +32,9 @@ import java.util.Map;
  * @param <V> the vertex type
  * @param <E> the edge type
  */
-public interface GraphCollectionLayoutFactory<G extends EPGMGraphHead, V extends EPGMVertex,
+public interface GraphCollectionLayoutFactory<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
   E extends EPGMEdge> extends BaseLayoutFactory {
   /**
    * Creates a collection layout from the given datasets.

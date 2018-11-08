@@ -22,14 +22,18 @@ import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.GraphCollectionLayoutFactoryTest;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+/**
+ * Test class {@link IndexedGVECollectionLayoutFactory}
+ */
 public class IndexedGVECollectionLayoutFactoryTest extends GraphCollectionLayoutFactoryTest {
   @Override
   protected GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> getFactory() {
-    GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> graphCollectionLayoutFactory =
-      new IndexedGVECollectionLayoutFactory();
+    // create the factory to test
+    IndexedGVECollectionLayoutFactory factory = new IndexedGVECollectionLayoutFactory();
+    // create a default gradoop flink config and set it to the layout
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    config.setGraphCollectionLayoutFactory(graphCollectionLayoutFactory);
-    return graphCollectionLayoutFactory;
+    factory.setGradoopFlinkConfig(config);
+    return factory;
   }
 
 

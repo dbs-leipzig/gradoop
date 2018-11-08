@@ -28,7 +28,9 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
  * @param <V> the vertex type
  * @param <E> the edge type
  */
-public interface LogicalGraphLayout<G extends EPGMGraphHead, V extends EPGMVertex,
+public interface LogicalGraphLayout<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
   E extends EPGMEdge> extends Layout<V, E> {
 
   /**

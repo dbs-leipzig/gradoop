@@ -36,8 +36,11 @@ import java.util.Map;
  * @param <E> the edge type
  * @param <GC> the type of the graph collection that will be created with this factory
  */
-public interface BaseGraphCollectionFactory<G extends EPGMGraphHead, V extends EPGMVertex,
-  E extends EPGMEdge, GC extends BaseGraphCollection> {
+public interface BaseGraphCollectionFactory<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  GC extends BaseGraphCollection> {
 
   /**
    * Sets the layout factory that is responsible for creating a graph collection layout.
@@ -69,7 +72,7 @@ public interface BaseGraphCollectionFactory<G extends EPGMGraphHead, V extends E
    * Creates a graph collection from the given datasets. The method assumes, that all vertices and
    * edges are already assigned to the specified graph heads.
    *
-   * @param graphHeads label indexed graph head dataset (1-element)
+   * @param graphHeads label indexed graph head dataset
    * @param vertices label indexed vertex datasets
    * @param edges label indexed edge datasets
    * @return graph collection

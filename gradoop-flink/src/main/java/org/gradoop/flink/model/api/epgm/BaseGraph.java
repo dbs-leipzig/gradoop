@@ -28,7 +28,10 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * @param <E> the edge type
  * @param <LG> the type of the logical graph that will be created with a provided factory
  */
-public interface BaseGraph<G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge,
+public interface BaseGraph<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
   LG extends BaseGraph> {
   /**
    * Returns the Gradoop Flink configuration.

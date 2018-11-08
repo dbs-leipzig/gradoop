@@ -17,16 +17,14 @@ package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 import java.io.IOException;
 
 /**
  * Operators that are available at all graph structures.
  *
- * @see LogicalGraph
- * @see GraphCollection
+ * @see BaseGraph
+ * @see BaseGraphCollection
  */
 public interface GraphBaseOperators {
 

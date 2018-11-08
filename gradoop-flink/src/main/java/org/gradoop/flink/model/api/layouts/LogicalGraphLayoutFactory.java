@@ -30,7 +30,9 @@ import java.util.Map;
  * @param <V> the vertex type
  * @param <E> the edge type
  */
-public interface LogicalGraphLayoutFactory<G extends EPGMGraphHead, V extends EPGMVertex,
+public interface LogicalGraphLayoutFactory<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
   E extends EPGMEdge> extends BaseLayoutFactory {
   /**
    * Creates a logical graph layout from the given vertex dataset.

@@ -22,12 +22,17 @@ import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.LogicalGraphLayoutFactoryTest;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+/**
+ * Test class {@link GVEGraphLayoutFactory}.
+ */
 public class GVEGraphLayoutFactoryTest extends LogicalGraphLayoutFactoryTest {
   @Override
   protected LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> getFactory() {
-    GVEGraphLayoutFactory logicalGraphLayoutFactory = new GVEGraphLayoutFactory();
+    // create the factory to test
+    GVEGraphLayoutFactory factory = new GVEGraphLayoutFactory();
+    // create a default gradoop flink config and set it to the layout
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    config.setLogicalGraphLayoutFactory(logicalGraphLayoutFactory);
-    return logicalGraphLayoutFactory;
+    factory.setGradoopFlinkConfig(config);
+    return factory;
   }
 }
