@@ -25,8 +25,7 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 public interface Max extends AggregateFunction {
 
   @Override
-  default PropertyValue aggregate(
-    PropertyValue aggregate, PropertyValue increment) {
+  default PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
     return PropertyValueUtils.Numeric.max(aggregate, increment);
   }
 }

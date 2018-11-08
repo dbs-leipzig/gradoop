@@ -33,13 +33,10 @@ class AggregateUtil {
    * @param aggregate aggregate map to be incremented
    * @param element element to increment with
    * @param aggregateFunctions aggregate functions
-   * @param <T> element type
    * @return incremented aggregate map
    */
-  static <T extends Element> Map<String, PropertyValue> increment(
-    Map<String, PropertyValue> aggregate,
-    T element,
-    Set<AggregateFunction> aggregateFunctions) {
+  static Map<String, PropertyValue> increment(Map<String, PropertyValue> aggregate, Element element,
+                                              Set<AggregateFunction> aggregateFunctions) {
     for (AggregateFunction aggFunc : aggregateFunctions) {
       PropertyValue increment = aggFunc.getIncrement(element);
       if (increment != null) {

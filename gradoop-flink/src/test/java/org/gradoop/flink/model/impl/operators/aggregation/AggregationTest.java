@@ -69,11 +69,10 @@ public class AggregationTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testSingleGraphMin() throws Exception {
-    LogicalGraph graph = getLoaderFromString(
-          "org:Ga[" +
-          "(:Va{p : 0.5f})-[:ea{p : 2}]->(:Vb{p : 3.1f})" +
-          "(:Vc{p : 0.33f})-[:eb]->(:Vd{p : 0.0f})" +
-          "]"
+    LogicalGraph graph = getLoaderFromString("org:Ga[" +
+        "(:Va{p : 0.5f})-[:ea{p : 2}]->(:Vb{p : 3.1f})" +
+        "(:Vc{p : 0.33f})-[:eb]->(:Vd{p : 0.0f})" +
+        "]"
       )
       .getLogicalGraphByVariable("org");
 
@@ -116,11 +115,10 @@ public class AggregationTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testSingleGraphMax() throws Exception {
-    LogicalGraph graph = getLoaderFromString(
-          "org:Ga[" +
-          "(:Va{p : 0.5f})-[:ea{p : 2}]->(:Vb{p : 3.1f})" +
-          "(:Vc{p : 0.33f})-[:eb]->(:Vd{p : 0.0f})" +
-          "]"
+    LogicalGraph graph = getLoaderFromString("org:Ga[" +
+        "(:Va{p : 0.5f})-[:ea{p : 2}]->(:Vb{p : 3.1f})" +
+        "(:Vc{p : 0.33f})-[:eb]->(:Vd{p : 0.0f})" +
+        "]"
       )
       .getLogicalGraphByVariable("org");
 
@@ -163,10 +161,9 @@ public class AggregationTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testSingleGraphSum() throws Exception {
-    LogicalGraph graph = getLoaderFromString(
-          "org:Ga[" +
-          "(:Va{p : 0.5f})-[:ea{p : 2}]->(:Vb{p : 3.1f})" +
-          "(:Vc{p : 0.33f})-[:eb]->(:Vd{p : 0.0f})" +
+    LogicalGraph graph = getLoaderFromString("org:Ga[" +
+        "(:Va{p : 0.5f})-[:ea{p : 2}]->(:Vb{p : 3.1f})" +
+        "(:Vc{p : 0.33f})-[:eb]->(:Vd{p : 0.0f})" +
           "]"
       ).getLogicalGraphByVariable("org");
 
@@ -215,10 +212,10 @@ public class AggregationTest extends GradoopFlinkTestBase {
 
     try {
       graph
-      .aggregate(new SumVertexProperty(PROPERTY, VERTEX_AGGREGATE_PROPERTY))
-      .aggregate(new SumEdgeProperty(PROPERTY, EDGE_AGGREGATE_PROPERTY))
-      .aggregate(new SumProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY))
-      .getGraphHead().print();
+        .aggregate(new SumVertexProperty(PROPERTY, VERTEX_AGGREGATE_PROPERTY))
+        .aggregate(new SumEdgeProperty(PROPERTY, EDGE_AGGREGATE_PROPERTY))
+        .aggregate(new SumProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY))
+        .getGraphHead().print();
     } catch (Exception e) {
       assertTrue(
         e instanceof JobExecutionException &&
