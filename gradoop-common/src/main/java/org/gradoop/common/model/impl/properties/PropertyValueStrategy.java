@@ -1,12 +1,16 @@
 package org.gradoop.common.model.impl.properties;
 
 import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public interface PropertyValueStrategy<T> {
 
@@ -36,6 +40,7 @@ public interface PropertyValueStrategy<T> {
         private PropertyValueStrategyFactory() {
             classStrategyMap = new HashMap<>();
             classStrategyMap.put(Boolean.class, new BooleanStrategy());
+            classStrategyMap.put(Set.class, new SetStrategy());
 
             byteStrategyMap = new HashMap<>(classStrategyMap.size());
             for (PropertyValueStrategy strategy : classStrategyMap.values()) {
@@ -45,6 +50,15 @@ public interface PropertyValueStrategy<T> {
 
         public static PropertyValueStrategy get(Class c) {
             PropertyValueStrategy strategy = INSTANCE.classStrategyMap.get(c);
+            if (strategy == null) {
+                for (Map.Entry<Class, PropertyValueStrategy> entry : INSTANCE.classStrategyMap.entrySet()) {
+                    if (entry.getKey().isAssignableFrom(c)) {
+                        strategy = entry.getValue();
+                        INSTANCE.classStrategyMap.put(c, strategy);
+                        break;
+                    }
+                }
+            }
             return strategy == null ? INSTANCE.noopPropertyValueStrategy : strategy;
         }
 
@@ -79,11 +93,6 @@ public interface PropertyValueStrategy<T> {
                 return get(value.getClass());
             }
             return INSTANCE.noopPropertyValueStrategy;
-        }
-
-        public static Object from(DataInputView inputView) throws IOException {
-            PropertyValueStrategy strategy = INSTANCE.byteStrategyMap.get(inputView.readByte());
-            return strategy == null ? null : strategy.read(inputView);
         }
     }
 
@@ -134,6 +143,115 @@ public interface PropertyValueStrategy<T> {
         }
 
 
+    }
+
+    class SetStrategy implements PropertyValueStrategy<Set> {
+
+        @Override
+        public boolean write(Set value, DataOutputView outputView) throws IOException {
+            byte[] rawBytes = getRawBytes(value);
+            outputView.write(rawBytes);
+            return true;
+        }
+
+        @Override
+        public Set read(DataInputView inputView) throws IOException {
+            int length = inputView.readShort();
+            // init new array
+            byte[] rawBytes = new byte[length];
+
+            inputView.read(rawBytes);
+
+            PropertyValue entry;
+
+            Set<PropertyValue> set = new HashSet<PropertyValue>();
+
+            ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
+            DataInputStream inputStream = new DataInputStream(byteStream);
+            DataInputView internalInputView = new DataInputViewStreamWrapper(inputStream);
+
+            try {
+                while (inputStream.available() > 0) {
+                    entry = new PropertyValue();
+                    entry.read(internalInputView);
+
+                    set.add(entry);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Error reading PropertyValue");
+            }
+
+            return set;
+        }
+
+        @Override
+        public int compare(Set value, Set other) {
+            throw new UnsupportedOperationException("Method compareTo() is not supported");
+        }
+
+        @Override
+        public boolean is(Object value) {
+            return value instanceof Set;
+        }
+
+        @Override
+        public Class<Set> getType() {
+            return Set.class;
+        }
+
+        @Override
+        public Set get(byte[] bytes) {
+            PropertyValue entry;
+
+            Set<PropertyValue> set = new HashSet<PropertyValue>();
+
+            ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
+            DataInputStream inputStream = new DataInputStream(byteStream);
+            DataInputView internalInputView = new DataInputViewStreamWrapper(inputStream);
+
+
+            try {
+                internalInputView.skipBytesToRead(1);
+                while (inputStream.available() > 0) {
+                    entry = new PropertyValue();
+                    entry.read(internalInputView);
+
+                    set.add(entry);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Error reading PropertyValue");
+            }
+
+            return set;
+        }
+
+        @Override
+        public Byte getRawType() {
+            return PropertyValue.TYPE_SET;
+        }
+
+        @Override
+        public byte[] getRawBytes(Set value) {
+            Set<PropertyValue> set = value;
+
+            int size = set.stream().mapToInt(PropertyValue::byteSize).sum() + PropertyValue.OFFSET + Bytes.SIZEOF_SHORT;
+
+            ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
+            DataOutputStream outputStream = new DataOutputStream(byteStream);
+            DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
+
+            try {
+                outputStream.write(PropertyValue.TYPE_SET);
+                outputStream.writeShort(size);
+                for (PropertyValue entry : set) {
+                    entry.write(outputView);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Error writing PropertyValue");
+            }
+
+            return byteStream.toByteArray();
+        }
     }
 
     class NoopPropertyValueStrategy implements PropertyValueStrategy {
