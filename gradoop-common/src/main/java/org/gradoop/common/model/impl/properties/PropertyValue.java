@@ -158,7 +158,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   private PropertyValue(Object value) {
     setObject(value);
-    legacyPropertyValue.setObject(value);
   }
 
   /**
@@ -199,7 +198,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return property value
    */
   public PropertyValue copy() {
-    return legacyPropertyValue.copy();
+    return create(getObject());
   }
 
   //----------------------------------------------------------------------------
@@ -338,7 +337,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return true, if {@code Set} value
    */
   public boolean isSet() {
-    return legacyPropertyValue.isSet();
+    return is(Set.class);
   }
 
   /**
@@ -503,8 +502,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return {@code Set<PropertyValue>} value
    */
   public Set<PropertyValue> getSet() {
-
-    return legacyPropertyValue.getSet();
+    return get(Set.class);
   }
 
   //----------------------------------------------------------------------------
@@ -521,6 +519,9 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     this.value = value;
     if (value == null || !is(value.getClass())) {
       legacyPropertyValue.setObject(value);
+    } else {
+      Byte rawType = PropertyValueStrategy.PropertyValueStrategyFactory.get(value).getRawType();
+      legacyPropertyValue.setBytes(new byte[] {rawType});
     }
   }
   /**
@@ -649,7 +650,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   public void setSet(Set<PropertyValue> set) {
 
-    legacyPropertyValue.setSet(set);
+    setObject(set);
   }
 
   //----------------------------------------------------------------------------
@@ -717,10 +718,12 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   @Override
   public int compareTo(PropertyValue o) {
     int compare = 0;
-    if (value != null) {
+    if (value == null || !is(value.getClass())) {
+      compare = legacyPropertyValue.compareTo(o);
+    } else {
       compare = PropertyValueStrategy.PropertyValueStrategyFactory.compare(value, o.value);
     }
-    return compare == 0 ? legacyPropertyValue.compareTo(o) : compare;
+    return compare;
   }
 
   /**
@@ -784,23 +787,28 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
 
     if (strategy == null) {
       value = null;
-      legacyPropertyValue.readObject(inputView, typeByte, type);
     } else {
       value = strategy.read(inputView);
+    }
+
+    if (value == null) {
+      legacyPropertyValue.readObject(inputView, typeByte, type);
     }
 
   }
 
   @Override
   public String toString() {
-    return legacyPropertyValue.toString();
+    return getObject() != null ?
+            getObject().toString() :
+            GradoopConstants.NULL_STRING;
   }
 
   public static class LegacyPropertyValue implements Comparable<PropertyValue>, Serializable {
     /**
      * Stores the type and the value
      */
-    private byte[] rawBytes;
+    private byte[] rawBytes = new byte[0];
 
     public LegacyPropertyValue() {
     }
@@ -974,7 +982,8 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
      * @return value or {@code null} if the value is empty
      */
     private Object getObject() {
-      return isBoolean() ? getBoolean() :
+      return rawBytes.length == 0 ? null :
+              isBoolean() ? getBoolean() :
               isShort() ? getShort() :
                       isInt() ? getInt() :
                               isLong() ? getLong() :
@@ -1591,7 +1600,11 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
      * @return byte size
      */
     private int byteSize() {
-      return rawBytes.length;
+      int length = rawBytes.length;
+      if (isString() || isBigDecimal() || isMap() || isList() || isSet()) {
+        length += Bytes.SIZEOF_SHORT;
+      }
+      return length;
     }
 
     /**
