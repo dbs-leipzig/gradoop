@@ -72,8 +72,6 @@ public class DegreeDistanceFunction extends RichMapFunction<WithCount<GradoopId>
    * Mapping function converting degree of vertex
    * to distance of max degree and degree of vertex
    *
-   * {@inheritDoc}
-   *
    * @param value degree of vertex
    * @return degree distance
    * @throws Exception throws any Exception
