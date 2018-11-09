@@ -36,7 +36,7 @@ public class DegreeCentralityRunner extends AbstractRunner implements ProgramDes
    * Calls the {@link DegreeCentrality} computation for a given logical graph.
    *
    * args[0] - path to input directory
-   * args[1] - input format (json, csv, index)
+   * args[1] - input format (json, csv, indexed)
    * args[2] - path to output directory
    *
    * @param args arguments
