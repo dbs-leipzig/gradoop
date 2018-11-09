@@ -1,0 +1,47 @@
+/*
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.gelly.randomjump.functions.datasetiteration;
+
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.gradoop.common.model.impl.pojo.Vertex;
+
+/**
+ * Joins an EPGM vertex with a DataSetIteration tuple, assigning a boolean property value from the
+ * tuple to the EPGM vertex, determining if this vertex was visited {@code true}, or not
+ * {@code false}
+ */
+public class DSIVertexJoin implements JoinFunction<Vertex, IterativeTuple, Vertex> {
+
+  /**
+   * Key for the boolean property value to assign to the EPGM vertex
+   */
+  private final String propertyKey;
+
+  /**
+   * Creates an instance of DSIVertexJoin with a given key for the boolean property value.
+   *
+   * @param propertyKey propertyKey Key for the boolean property value
+   */
+  public DSIVertexJoin(String propertyKey) {
+    this.propertyKey = propertyKey;
+  }
+
+  @Override
+  public Vertex join(Vertex vertex, IterativeTuple iterativeTuple) throws Exception {
+    vertex.setProperty(propertyKey, iterativeTuple.isSourceVisited());
+    return vertex;
+  }
+}

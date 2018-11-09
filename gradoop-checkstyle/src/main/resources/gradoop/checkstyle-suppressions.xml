@@ -14,4 +14,7 @@
   <suppress checks="IllegalCatch"
             files="GradoopGellyAlgorithm.java"
             lines="70-77"/>
+  <suppress checks="IllegalCatch"
+            files="RandomJumpDataSetIteration.java"
+            lines="112-116"/>
 </suppressions>
