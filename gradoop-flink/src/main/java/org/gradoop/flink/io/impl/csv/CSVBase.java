@@ -242,7 +242,7 @@ public abstract class CSVBase {
     DataSet<E> elements) {
     return elements
       .map(new ElementToPropertyMetaData<>())
-      .groupBy(1)
+      .groupBy(0, 1)
       .reduce(new ReducePropertyMetaData())
       .map(tuple -> Tuple3.of(tuple.f0, tuple.f1, MetaDataParser.getPropertiesMetaData(tuple.f2)))
       .returns(new TupleTypeInfo<>(
