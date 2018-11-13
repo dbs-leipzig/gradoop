@@ -20,7 +20,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyGlobalClusteringCoefficientDirected;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;

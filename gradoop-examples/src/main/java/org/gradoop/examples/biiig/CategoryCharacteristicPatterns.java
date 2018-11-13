@@ -18,18 +18,18 @@ package org.gradoop.examples.biiig;
 import org.apache.commons.io.IOUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.examples.utils.ExampleOutput;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.transactional.CategoryCharacteristicSubgraphs;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -150,10 +150,9 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
   }
 
   /**
-   * Aggregate function to determine "isClosed" measure
+   * Aggregate function to determine "isClosed" measure.
    */
-  private static class IsClosedAggregateFunction extends Or
-    implements VertexAggregateFunction {
+  private static class IsClosedAggregateFunction implements Or, VertexAggregateFunction {
 
     @Override
     public String getAggregatePropertyKey() {
@@ -161,7 +160,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     }
 
     @Override
-    public PropertyValue getVertexIncrement(Vertex vertex) {
+    public PropertyValue getIncrement(Element vertex) {
       boolean isClosedQuotation =
         vertex.getLabel().equals("Quotation") &&
           !vertex.getPropertyValue("status").toString().equals("open");
@@ -173,18 +172,18 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
   /**
    * Aggregate function to count sales orders per graph.
    */
-  private static class CountSalesOrdersAggregateFunction
-    extends Count implements VertexAggregateFunction {
+  private static class CountSalesOrdersAggregateFunction extends VertexCount {
 
-    @Override
-    public PropertyValue getVertexIncrement(Vertex vertex) {
-      return PropertyValue.create(
-        vertex.getLabel().equals("SalesOrder") ? 1 : 0);
+    /**
+     * Creates a new instance of a CountSalesOrderAggregateFunction aggregate function.
+     */
+    CountSalesOrdersAggregateFunction() {
+      super("soCount");
     }
 
     @Override
-    public String getAggregatePropertyKey() {
-      return "soCount";
+    public PropertyValue getIncrement(Element vertex) {
+      return PropertyValue.create(vertex.getLabel().equals("SalesOrder") ? 1 : 0);
     }
   }
 

@@ -20,18 +20,18 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
+import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
 import org.gradoop.flink.algorithms.gelly.pagerank.functions.PageRankToAttribute;
 import org.gradoop.flink.algorithms.gelly.pagerank.functions.PageRankResultKey;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
  * A gradoop operator wrapping {@link org.apache.flink.graph.library.linkanalysis.PageRank}.
  */
-public class PageRank extends GellyAlgorithm<NullValue, NullValue> {
+public class PageRank extends GradoopGellyAlgorithm<NullValue, NullValue> {
 
   /**
    * Property key to store the page rank in.
@@ -63,7 +63,7 @@ public class PageRank extends GellyAlgorithm<NullValue, NullValue> {
   }
 
   @Override
-  protected LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
+  public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
     throws Exception {
     DataSet<Vertex> newVertices =
       new org.apache.flink.graph.library.linkanalysis.PageRank<GradoopId, NullValue, NullValue>(

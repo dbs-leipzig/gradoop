@@ -15,29 +15,32 @@
  */
 package org.gradoop.examples.aggregation.functions;
 
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
-
+import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 
 /**
  * Custom vertex aggregate function that stores all values of the property 'name' over a set of
  * vertices as a comma separated list in a property named 'list_of_names'.
  * Used in {@link org.gradoop.examples.aggregation.AggregationExample}
  */
-public class AggregateListOfNames implements VertexAggregateFunction {
+public class AggregateListOfNames extends BaseAggregateFunction implements VertexAggregateFunction {
 
   /**
    * Property key 'name'
    */
   private static final String PROPERTY_KEY_NAME = "name";
+
   /**
-   * Property key 'list_of_names'
+   * Creates a new instance of a AggregateListOfNames aggregate function.
    */
-  private static final String PROPERTY_KEY_LIST_OF_NAMES = "list_of_names";
+  public AggregateListOfNames() {
+    super("list_of_names");
+  }
 
   @Override
-  public PropertyValue getVertexIncrement(Vertex vertex) {
+  public PropertyValue getIncrement(Element vertex) {
     return PropertyValue.create(vertex.getPropertyValue(PROPERTY_KEY_NAME).toString());
   }
 
@@ -45,10 +48,5 @@ public class AggregateListOfNames implements VertexAggregateFunction {
   public PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
     aggregate.setString(aggregate.getString() + "," + increment.getString());
     return aggregate;
-  }
-
-  @Override
-  public String getAggregatePropertyKey() {
-    return PROPERTY_KEY_LIST_OF_NAMES;
   }
 }

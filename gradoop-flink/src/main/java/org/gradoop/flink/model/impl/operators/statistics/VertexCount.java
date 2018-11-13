@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.count.Count;
 
@@ -28,5 +28,10 @@ public class VertexCount implements UnaryGraphToValueOperator<DataSet<Long>> {
   @Override
   public DataSet<Long> execute(LogicalGraph graph) {
     return Count.count(graph.getVertices());
+  }
+
+  @Override
+  public String getName() {
+    return VertexCount.class.getName();
   }
 }

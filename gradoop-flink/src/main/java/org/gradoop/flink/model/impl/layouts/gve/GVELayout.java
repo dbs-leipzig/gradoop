@@ -42,7 +42,8 @@ import java.util.Set;
  * - the second dataset contains the vertices contained in all graphs of the collection
  * - the third dataset contains the edges contained in all graphs of the collection
  */
-public class GVELayout implements LogicalGraphLayout, GraphCollectionLayout {
+public class GVELayout implements LogicalGraphLayout<GraphHead, Vertex, Edge>,
+  GraphCollectionLayout<GraphHead, Vertex, Edge> {
   /**
    * Graph data associated with the logical graphs in that collection.
    */

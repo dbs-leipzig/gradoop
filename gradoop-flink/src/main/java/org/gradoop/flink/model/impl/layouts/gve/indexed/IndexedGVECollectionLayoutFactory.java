@@ -31,8 +31,10 @@ import java.util.Objects;
 public class IndexedGVECollectionLayoutFactory extends GVECollectionLayoutFactory {
 
   @Override
-  public GraphCollectionLayout fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
-    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromIndexedDataSets(
+    Map<String, DataSet<GraphHead>> graphHeads,
+    Map<String, DataSet<Vertex>> vertices,
+    Map<String, DataSet<Edge>> edges) {
     Objects.requireNonNull(graphHeads);
     Objects.requireNonNull(vertices);
     Objects.requireNonNull(edges);

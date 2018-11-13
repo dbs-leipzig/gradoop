@@ -1,14 +1,17 @@
 <?xml version="1.0"?>
 
 <!DOCTYPE suppressions PUBLIC
-     "-//Puppy Crawl//DTD Suppressions 1.0//EN"
-     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
   <suppress checks="ParameterNumberCheck"
              files="GraphStatistics.java"
              lines="0-9999"/>
   <suppress checks="IllegalCatch"
-            files="GellyAlgorithm.java"
-            lines="60-70"/>
+            files="BaseGellyAlgorithm.java"
+            lines="36-42"/>
+  <suppress checks="IllegalCatch"
+            files="GradoopGellyAlgorithm.java"
+            lines="70-77"/>
 </suppressions>

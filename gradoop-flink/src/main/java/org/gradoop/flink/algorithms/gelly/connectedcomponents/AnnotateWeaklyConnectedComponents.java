@@ -21,12 +21,12 @@ import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
+import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.GellyVertexValueToVertexPropertyJoin;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.VertexPropertyToEdgePropertyJoin;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithGradoopId;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -38,7 +38,7 @@ import org.gradoop.flink.model.impl.functions.epgm.TargetId;
  * as a property. If {@link #annotateEdges} is set to {@code true}, the component id is assigned to
  * each edge as a property, too.
  */
-public class AnnotateWeaklyConnectedComponents extends GellyAlgorithm<GradoopId, NullValue> {
+public class AnnotateWeaklyConnectedComponents extends GradoopGellyAlgorithm<GradoopId, NullValue> {
 
   /**
    * Property key to store the component id in.
@@ -85,7 +85,7 @@ public class AnnotateWeaklyConnectedComponents extends GellyAlgorithm<GradoopId,
   }
 
   @Override
-  protected LogicalGraph executeInGelly(Graph<GradoopId, GradoopId, NullValue> graph)
+  public LogicalGraph executeInGelly(Graph<GradoopId, GradoopId, NullValue> graph)
     throws Exception {
     DataSet<Vertex> annotatedVertices = new org.apache.flink.graph.library.ConnectedComponents<
       GradoopId, GradoopId, NullValue>(maxIterations).run(graph)

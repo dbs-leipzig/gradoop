@@ -20,13 +20,12 @@ import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
- * Superclass of aggregate functions that determine a maximal value.
+ * Interface of aggregate functions that determine a maximal value.
  */
-public abstract class Max implements AggregateFunction {
+public interface Max extends AggregateFunction {
 
   @Override
-  public PropertyValue aggregate(
-    PropertyValue aggregate, PropertyValue increment) {
+  default PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
     return PropertyValueUtils.Numeric.max(aggregate, increment);
   }
 }

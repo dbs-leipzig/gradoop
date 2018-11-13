@@ -20,7 +20,7 @@ import org.gradoop.flink.algorithms.fsm.dimspan.DIMSpan;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion.EPGMGraphTransactionToLabeledGraph;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphStringString;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 

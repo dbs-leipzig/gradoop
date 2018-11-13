@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.api.operators;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 
 /**
  * Creates a value from one input collection.
