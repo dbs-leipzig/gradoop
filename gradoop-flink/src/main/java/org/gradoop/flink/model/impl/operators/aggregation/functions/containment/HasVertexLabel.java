@@ -22,10 +22,10 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
  *
  * <pre>
  * Usage:
- * <ul>
+ * <ol>
  * <li>aggregate
  * <li>filter using the same UDF instance.
- * </ul>
+ * </ol>
  * </pre>
  */
 public class HasVertexLabel extends HasLabel implements VertexAggregateFunction {

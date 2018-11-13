@@ -31,10 +31,10 @@ import java.util.Objects;
  *
  * <pre>
  * Usage:
- * <ul>
+ * <ol>
  * <li>aggregate
  * <li>filter using the same UDF instance.
- * </ul>
+ * </ol>
  * </pre>
  */
 public class HasLabel extends BaseAggregateFunction

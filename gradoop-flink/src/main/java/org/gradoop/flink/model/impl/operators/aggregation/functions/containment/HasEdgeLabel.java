@@ -22,10 +22,10 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
  *
  * <pre>
  * Usage:
- * <ul>
+ * <ol>
  * <li>aggregate
  * <li>filter using the same UDF instance.
- * </ul>
+ * </ol>
  * </pre>
  */
 public class HasEdgeLabel extends HasLabel implements EdgeAggregateFunction {
