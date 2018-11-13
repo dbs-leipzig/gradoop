@@ -20,14 +20,14 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 
 /**
- * Superclass if aggregate functions that sum property values of elements.
+ * Superclass of aggregate functions that sum property values of elements.
  */
 public class SumProperty extends BaseAggregateFunction implements Sum {
 
   /**
    * Property key whose value should be aggregated.
    */
-  private String propertyKey;
+  private final String propertyKey;
 
   /**
    * Creates a new instance of a SumProperty aggregate function.

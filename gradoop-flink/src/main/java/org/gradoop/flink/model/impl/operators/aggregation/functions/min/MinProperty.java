@@ -27,7 +27,7 @@ public class MinProperty extends BaseAggregateFunction implements Min {
   /**
    * Property key whose value should be aggregated.
    */
-  private String propertyKey;
+  private final String propertyKey;
 
   /**
    * Creates a new instance of a MinProperty aggregate function.

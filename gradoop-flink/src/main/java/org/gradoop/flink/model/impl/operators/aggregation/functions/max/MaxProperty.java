@@ -27,7 +27,7 @@ public class MaxProperty extends BaseAggregateFunction implements Max {
   /**
    * Property key whose value should be aggregated.
    */
-  protected final String propertyKey;
+  private final String propertyKey;
 
   /**
    * Creates a new instance of a MaxProperty aggregate function.

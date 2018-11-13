@@ -46,7 +46,7 @@ public interface AggregateFunction extends Serializable {
   /**
    * Describes the increment of an element that should be added to the aggregate.
    *
-   * @param element element
+   * @param element element used to get the increment
    * @return increment, may be NULL, which is handled in the operator
    */
   PropertyValue getIncrement(Element element);

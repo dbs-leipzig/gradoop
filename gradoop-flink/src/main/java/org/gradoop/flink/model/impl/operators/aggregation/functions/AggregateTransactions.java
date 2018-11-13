@@ -86,7 +86,7 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
   /**
    * Applies the aggregate functions on the vertices of the given graph transaction.
    *
-   * @param aggregate map to hold the aggregate properties
+   * @param aggregate map to hold the aggregate values
    * @param graphTransaction graph transaction
    * @return final vertex aggregate value
    */
@@ -101,7 +101,7 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
   /**
    * Applies the aggregate functions on the edges of the given graph transaction.
    *
-   * @param aggregate map to hold the aggregate properties
+   * @param aggregate map to hold the aggregate values
    * @param graphTransaction graph transaction
    * @return final edge aggregate value
    */

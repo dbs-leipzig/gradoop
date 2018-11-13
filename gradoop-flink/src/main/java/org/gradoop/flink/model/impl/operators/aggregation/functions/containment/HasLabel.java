@@ -29,8 +29,10 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
  *
  * <pre>
  * Usage:
- * 1. aggregate
- * 2. filter using the same UDF instance.
+ * <ul>
+ * <li>aggregate
+ * <li>filter using the same UDF instance.
+ * </ul>
  * </pre>
  */
 public class HasLabel extends BaseAggregateFunction
@@ -39,7 +41,7 @@ public class HasLabel extends BaseAggregateFunction
   /**
    * Label to check presence of.
    */
-  protected final String label;
+  private final String label;
 
   /**
    * Creates a new instance of a HasLabel aggregate function.
