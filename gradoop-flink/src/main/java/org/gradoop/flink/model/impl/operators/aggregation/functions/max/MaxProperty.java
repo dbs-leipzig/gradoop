@@ -19,6 +19,8 @@ import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 
+import java.util.Objects;
+
 /**
  * Superclass of aggregate functions that determine a maximal property value.
  */
@@ -35,8 +37,7 @@ public class MaxProperty extends BaseAggregateFunction implements Max {
    * @param propertyKey property key to aggregate
    */
   public MaxProperty(String propertyKey) {
-    super("max_" + propertyKey);
-    this.propertyKey = propertyKey;
+    this(propertyKey, "max_" + propertyKey);
   }
 
   /**
@@ -47,6 +48,7 @@ public class MaxProperty extends BaseAggregateFunction implements Max {
    */
   public MaxProperty(String propertyKey, String aggregatePropertyKey) {
     super(aggregatePropertyKey);
+    Objects.requireNonNull(propertyKey);
     this.propertyKey = propertyKey;
   }
 

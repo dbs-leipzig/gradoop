@@ -23,6 +23,8 @@ import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
 
+import java.util.Objects;
+
 /**
  * Superclass of aggregate and filter functions that check vertex or edge label
  * presence in a graph.
@@ -60,6 +62,7 @@ public class HasLabel extends BaseAggregateFunction
    */
   public HasLabel(String label, String aggregatePropertyKey) {
     super(aggregatePropertyKey);
+    Objects.requireNonNull(label);
     this.label = label;
   }
 

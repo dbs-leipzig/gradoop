@@ -17,6 +17,8 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
+import java.util.Objects;
+
 /**
  * Base implementation of AggregateFunction providing a custom aggregate property key.
  */
@@ -41,6 +43,7 @@ public abstract class BaseAggregateFunction implements AggregateFunction {
    * @param aggregatePropertyKey aggregate property key
    */
   public void setAggregatePropertyKey(String aggregatePropertyKey) {
+    Objects.requireNonNull(aggregatePropertyKey);
     this.aggregatePropertyKey = aggregatePropertyKey;
   }
 
