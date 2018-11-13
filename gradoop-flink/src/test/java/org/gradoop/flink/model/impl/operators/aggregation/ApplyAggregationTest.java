@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasEdgeLabel;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasLabel;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasVertexLabel;
