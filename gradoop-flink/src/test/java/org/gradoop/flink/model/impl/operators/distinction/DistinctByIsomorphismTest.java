@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.distinction;
 
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -16,7 +16,7 @@
 package org.gradoop.flink.algorithms.gelly;
 
 import org.apache.flink.graph.Graph;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
 
 /**

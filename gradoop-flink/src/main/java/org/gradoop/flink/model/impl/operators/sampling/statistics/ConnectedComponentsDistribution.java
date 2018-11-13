@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.sampling.statistics;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.AnnotateWeaklyConnectedComponents;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.functions.AggregateListOfWccEdges;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.functions.AggregateListOfWccVertices;

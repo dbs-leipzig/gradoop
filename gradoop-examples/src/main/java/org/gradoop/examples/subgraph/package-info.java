@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * An example for the {@link org.gradoop.flink.model.api.epgm.LogicalGraph#subgraph(
+ * An example for the {@link org.gradoop.flink.model.impl.epgm.LogicalGraph#subgraph(
  * org.apache.flink.api.common.functions.FilterFunction,
  * org.apache.flink.api.common.functions.FilterFunction) subgraph} operator and the use of
  * {@link org.gradoop.flink.model.impl.functions.filters.CombinableFilter combinable filters},
