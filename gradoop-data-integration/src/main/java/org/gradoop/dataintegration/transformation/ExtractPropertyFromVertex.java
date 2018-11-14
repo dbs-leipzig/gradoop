@@ -27,8 +27,8 @@ import org.gradoop.dataintegration.transformation.functions.CreateNewEdges;
 import org.gradoop.dataintegration.transformation.functions.CreateNewVertex;
 import org.gradoop.dataintegration.transformation.functions.CreateNewVertexWithEqualityCondense;
 import org.gradoop.dataintegration.transformation.functions.ExtractPropertyWithOriginId;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 
