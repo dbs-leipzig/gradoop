@@ -74,9 +74,9 @@ public class Communities extends AbstractRunner {
     // group the vertices of the graph by their community, count vertices per group and edges
     // between groups
     LogicalGraph communities = graph.groupBy(singletonList(communityKey), // vertex grouping keys
-      singletonList(new Count()), // vertex aggregate functions
+      singletonList(new Count("count")), // vertex aggregate functions
       emptyList(), // edge grouping keys
-      singletonList(new Count()), // edge aggregate functions
+      singletonList(new Count("count")), // edge aggregate functions
       GroupingStrategy.GROUP_REDUCE);
 
     // extract vertex induced subgraph only containing communities with more than 10 users

@@ -43,7 +43,7 @@ abstract class BuildBase implements Serializable {
   /**
    * Creates build base.
    *
-   * @param useLabel    use edge label
+   * @param useLabel use edge label
    */
   protected BuildBase(boolean useLabel) {
     this.useLabel = useLabel;
@@ -94,10 +94,8 @@ abstract class BuildBase implements Serializable {
    * @param values aggregate values
    * @param valueAggregators aggregate functions
    */
-  protected void setAggregateProperties(
-    EPGMAttributed element,
-    PropertyValueList values,
-    List<AggregateFunction> valueAggregators) {
+  protected void setAggregateProperties(EPGMAttributed element, PropertyValueList values,
+                                        List<AggregateFunction> valueAggregators) {
     if (!valueAggregators.isEmpty()) {
       Iterator<PropertyValue> valueIt = values.iterator();
       for (AggregateFunction valueAggregator : valueAggregators) {
