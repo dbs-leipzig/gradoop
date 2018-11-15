@@ -73,7 +73,7 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
     // count vertex and edge lines
     for (String line : dotLines) {
 
-      if(line.contains("digraph") && lines == 0) {
+      if (line.contains("digraph") && lines == 0) {
         graphLines++;
       } else  if (line.contains("->")) {
         edgeLines++;
@@ -95,5 +95,5 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
     assertEquals("Wrong number of graph lines", 1, graphLines);
     assertEquals("Wrong number of edge lines", 4, edgeLines);
     assertEquals("Wrong number of vertex lines", 3, vertexLines);
- }
+  }
 }

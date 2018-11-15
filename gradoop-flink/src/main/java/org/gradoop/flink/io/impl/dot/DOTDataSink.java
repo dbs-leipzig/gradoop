@@ -81,7 +81,7 @@ public class DOTDataSink implements DataSink {
 
     graphCollection
       .getGraphTransactions()
-      .map(tx -> dotFileFormat.format(tx))
+      .map(dotFileFormat::format)
       .output(graphvizWriter)
       .setParallelism(1);
   }
@@ -102,7 +102,7 @@ public class DOTDataSink implements DataSink {
      * @param outputPath graphviz dot file name
      * @param charset encoding
      */
-    public GraphvizWriter(Path outputPath, String charset) {
+    GraphvizWriter(Path outputPath, String charset) {
       super(outputPath, charset);
     }
 
@@ -110,7 +110,7 @@ public class DOTDataSink implements DataSink {
      * see super constructor.
      * @param outputPath graphviz dot file name
      */
-    public GraphvizWriter(Path outputPath) {
+    GraphvizWriter(Path outputPath) {
       super(outputPath);
     }
 

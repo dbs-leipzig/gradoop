@@ -29,7 +29,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 
-public class RandomLimitedDegreeVertexSamplingTest extends ParametrizedTestForGraphSampling {
+public class RandomLimitedDegreeVertexSamplingTest extends ParameterizedTestForGraphSampling {
 
   /**
    * Creates a new RandomLimitedDegreeVertexSamplingTest instance.
@@ -101,62 +101,54 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParametrizedTestForGr
    */
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
-    return Arrays.asList(
-      new String[] {
+    return Arrays.asList(new String[] {
         "With seed and the sum of in- and out-degree with value = 3",
         "-4181668494294894490",
         "0.272f",
         "BOTH",
         "3"
-      },
-      new String[] {
+    }, new String[] {
         "Without seed and the sum of in- and out-degree with value = 3",
         "0",
         "0.272f",
         "BOTH",
         "3"
-      },
-      new String[] {
+    }, new String[] {
         "With seed and vertex input degree for value = 3",
         "-4181668494294894490",
         "0.272f",
         "IN",
         "3"
-      },
-      new String[] {
+    }, new String[] {
         "With seed and vertex input degree for value = 0",
         "-4181668494294894490",
         "0.272f",
         "IN",
         "0"
-      },
-      new String[] {
+    }, new String[] {
         "With seed and vertex input degree for value = -1",
         "-4181668494294894490",
         "0.272f",
         "IN",
         "-1"
-      },
-      new String[] {
+    }, new String[] {
         "With seed and vertex output degree for value = 3",
         "-4181668494294894490",
         "0.272f",
         "OUT",
         "3"
-      },
-      new String[] {
+    }, new String[] {
         "With seed and vertex output degree for value = 0",
         "-4181668494294894490",
         "0.272f",
         "OUT",
         "0"
-      },
-      new String[] {
+    }, new String[] {
         "With seed and vertex output degree for value = -1",
         "-4181668494294894490",
         "0.272f",
         "OUT",
         "-1"
-      });
+    });
   }
 }

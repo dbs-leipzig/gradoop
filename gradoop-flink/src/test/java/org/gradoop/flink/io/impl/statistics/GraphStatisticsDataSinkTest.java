@@ -284,13 +284,13 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getDistinctVertexProperties( "name"), is(9L));
-    assertThat(statistics.getDistinctVertexProperties("gender"), is(2L));
-    assertThat(statistics.getDistinctVertexProperties("city"), is(3L));
-    assertThat(statistics.getDistinctVertexProperties( "age"), is(4L));
-    assertThat(statistics.getDistinctVertexProperties( "speaks"), is(1L));
-    assertThat(statistics.getDistinctVertexProperties( "locIP"), is(1L));
-    assertThat(statistics.getDistinctVertexProperties("title"), is(2L));
+    assertThat(statistics.getDistinctVertexProperties("name"),    is(9L));
+    assertThat(statistics.getDistinctVertexProperties("gender"),  is(2L));
+    assertThat(statistics.getDistinctVertexProperties("city"),    is(3L));
+    assertThat(statistics.getDistinctVertexProperties("age"),     is(4L));
+    assertThat(statistics.getDistinctVertexProperties("speaks"),  is(1L));
+    assertThat(statistics.getDistinctVertexProperties("locIP"),   is(1L));
+    assertThat(statistics.getDistinctVertexProperties("title"),   is(2L));
   }
 
 }
