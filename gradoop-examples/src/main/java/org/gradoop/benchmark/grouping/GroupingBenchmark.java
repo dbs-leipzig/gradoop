@@ -20,13 +20,13 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinProperty;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MaxAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MinAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
 import java.io.File;
 import java.io.IOException;
@@ -235,8 +235,8 @@ public class GroupingBenchmark extends AbstractRunner
     }
 
     // initialize aggregators
-    List<PropertyValueAggregator> vAggregators = Lists.newArrayList();
-    List<PropertyValueAggregator> eAggregators = Lists.newArrayList();
+    List<AggregateFunction> vAggregators = Lists.newArrayList();
+    List<AggregateFunction> eAggregators = Lists.newArrayList();
 
     if (cmd.hasOption(OPTION_VERTEX_AGGREGATION_KEYS)) {
       vAggregators =
@@ -365,10 +365,10 @@ public class GroupingBenchmark extends AbstractRunner
    * @param resultKeys  aggregator result keys as whole string
    * @return List of PropertyValueAggregators
    */
-  private static List<PropertyValueAggregator> getAggregators(String
+  private static List<AggregateFunction> getAggregators(String
     aggs, String keys, String resultKeys) {
 
-    List<PropertyValueAggregator> aggregatorList = Lists.newArrayList();
+    List<AggregateFunction> aggregatorList = Lists.newArrayList();
 
     aggs = aggs.replace("\\s", "");
     keys = keys.replace("\\s", "");
@@ -383,14 +383,14 @@ public class GroupingBenchmark extends AbstractRunner
       for (int i = 0; i < aggsList.size(); i++) {
         switch (aggsList.get(i)) {
         case "count" :
-          aggregatorList.add(new CountAggregator());
+          aggregatorList.add(new Count());
           break;
         case "max" :
-          aggregatorList.add(new MaxAggregator(keyList.get(i),
+          aggregatorList.add(new MaxProperty(keyList.get(i),
             resultKeyList.get(i)));
           break;
         case "min" :
-          aggregatorList.add(new MinAggregator(keyList.get(i),
+          aggregatorList.add(new MinProperty(keyList.get(i),
             resultKeyList.get(i)));
           break;
         default:
@@ -417,7 +417,7 @@ public class GroupingBenchmark extends AbstractRunner
   private static Grouping getOperator(GroupingStrategy strategy,
     List<String> vertexKeys, List<String> edgeKeys,
     boolean useVertexLabels, boolean useEdgeLabels,
-    List<PropertyValueAggregator> vAggs, List<PropertyValueAggregator> eAggs) {
+    List<AggregateFunction> vAggs, List<AggregateFunction> eAggs) {
 
     Grouping.GroupingBuilder builder =
       new Grouping.GroupingBuilder()
@@ -426,17 +426,17 @@ public class GroupingBenchmark extends AbstractRunner
         .useEdgeLabel(useEdgeLabels);
 
     if (vAggs.size() > 0) {
-      for (PropertyValueAggregator agg:vAggs) {
+      for (AggregateFunction agg:vAggs) {
         if (agg != null) {
-          builder.addVertexAggregator(agg);
+          builder.addVertexAggregateFunction(agg);
         }
       }
     }
 
     if (eAggs.size() > 0) {
-      for (PropertyValueAggregator agg: eAggs) {
+      for (AggregateFunction agg: eAggs) {
         if (agg != null) {
-          builder.addEdgeAggregator(agg);
+          builder.addEdgeAggregateFunction(agg);
         }
       }
     }
