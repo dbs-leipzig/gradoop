@@ -40,6 +40,8 @@
             files="[/\\]src[/\\]test[/\\]java[/\\]"/>
   <suppress checks="StaticVariableName"
             files="[/\\]src[/\\]test[/\\]java[/\\]"/>
+  <suppress checks="HiddenField"
+            files="[/\\]src[/\\]test[/\\]java[/\\]"/>
   <!--regexp should be checked (later) again-->
   <suppress checks="Regexp"
             files="[/\\]src[/\\]test[/\\]java[/\\]"/>
