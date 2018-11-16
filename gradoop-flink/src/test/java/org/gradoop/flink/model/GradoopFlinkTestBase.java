@@ -238,7 +238,7 @@ public abstract class GradoopFlinkTestBase {
       .fromElements(dummy)
       .filter(new False<>());
   }
-  
+
   /**
    * Returns the encoded file path to a resource.
    *

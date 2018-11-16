@@ -98,7 +98,7 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     TransformationFunction<EPGMVertex> renameFunction = new RenameLabel<>(label, newLabel);
 
     renameFunction.apply(vertex, vertex);
- 
+
     assertEquals(newLabel, vertex.getLabel());
     assertThat(vertex.getPropertyValue("k1").toString(), Is.<Object>is("v1"));
     assertThat(vertex.getPropertyValue("k2").toString(), Is.<Object>is("v2"));

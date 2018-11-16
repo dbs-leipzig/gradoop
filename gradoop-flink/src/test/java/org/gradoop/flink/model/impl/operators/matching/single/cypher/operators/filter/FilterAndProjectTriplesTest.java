@@ -70,7 +70,7 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
       predicates,
       new HashMap<>(), MatchStrategy.ISOMORPHISM
     ).evaluate().collect();
-    
+
     assertEquals(1, result.size());
     assertEquals(result.get(0).getId(0), a.getId());
     assertEquals(result.get(0).getId(1), e.getId());

@@ -35,11 +35,11 @@ public class MergeExpandEmbeddingsTest {
   private final GradoopId n = GradoopId.get();
   private final GradoopId a = GradoopId.get();
   private final GradoopId b = GradoopId.get();
-  
+
   private final GradoopId e0 = GradoopId.get();
   private final GradoopId e1 = GradoopId.get();
   private final GradoopId e2 = GradoopId.get();
-  
+
   // Homomorphism
   @Test
   public void testWithoutDuplicates() throws Exception {
@@ -72,7 +72,7 @@ public class MergeExpandEmbeddingsTest {
     testJoin(buildEdge(a, e2, m), new ArrayList<>(), new ArrayList<>(), 0, true);
     testJoin(buildEdge(a, e2, n), new ArrayList<>(), new ArrayList<>(), 2, true);
   }
-  
+
   //VertexIsomorphism
   @Test
   public void testVertexIsomorphismWithoutDuplicates() throws Exception {
@@ -157,12 +157,12 @@ public class MergeExpandEmbeddingsTest {
 
     MergeExpandEmbeddings op =
       new MergeExpandEmbeddings(distinctVertices, distinctEdges, closingColumn);
-    
+
     List<ExpandEmbedding> results = new ArrayList<>();
     op.join(expandEmbedding, edgeTuple, new ListCollector<>(results));
-    
+
     assertEquals(isResult ? 1 : 0, results.size());
-    
+
     if (isResult) {
       assertArrayEquals(new GradoopId[]{e1, a, edge.getId(1)}, results.get(0).getPath());
       assertEquals(edge.getId(2), results.get(0).getEnd());

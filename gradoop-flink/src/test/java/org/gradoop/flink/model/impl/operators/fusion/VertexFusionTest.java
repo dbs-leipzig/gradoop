@@ -471,7 +471,7 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
       "(a2:A {atype : \"avalue\"})-[beta2:BetaEdge {betatype : \"betavalue\"}]->(b2:B {btype : " +
       "\"bvalue\"})  " +
       "(dummy:Foo)" +
-      "] " + 
+      "] " +
       "pattern1:G {graph:\"pattern 1\"} [(a)-[beta]->(b)]" +
       "pattern2:G {graph:\"pattern 2\"} [(a2)-[beta2]->(b2)]" +
       "result:G {graph: \"inputgraph\"} [(:G {graph:\"pattern 1\"}) (:G {graph:\"pattern 2\"}) (dummy)]");
@@ -495,7 +495,7 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
       "(a)-[beta2:BetaEdge {betatype : \"betavalue\"}]->(b2:B {btype : " +
       "\"bvalue\"})  " +
       "(a)-[f:foo]->(dummy:Foo)" +
-      "] " + 
+      "] " +
       "pattern1:H {graph:\"pattern 1\"} [(a)-[beta]->(b)]" +
       "pattern2:H {graph:\"pattern 2\"} [(a)-[beta2]->(b2)]" +
       "result:G {graph: \"inputgraph\"} [(:H {graph:\"pattern 2\"})-[:foo]->(dummy) (:H {graph:\"pattern 1\"})-[:foo]->(dummy)]");
@@ -510,16 +510,16 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
         .equalsByElementIds(VertexFusionUtils.myInducedEdgeSubgraphForFusion(expected, searchGraph)));
     }
   }
-  
+
   @Test
   public void fuseSubgraph() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString("source:G {source : \"graph\"}[" + 
-        "      (a:Patent {author : \"asdf\", year: 2000, title: \"P1\"})-[:cite {difference : 0}]->(b:Patent {author : \"asdf\", year: 2000, title: \"P2\"})" + 
-        "      (a)-[:cite {difference : 0}]->(c:Patent {author : \"asdf\", year: 2000, title: \"P3\"})" + 
-        "      (b)-[:cite {difference : 0}]->(c)\n" + 
-        "      (a)-[:cite {difference : 5}]->(d:Patent {author : \"zxcv\", year: 1995, title: \"Earlier...\"})" + 
-        "      (b)-[:cite {difference : 5}]->(d)" + 
-        "      (e:Patent {author : \"kdkdkd\", year: 1997, title: \"Once upon a time\"})-[e_d:cite {difference : 2}]->(d)" + 
+    FlinkAsciiGraphLoader loader = getLoaderFromString("source:G {source : \"graph\"}[" +
+        "      (a:Patent {author : \"asdf\", year: 2000, title: \"P1\"})-[:cite {difference : 0}]->(b:Patent {author : \"asdf\", year: 2000, title: \"P2\"})" +
+        "      (a)-[:cite {difference : 0}]->(c:Patent {author : \"asdf\", year: 2000, title: \"P3\"})" +
+        "      (b)-[:cite {difference : 0}]->(c)\n" +
+        "      (a)-[:cite {difference : 5}]->(d:Patent {author : \"zxcv\", year: 1995, title: \"Earlier...\"})" +
+        "      (b)-[:cite {difference : 5}]->(d)" +
+        "      (e:Patent {author : \"kdkdkd\", year: 1997, title: \"Once upon a time\"})-[e_d:cite {difference : 2}]->(d)" +
         "]" +
         "expected:Combined [" +
         "(combined:Combined)-[:cite {difference : 5}]->(d)" +
@@ -536,7 +536,7 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
         },
           null,
           null));
-    
+
     VertexFusion f = new VertexFusion();
     LogicalGraph output = f
       .execute(searchGraph, patternGraph)
@@ -546,7 +546,7 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
       },
         null,
         null);
-    
+
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
     collectAndAssertTrue(output.equalsByData(expected));

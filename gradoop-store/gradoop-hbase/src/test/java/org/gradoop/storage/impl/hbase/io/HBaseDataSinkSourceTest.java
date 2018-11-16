@@ -675,7 +675,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test
   public void testWriteToSink() throws Exception {
     // Create an empty store
-    HBaseEPGMStore epgmStore = createEmptyEPGMStore("testWriteToSink");
+    HBaseEPGMStore newStore = createEmptyEPGMStore("testWriteToSink");
 
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(config);
 
@@ -685,7 +685,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     loader.initDatabaseFromStream(inputStream);
 
     GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    new HBaseDataSink(epgmStore, flinkConfig)
+    new HBaseDataSink(newStore, flinkConfig)
       .write(flinkConfig
         .getGraphCollectionFactory()
         .fromCollections(
@@ -695,32 +695,32 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     getExecutionEnvironment().execute();
 
-    epgmStore.flush();
+    newStore.flush();
 
     // read social network from HBase
 
     // graph heads
     validateEPGMElementCollections(
       loader.getGraphHeads(),
-      epgmStore.getGraphSpace().readRemainsAndClose()
+      newStore.getGraphSpace().readRemainsAndClose()
     );
     // vertices
     validateEPGMElementCollections(
       loader.getVertices(),
-      epgmStore.getVertexSpace().readRemainsAndClose()
+      newStore.getVertexSpace().readRemainsAndClose()
     );
     validateEPGMGraphElementCollections(
       loader.getVertices(),
-      epgmStore.getVertexSpace().readRemainsAndClose()
+      newStore.getVertexSpace().readRemainsAndClose()
     );
     // edges
     validateEPGMElementCollections(
       loader.getEdges(),
-      epgmStore.getEdgeSpace().readRemainsAndClose()
+      newStore.getEdgeSpace().readRemainsAndClose()
     );
     validateEPGMGraphElementCollections(
       loader.getEdges(),
-      epgmStore.getEdgeSpace().readRemainsAndClose()
+      newStore.getEdgeSpace().readRemainsAndClose()
     );
   }
 
@@ -730,13 +730,13 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test(expected = NotImplementedException.class)
   public void testWriteToSinkWithOverWrite() throws Exception {
     // Create an empty store
-    HBaseEPGMStore epgmStore = createEmptyEPGMStore("testWriteToSink");
+    HBaseEPGMStore newStore = createEmptyEPGMStore("testWriteToSink");
 
     GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
     GraphCollection graphCollection = flinkConfig.getGraphCollectionFactory()
       .createEmptyCollection();
 
-    new HBaseDataSink(epgmStore, flinkConfig).write(graphCollection, true);
+    new HBaseDataSink(newStore, flinkConfig).write(graphCollection, true);
 
     getExecutionEnvironment().execute();
   }

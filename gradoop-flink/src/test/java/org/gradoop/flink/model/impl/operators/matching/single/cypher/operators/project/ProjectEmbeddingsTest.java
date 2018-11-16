@@ -40,12 +40,12 @@ public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
       getExecutionEnvironment().fromElements(embedding, embedding);
 
     List<Integer> extractedPropertyKeys = Lists.newArrayList(0, 2);
-    
+
     ProjectEmbeddings operator = new ProjectEmbeddings(embeddings, extractedPropertyKeys);
 
     DataSet<Embedding> results = operator.evaluate();
     assertEquals(2, results.count());
-    
+
     assertEveryEmbedding(results, (e) -> {
       assertEquals(2, e.size());
       assertEquals(PropertyValue.create("m"), e.getProperty(0));
