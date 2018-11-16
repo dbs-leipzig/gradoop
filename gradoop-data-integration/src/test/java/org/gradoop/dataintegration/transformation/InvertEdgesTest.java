@@ -72,13 +72,14 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
     long oldEdgeCount = invertedEdgeGraph.getEdges().filter(new ByLabel<>(toInvertLabel)).count();
     Assert.assertEquals(oldEdgeCount, 0); // no edges with the old label should exist
 
-    /*
-     * We now have to check whether all of these hasInterest edges are inverted.
-     * (eve)-[:hasInterest]->(databases)
-     * (alice)-[:hasInterest]->(databases)
-     * (frank)-[:hasInterest]->(hadoop)
-     * (dave)-[:hasInterest]->(hadoop)
-     */
+    //-------------------
+    //  We now have to check whether all of these hasInterest edges are inverted.
+    //
+    // (eve)-[:hasInterest]->(databases)
+    // (alice)-[:hasInterest]->(databases)
+    // (frank)-[:hasInterest]->(hadoop)
+    // (dave)-[:hasInterest]->(hadoop)
+    //-------------------
     List<Vertex> vertices = new ArrayList<>();
     invertedEdgeGraph.getVertices()
         .filter(new Or<>(new ByLabel<>("Person"), new ByLabel<>("Tag")))
@@ -97,7 +98,7 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
     Set<String> tags = new HashSet<>(Arrays.asList("Databases", "Hadoop"));
     Set<String> persons = new HashSet<>(Arrays.asList("Eve", "Alice", "Frank", "Dave"));
 
-    for(Edge e : newEdges) {
+    for (Edge e : newEdges) {
       String sourceName = idMap.get(e.getSourceId());
       String targetName = idMap.get(e.getTargetId());
 

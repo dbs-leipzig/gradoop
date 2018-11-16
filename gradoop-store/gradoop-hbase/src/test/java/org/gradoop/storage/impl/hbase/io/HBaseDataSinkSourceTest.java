@@ -304,13 +304,13 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     List<Edge> edges = Lists.newArrayList(getSocialEdges())
       .stream()
-      .filter(e -> (e.getLabel().equals(LABEL_HAS_MODERATOR) ||
-        e.getLabel().equals(LABEL_HAS_MEMBER)))
+      .filter(e -> e.getLabel().equals(LABEL_HAS_MODERATOR) ||
+        e.getLabel().equals(LABEL_HAS_MEMBER))
       .collect(Collectors.toList());
 
     List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
       .stream()
-      .filter(e -> (e.getLabel().equals(LABEL_TAG) || e.getLabel().equals(LABEL_FORUM)))
+      .filter(e -> e.getLabel().equals(LABEL_TAG) || e.getLabel().equals(LABEL_FORUM))
       .collect(Collectors.toList());
 
     // Define HBase source

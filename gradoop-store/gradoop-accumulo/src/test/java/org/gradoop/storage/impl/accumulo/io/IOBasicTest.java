@@ -47,7 +47,7 @@ public class IOBasicTest extends GradoopFlinkTestBase {
   private static final String TEST_02 = "io_basic_02";
 
   @Test
-  public void test01_read() throws Exception {
+  public void read() throws Exception {
     AccumuloEPGMStore accumuloStore = new AccumuloEPGMStore(AccumuloTestSuite.getAcConfig(TEST_01));
 
     Collection<GraphHead> graphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
@@ -90,7 +90,7 @@ public class IOBasicTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void test02_write() throws Exception {
+  public void write() throws Exception {
     AccumuloEPGMStore accumuloStore = new AccumuloEPGMStore(AccumuloTestSuite.getAcConfig(TEST_02));
 
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(
