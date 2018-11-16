@@ -35,7 +35,7 @@ public class XorPredicateTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    XorPredicate xorPredicate = new XorPredicate(new Xor(a,b));
+    XorPredicate xorPredicate = new XorPredicate(new Xor(a, b));
 
     CNF reference = new OrPredicate(
       new Or(
@@ -58,7 +58,7 @@ public class XorPredicateTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    OrPredicate orPredicate = new OrPredicate(new Or(a,b));
+    OrPredicate orPredicate = new OrPredicate(new Or(a, b));
 
     assertEquals(new ComparisonExpression(a), orPredicate.getLhs());
   }
@@ -68,7 +68,7 @@ public class XorPredicateTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    OrPredicate orPredicate = new OrPredicate(new Or(a,b));
+    OrPredicate orPredicate = new OrPredicate(new Or(a, b));
 
     assertEquals(new ComparisonExpression(b), orPredicate.getRhs());
   }

@@ -476,7 +476,7 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
       "pattern2:G {graph:\"pattern 2\"} [(a2)-[beta2]->(b2)]" +
       "result:G {graph: \"inputgraph\"} [(:G {graph:\"pattern 1\"}) (:G {graph:\"pattern 2\"}) (dummy)]");
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("input");
-    GraphCollection patternGraphs = loader.getGraphCollectionByVariables("pattern1","pattern2");
+    GraphCollection patternGraphs = loader.getGraphCollectionByVariables("pattern1", "pattern2");
     VertexFusion f = new VertexFusion();
     LogicalGraph output = f.execute(searchGraph, patternGraphs);
     LogicalGraph expected = loader.getLogicalGraphByVariable("result");
@@ -500,7 +500,7 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
       "pattern2:H {graph:\"pattern 2\"} [(a)-[beta2]->(b2)]" +
       "result:G {graph: \"inputgraph\"} [(:H {graph:\"pattern 2\"})-[:foo]->(dummy) (:H {graph:\"pattern 1\"})-[:foo]->(dummy)]");
     LogicalGraph searchGraph = loader.getLogicalGraphByVariable("input");
-    GraphCollection patternGraphs = loader.getGraphCollectionByVariables("pattern1","pattern2");
+    GraphCollection patternGraphs = loader.getGraphCollectionByVariables("pattern1", "pattern2");
     VertexFusion f = new VertexFusion();
     LogicalGraph output = f.execute(searchGraph, patternGraphs);
     LogicalGraph expected = loader.getLogicalGraphByVariable("result");
@@ -530,10 +530,22 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
     LogicalGraph searchGraph = sourceGraph.reduce(new ReduceCombination());
     GraphCollection patternGraph = sourceGraph
         .apply(new ApplySubgraph(null, edge -> edge.getPropertyValue("difference").getInt() == 0))
-        .apply(new ApplyTransformation((gh, plain) -> {gh.setLabel("Combined"); return gh;}, null, null));
+        .apply(new ApplyTransformation((gh, plain) -> {
+          gh.setLabel("Combined");
+          return gh;
+        },
+          null,
+          null));
     
     VertexFusion f = new VertexFusion();
-    LogicalGraph output = f.execute(searchGraph, patternGraph).transform((gh, plain) -> {gh.setLabel("Combined"); return gh;}, null, null);
+    LogicalGraph output = f
+      .execute(searchGraph, patternGraph)
+      .transform((gh, plain) -> {
+        gh.setLabel("Combined");
+        return gh;
+      },
+        null,
+        null);
     
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 

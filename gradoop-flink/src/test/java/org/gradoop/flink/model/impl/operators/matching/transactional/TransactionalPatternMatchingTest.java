@@ -26,12 +26,13 @@ import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.D
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.assertTrue;
 import org.junit.rules.TemporaryFolder;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
 
@@ -116,7 +117,7 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
 
     GraphCollection coll = loader.getGraphCollectionByVariables("g1", "g2", "g3", "g4", "g5");
 
-    for(int i=0;i<tests.length;i++) {
+    for (int i = 0; i < tests.length; i++) {
       String testPattern = tests[i];
 
       GraphCollection result = coll.match(testPattern, new DepthSearchMatching(), true);
@@ -134,7 +135,7 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
 
       Map<GradoopId, String> lineageIdMap = new HashMap<>();
 
-      for(GraphHead original : originalHeads) {
+      for (GraphHead original : originalHeads) {
         lineageIdMap.put(original.getId(), original.getLabel());
       }
 
@@ -143,7 +144,7 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
       int cCount = 0;
       int dCount = 0;
       int eCount = 0;
-      for(GraphHead head : resultHeads) {
+      for (GraphHead head : resultHeads) {
         GradoopId id = head.getPropertyValue("lineage").getGradoopId();
         if (lineageIdMap.get(id).equals("A")) {
           aCount++;
@@ -161,53 +162,53 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
           eCount++;
         }
       }
-      assertTrue(aCount == resultCounts[i][0]);
-      assertTrue(bCount == resultCounts[i][1]);
-      assertTrue(cCount == resultCounts[i][2]);
-      assertTrue(dCount == resultCounts[i][3]);
-      assertTrue(eCount == resultCounts[i][4]);
+      assertEquals(aCount, resultCounts[i][0]);
+      assertEquals(bCount, resultCounts[i][1]);
+      assertEquals(cCount, resultCounts[i][2]);
+      assertEquals(dCount, resultCounts[i][3]);
+      assertEquals(eCount, resultCounts[i][4]);
     }
   }
 
   private String[] tests = {
-    TestData.CHAIN_PATTERN_0,
-    TestData.CHAIN_PATTERN_1,
-    TestData.CHAIN_PATTERN_2,
-    TestData.CHAIN_PATTERN_3,
-    TestData.CHAIN_PATTERN_4,
-    TestData.CHAIN_PATTERN_5,
-    TestData.CHAIN_PATTERN_6,
-    TestData.CYCLE_PATTERN_0,
-    TestData.CYCLE_PATTERN_1,
-    TestData.CYCLE_PATTERN_2,
-    TestData.CYCLE_PATTERN_3,
-    TestData.CYCLE_PATTERN_4,
-    TestData.CYCLE_PATTERN_5,
-    TestData.LOOP_PATTERN_0,
-    TestData.UNLABELED_PATTERN_0,
-    TestData.UNLABELED_PATTERN_1,
-    TestData.UNLABELED_PATTERN_2,
-    TestData.UNLABELED_PATTERN_3,
+      TestData.CHAIN_PATTERN_0,
+      TestData.CHAIN_PATTERN_1,
+      TestData.CHAIN_PATTERN_2,
+      TestData.CHAIN_PATTERN_3,
+      TestData.CHAIN_PATTERN_4,
+      TestData.CHAIN_PATTERN_5,
+      TestData.CHAIN_PATTERN_6,
+      TestData.CYCLE_PATTERN_0,
+      TestData.CYCLE_PATTERN_1,
+      TestData.CYCLE_PATTERN_2,
+      TestData.CYCLE_PATTERN_3,
+      TestData.CYCLE_PATTERN_4,
+      TestData.CYCLE_PATTERN_5,
+      TestData.LOOP_PATTERN_0,
+      TestData.UNLABELED_PATTERN_0,
+      TestData.UNLABELED_PATTERN_1,
+      TestData.UNLABELED_PATTERN_2,
+      TestData.UNLABELED_PATTERN_3,
   };
 
   private long[][] resultCounts = {
-    {3, 5, 0, 0, 0},
-    {0, 0, 3, 4, 0},
-    {3, 4, 4, 4, 0},
-    {0, 0, 0, 0, 0},
-    {0, 0, 2, 4, 0},
-    {0, 0, 0, 0, 0},
-    {12, 18, 0, 0, 0},
-    {1, 1, 0, 0, 0},
-    {0, 0, 0, 0, 0},
-    {1, 1, 0, 0, 0},
-    {0, 1, 0, 0, 0},
-    {2, 4, 0, 0, 0},
-    {0, 2, 0, 0, 0},
-    {0, 1, 0, 0, 0},
-    {11, 13, 4, 4, 2},
-    {13, 18, 3, 4, 1},
-    {2, 3, 0, 0, 0},
-    {3, 5, 0, 0, 0}
+      {3, 5, 0, 0, 0},
+      {0, 0, 3, 4, 0},
+      {3, 4, 4, 4, 0},
+      {0, 0, 0, 0, 0},
+      {0, 0, 2, 4, 0},
+      {0, 0, 0, 0, 0},
+      {12, 18, 0, 0, 0},
+      {1, 1, 0, 0, 0},
+      {0, 0, 0, 0, 0},
+      {1, 1, 0, 0, 0},
+      {0, 1, 0, 0, 0},
+      {2, 4, 0, 0, 0},
+      {0, 2, 0, 0, 0},
+      {0, 1, 0, 0, 0},
+      {11, 13, 4, 4, 2},
+      {13, 18, 3, 4, 1},
+      {2, 3, 0, 0, 0},
+      {3, 5, 0, 0, 0}
   };
 }

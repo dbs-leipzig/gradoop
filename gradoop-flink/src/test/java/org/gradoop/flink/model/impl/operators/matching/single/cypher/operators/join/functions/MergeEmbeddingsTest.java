@@ -98,7 +98,7 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
     Embedding left = createEmbedding(v0, e0, v1, e1, v2);
 
     // [Id(v1),Id(e2),Id(v3)]
-    Embedding right = createEmbedding(v1, e2 ,v3);
+    Embedding right = createEmbedding(v1, e2, v3);
 
     // join operator
     MergeEmbeddings udf = new MergeEmbeddings(3,
@@ -188,7 +188,7 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     MergeEmbeddings udf = new MergeEmbeddings(3,
-      Lists.newArrayList(0,2),
+      Lists.newArrayList(0, 2),
       Lists.newArrayList(), Lists.newArrayList(),
       Lists.newArrayList(), Lists.newArrayList()
     );
@@ -233,7 +233,7 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     MergeEmbeddings udf = new MergeEmbeddings(5,
-      Lists.newArrayList(0,4),
+      Lists.newArrayList(0, 4),
       Lists.newArrayList(), Lists.newArrayList(),
       Lists.newArrayList(), Lists.newArrayList()
     );
@@ -282,7 +282,7 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     MergeEmbeddings udf = new MergeEmbeddings(7,
-      Lists.newArrayList(2,4),
+      Lists.newArrayList(2, 4),
       Lists.newArrayList(), Lists.newArrayList(),
       Lists.newArrayList(), Lists.newArrayList()
     );
@@ -553,9 +553,9 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
     ArrayList<Embedding> resultList = new ArrayList<>();
 
     // get results
-    for(Embedding left : entries) {
-      for(Embedding right : entries) {
-        if(left.getId(0).equals(right.getId(0)) && left.getId(2).equals(right.getId(2)) ) {
+    for (Embedding left : entries) {
+      for (Embedding right : entries) {
+        if (left.getId(0).equals(right.getId(0)) && left.getId(2).equals(right.getId(2))) {
           ArrayList<Embedding> tmp = new ArrayList<>();
           ListCollector<Embedding> collector = new ListCollector<>(tmp);
           op.join(left, right, collector);

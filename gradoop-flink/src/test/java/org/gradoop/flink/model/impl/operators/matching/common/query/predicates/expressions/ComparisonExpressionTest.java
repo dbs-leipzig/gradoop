@@ -132,7 +132,7 @@ public class ComparisonExpressionTest {
 
   private boolean compare(Literal lhs, Literal rhs, Comparator comparator) {
     return new ComparisonExpression(
-      new Comparison(lhs,comparator,rhs)
+      new Comparison(lhs, comparator, rhs)
     ).evaluate(null, null);
   }
 }
