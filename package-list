@@ -100,6 +100,7 @@ org.gradoop.flink.model.api.operators
 org.gradoop.flink.model.api.tuples
 org.gradoop.flink.model.impl
 org.gradoop.flink.model.impl.comparators
+org.gradoop.flink.model.impl.epgm
 org.gradoop.flink.model.impl.functions
 org.gradoop.flink.model.impl.functions.bool
 org.gradoop.flink.model.impl.functions.epgm
