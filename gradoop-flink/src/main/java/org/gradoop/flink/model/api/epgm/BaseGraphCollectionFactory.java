@@ -15,17 +15,14 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
-import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Responsible for creating instances of graph collections with type {@link GC} based on a specific
@@ -69,18 +66,6 @@ public interface BaseGraphCollectionFactory<
   GC fromDataSets(DataSet<G> graphHeads, DataSet<V> vertices, DataSet<E> edges);
 
   /**
-   * Creates a graph collection from the given datasets. The method assumes that all vertices and
-   * edges are already assigned to the specified graph heads.
-   *
-   * @param graphHeads label indexed graph head dataset
-   * @param vertices label indexed vertex datasets
-   * @param edges label indexed edge datasets
-   * @return graph collection
-   */
-  GC fromIndexedDataSets(Map<String, DataSet<G>> graphHeads, Map<String, DataSet<V>> vertices,
-    Map<String, DataSet<E>> edges);
-
-  /**
    * Creates a collection layout from the given collections.
    *
    * @param graphHeads  Graph Head collection
@@ -93,35 +78,10 @@ public interface BaseGraphCollectionFactory<
   /**
    * Creates a graph collection from a given logical graph.
    *
-   * @param logicalGraphLayout  input graph
+   * @param logicalGraphLayout the graph layout with stored graph elements
    * @return 1-element graph collection
    */
-  GC fromGraph(LogicalGraph logicalGraphLayout);
-
-  /**
-   * Creates a graph collection from a graph transaction dataset.
-   *
-   * Overlapping vertices and edge are merged by Id comparison only.
-   *
-   * @param transactions  transaction dataset
-   * @return graph collection
-   */
-  GC fromTransactions(DataSet<GraphTransaction> transactions);
-
-  /**
-   * Creates a graph collection layout from graph transactions.
-   *
-   * Overlapping vertices and edge are merged using provided reduce functions.
-   *
-   * @param transactions        transaction dataset
-   * @param vertexMergeReducer  vertex merge function
-   * @param edgeMergeReducer    edge merge function
-   * @return graph collection
-   */
-  GC fromTransactions(
-    DataSet<GraphTransaction> transactions,
-    GroupReduceFunction<V, V> vertexMergeReducer,
-    GroupReduceFunction<E, E> edgeMergeReducer);
+  GC fromGraph(LogicalGraphLayout<G, V, E> logicalGraphLayout);
 
   /**
    * Creates an empty graph collection.

@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -74,7 +75,15 @@ public class GraphCollectionFactory
     return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, edges), config);
   }
 
-  @Override
+  /**
+   * Creates a graph collection from the given datasets. The method assumes that all vertices and
+   * edges are already assigned to the specified graph heads.
+   *
+   * @param graphHeads label indexed graph head dataset
+   * @param vertices label indexed vertex datasets
+   * @param edges label indexed edge datasets
+   * @return graph collection
+   */
   public GraphCollection fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
     Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
     GraphCollectionLayout<GraphHead, Vertex, Edge> layout = layoutFactory
@@ -89,16 +98,32 @@ public class GraphCollectionFactory
   }
 
   @Override
-  public GraphCollection fromGraph(LogicalGraph logicalGraphLayout) {
+  public GraphCollection fromGraph(LogicalGraphLayout<GraphHead, Vertex, Edge> logicalGraphLayout) {
     return new GraphCollection(layoutFactory.fromGraphLayout(logicalGraphLayout), config);
   }
 
-  @Override
+  /**
+   * Creates a graph collection from a graph transaction dataset.
+   *
+   * Overlapping vertices and edge are merged by Id comparison only.
+   *
+   * @param transactions  transaction dataset
+   * @return graph collection
+   */
   public GraphCollection fromTransactions(DataSet<GraphTransaction> transactions) {
     return new GraphCollection(layoutFactory.fromTransactions(transactions), config);
   }
 
-  @Override
+  /**
+   * Creates a graph collection layout from graph transactions.
+   *
+   * Overlapping vertices and edge are merged using provided reduce functions.
+   *
+   * @param transactions        transaction dataset
+   * @param vertexMergeReducer  vertex merge function
+   * @param edgeMergeReducer    edge merge function
+   * @return graph collection
+   */
   public GraphCollection fromTransactions(DataSet<GraphTransaction> transactions,
     GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
     GroupReduceFunction<Edge, Edge> edgeMergeReducer) {

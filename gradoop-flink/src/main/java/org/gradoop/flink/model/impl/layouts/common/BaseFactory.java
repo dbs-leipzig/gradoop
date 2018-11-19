@@ -21,6 +21,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 import org.gradoop.flink.model.api.layouts.BaseLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -110,6 +113,76 @@ public abstract class BaseFactory implements BaseLayoutFactory {
         .filter(new False<>());
     } else {
       edgeSet = env.fromCollection(edges);
+    }
+    return edgeSet;
+  }
+
+  /**
+   * Creates a temporal graph head dataset from a given collection.
+   * Encapsulates the workaround for dataset creation from an empty collection.
+   *
+   * @param temporalGraphHeads temporal graph heads
+   * @return temporal graph head dataset
+   */
+  protected DataSet<TemporalGraphHead> createTemporalGraphHeadDataSet(
+    Collection<TemporalGraphHead> temporalGraphHeads) {
+
+    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
+
+    DataSet<TemporalGraphHead> graphHeadSet;
+    if (temporalGraphHeads.isEmpty()) {
+      graphHeadSet = env
+        .fromElements(TemporalGraphHead.createGraphHead())
+        .filter(new False<>());
+    } else {
+      graphHeadSet =  env.fromCollection(temporalGraphHeads);
+    }
+    return graphHeadSet;
+  }
+
+  /**
+   * Creates a temporal vertex dataset from a given collection.
+   * Encapsulates the workaround for dataset creation from an empty collection.
+   *
+   * @param temporalVertices temporal vertex collection
+   * @return temporal vertex dataset
+   */
+  protected DataSet<TemporalVertex> createTemporalVertexDataSet(
+    Collection<TemporalVertex> temporalVertices) {
+
+    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
+
+    DataSet<TemporalVertex> vertexSet;
+    if (temporalVertices.isEmpty()) {
+      vertexSet = env
+        .fromElements(TemporalVertex.createVertex())
+        .filter(new False<>());
+    } else {
+      vertexSet = env.fromCollection(temporalVertices);
+    }
+    return vertexSet;
+  }
+
+  /**
+   * Creates a temporal edge dataset from a given collection.
+   * Encapsulates the workaround for dataset creation from an empty collection.
+   *
+   * @param temporalEdges collection with temporal edges
+   * @return temporal edge dataset
+   */
+  protected DataSet<TemporalEdge> createTemporalEdgeDataSet(
+    Collection<TemporalEdge> temporalEdges) {
+
+    ExecutionEnvironment env = getConfig().getExecutionEnvironment();
+
+    DataSet<TemporalEdge> edgeSet;
+    if (temporalEdges.isEmpty()) {
+      GradoopId dummyId = GradoopId.get();
+      edgeSet = env
+        .fromElements(TemporalEdge.createEdge(dummyId, dummyId))
+        .filter(new False<>());
+    } else {
+      edgeSet = env.fromCollection(temporalEdges);
     }
     return edgeSet;
   }

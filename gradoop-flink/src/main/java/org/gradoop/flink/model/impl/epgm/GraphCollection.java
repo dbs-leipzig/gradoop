@@ -30,6 +30,7 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.GraphCollectionOperators;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
+import org.gradoop.flink.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
@@ -42,6 +43,9 @@ import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalEdgeFromNonTemporal;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalGraphHeadFromNonTemporal;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalVertexFromNonTemporal;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
@@ -63,6 +67,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmpt
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.union.Union;
+import org.gradoop.flink.model.impl.tpgm.TemporalGraphCollection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -403,6 +408,44 @@ public class GraphCollection implements
   @Override
   public LogicalGraph reduce(ReducibleBinaryGraphToGraphOperator op) {
     return callForGraph(op);
+  }
+
+  /**
+   * Converts the {@link GraphCollection} to a {@link TemporalGraphCollection} instance. Since there
+   * is no extractor function provided for this function, the valid times of all elements will be
+   * empty.
+   *
+   * @return the graph collection represented as temporal graph collection with empty valid time
+   * attributes
+   */
+  public TemporalGraphCollection toTemporalGraph() {
+    return getConfig().getTemporalGraphCollectionFactory().fromDataSets(
+      getGraphHeads().map(new TemporalGraphHeadFromNonTemporal()),
+      getVertices().map(new TemporalVertexFromNonTemporal()),
+      getEdges().map(new TemporalEdgeFromNonTemporal()));
+  }
+
+  /**
+   * Converts the {@link GraphCollection} to a {@link TemporalGraphCollection} instance.
+   * By the provided timestamp extractors, it is possible to extract temporal information from the
+   * data to define a time interval that represents the beginning and end of the element's validity
+   * (valid time).
+   *
+   * @param graphHeadTimeIntervalExtractor extractor to pick the time interval from graph heads
+   * @param vertexTimeIntervalExtractor extractor to pick the time interval from vertices
+   * @param edgeTimeIntervalExtractor extractor to pick the time interval from edges
+   * @return the graph collection represented as temporal graph collection with a time interval as
+   * valid time
+   */
+  public TemporalGraphCollection toTemporalGraph(
+    TimeIntervalExtractor<GraphHead> graphHeadTimeIntervalExtractor,
+    TimeIntervalExtractor<Vertex> vertexTimeIntervalExtractor,
+    TimeIntervalExtractor<Edge> edgeTimeIntervalExtractor) {
+
+    return getConfig().getTemporalGraphCollectionFactory().fromDataSets(
+      getGraphHeads().map(new TemporalGraphHeadFromNonTemporal(graphHeadTimeIntervalExtractor)),
+      getVertices().map(new TemporalVertexFromNonTemporal(vertexTimeIntervalExtractor)),
+      getEdges().map(new TemporalEdgeFromNonTemporal(edgeTimeIntervalExtractor)));
   }
 
   //----------------------------------------------------------------------------

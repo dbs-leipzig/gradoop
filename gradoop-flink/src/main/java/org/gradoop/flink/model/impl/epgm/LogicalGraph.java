@@ -29,6 +29,7 @@ import org.gradoop.flink.model.api.epgm.LogicalGraphOperators;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
+import org.gradoop.flink.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
@@ -40,6 +41,9 @@ import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalEdgeFromNonTemporal;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalGraphHeadFromNonTemporal;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalVertexFromNonTemporal;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
@@ -68,6 +72,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmpt
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
+import org.gradoop.flink.model.impl.tpgm.TemporalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -590,6 +595,41 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   @Override
   public GraphCollection splitBy(String propertyKey) {
     return callForCollection(new Split(new PropertyGetter<>(Lists.newArrayList(propertyKey))));
+  }
+
+  /**
+   * Converts the {@link LogicalGraph} to a {@link TemporalGraph} instance. Since there is no
+   * extractor function provided for this function, the valid times of all elements will be empty.
+   *
+   * @return the logical graph represented as temporal graph with empty valid time attributes
+   */
+  public TemporalGraph toTemporalGraph() {
+    return getConfig().getTemporalGraphFactory().fromDataSets(
+      getGraphHead().map(new TemporalGraphHeadFromNonTemporal()),
+      getVertices().map(new TemporalVertexFromNonTemporal()),
+      getEdges().map(new TemporalEdgeFromNonTemporal()));
+  }
+
+  /**
+   * Converts the {@link LogicalGraph} to a {@link TemporalGraph} instance. By the provided
+   * timestamp extractors, it is possible to extract temporal information from the data to
+   * define a time interval that represents the beginning and end of the element's validity
+   * (valid time).
+   *
+   * @param graphHeadTimeIntervalExtractor extractor to pick the time interval from graph heads
+   * @param vertexTimeIntervalExtractor extractor to pick the time interval from vertices
+   * @param edgeTimeIntervalExtractor extractor to pick the time interval from edges
+   * @return the logical graph represented as temporal graph with a time interval as valid time
+   */
+  public TemporalGraph toTemporalGraph(
+    TimeIntervalExtractor<GraphHead> graphHeadTimeIntervalExtractor,
+    TimeIntervalExtractor<Vertex> vertexTimeIntervalExtractor,
+    TimeIntervalExtractor<Edge> edgeTimeIntervalExtractor) {
+
+    return getConfig().getTemporalGraphFactory().fromDataSets(
+      getGraphHead().map(new TemporalGraphHeadFromNonTemporal(graphHeadTimeIntervalExtractor)),
+      getVertices().map(new TemporalVertexFromNonTemporal(vertexTimeIntervalExtractor)),
+      getEdges().map(new TemporalEdgeFromNonTemporal(edgeTimeIntervalExtractor)));
   }
 
   //----------------------------------------------------------------------------

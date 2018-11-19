@@ -20,16 +20,16 @@ import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
-import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
-import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
-import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
-import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
+import org.gradoop.flink.model.impl.tpgm.TemporalGraphCollectionFactory;
+import org.gradoop.flink.model.impl.tpgm.TemporalGraphFactory;
 
 import java.util.Objects;
 
@@ -46,13 +46,22 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
   /**
    * Creates instances of {@link LogicalGraph}
    */
-  private final BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph> logicalGraphFactory;
+  private final LogicalGraphFactory logicalGraphFactory;
 
   /**
    * Creates instances of {@link GraphCollection}
    */
-  private final BaseGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection>
-    graphCollectionFactory;
+  private final GraphCollectionFactory graphCollectionFactory;
+
+  /**
+   * Creates instances of {@link org.gradoop.flink.model.impl.tpgm.TemporalGraph}
+   */
+  private final TemporalGraphFactory temporalGraphFactory;
+
+  /**
+   * Creates instances of {@link org.gradoop.flink.model.impl.tpgm.TemporalGraphCollection}
+   */
+  private final TemporalGraphCollectionFactory temporalGraphCollectionFactory;
 
   /**
    * Creates a new Configuration.
@@ -79,6 +88,9 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
 
     this.graphCollectionFactory = new GraphCollectionFactory(this);
     this.graphCollectionFactory.setLayoutFactory(graphCollectionLayoutFactory);
+
+    this.temporalGraphFactory = new TemporalGraphFactory(this);
+    this.temporalGraphCollectionFactory = new TemporalGraphCollectionFactory(this);
   }
 
   /**
@@ -117,21 +129,39 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
   }
 
   /**
-   * Returns a factory that is able to create logical graph layouts.
+   * Returns a factory that is able to create logical graphs.
    *
-   * @return factory for logical graph layouts
+   * @return factory for logical graph
    */
   public LogicalGraphFactory getLogicalGraphFactory() {
-    return (LogicalGraphFactory) logicalGraphFactory;
+    return logicalGraphFactory;
   }
 
   /**
-   * Returns a factory that is able to create graph collection layouts.
+   * Returns a factory that is able to create graph collections.
    *
-   * @return factory for graph collection layouts
+   * @return factory for graph collection
    */
   public GraphCollectionFactory getGraphCollectionFactory() {
-    return (GraphCollectionFactory) graphCollectionFactory;
+    return graphCollectionFactory;
+  }
+
+  /**
+   * Returns a factory that is able to create temporal graphs.
+   *
+   * @return factory for temporal graph
+   */
+  public TemporalGraphFactory getTemporalGraphFactory() {
+    return temporalGraphFactory;
+  }
+
+  /**
+   * Returns a factory that is able to create temporal graph collections.
+   *
+   * @return factory for graph collection
+   */
+  public TemporalGraphCollectionFactory getTemporalGraphCollectionFactory() {
+    return temporalGraphCollectionFactory;
   }
 
   /**

@@ -74,13 +74,28 @@ public class LogicalGraphFactory
     return new LogicalGraph(layoutFactory.fromDataSets(graphHead, vertices, edges), config);
   }
 
-  @Override
+  /**
+   * Creates a logical graph from the given datasets. A new graph head is created and all vertices
+   * and edges are assigned to that graph head.
+   *
+   * @param vertices label indexed vertex datasets
+   * @param edges label indexed edge datasets
+   * @return Logical graph
+   */
   public LogicalGraph fromIndexedDataSets(Map<String, DataSet<Vertex>> vertices,
     Map<String, DataSet<Edge>> edges) {
     return new LogicalGraph(layoutFactory.fromIndexedDataSets(vertices, edges), config);
   }
 
-  @Override
+  /**
+   * Creates a logical graph from the given datasets. The method assumes that all vertices and
+   * edges are already assigned to the specified graph head.
+   *
+   * @param graphHead label indexed graph head dataset (1-element)
+   * @param vertices label indexed vertex datasets
+   * @param edges label indexed edge datasets
+   * @return Logical graph
+   */
   public LogicalGraph fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHead,
     Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
     return new LogicalGraph(layoutFactory.fromIndexedDataSets(graphHead, vertices, edges), config);

@@ -20,10 +20,8 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Factory interface that is responsible for creating instances of logical graphs with type
@@ -78,30 +76,7 @@ public interface BaseGraphFactory<
    * @param edges       Edge DataSet
    * @return Logical graph
    */
-  LogicalGraph fromDataSets(DataSet<G> graphHead, DataSet<V> vertices, DataSet<E> edges);
-
-  /**
-   * Creates a logical graph from the given datasets. A new graph head is created and all vertices
-   * and edges are assigned to that graph head.
-   *
-   * @param vertices label indexed vertex datasets
-   * @param edges label indexed edge datasets
-   * @return Logical graph
-   */
-  LG fromIndexedDataSets(Map<String, DataSet<V>> vertices,
-    Map<String, DataSet<E>> edges);
-
-  /**
-   * Creates a logical graph from the given datasets. The method assumes that all vertices and
-   * edges are already assigned to the specified graph head.
-   *
-   * @param graphHead label indexed graph head dataset (1-element)
-   * @param vertices label indexed vertex datasets
-   * @param edges label indexed edge datasets
-   * @return Logical graph
-   */
-  LG fromIndexedDataSets(Map<String, DataSet<G>> graphHead,
-    Map<String, DataSet<V>> vertices, Map<String, DataSet<E>> edges);
+  LG fromDataSets(DataSet<G> graphHead, DataSet<V> vertices, DataSet<E> edges);
 
   /**
    * Creates a logical graph from the given single graph head, vertex and edge collections.

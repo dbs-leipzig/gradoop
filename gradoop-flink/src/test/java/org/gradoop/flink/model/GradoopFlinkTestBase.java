@@ -26,6 +26,7 @@ import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalElement;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
@@ -48,6 +49,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -248,5 +250,26 @@ public abstract class GradoopFlinkTestBase {
   protected String getFilePath(String relPath) throws UnsupportedEncodingException {
     return URLDecoder.decode(
       getClass().getResource(relPath).getFile(), StandardCharsets.UTF_8.name());
+  }
+
+  /**
+   * Check if the temporal graph element has default time values for valid and transaction time.
+   *
+   * @param element the temporal graph element to check
+   */
+  protected void checkDefaultTemporalElement(TemporalElement element) {
+    assertEquals(TemporalElement.DEFAULT_VALID_TIME, element.getValidFrom());
+    assertEquals(TemporalElement.DEFAULT_VALID_TIME, element.getValidTo());
+    checkDefaultTxTimes(element);
+  }
+
+  /**
+   * Check if the temporal graph element has default time values for transaction time.
+   *
+   * @param element the temporal graph element to check
+   */
+  protected void checkDefaultTxTimes(TemporalElement element) {
+    assertTrue(element.getTxFrom() < System.currentTimeMillis());
+    assertEquals(TemporalElement.DEFAULT_TX_TO, element.getTxTo());
   }
 }

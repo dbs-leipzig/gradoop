@@ -31,6 +31,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.tostring.CanonicalAdjacencyMatrixBuilder;
@@ -222,6 +223,79 @@ public class GradoopFlinkTestUtils {
       assertTrue(aProperties == null && bProperties == null
         || aProperties.equals(bProperties));
 
+    }
+  }
+
+  /**
+   * Get an instance of a {@link TimeIntervalExtractor<GraphHead>} for testing purposes.
+   *
+   * @return a time interval extractor
+   */
+  public static TimeIntervalExtractor<GraphHead> getGraphHeadTimeIntervalExtractor() {
+    return new TestGraphHeadTimeIntervalExtractor();
+  }
+
+  /**
+   * Get an instance of a {@link TimeIntervalExtractor<Vertex>} for testing purposes.
+   *
+   * @return a time interval extractor
+   */
+  public static TimeIntervalExtractor<Vertex> getVertexTimeIntervalExtractor() {
+    return new TestVertexTimeIntervalExtractor();
+  }
+
+  /**
+   * Get an instance of a {@link TimeIntervalExtractor<Edge>}for testing purposes.
+   *
+   * @return a time interval extractor
+   */
+  public static TimeIntervalExtractor<Edge> getEdgeTimeIntervalExtractor() {
+    return new TestEdgeTimeIntervalExtractor();
+  }
+
+  /**
+   * Test class for time interval extraction.
+   */
+  private static class TestGraphHeadTimeIntervalExtractor
+    implements TimeIntervalExtractor<GraphHead> {
+    @Override
+    public Long getValidFrom(GraphHead element) {
+      return 42L;
+    }
+
+    @Override
+    public Long getValidTo(GraphHead element) {
+      return 52L;
+    }
+  }
+
+  /**
+   * Test class for time interval extraction.
+   */
+  private static class TestVertexTimeIntervalExtractor implements TimeIntervalExtractor<Vertex> {
+    @Override
+    public Long getValidFrom(Vertex element) {
+      return 52L;
+    }
+
+    @Override
+    public Long getValidTo(Vertex element) {
+      return 62L;
+    }
+  }
+
+  /**
+   * Test class for time interval extraction.
+   */
+  private static class TestEdgeTimeIntervalExtractor implements TimeIntervalExtractor<Edge> {
+    @Override
+    public Long getValidFrom(Edge element) {
+      return 62L;
+    }
+
+    @Override
+    public Long getValidTo(Edge element) {
+      return 72L;
     }
   }
 }
