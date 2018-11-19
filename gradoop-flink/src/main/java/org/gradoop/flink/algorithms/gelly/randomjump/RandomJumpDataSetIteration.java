@@ -33,7 +33,7 @@ import org.gradoop.flink.algorithms.gelly.randomjump.functions.datasetiteration.
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.datasetiteration.SourceTargetToSourceTargetsListGroupReduce;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.datasetiteration.UpdateVisitedOnIterativeSetRichMap;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.datasetiteration.VerticesWithSourceTargetsListFlatJoin;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 

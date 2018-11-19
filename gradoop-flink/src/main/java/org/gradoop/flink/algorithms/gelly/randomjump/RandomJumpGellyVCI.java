@@ -30,7 +30,7 @@ import org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci.VCIEdgeJ
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci.VCIVertexJoin;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci.VCIVertexValue;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci.VertexToGellyVertexWithVCIVertexValue;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 

@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.algorithms.gelly.randomjump;
 
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
  * Interface implemented by the RandomJump algorithms {@link RandomJumpGellyVCI} and
