@@ -34,8 +34,6 @@ import org.gradoop.flink.model.impl.functions.epgm.GraphHeadFromTemporal;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromTemporal;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import javax.naming.OperationNotSupportedException;
-
 /**
  * A temporal (logical) graph is a base concept of the Temporal Property Graph Model (TPGM) that
  * extends the Extended Property Graph Model (EPGM). The temporal graph inherits the main concepts
