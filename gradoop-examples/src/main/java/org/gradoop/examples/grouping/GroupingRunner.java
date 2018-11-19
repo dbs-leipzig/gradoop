@@ -18,7 +18,7 @@ package org.gradoop.examples.grouping;
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;

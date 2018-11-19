@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.epgm;
+package org.gradoop.flink.model.impl.epgm;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -30,17 +31,18 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Responsible to create instances of {@link GraphCollection} based on a specific
- * {@link org.gradoop.flink.model.api.layouts.GraphCollectionLayout}.
+ * Responsible for creating instances of {@link GraphCollection} based on a specific
+ * {@link GraphCollectionLayout}.
  */
-public class GraphCollectionFactory {
+public class GraphCollectionFactory
+  implements BaseGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection> {
   /**
    * Creates the layout from given data.
    */
-  private GraphCollectionLayoutFactory layoutFactory;
+  private GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> layoutFactory;
 
   /**
-   * Gradoop Flink configuration.
+   * The Gradoop Flink configuration.
    */
   private final GradoopFlinkConfig config;
 
@@ -52,101 +54,51 @@ public class GraphCollectionFactory {
   public GraphCollectionFactory(GradoopFlinkConfig config) {
     this.config = config;
   }
-  /**
-   * Sets the layout factory that is responsible for creating a graph collection layout.
-   *
-   * @param layoutFactory graph collection layout factory
-   */
-  public void setLayoutFactory(GraphCollectionLayoutFactory layoutFactory) {
+
+  @Override
+  public void setLayoutFactory(
+    GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> layoutFactory) {
     Objects.requireNonNull(layoutFactory);
     this.layoutFactory = layoutFactory;
     this.layoutFactory.setGradoopFlinkConfig(config);
   }
 
-  /**
-   * Creates a collection from the given datasets.
-   *
-   * @param graphHeads  GraphHead DataSet
-   * @param vertices    Vertex DataSet
-   * @return Graph collection
-   */
+  @Override
   public GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices) {
     return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices), config);
   }
 
-  /**
-   * Creates a collection layout from the given datasets.
-   *
-   * @param graphHeads  GraphHead DataSet
-   * @param vertices    Vertex DataSet
-   * @param edges       Edge DataSet
-   * @return Graph collection
-   */
+  @Override
   public GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
     DataSet<Edge> edges) {
     return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, edges), config);
   }
 
-  /**
-   * Creates a graph collection from the given datasets. The method assumes, that all vertices and
-   * edges are already assigned to the specified graph heads.
-   *
-   * @param graphHeads label indexed graph head dataset (1-element)
-   * @param vertices label indexed vertex datasets
-   * @param edges label indexed edge datasets
-   * @return graph collection
-   */
+  @Override
   public GraphCollection fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
     Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
-    GraphCollectionLayout layout = layoutFactory.fromIndexedDataSets(graphHeads, vertices, edges);
+    GraphCollectionLayout<GraphHead, Vertex, Edge> layout = layoutFactory
+      .fromIndexedDataSets(graphHeads, vertices, edges);
     return new GraphCollection(layout, config);
   }
 
-  /**
-   * Creates a collection layout from the given collections.
-   *
-   * @param graphHeads  Graph Head collection
-   * @param vertices    Vertex collection
-   * @param edges       Edge collection
-   * @return Graph collection
-   */
+  @Override
   public GraphCollection fromCollections(Collection<GraphHead> graphHeads,
     Collection<Vertex> vertices, Collection<Edge> edges) {
     return new GraphCollection(layoutFactory.fromCollections(graphHeads, vertices, edges), config);
   }
 
-  /**
-   * Creates a graph collection from a given logical graph.
-   *
-   * @param logicalGraphLayout  input graph
-   * @return 1-element graph collection
-   */
+  @Override
   public GraphCollection fromGraph(LogicalGraph logicalGraphLayout) {
     return new GraphCollection(layoutFactory.fromGraphLayout(logicalGraphLayout), config);
   }
 
-  /**
-   * Creates a graph collection from a graph transaction dataset.
-   *
-   * Overlapping vertices and edge are merged by Id comparison only.
-   *
-   * @param transactions  transaction dataset
-   * @return graph collection
-   */
+  @Override
   public GraphCollection fromTransactions(DataSet<GraphTransaction> transactions) {
     return new GraphCollection(layoutFactory.fromTransactions(transactions), config);
   }
 
-  /**
-   * Creates a graph collection layout from graph transactions.
-   *
-   * Overlapping vertices and edge are merged using provided reduce functions.
-   *
-   * @param transactions        transaction dataset
-   * @param vertexMergeReducer  vertex merge function
-   * @param edgeMergeReducer    edge merge function
-   * @return graph collection
-   */
+  @Override
   public GraphCollection fromTransactions(DataSet<GraphTransaction> transactions,
     GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
     GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
@@ -154,11 +106,7 @@ public class GraphCollectionFactory {
       .fromTransactions(transactions, vertexMergeReducer, edgeMergeReducer), config);
   }
 
-  /**
-   * Creates an empty graph collection layout.
-   *
-   * @return empty graph collection layout
-   */
+  @Override
   public GraphCollection createEmptyCollection() {
     return new GraphCollection(layoutFactory.createEmptyCollection(), config);
   }

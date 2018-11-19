@@ -22,17 +22,14 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.ElementsOfSelectedGraphs;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateTransactions;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.ApplyAggregateEdges;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.ApplyAggregateVertices;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.ApplyAggregateElements;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.CombinePartitionApplyAggregates;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.SetAggregateProperties;
 
@@ -69,9 +66,6 @@ public class ApplyAggregation
     this.aggregateFunctions = new HashSet<>(Arrays.asList(aggregateFunctions));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection executeForGVELayout(GraphCollection collection) {
     DataSet<GraphHead> graphHeads = collection.getGraphHeads();
@@ -92,9 +86,6 @@ public class ApplyAggregation
       .fromDataSets(graphHeads, collection.getVertices(), collection.getEdges());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection executeForTxLayout(GraphCollection collection) {
     DataSet<GraphTransaction> updatedTransactions = collection.getGraphTransactions()
@@ -116,9 +107,8 @@ public class ApplyAggregation
       .flatMap(new ElementsOfSelectedGraphs<>())
       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
       .groupBy(0)
-      .combineGroup(new ApplyAggregateVertices(aggregateFunctions.stream()
-        .filter(f -> f instanceof VertexAggregateFunction)
-        .map(VertexAggregateFunction.class::cast)
+      .combineGroup(new ApplyAggregateElements<>(aggregateFunctions.stream()
+        .filter(AggregateFunction::isVertexAggregation)
         .collect(Collectors.toSet())));
   }
 
@@ -135,9 +125,8 @@ public class ApplyAggregation
       .flatMap(new ElementsOfSelectedGraphs<>())
       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
       .groupBy(0)
-      .combineGroup(new ApplyAggregateEdges(aggregateFunctions.stream()
-        .filter(f -> f instanceof EdgeAggregateFunction)
-        .map(EdgeAggregateFunction.class::cast)
+      .combineGroup(new ApplyAggregateElements<>(aggregateFunctions.stream()
+        .filter(AggregateFunction::isEdgeAggregation)
         .collect(Collectors.toSet())));
   }
 

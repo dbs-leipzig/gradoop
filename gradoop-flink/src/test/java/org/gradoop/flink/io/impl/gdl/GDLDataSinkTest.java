@@ -2,7 +2,7 @@ package org.gradoop.flink.io.impl.gdl;
 
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
 import org.junit.Test;

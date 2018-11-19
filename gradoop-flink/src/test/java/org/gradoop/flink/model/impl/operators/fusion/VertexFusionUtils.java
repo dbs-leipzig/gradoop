@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;

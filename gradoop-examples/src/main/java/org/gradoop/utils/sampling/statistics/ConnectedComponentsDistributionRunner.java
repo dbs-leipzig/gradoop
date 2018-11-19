@@ -18,7 +18,7 @@ package org.gradoop.utils.sampling.statistics;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.ConnectedComponentsDistribution;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 

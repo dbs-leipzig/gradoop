@@ -24,7 +24,7 @@ import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithDouble;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
 import org.gradoop.flink.algorithms.gelly.shortestpaths.functions.SingleSourceShortestPathsAttribute;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**

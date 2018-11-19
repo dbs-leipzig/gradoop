@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;

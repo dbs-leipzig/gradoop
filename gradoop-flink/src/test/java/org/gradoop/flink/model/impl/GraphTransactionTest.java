@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.functions.utils.First;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;

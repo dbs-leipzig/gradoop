@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;

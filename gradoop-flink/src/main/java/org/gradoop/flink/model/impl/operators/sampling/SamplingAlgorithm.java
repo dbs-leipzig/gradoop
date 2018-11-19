@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.sampling.functions.AddPageRankScoresToVertexCrossFunction;
 import org.gradoop.flink.model.impl.operators.sampling.functions.FilterVerticesWithDegreeOtherThanGiven;

@@ -22,8 +22,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.common.util.GradoopConstants;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.RenameLabel;
 
 import java.io.IOException;

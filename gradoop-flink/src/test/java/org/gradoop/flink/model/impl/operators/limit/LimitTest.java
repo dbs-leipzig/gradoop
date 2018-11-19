@@ -17,11 +17,9 @@ package org.gradoop.flink.model.impl.operators.limit;
 
 import org.apache.flink.api.common.InvalidProgramException;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
-import org.jamon.annotations.Template;
 import org.junit.Test;
-import org.s1ck.gdl.model.Graph;
 
 import static org.junit.Assert.assertEquals;
 

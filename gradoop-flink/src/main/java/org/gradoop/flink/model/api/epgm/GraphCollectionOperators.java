@@ -28,6 +28,8 @@ import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
