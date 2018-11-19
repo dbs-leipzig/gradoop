@@ -15,18 +15,15 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
 
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
- * Aggregate function returning the minimum of a specified property over all
- * vertices.
+ * Aggregate function returning the minimum of a specified property over all vertices.
  */
 public class MinVertexProperty extends MinProperty implements VertexAggregateFunction {
 
   /**
-   * Constructor.
+   * Creates a new instance of a MinVertexProperty aggregate function.
    *
    * @param propertyKey property key to aggregate
    */
@@ -34,8 +31,13 @@ public class MinVertexProperty extends MinProperty implements VertexAggregateFun
     super(propertyKey);
   }
 
-  @Override
-  public PropertyValue getVertexIncrement(Vertex vertex) {
-    return vertex.getPropertyValue(propertyKey);
+  /**
+   * Creates a new instance of a MinVertexProperty aggregate function.
+   *
+   * @param propertyKey property key to aggregate
+   * @param aggregatePropertyKey aggregate property key
+   */
+  public MinVertexProperty(String propertyKey, String aggregatePropertyKey) {
+    super(propertyKey, aggregatePropertyKey);
   }
 }

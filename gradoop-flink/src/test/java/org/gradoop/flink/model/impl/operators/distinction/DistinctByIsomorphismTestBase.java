@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.distinction;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 
 public class DistinctByIsomorphismTestBase extends GradoopFlinkTestBase {
   protected GraphCollection getTestCollection() {

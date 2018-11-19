@@ -17,8 +17,7 @@ package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;

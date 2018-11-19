@@ -20,7 +20,7 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.junit.Rule;
 import org.junit.Test;

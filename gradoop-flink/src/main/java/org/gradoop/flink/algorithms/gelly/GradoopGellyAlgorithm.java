@@ -22,7 +22,7 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdge;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertex;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 
 /**

@@ -16,7 +16,7 @@
 package org.gradoop.flink.algorithms.gelly.hits;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.junit.Test;
 
 public class HITSTest extends GradoopFlinkTestBase {

@@ -22,9 +22,9 @@ import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,45 +34,47 @@ import java.util.Set;
 /**
  * Applies vertex aggregate functions to vertices with the same graph id.
  * (graphId,vertex),.. => (graphId,[aggregateKey,aggregateValue]),..
+ *
+ * @param <T> element type
  */
-public class ApplyAggregateVertices implements GroupCombineFunction
-  <Tuple2<GradoopId, Vertex>, Tuple2<GradoopId, Map<String, PropertyValue>>> {
+public class ApplyAggregateElements<T extends Element> implements GroupCombineFunction
+  <Tuple2<GradoopId, T>, Tuple2<GradoopId, Map<String, PropertyValue>>> {
 
   /**
    * Aggregate functions.
    */
-  private final Set<VertexAggregateFunction> aggregateFunctions;
+  private final Set<AggregateFunction> aggregateFunctions;
   /**
    * Reuse tuple.
    */
   private final Tuple2<GradoopId, Map<String, PropertyValue>> reusePair = new Tuple2<>();
 
   /**
-   * Constructor.
+   * Creates a new instance of a ApplyAggregateElements group combine function.
    *
    * @param aggregateFunctions aggregate functions
    */
-  public ApplyAggregateVertices(Set<VertexAggregateFunction> aggregateFunctions) {
+  public ApplyAggregateElements(Set<AggregateFunction> aggregateFunctions) {
     this.aggregateFunctions = aggregateFunctions;
   }
 
   @Override
-  public void combine(Iterable<Tuple2<GradoopId, Vertex>> vertices,
+  public void combine(Iterable<Tuple2<GradoopId, T>> elements,
     Collector<Tuple2<GradoopId, Map<String, PropertyValue>>> out) {
 
-    Iterator<Tuple2<GradoopId, Vertex>> iterator = vertices.iterator();
-    Tuple2<GradoopId, Vertex> graphIdVertex = iterator.next();
+    Iterator<Tuple2<GradoopId, T>> iterator = elements.iterator();
+    Tuple2<GradoopId, T> graphIdElement = iterator.next();
 
-    Map<String, PropertyValue> aggregate = AggregateUtil.vertexIncrement(new HashMap<>(),
-      graphIdVertex.f1, aggregateFunctions);
+    Map<String, PropertyValue> aggregate = AggregateUtil.increment(new HashMap<>(),
+      graphIdElement.f1, aggregateFunctions);
 
     while (iterator.hasNext()) {
-      Vertex vertex = iterator.next().f1;
-      aggregate = AggregateUtil.vertexIncrement(aggregate, vertex, aggregateFunctions);
+      T element = iterator.next().f1;
+      aggregate = AggregateUtil.increment(aggregate, element, aggregateFunctions);
     }
 
     if (!aggregate.isEmpty()) {
-      reusePair.f0 = graphIdVertex.f0;
+      reusePair.f0 = graphIdElement.f0;
       reusePair.f1 = aggregate;
       out.collect(reusePair);
     }

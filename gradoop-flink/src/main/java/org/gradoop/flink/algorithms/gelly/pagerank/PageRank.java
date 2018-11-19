@@ -25,7 +25,7 @@ import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
 import org.gradoop.flink.algorithms.gelly.pagerank.functions.PageRankToAttribute;
 import org.gradoop.flink.algorithms.gelly.pagerank.functions.PageRankResultKey;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
