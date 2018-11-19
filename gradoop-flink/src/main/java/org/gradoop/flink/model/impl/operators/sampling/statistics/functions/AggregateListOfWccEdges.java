@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling.statistics.functions;
 
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
@@ -38,7 +38,7 @@ public class AggregateListOfWccEdges implements EdgeAggregateFunction {
   private final String listOfWccIDsPropertyKey;
 
   /**
-   * Constructor for aggregation
+   * Creates a new instance of a AggregateListOfWccEdges aggregate function.
    *
    * @param wccPropertyKey Property key to retrieve property values
    */
@@ -48,7 +48,7 @@ public class AggregateListOfWccEdges implements EdgeAggregateFunction {
   }
 
   @Override
-  public PropertyValue getEdgeIncrement(Edge edge) {
+  public PropertyValue getIncrement(Element edge) {
     List<PropertyValue> valueList = new ArrayList<>();
     valueList.add(PropertyValue.create(edge.getPropertyValue(wccPropertyKey).toString()));
     return PropertyValue.create(valueList);

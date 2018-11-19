@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.sampling.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.functions.AddSumDegreesToGraphHeadCrossFunction;

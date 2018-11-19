@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.common.model.impl.id.GradoopId;
 

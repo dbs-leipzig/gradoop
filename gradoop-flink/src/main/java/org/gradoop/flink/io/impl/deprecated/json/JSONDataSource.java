@@ -26,8 +26,8 @@ import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToEdge;
 import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToGraphHead;
 import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToVertex;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 

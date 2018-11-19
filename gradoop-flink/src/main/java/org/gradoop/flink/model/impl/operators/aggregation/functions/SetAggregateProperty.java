@@ -54,7 +54,7 @@ public class SetAggregateProperty
 
 
   /**
-   * Constructor.
+   * Creates a new instance of a SetAggregateProperty rich map function.
    *
    * @param aggregateFunctions aggregate functions
    */

@@ -21,6 +21,8 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByDifferentGraphId;
 import org.gradoop.flink.model.impl.functions.epgm.ByDifferentId;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
@@ -31,11 +33,11 @@ import org.gradoop.flink.model.impl.functions.epgm.TransactionVertices;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
- * Represents a {@link org.gradoop.flink.model.api.epgm.GraphCollection} with a single dataset.
- * Each row in the dataset represents a single {@link org.gradoop.flink.model.api.epgm.LogicalGraph}
+ * Represents a {@link GraphCollection} with a single dataset.
+ * Each row in the dataset represents a single {@link LogicalGraph}
  * with all its associated vertex and edge data.
  */
-public class TxCollectionLayout implements GraphCollectionLayout {
+public class TxCollectionLayout implements GraphCollectionLayout<GraphHead, Vertex, Edge> {
   /**
    * Flink dataset holding the actual data of that layout.
    */

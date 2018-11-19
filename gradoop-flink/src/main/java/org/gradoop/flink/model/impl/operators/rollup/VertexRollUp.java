@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.rollup;
 
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
   .PropertyValueAggregator;

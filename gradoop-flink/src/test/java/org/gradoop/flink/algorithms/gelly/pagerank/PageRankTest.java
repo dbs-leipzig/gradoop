@@ -17,7 +17,7 @@ package org.gradoop.flink.algorithms.gelly.pagerank;
 
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.junit.Test;
 
 import java.util.List;

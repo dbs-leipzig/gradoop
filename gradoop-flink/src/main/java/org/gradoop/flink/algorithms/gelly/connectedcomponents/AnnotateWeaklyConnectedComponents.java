@@ -26,7 +26,7 @@ import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.GellyVer
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.VertexPropertyToEdgePropertyJoin;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithGradoopId;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;

@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.statistics;
 
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 import java.util.Collections;
 import java.util.Map;

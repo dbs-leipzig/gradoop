@@ -15,8 +15,8 @@
  */
 package org.gradoop.flink.model.api.operators;
 
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 
 /**
  * Creates a {@link GraphCollection} based on one {@link LogicalGraph}.
