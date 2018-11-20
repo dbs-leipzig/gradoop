@@ -18,13 +18,14 @@ package org.gradoop.flink.io.impl.csv.indexed.functions;
 import org.apache.flink.api.common.io.CleanupWhenUnsuccessful;
 import org.apache.flink.api.common.io.InitializeOnMaster;
 import org.apache.flink.api.common.io.OutputFormat;
+import org.apache.flink.api.common.io.RichOutputFormat;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The abstract base class for all output formats using multiple files.
@@ -42,8 +43,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @param <IT> The type of the records to write.
  */
-public abstract class MultipleFileOutputFormat<IT> implements OutputFormat<IT>,
-  CleanupWhenUnsuccessful, InitializeOnMaster {
+public abstract class MultipleFileOutputFormat<IT> extends RichOutputFormat<IT>
+        implements CleanupWhenUnsuccessful, InitializeOnMaster {
 
   /**
    * The configuration set with {@link #configure(Configuration)}.
@@ -88,7 +89,7 @@ public abstract class MultipleFileOutputFormat<IT> implements OutputFormat<IT>,
    */
   MultipleFileOutputFormat(Path rootPath) {
     this.rootOutputPath = rootPath;
-    formatsPerSubdirectory = new ConcurrentHashMap<>();
+    formatsPerSubdirectory = new HashMap<>();
   }
 
   @Override
