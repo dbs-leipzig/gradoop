@@ -39,13 +39,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.Math.toIntExact;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ElementsFromEmbeddingTest {
 
   @Test
-  public void variableMappingTest() throws Exception{
+  public void variableMappingTest() throws Exception {
     GradoopId v1 = GradoopId.get();
     GradoopId v2 = GradoopId.get();
     GradoopId v3 = GradoopId.get();
@@ -64,8 +64,8 @@ public class ElementsFromEmbeddingTest {
     );
     udf.open(new Configuration());
 
-    GradoopId[] vertexMapping = new GradoopId[]{v1,v2,v3};
-    GradoopId[] edgeMapping = new GradoopId[]{e1,e2};
+    GradoopId[] vertexMapping = new GradoopId[]{v1, v2, v3};
+    GradoopId[] edgeMapping = new GradoopId[]{e1, e2};
 
     Embedding<GradoopId> embedding = new Embedding<>();
     embedding.setVertexMapping(vertexMapping);

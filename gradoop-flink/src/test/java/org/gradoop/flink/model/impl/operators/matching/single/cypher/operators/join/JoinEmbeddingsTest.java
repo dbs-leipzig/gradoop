@@ -58,14 +58,14 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
         PropertyValue.create("Baz")
       )
     ));
-    assertEmbeddingExists(result, v0,e0,v1);
+    assertEmbeddingExists(result, v0, e0, v1);
   }
 
   @Test
   public void testSingleJoinPartners() throws Exception {
     DataSet<Embedding> left = getExecutionEnvironment().fromElements(
-      createEmbedding(v0,e0,v1),
-      createEmbedding(v1,e2,v0)
+      createEmbedding(v0, e0, v1),
+      createEmbedding(v1, e2, v0)
     );
 
     DataSet<Embedding> right = getExecutionEnvironment().fromElements(
@@ -77,29 +77,29 @@ public class JoinEmbeddingsTest extends PhysicalOperatorTest {
 
     DataSet<Embedding> result = join.evaluate();
     assertEquals(2, result.count());
-    assertEmbeddingExists(result, v0,e0,v1);
-    assertEmbeddingExists(result, v1,e2,v0);
+    assertEmbeddingExists(result, v0, e0, v1);
+    assertEmbeddingExists(result, v1, e2, v0);
   }
 
   @Test
   public void testMultipleJoinPartners() throws Exception {
     //Single Column
     DataSet<Embedding> left = getExecutionEnvironment().fromElements(
-      createEmbedding(v0,e0,v1),
-      createEmbedding(v1,e1,v0)
+      createEmbedding(v0, e0, v1),
+      createEmbedding(v1, e1, v0)
     );
 
     DataSet<Embedding> right = getExecutionEnvironment().fromElements(
-      createEmbedding(v0,e2,v1),
-      createEmbedding(v1,e3,v0)
+      createEmbedding(v0, e2, v1),
+      createEmbedding(v1, e3, v0)
     );
 
     PhysicalOperator join =
-      new JoinEmbeddings(left, right, 3, Lists.newArrayList(0,2), Lists.newArrayList(2,0));
+      new JoinEmbeddings(left, right, 3, Lists.newArrayList(0, 2), Lists.newArrayList(2, 0));
 
     DataSet<Embedding> result = join.evaluate();
     assertEquals(2, result.count());
-    assertEmbeddingExists(result, v0,e0,v1,e3);
-    assertEmbeddingExists(result, v1,e1,v0,e2);
+    assertEmbeddingExists(result, v0, e0, v1, e3);
+    assertEmbeddingExists(result, v1, e1, v0, e2);
   }
 }

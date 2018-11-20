@@ -130,7 +130,7 @@
         <dep.accumulo.version>1.9.0</dep.accumulo.version>
         <dep.bson.version>3.6.3</dep.bson.version>
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
-        <dep.flink.version>1.5.0</dep.flink.version>
+        <dep.flink.version>1.6.0</dep.flink.version>
         <dep.gdl.version>0.3</dep.gdl.version>
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
@@ -145,7 +145,7 @@
         <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
 
         <plugin.maven-compiler.version>3.5.1</plugin.maven-compiler.version>
-        <plugin.maven-checkstyle.version>2.16</plugin.maven-checkstyle.version>
+        <plugin.maven-checkstyle.version>3.0.0</plugin.maven-checkstyle.version>
         <plugin.maven-findbugs.version>3.0.1</plugin.maven-findbugs.version>
         <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
         <plugin.maven-release.version>2.5.3</plugin.maven-release.version>
@@ -381,6 +381,7 @@
                         <headerLocation>gradoop/LICENSE.txt</headerLocation>
                         <includeResources>false</includeResources>
                         <includeTestResources>false</includeTestResources>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <suppressionsLocation>
                             gradoop/checkstyle-suppressions.xml
                         </suppressionsLocation>
@@ -577,6 +578,12 @@
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-hadoop-compatibility_2.11</artifactId>
+                <version>${dep.flink.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-shaded-hadoop2</artifactId>
                 <version>${dep.flink.version}</version>
             </dependency>
 

@@ -27,8 +27,7 @@ import java.util.Map;
  * contains only one map from integer to string.
  */
 public class Dictionary
-  implements GroupReduceFunction<Tuple2<Integer, String>, Map<Integer, String>>
-{
+  implements GroupReduceFunction<Tuple2<Integer, String>, Map<Integer, String>> {
 
   /**
    * Reduces the Tuple2 iterable into one map.

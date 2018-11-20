@@ -32,7 +32,7 @@ public class OrPredicateTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    OrPredicate orPredicate = new OrPredicate(new Or(a,b));
+    OrPredicate orPredicate = new OrPredicate(new Or(a, b));
 
     CNF reference = orPredicate.getLhs().asCNF().or(orPredicate.getRhs().asCNF());
 
@@ -44,7 +44,7 @@ public class OrPredicateTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    OrPredicate orPredicate = new OrPredicate(new Or(a,b));
+    OrPredicate orPredicate = new OrPredicate(new Or(a, b));
 
     assertEquals(new ComparisonExpression(a), orPredicate.getLhs());
   }
@@ -54,7 +54,7 @@ public class OrPredicateTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    OrPredicate orPredicate = new OrPredicate(new Or(a,b));
+    OrPredicate orPredicate = new OrPredicate(new Or(a, b));
 
     assertEquals(new ComparisonExpression(b), orPredicate.getRhs());
   }

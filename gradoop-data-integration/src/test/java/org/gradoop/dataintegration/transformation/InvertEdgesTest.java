@@ -83,6 +83,7 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
      * (frank)-[:hasInterest]->(hadoop)
      * (dave)-[:hasInterest]->(hadoop)
      */
+
     List<Vertex> vertices = new ArrayList<>();
     invertedEdgeGraph.getVertices()
       .filter(new Or<>(new ByLabel<>("Person"), new ByLabel<>("Tag")))

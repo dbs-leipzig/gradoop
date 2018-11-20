@@ -145,16 +145,17 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
       String targetName = idMap.get(e.getTargetId());
 
       if (direction.equals(EdgeDirection.ORIGIN_TO_NEWVERTEX)) {
-        Assert.assertTrue("source: " + sourceName + " | target: " + targetName
-            + " | edge direction: " + direction.name(),
+        Assert.assertTrue("source: " + sourceName + " | target: " + targetName +
+            " | edge direction: " + direction.name(),
           persons.contains(sourceName) && cities.contains(targetName));
       } else if (direction.equals(EdgeDirection.NEWVERTEX_TO_ORIGIN)) {
-        Assert.assertTrue("source: " + sourceName + " | target: " + targetName
-            + " | edge direction: " + direction.name(),
+        Assert.assertTrue("source: " + sourceName + " | target: " + targetName +
+            " | edge direction: " + direction.name(),
           cities.contains(sourceName) && persons.contains(targetName));
       } else if (direction.equals(EdgeDirection.BIDIRECTIONAL)) {
         boolean cityContainment = cities.contains(sourceName) || cities.contains(targetName);
         boolean personContainment = persons.contains(sourceName) || persons.contains(targetName);
+
         Assert.assertTrue("vertex name 1: " + sourceName + " | vertex name 2: " + targetName
             + " | edge direction: " + direction.name(),
           cityContainment && personContainment);
