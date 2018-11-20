@@ -15,21 +15,17 @@
  */
 package org.gradoop.common.model.impl.id;
 
+import com.google.common.collect.Sets;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.junit.Test;
 
-import com.google.common.collect.Sets;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.hamcrest.core.Is.is;
@@ -107,7 +103,8 @@ public class GradoopIdsTest {
     assertTrue(list2.contains(id2));
 
     list2.addAll(list1);
-    assertThat(list2.size(), is(2));  }
+    assertThat(list2.size(), is(2));
+  }
 
   @Test
   public void testContainsAllCollection() throws Exception {
@@ -178,10 +175,9 @@ public class GradoopIdsTest {
   @Test
   public void testIsEmpty() throws Exception {
     GradoopIdSet set1 = GradoopIdSet.fromExisting(GradoopId.get());
-    GradoopIdSet set2 = new GradoopIdSet();
 
     assertFalse(set1.isEmpty());
-    assertTrue(set2.isEmpty());
+    assertTrue(new GradoopIdSet().isEmpty());
   }
 
   @Test
@@ -274,38 +270,38 @@ public class GradoopIdsTest {
   }
 
   @Test
-  public void testEquals(){
+  public void testEquals() {
     GradoopId a = GradoopId.get();
     GradoopId b = GradoopId.get();
     GradoopId c = GradoopId.get();
 
     GradoopIdSet abc = GradoopIdSet.fromExisting(a, b, c);
-    assertTrue("equals failed for same object", abc.equals(abc));
-    assertTrue("hashCode failed for same object", abc.hashCode() == abc.hashCode());
+    assertEquals("equals failed for same object", abc, abc);
+    assertEquals("hashCode failed for same object", abc.hashCode(), abc.hashCode());
 
     GradoopIdSet abc2 = GradoopIdSet.fromExisting(a, b, c);
-    assertTrue("equals failed for same ids in same order", abc.equals(abc2));
-    assertTrue("hashCode failed for same ids in same order", abc.hashCode() == abc2.hashCode());
+    assertEquals("equals failed for same ids in same order", abc, abc2);
+    assertEquals("hashCode failed for same ids in same order", abc.hashCode(), abc2.hashCode());
 
     GradoopIdSet cba = GradoopIdSet.fromExisting(c, b, a);
-    assertTrue("equals succeeds for same ids in different order", abc.equals(cba));
-    assertTrue("hashCode succeeds for same ids in different order", abc.hashCode() == cba.hashCode());
+    assertEquals("equals succeeds for same ids in different order", abc, cba);
+    assertEquals("hashCode succeeds for same ids in different order", abc.hashCode(), cba.hashCode());
 
     GradoopIdSet aab = GradoopIdSet.fromExisting(a, a, b);
     GradoopIdSet abb = GradoopIdSet.fromExisting(a, b, b);
-    assertTrue("equals succeeds for same ids in different cardinality", aab.equals(abb));
-    assertTrue("hashCode succeeds for same ids in different cardinality", aab.hashCode() == abb.hashCode());
+    assertEquals("equals succeeds for same ids in different cardinality", aab, abb);
+    assertEquals("hashCode succeeds for same ids in different cardinality", aab.hashCode(), abb.hashCode());
 
     GradoopIdSet ab = GradoopIdSet.fromExisting(a, b);
-    assertTrue("equals succeeds for same ids but different sizes", aab.equals(ab));
-    assertTrue("hashCode succeeds for same ids but different sizes", aab.hashCode() == ab.hashCode());
+    assertEquals("equals succeeds for same ids but different sizes", aab, ab);
+    assertEquals("hashCode succeeds for same ids but different sizes", aab.hashCode(), ab.hashCode());
 
     GradoopIdSet empty = new GradoopIdSet();
     assertTrue("equals failed for one empty list", !abc.equals(empty));
     assertTrue("hashCode failed for one empty list", abc.hashCode() != empty.hashCode());
 
     GradoopIdSet empty2 = new GradoopIdSet();
-    assertTrue("equals failed for two empty lists", empty2.equals(empty));
-    assertTrue("hashCode failed two one empty lists", empty2.hashCode() == empty.hashCode());
+    assertEquals("equals failed for two empty lists", empty2, empty);
+    assertEquals("hashCode failed two one empty lists", empty2.hashCode(), empty.hashCode());
   }
 }

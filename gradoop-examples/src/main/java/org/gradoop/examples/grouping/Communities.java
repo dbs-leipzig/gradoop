@@ -64,9 +64,9 @@ public class Communities extends AbstractRunner {
     // load the graph and set initial community id
     LogicalGraph graph = dataSource.getLogicalGraph();
     graph = graph.transformVertices((current, transformed) -> {
-        current.setProperty(communityKey, current.getId());
-        return current;
-      });
+      current.setProperty(communityKey, current.getId());
+      return current;
+    });
 
     // apply label propagation to compute communities
     graph = graph.callForGraph(new GellyLabelPropagation(10, communityKey));

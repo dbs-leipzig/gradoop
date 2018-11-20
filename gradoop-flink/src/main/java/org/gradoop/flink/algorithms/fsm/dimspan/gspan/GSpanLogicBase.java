@@ -373,13 +373,12 @@ public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
       int[] minPattern = subEmbeddingsMap.getPattern(minPatternIndex);
 
       // find minimum among all k-edge DFS codes
-      for (int patternIndex = 1; patternIndex < subEmbeddingsMap.getPatternCount(); patternIndex++)
-      {
-        int[] subPattern = subEmbeddingsMap.getPattern(patternIndex);
+      for (int patIndex = 1; patIndex < subEmbeddingsMap.getPatternCount(); patIndex++) {
+        int[] subPattern = subEmbeddingsMap.getPattern(patIndex);
 
         if (comparator.compare(subPattern, minPattern) < 0) {
           minPattern = subPattern;
-          minPatternIndex = patternIndex;
+          minPatternIndex = patIndex;
         }
       }
 

@@ -45,7 +45,7 @@ public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
    * @throws Throwable if error
    */
   @Test
-  public void test01_vertexIdSetQueryTest() throws Throwable {
+  public void vertexIdSetQueryTest() throws Throwable {
     doTest(TEST01, (loader, store, config) -> {
       List<Vertex> inputVertices = sample(new ArrayList<>(loader.getVertices()), 5);
 
@@ -70,7 +70,7 @@ public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
    * @throws Throwable if error
    */
   @Test
-  public void test02_edgeIdSetQueryTest() throws Throwable {
+  public void edgeIdSetQueryTest() throws Throwable {
     doTest(TEST02, (loader, store, config) -> {
       List<Edge> inputEdges = sample(new ArrayList<>(loader.getEdges()), 5);
 
@@ -90,7 +90,7 @@ public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
   }
 
   @Test
-  public void test03_graphIdSetQueryTest() throws Throwable {
+  public void graphIdSetQueryTest() throws Throwable {
     doTest(TEST03, (loader, store, config) -> {
       List<GraphHead> inputGraphs = sample(new ArrayList<>(loader.getGraphHeads()), 3);
 

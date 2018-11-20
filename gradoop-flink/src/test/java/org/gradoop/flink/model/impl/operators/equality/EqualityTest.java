@@ -54,14 +54,14 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
   @Test
   public void testCollectionEqualityByGraphElementIds() throws Exception {
+
     FlinkAsciiGraphLoader loader = getTestGraphLoader();
-    
+
     CollectionEquality equality = new CollectionEquality(
       new GraphHeadToEmptyString(),
       new VertexToIdString(),
       new EdgeToIdString(),
-      true
-    );
+      true);
 
     GraphCollection gRef = loader
       .getGraphCollectionByVariables("gRef", "gClone", "gEmpty");

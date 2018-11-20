@@ -47,6 +47,6 @@ public class DistinctByIsomorphismTestBase extends GradoopFlinkTestBase {
       "(hb1)-[:c]->(hb2:B)-[:c]->(hb3:B)-[:c]->(hb1)]";
 
     return getLoaderFromString(asciiGraphs)
-      .getGraphCollectionByVariables("g" , "r" , "a" , "p" , "h");
+      .getGraphCollectionByVariables("g", "r", "a", "p", "h");
   }
 }

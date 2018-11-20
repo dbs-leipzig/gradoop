@@ -145,7 +145,7 @@
         <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
 
         <plugin.maven-compiler.version>3.5.1</plugin.maven-compiler.version>
-        <plugin.maven-checkstyle.version>2.16</plugin.maven-checkstyle.version>
+        <plugin.maven-checkstyle.version>3.0.0</plugin.maven-checkstyle.version>
         <plugin.maven-findbugs.version>3.0.1</plugin.maven-findbugs.version>
         <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
         <plugin.maven-release.version>2.5.3</plugin.maven-release.version>
@@ -381,6 +381,7 @@
                         <headerLocation>gradoop/LICENSE.txt</headerLocation>
                         <includeResources>false</includeResources>
                         <includeTestResources>false</includeTestResources>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <suppressionsLocation>
                             gradoop/checkstyle-suppressions.xml
                         </suppressionsLocation>

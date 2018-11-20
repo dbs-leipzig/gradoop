@@ -17,11 +17,10 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.util.ListCollector;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,8 +47,6 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
 
     GradoopId e0 = GradoopId.get();
 
-    ExecutionEnvironment env = getExecutionEnvironment();
-
     // [Id(v0)]
     Embedding left = createEmbedding(v0);
 
@@ -57,14 +54,14 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
     Embedding right = createEmbedding(v0, e0, v1);
 
     // join operator
-    MergeEmbeddings udf = new MergeEmbeddings(3, 
-      Lists.newArrayList(0), 
+    MergeEmbeddings udf = new MergeEmbeddings(3,
+      Lists.newArrayList(0),
       Lists.newArrayList(), Lists.newArrayList(),
       Lists.newArrayList(), Lists.newArrayList()
     );
 
     List<Embedding> result = new ArrayList<>();
-    
+
     // get results
     udf.join(left, right, new ListCollector<>(result));
 
@@ -92,13 +89,11 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e1 = GradoopId.get();
     GradoopId e2 = GradoopId.get();
 
-    ExecutionEnvironment env = getExecutionEnvironment();
-
     // [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2)]
     Embedding left = createEmbedding(v0, e0, v1, e1, v2);
 
     // [Id(v1),Id(e2),Id(v3)]
-    Embedding right = createEmbedding(v1, e2 ,v3);
+    Embedding right = createEmbedding(v1, e2, v3);
 
     // join operator
     MergeEmbeddings udf = new MergeEmbeddings(3,
@@ -138,8 +133,6 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e2 = GradoopId.get();
     GradoopId e3 = GradoopId.get();
 
-    ExecutionEnvironment env = getExecutionEnvironment();
-
     // [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2)]
     Embedding left = createEmbedding(v0, e0, v1, e1, v2);
 
@@ -178,8 +171,6 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e0 = GradoopId.get();
     GradoopId e1 = GradoopId.get();
 
-    ExecutionEnvironment env = getExecutionEnvironment();
-
     // [Id(v0),Id(e0),Id(v1)]
     Embedding left = createEmbedding(v0, e0, v1);
 
@@ -188,7 +179,7 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     MergeEmbeddings udf = new MergeEmbeddings(3,
-      Lists.newArrayList(0,2),
+      Lists.newArrayList(0, 2),
       Lists.newArrayList(), Lists.newArrayList(),
       Lists.newArrayList(), Lists.newArrayList()
     );
@@ -223,8 +214,6 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e2 = GradoopId.get();
     GradoopId e3 = GradoopId.get();
 
-    ExecutionEnvironment env = getExecutionEnvironment();
-
     // [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2)]
     Embedding left = createEmbedding(v0, e0, v1, e1, v2);
 
@@ -233,7 +222,7 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     MergeEmbeddings udf = new MergeEmbeddings(5,
-      Lists.newArrayList(0,4),
+      Lists.newArrayList(0, 4),
       Lists.newArrayList(), Lists.newArrayList(),
       Lists.newArrayList(), Lists.newArrayList()
     );
@@ -272,8 +261,6 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId e4 = GradoopId.get();
     GradoopId e5 = GradoopId.get();
 
-    ExecutionEnvironment env = getExecutionEnvironment();
-
     // [Id(v0),Id(e0),Id(v1),Id(e1),Id(v2),Id(e2),Id(v3)]
     Embedding left = createEmbedding(v0, e0, v1, e1, v2, e2, v3);
 
@@ -282,7 +269,7 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
 
     // join operator
     MergeEmbeddings udf = new MergeEmbeddings(7,
-      Lists.newArrayList(2,4),
+      Lists.newArrayList(2, 4),
       Lists.newArrayList(), Lists.newArrayList(),
       Lists.newArrayList(), Lists.newArrayList()
     );
@@ -308,8 +295,6 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
     GradoopId v0 = GradoopId.get();
     GradoopId e0 = GradoopId.get();
     GradoopId v1 = GradoopId.get();
-
-    ExecutionEnvironment env = getExecutionEnvironment();
 
     Embedding left = new Embedding();
     left.add(v0, PropertyValue.create("Alice"));
@@ -339,8 +324,6 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
   public void testAdoptSameColumn() throws Exception {
     GradoopId v0 = GradoopId.get();
     GradoopId v1 = GradoopId.get();
-
-    ExecutionEnvironment env = getExecutionEnvironment();
 
     // [(Id(v0)]
     Embedding left = createEmbedding(v0);
@@ -411,7 +394,7 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
   //
   // Query graph used throughout the tests
   //
-  // MATCH (v0)-[e0]->(v1)<-[e1]-(v0) RETURN *
+  // MATCH (vertex0)-[edge0]->(vertex1)<-[edge1]-(vertex0) RETURN *
   //
   // The input embeddings are always
   //
@@ -421,18 +404,18 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
   // 0 3 0                   0 3 0
   //------------------------------------------------------------------------------------------------
 
-  private static GradoopId v0 = GradoopId.get();
-  private static GradoopId v1 = GradoopId.get();
-  private static GradoopId e0 = GradoopId.get();
-  private static GradoopId e1 = GradoopId.get();
-  private static GradoopId e2 = GradoopId.get();
-  private static GradoopId e3 = GradoopId.get();
+  private static GradoopId vertex0 = GradoopId.get();
+  private static GradoopId vertex1 = GradoopId.get();
+  private static GradoopId edge0 = GradoopId.get();
+  private static GradoopId edge1 = GradoopId.get();
+  private static GradoopId edge2 = GradoopId.get();
+  private static GradoopId edge3 = GradoopId.get();
 
   /**
    * Tests for vertex homomorphism and edge homomorphism
-   *
+   * <p>
    * Expected Output:
-   *
+   * <p>
    * 0 0 1 0
    * 0 0 1 1
    * 0 1 1 0
@@ -445,25 +428,19 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
   @Test
   public void testVertexHomomorphismEdgeHomomorphism() throws Exception {
     List<Integer> emptyList = Collections.emptyList();
-    testMorphisms(
-      emptyList, emptyList, // vertex columns
+    testMorphisms(emptyList, emptyList, // vertex columns
       emptyList, emptyList,  // edge columns
-      Lists.newArrayList(
-        createEmbedding(v0, e0, v1, e0),
-        createEmbedding(v0, e0, v1, e1),
-        createEmbedding(v0, e1, v1, e0),
-        createEmbedding(v0, e1, v1, e1),
-        createEmbedding(v0, e2, v0, e2),
-        createEmbedding(v0, e2, v0, e3),
-        createEmbedding(v0, e3, v0, e2),
-        createEmbedding(v0, e3, v0, e3)));
+      Lists.newArrayList(createEmbedding(vertex0, edge0, vertex1, edge0), createEmbedding(vertex0, edge0, vertex1, edge1),
+        createEmbedding(vertex0, edge1, vertex1, edge0), createEmbedding(vertex0, edge1, vertex1, edge1),
+        createEmbedding(vertex0, edge2, vertex0, edge2), createEmbedding(vertex0, edge2, vertex0, edge3),
+        createEmbedding(vertex0, edge3, vertex0, edge2), createEmbedding(vertex0, edge3, vertex0, edge3)));
   }
 
   /**
    * Tests for vertex isomorphism and edge homomorphism
-   *
+   * <p>
    * Expected Output:
-   *
+   * <p>
    * 0 0 1 0
    * 0 0 1 1
    * 0 1 1 0
@@ -472,21 +449,17 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
   @Test
   public void testVertexIsomorphismEdgeHomomorphism() throws Exception {
     List<Integer> emptyList = Collections.emptyList();
-    testMorphisms(
-      Arrays.asList(0, 2), emptyList, // vertex columns
+    testMorphisms(Arrays.asList(0, 2), emptyList, // vertex columns
       emptyList, emptyList, // edge columns
-      Lists.newArrayList(
-        createEmbedding(v0, e0, v1, e0),
-        createEmbedding(v0, e0, v1, e1),
-        createEmbedding(v0, e1, v1, e0),
-        createEmbedding(v0, e1, v1, e1)));
+      Lists.newArrayList(createEmbedding(vertex0, edge0, vertex1, edge0), createEmbedding(vertex0, edge0, vertex1, edge1),
+        createEmbedding(vertex0, edge1, vertex1, edge0), createEmbedding(vertex0, edge1, vertex1, edge1)));
   }
 
   /**
    * Tests for vertex isomorphism and edge homomorphism
-   *
+   * <p>
    * Expected Output:
-   *
+   * <p>
    * 0 0 1 1
    * 0 1 1 0
    * 0 2 0 3
@@ -495,67 +468,55 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
   @Test
   public void testVertexHomomorphismEdgeIsomorphism() throws Exception {
     List<Integer> emptyList = Collections.emptyList();
-    testMorphisms(
-      emptyList, emptyList, // vertex columns
+    testMorphisms(emptyList, emptyList, // vertex columns
       Collections.singletonList(1), Collections.singletonList(1), // edge columns
-      Lists.newArrayList(
-        createEmbedding(v0, e0, v1, e1),
-        createEmbedding(v0, e1, v1, e0),
-        createEmbedding(v0, e2, v0, e3),
-        createEmbedding(v0, e3, v0, e2)));
+      Lists.newArrayList(createEmbedding(vertex0, edge0, vertex1, edge1), createEmbedding(vertex0, edge1, vertex1, edge0),
+        createEmbedding(vertex0, edge2, vertex0, edge3), createEmbedding(vertex0, edge3, vertex0, edge2)));
   }
 
   /**
    * Tests for vertex isomorphism and edge homomorphism
-   *
+   * <p>
    * Expected Output:
-   *
+   * <p>
    * 0 0 1 1
    * 0 1 1 0
    */
   @Test
   public void testVertexIsomorphismEdgeIsomorphism() throws Exception {
-    testMorphisms(
-      Arrays.asList(0, 2), Collections.emptyList(), // vertex columns
+    testMorphisms(Arrays.asList(0, 2), Collections.emptyList(), // vertex columns
       Collections.singletonList(1), Collections.singletonList(1), // edge columns
-      Lists.newArrayList(
-        createEmbedding(v0, e0, v1, e1),
-        createEmbedding(v0, e1, v1, e0)));
+      Lists.newArrayList(createEmbedding(vertex0, edge0, vertex1, edge1), createEmbedding(vertex0, edge1, vertex1, edge0)));
   }
 
   /**
    * Creates the input datasets, performs the join and validates the expected result.
    *
    * @param distinctVertexColumnsLeft join operator argument
-   * @param distinctEdgeColumnsLeft join operator argument
-   * @param expectedEmbedding expected result
+   * @param distinctEdgeColumnsLeft   join operator argument
+   * @param expectedEmbedding         expected result
    * @throws Exception
    */
-  private void testMorphisms(
-    List<Integer> distinctVertexColumnsLeft,
-    List<Integer> distinctVertexColumnsRight,
-    List<Integer> distinctEdgeColumnsLeft,
-    List<Integer> distinctEdgeColumnsRight,
-    List<Embedding> expectedEmbedding) throws Exception {
+  private void testMorphisms(List<Integer> distinctVertexColumnsLeft, List<Integer> distinctVertexColumnsRight,
+    List<Integer> distinctEdgeColumnsLeft, List<Integer> distinctEdgeColumnsRight, List<Embedding> expectedEmbedding) throws Exception {
 
     List<Embedding> entries = new ArrayList<>();
 
-    entries.add(createEmbedding(v0, e0, v1));
-    entries.add(createEmbedding(v0, e1, v1));
-    entries.add(createEmbedding(v0, e2, v0));
-    entries.add(createEmbedding(v0, e3, v0));
+    entries.add(createEmbedding(vertex0, edge0, vertex1));
+    entries.add(createEmbedding(vertex0, edge1, vertex1));
+    entries.add(createEmbedding(vertex0, edge2, vertex0));
+    entries.add(createEmbedding(vertex0, edge3, vertex0));
 
     // merge operator
-    MergeEmbeddings op = new MergeEmbeddings(3, Arrays.asList(0, 2),
-      distinctVertexColumnsLeft, distinctVertexColumnsRight,
-      distinctEdgeColumnsLeft, distinctEdgeColumnsRight);
+    MergeEmbeddings op = new MergeEmbeddings(3, Arrays.asList(0, 2), distinctVertexColumnsLeft,
+      distinctVertexColumnsRight, distinctEdgeColumnsLeft, distinctEdgeColumnsRight);
 
     ArrayList<Embedding> resultList = new ArrayList<>();
 
     // get results
-    for(Embedding left : entries) {
-      for(Embedding right : entries) {
-        if(left.getId(0).equals(right.getId(0)) && left.getId(2).equals(right.getId(2)) ) {
+    for (Embedding left : entries) {
+      for (Embedding right : entries) {
+        if (left.getId(0).equals(right.getId(0)) && left.getId(2).equals(right.getId(2))) {
           ArrayList<Embedding> tmp = new ArrayList<>();
           ListCollector<Embedding> collector = new ListCollector<>(tmp);
           op.join(left, right, collector);

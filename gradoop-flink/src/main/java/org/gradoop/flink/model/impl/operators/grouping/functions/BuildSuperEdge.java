@@ -32,7 +32,7 @@ abstract class BuildSuperEdge extends BuildBase {
    *
    * @param useLabel use edge label
    */
-  public BuildSuperEdge(boolean useLabel) {
+  BuildSuperEdge(boolean useLabel) {
     super(useLabel);
   }
 

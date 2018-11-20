@@ -91,36 +91,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.0.0</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.gradoop</groupId>
-                        <artifactId>gradoop-checkstyle</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <configLocation>gradoop/checkstyle.xml</configLocation>
-                    <headerLocation>gradoop/LICENSE.txt</headerLocation>
-                    <includeResources>false</includeResources>
-                    <includeTestResources>false</includeTestResources>
-                    <suppressionsLocation>
-                        gradoop/checkstyle-suppressions.xml
-                    </suppressionsLocation>
-                    <suppressionsFileExpression>
-                        checkstyle.suppressions.file
-                    </suppressionsFileExpression>
-                    <failsOnError>true</failsOnError>
-                    <consoleOutput>true</consoleOutput>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

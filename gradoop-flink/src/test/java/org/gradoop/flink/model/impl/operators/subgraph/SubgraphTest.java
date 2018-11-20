@@ -211,7 +211,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
         "]"
     );
 
-    GraphCollection input = loader.getGraphCollectionByVariables("g0","g1","g4");
+    GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1", "g4");
 
     FilterFunction<Vertex> vertexFilterFunction = v -> {
       PropertyValue city = v.getPropertyValue("city");
@@ -220,7 +220,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     FilterFunction<Edge> edgeFilterFunction = e -> {
       if (e.getLabel().equals("knows")) {
-        if (e.getPropertyValue("since").getInt() == 2016){
+        if (e.getPropertyValue("since").getInt() == 2016) {
           return true;
         }
       }
@@ -266,7 +266,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
         "]"
     );
 
-    GraphCollection input = loader.getGraphCollectionByVariables("g0","g1","g4");
+    GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1", "g4");
 
     FilterFunction<Vertex> vertexFilterFunction = v -> {
       PropertyValue city = v.getPropertyValue("city");
@@ -305,7 +305,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       "expected2[]"
     );
 
-    GraphCollection input = loader.getGraphCollectionByVariables("g0","g1","g2");
+    GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1", "g2");
 
     GraphCollection result = input
       .apply(new ApplySubgraph(null, e -> e.getPropertyValue("since").getInt() == 2015));

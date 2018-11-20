@@ -38,7 +38,7 @@ public class CNFElementTest {
     reference.add("a");
     reference.add("b");
 
-    assertEquals(reference,cnfElement.getVariables());
+    assertEquals(reference, cnfElement.getVariables());
   }
 
   @Test

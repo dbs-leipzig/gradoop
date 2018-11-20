@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 public class FilterEmbeddingsTest extends PhysicalOperatorTest {
 
   @Test
-  public void testFilterEmbeddings() throws Exception{
+  public void testFilterEmbeddings() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
     PropertyValue[] propertiesA = new PropertyValue[]{PropertyValue.create(23)};
@@ -54,7 +54,7 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
   }
 
   @Test
-  public void testKeepEmbeddings() throws Exception{
+  public void testKeepEmbeddings() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
     PropertyValue[] propertiesA = new PropertyValue[]{PropertyValue.create(42)};
@@ -78,7 +78,7 @@ public class FilterEmbeddingsTest extends PhysicalOperatorTest {
   }
 
   @Test
-  public void testDontAlterEmbedding() throws Exception{
+  public void testDontAlterEmbedding() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a),(b) WHERE a.age > b.age");
 
     PropertyValue[] propertiesA = new PropertyValue[]{PropertyValue.create(42)};
