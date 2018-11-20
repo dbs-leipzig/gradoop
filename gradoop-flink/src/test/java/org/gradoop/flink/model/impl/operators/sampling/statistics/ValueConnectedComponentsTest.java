@@ -113,7 +113,7 @@ public class ValueConnectedComponentsTest extends GradoopFlinkTestBase {
       if (!components.containsKey(tuple.f1)) {
         components.put(tuple.f1, 1L);
       } else {
-        components.put(tuple.f1, components.get(tuple.f1)+1L);
+        components.put(tuple.f1, components.get(tuple.f1) + 1L);
       }
     }
     return components;

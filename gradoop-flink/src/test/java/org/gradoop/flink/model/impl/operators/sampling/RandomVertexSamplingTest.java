@@ -23,7 +23,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertFalse;
 
-public class RandomVertexSamplingTest extends ParametrizedTestForGraphSampling {
+public class RandomVertexSamplingTest extends ParameterizedTestForGraphSampling {
 
   /**
    * Creates a new RandomVertexSamplingTest instance.
@@ -65,16 +65,14 @@ public class RandomVertexSamplingTest extends ParametrizedTestForGraphSampling {
    */
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
-    return Arrays.asList(
-      new String[] {
+    return Arrays.asList(new String[] {
         "VertexSamplingTest with seed",
         "-4181668494294894490",
         "0.272f"
-      },
-      new String[] {
+    }, new String[] {
         "VertexSamplingTest without seed",
         "0",
         "0.272f"
-      });
+    });
   }
 }

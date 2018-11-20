@@ -77,14 +77,14 @@ public class EdgeListExample implements ProgramDescription {
 
     // transform labels on vertices ...
     logicalGraph = logicalGraph.transformVertices((current, transformed) -> {
-        transformed.setLabel("Node");
-        return transformed;
-      });
+      transformed.setLabel("Node");
+      return transformed;
+    });
     // ... and edges
     logicalGraph = logicalGraph.transformEdges((current, transformed) -> {
-        transformed.setLabel("link");
-        return transformed;
-      });
+      transformed.setLabel("link");
+      return transformed;
+    });
 
     // do some analytics (e.g. match two-node cycles)
     String query = "(a:Node)-[:link]->(b:Node)-[:link]->(a)";

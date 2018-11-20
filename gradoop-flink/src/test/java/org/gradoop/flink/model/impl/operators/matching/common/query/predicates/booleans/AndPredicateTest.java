@@ -32,7 +32,7 @@ public class AndPredicateTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    AndPredicate andPredicate = new AndPredicate(new And(a,b));
+    AndPredicate andPredicate = new AndPredicate(new And(a, b));
 
     CNF reference = andPredicate.getLhs().asCNF().and(andPredicate.getRhs().asCNF());
 
@@ -44,7 +44,7 @@ public class AndPredicateTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    AndPredicate andPredicate = new AndPredicate(new And(a,b));
+    AndPredicate andPredicate = new AndPredicate(new And(a, b));
 
     assertEquals(new ComparisonExpression(a), andPredicate.getLhs());
   }
@@ -54,7 +54,7 @@ public class AndPredicateTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    AndPredicate andPredicate = new AndPredicate(new And(a,b));
+    AndPredicate andPredicate = new AndPredicate(new And(a, b));
 
     assertEquals(new ComparisonExpression(b), andPredicate.getRhs());
   }

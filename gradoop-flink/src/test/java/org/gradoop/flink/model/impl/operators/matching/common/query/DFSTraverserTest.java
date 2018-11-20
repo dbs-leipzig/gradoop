@@ -49,7 +49,7 @@ public class DFSTraverserTest {
       new Step(2L, 3L, 2L, true),
       new Step(2L, 1L, 1L, false),
       new Step(1L, 0L, 0L, false),
-      new Step(0L, 2L, 1L, false) 
+      new Step(0L, 2L, 1L, false)
     )));
   }
 

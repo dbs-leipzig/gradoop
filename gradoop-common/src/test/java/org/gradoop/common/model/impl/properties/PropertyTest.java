@@ -97,11 +97,11 @@ public class PropertyTest {
     assertNotEquals(p1, p4);
     assertNotEquals(p1, p5);
 
-    assertTrue(p1.hashCode() == p1.hashCode());
-    assertTrue(p1.hashCode() == p2.hashCode());
-    assertFalse(p1.hashCode() == p3.hashCode());
-    assertFalse(p1.hashCode() == p4.hashCode());
-    assertFalse(p1.hashCode() == p5.hashCode());
+    assertEquals(p1.hashCode(), p1.hashCode());
+    assertEquals(p1.hashCode(), p2.hashCode());
+    assertNotEquals(p1.hashCode(), p3.hashCode());
+    assertNotEquals(p1.hashCode(), p4.hashCode());
+    assertNotEquals(p1.hashCode(), p5.hashCode());
   }
 
   @Test
@@ -110,8 +110,8 @@ public class PropertyTest {
     Property p2 = new Property("key1", PropertyValue.create(10));
     Property p3 = new Property("key2", PropertyValue.create(10));
 
-    assertTrue(p1.compareTo(p1) == 0);
-    assertTrue(p1.compareTo(p2) == 0);
+    assertEquals(0, p1.compareTo(p1));
+    assertEquals(0, p1.compareTo(p2));
     assertTrue(p1.compareTo(p3) < 0);
     assertTrue(p3.compareTo(p1) > 0);
   }

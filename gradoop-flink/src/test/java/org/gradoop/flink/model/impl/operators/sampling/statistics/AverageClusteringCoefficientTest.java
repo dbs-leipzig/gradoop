@@ -121,7 +121,7 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
     double average = head.getPropertyValue(AverageClusteringCoefficient.PROPERTY_KEY_AVERAGE)
       .getDouble();
     assertEquals("graph has wrong average value, should be 0.2916",
-      ((1d/6d) + (1d/2d) + (1d/2d) + 0d) / 4d, average, 0.00001);
+      ((1d / 6d) + (1d / 2d) + (1d / 2d) + 0d) / 4d, average, 0.00001);
   }
 
   /**

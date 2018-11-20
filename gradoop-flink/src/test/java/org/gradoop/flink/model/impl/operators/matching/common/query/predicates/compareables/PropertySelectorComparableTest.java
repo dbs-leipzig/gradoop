@@ -32,7 +32,7 @@ public class PropertySelectorComparableTest {
   @Test
   public void testEvaluationReturnsPropertyValue() {
     PropertySelector
-      selector = new PropertySelector("a","age");
+      selector = new PropertySelector("a", "age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
     Embedding embedding = new Embedding();
@@ -48,7 +48,7 @@ public class PropertySelectorComparableTest {
 
   @Test(expected = NoSuchElementException.class)
   public void testThrowErrorIfPropertyIsMissing() {
-    PropertySelector selector = new PropertySelector("a","age");
+    PropertySelector selector = new PropertySelector("a", "age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
     Embedding embedding = new Embedding();
@@ -61,9 +61,9 @@ public class PropertySelectorComparableTest {
     wrapper.evaluate(embedding, metaData);
   }
 
-  @Test(expected= NoSuchElementException.class)
+  @Test(expected = NoSuchElementException.class)
   public void testThrowErrorIfElementNotPresent() {
-    PropertySelector selector = new PropertySelector("a","age");
+    PropertySelector selector = new PropertySelector("a", "age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
     Embedding embedding = new Embedding();
