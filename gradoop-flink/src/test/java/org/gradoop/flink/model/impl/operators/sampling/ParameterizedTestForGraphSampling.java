@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
  * Derived test-classes need to define the parameters as {@code Iterable data()}
  */
 @RunWith(Parameterized.class)
-public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestBase {
+public abstract class ParameterizedTestForGraphSampling extends GradoopFlinkTestBase {
   /**
    * Name for test-case
    */
@@ -121,7 +121,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    * @param seed Seed-value for random number generator, e.g. 0
    * @param sampleSize Value for sample size, e.g. 0.5
    */
-  public ParametrizedTestForGraphSampling(String testName, long seed, float sampleSize) {
+  public ParameterizedTestForGraphSampling(String testName, long seed, float sampleSize) {
     this.testName = testName;
     this.seed = seed;
     this.sampleSize = sampleSize;
@@ -135,7 +135,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    * @param sampleSize Value for sample size, e.g. 0.5
    * @param neighborType The vertex neighborhood type, e.g. Neighborhood.BOTH
    */
-  public ParametrizedTestForGraphSampling(String testName, long seed, float sampleSize,
+  public ParameterizedTestForGraphSampling(String testName, long seed, float sampleSize,
     Neighborhood neighborType) {
     this(testName, seed, sampleSize);
     this.neighborType = neighborType;
@@ -150,7 +150,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    * @param dampeningFactor The dampening factor used by Flinks PageRank-algorithm, e.g. 0.85
    * @param maxIteration The iteration number used by Flinks PageRank-algorithm, e.g. 20
    */
-  public ParametrizedTestForGraphSampling(String testName, long seed, float sampleSize,
+  public ParameterizedTestForGraphSampling(String testName, long seed, float sampleSize,
     double dampeningFactor, int maxIteration, boolean sampleGreaterThanThreshold,
     boolean keepVerticesIfSameScore) {
     this(testName, seed, sampleSize);
@@ -169,7 +169,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    * @param degreeType The vertex degree type, e.g. VertexDegree.BOTH
    * @param degreeThreshold The threshold for the vertex degree, e.g. 3
    */
-  public ParametrizedTestForGraphSampling(String testName, long seed, float sampleSize,
+  public ParameterizedTestForGraphSampling(String testName, long seed, float sampleSize,
     VertexDegree degreeType, long degreeThreshold) {
     this(testName, seed, sampleSize);
     this.degreeType = degreeType;
@@ -185,7 +185,7 @@ public abstract class ParametrizedTestForGraphSampling extends GradoopFlinkTestB
    * @param edgeSampleSize Value for edge sample size, e.g. 0.5
    * @param vertexEdgeSamplingType Type for VertexEdgeSampling, e.g. SimpleVersion
    */
-  public ParametrizedTestForGraphSampling(String testName, long seed, float sampleSize,
+  public ParameterizedTestForGraphSampling(String testName, long seed, float sampleSize,
     float edgeSampleSize, RandomVertexEdgeSampling.VertexEdgeSamplingType vertexEdgeSamplingType) {
     this(testName, seed, sampleSize);
     this.edgeSampleSize = edgeSampleSize;

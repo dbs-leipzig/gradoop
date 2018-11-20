@@ -39,7 +39,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
 
     collectAndAssertTrue(
-      loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
+      loader.getGraphCollectionByVariables("g1", "g2").equalsByGraphData(
         getConfig().getGraphCollectionFactory().fromTransactions(transactions)
       )
     );
@@ -61,7 +61,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
 
     collectAndAssertTrue(
-    loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
+    loader.getGraphCollectionByVariables("g1", "g2").equalsByGraphData(
     getConfig().getGraphCollectionFactory().fromTransactions(transactions)
     )
     );
@@ -86,7 +86,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
 
     collectAndAssertTrue(
-      loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
+      loader.getGraphCollectionByVariables("g1", "g2").equalsByGraphData(
         getConfig().getGraphCollectionFactory().fromTransactions(transactions)
       )
     );

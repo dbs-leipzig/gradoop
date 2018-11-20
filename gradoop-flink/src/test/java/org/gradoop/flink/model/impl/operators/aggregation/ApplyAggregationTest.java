@@ -272,7 +272,7 @@ public abstract class ApplyAggregationTest extends AggregationTest {
    * @throws Exception if the execution fails.
    */
   @Test
-  public void testWithMixedTypePropertyValues() throws Exception{
+  public void testWithMixedTypePropertyValues() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "g0[" +
         "(va {p : 0.5})" +

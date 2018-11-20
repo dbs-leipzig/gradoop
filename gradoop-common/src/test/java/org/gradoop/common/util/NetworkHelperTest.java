@@ -18,11 +18,10 @@ package org.gradoop.common.util;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-public class NetworkHelperTest {
 
+public class NetworkHelperTest {
   @Test
-  public void getLocalHost() throws Exception {
-    assertFalse(
-      NetworkHelper.getLocalHost().equals(NetworkHelper.LOCAL_HOST));
+  public void getLocalHost() {
+    assertNotEquals(NetworkHelper.getLocalHost(), NetworkHelper.LOCAL_HOST);
   }
 }

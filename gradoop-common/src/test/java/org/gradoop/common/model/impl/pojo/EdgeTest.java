@@ -67,7 +67,7 @@ public class EdgeTest {
     assertThat(edge.getPropertyValue("k2").getString(), Is.<Object>is("v2"));
     assertThat(edge.getGraphCount(), is(2));
 
-    for(GradoopId graphId : graphIds) {
+    for (GradoopId graphId : graphIds) {
       assertTrue(edge.getGraphIds().contains(graphId));
     }
   }

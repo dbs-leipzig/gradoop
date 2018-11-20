@@ -57,7 +57,7 @@ public class ValueJoinTest extends PhysicalOperatorTest {
     r2.add(e1, PropertyValue.create(42));
     r2.add(v3);
 
-    DataSet<Embedding> right = getExecutionEnvironment().fromElements(r1,r2);
+    DataSet<Embedding> right = getExecutionEnvironment().fromElements(r1, r2);
 
     List<Integer> emptyList = Lists.newArrayListWithCapacity(0);
 
@@ -78,7 +78,7 @@ public class ValueJoinTest extends PhysicalOperatorTest {
         PropertyValue.create(21)
         )
       ));
-    assertEmbeddingExists(result, v0,e0,v1,v2,e1,v3);
+    assertEmbeddingExists(result, v0, e0, v1, v2, e1, v3);
   }
 
   @Test
@@ -87,20 +87,20 @@ public class ValueJoinTest extends PhysicalOperatorTest {
     l1.add(v0, PropertyValue.create("Foobar"));
     Embedding l2 = new Embedding();
     l2.add(v1, PropertyValue.create("Bar"));
-    DataSet<Embedding> left = getExecutionEnvironment().fromElements(l1,l2);
+    DataSet<Embedding> left = getExecutionEnvironment().fromElements(l1, l2);
 
     Embedding r1 = new Embedding();
     r1.add(v2, PropertyValue.create("Foobar"));
     Embedding r2 = new Embedding();
     r2.add(v3, PropertyValue.create("Bar"));
-    DataSet<Embedding> right = getExecutionEnvironment().fromElements(r1,r2);
+    DataSet<Embedding> right = getExecutionEnvironment().fromElements(r1, r2);
 
     PhysicalOperator join = new ValueJoin(left, right, Lists.newArrayList(0), Lists.newArrayList(0), 1);
 
     DataSet<Embedding> result = join.evaluate();
     assertEquals(2, result.count());
-    assertEmbeddingExists(result, v0,v2);
-    assertEmbeddingExists(result, v1,v3);
+    assertEmbeddingExists(result, v0, v2);
+    assertEmbeddingExists(result, v1, v3);
   }
 
   @Test
@@ -109,20 +109,20 @@ public class ValueJoinTest extends PhysicalOperatorTest {
     l1.add(v0, PropertyValue.create("Foobar"), PropertyValue.create(21));
     Embedding l2 = new Embedding();
     l2.add(v1, PropertyValue.create("Foobar"), PropertyValue.create(42));
-    DataSet<Embedding> left = getExecutionEnvironment().fromElements(l1,l2);
+    DataSet<Embedding> left = getExecutionEnvironment().fromElements(l1, l2);
 
     Embedding r1 = new Embedding();
     r1.add(v2, PropertyValue.create("Foobar"), PropertyValue.create(21));
     Embedding r2 = new Embedding();
     r2.add(v3, PropertyValue.create("Foobar"), PropertyValue.create(42));
-    DataSet<Embedding> right = getExecutionEnvironment().fromElements(r1,r2);
+    DataSet<Embedding> right = getExecutionEnvironment().fromElements(r1, r2);
 
     PhysicalOperator join =
-      new ValueJoin(left, right, Lists.newArrayList(0,1), Lists.newArrayList(0,1), 1);
+      new ValueJoin(left, right, Lists.newArrayList(0, 1), Lists.newArrayList(0, 1), 1);
 
     DataSet<Embedding> result = join.evaluate();
     assertEquals(2, result.count());
-    assertEmbeddingExists(result, v0,v2);
-    assertEmbeddingExists(result, v1,v3);
+    assertEmbeddingExists(result, v0, v2);
+    assertEmbeddingExists(result, v1, v3);
   }
 }

@@ -78,7 +78,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testAllTransformationFunctions() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g01");
@@ -104,7 +104,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testGHTransformation() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g02");
@@ -131,7 +131,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testGHTransformationWithoutHistory() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g12");
@@ -155,7 +155,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testGHTransformationNewPropKey() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g22");
@@ -181,7 +181,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testVertexTransformation() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g03");
@@ -208,7 +208,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testVertexTransformationWithoutHistory() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g13");
@@ -219,7 +219,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
         null,
         DIVISION,
         null));
-    
+
     collectAndAssertTrue(result.equalsByData(expected));
   }
 
@@ -232,7 +232,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testVertexTransformationNewPropKey() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g23");
@@ -246,7 +246,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
         null,
         "dividedA",
         true));
-    
+
     collectAndAssertTrue(result.equalsByData(expected));
   }
 
@@ -259,7 +259,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testVertexTransformationLabelSpecific() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g33");
@@ -273,7 +273,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
         "A",
         null,
         true));
-    
+
     collectAndAssertTrue(result.equalsByData(expected));
   }
 
@@ -285,7 +285,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testEdgeTransformation() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g04");
@@ -312,7 +312,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testEdgeTransformationWithoutHistory() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g14");
@@ -336,7 +336,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testEdgeTransformationNewPropKey() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g24");
@@ -363,7 +363,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testEdgeTransformationLabelSpecific() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g1");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g34");
@@ -380,8 +380,8 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
-  
-  /**
+
+   /**
    * Executes a property transformation on graphHeads using the {@link LogicalGraph} object and
    * checks if the result is correct.
    *
@@ -390,7 +390,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testGHTransformationUsingLG() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g12");
@@ -409,13 +409,13 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testVertexTransformationUsingLG() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g13");
 
     LogicalGraph result = original.transformVertexProperties("a", DIVISION);
-    
+
     collectAndAssertTrue(result.equalsByData(expected));
   }
 
@@ -428,7 +428,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   @Test
   public void testEdgeTransformationUsingLG() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-    
+
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("g14");
