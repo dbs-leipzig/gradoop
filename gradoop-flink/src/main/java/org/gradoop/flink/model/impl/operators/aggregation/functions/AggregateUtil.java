@@ -50,7 +50,7 @@ public class AggregateUtil {
 
   /**
    * Returns the default aggregate value for the given aggregate function
-   * or {@code PropertyValue.NULL_VALUE}, if it has no default.
+   * or {@link PropertyValue#NULL_VALUE}, if it has no default.
    *
    * @param aggregateFunction aggregate function
    * @return aggregate value
