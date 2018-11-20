@@ -44,8 +44,7 @@ public class Transformation<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph<G, V, E, LG>>
-  implements UnaryBaseGraphToGraphOperator<LG> {
+  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToGraphOperator<LG> {
 
   /**
    * Modification function for graph heads
