@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * @param <T> output tuple type
  */
 public abstract class ElementToCSV<E extends Element, T extends Tuple>
-  extends RichMapFunction<E , T> {
+  extends RichMapFunction<E, T> {
   /**
    * Constant for an empty string.
    */

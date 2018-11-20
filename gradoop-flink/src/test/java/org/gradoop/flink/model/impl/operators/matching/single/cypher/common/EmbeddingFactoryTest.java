@@ -40,7 +40,7 @@ public class EmbeddingFactoryTest {
     Vertex vertex = new VertexFactory().createVertex("TestVertex",  properties);
 
     Embedding embedding =
-      EmbeddingFactory.fromVertex(vertex, Lists.newArrayList("foo","bar"));
+      EmbeddingFactory.fromVertex(vertex, Lists.newArrayList("foo", "bar"));
 
     assertEquals(1, embedding.size());
     assertEquals(vertex.getId(), embedding.getId(0));
@@ -59,7 +59,7 @@ public class EmbeddingFactoryTest {
     );
 
     Embedding embedding =
-      EmbeddingFactory.fromEdge(edge, Lists.newArrayList("foo","bar"), false);
+      EmbeddingFactory.fromEdge(edge, Lists.newArrayList("foo", "bar"), false);
 
     assertEquals(3, embedding.size());
     assertEquals(edge.getSourceId(), embedding.getId(0));
@@ -83,7 +83,7 @@ public class EmbeddingFactoryTest {
     );
 
     Embedding embedding =
-      EmbeddingFactory.fromEdge(edge, Lists.newArrayList("foo","bar"), true);
+      EmbeddingFactory.fromEdge(edge, Lists.newArrayList("foo", "bar"), true);
 
     assertEquals(2, embedding.size());
     assertEquals(edge.getSourceId(), embedding.getId(0));

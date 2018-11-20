@@ -59,9 +59,12 @@ public class AdjacencyList<ID extends Comparable<ID>, L extends Comparable<L>, E
    * @param outgoingRows outgoing adjacency list rows
    * @param incomingRows incoming adjacency list rows
    */
-  public AdjacencyList(GraphHead graphHead, Map<ID, L> labels, Map<ID, Properties> properties,
-    Map<ID, AdjacencyListRow<ED, VD>> outgoingRows, Map<ID, AdjacencyListRow<ED, VD>> incomingRows)
-  {
+  public AdjacencyList(
+    GraphHead graphHead,
+    Map<ID, L> labels,
+    Map<ID, Properties> properties,
+    Map<ID, AdjacencyListRow<ED, VD>> outgoingRows,
+    Map<ID, AdjacencyListRow<ED, VD>> incomingRows) {
     super(graphHead, labels, properties, outgoingRows, incomingRows);
   }
 

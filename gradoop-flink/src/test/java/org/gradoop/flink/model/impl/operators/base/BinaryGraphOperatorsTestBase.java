@@ -27,12 +27,12 @@ public class BinaryGraphOperatorsTestBase extends GradoopFlinkTestBase {
 
   protected void checkElementMatches(Set<GraphElement> inElements,
     Set<GraphElement> outElements) {
-    for(GraphElement outElement : outElements) {
+    for (GraphElement outElement : outElements) {
       boolean match = false;
 
       String elementClassName = outElement.getClass().getSimpleName();
 
-      for(GraphElement inVertex : inElements) {
+      for (GraphElement inVertex : inElements) {
         if (outElement.getId().equals(inVertex.getId())) {
           assertEquals(
             "wrong number of graphs for " + elementClassName,
@@ -43,7 +43,7 @@ public class BinaryGraphOperatorsTestBase extends GradoopFlinkTestBase {
           break;
         }
       }
-      assertTrue("expected " + elementClassName + " not found",match);
+      assertTrue("expected " + elementClassName + " not found", match);
     }
   }
 }

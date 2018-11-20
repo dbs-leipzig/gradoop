@@ -135,18 +135,17 @@ public class CSVDataSinkTest extends CSVTestBase {
 
     List<PropertyValue> list = Arrays.asList(PropertyValue.create(string2), PropertyValue.create(string1));
     Set<PropertyValue> set = new HashSet<>(list);
-    Map<PropertyValue, PropertyValue> map1 = new HashMap<PropertyValue, PropertyValue>() {{
-      put(PropertyValue.create(string1), PropertyValue.create(string2));
-      put(PropertyValue.create("key"), PropertyValue.create(string1));
-    }};
-    Map<PropertyValue, PropertyValue> map2 = new HashMap<PropertyValue, PropertyValue>() {{
-      put(PropertyValue.create(string1), PropertyValue.create(1));
-      put(PropertyValue.create("key"), PropertyValue.create(2));
-    }};
-    Map<PropertyValue, PropertyValue> map3 = new HashMap<PropertyValue, PropertyValue>() {{
-      put(PropertyValue.create(1), PropertyValue.create(string2));
-      put(PropertyValue.create(2), PropertyValue.create(string1));
-    }};
+    Map<PropertyValue, PropertyValue> map1 = new HashMap<>();
+    map1.put(PropertyValue.create(string1), PropertyValue.create(string2));
+    map1.put(PropertyValue.create("key"), PropertyValue.create(string1));
+
+    Map<PropertyValue, PropertyValue> map2 = new HashMap<>();
+    map2.put(PropertyValue.create(string1), PropertyValue.create(1));
+    map2.put(PropertyValue.create("key"), PropertyValue.create(2));
+
+    Map<PropertyValue, PropertyValue> map3 = new HashMap<>();
+    map3.put(PropertyValue.create(1), PropertyValue.create(string2));
+    map3.put(PropertyValue.create(2), PropertyValue.create(string1));
 
     Properties props = Properties.create();
     props.set(string1, string2);

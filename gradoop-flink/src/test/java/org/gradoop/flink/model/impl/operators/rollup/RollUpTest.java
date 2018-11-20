@@ -70,12 +70,12 @@ public class RollUpTest extends GradoopFlinkTestBase {
       Collections.singletonList(new CountAggregator("count"));
     List<String> edgeGK = Collections.emptyList();
     List<PropertyValueAggregator> edgeAGG = Collections.emptyList();
-    
+
     GraphCollection output = input.groupVerticesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
-  
+
     collectAndAssertTrue(output.equalsByGraphData(expected));
   }
-  
+
   /**
    * Executes a rollUp on edges using a single grouping key and checks if the result
    * is correct.
@@ -102,12 +102,12 @@ public class RollUpTest extends GradoopFlinkTestBase {
     List<PropertyValueAggregator> vertexAGG = Collections.emptyList();
     List<String> edgeGK = Collections.singletonList(Grouping.LABEL_SYMBOL);
     List<PropertyValueAggregator> edgeAGG = Collections.singletonList(new CountAggregator("count"));
-    
+
     GraphCollection output = input.groupEdgesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
 
     collectAndAssertTrue(output.equalsByGraphData(expected));
   }
-  
+
   /**
    * Executes a common rollUp on vertices using multiple grouping keys and checks if the result
    * is correct. This test also checks if vertices which do not contain the grouping key are
@@ -121,7 +121,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
 
     LogicalGraph input = loader.getGraphCollectionByVariables("g0", "g1", "g2", "g3")
       .reduce(new ReduceCombination());
-    
+
     //expected
     loader.initDatabaseFromString("g0 {vertexRollUpGroupingKeys:\"age,gender,city\"}[" +
       "(v2 {gender:\"f\",city:\"Dresden\",count:1L,age:30})" +
@@ -189,12 +189,12 @@ public class RollUpTest extends GradoopFlinkTestBase {
       Collections.singletonList(new CountAggregator("count"));
     List<String> edgeGK = Collections.emptyList();
     List<PropertyValueAggregator> edgeAGG = Collections.emptyList();
-    
+
     GraphCollection output = input.groupVerticesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
-    
+
     collectAndAssertTrue(output.equalsByGraphData(expected));
   }
-  
+
   /**
    * Executes a common rollUp on edges using multiple grouping keys and checks if the result
    * is correct. This test also checks if edges which do not contain the grouping key are
@@ -208,7 +208,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
 
     LogicalGraph input = loader.getGraphCollectionByVariables("g0", "g1", "g2", "g3")
       .reduce(new ReduceCombination());
-    
+
     //expected
     loader.initDatabaseFromString("g0 {edgeRollUpGroupingKeys:\":label,since,vertexCount\"}[" +
       "(v0)" +
@@ -239,7 +239,7 @@ public class RollUpTest extends GradoopFlinkTestBase {
     List<String> edgeGK = Arrays.asList(Grouping.LABEL_SYMBOL,
       "since", "vertexCount");
     List<PropertyValueAggregator> edgeAGG = Collections.singletonList(new CountAggregator("count"));
-    
+
     GraphCollection output = input.groupEdgesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
 
     collectAndAssertTrue(output.equalsByGraphData(expected));

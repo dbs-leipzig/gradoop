@@ -41,7 +41,7 @@ public class CNFTest {
     CNF copy = new CNF(base);
     copy.getPredicates().remove(0);
 
-    assertNotEquals(base,copy);
+    assertNotEquals(base, copy);
   }
 
   @Test
@@ -84,7 +84,7 @@ public class CNFTest {
     reference.add("a");
     reference.add("b");
 
-    assertEquals(reference,cnf.getVariables());
+    assertEquals(reference, cnf.getVariables());
   }
 
   @Test
@@ -97,7 +97,7 @@ public class CNFTest {
       "MATCH (a), (b), (c) WHERE a.name = \"Alice\" AND c.name = \"Chris\""
     );
 
-    assertEquals(expectedReturnValue, base.getSubCNF(Sets.newHashSet("a","c")));
+    assertEquals(expectedReturnValue, base.getSubCNF(Sets.newHashSet("a", "c")));
     assertEquals(new CNF(), base.getSubCNF(Sets.newHashSet("b")));
   }
 
@@ -116,7 +116,7 @@ public class CNFTest {
     );
 
 
-    assertEquals(expectedReturnValue, base.removeSubCNF(Sets.newHashSet("a","b")));
+    assertEquals(expectedReturnValue, base.removeSubCNF(Sets.newHashSet("a", "b")));
     assertEquals(expectedNewBase, base);
   }
 
@@ -185,11 +185,11 @@ public class CNFTest {
     CNF cnf = query.getPredicates();
 
     Properties properties = new Properties();
-    properties.set("name","Alice");
+    properties.set("name", "Alice");
     Vertex vertex = new VertexFactory().createVertex("Person", properties);
     assertTrue(cnf.evaluate(vertex));
 
-    properties.set("name","Bob");
+    properties.set("name", "Bob");
     assertFalse(cnf.evaluate(vertex));
   }
 
@@ -199,7 +199,7 @@ public class CNFTest {
     CNF cnf = query.getPredicates();
 
     Properties properties = new Properties();
-    properties.set("age",42);
+    properties.set("age", 42);
     Vertex vertex = new VertexFactory().createVertex("Person", properties);
     assertFalse(cnf.evaluate(vertex));
   }

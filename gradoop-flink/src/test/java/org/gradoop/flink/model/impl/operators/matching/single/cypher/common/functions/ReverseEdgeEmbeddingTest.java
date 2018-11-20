@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 public class ReverseEdgeEmbeddingTest {
   @Test
-  public void testReversingAnEdgeEmbedding() throws Exception{
+  public void testReversingAnEdgeEmbedding() throws Exception {
     GradoopId a = GradoopId.get();
     GradoopId e = GradoopId.get();
     GradoopId b = GradoopId.get();
