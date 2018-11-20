@@ -130,7 +130,7 @@
         <dep.accumulo.version>1.9.0</dep.accumulo.version>
         <dep.bson.version>3.6.3</dep.bson.version>
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
-        <dep.flink.version>1.5.0</dep.flink.version>
+        <dep.flink.version>1.6.0</dep.flink.version>
         <dep.gdl.version>0.3</dep.gdl.version>
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
@@ -578,6 +578,12 @@
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-hadoop-compatibility_2.11</artifactId>
+                <version>${dep.flink.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-shaded-hadoop2</artifactId>
                 <version>${dep.flink.version}</version>
             </dependency>
 
