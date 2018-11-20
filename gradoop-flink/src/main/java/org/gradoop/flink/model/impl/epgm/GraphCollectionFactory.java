@@ -17,6 +17,9 @@ package org.gradoop.flink.model.impl.epgm;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -61,6 +64,36 @@ public class GraphCollectionFactory
     Objects.requireNonNull(layoutFactory);
     this.layoutFactory = layoutFactory;
     this.layoutFactory.setGradoopFlinkConfig(config);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * The factory is passed from {@link GradoopFlinkConfig} at the moment.
+   */
+  @Override
+  public EPGMGraphHeadFactory<GraphHead> getGraphHeadFactory() {
+    return config.getGraphHeadFactory();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * The factory is passed from {@link GradoopFlinkConfig} at the moment.
+   */
+  @Override
+  public EPGMVertexFactory<Vertex> getVertexFactory() {
+    return config.getVertexFactory();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * The factory is passed from {@link GradoopFlinkConfig} at the moment.
+   */
+  @Override
+  public EPGMEdgeFactory<Edge> getEdgeFactory() {
+    return config.getEdgeFactory();
   }
 
   @Override

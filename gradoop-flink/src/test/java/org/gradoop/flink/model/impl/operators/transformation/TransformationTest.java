@@ -33,7 +33,7 @@ import static org.gradoop.common.GradoopTestUtils.validateIdEquality;
 
 public class TransformationTest extends GradoopFlinkTestBase {
 
-  protected static final String TEST_GRAPH = "" +
+  static final String TEST_GRAPH = "" +
     "g0:A  { a : 1 } [(:A { a : 1, b : 2 })-[:a { a : 1, b : 2 }]->(:B { c : 2 })]" +
     "g1:B  { a : 2 } [(:A { a : 2, b : 2 })-[:a { a : 2, b : 2 }]->(:B { c : 3 })]" +
     // full graph transformation
@@ -72,7 +72,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
   @Test(expected = IllegalArgumentException.class)
   public void testMissingFunctions() {
-    new Transformation(null, null, null);
+    new Transformation<>(null, null, null);
   }
 
   @Test

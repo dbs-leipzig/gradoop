@@ -31,7 +31,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * Applies the transformation operator on on all logical graphs in a graph
  * collection.
  */
-public class ApplyTransformation extends Transformation
+public class ApplyTransformation extends Transformation<GraphHead, Vertex, Edge, LogicalGraph>
   implements ApplicableUnaryGraphToGraphOperator {
 
   /**
@@ -55,9 +55,9 @@ public class ApplyTransformation extends Transformation
       collection.getGraphHeads(),
       collection.getVertices(),
       collection.getEdges(),
-      collection.getConfig());
+      collection.getConfig().getLogicalGraphFactory());
 
-    return collection.getConfig().getGraphCollectionFactory().fromDataSets(
+    return collection.getFactory().fromDataSets(
       modifiedGraph.getGraphHead(),
       modifiedGraph.getVertices(),
       modifiedGraph.getEdges());
@@ -71,11 +71,11 @@ public class ApplyTransformation extends Transformation
 
     DataSet<GraphTransaction> transformedGraphTransactions = graphTransactions
       .map(new TransformGraphTransaction(
-        config.getGraphHeadFactory(),
+        collection.getFactory().getGraphHeadFactory(),
         graphHeadTransFunc,
-        config.getVertexFactory(),
+        collection.getFactory().getVertexFactory(),
         vertexTransFunc,
-        config.getEdgeFactory(),
+        collection.getFactory().getEdgeFactory(),
         edgeTransFunc
       ));
 

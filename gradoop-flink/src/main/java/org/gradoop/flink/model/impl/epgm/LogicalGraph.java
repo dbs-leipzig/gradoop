@@ -34,8 +34,8 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
@@ -90,7 +90,7 @@ import java.util.Objects;
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalGraph>,
-  LogicalGraphLayout<GraphHead, Vertex, Edge>, LogicalGraphOperators {
+  LogicalGraphOperators {
   /**
    * Layout for that logical graph.
    */
@@ -299,7 +299,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
     TransformationFunction<GraphHead> graphHeadTransformationFunction,
     TransformationFunction<Vertex> vertexTransformationFunction,
     TransformationFunction<Edge> edgeTransformationFunction) {
-    return callForGraph(new Transformation(
+    return callForGraph(new Transformation<>(
       graphHeadTransformationFunction,
       vertexTransformationFunction,
       edgeTransformationFunction));
@@ -329,7 +329,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
     PropertyTransformationFunction graphHeadPropTransformationFunction) {
     Objects.requireNonNull(propertyKey);
     Objects.requireNonNull(graphHeadPropTransformationFunction);
-    return callForGraph(new PropertyTransformation(propertyKey,
+    return callForGraph(new PropertyTransformation<>(propertyKey,
       graphHeadPropTransformationFunction, null, null));
   }
 
@@ -339,7 +339,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
     PropertyTransformationFunction vertexPropTransformationFunction) {
     Objects.requireNonNull(propertyKey);
     Objects.requireNonNull(vertexPropTransformationFunction);
-    return callForGraph(new PropertyTransformation(propertyKey,
+    return callForGraph(new PropertyTransformation<>(propertyKey,
       null, vertexPropTransformationFunction, null));
   }
 
@@ -349,7 +349,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
     PropertyTransformationFunction edgePropTransformationFunction) {
     Objects.requireNonNull(propertyKey);
     Objects.requireNonNull(edgePropTransformationFunction);
-    return callForGraph(new PropertyTransformation(propertyKey,
+    return callForGraph(new PropertyTransformation<>(propertyKey,
       null, null, edgePropTransformationFunction));
   }
 
@@ -360,7 +360,8 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   public LogicalGraph vertexInducedSubgraph(
     FilterFunction<Vertex> vertexFilterFunction) {
     Objects.requireNonNull(vertexFilterFunction);
-    return callForGraph(new Subgraph(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
+    return callForGraph(
+      new Subgraph<>(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
   }
 
   /**
@@ -370,7 +371,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   public LogicalGraph edgeInducedSubgraph(
     FilterFunction<Edge> edgeFilterFunction) {
     Objects.requireNonNull(edgeFilterFunction);
-    return callForGraph(new Subgraph(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));
+    return callForGraph(new Subgraph<>(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));
   }
 
   /**
@@ -380,7 +381,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   public LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
     FilterFunction<Edge> edgeFilterFunction, Subgraph.Strategy strategy) {
     return callForGraph(
-      new Subgraph(vertexFilterFunction, edgeFilterFunction, strategy));
+      new Subgraph<>(vertexFilterFunction, edgeFilterFunction, strategy));
   }
 
   /**
@@ -555,7 +556,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph callForGraph(UnaryGraphToGraphOperator operator) {
+  public LogicalGraph callForGraph(UnaryBaseGraphToGraphOperator<LogicalGraph> operator) {
     return operator.execute(this);
   }
 
