@@ -66,6 +66,7 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
     long edgesBefore = social.getEdges().count();
     long edgesToChange = social.getEdges().filter(new ByLabel<>(toInvertLabel)).count();
     long edgesAfter = invertedEdgeGraph.getEdges().count();
+
     Assert.assertEquals(edgesToChange, 4); // we have 4 "hasInterest" edges
     Assert.assertEquals(edgesBefore, edgesAfter); // ensures no new edges are created
 
@@ -80,15 +81,19 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
     // (frank)-[:hasInterest]->(hadoop)
     // (dave)-[:hasInterest]->(hadoop)
     //-------------------
+
+    long invertedEdgeCount = invertedEdgeGraph.getEdges().filter(new ByLabel<>(invertedLabel)).count();
+    Assert.assertEquals(edgesToChange, invertedEdgeCount);
+
     List<Vertex> vertices = new ArrayList<>();
     invertedEdgeGraph.getVertices()
-        .filter(new Or<>(new ByLabel<>("Person"), new ByLabel<>("Tag")))
-        .output(new LocalCollectionOutputFormat<>(vertices));
+      .filter(new Or<>(new ByLabel<>("Person"), new ByLabel<>("Tag")))
+      .output(new LocalCollectionOutputFormat<>(vertices));
 
     List<Edge> newEdges = new ArrayList<>();
     invertedEdgeGraph
-        .getEdgesByLabel(invertedLabel)
-        .output(new LocalCollectionOutputFormat<>(newEdges));
+      .getEdgesByLabel(invertedLabel)
+      .output(new LocalCollectionOutputFormat<>(newEdges));
 
     getConfig().getExecutionEnvironment().execute();
 
@@ -103,7 +108,7 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
       String targetName = idMap.get(e.getTargetId());
 
       Assert.assertTrue("source: " + sourceName + " | target: " + targetName,
-          tags.contains(sourceName) && persons.contains(targetName));
+        tags.contains(sourceName) && persons.contains(targetName));
       persons.remove(targetName);
     }
   }
