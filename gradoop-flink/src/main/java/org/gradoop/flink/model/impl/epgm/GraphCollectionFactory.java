@@ -88,12 +88,7 @@ public class GraphCollectionFactory
     return new GraphCollection(layoutFactory.fromCollections(graphHeads, vertices, edges), config);
   }
 
-  /**
-   * Creates a graph collection from one or more given logical graphs.
-   *
-   * @param logicalGraphLayouts one or more logical graphs
-   * @return one- or multi-element graph collection
-   */
+  @Override
   public GraphCollection fromGraph(LogicalGraph... logicalGraphLayouts) {
     DataSet<GraphHead> graphHeads = null;
     DataSet<Vertex> vertices = null;

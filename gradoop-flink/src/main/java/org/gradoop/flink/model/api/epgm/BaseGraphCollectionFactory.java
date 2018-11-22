@@ -91,10 +91,10 @@ public interface BaseGraphCollectionFactory<
   GC fromCollections(Collection<G> graphHeads, Collection<V> vertices, Collection<E> edges);
 
   /**
-   * Creates a graph collection from a given logical graph.
+   * Creates a graph collection from one or more given logical graphs.
    *
    * @param logicalGraphLayout  input graph
-   * @return 1-element graph collection
+   * @return graph collection
    */
   GC fromGraph(LogicalGraph... logicalGraphLayout);
 
