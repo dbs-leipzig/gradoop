@@ -37,7 +37,7 @@ import java.util.Map;
  * {@link #close()} and {@link #initializeGlobal(int)} methods will not invoke the respective
  * methods of the new output formats, their parameters will just be stored as
  * {@link #configuration}, {@link #taskNumber}, {@link #numTasks}, {@link #parallelism}
- * respectively. Make sure to initialize each output format in
+ * respectively. Make sure to configure each output format in
  * {@link #createFormatForDirectory(Path)}.
  *
  * @param <IT> The type of the records to write.
