@@ -18,7 +18,6 @@ package org.gradoop.flink.io.impl.csv.indexed.functions;
 import org.apache.flink.api.common.io.CleanupWhenUnsuccessful;
 import org.apache.flink.api.common.io.InitializeOnMaster;
 import org.apache.flink.api.common.io.OutputFormat;
-import org.apache.flink.api.common.io.RichOutputFormat;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
@@ -112,7 +111,7 @@ public abstract class MultipleFileOutputFormat<IT>
     // Prepare root output directory
     final FileSystem fs = rootOutputPath.getFileSystem();
     if (fs.isDistributedFS()) {
-      if(!fs.initOutPathDistFS(rootOutputPath, writeMode, true)) {
+      if (!fs.initOutPathDistFS(rootOutputPath, writeMode, true)) {
         throw new IOException("Failed to initialize output root directory.");
       }
     } else {
