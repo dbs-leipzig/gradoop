@@ -89,8 +89,25 @@ public class GraphCollectionFactory
   }
 
   @Override
-  public GraphCollection fromGraph(LogicalGraph logicalGraphLayout) {
-    return new GraphCollection(layoutFactory.fromGraphLayout(logicalGraphLayout), config);
+  public GraphCollection fromGraph(LogicalGraph... logicalGraphLayout) {
+    DataSet<GraphHead> graphHeads = null;
+    DataSet<Vertex> vertices = null;
+    DataSet<Edge> edges = null;
+
+    GraphCollection graphCollection = new GraphCollection(layoutFactory.createEmptyCollection(),
+      config);
+
+    if (logicalGraphLayout.length != 0) {
+      for (LogicalGraph logicalGraph : logicalGraphLayout) {
+        graphHeads = (graphHeads == null) ? logicalGraph.getGraphHead() :
+          graphHeads.union(logicalGraph.getGraphHead());
+        vertices = (vertices == null) ? logicalGraph.getVertices() :
+          vertices.union(logicalGraph.getVertices());
+        edges = (edges == null) ? logicalGraph.getEdges() : edges.union(logicalGraph.getEdges());
+      }
+      graphCollection = fromDataSets(graphHeads, vertices, edges);
+    }
+    return graphCollection;
   }
 
   @Override

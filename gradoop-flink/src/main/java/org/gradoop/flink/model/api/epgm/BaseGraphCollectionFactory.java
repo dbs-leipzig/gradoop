@@ -96,7 +96,7 @@ public interface BaseGraphCollectionFactory<
    * @param logicalGraphLayout  input graph
    * @return 1-element graph collection
    */
-  GC fromGraph(LogicalGraph logicalGraphLayout);
+  GC fromGraph(LogicalGraph... logicalGraphLayout);
 
   /**
    * Creates a graph collection from a graph transaction dataset.
