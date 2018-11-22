@@ -17,40 +17,42 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
 import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Applies vertex aggregate functions to the vertices.
+ * Applies aggregate functions to the elements.
+ *
+ * @param <T> element type
  */
-public class AggregateVertices
-  implements GroupCombineFunction<Vertex, Map<String, PropertyValue>> {
+public class AggregateElements<T extends Element>
+  implements GroupCombineFunction<T, Map<String, PropertyValue>> {
 
   /**
    * Aggregate functions.
    */
-  private final Set<VertexAggregateFunction> aggregateFunctions;
+  private final Set<AggregateFunction> aggregateFunctions;
 
   /**
-   * Constructor.
+   * Creates a new instance of a AggregateElements group combine function.
    *
    * @param aggregateFunctions aggregate functions
    */
-  public AggregateVertices(Set<VertexAggregateFunction> aggregateFunctions) {
+  public AggregateElements(Set<AggregateFunction> aggregateFunctions) {
     this.aggregateFunctions = aggregateFunctions;
   }
 
   @Override
-  public void combine(Iterable<Vertex> vertices, Collector<Map<String, PropertyValue>> out) {
+  public void combine(Iterable<T> elements, Collector<Map<String, PropertyValue>> out) {
     Map<String, PropertyValue> aggregate = new HashMap<>();
 
-    for (Vertex vertex : vertices) {
-      aggregate = AggregateUtil.vertexIncrement(aggregate, vertex, aggregateFunctions);
+    for (T element : elements) {
+      aggregate = AggregateUtil.increment(aggregate, element, aggregateFunctions);
     }
 
     if (!aggregate.isEmpty()) {

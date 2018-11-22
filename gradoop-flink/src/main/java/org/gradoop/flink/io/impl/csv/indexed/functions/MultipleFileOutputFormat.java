@@ -43,8 +43,8 @@ import java.util.Map;
  *
  * @param <IT> The type of the records to write.
  */
-public abstract class MultipleFileOutputFormat<IT> extends RichOutputFormat<IT>
-        implements CleanupWhenUnsuccessful, InitializeOnMaster {
+public abstract class MultipleFileOutputFormat<IT>
+  extends RichOutputFormat<IT> implements InitializeOnMaster, CleanupWhenUnsuccessful {
 
   /**
    * The configuration set with {@link #configure(Configuration)}.

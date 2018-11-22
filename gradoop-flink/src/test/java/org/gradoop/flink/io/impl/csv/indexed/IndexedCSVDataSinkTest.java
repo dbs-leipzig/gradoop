@@ -29,8 +29,8 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
@@ -186,21 +186,20 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     String string1 = "abc;,|:\n=\\ def";
     String string2 = "def;,|:\n=\\ ghi";
 
-    List<PropertyValue> list = Arrays.asList(PropertyValue.create(string2),
-      PropertyValue.create(string1));
+    List<PropertyValue> list = Arrays.asList(PropertyValue.create(string2), PropertyValue.create(string1));
     Set<PropertyValue> set = new HashSet<>(list);
-    Map<PropertyValue, PropertyValue> map1 = new HashMap<PropertyValue, PropertyValue>() {{
-      put(PropertyValue.create(string1), PropertyValue.create(string2));
-      put(PropertyValue.create("key"), PropertyValue.create(string1));
-    }};
-    Map<PropertyValue, PropertyValue> map2 = new HashMap<PropertyValue, PropertyValue>() {{
-      put(PropertyValue.create(string1), PropertyValue.create(1));
-      put(PropertyValue.create("key"), PropertyValue.create(2));
-    }};
-    Map<PropertyValue, PropertyValue> map3 = new HashMap<PropertyValue, PropertyValue>() {{
-      put(PropertyValue.create(1), PropertyValue.create(string2));
-      put(PropertyValue.create(2), PropertyValue.create(string1));
-    }};
+
+    Map<PropertyValue, PropertyValue> map1 = new HashMap<>();
+    map1.put(PropertyValue.create(string1), PropertyValue.create(string2));
+    map1.put(PropertyValue.create("key"), PropertyValue.create(string1));
+
+    Map<PropertyValue, PropertyValue> map2 = new HashMap<>();
+    map2.put(PropertyValue.create(string1), PropertyValue.create(1));
+    map2.put(PropertyValue.create("key"), PropertyValue.create(2));
+
+    Map<PropertyValue, PropertyValue> map3 = new HashMap<>();
+    map3.put(PropertyValue.create(1), PropertyValue.create(string2));
+    map3.put(PropertyValue.create(2), PropertyValue.create(string1));
 
     Properties props = Properties.create();
     props.set(string1, string2);

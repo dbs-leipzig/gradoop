@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.common;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.BuildIdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.BuildTripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingEdges;

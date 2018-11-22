@@ -23,6 +23,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Maps the {@link LocalClusteringCoefficient.Result} for an undirected graph to a
  * {@code Tuple2<GradoopId, Double>} for further processing.
+ * Checks for and catches the return of {@code Double.NaN} from
+ * {@link LocalClusteringCoefficient.Result#getLocalClusteringCoefficientScore()}
  */
 public class LocalUndirectedCCResultToTupleMap implements
   MapFunction<LocalClusteringCoefficient.Result<GradoopId>, Tuple2<GradoopId, Double>> {
@@ -30,6 +32,10 @@ public class LocalUndirectedCCResultToTupleMap implements
   @Override
   public Tuple2<GradoopId, Double> map(
     LocalClusteringCoefficient.Result<GradoopId> result) throws Exception {
-    return Tuple2.of(result.getVertexId0(), result.getLocalClusteringCoefficientScore());
+    double value = result.getLocalClusteringCoefficientScore();
+    if (Double.isNaN(value)) {
+      value = 0.0;
+    }
+    return Tuple2.of(result.getVertexId0(), value);
   }
 }

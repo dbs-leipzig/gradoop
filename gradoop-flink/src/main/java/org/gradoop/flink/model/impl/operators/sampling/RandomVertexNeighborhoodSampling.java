@@ -21,7 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeWithSourceTarget;
 import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
@@ -35,7 +35,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.FilterVerticesW
 /**
  * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
  * amount and includes all neighbors of those vertices in the sampling. All edges which source-
- * and target-vertices where chosen are sampled, too.
+ * and target-vertices were chosen are sampled, too.
  */
 public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
 

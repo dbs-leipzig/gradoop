@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.api.operators;
 
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 
 /**
  * A marker interface for instances of {@link UnaryGraphToGraphOperator} that

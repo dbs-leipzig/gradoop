@@ -76,7 +76,7 @@ public class RenamePropertyKeysTest extends GradoopFlinkTestBase {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    EPGMEdge edge = 
+    EPGMEdge edge =
         new EdgeFactory().initEdge(edgeId, label, sourceId, targetId, props);
 
     HashMap<String, String> newProps = new HashMap<>();
@@ -110,7 +110,7 @@ public class RenamePropertyKeysTest extends GradoopFlinkTestBase {
     newProps.put("k1", "new_k1");
 
     TransformationFunction<EPGMVertex> renameFunction = new RenamePropertyKeys<>(newProps);
- 
+
     renameFunction.apply(vertex, vertex);
 
     assertThat(vertex.getPropertyCount(), is(2));

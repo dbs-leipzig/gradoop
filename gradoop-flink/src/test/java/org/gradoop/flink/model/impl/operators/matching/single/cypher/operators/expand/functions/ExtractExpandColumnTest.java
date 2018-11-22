@@ -30,8 +30,8 @@ public class ExtractExpandColumnTest {
     GradoopId c = GradoopId.get();
 
     Embedding embedding = new Embedding();
-    embedding.add(a); 
-    embedding.add(b); 
+    embedding.add(a);
+    embedding.add(b);
     embedding.add(c);
 
     ExtractExpandColumn selector = new ExtractExpandColumn(0);

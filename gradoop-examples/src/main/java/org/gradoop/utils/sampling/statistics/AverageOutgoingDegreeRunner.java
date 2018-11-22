@@ -18,7 +18,7 @@ package org.gradoop.utils.sampling.statistics;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.AverageOutgoingDegree;
 import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;

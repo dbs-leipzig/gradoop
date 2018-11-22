@@ -29,6 +29,8 @@ import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
@@ -571,6 +573,38 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return 1-element dataset containing true, iff equal by element data
    */
   DataSet<Boolean> equalsByData(LogicalGraph other);
+
+  /**
+   * Generates all combinations of the supplied vertex grouping keys according to the definition of
+   * the rollUp operation in SQL and uses them together with all edge grouping keys for separate
+   * grouping operations. For example, specifying the vertex grouping keys A, B and C leads to
+   * three differently grouped graphs {A,B,C},{A,B},{A} within the resulting graph collection.
+   *
+   * @param vertexGroupingKeys grouping keys to group vertices
+   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
+   * @param edgeGroupingKeys grouping keys to group edges
+   * @param edgeAggregateFunctions aggregate functions to apply on super edges
+   * @return graph collection containing all resulting graphs
+   */
+  GraphCollection groupVerticesByRollUp(
+    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions);
+
+  /**
+   * Generates all combinations of the supplied edge grouping keys according to the definition of
+   * the rollUp operation in SQL and uses them together with all vertex grouping keys for separate
+   * grouping operations. For example, specifying the edge grouping keys A, B and C leads to
+   * three differently grouped graphs {A,B,C},{A,B},{A} within the resulting graph collection.
+   *
+   * @param vertexGroupingKeys grouping keys to group vertices
+   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
+   * @param edgeGroupingKeys grouping keys to group edges
+   * @param edgeAggregateFunctions aggregate functions to apply on super edges
+   * @return graph collection containing all resulting graphs
+   */
+  GraphCollection groupEdgesByRollUp(
+    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions);
 
   //----------------------------------------------------------------------------
   // Binary Operators
