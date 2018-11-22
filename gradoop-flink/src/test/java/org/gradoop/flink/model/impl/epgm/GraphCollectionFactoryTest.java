@@ -18,27 +18,37 @@ package org.gradoop.flink.model.impl.epgm;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Test;
 
-public class GraphCollectionTest extends GradoopFlinkTestBase {
+/**
+ * Tests for class {@link GraphCollectionFactory}
+ */
+public class GraphCollectionFactoryTest extends GradoopFlinkTestBase {
 
+  /**
+   * Test converting a {@link LogicalGraph}, respectively a arbitrary number of those into a
+   * {@link GraphCollection}
+   *
+   * @throws Exception
+   */
   @Test
   public void testFromGrah() throws Exception {
     GraphCollectionFactory gcf = getConfig().getGraphCollectionFactory();
 
     LogicalGraph lg1 = getLoaderFromString(
       "g1:Community {title : \"Graphs\", memberCount : 23}[" +
-        "    (alice:User)-[:knows]->(bob:User)," +
-        "    (bob)-[e:knows]->(eve:User)," +
-        "    (eve)" +
-        "]").getLogicalGraph();
+        "(alice:User)-[:knows]->(bob:User)," +
+        "(bob)-[e:knows]->(eve:User)," +
+        "(eve)" +
+        "]").getLogicalGraphByVariable("g1");
 
     LogicalGraph lg2 = getLoaderFromString(
       "g2:Community {title : \"Databases\", memberCount : 42}[" +
-        "    (alice)" +
-        "]").getLogicalGraph();
+        "(alice)" +
+        "(bob)-[e]->(eve)" +
+        "]").getLogicalGraphByVariable("g2");
 
     GraphCollection gc1 = gcf.fromDataSets(lg1.getGraphHead(), lg1.getVertices(), lg1.getEdges());
-    GraphCollection gc2 = gcf.fromDataSets(lg2.getGraphHead(), lg2.getVertices(), lg2.getEdges());
-    GraphCollection gcCombined = gc1.union(gc2);
+    GraphCollection gcCombined = gcf.fromDataSets(lg1.getGraphHead().union(lg2.getGraphHead()),
+      lg1.getVertices().union(lg2.getVertices()), lg1.getEdges().union(lg2.getEdges()));
 
     collectAndAssertTrue(gcf.fromGraph(lg1).equalsByGraphData(gc1));
     collectAndAssertTrue(gcf.fromGraph(lg1, lg2).equalsByGraphData(gcCombined));

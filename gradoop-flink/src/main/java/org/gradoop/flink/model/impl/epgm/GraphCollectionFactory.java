@@ -94,9 +94,6 @@ public class GraphCollectionFactory
     DataSet<Vertex> vertices = null;
     DataSet<Edge> edges = null;
 
-    GraphCollection graphCollection = new GraphCollection(layoutFactory.createEmptyCollection(),
-      config);
-
     if (logicalGraphLayouts.length != 0) {
       for (LogicalGraph logicalGraph : logicalGraphLayouts) {
         graphHeads = (graphHeads == null) ? logicalGraph.getGraphHead() :
@@ -105,9 +102,10 @@ public class GraphCollectionFactory
           vertices.union(logicalGraph.getVertices());
         edges = (edges == null) ? logicalGraph.getEdges() : edges.union(logicalGraph.getEdges());
       }
-      graphCollection = fromDataSets(graphHeads, vertices, edges);
+      return fromDataSets(graphHeads, vertices, edges);
     }
-    return graphCollection;
+
+    return createEmptyCollection();
   }
 
   @Override
