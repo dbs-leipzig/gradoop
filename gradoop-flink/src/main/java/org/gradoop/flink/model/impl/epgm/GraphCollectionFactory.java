@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -88,8 +89,13 @@ public class GraphCollectionFactory
     return new GraphCollection(layoutFactory.fromCollections(graphHeads, vertices, edges), config);
   }
 
-  @Override
-  public GraphCollection fromGraph(LogicalGraph... logicalGraphLayout) {
+  /**
+   * Creates a graph collection from one or more given logical graphs.
+   *
+   * @param logicalGraphLayouts one or more logical graphs
+   * @return one- or multi-element graph collection
+   */
+  public GraphCollection fromGraph(LogicalGraph... logicalGraphLayouts) {
     DataSet<GraphHead> graphHeads = null;
     DataSet<Vertex> vertices = null;
     DataSet<Edge> edges = null;
@@ -97,8 +103,8 @@ public class GraphCollectionFactory
     GraphCollection graphCollection = new GraphCollection(layoutFactory.createEmptyCollection(),
       config);
 
-    if (logicalGraphLayout.length != 0) {
-      for (LogicalGraph logicalGraph : logicalGraphLayout) {
+    if (logicalGraphLayouts.length != 0) {
+      for (LogicalGraph logicalGraph : logicalGraphLayouts) {
         graphHeads = (graphHeads == null) ? logicalGraph.getGraphHead() :
           graphHeads.union(logicalGraph.getGraphHead());
         vertices = (vertices == null) ? logicalGraph.getVertices() :
