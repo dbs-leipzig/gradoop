@@ -42,15 +42,27 @@ public class GraphCollectionFactoryTest extends GradoopFlinkTestBase {
 
     LogicalGraph lg2 = getLoaderFromString(
       "g2:Community {title : \"Databases\", memberCount : 42}[" +
-        "(alice)" +
-        "(bob)-[e]->(eve)" +
+        "(alice:User)" +
+        "(bob:User)-[e:knows]->(eve:User)" +
         "]").getLogicalGraphByVariable("g2");
 
+    GraphCollection gc = getLoaderFromString(
+      "g1:Community {title : \"Graphs\", memberCount : 23}[" +
+        "(alice:User)-[:knows]->(bob:User)," +
+        "(bob)-[e:knows]->(eve:User)," +
+        "(eve)" +
+        "]" +
+        "g2:Community {title : \"Databases\", memberCount : 42}[" +
+        "(alice)" +
+        "(bob)-[e]->(eve)" +
+        "]").getGraphCollectionByVariables("g1", "g2");
+
     GraphCollection gc1 = gcf.fromDataSets(lg1.getGraphHead(), lg1.getVertices(), lg1.getEdges());
-    GraphCollection gcCombined = gcf.fromDataSets(lg1.getGraphHead().union(lg2.getGraphHead()),
-      lg1.getVertices().union(lg2.getVertices()), lg1.getEdges().union(lg2.getEdges()));
+
+    gcf.fromGraph(lg1, lg2).print();
+    gc.print();
 
     collectAndAssertTrue(gcf.fromGraph(lg1).equalsByGraphData(gc1));
-    collectAndAssertTrue(gcf.fromGraph(lg1, lg2).equalsByGraphData(gcCombined));
+    collectAndAssertTrue(gcf.fromGraph(lg1, lg2).equalsByGraphData(gc));
   }
 }
