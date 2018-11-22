@@ -44,7 +44,7 @@ import java.util.Map;
  * @param <IT> The type of the records to write.
  */
 public abstract class MultipleFileOutputFormat<IT>
-  extends RichOutputFormat<IT> implements InitializeOnMaster, CleanupWhenUnsuccessful {
+  implements OutputFormat<IT>, CleanupWhenUnsuccessful, InitializeOnMaster {
 
   /**
    * The configuration set with {@link #configure(Configuration)}.
@@ -108,6 +108,18 @@ public abstract class MultipleFileOutputFormat<IT>
   @Override
   public void initializeGlobal(int parallelism) throws IOException {
     this.parallelism = parallelism;
+
+    // Prepare root output directory
+    final FileSystem fs = rootOutputPath.getFileSystem();
+    if (fs.isDistributedFS()) {
+      if(!fs.initOutPathDistFS(rootOutputPath, writeMode, true)) {
+        throw new IOException("Failed to initialize output root directory.");
+      }
+    } else {
+      if (!fs.initOutPathLocalFS(rootOutputPath, writeMode, true)) {
+        throw new IOException("Failed to initialize output root directory.");
+      }
+    }
   }
 
   @Override
@@ -144,6 +156,7 @@ public abstract class MultipleFileOutputFormat<IT>
       format = formatsPerSubdirectory.get(subDirectory);
     } else {
       format = createFormatForDirectory(new Path(rootOutputPath, subDirectory));
+      format.open(taskNumber, numTasks);
       formatsPerSubdirectory.put(subDirectory, format);
     }
     format.writeRecord(record);

@@ -18,6 +18,7 @@ package org.gradoop.flink.io.impl.csv.indexed.functions;
 import org.apache.flink.api.common.io.OutputFormat;
 import org.apache.flink.api.java.io.CsvOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.tuples.CSVElement;
@@ -124,17 +125,15 @@ public class IndexedCSVFileFormat<T extends Tuple & CSVElement> extends
     this.charsetName = charsetName;
   }
 
-
   @Override
   protected OutputFormat<T> createFormatForDirectory(Path directory) throws IOException {
     CsvOutputFormat<T> format = new CsvOutputFormat<>(directory, recordDelimiter, fieldDelimiter);
-    format.initializeGlobal(getRuntimeContext().getNumberOfParallelSubtasks());
-    format.configure(configuration);
-    format.open(getRuntimeContext().getIndexOfThisSubtask(),
-            getRuntimeContext().getNumberOfParallelSubtasks());
+    // no overwrite allows multiple output formats to write concurrently
+    format.setWriteMode(FileSystem.WriteMode.NO_OVERWRITE);
     if (charsetName != null) {
       format.setCharsetName(charsetName);
     }
+    format.configure(configuration);
     return format;
   }
 
