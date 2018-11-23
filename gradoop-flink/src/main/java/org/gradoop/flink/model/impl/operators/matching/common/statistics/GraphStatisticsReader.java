@@ -237,17 +237,17 @@ public abstract class GraphStatisticsReader {
     lines
       .map(line -> line.split(TOKEN_SEPARATOR))
       .forEach(tokens -> {
-          String vertexLabel = tokens[0];
-          String edgeLabel = tokens[1];
-          Long edgeCount = Long.parseLong(tokens[2]);
-          if (mapping.containsKey(vertexLabel)) {
-            mapping.get(vertexLabel).put(edgeLabel, edgeCount);
-          } else {
-            Map<String, Long> value = new HashMap<>();
-            value.put(edgeLabel, edgeCount);
-            mapping.put(vertexLabel, value);
-          }
-        });
+        String vertexLabel = tokens[0];
+        String edgeLabel = tokens[1];
+        Long edgeCount = Long.parseLong(tokens[2]);
+        if (mapping.containsKey(vertexLabel)) {
+          mapping.get(vertexLabel).put(edgeLabel, edgeCount);
+        } else {
+          Map<String, Long> value = new HashMap<>();
+          value.put(edgeLabel, edgeCount);
+          mapping.put(vertexLabel, value);
+        }
+      });
 
     return mapping;
   }

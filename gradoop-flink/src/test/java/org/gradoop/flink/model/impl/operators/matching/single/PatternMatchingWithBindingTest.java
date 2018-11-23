@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single;
 
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.TestData;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public abstract class PatternMatchingWithBindingTest extends PatternMatchingTest
 
   public PatternMatchingWithBindingTest(String testName, String dataGraph, String queryGraph,
     String expectedGraphVariables, String expectedCollection) {
-    super(testName,dataGraph,queryGraph,expectedGraphVariables,expectedCollection);
+    super(testName, dataGraph, queryGraph, expectedGraphVariables, expectedCollection);
   }
 
   @Test
@@ -51,7 +51,7 @@ public abstract class PatternMatchingWithBindingTest extends PatternMatchingTest
     List<GraphHead> graphHeads = getImplementation(queryGraph, false).execute(db).
       getGraphHeads().collect();
 
-    for(GraphHead graphHead : graphHeads) {
+    for (GraphHead graphHead : graphHeads) {
       assertTrue(graphHead.hasProperty(PatternMatching.VARIABLE_MAPPING_KEY));
     }
 

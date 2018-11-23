@@ -57,7 +57,7 @@ public abstract class MultipleFileOutputFormat<IT>
   /**
    * Behavior for creating output directories.
    */
-  public static enum OutputDirectoryMode {
+  public enum OutputDirectoryMode {
 
     /** A directory is always created, regardless of number of write tasks. */
     ALWAYS,

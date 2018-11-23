@@ -19,9 +19,8 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsLocalFSReader;
 import org.junit.Rule;
@@ -285,13 +284,13 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getDistinctVertexProperties( "name"), is(9L));
-    assertThat(statistics.getDistinctVertexProperties("gender"), is(2L));
-    assertThat(statistics.getDistinctVertexProperties("city"), is(3L));
-    assertThat(statistics.getDistinctVertexProperties( "age"), is(4L));
-    assertThat(statistics.getDistinctVertexProperties( "speaks"), is(1L));
-    assertThat(statistics.getDistinctVertexProperties( "locIP"), is(1L));
-    assertThat(statistics.getDistinctVertexProperties("title"), is(2L));
+    assertThat(statistics.getDistinctVertexProperties("name"),    is(9L));
+    assertThat(statistics.getDistinctVertexProperties("gender"),  is(2L));
+    assertThat(statistics.getDistinctVertexProperties("city"),    is(3L));
+    assertThat(statistics.getDistinctVertexProperties("age"),     is(4L));
+    assertThat(statistics.getDistinctVertexProperties("speaks"),  is(1L));
+    assertThat(statistics.getDistinctVertexProperties("locIP"),   is(1L));
+    assertThat(statistics.getDistinctVertexProperties("title"),   is(2L));
   }
 
 }

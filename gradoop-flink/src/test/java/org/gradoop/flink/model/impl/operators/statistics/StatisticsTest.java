@@ -19,7 +19,7 @@ import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.junit.Test;
 
@@ -300,11 +300,11 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
-    assertThat(cache.get(Tuple2.of("Forum","hasModerator")), is(2L));
-    assertThat(cache.get(Tuple2.of("Forum","hasTag")), is(4L));
-    assertThat(cache.get(Tuple2.of("Person","hasInterest")), is(4L));
-    assertThat(cache.get(Tuple2.of("Person","knows")), is(10L));
-    assertThat(cache.get(Tuple2.of("Forum","hasMember")), is(4L));
+    assertThat(cache.get(Tuple2.of("Forum", "hasModerator")), is(2L));
+    assertThat(cache.get(Tuple2.of("Forum", "hasTag")), is(4L));
+    assertThat(cache.get(Tuple2.of("Person", "hasInterest")), is(4L));
+    assertThat(cache.get(Tuple2.of("Person", "knows")), is(10L));
+    assertThat(cache.get(Tuple2.of("Forum", "hasMember")), is(4L));
   }
 
   @Test
@@ -321,11 +321,11 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
-    assertThat(cache.get(Tuple2.of("Tag","hasTag")), is(4L));
-    assertThat(cache.get(Tuple2.of("Tag","hasInterest")), is(4L));
-    assertThat(cache.get(Tuple2.of("Person","knows")), is(10L));
-    assertThat(cache.get(Tuple2.of("Person","hasModerator")), is(2L));
-    assertThat(cache.get(Tuple2.of("Person","hasMember")), is(4L));
+    assertThat(cache.get(Tuple2.of("Tag", "hasTag")), is(4L));
+    assertThat(cache.get(Tuple2.of("Tag", "hasInterest")), is(4L));
+    assertThat(cache.get(Tuple2.of("Person", "knows")), is(10L));
+    assertThat(cache.get(Tuple2.of("Person", "hasModerator")), is(2L));
+    assertThat(cache.get(Tuple2.of("Person", "hasMember")), is(4L));
   }
 
 
@@ -342,8 +342,8 @@ public class StatisticsTest extends GradoopFlinkTestBase {
     result.forEach(e -> cache.put(e.getObject(), e.getCount()));
 
     assertThat(result.size(), is(2));
-    assertThat(cache.get(Tuple2.of("knows","since")), is(3L));
-    assertThat(cache.get(Tuple2.of("hasModerator","since")), is(1L));
+    assertThat(cache.get(Tuple2.of("knows", "since")), is(3L));
+    assertThat(cache.get(Tuple2.of("hasModerator", "since")), is(1L));
   }
 
   @Test
@@ -360,14 +360,14 @@ public class StatisticsTest extends GradoopFlinkTestBase {
 
     assertThat(result.size(), is(8));
 
-    assertThat(cache.get(Tuple2.of("Person","name")), is(6L));
-    assertThat(cache.get(Tuple2.of("Person","gender")), is(2L));
-    assertThat(cache.get(Tuple2.of("Person","city")), is(3L));
-    assertThat(cache.get(Tuple2.of("Person","age")), is(4L));
-    assertThat(cache.get(Tuple2.of("Person","speaks")), is(1L));
-    assertThat(cache.get(Tuple2.of("Person","locIP")), is(1L));
-    assertThat(cache.get(Tuple2.of("Tag","name")), is(3L));
-    assertThat(cache.get(Tuple2.of("Forum","title")), is(2L));
+    assertThat(cache.get(Tuple2.of("Person", "name")), is(6L));
+    assertThat(cache.get(Tuple2.of("Person", "gender")), is(2L));
+    assertThat(cache.get(Tuple2.of("Person", "city")), is(3L));
+    assertThat(cache.get(Tuple2.of("Person", "age")), is(4L));
+    assertThat(cache.get(Tuple2.of("Person", "speaks")), is(1L));
+    assertThat(cache.get(Tuple2.of("Person", "locIP")), is(1L));
+    assertThat(cache.get(Tuple2.of("Tag", "name")), is(3L));
+    assertThat(cache.get(Tuple2.of("Forum", "title")), is(2L));
   }
 
   @Test

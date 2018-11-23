@@ -61,9 +61,9 @@ public class CombinePropertyValueDistribution<K> implements
     return values.stream()
       .map(triple -> triple.f1)
       .reduce((lhs, rhs) -> {
-          lhs.addAll(rhs);
-          return lhs;
-        })
+        lhs.addAll(rhs);
+        return lhs;
+      })
       .get();
   }
 }

@@ -1,14 +1,43 @@
 <?xml version="1.0"?>
 
 <!DOCTYPE suppressions PUBLIC
-     "-//Puppy Crawl//DTD Suppressions 1.0//EN"
-     "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
   <suppress checks="ParameterNumberCheck"
              files="GraphStatistics.java"
              lines="0-9999"/>
   <suppress checks="IllegalCatch"
-            files="GellyAlgorithm.java"
-            lines="60-70"/>
+            files="BaseGellyAlgorithm.java"
+            lines="36-42"/>
+  <suppress checks="IllegalCatch"
+            files="GradoopGellyAlgorithm.java"
+            lines="70-77"/>
+
+  <!-- less restrictive checkstyle for tests -->
+  <suppress checks="JavadocMethod"
+            files="[/\\]src[/\\]test[/\\]java[/\\]"/>
+  <suppress checks="JavadocVariable"
+            files="[/\\]src[/\\]test[/\\]java[/\\]"/>
+  <suppress checks="JavadocType"
+            files="[/\\]src[/\\]test[/\\]java[/\\]"/>
+  <suppress checks="AvoidStarImport"
+            files="[/\\]src[/\\]test[/\\]java[/\\]"/>
+  <suppress checks="JavadocPackage"
+            files="[/\\]src[/\\]test[/\\]java[/\\]"/>
+  <suppress checks="IllegalCatch"
+            files="[/\\]src[/\\]test[/\\]java[/\\]"/>
+  <suppress checks="ConstantName"
+            files="[/\\]src[/\\]test[/\\]java[/\\]"/>
+  <suppress checks="LineLength"
+            files="[/\\]src[/\\]test[/\\]java[/\\]"/>
+  <suppress checks="MethodLength"
+            files="[/\\]src[/\\]test[/\\]java[/\\]"/>
+  <suppress checks="VisibilityModifier"
+            files="[/\\]src[/\\]test[/\\]java[/\\]"/>
+  <suppress checks="DeclarationOrder"
+            files="[/\\]src[/\\]test[/\\]java[/\\]"/>
+  <suppress checks="StaticVariableName"
+            files="[/\\]src[/\\]test[/\\]java[/\\]"/>
 </suppressions>

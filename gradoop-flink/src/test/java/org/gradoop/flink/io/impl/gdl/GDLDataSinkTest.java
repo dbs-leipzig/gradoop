@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.gradoop.flink.io.impl.gdl;
 
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,7 +30,7 @@ public class GDLDataSinkTest extends GradoopFlinkTestBase {
   @Test
   public void testWrite() throws Exception {
     FlinkAsciiGraphLoader testLoader = getSocialNetworkLoader();
-    GraphCollection expectedCollection = testLoader.getGraphCollectionByVariables("g0","g1","g2","g3");
+    GraphCollection expectedCollection = testLoader.getGraphCollectionByVariables("g0", "g1", "g2", "g3");
 
     String path = temporaryFolder.getRoot().getPath() + "/graph.gdl";
     DataSink gdlsink = new GDLDataSink(path);
@@ -40,7 +39,7 @@ public class GDLDataSinkTest extends GradoopFlinkTestBase {
 
     FlinkAsciiGraphLoader sinkLoader = getLoaderFromFile(path);
     GraphCollection sinkCollection = sinkLoader
-      .getGraphCollectionByVariables("g0","g1","g2","g3");
+      .getGraphCollectionByVariables("g0", "g1", "g2", "g3");
 
     collectAndAssertTrue(sinkCollection.equalsByGraphElementData(expectedCollection));
   }

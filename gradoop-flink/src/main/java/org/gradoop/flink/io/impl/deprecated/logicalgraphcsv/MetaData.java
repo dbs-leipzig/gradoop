@@ -68,9 +68,9 @@ public class MetaData {
     return config.getExecutionEnvironment()
       .readTextFile(path)
       .map(line -> {
-          String[] tokens = line.split(CSVConstants.TOKEN_DELIMITER, 3);
-          return Tuple3.of(tokens[0], tokens[1], tokens[2]);
-        })
+        String[] tokens = line.split(CSVConstants.TOKEN_DELIMITER, 3);
+        return Tuple3.of(tokens[0], tokens[1], tokens[2]);
+      })
       .returns(new TypeHint<Tuple3<String, String, String>>() { });
   }
 

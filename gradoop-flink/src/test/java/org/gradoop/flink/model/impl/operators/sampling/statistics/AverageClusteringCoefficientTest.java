@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.sampling.statistics;
 
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Before;
 import org.junit.Test;
@@ -121,7 +121,7 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
     double average = head.getPropertyValue(AverageClusteringCoefficient.PROPERTY_KEY_AVERAGE)
       .getDouble();
     assertEquals("graph has wrong average value, should be 0.2916",
-      ((1d/6d) + (1d/2d) + (1d/2d) + 0d) / 4d, average, 0.0);
+      ((1d / 6d) + (1d / 2d) + (1d / 2d) + 0d) / 4d, average, 0.00001);
   }
 
   /**

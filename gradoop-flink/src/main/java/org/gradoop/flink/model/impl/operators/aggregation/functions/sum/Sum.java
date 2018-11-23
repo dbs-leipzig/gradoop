@@ -20,14 +20,12 @@ import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
- * Superclass of summing aggregate functions
+ * Interface of summing aggregate functions
  */
-public abstract class Sum implements AggregateFunction {
+public interface Sum extends AggregateFunction {
 
   @Override
-  public PropertyValue aggregate(
-    PropertyValue aggregate, PropertyValue increment) {
-
+  default PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
     return PropertyValueUtils.Numeric.add(aggregate, increment);
   }
 }

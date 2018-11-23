@@ -20,8 +20,8 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.deprecated.json.functions.EdgeToJSON;
 import org.gradoop.flink.io.impl.deprecated.json.functions.GraphHeadToJSON;
 import org.gradoop.flink.io.impl.deprecated.json.functions.VertexToJSON;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;

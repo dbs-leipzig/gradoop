@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
 import org.gradoop.flink.model.impl.functions.tuple.ToIdWithLabel;
 import org.gradoop.flink.model.impl.functions.tuple.Tuple2ToWithCount;
@@ -41,5 +41,10 @@ public class TargetLabelAndEdgeLabelDistribution
       .where(0).equalTo(0)
       .with(new BothLabels()))
       .map(new Tuple2ToWithCount<>());
+  }
+
+  @Override
+  public String getName() {
+    return TargetLabelAndEdgeLabelDistribution.class.getName();
   }
 }

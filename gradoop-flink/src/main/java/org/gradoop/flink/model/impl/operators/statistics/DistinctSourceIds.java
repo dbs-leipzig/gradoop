@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.operators.count.Count;
 
@@ -33,5 +33,10 @@ public class DistinctSourceIds implements UnaryGraphToValueOperator<DataSet<Long
         .map(new SourceId<>())
         .distinct()
     );
+  }
+
+  @Override
+  public String getName() {
+    return DistinctSourceIds.class.getName();
   }
 }

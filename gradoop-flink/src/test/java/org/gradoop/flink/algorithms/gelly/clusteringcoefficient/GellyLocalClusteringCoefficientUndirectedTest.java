@@ -16,7 +16,7 @@
 package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 import java.util.List;
 
@@ -50,8 +50,9 @@ public class GellyLocalClusteringCoefficientUndirectedTest
     validateGraphProperties(nonConnectedGraph);
     List<Vertex> vertices = nonConnectedGraph.getVertices().collect();
     for (Vertex v : vertices) {
-      assertEquals("Wrong local value for not connected vertex: " + v.getId().toString() +
-          ", should be 0",0d,
+      assertEquals(
+        "Wrong local value for not connected vertex: " + v.getId().toString() + ", should be 0",
+        0d,
         v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
     }
   }
@@ -83,8 +84,8 @@ public class GellyLocalClusteringCoefficientUndirectedTest
     List<Vertex> vertices = result.getVertices().collect();
     for (Vertex v : vertices) {
       if (v.getPropertyValue("id").getInt() == 0) {
-        assertEquals("vertex with id 0 has wrong local value, should be 0.3333", (1d/3d),
-          v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
+        assertEquals("vertex with id 0 has wrong local value, should be 0.3333", 1d / 3d,
+          v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.00001);
       }
       if (v.getPropertyValue("id").getInt() == 1) {
         assertEquals("vertex with id 1 has wrong local value, should be 1", 1d,

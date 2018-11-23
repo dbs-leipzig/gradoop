@@ -17,7 +17,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.basic;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,50 +48,42 @@ public abstract class BasicPatternsTransactionalFSMTestBase extends GradoopFlink
 
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
-    return Arrays.asList(
-      new String[] {
+    return Arrays.asList(new String[] {
         "Single_Edge",
         BasicPatternsData.FSM_SINGLE_EDGE,
         "g1,g2,g3,g4",
         "s1"
-      },
-      new String[] {
+    }, new String[] {
         "Simple_Graph",
         BasicPatternsData.FSM_SIMPLE_GRAPH,
         "g1,g2,g3",
         "s1,s2,s3,s4,s5"
-      },
-      new String[] {
+    }, new String[] {
         "Parallel_Edges",
         BasicPatternsData.FSM_PARALLEL_EDGES,
         "g1,g2,g3",
         "s1,s2"
-      },
-      new String[] {
+    }, new String[] {
         "Loop",
         BasicPatternsData.FSM_LOOP,
         "g1,g2,g3,g4",
         "s1,s2,s3"
-      },
-      new String[] {
+    }, new String[] {
         "Diamond",
         BasicPatternsData.FSM_DIAMOND,
         "g1,g2,g3",
         "s1,s2,s3,s4,s5,s6,s7"
-      },
-      new String[] {
+    }, new String[] {
         "Circle_with_Branch",
         BasicPatternsData.FSM_CIRCLE_WITH_BRANCH,
         "g1,g2,g3",
         "s1,s2,s3,s4,s5,s6,s7,s8,s9,s10"
-      },
-      new String[] {
+    }, new String[] {
         "Colored Circle",
         BasicPatternsData.MULTI_LABELED_CIRCLE,
         "g1,g2",
         "s1,s2,s3,s4,s5,s6,s7"
-      }
-    );
+    });
   }
 
   @Test
