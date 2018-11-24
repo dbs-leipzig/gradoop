@@ -16,6 +16,8 @@ org.gradoop.common.model.impl.properties
 org.gradoop.common.util
 org.gradoop.dataintegration.importer
 org.gradoop.dataintegration.transformation
+org.gradoop.dataintegration.transformation.config
+org.gradoop.dataintegration.transformation.functions
 org.gradoop.examples
 org.gradoop.examples.aggregation
 org.gradoop.examples.aggregation.functions
