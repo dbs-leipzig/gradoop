@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains all implementations of the graph property transformation operator.
+ * This package contains operators which are executing structural changes to a gradoop graph.
  */
-package org.gradoop.flink.model.impl.operators.propertytransformation;
+package org.gradoop.dataintegration.operators.impl.transformation;

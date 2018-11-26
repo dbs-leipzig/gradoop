@@ -13,23 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.functions;
-
-import org.gradoop.common.model.impl.properties.PropertyValue;
-
-import java.io.Serializable;
-
 /**
- * Interface for all functions which are used for property transformation operations.
+ * Contains all classes related to property transformation.
  */
-public interface PropertyTransformationFunction extends Serializable {
-
-  /**
-   * Returns a changed property value based on the value before the transformation.
-   *
-   * @param property current property
-   * @return transformed property
-   */
-  PropertyValue execute(PropertyValue property);
-
-}
+package org.gradoop.dataintegration.operators.impl.propertytransformation;

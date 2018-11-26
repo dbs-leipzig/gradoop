@@ -16,4 +16,4 @@
 /**
  * This package contains functions used for graph transformations.
  */
-package org.gradoop.dataintegration.transformation.functions;
+package org.gradoop.dataintegration.operators.impl.transformation.functions;

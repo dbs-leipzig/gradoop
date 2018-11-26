@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.propertytransformation;
+package org.gradoop.dataintegration.operators.impl.propertytransformation.functions;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
+import org.gradoop.dataintegration.operators.api.propertytransformation.PropertyTransformationFunction;
 
 /**
  * A sample property transformation function which can be used for the property transformation
  * operator.
  *
- * @see org.gradoop.flink.model.impl.operators.propertytransformation.PropertyTransformation
- * @see org.gradoop.flink.model.api.functions.PropertyTransformationFunction
+ * @see org.gradoop.dataintegration.operators.impl.propertytransformation.PropertyTransformation
+ * @see org.gradoop.dataintegration.operators.api.propertytransformation.PropertyTransformationFunction
  */
 public class DivideBy implements PropertyTransformationFunction {
   /**

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.transformation;
+package org.gradoop.dataintegration.operators.impl.transformation;
 
 import org.apache.flink.util.Preconditions;
 import org.gradoop.common.model.impl.id.GradoopId;

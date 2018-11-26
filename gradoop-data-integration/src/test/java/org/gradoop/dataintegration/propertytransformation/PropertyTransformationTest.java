@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.propertytransformation;
+package org.gradoop.dataintegration.propertytransformation;
 
+import org.gradoop.dataintegration.operators.api.propertytransformation.PropertyTransformationFunction;
+import org.gradoop.dataintegration.operators.impl.propertytransformation.PropertyTransformation;
+import org.gradoop.dataintegration.operators.impl.propertytransformation.functions.DivideBy;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -377,63 +379,6 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
         "a",
         null,
         true));
-
-    collectAndAssertTrue(result.equalsByData(expected));
-  }
-
-   /**
-   * Executes a property transformation on graphHeads using the {@link LogicalGraph} object and
-   * checks if the result is correct.
-   *
-   * @throws Exception If the execution fails.
-   */
-  @Test
-  public void testGHTransformationUsingLG() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-
-    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
-
-    LogicalGraph expected = loader.getLogicalGraphByVariable("g12");
-
-    LogicalGraph result = original.transformGraphHeadProperties("a", DIVISION);
-
-    collectAndAssertTrue(result.equalsByData(expected));
-  }
-
-  /**
-   * Executes a property transformation on vertices using the {@link LogicalGraph} object and
-   * checks if the result is correct.
-   *
-   * @throws Exception If the execution fails.
-   */
-  @Test
-  public void testVertexTransformationUsingLG() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-
-    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
-
-    LogicalGraph expected = loader.getLogicalGraphByVariable("g13");
-
-    LogicalGraph result = original.transformVertexProperties("a", DIVISION);
-
-    collectAndAssertTrue(result.equalsByData(expected));
-  }
-
-  /**
-   * Executes a property transformation on edges using the {@link LogicalGraph} object and
-   * checks if the result is correct.
-   *
-   * @throws Exception If the execution fails.
-   */
-  @Test
-  public void testEdgeTransformationUsingLG() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-
-    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
-
-    LogicalGraph expected = loader.getLogicalGraphByVariable("g14");
-
-    LogicalGraph result = original.transformEdgeProperties("a", DIVISION);
 
     collectAndAssertTrue(result.equalsByData(expected));
   }
