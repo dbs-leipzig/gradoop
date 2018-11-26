@@ -22,10 +22,6 @@ import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.tuples.CSVElement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 /**
  * This is an OutputFormat to serialize {@link Tuple}s to text by their labels.
@@ -37,8 +33,8 @@ import java.io.IOException;
  *
  * references to: org.apache.flink.api.java.io.CSVOutputFormat
  */
-public class IndexedCSVFileFormat<T extends Tuple & CSVElement> extends
-  MultipleFileOutputFormat<T> {
+public class IndexedCSVFileFormat<T extends Tuple & CSVElement>
+  extends MultipleFileOutputFormat<T> {
 
   /**
    * The default line delimiter if no one is set.
@@ -49,13 +45,6 @@ public class IndexedCSVFileFormat<T extends Tuple & CSVElement> extends
    * The default field delimiter if no is set.
    */
   public static final String DEFAULT_FIELD_DELIMITER = CSVConstants.TOKEN_DELIMITER;
-
-  // --------------------------------------------------------------------------------
-
-  /**
-   * The logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(IndexedCSVFileFormat.class);
 
   // --------------------------------------------------------------------------------
 
@@ -126,9 +115,10 @@ public class IndexedCSVFileFormat<T extends Tuple & CSVElement> extends
   }
 
   @Override
-  protected OutputFormat<T> createFormatForDirectory(Path directory) throws IOException {
+  protected OutputFormat<T> createFormatForDirectory(Path directory) {
     CsvOutputFormat<T> format = new CsvOutputFormat<>(directory, recordDelimiter, fieldDelimiter);
-    // no overwrite allows multiple output formats to write concurrently
+    // NO_OVERWRITE allows multiple output formats to write concurrently
+    // OVERWRITE would delete the label directory including already written files of other workers
     format.setWriteMode(FileSystem.WriteMode.NO_OVERWRITE);
     if (charsetName != null) {
       format.setCharsetName(charsetName);

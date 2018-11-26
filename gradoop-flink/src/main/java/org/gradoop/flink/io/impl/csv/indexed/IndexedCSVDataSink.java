@@ -113,17 +113,26 @@ public class IndexedCSVDataSink extends CSVBase implements DataSink {
     }
 
     IndexedCSVFileFormat<CSVGraphHead> graphHeadFormat = new IndexedCSVFileFormat<>(
-      new Path(getGraphHeadPath()), CSVConstants.ROW_DELIMITER, CSVConstants.TOKEN_DELIMITER);
+      new Path(getGraphHeadPath()),
+      CSVConstants.ROW_DELIMITER,
+      CSVConstants.TOKEN_DELIMITER);
+
     graphHeadFormat.setWriteMode(writeMode);
     csvGraphHeads.output(graphHeadFormat);
 
     IndexedCSVFileFormat<CSVVertex> vertexFormat = new IndexedCSVFileFormat<>(
-      new Path(getVertexPath()), CSVConstants.ROW_DELIMITER, CSVConstants.TOKEN_DELIMITER);
+      new Path(getVertexPath()),
+      CSVConstants.ROW_DELIMITER,
+      CSVConstants.TOKEN_DELIMITER);
+
     vertexFormat.setWriteMode(writeMode);
     csvVertices.output(vertexFormat);
 
     IndexedCSVFileFormat<CSVEdge> edgeFormat = new IndexedCSVFileFormat<>(
-      new Path(getEdgePath()), CSVConstants.ROW_DELIMITER, CSVConstants.TOKEN_DELIMITER);
+      new Path(getEdgePath()),
+      CSVConstants.ROW_DELIMITER,
+      CSVConstants.TOKEN_DELIMITER);
+
     edgeFormat.setWriteMode(writeMode);
     csvEdges.output(edgeFormat);
   }
