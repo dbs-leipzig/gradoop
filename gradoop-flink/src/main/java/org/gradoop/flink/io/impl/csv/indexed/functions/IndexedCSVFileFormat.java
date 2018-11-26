@@ -117,8 +117,10 @@ public class IndexedCSVFileFormat<T extends Tuple & CSVElement>
   @Override
   protected OutputFormat<T> createFormatForDirectory(Path directory) {
     CsvOutputFormat<T> format = new CsvOutputFormat<>(directory, recordDelimiter, fieldDelimiter);
-    // NO_OVERWRITE allows multiple output formats to write concurrently
-    // OVERWRITE would delete the label directory including already written files of other workers
+    // OVERWRITE in a distributed fs would delete the label directory including already written
+    // files of other workers. In a local fs it does not delete the directory but it would not
+    // overwrite files of workers not having a specific label.
+    // initializeGlobal() takes care of OVERWRITE.
     format.setWriteMode(FileSystem.WriteMode.NO_OVERWRITE);
     if (charsetName != null) {
       format.setCharsetName(charsetName);

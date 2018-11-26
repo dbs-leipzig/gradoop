@@ -112,11 +112,19 @@ public abstract class MultipleFileOutputFormat<IT>
     final FileSystem fs = rootOutputPath.getFileSystem();
     if (fs.isDistributedFS()) {
       if (!fs.initOutPathDistFS(rootOutputPath, writeMode, true)) {
-        throw new IOException("Failed to initialize output root directory.");
+        throw new IOException("Failed to initialize output root directory: " + rootOutputPath);
       }
     } else {
+      if (writeMode == FileSystem.WriteMode.OVERWRITE && fs.getFileStatus(rootOutputPath).isDir()) {
+        try {
+          fs.delete(rootOutputPath, true);
+        } catch (IOException e) {
+          throw new IOException("Could not remove existing output root directory: " +
+            rootOutputPath, e);
+        }
+      }
       if (!fs.initOutPathLocalFS(rootOutputPath, writeMode, true)) {
-        throw new IOException("Failed to initialize output root directory.");
+        throw new IOException("Failed to initialize output root directory: " + rootOutputPath);
       }
     }
   }
