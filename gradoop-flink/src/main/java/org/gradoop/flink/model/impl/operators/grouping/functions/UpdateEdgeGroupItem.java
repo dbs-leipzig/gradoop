@@ -26,8 +26,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVer
 public class UpdateEdgeGroupItem
   implements JoinFunction<EdgeGroupItem, VertexWithSuperVertex, EdgeGroupItem> {
   /**
-   * Field in {@link EdgeGroupItem} which is overridden by the group
-   * representative id.
+   * Field in {@link EdgeGroupItem} which is overridden by the group representative id.
    */
   private final int field;
   /**
@@ -39,9 +38,6 @@ public class UpdateEdgeGroupItem
     this.field = field;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public EdgeGroupItem join(EdgeGroupItem edge, VertexWithSuperVertex idTuple) throws Exception {
     edge.setField(idTuple.getSuperVertexId(), field);

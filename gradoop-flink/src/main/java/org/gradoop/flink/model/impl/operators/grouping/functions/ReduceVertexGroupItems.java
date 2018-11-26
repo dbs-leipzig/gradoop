@@ -77,17 +77,15 @@ public class ReduceVertexGroupItems
       // collect updated vertex item
       collector.collect(reuseTuple);
 
-      if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
-        aggregate(groupItem.getAggregateValues(), reuseTuple.getLabelGroup().getAggregators());
-      }
+      reuseTuple.getLabelGroup().aggregate(groupItem.getAggregateValues());
     }
 
     VertexGroupItem superVertex = createSuperVertexTuple(
       superVertexId,
       groupLabel,
       groupPropertyValues,
-      reuseTuple.getLabelGroup().getAggregators());
-    resetAggregators(superVertex.getLabelGroup().getAggregators());
+      reuseTuple.getLabelGroup().getAggregateValueList());
+    superVertex.getLabelGroup().resetAggregateValues();
     collector.collect(superVertex);
   }
 }
