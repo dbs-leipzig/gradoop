@@ -21,10 +21,10 @@ import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MaxAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.MinAggregator;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -80,11 +80,11 @@ public class Composition extends AbstractRunner {
     LogicalGraph summary = transformed.groupBy(
       Collections.singletonList("decade"),
       Arrays.asList(
-        new CountAggregator("count"),
-        new MinAggregator("yob", "min_yob"),
-        new MaxAggregator("yob", "max_yob")),
+        new Count("count"),
+        new MinVertexProperty("yob", "min_yob"),
+        new MaxVertexProperty("yob", "max_yob")),
       Collections.emptyList(),
-      Collections.singletonList(new CountAggregator("count")),
+      Collections.singletonList(new Count("count")),
       GroupingStrategy.GROUP_COMBINE);
 
     // use the decade as label information for the DOT sink

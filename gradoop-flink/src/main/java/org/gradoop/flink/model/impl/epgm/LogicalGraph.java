@@ -47,7 +47,6 @@ import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
@@ -420,8 +419,8 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
    */
   @Override
   public LogicalGraph groupBy(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
+    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions,
     GroupingStrategy groupingStrategy) {
 
     Objects.requireNonNull(vertexGroupingKeys, "missing vertex grouping key(s)");
@@ -436,10 +435,10 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
       builder.addEdgeGroupingKeys(edgeGroupingKeys);
     }
     if (vertexAggregateFunctions != null) {
-      vertexAggregateFunctions.forEach(builder::addVertexAggregator);
+      vertexAggregateFunctions.forEach(builder::addVertexAggregateFunction);
     }
     if (edgeAggregateFunctions != null) {
-      edgeAggregateFunctions.forEach(builder::addEdgeAggregator);
+      edgeAggregateFunctions.forEach(builder::addEdgeAggregateFunction);
     }
     return callForGraph(builder.build());
   }
@@ -464,8 +463,8 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
 
   @Override
   public GraphCollection groupVerticesByRollUp(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions) {
+    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions) {
     if (vertexGroupingKeys == null || vertexGroupingKeys.isEmpty()) {
       throw new IllegalArgumentException("Missing vertex grouping key(s).");
     }
@@ -476,8 +475,8 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
 
   @Override
   public GraphCollection groupEdgesByRollUp(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions) {
+    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions) {
     if (edgeGroupingKeys == null || edgeGroupingKeys.isEmpty()) {
       throw new IllegalArgumentException("Missing edge grouping key(s).");
     }
