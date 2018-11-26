@@ -115,7 +115,7 @@ public abstract class MultipleFileOutputFormat<IT>
         throw new IOException("Failed to initialize output root directory: " + rootOutputPath);
       }
     } else {
-      if (writeMode == FileSystem.WriteMode.OVERWRITE && fs.getFileStatus(rootOutputPath).isDir()) {
+      if (writeMode == FileSystem.WriteMode.OVERWRITE) {
         try {
           fs.delete(rootOutputPath, true);
         } catch (IOException e) {
