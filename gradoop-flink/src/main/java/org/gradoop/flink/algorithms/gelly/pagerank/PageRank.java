@@ -52,9 +52,22 @@ public class PageRank extends GradoopGellyAlgorithm<NullValue, NullValue> {
    * Whether to include "zero-degree" vertices in the PageRank computation and result. These
    * vertices only affect the scores of other vertices indirectly through influencing the initial
    * proportional score of {@code (1 - damping factor) / number of vertices}.
-   * If set to {@code false}, these vertices will NOT be part of the result graph.
+   * If set to {@code false}, these vertices will NOT be part of the computation and the returned
+   * result graph.
    */
   private final boolean includeZeroDegrees;
+
+  /**
+   * Constructor for Page Rank with fixed number of iterations and {@link #includeZeroDegrees}
+   * set to {@code false}.
+   *
+   * @param propertyKey Property key to store the page rank in.
+   * @param dampingFactor Damping factor.
+   * @param iterations    Number of iterations.
+   */
+  public PageRank(String propertyKey, double dampingFactor, int iterations) {
+    this(propertyKey, dampingFactor, iterations, false);
+  }
 
   /**
    * Constructor for Page Rank with fixed number of iterations.
