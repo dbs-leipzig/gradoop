@@ -20,7 +20,6 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.HashMap;
@@ -66,10 +65,7 @@ public class SetAggregateProperty
     defaultValues = new HashMap<>();
 
     for (AggregateFunction func : aggregateFunctions) {
-      defaultValues.put(func.getAggregatePropertyKey(),
-        func instanceof AggregateDefaultValue ?
-          ((AggregateDefaultValue) func).getDefaultValue() :
-          PropertyValue.NULL_VALUE);
+      defaultValues.put(func.getAggregatePropertyKey(), AggregateUtil.getDefaultAggregate(func));
     }
   }
 
