@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.dataintegration.importer.csv;
 
 import static org.hamcrest.core.Is.is;
@@ -19,50 +34,50 @@ import org.junit.Test;
  */
 public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
-    /**
-     * Test if the properties of the imported vertices works correct.
-     * @throws Exception
-     */
-    @Test
-    public void testImport() throws Exception {
+  /**
+   * Test if the properties of the imported vertices works correct.
+   * @throws Exception
+   */
+  @Test
+  public void testImport() throws Exception {
 
-        String csvPath = getFilePath("/csv/input.csv");
-        String delimiter = ";";
+    String csvPath = getFilePath("/csv/input.csv");
+    String delimiter = ";";
 
-        ExecutionEnvironment env = getExecutionEnvironment();
+    ExecutionEnvironment env = getExecutionEnvironment();
 
-        MinimalCSVImporter importVertexImporter = new MinimalCSVImporter(csvPath, delimiter, getConfig());
+    MinimalCSVImporter importVertexImporter = new MinimalCSVImporter(csvPath, delimiter, getConfig());
 
-        DataSet<ImportVertex<Long>> importVertex = importVertexImporter.importVertices();
+    DataSet<ImportVertex<Long>> importVertex = importVertexImporter.importVertices();
 
-        List<ImportVertex<Long>> lv = new ArrayList<>();
-        importVertex.output(new LocalCollectionOutputFormat<>(lv));
+    List<ImportVertex<Long>> lv = new ArrayList<>();
+    importVertex.output(new LocalCollectionOutputFormat<>(lv));
 
-        env.execute();
+    env.execute();
 
-        assertThat(lv.size(), is(3));
+    assertThat(lv.size(), is(3));
 
-        for(ImportVertex<Long> v : lv) {
-            if (v.f2.get("name").toString().equals("foo")) {
-                assertThat(v.f2.size(), is(4));
-                assertThat(v.f2.get("name").toString(), is("foo"));
-                assertThat(v.f2.get("value1").toString(), is("453"));
-                assertThat(v.f2.get("value2").toString(), is("true"));
-                assertThat(v.f2.get("value3").toString(), is("71.03"));
-            } else if (v.f2.get("name").toString().equals("bar")) {
-                assertThat(v.f2.size(), is(4));
-                assertThat(v.f2.get("name").toString(), is("bar"));
-                assertThat(v.f2.get("value1").toString(), is("76"));
-                assertThat(v.f2.get("value2").toString(), is("false"));
-                assertThat(v.f2.get("value3").toString(), is("33.4"));
-            } else if (v.f2.get("name").toString().equals("bla")) {
-                assertThat(v.f2.size(), is(3));
-                assertThat(v.f2.get("name").toString(), is("bla"));
-                assertThat(v.f2.get("value1").toString(), is("4568"));
-                assertThat(v.f2.get("value3").toString(), is("9.42"));
-            } else {
-                fail();
-            }
-        }
+    for(ImportVertex<Long> v : lv) {
+      if (v.f2.get("name").toString().equals("foo")) {
+        assertThat(v.f2.size(), is(4));
+        assertThat(v.f2.get("name").toString(), is("foo"));
+        assertThat(v.f2.get("value1").toString(), is("453"));
+        assertThat(v.f2.get("value2").toString(), is("true"));
+        assertThat(v.f2.get("value3").toString(), is("71.03"));
+      } else if (v.f2.get("name").toString().equals("bar")) {
+        assertThat(v.f2.size(), is(4));
+        assertThat(v.f2.get("name").toString(), is("bar"));
+        assertThat(v.f2.get("value1").toString(), is("76"));
+        assertThat(v.f2.get("value2").toString(), is("false"));
+        assertThat(v.f2.get("value3").toString(), is("33.4"));
+      } else if (v.f2.get("name").toString().equals("bla")) {
+        assertThat(v.f2.size(), is(3));
+        assertThat(v.f2.get("name").toString(), is("bla"));
+        assertThat(v.f2.get("value1").toString(), is("4568"));
+        assertThat(v.f2.get("value3").toString(), is("9.42"));
+      } else {
+        fail();
+      }
     }
+  }
 }
