@@ -16,12 +16,12 @@
 package org.gradoop.flink.model.impl.operators.rollup;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -66,10 +66,10 @@ public class RollUpTest extends GradoopFlinkTestBase {
     GraphCollection expected = loader.getGraphCollection();
 
     List<String> vertexGK = Collections.singletonList("age");
-    List<PropertyValueAggregator> vertexAGG =
-      Collections.singletonList(new CountAggregator("count"));
+    List<AggregateFunction> vertexAGG =
+      Collections.singletonList(new Count("count"));
     List<String> edgeGK = Collections.emptyList();
-    List<PropertyValueAggregator> edgeAGG = Collections.emptyList();
+    List<AggregateFunction> edgeAGG = Collections.emptyList();
 
     GraphCollection output = input.groupVerticesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
 
@@ -99,9 +99,9 @@ public class RollUpTest extends GradoopFlinkTestBase {
     GraphCollection expected = loader.getGraphCollection();
 
     List<String> vertexGK = Collections.emptyList();
-    List<PropertyValueAggregator> vertexAGG = Collections.emptyList();
+    List<AggregateFunction> vertexAGG = Collections.emptyList();
     List<String> edgeGK = Collections.singletonList(Grouping.LABEL_SYMBOL);
-    List<PropertyValueAggregator> edgeAGG = Collections.singletonList(new CountAggregator("count"));
+    List<AggregateFunction> edgeAGG = Collections.singletonList(new Count("count"));
 
     GraphCollection output = input.groupEdgesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
 
@@ -185,10 +185,10 @@ public class RollUpTest extends GradoopFlinkTestBase {
     GraphCollection expected = loader.getGraphCollection();
 
     List<String> vertexGK = Arrays.asList("age", "gender", "city");
-    List<PropertyValueAggregator> vertexAGG =
-      Collections.singletonList(new CountAggregator("count"));
+    List<AggregateFunction> vertexAGG =
+      Collections.singletonList(new Count("count"));
     List<String> edgeGK = Collections.emptyList();
-    List<PropertyValueAggregator> edgeAGG = Collections.emptyList();
+    List<AggregateFunction> edgeAGG = Collections.emptyList();
 
     GraphCollection output = input.groupVerticesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
 
@@ -235,10 +235,10 @@ public class RollUpTest extends GradoopFlinkTestBase {
     GraphCollection expected = loader.getGraphCollection();
 
     List<String> vertexGK = Collections.emptyList();
-    List<PropertyValueAggregator> vertexAGG = Collections.emptyList();
+    List<AggregateFunction> vertexAGG = Collections.emptyList();
     List<String> edgeGK = Arrays.asList(Grouping.LABEL_SYMBOL,
       "since", "vertexCount");
-    List<PropertyValueAggregator> edgeAGG = Collections.singletonList(new CountAggregator("count"));
+    List<AggregateFunction> edgeAGG = Collections.singletonList(new Count("count"));
 
     GraphCollection output = input.groupEdgesByRollUp(vertexGK, vertexAGG, edgeGK, edgeAGG);
 
