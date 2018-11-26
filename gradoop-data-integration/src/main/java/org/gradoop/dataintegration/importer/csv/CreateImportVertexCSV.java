@@ -39,16 +39,16 @@ public class CreateImportVertexCSV<K extends Comparable<K>>
    */
   private ImportVertex<K> vertex;
   /**
-   * Constructor
+   * Create a new CreateImportVertexCSV function
    */
   public CreateImportVertexCSV() {
     this.vertex = new ImportVertex<>();
+    vertex.setLabel(GradoopConstants.DEFAULT_VERTEX_LABEL);
   }
 
   @Override
   public ImportVertex<K> map(final Tuple2<K, Properties> value) throws Exception {
     vertex.setId(value.f0);
-    vertex.setLabel(GradoopConstants.DEFAULT_VERTEX_LABEL);
     vertex.setProperties(value.f1);
     return vertex;
   }
