@@ -20,6 +20,7 @@ as a proof of concept implementation and far from production ready.
 
 ##### Further Information (articles and talks)
 
+* [Declarative and distributed graph analytics with GRADOOP, VLDB Demo, August 2018](http://www.vldb.org/pvldb/vol11/p2006-junghanns.pdf)
 * [Cypher-based Graph Pattern Matching in Apache Flink, FlinkForward, September 2017](https://youtu.be/dZ8_v_P1j98)
 * [Cypher-based Graph Pattern Matching in GRADOOP, SIGMOD GRADES Workshop, May 2017](https://dbs.uni-leipzig.de/file/GRADES17_Cypher_in_Gradoop.pdf)
 * [DIMSpan - Transactional Frequent Subgraph Mining with Distributed In-Memory Dataflow Systems, arXiv, March 2017](https://arxiv.org/pdf/1703.01910.pdf)
