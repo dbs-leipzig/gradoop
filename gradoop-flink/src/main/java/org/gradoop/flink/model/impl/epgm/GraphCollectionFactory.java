@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -31,8 +32,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Responsible for creating instances of {@link GraphCollection} based on a specific
- * {@link GraphCollectionLayout}.
+ * Responsible for creating instances of {@link GraphCollection} based on a specific {@link
+ * GraphCollectionLayout}.
  */
 public class GraphCollectionFactory
   implements BaseGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection> {
@@ -69,13 +70,15 @@ public class GraphCollectionFactory
   }
 
   @Override
-  public GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
+  public GraphCollection fromDataSets(
+    DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
     DataSet<Edge> edges) {
     return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, edges), config);
   }
 
   @Override
-  public GraphCollection fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
+  public GraphCollection fromIndexedDataSets(
+    Map<String, DataSet<GraphHead>> graphHeads,
     Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
     GraphCollectionLayout<GraphHead, Vertex, Edge> layout = layoutFactory
       .fromIndexedDataSets(graphHeads, vertices, edges);
@@ -83,13 +86,19 @@ public class GraphCollectionFactory
   }
 
   @Override
-  public GraphCollection fromCollections(Collection<GraphHead> graphHeads,
+  public GraphCollection fromCollections(
+    Collection<GraphHead> graphHeads,
     Collection<Vertex> vertices, Collection<Edge> edges) {
     return new GraphCollection(layoutFactory.fromCollections(graphHeads, vertices, edges), config);
   }
 
   @Override
-  public GraphCollection fromGraph(LogicalGraph... logicalGraphLayouts) {
+  public GraphCollection fromGraph(LogicalGraph logicalGraphLayout) {
+    return new GraphCollection(layoutFactory.fromGraphLayout(logicalGraphLayout), config);
+  }
+
+  @Override
+  public GraphCollection fromGraphs(LogicalGraph... logicalGraphLayouts) {
     DataSet<GraphHead> graphHeads = null;
     DataSet<Vertex> vertices = null;
     DataSet<Edge> edges = null;
@@ -102,7 +111,8 @@ public class GraphCollectionFactory
           vertices.union(logicalGraph.getVertices());
         edges = (edges == null) ? logicalGraph.getEdges() : edges.union(logicalGraph.getEdges());
       }
-      return fromDataSets(graphHeads, vertices, edges);
+      return fromDataSets(graphHeads.distinct(new Id<GraphHead>()),
+        vertices.distinct(new Id<Vertex>()), edges.distinct(new Id<Edge>()));
     }
 
     return createEmptyCollection();
@@ -114,7 +124,8 @@ public class GraphCollectionFactory
   }
 
   @Override
-  public GraphCollection fromTransactions(DataSet<GraphTransaction> transactions,
+  public GraphCollection fromTransactions(
+    DataSet<GraphTransaction> transactions,
     GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
     GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
     return new GraphCollection(layoutFactory

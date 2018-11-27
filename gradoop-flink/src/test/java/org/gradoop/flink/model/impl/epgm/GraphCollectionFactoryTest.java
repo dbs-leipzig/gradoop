@@ -16,53 +16,46 @@
 package org.gradoop.flink.model.impl.epgm;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Tests for class {@link GraphCollectionFactory}
  */
 public class GraphCollectionFactoryTest extends GradoopFlinkTestBase {
+  FlinkAsciiGraphLoader loader;
+  GraphCollectionFactory factory;
 
-  /**
-   * Test converting a {@link LogicalGraph}, respectively a arbitrary number of those into a
-   * {@link GraphCollection}
-   *
-   * @throws Exception
-   */
-  @Test
-  public void testFromGrah() throws Exception {
-    GraphCollectionFactory gcf = getConfig().getGraphCollectionFactory();
-
-    LogicalGraph lg1 = getLoaderFromString(
+  @Before
+  public void setUp() {
+    loader = getLoaderFromString(
       "g1:Community {title : \"Graphs\", memberCount : 23}[" +
-        "(alice:User)-[:knows]->(bob:User)," +
-        "(bob)-[e:knows]->(eve:User)," +
-        "(eve)" +
-        "]").getLogicalGraphByVariable("g1");
-
-    LogicalGraph lg2 = getLoaderFromString(
-      "g2:Community {title : \"Databases\", memberCount : 42}[" +
-        "(alice:User)" +
-        "(bob:User)-[e:knows]->(eve:User)" +
-        "]").getLogicalGraphByVariable("g2");
-
-    GraphCollection gc = getLoaderFromString(
-      "g1:Community {title : \"Graphs\", memberCount : 23}[" +
-        "(alice:User)-[:knows]->(bob:User)," +
-        "(bob)-[e:knows]->(eve:User)," +
-        "(eve)" +
+        "(alice:User {age:23})-[:knows]->(bob:User)," +
+        "(bob)-[e1:knows]->(eve:User)," +
         "]" +
         "g2:Community {title : \"Databases\", memberCount : 42}[" +
-        "(alice)" +
-        "(bob)-[e]->(eve)" +
-        "]").getGraphCollectionByVariables("g1", "g2");
+        "(alice:User {age:23)" +
+        "(peter:User {age:28)" +
+        "(alice)-[e2:hates]->(peter)" +
+        "]");
 
-    GraphCollection gc1 = gcf.fromDataSets(lg1.getGraphHead(), lg1.getVertices(), lg1.getEdges());
+    factory = getConfig().getGraphCollectionFactory();
+  }
 
-    gcf.fromGraph(lg1, lg2).print();
-    gc.print();
+  @Test
+  public void testFromGraphMethod() throws Exception {
+    collectAndAssertTrue(factory.fromGraph(loader.getLogicalGraphByVariable("g1"))
+      .equalsByGraphElementData(loader.getGraphCollectionByVariables("g1")));
+  }
 
-    collectAndAssertTrue(gcf.fromGraph(lg1).equalsByGraphData(gc1));
-    collectAndAssertTrue(gcf.fromGraph(lg1, lg2).equalsByGraphData(gc));
+  @Test
+  public void testFromGraphsMethod() throws Exception {
+    collectAndAssertTrue(
+      factory.createEmptyCollection().equalsByGraphElementData(factory.fromGraphs()));
+
+    collectAndAssertTrue(factory
+      .fromGraphs(loader.getLogicalGraphByVariable("g1"), loader.getLogicalGraphByVariable("g2")).
+        equalsByGraphElementData(loader.getGraphCollection()));
   }
 }
