@@ -22,7 +22,7 @@ import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 
 /**
- * (vertexId, properties) => ImportVertex
+ * Create an ImportVertex for each tuple of an id and properties.
  *
  * Forwarded fields:
  *
