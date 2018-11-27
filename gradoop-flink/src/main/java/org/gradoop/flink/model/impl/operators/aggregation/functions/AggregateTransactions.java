@@ -19,10 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.util.HashMap;
@@ -38,18 +35,18 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
   /**
    * Set of aggregate vertex functions.
    */
-  private final Set<VertexAggregateFunction> vertexAggregateFunctions;
+  private final Set<AggregateFunction> vertexAggregateFunctions;
   /**
    * Set of aggregate edge functions.
    */
-  private final Set<EdgeAggregateFunction> edgeAggregateFunctions;
+  private final Set<AggregateFunction> edgeAggregateFunctions;
   /**
    * Set of aggregate default values.
    */
   private final Map<String, PropertyValue> aggregateDefaultValues;
 
   /**
-   * Creates a new instance.
+   * Creates a new instance of a AggregateTransactions map function.
    *
    * @param aggregateFunctions vertex or edge aggregate functions with possible default value
    */
@@ -57,29 +54,25 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
     // initialization logic to avoid instanceOf checking during execution
 
     vertexAggregateFunctions = aggregateFunctions.stream()
-      .filter(f -> f instanceof VertexAggregateFunction)
-      .map(VertexAggregateFunction.class::cast)
+      .filter(AggregateFunction::isVertexAggregation)
       .collect(Collectors.toSet());
 
     edgeAggregateFunctions = aggregateFunctions.stream()
-      .filter(f -> f instanceof EdgeAggregateFunction)
-      .map(EdgeAggregateFunction.class::cast)
+      .filter(AggregateFunction::isEdgeAggregation)
       .collect(Collectors.toSet());
 
     aggregateDefaultValues = new HashMap<>();
     for (AggregateFunction func : aggregateFunctions) {
       aggregateDefaultValues.put(func.getAggregatePropertyKey(),
-        func instanceof AggregateDefaultValue ?
-          ((AggregateDefaultValue) func).getDefaultValue() :
-          PropertyValue.NULL_VALUE);
+        AggregateUtil.getDefaultAggregate(func));
     }
   }
 
   @Override
   public GraphTransaction map(GraphTransaction graphTransaction) throws Exception {
-
-    Map<String, PropertyValue> aggregate = aggregateVertices(graphTransaction);
-    aggregate.putAll(aggregateEdges(graphTransaction));
+    Map<String, PropertyValue> aggregate = new HashMap<>();
+    aggregate = aggregateVertices(aggregate, graphTransaction);
+    aggregate = aggregateEdges(aggregate, graphTransaction);
 
     aggregateDefaultValues.forEach(aggregate::putIfAbsent);
 
@@ -90,14 +83,14 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
   /**
    * Applies the aggregate functions on the vertices of the given graph transaction.
    *
+   * @param aggregate map to hold the aggregate values
    * @param graphTransaction graph transaction
    * @return final vertex aggregate value
    */
-  private Map<String, PropertyValue> aggregateVertices(GraphTransaction graphTransaction) {
-    Map<String, PropertyValue> aggregate = new HashMap<>();
-
+  private Map<String, PropertyValue> aggregateVertices(Map<String, PropertyValue> aggregate,
+                                                       GraphTransaction graphTransaction) {
     for (Vertex vertex : graphTransaction.getVertices()) {
-      aggregate = AggregateUtil.vertexIncrement(aggregate, vertex, vertexAggregateFunctions);
+      aggregate = AggregateUtil.increment(aggregate, vertex, vertexAggregateFunctions);
     }
     return aggregate;
   }
@@ -105,14 +98,14 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
   /**
    * Applies the aggregate functions on the edges of the given graph transaction.
    *
+   * @param aggregate map to hold the aggregate values
    * @param graphTransaction graph transaction
    * @return final edge aggregate value
    */
-  private Map<String, PropertyValue> aggregateEdges(GraphTransaction graphTransaction) {
-    Map<String, PropertyValue> aggregate = new HashMap<>();
-
+  private Map<String, PropertyValue> aggregateEdges(Map<String, PropertyValue> aggregate,
+                                                    GraphTransaction graphTransaction) {
     for (Edge edge : graphTransaction.getEdges()) {
-      aggregate = AggregateUtil.edgeIncrement(aggregate, edge, edgeAggregateFunctions);
+      aggregate = AggregateUtil.increment(aggregate, edge, edgeAggregateFunctions);
     }
     return aggregate;
   }

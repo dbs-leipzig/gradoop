@@ -16,10 +16,9 @@
 package org.gradoop.flink.io.impl.csv.indexed;
 
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.junit.Test;
 
@@ -35,13 +34,9 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testRead() throws Exception {
-    String csvPath = VertexLabeledEdgeListDataSourceTest.class
-      .getResource("/data/csv/input_indexed")
-      .getFile();
+    String csvPath = getFilePath("/data/csv/input_indexed");
 
-    String gdlPath = IndexedCSVDataSourceTest.class
-      .getResource("/data/csv/expected/expected_graph_collection.gdl")
-      .getFile();
+    String gdlPath = getFilePath("/data/csv/expected/expected_graph_collection.gdl");
 
     DataSource dataSource = new IndexedCSVDataSource(csvPath, getConfig());
     GraphCollection input = dataSource.getGraphCollection();
@@ -59,13 +54,9 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testReadSingleGraph() throws Exception {
-    String csvPath = VertexLabeledEdgeListDataSourceTest.class
-      .getResource("/data/csv/input_indexed")
-      .getFile();
+    String csvPath = getFilePath("/data/csv/input_indexed");
 
-    String gdlPath = IndexedCSVDataSourceTest.class
-      .getResource("/data/csv/expected/expected_graph_collection.gdl")
-      .getFile();
+    String gdlPath = getFilePath("/data/csv/expected/expected_graph_collection.gdl");
 
     DataSource dataSource = new IndexedCSVDataSource(csvPath, getConfig());
     LogicalGraph input = dataSource.getLogicalGraph();
@@ -84,13 +75,9 @@ public class IndexedCSVDataSourceTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testEmptyEdgeRead() throws Exception {
-    String csvPath = VertexLabeledEdgeListDataSourceTest.class
-      .getResource("/data/csv/input_indexed_no_edges")
-      .getFile();
+    String csvPath = getFilePath("/data/csv/input_indexed_no_edges");
 
-    String gdlPath = IndexedCSVDataSourceTest.class
-      .getResource("/data/csv/expected/expected_no_edges.gdl")
-      .getFile();
+    String gdlPath = getFilePath("/data/csv/expected/expected_no_edges.gdl");
 
     DataSource dataSource = new IndexedCSVDataSource(csvPath, getConfig());
     GraphCollection input = dataSource.getGraphCollection();

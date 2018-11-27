@@ -23,6 +23,9 @@ import org.apache.flink.test.util.TestBaseUtils;
 import org.apache.flink.test.util.TestEnvironment;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
@@ -38,6 +41,9 @@ import scala.concurrent.duration.FiniteDuration;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
@@ -66,17 +72,26 @@ public abstract class GradoopFlinkTestBase {
    */
   private GradoopFlinkConfig config;
 
-  private LogicalGraphLayoutFactory graphLayoutFactory;
+  /**
+   * The factory to create a logical graph layout.
+   */
+  private LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> graphLayoutFactory;
 
-  private GraphCollectionLayoutFactory collectionLayoutFactory;
+  /**
+   * The factory to create a graph collection layout.
+   */
+  private GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> collectionLayoutFactory;
 
+  /**
+   * Creates a new instance of {@link GradoopFlinkTestBase}.
+   */
   public GradoopFlinkTestBase() {
     TestEnvironment testEnv = new TestEnvironment(CLUSTER, DEFAULT_PARALLELISM, false);
     // makes ExecutionEnvironment.getExecutionEnvironment() return this instance
     testEnv.setAsContext();
     this.env = testEnv;
-    setGraphLayoutFactory(new GVEGraphLayoutFactory());
-    setCollectionLayoutFactory(new GVECollectionLayoutFactory());
+    this.graphLayoutFactory = new GVEGraphLayoutFactory();
+    this.collectionLayoutFactory = new GVECollectionLayoutFactory();
   }
 
   /**
@@ -96,8 +111,8 @@ public abstract class GradoopFlinkTestBase {
   protected GradoopFlinkConfig getConfig() {
     if (config == null) {
       setConfig(GradoopFlinkConfig.createConfig(getExecutionEnvironment(),
-        getGraphLayoutFactory(),
-        getCollectionLayoutFactory()));
+        graphLayoutFactory,
+        collectionLayoutFactory));
     }
     return config;
   }
@@ -109,19 +124,8 @@ public abstract class GradoopFlinkTestBase {
     this.config = config;
   }
 
-  protected LogicalGraphLayoutFactory getGraphLayoutFactory() {
-    return graphLayoutFactory;
-  }
-
-  protected void setGraphLayoutFactory(LogicalGraphLayoutFactory graphLayoutFactory) {
-    this.graphLayoutFactory = graphLayoutFactory;
-  }
-
-  protected GraphCollectionLayoutFactory getCollectionLayoutFactory() {
-    return collectionLayoutFactory;
-  }
-
-  protected void setCollectionLayoutFactory(GraphCollectionLayoutFactory collectionLayoutFactory) {
+  protected void setCollectionLayoutFactory(
+    GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> collectionLayoutFactory) {
     this.collectionLayoutFactory = collectionLayoutFactory;
   }
 
@@ -233,5 +237,16 @@ public abstract class GradoopFlinkTestBase {
     return getExecutionEnvironment()
       .fromElements(dummy)
       .filter(new False<>());
+  }
+
+  /**
+   * Returns the encoded file path to a resource.
+   *
+   * @param  relPath the relative path to the resource
+   * @return encoded file path
+   */
+  protected String getFilePath(String relPath) throws UnsupportedEncodingException {
+    return URLDecoder.decode(
+      getClass().getResource(relPath).getFile(), StandardCharsets.UTF_8.name());
   }
 }

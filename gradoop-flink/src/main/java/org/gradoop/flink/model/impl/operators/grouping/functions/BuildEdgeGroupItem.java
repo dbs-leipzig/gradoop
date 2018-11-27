@@ -27,7 +27,6 @@ import java.util.List;
 /**
  * Takes an EPGM edge as input and creates a {@link EdgeGroupItem} which
  * contains only necessary information for further processing.
- *
  */
 @FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1;")
 @FunctionAnnotation.ReadFields("label;properties")
@@ -43,8 +42,8 @@ public class BuildEdgeGroupItem
   /**
    * Creates map function.
    *
-   * @param useLabel                        true, if vertex label shall be used
-   * @param edgeLabelGroups                 stores grouping properties for edge labels
+   * @param useLabel true, if vertex label shall be used
+   * @param edgeLabelGroups stores grouping properties for edge labels
    */
   public BuildEdgeGroupItem(boolean useLabel, List<LabelGroup> edgeLabelGroups) {
     super(useLabel, edgeLabelGroups);

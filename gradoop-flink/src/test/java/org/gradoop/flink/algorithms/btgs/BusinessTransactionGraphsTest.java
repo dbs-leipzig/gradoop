@@ -16,8 +16,8 @@
 package org.gradoop.flink.algorithms.btgs;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -28,9 +28,7 @@ public class BusinessTransactionGraphsTest  extends GradoopFlinkTestBase {
 
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(getConfig());
 
-    loader.initDatabaseFromFile(
-      BusinessTransactionGraphsTest.class
-        .getResource("/data/gdl/iig_btgs.gdl").getFile());
+    loader.initDatabaseFromFile(getFilePath("/data/gdl/iig_btgs.gdl"));
 
     LogicalGraph iig = loader.getLogicalGraphByVariable("iig");
 

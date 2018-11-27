@@ -38,46 +38,52 @@ import java.util.Objects;
 /**
  * Responsible for creating a {@link GVELayout} from given data.
  */
-public class GVECollectionLayoutFactory extends GVEBaseFactory implements GraphCollectionLayoutFactory {
+public class GVECollectionLayoutFactory extends GVEBaseFactory
+  implements GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> {
 
   @Override
-  public GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads,
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromDataSets(DataSet<GraphHead> graphHeads,
     DataSet<Vertex> vertices) {
     return fromDataSets(graphHeads, vertices,
       createEdgeDataSet(new ArrayList<>(0)));
   }
 
   @Override
-  public GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromDataSets(
+    DataSet<GraphHead> graphHeads,
+    DataSet<Vertex> vertices,
     DataSet<Edge> edges) {
     return create(graphHeads, vertices, edges);
   }
 
   @Override
-  public GraphCollectionLayout fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
-    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromIndexedDataSets(
+    Map<String, DataSet<GraphHead>> graphHeads,
+    Map<String, DataSet<Vertex>> vertices,
+    Map<String, DataSet<Edge>> edges) {
     return create(graphHeads, vertices, edges);
   }
 
   @Override
-  public GraphCollectionLayout fromCollections(Collection<GraphHead> graphHeads,
-    Collection<Vertex> vertices, Collection<Edge> edges) {
-    Objects.requireNonNull(graphHeads, "GraphHead collection was null");
-    Objects.requireNonNull(vertices, "Vertex collection was null");
-    Objects.requireNonNull(edges, "Edge collection was null");
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromCollections(
+    Collection<GraphHead> graphHeads,
+    Collection<Vertex> vertices,
+    Collection<Edge> edges) {
     return fromDataSets(
-      createGraphHeadDataSet(graphHeads),
-      createVertexDataSet(vertices),
-      createEdgeDataSet(edges));
+      createGraphHeadDataSet(Objects.requireNonNull(graphHeads, "GraphHead collection was null")),
+      createVertexDataSet(Objects.requireNonNull(vertices, "Vertex collection was null")),
+      createEdgeDataSet(Objects.requireNonNull(edges, "Edge collection was null")));
   }
 
   @Override
-  public GraphCollectionLayout fromGraphLayout(LogicalGraphLayout graph) {
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromGraphLayout(
+    LogicalGraphLayout<GraphHead, Vertex, Edge> graph) {
     return fromDataSets(graph.getGraphHead(), graph.getVertices(), graph.getEdges());
   }
 
   @Override
-  public GraphCollectionLayout fromTransactions(DataSet<GraphTransaction> transactions) {
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromTransactions(
+    DataSet<GraphTransaction> transactions) {
     GroupReduceFunction<Vertex, Vertex> vertexReducer = new First<>();
     GroupReduceFunction<Edge, Edge> edgeReducer = new First<>();
 
@@ -85,7 +91,8 @@ public class GVECollectionLayoutFactory extends GVEBaseFactory implements GraphC
   }
 
   @Override
-  public GraphCollectionLayout fromTransactions(DataSet<GraphTransaction> transactions,
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromTransactions(
+    DataSet<GraphTransaction> transactions,
     GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
     GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
 
@@ -105,7 +112,7 @@ public class GVECollectionLayoutFactory extends GVEBaseFactory implements GraphC
   }
 
   @Override
-  public GraphCollectionLayout createEmptyCollection() {
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> createEmptyCollection() {
     Collection<GraphHead> graphHeads = new ArrayList<>();
     Collection<Vertex> vertices = new ArrayList<>();
     Collection<Edge> edges = new ArrayList<>();

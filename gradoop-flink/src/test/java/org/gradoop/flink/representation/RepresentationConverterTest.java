@@ -34,7 +34,6 @@ import java.util.Set;
 
 public class RepresentationConverterTest extends GradoopFlinkTestBase {
 
-
   @Test
   public void testGraphTransactionAdjacencyList() throws Exception {
 
@@ -71,16 +70,11 @@ public class RepresentationConverterTest extends GradoopFlinkTestBase {
 
     Properties loopProperties = new Properties();
 
-    edges.add(
-      new Edge(GradoopId.get(), "loop", v1.getId(), v1.getId(), loopProperties, graphIds));
-    edges.add(
-      new Edge(GradoopId.get(), "m", v1.getId(), v2.getId(), null, graphIds));
-    edges.add(
-      new Edge(GradoopId.get(), "m", v1.getId(), v2.getId(), null, graphIds));
-    edges.add(
-      new Edge(GradoopId.get(), "m", v2.getId(), v1.getId(), null, graphIds));
+    edges.add(new Edge(GradoopId.get(), "loop", v1.getId(), v1.getId(), loopProperties, graphIds));
+    edges.add(new Edge(GradoopId.get(), "m", v1.getId(), v2.getId(), null, graphIds));
+    edges.add(new Edge(GradoopId.get(), "m", v1.getId(), v2.getId(), null, graphIds));
+    edges.add(new Edge(GradoopId.get(), "m", v2.getId(), v1.getId(), null, graphIds));
 
     return new GraphTransaction(graphHead, vertices, edges);
   }
-
 }

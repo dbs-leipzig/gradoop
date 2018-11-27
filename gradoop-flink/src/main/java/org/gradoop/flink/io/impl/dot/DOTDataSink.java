@@ -20,8 +20,8 @@ import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.io.IOException;
@@ -81,7 +81,7 @@ public class DOTDataSink implements DataSink {
 
     graphCollection
       .getGraphTransactions()
-      .map(tx -> dotFileFormat.format(tx))
+      .map(dotFileFormat::format)
       .output(graphvizWriter)
       .setParallelism(1);
   }
@@ -102,7 +102,7 @@ public class DOTDataSink implements DataSink {
      * @param outputPath graphviz dot file name
      * @param charset encoding
      */
-    public GraphvizWriter(Path outputPath, String charset) {
+    GraphvizWriter(Path outputPath, String charset) {
       super(outputPath, charset);
     }
 
@@ -110,7 +110,7 @@ public class DOTDataSink implements DataSink {
      * see super constructor.
      * @param outputPath graphviz dot file name
      */
-    public GraphvizWriter(Path outputPath) {
+    GraphvizWriter(Path outputPath) {
       super(outputPath);
     }
 

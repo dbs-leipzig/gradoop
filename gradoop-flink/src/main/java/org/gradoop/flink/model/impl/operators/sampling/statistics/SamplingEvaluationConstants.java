@@ -78,6 +78,21 @@ public class SamplingEvaluationConstants {
   public static final String FILE_CONNECTED_COMPONENTS_DIST = "connected_components_distribution";
 
   /**
+   * Filename for the saved average clustering coefficient of the graph
+   */
+  public static final String FILE_CLUSTERING_COEFFICIENT_AVERAGE = "clustering_coefficient_average";
+
+  /**
+   * Filename for the saved global clustering coefficient of the graph
+   */
+  public static final String FILE_CLUSTERING_COEFFICIENT_GLOBAL = "clustering_coefficient_global";
+
+  /**
+   * Filename for the saved triangle count of the graph
+   */
+  public static final String FILE_TRIANGLE_COUNT = "triangle_count";
+
+  /**
    * private Constructor
    */
   private SamplingEvaluationConstants() { }

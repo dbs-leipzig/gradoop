@@ -61,12 +61,9 @@ public class GradoopIdTest {
     GradoopId originalId = GradoopId.get();
     GradoopId fromStringId = GradoopId.fromString(originalId.toString());
 
-    assertTrue(
-      "reconstruction from string failed",
-      originalId.equals(fromStringId)
-    );
+    assertEquals("reconstruction from string failed", originalId, fromStringId);
   }
-  
+
   @Test
   public void testGetRawBytes() {
     GradoopId originalId = GradoopId.get();
@@ -88,12 +85,14 @@ public class GradoopIdTest {
 
     buffer.putInt(bsonId.getTimestamp());
 
-    byte b1,b2,b3;
+    byte b1;
+    byte b2;
+    byte b3;
 
     int machineId = bsonId.getMachineIdentifier();
-    b3 = (byte)(machineId & 0xFF);
-    b2 = (byte)((machineId >> 8) & 0xFF);
-    b1 = (byte)((machineId >> 16) & 0xFF);
+    b3 = (byte) (machineId & 0xFF);
+    b2 = (byte) ((machineId >> 8) & 0xFF);
+    b1 = (byte) ((machineId >> 16) & 0xFF);
     buffer.put(b1);
     buffer.put(b2);
     buffer.put(b3);
@@ -101,9 +100,9 @@ public class GradoopIdTest {
     buffer.putShort(bsonId.getProcessIdentifier());
 
     int counter = bsonId.getCounter();
-    b3 = (byte)(counter & 0xFF);
-    b2 = (byte)((counter >> 8) & 0xFF);
-    b1 = (byte)((counter >> 16) & 0xFF);
+    b3 = (byte) (counter & 0xFF);
+    b2 = (byte) ((counter >> 8) & 0xFF);
+    b1 = (byte) ((counter >> 16) & 0xFF);
     buffer.put(b1);
     buffer.put(b2);
     buffer.put(b3);
@@ -111,5 +110,18 @@ public class GradoopIdTest {
     GradoopId newId = GradoopId.fromByteArray(bytes);
 
     assertEquals(expectedId, newId);
+  }
+
+  /**
+   * Test the {@link GradoopId#min(GradoopId, GradoopId)} method.
+   */
+  @Test
+  public void testMin() {
+    GradoopId first = GradoopId.get();
+    GradoopId second = GradoopId.get();
+    GradoopId min = GradoopId.min(first, second);
+    assertTrue("First ID is smaller then the minimum.", first.compareTo(min) >= 0);
+    assertTrue("Second ID is smaller then the minimum.", second.compareTo(min) >= 0);
+    assertTrue(first == min || second == min);
   }
 }

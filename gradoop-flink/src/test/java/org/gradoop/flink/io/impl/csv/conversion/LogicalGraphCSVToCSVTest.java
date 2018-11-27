@@ -21,7 +21,7 @@ import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.deprecated.logicalgraphcsv.LogicalGraphCSVDataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -41,9 +41,7 @@ public class LogicalGraphCSVToCSVTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testConversion() throws Exception {
-    String csvPath = LogicalGraphCSVToCSVTest.class
-      .getResource("/data/csv/input_deprecated")
-      .getFile();
+    String csvPath = getFilePath("/data/csv/input_deprecated");
 
     DataSource logicalGraphCSVDataSource = new LogicalGraphCSVDataSource(csvPath, getConfig());
 

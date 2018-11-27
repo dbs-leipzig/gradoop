@@ -46,7 +46,7 @@ public class ElementSelectorComparableTest {
     assertNotEquals(PropertyValue.create("42"), wrapper.evaluate(embedding, metaData));
   }
 
-  @Test(expected= NoSuchElementException.class)
+  @Test(expected = NoSuchElementException.class)
   public void testThrowErrorIfElementNotPresent() {
     ElementSelector selector = new ElementSelector("a");
     ElementSelectorComparable wrapper = new ElementSelectorComparable(selector);

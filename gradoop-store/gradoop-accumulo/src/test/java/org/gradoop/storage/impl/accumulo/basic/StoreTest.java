@@ -87,7 +87,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * accumulo graph store test
+ * Accumulo graph store test
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class StoreTest extends AccumuloStoreTestBase {
@@ -103,7 +103,7 @@ public class StoreTest extends AccumuloStoreTestBase {
    * closes the store, opens it and reads/validates the data again.
    */
   @Test
-  public void test01_writeCloseOpenReadTest() throws AccumuloSecurityException, AccumuloException,
+  public void writeCloseOpenReadTest() throws AccumuloSecurityException, AccumuloException,
     IOException {
     GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(TEST01);
 
@@ -135,7 +135,7 @@ public class StoreTest extends AccumuloStoreTestBase {
    * flushes the tables and reads/validates the data.
    */
   @Test
-  public void test02_writeFlushReadTest() throws AccumuloSecurityException, AccumuloException,
+  public void writeFlushReadTest() throws AccumuloSecurityException, AccumuloException,
     IOException {
     GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(TEST02);
 
@@ -168,7 +168,7 @@ public class StoreTest extends AccumuloStoreTestBase {
    * equality.
    */
   @Test
-  public void test03_iteratorTest() throws IOException, AccumuloSecurityException,
+  public void iteratorTest() throws IOException, AccumuloSecurityException,
     AccumuloException {
     GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(TEST03);
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
@@ -211,7 +211,7 @@ public class StoreTest extends AccumuloStoreTestBase {
    * Tries to add an unsupported property type {@link Queue} as property value.
    */
   @Test(expected = UnsupportedTypeException.class)
-  public void test04_wrongPropertyTypeTest() throws AccumuloSecurityException, AccumuloException {
+  public void wrongPropertyTypeTest() throws AccumuloSecurityException, AccumuloException {
     GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(TEST04);
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
@@ -236,8 +236,8 @@ public class StoreTest extends AccumuloStoreTestBase {
    */
   @SuppressWarnings("Duplicates")
   @Test
-  public void test05_propertyTypeTest() throws AccumuloSecurityException, AccumuloException,
-    IOException {
+  public void propertyTypeTest()
+    throws AccumuloSecurityException, AccumuloException, IOException {
     GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(TEST05);
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
@@ -328,6 +328,7 @@ public class StoreTest extends AccumuloStoreTestBase {
         assertTrue(v.getPropertyValue(propertyKey).isSet());
         assertEquals(SET_VAL_f, v.getPropertyValue(propertyKey).getSet());
         break;
+      default: break;
       }
     }
   }

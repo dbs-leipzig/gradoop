@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.edgelist;
 
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -25,10 +25,8 @@ public class EdgeListDataSourceTest extends GradoopFlinkTestBase {
 
   @Test
   public void testRead() throws Exception {
-    String edgeListFile = VertexLabeledEdgeListDataSourceTest.class
-      .getResource("/data/edgelist/basic/input").getFile();
-    String gdlFile = VertexLabeledEdgeListDataSourceTest.class
-      .getResource("/data/edgelist/basic/expected.gdl").getFile();
+    String edgeListFile = getFilePath("/data/edgelist/basic/input");
+    String gdlFile = getFilePath("/data/edgelist/basic/expected.gdl");
 
     DataSource dataSource = new EdgeListDataSource(edgeListFile, ",", getConfig());
     LogicalGraph result = dataSource.getLogicalGraph();

@@ -15,10 +15,13 @@
  */
 package org.gradoop.examples.aggregation;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.aggregation.functions.AddPropertyMeanAgeToGraphHead;
 import org.gradoop.examples.aggregation.functions.AggregateListOfNames;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
@@ -75,7 +78,8 @@ public class AggregationExample {
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(GradoopFlinkConfig.createConfig(env));
 
     // load data
-    loader.initDatabaseFromFile(EXAMPLE_DATA_FILE);
+    loader.initDatabaseFromFile(
+      URLDecoder.decode(EXAMPLE_DATA_FILE, StandardCharsets.UTF_8.name()));
 
     // get LogicalGraph representation of the social network graph
     LogicalGraph networkGraph = loader.getLogicalGraph();

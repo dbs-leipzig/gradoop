@@ -31,8 +31,8 @@ import org.gradoop.flink.io.impl.csv.functions.CSVLineToEdge;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToGraphHead;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToVertex;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
  *   |- Person.csv     # contains all vertices with label 'Person'
  *   |- University.csv # contains all vertices with label 'University'
  *   |- knows.csv      # contains all edges with label 'knows'
- *   |- studyAy.csv    # contains all edges with label 'studyAt'
+ *   |- studyAt.csv    # contains all edges with label 'studyAt'
  *   |- metadata.csv   # Meta data for all data contained in the graph
  */
 public class IndexedCSVDataSource extends CSVBase implements DataSource {

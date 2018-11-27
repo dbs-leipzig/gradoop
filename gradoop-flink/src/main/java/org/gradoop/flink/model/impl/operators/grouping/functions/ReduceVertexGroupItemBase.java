@@ -16,12 +16,8 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Base class for reducer/combiner implementations on vertices.
@@ -50,20 +46,20 @@ abstract class ReduceVertexGroupItemBase extends BuildBase {
    * Creates one super vertex tuple representing the whole group. This tuple is
    * later used to create a super vertex for each group.
    *
-   * @param superVertexId       super vertex id
-   * @param groupLabel          group label
+   * @param superVertexId super vertex id
+   * @param groupLabel group label
    * @param groupPropertyValues group property values
-   * @param valueAggregators    vertex aggregators
+   * @param aggregateValues aggregate values
    * @return vertex group item representing the super vertex
    */
   protected VertexGroupItem createSuperVertexTuple(
     GradoopId superVertexId, String groupLabel,
     PropertyValueList groupPropertyValues,
-    List<PropertyValueAggregator> valueAggregators) throws IOException {
+    PropertyValueList aggregateValues) {
     reuseVertexGroupItem.setVertexId(superVertexId);
     reuseVertexGroupItem.setGroupLabel(groupLabel);
     reuseVertexGroupItem.setGroupingValues(groupPropertyValues);
-    reuseVertexGroupItem.setAggregateValues(getAggregateValues(valueAggregators));
+    reuseVertexGroupItem.setAggregateValues(aggregateValues);
     reuseVertexGroupItem.setSuperVertex(true);
     return reuseVertexGroupItem;
   }

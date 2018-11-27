@@ -21,9 +21,9 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import static java.util.Collections.emptyList;
@@ -64,9 +64,9 @@ public class Communities extends AbstractRunner {
     // load the graph and set initial community id
     LogicalGraph graph = dataSource.getLogicalGraph();
     graph = graph.transformVertices((current, transformed) -> {
-        current.setProperty(communityKey, current.getId());
-        return current;
-      });
+      current.setProperty(communityKey, current.getId());
+      return current;
+    });
 
     // apply label propagation to compute communities
     graph = graph.callForGraph(new GellyLabelPropagation(10, communityKey));
@@ -74,9 +74,9 @@ public class Communities extends AbstractRunner {
     // group the vertices of the graph by their community, count vertices per group and edges
     // between groups
     LogicalGraph communities = graph.groupBy(singletonList(communityKey), // vertex grouping keys
-      singletonList(new CountAggregator("count")), // vertex aggregate functions
+      singletonList(new Count("count")), // vertex aggregate functions
       emptyList(), // edge grouping keys
-      singletonList(new CountAggregator("count")), // edge aggregate functions
+      singletonList(new Count("count")), // edge aggregate functions
       GroupingStrategy.GROUP_REDUCE);
 
     // extract vertex induced subgraph only containing communities with more than 10 users

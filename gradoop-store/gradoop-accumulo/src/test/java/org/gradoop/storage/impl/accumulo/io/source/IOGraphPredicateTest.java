@@ -36,12 +36,12 @@ public class IOGraphPredicateTest extends AccumuloStoreTestBase {
   private static final String TEST02 = "io_graph_predicate_02";
 
   /**
-   * query graph head by property only
+   * Query graph head by property only
    *
    * @throws Throwable if error
    */
   @Test
-  public void test01_queryGraphByProperty() throws Throwable {
+  public void queryGraphByProperty() throws Throwable {
     doTest(TEST01, (loader, store, config) -> {
       List<GraphHead> storeGraphs = loader.getGraphHeads().stream()
         .filter(it -> {
@@ -67,12 +67,12 @@ public class IOGraphPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * query graph head by label and property
+   * Query graph head by label and property
    *
    * @throws Throwable if error
    */
   @Test
-  public void test02_queryByMulti() throws Throwable {
+  public void queryByMulti() throws Throwable {
     doTest(TEST02, (loader, store, config) -> {
       List<GraphHead> storeGraphs = loader.getGraphHeads().stream()
         .filter(it -> Objects.equals(it.getLabel(), "Community"))

@@ -49,10 +49,11 @@ import java.util.Set;
 /**
  * Responsible for producing instances of {@link TxCollectionLayout}.
  */
-public class TxCollectionLayoutFactory extends BaseFactory implements GraphCollectionLayoutFactory {
+public class TxCollectionLayoutFactory extends BaseFactory
+  implements GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> {
 
   @Override
-  public GraphCollectionLayout fromDataSets(DataSet<GraphHead> graphHeads,
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromDataSets(DataSet<GraphHead> graphHeads,
     DataSet<Vertex> vertices) {
     Objects.requireNonNull(graphHeads);
     Objects.requireNonNull(vertices);
@@ -62,8 +63,10 @@ public class TxCollectionLayoutFactory extends BaseFactory implements GraphColle
   }
 
   @Override
-  public GraphCollectionLayout fromDataSets(DataSet<GraphHead> inGraphHeads,
-    DataSet<Vertex> inVertices, DataSet<Edge> inEdges) {
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromDataSets(
+    DataSet<GraphHead> inGraphHeads,
+    DataSet<Vertex> inVertices,
+    DataSet<Edge> inEdges) {
     Objects.requireNonNull(inGraphHeads);
     Objects.requireNonNull(inVertices);
     Objects.requireNonNull(inEdges);
@@ -101,8 +104,10 @@ public class TxCollectionLayoutFactory extends BaseFactory implements GraphColle
   }
 
   @Override
-  public GraphCollectionLayout fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
-    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromIndexedDataSets(
+    Map<String, DataSet<GraphHead>> graphHeads,
+    Map<String, DataSet<Vertex>> vertices,
+    Map<String, DataSet<Edge>> edges) {
     Objects.requireNonNull(graphHeads);
     Objects.requireNonNull(vertices);
     Objects.requireNonNull(edges);
@@ -117,8 +122,10 @@ public class TxCollectionLayoutFactory extends BaseFactory implements GraphColle
   }
 
   @Override
-  public GraphCollectionLayout fromCollections(Collection<GraphHead> graphHeads,
-    Collection<Vertex> vertices, Collection<Edge> edges) {
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromCollections(
+    Collection<GraphHead> graphHeads,
+    Collection<Vertex> vertices,
+    Collection<Edge> edges) {
     return fromDataSets(
       createGraphHeadDataSet(graphHeads),
       createVertexDataSet(vertices),
@@ -127,26 +134,29 @@ public class TxCollectionLayoutFactory extends BaseFactory implements GraphColle
   }
 
   @Override
-  public GraphCollectionLayout fromGraphLayout(LogicalGraphLayout logicalGraphLayout) {
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromGraphLayout(
+    LogicalGraphLayout<GraphHead, Vertex, Edge> logicalGraphLayout) {
     return fromDataSets(logicalGraphLayout.getGraphHead(),
       logicalGraphLayout.getVertices(),
       logicalGraphLayout.getEdges());
   }
 
   @Override
-  public GraphCollectionLayout fromTransactions(DataSet<GraphTransaction> transactions) {
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromTransactions(
+    DataSet<GraphTransaction> transactions) {
     return new TxCollectionLayout(transactions);
   }
 
   @Override
-  public GraphCollectionLayout fromTransactions(DataSet<GraphTransaction> transactions,
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromTransactions(
+    DataSet<GraphTransaction> transactions,
     GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
     GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
     return new TxCollectionLayout(transactions);
   }
 
   @Override
-  public GraphCollectionLayout createEmptyCollection() {
+  public GraphCollectionLayout<GraphHead, Vertex, Edge> createEmptyCollection() {
     return fromTransactions(createGraphTransactionDataSet(Lists.newArrayListWithCapacity(0)));
   }
 

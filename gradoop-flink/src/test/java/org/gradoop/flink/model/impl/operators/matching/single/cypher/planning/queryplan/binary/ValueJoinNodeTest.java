@@ -64,7 +64,7 @@ public class ValueJoinNodeTest extends GradoopFlinkTestBase {
     MockPlanNode rightMockNode = new MockPlanNode(null, rightInputMetaData);
 
     ValueJoinNode node = new ValueJoinNode(leftMockNode, rightMockNode,
-      singletonList(Pair.of("v1","age")), singletonList(Pair.of("v3","age")),
+      singletonList(Pair.of("v1", "age")), singletonList(Pair.of("v3", "age")),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
     EmbeddingMetaData outputMetaData = node.getEmbeddingMetaData();
@@ -107,7 +107,7 @@ public class ValueJoinNodeTest extends GradoopFlinkTestBase {
     PlanNode rightChild = new MockPlanNode(null, rightInputMetaData);
 
     ValueJoinNode node = new ValueJoinNode(leftChild, rightChild,
-      singletonList(Pair.of("v1","age")), singletonList(Pair.of("v4","age")),
+      singletonList(Pair.of("v1", "age")), singletonList(Pair.of("v4", "age")),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
     assertThat(call(ValueJoinNode.class, node, "getJoinPropertiesLeft"), is(asList(0)));
@@ -227,7 +227,7 @@ public class ValueJoinNodeTest extends GradoopFlinkTestBase {
     MockPlanNode rightChild = new MockPlanNode(rightEmbeddings, rightInputMetaData);
 
     ValueJoinNode node = new ValueJoinNode(leftChild, rightChild,
-      singletonList(Pair.of("v1","age")), singletonList(Pair.of("v3","age")),
+      singletonList(Pair.of("v1", "age")), singletonList(Pair.of("v3", "age")),
       MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM);
 
     List<Embedding> result = node.execute().collect();

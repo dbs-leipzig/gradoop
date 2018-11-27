@@ -17,6 +17,7 @@ package org.gradoop.examples.biiig;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -26,8 +27,8 @@ import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
@@ -35,6 +36,8 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.Sum;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 
 import java.math.BigDecimal;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import static java.math.BigDecimal.ROUND_HALF_UP;
 import static java.math.BigDecimal.ZERO;
@@ -150,8 +153,9 @@ public class FrequentLossPatterns
 
     // (1) read data from source
 
-    String csvPath = FrequentLossPatterns.class
-      .getResource("/data/csv/foodbroker").getFile();
+    String csvPath = URLDecoder.decode(
+      FrequentLossPatterns.class.getResource("/data/csv/foodbroker").getFile(),
+      StandardCharsets.UTF_8.name());
 
     LogicalGraph iig = readLogicalGraph(csvPath);
 
@@ -211,9 +215,7 @@ public class FrequentLossPatterns
     // trigger execution
     getExecutionEnvironment().execute();
 
-    String cmd = "dot -Tps " + dotPath + " -o " + psPath;
-
-    Runtime.getRuntime().exec(cmd);
+    new ProcessBuilder("dot", "-Tps", dotPath, "-o", psPath).inheritIO().start();
   }
 
   // AGGREGATE FUNCTIONS
@@ -221,8 +223,7 @@ public class FrequentLossPatterns
   /**
    * Calculate the financial result of business transaction graphs.
    */
-  private static class Result
-    extends Sum implements VertexAggregateFunction {
+  private static class Result implements Sum, VertexAggregateFunction {
 
     /**
      * Property key for revenue values.
@@ -235,21 +236,17 @@ public class FrequentLossPatterns
 
 
     @Override
-    public PropertyValue getVertexIncrement(Vertex vertex) {
+    public PropertyValue getIncrement(Element vertex) {
       PropertyValue increment;
 
       if (vertex.hasProperty(REVENUE_KEY)) {
         increment = vertex.getPropertyValue(REVENUE_KEY);
-
       } else if (vertex.hasProperty(EXPENSE_KEY)) {
         PropertyValue expense = vertex.getPropertyValue(EXPENSE_KEY);
-        increment = PropertyValueUtils.Numeric
-          .multiply(expense, PropertyValue.create(-1));
-
+        increment = PropertyValueUtils.Numeric.multiply(expense, PropertyValue.create(-1));
       } else {
         increment = PropertyValue.create(0);
       }
-
       return increment;
     }
 
@@ -262,11 +259,10 @@ public class FrequentLossPatterns
   /**
    * Counts master data vertices less than the number of transactional vertices.
    */
-  private static class DetermineMasterDataSurplus
-    extends Sum implements VertexAggregateFunction {
+  private static class DetermineMasterDataSurplus implements Sum, VertexAggregateFunction {
 
     @Override
-    public PropertyValue getVertexIncrement(Vertex vertex) {
+    public PropertyValue getIncrement(Element vertex) {
       return vertex.getLabel().startsWith(MASTER_PREFIX) ?
         PropertyValue.create(1) : PropertyValue.create(-1);
     }

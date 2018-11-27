@@ -36,7 +36,7 @@ public class CombinePartitionAggregates
   private final Set<AggregateFunction> aggregateFunctions;
 
   /**
-   * Constructor.
+   * Creates a new instance of a CombinePartitionAggregates group reduce function.
    *
    * @param aggregateFunctions aggregate functions
    */
