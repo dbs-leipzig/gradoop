@@ -24,11 +24,6 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 /**
  * Create an ImportVertex for each tuple of an id and properties.
  *
- * Forwarded fields:
- *
- * f0: vertexId
- * f1: vertexProperties
- *
  * @param <K> id type
  */
 public class CreateImportVertexCSV<K extends Comparable<K>>

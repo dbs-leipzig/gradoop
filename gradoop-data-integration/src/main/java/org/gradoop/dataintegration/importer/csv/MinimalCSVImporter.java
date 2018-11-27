@@ -111,8 +111,10 @@ public class MinimalCSVImporter {
    * @param checkReoccurringHeader if each row of the file should be checked for reocurring of
    * the column property names.
    * @return the imported vertices
+ * @throws IOException if an error occurred while open the stream
    */
-  public DataSet<ImportVertex<Long>> importVertices(boolean checkReoccurringHeader) {
+  public DataSet<ImportVertex<Long>> importVertices(boolean checkReoccurringHeader)
+          throws IOException {
     if (columnNames == null) {
       return readCSVFile(readHeaderRow(), checkReoccurringHeader);
     } else {
@@ -142,15 +144,16 @@ public class MinimalCSVImporter {
   /**
    * Read the fist row of a csv file and put each the entry in each column in a list.
    * @return the property names
+ * @throws IOException if an error occurred while open the stream
    */
-  public List<String> readHeaderRow() {
+  public List<String> readHeaderRow() throws IOException {
     try (final BufferedReader reader =
               new BufferedReader(new InputStreamReader(new FileInputStream(path),
                       charset))) {
       String headerLine = reader.readLine();
       if (headerLine == null) {
         LOG.error("The file do not contain any rows.");
-        return null;
+        throw new NullPointerException();
       }
       headerLine = headerLine.substring(0, headerLine.length());
       String[] headerArray;
@@ -160,7 +163,7 @@ public class MinimalCSVImporter {
     } catch (IOException ex) {
       LOG.error("I/O Error occurred while trying to open a stream to: '" +
         path + "'.");
-      return null;
+      throw new IOException();
     }
   }
 }
