@@ -19,11 +19,12 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Representation of a vertex id and its corresponding vertex group
- * representative.
+ * Representation of a vertex id and its corresponding vertex group representative.
  *
+ * <pre>
  * f0: vertex id
  * f1: group representative vertex id
+ * </pre>
  */
 public class VertexWithSuperVertex extends Tuple2<GradoopId, GradoopId> {
 

@@ -28,9 +28,8 @@ import java.util.List;
 /**
  * Creates a minimal representation of vertex data to be used for label specific grouping.
  *
- * The output of that mapper is {@link VertexGroupItem} that contains
- * the vertex id, vertex label, vertex group properties and vertex aggregate
- * properties.
+ * The output of that mapper is {@link VertexGroupItem} that contains the vertex id,
+ * vertex label, vertex group properties and vertex aggregate properties.
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 @FunctionAnnotation.ReadFields("label;properties")
@@ -46,7 +45,7 @@ public class BuildVertexGroupItem
   /**
    * Creates map function
    *
-   * @param useLabel          true, if label shall be considered
+   * @param useLabel true, if label shall be considered
    * @param vertexLabelGroups stores grouping properties for vertex labels
    */
   public BuildVertexGroupItem(boolean useLabel, List<LabelGroup> vertexLabelGroups) {
@@ -57,9 +56,6 @@ public class BuildVertexGroupItem
     this.reuseVertexGroupItem.setSuperVertex(false);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void flatMap(Vertex vertex, Collector<VertexGroupItem> collector) throws Exception {
     boolean usedVertexLabelGroup = false;

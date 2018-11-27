@@ -33,7 +33,6 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
@@ -517,8 +516,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @see Grouping
    */
   LogicalGraph groupBy(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
+    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions,
     GroupingStrategy groupingStrategy);
 
   /**
@@ -587,8 +586,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return graph collection containing all resulting graphs
    */
   GraphCollection groupVerticesByRollUp(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions);
+    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions);
 
   /**
    * Generates all combinations of the supplied edge grouping keys according to the definition of
@@ -603,8 +602,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return graph collection containing all resulting graphs
    */
   GraphCollection groupEdgesByRollUp(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions);
+    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions);
 
   //----------------------------------------------------------------------------
   // Binary Operators
