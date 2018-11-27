@@ -22,12 +22,14 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
 /**
  * Edge representation used for grouping edges to super edges.
  *
+ * <pre>
  * f0: source vertex id
  * f1: target vertex id
  * f2: edge group label
  * f3: edge group property values
  * f4: edge group aggregate values
  * f5: edge label group
+ * </pre>
  */
 public class EdgeGroupItem
   extends Tuple6<GradoopId, GradoopId, String, PropertyValueList, PropertyValueList, LabelGroup>

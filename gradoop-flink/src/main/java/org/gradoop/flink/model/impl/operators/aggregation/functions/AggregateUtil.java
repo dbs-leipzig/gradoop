@@ -17,6 +17,7 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.Map;
@@ -25,7 +26,7 @@ import java.util.Set;
 /**
  * Utility functions for the aggregation operator
  */
-class AggregateUtil {
+public class AggregateUtil {
 
   /**
    * Increments the aggregate map by the increment of the aggregate functions on the element
@@ -45,5 +46,20 @@ class AggregateUtil {
       }
     }
     return aggregate;
+  }
+
+  /**
+   * Returns the default aggregate value for the given aggregate function
+   * or {@link PropertyValue#NULL_VALUE}, if it has no default.
+   *
+   * @param aggregateFunction aggregate function
+   * @return aggregate value
+   */
+  public static PropertyValue getDefaultAggregate(AggregateFunction aggregateFunction) {
+    if (aggregateFunction instanceof AggregateDefaultValue) {
+      return ((AggregateDefaultValue) aggregateFunction).getDefaultValue();
+    } else {
+      return PropertyValue.NULL_VALUE;
+    }
   }
 }

@@ -16,8 +16,7 @@
 package org.gradoop.flink.model.impl.operators.grouping;
 
 /**
- * Used to define the grouping strategy which is used for computing the summary
- * graph.
+ * Used to define the grouping strategy which is used for computing the summary graph.
  */
 public enum GroupingStrategy {
   /**
