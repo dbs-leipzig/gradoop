@@ -32,8 +32,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Responsible for creating instances of {@link GraphCollection} based on a specific {@link
- * GraphCollectionLayout}.
+ * Responsible for creating instances of {@link GraphCollection} based on a specific
+ * {@link GraphCollectionLayout}.
  */
 public class GraphCollectionFactory
   implements BaseGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection> {
@@ -70,15 +70,13 @@ public class GraphCollectionFactory
   }
 
   @Override
-  public GraphCollection fromDataSets(
-    DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
+  public GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
     DataSet<Edge> edges) {
     return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, edges), config);
   }
 
   @Override
-  public GraphCollection fromIndexedDataSets(
-    Map<String, DataSet<GraphHead>> graphHeads,
+  public GraphCollection fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
     Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
     GraphCollectionLayout<GraphHead, Vertex, Edge> layout = layoutFactory
       .fromIndexedDataSets(graphHeads, vertices, edges);
@@ -86,8 +84,7 @@ public class GraphCollectionFactory
   }
 
   @Override
-  public GraphCollection fromCollections(
-    Collection<GraphHead> graphHeads,
+  public GraphCollection fromCollections(Collection<GraphHead> graphHeads,
     Collection<Vertex> vertices, Collection<Edge> edges) {
     return new GraphCollection(layoutFactory.fromCollections(graphHeads, vertices, edges), config);
   }
@@ -124,8 +121,7 @@ public class GraphCollectionFactory
   }
 
   @Override
-  public GraphCollection fromTransactions(
-    DataSet<GraphTransaction> transactions,
+  public GraphCollection fromTransactions(DataSet<GraphTransaction> transactions,
     GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
     GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
     return new GraphCollection(layoutFactory
