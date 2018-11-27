@@ -520,8 +520,8 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     if (value == null || !is(value.getClass())) {
       legacyPropertyValue.setObject(value);
     } else {
-      Byte rawType = PropertyValueStrategy.PropertyValueStrategyFactory.get(value).getRawType();
-      legacyPropertyValue.setBytes(new byte[] {rawType});
+      byte[] rawBytes = PropertyValueStrategy.PropertyValueStrategyFactory.getRawBytes(value);
+      legacyPropertyValue.setBytes(rawBytes);
     }
   }
   /**
