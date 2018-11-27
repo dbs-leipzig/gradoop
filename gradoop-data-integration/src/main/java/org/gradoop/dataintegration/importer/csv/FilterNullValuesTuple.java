@@ -27,9 +27,6 @@ public class FilterNullValuesTuple<T> implements FilterFunction<T> {
 
   @Override
   public boolean filter(final T value) throws Exception {
-    if (value != null) {
-      return true;
-    }
-    return false;
+    return value != null;
   }
 }

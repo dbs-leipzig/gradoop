@@ -20,6 +20,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.flink.api.java.DataSet;
@@ -35,20 +36,23 @@ import org.junit.Test;
 public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
   /**
-   * Test if the properties of the imported vertices works correct.
+   * Test if the properties of the imported vertices works correct. Set the first line
+   * of the file as the column property names.
    * @throws Exception
    */
   @Test
-  public void testImport() throws Exception {
+  public void testImportWithHeader() throws Exception {
 
     String csvPath = getFilePath("/csv/input.csv");
     String delimiter = ";";
 
     ExecutionEnvironment env = getExecutionEnvironment();
 
-    MinimalCSVImporter importVertexImporter = new MinimalCSVImporter(csvPath, delimiter, getConfig());
+    MinimalCSVImporter importVertexImporter =
+            new MinimalCSVImporter(csvPath, delimiter, getConfig());
 
-    DataSet<ImportVertex<Long>> importVertex = importVertexImporter.importVertices();
+    //check the rows for the header line
+    DataSet<ImportVertex<Long>> importVertex = importVertexImporter.importVertices(true);
 
     List<ImportVertex<Long>> lv = new ArrayList<>();
     importVertex.output(new LocalCollectionOutputFormat<>(lv));
@@ -57,7 +61,57 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
     assertThat(lv.size(), is(3));
 
-    for(ImportVertex<Long> v : lv) {
+    for (ImportVertex<Long> v : lv) {
+      if (v.f2.get("name").toString().equals("foo")) {
+        assertThat(v.f2.size(), is(4));
+        assertThat(v.f2.get("name").toString(), is("foo"));
+        assertThat(v.f2.get("value1").toString(), is("453"));
+        assertThat(v.f2.get("value2").toString(), is("true"));
+        assertThat(v.f2.get("value3").toString(), is("71.03"));
+      } else if (v.f2.get("name").toString().equals("bar")) {
+        assertThat(v.f2.size(), is(4));
+        assertThat(v.f2.get("name").toString(), is("bar"));
+        assertThat(v.f2.get("value1").toString(), is("76"));
+        assertThat(v.f2.get("value2").toString(), is("false"));
+        assertThat(v.f2.get("value3").toString(), is("33.4"));
+      } else if (v.f2.get("name").toString().equals("bla")) {
+        assertThat(v.f2.size(), is(3));
+        assertThat(v.f2.get("name").toString(), is("bla"));
+        assertThat(v.f2.get("value1").toString(), is("4568"));
+        assertThat(v.f2.get("value3").toString(), is("9.42"));
+      } else {
+        fail();
+      }
+    }
+  }
+
+  /**
+   * Test if the properties of the imported vertices works correct. In this case
+   * the file do not contain a header row. For this the user set a list with
+   * the column names.
+   * @throws Exception
+   */
+  @Test
+  public void testImportWithoutHeader() throws Exception {
+
+    String csvPath = getFilePath("/csv/inputWithoutHeader.csv");
+    String delimiter = ";";
+
+    ExecutionEnvironment env = getExecutionEnvironment();
+
+    List<String> columnNames = Arrays.asList("name", "value1", "value2", "value3");
+    MinimalCSVImporter importVertexImporter =
+            new MinimalCSVImporter(csvPath, delimiter, getConfig(), columnNames);
+    DataSet<ImportVertex<Long>> importVertex = importVertexImporter.importVertices(false);
+
+    List<ImportVertex<Long>> lv = new ArrayList<>();
+    importVertex.output(new LocalCollectionOutputFormat<>(lv));
+
+    env.execute();
+
+    assertThat(lv.size(), is(3));
+
+    for (ImportVertex<Long> v : lv) {
       if (v.f2.get("name").toString().equals("foo")) {
         assertThat(v.f2.size(), is(4));
         assertThat(v.f2.get("name").toString(), is("foo"));

@@ -19,19 +19,26 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.utils.DataSetUtils;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Read a csv file and import each row as a vertex in EPGM representation.
  */
 public class MinimalCSVImporter {
+
+  /**
+   * Log if an error by reading of the file occurs.
+   */
+  private static final Logger LOG = LoggerFactory.getLogger(MinimalCSVImporter.class);
 
   /**
    * Token delimiter
@@ -44,42 +51,90 @@ public class MinimalCSVImporter {
   private String path;
 
   /**
+   * The charset used in the csv file.
+   */
+  private String charset;
+
+  /**
+   * THe property names for all columns in the file.
+   */
+  private List<String> columnNames;
+
+  /**
    * Gradoop Flink configuration
    */
   private GradoopFlinkConfig config;
 
   /**
-   * Create a new MinimalCSVImporter
+   * Create a new MinimalCSVImporter. The user set a list of the property names.
+   * @param path the path to the csv file
+   * @param tokenSeperator the token delimiter of the csv file
+   * @param config GradoopFlinkConfig
+   * @param columnNames property identifier for each column
+   */
+  public MinimalCSVImporter(String path, String tokenSeperator, GradoopFlinkConfig config,
+          List<String> columnNames) {
+    this(path, tokenSeperator, config);
+    this.columnNames = columnNames;
+  }
+
+  /**
+   * Create a new MinimalCSVImporter. Use the utf-8 charset as default. The first line of the file
+   * will set as the property names for each column.
    * @param path the path to the csv file
    * @param tokenSeperator the token delimiter of the csv file
    * @param config GradoopFlinkConfig
    */
   public MinimalCSVImporter(String path, String tokenSeperator, GradoopFlinkConfig config) {
-    this.path = path;
-    this.tokenSeparator = tokenSeperator;
-    this.config = config;
+    this(path, tokenSeperator, config, "UTF-8");
   }
 
   /**
-   * Import each row of the file as a vertex.
+   * Create a new MinimalCSVImporter with a user set charset. The first line of the file
+   * will set as the property names for each column.
+   * @param path the path to the csv file
+   * @param tokenSeperator the token delimiter of the csv file
+   * @param config GradoopFlinkConfig
+   * @param charset the charset used in the csv file
+   */
+  public MinimalCSVImporter(String path, String tokenSeperator, GradoopFlinkConfig config,
+          String charset) {
+    this.path = path;
+    this.tokenSeparator = tokenSeperator;
+    this.config = config;
+    this.charset = charset;
+  }
+
+  /**
+   * Import each row of the file as a vertex. If no column property names are set,
+   * read the first line of the file as header and set this values as column names.
+   * @param checkReoccurringHeader if each row of the file should be checked for reocurring of
+   * the column property names.
    * @return the imported vertices
    */
-  public DataSet<ImportVertex<Long>> importVertices() {
-    return readCSVFile(readHeaderRow());
+  public DataSet<ImportVertex<Long>> importVertices(boolean checkReoccurringHeader) {
+    if (columnNames == null) {
+      return readCSVFile(readHeaderRow(), checkReoccurringHeader);
+    } else {
+      return readCSVFile(columnNames, checkReoccurringHeader);
+    }
   }
 
   /**
    * Read the vertices from a csv file.
    *
    * @param propertyNames list of the property identifier name
+   * @param checkReoccurringHeader if each row of the file should be checked for reocurring of
+   * the column property names.
    * @return DateSet of all vertices from one specific file.
    */
-  public DataSet<ImportVertex<Long>> readCSVFile(ArrayList<String> propertyNames) {
+  public DataSet<ImportVertex<Long>> readCSVFile(List<String> propertyNames,
+          boolean checkReoccurringHeader) {
 
     DataSet<Properties> lines = config.getExecutionEnvironment()
     .readTextFile(path)
-    .map(new RowToVertexMapper(path, tokenSeparator, propertyNames))
-    .filter(new FilterNullValuesTuple<Properties>());
+    .map(new RowToVertexMapper(path, tokenSeparator, propertyNames, checkReoccurringHeader))
+    .filter(new FilterNullValuesTuple<>());
 
     return DataSetUtils.zipWithUniqueId(lines).map(new CreateImportVertexCSV<>());
   }
@@ -88,17 +143,23 @@ public class MinimalCSVImporter {
    * Read the fist row of a csv file and put each the entry in each column in a list.
    * @return the property names
    */
-  public ArrayList<String> readHeaderRow() {
+  public List<String> readHeaderRow() {
     try (final BufferedReader reader =
               new BufferedReader(new InputStreamReader(new FileInputStream(path),
-                      "UTF-8"))) { //use UTF-8 as charset
+                      charset))) {
       String headerLine = reader.readLine();
+      if (headerLine == null) {
+        LOG.error("The file do not contain any rows.");
+        return null;
+      }
       headerLine = headerLine.substring(0, headerLine.length());
       String[] headerArray;
       headerArray = headerLine.split(tokenSeparator);
 
-      return new ArrayList<>(Arrays.asList(headerArray));
+      return Arrays.asList(headerArray);
     } catch (IOException ex) {
+      LOG.error("I/O Error occurred while trying to open a stream to: '" +
+        path + "'.");
       return null;
     }
   }

@@ -15,7 +15,7 @@
  */
 package org.gradoop.dataintegration.importer.csv;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -41,24 +41,30 @@ public class RowToVertexMapper implements MapFunction<String, Properties> {
   /**
    * The name of the properties
    */
-  private ArrayList<String> propertyNames;
+  private List<String> propertyNames;
+
+  /**
+   * True, if the user want to check if each row of the file is equals to the header row.
+   */
+  private boolean checkReoccurringHeader;
 
   /**
    * Create a new RowToVertexMapper
    * @param filePath the csv file is stored
    * @param tokenDelimiter in the file is used
    * @param propertyNames list of the property names
+   * @param checkReoccurringHeader should the row checked for a occurring of the column names?
    */
   public RowToVertexMapper(String filePath, String tokenDelimiter,
-          ArrayList<String> propertyNames) {
+          List<String> propertyNames, boolean checkReoccurringHeader) {
     this.filePath = filePath;
     this.tokenSperator = tokenDelimiter;
     this.propertyNames = propertyNames;
+    this.checkReoccurringHeader = checkReoccurringHeader;
   }
 
   @Override
-  public Properties map(final String line) throws Exception {
-
+  public Properties map(final String line) {
     return parseProperties(line, propertyNames);
   }
 
@@ -68,29 +74,31 @@ public class RowToVertexMapper implements MapFunction<String, Properties> {
    * @param propertyNames identifier of the property values
    * @return the properties of the vertex
    */
-  private Properties parseProperties(String line, ArrayList<String> propertyNames) {
+  private Properties parseProperties(String line, List<String> propertyNames) {
 
     Properties properties = new Properties();
 
     String[] propertyValues = line.split(tokenSperator);
 
-    /*
-     * If the line to read is equals to the header, we do not import this line
-     * (because the file contains a header line, which is not a vertex).
-     * In this case, we return null, else we return the line tuple.
-     */
-    boolean equals = false;
-    if (propertyValues.length == propertyNames.size()) {
-      for (int i = 0; i < propertyValues.length; i++) {
-        if (propertyValues[i].trim().equals(propertyNames.get(i).trim())) {
-          equals = true;
-        } else {
-          equals = false;
-          break;
+    if (checkReoccurringHeader) {
+      /*
+       * If the line to read is equals to the header, we do not import this line
+       * (because the file contains a header line, which is not a vertex).
+       * In this case, we return null, else we return the line tuple.
+       */
+      boolean equals = false;
+      if (propertyValues.length == propertyNames.size()) {
+        for (int i = 0; i < propertyValues.length; i++) {
+          if (propertyValues[i].trim().equals(propertyNames.get(i).trim())) {
+            equals = true;
+          } else {
+            equals = false;
+            break;
+          }
         }
-      }
-      if (equals) {
-        return null;
+        if (equals) {
+          return null;
+        }
       }
     }
 
