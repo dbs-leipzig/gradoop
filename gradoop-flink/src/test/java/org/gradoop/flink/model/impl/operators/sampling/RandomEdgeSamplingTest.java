@@ -69,13 +69,13 @@ public class RandomEdgeSamplingTest extends ParameterizedTestForGraphSampling {
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
     return Arrays.asList(new String[] {
-        "EdgeSamplingTest with seed",
-        "-4181668494294894490",
-        "0.272f"
+      "EdgeSamplingTest with seed",
+      "-4181668494294894490",
+      "0.272f"
     }, new String[] {
-        "EdgeSamplingTest without seed",
-        "0",
-        "0.272f"
+      "EdgeSamplingTest without seed",
+      "0",
+      "0.272f"
     });
   }
 }
