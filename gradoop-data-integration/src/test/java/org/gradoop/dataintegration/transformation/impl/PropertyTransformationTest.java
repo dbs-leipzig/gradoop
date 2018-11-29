@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.propertytransformation;
+package org.gradoop.dataintegration.transformation.impl;
 
 import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
-import org.gradoop.dataintegration.transformation.impl.PropertyTransformation;
 import org.gradoop.dataintegration.transformation.impl.functions.DivideBy;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
