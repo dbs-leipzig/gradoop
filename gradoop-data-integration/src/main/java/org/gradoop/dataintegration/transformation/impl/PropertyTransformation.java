@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.operators.impl.propertytransformation;
+package org.gradoop.dataintegration.transformation.impl;
 
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.dataintegration.operators.api.propertytransformation.PropertyTransformationFunction;
+import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 
 /**

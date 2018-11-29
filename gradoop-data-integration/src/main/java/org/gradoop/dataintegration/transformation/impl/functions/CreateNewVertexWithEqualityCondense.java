@@ -13,50 +13,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.operators.impl.transformation.functions;
+package org.gradoop.dataintegration.transformation.impl.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Creates a new {@link Vertex} containing the given attribute {@link PropertyValue} and its origin.
+ * A {@link GroupReduceFunction} that creates one new vertex and adds all origin Ids to a {@link List}
+ * for later use. This function reduces the amount of equal property values significantly.
  */
-public class CreateNewVertex implements MapFunction<Tuple2<PropertyValue, GradoopId>, Tuple2<Vertex, List<GradoopId>>> {
+public class CreateNewVertexWithEqualityCondense implements GroupReduceFunction<Tuple2<PropertyValue, GradoopId>, Tuple2<Vertex, List<GradoopId>>> {
+
   /**
    * The new vertex label.
    */
   private final String newVertexLabel;
 
   /**
-   * The new property key
+   * The new property key.
    */
   private final String newPropertyName;
 
   /**
-   * The Factory the vertices are created with.
+   * The factory new vertices are created with.
    */
   private final VertexFactory vertexFactory;
 
   /**
-   * Reduce object instantiation.
-   */
+    * Reduce object instantiation.
+    */
   private final Tuple2<Vertex, List<GradoopId>> reuseTuple;
 
   /**
-   * The constructor for creating new vertices with their origin Ids.
+   * The constructor for condensation of same property values to one newly created vertex.
    *
-   * @param factory The Factory the vertices are created with.
-   * @param newVertexLabel  The new vertex Label.
+   * @param factory The factory new vertices are created with.
+   * @param newVertexLabel  The new vertex label.
    * @param newPropertyName The new property key.
    */
-  public CreateNewVertex(VertexFactory factory, String newVertexLabel, String newPropertyName) {
+  public CreateNewVertexWithEqualityCondense(VertexFactory factory, String newVertexLabel,
+                                             String newPropertyName) {
     this.vertexFactory = factory;
     this.newVertexLabel = newVertexLabel;
     this.newPropertyName = newPropertyName;
@@ -65,13 +69,25 @@ public class CreateNewVertex implements MapFunction<Tuple2<PropertyValue, Gradoo
   }
 
   @Override
-  public Tuple2<Vertex, List<GradoopId>> map(Tuple2<PropertyValue, GradoopId> tuple) {
+  public void reduce(Iterable<Tuple2<PropertyValue, GradoopId>> values,
+                     Collector<Tuple2<Vertex, List<GradoopId>>> out) {
+    List<GradoopId> sources = new ArrayList<>();
+    PropertyValue pv = null;
+
+    for (Tuple2<PropertyValue, GradoopId> tuple : values) {
+      sources.add(tuple.f1);
+
+      if (pv == null) {
+        pv = tuple.f0;
+      }
+    }
+
     Vertex vertex = vertexFactory.createVertex(newVertexLabel);
-    vertex.setProperty(newPropertyName, tuple.f0);
+    vertex.setProperty(newPropertyName, pv);
 
     reuseTuple.f0 = vertex;
-    reuseTuple.f1 = Collections.singletonList(tuple.f1);
+    reuseTuple.f1 = sources;
 
-    return reuseTuple;
+    out.collect(reuseTuple);
   }
 }

@@ -13,7 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.gradoop.dataintegration.transformation.api;
+
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.io.Serializable;
+
 /**
- * Contains all classes related to property transformation.
+ * Interface for all functions which are used for property transformation operations.
  */
-package org.gradoop.dataintegration.operators.impl.propertytransformation;
+public interface PropertyTransformationFunction extends Serializable {
+
+  /**
+   * Returns a changed property value based on the value before the transformation.
+   *
+   * @param property current property
+   * @return transformed property
+   */
+  PropertyValue execute(PropertyValue property);
+
+}

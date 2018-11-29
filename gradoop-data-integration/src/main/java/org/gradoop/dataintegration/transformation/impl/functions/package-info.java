@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * This package contains operators which are executing structural changes to a gradoop graph.
+ * This package contains functions used for graph transformations.
  */
-package org.gradoop.dataintegration.operators.impl.transformation;
+package org.gradoop.dataintegration.transformation.impl.functions;

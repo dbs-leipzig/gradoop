@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.operators.impl.propertytransformation.functions;
+package org.gradoop.dataintegration.transformation.impl.functions;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.dataintegration.operators.api.propertytransformation.PropertyTransformationFunction;
+import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
 
 /**
  * A sample property transformation function which can be used for the property transformation
  * operator.
  *
- * @see org.gradoop.dataintegration.operators.impl.propertytransformation.PropertyTransformation
- * @see org.gradoop.dataintegration.operators.api.propertytransformation.PropertyTransformationFunction
+ * @see org.gradoop.dataintegration.transformation.impl.PropertyTransformation
+ * @see org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction
  */
 public class DivideBy implements PropertyTransformationFunction {
   /**

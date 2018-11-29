@@ -19,7 +19,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.dataintegration.operators.impl.transformation.InvertEdges;
+import org.gradoop.dataintegration.transformation.impl.InvertEdges;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;

@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains all classes related to data integration operators.
+ * This package contains all interfaces related to transformation operators.
  */
-package org.gradoop.dataintegration.operators.impl;
+package org.gradoop.dataintegration.transformation.impl;

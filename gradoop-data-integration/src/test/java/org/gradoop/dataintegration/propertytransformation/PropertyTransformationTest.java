@@ -15,9 +15,9 @@
  */
 package org.gradoop.dataintegration.propertytransformation;
 
-import org.gradoop.dataintegration.operators.api.propertytransformation.PropertyTransformationFunction;
-import org.gradoop.dataintegration.operators.impl.propertytransformation.PropertyTransformation;
-import org.gradoop.dataintegration.operators.impl.propertytransformation.functions.DivideBy;
+import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
+import org.gradoop.dataintegration.transformation.impl.PropertyTransformation;
+import org.gradoop.dataintegration.transformation.impl.functions.DivideBy;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.operators.impl.propertytransformation;
+package org.gradoop.dataintegration.transformation.impl;
 
 import java.util.Objects;
 
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.dataintegration.operators.api.propertytransformation.PropertyTransformationFunction;
+import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
 /**
