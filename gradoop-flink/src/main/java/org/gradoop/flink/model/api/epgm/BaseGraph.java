@@ -33,7 +33,7 @@ public interface BaseGraph<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph> extends LogicalGraphLayout<G, V, E> {
+  LG extends BaseGraph<G, V, E, LG>> extends LogicalGraphLayout<G, V, E> {
   /**
    * Returns the Gradoop Flink configuration.
    *

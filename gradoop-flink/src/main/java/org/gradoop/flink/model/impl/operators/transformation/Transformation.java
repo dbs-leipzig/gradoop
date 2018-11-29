@@ -112,12 +112,14 @@ public class Transformation<
     DataSet<V> transformedVertices = vertexTransFunc != null ?
       vertices
         .map(new TransformVertex(vertexTransFunc, factory.getVertexFactory()))
-        .returns(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())) : vertices;
+        .returns(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())) :
+      vertices;
 
     DataSet<E> transformedEdges = edgeTransFunc != null ?
       edges
         .map(new TransformEdge(edgeTransFunc, factory.getEdgeFactory()))
-        .returns(TypeExtractor.createTypeInfo(factory.getEdgeFactory().getType())) : edges;
+        .returns(TypeExtractor.createTypeInfo(factory.getEdgeFactory().getType())) :
+      edges;
 
     return factory.fromDataSets(transformedGraphHeads, transformedVertices, transformedEdges);
   }

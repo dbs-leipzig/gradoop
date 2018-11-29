@@ -38,7 +38,7 @@ public interface BaseGraphFactory<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph> extends ElementFactoryProvider<G, V, E> {
+  LG extends BaseGraph<G, V, E, LG>> extends ElementFactoryProvider<G, V, E> {
 
   /**
    * Sets the layout factory that is responsible for creating a graph layout.

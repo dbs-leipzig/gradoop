@@ -33,7 +33,7 @@ public interface BaseGraphCollection<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  GC extends BaseGraphCollection> extends GraphCollectionLayout<G, V, E> {
+  GC extends BaseGraphCollection<G, V, E, GC>> extends GraphCollectionLayout<G, V, E> {
   /**
    * Returns the Gradoop Flink configuration.
    *
