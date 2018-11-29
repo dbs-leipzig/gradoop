@@ -109,7 +109,7 @@ public class ValueConnectedComponentsTest extends GradoopFlinkTestBase {
 
     Map<Long, Long> components = new HashMap<>();
 
-    for (Tuple2<Long, Long> tuple: vertexComponentList) {
+    for (Tuple2<Long, Long> tuple : vertexComponentList) {
       if (!components.containsKey(tuple.f1)) {
         components.put(tuple.f1, 1L);
       } else {
