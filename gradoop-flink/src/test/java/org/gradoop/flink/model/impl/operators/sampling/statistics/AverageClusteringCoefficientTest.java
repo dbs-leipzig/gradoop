@@ -41,32 +41,32 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
   @Before
   public void initGraphs() {
     String graphString = "/* vertices */" +
-        "(v0 {id:0, value:\"A\"})" +
-        "(v1 {id:1, value:\"B\"})" +
-        "(v2 {id:2, value:\"C\"})" +
-        "clique[" +
-        "/* fully connected clique */" +
-        "(v0)-[e0]->(v1)" +
-        "(v1)-[e1]->(v0)" +
-        "(v0)-[e2]->(v2)" +
-        "(v2)-[e3]->(v0)" +
-        "(v1)-[e4]->(v2)" +
-        "(v2)-[e5]->(v1)" +
-        "]" +
-        "nonConnected[" +
-        "/* not connected vertices */" +
-        "(v3 {id:3, value:\"D\"})" +
-        "(v4 {id:4, value:\"E\"})" +
-        "(v5 {id:5, value:\"F\"})" +
-        "]" +
-        "halfConnected[" +
-        "/* half connected graph */" +
-        "(v6 {id:6, value:\"G\"})" +
-        "(v0)-[e6]->(v1)" +
-        "(v0)-[e7]->(v2)" +
-        "(v0)-[e8]->(v6)" +
-        "(v1)-[e9]->(v2)" +
-        "]";
+      "(v0 {id:0, value:\"A\"})" +
+      "(v1 {id:1, value:\"B\"})" +
+      "(v2 {id:2, value:\"C\"})" +
+      "clique[" +
+      "/* fully connected clique */" +
+      "(v0)-[e0]->(v1)" +
+      "(v1)-[e1]->(v0)" +
+      "(v0)-[e2]->(v2)" +
+      "(v2)-[e3]->(v0)" +
+      "(v1)-[e4]->(v2)" +
+      "(v2)-[e5]->(v1)" +
+      "]" +
+      "nonConnected[" +
+      "/* not connected vertices */" +
+      "(v3 {id:3, value:\"D\"})" +
+      "(v4 {id:4, value:\"E\"})" +
+      "(v5 {id:5, value:\"F\"})" +
+      "]" +
+      "halfConnected[" +
+      "/* half connected graph */" +
+      "(v6 {id:6, value:\"G\"})" +
+      "(v0)-[e6]->(v1)" +
+      "(v0)-[e7]->(v2)" +
+      "(v0)-[e8]->(v6)" +
+      "(v1)-[e9]->(v2)" +
+      "]";
 
     this.loader = getLoaderFromString(graphString);
   }
