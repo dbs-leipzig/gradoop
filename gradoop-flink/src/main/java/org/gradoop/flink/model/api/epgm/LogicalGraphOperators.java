@@ -22,7 +22,6 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
@@ -333,51 +332,6 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return transformed logical graph
    */
   LogicalGraph transformEdges(TransformationFunction<Edge> edgeTransformationFunction);
-
-  /**
-   * Transforms the graph head properties of the logical graph using the given
-   * property transformation function. The identity of the graph is preserved.
-   *
-   * This is a convenience function for
-   * {@link LogicalGraph#transformGraphHead(TransformationFunction)}.
-   *
-   * @param propertyKey                          the property key to be considered
-   * @param graphHeadPropTransformationFunction  graph head property transformation function
-   * @return transformed logical graph
-   */
-  LogicalGraph transformGraphHeadProperties(
-    String propertyKey,
-    PropertyTransformationFunction graphHeadPropTransformationFunction);
-
-  /**
-   * Transforms the vertex properties of the logical graph using the given transformation
-   * function. The identity of the vertices is preserved.
-   *
-   * This is a convenience function for
-   * {@link LogicalGraph#transformVertices(TransformationFunction)}.
-   *
-   * @param propertyKey                       the property key to be considered
-   * @param vertexPropTransformationFunction  vertex property transformation function
-   * @return transformed logical graph
-   */
-  LogicalGraph transformVertexProperties(
-    String propertyKey,
-    PropertyTransformationFunction vertexPropTransformationFunction);
-
-  /**
-   * Transforms the edge properties of the logical graph using the given transformation
-   * function. The identity of the edges is preserved.
-   *
-   * This is a convenience function for
-   * {@link LogicalGraph#transformEdges(TransformationFunction)}.
-   *
-   * @param propertyKey                     the property key to be considered
-   * @param edgePropTransformationFunction  edge property transformation function
-   * @return transformed logical graph
-   */
-  LogicalGraph transformEdgeProperties(
-    String propertyKey,
-    PropertyTransformationFunction edgePropTransformationFunction);
 
   /**
    * Returns the subgraph that is induced by the vertices which fulfill the

@@ -28,7 +28,6 @@ import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.epgm.LogicalGraphOperators;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
@@ -54,7 +53,6 @@ import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
-import org.gradoop.flink.model.impl.operators.propertytransformation.PropertyTransformation;
 import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
 import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
@@ -320,36 +318,6 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   public LogicalGraph transformEdges(
     TransformationFunction<Edge> edgeTransformationFunction) {
     return transform(null, null, edgeTransformationFunction);
-  }
-
-  @Override
-  public LogicalGraph transformGraphHeadProperties(
-    String propertyKey,
-    PropertyTransformationFunction graphHeadPropTransformationFunction) {
-    Objects.requireNonNull(propertyKey);
-    Objects.requireNonNull(graphHeadPropTransformationFunction);
-    return callForGraph(new PropertyTransformation(propertyKey,
-      graphHeadPropTransformationFunction, null, null));
-  }
-
-  @Override
-  public LogicalGraph transformVertexProperties(
-    String propertyKey,
-    PropertyTransformationFunction vertexPropTransformationFunction) {
-    Objects.requireNonNull(propertyKey);
-    Objects.requireNonNull(vertexPropTransformationFunction);
-    return callForGraph(new PropertyTransformation(propertyKey,
-      null, vertexPropTransformationFunction, null));
-  }
-
-  @Override
-  public LogicalGraph transformEdgeProperties(
-    String propertyKey,
-    PropertyTransformationFunction edgePropTransformationFunction) {
-    Objects.requireNonNull(propertyKey);
-    Objects.requireNonNull(edgePropTransformationFunction);
-    return callForGraph(new PropertyTransformation(propertyKey,
-      null, null, edgePropTransformationFunction));
   }
 
   /**
