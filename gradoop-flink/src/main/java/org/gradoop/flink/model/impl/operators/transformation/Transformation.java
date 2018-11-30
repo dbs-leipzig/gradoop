@@ -23,7 +23,7 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformEdge;
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformGraphHead;
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformVertex;
@@ -44,7 +44,7 @@ public class Transformation<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToGraphOperator<LG> {
+  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Modification function for graph heads
@@ -103,23 +103,17 @@ public class Transformation<
   protected LG executeInternal(DataSet<G> graphHeads, DataSet<V> vertices, DataSet<E> edges,
     BaseGraphFactory<G, V, E, LG> factory) {
 
-    DataSet<G> transformedGraphHeads = graphHeadTransFunc != null ?
-      graphHeads
-        .map(new TransformGraphHead(graphHeadTransFunc, factory.getGraphHeadFactory()))
-        .returns(TypeExtractor.createTypeInfo(factory.getGraphHeadFactory().getType())) :
-      graphHeads;
+    DataSet<G> transformedGraphHeads = graphHeadTransFunc != null ? graphHeads
+      .map(new TransformGraphHead(graphHeadTransFunc, factory.getGraphHeadFactory()))
+      .returns(TypeExtractor.createTypeInfo(factory.getGraphHeadFactory().getType())) : graphHeads;
 
-    DataSet<V> transformedVertices = vertexTransFunc != null ?
-      vertices
-        .map(new TransformVertex(vertexTransFunc, factory.getVertexFactory()))
-        .returns(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())) :
-      vertices;
+    DataSet<V> transformedVertices = vertexTransFunc != null ? vertices
+      .map(new TransformVertex(vertexTransFunc, factory.getVertexFactory()))
+      .returns(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())) : vertices;
 
-    DataSet<E> transformedEdges = edgeTransFunc != null ?
-      edges
-        .map(new TransformEdge(edgeTransFunc, factory.getEdgeFactory()))
-        .returns(TypeExtractor.createTypeInfo(factory.getEdgeFactory().getType())) :
-      edges;
+    DataSet<E> transformedEdges = edgeTransFunc != null ? edges
+      .map(new TransformEdge(edgeTransFunc, factory.getEdgeFactory()))
+      .returns(TypeExtractor.createTypeInfo(factory.getEdgeFactory().getType())) : edges;
 
     return factory.fromDataSets(transformedGraphHeads, transformedVertices, transformedEdges);
   }

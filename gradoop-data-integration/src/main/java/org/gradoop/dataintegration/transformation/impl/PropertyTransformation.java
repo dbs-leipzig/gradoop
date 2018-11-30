@@ -20,7 +20,7 @@ import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 
 /**
@@ -38,7 +38,7 @@ public class PropertyTransformation<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToGraphOperator<LG> {
+  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Label of the element whose property shall be transformed.

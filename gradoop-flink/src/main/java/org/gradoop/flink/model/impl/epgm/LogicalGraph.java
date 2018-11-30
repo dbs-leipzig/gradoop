@@ -33,7 +33,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
@@ -523,7 +523,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph callForGraph(UnaryBaseGraphToGraphOperator<LogicalGraph> operator) {
+  public LogicalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<LogicalGraph> operator) {
     return operator.execute(this);
   }
 

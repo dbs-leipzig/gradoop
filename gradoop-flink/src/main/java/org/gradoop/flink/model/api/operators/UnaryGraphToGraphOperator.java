@@ -20,5 +20,5 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 /**
  * Creates a {@link LogicalGraph} based on one input {@link LogicalGraph}.
  */
-public interface UnaryGraphToGraphOperator extends UnaryBaseGraphToGraphOperator<LogicalGraph> {
+public interface UnaryGraphToGraphOperator extends UnaryBaseGraphToBaseGraphOperator<LogicalGraph> {
 }
