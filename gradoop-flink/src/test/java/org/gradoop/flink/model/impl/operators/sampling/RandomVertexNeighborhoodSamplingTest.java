@@ -70,25 +70,25 @@ public class RandomVertexNeighborhoodSamplingTest extends ParameterizedTestForGr
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
     return Arrays.asList(new String[] {
-        "VertexNeighborhoodSamplingTest with seed and both neighborhood",
-        "-4181668494294894490",
-        "0.272f",
-        "BOTH"
+      "VertexNeighborhoodSamplingTest with seed and both neighborhood",
+      "-4181668494294894490",
+      "0.272f",
+      "BOTH"
     }, new String[] {
-        "VertexNeighborhoodSamplingTest without seed and both neighborhood",
-        "0",
-        "0.272f",
-        "BOTH"
+      "VertexNeighborhoodSamplingTest without seed and both neighborhood",
+      "0",
+      "0.272f",
+      "BOTH"
     }, new String[] {
-        "VertexNeighborhoodSamplingTest with seed and input neighborhood",
-        "-4181668494294894490",
-        "0.272f",
-        "IN"
+      "VertexNeighborhoodSamplingTest with seed and input neighborhood",
+      "-4181668494294894490",
+      "0.272f",
+      "IN"
     }, new String[] {
-        "VertexNeighborhoodSamplingTest with seed and output neighborhood",
-        "-4181668494294894490",
-        "0.272f",
-        "OUT"
+      "VertexNeighborhoodSamplingTest with seed and output neighborhood",
+      "-4181668494294894490",
+      "0.272f",
+      "OUT"
     });
   }
 }

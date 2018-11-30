@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.propertytransformation;
+package org.gradoop.dataintegration.transformation.impl;
 
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
-import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
+import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 
