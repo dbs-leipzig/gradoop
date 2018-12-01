@@ -15,9 +15,10 @@ org.gradoop.common.model.impl.pojo
 org.gradoop.common.model.impl.properties
 org.gradoop.common.util
 org.gradoop.dataintegration.importer
-org.gradoop.dataintegration.transformation
-org.gradoop.dataintegration.transformation.config
-org.gradoop.dataintegration.transformation.functions
+org.gradoop.dataintegration.transformation.api
+org.gradoop.dataintegration.transformation.impl
+org.gradoop.dataintegration.transformation.impl.config
+org.gradoop.dataintegration.transformation.impl.functions
 org.gradoop.examples
 org.gradoop.examples.aggregation
 org.gradoop.examples.aggregation.functions
@@ -141,7 +142,6 @@ org.gradoop.flink.model.impl.operators.fusion
 org.gradoop.flink.model.impl.operators.fusion.functions
 org.gradoop.flink.model.impl.operators.grouping
 org.gradoop.flink.model.impl.operators.grouping.functions
-org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
 org.gradoop.flink.model.impl.operators.grouping.tuples
 org.gradoop.flink.model.impl.operators.intersection
 org.gradoop.flink.model.impl.operators.intersection.functions
@@ -204,7 +204,6 @@ org.gradoop.flink.model.impl.operators.neighborhood
 org.gradoop.flink.model.impl.operators.neighborhood.functions
 org.gradoop.flink.model.impl.operators.neighborhood.keyselector
 org.gradoop.flink.model.impl.operators.overlap
-org.gradoop.flink.model.impl.operators.propertytransformation
 org.gradoop.flink.model.impl.operators.rollup
 org.gradoop.flink.model.impl.operators.sampling
 org.gradoop.flink.model.impl.operators.sampling.functions
