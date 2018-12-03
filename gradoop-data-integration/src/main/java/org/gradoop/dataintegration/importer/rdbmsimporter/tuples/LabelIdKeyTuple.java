@@ -81,7 +81,6 @@ public class LabelIdKeyTuple extends Tuple3<String, GradoopId, String> {
   /**
    * Checks if two LabelIdKeyTuple tuples are equal
    *
-   * @param t object to check equality
    * @return <code>true</code> if Object equals LabelIdKeyTuple;
    *         <code>false</code> otherwise
    */

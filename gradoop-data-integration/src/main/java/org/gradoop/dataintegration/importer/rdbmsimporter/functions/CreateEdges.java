@@ -85,7 +85,7 @@ public class CreateEdges {
       for (TableToEdge table : tablesToEdges) {
         if (!table.isDirectionIndicator()) {
 
-          DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper.getInput(env, rdbmsConfig,
+          DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper.create().getInput(env, rdbmsConfig,
               table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
 
           // Represents the two foreign key attributes and belonging

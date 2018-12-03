@@ -25,10 +25,10 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 /**
- * Implements a jdbc driver. Needed for registering a generic jdbc driver in
+ * Implements a JDBC driver. Needed for registering a generic JDBC driver in
  * class loader.
  */
-public class DriverShim implements Driver {
+public class GradoopJDBCDriver implements Driver {
 
   /**
    * Valid java sql driver
@@ -40,7 +40,7 @@ public class DriverShim implements Driver {
    *
    * @param driver Database driver to wrap
    */
-  public DriverShim(Driver driver) {
+  public GradoopJDBCDriver(Driver driver) {
     this.driver = driver;
   }
 
@@ -61,7 +61,7 @@ public class DriverShim implements Driver {
    * Wraps the call to the underlying driver's connect method.
    *
    * @param url the URL of the database
-   * @param info a collection of string/value pairs
+   * @param props a collection of string/value pairs
    * @return a Connection object
    * @throws SQLException thrown if there is an error connecting to the database
    */
@@ -106,7 +106,7 @@ public class DriverShim implements Driver {
    * Wraps the call to the underlying driver's getPropertyInfo method.
    *
    * @param url the URL of the database
-   * @param info a collection of string/value pairs
+   * @param props a collection of string/value pairs
    * @return an array of DriverPropertyInfo objects
    * @throws SQLException thrown if there is an error accessing the database
    */

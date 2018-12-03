@@ -49,7 +49,7 @@ public class RdbmsConstants {
   /**
    * Database management system identifier
    */
-  public static enum RdbmsType {
+  public enum RdbmsType {
     /**
      * Identifier for mysql,mariadb,postgresql,h2,hsqldb management systems
      */

@@ -51,7 +51,7 @@ public class CreateVertices {
     int counter = 0;
 
     for (TableToNode table : tablesToNodes) {
-      DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper.getInput(
+      DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper.create().getInput(
           flinkConfig.getExecutionEnvironment(), rdbmsConfig, table.getRowCount(),
           table.getSqlQuery(), table.getRowTypeInfo());
 

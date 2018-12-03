@@ -50,7 +50,7 @@ public class RegisterDriver {
           URLClassLoader ucl = new URLClassLoader(new URL[] { driverUrl });
           Driver driver = (Driver) Class.forName(config.getJdbcDriverClassName(), true, ucl)
               .getDeclaredConstructor().newInstance();
-          DriverManager.registerDriver(new DriverShim(driver));
+          DriverManager.registerDriver(new GradoopJDBCDriver(driver));
 
         } catch (SQLException e) {
           System.err.println("Cannot register jdbc driver !");

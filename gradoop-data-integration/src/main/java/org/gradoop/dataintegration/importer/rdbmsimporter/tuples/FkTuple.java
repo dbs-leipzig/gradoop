@@ -90,7 +90,6 @@ public class FkTuple extends Tuple4<String, JDBCType, String, String> {
   /**
    * Checks if two FkTuple tuples are equal
    *
-   * @param t object to check equality
    * @return <code>true</code> if Object equals FkTuple; <code>false</code>
    *         otherwise
    */

@@ -29,7 +29,7 @@ import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToEdge;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToNode;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -59,12 +59,12 @@ public class RdbmsDataImportTest extends GradoopFlinkTestBase {
     metadataParser.parse();
 
     System.out.println(RdbmsDataImportTest.class
-        .getResource("/data/rdbms/expected/cycleTest.gdl").getFile());
-    
+      .getResource("/data/rdbms/expected/cycleTest.gdl").getFile());
+
     gdlPath = RdbmsDataImportTest.class
-        .getResource("/data/rdbms/expected/cycleTest.gdl").getFile();
+      .getResource("/data/rdbms/expected/cycleTest.gdl").getFile();
   }
-  
+
   @Test
   public void dbMetadataTest() throws SQLException, IOException {
     List<RdbmsTableBase> tableBase = metadataParser.getTableBase();
@@ -89,12 +89,12 @@ public class RdbmsDataImportTest extends GradoopFlinkTestBase {
     String user = "userName";
     String password = "password";
     String jdbcDriverPath = RdbmsDataImportTest.class
-        .getResource("/data/rdbms/jdbcDrivers/postgresql-42.2.2.jar").getFile();
+      .getResource("/data/rdbms/jdbcDrivers/postgresql-42.2.2.jar").getFile();
     String jdbcDriverClassName = "org.postgresql.Driver";
 
     // creates rdbms data import of embedded databse
     DataSource dataSource = new RdbmsDataSource(url, user, password, jdbcDriverPath,
-        jdbcDriverClassName, getConfig());
+      jdbcDriverClassName, getConfig());
 
     LogicalGraph tempInput = dataSource.getLogicalGraph();
     FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlPath);
@@ -116,11 +116,11 @@ public class RdbmsDataImportTest extends GradoopFlinkTestBase {
     });
 
     LogicalGraph input = getConfig().getLogicalGraphFactory().fromDataSets(v,
-        tempInput.getEdges());
-   
+      tempInput.getEdges());
+
     collectAndAssertTrue(input.equalsByElementData(expected));
   }
-  
+
   @AfterClass
   public static void stopEmbeddedPostgres() {
     pw.stop();

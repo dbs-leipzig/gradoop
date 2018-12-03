@@ -45,6 +45,7 @@ public class SQLToBasicTypeMapper {
     case "VARCHAR":
     case "NVARCHAR":
     case "LONGVARCHAR":
+    case "LONGNVARCHAR":
       typeInfo = BasicTypeInfo.STRING_TYPE_INFO;
       break;
     case "NUMERIC":

@@ -80,7 +80,6 @@ public class Fk1Fk2Props extends Tuple3<String, String, Properties> {
   /**
    * Checks if two Fk1Fk2Props tuples are equal
    *
-   * @param t object to check equality
    * @return <code>true</code> if Object equals Fk1Fk2Props; <code>false</code>
    *         otherwise
    */

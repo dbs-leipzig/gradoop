@@ -19,7 +19,7 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.dataintegration.importer.rdbmsimporter.RdbmsDataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -82,5 +82,4 @@ public class RdbmsExample implements ProgramDescription {
     return "Data import for relational databases, " +
         "implementing a relational database to epgm graph database conversion.";
   }
-
 }

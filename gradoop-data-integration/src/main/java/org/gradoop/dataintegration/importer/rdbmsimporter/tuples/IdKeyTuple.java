@@ -69,7 +69,6 @@ public class IdKeyTuple extends Tuple2<GradoopId, String> {
   /**
    * Checks if two IdKeyTuple tuples are equal
    *
-   * @param t object to check equality
    * @return <code>true</code> if Object equals IdKeyTuple; <code>false</code>
    *         otherwise
    */

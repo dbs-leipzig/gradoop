@@ -78,7 +78,6 @@ public class RowHeaderTuple extends Tuple3<String, String, Integer> {
   /**
    * Checks if two RowHeaderTuple tuples are equal
    *
-   * @param t object to check equality
    * @return <code>true</code> if Object equals RowHeaderTuple; <code>false</code>
    *         otherwise
    */

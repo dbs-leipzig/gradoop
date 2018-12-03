@@ -23,35 +23,58 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
 
 /**
- * Queries the relational data
+ * Provides a {@link org.apache.hadoop.mapred.InputFormat} from a given relational database.
  */
 public class FlinkDatabaseInputHelper {
 
   /**
-   * Provides a flink input to a relational database and querying data in a
-   * distributed manner.
+   * To store singelton class
+   */
+  private static FlinkDatabaseInputHelper OBJ = null;
+
+  /**
+   * Singelton class to provides a {@link org.apache.hadoop.mapred.InputFormat} from a given
+   * relational database.
+   */
+  private FlinkDatabaseInputHelper() { }
+
+  /**
+   * Creates a {@link FlinkDatabaseInputHelper} if none exists yet.
+   *
+   * @return {@link FlinkDatabaseInputHelper}
+   */
+  public static FlinkDatabaseInputHelper create() {
+    if (OBJ == null) {
+      OBJ = new FlinkDatabaseInputHelper();
+    }
+    return OBJ;
+  }
+
+  /**
+   * Provides a {@link org.apache.hadoop.mapred.InputFormat} from a given relational database.
    *
    * @param env flink execution environment
    * @param rdbmsConfig configuration of the used database management system
    * @param rowCount number of table rows
    * @param sqlQuery valid sql query
-   * @param typeInfo database row type information
+   * @param typeInfo {@link RowTypeInfo} of given relational database
    * @return a row DataSet, represents database table data
    */
-  public static DataSet<Row> getInput(ExecutionEnvironment env, RdbmsConfig rdbmsConfig,
-      int rowCount, String sqlQuery, RowTypeInfo typeInfo) {
+  public DataSet<Row> getInput(
+    ExecutionEnvironment env, RdbmsConfig rdbmsConfig,
+    int rowCount, String sqlQuery, RowTypeInfo typeInfo) {
 
     int parallelism = env.getParallelism();
 
     // run jdbc input format with pagination
     JDBCInputFormat jdbcInput = JDBCInputFormat.buildJDBCInputFormat()
-        .setDrivername("org.gradoop.dataintegration.importer.rdbmsimporter.connection.DriverShim")
-        .setDBUrl(rdbmsConfig.getUrl()).setUsername(rdbmsConfig.getUser())
-        .setPassword(rdbmsConfig.getPw())
-        .setQuery(sqlQuery + PageinationQueryChooser.choose(rdbmsConfig.getRdbmsType()))
-        .setRowTypeInfo(typeInfo).setParametersProvider(new GenericParameterValuesProvider(
-            ParametersChooser.choose(rdbmsConfig.getRdbmsType(), parallelism, rowCount)))
-        .finish();
+      .setDrivername(GradoopJDBCDriver.class.getName())
+      .setDBUrl(rdbmsConfig.getUrl()).setUsername(rdbmsConfig.getUser())
+      .setPassword(rdbmsConfig.getPw())
+      .setQuery(sqlQuery + PageinationQueryChooser.choose(rdbmsConfig.getRdbmsType()))
+      .setRowTypeInfo(typeInfo).setParametersProvider(new GenericParameterValuesProvider(
+        ParametersChooser.choose(rdbmsConfig.getRdbmsType(), parallelism, rowCount)))
+      .finish();
 
     return env.createInput(jdbcInput);
   }

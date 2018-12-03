@@ -71,7 +71,6 @@ public class NameTypeTuple extends Tuple2<String, JDBCType> {
   /**
    * Checks if two NameTypeTuple tuples are equal
    *
-   * @param t object to check equality
    * @return <code>true</code> if Object equals NameTypeTuple; <code>false</code>
    *         otherwise
    */

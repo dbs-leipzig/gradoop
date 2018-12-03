@@ -27,21 +27,17 @@ import org.gradoop.dataintegration.importer.rdbmsimporter.functions.CreateVertic
 import org.gradoop.dataintegration.importer.rdbmsimporter.functions.DeletePkFkProperties;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.MetaDataParser;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * A graph data import for relational databases. This data import was tested
- * with mysql,mariadb,postgresql and sql-server management systems. The
- * execution is currently limited to 64 database tables going to convert to epgm
- * vertices (64 non n:m relations). This due to Flink's union operator
- * limitation of max. 64 nodes. The data importer do not support following data
- * types: ARRAY,NVARCHAR,LONGNVARCHAR.
+ * A graph data import for relational databases. This data import was tested with
+ * mysql,mariadb,postgresql and sql-server management systems. The execution is currently limited to
+ * 64 database tables due to limitations of Flink's union operator. (max 64 datasets in parallel).
  */
 public class RdbmsDataSource implements DataSource {
 
@@ -58,14 +54,14 @@ public class RdbmsDataSource implements DataSource {
   /**
    * Transforms a relational database into an EPGM instance.
    *
-   * The data source expects a standard jdbc url, e.g.
-   * (jdbc:mysql://localhost/employees) and a valid path to a proper jdbc driver.
+   * The data source expects a standard JDBC url, e.g.
+   * (JDBC:mysql://localhost/employees) and a valid path to a proper JDBC driver.
    *
-   * @param url Valid jdbc url (e.g. jdbc:mysql://localhost/employees)
+   * @param url Valid JDBC url (e.g. jdbc:mysql://localhost/employees)
    * @param user User name of relational database user
    * @param pw Password of relational database user
-   * @param jdbcDriverPath Valid path to jdbc driver
-   * @param jdbcDriverClassName Valid jdbc driver class name
+   * @param jdbcDriverPath Valid path to JDBC driver
+   * @param jdbcDriverClassName Valid JDBC driver class name
    * @param flinkConfig Valid gradoop flink configuration
    */
   public RdbmsDataSource(String url, String user, String pw, String jdbcDriverPath,
@@ -99,19 +95,17 @@ public class RdbmsDataSource implements DataSource {
 
     // cleans vertices by deleting primary key and foreign key
     // properties
-    vertices = vertices.map(new DeletePkFkProperties()).withBroadcastSet(
-        flinkConfig.getExecutionEnvironment().fromCollection(metadataParser.getTablesToNodes()),
-        RdbmsConstants.BROADCAST_VARIABLE);
+    vertices = vertices
+      .map(new DeletePkFkProperties())
+      .withBroadcastSet(
+        flinkConfig.getExecutionEnvironment().fromCollection(
+          metadataParser.getTablesToNodes()), RdbmsConstants.BROADCAST_VARIABLE);
 
-    if (edges == null) {
-      return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices);
-    } else {
-      return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
-    }
+    return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
   }
 
   @Override
-  public GraphCollection getGraphCollection() throws IOException {
+  public GraphCollection getGraphCollection() {
     return flinkConfig.getGraphCollectionFactory().fromGraph(getLogicalGraph());
   }
 }
