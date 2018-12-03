@@ -25,9 +25,6 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 @FunctionAnnotation.ReadFields("f5")
 public class FilterRegularVertices implements FilterFunction<VertexGroupItem> {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean filter(VertexGroupItem vertexGroupItem) throws Exception {
     return !vertexGroupItem.isSuperVertex();

@@ -13,7 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.gradoop.flink.model.api.operators;
+
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+
 /**
- * This package contains configuration objects used for graph transformations.
+ * Creates a value of type {@link V} from one input graph of type {@link G}.
+ *
+ * @param <G> the input graph type
+ * @param <V> the type of the return value
  */
-package org.gradoop.dataintegration.transformation.config;
+public interface UnaryBaseGraphToValueOperator<G extends BaseGraph, V> extends Operator {
+  /**
+   * Executes the operator on the given graph.
+   *
+   * @param graph input graph
+   * @return operator result
+   */
+  V execute(G graph);
+}

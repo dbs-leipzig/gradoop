@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.propertytransformation;
+package org.gradoop.dataintegration.transformation.impl;
 
+import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
+import org.gradoop.dataintegration.transformation.impl.functions.DivideBy;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -84,7 +85,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
     LogicalGraph expected = loader.getLogicalGraphByVariable("g01");
 
     LogicalGraph result = original.callForGraph(
-      new PropertyTransformation(
+      new PropertyTransformation<>(
         "a",
         DIVISION,
         DIVISION,
@@ -110,7 +111,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
     LogicalGraph expected = loader.getLogicalGraphByVariable("g02");
 
     LogicalGraph result = original.callForGraph(
-      new PropertyTransformation(
+      new PropertyTransformation<>(
         "a",
         DIVISION,
         null,
@@ -137,7 +138,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
     LogicalGraph expected = loader.getLogicalGraphByVariable("g12");
 
     LogicalGraph result = original.callForGraph(
-      new PropertyTransformation(
+      new PropertyTransformation<>(
         "a",
         DIVISION,
         null,
@@ -161,7 +162,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
     LogicalGraph expected = loader.getLogicalGraphByVariable("g22");
 
     LogicalGraph result = original.callForGraph(
-      new PropertyTransformation(
+      new PropertyTransformation<>(
         "a",
         DIVISION,
         null,
@@ -187,7 +188,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
     LogicalGraph expected = loader.getLogicalGraphByVariable("g03");
 
     LogicalGraph result = original.callForGraph(
-      new PropertyTransformation(
+      new PropertyTransformation<>(
         "a",
         null,
         DIVISION,
@@ -214,7 +215,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
     LogicalGraph expected = loader.getLogicalGraphByVariable("g13");
 
     LogicalGraph result = original.callForGraph(
-      new PropertyTransformation(
+      new PropertyTransformation<>(
         "a",
         null,
         DIVISION,
@@ -238,7 +239,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
     LogicalGraph expected = loader.getLogicalGraphByVariable("g23");
 
     LogicalGraph result = original.callForGraph(
-      new PropertyTransformation(
+      new PropertyTransformation<>(
         "a",
         null,
         DIVISION,
@@ -265,7 +266,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
     LogicalGraph expected = loader.getLogicalGraphByVariable("g33");
 
     LogicalGraph result = original.callForGraph(
-      new PropertyTransformation(
+      new PropertyTransformation<>(
         "a",
         null,
         DIVISION,
@@ -291,7 +292,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
     LogicalGraph expected = loader.getLogicalGraphByVariable("g04");
 
     LogicalGraph result = original.callForGraph(
-      new PropertyTransformation(
+      new PropertyTransformation<>(
         "a",
         null,
         null,
@@ -318,7 +319,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
     LogicalGraph expected = loader.getLogicalGraphByVariable("g14");
 
     LogicalGraph result = original.callForGraph(
-      new PropertyTransformation(
+      new PropertyTransformation<>(
         "a",
         null,
         null,
@@ -342,7 +343,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
     LogicalGraph expected = loader.getLogicalGraphByVariable("g24");
 
     LogicalGraph result = original.callForGraph(
-      new PropertyTransformation(
+      new PropertyTransformation<>(
         "a",
         null,
         null,
@@ -369,7 +370,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
     LogicalGraph expected = loader.getLogicalGraphByVariable("g34");
 
     LogicalGraph result = original.callForGraph(
-      new PropertyTransformation(
+      new PropertyTransformation<>(
         "a",
         null,
         null,
@@ -377,63 +378,6 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
         "a",
         null,
         true));
-
-    collectAndAssertTrue(result.equalsByData(expected));
-  }
-
-   /**
-   * Executes a property transformation on graphHeads using the {@link LogicalGraph} object and
-   * checks if the result is correct.
-   *
-   * @throws Exception If the execution fails.
-   */
-  @Test
-  public void testGHTransformationUsingLG() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-
-    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
-
-    LogicalGraph expected = loader.getLogicalGraphByVariable("g12");
-
-    LogicalGraph result = original.transformGraphHeadProperties("a", DIVISION);
-
-    collectAndAssertTrue(result.equalsByData(expected));
-  }
-
-  /**
-   * Executes a property transformation on vertices using the {@link LogicalGraph} object and
-   * checks if the result is correct.
-   *
-   * @throws Exception If the execution fails.
-   */
-  @Test
-  public void testVertexTransformationUsingLG() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-
-    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
-
-    LogicalGraph expected = loader.getLogicalGraphByVariable("g13");
-
-    LogicalGraph result = original.transformVertexProperties("a", DIVISION);
-
-    collectAndAssertTrue(result.equalsByData(expected));
-  }
-
-  /**
-   * Executes a property transformation on edges using the {@link LogicalGraph} object and
-   * checks if the result is correct.
-   *
-   * @throws Exception If the execution fails.
-   */
-  @Test
-  public void testEdgeTransformationUsingLG() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
-
-    LogicalGraph original = loader.getLogicalGraphByVariable("g0");
-
-    LogicalGraph expected = loader.getLogicalGraphByVariable("g14");
-
-    LogicalGraph result = original.transformEdgeProperties("a", DIVISION);
 
     collectAndAssertTrue(result.equalsByData(expected));
   }

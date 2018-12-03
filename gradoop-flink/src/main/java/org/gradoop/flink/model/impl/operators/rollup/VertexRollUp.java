@@ -15,10 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.rollup;
 
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
-  .PropertyValueAggregator;
 
 import java.util.List;
 
@@ -47,9 +46,9 @@ public class VertexRollUp extends RollUp {
    */
   public VertexRollUp(
     List<String> vertexGroupingKeys,
-    List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<AggregateFunction> vertexAggregateFunctions,
     List<String> edgeGroupingKeys,
-    List<PropertyValueAggregator> edgeAggregateFunctions
+    List<AggregateFunction> edgeAggregateFunctions
   ) {
     super(vertexGroupingKeys, vertexAggregateFunctions, edgeGroupingKeys, edgeAggregateFunctions);
   }
