@@ -20,42 +20,57 @@ import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+
 /**
  * Tests for class {@link GraphCollectionFactory}
  */
 public class GraphCollectionFactoryTest extends GradoopFlinkTestBase {
-  FlinkAsciiGraphLoader loader;
-  GraphCollectionFactory factory;
+
+  private FlinkAsciiGraphLoader loader;
+  private GraphCollectionFactory factory;
 
   @Before
-  public void setUp() {
-    loader = getLoaderFromString(
-      "g1:Community {title : \"Graphs\", memberCount : 23}[" +
-        "(alice:User {age:23})-[:knows]->(bob:User)," +
-        "(bob)-[e1:knows]->(eve:User)," +
-        "]" +
-        "g2:Community {title : \"Databases\", memberCount : 42}[" +
-        "(alice:User {age:23)" +
-        "(peter:User {age:28)" +
-        "(alice)-[e2:hates]->(peter)" +
-        "]");
-
+  public void setUp() throws IOException {
+    loader = getSocialNetworkLoader();
     factory = getConfig().getGraphCollectionFactory();
   }
 
   @Test
   public void testFromGraphMethod() throws Exception {
-    collectAndAssertTrue(factory.fromGraph(loader.getLogicalGraphByVariable("g1"))
-      .equalsByGraphElementData(loader.getGraphCollectionByVariables("g1")));
+    GraphCollection expected = loader.getGraphCollectionByVariables("g0");
+    GraphCollection result = factory.fromGraph(loader.getLogicalGraphByVariable("g0"));
+
+    collectAndAssertTrue(expected.equalsByGraphElementData(result));
+  }
+
+  @Test
+  public void testSingleFromGraphsMethod() throws Exception {
+
+    GraphCollection expected = loader.getGraphCollectionByVariables("g0");
+    GraphCollection result = factory.fromGraphs(loader.getLogicalGraphByVariable("g0"));
+
+    collectAndAssertTrue(result.equalsByGraphElementData(expected));
+  }
+
+  @Test
+  public void testEmptyFromGraphsMethod() throws Exception {
+
+    GraphCollection expected = factory.createEmptyCollection();
+    GraphCollection result = factory.fromGraphs();
+
+    collectAndAssertTrue(result.equalsByGraphElementData(expected));
   }
 
   @Test
   public void testFromGraphsMethod() throws Exception {
-    collectAndAssertTrue(
-      factory.createEmptyCollection().equalsByGraphElementData(factory.fromGraphs()));
 
-    collectAndAssertTrue(factory
-      .fromGraphs(loader.getLogicalGraphByVariable("g1"), loader.getLogicalGraphByVariable("g2")).
-        equalsByGraphElementData(loader.getGraphCollection()));
+    LogicalGraph graph1 = loader.getLogicalGraphByVariable("g1");
+    LogicalGraph graph2 = loader.getLogicalGraphByVariable("g2");
+
+    GraphCollection expected = loader.getGraphCollectionByVariables("g1", "g2");
+    GraphCollection result = factory.fromGraphs(graph1, graph2);
+
+    collectAndAssertTrue(result.equalsByGraphElementData(expected));
   }
 }
