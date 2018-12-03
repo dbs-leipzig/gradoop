@@ -15,17 +15,30 @@
  */
 package org.gradoop.dataintegration.transformation.impl;
 
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 
 /**
  * Creates a graph with the same structure but a specified property of an element is transformed
  * by the declared function. The transformed value can be stored under a new key. If the
  * original key shall be reused the old value can be stored under the key 'key__x' where 'x' is a
  * version number. This number increases on every continuous transformation.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the logical graph instance
  */
-public class PropertyTransformation implements UnaryGraphToGraphOperator {
+public class PropertyTransformation<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Label of the element whose property shall be transformed.
@@ -116,14 +129,15 @@ public class PropertyTransformation implements UnaryGraphToGraphOperator {
    * @return transformed logical graph
    */
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
-    return graph.transform(
+  public LG execute(LG graph) {
+    return new Transformation<G, V, E, LG>(
         graphHeadTransformationFunction == null ? null : new BasePropertyTransformationFunction<>(
             propertyKey, graphHeadTransformationFunction, label, newPropertyKey, keepHistory),
         vertexTransformationFunction == null ? null : new BasePropertyTransformationFunction<>(
             propertyKey, vertexTransformationFunction, label, newPropertyKey, keepHistory),
         edgeTransformationFunction == null ? null : new BasePropertyTransformationFunction<>(
-            propertyKey, edgeTransformationFunction, label, newPropertyKey, keepHistory));
+            propertyKey, edgeTransformationFunction, label, newPropertyKey, keepHistory))
+      .execute(graph);
   }
 
   @Override
