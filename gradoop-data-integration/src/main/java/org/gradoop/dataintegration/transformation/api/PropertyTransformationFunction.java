@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.functions;
+package org.gradoop.dataintegration.transformation.api;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
 

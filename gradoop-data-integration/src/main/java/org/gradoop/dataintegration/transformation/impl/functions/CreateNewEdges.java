@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.transformation.functions;
+package org.gradoop.dataintegration.transformation.impl.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.dataintegration.transformation.config.EdgeDirection;
+import org.gradoop.dataintegration.transformation.impl.config.EdgeDirection;
 
 import java.util.List;
 

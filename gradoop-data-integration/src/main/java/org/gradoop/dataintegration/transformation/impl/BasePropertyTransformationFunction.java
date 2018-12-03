@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.propertytransformation;
+package org.gradoop.dataintegration.transformation.impl;
 
 import java.util.Objects;
 
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
 /**
@@ -26,7 +26,7 @@ import org.gradoop.flink.model.api.functions.TransformationFunction;
  *
  * @param <EL> graph element to be considered by the transformation
  */
-public class BasePropertyTransformationFunction<EL extends Element>
+public class BasePropertyTransformationFunction<EL extends EPGMElement>
   implements TransformationFunction<EL> {
 
   /**
