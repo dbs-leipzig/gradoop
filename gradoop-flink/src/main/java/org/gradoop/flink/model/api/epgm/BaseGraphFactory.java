@@ -19,6 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.ElementFactoryProvider;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 
 import java.util.Collection;
@@ -36,7 +37,7 @@ public interface BaseGraphFactory<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph> {
+  LG extends BaseGraph<G, V, E, LG>> extends ElementFactoryProvider<G, V, E> {
 
   /**
    * Sets the layout factory that is responsible for creating a graph layout.

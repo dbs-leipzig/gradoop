@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.transformation;
+package org.gradoop.dataintegration.transformation.impl;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -22,11 +22,11 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.dataintegration.transformation.config.EdgeDirection;
-import org.gradoop.dataintegration.transformation.functions.CreateNewEdges;
-import org.gradoop.dataintegration.transformation.functions.CreateNewVertex;
-import org.gradoop.dataintegration.transformation.functions.CreateNewVertexWithEqualityCondense;
-import org.gradoop.dataintegration.transformation.functions.ExtractPropertyWithOriginId;
+import org.gradoop.dataintegration.transformation.impl.config.EdgeDirection;
+import org.gradoop.dataintegration.transformation.impl.functions.CreateNewEdges;
+import org.gradoop.dataintegration.transformation.impl.functions.CreateNewVertex;
+import org.gradoop.dataintegration.transformation.impl.functions.CreateNewVertexWithEqualityCondense;
+import org.gradoop.dataintegration.transformation.impl.functions.ExtractPropertyWithOriginId;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;

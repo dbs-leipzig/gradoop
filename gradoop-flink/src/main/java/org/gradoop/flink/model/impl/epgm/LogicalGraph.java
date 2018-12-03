@@ -28,15 +28,14 @@ import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.epgm.LogicalGraphOperators;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
 import org.gradoop.flink.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
@@ -51,7 +50,6 @@ import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
@@ -59,7 +57,6 @@ import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
-import org.gradoop.flink.model.impl.operators.propertytransformation.PropertyTransformation;
 import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
 import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
@@ -95,7 +92,7 @@ import java.util.Objects;
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalGraph>,
-  LogicalGraphLayout<GraphHead, Vertex, Edge>, LogicalGraphOperators {
+  LogicalGraphOperators {
   /**
    * Layout for that logical graph.
    */
@@ -304,7 +301,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
     TransformationFunction<GraphHead> graphHeadTransformationFunction,
     TransformationFunction<Vertex> vertexTransformationFunction,
     TransformationFunction<Edge> edgeTransformationFunction) {
-    return callForGraph(new Transformation(
+    return callForGraph(new Transformation<>(
       graphHeadTransformationFunction,
       vertexTransformationFunction,
       edgeTransformationFunction));
@@ -328,36 +325,6 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
     return transform(null, null, edgeTransformationFunction);
   }
 
-  @Override
-  public LogicalGraph transformGraphHeadProperties(
-    String propertyKey,
-    PropertyTransformationFunction graphHeadPropTransformationFunction) {
-    Objects.requireNonNull(propertyKey);
-    Objects.requireNonNull(graphHeadPropTransformationFunction);
-    return callForGraph(new PropertyTransformation(propertyKey,
-      graphHeadPropTransformationFunction, null, null));
-  }
-
-  @Override
-  public LogicalGraph transformVertexProperties(
-    String propertyKey,
-    PropertyTransformationFunction vertexPropTransformationFunction) {
-    Objects.requireNonNull(propertyKey);
-    Objects.requireNonNull(vertexPropTransformationFunction);
-    return callForGraph(new PropertyTransformation(propertyKey,
-      null, vertexPropTransformationFunction, null));
-  }
-
-  @Override
-  public LogicalGraph transformEdgeProperties(
-    String propertyKey,
-    PropertyTransformationFunction edgePropTransformationFunction) {
-    Objects.requireNonNull(propertyKey);
-    Objects.requireNonNull(edgePropTransformationFunction);
-    return callForGraph(new PropertyTransformation(propertyKey,
-      null, null, edgePropTransformationFunction));
-  }
-
   /**
    * {@inheritDoc}
    */
@@ -365,7 +332,8 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   public LogicalGraph vertexInducedSubgraph(
     FilterFunction<Vertex> vertexFilterFunction) {
     Objects.requireNonNull(vertexFilterFunction);
-    return callForGraph(new Subgraph(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
+    return callForGraph(
+      new Subgraph<>(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
   }
 
   /**
@@ -375,7 +343,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   public LogicalGraph edgeInducedSubgraph(
     FilterFunction<Edge> edgeFilterFunction) {
     Objects.requireNonNull(edgeFilterFunction);
-    return callForGraph(new Subgraph(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));
+    return callForGraph(new Subgraph<>(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));
   }
 
   /**
@@ -385,7 +353,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   public LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
     FilterFunction<Edge> edgeFilterFunction, Subgraph.Strategy strategy) {
     return callForGraph(
-      new Subgraph(vertexFilterFunction, edgeFilterFunction, strategy));
+      new Subgraph<>(vertexFilterFunction, edgeFilterFunction, strategy));
   }
 
   /**
@@ -425,8 +393,8 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
    */
   @Override
   public LogicalGraph groupBy(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
+    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions,
     GroupingStrategy groupingStrategy) {
 
     Objects.requireNonNull(vertexGroupingKeys, "missing vertex grouping key(s)");
@@ -441,10 +409,10 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
       builder.addEdgeGroupingKeys(edgeGroupingKeys);
     }
     if (vertexAggregateFunctions != null) {
-      vertexAggregateFunctions.forEach(builder::addVertexAggregator);
+      vertexAggregateFunctions.forEach(builder::addVertexAggregateFunction);
     }
     if (edgeAggregateFunctions != null) {
-      edgeAggregateFunctions.forEach(builder::addEdgeAggregator);
+      edgeAggregateFunctions.forEach(builder::addEdgeAggregateFunction);
     }
     return callForGraph(builder.build());
   }
@@ -469,8 +437,8 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
 
   @Override
   public GraphCollection groupVerticesByRollUp(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions) {
+    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions) {
     if (vertexGroupingKeys == null || vertexGroupingKeys.isEmpty()) {
       throw new IllegalArgumentException("Missing vertex grouping key(s).");
     }
@@ -481,8 +449,8 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
 
   @Override
   public GraphCollection groupEdgesByRollUp(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions) {
+    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions) {
     if (edgeGroupingKeys == null || edgeGroupingKeys.isEmpty()) {
       throw new IllegalArgumentException("Missing edge grouping key(s).");
     }
@@ -560,7 +528,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
    * {@inheritDoc}
    */
   @Override
-  public LogicalGraph callForGraph(UnaryGraphToGraphOperator operator) {
+  public LogicalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<LogicalGraph> operator) {
     return operator.execute(this);
   }
 

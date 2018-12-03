@@ -90,8 +90,7 @@ import java.util.Objects;
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class GraphCollection implements
-  BaseGraphCollection<GraphHead, Vertex, Edge, GraphCollection>,
-  GraphCollectionLayout<GraphHead, Vertex, Edge>, GraphCollectionOperators {
+  BaseGraphCollection<GraphHead, Vertex, Edge, GraphCollection>, GraphCollectionOperators {
   /**
    * Layout for that graph collection
    */

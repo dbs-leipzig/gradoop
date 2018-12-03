@@ -129,7 +129,7 @@ public class SetPairBulkTraverser<K> extends SetPairTraverser<K> {
 
     // traverse to outgoing/incoming edges
     String[] forwardedFieldsEdgeSteps = new String[] {
-        "f0" // forward edge id
+      "f0" // forward edge id
     };
     DataSet<EmbeddingWithTiePoint<K>> nextWorkSet = traverseEdges(edges,
       embeddings, superstep, TraverserStrategy.SET_PAIR_BULK_ITERATION,
