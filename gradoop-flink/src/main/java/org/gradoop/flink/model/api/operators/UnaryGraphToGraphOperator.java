@@ -15,10 +15,10 @@
  */
 package org.gradoop.flink.model.api.operators;
 
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
  * Creates a {@link LogicalGraph} based on one input {@link LogicalGraph}.
  */
-public interface UnaryGraphToGraphOperator extends UnaryGraphToValueOperator<LogicalGraph> {
+public interface UnaryGraphToGraphOperator extends UnaryBaseGraphToBaseGraphOperator<LogicalGraph> {
 }

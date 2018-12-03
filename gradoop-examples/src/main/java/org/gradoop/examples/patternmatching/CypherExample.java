@@ -20,8 +20,8 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsLocalFSReader;
 import org.gradoop.flink.util.GradoopFlinkConfig;

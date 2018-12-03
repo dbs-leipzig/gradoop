@@ -23,12 +23,12 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.SetProperty;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 
 /**
  * The rollUp operator generates all combinations of the supplied vertex or edge grouping keys
@@ -47,7 +47,7 @@ public abstract class RollUp implements UnaryGraphToCollectionOperator {
   /**
    * Stores aggregation functions for vertices.
    */
-  protected final List<PropertyValueAggregator> vertexAggregateFunctions;
+  protected final List<AggregateFunction> vertexAggregateFunctions;
 
   /**
    * Stores grouping keys for edges.
@@ -57,7 +57,7 @@ public abstract class RollUp implements UnaryGraphToCollectionOperator {
   /**
    * Stores aggregation functions for edges.
    */
-  protected final List<PropertyValueAggregator> edgeAggregateFunctions;
+  protected final List<AggregateFunction> edgeAggregateFunctions;
 
   /**
    * Stores the strategy used for grouping.
@@ -76,9 +76,9 @@ public abstract class RollUp implements UnaryGraphToCollectionOperator {
    */
   RollUp(
     List<String> vertexGroupingKeys,
-    List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<AggregateFunction> vertexAggregateFunctions,
     List<String> edgeGroupingKeys,
-    List<PropertyValueAggregator> edgeAggregateFunctions) {
+    List<AggregateFunction> edgeAggregateFunctions) {
     this.vertexGroupingKeys = vertexGroupingKeys;
     this.vertexAggregateFunctions = vertexAggregateFunctions;
     this.edgeGroupingKeys = edgeGroupingKeys;

@@ -39,13 +39,13 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
   private static final String TEST03 = "io_vertex_predicate_03";
 
   /**
-   * pick 3 person randomly
+   * Pick 3 person randomly
    * then find vertex with label 'Person' and with same name (property) value
    *
    * @throws Throwable if error
    */
   @Test
-  public void test01_writeAndQueryVertexByName() throws Throwable {
+  public void writeAndQueryVertexByName() throws Throwable {
     doTest(TEST01, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = sample(loader.getVertices()
@@ -81,12 +81,12 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find all person who's age is not smaller than 35
+   * Find all person who's age is not smaller than 35
    *
    * @throws Throwable if error
    */
   @Test
-  public void test02_findPersonByAge() throws Throwable {
+  public void findPersonByAgeBiggerThan35() throws Throwable {
     doTest(TEST02, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = loader.getVertices()
@@ -114,12 +114,12 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
   }
 
   /**
-   * find all person who's age is smaller than 35
+   * Find all person who's age is smaller than 35
    *
    * @throws Throwable if error
    */
   @Test
-  public void test03_findPersonByAge() throws Throwable {
+  public void findPersonByAgeSmallerThan35() throws Throwable {
     doTest(TEST03, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = loader.getVertices()

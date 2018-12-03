@@ -16,13 +16,22 @@
 package org.gradoop.flink.model.api.layouts;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 
 /**
- * A logical graph layout defines the Flink internal (DataSet) representation of a
- * {@link org.gradoop.flink.model.api.epgm.LogicalGraph}.
+ * A logical graph layout defines the Flink internal (DataSet) representation of a logical graph
+ * instance containing elements of the specified types.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
  */
-public interface LogicalGraphLayout extends Layout {
+public interface LogicalGraphLayout<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge> extends Layout<V, E> {
 
   /**
    * True, if the layout is based on three separate datasets.
@@ -44,5 +53,5 @@ public interface LogicalGraphLayout extends Layout {
    *
    * @return 1-element dataset
    */
-  DataSet<GraphHead> getGraphHead();
+  DataSet<G> getGraphHead();
 }

@@ -30,7 +30,7 @@ import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.CreateLo
 import org.gradoop.flink.algorithms.gelly.functions.LongTupleToGellyEdgeWithLongValue;
 import org.gradoop.flink.algorithms.gelly.functions.LongTupleToGellyVertexWithLongValue;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.MapVertexIdComponentId;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 

@@ -15,19 +15,13 @@
  */
 package org.gradoop.flink.model.api.operators;
 
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
  * Creates a value from one input {@link LogicalGraph}.
  *
  * @param <T> result type
  */
-public interface UnaryGraphToValueOperator<T> extends Operator {
-  /**
-   * Executes the operator.
-   *
-   * @param graph input graph
-   * @return operator result
-   */
-  T execute(LogicalGraph graph);
+public interface UnaryGraphToValueOperator<T>
+  extends UnaryBaseGraphToValueOperator<LogicalGraph, T> {
 }

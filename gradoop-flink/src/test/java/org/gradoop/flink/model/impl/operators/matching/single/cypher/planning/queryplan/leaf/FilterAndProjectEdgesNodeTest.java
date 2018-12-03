@@ -60,7 +60,7 @@ public class FilterAndProjectEdgesNodeTest extends GradoopFlinkTestBase {
     String edgeVariable   = "e";
     String targetVariable = "a";
     FilterAndProjectEdgesNode node = new FilterAndProjectEdgesNode(
-      null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(),false);
+      null, sourceVariable, edgeVariable, targetVariable, new CNF(), new HashSet<>(), false);
 
     EmbeddingMetaData embeddingMetaData = node.getEmbeddingMetaData();
     assertThat(embeddingMetaData.getEntryColumn(sourceVariable), is(0));

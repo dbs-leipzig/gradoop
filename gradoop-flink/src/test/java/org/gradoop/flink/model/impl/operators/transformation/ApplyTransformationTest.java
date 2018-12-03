@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public abstract class ApplyTransformationTest extends TransformationTest {
 
   @Test
   public void testIdEquality() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(testGraphString);
 
     GraphCollection inputCollection = loader
       .getGraphCollectionByVariables("g0", "g1");
@@ -83,7 +83,7 @@ public abstract class ApplyTransformationTest extends TransformationTest {
 
   @Test
   public void testDataEquality() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(testGraphString);
 
     GraphCollection inputCollection = loader
       .getGraphCollectionByVariables("g0", "g1");
@@ -103,7 +103,7 @@ public abstract class ApplyTransformationTest extends TransformationTest {
 
   @Test
   public void testGraphHeadOnlyTransformation() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(testGraphString);
 
     GraphCollection inputCollection =
       loader.getGraphCollectionByVariables("g0", "g1");
@@ -120,7 +120,7 @@ public abstract class ApplyTransformationTest extends TransformationTest {
 
   @Test
   public void testVertexOnlyTransformation() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(testGraphString);
 
     GraphCollection inputCollection = loader
       .getGraphCollectionByVariables("g0", "g1");
@@ -137,7 +137,7 @@ public abstract class ApplyTransformationTest extends TransformationTest {
 
   @Test
   public void testEdgeOnlyTransformation() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(testGraphString);
 
     GraphCollection inputCollection = loader
       .getGraphCollectionByVariables("g0", "g1");

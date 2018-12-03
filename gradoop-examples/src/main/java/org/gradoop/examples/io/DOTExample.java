@@ -20,7 +20,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 
 /**
  * Example program that reads a graph from an EPGM format (csv, indexed, json)

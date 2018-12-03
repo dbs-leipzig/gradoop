@@ -20,8 +20,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.junit.Test;
 
 import java.util.List;
@@ -58,8 +58,9 @@ public class FlinkAsciiGraphLoaderTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testGetLogicalGraph() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString("expected:"
-      + GradoopConstants.DB_GRAPH_LABEL + "[" +
+    FlinkAsciiGraphLoader loader = getLoaderFromString("expected:" +
+      GradoopConstants.DB_GRAPH_LABEL +
+      "[" +
       "(v1:TestVertex)-[e1:TestEdge]->(v2:TestVertex)" +
       "]");
     LogicalGraph databaseGraph = loader.getLogicalGraph();
@@ -99,7 +100,7 @@ public class FlinkAsciiGraphLoaderTest extends GradoopFlinkTestBase {
     String[] graphVariables = new String[]{"g0", "g1", "g2"};
     List<GradoopId> graphIds = Lists.newArrayList();
 
-    for(String graphVariable : graphVariables) {
+    for (String graphVariable : graphVariables) {
       graphIds.add(loader.getGraphHeadByVariable(graphVariable).getId());
     }
 

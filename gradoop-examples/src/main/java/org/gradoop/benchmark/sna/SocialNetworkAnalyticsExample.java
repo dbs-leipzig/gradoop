@@ -26,11 +26,11 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsHDFSReader;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
@@ -140,7 +140,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
       .setStrategy(GroupingStrategy.GROUP_COMBINE)
       .addVertexGroupingKey("name")
       .useEdgeLabel(true).useVertexLabel(true)
-      .addEdgeAggregator(new CountAggregator())
+      .addEdgeAggregateFunction(new Count())
       .build().execute(graph);
 
     // filter all edges below a fixed threshold

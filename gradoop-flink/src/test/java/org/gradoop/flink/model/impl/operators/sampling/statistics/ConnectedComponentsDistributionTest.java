@@ -20,7 +20,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -130,17 +130,17 @@ public class ConnectedComponentsDistributionTest extends GradoopFlinkTestBase {
     assertTrue("Wrong number of vertices per component",
       vertexCount.contains(4L) && vertexCount.contains(3L) && vertexCount.contains(2L));
 
-    if(annotateEdges) {
-      for(Tuple3<String, Long, Long> componentTuple : componentDistList) {
-        if(componentTuple.f1 == 4L) {
+    if (annotateEdges) {
+      for (Tuple3<String, Long, Long> componentTuple : componentDistList) {
+        if (componentTuple.f1 == 4L) {
           assertEquals("Wrong number of edges for component '" + componentTuple.f0 + "'",
             12L, (long) componentTuple.f2);
         }
-        if(componentTuple.f1 == 3L) {
+        if (componentTuple.f1 == 3L) {
           assertEquals("Wrong number of edges for component '" + componentTuple.f0 + "'",
             3L, (long) componentTuple.f2);
         }
-        if(componentTuple.f1 == 2L) {
+        if (componentTuple.f1 == 2L) {
           assertEquals("Wrong number of edges for component '" + componentTuple.f0 + "'",
             1L, (long) componentTuple.f2);
         }
@@ -155,18 +155,16 @@ public class ConnectedComponentsDistributionTest extends GradoopFlinkTestBase {
    */
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
-    return Arrays.asList(
-      new String[] {
-        "wcc with annotated edges and int.max iterations",
-        "wcc_id",
-        "MAX",
-        "true"
-      },
-      new String[] {
-        "wcc without annotated edges and 10 iterations",
-        "wcc_id",
-        "10",
-        "false"
-      });
+    return Arrays.asList(new String[] {
+      "wcc with annotated edges and int.max iterations",
+      "wcc_id",
+      "MAX",
+      "true"
+    }, new String[] {
+      "wcc without annotated edges and 10 iterations",
+      "wcc_id",
+      "10",
+      "false"
+    });
   }
 }

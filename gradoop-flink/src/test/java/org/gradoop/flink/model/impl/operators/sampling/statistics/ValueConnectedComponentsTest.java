@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -109,11 +109,11 @@ public class ValueConnectedComponentsTest extends GradoopFlinkTestBase {
 
     Map<Long, Long> components = new HashMap<>();
 
-    for (Tuple2<Long, Long> tuple: vertexComponentList) {
+    for (Tuple2<Long, Long> tuple : vertexComponentList) {
       if (!components.containsKey(tuple.f1)) {
         components.put(tuple.f1, 1L);
       } else {
-        components.put(tuple.f1, components.get(tuple.f1)+1L);
+        components.put(tuple.f1, components.get(tuple.f1) + 1L);
       }
     }
     return components;

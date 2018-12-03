@@ -698,15 +698,13 @@ public class Embedding implements Value, CopyableValue<Embedding> {
 
     String idString = idCollection
       .stream()
-      .map(entry ->
-        {
-          if (entry.size() == 1) {
-            return entry.get(0).toString();
-          } else {
-            return entry.stream().map(GradoopId::toString).collect(joining(", ", "[", "]"));
-          }
+      .map(entry -> {
+        if (entry.size() == 1) {
+          return entry.get(0).toString();
+        } else {
+          return entry.stream().map(GradoopId::toString).collect(joining(", ", "[", "]"));
         }
-      )
+      })
       .collect(joining(", "));
 
     String propertyString = getProperties()
