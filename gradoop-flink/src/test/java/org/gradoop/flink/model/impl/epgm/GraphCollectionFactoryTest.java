@@ -38,6 +38,7 @@ public class GraphCollectionFactoryTest extends GradoopFlinkTestBase {
 
   @Test
   public void testFromGraphMethod() throws Exception {
+
     GraphCollection expected = loader.getGraphCollectionByVariables("g0");
     GraphCollection result = factory.fromGraph(loader.getLogicalGraphByVariable("g0"));
 
