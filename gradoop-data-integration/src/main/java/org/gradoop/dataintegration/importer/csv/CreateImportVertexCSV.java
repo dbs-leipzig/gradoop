@@ -33,6 +33,7 @@ public class CreateImportVertexCSV<K extends Comparable<K>>
    * Used ImportVertex
    */
   private ImportVertex<K> vertex;
+
   /**
    * Create a new CreateImportVertexCSV function
    */
@@ -42,7 +43,7 @@ public class CreateImportVertexCSV<K extends Comparable<K>>
   }
 
   @Override
-  public ImportVertex<K> map(final Tuple2<K, Properties> value) throws Exception {
+  public ImportVertex<K> map(final Tuple2<K, Properties> value) {
     vertex.setId(value.f0);
     vertex.setProperties(value.f1);
     return vertex;

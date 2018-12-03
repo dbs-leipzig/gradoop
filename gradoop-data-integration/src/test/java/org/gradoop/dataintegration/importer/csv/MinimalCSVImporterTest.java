@@ -15,8 +15,7 @@
  */
 package org.gradoop.dataintegration.importer.csv;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -59,30 +58,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
     env.execute();
 
-    assertThat(lv.size(), is(3));
-
-    for (ImportVertex<Long> v : lv) {
-      if (v.f2.get("name").toString().equals("foo")) {
-        assertThat(v.f2.size(), is(4));
-        assertThat(v.f2.get("name").toString(), is("foo"));
-        assertThat(v.f2.get("value1").toString(), is("453"));
-        assertThat(v.f2.get("value2").toString(), is("true"));
-        assertThat(v.f2.get("value3").toString(), is("71.03"));
-      } else if (v.f2.get("name").toString().equals("bar")) {
-        assertThat(v.f2.size(), is(4));
-        assertThat(v.f2.get("name").toString(), is("bar"));
-        assertThat(v.f2.get("value1").toString(), is("76"));
-        assertThat(v.f2.get("value2").toString(), is("false"));
-        assertThat(v.f2.get("value3").toString(), is("33.4"));
-      } else if (v.f2.get("name").toString().equals("bla")) {
-        assertThat(v.f2.size(), is(3));
-        assertThat(v.f2.get("name").toString(), is("bla"));
-        assertThat(v.f2.get("value1").toString(), is("4568"));
-        assertThat(v.f2.get("value3").toString(), is("9.42"));
-      } else {
-        fail();
-      }
-    }
+    assertImportCSV(lv);
   }
 
   /**
@@ -97,38 +73,42 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
     String csvPath = getFilePath("/csv/inputWithoutHeader.csv");
     String delimiter = ";";
 
-    ExecutionEnvironment env = getExecutionEnvironment();
-
     List<String> columnNames = Arrays.asList("name", "value1", "value2", "value3");
     MinimalCSVImporter importVertexImporter =
-            new MinimalCSVImporter(csvPath, delimiter, getConfig(), columnNames);
+      new MinimalCSVImporter(csvPath, delimiter, getConfig(), columnNames);
     DataSet<ImportVertex<Long>> importVertex = importVertexImporter.importVertices(false);
 
     List<ImportVertex<Long>> lv = new ArrayList<>();
     importVertex.output(new LocalCollectionOutputFormat<>(lv));
 
-    env.execute();
+    getExecutionEnvironment().execute();
 
-    assertThat(lv.size(), is(3));
+    assertImportCSV(lv);
+  }
+
+  /**
+   * Checks if the csv file import is equals to the assert import.
+   *
+   * @param lv list of the import vertices
+   */
+  public void assertImportCSV(List<ImportVertex<Long>> lv) {
+    assertEquals(lv.size(), 3);
 
     for (ImportVertex<Long> v : lv) {
       if (v.f2.get("name").toString().equals("foo")) {
-        assertThat(v.f2.size(), is(4));
-        assertThat(v.f2.get("name").toString(), is("foo"));
-        assertThat(v.f2.get("value1").toString(), is("453"));
-        assertThat(v.f2.get("value2").toString(), is("true"));
-        assertThat(v.f2.get("value3").toString(), is("71.03"));
+        assertEquals(v.f2.size(), 4);
+        assertEquals(v.f2.get("value1").toString(), "453");
+        assertEquals(v.f2.get("value2").toString(), "true");
+        assertEquals(v.f2.get("value3").toString(), "71.03");
       } else if (v.f2.get("name").toString().equals("bar")) {
-        assertThat(v.f2.size(), is(4));
-        assertThat(v.f2.get("name").toString(), is("bar"));
-        assertThat(v.f2.get("value1").toString(), is("76"));
-        assertThat(v.f2.get("value2").toString(), is("false"));
-        assertThat(v.f2.get("value3").toString(), is("33.4"));
+        assertEquals(v.f2.size(), 4);
+        assertEquals(v.f2.get("value1").toString(), "76");
+        assertEquals(v.f2.get("value2").toString(), "false");
+        assertEquals(v.f2.get("value3").toString(), "33.4");
       } else if (v.f2.get("name").toString().equals("bla")) {
-        assertThat(v.f2.size(), is(3));
-        assertThat(v.f2.get("name").toString(), is("bla"));
-        assertThat(v.f2.get("value1").toString(), is("4568"));
-        assertThat(v.f2.get("value3").toString(), is("9.42"));
+        assertEquals(v.f2.size(), 3);
+        assertEquals(v.f2.get("value1").toString(), "4568");
+        assertEquals(v.f2.get("value3").toString(), "9.42");
       } else {
         fail();
       }

@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.utils.DataSetUtils;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.dataintegration.importer.csv.functions.FilterNullValuesTuple;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.slf4j.Logger;
@@ -67,6 +68,7 @@ public class MinimalCSVImporter {
 
   /**
    * Create a new MinimalCSVImporter. The user set a list of the property names.
+   *
    * @param path the path to the csv file
    * @param tokenSeperator the token delimiter of the csv file
    * @param config GradoopFlinkConfig
@@ -81,6 +83,7 @@ public class MinimalCSVImporter {
   /**
    * Create a new MinimalCSVImporter. Use the utf-8 charset as default. The first line of the file
    * will set as the property names for each column.
+   *
    * @param path the path to the csv file
    * @param tokenSeperator the token delimiter of the csv file
    * @param config GradoopFlinkConfig
@@ -92,6 +95,7 @@ public class MinimalCSVImporter {
   /**
    * Create a new MinimalCSVImporter with a user set charset. The first line of the file
    * will set as the property names for each column.
+   *
    * @param path the path to the csv file
    * @param tokenSeperator the token delimiter of the csv file
    * @param config GradoopFlinkConfig
@@ -108,6 +112,7 @@ public class MinimalCSVImporter {
   /**
    * Import each row of the file as a vertex. If no column property names are set,
    * read the first line of the file as header and set this values as column names.
+   *
    * @param checkReoccurringHeader if each row of the file should be checked for reocurring of
    * the column property names.
    * @return the imported vertices
