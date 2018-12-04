@@ -55,7 +55,7 @@ public class TemporalGraphLayoutFactory extends BaseFactory implements
     DataSet<TemporalVertex> vertices, DataSet<TemporalEdge> edges) {
     Objects.requireNonNull(vertices, "Vertex DataSet is null");
     Objects.requireNonNull(edges, "Edge DataSet is null");
-    TemporalGraphHead graphHead = TemporalGraphHead.createGraphHead();
+    TemporalGraphHead graphHead = getConfig().getTemporalGraphHeadFactory().createGraphHead();
 
     DataSet<TemporalGraphHead> graphHeadSet = getConfig().getExecutionEnvironment()
       .fromElements(graphHead);

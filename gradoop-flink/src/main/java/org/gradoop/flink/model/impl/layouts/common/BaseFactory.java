@@ -132,7 +132,7 @@ public abstract class BaseFactory implements BaseLayoutFactory {
     DataSet<TemporalGraphHead> graphHeadSet;
     if (temporalGraphHeads.isEmpty()) {
       graphHeadSet = env
-        .fromElements(TemporalGraphHead.createGraphHead())
+        .fromElements(getConfig().getTemporalGraphHeadFactory().createGraphHead())
         .filter(new False<>());
     } else {
       graphHeadSet =  env.fromCollection(temporalGraphHeads);
@@ -155,7 +155,7 @@ public abstract class BaseFactory implements BaseLayoutFactory {
     DataSet<TemporalVertex> vertexSet;
     if (temporalVertices.isEmpty()) {
       vertexSet = env
-        .fromElements(TemporalVertex.createVertex())
+        .fromElements(getConfig().getTemporalVertexFactory().createVertex())
         .filter(new False<>());
     } else {
       vertexSet = env.fromCollection(temporalVertices);
@@ -179,7 +179,7 @@ public abstract class BaseFactory implements BaseLayoutFactory {
     if (temporalEdges.isEmpty()) {
       GradoopId dummyId = GradoopId.get();
       edgeSet = env
-        .fromElements(TemporalEdge.createEdge(dummyId, dummyId))
+        .fromElements(getConfig().getTemporalEdgeFactory().createEdge(dummyId, dummyId))
         .filter(new False<>());
     } else {
       edgeSet = env.fromCollection(temporalEdges);
