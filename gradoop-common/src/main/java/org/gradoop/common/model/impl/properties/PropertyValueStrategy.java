@@ -43,6 +43,9 @@ public interface PropertyValueStrategy<T> {
       classStrategyMap.put(Set.class, new SetStrategy());
       classStrategyMap.put(Integer.class, new IntegerStrategy());
       classStrategyMap.put(Long.class, new LongStrategy());
+      classStrategyMap.put(Float.class, new FloatStrategy());
+      classStrategyMap.put(Double.class, new DoubleStrategy());
+      classStrategyMap.put(Short.class, new ShortStrategy());
 
       byteStrategyMap = new HashMap<>(classStrategyMap.size());
       for (PropertyValueStrategy strategy : classStrategyMap.values()) {
@@ -255,6 +258,7 @@ public interface PropertyValueStrategy<T> {
   }
 
   class IntegerStrategy implements PropertyValueStrategy<Integer> {
+
     @Override
     public boolean write(Integer value, DataOutputView outputView) throws IOException {
       outputView.write(getRawBytes(value));
@@ -354,6 +358,162 @@ public interface PropertyValueStrategy<T> {
       byte[] rawBytes = new byte[PropertyValue.OFFSET + Bytes.SIZEOF_LONG];
       rawBytes[0] = getRawType();
       Bytes.putLong(rawBytes, PropertyValue.OFFSET, value);
+      return rawBytes;
+    }
+  }
+
+  class FloatStrategy implements PropertyValueStrategy<Float> {
+
+    @Override
+    public boolean write(Float value, DataOutputView outputView) throws IOException {
+      outputView.write(getRawBytes(value));
+      return true;
+    }
+
+    @Override
+    public Float read(DataInputView inputView) throws IOException {
+      int length = Bytes.SIZEOF_FLOAT;
+      byte[] rawBytes = new byte[length];
+      for (int i  = 0; i < rawBytes.length; i++) {
+        rawBytes[i] = inputView.readByte();
+      }
+      return Bytes.toFloat(rawBytes);
+    }
+
+    @Override
+    public int compare(Float value, Float other) {
+      return Float.compare(value, other);
+    }
+
+    @Override
+    public boolean is(Object value) {
+      return value instanceof Float;
+    }
+
+    @Override
+    public Class<Float> getType() {
+      return Float.class;
+    }
+
+    @Override
+    public Float get(byte[] bytes) {
+      return Bytes.toFloat(bytes, PropertyValue.OFFSET);
+    }
+
+    @Override
+    public Byte getRawType() {
+      return PropertyValue.TYPE_FLOAT;
+    }
+
+    @Override
+    public byte[] getRawBytes(Float value) {
+      byte[] rawBytes = new byte[PropertyValue.OFFSET + Bytes.SIZEOF_FLOAT];
+      rawBytes[0] = getRawType();
+      Bytes.putFloat(rawBytes, PropertyValue.OFFSET, value);
+      return rawBytes;
+    }
+  }
+
+  class DoubleStrategy implements PropertyValueStrategy<Double> {
+
+    @Override
+    public boolean write(Double value, DataOutputView outputView) throws IOException {
+      outputView.write(getRawBytes(value));
+      return true;
+    }
+
+    @Override
+    public Double read(DataInputView inputView) throws IOException {
+      int length = Bytes.SIZEOF_DOUBLE;
+      byte[] rawBytes = new byte[length];
+      for (int i  = 0; i < rawBytes.length; i++) {
+        rawBytes[i] = inputView.readByte();
+      }
+      return Bytes.toDouble(rawBytes);
+    }
+
+    @Override
+    public int compare(Double value, Double other) {
+      return Double.compare(value, other);
+    }
+
+    @Override
+    public boolean is(Object value) {
+      return value instanceof Double;
+    }
+
+    @Override
+    public Class<Double> getType() {
+      return Double.class;
+    }
+
+    @Override
+    public Double get(byte[] bytes) {
+      return Bytes.toDouble(bytes);
+    }
+
+    @Override
+    public Byte getRawType() {
+      return PropertyValue.TYPE_DOUBLE;
+    }
+
+    @Override
+    public byte[] getRawBytes(Double value) {
+      byte[] rawBytes = new byte[PropertyValue.OFFSET + Bytes.SIZEOF_DOUBLE];
+      rawBytes[0] = getRawType();
+      Bytes.putDouble(rawBytes, PropertyValue.OFFSET, value);
+      return rawBytes;
+    }
+  }
+
+  class ShortStrategy implements PropertyValueStrategy<Short> {
+
+    @Override
+    public boolean write(Short value, DataOutputView outputView) throws IOException {
+      outputView.write(getRawBytes(value));
+      return true;
+    }
+
+    @Override
+    public Short read(DataInputView inputView) throws IOException {
+      int length = Bytes.SIZEOF_SHORT;
+      byte[] rawBytes = new byte[length];
+      for (int i  = 0; i < rawBytes.length; i++) {
+        rawBytes[i] = inputView.readByte();
+      }
+      return Bytes.toShort(rawBytes);
+    }
+
+    @Override
+    public int compare(Short value, Short other) {
+      return Short.compare(value, other);
+    }
+
+    @Override
+    public boolean is(Object value) {
+      return value instanceof Short;
+    }
+
+    @Override
+    public Class<Short> getType() {
+      return Short.class;
+    }
+
+    @Override
+    public Short get(byte[] bytes) {
+      return Bytes.toShort(bytes, PropertyValue.OFFSET);
+    }
+
+    @Override
+    public Byte getRawType() {
+      return PropertyValue.TYPE_SHORT;
+    }
+
+    @Override
+    public byte[] getRawBytes(Short value) {
+      byte[] rawBytes = new byte[PropertyValue.OFFSET + Bytes.SIZEOF_SHORT];
+      rawBytes[0] = getRawType();
+      Bytes.putShort(rawBytes, PropertyValue.OFFSET, value);
       return rawBytes;
     }
   }
