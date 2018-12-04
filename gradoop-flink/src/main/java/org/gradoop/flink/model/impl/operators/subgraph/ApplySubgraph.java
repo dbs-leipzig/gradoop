@@ -127,8 +127,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
-      .getGraphHeadFactory();
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())
@@ -231,8 +230,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
-      .getGraphHeadFactory();
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())
@@ -306,8 +304,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
-      .getGraphHeadFactory();
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())

@@ -18,6 +18,7 @@ package org.gradoop.flink.model.api.epgm;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
@@ -32,7 +33,7 @@ public interface BaseGraph<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph> {
+  LG extends BaseGraph<G, V, E, LG>> extends LogicalGraphLayout<G, V, E> {
   /**
    * Returns the Gradoop Flink configuration.
    *
