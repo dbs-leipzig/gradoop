@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.examples.rollup;
+package org.gradoop.examples.rollup.functions;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
 /**
  * Transformation function that creates separate year, month, day, hour and minute properties based
  * on a property of type long.
  *
- * @param <E> gradoop element
+ * @param <E> element type
  */
+@FunctionAnnotation.ForwardedFields("id;label")
 public class TimePropertyTransformationFunction<E extends EPGMElement>
-implements TransformationFunction<E> {
+  implements TransformationFunction<E> {
 
   /**
    * serialVersionUID.
@@ -50,20 +52,24 @@ implements TransformationFunction<E> {
     this.propertyKey = propertyKey;
   }
 
-  /**
-   * Runs the transformation.
-   */
   @Override
   public E apply(E current, E transformed) {
-    Date timeOfCall = new Date(current.getPropertyValue(propertyKey).getInt() * 1000L);
-    Calendar calendar = new GregorianCalendar();
-    calendar.setTime(timeOfCall);
+    PropertyValue timePropertyValue = current.getPropertyValue(propertyKey);
 
-    transformed.setProperty("year", calendar.get(Calendar.YEAR));
-    transformed.setProperty("month", calendar.get(Calendar.MONTH));
-    transformed.setProperty("day", calendar.get(Calendar.DAY_OF_MONTH));
-    transformed.setProperty("hour", calendar.get(Calendar.HOUR));
-    transformed.setProperty("minute", calendar.get(Calendar.MINUTE));
+    if (timePropertyValue == null) {
+      return current;
+    }
+
+    LocalDateTime timeOfCall = LocalDateTime.ofEpochSecond((long) timePropertyValue.getInt(),
+      0, OffsetDateTime.now().getOffset());
+
+    transformed.setLabel(current.getLabel());
+
+    transformed.setProperty("year", timeOfCall.getYear());
+    transformed.setProperty("month", timeOfCall.getMonth().getValue());
+    transformed.setProperty("day", timeOfCall.getDayOfMonth());
+    transformed.setProperty("hour", timeOfCall.getHour());
+    transformed.setProperty("minute", timeOfCall.getMinute());
 
     return transformed;
   }

@@ -21,11 +21,13 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.flink.io.impl.gdl.GDLDataSink;
+import org.gradoop.examples.AbstractRunner;
+import org.gradoop.examples.rollup.functions.TimePropertyTransformationFunction;
+import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -34,23 +36,18 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  *
  * The example uses our own telephone call example graph.
  */
-public class TelephoneCallGraph {
+public class RollUpExample extends AbstractRunner {
 
   /**
    * Path to the example data graph
    */
   private static final String EXAMPLE_DATA_FILE =
-    TelephoneCallGraph.class.getResource("/data/gdl/tc.gdl").getFile();
+    RollUpExample.class.getResource("/data/gdl/tc.gdl").getFile();
 
   /**
-   * Runs the program on the example data graph.
-   *
    * The example provides an overview over the usage of the different rollUp methods.
    * It showcases the application of rollUp functions that are already provided by
    * Gradoop. Documentation for all available rollUp functions can be found in the projects wiki.
-   *
-   * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Unary-Logical-Graph-Operators">
-   * Gradoop Wiki</a>
    *
    * Using the telephone call graph in the resources directory, the program will:
    * 1. transform the long value of the "time" property into the separate properties "year",
@@ -61,6 +58,9 @@ public class TelephoneCallGraph {
    * 4. write both results into a separate GDL-File
    *
    * @param args arguments
+   *
+   * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Unary-Logical-Graph-Operators">
+   * Gradoop Wiki</a>
    */
   public static void main(String[] args) throws Exception {
     // init execution environment
@@ -83,27 +83,30 @@ public class TelephoneCallGraph {
     String pathPrefix = System.getProperty("user.home") + "/telephoneGraph";
 
     // group by rollUp on vertices
-    String gdlPath = pathPrefix + "_vertexRollUp.gdl";
+    String firstDotPath = pathPrefix + "_vertexRollUp.dot";
     GraphCollection graphGroupedByRollUpOnVertices =
       callGraph.groupVerticesByRollUp(
-      Arrays.asList(Grouping.LABEL_SYMBOL, "country", "state", "city"),
-      Collections.singletonList(new CountAggregator("count")),
-      Collections.emptyList(),
-      Collections.emptyList());
+        Arrays.asList(Grouping.LABEL_SYMBOL, "country", "state", "city"),
+        Collections.singletonList(new Count("count")),
+        Arrays.asList(Grouping.LABEL_SYMBOL, "year", "month"),
+        Collections.singletonList(new Count("count")));
 
-    new GDLDataSink(gdlPath).write(graphGroupedByRollUpOnVertices, true);
+    new DOTDataSink(firstDotPath, true).write(graphGroupedByRollUpOnVertices, true);
 
     // group by rollUp on edges
-    gdlPath = pathPrefix + "_edgeRollUp.gdl";
+    String secondDotPath = pathPrefix + "_edgeRollUp.dot";
     GraphCollection graphGroupedByRollUpOnEdges =
       callGraph.groupEdgesByRollUp(
-      Collections.emptyList(),
-      Collections.emptyList(),
-      Arrays.asList("year", "month", "day", "hour", "minute"),
-      Collections.singletonList(new CountAggregator("count")));
+        Arrays.asList(Grouping.LABEL_SYMBOL, "city"),
+        Collections.singletonList(new Count("count")),
+        Arrays.asList(Grouping.LABEL_SYMBOL, "year", "month", "day", "hour", "minute"),
+        Collections.singletonList(new Count("count")));
 
-    new GDLDataSink(gdlPath).write(graphGroupedByRollUpOnEdges, true);
+    new DOTDataSink(secondDotPath, true).write(graphGroupedByRollUpOnEdges, true);
 
     env.execute();
+
+    convertDotToPNG(firstDotPath, firstDotPath.replace("dot", "png"));
+    convertDotToPNG(secondDotPath, secondDotPath.replace("dot", "png"));
   }
 }

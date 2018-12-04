@@ -21,9 +21,9 @@ tc[
 (vincent:Person {name:"Vincent", country: "Germany", state: "Thuringia", city:"Jena"})
 (maria:Person {name:"Maria", country: "Germany", state: "Saxony", city:"Dresden"})
 (marta:Person {name:"Marta", country: "Germany", state: "Saxony", city:"Dresden"})
-(lisa:Person {name:"Lisa", country: "Germany", state: "Thuringia", city:"Erfurt"})
-(linda:Person {name:"Linda", country: "Germany", state: "Thuringia", city:"Erfurt"})
-(rica:Person {name:"Rica", country: "Germany", state: "Bavaria", city:"Munich"})
+(lisa:Person {name:"Lisa", country: "USA", state: "Arizona", city:"Phoenix"})
+(linda:Person {name:"Linda", country: "USA", state: "Arizona", city:"Phoenix"})
+(rica:Person {name:"Rica", country: "USA", state: "Pennsylvania", city:"Philadelphia"})
 
 // edge space
 (alice)-[e0:calls {time:1542295800}]->(doris)
