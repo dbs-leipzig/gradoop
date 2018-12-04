@@ -156,8 +156,8 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
         boolean cityContainment = cities.contains(sourceName) || cities.contains(targetName);
         boolean personContainment = persons.contains(sourceName) || persons.contains(targetName);
 
-        Assert.assertTrue("vertex name 1: " + sourceName + " | vertex name 2: " + targetName
-            + " | edge direction: " + direction.name(),
+        Assert.assertTrue("vertex name 1: " + sourceName + " | vertex name 2: " +
+            targetName + " | edge direction: " + direction.name(),
           cityContainment && personContainment);
       }
     }
@@ -204,12 +204,15 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
   public void listPropertyTest() throws Exception {
     VertexFactory vf = getConfig().getVertexFactory();
     Vertex v1 = vf.createVertex("foo");
-    v1.setProperty("a", PropertyValue.create(Arrays.asList(PropertyValue.create("m"), PropertyValue.create("n"))));
+    v1.setProperty("a", PropertyValue.create(Arrays.asList(PropertyValue.create("m"),
+      PropertyValue.create("n"))));
 
     Vertex v2 = vf.createVertex("foo");
-    v2.setProperty("a", PropertyValue.create(Arrays.asList(PropertyValue.create("x"), PropertyValue.create("y"), PropertyValue.create("z"))));
+    v2.setProperty("a", PropertyValue.create(Arrays.asList(PropertyValue.create("x"),
+      PropertyValue.create("y"), PropertyValue.create("z"))));
 
-    LogicalGraph input = getConfig().getLogicalGraphFactory().fromCollections(Arrays.asList(v1, v2), Collections.emptyList());
+    LogicalGraph input = getConfig().getLogicalGraphFactory().fromCollections(
+      Arrays.asList(v1, v2), Collections.emptyList());
 
     ExtractPropertyFromVertex ext = new ExtractPropertyFromVertex("foo", "a", "A", "key");
     LogicalGraph output = input.callForGraph(ext);
