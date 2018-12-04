@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.api.tpgm;
 
 import org.gradoop.flink.model.api.epgm.GraphBaseOperators;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.tpgm.TemporalGraphCollection;
 
 /**
@@ -23,4 +24,16 @@ import org.gradoop.flink.model.impl.tpgm.TemporalGraphCollection;
  */
 public interface TemporalGraphCollectionOperators extends GraphBaseOperators {
 
+  //----------------------------------------------------------------------------
+  // Utilities
+  //----------------------------------------------------------------------------
+
+  /**
+   * Converts the {@link TemporalGraphCollection} to a {@link GraphCollection} instance by
+   * discarding all temporal information from the graph elements. All Ids (graphs, vertices,
+   * edges) are kept during the transformation.
+   *
+   * @return the graph collection instance
+   */
+  GraphCollection toGraphCollection();
 }

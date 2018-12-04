@@ -162,13 +162,10 @@ public class TemporalGraphCollection implements
     return this.layout.getGraphTransactions();
   }
 
-  /**
-   * Converts the {@link TemporalGraphCollection} to a {@link GraphCollection} instance by
-   * discarding all temporal information from the graph elements. All Ids (graphs, vertices,
-   * edges) are kept during the transformation.
-   *
-   * @return the graph collection instance
-   */
+  //----------------------------------------------------------------------------
+  // Utilities
+  //----------------------------------------------------------------------------
+  @Override
   public GraphCollection toGraphCollection() {
     return getConfig().getGraphCollectionFactory().fromDataSets(
       getGraphHeads().map(new GraphHeadFromTemporal()),

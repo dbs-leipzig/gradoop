@@ -24,6 +24,9 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalEdgeFactory;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalVertexFactory;
 
 /**
  * Basic Gradoop Configuration.
@@ -49,6 +52,21 @@ public class GradoopConfig
    *  Knows how to create {@link Edge}
    */
   private final EdgeFactory edgeFactory;
+
+  /**
+   * Knows how to create {@link org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead}
+   */
+  private TemporalGraphHeadFactory temporalGraphHeadFactory;
+
+  /**
+   * Knows how to create {@link org.gradoop.common.model.impl.pojo.temporal.TemporalVertex}
+   */
+  private TemporalVertexFactory temporalVertexFactory;
+
+  /**
+   * Knows how to create {@link org.gradoop.common.model.impl.pojo.temporal.TemporalEdge}
+   */
+  private TemporalEdgeFactory temporalEdgeFactory;
 
   /**
    * Creates a new Configuration.
@@ -80,5 +98,44 @@ public class GradoopConfig
 
   public EdgeFactory getEdgeFactory() {
     return edgeFactory;
+  }
+
+  /**
+   * Returns a factory that is responsible for creating a
+   * {@link org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead} instance.
+   *
+   * @return the temporal graph head factory
+   */
+  public TemporalGraphHeadFactory getTemporalGraphHeadFactory() {
+    if (temporalGraphHeadFactory == null) {
+      temporalGraphHeadFactory = new TemporalGraphHeadFactory();
+    }
+    return temporalGraphHeadFactory;
+  }
+
+  /**
+   * Returns a factory that is responsible for creating a
+   * {@link org.gradoop.common.model.impl.pojo.temporal.TemporalVertex} instance.
+   *
+   * @return the temporal vertex factory
+   */
+  public TemporalVertexFactory getTemporalVertexFactory() {
+    if (temporalVertexFactory == null) {
+      temporalVertexFactory = new TemporalVertexFactory();
+    }
+    return temporalVertexFactory;
+  }
+
+  /**
+   * Returns a factory that is responsible for creating a
+   * {@link org.gradoop.common.model.impl.pojo.temporal.TemporalEdge} instance.
+   *
+   * @return the temporal edge factory
+   */
+  public TemporalEdgeFactory getTemporalEdgeFactory() {
+    if (temporalEdgeFactory == null) {
+      temporalEdgeFactory = new TemporalEdgeFactory();
+    }
+    return temporalEdgeFactory;
   }
 }

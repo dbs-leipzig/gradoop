@@ -44,7 +44,7 @@ public class TemporalEdgeTest {
     Long validTo = 52L;
 
     TemporalEdge temporalEdge = new TemporalEdge(edgeId, label, sourceId, targetId, null, null,
-      validFrom,validTo);
+      validFrom, validTo);
 
     assertEquals(edgeId, temporalEdge.getId());
     assertEquals(sourceId, temporalEdge.getSourceId());

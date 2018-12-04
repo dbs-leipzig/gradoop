@@ -24,7 +24,6 @@ import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.gradoop.flink.model.impl.tpgm.TemporalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -146,8 +145,7 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test the {@link LogicalGraph#toTemporalGraph(TimeIntervalExtractor, TimeIntervalExtractor,
-   * TimeIntervalExtractor)}  function.
+   * Test the {@link LogicalGraph#toTemporalGraph()} function with time interval extractors.
    *
    * @throws Exception if the test execution fails
    */

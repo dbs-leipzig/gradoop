@@ -17,6 +17,9 @@ package org.gradoop.flink.model.impl.tpgm;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.util.Preconditions;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
@@ -92,5 +95,20 @@ public class TemporalGraphCollectionFactory implements BaseGraphCollectionFactor
   @Override
   public TemporalGraphCollection createEmptyCollection() {
     return new TemporalGraphCollection(layoutFactory.createEmptyCollection(), config);
+  }
+
+  @Override
+  public EPGMGraphHeadFactory<TemporalGraphHead> getGraphHeadFactory() {
+    return this.config.getTemporalGraphHeadFactory();
+  }
+
+  @Override
+  public EPGMVertexFactory<TemporalVertex> getVertexFactory() {
+    return this.config.getTemporalVertexFactory();
+  }
+
+  @Override
+  public EPGMEdgeFactory<TemporalEdge> getEdgeFactory() {
+    return this.config.getTemporalEdgeFactory();
   }
 }

@@ -24,6 +24,7 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.tpgm.TemporalGraphOperators;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.bool.Not;
@@ -53,9 +54,9 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * Note that the {@link TemporalGraph} also implements that interface and just forward the calls to
  * the layout. This is just for convenience and API synchronicity.
  */
-public class TemporalGraph implements
-  BaseGraph<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph>,
-  LogicalGraphLayout<TemporalGraphHead, TemporalVertex, TemporalEdge>, TemporalGraphOperators {
+public class TemporalGraph
+  implements BaseGraph<TemporalGraphHead, TemporalVertex, TemporalEdge, TemporalGraph>,
+  TemporalGraphOperators {
 
   /**
    * Layout for that temporal graph.
@@ -143,13 +144,21 @@ public class TemporalGraph implements
     return this.layout.getEdgesByLabel(label);
   }
 
-  /**
-   * Converts the {@link TemporalGraph} to a {@link LogicalGraph} instance by discarding all
-   * temporal information from the graph elements. All Ids (graphs, vertices, edges) are kept
-   * during the transformation.
-   *
-   * @return the logical graph instance
-   */
+  //----------------------------------------------------------------------------
+  // Auxiliary Operators
+  //----------------------------------------------------------------------------
+
+  @Override
+  public TemporalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<TemporalGraph> operator) {
+    return operator.execute(this);
+  }
+
+
+  //----------------------------------------------------------------------------
+  // Utilities
+  //----------------------------------------------------------------------------
+
+  @Override
   public LogicalGraph toLogicalGraph() {
     return getConfig().getLogicalGraphFactory().fromDataSets(
       getGraphHead().map(new GraphHeadFromTemporal()),

@@ -427,8 +427,8 @@ public class GraphCollection implements
   /**
    * Converts the {@link GraphCollection} to a {@link TemporalGraphCollection} instance.
    * By the provided timestamp extractors, it is possible to extract temporal information from the
-   * data to define a time interval that represents the beginning and end of the element's validity
-   * (valid time).
+   * data to define a timestamp or time interval that represents the beginning (and end) of the
+   * element's validity (valid time).
    *
    * @param graphHeadTimeIntervalExtractor extractor to pick the time interval from graph heads
    * @param vertexTimeIntervalExtractor extractor to pick the time interval from vertices

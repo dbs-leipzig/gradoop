@@ -88,8 +88,14 @@ public class TemporalGraphLayoutFactoryTest extends GradoopFlinkTestBase {
   @Test
   public void testFromDataSets() throws Exception {
     // Remove graph ids first
-    vertexDataSet = vertexDataSet.map(v -> {v.resetGraphIds(); return v;});
-    edgeDataSet = edgeDataSet.map(e -> {e.resetGraphIds(); return e;});
+    vertexDataSet = vertexDataSet.map(v -> {
+      v.resetGraphIds();
+      return v;
+    });
+    edgeDataSet = edgeDataSet.map(e -> {
+      e.resetGraphIds();
+      return e;
+    });
 
     final LogicalGraphLayout<TemporalGraphHead, TemporalVertex, TemporalEdge> layout =
       factory.fromDataSets(vertexDataSet, edgeDataSet);

@@ -72,7 +72,7 @@ public class TemporalGraphCollectionTest extends GradoopFlinkTestBase {
    * Test the {@link TemporalGraphCollection#isEmpty()} method.
    */
   @Test
-  public void testIsEmpty() throws Exception{
+  public void testIsEmpty() throws Exception {
     collectAndAssertFalse(testTemporalCollection.isEmpty());
   }
 

@@ -16,11 +16,38 @@
 package org.gradoop.flink.model.api.tpgm;
 
 import org.gradoop.flink.model.api.epgm.GraphBaseOperators;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.tpgm.TemporalGraph;
 
 /**
  * Defines the operators that are available on a {@link TemporalGraph}.
  */
 public interface TemporalGraphOperators extends GraphBaseOperators {
+
+  //----------------------------------------------------------------------------
+  // Auxiliary Operators
+  //----------------------------------------------------------------------------
+
+  /**
+   * Creates a temporal graph using the given unary graph operator.
+   *
+   * @param operator unary graph to graph operator
+   * @return result of given operator
+   */
+  TemporalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<TemporalGraph> operator);
+
+  //----------------------------------------------------------------------------
+  // Utilities
+  //----------------------------------------------------------------------------
+
+  /**
+   * Converts the {@link TemporalGraph} to a {@link LogicalGraph} instance by discarding all
+   * temporal information from the graph elements. All Ids (graphs, vertices, edges) are kept
+   * during the transformation.
+   *
+   * @return the logical graph instance
+   */
+  LogicalGraph toLogicalGraph();
 
 }

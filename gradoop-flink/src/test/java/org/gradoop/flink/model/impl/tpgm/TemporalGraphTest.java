@@ -40,12 +40,12 @@ import static org.junit.Assert.assertEquals;
 public class TemporalGraphTest extends GradoopFlinkTestBase {
 
   /**
-   * Test temporal graph.
+   * Temporal graph to test
    */
   private TemporalGraph testGraph;
 
   /**
-   * Logical grpah to test
+   * Logical graph to test
    */
   private LogicalGraph testLogicalGraph;
 
@@ -73,7 +73,7 @@ public class TemporalGraphTest extends GradoopFlinkTestBase {
    * Test the {@link TemporalGraph#isEmpty()} method.
    */
   @Test
-  public void testIsEmpty() throws Exception{
+  public void testIsEmpty() throws Exception {
     collectAndAssertFalse(testGraph.isEmpty());
   }
 
