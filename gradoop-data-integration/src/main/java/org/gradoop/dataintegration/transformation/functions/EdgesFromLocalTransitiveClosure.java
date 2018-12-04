@@ -24,6 +24,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This function supports the calculation of the transitive closure in the direct neighborhood of a
@@ -33,6 +34,21 @@ import java.util.List;
  */
 public class EdgesFromLocalTransitiveClosure implements CoGroupFunction<Tuple2<Vertex,
   List<Neighborhood.VertexPojo>>, Tuple2<Vertex, List<Neighborhood.VertexPojo>>, Edge> {
+
+  /**
+   * The property key used to store the original vertex label on the new edge.
+   */
+  public static final String ORIGINAL_VERTEX_LABEL = "originalVertexLabel";
+
+  /**
+   * The property key used to store the first label of the combined edges on the new edge.
+   */
+  public static final String FIRST_EDGE_LABEL = "firstEdgeLabel";
+
+  /**
+   * The property key used to store the second label of the combined edges on the new edge.
+   */
+  public static final String SECOND_EDGE_LABEL = "secondEdgeLabel";
 
   /**
    * The edge label of the newly created edge.
@@ -48,9 +64,11 @@ public class EdgesFromLocalTransitiveClosure implements CoGroupFunction<Tuple2<V
    * The constructor of the CoGroup function to created new edges based on transitivity.
    *
    * @param newEdgeLabel The edge label of the newly created edge.
-   * @param factory The EdgeFactory new edges are created with.
+   * @param factory The {@link EdgeFactory} new edges are created with.
    */
   public EdgesFromLocalTransitiveClosure(String newEdgeLabel, EdgeFactory factory) {
+    Objects.requireNonNull(newEdgeLabel);
+    Objects.requireNonNull(factory);
     this.newEdgeLabel = newEdgeLabel;
     this.factory = factory;
   }
@@ -76,9 +94,9 @@ public class EdgesFromLocalTransitiveClosure implements CoGroupFunction<Tuple2<V
               .createEdge(newEdgeLabel, source.getNeighborId(), target.getNeighborId(),
                   centralVertex.getProperties());
 
-          newEdge.setProperty("originalVertexLabel", centralVertex.getLabel());
-          newEdge.setProperty("firstEdgeLabel", source.getConnectingEdgeLabel());
-          newEdge.setProperty("secondEdgeLabel", target.getConnectingEdgeLabel());
+          newEdge.setProperty(ORIGINAL_VERTEX_LABEL, centralVertex.getLabel());
+          newEdge.setProperty(FIRST_EDGE_LABEL, source.getConnectingEdgeLabel());
+          newEdge.setProperty(SECOND_EDGE_LABEL, target.getConnectingEdgeLabel());
 
           edges.collect(newEdge);
         }

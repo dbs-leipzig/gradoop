@@ -38,16 +38,18 @@ import java.util.List;
  * Each edge that has to be created results from a path in the graph of the following form: <br>
  * v_i --e_i,j--> v_j --e_j,k--> v_k <br>
  * The newly created edge goes from: v_i --e_i,k--> v_k <br>
- * The edge e_i,k has a user-defined label and besides the original vertex properties three
- * additional properties: <br>
- * - originalVertexLabel <br>
- * - firstEdgeLabel = labelOf(e_i,j) <br>
- * - secondEdgeLabel = labelOf(e_j,k)
+ * The edge {@code e_i,k} has a user-defined label and besides the original vertex properties three
+ * additional properties:
+ * <ul>
+ *   <li>{@code originalVertexLabel}</li>
+ *   <li>{@code firstEdgeLabel = labelOf(e_i,j)}</li>
+ *   <li>{@code secondEdgeLabel = labelOf(e_j,k)}</li>
+ * </ul>
  */
 public class VertexToEdge implements UnaryGraphToGraphOperator {
 
   /**
-   * The vertex label of v_j.
+   * The vertex label of {@code v_j}.
    */
   private final String centralVertexLabel;
 
@@ -59,18 +61,16 @@ public class VertexToEdge implements UnaryGraphToGraphOperator {
   /**
    * The constructor of the operator to transform vertices into edges.
    *
-   * @param centralVertexLabel The vertex label of v_j.
+   * @param centralVertexLabel The vertex label of {@code v_j}.
    * @param newEdgeLabel The edge label for new edges.
    */
   public VertexToEdge(String centralVertexLabel, String newEdgeLabel) {
-
     this.centralVertexLabel = centralVertexLabel;
     this.newEdgeLabel = newEdgeLabel;
   }
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-
     DataSet<Tuple2<Vertex, List<Neighborhood.VertexPojo>>> incomingNeighborhood = Neighborhood
         .getPerVertex(graph,
           graph.getVerticesByLabel(centralVertexLabel),
@@ -81,19 +81,20 @@ public class VertexToEdge implements UnaryGraphToGraphOperator {
           graph.getVerticesByLabel(centralVertexLabel),
           Neighborhood.EdgeDirection.OUTGOING);
 
-    if (incomingNeighborhood != null && outgoingNeighborhood != null) {
-      DataSet<Edge> newEdges = incomingNeighborhood
-          .coGroup(outgoingNeighborhood)
-          .where(new IdInTuple<>(0))
-          .equalTo(new IdInTuple<>(0))
-          .with(new EdgesFromLocalTransitiveClosure(newEdgeLabel,
-            graph.getConfig().getEdgeFactory()));
-
-      return graph.getConfig().getLogicalGraphFactory()
-          .fromDataSets(graph.getVertices(),
-            graph.getEdges().union(newEdges));
+    if (incomingNeighborhood == null || outgoingNeighborhood == null) {
+      throw new IllegalStateException("At least one calculated neighborhood was null.");
     }
-    return null;
+
+    DataSet<Edge> newEdges = incomingNeighborhood
+        .coGroup(outgoingNeighborhood)
+        .where(new IdInTuple<>(0))
+        .equalTo(new IdInTuple<>(0))
+        .with(new EdgesFromLocalTransitiveClosure(newEdgeLabel,
+          graph.getConfig().getEdgeFactory()));
+
+    return graph.getConfig().getLogicalGraphFactory()
+        .fromDataSets(graph.getVertices(),
+          graph.getEdges().union(newEdges));
   }
 
   @Override
