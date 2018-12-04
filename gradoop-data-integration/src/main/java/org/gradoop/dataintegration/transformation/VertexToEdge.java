@@ -90,7 +90,7 @@ public class VertexToEdge implements UnaryGraphToGraphOperator {
             graph.getConfig().getEdgeFactory()));
 
       return graph.getConfig().getLogicalGraphFactory()
-          .fromDataSets(graph.getGraphHead(), graph.getVertices(),
+          .fromDataSets(graph.getVertices(),
             graph.getEdges().union(newEdges));
     }
     return null;
