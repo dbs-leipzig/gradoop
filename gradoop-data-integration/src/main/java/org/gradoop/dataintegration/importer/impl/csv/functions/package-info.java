@@ -16,4 +16,4 @@
 /**
  * Functions related to import an external graph from a csv file into EPGM.
  */
-package org.gradoop.dataintegration.importer.csv.functions;
+package org.gradoop.dataintegration.importer.impl.csv.functions;

@@ -13,7 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.importer.csv;
+package org.gradoop.dataintegration.importer.impl.csv;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.utils.DataSetUtils;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.dataintegration.importer.impl.csv.functions.CreateImportVertexCSV;
+import org.gradoop.dataintegration.importer.impl.csv.functions.FilterNullValuesTuple;
+import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -21,15 +31,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.utils.DataSetUtils;
-import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.dataintegration.importer.csv.functions.FilterNullValuesTuple;
-import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Read a csv file and import each row as a vertex in EPGM representation.
@@ -75,7 +76,7 @@ public class MinimalCSVImporter {
    * @param columnNames property identifier for each column
    */
   public MinimalCSVImporter(String path, String tokenSeperator, GradoopFlinkConfig config,
-          List<String> columnNames) {
+                            List<String> columnNames) {
     this(path, tokenSeperator, config);
     this.columnNames = columnNames;
   }
@@ -102,7 +103,7 @@ public class MinimalCSVImporter {
    * @param charset the charset used in the csv file
    */
   public MinimalCSVImporter(String path, String tokenSeperator, GradoopFlinkConfig config,
-          String charset) {
+                            String charset) {
     this.path = path;
     this.tokenSeparator = tokenSeperator;
     this.config = config;
@@ -113,13 +114,13 @@ public class MinimalCSVImporter {
    * Import each row of the file as a vertex. If no column property names are set,
    * read the first line of the file as header and set this values as column names.
    *
-   * @param checkReoccurringHeader if each row of the file should be checked for reocurring of
+   * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
    * the column property names.
    * @return the imported vertices
  * @throws IOException if an error occurred while open the stream
    */
   public DataSet<ImportVertex<Long>> importVertices(boolean checkReoccurringHeader)
-          throws IOException {
+    throws IOException {
     if (columnNames == null) {
       return readCSVFile(readHeaderRow(), checkReoccurringHeader);
     } else {
@@ -135,40 +136,38 @@ public class MinimalCSVImporter {
    * the column property names.
    * @return DateSet of all vertices from one specific file.
    */
-  public DataSet<ImportVertex<Long>> readCSVFile(List<String> propertyNames,
-          boolean checkReoccurringHeader) {
+  private DataSet<ImportVertex<Long>> readCSVFile(List<String> propertyNames,
+                                                  boolean checkReoccurringHeader) {
 
     DataSet<Properties> lines = config.getExecutionEnvironment()
-    .readTextFile(path)
-    .map(new RowToVertexMapper(path, tokenSeparator, propertyNames, checkReoccurringHeader))
-    .filter(new FilterNullValuesTuple<>());
+      .readTextFile(path)
+      .flatMap(new RowToVertexMapper(tokenSeparator, propertyNames, checkReoccurringHeader))
+      .filter(new FilterNullValuesTuple<>());
 
     return DataSetUtils.zipWithUniqueId(lines).map(new CreateImportVertexCSV<>());
   }
 
   /**
-   * Read the fist row of a csv file and put each the entry in each column in a list.
+   * Reads the fist row of a csv file and creates a list including all column entries that
+   * will be used as property names.
    * @return the property names
- * @throws IOException if an error occurred while open the stream
+   * @throws IOException if an error occurred while open the stream
    */
   public List<String> readHeaderRow() throws IOException {
     try (final BufferedReader reader =
-              new BufferedReader(new InputStreamReader(new FileInputStream(path),
-                      charset))) {
+      new BufferedReader(new InputStreamReader(new FileInputStream(path), charset))) {
       String headerLine = reader.readLine();
       if (headerLine == null) {
-        LOG.error("The file do not contain any rows.");
+        LOG.error("The '\" + path + \"'does not contain any rows.");
         throw new NullPointerException();
       }
-      headerLine = headerLine.substring(0, headerLine.length());
       String[] headerArray;
       headerArray = headerLine.split(tokenSeparator);
 
       return Arrays.asList(headerArray);
     } catch (IOException ex) {
-      LOG.error("I/O Error occurred while trying to open a stream to: '" +
-        path + "'.");
-      throw new IOException();
+      throw new IOException("I/O Error occurred while trying to open a stream to: '" +
+        path + "'.", ex);
     }
   }
 }

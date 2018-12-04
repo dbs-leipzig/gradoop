@@ -13,21 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.importer.csv.functions;
-
-import org.apache.flink.api.common.functions.FilterFunction;
-
 /**
- * FilterFunction to remove all tuple that return null.
- * Null value tuple are stored, if the csv file contains a header.
- * To not import this line/tuple as an vertex/edge, we set it null and filter it.
- *
- * @param <T> The type of the filtered elements.
+ * Contains all classes related to import an external graph from a csv file into EPGM.
  */
-public class FilterNullValuesTuple<T> implements FilterFunction<T> {
-
-  @Override
-  public boolean filter(final T value) {
-    return value != null;
-  }
-}
+package org.gradoop.dataintegration.importer.impl.csv;

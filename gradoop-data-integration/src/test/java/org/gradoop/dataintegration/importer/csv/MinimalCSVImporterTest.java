@@ -25,12 +25,13 @@ import java.util.List;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.dataintegration.importer.impl.csv.MinimalCSVImporter;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Test;
 
 /**
- * Test class for {@link org.gradoop.dataintegration.importer.csv.MinimalCSVImporter}
+ * Test class for {@link MinimalCSVImporter}
  */
 public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
