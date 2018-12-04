@@ -15,13 +15,13 @@
  */
 package org.gradoop.dataintegration.importer.impl.csv.functions;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Map the values of a token separated row of a file to the properties of a EPGM vertex.

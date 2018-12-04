@@ -18,10 +18,6 @@ package org.gradoop.dataintegration.importer.csv;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
@@ -29,6 +25,10 @@ import org.gradoop.dataintegration.importer.impl.csv.MinimalCSVImporter;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Test class for {@link MinimalCSVImporter}
