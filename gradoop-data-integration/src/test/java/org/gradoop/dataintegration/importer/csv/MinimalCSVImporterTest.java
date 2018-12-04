@@ -38,6 +38,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
   /**
    * Test if the properties of the imported vertices works correct. Set the first line
    * of the file as the column property names.
+   *
    * @throws Exception
    */
   @Test
@@ -49,7 +50,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
     ExecutionEnvironment env = getExecutionEnvironment();
 
     MinimalCSVImporter importVertexImporter =
-            new MinimalCSVImporter(csvPath, delimiter, getConfig());
+      new MinimalCSVImporter(csvPath, delimiter, getConfig());
 
     //check the rows for the header line
     DataSet<ImportVertex<Long>> importVertex = importVertexImporter.importVertices(true);
@@ -66,6 +67,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    * Test if the properties of the imported vertices works correct. In this case
    * the file do not contain a header row. For this the user set a list with
    * the column names.
+   *
    * @throws Exception
    */
   @Test
@@ -93,23 +95,23 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    * @param lv list of the import vertices
    */
   public void assertImportCSV(List<ImportVertex<Long>> lv) {
-    assertEquals(lv.size(), 3);
+    assertEquals(3, lv.size());
 
     for (ImportVertex<Long> v : lv) {
       if (v.f2.get("name").toString().equals("foo")) {
-        assertEquals(v.f2.size(), 4);
-        assertEquals(v.f2.get("value1").toString(), "453");
-        assertEquals(v.f2.get("value2").toString(), "true");
-        assertEquals(v.f2.get("value3").toString(), "71.03");
+        assertEquals(4, v.f2.size());
+        assertEquals("453", v.f2.get("value1").toString());
+        assertEquals("true", v.f2.get("value2").toString());
+        assertEquals("71.03", v.f2.get("value3").toString());
       } else if (v.f2.get("name").toString().equals("bar")) {
-        assertEquals(v.f2.size(), 4);
-        assertEquals(v.f2.get("value1").toString(), "76");
-        assertEquals(v.f2.get("value2").toString(), "false");
-        assertEquals(v.f2.get("value3").toString(), "33.4");
+        assertEquals(4, v.f2.size());
+        assertEquals("76", v.f2.get("value1").toString());
+        assertEquals("false", v.f2.get("value2").toString());
+        assertEquals("33.4", v.f2.get("value3").toString());
       } else if (v.f2.get("name").toString().equals("bla")) {
-        assertEquals(v.f2.size(), 3);
-        assertEquals(v.f2.get("value1").toString(), "4568");
-        assertEquals(v.f2.get("value3").toString(), "9.42");
+        assertEquals(3, v.f2.size());
+        assertEquals("4568", v.f2.get("value1").toString());
+        assertEquals("9.42", v.f2.get("value3").toString());
       } else {
         fail();
       }

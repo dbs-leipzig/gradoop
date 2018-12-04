@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.importer.impl.csv;
+package org.gradoop.dataintegration.importer.impl.csv.functions;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
@@ -60,28 +61,27 @@ public class RowToVertexMapper implements FlatMapFunction<String, Properties> {
 
   @Override
   public void flatMap(String line, Collector<Properties> out) {
-    Properties properties = new Properties();
+
+    // Check if is an empty line
+    if (line.isEmpty()) {
+      return;
+    }
 
     String[] propertyValues = line.split(tokenSeparator);
+    /*
+     * If the line to read is equals to the header and the checkReoccurringHeader flag is set to
+     * TRUE, we do not import this line.
+     */
+    if (checkReoccurringHeader && propertyNames.containsAll(Arrays.asList(propertyValues))) {
+      return;
+    }
 
-    boolean equals = true;
+    Properties properties = new Properties();
     for (int i = 0; i < propertyValues.length; i++) {
+      // if a value is empty, do not add a property
       if (!propertyValues[i].isEmpty()) {
         properties.set(propertyNames.get(i), PropertyValue.create(propertyValues[i]));
       }
-      if (checkReoccurringHeader) {
-        /*
-         * If the line to read is equals to the header, we do not import this line
-         * (because the file contains a header line, which is not a vertex).
-         * In this case, we return null, else we return the line tuple.
-         */
-        if (!propertyValues[i].trim().equals(propertyNames.get(i).trim())) {
-          equals = false;
-        }
-      }
-    }
-    if (checkReoccurringHeader && equals) {
-      return;
     }
     out.collect(properties);
   }

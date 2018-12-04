@@ -19,11 +19,9 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.utils.DataSetUtils;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.dataintegration.importer.impl.csv.functions.CreateImportVertexCSV;
-import org.gradoop.dataintegration.importer.impl.csv.functions.FilterNullValuesTuple;
+import org.gradoop.dataintegration.importer.impl.csv.functions.RowToVertexMapper;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -31,16 +29,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Read a csv file and import each row as a vertex in EPGM representation.
  */
 public class MinimalCSVImporter {
-
-  /**
-   * Log if an error by reading of the file occurs.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(MinimalCSVImporter.class);
 
   /**
    * Token delimiter
@@ -71,14 +65,14 @@ public class MinimalCSVImporter {
    * Create a new MinimalCSVImporter. The user set a list of the property names.
    *
    * @param path the path to the csv file
-   * @param tokenSeperator the token delimiter of the csv file
+   * @param tokenSeparator the token delimiter of the csv file
    * @param config GradoopFlinkConfig
    * @param columnNames property identifier for each column
    */
-  public MinimalCSVImporter(String path, String tokenSeperator, GradoopFlinkConfig config,
+  public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config,
                             List<String> columnNames) {
-    this(path, tokenSeperator, config);
-    this.columnNames = columnNames;
+    this(path, tokenSeparator, config);
+    this.columnNames = Objects.requireNonNull(columnNames);
   }
 
   /**
@@ -86,11 +80,11 @@ public class MinimalCSVImporter {
    * will set as the property names for each column.
    *
    * @param path the path to the csv file
-   * @param tokenSeperator the token delimiter of the csv file
+   * @param tokenSeparator the token delimiter of the csv file
    * @param config GradoopFlinkConfig
    */
-  public MinimalCSVImporter(String path, String tokenSeperator, GradoopFlinkConfig config) {
-    this(path, tokenSeperator, config, "UTF-8");
+  public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config) {
+    this(path, tokenSeparator, config, "UTF-8");
   }
 
   /**
@@ -98,16 +92,16 @@ public class MinimalCSVImporter {
    * will set as the property names for each column.
    *
    * @param path the path to the csv file
-   * @param tokenSeperator the token delimiter of the csv file
+   * @param tokenSeparator the token delimiter of the csv file
    * @param config GradoopFlinkConfig
    * @param charset the charset used in the csv file
    */
-  public MinimalCSVImporter(String path, String tokenSeperator, GradoopFlinkConfig config,
+  public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config,
                             String charset) {
-    this.path = path;
-    this.tokenSeparator = tokenSeperator;
-    this.config = config;
-    this.charset = charset;
+    this.path = Objects.requireNonNull(path);
+    this.tokenSeparator = Objects.requireNonNull(tokenSeparator);
+    this.config = Objects.requireNonNull(config);
+    this.charset = Objects.requireNonNull(charset);
   }
 
   /**
@@ -141,8 +135,7 @@ public class MinimalCSVImporter {
 
     DataSet<Properties> lines = config.getExecutionEnvironment()
       .readTextFile(path)
-      .flatMap(new RowToVertexMapper(tokenSeparator, propertyNames, checkReoccurringHeader))
-      .filter(new FilterNullValuesTuple<>());
+      .flatMap(new RowToVertexMapper(tokenSeparator, propertyNames, checkReoccurringHeader));
 
     return DataSetUtils.zipWithUniqueId(lines).map(new CreateImportVertexCSV<>());
   }
@@ -150,6 +143,7 @@ public class MinimalCSVImporter {
   /**
    * Reads the fist row of a csv file and creates a list including all column entries that
    * will be used as property names.
+   *
    * @return the property names
    * @throws IOException if an error occurred while open the stream
    */
@@ -158,8 +152,7 @@ public class MinimalCSVImporter {
       new BufferedReader(new InputStreamReader(new FileInputStream(path), charset))) {
       String headerLine = reader.readLine();
       if (headerLine == null) {
-        LOG.error("The '\" + path + \"'does not contain any rows.");
-        throw new NullPointerException();
+        throw new IOException("The file " + path + " does not contain any rows.");
       }
       String[] headerArray;
       headerArray = headerLine.split(tokenSeparator);
