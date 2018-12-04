@@ -19,53 +19,76 @@ package org.gradoop.dataintegration.importer.rdbmsimporter.functions;
 import org.apache.flink.types.Row;
 import org.apache.log4j.Logger;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.RowHeader;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.RowHeaderTuple;
 
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.FK_FIELD;
+
 /**
- * Converts database tuples to valid Epgm properties
+ * Converts database relation tuples to valid EPGM properties.
  */
 public class AttributesToProperties {
 
   /**
-   * Converts relational attributes to epgm properties
+   * Instance variable of class {@link AttributesToProperties}.
+   */
+  private static AttributesToProperties OBJ = null;
+
+  /**
+   * Singleton instance of class {@link AttributesToProperties}.
+   */
+  private AttributesToProperties() { }
+
+  /**
+   * Creates a single instance of class {@link AttributesToProperties}.
    *
-   * @param tuple Row of relational database
-   * @param rowheader Rowheader of database table
-   * @return Epgm Properties
+   * @return single instance of class {@link AttributesToProperties}
+   */
+  public static AttributesToProperties create() {
+    if (OBJ == null) {
+      OBJ = new AttributesToProperties();
+    }
+    return OBJ;
+  }
+
+  /**
+   * Converts a tuple of a database relation to EPGM properties.
+   *
+   * @param tuple database relation-tuple
+   * @param rowheader rowheader for this relation
+   * @return EPGM properties
    */
   public static Properties getProperties(Row tuple, RowHeader rowheader) {
 
     Logger logger = Logger.getLogger(AttributesToProperties.class);
-    Properties props = Properties.create();
+    Properties properties = Properties.create();
 
-    for (RowHeaderTuple rht : rowheader.getRowHeader()) {
+    for (RowHeaderTuple rowHeaderTuple : rowheader.getRowHeader()) {
       try {
-        props.set(rht.getName(), PropertyValueParser.parse(tuple.getField(rht.getPos())));
+        properties.set(rowHeaderTuple.getName(),
+          PropertyValueParser.parse(tuple.getField(rowHeaderTuple.getPos())));
       } catch (IndexOutOfBoundsException e) {
-        logger.warn("Empty value field in column " + rht.getName());
+        logger.warn("Empty value field in column " + rowHeaderTuple.getName());
       }
     }
-
-    return props;
+    return properties;
   }
 
   /**
-   * Converts relational attributes to epgm properties without foreign key
-   * attributes
+   * Converts a tuple of a database relation to EPGM properties without foreign key attributes.
    *
-   * @param tuple Row of relational database
-   * @param rowheader Rowheader of database table
-   * @return Epgm Properties without foreign key attributes
+   * @param tuple database relation-tuple
+   * @param rowheader rowheader for this relation
+   * @return EPGM properties
    */
   public static Properties getPropertiesWithoutFKs(Row tuple, RowHeader rowheader) {
-    Properties props = new Properties();
-    for (RowHeaderTuple rht : rowheader.getRowHeader()) {
-      if (!rht.getAttType().equals(RdbmsConstants.FK_FIELD)) {
-        props.set(rht.getName(), PropertyValueParser.parse(tuple.getField(rht.getPos())));
+    Properties properties = new Properties();
+    for (RowHeaderTuple rowHeaderTuple : rowheader.getRowHeader()) {
+      if (!rowHeaderTuple.getAttType().equals(FK_FIELD)) {
+        properties.set(rowHeaderTuple.getName(),
+          PropertyValueParser.parse(tuple.getField(rowHeaderTuple.getPos())));
       }
     }
-    return props;
+    return properties;
   }
 }

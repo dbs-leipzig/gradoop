@@ -21,11 +21,12 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToEdge;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.LabelIdKeyTuple;
 
 import java.util.List;
+
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.BROADCAST_VARIABLE;
 
 /**
  * Collects label,gradoop id, primary key value of vertices
@@ -59,6 +60,7 @@ public class VerticesToPkTable extends RichFlatMapFunction<TableToEdge, LabelIdK
 
   @Override
   public void open(Configuration parameters) throws Exception {
-    this.vertices = getRuntimeContext().getBroadcastVariable(RdbmsConstants.BROADCAST_VARIABLE);
+    this.vertices =
+      getRuntimeContext().getBroadcastVariable(BROADCAST_VARIABLE);
   }
 }

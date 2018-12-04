@@ -28,28 +28,51 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Registers jdbc driver
+ * Registers a JDBC driver.
  */
 public class RegisterDriver {
 
   /**
-   * Registers a jdbc driver
-   *
-   * @param config Database configuration
+   * Object variable of calss {@link RegisterDriver}.
    */
-  public static void register(RdbmsConfig config) {
+  private static RegisterDriver OBJ = null;
+
+  /**
+   * Singleton instance of class {@link RegisterDriver} to registers a driver by given .jar file.
+   */
+  private RegisterDriver() { }
+
+  /**
+   * Creates a single instance of class {@link RegisterDriver}
+   *
+   * @return single instance of class {@link RegisterDriver}
+   */
+  public static RegisterDriver create() {
+    if (OBJ == null) {
+      OBJ = new RegisterDriver();
+    }
+    return OBJ;
+  }
+
+
+  /**
+   * Registers a JDBC driver by a given .jar file.
+   *
+   * @param config database configuration
+   */
+  public void register(RdbmsConfig config) {
     AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
       @Override
       public Object run() {
-        // privileged code goes here, for example:
         Logger logger = Logger.getLogger(RegisterDriver.class);
 
         try {
           URL driverUrl = new URL("jar:file:" + config.getJdbcDriverPath() + "!/");
-          URLClassLoader ucl = new URLClassLoader(new URL[] { driverUrl });
-          Driver driver = (Driver) Class.forName(config.getJdbcDriverClassName(), true, ucl)
-              .getDeclaredConstructor().newInstance();
+          URLClassLoader classLoader = new URLClassLoader(new URL[]{driverUrl});
+          Driver driver = (Driver) Class.forName(
+            config.getJdbcDriverClassName(), true, classLoader)
+            .getDeclaredConstructor().newInstance();
           DriverManager.registerDriver(new GradoopJDBCDriver(driver));
 
         } catch (SQLException e) {
@@ -63,7 +86,7 @@ public class RegisterDriver {
             SecurityException e) {
           logger.error(e);
         }
-        return null;
+        return this;
       }
     });
   }

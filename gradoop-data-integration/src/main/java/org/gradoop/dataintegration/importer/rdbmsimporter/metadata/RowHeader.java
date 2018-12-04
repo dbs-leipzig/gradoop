@@ -16,11 +16,12 @@
 
 package org.gradoop.dataintegration.importer.rdbmsimporter.metadata;
 
-import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.RowHeaderTuple;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.FK_FIELD;
 
 /**
  * Rowheader of a row based relational data representation
@@ -60,7 +61,7 @@ public class RowHeader implements Serializable {
   public ArrayList<RowHeaderTuple> getForeignKeyHeader() {
     ArrayList<RowHeaderTuple> fkHeader = new ArrayList<RowHeaderTuple>();
     for (RowHeaderTuple rht : this.rowHeader) {
-      if (rht.getAttType().equals(RdbmsConstants.FK_FIELD)) {
+      if (rht.getAttType().equals(FK_FIELD)) {
         fkHeader.add(rht);
       }
     }

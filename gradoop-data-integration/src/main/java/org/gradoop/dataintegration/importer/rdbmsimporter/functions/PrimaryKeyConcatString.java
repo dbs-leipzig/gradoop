@@ -17,9 +17,10 @@
 package org.gradoop.dataintegration.importer.rdbmsimporter.functions;
 
 import org.apache.flink.types.Row;
-import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.RowHeader;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.RowHeaderTuple;
+
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.PK_FIELD;
 
 /**
  * Concatenates multiple primary keys
@@ -37,7 +38,7 @@ public class PrimaryKeyConcatString {
     StringBuilder sb = new StringBuilder();
 
     for (RowHeaderTuple rht : rowheader.getRowHeader()) {
-      if (rht.getAttType().equals(RdbmsConstants.PK_FIELD)) {
+      if (rht.getAttType().equals(PK_FIELD)) {
         sb.append(tuple.getField(rht.getPos()).toString());
       }
     }

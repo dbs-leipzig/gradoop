@@ -54,8 +54,7 @@ public class MetaDataParser {
   private ArrayList<RdbmsTableBase> tableBase;
 
   /**
-   * Parses the schema of a relational database and provides base classes for
-   * graph conversation
+   * Parses the schema of a relational database and provides base classes for graph conversation
    *
    * @param con Database connection
    * @param rdbmsType Management type of connected rdbms
@@ -69,13 +68,12 @@ public class MetaDataParser {
   }
 
   /**
-   * Parses the schema of a relational database to a relational database metadata
-   * representation
+   * Parses the schema of a relational database to a relational database metadata representation
    *
    * @throws SQLException
    */
   public void parse() throws SQLException {
-    ResultSet rsTables = metadata.getTables(null, "%", "%", new String[] { "TABLE" });
+    ResultSet rsTables = metadata.getTables(null, "%", "%", new String[]{"TABLE"});
 
     while (rsTables.next()) {
       String tableName = rsTables.getString("TABLE_NAME");
@@ -127,10 +125,10 @@ public class MetaDataParser {
 
           if (refdTableSchem == null) {
             foreignKeys.add(new FkTuple(rsForeignKeys.getString("FKCOLUMN_NAME"), null,
-                rsForeignKeys.getString("PKCOLUMN_NAME"), refdTableName));
+              rsForeignKeys.getString("PKCOLUMN_NAME"), refdTableName));
           } else {
             foreignKeys.add(new FkTuple(rsForeignKeys.getString("FKCOLUMN_NAME"), null,
-                rsForeignKeys.getString("PKCOLUMN_NAME"), refdTableSchem + "." + refdTableName));
+              rsForeignKeys.getString("PKCOLUMN_NAME"), refdTableSchem + "." + refdTableName));
           }
 
           pkfkAttributes.add(rsForeignKeys.getString("FKCOLUMN_NAME"));
@@ -152,13 +150,11 @@ public class MetaDataParser {
 
         // catches unsupported data types
         if (!pkfkAttributes.contains(rsAttributes.getString("COLUMN_NAME")) &&
-            JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.OTHER &&
-            JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.ARRAY &&
-            JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.LONGNVARCHAR &&
-            JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.NVARCHAR) {
+          JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.OTHER &&
+          JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")) != JDBCType.ARRAY) {
 
           NameTypeTuple att = new NameTypeTuple(rsAttributes.getString("COLUMN_NAME"),
-              JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")));
+            JDBCType.valueOf(rsAttributes.getInt("DATA_TYPE")));
 
           furtherAttributes.add(att);
         }
@@ -171,22 +167,22 @@ public class MetaDataParser {
 
         rowCount = TableRowSize.getTableRowCount(con, tableName);
         tableBase.add(
-            new RdbmsTableBase(tableName, primaryKeys, foreignKeys, furtherAttributes, rowCount));
+          new RdbmsTableBase(tableName, primaryKeys, foreignKeys, furtherAttributes, rowCount));
       } else {
 
         rowCount = TableRowSize.getTableRowCount(con, schemName + "." + tableName);
         tableBase.add(new RdbmsTableBase(schemName + "." + tableName, primaryKeys, foreignKeys,
-            furtherAttributes, rowCount));
+          furtherAttributes, rowCount));
       }
     }
     con.close();
   }
 
   /**
-   * Creates metadata representations of tables going to convert to vertices
+   * Creates metadata representations of tables going to convert to vertices.
    *
-   * @return ArrayList containing metadata representations of rdbms tables going
-   *         to convert to vertices
+   * @return list containing metadata representations of rdbms tables going to convert to
+   * vertices
    */
   public ArrayList<TableToNode> getTablesToNodes() {
     ArrayList<TableToNode> tablesToNodes = Lists.newArrayList();
@@ -195,18 +191,17 @@ public class MetaDataParser {
       if (!(tables.getForeignKeys().size() == 2) || !(tables.getPrimaryKeys().size() == 2)) {
 
         tablesToNodes
-            .add(new TableToNode(rdbmsType, tables.getTableName(), tables.getPrimaryKeys(),
-                tables.getForeignKeys(), tables.getFurtherAttributes(), tables.getRowCount()));
+          .add(new TableToNode(rdbmsType, tables.getTableName(), tables.getPrimaryKeys(),
+            tables.getForeignKeys(), tables.getFurtherAttributes(), tables.getRowCount()));
       }
     }
     return tablesToNodes;
   }
 
   /**
-   * Creates metadata representations of tables going to convert to edges
+   * Creates metadata representations of tables going to convert to edges.
    *
-   * @return ArrayList containing metadata representations of rdbms tables going
-   *         to convert to edges
+   * @return list containing metadata representations of rdbms tables going to convert to edges
    */
   public ArrayList<TableToEdge> getTablesToEdges() {
     ArrayList<TableToEdge> tablesToEdges = Lists.newArrayList();
@@ -224,13 +219,13 @@ public class MetaDataParser {
           String refdTableNameTwo = table.getForeignKeys().get(1).f3;
 
           NameTypeTuple fkAttOne = new NameTypeTuple(table.getForeignKeys().get(0).f0,
-              table.getForeignKeys().get(0).f1);
+            table.getForeignKeys().get(0).f1);
           NameTypeTuple fkAttTwo = new NameTypeTuple(table.getForeignKeys().get(1).f0,
-              table.getForeignKeys().get(1).f1);
+            table.getForeignKeys().get(1).f1);
 
           tablesToEdges
-              .add(new TableToEdge(rdbmsType, tableName, refdTableNameOne, refdTableNameTwo,
-                  fkAttOne, fkAttTwo, null, table.getFurtherAttributes(), false, rowCount));
+            .add(new TableToEdge(rdbmsType, tableName, refdTableNameOne, refdTableNameTwo,
+              fkAttOne, fkAttTwo, table.getFurtherAttributes(), false, rowCount));
         } else {
           for (FkTuple fk : table.getForeignKeys()) {
 
@@ -240,28 +235,12 @@ public class MetaDataParser {
             NameTypeTuple endAtt = new NameTypeTuple(fk.f2, null);
 
             tablesToEdges.add(new TableToEdge(rdbmsType, null, tableName, refdTableName, startAtt,
-                endAtt, table.getPrimaryKeys(), null, true, rowCount));
+              endAtt, null, true, rowCount));
           }
         }
       }
     }
     return tablesToEdges;
-  }
-
-  public Connection getCon() {
-    return con;
-  }
-
-  public void setCon(Connection con) {
-    this.con = con;
-  }
-
-  public RdbmsType getRdbmsType() {
-    return rdbmsType;
-  }
-
-  public void setRdbmsType(RdbmsType rdbmsType) {
-    this.rdbmsType = rdbmsType;
   }
 
   public DatabaseMetaData getMetadata() {
@@ -274,9 +253,5 @@ public class MetaDataParser {
 
   public ArrayList<RdbmsTableBase> getTableBase() {
     return tableBase;
-  }
-
-  public void setTableBase(ArrayList<RdbmsTableBase> tableBase) {
-    this.tableBase = tableBase;
   }
 }

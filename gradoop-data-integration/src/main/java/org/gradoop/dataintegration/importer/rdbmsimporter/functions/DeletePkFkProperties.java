@@ -21,12 +21,15 @@ import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToNode;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.RowHeaderTuple;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.BROADCAST_VARIABLE;
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.FK_FIELD;
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.PK_ID;
 
 /**
  * Cleans Epgm vertices by deleting primary key and foreign key propeties
@@ -52,13 +55,13 @@ public class DeletePkFkProperties extends RichMapFunction<Vertex, Vertex> {
 
         ArrayList<String> foreignKeys = Lists.newArrayList();
         for (RowHeaderTuple rht : table.getRowheader().getRowHeader()) {
-          if (rht.getAttType().equals(RdbmsConstants.FK_FIELD)) {
+          if (rht.getAttType().equals(FK_FIELD)) {
             foreignKeys.add(rht.f0);
           }
         }
 
         for (Property oldProp : v.getProperties()) {
-          if (!oldProp.getKey().equals(RdbmsConstants.PK_ID) &&
+          if (!oldProp.getKey().equals(PK_ID) &&
               !foreignKeys.contains(oldProp.getKey())) {
             newProps.set(oldProp);
           }
@@ -73,6 +76,6 @@ public class DeletePkFkProperties extends RichMapFunction<Vertex, Vertex> {
   @Override
   public void open(Configuration parameters) throws Exception {
     this.tablesToNodes = getRuntimeContext()
-        .getBroadcastVariable(RdbmsConstants.BROADCAST_VARIABLE);
+        .getBroadcastVariable(BROADCAST_VARIABLE);
   }
 }

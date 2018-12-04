@@ -18,34 +18,58 @@ package org.gradoop.dataintegration.importer.rdbmsimporter.connection;
 
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.RdbmsType;
 
 import java.sql.JDBCType;
 
 /**
- * JDBC type to BasiTypeInfo Mapper
+ * JDBC type to BasiTypeInfo Mapper.
  */
 public class SQLToBasicTypeMapper {
 
   /**
-   * Maps jdbc types to flink compatible BasicTypeInfos
-   *
-   * @param jdbcType Jdbc Type of attribute
-   * @param rdbmsType Management type of connected rdbms
-   * @return Flink type information
+   * Instance variable of class {@link SQLToBasicTypeMapper}.
    */
-  public static TypeInformation<?> getTypeInfo(JDBCType jdbcType, RdbmsType rdbmsType) {
+  private static SQLToBasicTypeMapper OBJ = null;
 
-    TypeInformation<?> typeInfo = null;
+  /**
+   * Singleton instance of {@link SQLToBasicTypeMapper}.
+   */
+  private SQLToBasicTypeMapper() { }
+
+  /**
+   * Creates a single instance of class {@link SQLToBasicTypeMapper}.
+   *
+   * @return single instance of class {@link SQLToBasicTypeMapper}
+   */
+  public static SQLToBasicTypeMapper create() {
+    if (OBJ == null) {
+      OBJ = new SQLToBasicTypeMapper();
+    }
+    return OBJ;
+  }
+
+  /**
+   * Maps jdbc types to flink compatible BasicTypeInfos.
+   *
+   * @param jdbcType JDBC type
+   * @param rdbmsType type of database management system
+   * @return flink type information array
+   */
+  public TypeInformation<?> getTypeInfo(JDBCType jdbcType, RdbmsType rdbmsType) throws
+    UnsupportedTypeException {
+
+    TypeInformation<?> typeInfo;
 
     switch (jdbcType.name()) {
 
-    default:
     case "CHAR":
     case "VARCHAR":
     case "NVARCHAR":
     case "LONGVARCHAR":
     case "LONGNVARCHAR":
+    default:
       typeInfo = BasicTypeInfo.STRING_TYPE_INFO;
       break;
     case "NUMERIC":
@@ -105,7 +129,6 @@ public class SQLToBasicTypeMapper {
       typeInfo = TypeInformation.of(java.sql.Blob.class);
       break;
     }
-
     return typeInfo;
   }
 }

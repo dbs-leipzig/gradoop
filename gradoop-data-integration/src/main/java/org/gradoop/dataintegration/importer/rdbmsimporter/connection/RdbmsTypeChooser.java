@@ -15,6 +15,7 @@
  */
 package org.gradoop.dataintegration.importer.rdbmsimporter.connection;
 
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.RdbmsType;
 
 /**
@@ -23,33 +24,52 @@ import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstan
 public class RdbmsTypeChooser {
 
   /**
-   * Assigns connected database with management type
-   *
-   * @param rdbms Name of datanase management system
-   * @return Database management system type
+   * Instance variable of class {@link RdbmsTypeChooser}.
    */
-  public static RdbmsType choose(String rdbms) {
+  private static RdbmsTypeChooser OBJ = null;
 
+  /**
+   * Singelton class to choose and assign a database management system type.
+   */
+  private RdbmsTypeChooser() { }
+
+  /**
+   * Creates a single instance of {@link RdbmsTypeChooser}.
+   *
+   * @return single instance of {@link RdbmsTypeChooser}
+   */
+  public static RdbmsTypeChooser create() {
+    if (OBJ == null) {
+      OBJ = new RdbmsTypeChooser();
+    }
+    return OBJ;
+  }
+
+  /**
+   * Assigns a database management system type.
+   *
+   * @param rdbmsName name of database instance
+   * @return type of database management system
+   */
+  public static RdbmsType choose(String rdbmsName) throws UnsupportedTypeException {
     RdbmsType rdbmsType;
 
-    switch (rdbms) {
-
-    default:
-    case "posrgresql":
-    case "mysql":
-    case "h2":
-    case "sqlite":
-    case "hsqldb":
-      rdbmsType = RdbmsType.MYSQL_TYPE;
-      break;
-
+    switch (rdbmsName) {
     case "derby":
     case "microsoft sql server":
     case "oracle":
       rdbmsType = RdbmsType.SQLSERVER_TYPE;
       break;
-    }
 
+    case "posrgresql":
+    case "mysql":
+    case "h2":
+    case "sqlite":
+    case "hsqldb":
+    default:
+      rdbmsType = RdbmsType.MYSQL_TYPE;
+      break;
+    }
     return rdbmsType;
   }
 }

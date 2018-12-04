@@ -21,6 +21,13 @@ import org.apache.flink.api.java.io.jdbc.JDBCInputFormat;
 import org.apache.flink.api.java.io.jdbc.split.GenericParameterValuesProvider;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
+import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants;
+
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.
+  RdbmsType.MYSQL_TYPE;
+
+import java.io.Serializable;
+
 
 /**
  * Provides a {@link org.apache.hadoop.mapred.InputFormat} from a given relational database.
@@ -71,11 +78,77 @@ public class FlinkDatabaseInputHelper {
       .setDrivername(GradoopJDBCDriver.class.getName())
       .setDBUrl(rdbmsConfig.getUrl()).setUsername(rdbmsConfig.getUser())
       .setPassword(rdbmsConfig.getPw())
-      .setQuery(sqlQuery + PageinationQueryChooser.choose(rdbmsConfig.getRdbmsType()))
+      .setQuery(sqlQuery + choosePageinationQuery(rdbmsConfig.getRdbmsType()))
       .setRowTypeInfo(typeInfo).setParametersProvider(new GenericParameterValuesProvider(
-        ParametersChooser.choose(rdbmsConfig.getRdbmsType(), parallelism, rowCount)))
+        choosePartitionParameters(rdbmsConfig.getRdbmsType(), parallelism, rowCount)))
       .finish();
-
     return env.createInput(jdbcInput);
+  }
+
+  /**
+   * Chooses a proper sql query string for belonging database management system.
+   *
+   * @param rdbmsType type of connected database management system
+   * @return proper sql pageination query string
+   */
+  public String choosePageinationQuery(RdbmsConstants.RdbmsType rdbmsType) {
+    String pageinationQuery = "";
+
+    switch (rdbmsType) {
+    case MYSQL_TYPE:
+    default:
+      pageinationQuery = " LIMIT ? OFFSET ?";
+      break;
+    case SQLSERVER_TYPE:
+      pageinationQuery = " ORDER BY (1) OFFSET (?) ROWS FETCH NEXT (?) ROWS ONLY";
+      break;
+    }
+    return pageinationQuery;
+  }
+
+  /**
+   * Creates a parameter array to store pageintion borders.
+   *
+   * @param rdbmsType type of connected database management system
+   * @param parallelism set parallelism of flink process
+   * @param rowCount count of database table rows
+   * @return 2d array containing pageination border parameters
+   */
+  public Serializable[][] choosePartitionParameters(
+    RdbmsConstants.RdbmsType rdbmsType, int parallelism, int rowCount) {
+    Serializable[][] parameters;
+
+    // split database table in parts of same size
+    int partitionNumber;
+    int partitionRest;
+
+    if (rowCount < parallelism) {
+      partitionNumber = 1;
+      partitionRest = 0;
+      parameters = new Integer[rowCount][2];
+    } else {
+      partitionNumber = rowCount / parallelism;
+      partitionRest = rowCount % parallelism;
+      parameters = new Integer[parallelism][2];
+    }
+
+    int j = 0;
+    for (int i = 0; i < parameters.length; i++) {
+      if (i == parameters.length - 1) {
+        if (rdbmsType == MYSQL_TYPE) {
+          parameters[i] = new Integer[]{partitionNumber + partitionRest, j};
+        } else {
+          parameters[i] = new Integer[]{j, partitionNumber + partitionRest};
+        }
+      } else {
+        if (rdbmsType == MYSQL_TYPE) {
+          parameters[i] = new Integer[]{partitionNumber, j};
+        } else {
+          parameters[i] = new Integer[]{j, partitionNumber};
+        }
+        j = j + partitionNumber;
+      }
+    }
+    return parameters;
   }
 }

@@ -105,15 +105,7 @@ public class RowHeaderTuple extends Tuple3<String, String, Integer> {
     return attType;
   }
 
-  public void setAttType(String attType) {
-    this.attType = attType;
-  }
-
   public int getPos() {
     return pos;
-  }
-
-  public void setPos(int pos) {
-    this.pos = pos;
   }
 }

@@ -17,45 +17,45 @@
 package org.gradoop.dataintegration.importer.rdbmsimporter.constants;
 
 /**
- * Stores constants for relational database to graph conversion
+ * Stores constants for relational database to graph conversion.
  */
 public class RdbmsConstants {
 
   /**
-   * Vertex key identifier for primary keys
+   * Vertex key identifier for primary keys.
    */
   public static final String PK_ID = "*#primary_key_identifier#*";
 
   /**
-   * Field identifier for primary keys
+   * Field identifier for primary keys.
    */
   public static final String PK_FIELD = "pk";
 
   /**
-   * Field identifier for foreign keys
+   * Field identifier for foreign keys.
    */
   public static final String FK_FIELD = "fk";
 
   /**
-   * Field identifier for further attributes
+   * Field identifier for further attributes.
    */
   public static final String ATTRIBUTE_FIELD = "att";
 
   /**
-   * Broadcast variable constant
+   * Broadcast variable constant.
    */
   public static final String BROADCAST_VARIABLE = "broadcastVariable";
 
   /**
-   * Database management system identifier
+   * Database management system identifier.
    */
   public enum RdbmsType {
     /**
-     * Identifier for mysql,mariadb,postgresql,h2,hsqldb management systems
+     * Identifier for mysql,mariadb,postgresql,h2,hsqldb management systems.
      */
     MYSQL_TYPE,
     /**
-     * Identifier for sql-server, oracle,derby,sql:2018 standard management systems
+     * Identifier for sql-server, oracle,derby,sql:2018 standard management systems.
      */
     SQLSERVER_TYPE
   }

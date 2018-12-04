@@ -21,25 +21,26 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.dataintegration.importer.rdbmsimporter.connection.FlinkDatabaseInputHelper;
 import org.gradoop.dataintegration.importer.rdbmsimporter.connection.RdbmsConfig;
-import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.MetaDataParser;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToNode;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.List;
 
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.BROADCAST_VARIABLE;
+
 /**
- * Creates Epgm vertices from database tables
+ * Creates EPGM vertices from database tables.
  */
 public class CreateVertices {
 
   /**
-   * Creates Epgm vertices from database table tuples
+   * Creates EPGM vertices from database table tuples.
    *
-   * @param flinkConfig Valid gradoop flink config
-   * @param rdbmsConfig Valid rdbms config
-   * @param metadataParser Metadata of connected relational database
-   * @return DataSet of Epgm vertices
+   * @param flinkConfig valid gradoop flink config
+   * @param rdbmsConfig valid rdbms config
+   * @param metadataParser database metadata
+   * @return set of Epgm vertices
    */
   public static DataSet<Vertex> create(GradoopFlinkConfig flinkConfig, RdbmsConfig rdbmsConfig,
       MetaDataParser metadataParser) {
@@ -49,21 +50,26 @@ public class CreateVertices {
     VertexFactory vertexFactory = flinkConfig.getVertexFactory();
 
     int counter = 0;
-
     for (TableToNode table : tablesToNodes) {
-      DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper.create().getInput(
+      DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper
+        .create().getInput(
           flinkConfig.getExecutionEnvironment(), rdbmsConfig, table.getRowCount(),
           table.getSqlQuery(), table.getRowTypeInfo());
 
       if (vertices == null) {
-        vertices = dsSQLResult.map(new RowToVertex(vertexFactory, table.getTableName(), counter))
-            .withBroadcastSet(flinkConfig.getExecutionEnvironment().fromCollection(tablesToNodes),
-                RdbmsConstants.BROADCAST_VARIABLE);
+        vertices = dsSQLResult
+          .map(new RowToVertex(vertexFactory, table.getTableName(), counter))
+          .withBroadcastSet(
+            flinkConfig.getExecutionEnvironment().fromCollection(tablesToNodes),
+            BROADCAST_VARIABLE);
       } else {
-        vertices = vertices.union(dsSQLResult
-            .map(new RowToVertex(vertexFactory, table.getTableName(), counter))
-            .withBroadcastSet(flinkConfig.getExecutionEnvironment().fromCollection(tablesToNodes),
-                RdbmsConstants.BROADCAST_VARIABLE));
+        vertices = vertices
+          .union(
+            dsSQLResult
+              .map(new RowToVertex(vertexFactory, table.getTableName(), counter))
+              .withBroadcastSet(
+                flinkConfig.getExecutionEnvironment().fromCollection(tablesToNodes),
+                BROADCAST_VARIABLE));
       }
 
       counter++;

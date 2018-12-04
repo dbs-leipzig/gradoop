@@ -24,7 +24,6 @@ import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.dataintegration.importer.rdbmsimporter.connection.FlinkDatabaseInputHelper;
 import org.gradoop.dataintegration.importer.rdbmsimporter.connection.RdbmsConfig;
-import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.MetaDataParser;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToEdge;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.Fk1Fk2Props;
@@ -35,25 +34,48 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.List;
 
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.BROADCAST_VARIABLE;
+
 /**
- * Creates Epgm edges from foreign key respectively n:m relations
- *
+ * Creates instances of class {@link org.gradoop.common.model.api.entities.EPGMEdge} from database.
  */
-public class CreateEdges {
+public class CreateEdgesOfTables {
 
   /**
-   * Creates EPGM edges from foreign key respectively n:m relations
-   *
-   * @param flinkConfig Gradoop Flink configuration.
-   * @param rdbmsConfig Relational database configuration.
-   * @param metadataParser Metadata of connected relational database.
-   * @param vertices Dataset of already created vertices.
-   * @return Directed and undirected EPGM edges.
-   * @throws Exception
+   * Instance variable of class {@link CreateEdgesOfTables}.
    */
+  private static CreateEdgesOfTables OBJ = null;
 
-  public static DataSet<Edge> create(GradoopFlinkConfig flinkConfig, RdbmsConfig rdbmsConfig,
-      MetaDataParser metadataParser, DataSet<Vertex> vertices) {
+  /**
+   * Singleton instance of class {@link CreateEdgesOfTables}.
+   */
+  private CreateEdgesOfTables() { }
+
+  /**
+   * Single instance of class {@link CreateEdgesOfTables} for converting database tuples into EPGM
+   * edges.
+   *
+   * @return single instance of class {@link CreateEdgesOfTables}
+   */
+  public static CreateEdgesOfTables create() {
+    if (OBJ == null) {
+      OBJ = new CreateEdgesOfTables();
+    }
+    return OBJ;
+  }
+
+  /**
+   * Creates EPGM edges from foreign key respectively n:m relations.
+   *
+   * @param flinkConfig gradoop flink configuration
+   * @param rdbmsConfig database configuration
+   * @param metadataParser database metadata
+   * @param vertices set consisting of already converted vertices
+   * @return directed and undirected EPGM edges
+   */
+  public DataSet<Edge> convert(
+    GradoopFlinkConfig flinkConfig, RdbmsConfig rdbmsConfig,
+    MetaDataParser metadataParser, DataSet<Vertex> vertices) {
     List<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
 
     DataSet<Edge> edges = null;
@@ -61,50 +83,66 @@ public class CreateEdges {
     ExecutionEnvironment env = flinkConfig.getExecutionEnvironment();
 
     /*
-     * Foreign key relations to edges
+     * Foreign key relations to edges.
      */
     if (!tablesToEdges.isEmpty()) {
       DataSet<TableToEdge> dsTablesToEdges = env.fromCollection(tablesToEdges);
 
       // Primary key table representation of foreign key relation
-      DataSet<LabelIdKeyTuple> pkEdges = dsTablesToEdges.filter(new IsDirected())
-          .flatMap(new VerticesToPkTable())
-          .withBroadcastSet(vertices, RdbmsConstants.BROADCAST_VARIABLE).distinct("*");
+      DataSet<LabelIdKeyTuple> pkEdges = dsTablesToEdges
+        .filter(new IsDirected())
+        .flatMap(new VerticesToPkTable())
+        .withBroadcastSet(vertices, BROADCAST_VARIABLE)
+        .distinct("*");
 
       // Foreign key table representation of foreign key relation
-      DataSet<LabelIdKeyTuple> fkEdges = dsTablesToEdges.filter(new IsDirected())
-          .flatMap(new VerticesToFkTable())
-          .withBroadcastSet(vertices, RdbmsConstants.BROADCAST_VARIABLE);
+      DataSet<LabelIdKeyTuple> fkEdges = dsTablesToEdges
+        .filter(new IsDirected())
+        .flatMap(new VerticesToFkTable())
+        .withBroadcastSet(vertices, BROADCAST_VARIABLE);
 
-      edges = pkEdges.join(fkEdges).where(0, 2).equalTo(0, 2).map(new JoinSetToEdges(edgeFactory));
+      edges = pkEdges
+        .join(fkEdges).where(0, 2)
+        .equalTo(0, 2)
+        .map(new JoinSetToEdges(edgeFactory));
 
       /*
-       * N:M relations to edges
+       * N:M relations to edges.
        */
       int counter = 0;
       for (TableToEdge table : tablesToEdges) {
         if (!table.isDirectionIndicator()) {
 
-          DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper.create().getInput(env, rdbmsConfig,
-              table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
+          DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper
+            .create()
+            .getInput(env, rdbmsConfig,
+            table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
 
           // Represents the two foreign key attributes and belonging
           // properties
-          DataSet<Fk1Fk2Props> fkPropsTable = dsSQLResult.map(new FKandProps(counter))
-              .withBroadcastSet(env.fromCollection(tablesToEdges),
-                  RdbmsConstants.BROADCAST_VARIABLE);
+          DataSet<Fk1Fk2Props> fkPropsTable = dsSQLResult
+            .map(new FKandProps(counter))
+            .withBroadcastSet(
+              env.fromCollection(tablesToEdges), BROADCAST_VARIABLE);
 
           // Represents vertices in relation with foreign key one
           DataSet<IdKeyTuple> idPkTableOne = vertices
-              .filter(new ByLabel<Vertex>(table.getStartTableName())).map(new VertexToIdPkTuple());
+            .filter(new ByLabel<>(table.getStartTableName()))
+            .map(new VertexToIdPkTuple());
 
           // Represents vertices in relation with foreign key two
           DataSet<IdKeyTuple> idPkTableTwo = vertices
-              .filter(new ByLabel<Vertex>(table.getEndTableName())).map(new VertexToIdPkTuple());
+            .filter(new ByLabel<>(table.getEndTableName()))
+            .map(new VertexToIdPkTuple());
 
-          DataSet<Edge> dsTupleEdges = fkPropsTable.join(idPkTableOne).where(0).equalTo(1)
-              .map(new Tuple2ToIdFkWithProps()).join(idPkTableTwo).where(1).equalTo(1)
-              .map(new Tuple3ToEdge(edgeFactory, table.getRelationshipType()));
+          DataSet<Edge> dsTupleEdges = fkPropsTable
+            .join(idPkTableOne)
+            .where(0)
+            .equalTo(1)
+            .map(new Tuple2ToIdFkWithProps())
+            .join(idPkTableTwo).where(1)
+            .equalTo(1)
+            .map(new Tuple3ToEdge(edgeFactory, table.getRelationshipType()));
 
           if (edges == null) {
             edges = dsTupleEdges;

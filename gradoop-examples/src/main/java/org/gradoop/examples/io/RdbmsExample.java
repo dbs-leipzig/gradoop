@@ -24,7 +24,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Example program that converts a given relational database into a
- * {@link LogicalGraph} and stores the resulting {@link LogicalGraph} as JSON
+ * {@link LogicalGraph} and stores the resulting {@link LogicalGraph} as CSV
  * into declared directory.
  */
 public class RdbmsExample implements ProgramDescription {

@@ -18,8 +18,9 @@ package org.gradoop.dataintegration.importer.rdbmsimporter.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.IdKeyTuple;
+
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.PK_ID;
 
 /**
  * Creates tuples of gradoop id, primary key name from vertices
@@ -34,6 +35,7 @@ public class VertexToIdPkTuple implements MapFunction<Vertex, IdKeyTuple> {
   @Override
   public IdKeyTuple map(Vertex v) throws Exception {
 
-    return new IdKeyTuple(v.getId(), v.getProperties().get(RdbmsConstants.PK_ID).toString());
+    return new IdKeyTuple(v.getId(),
+      v.getProperties().get(PK_ID).toString());
   }
 }

@@ -21,55 +21,59 @@ import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstan
 /**
  * Stores database management system parameters
  */
-public class RdbmsConfig {
+public class  RdbmsConfig {
 
   /**
-   * Name of used relational database management system
+   * Name of database instance.
    */
   private final String rdbmsName;
 
   /**
-   * Management system identifier
+   * Type of database management system.
    */
   private RdbmsType rdbmsType;
 
   /**
-   * Valid jdbc url
+   * JDBC database url.
    */
   private final String url;
 
   /**
-   * Username of database management system user
+   * Name of database user.
    */
   private final String user;
 
   /**
-   * Password of database management system user
+   * Password of database user.
    */
   private final String pw;
 
   /**
-   * Valid path to a fitting jdbc driver jar
+   * Path to JDBC driver .jar file.
    */
   private final String jdbcDriverPath;
 
   /**
-   * Valid and fitting jdbc driver class name
+   * JDBC driver class name.
    */
   private final String jdbcDriverClassName;
 
   /**
-   * Constructor
+   * Creates an instance of {@link RdbmsConfig} to store the configuration of a database instance.
    *
-   * @param rdbmsName Database management system
-   * @param url Valid jdbc url
-   * @param user User name of database management system user
-   * @param pw Password of database management system user
-   * @param jdbcDriverPath Valid path to a fitting jdbc driver jar
-   * @param jdbcDriverClassName Valid and fitting jdbc driver class name
+   * @param rdbmsName database management system
+   * @param url valid JDBC url
+   * @param user user name of database user
+   * @param pw password of database user
+   * @param jdbcDriverPath valid path to a proper JDBC driver .jar file
+   * @param jdbcDriverClassName valid and proper JDBC driver class name
    */
-  public RdbmsConfig(String rdbmsName, String url, String user, String pw, String jdbcDriverPath,
-      String jdbcDriverClassName) {
+  public RdbmsConfig(String rdbmsName,
+    String url,
+    String user,
+    String pw,
+    String jdbcDriverPath,
+    String jdbcDriverClassName) {
     this.rdbmsName = rdbmsName;
     this.url = url;
     this.user = user;
@@ -79,56 +83,72 @@ public class RdbmsConfig {
   }
 
   /**
-   * @return Relational database management system type.
+   * Get type of connected database.
+   *
+   * @return database management system type
    */
   public RdbmsType getRdbmsType() {
     return rdbmsType;
   }
 
   /**
-   * @param rdbmsName Name of connected relational database management system.
+   * Set type of connected database.
+   *
+   * @param rdbmsName name of connected database instance
    */
   public void setRdbmsType(String rdbmsName) {
-    this.rdbmsType = RdbmsTypeChooser.choose(rdbmsName);
+    this.rdbmsType = RdbmsTypeChooser.create().choose(rdbmsName);
   }
 
   /**
-   * @return Name if relational database management system.
+   * Get name of database instance.
+   *
+   * @return name of database instance
    */
   public String getRdbmsName() {
     return rdbmsName;
   }
 
   /**
-   * @return Relational database url.
+   * Get JDBC url of database connection.
+   *
+   * @return JDBC url
    */
   public String getUrl() {
     return url;
   }
 
   /**
-   * @return Relational database user name.
+   * Get user name.
+   *
+   * @return user name
    */
   public String getUser() {
     return user;
   }
 
   /**
-   * @return Relational database user password.
+   * Get user password.
+   *
+   * @return user password
    */
   public String getPw() {
     return pw;
   }
 
   /**
-   * @return Path of used jdbc driver.
+   * Get path to JDBC driver .jar file
+   *
+   * @return path to JDBC driver
    */
   public String getJdbcDriverPath() {
     return jdbcDriverPath;
   }
 
   /**
-   * @return Used jdbc driver class name.
+   * Get JDBC driver class name
+   *
+   * @return JDBC driver class name
    */
   public String getJdbcDriverClassName() {
     return jdbcDriverClassName;

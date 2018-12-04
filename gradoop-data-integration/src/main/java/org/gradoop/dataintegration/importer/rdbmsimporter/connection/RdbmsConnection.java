@@ -22,23 +22,45 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Connection to relational database
+ * Connection to relational database.
  */
-public class RdbmsConnectionHelper {
+public class RdbmsConnection {
 
   /**
-   * Establishes a connection to a relational database via jdbc.
-   *
-   * @param config Configuration of relational database
-   * @return Valid connection to a relational database
+   * Instance variable of class {@link RdbmsConnection}.
    */
-  public static Connection getConnection(RdbmsConfig config) {
+  private static RdbmsConnection OBJ = null;
 
-    Logger logger = Logger.getLogger(RdbmsConnectionHelper.class);
+  /**
+   * Singelton instance of class {@link RdbmsConnection}.
+   */
+  private RdbmsConnection() { }
+
+  /**
+   * Creates only one instance of {@link RdbmsConnection}.
+   *
+   * @return singelton instance of {@link RdbmsConnection}
+   */
+  public static RdbmsConnection create() {
+    if (OBJ == null) {
+      OBJ = new RdbmsConnection();
+    }
+    return OBJ;
+  }
+
+  /**
+   * Establishes a connection to a relational database via JDBC.
+   *
+   * @param config database configuration
+   * @return JDBC connection to a database instance
+   */
+  public Connection getConnection(RdbmsConfig config) {
+
+    Logger logger = Logger.getLogger(RdbmsConnection.class);
     Connection connection = null;
 
     try {
-      RegisterDriver.register(config);
+      RegisterDriver.create().register(config);
       connection = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPw());
     } catch (SQLException e) {
       logger.error("Cannot establish database connection : " + e);

@@ -23,11 +23,14 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.RowHeader;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToNode;
 
 import java.util.List;
+
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.BROADCAST_VARIABLE;
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.PK_ID;
+
 
 /**
  * Creates one EPGM vertex from one row
@@ -90,14 +93,15 @@ public class RowToVertex extends RichMapFunction<Row, Vertex> {
     GradoopId id = GradoopId.get();
     String label = tableName;
     Properties properties = AttributesToProperties.getProperties(tuple, rowheader);
-    properties.set(RdbmsConstants.PK_ID,
-        PrimaryKeyConcatString.getPrimaryKeyString(tuple, rowheader));
+    properties.set(PK_ID,
+      PrimaryKeyConcatString.getPrimaryKeyString(tuple, rowheader));
 
     return vertexFactory.initVertex(id, label, properties);
   }
 
   @Override
   public void open(Configuration parameters) throws Exception {
-    this.tables = getRuntimeContext().getBroadcastVariable(RdbmsConstants.BROADCAST_VARIABLE);
+    this.tables =
+      getRuntimeContext().getBroadcastVariable(BROADCAST_VARIABLE);
   }
 }
