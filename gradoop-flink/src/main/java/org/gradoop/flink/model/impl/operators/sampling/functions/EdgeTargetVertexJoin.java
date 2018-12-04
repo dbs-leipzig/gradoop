@@ -16,7 +16,6 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -25,29 +24,38 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 /**
  * Joins to get the edge target
  */
-public class EdgeTargetVertexJoin implements JoinFunction<Tuple3<Edge, Vertex, GradoopId>,
-        Tuple2<Vertex, GradoopId>, Tuple3<Edge, Vertex, Vertex>> {
+public class EdgeTargetVertexJoin implements
+  JoinFunction<Tuple3<Edge, GradoopId, Boolean>, Vertex, Tuple3<Edge, Boolean, Boolean>> {
+
   /**
    *  Reduce object instantiations
    */
-  private Tuple3<Edge, Vertex, Vertex> reuse;
+  private Tuple3<Edge, Boolean, Boolean> reuse;
 
   /**
-   * Constructor
+   * Property key of vertex value
    */
-  public EdgeTargetVertexJoin() {
-    reuse = new Tuple3<>();
+  private final String propertyKey;
+
+  /**
+   * Creates an instance of this join function
+   *
+   * @param propertyKey property key of marked vertex value
+   */
+  public EdgeTargetVertexJoin(String propertyKey) {
+    this.reuse = new Tuple3<>();
+    this.propertyKey = propertyKey;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Tuple3<Edge, Vertex, Vertex> join(Tuple3<Edge, Vertex, GradoopId> edgeWithItsVerticesIds,
-                                           Tuple2<Vertex, GradoopId> vertexWithItsId) {
-    reuse.f0 = edgeWithItsVerticesIds.f0;
-    reuse.f1 = edgeWithItsVerticesIds.f1;
-    reuse.f2 = vertexWithItsId.f0;
+  public Tuple3<Edge, Boolean, Boolean> join(Tuple3<Edge, GradoopId, Boolean> result,
+                                           Vertex vertex) {
+    reuse.f0 = result.f0;
+    reuse.f1 = result.f2;
+    reuse.f2 = vertex.getPropertyValue(propertyKey).getBoolean();
     return reuse;
   }
 }

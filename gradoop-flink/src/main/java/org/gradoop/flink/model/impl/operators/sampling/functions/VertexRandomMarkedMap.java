@@ -23,10 +23,8 @@ import java.util.Random;
 /**
  * Creates a random value for each vertex and marks those that are below a
  * given threshold.
- *
- * @param <V> EPGM vertex type
  */
-public class VertexRandomMarkedMap<V extends Vertex> implements MapFunction<V, V> {
+public class VertexRandomMarkedMap implements MapFunction<Vertex, Vertex> {
   /**
    * Threshold to decide if a vertex needs to be filtered.
    */
@@ -57,7 +55,7 @@ public class VertexRandomMarkedMap<V extends Vertex> implements MapFunction<V, V
    * {@inheritDoc}
    */
   @Override
-  public V map(V vertex) throws Exception {
+  public Vertex map(Vertex vertex) throws Exception {
     if (randomGenerator.nextFloat() <= sampleSize) {
       vertex.setProperty(mark, true);
     } else {

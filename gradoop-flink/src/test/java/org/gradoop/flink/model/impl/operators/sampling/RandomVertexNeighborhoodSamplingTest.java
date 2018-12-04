@@ -35,7 +35,7 @@ public class RandomVertexNeighborhoodSamplingTest extends ParameterizedTestForGr
    * @param neighborType The vertex neighborhood type, e.g. Neighborhood.BOTH
    */
   public RandomVertexNeighborhoodSamplingTest(String testName, String seed, String sampleSize,
-    String neighborType) {
+                                              String neighborType) {
     super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize),
       Neighborhood.valueOf(neighborType));
   }
@@ -54,11 +54,12 @@ public class RandomVertexNeighborhoodSamplingTest extends ParameterizedTestForGr
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
 
-    dbEdges.removeAll(newEdges);
-    for (Edge edge : dbEdges) {
-      assertFalse("edge from original graph was not sampled but source and target were",
-        newVertexIDs.contains(edge.getSourceId()) &&
-          newVertexIDs.contains(edge.getTargetId()));
+    if (neighborType.equals(Neighborhood.BOTH)) {
+      dbEdges.removeAll(newEdges);
+      for (Edge edge : dbEdges) {
+        assertFalse("edge from original graph was not sampled but source and target were",
+          newVertexIDs.contains(edge.getSourceId()) && newVertexIDs.contains(edge.getTargetId()));
+      }
     }
   }
 
