@@ -129,34 +129,29 @@ public class GraphCollectionFactory
 
   @Override
   public GraphCollection fromGraphs(LogicalGraph... logicalGraphLayouts) {
-    if (logicalGraphLayouts.length == 1) {
-
-      return fromGraph(logicalGraphLayouts[0]);
-    } else {
-
+    if (logicalGraphLayouts.length != 0) {
       DataSet<GraphHead> graphHeads = null;
       DataSet<Vertex> vertices = null;
       DataSet<Edge> edges = null;
 
-      if (logicalGraphLayouts.length != 0) {
-
-        for (LogicalGraph logicalGraph : logicalGraphLayouts) {
-          graphHeads = (graphHeads == null) ?
-            logicalGraph.getGraphHead() : graphHeads.union(logicalGraph.getGraphHead());
-          vertices = (vertices == null) ?
-            logicalGraph.getVertices() : vertices.union(logicalGraph.getVertices());
-          edges = (edges == null) ?
-            logicalGraph.getEdges() : edges.union(logicalGraph.getEdges());
-        }
-
-        return fromDataSets(
-          graphHeads.distinct(new Id<GraphHead>()),
-          vertices.distinct(new Id<Vertex>()),
-          edges.distinct(new Id<Edge>()));
+      if (logicalGraphLayouts.length == 1) {
+        return fromGraph(logicalGraphLayouts[0]);
       }
 
-      return createEmptyCollection();
+      for (LogicalGraph logicalGraph : logicalGraphLayouts) {
+        graphHeads = (graphHeads == null) ?
+          logicalGraph.getGraphHead() : graphHeads.union(logicalGraph.getGraphHead());
+        vertices = (vertices == null) ?
+          logicalGraph.getVertices() : vertices.union(logicalGraph.getVertices());
+        edges = (edges == null) ?
+          logicalGraph.getEdges() : edges.union(logicalGraph.getEdges());
+      }
+      return fromDataSets(
+        graphHeads.distinct(new Id<GraphHead>()),
+        vertices.distinct(new Id<Vertex>()),
+        edges.distinct(new Id<Edge>()));
     }
+    return createEmptyCollection();
   }
 
   @Override
