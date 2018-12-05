@@ -147,9 +147,9 @@ public class GraphCollectionFactory
           logicalGraph.getEdges() : edges.union(logicalGraph.getEdges());
       }
       return fromDataSets(
-        graphHeads.distinct(new Id<GraphHead>()),
-        vertices.distinct(new Id<Vertex>()),
-        edges.distinct(new Id<Edge>()));
+        graphHeads.distinct(new Id<>()),
+        vertices.distinct(new Id<>()),
+        edges.distinct(new Id<>()));
     }
     return createEmptyCollection();
   }
