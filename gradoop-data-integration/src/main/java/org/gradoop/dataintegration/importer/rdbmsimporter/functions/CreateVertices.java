@@ -35,15 +35,40 @@ import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.Rdbms
 public class CreateVertices {
 
   /**
+   * Instance variable of class {@link CreateVertices}.
+   */
+  private static CreateVertices OBJ = null;
+
+  /**
+   * Singleton instance of class {@link CreateVertices} to convert database data to EPGM edges.
+   */
+  private CreateVertices() { }
+
+  /**
+   * Creates a single instance of class {@link CreateVertices}.
+   *
+   * @return single instance of class {@link CreateVertices}
+   */
+  public static CreateVertices create() {
+    if (OBJ == null) {
+      OBJ = new CreateVertices();
+    }
+    return OBJ;
+  }
+
+  /**
    * Creates EPGM vertices from database table tuples.
    *
    * @param flinkConfig valid gradoop flink config
    * @param rdbmsConfig valid rdbms config
    * @param metadataParser database metadata
-   * @return set of Epgm vertices
+   * @return set of EPGM vertices
    */
-  public static DataSet<Vertex> create(GradoopFlinkConfig flinkConfig, RdbmsConfig rdbmsConfig,
-      MetaDataParser metadataParser) {
+  public DataSet<Vertex> convert(
+    GradoopFlinkConfig flinkConfig,
+    RdbmsConfig rdbmsConfig,
+    MetaDataParser metadataParser) {
+
     List<TableToNode> tablesToNodes = metadataParser.getTablesToNodes();
 
     DataSet<Vertex> vertices = null;

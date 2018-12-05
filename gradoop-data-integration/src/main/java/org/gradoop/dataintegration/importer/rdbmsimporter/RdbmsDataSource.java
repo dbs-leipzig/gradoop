@@ -23,7 +23,7 @@ import org.gradoop.dataintegration.importer.rdbmsimporter.connection.RdbmsConfig
 import org.gradoop.dataintegration.importer.rdbmsimporter.connection.RdbmsConnection;
 import org.gradoop.dataintegration.importer.rdbmsimporter.functions.CreateEdgesOfTables;
 import org.gradoop.dataintegration.importer.rdbmsimporter.functions.CreateVertices;
-import org.gradoop.dataintegration.importer.rdbmsimporter.functions.DeletePkFkProperties;
+import org.gradoop.dataintegration.importer.rdbmsimporter.functions.RemovePkFkProperties;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.MetaDataParser;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -92,7 +92,7 @@ public class RdbmsDataSource implements DataSource {
     }
 
     // creates vertices from rdbms table tuples
-    vertices = CreateVertices.create(flinkConfig, rdbmsConfig, metadataParser);
+    vertices = CreateVertices.create().convert(flinkConfig, rdbmsConfig, metadataParser);
 
     edges =
       CreateEdgesOfTables.create().convert(flinkConfig, rdbmsConfig, metadataParser, vertices);
@@ -100,7 +100,7 @@ public class RdbmsDataSource implements DataSource {
     // cleans vertices by deleting primary key and foreign key
     // properties
     vertices = vertices
-      .map(new DeletePkFkProperties())
+      .map(new RemovePkFkProperties())
       .withBroadcastSet(
         flinkConfig.getExecutionEnvironment().fromCollection(
           metadataParser.getTablesToNodes()), BROADCAST_VARIABLE);

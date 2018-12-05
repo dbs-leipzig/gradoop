@@ -74,8 +74,11 @@ public class CreateEdgesOfTables {
    * @return directed and undirected EPGM edges
    */
   public DataSet<Edge> convert(
-    GradoopFlinkConfig flinkConfig, RdbmsConfig rdbmsConfig,
-    MetaDataParser metadataParser, DataSet<Vertex> vertices) {
+    GradoopFlinkConfig flinkConfig,
+    RdbmsConfig rdbmsConfig,
+    MetaDataParser metadataParser,
+    DataSet<Vertex> vertices) {
+
     List<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
 
     DataSet<Edge> edges = null;
@@ -86,6 +89,7 @@ public class CreateEdgesOfTables {
      * Foreign key relations to edges.
      */
     if (!tablesToEdges.isEmpty()) {
+
       DataSet<TableToEdge> dsTablesToEdges = env.fromCollection(tablesToEdges);
 
       // Primary key table representation of foreign key relation
@@ -111,6 +115,7 @@ public class CreateEdgesOfTables {
        */
       int counter = 0;
       for (TableToEdge table : tablesToEdges) {
+
         if (!table.isDirectionIndicator()) {
 
           DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper

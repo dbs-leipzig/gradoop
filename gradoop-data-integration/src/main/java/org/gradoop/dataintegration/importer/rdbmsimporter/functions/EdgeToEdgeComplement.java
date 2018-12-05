@@ -46,7 +46,7 @@ public class EdgeToEdgeComplement implements MapFunction<Edge, Edge> {
   }
 
   @Override
-  public Edge map(Edge e) throws Exception {
+  public Edge map(Edge e) {
 
     return edgeFactory.initEdge(GradoopId.get(), e.getLabel(), e.getTargetId(), e.getSourceId(),
         e.getProperties());
