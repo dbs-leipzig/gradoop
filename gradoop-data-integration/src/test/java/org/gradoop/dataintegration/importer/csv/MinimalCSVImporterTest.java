@@ -19,11 +19,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.dataintegration.importer.impl.csv.MinimalCSVImporter;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -42,23 +44,21 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    * @throws Exception
    */
   @Test
-  public void testImportWithHeader() throws Exception {
+  public void testImportVertexWithHeader() throws Exception {
 
     String csvPath = getFilePath("/csv/input.csv");
     String delimiter = ";";
 
-    ExecutionEnvironment env = getExecutionEnvironment();
-
     MinimalCSVImporter importVertexImporter =
-      new MinimalCSVImporter(csvPath, delimiter, getConfig());
+      new MinimalCSVImporter(csvPath, delimiter, getConfig(), true);
 
     //check the rows for the header line
-    DataSet<ImportVertex<Long>> importVertex = importVertexImporter.importVertices(true);
+    DataSet<ImportVertex<Long>> importVertex = importVertexImporter.importVertices();
 
     List<ImportVertex<Long>> lv = new ArrayList<>();
     importVertex.output(new LocalCollectionOutputFormat<>(lv));
 
-    env.execute();
+    getExecutionEnvironment().execute();
 
     assertImportCSV(lv);
   }
@@ -71,15 +71,15 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    * @throws Exception
    */
   @Test
-  public void testImportWithoutHeader() throws Exception {
+  public void testImportVertexWithoutHeader() throws Exception {
 
     String csvPath = getFilePath("/csv/inputWithoutHeader.csv");
     String delimiter = ";";
 
     List<String> columnNames = Arrays.asList("name", "value1", "value2", "value3");
     MinimalCSVImporter importVertexImporter =
-      new MinimalCSVImporter(csvPath, delimiter, getConfig(), columnNames);
-    DataSet<ImportVertex<Long>> importVertex = importVertexImporter.importVertices(false);
+      new MinimalCSVImporter(csvPath, delimiter, getConfig(), columnNames, false);
+    DataSet<ImportVertex<Long>> importVertex = importVertexImporter.importVertices();
 
     List<ImportVertex<Long>> lv = new ArrayList<>();
     importVertex.output(new LocalCollectionOutputFormat<>(lv));
@@ -87,6 +87,140 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
     getExecutionEnvironment().execute();
 
     assertImportCSV(lv);
+  }
+
+  /**
+   * Test if the import and creation of a logical graph works correct. Set the first line
+   * of the file as the column property names.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testImportLogicalGraphWithHeader() throws Exception {
+
+    String csvPath = getFilePath("/csv/input.csv");
+    String delimiter = ";";
+
+    String gdlFile = getFilePath("/csv/expected.gdl");
+
+    MinimalCSVImporter importVertexImporter =
+      new MinimalCSVImporter(csvPath, delimiter, getConfig(), true);
+
+    LogicalGraph result = importVertexImporter.getLogicalGraph();
+    FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlFile);
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+    collectAndAssertTrue(expected.equalsByElementData(result));
+  }
+
+  /**
+   * Test if the import and creation of a logical graph works correct. In this case
+   * the file do not contain a header row. For this the user set a list with
+   * the column names.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testImportLogicalGraphWithoutHeader() throws Exception {
+
+    String csvPath = getFilePath("/csv/inputWithoutHeader.csv");
+    String delimiter = ";";
+
+    String gdlFile = getFilePath("/csv/expected.gdl");
+
+    List<String> columnNames = Arrays.asList("name", "value1", "value2", "value3");
+    MinimalCSVImporter importVertexImporter =
+      new MinimalCSVImporter(csvPath, delimiter, getConfig(), columnNames, false);
+
+    LogicalGraph result = importVertexImporter.getLogicalGraph();
+    FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlFile);
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+    collectAndAssertTrue(expected.equalsByElementData(result));
+  }
+
+  /**
+   * Test if the reoccurring header flag is set this row will skipped.
+   * @throws Exception
+   */
+  @Test
+  public void testReoccurringHeader() throws Exception {
+
+    String csvPathWithHeader = getFilePath("/csv/input.csv");
+    String csvPathWithoutHeader = getFilePath("/csv/inputWithoutHeader.csv");
+    String delimiter = ";";
+
+    //set the first line of the file as column property names and check file of reoccurring and skip
+    //header row as vertex
+    MinimalCSVImporter importVertexImporterHeader =
+      new MinimalCSVImporter(csvPathWithHeader, delimiter, getConfig(), true);
+
+    //read all rows of the csv files as vertices
+    List<String> columnNames = Arrays.asList("name", "value1", "value2", "value3");
+    MinimalCSVImporter importVertexImporter =
+      new MinimalCSVImporter(csvPathWithoutHeader, delimiter, getConfig(), columnNames, false);
+
+    LogicalGraph resultWithHeader = importVertexImporter.getLogicalGraph();
+    LogicalGraph resultWithoutHeader = importVertexImporter.getLogicalGraph();
+
+    collectAndAssertTrue(resultWithHeader.equalsByElementData(resultWithoutHeader));
+  }
+
+  /**
+   * Test if an empty line in the csv file will be skipped.
+   * @throws Exception
+   */
+  @Test
+  public void testEmptyLines() throws Exception {
+
+    String csvPath = getFilePath("/csv/inputEmptyLines.csv");
+    String delimiter = ";";
+
+    String gdlFile = getFilePath("/csv/expected.gdl");
+
+    MinimalCSVImporter importVertexImporter =
+      new MinimalCSVImporter(csvPath, delimiter, getConfig(), true);
+
+    LogicalGraph result = importVertexImporter.getLogicalGraph();
+    FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlFile);
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+    collectAndAssertTrue(expected.equalsByElementData(result));
+  }
+
+  /**
+   * Test if a row contains empty entries, no property will be create.
+   * @throws Exception
+   */
+  @Test
+  public void testEmptyProperty() throws Exception {
+
+    String csvPath = getFilePath("/csv/inputEmptyPropertyValues.csv");
+    String delimiter = ";";
+
+    MinimalCSVImporter importVertexImporter =
+      new MinimalCSVImporter(csvPath, delimiter, getConfig(), true);
+
+    LogicalGraph result = importVertexImporter.getLogicalGraph();
+
+    List<Vertex> lv = new ArrayList<>();
+    result.getVertices().output(new LocalCollectionOutputFormat<>(lv));
+
+    getExecutionEnvironment().execute();
+
+    for (Vertex v : lv) {
+      if (v.hasProperty("name")) {
+        assertEquals(2, v.getPropertyCount());
+        assertEquals(v.hasProperty("value1"), false);
+        assertEquals(v.hasProperty("value2"), true);
+        assertEquals(v.hasProperty("value3"), false);
+      } else if (v.hasProperty("value1")) {
+        assertEquals(2, v.getPropertyCount());
+        assertEquals(v.hasProperty("name"), false);
+        assertEquals(v.hasProperty("value2"), false);
+        assertEquals(v.hasProperty("value3"), true);
+      } else {
+        fail();
+      }
+    }
+
   }
 
   /**
