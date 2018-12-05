@@ -100,6 +100,14 @@ public interface BaseGraphCollectionFactory<
   GC fromGraph(LogicalGraph logicalGraphLayout);
 
   /**
+   * Creates a graph collection from multiple given logical graphs.
+   *
+   * @param logicalGraphLayout  input graphs
+   * @return graph collection
+   */
+  GC fromGraphs(LogicalGraph... logicalGraphLayout);
+
+  /**
    * Creates a graph collection from a graph transaction dataset.
    *
    * Overlapping vertices and edge are merged by Id comparison only.
