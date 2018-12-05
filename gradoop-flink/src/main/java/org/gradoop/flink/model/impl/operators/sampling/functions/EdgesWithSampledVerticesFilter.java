@@ -52,7 +52,7 @@ public class EdgesWithSampledVerticesFilter
     boolean filter = false;
 
     if (neighborType.equals(Neighborhood.BOTH)) {
-      filter = isSourceVertexMarked && isTargetVertexMarked;
+      filter = isSourceVertexMarked || isTargetVertexMarked;
     } else if (neighborType.equals(Neighborhood.IN)) {
       filter = isTargetVertexMarked;
     } else if (neighborType.equals(Neighborhood.OUT)) {

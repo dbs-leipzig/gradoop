@@ -233,8 +233,6 @@ public abstract class ParameterizedTestForGraphSampling extends GradoopFlinkTest
 
     getExecutionEnvironment().execute();
 
-    assertNotNull("vertices was null", output.getVertices());
-    assertNotNull("edges was null", output.getEdges());
     assertNotNull("graph was null", output);
 
     newVertexIDs = new HashSet<>();
