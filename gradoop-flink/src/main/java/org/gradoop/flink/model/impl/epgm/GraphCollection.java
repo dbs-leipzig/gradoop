@@ -414,7 +414,7 @@ public class GraphCollection implements
    * @return the graph collection represented as temporal graph collection with empty valid time
    * attributes
    */
-  public TemporalGraphCollection toTemporalGraph() {
+  public TemporalGraphCollection toTemporalGraphCollection() {
     return getConfig().getTemporalGraphCollectionFactory()
       .fromNonTemporalDataSets(getGraphHeads(), getVertices(), getEdges());
   }
@@ -431,7 +431,7 @@ public class GraphCollection implements
    * @return the graph collection represented as temporal graph collection with a time interval as
    * valid time
    */
-  public TemporalGraphCollection toTemporalGraph(
+  public TemporalGraphCollection toTemporalGraphCollection(
     TimeIntervalExtractor<GraphHead> graphHeadTimeIntervalExtractor,
     TimeIntervalExtractor<Vertex> vertexTimeIntervalExtractor,
     TimeIntervalExtractor<Edge> edgeTimeIntervalExtractor) {

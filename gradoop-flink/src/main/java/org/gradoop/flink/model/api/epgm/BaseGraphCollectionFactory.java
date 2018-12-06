@@ -22,6 +22,7 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.api.entities.ElementFactoryProvider;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 import java.util.Collection;
 
@@ -79,7 +80,7 @@ public interface BaseGraphCollectionFactory<
   /**
    * Creates a graph collection from a given logical graph.
    *
-   * @param logicalGraphLayout the graph layout with stored graph elements
+   * @param logicalGraphLayout the graph layout (e.g. logical graph) with stored graph elements
    * @return 1-element graph collection
    */
   GC fromGraph(LogicalGraphLayout<G, V, E> logicalGraphLayout);
@@ -87,10 +88,34 @@ public interface BaseGraphCollectionFactory<
   /**
    * Creates a graph collection from multiple given logical graphs.
    *
-   * @param logicalGraphLayout  input graphs
+   * @param logicalGraphLayouts the logical graph layouts (e.g. logical graphs)
    * @return graph collection
    */
-  GC fromGraphs(LogicalGraphLayout<G, V, E>... logicalGraphLayout);
+  default GC fromGraphs(LogicalGraphLayout<G, V, E>... logicalGraphLayouts) {
+    if (logicalGraphLayouts.length != 0) {
+      DataSet<G> graphHeads = null;
+      DataSet<V> vertices = null;
+      DataSet<E> edges = null;
+
+      if (logicalGraphLayouts.length == 1) {
+        return fromGraph(logicalGraphLayouts[0]);
+      }
+
+      for (LogicalGraphLayout<G, V, E> logicalGraph : logicalGraphLayouts) {
+        graphHeads = (graphHeads == null) ?
+          logicalGraph.getGraphHead() : graphHeads.union(logicalGraph.getGraphHead());
+        vertices = (vertices == null) ?
+          logicalGraph.getVertices() : vertices.union(logicalGraph.getVertices());
+        edges = (edges == null) ?
+          logicalGraph.getEdges() : edges.union(logicalGraph.getEdges());
+      }
+      return fromDataSets(
+        graphHeads.distinct(new Id<>()),
+        vertices.distinct(new Id<>()),
+        edges.distinct(new Id<>()));
+    }
+    return createEmptyCollection();
+  }
 
   /**
    * Creates an empty graph collection.

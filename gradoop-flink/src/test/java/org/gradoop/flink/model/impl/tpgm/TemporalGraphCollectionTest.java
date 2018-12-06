@@ -56,7 +56,7 @@ public class TemporalGraphCollectionTest extends GradoopFlinkTestBase {
   @Before
   public void setUp() throws Exception {
     testCollection = getSocialNetworkLoader().getGraphCollectionByVariables("g1", "g2");
-    testTemporalCollection = testCollection.toTemporalGraph();
+    testTemporalCollection = testCollection.toTemporalGraphCollection();
   }
 
   /**

@@ -32,6 +32,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.util.AsciiGraphLoader;
 
@@ -256,6 +257,40 @@ public class GradoopTestUtils {
     }
     assertFalse("too many elements in first collection", it1.hasNext());
     assertFalse("too many elements in second collection", it2.hasNext());
+  }
+
+  /**
+   * Checks if two TPGM collections contain the same TPGM elements in terms of data
+   * (i.e. label and properties).
+   *
+   * @param collection1 first collection
+   * @param collection2 second collection
+   */
+  public static void validateTPGMElementCollections(
+    Collection<? extends TemporalElement> collection1,
+    Collection<? extends TemporalElement> collection2) {
+
+    // First, validate EPGM information
+    validateEPGMElementCollections(collection1, collection2);
+
+    List<? extends TemporalElement> list1 = Lists.newArrayList(collection1);
+    List<? extends TemporalElement> list2 = Lists.newArrayList(collection2);
+
+    list1.sort(ID_COMPARATOR);
+    list2.sort(ID_COMPARATOR);
+
+    Iterator<? extends TemporalElement> it1 = list1.iterator();
+    Iterator<? extends TemporalElement> it2 = list2.iterator();
+
+    while (it1.hasNext()) {
+      TemporalElement firstElement = it1.next();
+      TemporalElement secondElement = it2.next();
+
+      assertEquals(firstElement.getTransactionTime(), secondElement.getTransactionTime());
+      assertEquals(firstElement.getValidTime(), secondElement.getValidTime());
+    }
+    assertFalse("Too many elements in first collection.", it1.hasNext());
+    assertFalse("Too many elements in second collection", it2.hasNext());
   }
 
   /**

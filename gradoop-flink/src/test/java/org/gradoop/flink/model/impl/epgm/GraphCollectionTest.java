@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class GraphCollectionTest extends GradoopFlinkTestBase {
   /**
-   * Test the {@link GraphCollection#toTemporalGraph()} function.
+   * Test the {@link GraphCollection#toTemporalGraphCollection()} function.
    *
    * @throws Exception if the test execution fails
    */
@@ -50,7 +50,7 @@ public class GraphCollectionTest extends GradoopFlinkTestBase {
     GraphCollection graphCollection = loader.getGraphCollection();
 
     // Call the function to test
-    TemporalGraphCollection temporalGraphCollection = graphCollection.toTemporalGraph();
+    TemporalGraphCollection temporalGraphCollection = graphCollection.toTemporalGraphCollection();
 
     // use collections as data sink
     Collection<Vertex> vertices = Lists.newArrayList();
@@ -92,7 +92,7 @@ public class GraphCollectionTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test the {@link GraphCollection#toTemporalGraph()} function with time extractors.
+   * Test the {@link GraphCollection#toTemporalGraphCollection()} function with time extractors.
    *
    * @throws Exception if the test execution fails
    */
@@ -102,7 +102,7 @@ public class GraphCollectionTest extends GradoopFlinkTestBase {
     GraphCollection graphCollection = loader.getGraphCollection();
 
     // Call the function to test
-    TemporalGraphCollection temporalGraphCollection = graphCollection.toTemporalGraph(
+    TemporalGraphCollection temporalGraphCollection = graphCollection.toTemporalGraphCollection(
       GradoopFlinkTestUtils.getGraphHeadTimeIntervalExtractor(),
       GradoopFlinkTestUtils.getVertexTimeIntervalExtractor(),
       GradoopFlinkTestUtils.getEdgeTimeIntervalExtractor());
