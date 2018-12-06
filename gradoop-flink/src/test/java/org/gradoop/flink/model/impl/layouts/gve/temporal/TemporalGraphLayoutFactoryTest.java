@@ -18,16 +18,12 @@ package org.gradoop.flink.model.impl.layouts.gve.temporal;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphElement;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +35,8 @@ import java.util.stream.Collectors;
 
 import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test of {@link TemporalGraphLayoutFactory}
@@ -66,11 +63,14 @@ public class TemporalGraphLayoutFactoryTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     graphHeads = loader.getGraphHeadsByVariables("g0").stream()
-      .map(TemporalGraphHead::fromNonTemporalGraphHead).collect(Collectors.toList());
+      .map(getConfig().getTemporalGraphHeadFactory()::fromNonTemporalGraphHead)
+      .collect(Collectors.toList());
     vertices = loader.getVerticesByGraphVariables("g0").stream()
-      .map(TemporalVertex::fromNonTemporalVertex).collect(Collectors.toList());
+      .map(getConfig().getTemporalVertexFactory()::fromNonTemporalVertex)
+      .collect(Collectors.toList());
     edges = loader.getEdgesByGraphVariables("g0").stream()
-      .map(TemporalEdge::fromNonTemporalEdge).collect(Collectors.toList());
+      .map(getConfig().getTemporalEdgeFactory()::fromNonTemporalEdge)
+      .collect(Collectors.toList());
 
     graphHeadDataSet = getExecutionEnvironment().fromCollection(graphHeads);
     vertexDataSet = getExecutionEnvironment().fromCollection(vertices);
@@ -150,54 +150,5 @@ public class TemporalGraphLayoutFactoryTest extends GradoopFlinkTestBase {
     validateEPGMElementCollections(edges, loadedEdges);
     validateEPGMGraphElementCollections(vertices, loadedVertices);
     validateEPGMGraphElementCollections(edges, loadedEdges);
-  }
-
-  /**
-   * Test the {@link TemporalGraphLayoutFactory#fromNonTemporalDataSets(DataSet, DataSet, DataSet)}
-   * method.
-   *
-   * @throws Exception if the test fails
-   */
-  @Test
-  public void testFromNonTemporalDataSets() throws Exception {
-    GraphCollection collection = getSocialNetworkLoader().getGraphCollectionByVariables("g0", "g1");
-
-    TemporalGVELayout layout = factory.fromNonTemporalDataSets(
-      collection.getGraphHeads(),
-      collection.getVertices(),
-      collection.getEdges()
-    );
-
-    Collection<TemporalGraphHead> loadedGraphHeads = Lists.newArrayList();
-    Collection<TemporalVertex> loadedVertices = Lists.newArrayList();
-    Collection<TemporalEdge> loadedEdges = Lists.newArrayList();
-
-    layout.getGraphHead().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
-    layout.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
-    layout.getEdges().output(new LocalCollectionOutputFormat<>(loadedEdges));
-
-    Collection<GraphHead> epgmGraphHeads = Lists.newArrayList();
-    Collection<Vertex> epgmVertices = Lists.newArrayList();
-    Collection<Edge> epgmEdges = Lists.newArrayList();
-
-    collection.getGraphHeads().output(new LocalCollectionOutputFormat<>(epgmGraphHeads));
-    collection.getVertices().output(new LocalCollectionOutputFormat<>(epgmVertices));
-    collection.getEdges().output(new LocalCollectionOutputFormat<>(epgmEdges));
-
-    getExecutionEnvironment().execute();
-
-    assertFalse(loadedGraphHeads.isEmpty());
-    assertFalse(loadedVertices.isEmpty());
-    assertFalse(loadedEdges.isEmpty());
-
-    validateEPGMElementCollections(epgmGraphHeads, loadedGraphHeads);
-    validateEPGMElementCollections(epgmVertices, loadedVertices);
-    validateEPGMElementCollections(epgmEdges, loadedEdges);
-    validateEPGMGraphElementCollections(epgmVertices, loadedVertices);
-    validateEPGMGraphElementCollections(epgmEdges, loadedEdges);
-
-    loadedGraphHeads.forEach(this::checkDefaultTemporalElement);
-    loadedVertices.forEach(this::checkDefaultTemporalElement);
-    loadedEdges.forEach(this::checkDefaultTemporalElement);
   }
 }

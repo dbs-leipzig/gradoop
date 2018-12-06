@@ -15,12 +15,14 @@
  */
 package org.gradoop.common.model.impl.pojo.temporal;
 
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -30,6 +32,16 @@ import static org.junit.Assert.assertNull;
  * Tests of class {@link TemporalEdge}
  */
 public class TemporalEdgeTest {
+
+  /**
+   * The factory that is responsible for creating the TPGM element.
+   */
+  private TemporalEdgeFactory factory;
+
+  @Before
+  public void setUp() {
+    factory = new TemporalEdgeFactory();
+  }
 
   /**
    * Test the constructor.
@@ -43,7 +55,7 @@ public class TemporalEdgeTest {
     Long validFrom = 42L;
     Long validTo = 52L;
 
-    TemporalEdge temporalEdge = new TemporalEdge(edgeId, label, sourceId, targetId, null, null,
+    TemporalEdge temporalEdge = factory.initEdge(edgeId, label, sourceId, targetId, null, null,
       validFrom, validTo);
 
     assertEquals(edgeId, temporalEdge.getId());
@@ -84,7 +96,7 @@ public class TemporalEdgeTest {
     GradoopId targetId = GradoopId.get();
     String label = "x";
 
-    TemporalEdge temporalEdge = new TemporalEdge(edgeId, label, sourceId, targetId, null, null,
+    TemporalEdge temporalEdge = factory.initEdge(edgeId, label, sourceId, targetId, null, null,
       null, null);
 
     assertEquals(TemporalElement.DEFAULT_VALID_TIME, temporalEdge.getValidFrom());
@@ -92,13 +104,13 @@ public class TemporalEdgeTest {
   }
 
   /**
-   * Test the {@link TemporalEdge#createEdge(GradoopId, GradoopId)} function.
+   * Test the {@link TemporalEdgeFactory#createEdge(GradoopId, GradoopId)} function.
    */
   @Test
   public void testCreateEdge() {
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
-    TemporalEdge temporalEdge = TemporalEdge.createEdge(sourceId, targetId);
+    TemporalEdge temporalEdge = factory.createEdge(sourceId, targetId);
 
     assertEquals(sourceId, temporalEdge.getSourceId());
     assertEquals(targetId, temporalEdge.getTargetId());
@@ -108,7 +120,7 @@ public class TemporalEdgeTest {
   }
 
   /**
-   * Test the {@link TemporalEdge#fromNonTemporalEdge(Edge)} function.
+   * Test the {@link TemporalEdgeFactory#fromNonTemporalEdge(EPGMEdge)} function.
    */
   @Test
   public void testFromNonTemporalEdge() {
@@ -124,7 +136,7 @@ public class TemporalEdgeTest {
     Edge nonTemporalEdge = new EdgeFactory()
       .initEdge(edgeId, label, sourceId, targetId, props, graphIds);
 
-    TemporalEdge temporalEdge = TemporalEdge.fromNonTemporalEdge(nonTemporalEdge);
+    TemporalEdge temporalEdge = factory.fromNonTemporalEdge(nonTemporalEdge);
 
     assertEquals(nonTemporalEdge.getId(), temporalEdge.getId());
     assertEquals(nonTemporalEdge.getSourceId(), temporalEdge.getSourceId());

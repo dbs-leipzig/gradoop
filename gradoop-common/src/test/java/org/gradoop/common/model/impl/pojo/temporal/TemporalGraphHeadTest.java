@@ -15,11 +15,13 @@
  */
 package org.gradoop.common.model.impl.pojo.temporal;
 
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -28,6 +30,16 @@ import static org.junit.Assert.*;
  * Tests of class {@link TemporalGraphHead}
  */
 public class TemporalGraphHeadTest {
+
+  /**
+   * The factory that is responsible for creating the TPGM element.
+   */
+  private TemporalGraphHeadFactory factory;
+
+  @Before
+  public void setUp() {
+    factory = new TemporalGraphHeadFactory();
+  }
 
   /**
    * Test the default constructor.
@@ -41,11 +53,11 @@ public class TemporalGraphHeadTest {
   }
 
   /**
-   * Test the {@link TemporalGraphHead#createGraphHead()} function
+   * Test the {@link TemporalGraphHeadFactory#createGraphHead()} function
    */
   @Test
   public void testCreateGraphHead() {
-    TemporalGraphHead temporalGraphHead = TemporalGraphHead.createGraphHead();
+    TemporalGraphHead temporalGraphHead = factory.createGraphHead();
 
     assertNotNull(temporalGraphHead.getId());
     assertEquals(GradoopConstants.DEFAULT_VERTEX_LABEL, temporalGraphHead.getLabel());
@@ -54,7 +66,7 @@ public class TemporalGraphHeadTest {
   }
 
   /**
-   * Test the {@link TemporalGraphHead#fromNonTemporalGraphHead(GraphHead)} function
+   * Test the {@link TemporalGraphHeadFactory#fromNonTemporalGraphHead(EPGMGraphHead)} function
    */
   @Test
   public void testFromNonTemporalGraphHead() {
@@ -66,8 +78,7 @@ public class TemporalGraphHeadTest {
 
     GraphHead nonTemporalGraphHead = new GraphHeadFactory().initGraphHead(id, label, props);
 
-    TemporalGraphHead temporalGraphHead = TemporalGraphHead
-      .fromNonTemporalGraphHead(nonTemporalGraphHead);
+    TemporalGraphHead temporalGraphHead = factory.fromNonTemporalGraphHead(nonTemporalGraphHead);
 
     assertEquals(nonTemporalGraphHead.getId(), temporalGraphHead.getId());
     assertEquals(nonTemporalGraphHead.getLabel(), temporalGraphHead.getLabel());

@@ -18,9 +18,7 @@ package org.gradoop.common.model.impl.pojo.temporal;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.util.GradoopConstants;
 
 /**
  * POJO Implementation of a TPGM edge.
@@ -82,31 +80,5 @@ public class TemporalEdge extends TemporalGraphElement implements EPGMEdge {
   @Override
   public void setTargetId(GradoopId targetId) {
     this.targetId = targetId;
-  }
-
-  /**
-   * Static create method to avoid the usage of a factory class. Creates a temporal edge instance
-   * with default values.
-   *
-   * @param sourceId the Gradoop identifier of the source vertex
-   * @param targetId the Gradoop identifier of the target vertex
-   * @return a temporal edge instance
-   */
-  public static TemporalEdge createEdge(GradoopId sourceId, GradoopId targetId) {
-    return new TemporalEdge(GradoopId.get(), GradoopConstants.DEFAULT_EDGE_LABEL, sourceId,
-      targetId, null, null, null, null);
-  }
-
-  /**
-   * Helper function to create a TPGM edge from an EPGM edge.
-   * The ids, label and all other information will be inherited.
-   *
-   * @param edge the EPGM edge instance
-   * @return a TPGM edge instance with default values at its valid times
-   */
-  public static TemporalEdge fromNonTemporalEdge(Edge edge) {
-    return new TemporalEdge(edge.getId(), edge.getLabel(), edge.getSourceId(), edge.getTargetId(),
-      edge.getProperties(), edge.getGraphIds(), null, null);
-
   }
 }

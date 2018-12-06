@@ -17,6 +17,7 @@ package org.gradoop.flink.model.impl.functions.tpgm;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 import org.gradoop.flink.model.api.functions.TimeIntervalExtractor;
@@ -40,9 +41,11 @@ public class TemporalVertexFromNonTemporal implements MapFunction<Vertex, Tempor
   /**
    * Creates an instance of the TemporalVertexFromNonTemporal map function. The temporal instance
    * will have default temporal information.
+   *
+   * @param elementFactory factory that is responsible for creating a temporal vertex instance
    */
-  public TemporalVertexFromNonTemporal() {
-    this.reuse = TemporalVertex.createVertex();
+  public TemporalVertexFromNonTemporal(EPGMVertexFactory<TemporalVertex> elementFactory) {
+    this.reuse = elementFactory.createVertex();
   }
 
   /**
@@ -50,10 +53,13 @@ public class TemporalVertexFromNonTemporal implements MapFunction<Vertex, Tempor
    * will have valid times extracted from the non-temporal instance by the given
    * timeIntervalExtractor.
    *
+   * @param elementFactory factory that is responsible for creating a temporal vertex instance
    * @param timeIntervalExtractor the extractor instance fetches the validFrom and validTo values
    */
-  public TemporalVertexFromNonTemporal(TimeIntervalExtractor<Vertex> timeIntervalExtractor) {
-    this();
+  public TemporalVertexFromNonTemporal(
+    EPGMVertexFactory<TemporalVertex> elementFactory,
+    TimeIntervalExtractor<Vertex> timeIntervalExtractor) {
+    this(elementFactory);
     this.timeIntervalExtractor = timeIntervalExtractor;
   }
 

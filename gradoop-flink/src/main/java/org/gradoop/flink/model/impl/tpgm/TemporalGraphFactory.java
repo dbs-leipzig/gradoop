@@ -20,11 +20,18 @@ import org.apache.flink.util.Preconditions;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
+import org.gradoop.flink.model.api.functions.TimeIntervalExtractor;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalEdgeFromNonTemporal;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalGraphHeadFromNonTemporal;
+import org.gradoop.flink.model.impl.functions.tpgm.TemporalVertexFromNonTemporal;
 import org.gradoop.flink.model.impl.layouts.gve.temporal.TemporalGraphLayoutFactory;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -108,5 +115,60 @@ public class TemporalGraphFactory
   @Override
   public EPGMEdgeFactory<TemporalEdge> getEdgeFactory() {
     return this.config.getTemporalEdgeFactory();
+  }
+
+  /**
+   * Creates a {@link TemporalGraph} instance by the given
+   * EPGM graph head, vertex and edge datasets.
+   *
+   * The method assumes that the given vertices and edges are already assigned to the given
+   * graph head.
+   *
+   * @param graphHead   1-element EPGM graph head DataSet
+   * @param vertices    EPGM vertex DataSet
+   * @param edges       EPGM edge DataSet
+   * @return a temporal graph representing the temporal graph data
+   */
+  public TemporalGraph fromNonTemporalDataSets(
+    DataSet<GraphHead> graphHead,
+    DataSet<Vertex> vertices,
+    DataSet<Edge> edges) {
+    return new TemporalGraph(this.layoutFactory.fromDataSets(
+      graphHead.map(new TemporalGraphHeadFromNonTemporal(getGraphHeadFactory())),
+      vertices.map(new TemporalVertexFromNonTemporal(getVertexFactory())),
+      edges.map(new TemporalEdgeFromNonTemporal(getEdgeFactory()))), config);
+  }
+
+  /**
+   * Creates a {@link TemporalGraph} instance. By the provided timestamp extractors, it is possible
+   * to extract temporal information from the data to define a timestamp or time interval that
+   * represents the beginning and end of the element's validity (valid time).
+   *
+   * The method assumes that the given vertices and edges are already assigned to the given
+   * graph head.
+   *
+   * @param graphHead 1-element EPGM graph head DataSet
+   * @param graphHeadTimeIntervalExtractor extractor to pick the time interval from graph heads
+   * @param vertices EPGM vertex DataSet
+   * @param vertexTimeIntervalExtractor extractor to pick the time interval from vertices
+   * @param edges EPGM edge DataSet
+   * @param edgeTimeIntervalExtractor extractor to pick the time interval from edges
+   * @return the logical graph represented as temporal graph with defined valid times
+   */
+  public TemporalGraph fromNonTemporalDataSets(
+    DataSet<GraphHead> graphHead,
+    TimeIntervalExtractor<GraphHead> graphHeadTimeIntervalExtractor,
+    DataSet<Vertex> vertices,
+    TimeIntervalExtractor<Vertex> vertexTimeIntervalExtractor,
+    DataSet<Edge> edges,
+    TimeIntervalExtractor<Edge> edgeTimeIntervalExtractor) {
+
+    return new TemporalGraph(this.layoutFactory.fromDataSets(
+      graphHead.map(new TemporalGraphHeadFromNonTemporal(getGraphHeadFactory(),
+        graphHeadTimeIntervalExtractor)),
+      vertices.map(new TemporalVertexFromNonTemporal(getVertexFactory(),
+        vertexTimeIntervalExtractor)),
+      edges.map(new TemporalEdgeFromNonTemporal(getEdgeFactory(),
+        edgeTimeIntervalExtractor))), config);
   }
 }

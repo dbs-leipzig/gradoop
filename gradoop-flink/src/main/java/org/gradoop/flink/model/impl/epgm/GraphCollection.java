@@ -43,9 +43,6 @@ import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
-import org.gradoop.flink.model.impl.functions.tpgm.TemporalEdgeFromNonTemporal;
-import org.gradoop.flink.model.impl.functions.tpgm.TemporalGraphHeadFromNonTemporal;
-import org.gradoop.flink.model.impl.functions.tpgm.TemporalVertexFromNonTemporal;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
@@ -418,10 +415,8 @@ public class GraphCollection implements
    * attributes
    */
   public TemporalGraphCollection toTemporalGraph() {
-    return getConfig().getTemporalGraphCollectionFactory().fromDataSets(
-      getGraphHeads().map(new TemporalGraphHeadFromNonTemporal()),
-      getVertices().map(new TemporalVertexFromNonTemporal()),
-      getEdges().map(new TemporalEdgeFromNonTemporal()));
+    return getConfig().getTemporalGraphCollectionFactory()
+      .fromNonTemporalDataSets(getGraphHeads(), getVertices(), getEdges());
   }
 
   /**
@@ -441,10 +436,13 @@ public class GraphCollection implements
     TimeIntervalExtractor<Vertex> vertexTimeIntervalExtractor,
     TimeIntervalExtractor<Edge> edgeTimeIntervalExtractor) {
 
-    return getConfig().getTemporalGraphCollectionFactory().fromDataSets(
-      getGraphHeads().map(new TemporalGraphHeadFromNonTemporal(graphHeadTimeIntervalExtractor)),
-      getVertices().map(new TemporalVertexFromNonTemporal(vertexTimeIntervalExtractor)),
-      getEdges().map(new TemporalEdgeFromNonTemporal(edgeTimeIntervalExtractor)));
+    return getConfig().getTemporalGraphCollectionFactory().fromNonTemporalDataSets(
+      getGraphHeads(),
+      graphHeadTimeIntervalExtractor,
+      getVertices(),
+      vertexTimeIntervalExtractor,
+      getEdges(),
+      edgeTimeIntervalExtractor);
   }
 
   //----------------------------------------------------------------------------

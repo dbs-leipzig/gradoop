@@ -15,6 +15,7 @@
  */
 package org.gradoop.common.model.impl.pojo.temporal;
 
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
@@ -83,6 +84,31 @@ public class TemporalEdgeFactory implements EPGMEdgeFactory<TemporalEdge>, Seria
   @Override
   public TemporalEdge initEdge(GradoopId id, String label, GradoopId sourceVertexId,
     GradoopId targetVertexId, Properties properties, GradoopIdSet graphIds) {
+    return initEdge(id, label, sourceVertexId, targetVertexId, properties, graphIds, null, null);
+  }
+
+  @Override
+  public Class<TemporalEdge> getType() {
+    return TemporalEdge.class;
+  }
+
+  /**
+   * Initializes an edge based on the given parameters. If the valid times are null, default values
+   * are used.
+   *
+   * @param id              edge identifier
+   * @param label           edge label
+   * @param sourceVertexId  source vertex id
+   * @param targetVertexId  target vertex id
+   * @param properties      edge properties
+   * @param graphIds        graphIds, that contain the edge
+   * @param validFrom       begin of the elements validity as unix timestamp [ms] or null
+   * @param validTo         end of the elements validity as unix timestamp [ms] or null
+   * @return the temporal edge instance
+   */
+  public TemporalEdge initEdge(GradoopId id, String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId, Properties properties, GradoopIdSet graphIds, Long validFrom,
+    Long validTo) {
     return new TemporalEdge(
       Objects.requireNonNull(id, "Identifier is null."),
       Objects.requireNonNull(label, "Label is null."),
@@ -90,13 +116,19 @@ public class TemporalEdgeFactory implements EPGMEdgeFactory<TemporalEdge>, Seria
       Objects.requireNonNull(targetVertexId, "Target vertex id was null."),
       properties,
       graphIds,
-      null,
-      null
-    );
+      validFrom,
+      validTo);
   }
 
-  @Override
-  public Class<TemporalEdge> getType() {
-    return TemporalEdge.class;
+  /**
+   * Helper function to create a TPGM edge from an EPGM edge.
+   * The ids, label and all other information will be inherited.
+   *
+   * @param edge the EPGM edge instance
+   * @return a TPGM edge instance with default values at its valid times
+   */
+  public TemporalEdge fromNonTemporalEdge(EPGMEdge edge) {
+    return initEdge(edge.getId(), edge.getLabel(), edge.getSourceId(), edge.getTargetId(),
+      edge.getProperties(), edge.getGraphIds());
   }
 }

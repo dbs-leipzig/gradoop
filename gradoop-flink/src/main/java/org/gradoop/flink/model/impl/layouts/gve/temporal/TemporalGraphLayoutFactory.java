@@ -17,18 +17,12 @@ package org.gradoop.flink.model.impl.layouts.gve.temporal;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
-import org.gradoop.flink.model.impl.functions.tpgm.TemporalEdgeFromNonTemporal;
-import org.gradoop.flink.model.impl.functions.tpgm.TemporalGraphHeadFromNonTemporal;
-import org.gradoop.flink.model.impl.functions.tpgm.TemporalVertexFromNonTemporal;
 import org.gradoop.flink.model.impl.layouts.common.BaseFactory;
 
 import java.util.ArrayList;
@@ -142,25 +136,5 @@ public class TemporalGraphLayoutFactory extends BaseFactory implements
     Collection<TemporalVertex> vertices = new ArrayList<>(0);
     Collection<TemporalEdge> edges = new ArrayList<>(0);
     return fromCollections(null, vertices, edges);
-  }
-
-  /**
-   * Creates a temporal graph layout from given non-temporal EPGM graph head, vertex and edge
-   * datasets.
-   *
-   * The method assumes that the given vertices and edges are already assigned to the given
-   * graph head.
-   *
-   * @param graphHead   1-element EPGM graph head DataSet
-   * @param vertices    EPGM vertex DataSet
-   * @param edges       EPGM edge DataSet
-   * @return a temporal graph layout representing the temporal graph data
-   */
-  public TemporalGVELayout fromNonTemporalDataSets(DataSet<GraphHead> graphHead,
-    DataSet<Vertex> vertices, DataSet<Edge> edges) {
-    return new TemporalGVELayout(
-      graphHead.map(new TemporalGraphHeadFromNonTemporal()),
-      vertices.map(new TemporalVertexFromNonTemporal()),
-      edges.map(new TemporalEdgeFromNonTemporal()));
   }
 }

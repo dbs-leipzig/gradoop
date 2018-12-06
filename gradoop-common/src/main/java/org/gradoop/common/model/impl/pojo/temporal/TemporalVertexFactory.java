@@ -15,6 +15,7 @@
  */
 package org.gradoop.common.model.impl.pojo.temporal;
 
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
@@ -90,5 +91,41 @@ public class TemporalVertexFactory implements EPGMVertexFactory<TemporalVertex>,
   @Override
   public Class<TemporalVertex> getType() {
     return TemporalVertex.class;
+  }
+
+
+  /**
+   * Initializes a temporal vertex based on the given parameters. If the valid times are null,
+   * default values are used.
+   *
+   * @param id              vertex identifier
+   * @param label           vertex label
+   * @param properties      vertex properties
+   * @param graphIds        graphIds, that contain the vertex
+   * @param validFrom       begin of the elements validity as unix timestamp [ms] or null
+   * @param validTo         end of the elements validity as unix timestamp [ms] or null
+   * @return the temporal vertex instance
+   */
+  public TemporalVertex initVertex(GradoopId id, String label, Properties properties,
+    GradoopIdSet graphIds, Long validFrom, Long validTo) {
+    return new TemporalVertex(
+      Objects.requireNonNull(id, "Identifier is null."),
+      Objects.requireNonNull(label, "Label is null."),
+      properties,
+      graphIds,
+      validFrom,
+      validTo);
+  }
+
+  /**
+   * Helper function to create a TPGM vertex from an EPGM vertex.
+   * The id, label and all other information will be inherited.
+   *
+   * @param vertex the EPGM vertex instance
+   * @return a TPGM vertex instance with default values at its valid times
+   */
+  public TemporalVertex fromNonTemporalVertex(EPGMVertex vertex) {
+    return initVertex(vertex.getId(), vertex.getLabel(), vertex.getProperties(),
+      vertex.getGraphIds(), null, null);
   }
 }

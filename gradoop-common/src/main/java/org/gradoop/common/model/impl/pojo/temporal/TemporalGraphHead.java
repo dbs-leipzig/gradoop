@@ -17,9 +17,7 @@ package org.gradoop.common.model.impl.pojo.temporal;
 
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.util.GradoopConstants;
 
 /**
  * POJO Implementation of a TPGM graph head.
@@ -45,28 +43,5 @@ public class TemporalGraphHead extends TemporalElement implements EPGMGraphHead 
   public TemporalGraphHead(GradoopId id, String label, Properties properties, Long validFrom,
     Long validTo) {
     super(id, label, properties, validFrom, validTo);
-  }
-
-  /**
-   * Static create method to avoid the usage of a factory class. Creates a temporal graph head
-   * instance with default values.
-   *
-   * @return a temporal graph head instance
-   */
-  public static TemporalGraphHead createGraphHead() {
-    return new TemporalGraphHead(GradoopId.get(), GradoopConstants.DEFAULT_GRAPH_LABEL, null, null,
-      null);
-  }
-
-  /**
-   * Helper function to create a TPGM graph head from an EPGM graph head.
-   * The id, label and all other information will be inherited.
-   *
-   * @param graphHead the EPGM graph head instance
-   * @return a TPGM graph head instance with default values at its valid times
-   */
-  public static TemporalGraphHead fromNonTemporalGraphHead(GraphHead graphHead) {
-    return new TemporalGraphHead(graphHead.getId(), graphHead.getLabel(), graphHead.getProperties(),
-      null, null);
   }
 }

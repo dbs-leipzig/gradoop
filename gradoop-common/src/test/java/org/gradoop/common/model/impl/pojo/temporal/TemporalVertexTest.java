@@ -15,20 +15,34 @@
  */
 package org.gradoop.common.model.impl.pojo.temporal;
 
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
+import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Tests of class {@link TemporalVertex}
  */
 public class TemporalVertexTest {
+
+  /**
+   * The factory that is responsible for creating the TPGM element.
+   */
+  private TemporalVertexFactory factory;
+
+  @Before
+  public void setUp() {
+    factory = new TemporalVertexFactory();
+  }
 
   /**
    * Test the default constructor.
@@ -42,11 +56,11 @@ public class TemporalVertexTest {
   }
 
   /**
-   * Test the {@link TemporalVertex#createVertex()} function
+   * Test the {@link TemporalVertexFactory#createVertex()} function
    */
   @Test
   public void testCreateVertex() {
-    TemporalVertex temporalVertex = TemporalVertex.createVertex();
+    TemporalVertex temporalVertex = factory.createVertex();
 
     assertNotNull(temporalVertex.getId());
     assertEquals(GradoopConstants.DEFAULT_VERTEX_LABEL, temporalVertex.getLabel());
@@ -56,7 +70,7 @@ public class TemporalVertexTest {
   }
 
   /**
-   * Test the {@link TemporalVertex#fromNonTemporalVertex(Vertex)} function
+   * Test the {@link TemporalVertexFactory#fromNonTemporalVertex(EPGMVertex)} function
    */
   @Test
   public void testFromNonTemporalVertex() {
@@ -69,7 +83,7 @@ public class TemporalVertexTest {
 
     Vertex nonTemporalVertex = new VertexFactory().initVertex(vertexId, label, props, graphIds);
 
-    TemporalVertex temporalVertex = TemporalVertex.fromNonTemporalVertex(nonTemporalVertex);
+    TemporalVertex temporalVertex = factory.fromNonTemporalVertex(nonTemporalVertex);
 
     assertEquals(nonTemporalVertex.getId(), temporalVertex.getId());
     assertEquals(nonTemporalVertex.getLabel(), temporalVertex.getLabel());

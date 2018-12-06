@@ -60,11 +60,14 @@ public class TemporalGraphCollectionLayoutFactoryTest extends GradoopFlinkTestBa
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     graphHeads = loader.getGraphHeadsByVariables("g0").stream()
-      .map(TemporalGraphHead::fromNonTemporalGraphHead).collect(Collectors.toList());
+      .map(getConfig().getTemporalGraphHeadFactory()::fromNonTemporalGraphHead)
+      .collect(Collectors.toList());
     vertices = loader.getVerticesByGraphVariables("g0").stream()
-      .map(TemporalVertex::fromNonTemporalVertex).collect(Collectors.toList());
+      .map(getConfig().getTemporalVertexFactory()::fromNonTemporalVertex)
+      .collect(Collectors.toList());
     edges = loader.getEdgesByGraphVariables("g0").stream()
-      .map(TemporalEdge::fromNonTemporalEdge).collect(Collectors.toList());
+      .map(getConfig().getTemporalEdgeFactory()::fromNonTemporalEdge)
+      .collect(Collectors.toList());
 
     graphHeadDataSet = getExecutionEnvironment().fromCollection(graphHeads);
     vertexDataSet = getExecutionEnvironment().fromCollection(vertices);

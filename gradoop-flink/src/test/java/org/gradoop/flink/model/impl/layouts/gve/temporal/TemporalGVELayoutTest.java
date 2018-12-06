@@ -18,8 +18,11 @@ package org.gradoop.flink.model.impl.layouts.gve.temporal;
 import com.google.common.collect.Sets;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalEdgeFactory;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalVertex;
+import org.gradoop.common.model.impl.pojo.temporal.TemporalVertexFactory;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,19 +52,23 @@ public class TemporalGVELayoutTest extends GradoopFlinkTestBase {
    */
   @BeforeClass
   public static void setup() {
-    g0 = TemporalGraphHead.createGraphHead();
+    TemporalGraphHeadFactory temporalGraphHeadFactory = new TemporalGraphHeadFactory();
+    TemporalVertexFactory temporalVertexFactory = new TemporalVertexFactory();
+    TemporalEdgeFactory temporalEdgeFactory = new TemporalEdgeFactory();
+
+    g0 = temporalGraphHeadFactory.createGraphHead();
     g0.setLabel("A");
-    g1 = TemporalGraphHead.createGraphHead();
+    g1 = temporalGraphHeadFactory.createGraphHead();
     g1.setLabel("B");
 
-    v0 = TemporalVertex.createVertex();
+    v0 = temporalVertexFactory.createVertex();
     v0.setLabel("A");
-    v1 = TemporalVertex.createVertex();
-    v2 = TemporalVertex.createVertex();
+    v1 = temporalVertexFactory.createVertex();
+    v2 = temporalVertexFactory.createVertex();
 
-    e0 = TemporalEdge.createEdge(v0.getId(), v1.getId());
+    e0 = temporalEdgeFactory.createEdge(v0.getId(), v1.getId());
     e0.setLabel("a");
-    e1 = TemporalEdge.createEdge(v1.getId(), v2.getId());
+    e1 = temporalEdgeFactory.createEdge(v1.getId(), v2.getId());
 
     v0.addGraphId(g0.getId());
     v1.addGraphId(g0.getId());

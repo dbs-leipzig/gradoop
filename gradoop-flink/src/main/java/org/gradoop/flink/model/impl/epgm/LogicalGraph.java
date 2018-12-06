@@ -40,9 +40,6 @@ import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
-import org.gradoop.flink.model.impl.functions.tpgm.TemporalEdgeFromNonTemporal;
-import org.gradoop.flink.model.impl.functions.tpgm.TemporalGraphHeadFromNonTemporal;
-import org.gradoop.flink.model.impl.functions.tpgm.TemporalVertexFromNonTemporal;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
@@ -572,10 +569,8 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
    * @return the logical graph represented as temporal graph with empty valid time attributes
    */
   public TemporalGraph toTemporalGraph() {
-    return getConfig().getTemporalGraphFactory().fromDataSets(
-      getGraphHead().map(new TemporalGraphHeadFromNonTemporal()),
-      getVertices().map(new TemporalVertexFromNonTemporal()),
-      getEdges().map(new TemporalEdgeFromNonTemporal()));
+    return getConfig().getTemporalGraphFactory()
+      .fromNonTemporalDataSets(getGraphHead(), getVertices(), getEdges());
   }
 
   /**
@@ -594,10 +589,13 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
     TimeIntervalExtractor<Vertex> vertexTimeIntervalExtractor,
     TimeIntervalExtractor<Edge> edgeTimeIntervalExtractor) {
 
-    return getConfig().getTemporalGraphFactory().fromDataSets(
-      getGraphHead().map(new TemporalGraphHeadFromNonTemporal(graphHeadTimeIntervalExtractor)),
-      getVertices().map(new TemporalVertexFromNonTemporal(vertexTimeIntervalExtractor)),
-      getEdges().map(new TemporalEdgeFromNonTemporal(edgeTimeIntervalExtractor)));
+    return getConfig().getTemporalGraphFactory().fromNonTemporalDataSets(
+      getGraphHead(),
+      graphHeadTimeIntervalExtractor,
+      getVertices(),
+      vertexTimeIntervalExtractor,
+      getEdges(),
+      edgeTimeIntervalExtractor);
   }
 
   //----------------------------------------------------------------------------

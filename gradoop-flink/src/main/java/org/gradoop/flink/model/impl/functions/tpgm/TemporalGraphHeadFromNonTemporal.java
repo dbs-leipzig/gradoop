@@ -17,6 +17,7 @@ package org.gradoop.flink.model.impl.functions.tpgm;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalGraphHead;
 import org.gradoop.flink.model.api.functions.TimeIntervalExtractor;
@@ -40,9 +41,11 @@ public class TemporalGraphHeadFromNonTemporal implements MapFunction<GraphHead, 
   /**
    * Creates an instance of the TemporalGraphHeadFromNonTemporal map function. The temporal instance
    * will have default temporal information.
+   *
+   * @param elementFactory factory that is responsible for creating a temporal graph head instance
    */
-  public TemporalGraphHeadFromNonTemporal() {
-    this.reuse = TemporalGraphHead.createGraphHead();
+  public TemporalGraphHeadFromNonTemporal(EPGMGraphHeadFactory<TemporalGraphHead> elementFactory) {
+    this.reuse = elementFactory.createGraphHead();
   }
 
   /**
@@ -50,10 +53,13 @@ public class TemporalGraphHeadFromNonTemporal implements MapFunction<GraphHead, 
    * will have valid times extracted from the non-temporal instance by the given
    * timeIntervalExtractor.
    *
+   * @param elementFactory factory that is responsible for creating a temporal graph head instance
    * @param timeIntervalExtractor the extractor instance fetches the validFrom and validTo values
    */
-  public TemporalGraphHeadFromNonTemporal(TimeIntervalExtractor<GraphHead> timeIntervalExtractor) {
-    this();
+  public TemporalGraphHeadFromNonTemporal(
+    EPGMGraphHeadFactory<TemporalGraphHead> elementFactory,
+    TimeIntervalExtractor<GraphHead> timeIntervalExtractor) {
+    this(elementFactory);
     this.timeIntervalExtractor = timeIntervalExtractor;
   }
 

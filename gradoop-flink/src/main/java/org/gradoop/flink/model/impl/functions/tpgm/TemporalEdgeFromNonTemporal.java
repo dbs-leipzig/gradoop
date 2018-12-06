@@ -17,6 +17,7 @@ package org.gradoop.flink.model.impl.functions.tpgm;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.temporal.TemporalEdge;
@@ -41,9 +42,11 @@ public class TemporalEdgeFromNonTemporal implements MapFunction<Edge, TemporalEd
   /**
    * Creates an instance of the TemporalEdgeFromNonTemporal map function. The temporal instance
    * will have default temporal information.
+   *
+   * @param elementFactory factory that is responsible for creating a temporal edge instance
    */
-  public TemporalEdgeFromNonTemporal() {
-    this.reuse = TemporalEdge.createEdge(GradoopId.get(), GradoopId.get());
+  public TemporalEdgeFromNonTemporal(EPGMEdgeFactory<TemporalEdge> elementFactory) {
+    this.reuse = elementFactory.createEdge(GradoopId.get(), GradoopId.get());
   }
 
   /**
@@ -51,10 +54,13 @@ public class TemporalEdgeFromNonTemporal implements MapFunction<Edge, TemporalEd
    * will have valid times extracted from the non-temporal instance by the given
    * timeIntervalExtractor.
    *
+   * @param elementFactory factory that is responsible for creating a temporal edge instance
    * @param timeIntervalExtractor the extractor instance fetches the validFrom and validTo values
    */
-  public TemporalEdgeFromNonTemporal(TimeIntervalExtractor<Edge> timeIntervalExtractor) {
-    this();
+  public TemporalEdgeFromNonTemporal(
+    EPGMEdgeFactory<TemporalEdge> elementFactory,
+    TimeIntervalExtractor<Edge> timeIntervalExtractor) {
+    this(elementFactory);
     this.timeIntervalExtractor = timeIntervalExtractor;
   }
 
