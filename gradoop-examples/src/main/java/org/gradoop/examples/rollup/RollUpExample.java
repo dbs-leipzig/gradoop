@@ -42,7 +42,7 @@ public class RollUpExample extends AbstractRunner {
    * Path to the example data graph
    */
   private static final String EXAMPLE_DATA_FILE =
-    RollUpExample.class.getResource("/data/gdl/tc.gdl").getFile();
+    RollUpExample.class.getResource("/data/gdl/telephonecalls.gdl").getFile();
 
   /**
    * The example provides an overview over the usage of the different rollUp methods.
@@ -56,6 +56,8 @@ public class RollUpExample extends AbstractRunner {
    * properties
    * 3. run an edge based rollUp using the "year", "month", "day", "hour" and "minute" properties
    * 4. write both results into a separate GDL-File
+   *
+   * args[0] - the base path for the generated png files
    *
    * @param args arguments
    *
@@ -80,7 +82,7 @@ public class RollUpExample extends AbstractRunner {
     callGraph = callGraph.transformEdges(new TimePropertyTransformationFunction<>("time"));
 
     // path prefix for dot file
-    String pathPrefix = System.getProperty("user.home") + "/telephoneGraph";
+    String pathPrefix = args[0];
 
     // group by rollUp on vertices
     String firstDotPath = pathPrefix + "_vertexRollUp.dot";
@@ -97,7 +99,7 @@ public class RollUpExample extends AbstractRunner {
     String secondDotPath = pathPrefix + "_edgeRollUp.dot";
     GraphCollection graphGroupedByRollUpOnEdges =
       callGraph.groupEdgesByRollUp(
-        Arrays.asList(Grouping.LABEL_SYMBOL, "city"),
+        Arrays.asList(Grouping.LABEL_SYMBOL, "country", "state"),
         Collections.singletonList(new Count("count")),
         Arrays.asList(Grouping.LABEL_SYMBOL, "year", "month", "day", "hour", "minute"),
         Collections.singletonList(new Count("count")));

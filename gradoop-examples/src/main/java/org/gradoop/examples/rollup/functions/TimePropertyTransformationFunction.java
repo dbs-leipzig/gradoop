@@ -60,8 +60,8 @@ public class TimePropertyTransformationFunction<E extends EPGMElement>
       return current;
     }
 
-    LocalDateTime timeOfCall = LocalDateTime.ofEpochSecond((long) timePropertyValue.getInt(),
-      0, OffsetDateTime.now().getOffset());
+    LocalDateTime timeOfCall = LocalDateTime.ofEpochSecond(
+      (long) timePropertyValue.getInt(), 0, OffsetDateTime.now().getOffset());
 
     transformed.setLabel(current.getLabel());
 

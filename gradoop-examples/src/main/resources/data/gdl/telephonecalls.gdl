@@ -1,4 +1,4 @@
-tc[
+telephonecalls[
 // vertex space
 (alice:Person {name:"Alice", country: "Germany", state: "Saxony", city:"Leipzig"})
 (bob:Person {name:"Bob", country: "Germany", state: "Saxony", city:"Leipzig"})
