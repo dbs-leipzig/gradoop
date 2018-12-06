@@ -16,14 +16,18 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Joins to get the edge source
+ * Joins to get the edge source:
+ * (edge),(vertex) -> (edge,edge.targetId,(bool)vertex[propertyKey])
  */
+@FunctionAnnotation.ForwardedFieldsFirst({"*->f0", "id->f1"})
+@FunctionAnnotation.ReadFieldsSecond("properties")
 public class EdgeSourceVertexJoin
   implements JoinFunction<Edge, Vertex, Tuple3<Edge, GradoopId, Boolean>> {
   /**

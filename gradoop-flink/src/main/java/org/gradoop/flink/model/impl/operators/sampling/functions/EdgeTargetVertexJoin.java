@@ -16,14 +16,18 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Joins to get the edge target
+ * Joins to get the edge target:
+ * (edge,edge.targetId,bool-source),(target) -> (edge,bool-source,(bool)target[propertyKey])
  */
+@FunctionAnnotation.ForwardedFieldsFirst({"f0->f0", "f2->f1"})
+@FunctionAnnotation.ReadFieldsSecond("properties")
 public class EdgeTargetVertexJoin implements
   JoinFunction<Tuple3<Edge, GradoopId, Boolean>, Vertex, Tuple3<Edge, Boolean, Boolean>> {
 
@@ -51,10 +55,10 @@ public class EdgeTargetVertexJoin implements
    * {@inheritDoc}
    */
   @Override
-  public Tuple3<Edge, Boolean, Boolean> join(Tuple3<Edge, GradoopId, Boolean> result,
-                                           Vertex vertex) {
-    reuse.f0 = result.f0;
-    reuse.f1 = result.f2;
+  public Tuple3<Edge, Boolean, Boolean> join(Tuple3<Edge, GradoopId, Boolean> interim,
+    Vertex vertex) {
+    reuse.f0 = interim.f0;
+    reuse.f1 = interim.f2;
     reuse.f2 = vertex.getPropertyValue(propertyKey).getBoolean();
     return reuse;
   }

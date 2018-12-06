@@ -119,7 +119,7 @@ public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
       .filter(new EdgesWithSampledVerticesFilter(neighborType))
       .map(new Value0Of3<>());
 
-    graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getVertices(), newEdges);
+    graph = graph.getFactory().fromDataSets(graph.getVertices(), newEdges);
 
     graph = new FilterVerticesWithDegreeOtherThanGiven(0L).execute(graph);
 

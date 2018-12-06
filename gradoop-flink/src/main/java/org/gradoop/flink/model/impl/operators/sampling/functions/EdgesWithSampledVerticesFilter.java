@@ -17,6 +17,7 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.impl.pojo.Edge;
 
 /**
@@ -49,14 +50,16 @@ public class EdgesWithSampledVerticesFilter
     boolean isSourceVertexMarked = tuple.f1;
     boolean isTargetVertexMarked = tuple.f2;
 
-    boolean filter = false;
+    boolean filter;
 
-    if (neighborType.equals(Neighborhood.BOTH)) {
-      filter = isSourceVertexMarked || isTargetVertexMarked;
-    } else if (neighborType.equals(Neighborhood.IN)) {
-      filter = isTargetVertexMarked;
-    } else if (neighborType.equals(Neighborhood.OUT)) {
-      filter = isSourceVertexMarked;
+    switch (neighborType) {
+    case BOTH:  filter = isSourceVertexMarked || isTargetVertexMarked;
+    break;
+    case IN:    filter = isTargetVertexMarked;
+    break;
+    case OUT:   filter = isSourceVertexMarked;
+    break;
+    default: throw new UnsupportedTypeException("NeighborType needs to be BOTH, IN or OUT");
     }
 
     return filter;
