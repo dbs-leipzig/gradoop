@@ -15,10 +15,6 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
@@ -31,6 +27,9 @@ import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.hamcrest.core.Is;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class RenameLabelTest extends GradoopFlinkTestBase {
 
@@ -99,7 +98,7 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     TransformationFunction<EPGMVertex> renameFunction = new RenameLabel<>(label, newLabel);
 
     renameFunction.apply(vertex, vertex);
- 
+
     assertEquals(newLabel, vertex.getLabel());
     assertThat(vertex.getPropertyValue("k1").toString(), Is.<Object>is("v1"));
     assertThat(vertex.getPropertyValue("k2").toString(), Is.<Object>is("v2"));

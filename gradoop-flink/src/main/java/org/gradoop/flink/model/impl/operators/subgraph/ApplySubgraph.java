@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.InitGraphHead;
@@ -127,8 +127,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
-      .getGraphHeadFactory();
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())
@@ -231,8 +230,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
-      .getGraphHeadFactory();
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())
@@ -306,8 +304,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
-      .getGraphHeadFactory();
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())

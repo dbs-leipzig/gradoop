@@ -24,7 +24,7 @@ import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.functions.ElementToPropertyMetaData;
 import org.gradoop.flink.io.impl.csv.functions.ReducePropertyMetaData;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;

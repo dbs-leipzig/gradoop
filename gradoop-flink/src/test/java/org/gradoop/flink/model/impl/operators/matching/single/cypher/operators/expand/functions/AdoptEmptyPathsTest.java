@@ -46,7 +46,7 @@ public class AdoptEmptyPathsTest {
   }
 
   @Test
-  public void testEmbeddingFormat() throws Exception{
+  public void testEmbeddingFormat() throws Exception {
     GradoopId a = GradoopId.get();
     GradoopId b = GradoopId.get();
 

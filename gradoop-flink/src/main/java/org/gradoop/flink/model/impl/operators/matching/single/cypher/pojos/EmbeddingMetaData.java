@@ -106,15 +106,14 @@ public class EmbeddingMetaData implements Serializable {
     this.directionMapping = new HashMap<>(metaData.getPathCount());
 
     metaData.getVariables().forEach(var -> {
-        this.entryMapping.put(
-          Pair.of(var, metaData.getEntryType(var)), metaData.getEntryColumn(var));
-        metaData.getPropertyKeys(var).forEach(key ->
-          this.propertyMapping.put(Pair.of(var, key), metaData.getPropertyColumn(var, key)));
-        if (metaData.getEntryType(var) == EntryType.PATH) {
-          this.directionMapping.put(var, metaData.getDirection(var));
-        }
+      this.entryMapping.put(
+        Pair.of(var, metaData.getEntryType(var)), metaData.getEntryColumn(var));
+      metaData.getPropertyKeys(var).forEach(key ->
+        this.propertyMapping.put(Pair.of(var, key), metaData.getPropertyColumn(var, key)));
+      if (metaData.getEntryType(var) == EntryType.PATH) {
+        this.directionMapping.put(var, metaData.getDirection(var));
       }
-    );
+    });
   }
 
   public Map<Pair<String, EntryType>, Integer> getEntryMapping() {

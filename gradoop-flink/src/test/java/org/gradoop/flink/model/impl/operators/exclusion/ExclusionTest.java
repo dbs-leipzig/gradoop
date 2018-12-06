@@ -19,7 +19,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -132,13 +132,13 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
     getExecutionEnvironment().execute();
 
     Set<GraphElement> inVertices = new HashSet<>();
-    for(Vertex vertex : vertices2) {
+    for (Vertex vertex : vertices2) {
       if (!vertices0.contains(vertex)) {
         inVertices.add(vertex);
       }
     }
     Set<GraphElement> inEdges = new HashSet<>();
-    for(Edge edge : edges2) {
+    for (Edge edge : edges2) {
       if (!edges0.contains(edge)) {
         inVertices.add(edge);
       }

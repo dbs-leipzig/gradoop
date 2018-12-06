@@ -20,7 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import java.io.File;
 import java.io.IOException;

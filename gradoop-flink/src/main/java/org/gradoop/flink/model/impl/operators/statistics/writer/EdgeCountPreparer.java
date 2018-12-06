@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.statistics.writer;
 
 import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.operators.statistics.EdgeCount;
@@ -37,5 +37,10 @@ public class EdgeCountPreparer implements UnaryGraphToValueOperator<MapOperator<
     return new EdgeCount()
         .execute(graph)
         .map(new ObjectTo1<>());
+  }
+
+  @Override
+  public String getName() {
+    return EdgeCountPreparer.class.getName();
   }
 }

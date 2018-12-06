@@ -19,8 +19,8 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -31,7 +31,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * Applies the transformation operator on on all logical graphs in a graph
  * collection.
  */
-public class ApplyTransformation extends Transformation
+public class ApplyTransformation extends Transformation<GraphHead, Vertex, Edge, LogicalGraph>
   implements ApplicableUnaryGraphToGraphOperator {
 
   /**
@@ -55,9 +55,9 @@ public class ApplyTransformation extends Transformation
       collection.getGraphHeads(),
       collection.getVertices(),
       collection.getEdges(),
-      collection.getConfig());
+      collection.getConfig().getLogicalGraphFactory());
 
-    return collection.getConfig().getGraphCollectionFactory().fromDataSets(
+    return collection.getFactory().fromDataSets(
       modifiedGraph.getGraphHead(),
       modifiedGraph.getVertices(),
       modifiedGraph.getEdges());
@@ -71,11 +71,11 @@ public class ApplyTransformation extends Transformation
 
     DataSet<GraphTransaction> transformedGraphTransactions = graphTransactions
       .map(new TransformGraphTransaction(
-        config.getGraphHeadFactory(),
+        collection.getFactory().getGraphHeadFactory(),
         graphHeadTransFunc,
-        config.getVertexFactory(),
+        collection.getFactory().getVertexFactory(),
         vertexTransFunc,
-        config.getEdgeFactory(),
+        collection.getFactory().getEdgeFactory(),
         edgeTransFunc
       ));
 

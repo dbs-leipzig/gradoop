@@ -299,11 +299,11 @@ public class MetaDataParser {
     return Arrays.stream(s.split(LIST_DELIMITER))
       .map(st -> st.split("="))
       .map(strings -> {
-          Object[] objects = new Object[2];
-          objects[0] = keyParser.apply(strings[0]);
-          objects[1] = valueParser.apply(strings[1]);
-          return objects;
-        })
+        Object[] objects = new Object[2];
+        objects[0] = keyParser.apply(strings[0]);
+        objects[1] = valueParser.apply(strings[1]);
+        return objects;
+      })
       .collect(Collectors.toMap(e -> PropertyValue.create(e[0]), e -> PropertyValue.create(e[1])));
   }
 

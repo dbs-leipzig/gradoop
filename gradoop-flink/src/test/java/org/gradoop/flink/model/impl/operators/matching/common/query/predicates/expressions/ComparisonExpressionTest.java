@@ -90,12 +90,12 @@ public class ComparisonExpressionTest {
     assertTrue(compare(lhs, rhs, Comparator.GT));
     assertTrue(compare(lhs, rhs, Comparator.GTE));
   }
-  
+
   @Test
   public void testNegativeComparison() {
     Literal lhs;
     Literal rhs;
-    
+
     lhs = new Literal(42);
     rhs = new Literal(42);
     assertFalse(compare(lhs, rhs, Comparator.NEQ));
@@ -132,7 +132,7 @@ public class ComparisonExpressionTest {
 
   private boolean compare(Literal lhs, Literal rhs, Comparator comparator) {
     return new ComparisonExpression(
-      new Comparison(lhs,comparator,rhs)
+      new Comparison(lhs, comparator, rhs)
     ).evaluate(null, null);
   }
 }

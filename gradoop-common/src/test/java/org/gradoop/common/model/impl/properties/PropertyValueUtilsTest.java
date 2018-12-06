@@ -429,8 +429,8 @@ public class PropertyValueUtilsTest {
       long maxLong = 11L;
       int minInt = 10;
       int maxInt = 11;
-      short minShort = (short)10;
-      short maxShort = (short)11;
+      short minShort = (short) 10;
+      short maxShort = (short) 11;
 
       // MIN BigDecimal
       p = min(create(minBigDecimal), create(maxBigDecimal));
@@ -704,8 +704,8 @@ public class PropertyValueUtilsTest {
       long maxLong = 11L;
       int minInt = 10;
       int maxInt = 11;
-      short minShort = (short)10;
-      short maxShort = (short)11;
+      short minShort = (short) 10;
+      short maxShort = (short) 11;
 
       // MAX BigDecimal
       p = max(create(maxBigDecimal), create(minBigDecimal));

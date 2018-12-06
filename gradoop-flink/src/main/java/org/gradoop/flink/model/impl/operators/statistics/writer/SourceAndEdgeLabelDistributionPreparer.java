@@ -19,7 +19,7 @@ import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
 import org.gradoop.flink.model.impl.operators.statistics.SourceLabelAndEdgeLabelDistribution;
 import org.gradoop.flink.model.impl.tuples.WithCount;
@@ -43,5 +43,10 @@ Tuple3<String, String, Long>>> {
         .execute(graph)
         .map(value -> Tuple3.of(value.f0.f0, value.f0.f1, value.f1))
         .returns(new TypeHint<Tuple3<String, String, Long>>() { });
+  }
+
+  @Override
+  public String getName() {
+    return SourceAndEdgeLabelDistributionPreparer.class.getName();
   }
 }

@@ -82,7 +82,8 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
         sampleSize, population.size()));
     }
 
-    int i = 0, nLeft = population.size();
+    int i = 0;
+    int nLeft = population.size();
     while (sampleSize > 0) {
       int rand = random.nextInt(nLeft);
       if (rand < sampleSize) {

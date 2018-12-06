@@ -25,8 +25,8 @@ import org.gradoop.flink.io.impl.csv.functions.ReducePropertyMetaData;
 import org.gradoop.flink.io.impl.csv.functions.StringEscaper;
 import org.gradoop.flink.io.impl.csv.indexed.functions.MultipleFileOutputFormat;
 import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;
@@ -242,7 +242,7 @@ public abstract class CSVBase {
     DataSet<E> elements) {
     return elements
       .map(new ElementToPropertyMetaData<>())
-      .groupBy(1)
+      .groupBy(0, 1)
       .reduce(new ReducePropertyMetaData())
       .map(tuple -> Tuple3.of(tuple.f0, tuple.f1, MetaDataParser.getPropertiesMetaData(tuple.f2)))
       .returns(new TupleTypeInfo<>(

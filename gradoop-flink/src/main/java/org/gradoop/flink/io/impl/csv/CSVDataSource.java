@@ -25,8 +25,8 @@ import org.gradoop.flink.io.impl.csv.functions.CSVLineToEdge;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToGraphHead;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToVertex;
 import org.gradoop.flink.io.impl.csv.metadata.MetaData;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 

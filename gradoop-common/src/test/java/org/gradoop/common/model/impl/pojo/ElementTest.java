@@ -142,7 +142,7 @@ public class ElementTest {
       .useConstructor(gradoopId, "someLabel", properties)
       .defaultAnswer(CALLS_REAL_METHODS));
 
-    for(String key : elementMock.getPropertyKeys()) {
+    for (String key : elementMock.getPropertyKeys()) {
       assertTrue(key.equals(KEY_0) || key.equals(KEY_1) || key.equals(KEY_2));
     }
   }

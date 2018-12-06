@@ -110,8 +110,7 @@ public class TraversalCode<C extends Comparable<C>> implements Serializable, Com
 
       // if two DFS-Codes share initial traversals,
       // the first different traversal will decide about comparison
-      while (comparison == 0 && thisIterator.hasNext() && thatIterator.hasNext())
-      {
+      while (comparison == 0 && thisIterator.hasNext() && thatIterator.hasNext()) {
         comparison = thisIterator.next().compareTo(thatIterator.next());
       }
 

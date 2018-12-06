@@ -25,8 +25,8 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Triple;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
   private VertexFactory vertexFactory;
@@ -63,7 +62,7 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     properties.set("since", "2013");
     Edge e = edgeFactory.createEdge("knows", a.getId(), b.getId(), properties);
 
-    DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a,e,b));
+    DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a, e, b));
 
     List<Embedding> result = new FilterAndProjectTriples(
       triples,
@@ -71,11 +70,11 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
       predicates,
       new HashMap<>(), MatchStrategy.ISOMORPHISM
     ).evaluate().collect();
-    
+
     assertEquals(1, result.size());
-    assertTrue(result.get(0).getId(0).equals(a.getId()));
-    assertTrue(result.get(0).getId(1).equals(e.getId()));
-    assertTrue(result.get(0).getId(2).equals(b.getId()));
+    assertEquals(result.get(0).getId(0), a.getId());
+    assertEquals(result.get(0).getId(1), e.getId());
+    assertEquals(result.get(0).getId(2), b.getId());
   }
 
   @Test
@@ -107,9 +106,9 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
 
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(
-      new Triple(a,e1,b),
-      new Triple(b,e2,a),
-      new Triple(a,e3,b)
+      new Triple(a, e1, b),
+      new Triple(b, e2, a),
+      new Triple(a, e3, b)
     );
 
     List<Embedding> result = new FilterAndProjectTriples(triples,
@@ -118,9 +117,9 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     ).evaluate().collect();
 
     assertEquals(1, result.size());
-    assertTrue(result.get(0).getId(0).equals(a.getId()));
-    assertTrue(result.get(0).getId(1).equals(e1.getId()));
-    assertTrue(result.get(0).getId(2).equals(b.getId()));
+    assertEquals(result.get(0).getId(0), a.getId());
+    assertEquals(result.get(0).getId(1), e1.getId());
+    assertEquals(result.get(0).getId(2), b.getId());
   }
 
   @Test
@@ -135,9 +134,9 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     Edge e3 = edgeFactory.createEdge("knows", a1.getId(), b.getId());
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(
-      new Triple(a1,e1,b),
-      new Triple(a2,e2,b),
-      new Triple(a1,e3,b)
+      new Triple(a1, e1, b),
+      new Triple(a2, e2, b),
+      new Triple(a1, e3, b)
     );
 
 
@@ -147,9 +146,9 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     ).evaluate().collect();
 
     assertEquals(1, result.size());
-    assertTrue(result.get(0).getId(0).equals(a1.getId()));
-    assertTrue(result.get(0).getId(1).equals(e1.getId()));
-    assertTrue(result.get(0).getId(2).equals(b.getId()));
+    assertEquals(result.get(0).getId(0), a1.getId());
+    assertEquals(result.get(0).getId(1), e1.getId());
+    assertEquals(result.get(0).getId(2), b.getId());
   }
 
   @Test
@@ -162,8 +161,8 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     Edge e2 = edgeFactory.createEdge("loves", a.getId(), b.getId());
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(
-      new Triple(a,e1,a),
-      new Triple(a,e2,b)
+      new Triple(a, e1, a),
+      new Triple(a, e2, b)
     );
 
     List<Embedding> result = new FilterAndProjectTriples(triples,
@@ -172,8 +171,8 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     ).evaluate().collect();
 
     assertEquals(1, result.size());
-    assertTrue(result.get(0).getId(0).equals(a.getId()));
-    assertTrue(result.get(0).getId(1).equals(e1.getId()));
+    assertEquals(result.get(0).getId(0), a.getId());
+    assertEquals(result.get(0).getId(1), e1.getId());
   }
 
   @Test
@@ -186,8 +185,8 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     Edge e2 = edgeFactory.createEdge("loves", a.getId(), b.getId());
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(
-      new Triple(a,e1,a),
-      new Triple(a,e2,b)
+      new Triple(a, e1, a),
+      new Triple(a, e2, b)
     );
 
     List<Embedding> result = new FilterAndProjectTriples(triples,
@@ -196,9 +195,9 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
       ).evaluate().collect();
 
     assertEquals(1, result.size());
-    assertTrue(result.get(0).getId(0).equals(a.getId()));
-    assertTrue(result.get(0).getId(1).equals(e2.getId()));
-    assertTrue(result.get(0).getId(2).equals(b.getId()));
+    assertEquals(result.get(0).getId(0), a.getId());
+    assertEquals(result.get(0).getId(1), e2.getId());
+    assertEquals(result.get(0).getId(2), b.getId());
   }
 
   @Test
@@ -211,8 +210,8 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     Edge e2 = edgeFactory.createEdge("loves", a.getId(), b.getId());
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(
-      new Triple(a,e1,a),
-      new Triple(a,e2,b)
+      new Triple(a, e1, a),
+      new Triple(a, e2, b)
     );
 
     List<Embedding> result = new FilterAndProjectTriples(triples,
@@ -231,7 +230,7 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     Vertex b = vertexFactory.createVertex("Person");
     Edge e = edgeFactory.createEdge("loves", a.getId(), b.getId());
 
-    DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a,e,b));
+    DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a, e, b));
 
     List<Embedding> result = new FilterAndProjectTriples(triples,
       "a", "e", "b",
@@ -252,7 +251,7 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     Vertex a = vertexFactory.createVertex("Person");
     Edge e = edgeFactory.createEdge("loves", a.getId(), a.getId());
 
-    DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a,e,a));
+    DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a, e, a));
 
     List<Embedding> result = new FilterAndProjectTriples(triples,
       "a", "e", "a",
@@ -266,7 +265,7 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
   }
 
   @Test
-  public void testProjectionOfAvailableValues() throws Exception{
+  public void testProjectionOfAvailableValues() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a)-[e]->(b)");
 
     Properties properties = Properties.create();
@@ -285,10 +284,10 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     Edge e = edgeFactory.createEdge("knows", a.getId(), b.getId(), properties);
 
 
-    DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a,e,b));
+    DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a, e, b));
 
     HashMap<String, List<String>> propertyKeys = new HashMap<>();
-    propertyKeys.put("a", Lists.newArrayList("name","age"));
+    propertyKeys.put("a", Lists.newArrayList("name", "age"));
     propertyKeys.put("e", Lists.newArrayList("since"));
     propertyKeys.put("b", Lists.newArrayList("name"));
 
@@ -297,14 +296,14 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
       predicates, propertyKeys, MatchStrategy.ISOMORPHISM
     ).evaluate().collect().get(0);
 
-    assertTrue(result.getProperty(0).equals(PropertyValue.create("Alice")));
-    assertTrue(result.getProperty(1).equals(PropertyValue.create(25)));
-    assertTrue(result.getProperty(2).equals(PropertyValue.create(2013)));
-    assertTrue(result.getProperty(3).equals(PropertyValue.create("Bob")));
+    assertEquals(result.getProperty(0), PropertyValue.create("Alice"));
+    assertEquals(result.getProperty(1), PropertyValue.create(25));
+    assertEquals(result.getProperty(2), PropertyValue.create(2013));
+    assertEquals(result.getProperty(3), PropertyValue.create("Bob"));
   }
 
   @Test
-  public void testProjectionOfMissingValues() throws Exception{
+  public void testProjectionOfMissingValues() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a)-[e]->(b)");
 
     Vertex a = vertexFactory.createVertex("Person");
@@ -312,7 +311,7 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     Edge e = edgeFactory.createEdge("knows", a.getId(), b.getId());
 
 
-    DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a,e,b));
+    DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a, e, b));
 
     HashMap<String, List<String>> propertyKeys = new HashMap<>();
     propertyKeys.put("a", Lists.newArrayList("name"));
@@ -324,8 +323,8 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
       predicates, propertyKeys, MatchStrategy.ISOMORPHISM
     ).evaluate().collect().get(0);
 
-    assertTrue(result.getProperty(0).equals(PropertyValue.NULL_VALUE));
-    assertTrue(result.getProperty(1).equals(PropertyValue.NULL_VALUE));
-    assertTrue(result.getProperty(2).equals(PropertyValue.NULL_VALUE));
+    assertEquals(result.getProperty(0), PropertyValue.NULL_VALUE);
+    assertEquals(result.getProperty(1), PropertyValue.NULL_VALUE);
+    assertEquals(result.getProperty(2), PropertyValue.NULL_VALUE);
   }
 }

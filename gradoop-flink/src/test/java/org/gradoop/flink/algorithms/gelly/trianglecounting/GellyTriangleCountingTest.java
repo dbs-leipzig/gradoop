@@ -17,7 +17,7 @@ package org.gradoop.flink.algorithms.gelly.trianglecounting;
 
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -91,22 +91,22 @@ public class GellyTriangleCountingTest extends GradoopFlinkTestBase {
     trianglesDirectedGraph = trianglesDirectedGraph.callForGraph(new GellyTriangleCounting());
     trianglesUndirectedGraph = trianglesUndirectedGraph.callForGraph(new GellyTriangleCounting());
 
-    assertEquals("Wrong number of triangles for triplet, should be 0L",0L,
+    assertEquals("Wrong number of triangles for triplet, should be 0L", 0L,
       tripletGraph.getGraphHead().collect().get(0).getPropertyValue(
         GellyTriangleCounting.PROPERTY_KEY_TRIANGLES).getLong());
 
-    assertEquals("Wrong number of triangles for directed graph, should be 2L",2L,
+    assertEquals("Wrong number of triangles for directed graph, should be 2L", 2L,
       trianglesDirectedGraph.getGraphHead().collect().get(0).getPropertyValue(
         GellyTriangleCounting.PROPERTY_KEY_TRIANGLES).getLong());
 
-    assertEquals("Wrong number of triangles for undirected graph, should be 2L",2L,
+    assertEquals("Wrong number of triangles for undirected graph, should be 2L", 2L,
       trianglesUndirectedGraph.getGraphHead().collect().get(0).getPropertyValue(
         GellyTriangleCounting.PROPERTY_KEY_TRIANGLES).getLong());
 
     LogicalGraph socialGraph = getSocialNetworkLoader().getLogicalGraph();
     socialGraph = socialGraph.callForGraph(new GellyTriangleCounting());
 
-    assertEquals("Wrong number of triangles for social graph, should be 8L",8L,
+    assertEquals("Wrong number of triangles for social graph, should be 8L", 8L,
       socialGraph.getGraphHead().collect().get(0).getPropertyValue(
         GellyTriangleCounting.PROPERTY_KEY_TRIANGLES).getLong());
   }

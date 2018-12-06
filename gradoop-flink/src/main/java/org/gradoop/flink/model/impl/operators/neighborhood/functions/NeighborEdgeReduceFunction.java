@@ -58,10 +58,10 @@ public class NeighborEdgeReduceFunction
         //each tuple contains the same vertex
         vertex = tuple.f1;
         isFirst = false;
-        propertyValue = getFunction().getEdgeIncrement(edge);
+        propertyValue = getFunction().getIncrement(edge);
       } else {
         propertyValue = getFunction()
-          .aggregate(propertyValue, getFunction().getEdgeIncrement(edge));
+          .aggregate(propertyValue, getFunction().getIncrement(edge));
       }
     }
     vertex.setProperty(getFunction().getAggregatePropertyKey(), propertyValue);

@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -33,7 +33,7 @@ import static org.gradoop.common.GradoopTestUtils.validateIdEquality;
 
 public class TransformationTest extends GradoopFlinkTestBase {
 
-  protected static final String TEST_GRAPH = "" +
+  final String testGraphString = "" +
     "g0:A  { a : 1 } [(:A { a : 1, b : 2 })-[:a { a : 1, b : 2 }]->(:B { c : 2 })]" +
     "g1:B  { a : 2 } [(:A { a : 2, b : 2 })-[:a { a : 2, b : 2 }]->(:B { c : 3 })]" +
     // full graph transformation
@@ -72,12 +72,12 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
   @Test(expected = IllegalArgumentException.class)
   public void testMissingFunctions() {
-    new Transformation(null, null, null);
+    new Transformation<>(null, null, null);
   }
 
   @Test
   public void testIdEquality() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(testGraphString);
 
     List<GradoopId> expectedGraphHeadIds = Lists.newArrayList();
     List<GradoopId> expectedVertexIds = Lists.newArrayList();
@@ -128,7 +128,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testDataEquality() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(testGraphString);
 
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
@@ -146,7 +146,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testGraphHeadOnlyTransformation() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(testGraphString);
 
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
@@ -159,7 +159,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexOnlyTransformation() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(testGraphString);
 
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 
@@ -172,7 +172,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testEdgeOnlyTransformation() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString(TEST_GRAPH);
+    FlinkAsciiGraphLoader loader = getLoaderFromString(testGraphString);
 
     LogicalGraph original = loader.getLogicalGraphByVariable("g0");
 

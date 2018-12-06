@@ -15,13 +15,16 @@
  */
 package org.gradoop.flink.model.impl.layouts.transactional;
 
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.GraphCollectionLayoutFactoryTest;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 public class TxCollectionLayoutFactoryTest extends GraphCollectionLayoutFactoryTest {
   @Override
-  protected GraphCollectionLayoutFactory getFactory() {
+  protected GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> getFactory() {
     TxCollectionLayoutFactory txCollectionLayoutFactory = new TxCollectionLayoutFactory();
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
     config.setGraphCollectionLayoutFactory(txCollectionLayoutFactory);

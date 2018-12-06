@@ -18,34 +18,29 @@ package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
+import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
  * Base class for Gradoop EPGM model wrapper for Flink Gellys implementation of the clustering
- * coefficient algorithm. Implementations compute the local, average and global clustering
- * coefficient of a graph, where:
+ * coefficient algorithm. Implementations compute the local and global clustering coefficient of
+ * a graph, where:
  * <pre>
  *   local - connectedness of a single vertex regarding the connections of its neighborhood, with
  *           value between 0.0 (no edges between neighbors) and 1.0 (neighbors fully connected)
- *   average - mean over all local values
  *   global - connectedness of the graph as ratio from closed triplets (triangles) to all triplets
  *            with value between 0.0 (no closed triplets) and 1.0 (all triplets closed)
  * </pre>
  */
-public abstract class ClusteringCoefficientBase extends GellyAlgorithm<NullValue, NullValue> {
+public abstract class ClusteringCoefficientBase extends
+  GradoopGellyAlgorithm<NullValue, NullValue> {
 
   /**
    * Property key to access the local clustering coefficient value stored in the vertices
    */
   public static final String PROPERTY_KEY_LOCAL = "clustering_coefficient_local";
-
-  /**
-   * Property key to access the average clustering coefficient value stored the graph head
-   */
-  public static final String PROPERTY_KEY_AVERAGE = "clustering_coefficient_average";
 
   /**
    * Property key to access the global clustering coefficient value stored the graph head
@@ -54,7 +49,7 @@ public abstract class ClusteringCoefficientBase extends GellyAlgorithm<NullValue
 
   /**
    * Creates an instance of the ClusteringCoefficientBase wrapper class.
-   * Calls constructor of super class {@link GellyAlgorithm}
+   * Calls constructor of super class {@link GradoopGellyAlgorithm}
    */
   public ClusteringCoefficientBase() {
     super(new VertexToGellyVertexWithNullValue(),
@@ -62,7 +57,7 @@ public abstract class ClusteringCoefficientBase extends GellyAlgorithm<NullValue
   }
 
   @Override
-  protected LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
+  public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
     throws Exception {
     return executeInternal(graph);
   }
@@ -71,8 +66,8 @@ public abstract class ClusteringCoefficientBase extends GellyAlgorithm<NullValue
    * Executes the computation of the clustering coefficient.
    *
    * @param gellyGraph Gelly graph with initialized vertices
-   * @return {@link LogicalGraph} with local values written to the vertices, average and global
-   * value written to the graph head
+   * @return {@link LogicalGraph} with local values written to the vertices or global value
+   * written to the graph head
    * @throws Exception Thrown if the gelly algorithm fails
    */
   protected abstract LogicalGraph executeInternal(Graph<GradoopId, NullValue, NullValue> gellyGraph)

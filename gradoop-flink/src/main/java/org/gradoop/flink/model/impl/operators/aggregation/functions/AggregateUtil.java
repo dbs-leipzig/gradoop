@@ -15,11 +15,10 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
+import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.Map;
 import java.util.Set;
@@ -27,20 +26,20 @@ import java.util.Set;
 /**
  * Utility functions for the aggregation operator
  */
-class AggregateUtil {
+public class AggregateUtil {
 
   /**
-   * Increments the aggregate map by the increment of the aggregate functions on the vertex
+   * Increments the aggregate map by the increment of the aggregate functions on the element
    *
    * @param aggregate aggregate map to be incremented
-   * @param vertex vertex to increment with
+   * @param element element to increment with
    * @param aggregateFunctions aggregate functions
    * @return incremented aggregate map
    */
-  static Map<String, PropertyValue> vertexIncrement(Map<String, PropertyValue> aggregate,
-    Vertex vertex, Set<VertexAggregateFunction> aggregateFunctions) {
-    for (VertexAggregateFunction aggFunc : aggregateFunctions) {
-      PropertyValue increment = aggFunc.getVertexIncrement(vertex);
+  static Map<String, PropertyValue> increment(Map<String, PropertyValue> aggregate, Element element,
+                                              Set<AggregateFunction> aggregateFunctions) {
+    for (AggregateFunction aggFunc : aggregateFunctions) {
+      PropertyValue increment = aggFunc.getIncrement(element);
       if (increment != null) {
         aggregate.compute(aggFunc.getAggregatePropertyKey(), (key, agg) -> agg == null ?
           increment.copy() : aggFunc.aggregate(agg, increment));
@@ -50,22 +49,17 @@ class AggregateUtil {
   }
 
   /**
-   * Increments the aggregate map by the increment of the aggregate functions on the edge
+   * Returns the default aggregate value for the given aggregate function
+   * or {@link PropertyValue#NULL_VALUE}, if it has no default.
    *
-   * @param aggregate aggregate map to be incremented
-   * @param edge edge to increment with
-   * @param aggregateFunctions aggregate functions
-   * @return incremented aggregate map
+   * @param aggregateFunction aggregate function
+   * @return aggregate value
    */
-  static Map<String, PropertyValue> edgeIncrement(Map<String, PropertyValue> aggregate, Edge edge,
-    Set<EdgeAggregateFunction> aggregateFunctions) {
-    for (EdgeAggregateFunction aggFunc : aggregateFunctions) {
-      PropertyValue increment = aggFunc.getEdgeIncrement(edge);
-      if (increment != null) {
-        aggregate.compute(aggFunc.getAggregatePropertyKey(), (key, agg) -> agg == null ?
-          increment.copy() : aggFunc.aggregate(agg, increment));
-      }
+  public static PropertyValue getDefaultAggregate(AggregateFunction aggregateFunction) {
+    if (aggregateFunction instanceof AggregateDefaultValue) {
+      return ((AggregateDefaultValue) aggregateFunction).getDefaultValue();
+    } else {
+      return PropertyValue.NULL_VALUE;
     }
-    return aggregate;
   }
 }

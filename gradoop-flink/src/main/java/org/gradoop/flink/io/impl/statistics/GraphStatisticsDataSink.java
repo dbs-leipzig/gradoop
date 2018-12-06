@@ -18,8 +18,8 @@ package org.gradoop.flink.io.impl.statistics;
 import java.io.IOException;
 
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctEdgeProperties;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIdsByEdgeLabel;

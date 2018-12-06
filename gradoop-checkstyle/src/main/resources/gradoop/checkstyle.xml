@@ -97,7 +97,7 @@
         <module name="MissingSwitchDefault"/>
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
-        <!-- Only one statment per line allowed -->
+        <!-- Only one statement per line allowed -->
         <module name="OneStatementPerLine"/>
         <!-- Use a consistent way to put declarations -->
         <module name="DeclarationOrder"/>
@@ -145,6 +145,7 @@
         <module name="ArrayTypeStyle"/>
         <!-- Indentation -->
         <module name="Indentation">
+            <property name="arrayInitIndent" value="2"/>
             <property name="caseIndent" value="0"/>
             <property name="basicOffset" value="2"/>
             <property name="braceAdjustment" value="0"/>
@@ -198,7 +199,7 @@
 
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
-        <!-- Lines cannot exceed 80 chars -->
+        <!-- Lines cannot exceed 100 chars -->
         <module name="LineLength">
             <property name="max" value="100"/>
             <property name="ignorePattern" value="^[import|package]|@see|@link"/>

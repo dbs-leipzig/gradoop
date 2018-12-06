@@ -22,16 +22,16 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.flink.model.api.functions.PropertyTransformationFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.PropertyValueAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
@@ -334,51 +334,6 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   LogicalGraph transformEdges(TransformationFunction<Edge> edgeTransformationFunction);
 
   /**
-   * Transforms the graph head properties of the logical graph using the given
-   * property transformation function. The identity of the graph is preserved.
-   *
-   * This is a convenience function for
-   * {@link LogicalGraph#transformGraphHead(TransformationFunction)}.
-   *
-   * @param propertyKey                          the property key to be considered
-   * @param graphHeadPropTransformationFunction  graph head property transformation function
-   * @return transformed logical graph
-   */
-  LogicalGraph transformGraphHeadProperties(
-    String propertyKey,
-    PropertyTransformationFunction graphHeadPropTransformationFunction);
-
-  /**
-   * Transforms the vertex properties of the logical graph using the given transformation
-   * function. The identity of the vertices is preserved.
-   *
-   * This is a convenience function for
-   * {@link LogicalGraph#transformVertices(TransformationFunction)}.
-   *
-   * @param propertyKey                       the property key to be considered
-   * @param vertexPropTransformationFunction  vertex property transformation function
-   * @return transformed logical graph
-   */
-  LogicalGraph transformVertexProperties(
-    String propertyKey,
-    PropertyTransformationFunction vertexPropTransformationFunction);
-
-  /**
-   * Transforms the edge properties of the logical graph using the given transformation
-   * function. The identity of the edges is preserved.
-   *
-   * This is a convenience function for
-   * {@link LogicalGraph#transformEdges(TransformationFunction)}.
-   *
-   * @param propertyKey                     the property key to be considered
-   * @param edgePropTransformationFunction  edge property transformation function
-   * @return transformed logical graph
-   */
-  LogicalGraph transformEdgeProperties(
-    String propertyKey,
-    PropertyTransformationFunction edgePropTransformationFunction);
-
-  /**
    * Returns the subgraph that is induced by the vertices which fulfill the
    * given filter function.
    *
@@ -515,8 +470,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @see Grouping
    */
   LogicalGraph groupBy(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions,
+    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions,
     GroupingStrategy groupingStrategy);
 
   /**
@@ -585,8 +540,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return graph collection containing all resulting graphs
    */
   GraphCollection groupVerticesByRollUp(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions);
+    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions);
 
   /**
    * Generates all combinations of the supplied edge grouping keys according to the definition of
@@ -601,8 +556,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return graph collection containing all resulting graphs
    */
   GraphCollection groupEdgesByRollUp(
-    List<String> vertexGroupingKeys, List<PropertyValueAggregator> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<PropertyValueAggregator> edgeAggregateFunctions);
+    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions);
 
   //----------------------------------------------------------------------------
   // Binary Operators
@@ -661,7 +616,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param operator unary graph to graph operator
    * @return result of given operator
    */
-  LogicalGraph callForGraph(UnaryGraphToGraphOperator operator);
+  LogicalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<LogicalGraph> operator);
 
   /**
    * Creates a logical graph from that graph and the input graph using the
