@@ -82,10 +82,10 @@ public class RollUpExample extends AbstractRunner {
     callGraph = callGraph.transformEdges(new TimePropertyTransformationFunction<>("time"));
 
     // path prefix for dot file
-    String pathPrefix = args[0];
+    String pathPrefix = appendSeparator(args[0]);
 
     // group by rollUp on vertices
-    String firstDotPath = pathPrefix + "_vertexRollUp.dot";
+    String firstDotPath = pathPrefix + "vertexRollUp.dot";
     GraphCollection graphGroupedByRollUpOnVertices =
       callGraph.groupVerticesByRollUp(
         Arrays.asList(Grouping.LABEL_SYMBOL, "country", "state", "city"),
@@ -96,7 +96,7 @@ public class RollUpExample extends AbstractRunner {
     new DOTDataSink(firstDotPath, true).write(graphGroupedByRollUpOnVertices, true);
 
     // group by rollUp on edges
-    String secondDotPath = pathPrefix + "_edgeRollUp.dot";
+    String secondDotPath = pathPrefix + "edgeRollUp.dot";
     GraphCollection graphGroupedByRollUpOnEdges =
       callGraph.groupEdgesByRollUp(
         Arrays.asList(Grouping.LABEL_SYMBOL, "country", "state"),
