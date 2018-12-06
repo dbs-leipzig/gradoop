@@ -7,6 +7,7 @@ import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -46,6 +47,7 @@ public interface PropertyValueStrategy<T> {
       classStrategyMap.put(Float.class, new FloatStrategy());
       classStrategyMap.put(Double.class, new DoubleStrategy());
       classStrategyMap.put(Short.class, new ShortStrategy());
+      classStrategyMap.put(BigDecimal.class, new BigDecimalStrategy());
 
       byteStrategyMap = new HashMap<>(classStrategyMap.size());
       for (PropertyValueStrategy strategy : classStrategyMap.values()) {
@@ -514,6 +516,74 @@ public interface PropertyValueStrategy<T> {
       byte[] rawBytes = new byte[PropertyValue.OFFSET + Bytes.SIZEOF_SHORT];
       rawBytes[0] = getRawType();
       Bytes.putShort(rawBytes, PropertyValue.OFFSET, value);
+      return rawBytes;
+    }
+  }
+
+  class BigDecimalStrategy implements PropertyValueStrategy<BigDecimal> {
+
+    @Override
+    public boolean write(BigDecimal value, DataOutputView outputView) throws IOException {
+      byte[] rawBytes = getRawBytes(value);
+      byte type = rawBytes[0];
+
+      if (rawBytes.length > PropertyValue.LARGE_PROPERTY_THRESHOLD) {
+        type |= PropertyValue.FLAG_LARGE;
+      }
+      outputView.writeByte(type);
+      // Write length as an int if the "large" flag is set.
+      if ((type & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
+        outputView.writeInt(rawBytes.length - PropertyValue.OFFSET);
+      } else {
+        outputView.writeShort(rawBytes.length - PropertyValue.OFFSET);
+      }
+
+      outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);
+      return true;
+    }
+
+    @Override
+    public BigDecimal read(DataInputView inputView) throws IOException {
+      // @TODO This will break as soon as BigDecimal gets real big, find a whether readInt needs to be used
+      int length = inputView.readShort();
+      byte[] rawBytes = new byte[length];
+      for (int i = 0; i < rawBytes.length; i++) {
+        rawBytes[i] = inputView.readByte();
+      }
+      return Bytes.toBigDecimal(rawBytes);
+    }
+
+    @Override
+    public int compare(BigDecimal value, BigDecimal other) {
+      return value.compareTo(other);
+    }
+
+    @Override
+    public boolean is(Object value) {
+      return value instanceof BigDecimal;
+    }
+
+    @Override
+    public Class<BigDecimal> getType() {
+      return BigDecimal.class;
+    }
+
+    @Override
+    public BigDecimal get(byte[] bytes) {
+      return Bytes.toBigDecimal(bytes, PropertyValue.OFFSET, bytes.length - PropertyValue.OFFSET);
+    }
+
+    @Override
+    public Byte getRawType() {
+      return PropertyValue.TYPE_BIG_DECIMAL;
+    }
+
+    @Override
+    public byte[] getRawBytes(BigDecimal value) {
+      byte[] valueBytes = Bytes.toBytes(value);
+      byte[] rawBytes = new byte[PropertyValue.OFFSET + valueBytes.length];
+      rawBytes[0] = getRawType();
+      Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);
       return rawBytes;
     }
   }

@@ -717,7 +717,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
 
   @Override
   public int compareTo(PropertyValue o) {
-    int compare = 0;
+    int compare;
     if (value == null || !is(value.getClass())) {
       compare = legacyPropertyValue.compareTo(o);
     } else {
