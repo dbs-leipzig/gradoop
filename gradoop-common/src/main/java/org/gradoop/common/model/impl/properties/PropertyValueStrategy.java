@@ -6,8 +6,16 @@ import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -48,6 +56,9 @@ public interface PropertyValueStrategy<T> {
       classStrategyMap.put(Double.class, new DoubleStrategy());
       classStrategyMap.put(Short.class, new ShortStrategy());
       classStrategyMap.put(BigDecimal.class, new BigDecimalStrategy());
+      classStrategyMap.put(LocalDate.class, new DateStrategy());
+      classStrategyMap.put(LocalTime.class, new TimeStrategy());
+      classStrategyMap.put(LocalDateTime.class, new DateTimeStrategy());
 
       byteStrategyMap = new HashMap<>(classStrategyMap.size());
       for (PropertyValueStrategy strategy : classStrategyMap.values()) {
@@ -480,6 +491,7 @@ public interface PropertyValueStrategy<T> {
     public Short read(DataInputView inputView) throws IOException {
       int length = Bytes.SIZEOF_SHORT;
       byte[] rawBytes = new byte[length];
+
       for (int i  = 0; i < rawBytes.length; i++) {
         rawBytes[i] = inputView.readByte();
       }
@@ -582,6 +594,180 @@ public interface PropertyValueStrategy<T> {
     public byte[] getRawBytes(BigDecimal value) {
       byte[] valueBytes = Bytes.toBytes(value);
       byte[] rawBytes = new byte[PropertyValue.OFFSET + valueBytes.length];
+      rawBytes[0] = getRawType();
+      Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);
+      return rawBytes;
+    }
+  }
+
+  class DateStrategy implements PropertyValueStrategy <LocalDate> {
+
+    @Override
+    public boolean write(LocalDate value, DataOutputView outputView) throws IOException {
+      outputView.write(getRawBytes(value));
+      return true;
+    }
+
+    @Override
+    public LocalDate read(DataInputView inputView) throws IOException {
+      int length = DateTimeSerializer.SIZEOF_DATE;
+      byte[] rawBytes = new byte[length];
+
+      for (int i  = 0; i < rawBytes.length; i++) {
+        rawBytes[i] = inputView.readByte();
+      }
+
+      return DateTimeSerializer.deserializeDate(rawBytes);
+    }
+
+    @Override
+    public int compare(LocalDate value, LocalDate other) {
+      return value.compareTo(other);
+    }
+
+    @Override
+    public boolean is(Object value) {
+      return value instanceof LocalDate;
+    }
+
+    @Override
+    public Class<LocalDate> getType() {
+      return LocalDate.class;
+    }
+
+    @Override
+    public LocalDate get(byte[] bytes) {
+      return DateTimeSerializer.deserializeDate(
+        Arrays.copyOfRange(
+          bytes, PropertyValue.OFFSET, DateTimeSerializer.SIZEOF_DATE + PropertyValue.OFFSET
+        ));
+    }
+
+    @Override
+    public Byte getRawType() {
+      return PropertyValue.TYPE_DATE;
+    }
+
+    @Override
+    public byte[] getRawBytes(LocalDate value) {
+      byte[] valueBytes = DateTimeSerializer.serializeDate(value);
+      byte[] rawBytes = new byte[PropertyValue.OFFSET + DateTimeSerializer.SIZEOF_DATE];
+      rawBytes[0] = getRawType();
+      Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);
+      return rawBytes;
+    }
+  }
+
+  class TimeStrategy implements PropertyValueStrategy<LocalTime> {
+
+    @Override
+    public boolean write(LocalTime value, DataOutputView outputView) throws IOException {
+      outputView.write(getRawBytes(value));
+      return true;
+    }
+
+    @Override
+    public LocalTime read(DataInputView inputView) throws IOException {
+      int length = DateTimeSerializer.SIZEOF_TIME;
+      byte[] rawBytes = new byte[length];
+
+      for (int i  = 0; i < rawBytes.length; i++) {
+        rawBytes[i] = inputView.readByte();
+      }
+
+      return DateTimeSerializer.deserializeTime(rawBytes);
+    }
+
+    @Override
+    public int compare(LocalTime value, LocalTime other) {
+      return value.compareTo(other);
+    }
+
+    @Override
+    public boolean is(Object value) {
+      return value instanceof LocalTime;
+    }
+
+    @Override
+    public Class<LocalTime> getType() {
+      return LocalTime.class;
+    }
+
+    @Override
+    public LocalTime get(byte[] bytes) {
+      return DateTimeSerializer.deserializeTime(
+        Arrays.copyOfRange(
+          bytes, PropertyValue.OFFSET, DateTimeSerializer.SIZEOF_TIME + PropertyValue.OFFSET
+        ));
+    }
+
+    @Override
+    public Byte getRawType() {
+      return PropertyValue.TYPE_TIME;
+    }
+
+    @Override
+    public byte[] getRawBytes(LocalTime value) {
+      byte[] valueBytes = DateTimeSerializer.serializeTime(value);
+      byte[] rawBytes = new byte[PropertyValue.OFFSET + DateTimeSerializer.SIZEOF_TIME];
+      rawBytes[0] = getRawType();
+      Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);
+      return rawBytes;
+    }
+  }
+
+  class DateTimeStrategy implements PropertyValueStrategy<LocalDateTime> {
+
+    @Override
+    public boolean write(LocalDateTime value, DataOutputView outputView) throws IOException {
+      outputView.write(getRawBytes(value));
+      return true;
+    }
+
+    @Override
+    public LocalDateTime read(DataInputView inputView) throws IOException {
+      int length = DateTimeSerializer.SIZEOF_DATETIME;
+      byte[] rawBytes = new byte[length];
+
+      for (int i  = 0; i < rawBytes.length; i++) {
+        rawBytes[i] = inputView.readByte();
+      }
+
+      return DateTimeSerializer.deserializeDateTime(rawBytes);
+    }
+
+    @Override
+    public int compare(LocalDateTime value, LocalDateTime other) {
+      return value.compareTo(other);
+    }
+
+    @Override
+    public boolean is(Object value) {
+      return value instanceof LocalDateTime;
+    }
+
+    @Override
+    public Class<LocalDateTime> getType() {
+      return LocalDateTime.class;
+    }
+
+    @Override
+    public LocalDateTime get(byte[] bytes) {
+      return DateTimeSerializer.deserializeDateTime(
+        Arrays.copyOfRange(
+          bytes, PropertyValue.OFFSET, DateTimeSerializer.SIZEOF_DATETIME + PropertyValue.OFFSET
+        ));
+    }
+
+    @Override
+    public Byte getRawType() {
+      return PropertyValue.TYPE_DATETIME;
+    }
+
+    @Override
+    public byte[] getRawBytes(LocalDateTime value) {
+      byte[] valueBytes = DateTimeSerializer.serializeDateTime(value);
+      byte[] rawBytes = new byte[PropertyValue.OFFSET + DateTimeSerializer.SIZEOF_DATETIME];
       rawBytes[0] = getRawType();
       Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);
       return rawBytes;
