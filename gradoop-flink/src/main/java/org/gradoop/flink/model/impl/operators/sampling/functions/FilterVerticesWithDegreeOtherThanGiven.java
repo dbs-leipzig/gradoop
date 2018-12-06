@@ -47,6 +47,7 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
    */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
+
     DistinctVertexDegrees distinctVertexDegrees = new DistinctVertexDegrees(
       SamplingAlgorithm.DEGREE_PROPERTY_KEY,
       SamplingAlgorithm.IN_DEGREE_PROPERTY_KEY,
