@@ -15,6 +15,7 @@
  */
 package org.gradoop.dataintegration.transformation.functions;
 
+import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -80,7 +81,10 @@ public class NeighborhoodTest extends GradoopFlinkTestBase {
       new Object[]{"center", "undirected1", Neighborhood.EdgeDirection.UNDIRECTED},
       new Object[]{"center2", "incoming2", Neighborhood.EdgeDirection.INCOMING},
       new Object[]{"center2", "outgoing2", Neighborhood.EdgeDirection.OUTGOING},
-      new Object[]{"center2", "undirected2", Neighborhood.EdgeDirection.UNDIRECTED});
+      new Object[]{"center2", "undirected2", Neighborhood.EdgeDirection.UNDIRECTED},
+      new Object[]{"nocenter", "incoming2", Neighborhood.EdgeDirection.INCOMING},
+      new Object[]{"nocenter", "outgoing2", Neighborhood.EdgeDirection.OUTGOING},
+      new Object[]{"nocenter", "undirected2", Neighborhood.EdgeDirection.UNDIRECTED});
   }
 
   /**
@@ -93,12 +97,13 @@ public class NeighborhoodTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
     Vertex center = loader.getVertexByVariable(centerVertex);
     Collection<Vertex> neighborhoodVertices = loader.getVerticesByGraphVariables(neighborhood);
+    DataSet<Vertex> centers = center == null ? getEmptyDataSet(new Vertex()) :
+      getExecutionEnvironment().fromElements(center);
     List<Tuple2<Vertex, List<Neighborhood.VertexPojo>>> neighborhoods =
-      Neighborhood.getPerVertex(input, getExecutionEnvironment().fromElements(center), direction)
-      .collect();
+      Neighborhood.getPerVertex(input, centers, direction).collect();
     // Make sure we only have 1 center vertex.
     long centerCount = neighborhoods.stream().map(h -> h.f0.getId()).distinct().count();
-    assertEquals(1, centerCount);
+    assertEquals(center != null ? 1 : 0, centerCount);
 
     // Get all neighbor ids of that vertex.
     Object[] neighbors = neighborhoods.stream().flatMap(h -> h.f1.stream())

@@ -25,6 +25,7 @@ import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This class contains everything related to the neighborhood of vertices.
@@ -41,10 +42,13 @@ public class Neighborhood {
    * @param centralVertices The vertices the neighborhood should be calculated for.
    * @param edgeDirection The relevant direction for neighbors.
    * @return A Dataset of tuples containing vertices and their neighborhood.
+   * @throws NullPointerException if any of the parameters is null.
    */
   public static DataSet<Tuple2<Vertex, List<VertexPojo>>> getPerVertex(LogicalGraph graph,
                  DataSet<Vertex> centralVertices, EdgeDirection edgeDirection) {
-
+    Objects.requireNonNull(graph);
+    Objects.requireNonNull(centralVertices);
+    Objects.requireNonNull(edgeDirection);
     DataSet<Tuple2<Vertex, List<VertexPojo>>> incoming = null;
     DataSet<Tuple2<Vertex, List<VertexPojo>>> outgoing = null;
 
@@ -69,7 +73,7 @@ public class Neighborhood {
     }
 
     if (edgeDirection.equals(EdgeDirection.UNDIRECTED)) {
-      return incoming != null && outgoing != null ? incoming.union(outgoing) : null;
+      return incoming.union(outgoing);
     }
     return edgeDirection.equals(EdgeDirection.INCOMING) ? incoming : outgoing;
   }
