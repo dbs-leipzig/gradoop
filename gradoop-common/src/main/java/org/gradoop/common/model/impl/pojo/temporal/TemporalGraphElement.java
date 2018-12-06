@@ -83,4 +83,9 @@ public abstract class TemporalGraphElement extends TemporalElement implements EP
   public int getGraphCount() {
     return (graphIds != null) ? graphIds.size() : 0;
   }
+
+  @Override
+  public String toString() {
+    return String.format("%s @ %s", super.toString(), graphIds);
+  }
 }
