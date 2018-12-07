@@ -180,7 +180,8 @@ public class EdgeToVertex implements UnaryGraphToGraphOperator {
      * @param edgeLabelNewToTarget The label of the newly created edge which starts at the newly
      *                             created vertex.
      */
-    CreateEdgesFromTriple(EdgeFactory factory, String edgeLabelSourceToNew, String edgeLabelNewToTarget) {
+    CreateEdgesFromTriple(EdgeFactory factory, String edgeLabelSourceToNew,
+                          String edgeLabelNewToTarget) {
       this.edgeLabelSourceToNew = edgeLabelSourceToNew;
       this.edgeLabelNewToTarget = edgeLabelNewToTarget;
       this.edgeFactory = factory;

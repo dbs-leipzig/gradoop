@@ -39,10 +39,31 @@ import java.util.Set;
  * A property of a vertex is propagated to its neighbors and aggregated in a Property List.
  */
 public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
+
+  /**
+   * The label of the vertex the property to propagate is part of.
+   */
   private final String vertexLabel;
+
+  /**
+   * The property key of the property to propagate.
+   */
   private final String propertyKey;
+
+  /**
+   * The property key where the PropertyValue list should be stored at the target vertices.
+   */
   private final String targetVertexPropertyKey;
+
+  /**
+   * Only edges with the inserted labels are used. If all labels  are sufficient use 'null'.
+   */
   private final Set<String> propagatingEdges;
+
+  /**
+   * Only vertices with the inserted labels will store the propagated values.
+   * If all vertices should do it use 'null'
+   */
   private final Set<String> targetVertexLabels;
 
   /**
