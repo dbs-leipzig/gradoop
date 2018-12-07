@@ -5,6 +5,7 @@ import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -59,6 +60,7 @@ public interface PropertyValueStrategy<T> {
       classStrategyMap.put(LocalDate.class, new DateStrategy());
       classStrategyMap.put(LocalTime.class, new TimeStrategy());
       classStrategyMap.put(LocalDateTime.class, new DateTimeStrategy());
+      classStrategyMap.put(GradoopId.class, new GradoopIdStrategy());
 
       byteStrategyMap = new HashMap<>(classStrategyMap.size());
       for (PropertyValueStrategy strategy : classStrategyMap.values()) {
@@ -774,6 +776,64 @@ public interface PropertyValueStrategy<T> {
     }
   }
 
+  class GradoopIdStrategy implements PropertyValueStrategy<GradoopId> {
+
+    @Override
+    public boolean write(GradoopId value, DataOutputView outputView) throws IOException {
+      outputView.write(getRawBytes(value));
+      return true;
+    }
+
+    @Override
+    public GradoopId read(DataInputView inputView) throws IOException {
+      int length = GradoopId.ID_SIZE;
+      byte[] rawBytes = new byte[length];
+
+      for (int i = 0; i < rawBytes.length; i++) {
+        rawBytes[i] = inputView.readByte();
+      }
+
+      return GradoopId.fromByteArray(rawBytes);
+    }
+
+    @Override
+    public int compare(GradoopId value, GradoopId other) {
+      return value.compareTo(other);
+    }
+
+    @Override
+    public boolean is(Object value) {
+      return value instanceof GradoopId;
+    }
+
+    @Override
+    public Class<GradoopId> getType() {
+      return GradoopId.class;
+    }
+
+    @Override
+    public GradoopId get(byte[] bytes) {
+      return GradoopId.fromByteArray(
+        Arrays.copyOfRange(
+          bytes, PropertyValue.OFFSET, GradoopId.ID_SIZE + PropertyValue.OFFSET
+        ));
+    }
+
+    @Override
+    public Byte getRawType() {
+      return PropertyValue.TYPE_GRADOOP_ID;
+    }
+
+    @Override
+    public byte[] getRawBytes(GradoopId value) {
+      byte[] valueBytes = value.toByteArray();
+      byte[] rawBytes = new byte[PropertyValue.OFFSET + GradoopId.ID_SIZE];
+      rawBytes[0] = getRawType();
+      Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);
+      return rawBytes;
+    }
+  }
+
   class NoopPropertyValueStrategy implements PropertyValueStrategy {
     @Override
     public boolean write(Object value, DataOutputView outputView) {
@@ -814,7 +874,5 @@ public interface PropertyValueStrategy<T> {
     public byte[] getRawBytes(Object value) {
       return null;
     }
-
-
   }
 }
