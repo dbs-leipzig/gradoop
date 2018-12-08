@@ -28,6 +28,8 @@ org.gradoop.examples.dimspan.data_source
 org.gradoop.examples.grouping
 org.gradoop.examples.io
 org.gradoop.examples.patternmatching
+org.gradoop.examples.rollup
+org.gradoop.examples.rollup.functions
 org.gradoop.examples.sna
 org.gradoop.examples.subgraph
 org.gradoop.examples.utils
