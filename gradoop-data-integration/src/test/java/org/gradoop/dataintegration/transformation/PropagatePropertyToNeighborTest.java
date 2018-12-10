@@ -16,6 +16,7 @@
 package org.gradoop.dataintegration.transformation;
 
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.dataintegration.transformation.impl.PropertyTransformation;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -71,11 +72,11 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
       }
       v.setProperty("t", Arrays.asList(PropertyValue.create(1L), PropertyValue.create("")));
       return v;
-    }).transformVertexProperties("t",
-      PropagatePropertyToNeighborTest::orderListProperty);
+    }).callForGraph(new PropertyTransformation<>("t", pv -> pv,
+      PropagatePropertyToNeighborTest::orderListProperty, pv -> pv));
     LogicalGraph result = input.callForGraph(operator)
-      .transformVertexProperties("t",
-        PropagatePropertyToNeighborTest::orderListProperty);
+      .callForGraph(new PropertyTransformation<>("t", pv -> pv,
+      PropagatePropertyToNeighborTest::orderListProperty, pv -> pv));
     collectAndAssertTrue(expected.equalsByElementData(result));
   }
 
@@ -116,10 +117,11 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
       }
       v.setProperty("t", Arrays.asList(PropertyValue.create(1L), PropertyValue.create("")));
       return v;
-    }).transformVertexProperties("t",
-      PropagatePropertyToNeighborTest::orderListProperty);
-    LogicalGraph result = input.callForGraph(operator).transformVertexProperties("t",
-      PropagatePropertyToNeighborTest::orderListProperty);
+    }).callForGraph(new PropertyTransformation<>("t", pv -> pv,
+      PropagatePropertyToNeighborTest::orderListProperty, pv -> pv));
+    LogicalGraph result = input.callForGraph(operator)
+      .callForGraph(new PropertyTransformation<>("t", pv -> pv,
+      PropagatePropertyToNeighborTest::orderListProperty, pv -> pv));
     collectAndAssertTrue(expected.equalsByElementData(result));
   }
 
