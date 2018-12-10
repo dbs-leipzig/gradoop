@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
-import com.google.common.collect.Lists;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
@@ -24,6 +23,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.GroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,7 +56,7 @@ public class BuildGroupItemBase extends BuildBase {
     boolean useLabel, List<LabelGroup> labelGroups) {
     super(useLabel);
     this.labelGroups = labelGroups;
-    groupingValues = Lists.newArrayList();
+    groupingValues = new ArrayList<>();
     LabelGroup standardLabelGroup = null;
 
     // find and keep the default label group for fast access
@@ -101,12 +101,7 @@ public class BuildGroupItemBase extends BuildBase {
       groupItem.setGroupLabel(labelGroup.getGroupLabel());
     }
 
-    if (doAggregate(labelGroup.getAggregators())) {
-      groupItem.setAggregateValues(
-        getAggregateValues(element, labelGroup.getAggregators()));
-    } else {
-      groupItem.setAggregateValues(PropertyValueList.createEmptyList());
-    }
+    groupItem.setAggregateValues(labelGroup.getIncrementValues(element));
     groupItem.setLabelGroup(labelGroup);
     groupItem.setGroupingValues(PropertyValueList.fromPropertyValues(groupingValues));
     groupingValues.clear();

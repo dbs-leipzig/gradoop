@@ -22,12 +22,6 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
  *
  * @param <T> result type
  */
-public interface UnaryGraphToValueOperator<T> extends Operator {
-  /**
-   * Executes the operator.
-   *
-   * @param graph input graph
-   * @return operator result
-   */
-  T execute(LogicalGraph graph);
+public interface UnaryGraphToValueOperator<T>
+  extends UnaryBaseGraphToValueOperator<LogicalGraph, T> {
 }
