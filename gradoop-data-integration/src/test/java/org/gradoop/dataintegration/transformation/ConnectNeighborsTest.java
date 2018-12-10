@@ -20,12 +20,13 @@ import org.junit.Test;
 
 
 /**
- * Tests for the {@link PropagatePropertyToNeighbor} operator.
+ * Tests for the {@link ConnectNeighbors} operator.
  */
-public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
+public class ConnectNeighborsTest extends GradoopFlinkTestBase {
 
 
   @Test
   public void testDummy() {
+
   }
 }

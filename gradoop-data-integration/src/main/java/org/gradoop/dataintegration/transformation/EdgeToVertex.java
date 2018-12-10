@@ -186,7 +186,7 @@ public class EdgeToVertex implements UnaryGraphToGraphOperator {
      *                             created vertex.
      */
     CreateEdgesFromTriple(EdgeFactory factory, String edgeLabelSourceToNew,
-      String edgeLabelNewToTarget) {
+                          String edgeLabelNewToTarget) {
       this.edgeLabelSourceToNew = edgeLabelSourceToNew;
       this.edgeLabelNewToTarget = edgeLabelNewToTarget;
       this.edgeFactory = factory;
