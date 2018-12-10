@@ -38,6 +38,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.PageRankResultV
  * and a number of maximum iterations. It computes a per-vertex score which is the sum of the
  * PageRank-scores transmitted over all in-edges. The score of each vertex is divided evenly
  * among its out-edges.
+ * The PageRank-algorithm is called with {@code setIncludeZeroDegreeVertices(true)}.
  *
  * If vertices got different PageRank-scores, all scores are scaled in a range between 0 and 1.
  * Then it retains all vertices with a PageRank-score greater or equal/smaller than a given
@@ -112,7 +113,7 @@ public class PageRankSampling extends SamplingAlgorithm {
   public LogicalGraph sample(LogicalGraph graph) {
 
     LogicalGraph pageRankGraph = new PageRank(
-      PAGE_RANK_SCORE_PROPERTY_KEY, dampeningFactor, maxIteration).execute(graph);
+      PAGE_RANK_SCORE_PROPERTY_KEY, dampeningFactor, maxIteration, true).execute(graph);
 
     graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(
       graph.getGraphHead(), pageRankGraph.getVertices(), pageRankGraph.getEdges());

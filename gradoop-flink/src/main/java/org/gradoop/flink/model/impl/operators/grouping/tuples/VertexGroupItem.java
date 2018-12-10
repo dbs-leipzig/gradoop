@@ -22,6 +22,7 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
 /**
  * Vertex representation used for grouping vertices to super vertices.
  *
+ * <pre>
  * f0: vertex id
  * f1: super vertex id
  * f2: vertex group label
@@ -29,6 +30,7 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
  * f4: vertex group aggregate values
  * f5: super vertex tuple true/false
  * f6: vertex label group
+ * </pre>
  */
 public class VertexGroupItem
   extends Tuple7

@@ -58,9 +58,6 @@ public class AggregationExample {
    * Documentation for all available aggregation functions as well as a detailed description of the
    * aggregate method can be found in the projects wiki.
    *
-   * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Unary-Logical-Graph-Operators">
-   * Gradoop Wiki</a>
-   *
    * Using the social network graph in the resources directory, the program will:
    * 1. extract a subgraph only containing vertices which are labeled "person"
    * 2. concatenate the values of the vertex property "name" of each vertex in the subgraph
@@ -69,6 +66,9 @@ public class AggregationExample {
    * 5. add the property "meanAge" to the graph head using a graph head transformation
    *
    * @param args arguments
+   *
+   * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Unary-Logical-Graph-Operators">
+   * Gradoop Wiki</a>
    */
   public static void main(String[] args) throws Exception {
     // init execution environment

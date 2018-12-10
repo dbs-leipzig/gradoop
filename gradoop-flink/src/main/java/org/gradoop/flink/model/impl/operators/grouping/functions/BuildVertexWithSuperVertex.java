@@ -42,9 +42,6 @@ public class BuildVertexWithSuperVertex
     this.reuseTuple = new VertexWithSuperVertex();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public VertexWithSuperVertex map(VertexGroupItem vertexGroupItem) throws
     Exception {

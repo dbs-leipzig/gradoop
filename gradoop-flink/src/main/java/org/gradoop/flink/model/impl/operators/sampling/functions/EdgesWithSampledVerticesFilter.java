@@ -17,32 +17,27 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
  * Filters the edges with sampled vertices. If any vertices of the edge does not have any related
  * property for sampling, we consider that vertex as not sampled.
  */
 public class EdgesWithSampledVerticesFilter
-  implements FilterFunction<Tuple3<Edge, Vertex, Vertex>> {
+  implements FilterFunction<Tuple3<Edge, Boolean, Boolean>> {
+
   /**
-   * Property name which shows if a vertex is sampled
-   */
-  private String propertyNameForSampled;
-  /**
-   * type of neighborhood
+   * Type of neighborhood
    */
   private Neighborhood neighborType;
 
   /**
    * Constructor
    *
-   * @param propertyNameForSampled property name which shows if a vertex is sampled
    * @param neighborType type of neighborhood
    */
-  public EdgesWithSampledVerticesFilter(String propertyNameForSampled, Neighborhood neighborType) {
-    this.propertyNameForSampled = propertyNameForSampled;
+  public EdgesWithSampledVerticesFilter(Neighborhood neighborType) {
     this.neighborType = neighborType;
   }
 
@@ -50,25 +45,23 @@ public class EdgesWithSampledVerticesFilter
    * {@inheritDoc}
    */
   @Override
-  public boolean filter(Tuple3<Edge, Vertex, Vertex> t3) {
-    boolean isSourceVertexMarked = false;
-    boolean isTargetVertexMarked = false;
-    if (t3.f1.hasProperty(propertyNameForSampled)) {
-      isSourceVertexMarked = Boolean.getBoolean(
-              t3.f1.getPropertyValue(propertyNameForSampled).toString());
+  public boolean filter(Tuple3<Edge, Boolean, Boolean> tuple) {
+
+    boolean isSourceVertexMarked = tuple.f1;
+    boolean isTargetVertexMarked = tuple.f2;
+
+    boolean filter;
+
+    switch (neighborType) {
+    case BOTH:  filter = isSourceVertexMarked || isTargetVertexMarked;
+    break;
+    case IN:    filter = isTargetVertexMarked;
+    break;
+    case OUT:   filter = isSourceVertexMarked;
+    break;
+    default: throw new UnsupportedTypeException("NeighborType needs to be BOTH, IN or OUT");
     }
-    if (t3.f2.hasProperty(propertyNameForSampled)) {
-      isTargetVertexMarked = Boolean.getBoolean(
-              t3.f2.getPropertyValue(propertyNameForSampled).toString());
-    }
-    boolean ret = false;
-    if (neighborType.equals(Neighborhood.BOTH)) {
-      ret = isSourceVertexMarked || isTargetVertexMarked;
-    } else if (neighborType.equals(Neighborhood.IN)) {
-      ret = isTargetVertexMarked;
-    } else if (neighborType.equals(Neighborhood.OUT)) {
-      ret = isSourceVertexMarked;
-    }
-    return ret;
+
+    return filter;
   }
 }
