@@ -27,14 +27,15 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
+
+import java.util.Objects;
 
 /**
  * For edges of a specific label this graph transformation creates a new vertex containing the
  * properties of the edge and two new edges respecting the direction of the original edge.
  * The newly created edges and vertex labels are user-defined.
- *
+ * <p>
  * The original edges are still part of the resulting graph.
  * Use a @{@link org.apache.flink.api.common.functions.FilterFunction} on the original label to
  * remove them.
@@ -62,17 +63,23 @@ public class EdgeToVertex implements UnaryGraphToGraphOperator {
   private final String edgeLabelNewToTarget;
 
   /**
-   * The constructor for the structural transformation
+   * The constructor for the structural transformation.
    *
-   * @param edgeLabel The label of the edges use for the transformation.
-   * @param newVertexLabel The label of the newly created vertex.
+   * @param edgeLabel            The label of the edges use for the transformation.
+   *                             (No edges will be transformed if this parameter is {@code null}).
+   * @param newVertexLabel       The label of the newly created vertex.
    * @param edgeLabelSourceToNew The label of the newly created edge which points to the newly
    *                             created vertex.
    * @param edgeLabelNewToTarget The label of the newly created edge which starts at the newly
    *                             created vertex.
+   *
+   * @throws NullPointerException when at least on of the latter 3 arguments is {@code null}.
    */
   public EdgeToVertex(String edgeLabel, String newVertexLabel, String edgeLabelSourceToNew,
-                      String edgeLabelNewToTarget) {
+    String edgeLabelNewToTarget) {
+    Objects.requireNonNull(newVertexLabel);
+    Objects.requireNonNull(edgeLabelSourceToNew);
+    Objects.requireNonNull(edgeLabelNewToTarget);
     this.edgeLabel = edgeLabel;
     this.newVertexLabel = newVertexLabel;
     this.edgeLabelSourceToNew = edgeLabelSourceToNew;
@@ -81,14 +88,12 @@ public class EdgeToVertex implements UnaryGraphToGraphOperator {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    DataSet<Edge> relevantEdges = graph
-        .getEdges()
-        .filter(new ByLabel<>(edgeLabel));
+    DataSet<Edge> relevantEdges = graph.getEdgesByLabel(edgeLabel);
 
     // create new vertices
     DataSet<Tuple3<Vertex, GradoopId, GradoopId>> newVerticesAndOriginIds =
         relevantEdges
-            .map(new CreateVertexFromEdges(newVertexLabel));
+            .map(new CreateVertexFromEdges(newVertexLabel, graph.getConfig().getVertexFactory()));
 
     DataSet<Vertex> newVertices =
         newVerticesAndOriginIds
@@ -102,9 +107,8 @@ public class EdgeToVertex implements UnaryGraphToGraphOperator {
               edgeLabelSourceToNew, edgeLabelNewToTarget))
             .union(graph.getEdges());
 
-    return graph.getConfig()
-        .getLogicalGraphFactory()
-        .fromDataSets(graph.getGraphHead(), newVertices, newEdges);
+    return graph.getConfig().getLogicalGraphFactory()
+      .fromDataSets(newVertices, newEdges);
   }
 
   @Override
@@ -133,9 +137,10 @@ public class EdgeToVertex implements UnaryGraphToGraphOperator {
      * The constructor of the MapFunction.
      *
      * @param newVertexLabel The label of the newly created vertex.
+     * @param factory        The factory for creating new vertices.
      */
-    CreateVertexFromEdges(String newVertexLabel) {
-      this.factory = new VertexFactory();
+    CreateVertexFromEdges(String newVertexLabel, VertexFactory factory) {
+      this.factory = factory;
       this.newVertexLabel = newVertexLabel;
     }
 
@@ -174,7 +179,7 @@ public class EdgeToVertex implements UnaryGraphToGraphOperator {
     /**
      * The constructor to create the new edges based on the given triple.
      *
-     * @param factory The Factory which creates the new edges.
+     * @param factory              The Factory which creates the new edges.
      * @param edgeLabelSourceToNew The label of the newly created edge which points to the newly
      *                             created vertex.
      * @param edgeLabelNewToTarget The label of the newly created edge which starts at the newly

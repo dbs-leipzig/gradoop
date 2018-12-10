@@ -15,8 +15,8 @@
  */
 package org.gradoop.dataintegration.transformation.functions;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 import java.util.Set;
 
@@ -25,7 +25,7 @@ import java.util.Set;
  *
  * @param <T> The {@link EPGMElement} the filter is used for.
  */
-public class SetBasedLabelFilter<T extends EPGMElement> implements FilterFunction<T> {
+public class SetBasedLabelFilter<T extends EPGMElement> implements CombinableFilter<T> {
 
   /**
    * The Set of labels that are accepted.

@@ -15,8 +15,17 @@
  */
 package org.gradoop.dataintegration.transformation;
 
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 
 /**
@@ -24,8 +33,149 @@ import org.junit.Test;
  */
 public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
 
+  /**
+   * A comparator ordering property values by type first.
+   * This will effectively be able to compare any property value.
+   * Whether this order makes any sense is not relevant for this test, it is just used to make sure
+   * that two list-typed properties have the same order.
+   */
+  private static Comparator<PropertyValue> byTypeFirst = Comparator
+    .comparing((PropertyValue pv) -> pv.getType().getSimpleName())
+    .thenComparing(Comparator.naturalOrder());
 
+  /**
+   * The loader with the graphs used in this test.
+   */
+  private FlinkAsciiGraphLoader loader = getLoaderFromString(
+    "input1[" + "(s1:Source {p1: 1, p2: 1.1d})-[e1:edge1]->(t:Target {t: 0})" +
+      "(s2:Source {p1: \"\"})-[e2:edge2]->(t)" +
+      "(s1)-[e12:edge1]->(t2:Target2 {t: 0})" +
+      "(s2)-[e22:edge2]->(t2)" +
+      "] input2 [" +
+      "(v:Vertex {t: 1})-->(v)" +
+      "]");
+
+  /**
+   * Test the operator propagating a property to two vertices.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
   @Test
-  public void testDummy() {
+  public void testPropagateDirected() throws Exception {
+    LogicalGraph input = loader.getLogicalGraphByVariable("input1");
+    UnaryGraphToGraphOperator operator = new PropagatePropertyToNeighbor("Source", "p1", "t");
+    // We have to update the vertices manually because the ascii loader does not support lists.
+    LogicalGraph expected = input.transformVertices((v, c) -> {
+      if (!"Target".equals(v.getLabel()) && !"Target2".equals(v.getLabel())) {
+        return v;
+      }
+      v.setProperty("t", Arrays.asList(PropertyValue.create(1L), PropertyValue.create("")));
+      return v;
+    }).transformVertexProperties("t",
+      PropagatePropertyToNeighborTest::orderListProperty);
+    LogicalGraph result = input.callForGraph(operator)
+      .transformVertexProperties("t",
+        PropagatePropertyToNeighborTest::orderListProperty);
+    collectAndAssertTrue(expected.equalsByElementData(result));
+  }
+
+  /**
+   * Test the operator propagating along only certain edge labels.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testPropagateAlongCertainEdges() throws Exception {
+    LogicalGraph input = loader.getLogicalGraphByVariable("input1");
+    UnaryGraphToGraphOperator operator = new PropagatePropertyToNeighbor("Source", "p1", "t",
+      Collections.singleton("edge1"), null);
+    LogicalGraph expected = input.transformVertices((v, c) -> {
+      if (!"Target".equals(v.getLabel()) && !"Target2".equals(v.getLabel())) {
+        return v;
+      }
+      v.setProperty("t", Arrays.asList(PropertyValue.create(1L)));
+      return v;
+    });
+    LogicalGraph result = input.callForGraph(operator);
+    collectAndAssertTrue(expected.equalsByElementData(result));
+  }
+
+  /**
+   * Test the operator propagating only to vertices with a certain label.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testPropagateToCertainVertices() throws Exception {
+    LogicalGraph input = loader.getLogicalGraphByVariable("input1");
+    UnaryGraphToGraphOperator operator = new PropagatePropertyToNeighbor("Source", "p1", "t",
+      null, Collections.singleton("Target"));
+    LogicalGraph expected = input.transformVertices((v, c) -> {
+      if (!"Target".equals(v.getLabel())) {
+        return v;
+      }
+      v.setProperty("t", Arrays.asList(PropertyValue.create(1L), PropertyValue.create("")));
+      return v;
+    }).transformVertexProperties("t",
+      PropagatePropertyToNeighborTest::orderListProperty);
+    LogicalGraph result = input.callForGraph(operator).transformVertexProperties("t",
+      PropagatePropertyToNeighborTest::orderListProperty);
+    collectAndAssertTrue(expected.equalsByElementData(result));
+  }
+
+  /**
+   * Test the operator propagating only to vertices with a certain label and only along edges of
+   * a certain label.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testPropagateToCertainVerticesAlongCertainEdges() throws Exception {
+    LogicalGraph input = loader.getLogicalGraphByVariable("input1");
+    UnaryGraphToGraphOperator operator = new PropagatePropertyToNeighbor("Source", "p1", "t",
+      Collections.singleton("edge1"), Collections.singleton("Target"));
+    LogicalGraph expected = input.transformVertices((v, c) -> {
+      if (!"Target".equals(v.getLabel())) {
+        return v;
+      }
+      v.setProperty("t", Arrays.asList(PropertyValue.create(1L)));
+      return v;
+    });
+    LogicalGraph result = input.callForGraph(operator);
+    collectAndAssertTrue(expected.equalsByElementData(result));
+  }
+
+  /**
+   * Test if the operator works correctly for loops.
+   * This will also check if using the same property key for reading and writing values works.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testPropagateInLoops() throws Exception {
+    LogicalGraph input = loader.getLogicalGraphByVariable("input2");
+    UnaryGraphToGraphOperator operator = new PropagatePropertyToNeighbor("Vertex", "t", "t");
+    LogicalGraph expected = input.transformVertices((v, c) -> {
+      v.setProperty("t", Arrays.asList(PropertyValue.create(1L)));
+      return v;
+    });
+    LogicalGraph result = input.callForGraph(operator);
+    collectAndAssertTrue(expected.equalsByElementData(result));
+  }
+
+  /**
+   * Order a list-type property. This is used to make sure that two lists are equal except
+   * for the order of their elements.
+   *
+   * @param list The property.
+   * @return The ordered property.
+   */
+  private static PropertyValue orderListProperty(PropertyValue list) {
+    if (!list.isList()) {
+      return list;
+    }
+    List<PropertyValue> theList = list.getList();
+    theList.sort(byTypeFirst);
+    return PropertyValue.create(theList);
   }
 }
