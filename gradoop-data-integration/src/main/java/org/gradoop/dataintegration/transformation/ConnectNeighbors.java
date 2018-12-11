@@ -94,7 +94,6 @@ public class ConnectNeighbors implements UnaryGraphToGraphOperator {
 
       return graph.getConfig().getLogicalGraphFactory()
           .fromDataSets(
-              graph.getGraphHead(),
               graph.getVertices(),
               graph.getEdges().union(newEdges));
     }

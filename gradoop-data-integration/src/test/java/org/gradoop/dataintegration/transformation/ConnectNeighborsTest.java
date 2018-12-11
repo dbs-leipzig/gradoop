@@ -15,7 +15,11 @@
  */
 package org.gradoop.dataintegration.transformation;
 
+import org.gradoop.dataintegration.transformation.functions.Neighborhood;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 
@@ -24,9 +28,65 @@ import org.junit.Test;
  */
 public class ConnectNeighborsTest extends GradoopFlinkTestBase {
 
+  /**
+   * The loader used to get the test graphs.
+   */
+  private FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
+      "(i:V)-->(c:Center)-->(o:V)" +
+      "(i2:V)-->(c)-->(o2:V)" +
+      "(:other)-->(c)-->(:other)" +
+      "] expectedIncoming [" +
+      "(i)-[:neighbor]->(i2)" +
+      "(i2)-[:neighbor]->(i)" +
+      "] expectedOutgoing [" +
+      "(o)-[:neighbor]->(o2)" +
+      "(o2)-[:neighbor]->(o)" +
+      "]");
 
+  /**
+   * Test using incoming edges.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
   @Test
-  public void testDummy() {
+  public void testIncoming() throws Exception {
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+    UnaryGraphToGraphOperator operator =
+      new ConnectNeighbors("Center", Neighborhood.EdgeDirection.INCOMING, "V", "neighbor");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expectedIncoming").combine(input);
 
+    collectAndAssertTrue(expected.equalsByElementData(input.callForGraph(operator)));
+  }
+
+  /**
+   * Test using outgoing edges.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testOutgoing() throws Exception {
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+    UnaryGraphToGraphOperator operator =
+      new ConnectNeighbors("Center", Neighborhood.EdgeDirection.OUTGOING, "V", "neighbor");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expectedOutgoing").combine(input);
+
+    collectAndAssertTrue(expected.equalsByElementData(input.callForGraph(operator)));
+  }
+
+  /**
+   * Test using edges in both directions.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testUndirected() throws Exception {
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+    UnaryGraphToGraphOperator operator =
+      new ConnectNeighbors("Center", Neighborhood.EdgeDirection.UNDIRECTED, "V", "neighbor");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expectedOutgoing")
+      .combine(loader.getLogicalGraphByVariable("expectedIncoming"))
+      .combine(input);
+
+    collectAndAssertTrue(expected.equalsByElementData(input.callForGraph(operator)));
   }
 }
