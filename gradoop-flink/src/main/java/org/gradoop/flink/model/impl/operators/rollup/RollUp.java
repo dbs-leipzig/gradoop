@@ -80,9 +80,11 @@ public abstract class RollUp implements UnaryGraphToCollectionOperator {
     List<String> edgeGroupingKeys,
     List<AggregateFunction> edgeAggregateFunctions) {
     this.vertexGroupingKeys = vertexGroupingKeys;
-    this.vertexAggregateFunctions = vertexAggregateFunctions;
+    // The list is copied to guarantee mutability
+    this.vertexAggregateFunctions = new ArrayList<>(vertexAggregateFunctions);
     this.edgeGroupingKeys = edgeGroupingKeys;
-    this.edgeAggregateFunctions = edgeAggregateFunctions;
+    // The list is copied to guarantee mutability
+    this.edgeAggregateFunctions = new ArrayList<>(edgeAggregateFunctions);
     this.strategy = GroupingStrategy.GROUP_REDUCE;
   }
 
@@ -97,28 +99,37 @@ public abstract class RollUp implements UnaryGraphToCollectionOperator {
     DataSet<GraphHead> graphHeads = null;
     DataSet<Vertex> vertices = null;
     DataSet<Edge> edges = null;
+    LogicalGraph groupedGraph = null;
     List<List<String>> groupingKeyCombinations = getGroupingKeyCombinations();
 
     // for each permutation execute a grouping
     for (List<String> combination : groupingKeyCombinations) {
-      // apply the grouping
-      LogicalGraph groupedGraph = applyGrouping(graph, combination);
-
-      // add a property to the grouped graph's head to specify the used keys
       PropertyValue groupingKeys = PropertyValue.create(String.join(",", combination));
-      DataSet<GraphHead> newGraphHead =
-        groupedGraph.getGraphHead().map(new SetProperty<>(getGraphPropertyKey(), groupingKeys));
 
       if (graphHeads != null && vertices != null && edges != null) {
+        // in later iterations apply the grouping to the grouped graph
+        groupedGraph = applyGrouping(groupedGraph, combination);
+
         // in later iterations union the datasets of the grouped elements with the existing ones
-        graphHeads = graphHeads.union(newGraphHead);
+        // and add a property to the grouped graph's head to specify the used keys
+        graphHeads = graphHeads.union(groupedGraph.getGraphHead()
+          .map(new SetProperty<>(getGraphPropertyKey(), groupingKeys)));
         vertices = vertices.union(groupedGraph.getVertices());
         edges = edges.union(groupedGraph.getEdges());
       } else {
+        // in the first iteration apply the grouping to the initial graph
+        groupedGraph = applyGrouping(graph, combination);
+
         // in the first iteration, fill the datasets
-        graphHeads = newGraphHead;
+        // and add a property to the grouped graph's head to specify the used keys
+        graphHeads = groupedGraph.getGraphHead()
+          .map(new SetProperty<>(getGraphPropertyKey(), groupingKeys));
         vertices = groupedGraph.getVertices();
         edges = groupedGraph.getEdges();
+
+        // Reuse existing properties after the first grouping
+        vertexAggregateFunctions.replaceAll(ReuseAggregatePropertyWrapper::new);
+        edgeAggregateFunctions.replaceAll(ReuseAggregatePropertyWrapper::new);
       }
     }
 
