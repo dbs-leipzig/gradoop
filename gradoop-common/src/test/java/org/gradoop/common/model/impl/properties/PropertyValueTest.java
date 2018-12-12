@@ -164,19 +164,119 @@ public class PropertyValueTest {
    * Test copying the property value
    */
   @Test
-  public void testCopy() {
-    // copy primitive value
+  public void testCopyBoolean() {
     PropertyValue p = create(BOOL_VAL_1);
     PropertyValue copy = p.copy();
     assertEquals(p, copy);
     assertNotSame(p, copy);
+  }
 
-    // deep copy complex value
-    p = create(LIST_VAL_a);
-    copy = p.copy();
+  @Test
+  public void testCopyFloat() {
+    PropertyValue p = create(FLOAT_VAL_4);
+    PropertyValue copy = p.copy();
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+    assertNotSame(FLOAT_VAL_4, copy.getObject());
+  }
+
+  @Test
+  public void testCopyDouble() {
+    PropertyValue p = create(DOUBLE_VAL_5);
+    PropertyValue copy = p.copy();
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+    assertNotSame(DOUBLE_VAL_5, copy.getObject());
+  }
+
+  @Test
+  public void testCopyBigDecimal() {
+    PropertyValue p = create(BIG_DECIMAL_VAL_7);
+    PropertyValue copy = p.copy();
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+    assertNotSame(BIG_DECIMAL_VAL_7, copy.getObject());
+  }
+
+  @Test
+  public void testCopyGradoopId() {
+    PropertyValue p = create(GRADOOP_ID_VAL_8);
+    PropertyValue copy = p.copy();
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+    assertNotSame(GRADOOP_ID_VAL_8, copy.getObject());
+  }
+
+  @Test
+  public void testCopyDate() {
+    PropertyValue p = create(DATE_VAL_b);
+    PropertyValue copy = p.copy();
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+    assertNotSame(DATE_VAL_b, copy.getObject());
+  }
+
+  @Test
+  public void testCopyDateTime() {
+    PropertyValue p = create(DATETIME_VAL_d);
+    PropertyValue copy = p.copy();
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+    assertNotSame(DATETIME_VAL_d, copy.getObject());
+  }
+
+  @Test
+  public void testCopyTime() {
+    PropertyValue p = create(TIME_VAL_c);
+    PropertyValue copy = p.copy();
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+    assertNotSame(TIME_VAL_c, copy.getObject());
+  }
+
+  @Test
+  public void testCopyInteger() {
+    PropertyValue p = create(INT_VAL_2);
+    PropertyValue copy = p.copy();
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+    assertNotSame(INT_VAL_2, copy.getObject());
+  }
+
+  @Test
+  public void testCopyString() {
+    PropertyValue p = create(STRING_VAL_6);
+    PropertyValue copy = p.copy();
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+    assertNotSame(STRING_VAL_6, copy.getObject());
+  }
+
+  @Test
+  public void testCopyMap() {
+    PropertyValue p = create(MAP_VAL_9);
+    PropertyValue copy = p.copy();
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+    assertNotSame(MAP_VAL_9, copy.getObject());
+  }
+
+  @Test
+  public void testCopyList() {
+    PropertyValue p = create(LIST_VAL_a);
+    PropertyValue copy = p.copy();
     assertEquals(p, copy);
     assertNotSame(p, copy);
     assertNotSame(LIST_VAL_a, copy.getObject());
+  }
+
+  @Test
+  public void testCopySet() {
+    PropertyValue p = create(SET_VAL_f);
+    PropertyValue copy = p.copy();
+    assertEquals(p, copy);
+    assertNotSame(p, copy);
+    assertNotSame(SET_VAL_f, copy.getObject());
   }
 
   @Test
