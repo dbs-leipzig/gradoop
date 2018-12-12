@@ -61,6 +61,7 @@ public interface PropertyValueStrategy<T> {
       classStrategyMap.put(LocalTime.class, new TimeStrategy());
       classStrategyMap.put(LocalDateTime.class, new DateTimeStrategy());
       classStrategyMap.put(GradoopId.class, new GradoopIdStrategy());
+      classStrategyMap.put(String.class, new StringStrategy());
 
       byteStrategyMap = new HashMap<>(classStrategyMap.size());
       for (PropertyValueStrategy strategy : classStrategyMap.values()) {
@@ -168,7 +169,20 @@ public interface PropertyValueStrategy<T> {
     @Override
     public boolean write(Set value, DataOutputView outputView) throws IOException {
       byte[] rawBytes = getRawBytes(value);
-      outputView.write(rawBytes);
+      byte type = rawBytes[0];
+
+      if (rawBytes.length > PropertyValue.LARGE_PROPERTY_THRESHOLD) {
+        type |= PropertyValue.FLAG_LARGE;
+      }
+      outputView.writeByte(type);
+      // Write length as an int if the "large" flag is set.
+      if ((type & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
+        outputView.writeInt(rawBytes.length - PropertyValue.OFFSET);
+      } else {
+        outputView.writeShort(rawBytes.length - PropertyValue.OFFSET);
+      }
+
+      outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);
       return true;
     }
 
@@ -259,8 +273,7 @@ public interface PropertyValueStrategy<T> {
       DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
 
       try {
-        outputStream.write(PropertyValue.TYPE_SET);
-        outputStream.writeShort(size);
+        outputStream.write(getRawType());
         for (PropertyValue entry : set) {
           entry.write(outputView);
         }
@@ -828,6 +841,74 @@ public interface PropertyValueStrategy<T> {
     public byte[] getRawBytes(GradoopId value) {
       byte[] valueBytes = value.toByteArray();
       byte[] rawBytes = new byte[PropertyValue.OFFSET + GradoopId.ID_SIZE];
+      rawBytes[0] = getRawType();
+      Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);
+      return rawBytes;
+    }
+  }
+
+  class StringStrategy implements PropertyValueStrategy<String> {
+
+    @Override
+    public boolean write(String value, DataOutputView outputView) throws IOException {
+      byte[] rawBytes = getRawBytes(value);
+      byte type = rawBytes[0];
+
+      if (rawBytes.length > PropertyValue.LARGE_PROPERTY_THRESHOLD) {
+        type |= PropertyValue.FLAG_LARGE;
+      }
+      outputView.writeByte(type);
+      // Write length as an int if the "large" flag is set.
+      if ((type & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
+        outputView.writeInt(rawBytes.length - PropertyValue.OFFSET);
+      } else {
+        outputView.writeShort(rawBytes.length - PropertyValue.OFFSET);
+      }
+
+      outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);
+      return true;
+    }
+
+    @Override
+    public String read(DataInputView inputView) throws IOException {
+      // @TODO This will break as soon as String gets real big, find a way to determine whether readInt needs to be used
+      int length = inputView.readShort();
+      byte[] rawBytes = new byte[length];
+      for (int i = 0; i < rawBytes.length; i++) {
+        rawBytes[i] = inputView.readByte();
+      }
+      return Bytes.toString(rawBytes);
+    }
+
+    @Override
+    public int compare(String value, String other) {
+      return value.compareTo(other);
+    }
+
+    @Override
+    public boolean is(Object value) {
+      return value instanceof String;
+    }
+
+    @Override
+    public Class<String> getType() {
+      return String.class;
+    }
+
+    @Override
+    public String get(byte[] bytes) {
+      return Bytes.toString(bytes, PropertyValue.OFFSET, bytes.length - PropertyValue.OFFSET);
+    }
+
+    @Override
+    public Byte getRawType() {
+      return PropertyValue.TYPE_STRING;
+    }
+
+    @Override
+    public byte[] getRawBytes(String value) {
+      byte[] valueBytes = Bytes.toBytes(value);
+      byte[] rawBytes = new byte[PropertyValue.OFFSET + valueBytes.length];
       rawBytes[0] = getRawType();
       Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);
       return rawBytes;
