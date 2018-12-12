@@ -16,11 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface PropertyValueStrategy<T> {
 
@@ -62,6 +58,7 @@ public interface PropertyValueStrategy<T> {
       classStrategyMap.put(LocalDateTime.class, new DateTimeStrategy());
       classStrategyMap.put(GradoopId.class, new GradoopIdStrategy());
       classStrategyMap.put(String.class, new StringStrategy());
+      classStrategyMap.put(List.class, new ListStrategy());
 
       byteStrategyMap = new HashMap<>(classStrategyMap.size());
       for (PropertyValueStrategy strategy : classStrategyMap.values()) {
@@ -275,6 +272,131 @@ public interface PropertyValueStrategy<T> {
       try {
         outputStream.write(getRawType());
         for (PropertyValue entry : set) {
+          entry.write(outputView);
+        }
+      } catch (IOException e) {
+        throw new RuntimeException("Error writing PropertyValue");
+      }
+
+      return byteStream.toByteArray();
+    }
+  }
+
+  class ListStrategy implements PropertyValueStrategy<List> {
+
+    @Override
+    public boolean write(List value, DataOutputView outputView) throws IOException {
+      byte[] rawBytes = getRawBytes(value);
+      byte type = rawBytes[0];
+
+      if (rawBytes.length > PropertyValue.LARGE_PROPERTY_THRESHOLD) {
+        type |= PropertyValue.FLAG_LARGE;
+      }
+      outputView.writeByte(type);
+      // Write length as an int if the "large" flag is set.
+      if ((type & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
+        outputView.writeInt(rawBytes.length - PropertyValue.OFFSET);
+      } else {
+        outputView.writeShort(rawBytes.length - PropertyValue.OFFSET);
+      }
+
+      outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);
+      return true;
+    }
+
+    @Override
+    public List read(DataInputView inputView) throws IOException {
+      int length = inputView.readShort();
+      // init new array
+      byte[] rawBytes = new byte[length];
+
+      inputView.read(rawBytes);
+
+      PropertyValue entry;
+
+      List<PropertyValue> list = new ArrayList<>();
+
+      ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
+      DataInputStream inputStream = new DataInputStream(byteStream);
+      DataInputView internalInputView = new DataInputViewStreamWrapper(inputStream);
+
+      try {
+        while (inputStream.available() > 0) {
+          entry = new PropertyValue();
+          entry.read(internalInputView);
+
+          list.add(entry);
+        }
+      } catch (IOException e) {
+        throw new RuntimeException("Error reading PropertyValue");
+      }
+
+      return list;
+    }
+
+    @Override
+    public int compare(List value, List other) {
+      throw new UnsupportedOperationException(
+        "Method compareTo() is not supported for List;"
+      );
+    }
+
+    @Override
+    public boolean is(Object value) {
+      return value instanceof List;
+    }
+
+    @Override
+    public Class<List> getType() {
+      return List.class;
+    }
+
+    @Override
+    public List get(byte[] bytes) {
+      PropertyValue entry;
+
+      List<PropertyValue> list = new ArrayList<>();
+
+      ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
+      DataInputStream inputStream = new DataInputStream(byteStream);
+      DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
+
+      try {
+        if (inputStream.skipBytes(PropertyValue.OFFSET) != PropertyValue.OFFSET) {
+          throw new RuntimeException("Malformed entry in PropertyValue List");
+        }
+        while (inputStream.available() > 0) {
+          entry = new PropertyValue();
+          entry.read(inputView);
+
+          list.add(entry);
+        }
+      } catch (IOException e) {
+        throw new RuntimeException("Error reading PropertyValue");
+      }
+
+      return list;
+    }
+
+    @Override
+    public Byte getRawType() {
+      return PropertyValue.TYPE_LIST;
+    }
+
+    @Override
+    public byte[] getRawBytes(List value) {
+      List<PropertyValue> list = value;
+
+      int size = list.stream().mapToInt(PropertyValue::byteSize).sum() +
+        PropertyValue.OFFSET;
+
+      ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
+      DataOutputStream outputStream = new DataOutputStream(byteStream);
+      DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
+
+      try {
+        outputStream.write(getRawType());
+        for (PropertyValue entry : list) {
           entry.write(outputView);
         }
       } catch (IOException e) {
