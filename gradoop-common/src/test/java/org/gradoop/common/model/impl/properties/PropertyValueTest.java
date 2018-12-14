@@ -240,7 +240,6 @@ public class PropertyValueTest {
     PropertyValue copy = p.copy();
     assertEquals(p, copy);
     assertNotSame(p, copy);
-    assertNotSame(INT_VAL_2, copy.getObject());
   }
 
   @Test
@@ -1348,6 +1347,7 @@ public class PropertyValueTest {
    */
   private void validateCompareTo(PropertyValue p1, PropertyValue p2,
     PropertyValue p3) {
+    boolean stop = true;
     assertTrue(p1.compareTo(p1) == 0);
     assertTrue(p1.compareTo(p2) == 0);
     assertTrue(p2.compareTo(p1) == 0);

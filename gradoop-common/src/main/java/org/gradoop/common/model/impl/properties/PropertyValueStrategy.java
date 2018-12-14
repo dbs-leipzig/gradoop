@@ -30,7 +30,7 @@ public interface PropertyValueStrategy<T> {
 
   T read(DataInputView inputView) throws IOException;
 
-  int compare(T value, T other);
+  int compare(T value, Object other);
 
   boolean is(Object value);
 
@@ -95,10 +95,9 @@ public interface PropertyValueStrategy<T> {
     public static int compare(Object value, Object other) {
       if (value != null) {
         PropertyValueStrategy strategy = get(value.getClass());
-        if (strategy.is(other)) {
-          return strategy.compare(value, other);
-        }
+        return strategy.compare(value, other);
       }
+
       return 0;
     }
 
@@ -135,8 +134,12 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(Boolean value, Boolean other) {
-      return Boolean.compare(value, other);
+    public int compare(Boolean value, Object other) {
+      if (other.getClass() == Boolean.class) {
+        return Boolean.compare(value,(boolean) other);
+      }
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", value.getClass(), other.getClass()));
     }
 
     @Override
@@ -221,7 +224,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(Set value, Set other) {
+    public int compare(Set value, Object other) {
       throw new UnsupportedOperationException("Method compareTo() is not supported");
     }
 
@@ -342,7 +345,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(List value, List other) {
+    public int compare(List value, Object other) {
       throw new UnsupportedOperationException(
         "Method compareTo() is not supported for List;"
       );
@@ -471,7 +474,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(Map value, Map other) {
+    public int compare(Map value, Object other) {
       throw new UnsupportedOperationException(
         "Method compareTo() is not supported for Map;"
       );
@@ -569,8 +572,13 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(Integer value, Integer other) {
-      return Integer.compare(value, other);
+    public int compare(Integer value, Object other) {
+      if (other instanceof Number) {
+        Number num = (Number) other;
+        return PropertyValueStrategyUtils.compareNumerical(value, num);
+      }
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", value.getClass(), other.getClass()));
     }
 
     @Override
@@ -622,8 +630,13 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(Long value, Long other) {
-      return Long.compare(value, other);
+    public int compare(Long value, Object other) {
+      if (other instanceof Number) {
+        Number num = (Number) other;
+        return PropertyValueStrategyUtils.compareNumerical(value, num);
+      }
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", value.getClass(), other.getClass()));
     }
 
     @Override
@@ -674,8 +687,13 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(Float value, Float other) {
-      return Float.compare(value, other);
+    public int compare(Float value, Object other) {
+      if (other instanceof Number) {
+        Number num = (Number) other;
+        return PropertyValueStrategyUtils.compareNumerical(value, num);
+      }
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", value.getClass(), other.getClass()));
     }
 
     @Override
@@ -726,8 +744,13 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(Double value, Double other) {
-      return Double.compare(value, other);
+    public int compare(Double value, Object other) {
+      if (other instanceof Number) {
+        Number num = (Number) other;
+        return PropertyValueStrategyUtils.compareNumerical(value, num);
+      }
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", value.getClass(), other.getClass()));
     }
 
     @Override
@@ -742,7 +765,7 @@ public interface PropertyValueStrategy<T> {
 
     @Override
     public Double get(byte[] bytes) {
-      return Bytes.toDouble(bytes);
+      return Bytes.toDouble(bytes, PropertyValue.OFFSET);
     }
 
     @Override
@@ -779,8 +802,13 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(Short value, Short other) {
-      return Short.compare(value, other);
+    public int compare(Short value, Object other) {
+      if (other instanceof Number) {
+        Number num = (Number) other;
+        return PropertyValueStrategyUtils.compareNumerical(value, num);
+      }
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", value.getClass(), other.getClass()));
     }
 
     @Override
@@ -846,8 +874,13 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(BigDecimal value, BigDecimal other) {
-      return value.compareTo(other);
+    public int compare(BigDecimal value, Object other) {
+      if (other instanceof Number) {
+        Number num = (Number) other;
+        return PropertyValueStrategyUtils.compareNumerical(value, num);
+      }
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", value.getClass(), other.getClass()));
     }
 
     @Override
@@ -862,7 +895,39 @@ public interface PropertyValueStrategy<T> {
 
     @Override
     public BigDecimal get(byte[] bytes) {
-      return Bytes.toBigDecimal(bytes, PropertyValue.OFFSET, bytes.length - PropertyValue.OFFSET);
+
+      BigDecimal decimal;
+      byte type = bytes[0];
+      byte[] valueBytes = Arrays.copyOfRange(bytes, PropertyValue.OFFSET, bytes.length);
+
+      switch (type) {
+      case PropertyValue.TYPE_BIG_DECIMAL:
+        decimal = Bytes.toBigDecimal(valueBytes);
+        break;
+      case PropertyValue.TYPE_FLOAT:
+        decimal = BigDecimal.valueOf(Bytes.toFloat(valueBytes));
+        break;
+      case PropertyValue.TYPE_DOUBLE:
+        decimal = BigDecimal.valueOf(Bytes.toDouble(valueBytes));
+        break;
+      case PropertyValue.TYPE_SHORT:
+        decimal = BigDecimal.valueOf(Bytes.toShort(valueBytes));
+        break;
+        case PropertyValue.TYPE_INTEGER:
+          decimal = BigDecimal.valueOf(Bytes.toInt(valueBytes));
+          break;
+          case PropertyValue.TYPE_LONG:
+            decimal = BigDecimal.valueOf(Bytes.toLong(valueBytes));
+            break;
+            case PropertyValue.TYPE_STRING:
+              decimal = new BigDecimal(Bytes.toString(valueBytes));
+              break;
+              default:
+                throw new ClassCastException(
+                  "Cannot covert " + this.getType().getSimpleName() +
+                    " to " + BigDecimal.class.getSimpleName());
+      }
+      return decimal;
     }
 
     @Override
@@ -901,8 +966,12 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(LocalDate value, LocalDate other) {
-      return value.compareTo(other);
+    public int compare(LocalDate value, Object other) {
+      if (other instanceof LocalDate) {
+        return value.compareTo((LocalDate) other);
+      }
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", value.getClass(), other.getClass()));
     }
 
     @Override
@@ -959,8 +1028,12 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(LocalTime value, LocalTime other) {
-      return value.compareTo(other);
+    public int compare(LocalTime value, Object other) {
+      if (other instanceof LocalTime) {
+        return value.compareTo((LocalTime) other);
+      }
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", value.getClass(), other.getClass()));
     }
 
     @Override
@@ -1017,8 +1090,12 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(LocalDateTime value, LocalDateTime other) {
-      return value.compareTo(other);
+    public int compare(LocalDateTime value, Object other) {
+      if (other instanceof LocalDateTime) {
+        return value.compareTo((LocalDateTime) other);
+      }
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", value.getClass(), other.getClass()));
     }
 
     @Override
@@ -1075,8 +1152,12 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(GradoopId value, GradoopId other) {
-      return value.compareTo(other);
+    public int compare(GradoopId value, Object other) {
+      if (other instanceof GradoopId) {
+        return value.compareTo((GradoopId) other);
+      }
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", value.getClass(), other.getClass()));
     }
 
     @Override
@@ -1146,8 +1227,12 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public int compare(String value, String other) {
-      return value.compareTo(other);
+    public int compare(String value, Object other) {
+      if (other instanceof String) {
+        return value.compareTo((String) other);
+      }
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", value.getClass(), other.getClass()));
     }
 
     @Override
