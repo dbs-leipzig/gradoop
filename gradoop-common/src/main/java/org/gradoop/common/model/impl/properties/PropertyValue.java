@@ -198,7 +198,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return property value
    */
   public PropertyValue copy() {
-    return create(getObject());
+    return new PropertyValue(getRawBytes());
   }
 
   //----------------------------------------------------------------------------
@@ -313,7 +313,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return true, if {@code LocalDate} value
    */
   public boolean isDate() {
-    return is(Date.class);
+    return is(LocalDate.class);
   }
   /**
    * True, if the wrapped value is of type {@code LocalTime}.
@@ -353,12 +353,21 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   // Getter
   //----------------------------------------------------------------------------
 
+  /**
+   * Returns the value as the specified type. If it is already of the same type as requested, we
+   * just return the value. If not, then we try to cast the value via the requested types strategy
+   * get method.
+   * @param c the requested value type
+   * @param <T> PropertyValue supported type
+   * @return value
+   */
   public <T> T get(Class<T> c) {
     PropertyValueStrategy strategy = PropertyValueStrategy.PropertyValueStrategyFactory.get(c);
     if (strategy.is(value)) {
       return (T) value;
     }
-    return null;
+    byte[] bytes = PropertyValueStrategy.PropertyValueStrategyFactory.getRawBytes(value);
+    return (T) strategy.get(bytes);
   }
 
   /**
