@@ -34,12 +34,15 @@ public class EdgeToVertexTest extends GradoopFlinkTestBase {
    */
   private final FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
     "(a:VertexA)-[e:edgeToTransform {testProp: 1, testProp2: \"\"}]->(b:VertexB)" +
-    "(a)-[e2:anotherEdge]->(b)" +
+    "(a)-[e2:edgeToTransform]->(b)" +
+    "(a)-[en:anotherEdge]->(b)" +
     "]" +
     "expected [" +
     "(a)-[e]->(b)" +
     "(a)-[e2]->(b)" +
+    "(a)-[en]->(b)" +
     "(a)-[:fromSource]->(:VertexFromEdge {testProp: 1, testProp2: \"\"})-[:toTarget]->(b)" +
+    "(a)-[:fromSource]->(:VertexFromEdge)-[:toTarget]->(b)" +
     "]");
 
   /**
