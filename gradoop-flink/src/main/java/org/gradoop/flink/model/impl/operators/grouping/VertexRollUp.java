@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.rollup;
+package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 
 import java.util.List;
 
 /**
  * Applies the groupBy-operator multiple times on a logical graph using different combinations of
- * the given edge grouping keys according to the definition of the rollUp operation in SQL.
+ * the given vertex grouping keys according to the definition of the rollUp operation in SQL.
  *
  * See the description of the abstract class {@link RollUp} for further details.
  */
-public class EdgeRollUp extends RollUp {
-  /**
-   * Property key used to store the grouping keys used for rollUp on edges.
-   */
-  private static final String EDGE_GROUPING_KEYS_PROPERTY = "edgeRollUpGroupingKeys";
+public class VertexRollUp extends RollUp {
 
   /**
-   * Creates a edgeRollUp operator instance with {@link GroupingStrategy#GROUP_REDUCE} as grouping
+   * Property key used to store the grouping keys used for rollUp on vertices.
+   */
+  private static final String VERTEX_GROUPING_KEYS_PROPERTY = "vertexRollUpGroupingKeys";
+
+  /**
+   * Creates a vertexRollUp operator instance with {@link GroupingStrategy#GROUP_REDUCE} as grouping
    * strategy. Use {@link RollUp#setGroupingStrategy(GroupingStrategy)} to define a different
    * grouping strategy.
    *
@@ -43,7 +43,7 @@ public class EdgeRollUp extends RollUp {
    * @param edgeGroupingKeys grouping keys to group edges
    * @param edgeAggregateFunctions aggregate functions to apply on super edges
    */
-  public EdgeRollUp(
+  public VertexRollUp(
     List<String> vertexGroupingKeys,
     List<AggregateFunction> vertexAggregateFunctions,
     List<String> edgeGroupingKeys,
@@ -54,22 +54,22 @@ public class EdgeRollUp extends RollUp {
 
   @Override
   String getGraphPropertyKey() {
-    return EDGE_GROUPING_KEYS_PROPERTY;
+    return VERTEX_GROUPING_KEYS_PROPERTY;
   }
 
   @Override
   LogicalGraph applyGrouping(LogicalGraph graph, List<String> groupingKeys) {
-    return graph.groupBy(vertexGroupingKeys, vertexAggregateFunctions, groupingKeys,
+    return graph.groupBy(groupingKeys, vertexAggregateFunctions, edgeGroupingKeys,
       edgeAggregateFunctions, strategy);
   }
 
   @Override
   List<List<String>> getGroupingKeyCombinations() {
-    return createGroupingKeyCombinations(edgeGroupingKeys);
+    return createGroupingKeyCombinations(vertexGroupingKeys);
   }
 
   @Override
   public String getName() {
-    return EdgeRollUp.class.getName();
+    return VertexRollUp.class.getName();
   }
 }

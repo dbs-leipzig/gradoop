@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains all implementations of the graph rollUp operator.
+ * Custom functions used in the {@link org.gradoop.benchmark.grouping.RollUpExample}.
  */
-package org.gradoop.flink.model.impl.operators.rollup;
+package org.gradoop.benchmark.grouping.functions;

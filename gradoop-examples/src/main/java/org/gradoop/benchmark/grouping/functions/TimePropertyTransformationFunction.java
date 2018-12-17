@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.examples.rollup.functions;
+package org.gradoop.benchmark.grouping.functions;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;

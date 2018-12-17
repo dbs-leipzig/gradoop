@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.examples.rollup;
+package org.gradoop.benchmark.grouping;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -21,8 +21,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.benchmark.grouping.functions.TimePropertyTransformationFunction;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.examples.rollup.functions.TimePropertyTransformationFunction;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;

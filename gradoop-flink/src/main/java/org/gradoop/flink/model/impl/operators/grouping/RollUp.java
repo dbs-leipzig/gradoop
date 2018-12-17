@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.rollup;
+package org.gradoop.flink.model.impl.operators.grouping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,6 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.SetProperty;
-import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 
 /**
  * The rollUp operator generates all combinations of the supplied vertex or edge grouping keys
