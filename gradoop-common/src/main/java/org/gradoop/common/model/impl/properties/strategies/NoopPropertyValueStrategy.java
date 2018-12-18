@@ -8,8 +8,9 @@ import java.io.IOException;
 
 public class NoopPropertyValueStrategy implements PropertyValueStrategy {
   @Override
-  public boolean write(Object value, DataOutputView outputView) {
-    return false;
+  public boolean write(Object value, DataOutputView outputView) throws IOException {
+    outputView.write(new byte[]{0});
+    return true;
   }
 
   @Override
