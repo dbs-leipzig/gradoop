@@ -28,7 +28,7 @@ public interface PropertyValueStrategy<T> {
 
   boolean write(T value, DataOutputView outputView) throws IOException;
 
-  T read(DataInputView inputView) throws IOException;
+  T read(DataInputView inputView, byte typeByte) throws IOException;
 
   int compare(T value, Object other);
 
@@ -129,7 +129,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public Boolean read(DataInputView inputView) throws IOException {
+    public Boolean read(DataInputView inputView, byte typeByte) throws IOException {
       return inputView.readByte() == -1;
     }
 
@@ -194,8 +194,14 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public Set read(DataInputView inputView) throws IOException {
-      int length = inputView.readShort();
+    public Set read(DataInputView inputView, byte typeByte) throws IOException {
+      int length;
+      // read length
+      if ((typeByte & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
+        length = inputView.readInt();
+      } else {
+        length = inputView.readShort();
+      }
       // init new array
       byte[] rawBytes = new byte[length];
 
@@ -315,8 +321,14 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public List read(DataInputView inputView) throws IOException {
-      int length = inputView.readShort();
+    public List read(DataInputView inputView, byte typeByte) throws IOException {
+      int length;
+      // read length
+      if ((typeByte & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
+        length = inputView.readInt();
+      } else {
+        length = inputView.readShort();
+      }
       // init new array
       byte[] rawBytes = new byte[length];
 
@@ -440,8 +452,14 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public Map read(DataInputView inputView) throws IOException {
-      int length = inputView.readShort();
+    public Map read(DataInputView inputView, byte typeByte) throws IOException {
+      int length;
+      // read length
+      if ((typeByte & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
+        length = inputView.readInt();
+      } else {
+        length = inputView.readShort();
+      }
 
       byte[] rawBytes = new byte[length];
 
@@ -562,7 +580,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public Integer read(DataInputView inputView) throws IOException {
+    public Integer read(DataInputView inputView, byte typeByte) throws IOException {
       int length = Bytes.SIZEOF_INT;
       byte[] rawBytes = new byte[length];
       for (int i  = 0; i < rawBytes.length; i++) {
@@ -620,7 +638,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public Long read(DataInputView inputView) throws IOException {
+    public Long read(DataInputView inputView, byte typeByte) throws IOException {
       int length = Bytes.SIZEOF_LONG;
       byte[] rawBytes = new byte[length];
       for (int i  = 0; i < rawBytes.length; i++) {
@@ -677,7 +695,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public Float read(DataInputView inputView) throws IOException {
+    public Float read(DataInputView inputView, byte typeByte) throws IOException {
       int length = Bytes.SIZEOF_FLOAT;
       byte[] rawBytes = new byte[length];
       for (int i  = 0; i < rawBytes.length; i++) {
@@ -734,7 +752,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public Double read(DataInputView inputView) throws IOException {
+    public Double read(DataInputView inputView, byte typeByte) throws IOException {
       int length = Bytes.SIZEOF_DOUBLE;
       byte[] rawBytes = new byte[length];
       for (int i  = 0; i < rawBytes.length; i++) {
@@ -791,7 +809,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public Short read(DataInputView inputView) throws IOException {
+    public Short read(DataInputView inputView, byte typeByte) throws IOException {
       int length = Bytes.SIZEOF_SHORT;
       byte[] rawBytes = new byte[length];
 
@@ -863,9 +881,14 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public BigDecimal read(DataInputView inputView) throws IOException {
-      // @TODO This will break as soon as BigDecimal gets real big, find a whether readInt needs to be used
-      int length = inputView.readShort();
+    public BigDecimal read(DataInputView inputView, byte typeByte) throws IOException {
+      int length;
+      // read length
+      if ((typeByte & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
+        length = inputView.readInt();
+      } else {
+        length = inputView.readShort();
+      }
       byte[] rawBytes = new byte[length];
       for (int i = 0; i < rawBytes.length; i++) {
         rawBytes[i] = inputView.readByte();
@@ -954,7 +977,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public LocalDate read(DataInputView inputView) throws IOException {
+    public LocalDate read(DataInputView inputView, byte typeByte) throws IOException {
       int length = DateTimeSerializer.SIZEOF_DATE;
       byte[] rawBytes = new byte[length];
 
@@ -1016,7 +1039,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public LocalTime read(DataInputView inputView) throws IOException {
+    public LocalTime read(DataInputView inputView, byte typeByte) throws IOException {
       int length = DateTimeSerializer.SIZEOF_TIME;
       byte[] rawBytes = new byte[length];
 
@@ -1078,7 +1101,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public LocalDateTime read(DataInputView inputView) throws IOException {
+    public LocalDateTime read(DataInputView inputView, byte typeByte) throws IOException {
       int length = DateTimeSerializer.SIZEOF_DATETIME;
       byte[] rawBytes = new byte[length];
 
@@ -1140,7 +1163,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public GradoopId read(DataInputView inputView) throws IOException {
+    public GradoopId read(DataInputView inputView, byte typeByte) throws IOException {
       int length = GradoopId.ID_SIZE;
       byte[] rawBytes = new byte[length];
 
@@ -1216,9 +1239,14 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public String read(DataInputView inputView) throws IOException {
-      // @TODO This will break as soon as String gets real big, find a way to determine whether readInt needs to be used
-      int length = inputView.readShort();
+    public String read(DataInputView inputView, byte typeByte) throws IOException {
+      int length;
+      // read length
+      if ((typeByte & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
+        length = inputView.readInt();
+      } else {
+        length = inputView.readShort();
+      }
       byte[] rawBytes = new byte[length];
       for (int i = 0; i < rawBytes.length; i++) {
         rawBytes[i] = inputView.readByte();
@@ -1272,7 +1300,7 @@ public interface PropertyValueStrategy<T> {
     }
 
     @Override
-    public Object read(DataInputView inputView) throws IOException {
+    public Object read(DataInputView inputView, byte typeByte) throws IOException {
       return null;
     }
 
