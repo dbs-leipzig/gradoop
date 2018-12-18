@@ -15,17 +15,16 @@
  */
 package org.gradoop.dataintegration.transformation;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.dataintegration.transformation.functions.CreateCartesianNeighborhoodEdges;
 import org.gradoop.dataintegration.transformation.functions.Neighborhood;
+import org.gradoop.dataintegration.transformation.functions.NeighborhoodVertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
+import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
 
 import java.util.List;
 
@@ -59,13 +58,13 @@ public class ConnectNeighbors implements UnaryGraphToGraphOperator {
   /**
    * The constructor to connect the neighbors of vertices with a certain label.
    *
-   * @param sourceVertexLabel The label of the vertices the neighborhood is connected.
-   * @param edgeDirection The edge direction to consider.
+   * @param sourceVertexLabel       The label of the vertices the neighborhood is connected.
+   * @param edgeDirection           The edge direction to consider.
    * @param neighborhoodVertexLabel The label of the neighboring vertices that should be connected.
-   * @param newEdgeLabel The label of the created edge between the neighbors.
+   * @param newEdgeLabel            The label of the created edge between the neighbors.
    */
   public ConnectNeighbors(String sourceVertexLabel, Neighborhood.EdgeDirection edgeDirection,
-                          String neighborhoodVertexLabel, String newEdgeLabel) {
+    String neighborhoodVertexLabel, String newEdgeLabel) {
     this.sourceVertexLabel = sourceVertexLabel;
     this.edgeDirection = edgeDirection;
     this.neighborhoodVertexLabel = neighborhoodVertexLabel;
@@ -81,70 +80,22 @@ public class ConnectNeighbors implements UnaryGraphToGraphOperator {
 
     // prepare the graph
     LogicalGraph reducedGraph = graph
-        .vertexInducedSubgraph(new LabelIsIn<>(sourceVertexLabel, neighborhoodVertexLabel));
+      .vertexInducedSubgraph(new LabelIsIn<>(sourceVertexLabel, neighborhoodVertexLabel));
 
     // determine the neighborhood by edge direction
-    DataSet<Tuple2<Vertex, List<Neighborhood.VertexPojo>>> neighborhood =
-        Neighborhood.getPerVertex(reducedGraph, verticesByLabel, edgeDirection);
+    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> neighborhood =
+      Neighborhood.getPerVertex(reducedGraph, verticesByLabel, edgeDirection);
 
     // calculate the new edges and add them to the original graph
-    if (neighborhood != null) {
-      DataSet<Edge> newEdges = neighborhood.flatMap(
-        new CreateCartesianNeighborhoodEdges(graph.getConfig().getEdgeFactory(), newEdgeLabel));
+    DataSet<Edge> newEdges = neighborhood.flatMap(
+      new CreateCartesianNeighborhoodEdges<>(graph.getConfig().getEdgeFactory(), newEdgeLabel));
 
-      return graph.getConfig().getLogicalGraphFactory()
-          .fromDataSets(
-              graph.getVertices(),
-              graph.getEdges().union(newEdges));
-    }
-    return null;
+    return graph.getConfig().getLogicalGraphFactory()
+      .fromDataSets(graph.getVertices(), graph.getEdges().union(newEdges));
   }
 
   @Override
   public String getName() {
-    return this.getClass().getName();
-  }
-
-  /**
-   * The {@link FlatMapFunction} creates all edges between neighbor vertices.
-   */
-  private static class CreateCartesianNeighborhoodEdges implements FlatMapFunction<Tuple2<Vertex,
-    List<Neighborhood.VertexPojo>>, Edge> {
-
-    /**
-     * The label of the created edge between the neighbors.
-     */
-    private final String newEdgeLabel;
-
-    /**
-     * The factory the edges are created with.
-     */
-    private final EdgeFactory factory;
-
-    /**
-     * The constructor to calculate the edges in the neighborhood.
-     *
-     * @param factory The factory the edges are created with.
-     * @param newEdgeLabel The label of the created edge between the neighbors.
-     */
-    CreateCartesianNeighborhoodEdges(EdgeFactory factory, String newEdgeLabel) {
-      this.newEdgeLabel = newEdgeLabel;
-      this.factory = factory;
-    }
-
-    @Override
-    public void flatMap(Tuple2<Vertex, List<Neighborhood.VertexPojo>> value, Collector<Edge> out) {
-      List<Neighborhood.VertexPojo> neighbors = value.f1;
-
-      // To "simulate" bidirectional edges we have to create an edge for each direction.
-      for (int i = 0; i < neighbors.size(); i++) {
-        for (int j = 0; j < neighbors.size(); j++) {
-          if (i != j) {
-            out.collect(factory.createEdge(newEdgeLabel, neighbors.get(i).getNeighborId(),
-              neighbors.get(j).getNeighborId()));
-          }
-        }
-      }
-    }
+    return ConnectNeighbors.class.getName();
   }
 }

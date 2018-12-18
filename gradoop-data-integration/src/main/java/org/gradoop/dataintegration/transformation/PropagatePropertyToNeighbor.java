@@ -15,24 +15,18 @@
  */
 package org.gradoop.dataintegration.transformation;
 
-import org.apache.flink.api.common.functions.CoGroupFunction;
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.dataintegration.transformation.functions.SetBasedLabelFilter;
+import org.gradoop.dataintegration.transformation.functions.AccumulatePropagatedValues;
+import org.gradoop.dataintegration.transformation.functions.BuildIdPropertyValuePairs;
+import org.gradoop.dataintegration.transformation.functions.BuildTargetVertexIdPropertyValuePairs;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -56,13 +50,13 @@ public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
   private final String targetVertexPropertyKey;
 
   /**
-   * Only edges with the inserted labels are used. If all labels  are sufficient use 'null'.
+   * Only edges with the inserted labels are used. If all labels are sufficient use {@code null}.
    */
-  private final Set<String> propagatingEdges;
+  private final Set<String> propagatingEdgeLabels;
 
   /**
    * Only vertices with the inserted labels will store the propagated values.
-   * If all vertices should do it use 'null'
+   * If all vertices should do it use {@code null}.
    */
   private final Set<String> targetVertexLabels;
 
@@ -70,6 +64,13 @@ public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
    * The constructor for the propagate property transformation. Additionally it is possible to
    * define which edge labels can be used for propagation and / or which vertices could be target
    * of the Properties.
+   * <p>
+   * Using this constructor, properties will be propagated along all edges and to all
+   * target vertices. {@link #PropagatePropertyToNeighbor(String, String, String, Set, Set)}
+   * can be used when properties should only be propagated along certain edges (selected by their
+   * label) and / or to certail vertices (selected by their label). Using this constructor is
+   * equivalent to {@code PropagatePropertyToNeighbor(vertexLabel, propertyKey,
+   * targetVertexPropertyKey, null, null)}.
    *
    * @param vertexLabel             The label of the vertex the property to propagate is part of.
    * @param propertyKey             The property key of the property to propagate.
@@ -90,10 +91,10 @@ public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
    * @param propertyKey             The property key of the property to propagate.
    * @param targetVertexPropertyKey The property key where the PropertyValue list should be stored
    *                                at the target vertices.
-   * @param propagatingEdges        only edges with the inserted labels are used. If all labels
-   *                                are sufficient use 'null'
-   * @param targetVertexLabels      only vertices with the inserted labels will store the propagated
-   *                                values. If all vertices should do it use 'null'
+   * @param propagatingEdges        Only edges with the inserted labels are used. If all labels
+   *                                are sufficient use {@code null}.
+   * @param targetVertexLabels      Only vertices with the inserted labels will store the
+   *                                propagated values. If all vertices should, use {@code null}.
    */
   public PropagatePropertyToNeighbor(String vertexLabel, String propertyKey,
                                      String targetVertexPropertyKey, Set<String> propagatingEdges,
@@ -101,7 +102,7 @@ public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
     this.vertexLabel = vertexLabel;
     this.propertyKey = propertyKey;
     this.targetVertexPropertyKey = targetVertexPropertyKey;
-    this.propagatingEdges = propagatingEdges;
+    this.propagatingEdgeLabels = propagatingEdges;
     this.targetVertexLabels = targetVertexLabels;
   }
 
@@ -109,138 +110,27 @@ public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
   public LogicalGraph execute(LogicalGraph graph) {
     // prepare the edge set, EdgeFilter if propagating edges are given
     DataSet<Edge> propagateAlong = graph.getEdges();
-    if (propagatingEdges != null) {
-      propagateAlong = propagateAlong.filter(new SetBasedLabelFilter<>(propagatingEdges));
+    if (propagatingEdgeLabels != null) {
+      propagateAlong = propagateAlong.filter(new LabelIsIn<>(propagatingEdgeLabels));
     }
 
     DataSet<Vertex> newVertices = graph.getVertices()
       // Extract properties to propagate
-      .flatMap(new BuildIdPropertyValuePairs(vertexLabel, propertyKey))
+      .flatMap(new BuildIdPropertyValuePairs<>(vertexLabel, propertyKey))
       // Propagate along edges.
       .join(propagateAlong)
       .where(0).equalTo(new SourceId<>())
-      .with(new BuildTargetVertexIdPropertyValuePairs())
+      .with(new BuildTargetVertexIdPropertyValuePairs<>())
       // Update target vertices.
       .coGroup(graph.getVertices())
       .where(0).equalTo(new Id<>())
-      .with(new AccumulatePropagatedValues(targetVertexPropertyKey, targetVertexLabels));
+      .with(new AccumulatePropagatedValues<>(targetVertexPropertyKey, targetVertexLabels));
 
-    return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, graph.getEdges());
+    return graph.getFactory().fromDataSets(newVertices, graph.getEdges());
   }
 
   @Override
   public String getName() {
     return PropagatePropertyToNeighbor.class.getName();
-  }
-
-
-  /**
-   * A simple {@link FlatMapFunction} that prepares Vertex data for further processing.
-   * Since not all vertices necessarily have the property a flat map is used.
-   */
-  private static class BuildIdPropertyValuePairs implements FlatMapFunction<Vertex,
-    Tuple2<GradoopId, PropertyValue>> {
-
-    /**
-     * The label of vertices from which to propagate the property.
-     */
-    private final String label;
-
-    /**
-     * The property key of the property to propagate.
-     */
-    private final String propertyKey;
-
-    /**
-     * The constructor of the {@link FlatMapFunction} to create {@link GradoopId} /
-     * {@link PropertyValue} pairs.
-     *
-     * @param label       The label of the vertices to propagate from.
-     * @param propertyKey The property key of the property to propagate.
-     */
-    BuildIdPropertyValuePairs(String label, String propertyKey) {
-      this.label = label;
-      this.propertyKey = propertyKey;
-    }
-
-    @Override
-    public void flatMap(Vertex v, Collector<Tuple2<GradoopId, PropertyValue>> out) {
-      if (!label.equals(v.getLabel())) {
-        return;
-      }
-      PropertyValue pv = v.getPropertyValue(propertyKey);
-      if (pv != null) {
-        out.collect(Tuple2.of(v.getId(), pv));
-      }
-    }
-  }
-
-  /**
-   * The {@link JoinFunction} builds new {@link GradoopId} / {@link PropertyValue} pairs.
-   * This function is used to propagate a property along an edge.
-   */
-  private static class BuildTargetVertexIdPropertyValuePairs
-    implements JoinFunction<Tuple2<GradoopId, PropertyValue>, Edge,
-    Tuple2<GradoopId, PropertyValue>> {
-
-    @Override
-    public Tuple2<GradoopId, PropertyValue> join(Tuple2<GradoopId, PropertyValue> t, Edge e) {
-      return Tuple2.of(e.getTargetId(), t.f1);
-    }
-  }
-
-  /**
-   * This {@link CoGroupFunction} accumulates all properties that might be send to a vertex and
-   * stores them in a {@link PropertyValue} list.
-   */
-  private static class AccumulatePropagatedValues
-    implements CoGroupFunction<Tuple2<GradoopId, PropertyValue>, Vertex, Vertex> {
-
-    /**
-     * The property key where the PropertyValue list should be stored at the target vertices.
-     */
-    private final String targetVertexPropertyKey;
-
-    /**
-     * Labels of vertices where the propagated property should be set.
-     */
-    private final Set<String> targetVertexLabels;
-
-    /**
-     * The constructor of the co group function for accumulation of collected property values.
-     *
-     * @param targetVertexPropertyKey The property key where the PropertyValue list should be
-     *                                stored at the target vertices.
-     * @param targetVertexLabels      The set of labels of vertices where the property should be
-     *                                set. (Use {@code null} for all vertices.)
-     */
-    AccumulatePropagatedValues(String targetVertexPropertyKey, Set<String> targetVertexLabels) {
-      this.targetVertexPropertyKey = targetVertexPropertyKey;
-      this.targetVertexLabels = targetVertexLabels;
-    }
-
-    @Override
-    public void coGroup(Iterable<Tuple2<GradoopId, PropertyValue>> propertyValues,
-      Iterable<Vertex> vertices, Collector<Vertex> out) {
-      // should only contain one vertex, based on the uniqueness of gradoop ids
-      Vertex targetVertex = vertices.iterator().next();
-      // Do not update vertices that don't have a certain label.
-      if (targetVertexLabels != null && !targetVertexLabels.contains(targetVertex.getLabel())) {
-        out.collect(targetVertex);
-        return;
-      }
-
-      // collect values of neighbors
-      List<PropertyValue> values = new ArrayList<>();
-      propertyValues.forEach(t -> values.add(t.f1));
-
-      // Add to vertex if and only if at least one property was propagated.
-      if (!values.isEmpty()) {
-        PropertyValue pv = PropertyValue.create(values);
-        targetVertex.setProperty(targetVertexPropertyKey, pv);
-      }
-
-      out.collect(targetVertex);
-    }
   }
 }

@@ -26,7 +26,7 @@ import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
+import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
 import org.junit.Assert;
 import org.junit.Test;
 

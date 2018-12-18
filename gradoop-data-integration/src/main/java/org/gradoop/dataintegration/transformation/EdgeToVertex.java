@@ -15,16 +15,13 @@
  */
 package org.gradoop.dataintegration.transformation;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.dataintegration.transformation.functions.CreateEdgesFromTriple;
+import org.gradoop.dataintegration.transformation.functions.CreateVertexFromEdges;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
@@ -37,7 +34,7 @@ import java.util.Objects;
  * The newly created edges and vertex labels are user-defined.
  * <p>
  * The original edges are still part of the resulting graph.
- * Use a @{@link org.apache.flink.api.common.functions.FilterFunction} on the original label to
+ * Use a {@link org.apache.flink.api.common.functions.FilterFunction} on the original label to
  * remove them.
  */
 public class EdgeToVertex implements UnaryGraphToGraphOperator {
@@ -72,18 +69,13 @@ public class EdgeToVertex implements UnaryGraphToGraphOperator {
    *                             created vertex.
    * @param edgeLabelNewToTarget The label of the newly created edge which starts at the newly
    *                             created vertex.
-   *
-   * @throws NullPointerException when at least on of the latter 3 arguments is {@code null}.
    */
   public EdgeToVertex(String edgeLabel, String newVertexLabel, String edgeLabelSourceToNew,
     String edgeLabelNewToTarget) {
-    Objects.requireNonNull(newVertexLabel);
-    Objects.requireNonNull(edgeLabelSourceToNew);
-    Objects.requireNonNull(edgeLabelNewToTarget);
     this.edgeLabel = edgeLabel;
-    this.newVertexLabel = newVertexLabel;
-    this.edgeLabelSourceToNew = edgeLabelSourceToNew;
-    this.edgeLabelNewToTarget = edgeLabelNewToTarget;
+    this.newVertexLabel = Objects.requireNonNull(newVertexLabel);
+    this.edgeLabelSourceToNew = Objects.requireNonNull(edgeLabelSourceToNew);
+    this.edgeLabelNewToTarget = Objects.requireNonNull(edgeLabelNewToTarget);
   }
 
   @Override
@@ -91,116 +83,24 @@ public class EdgeToVertex implements UnaryGraphToGraphOperator {
     DataSet<Edge> relevantEdges = graph.getEdgesByLabel(edgeLabel);
 
     // create new vertices
-    DataSet<Tuple3<Vertex, GradoopId, GradoopId>> newVerticesAndOriginIds =
-        relevantEdges
-            .map(new CreateVertexFromEdges(newVertexLabel, graph.getConfig().getVertexFactory()));
+    DataSet<Tuple3<Vertex, GradoopId, GradoopId>> newVerticesAndOriginIds = relevantEdges
+      .map(new CreateVertexFromEdges<>(newVertexLabel, graph.getFactory().getVertexFactory()));
 
-    DataSet<Vertex> newVertices =
-        newVerticesAndOriginIds
-            .map(new Value0Of3<>())
-            .union(graph.getVertices());
+    DataSet<Vertex> newVertices = newVerticesAndOriginIds
+      .map(new Value0Of3<>())
+      .union(graph.getVertices());
 
     // create edges to the newly created vertex
-    DataSet<Edge> newEdges =
-        newVerticesAndOriginIds
-            .flatMap(new CreateEdgesFromTriple(graph.getConfig().getEdgeFactory(),
-              edgeLabelSourceToNew, edgeLabelNewToTarget))
-            .union(graph.getEdges());
+    DataSet<Edge> newEdges = newVerticesAndOriginIds
+      .flatMap(new CreateEdgesFromTriple<>(graph.getFactory().getEdgeFactory(),
+        edgeLabelSourceToNew, edgeLabelNewToTarget))
+      .union(graph.getEdges());
 
-    return graph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(newVertices, newEdges);
+    return graph.getFactory().fromDataSets(newVertices, newEdges);
   }
 
   @Override
   public String getName() {
-    return this.getClass().getName();
-  }
-
-  /**
-   * A {@link MapFunction} that creates a new vertex based on the given edge. Furthermore it
-   * returns the source and target id of the edge for later use.
-   */
-  private static class CreateVertexFromEdges implements MapFunction<Edge, Tuple3<Vertex, GradoopId,
-    GradoopId>> {
-
-    /**
-     * The factory vertices are created with.
-     */
-    private final VertexFactory factory;
-
-    /**
-     * The label of the newly created vertex.
-     */
-    private final String newVertexLabel;
-
-    /**
-     * The constructor of the MapFunction.
-     *
-     * @param newVertexLabel The label of the newly created vertex.
-     * @param factory        The factory for creating new vertices.
-     */
-    CreateVertexFromEdges(String newVertexLabel, VertexFactory factory) {
-      this.factory = factory;
-      this.newVertexLabel = newVertexLabel;
-    }
-
-    @Override
-    public Tuple3<Vertex, GradoopId, GradoopId> map(Edge e) {
-      return Tuple3.of(
-          factory.createVertex(newVertexLabel, e.getProperties()),
-          e.getSourceId(),
-          e.getTargetId()
-      );
-    }
-  }
-
-  /**
-   * A {@link FlatMapFunction} to create two new edges per inserted edge.
-   * Source to new vertex, new vertex to target.
-   */
-  private static class CreateEdgesFromTriple implements FlatMapFunction<Tuple3<Vertex, GradoopId,
-    GradoopId>, Edge> {
-
-    /**
-     * The Factory which creates the new edges.
-     */
-    private final EdgeFactory edgeFactory;
-
-    /**
-     * The label of the newly created edge which points to the newly created vertex.
-     */
-    private final String edgeLabelSourceToNew;
-
-    /**
-     * The label of the newly created edge which starts at the newly created vertex.
-     */
-    private final String edgeLabelNewToTarget;
-
-    /**
-     * The constructor to create the new edges based on the given triple.
-     *
-     * @param factory              The Factory which creates the new edges.
-     * @param edgeLabelSourceToNew The label of the newly created edge which points to the newly
-     *                             created vertex.
-     * @param edgeLabelNewToTarget The label of the newly created edge which starts at the newly
-     *                             created vertex.
-     */
-    CreateEdgesFromTriple(EdgeFactory factory, String edgeLabelSourceToNew,
-                          String edgeLabelNewToTarget) {
-      this.edgeLabelSourceToNew = edgeLabelSourceToNew;
-      this.edgeLabelNewToTarget = edgeLabelNewToTarget;
-      this.edgeFactory = factory;
-    }
-
-    @Override
-    public void flatMap(Tuple3<Vertex, GradoopId, GradoopId> triple, Collector<Edge> out) {
-      Edge sourceToNewVertex = edgeFactory.createEdge(edgeLabelSourceToNew, triple.f1,
-        triple.f0.getId());
-      Edge newVertexToTarget = edgeFactory.createEdge(edgeLabelNewToTarget, triple.f0.getId(),
-        triple.f2);
-
-      out.collect(sourceToNewVertex);
-      out.collect(newVertexToTarget);
-    }
+    return EdgeToVertex.class.getName();
   }
 }

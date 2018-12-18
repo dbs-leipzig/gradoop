@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * This CoGroup operation creates a list of neighbors for each vertex.
  */
-public class CreateNeighborList implements CoGroupFunction<Edge, Vertex, Tuple2<Vertex, List<Neighborhood.VertexPojo>>> {
+public class CreateNeighborList implements CoGroupFunction<Edge, Vertex, Tuple2<Vertex, List<NeighborhoodVertex>>> {
 
   /**
    * The edge direction to consider.
@@ -47,15 +47,15 @@ public class CreateNeighborList implements CoGroupFunction<Edge, Vertex, Tuple2<
 
   @Override
   public void coGroup(Iterable<Edge> edges, Iterable<Vertex> vertex,
-                      Collector<Tuple2<Vertex, List<Neighborhood.VertexPojo>>> out) {
+                      Collector<Tuple2<Vertex, List<NeighborhoodVertex>>> out) {
     // should only contain one or no vertex
     Iterator<Vertex> vertexIter = vertex.iterator();
     if (vertexIter.hasNext()) {
       Vertex v = vertexIter.next();
 
-      List<Neighborhood.VertexPojo> neighbors = new ArrayList<>();
+      List<NeighborhoodVertex> neighbors = new ArrayList<>();
       for (Edge e : edges) {
-        neighbors.add(new Neighborhood.VertexPojo(getNeighborId(v, e), e.getId(), e.getLabel()));
+        neighbors.add(new NeighborhoodVertex(getNeighborId(v, e), e.getId(), e.getLabel()));
       }
 
       out.collect(Tuple2.of(v, neighbors));

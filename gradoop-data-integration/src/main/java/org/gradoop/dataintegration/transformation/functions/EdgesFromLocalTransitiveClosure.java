@@ -16,11 +16,15 @@
 package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
 
 import java.util.Iterator;
 import java.util.List;
@@ -31,9 +35,13 @@ import java.util.Objects;
  * vertex. For each transitive connection an edge is created containing the properties of the
  * central vertex and the labels of the first and second edge that need to be traversed for the
  * transitive connection.
+ *
+ * @param <V> The vertex type.
+ * @param <E> The edge type.
  */
-public class EdgesFromLocalTransitiveClosure implements CoGroupFunction<Tuple2<Vertex,
-  List<Neighborhood.VertexPojo>>, Tuple2<Vertex, List<Neighborhood.VertexPojo>>, Edge> {
+public class EdgesFromLocalTransitiveClosure<V extends EPGMVertex, E extends EPGMEdge> implements
+  CoGroupFunction<Tuple2<V, List<NeighborhoodVertex>>,
+    Tuple2<V, List<NeighborhoodVertex>>, E>, ResultTypeQueryable<E> {
 
   /**
    * The property key used to store the original vertex label on the new edge.
@@ -58,7 +66,12 @@ public class EdgesFromLocalTransitiveClosure implements CoGroupFunction<Tuple2<V
   /**
    * The EdgeFactory new edges are created with.
    */
-  private final EdgeFactory factory;
+  private final EPGMEdgeFactory<E> factory;
+
+  /**
+   * Reduce object instantiations.
+   */
+  private E reuse;
 
   /**
    * The constructor of the CoGroup function to created new edges based on transitivity.
@@ -66,41 +79,53 @@ public class EdgesFromLocalTransitiveClosure implements CoGroupFunction<Tuple2<V
    * @param newEdgeLabel The edge label of the newly created edge.
    * @param factory The {@link EdgeFactory} new edges are created with.
    */
-  public EdgesFromLocalTransitiveClosure(String newEdgeLabel, EdgeFactory factory) {
-    Objects.requireNonNull(newEdgeLabel);
-    Objects.requireNonNull(factory);
-    this.newEdgeLabel = newEdgeLabel;
-    this.factory = factory;
+  public EdgesFromLocalTransitiveClosure(String newEdgeLabel, EPGMEdgeFactory<E> factory) {
+    this.newEdgeLabel = Objects.requireNonNull(newEdgeLabel);
+    this.factory = Objects.requireNonNull(factory);
   }
 
   @Override
-  public void coGroup(Iterable<Tuple2<Vertex, List<Neighborhood.VertexPojo>>> incoming,
-                      Iterable<Tuple2<Vertex, List<Neighborhood.VertexPojo>>> outgoing,
-                      Collector<Edge> edges) {
+  public void coGroup(Iterable<Tuple2<V, List<NeighborhoodVertex>>> incoming,
+                      Iterable<Tuple2<V, List<NeighborhoodVertex>>> outgoing,
+                      Collector<E> edges) {
 
-    Iterator<Tuple2<Vertex, List<Neighborhood.VertexPojo>>> incIt = incoming.iterator();
-    Iterator<Tuple2<Vertex, List<Neighborhood.VertexPojo>>> outIt = outgoing.iterator();
+    Iterator<Tuple2<V, List<NeighborhoodVertex>>> incIt = incoming.iterator();
+    Iterator<Tuple2<V, List<NeighborhoodVertex>>> outIt = outgoing.iterator();
 
     if (incIt.hasNext() && outIt.hasNext()) {
       // each of the incoming and outgoing sets should be represented only once.
-      Tuple2<Vertex, List<Neighborhood.VertexPojo>> first = incIt.next();
-      Vertex centralVertex = first.f0;
-      List<Neighborhood.VertexPojo> in = first.f1;
-      List<Neighborhood.VertexPojo> out = outIt.next().f1;
+      Tuple2<V, List<NeighborhoodVertex>> first = incIt.next();
+      V centralVertex = first.f0;
+      List<NeighborhoodVertex> in = first.f1;
+      List<NeighborhoodVertex> out = outIt.next().f1;
+      if (in.isEmpty()) {
+        return;
+      }
+      if (reuse == null) {
+        // We just need some ID, it will be changed later.
+        GradoopId neighborId = in.get(0).getNeighborId();
+        reuse = factory.createEdge(newEdgeLabel, neighborId, neighborId);
+      }
+      reuse.setProperties(centralVertex.getProperties());
+      reuse.setProperty(ORIGINAL_VERTEX_LABEL, centralVertex.getLabel());
 
-      for (Neighborhood.VertexPojo source : in) {
-        for (Neighborhood.VertexPojo target: out) {
-          Edge newEdge = factory
-              .createEdge(newEdgeLabel, source.getNeighborId(), target.getNeighborId(),
-                  centralVertex.getProperties());
+      for (NeighborhoodVertex source : in) {
+        for (NeighborhoodVertex target : out) {
+          reuse.setId(GradoopId.get());
+          reuse.setSourceId(source.getNeighborId());
+          reuse.setTargetId(target.getNeighborId());
 
-          newEdge.setProperty(ORIGINAL_VERTEX_LABEL, centralVertex.getLabel());
-          newEdge.setProperty(FIRST_EDGE_LABEL, source.getConnectingEdgeLabel());
-          newEdge.setProperty(SECOND_EDGE_LABEL, target.getConnectingEdgeLabel());
+          reuse.setProperty(FIRST_EDGE_LABEL, source.getConnectingEdgeLabel());
+          reuse.setProperty(SECOND_EDGE_LABEL, target.getConnectingEdgeLabel());
 
-          edges.collect(newEdge);
+          edges.collect(reuse);
         }
       }
     }
+  }
+
+  @Override
+  public TypeInformation<E> getProducedType() {
+    return TypeInformation.of(factory.getType());
   }
 }
