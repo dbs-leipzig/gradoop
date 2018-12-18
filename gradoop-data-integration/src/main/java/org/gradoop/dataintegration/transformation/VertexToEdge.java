@@ -21,12 +21,13 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.dataintegration.transformation.functions.EdgesFromLocalTransitiveClosure;
 import org.gradoop.dataintegration.transformation.functions.Neighborhood;
+import org.gradoop.dataintegration.transformation.functions.NeighborhoodVertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.neighborhood.keyselector.IdInTuple;
 
 import java.util.List;
-
+import java.util.Objects;
 
 /**
  * For a given vertex label this graph transformation takes all neighbours per vertex with this
@@ -36,8 +37,8 @@ import java.util.List;
  * transitive closure and the former properties of the vertex. <br><br>
  * <p>
  * Each edge that has to be created results from a path in the graph of the following form: <br>
- * v_i --e_i,j--> v_j --e_j,k--> v_k <br>
- * The newly created edge goes from: v_i --e_i,k--> v_k <br>
+ * {@code v_i --e_i,j--> v_j --e_j,k--> v_k} <br>
+ * The newly created edge goes from: {@code v_i --e_i,k--> v_k} <br>
  * The edge {@code e_i,k} has a user-defined label and besides the original vertex properties three
  * additional properties:
  * <ul>
@@ -65,40 +66,36 @@ public class VertexToEdge implements UnaryGraphToGraphOperator {
    * @param newEdgeLabel The edge label for new edges.
    */
   public VertexToEdge(String centralVertexLabel, String newEdgeLabel) {
-    this.centralVertexLabel = centralVertexLabel;
-    this.newEdgeLabel = newEdgeLabel;
+    this.centralVertexLabel = Objects.requireNonNull(centralVertexLabel);
+    this.newEdgeLabel = Objects.requireNonNull(newEdgeLabel);
   }
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    DataSet<Tuple2<Vertex, List<Neighborhood.VertexPojo>>> incomingNeighborhood = Neighborhood
-        .getPerVertex(graph,
-          graph.getVerticesByLabel(centralVertexLabel),
-          Neighborhood.EdgeDirection.INCOMING);
+    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> incomingNeighborhood = Neighborhood
+      .getPerVertex(graph, graph.getVerticesByLabel(centralVertexLabel),
+        Neighborhood.EdgeDirection.INCOMING);
 
-    DataSet<Tuple2<Vertex, List<Neighborhood.VertexPojo>>> outgoingNeighborhood = Neighborhood
-        .getPerVertex(graph,
-          graph.getVerticesByLabel(centralVertexLabel),
-          Neighborhood.EdgeDirection.OUTGOING);
+    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> outgoingNeighborhood = Neighborhood
+      .getPerVertex(graph, graph.getVerticesByLabel(centralVertexLabel),
+        Neighborhood.EdgeDirection.OUTGOING);
 
     if (incomingNeighborhood == null || outgoingNeighborhood == null) {
       throw new IllegalStateException("At least one calculated neighborhood was null.");
     }
 
     DataSet<Edge> newEdges = incomingNeighborhood
-        .coGroup(outgoingNeighborhood)
-        .where(new IdInTuple<>(0))
-        .equalTo(new IdInTuple<>(0))
-        .with(new EdgesFromLocalTransitiveClosure(newEdgeLabel,
-          graph.getConfig().getEdgeFactory()));
+      .coGroup(outgoingNeighborhood)
+      .where(new IdInTuple<>(0))
+      .equalTo(new IdInTuple<>(0))
+      .with(new EdgesFromLocalTransitiveClosure<>(newEdgeLabel,
+        graph.getFactory().getEdgeFactory()));
 
-    return graph.getConfig().getLogicalGraphFactory()
-        .fromDataSets(graph.getVertices(),
-          graph.getEdges().union(newEdges));
+    return graph.getFactory().fromDataSets(graph.getVertices(), graph.getEdges().union(newEdges));
   }
 
   @Override
   public String getName() {
-    return this.getClass().getName();
+    return VertexToEdge.class.getName();
   }
 }

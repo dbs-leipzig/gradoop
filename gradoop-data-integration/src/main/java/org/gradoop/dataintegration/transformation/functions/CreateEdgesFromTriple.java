@@ -25,6 +25,8 @@ import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 
+import java.util.Objects;
+
 /**
  * A {@link FlatMapFunction} to create two new edges per inserted edge.
  * Source to new vertex, new vertex to target.
@@ -66,9 +68,9 @@ public class CreateEdgesFromTriple<V extends EPGMVertex, E extends EPGMEdge>
    */
   public CreateEdgesFromTriple(EPGMEdgeFactory<E> factory, String edgeLabelSourceToNew,
     String edgeLabelNewToTarget) {
-    this.edgeLabelSourceToNew = edgeLabelSourceToNew;
-    this.edgeLabelNewToTarget = edgeLabelNewToTarget;
-    this.edgeFactory = factory;
+    this.edgeFactory = Objects.requireNonNull(factory);
+    this.edgeLabelSourceToNew = Objects.requireNonNull(edgeLabelSourceToNew);
+    this.edgeLabelNewToTarget = Objects.requireNonNull(edgeLabelNewToTarget);
   }
 
   @Override

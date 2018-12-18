@@ -21,9 +21,10 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.dataintegration.transformation.functions.CreateCartesianNeighborhoodEdges;
 import org.gradoop.dataintegration.transformation.functions.Neighborhood;
+import org.gradoop.dataintegration.transformation.functions.NeighborhoodVertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
+import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
 
 import java.util.List;
 
@@ -82,7 +83,7 @@ public class ConnectNeighbors implements UnaryGraphToGraphOperator {
       .vertexInducedSubgraph(new LabelIsIn<>(sourceVertexLabel, neighborhoodVertexLabel));
 
     // determine the neighborhood by edge direction
-    DataSet<Tuple2<Vertex, List<Neighborhood.VertexPojo>>> neighborhood =
+    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> neighborhood =
       Neighborhood.getPerVertex(reducedGraph, verticesByLabel, edgeDirection);
 
     // calculate the new edges and add them to the original graph

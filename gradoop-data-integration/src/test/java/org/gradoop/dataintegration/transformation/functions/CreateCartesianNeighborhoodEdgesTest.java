@@ -70,7 +70,7 @@ public class CreateCartesianNeighborhoodEdgesTest extends GradoopFlinkTestBase {
   @Test
   public void testWithEmptyNeighborhood() throws Exception {
     Vertex someVertex = vertexFactory.createVertex();
-    Tuple2<Vertex, List<Neighborhood.VertexPojo>> inputEmpty = new Tuple2<>(someVertex,
+    Tuple2<Vertex, List<NeighborhoodVertex>> inputEmpty = new Tuple2<>(someVertex,
       Collections.emptyList());
     List<Edge> result = getExecutionEnvironment().fromElements(inputEmpty)
       .flatMap(toTest).collect();
@@ -88,10 +88,10 @@ public class CreateCartesianNeighborhoodEdgesTest extends GradoopFlinkTestBase {
     final int count = 10;
     List<GradoopId> ids = Stream.generate(GradoopId::get).limit(count).collect(Collectors.toList());
     // Create some dummy neighborhood vertex pojos.
-    List<Neighborhood.VertexPojo> vertexPojos = ids.stream()
-      .map(id -> new Neighborhood.VertexPojo(id, someVertex.getId(), ""))
+    List<NeighborhoodVertex> vertexPojos = ids.stream()
+      .map(id -> new NeighborhoodVertex(id, someVertex.getId(), ""))
       .collect(Collectors.toList());
-    Tuple2<Vertex, List<Neighborhood.VertexPojo>> inputNonEmpty = new Tuple2<>(someVertex,
+    Tuple2<Vertex, List<NeighborhoodVertex>> inputNonEmpty = new Tuple2<>(someVertex,
       vertexPojos);
     List<Edge> result = getExecutionEnvironment().fromElements(inputNonEmpty)
       .flatMap(toTest).collect();

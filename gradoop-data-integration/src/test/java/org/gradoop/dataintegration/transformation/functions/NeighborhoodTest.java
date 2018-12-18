@@ -99,7 +99,7 @@ public class NeighborhoodTest extends GradoopFlinkTestBase {
     Collection<Vertex> neighborhoodVertices = loader.getVerticesByGraphVariables(neighborhood);
     DataSet<Vertex> centers = center == null ? getEmptyDataSet(new Vertex()) :
       getExecutionEnvironment().fromElements(center);
-    List<Tuple2<Vertex, List<Neighborhood.VertexPojo>>> neighborhoods =
+    List<Tuple2<Vertex, List<NeighborhoodVertex>>> neighborhoods =
       Neighborhood.getPerVertex(input, centers, direction).collect();
     // Make sure we only have 1 center vertex.
     long centerCount = neighborhoods.stream().map(h -> h.f0.getId()).distinct().count();
@@ -107,7 +107,7 @@ public class NeighborhoodTest extends GradoopFlinkTestBase {
 
     // Get all neighbor ids of that vertex.
     Object[] neighbors = neighborhoods.stream().flatMap(h -> h.f1.stream())
-      .map(Neighborhood.VertexPojo::getNeighborId)
+      .map(NeighborhoodVertex::getNeighborId)
       .sorted()
       .toArray();
     Object[] neighborIdsExpected = neighborhoodVertices.stream().map(Vertex::getId).sorted()

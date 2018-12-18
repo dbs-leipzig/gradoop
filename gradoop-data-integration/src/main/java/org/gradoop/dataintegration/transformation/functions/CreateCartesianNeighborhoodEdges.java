@@ -38,7 +38,7 @@ import java.util.Objects;
  */
 @FunctionAnnotation.ReadFields({"f1"})
 public class CreateCartesianNeighborhoodEdges<V extends EPGMVertex, E extends EPGMEdge> implements
-  FlatMapFunction<Tuple2<V, List<Neighborhood.VertexPojo>>, E>, ResultTypeQueryable<E> {
+  FlatMapFunction<Tuple2<V, List<NeighborhoodVertex>>, E>, ResultTypeQueryable<E> {
 
   /**
    * The label of the created edge between the neighbors.
@@ -67,8 +67,8 @@ public class CreateCartesianNeighborhoodEdges<V extends EPGMVertex, E extends EP
   }
 
   @Override
-  public void flatMap(Tuple2<V, List<Neighborhood.VertexPojo>> value, Collector<E> out) {
-    final List<Neighborhood.VertexPojo> neighbors = value.f1;
+  public void flatMap(Tuple2<V, List<NeighborhoodVertex>> value, Collector<E> out) {
+    final List<NeighborhoodVertex> neighbors = value.f1;
     // Initialize the reuse edge here first (when needed). The label is the same for every edge.
     if (!neighbors.isEmpty() && resultEdge == null) {
       resultEdge = factory.createEdge(newEdgeLabel, neighbors.get(0).getNeighborId(),
@@ -76,10 +76,10 @@ public class CreateCartesianNeighborhoodEdges<V extends EPGMVertex, E extends EP
     }
 
     // To "simulate" bidirectional edges we have to create an edge for each direction.
-    for (Neighborhood.VertexPojo source : neighbors) {
+    for (NeighborhoodVertex source : neighbors) {
       // The source id is the same for the inner loop, we can keep it.
       resultEdge.setSourceId(source.getNeighborId());
-      for (Neighborhood.VertexPojo target : neighbors) {
+      for (NeighborhoodVertex target : neighbors) {
         if (source == target) {
           continue;
         }

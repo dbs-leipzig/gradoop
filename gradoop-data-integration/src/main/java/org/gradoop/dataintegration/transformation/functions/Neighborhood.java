@@ -17,7 +17,6 @@ package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -44,13 +43,13 @@ public class Neighborhood {
    * @return A Dataset of tuples containing vertices and their neighborhood.
    * @throws NullPointerException if any of the parameters is null.
    */
-  public static DataSet<Tuple2<Vertex, List<VertexPojo>>> getPerVertex(LogicalGraph graph,
+  public static DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> getPerVertex(LogicalGraph graph,
                  DataSet<Vertex> centralVertices, EdgeDirection edgeDirection) {
     Objects.requireNonNull(graph);
     Objects.requireNonNull(centralVertices);
     Objects.requireNonNull(edgeDirection);
-    DataSet<Tuple2<Vertex, List<VertexPojo>>> incoming = null;
-    DataSet<Tuple2<Vertex, List<VertexPojo>>> outgoing = null;
+    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> incoming = null;
+    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> outgoing = null;
 
     // get incoming
     if (edgeDirection.equals(EdgeDirection.INCOMING) ||
@@ -76,70 +75,6 @@ public class Neighborhood {
       return incoming.union(outgoing);
     }
     return edgeDirection.equals(EdgeDirection.INCOMING) ? incoming : outgoing;
-  }
-
-  /**
-   * A simple neighbor vertex pojo which contains information about the Id, the connecting edge id
-   * and label.
-   */
-  public static class VertexPojo {
-    /**
-     * The {@link GradoopId} of the neighbor vertex.
-     */
-    private final GradoopId neighborId;
-
-    /**
-     * The {@link GradoopId} of the edge which connects the original vertex and the neighbor.
-     */
-    private final GradoopId connectingEdgeId;
-
-    /**
-     * The edge label of the edge which connects the original vertex and the neighbor.
-     */
-    private final String connectingEdgeLabel;
-
-    /**
-     * A constructor for the Pojo that contains information of a neighbor vertex.
-     *
-     * @param neighborId The {@link GradoopId} of the neighbor vertex.
-     * @param connectingEdgeId The {@link GradoopId} of the edge which connects the original
-     *                         vertex and the neighbor.
-     * @param connectingEdgeLabel The edge label of the edge which connects the original vertex and
-     *                            the neighbor.
-     */
-    public VertexPojo(GradoopId neighborId, GradoopId connectingEdgeId,
-                      String connectingEdgeLabel) {
-      this.neighborId = neighborId;
-      this.connectingEdgeId = connectingEdgeId;
-      this.connectingEdgeLabel = connectingEdgeLabel;
-    }
-
-    /**
-     * Get the {@link GradoopId} of the neighbor vertex.
-     *
-     * @return GradoopId of the Neighbor.
-     */
-    public GradoopId getNeighborId() {
-      return neighborId;
-    }
-
-    /**
-     * Get the {@link GradoopId} of the edge which connects the original vertex and the neighbor.
-     *
-     * @return GradoopId of the connecting edge.
-     */
-    public GradoopId getConnectingEdgeId() {
-      return connectingEdgeId;
-    }
-
-    /**
-     * Get the edge label of the edge which connects the original vertex and the neighbor.
-     *
-     * @return The edge label of the connecting edge.
-     */
-    public String getConnectingEdgeLabel() {
-      return connectingEdgeLabel;
-    }
   }
 
   /**
