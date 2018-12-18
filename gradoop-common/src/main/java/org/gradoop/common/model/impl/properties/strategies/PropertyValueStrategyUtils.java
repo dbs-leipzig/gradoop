@@ -1,4 +1,4 @@
-package org.gradoop.common.model.impl.properties;
+package org.gradoop.common.model.impl.properties.strategies;
 
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import java.math.BigDecimal;
