@@ -2,7 +2,6 @@ package org.gradoop.common.model.impl.properties.strategies;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -75,7 +74,7 @@ public class PropertyValueStrategyFactory {
     if (value != null) {
       return get(value.getClass()).getRawBytes(value);
     }
-    return new byte[0];
+    return new byte[]{0};
   }
 
   public static PropertyValueStrategy get(byte value) {
