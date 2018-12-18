@@ -1292,6 +1292,20 @@ public class PropertyValueTest {
   }
 
   @Test
+  public void testReadAndWriteLargeString() throws Exception {
+    PropertyValue p = create(new String(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD]));
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
+  }
+
+  @Test
+  public void testReadAndWriteLargeBigDecimal() throws Exception {
+    byte [] bigEndian = new byte[Short.MAX_VALUE + 10];
+    Arrays.fill(bigEndian, (byte) 121);
+    PropertyValue p = create(new BigDecimal(new BigInteger(bigEndian)));
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
+  }
+
+  @Test
   public void testGetType() {
     PropertyValue p = create(NULL_VAL_0);
     assertNull(p.getType());

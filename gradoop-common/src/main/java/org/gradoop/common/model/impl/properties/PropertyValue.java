@@ -792,7 +792,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     if (strategy == null) {
       value = null;
     } else {
-      value = strategy.read(inputView);
+      value = strategy.read(inputView, typeByte);
     }
 
     if (value == null) {
