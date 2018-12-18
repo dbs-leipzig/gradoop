@@ -1,0 +1,73 @@
+package org.gradoop.common.model.impl.properties.strategies;
+
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.hadoop.hbase.util.Bytes;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
+
+import java.io.IOException;
+import java.util.Arrays;
+
+public class GradoopIdStrategy implements PropertyValueStrategy<GradoopId> {
+
+  @Override
+  public boolean write(GradoopId value, DataOutputView outputView) throws IOException {
+    outputView.write(getRawBytes(value));
+    return true;
+  }
+
+  @Override
+  public GradoopId read(DataInputView inputView, byte typeByte) throws IOException {
+    int length = GradoopId.ID_SIZE;
+    byte[] rawBytes = new byte[length];
+
+    for (int i = 0; i < rawBytes.length; i++) {
+      rawBytes[i] = inputView.readByte();
+    }
+
+    return GradoopId.fromByteArray(rawBytes);
+  }
+
+  @Override
+  public int compare(GradoopId value, Object other) {
+    if (other instanceof GradoopId) {
+      return value.compareTo((GradoopId) other);
+    }
+    throw new IllegalArgumentException(String.format(
+      "Incompatible types: %s, %s", value.getClass(), other.getClass()));
+  }
+
+  @Override
+  public boolean is(Object value) {
+    return value instanceof GradoopId;
+  }
+
+  @Override
+  public Class<GradoopId> getType() {
+    return GradoopId.class;
+  }
+
+  @Override
+  public GradoopId get(byte[] bytes) {
+    return GradoopId.fromByteArray(
+      Arrays.copyOfRange(
+        bytes, PropertyValue.OFFSET, GradoopId.ID_SIZE + PropertyValue.OFFSET
+      ));
+  }
+
+  @Override
+  public Byte getRawType() {
+    return PropertyValue.TYPE_GRADOOP_ID;
+  }
+
+  @Override
+  public byte[] getRawBytes(GradoopId value) {
+    byte[] valueBytes = value.toByteArray();
+    byte[] rawBytes = new byte[PropertyValue.OFFSET + GradoopId.ID_SIZE];
+    rawBytes[0] = getRawType();
+    Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);
+    return rawBytes;
+  }
+}

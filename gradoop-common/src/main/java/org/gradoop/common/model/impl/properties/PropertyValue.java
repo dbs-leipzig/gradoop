@@ -23,7 +23,9 @@ import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.flink.types.Value;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
+import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.strategies.PropertyValueStrategyFactory;
 import org.gradoop.common.util.GradoopConstants;
 
 import java.io.*;
@@ -206,7 +208,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   //----------------------------------------------------------------------------
 
   public boolean is(Class c) {
-    return PropertyValueStrategy.PropertyValueStrategyFactory.get(c).is(value);
+    return PropertyValueStrategyFactory.get(c).is(value);
   }
 
   /**
@@ -362,11 +364,11 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return value
    */
   public <T> T get(Class<T> c) {
-    PropertyValueStrategy strategy = PropertyValueStrategy.PropertyValueStrategyFactory.get(c);
+    PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(c);
     if (strategy.is(value)) {
       return (T) value;
     }
-    byte[] bytes = PropertyValueStrategy.PropertyValueStrategyFactory.getRawBytes(value);
+    byte[] bytes = PropertyValueStrategyFactory.getRawBytes(value);
     return (T) strategy.get(bytes);
   }
 
@@ -526,7 +528,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     if (value == null || !is(value.getClass())) {
       legacyPropertyValue.setObject(value);
     } else {
-      byte[] rawBytes = PropertyValueStrategy.PropertyValueStrategyFactory.getRawBytes(value);
+      byte[] rawBytes = PropertyValueStrategyFactory.getRawBytes(value);
       legacyPropertyValue.setBytes(rawBytes);
     }
   }
@@ -669,7 +671,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public Class<?> getType() {
     Class<?> c = null;
     if (value != null) {
-      c = PropertyValueStrategy.PropertyValueStrategyFactory.get(value.getClass()).getType();
+      c = PropertyValueStrategyFactory.get(value.getClass()).getType();
     }
 
     if (c == null) {
@@ -687,7 +689,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public byte[] getRawBytes() {
     byte[] rawBytes = null;
     if (value != null) {
-      rawBytes = PropertyValueStrategy.PropertyValueStrategyFactory.getRawBytes(value);
+      rawBytes = PropertyValueStrategyFactory.getRawBytes(value);
     }
     if (rawBytes == null) {
       rawBytes = legacyPropertyValue.getRawBytes();
@@ -701,7 +703,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   @SuppressWarnings("EI_EXPOSE_REP")
   public void setBytes(byte[] bytes) {
-    value = PropertyValueStrategy.PropertyValueStrategyFactory.fromRawBytes(bytes);
+    value = PropertyValueStrategyFactory.fromRawBytes(bytes);
     legacyPropertyValue.setBytes(bytes);
   }
 
@@ -714,7 +716,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public int hashCode() {
     byte[] rawBytes = null;
     if (value != null) {
-      rawBytes = PropertyValueStrategy.PropertyValueStrategyFactory.getRawBytes(value);
+      rawBytes = PropertyValueStrategyFactory.getRawBytes(value);
     }
     return rawBytes == null ? legacyPropertyValue.hashCode() : Arrays.hashCode(rawBytes);
   }
@@ -725,7 +727,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     if (value == null || !is(value.getClass())) {
       compare = legacyPropertyValue.compareTo(o);
     } else {
-      compare = PropertyValueStrategy.PropertyValueStrategyFactory.compare(value, o.value);
+      compare = PropertyValueStrategyFactory.compare(value, o.value);
     }
     return compare;
   }
@@ -737,7 +739,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public int byteSize() {
       byte[] rawBytes = null;
       if (value != null) {
-          rawBytes = PropertyValueStrategy.PropertyValueStrategyFactory.getRawBytes(value);
+          rawBytes = PropertyValueStrategyFactory.getRawBytes(value);
       }
       return rawBytes == null ? legacyPropertyValue.byteSize() : rawBytes.length;
   }
@@ -770,7 +772,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   @Override
   public void write(DataOutputView outputView) throws IOException {
-    if ( !PropertyValueStrategy.PropertyValueStrategyFactory.get(value).write(value, outputView) ) {
+    if ( !PropertyValueStrategyFactory.get(value).write(value, outputView) ) {
 
       // null?
       // Write type.
@@ -787,7 +789,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     // Apply bitmask to get the actual type.
     byte type = (byte) (~PropertyValue.FLAG_LARGE & typeByte);
 
-    PropertyValueStrategy strategy = PropertyValueStrategy.PropertyValueStrategyFactory.get(type);
+    PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(type);
 
     if (strategy == null) {
       value = null;
