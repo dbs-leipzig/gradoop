@@ -61,7 +61,7 @@ public class GraphHeadTableInputFormat extends BaseTableInputFormat<GraphHead> {
     scan.setCaching(EPGMGraphOutput.DEFAULT_CACHE_SIZE);
 
     if (graphHeadHandler.getQuery() != null) {
-      attachFilter(graphHeadHandler.getQuery(), scan);
+      attachFilter(graphHeadHandler.getQuery(), scan, graphHeadHandler.isSpreadingByteUsed());
     }
 
     return scan;

@@ -28,7 +28,10 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-  HBaseGraphStoreTest.class,
+  HBaseEPGMStoreTest.class,
+  HBaseDefaultGraphStoreTest.class,
+  HBaseSplitRegionGraphStoreTest.class,
+  HBaseSpreadingByteGraphStoreTest.class,
   HBaseDataSinkSourceTest.class
 })
 public class HBaseTestSuite {
