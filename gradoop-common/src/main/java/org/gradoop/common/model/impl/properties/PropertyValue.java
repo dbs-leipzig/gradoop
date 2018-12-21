@@ -42,16 +42,10 @@ import java.util.Set;
  * A property value wraps a value that implements a supported data type.
  */
 public class PropertyValue implements Value, Serializable, Comparable<PropertyValue> {
-
   /**
    * Represents a property value that is {@code null}.
    */
   public static final PropertyValue NULL_VALUE = PropertyValue.create(null);
-
-  /**
-   * {@code <property-type>} for empty property value (i.e. {@code null})
-   */
-  static final transient byte TYPE_NULL         = 0x00;
   /**
    * {@code <property-type>} for {@link java.lang.Boolean}
    */
@@ -112,7 +106,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * {@code <property-type>} for {@link java.util.Set}
    */
   public static final transient byte TYPE_SET          = 0x0f;
-
   /**
    * Value offset in byte
    */
@@ -133,6 +126,11 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @see #write(DataOutputView)
    */
   public static final transient int LARGE_PROPERTY_THRESHOLD = Short.MAX_VALUE;
+
+  /**
+   * {@code <property-type>} for empty property value (i.e. {@code null})
+   */
+  static final transient byte TYPE_NULL         = 0x00;
 
   /**
    * Class version for serialization.
@@ -206,6 +204,13 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   // Type checking
   //----------------------------------------------------------------------------
 
+  /**
+   * Checks if the field {@code value} is of the same type as the provided class.
+   *
+   * @param c class to check against.
+   * @return true if the attribute {@code value} is an object of the provided class, false
+   * otherwise.
+   */
   public boolean is(Class c) {
     return PropertyValueStrategyFactory.get(c).is(value);
   }
@@ -463,7 +468,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    *
    * @return {@code Map<PropertyValue, PropertyValue>} value
    */
-  public Map getMap() {
+  public Map<PropertyValue, PropertyValue> getMap() {
     return get(Map.class);
   }
 
@@ -472,7 +477,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    *
    * @return {@code List<PropertyValue>} value
    */
-  public List getList() {
+  public List<PropertyValue> getList() {
     return get(List.class);
   }
   /**
@@ -504,7 +509,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    *
    * @return {@code Set<PropertyValue>} value
    */
-  public Set getSet() {
+  public Set<PropertyValue> getSet() {
     return get(Set.class);
   }
 
@@ -689,7 +694,8 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
 
   @Override
   public boolean equals(Object o) {
-    return o == null || (o instanceof PropertyValue && Objects.equals(value, ((PropertyValue)o).value));
+    return o == null ||
+      (o instanceof PropertyValue && Objects.equals(value, ((PropertyValue) o).value));
   }
 
   @Override

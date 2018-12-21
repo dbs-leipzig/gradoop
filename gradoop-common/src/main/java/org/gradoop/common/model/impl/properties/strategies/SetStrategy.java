@@ -1,3 +1,18 @@
+/*
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.common.model.impl.properties.strategies;
 
 import org.apache.flink.core.memory.DataInputView;
@@ -8,10 +23,18 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Strategy class for handling {@code PropertyValue} operations with a value of the type
+ * {@code Set}.
+ */
 public class SetStrategy implements PropertyValueStrategy<Set> {
 
   @Override
@@ -46,7 +69,11 @@ public class SetStrategy implements PropertyValueStrategy<Set> {
     // init new array
     byte[] rawBytes = new byte[length];
 
-    inputView.read(rawBytes);
+    int bytesRead = inputView.read(rawBytes);
+
+    if (bytesRead != length) {
+      throw new RuntimeException("Error reading input view.");
+    }
 
     PropertyValue entry;
 
@@ -120,7 +147,8 @@ public class SetStrategy implements PropertyValueStrategy<Set> {
   public byte[] getRawBytes(Set value) {
     Set<PropertyValue> set = value;
 
-    int size = set.stream().mapToInt(PropertyValue::byteSize).sum() + PropertyValue.OFFSET + Bytes.SIZEOF_SHORT;
+    int size = set.stream().mapToInt(PropertyValue::byteSize)
+      .sum() + PropertyValue.OFFSET + Bytes.SIZEOF_SHORT;
 
     ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
     DataOutputStream outputStream = new DataOutputStream(byteStream);

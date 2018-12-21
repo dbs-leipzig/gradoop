@@ -1,10 +1,29 @@
+/*
+ * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.common.model.impl.properties.strategies;
 
 import org.gradoop.common.exceptions.UnsupportedTypeException;
+
 import java.math.BigDecimal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Utility class which mainly handles comparing any values of the type {@code Numerical}.
+ */
 class PropertyValueStrategyUtils {
 
   /**
@@ -32,6 +51,14 @@ class PropertyValueStrategyUtils {
    */
   private static final int BIG_DECIMAL = 5;
 
+  /**
+   * Compare two numerical values.
+   *
+   * @param aValue first value
+   * @param bValue second value
+   * @return a negative integer, zero, or a positive integer as aValue is less than, equal to, or
+   * greater than bValue.
+   */
   static int compareNumerical(Number aValue, Number bValue) {
 
     int aType = getType(aValue);
@@ -46,7 +73,7 @@ class PropertyValueStrategyUtils {
     if (maxType == SHORT) {
       result = Short.compare(aValue.shortValue(), bValue.shortValue());
 
-    } else if (maxType == INT)  {
+    } else if (maxType == INT) {
       int a;
       int b;
 
@@ -111,9 +138,9 @@ class PropertyValueStrategyUtils {
         b = (BigDecimal) bValue;
       } else {
         a = aType == BIG_DECIMAL ? (BigDecimal) aValue :
-          bigDecimalValue(aValue, aType);
+        bigDecimalValue(aValue, aType);
         b = bType == BIG_DECIMAL ? (BigDecimal) bValue :
-          bigDecimalValue(bValue, bType);
+        bigDecimalValue(bValue, bType);
       }
 
       result = a.compareTo(b);
@@ -122,6 +149,12 @@ class PropertyValueStrategyUtils {
     return result;
   }
 
+  /**
+   * Gets the number type of the provided object.
+   *
+   * @param value some number object.
+   * @return integer representation of the objects data type.
+   */
   private static int getType(Number value) {
     checkNotNull(value);
 
@@ -150,8 +183,7 @@ class PropertyValueStrategyUtils {
    * Converts a value of a lower domain numerical type to BigDecimal.
    *
    * @param value value
-   * @param type type
-   *
+   * @param type  type
    * @return converted value
    */
   private static BigDecimal bigDecimalValue(Number value, int type) {
@@ -173,8 +205,7 @@ class PropertyValueStrategyUtils {
    * Converts a value of a lower domain numerical type to Double.
    *
    * @param value value
-   * @param type type
-   *
+   * @param type  type
    * @return converted value
    */
   private static double doubleValue(Number value, int type) {
@@ -194,8 +225,7 @@ class PropertyValueStrategyUtils {
    * Converts a value of a lower domain numerical type to Long.
    *
    * @param value value
-   * @param type type
-   *
+   * @param type  type
    * @return converted value
    */
   private static long longValue(Number value, int type) {
@@ -209,8 +239,7 @@ class PropertyValueStrategyUtils {
    * Converts a value of a lower domain numerical type to Float.
    *
    * @param value value
-   * @param type type
-   *
+   * @param type  type
    * @return converted value
    */
   private static float floatValue(Number value, int type) {
