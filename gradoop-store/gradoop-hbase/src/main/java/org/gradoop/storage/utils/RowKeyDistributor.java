@@ -47,7 +47,7 @@ public class RowKeyDistributor {
   private byte maxPrefix;
 
   /**
-   * The next prefix
+   * The next prefix byte (initialized with 0)
    */
   private byte nextPrefix;
 
@@ -57,7 +57,6 @@ public class RowKeyDistributor {
    */
   private RowKeyDistributor() {
     this.maxPrefix = DEFAULT_MAX_PREFIX;
-    this.nextPrefix = 0;
     this.prefixes = new byte[Byte.MAX_VALUE][];
     for (byte i = 0; i < Byte.MAX_VALUE; i++) {
       prefixes[i] = new byte[] {i};
