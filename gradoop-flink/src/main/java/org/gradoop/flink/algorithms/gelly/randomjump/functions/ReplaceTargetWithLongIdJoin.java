@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci;
+package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 @FunctionAnnotation.ForwardedFieldsFirst("f0;f2")
 @FunctionAnnotation.ForwardedFieldsSecond("f0->f1")
 public class ReplaceTargetWithLongIdJoin implements
-  JoinFunction<Tuple3<Long,GradoopId,GradoopId>, Tuple2<Long,GradoopId>,
+  JoinFunction<Tuple3<Long, GradoopId, GradoopId>, Tuple2<Long, GradoopId>,
     Tuple3<Long, Long, GradoopId>> {
 
   /**
@@ -43,8 +43,7 @@ public class ReplaceTargetWithLongIdJoin implements
   }
 
   @Override
-  public Tuple3<Long, Long, GradoopId> join(
-    Tuple3<Long, GradoopId, GradoopId> edgeTuple,
+  public Tuple3<Long, Long, GradoopId> join(Tuple3<Long, GradoopId, GradoopId> edgeTuple,
     Tuple2<Long, GradoopId> uniqueLongToVertexId) throws Exception {
     reuseTuple.f0 = edgeTuple.f0;
     reuseTuple.f1 = uniqueLongToVertexId.f0;

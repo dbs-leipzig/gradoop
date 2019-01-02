@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci;
+package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 

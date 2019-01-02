@@ -17,15 +17,15 @@ package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Joins an EPGM vertex with a visited edge, if the vertex is source or target for this edge.
- * Writes the edges visited property to the vertex.
+ * Joins an EPGM vertex with the source- resp. target-id of a visited edge. Sets the vertex visited
+ * property to {@code true}, if there is a join-partner.
  */
 @FunctionAnnotation.ForwardedFieldsFirst("id;label;graphIds")
-public class VertexWithVisitedEdgeJoin implements JoinFunction<Vertex, Edge, Vertex> {
+public class VertexWithVisitedSourceTargetIdJoin implements JoinFunction<Vertex, GradoopId, Vertex> {
 
   /**
    * Key for the boolean property of the edge
@@ -33,18 +33,18 @@ public class VertexWithVisitedEdgeJoin implements JoinFunction<Vertex, Edge, Ver
   private final String propertyKey;
 
   /**
-   * Creates an instance of VertexWithVisitedEdgeJoin with a given property key
+   * Creates an instance of VertexWithVisitedSourceTargetIdJoin with a given property key
    *
    * @param propertyKey propertyKey Key for the boolean property value
    */
-  public VertexWithVisitedEdgeJoin(String propertyKey) {
+  public VertexWithVisitedSourceTargetIdJoin(String propertyKey) {
     this.propertyKey = propertyKey;
   }
 
   @Override
-  public Vertex join(Vertex vertex, Edge edge) throws Exception {
-    if (edge != null) {
-      vertex.setProperty(propertyKey, edge.getPropertyValue(propertyKey));
+  public Vertex join(Vertex vertex, GradoopId visitedId) throws Exception {
+    if (visitedId != null) {
+      vertex.setProperty(propertyKey, true);
     }
     return vertex;
   }

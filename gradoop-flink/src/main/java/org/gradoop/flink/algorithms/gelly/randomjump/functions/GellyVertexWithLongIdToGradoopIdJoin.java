@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci;
+package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
@@ -22,13 +22,13 @@ import org.apache.flink.graph.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Joins a Gelly vertex with its LongId-to-GradoopId-mapping to replace the vertex id.
+ * Joins a Gelly vertex with its index-to-GradoopId-mapping to replace the index with the GradoopId.
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f1->f1")
 @FunctionAnnotation.ForwardedFieldsSecond("f1->f0")
 public class GellyVertexWithLongIdToGradoopIdJoin implements
-  JoinFunction<Vertex<Long,VCIVertexValue>, Tuple2<Long,GradoopId>,
-    Vertex<GradoopId,VCIVertexValue>> {
+  JoinFunction<Vertex<Long, VCIVertexValue>, Tuple2<Long, GradoopId>,
+    Vertex<GradoopId, VCIVertexValue>> {
 
   /**
    * Reduce object instantiation
@@ -44,9 +44,9 @@ public class GellyVertexWithLongIdToGradoopIdJoin implements
 
   @Override
   public Vertex<GradoopId, VCIVertexValue> join(
-    Vertex<Long, VCIVertexValue> gellyVertexWithLongId,
-    Tuple2<Long, GradoopId> uniqueLongToVertexId) throws Exception {
-    reuseVertex.setId(uniqueLongToVertexId.f1);
+    Vertex<Long, VCIVertexValue> gellyVertexWithLongId, Tuple2<Long, GradoopId> indexToGradoopId)
+    throws Exception {
+    reuseVertex.setId(indexToGradoopId.f1);
     reuseVertex.setValue(gellyVertexWithLongId.getValue());
     return reuseVertex;
   }

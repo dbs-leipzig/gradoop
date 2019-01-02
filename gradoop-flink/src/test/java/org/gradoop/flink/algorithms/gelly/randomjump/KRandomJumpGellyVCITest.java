@@ -26,30 +26,17 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Base class for derived test classes for the RandomJump algorithms.
+ * Test class for {@link KRandomJumpGellyVCI}
  */
 @RunWith(Parameterized.class)
-public abstract class RandomJumpBaseTest extends GradoopFlinkTestBase {
-
-  /**
-   * Enum to declare the used RandomJump algorithm
-   */
-  private enum RandomJumpAlgorithm {
-    /**
-     * VertexCentricIteration
-     */
-    VCI,
-    /**
-     * DataSetIteration
-     */
-    DSI
-  }
+public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
 
   /**
    * Name for test-case
@@ -70,11 +57,6 @@ public abstract class RandomJumpBaseTest extends GradoopFlinkTestBase {
    * Relative amount of vertices to visit via walk or jump
    */
   private final double percentageVisited;
-
-  /**
-   * The used RandomJump algorithm
-   */
-  private final RandomJumpAlgorithm algorithm;
 
   /**
    * Number of start vertices
@@ -104,18 +86,16 @@ public abstract class RandomJumpBaseTest extends GradoopFlinkTestBase {
   /**
    * Creates an instance of the base test class.
    *
-   * @param testName Name for test-case
-   * @param algorithm The used RandomJump algorithm, determined via {@link RandomJumpAlgorithm}
-   * @param k Number of start vertices
-   * @param maxIterations Value for maximum number of iterations for the algorithm
-   * @param jumpProbability Probability for jumping to a random vertex instead of walking to
-   *                        a random neighbor
+   * @param testName          Name for test-case
+   * @param k                 Number of start vertices
+   * @param maxIterations     Value for maximum number of iterations for the algorithm
+   * @param jumpProbability   Probability for jumping to a random vertex instead of walking to
+   *                          a random neighbor
    * @param percentageVisited Relative amount of vertices to visit via walk or jump
    */
-  public RandomJumpBaseTest(String testName, String algorithm, String k, String maxIterations,
+  public KRandomJumpGellyVCITest(String testName, String k, String maxIterations,
     String jumpProbability, String percentageVisited) {
     this.testName = testName;
-    this.algorithm = RandomJumpAlgorithm.valueOf(algorithm);
     this.k = Integer.parseInt(k);
     this.maxIterations = Integer.parseInt(maxIterations);
     this.jumpProbability = Double.parseDouble(jumpProbability);
@@ -140,16 +120,8 @@ public abstract class RandomJumpBaseTest extends GradoopFlinkTestBase {
       graph = getSocialNetworkLoader().getLogicalGraph();
     }
 
-    RandomJumpBase randomJump;
-    if (algorithm == RandomJumpAlgorithm.VCI) {
-      randomJump = new KRandomJumpGellyVCI(k, maxIterations, jumpProbability, percentageVisited);
-    } else if (algorithm == RandomJumpAlgorithm.DSI) {
-      randomJump = new KRandomJumpDataSetIteration(k, maxIterations, jumpProbability,
-        percentageVisited);
-    } else {
-      throw new IllegalArgumentException("Unknown kind of RandomJump algorithm - use VCI or DSI");
-    }
-    resultGraph = randomJump.execute(graph);
+    resultGraph =
+      new KRandomJumpGellyVCI(k, maxIterations, jumpProbability, percentageVisited).execute(graph);
 
     resultVertices = new ArrayList<>();
     resultEdges = new ArrayList<>();
@@ -166,17 +138,19 @@ public abstract class RandomJumpBaseTest extends GradoopFlinkTestBase {
   @Test
   public void validateAnnotation() throws Exception {
 
-    assertEquals("vertices are missing in resultGraph", graph.getVertices().count(),
+    System.out.println("-------- VCI Test - vertices: ");
+    resultGraph.getVertices().print();
+
+    assertEquals("wrong number of vertices in resultGraph", graph.getVertices().count(),
       resultGraph.getVertices().count());
-    assertEquals("edges are missing in resultGraph", graph.getEdges().count(),
+    assertEquals("wrong number of edges in resultGraph", graph.getEdges().count(),
       resultGraph.getEdges().count());
 
-    resultVertices.forEach(vertex -> assertTrue(
-      "vertex " + vertex.getId() + " is not annotated",
-      vertex.hasProperty(RandomJumpBase.PROPERTY_KEY_VISITED)));
+    resultVertices.forEach(vertex -> assertTrue("vertex " + vertex.getId() + " is not annotated",
+      vertex.hasProperty(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED)));
 
     resultEdges.forEach(edge -> assertTrue("edge " + edge.getId() + " is not annotated",
-      edge.hasProperty(RandomJumpBase.PROPERTY_KEY_VISITED)));
+      edge.hasProperty(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED)));
   }
 
   /**
@@ -185,47 +159,59 @@ public abstract class RandomJumpBaseTest extends GradoopFlinkTestBase {
   @Test
   public void checkVisitedProperty() {
 
-    for (Edge edge : resultEdges)  {
-      if (edge.getPropertyValue(RandomJumpBase.PROPERTY_KEY_VISITED).getBoolean()) {
-        resultVertices.stream().filter(vertex -> vertex.getId().equals(edge.getSourceId()))
-          .forEach(sourceVertex -> assertTrue("source of visited edge is not visited",
-            sourceVertex.getPropertyValue(RandomJumpBase.PROPERTY_KEY_VISITED).getBoolean()));
-        resultVertices.stream().filter(vertex -> vertex.getId().equals(edge.getTargetId()))
-          .forEach(targetVertex -> assertTrue("target of visited edge is not visited",
-            targetVertex.getPropertyValue(RandomJumpBase.PROPERTY_KEY_VISITED).getBoolean()));
+    for (Edge edge : resultEdges) {
+      if (edge.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()) {
+        resultVertices.stream().filter(vertex -> vertex.getId().equals(edge.getSourceId())).forEach(
+          sourceVertex -> assertTrue("source of visited edge is not visited",
+            sourceVertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()));
+        resultVertices.stream().filter(vertex -> vertex.getId().equals(edge.getTargetId())).forEach(
+          targetVertex -> assertTrue("target of visited edge is not visited",
+            targetVertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()));
       }
     }
 
     switch (testName) {
     case "base": {
       long visitedVertices = resultVertices.stream().filter(
-        vertex -> vertex.getPropertyValue(RandomJumpBase.PROPERTY_KEY_VISITED)
-          .getBoolean()).count();
-      assertEquals("Wrong number of visited vertices, should be 6", 6L,
-        visitedVertices);
+        vertex -> vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean())
+        .count();
+      assertTrue("Wrong number of visited vertices, should be at least 6",
+        visitedVertices >= 6L);
       break;
     }
     case "base3StartVertices": {
-      long visitedVertices = resultVertices.stream()
-        .filter(vertex -> vertex.getPropertyValue(RandomJumpBase.PROPERTY_KEY_VISITED)
-          .getBoolean()).count();
-      assertEquals("Wrong number of visited vertices, should be 6", 6L,
-        visitedVertices);
-      break;
-    }
-    case "visitOne": {
       long visitedVertices = resultVertices.stream().filter(
-        vertex -> vertex.getPropertyValue(RandomJumpBase.PROPERTY_KEY_VISITED)
-          .getBoolean()).count();
-      assertEquals("Wrong number of visited vertices, should be 1", 1L,
-        visitedVertices);
+        vertex -> vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean())
+        .count();
+      assertTrue("Wrong number of visited vertices, should be at least 6",
+        visitedVertices >= 6L);
       break;
     }
     default:
       resultVertices.forEach(vertex -> assertTrue(
         "vertex " + vertex.getId() + " was not visited, all vertices should be",
-        vertex.getPropertyValue(RandomJumpBase.PROPERTY_KEY_VISITED).getBoolean()));
+        vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()));
       break;
     }
+  }
+
+  /**
+   * Parameters called when running the test
+   *
+   * @return List of parameters
+   */
+  @Parameterized.Parameters(name = "{index}: {0}")
+  public static Iterable data() {
+    return Arrays.asList(new String[] {
+      "base", "1", "1000", "0.15", "0.5"
+    }, new String[] {
+      "base3StartVertices", "3", "1000", "0.15", "0.5"
+    }, new String[] {
+      "visitAll", "1", "1000", "0.15", "1.0"
+    }, new String[] {
+      "visitAll3StartVertices", "3", "1000", "0.15", "1.0"
+    }, new String[] {
+      "visitAllJumpsOnly", "1", "1000", "0.15", "1.0"
+    });
   }
 }

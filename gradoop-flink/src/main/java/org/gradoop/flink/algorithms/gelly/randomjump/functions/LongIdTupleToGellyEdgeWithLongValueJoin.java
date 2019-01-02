@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci;
+package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
@@ -23,7 +23,7 @@ import org.apache.flink.graph.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Creates a Gelly edge with its unique long id as its value.
+ * Creates a Gelly edge with its long index as its value.
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f0;f1")
 @FunctionAnnotation.ForwardedFieldsSecond("f0->f2")
@@ -44,10 +44,10 @@ public class LongIdTupleToGellyEdgeWithLongValueJoin implements
 
   @Override
   public Edge<Long, Long> join(Tuple3<Long, Long, GradoopId> edgeTuple,
-    Tuple2<Long, GradoopId> uniqueLongToEdgeId) throws Exception {
+    Tuple2<Long, GradoopId> indexToEdgeId) throws Exception {
     reuseEdge.setSource(edgeTuple.f0);
     reuseEdge.setTarget(edgeTuple.f1);
-    reuseEdge.setValue(uniqueLongToEdgeId.f0);
+    reuseEdge.setValue(indexToEdgeId.f0);
     return reuseEdge;
   }
 }

@@ -13,18 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci;
+package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 
+/**
+ * Joins an edge index with its index-to-GradoopId-mapping to replace the index with the GradoopId.
+ */
+@FunctionAnnotation.ReadFieldsSecond("f1")
 public class VisitedGellyEdgesWithLongIdToGradoopIdJoin implements
   JoinFunction<Long, Tuple2<Long, GradoopId>, GradoopId> {
 
   @Override
-  public GradoopId join(Long edgeLongId, Tuple2<Long, GradoopId> uniqueLongToEdgeId)
-    throws Exception {
-    return uniqueLongToEdgeId.f1;
+  public GradoopId join(Long edgeLongId, Tuple2<Long, GradoopId> indexToEdgeId) throws Exception {
+    return indexToEdgeId.f1;
   }
 }

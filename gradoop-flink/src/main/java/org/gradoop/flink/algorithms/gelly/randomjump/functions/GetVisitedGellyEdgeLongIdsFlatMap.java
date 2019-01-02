@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci;
+package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Retrieve the unique long id for all visited outgoing edges from a gelly source vertex.
+ * Retrieves the long index for all visited outgoing edges from a gelly source vertex.
  */
 @FunctionAnnotation.ReadFieldsFirst("f1")
 public class GetVisitedGellyEdgeLongIdsFlatMap implements
-  FlatMapFunction<Vertex<GradoopId, VCIVertexValue>, Long> {
+  FlatMapFunction<Vertex<Long, VCIVertexValue>, Long> {
 
   @Override
-  public void flatMap(Vertex<GradoopId, VCIVertexValue> gellyVertex,
+  public void flatMap(Vertex<Long, VCIVertexValue> gellyVertex,
     Collector<Long> out) throws Exception {
     for (Long visitedOutEdge : gellyVertex.getValue().getVisitedOutEdges()) {
       out.collect(visitedOutEdge);
