@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.gelly.randomjump.functions.datasetiteration;
+package org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci;
 
-import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
 
-/**
- * Filter to get the currently active tuple in a dataset, determined by a flag set in this tuple.
- */
-public class GetActiveTupleFilter implements FilterFunction<IterativeTuple> {
+public class VisitedGellyEdgesWithLongIdToGradoopIdJoin implements
+  JoinFunction<Long, Tuple2<Long, GradoopId>, GradoopId> {
 
   @Override
-  public boolean filter(IterativeTuple iterativeTuple) throws Exception {
-    return iterativeTuple.isTupleActive();
+  public GradoopId join(Long edgeLongId, Tuple2<Long, GradoopId> uniqueLongToEdgeId)
+    throws Exception {
+    return uniqueLongToEdgeId.f1;
   }
 }

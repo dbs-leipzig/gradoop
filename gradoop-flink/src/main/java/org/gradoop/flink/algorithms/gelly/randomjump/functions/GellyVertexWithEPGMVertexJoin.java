@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.gelly.randomjump.functions.datasetiteration;
+package org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Joins an EPGM vertex with a DataSetIteration tuple, assigning a boolean property value from the
- * tuple to the EPGM vertex, determining if this vertex was visited {@code true}, or not
- * {@code false}
+ * Joins a Gelly result vertex with an EPGM vertex. Assigning a boolean property value from the
+ * Gelly vertex to the EPGM vertex, determining if this vertex was visited.
  */
-public class DSIVertexJoin implements JoinFunction<Vertex, IterativeTuple, Vertex> {
+@FunctionAnnotation.ReadFieldsFirst("f1")
+@FunctionAnnotation.ForwardedFieldsSecond("id;label;graphIds")
+public class GellyVertexWithEPGMVertexJoin implements
+  JoinFunction<org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue>, Vertex, Vertex> {
 
   /**
    * Key for the boolean property value to assign to the EPGM vertex
@@ -31,17 +35,19 @@ public class DSIVertexJoin implements JoinFunction<Vertex, IterativeTuple, Verte
   private final String propertyKey;
 
   /**
-   * Creates an instance of DSIVertexJoin with a given key for the boolean property value.
+   * Creates an instance of GellyVertexWithEPGMVertexJoin with a given key for
+   * the boolean property value.
    *
    * @param propertyKey propertyKey Key for the boolean property value
    */
-  public DSIVertexJoin(String propertyKey) {
+  public GellyVertexWithEPGMVertexJoin(String propertyKey) {
     this.propertyKey = propertyKey;
   }
 
   @Override
-  public Vertex join(Vertex vertex, IterativeTuple iterativeTuple) throws Exception {
-    vertex.setProperty(propertyKey, iterativeTuple.isSourceVisited());
-    return vertex;
+  public Vertex join(org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue> gellyVertex,
+    Vertex epgmVertex) throws Exception {
+    epgmVertex.setProperty(propertyKey, gellyVertex.getValue().f0);
+    return epgmVertex;
   }
 }

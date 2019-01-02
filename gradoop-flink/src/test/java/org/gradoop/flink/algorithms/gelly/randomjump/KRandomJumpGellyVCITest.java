@@ -77,6 +77,11 @@ public abstract class RandomJumpBaseTest extends GradoopFlinkTestBase {
   private final RandomJumpAlgorithm algorithm;
 
   /**
+   * Number of start vertices
+   */
+  private final int k;
+
+  /**
    * The original graph used for testing
    */
   private LogicalGraph graph;
@@ -101,15 +106,17 @@ public abstract class RandomJumpBaseTest extends GradoopFlinkTestBase {
    *
    * @param testName Name for test-case
    * @param algorithm The used RandomJump algorithm, determined via {@link RandomJumpAlgorithm}
+   * @param k Number of start vertices
    * @param maxIterations Value for maximum number of iterations for the algorithm
    * @param jumpProbability Probability for jumping to a random vertex instead of walking to
    *                        a random neighbor
    * @param percentageVisited Relative amount of vertices to visit via walk or jump
    */
-  public RandomJumpBaseTest(String testName, String algorithm, String maxIterations,
+  public RandomJumpBaseTest(String testName, String algorithm, String k, String maxIterations,
     String jumpProbability, String percentageVisited) {
     this.testName = testName;
     this.algorithm = RandomJumpAlgorithm.valueOf(algorithm);
+    this.k = Integer.parseInt(k);
     this.maxIterations = Integer.parseInt(maxIterations);
     this.jumpProbability = Double.parseDouble(jumpProbability);
     this.percentageVisited = Double.parseDouble(percentageVisited);
@@ -135,9 +142,9 @@ public abstract class RandomJumpBaseTest extends GradoopFlinkTestBase {
 
     RandomJumpBase randomJump;
     if (algorithm == RandomJumpAlgorithm.VCI) {
-      randomJump = new RandomJumpGellyVCI(maxIterations, jumpProbability, percentageVisited);
+      randomJump = new KRandomJumpGellyVCI(k, maxIterations, jumpProbability, percentageVisited);
     } else if (algorithm == RandomJumpAlgorithm.DSI) {
-      randomJump = new RandomJumpDataSetIteration(maxIterations, jumpProbability,
+      randomJump = new KRandomJumpDataSetIteration(k, maxIterations, jumpProbability,
         percentageVisited);
     } else {
       throw new IllegalArgumentException("Unknown kind of RandomJump algorithm - use VCI or DSI");
@@ -193,6 +200,14 @@ public abstract class RandomJumpBaseTest extends GradoopFlinkTestBase {
     case "base": {
       long visitedVertices = resultVertices.stream().filter(
         vertex -> vertex.getPropertyValue(RandomJumpBase.PROPERTY_KEY_VISITED)
+          .getBoolean()).count();
+      assertEquals("Wrong number of visited vertices, should be 6", 6L,
+        visitedVertices);
+      break;
+    }
+    case "base3StartVertices": {
+      long visitedVertices = resultVertices.stream()
+        .filter(vertex -> vertex.getPropertyValue(RandomJumpBase.PROPERTY_KEY_VISITED)
           .getBoolean()).count();
       assertEquals("Wrong number of visited vertices, should be 6", 6L,
         visitedVertices);

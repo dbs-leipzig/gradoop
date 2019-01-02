@@ -16,14 +16,13 @@
 package org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci;
 
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.List;
 
 /**
  * The vertex value used for the Gelly vertex centric iteration.
  */
-public class VCIVertexValue extends Tuple2<Boolean, List<GradoopId>> {
+public class VCIVertexValue extends Tuple2<Boolean, List<Long>> {
 
   /**
    * Creates an empty instance of VCIVertexValue
@@ -35,10 +34,10 @@ public class VCIVertexValue extends Tuple2<Boolean, List<GradoopId>> {
    *
    * @param visited {@code Boolean} determining if a vertex was visited ({@code true})
    *                or not ({@code false})
-   * @param visitedNeighbors {@code List} containing the ids of all visited neighbors
+   * @param visitedOutEdgeIds {@code List} containing the ids of all visited outgoing edges
    */
-  public VCIVertexValue(Boolean visited, List<GradoopId> visitedNeighbors) {
-    super(visited, visitedNeighbors);
+  public VCIVertexValue(Boolean visited, List<Long> visitedOutEdgeIds) {
+    super(visited, visitedOutEdgeIds);
   }
 
   /**
@@ -58,20 +57,20 @@ public class VCIVertexValue extends Tuple2<Boolean, List<GradoopId>> {
   }
 
   /**
-   * Gets all visited neighbors
+   * Gets all visited outgoing edges
    *
-   * @return List containing the ids off all visited neighbors
+   * @return List containing the ids off all visited outgoing edges
    */
-  public List<GradoopId> getVisitedNeighbors() {
+  public List<Long> getVisitedOutEdges() {
     return this.f1;
   }
 
   /**
-   * Adds an id to the list of visited neighbors.
+   * Adds an id to the list of visited outgoing edges.
    *
-   * @param neighborId The newly visited neighbor id
+   * @param edgeId The newly visited outgoing edge id
    */
-  public void addVisitedNeighbor(GradoopId neighborId) {
-    this.f1.add(neighborId);
+  public void addVisitedOutEdge(Long edgeId) {
+    this.f1.add(edgeId);
   }
 }

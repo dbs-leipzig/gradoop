@@ -13,37 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci;
+package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.gradoop.common.model.impl.id.GradoopId;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Joins a Gelly vertex with an EPGM vertex. Assigning a boolean property value from the Gelly
- * vertex to the EPGM vertex, determining if this vertex was visited.
+ * Joins an EPGM vertex with a visited edge, if the vertex is source or target for this edge.
+ * Writes the edges visited property to the vertex.
  */
-public class VCIVertexJoin implements
-  JoinFunction<org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue>, Vertex, Vertex> {
+@FunctionAnnotation.ForwardedFieldsFirst("id;label;graphIds")
+public class VertexWithVisitedEdgeJoin implements JoinFunction<Vertex, Edge, Vertex> {
 
   /**
-   * Key for the boolean property value to assign to the EPGM vertex
+   * Key for the boolean property of the edge
    */
   private final String propertyKey;
 
   /**
-   * Creates an instance of VCIVertexJoin with a given key for the boolean property value.
+   * Creates an instance of VertexWithVisitedEdgeJoin with a given property key
    *
    * @param propertyKey propertyKey Key for the boolean property value
    */
-  public VCIVertexJoin(String propertyKey) {
+  public VertexWithVisitedEdgeJoin(String propertyKey) {
     this.propertyKey = propertyKey;
   }
 
   @Override
-  public Vertex join(org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue> gellyVertex,
-    Vertex epgmVertex) throws Exception {
-    epgmVertex.setProperty(propertyKey, gellyVertex.getValue().f0);
-    return epgmVertex;
+  public Vertex join(Vertex vertex, Edge edge) throws Exception {
+    if (edge != null) {
+      vertex.setProperty(propertyKey, edge.getPropertyValue(propertyKey));
+    }
+    return vertex;
   }
 }

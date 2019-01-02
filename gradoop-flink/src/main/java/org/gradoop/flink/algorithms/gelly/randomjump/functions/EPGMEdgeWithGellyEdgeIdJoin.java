@@ -16,19 +16,17 @@
 package org.gradoop.flink.algorithms.gelly.randomjump.functions.gellyvci;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.graph.Vertex;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 
-import java.util.List;
-
 /**
- * Joins an EPGM edge with a Gelly vertex if the vertex id is the edges source id. Assigns a
- * boolean property to the edge, determining if this edge was visited. The property is set to
- * {@code true} if the {@code Set<GradoopId>} in the vertex value contains the target id of the
- * edge, set to {@code false} otherwise.
+ * Joins an EPGM edge with a GradoopId of an visited edge from the VCI run. Assigns a boolean
+ * property to the EPGM edge, determining if this edge was visited. The property is set to
+ * {@code true} if the EPGM egde has a join partner, set to {@code false} otherwise.
  */
-public class VCIEdgeJoin implements JoinFunction<Edge, Vertex<GradoopId, VCIVertexValue>, Edge> {
+@FunctionAnnotation.ForwardedFieldsFirst("id;sourceId;targetId;label;graphIds")
+public class EPGMEdgeWithGellyEdgeIdJoin implements JoinFunction<Edge, GradoopId, Edge> {
 
   /**
    * Key for the boolean property of the edge
@@ -36,23 +34,20 @@ public class VCIEdgeJoin implements JoinFunction<Edge, Vertex<GradoopId, VCIVert
   private final String propertyKey;
 
   /**
-   * Creates an instance of VCIEdgeJoin with a given key for the boolean
+   * Creates an instance of EPGMEdgeWithGellyEdgeIdJoin with a given key for the boolean
    * property value.
    *
    * @param propertyKey propertyKey Key for the boolean property value
    */
-  public VCIEdgeJoin(String propertyKey) {
+  public EPGMEdgeWithGellyEdgeIdJoin(String propertyKey) {
     this.propertyKey = propertyKey;
   }
 
   @Override
-  public Edge join(Edge edge, Vertex<GradoopId, VCIVertexValue> gellyVertex) throws Exception {
-    List<GradoopId> visitedNeighbors = gellyVertex.getValue().f1;
+  public Edge join(Edge edge, GradoopId visitedEdgeId) throws Exception {
     boolean visited = false;
-    for (GradoopId neighborId : visitedNeighbors) {
-      if (edge.getTargetId().equals(neighborId)) {
-        visited = true;
-      }
+    if (visitedEdgeId != null) {
+      visited = true;
     }
     edge.setProperty(propertyKey, visited);
     return edge;
