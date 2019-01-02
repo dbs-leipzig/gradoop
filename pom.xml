@@ -128,7 +128,6 @@
 
         <!-- alpha order require -->
         <dep.accumulo.version>1.9.0</dep.accumulo.version>
-        <dep.bson.version>3.6.3</dep.bson.version>
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
         <dep.flink.version>1.5.0</dep.flink.version>
         <dep.gdl.version>0.3</dep.gdl.version>
@@ -631,12 +630,6 @@
                 <artifactId>log4j</artifactId>
                 <version>${dep.log4j.version}</version>
                 <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mongodb</groupId>
-                <artifactId>bson</artifactId>
-                <version>${dep.bson.version}</version>
             </dependency>
 
             <dependency>
