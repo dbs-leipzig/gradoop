@@ -60,7 +60,7 @@ public class EdgeTableInputFormat extends BaseTableInputFormat<Edge> {
     scan.setCaching(EPGMGraphOutput.DEFAULT_CACHE_SIZE);
 
     if (edgeHandler.getQuery() != null) {
-      attachFilter(edgeHandler.getQuery(), scan);
+      attachFilter(edgeHandler.getQuery(), scan, edgeHandler.isSpreadingByteUsed());
     }
 
     return scan;

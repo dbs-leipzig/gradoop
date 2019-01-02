@@ -153,6 +153,19 @@ public class GradoopHBaseTestBase {
     );
   }
 
+  /**
+   * Open existing EPGMStore for test purposes. If the store does not exist, a
+   * new one will be initialized and returned.
+   *
+   * @param prefix the table prefix
+   * @param gradoopHBaseConfig the gradoop HBase config to use
+   * @return EPGMStore with vertices and edges
+   */
+  public static HBaseEPGMStore openEPGMStore(String prefix, GradoopHBaseConfig gradoopHBaseConfig) {
+    return HBaseEPGMStoreFactory.createOrOpenEPGMStore(utility.getConfiguration(),
+      gradoopHBaseConfig, prefix);
+  }
+
 
   //----------------------------------------------------------------------------
   // Data generation

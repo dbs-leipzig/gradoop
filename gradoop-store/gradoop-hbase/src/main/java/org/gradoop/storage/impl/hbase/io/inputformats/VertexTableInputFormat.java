@@ -60,7 +60,7 @@ public class VertexTableInputFormat extends BaseTableInputFormat<Vertex> {
     scan.setCaching(EPGMGraphOutput.DEFAULT_CACHE_SIZE);
 
     if (vertexHandler.getQuery() != null) {
-      attachFilter(vertexHandler.getQuery(), scan);
+      attachFilter(vertexHandler.getQuery(), scan, vertexHandler.isSpreadingByteUsed());
     }
 
     return scan;
