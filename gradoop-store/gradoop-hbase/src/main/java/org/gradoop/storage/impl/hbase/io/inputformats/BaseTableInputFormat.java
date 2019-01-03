@@ -38,12 +38,18 @@ abstract class BaseTableInputFormat<E extends EPGMElement> extends TableInputFor
    *
    * @param query the query that represents a filter
    * @param scan the HBase scan instance on which the filter will be applied
+   * @param isSpreadingByteUsed indicates whether a spreading byte is used as row key prefix or not
    */
-  void attachFilter(@Nonnull ElementQuery<HBaseElementFilter<E>> query, @Nonnull Scan scan) {
+  void attachFilter(
+    @Nonnull ElementQuery<HBaseElementFilter<E>> query,
+    @Nonnull Scan scan,
+    boolean isSpreadingByteUsed) {
+
     FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 
     if (query.getQueryRanges() != null && !query.getQueryRanges().isEmpty()) {
-      conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges()));
+      conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges(),
+        isSpreadingByteUsed));
     }
 
     if (query.getFilterPredicate() != null) {
