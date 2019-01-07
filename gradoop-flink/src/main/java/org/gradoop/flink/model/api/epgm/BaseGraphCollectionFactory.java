@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,6 +98,14 @@ public interface BaseGraphCollectionFactory<
    * @return 1-element graph collection
    */
   GC fromGraph(LogicalGraph logicalGraphLayout);
+
+  /**
+   * Creates a graph collection from multiple given logical graphs.
+   *
+   * @param logicalGraphLayout  input graphs
+   * @return graph collection
+   */
+  GC fromGraphs(LogicalGraph... logicalGraphLayout);
 
   /**
    * Creates a graph collection from a graph transaction dataset.
