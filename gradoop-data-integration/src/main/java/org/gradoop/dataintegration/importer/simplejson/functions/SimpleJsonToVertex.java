@@ -39,9 +39,7 @@ import java.util.Objects;
  * <p>
  * <pre>{@code {
  * "id":0,
- * "data":{"name":"Alice","gender":"female","age":42},
- * "meta":{"label":"Employee", "out-edges":[0,1,2,3], in-edges:[4,5,6,7],
- * "graphs":[0,1,2,3]}
+ * "name":"Alice","gender":"female","age":42
  * }}</pre>
  */
 public class SimpleJsonToVertex implements MapFunction<String, Vertex> {
@@ -63,6 +61,7 @@ public class SimpleJsonToVertex implements MapFunction<String, Vertex> {
    */
   public SimpleJsonToVertex(EPGMVertexFactory<Vertex> vertexFactory) {
     this.reuse = Objects.requireNonNull(vertexFactory).createVertex(JSON_VERTEX_LABEL);
+    this.reuse.setProperties(Properties.create());
   }
 
   /**
@@ -75,7 +74,8 @@ public class SimpleJsonToVertex implements MapFunction<String, Vertex> {
   public Vertex map(String jsonString) throws Exception {
     JSONObject jsonVertex = new JSONObject(jsonString);
 
-    Properties properties = Properties.create();
+    Properties properties = reuse.getProperties();
+    properties.clear();
 
     for (Iterator it = jsonVertex.keys(); it.hasNext();) {
       String key = (String) it.next();
@@ -83,7 +83,6 @@ public class SimpleJsonToVertex implements MapFunction<String, Vertex> {
       PropertyValue propertyValue = getPropertyValue(jsonVertex, key);
       properties.set(key, propertyValue);
     }
-    reuse.setProperties(properties);
     return reuse;
   }
 
