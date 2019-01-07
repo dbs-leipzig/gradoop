@@ -54,7 +54,6 @@ public class VertexToEdgeTest extends GradoopFlinkTestBase {
     VertexToEdge transformation = new VertexToEdge("Green", "foo");
     LogicalGraph transformed = input.callForGraph(transformation);
 
-    collectAndAssertTrue(
-      transformed.equalsByElementData(expected));
+    collectAndAssertTrue(transformed.equalsByElementData(expected));
   }
 }

@@ -27,6 +27,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -68,7 +69,7 @@ public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
    * Using this constructor, properties will be propagated along all edges and to all
    * target vertices. {@link #PropagatePropertyToNeighbor(String, String, String, Set, Set)}
    * can be used when properties should only be propagated along certain edges (selected by their
-   * label) and / or to certail vertices (selected by their label). Using this constructor is
+   * label) and / or to certain vertices (selected by their label). Using this constructor is
    * equivalent to {@code PropagatePropertyToNeighbor(vertexLabel, propertyKey,
    * targetVertexPropertyKey, null, null)}.
    *
@@ -99,9 +100,9 @@ public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
   public PropagatePropertyToNeighbor(String vertexLabel, String propertyKey,
                                      String targetVertexPropertyKey, Set<String> propagatingEdges,
                                      Set<String> targetVertexLabels) {
-    this.vertexLabel = vertexLabel;
-    this.propertyKey = propertyKey;
-    this.targetVertexPropertyKey = targetVertexPropertyKey;
+    this.vertexLabel = Objects.requireNonNull(vertexLabel);
+    this.propertyKey = Objects.requireNonNull(propertyKey);
+    this.targetVertexPropertyKey = Objects.requireNonNull(targetVertexPropertyKey);
     this.propagatingEdgeLabels = propagatingEdges;
     this.targetVertexLabels = targetVertexLabels;
   }

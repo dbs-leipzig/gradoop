@@ -20,8 +20,8 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.dataintegration.transformation.functions.EdgesFromLocalTransitiveClosure;
-import org.gradoop.dataintegration.transformation.functions.Neighborhood;
-import org.gradoop.dataintegration.transformation.functions.NeighborhoodVertex;
+import org.gradoop.dataintegration.transformation.impl.Neighborhood;
+import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.neighborhood.keyselector.IdInTuple;
@@ -30,14 +30,14 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * For a given vertex label this graph transformation takes all neighbours per vertex with this
+ * For a given vertex label this graph transformation takes all neighbors per vertex with this
  * label and calculates the transitive closure for this subgraph. An edge is created between all
- * vertice pairs that fulfill the transitive closure requirement.
+ * vertex pairs that fulfill the transitive closure requirement.
  * Furthermore each of those created edges contains the labels of the edges to create the
- * transitive closure and the former properties of the vertex. <br><br>
+ * transitive closure and the former properties of the vertex.
  * <p>
  * Each edge that has to be created results from a path in the graph of the following form: <br>
- * {@code v_i --e_i,j--> v_j --e_j,k--> v_k} <br>
+ * {@code (i)-[i_j]->(j)-[j_k]->(k)} <br>
  * The newly created edge goes from: {@code v_i --e_i,k--> v_k} <br>
  * The edge {@code e_i,k} has a user-defined label and besides the original vertex properties three
  * additional properties:
@@ -79,10 +79,6 @@ public class VertexToEdge implements UnaryGraphToGraphOperator {
     DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> outgoingNeighborhood = Neighborhood
       .getPerVertex(graph, graph.getVerticesByLabel(centralVertexLabel),
         Neighborhood.EdgeDirection.OUTGOING);
-
-    if (incomingNeighborhood == null || outgoingNeighborhood == null) {
-      throw new IllegalStateException("At least one calculated neighborhood was null.");
-    }
 
     DataSet<Edge> newEdges = incomingNeighborhood
       .coGroup(outgoingNeighborhood)

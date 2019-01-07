@@ -35,7 +35,8 @@ public class BuildIdPropertyValuePairsTest extends GradoopFlinkTestBase {
 
   /**
    * Test if the function selects the correct labels and properties.
-   * @throws Exception
+   *
+   * @throws Exception when the execution in Flink fails.
    */
   @Test
   public void testFunction() throws Exception {

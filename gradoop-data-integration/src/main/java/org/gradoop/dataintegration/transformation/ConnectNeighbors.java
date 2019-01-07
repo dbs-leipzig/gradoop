@@ -20,13 +20,14 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.dataintegration.transformation.functions.CreateCartesianNeighborhoodEdges;
-import org.gradoop.dataintegration.transformation.functions.Neighborhood;
-import org.gradoop.dataintegration.transformation.functions.NeighborhoodVertex;
+import org.gradoop.dataintegration.transformation.impl.Neighborhood;
+import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This graph transformation adds new edges to the graph. Those edges are created if a vertex of a
@@ -65,12 +66,11 @@ public class ConnectNeighbors implements UnaryGraphToGraphOperator {
    */
   public ConnectNeighbors(String sourceVertexLabel, Neighborhood.EdgeDirection edgeDirection,
     String neighborhoodVertexLabel, String newEdgeLabel) {
-    this.sourceVertexLabel = sourceVertexLabel;
-    this.edgeDirection = edgeDirection;
-    this.neighborhoodVertexLabel = neighborhoodVertexLabel;
-    this.newEdgeLabel = newEdgeLabel;
+    this.sourceVertexLabel = Objects.requireNonNull(sourceVertexLabel);
+    this.edgeDirection = Objects.requireNonNull(edgeDirection);
+    this.neighborhoodVertexLabel = Objects.requireNonNull(neighborhoodVertexLabel);
+    this.newEdgeLabel = Objects.requireNonNull(newEdgeLabel);
   }
-
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {

@@ -18,23 +18,20 @@ package org.gradoop.dataintegration.transformation.functions;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This {@link CoGroupFunction} accumulates all properties that might be send to a vertex and
  * stores them in a {@link PropertyValue} list.
  *
- * @param <E> The edge type.
+ * @param <V> The edge type.
  */
-public class AccumulatePropagatedValues<E extends EPGMElement>
-  implements CoGroupFunction<Tuple2<GradoopId, PropertyValue>, E, E> {
+public class AccumulatePropagatedValues<V extends EPGMVertex>
+  implements CoGroupFunction<Tuple2<GradoopId, PropertyValue>, V, V> {
 
   /**
    * The property key where the PropertyValue list should be stored at the target vertices.
@@ -62,10 +59,14 @@ public class AccumulatePropagatedValues<E extends EPGMElement>
 
   @Override
   public void coGroup(Iterable<Tuple2<GradoopId, PropertyValue>> propertyValues,
-    Iterable<E> elements, Collector<E> out) {
+                      Iterable<V> elements, Collector<V> out) {
     // should only contain one vertex, based on the uniqueness of gradoop ids
-    E targetVertex = elements.iterator().next();
-    // Do not update vertices that don't have a certain label.
+    Iterator<V> iterator = elements.iterator();
+    if (!iterator.hasNext()) {
+      return;
+    }
+    V targetVertex = iterator.next();
+    // If the vertex is not whitelisted by the targetVertexLabels list, forward it without modification.
     if (targetVertexLabels != null && !targetVertexLabels.contains(targetVertex.getLabel())) {
       out.collect(targetVertex);
       return;
@@ -77,8 +78,7 @@ public class AccumulatePropagatedValues<E extends EPGMElement>
 
     // Add to vertex if and only if at least one property was propagated.
     if (!values.isEmpty()) {
-      PropertyValue pv = PropertyValue.create(values);
-      targetVertex.setProperty(targetVertexPropertyKey, pv);
+      targetVertex.setProperty(targetVertexPropertyKey, PropertyValue.create(values));
     }
 
     out.collect(targetVertex);

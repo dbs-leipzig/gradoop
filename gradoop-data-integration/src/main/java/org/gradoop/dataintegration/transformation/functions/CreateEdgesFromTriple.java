@@ -38,9 +38,9 @@ public class CreateEdgesFromTriple<V extends EPGMVertex, E extends EPGMEdge>
   implements FlatMapFunction<Tuple3<V, GradoopId, GradoopId>, E>, ResultTypeQueryable<E> {
 
   /**
-   * The Factory which creates the new edges.
+   * The edge type created by the factory.
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final Class<E> edgeType;
 
   /**
    * The label of the newly created edge which points to the newly created vertex.
@@ -55,7 +55,7 @@ public class CreateEdgesFromTriple<V extends EPGMVertex, E extends EPGMEdge>
   /**
    * Reduce object instantiations.
    */
-  private E reuse = null;
+  private E reuse;
 
   /**
    * The constructor to create the new edges based on the given triple.
@@ -68,22 +68,21 @@ public class CreateEdgesFromTriple<V extends EPGMVertex, E extends EPGMEdge>
    */
   public CreateEdgesFromTriple(EPGMEdgeFactory<E> factory, String edgeLabelSourceToNew,
     String edgeLabelNewToTarget) {
-    this.edgeFactory = Objects.requireNonNull(factory);
+    this.edgeType = Objects.requireNonNull(factory).getType();
     this.edgeLabelSourceToNew = Objects.requireNonNull(edgeLabelSourceToNew);
     this.edgeLabelNewToTarget = Objects.requireNonNull(edgeLabelNewToTarget);
+    this.reuse = factory.createEdge(edgeLabelSourceToNew, GradoopId.NULL_VALUE,
+      GradoopId.NULL_VALUE);
   }
 
   @Override
   public void flatMap(Tuple3<V, GradoopId, GradoopId> triple, Collector<E> out) {
-    if (reuse == null) {
-      reuse = edgeFactory.createEdge(edgeLabelSourceToNew, triple.f1, triple.f0.getId());
-    } else {
-      reuse.setId(GradoopId.get());
-      reuse.setLabel(edgeLabelSourceToNew);
-      reuse.setSourceId(triple.f1);
-      reuse.setTargetId(triple.f0.getId());
-    }
+    reuse.setId(GradoopId.get());
+    reuse.setLabel(edgeLabelSourceToNew);
+    reuse.setSourceId(triple.f1);
+    reuse.setTargetId(triple.f0.getId());
     out.collect(reuse);
+
     reuse.setId(GradoopId.get());
     reuse.setLabel(edgeLabelNewToTarget);
     reuse.setSourceId(triple.f0.getId());
@@ -93,6 +92,6 @@ public class CreateEdgesFromTriple<V extends EPGMVertex, E extends EPGMEdge>
 
   @Override
   public TypeInformation<E> getProducedType() {
-    return TypeInformation.of(edgeFactory.getType());
+    return TypeInformation.of(edgeType);
   }
 }

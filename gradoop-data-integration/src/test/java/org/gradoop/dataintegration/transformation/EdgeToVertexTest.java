@@ -23,7 +23,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.fail;
 
-
 /**
  * Tests for the {@link EdgeToVertex} operator.
  */
@@ -77,7 +76,7 @@ public class EdgeToVertexTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test if {@link EdgeToVertex#EdgeToVertex(String, String, String, String) the constructor}
+   * Test if the constructor {@link EdgeToVertex#EdgeToVertex(String, String, String, String)}
    * handles null-values as intended.
    */
   @Test

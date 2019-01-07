@@ -25,6 +25,7 @@ import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 
 import java.util.Iterator;
 import java.util.List;
@@ -39,8 +40,8 @@ import java.util.Objects;
  * @param <V> The vertex type.
  * @param <E> The edge type.
  */
-public class EdgesFromLocalTransitiveClosure<V extends EPGMVertex, E extends EPGMEdge> implements
-  CoGroupFunction<Tuple2<V, List<NeighborhoodVertex>>,
+public class EdgesFromLocalTransitiveClosure<V extends EPGMVertex, E extends EPGMEdge>
+  implements CoGroupFunction<Tuple2<V, List<NeighborhoodVertex>>,
     Tuple2<V, List<NeighborhoodVertex>>, E>, ResultTypeQueryable<E> {
 
   /**
@@ -59,19 +60,14 @@ public class EdgesFromLocalTransitiveClosure<V extends EPGMVertex, E extends EPG
   public static final String SECOND_EDGE_LABEL = "secondEdgeLabel";
 
   /**
-   * The edge label of the newly created edge.
+   * The type of the edges created by the factory..
    */
-  private final String newEdgeLabel;
-
-  /**
-   * The EdgeFactory new edges are created with.
-   */
-  private final EPGMEdgeFactory<E> factory;
+  private final Class<E> edgeType;
 
   /**
    * Reduce object instantiations.
    */
-  private E reuse;
+  private final E reuse;
 
   /**
    * The constructor of the CoGroup function to created new edges based on transitivity.
@@ -80,8 +76,9 @@ public class EdgesFromLocalTransitiveClosure<V extends EPGMVertex, E extends EPG
    * @param factory The {@link EdgeFactory} new edges are created with.
    */
   public EdgesFromLocalTransitiveClosure(String newEdgeLabel, EPGMEdgeFactory<E> factory) {
-    this.newEdgeLabel = Objects.requireNonNull(newEdgeLabel);
-    this.factory = Objects.requireNonNull(factory);
+    this.edgeType = Objects.requireNonNull(factory).getType();
+    this.reuse = factory.createEdge(Objects.requireNonNull(newEdgeLabel), GradoopId.NULL_VALUE,
+      GradoopId.NULL_VALUE);
   }
 
   @Override
@@ -100,11 +97,6 @@ public class EdgesFromLocalTransitiveClosure<V extends EPGMVertex, E extends EPG
       List<NeighborhoodVertex> out = outIt.next().f1;
       if (in.isEmpty()) {
         return;
-      }
-      if (reuse == null) {
-        // We just need some ID, it will be changed later.
-        GradoopId neighborId = in.get(0).getNeighborId();
-        reuse = factory.createEdge(newEdgeLabel, neighborId, neighborId);
       }
       reuse.setProperties(centralVertex.getProperties());
       reuse.setProperty(ORIGINAL_VERTEX_LABEL, centralVertex.getLabel());
@@ -126,6 +118,6 @@ public class EdgesFromLocalTransitiveClosure<V extends EPGMVertex, E extends EPG
 
   @Override
   public TypeInformation<E> getProducedType() {
-    return TypeInformation.of(factory.getType());
+    return TypeInformation.of(edgeType);
   }
 }

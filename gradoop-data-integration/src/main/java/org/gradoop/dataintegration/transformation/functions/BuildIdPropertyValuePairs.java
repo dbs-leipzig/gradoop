@@ -30,8 +30,8 @@ import java.util.Objects;
  *
  * @param <E> The element type.
  */
-public class BuildIdPropertyValuePairs<E extends EPGMElement> implements
-  FlatMapFunction<E, Tuple2<GradoopId, PropertyValue>> {
+public class BuildIdPropertyValuePairs<E extends EPGMElement>
+  implements FlatMapFunction<E, Tuple2<GradoopId, PropertyValue>> {
 
   /**
    * The label of elements from which to propagate the property.
