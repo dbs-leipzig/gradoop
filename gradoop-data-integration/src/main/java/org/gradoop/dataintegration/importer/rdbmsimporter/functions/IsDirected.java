@@ -25,12 +25,12 @@ import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToEdge;
 public class IsDirected implements FilterFunction<TableToEdge> {
 
   /**
-   * serial version uid
+   * Default serial version uid.
    */
   private static final long serialVersionUID = 1L;
 
   @Override
-  public boolean filter(TableToEdge table) throws Exception {
+  public boolean filter(TableToEdge table) {
     return table.isDirectionIndicator();
   }
 }

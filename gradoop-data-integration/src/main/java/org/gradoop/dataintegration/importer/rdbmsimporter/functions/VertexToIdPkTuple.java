@@ -20,6 +20,8 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.IdKeyTuple;
 
+import java.util.Objects;
+
 import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.PK_ID;
 
 /**
@@ -32,10 +34,23 @@ public class VertexToIdPkTuple implements MapFunction<Vertex, IdKeyTuple> {
    */
   private static final long serialVersionUID = 1L;
 
-  @Override
-  public IdKeyTuple map(Vertex v) throws Exception {
+  /**
+   * Reuse tuple to avoid needless instantiation.
+   */
+  private IdKeyTuple reuseTuple;
 
-    return new IdKeyTuple(v.getId(),
-      v.getProperties().get(PK_ID).toString());
+  /**
+   * Instantiate the reuse tuple.
+   */
+  VertexToIdPkTuple() {
+    this.reuseTuple = new IdKeyTuple();
+  }
+
+  @Override
+  public IdKeyTuple map(Vertex v) {
+    reuseTuple.f0 = v.getId();
+    reuseTuple.f1 = Objects.requireNonNull(v.getProperties()).get(PK_ID).toString();
+
+    return reuseTuple;
   }
 }

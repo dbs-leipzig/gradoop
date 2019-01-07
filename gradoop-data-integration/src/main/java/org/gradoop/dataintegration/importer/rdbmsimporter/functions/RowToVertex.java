@@ -25,83 +25,91 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.RowHeader;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToNode;
+import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.RowHeaderTuple;
 
 import java.util.List;
 
 import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.BROADCAST_VARIABLE;
+import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.PK_FIELD;
 import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.PK_ID;
 
 
 /**
- * Creates one EPGM vertex from one row
+ * Converts a database tuple to a {@link org.gradoop.common.model.api.entities.EPGMVertex}.
  */
 public class RowToVertex extends RichMapFunction<Row, Vertex> {
 
   /**
-   * serial versoin uid
+   * Default serial version uid.
    */
   private static final long serialVersionUID = 1L;
 
   /**
-   * EPGM vertex factory
+   * EPGM vertex factory.
    */
   private VertexFactory vertexFactory;
 
   /**
-   * List of all instances converted to vertices
+   * List of all instances converted to vertices.
    */
   private List<TableToNode> tables;
 
   /**
-   * Current table
-   */
-  private TableToNode currentTable;
-
-  /**
-   * Current rowheader
-   */
-  private RowHeader rowheader;
-
-  /**
-   * Name of current database table
+   * Name of current database table.
    */
   private String tableName;
 
   /**
-   * Current position of iteration
+   * Current position of iteration.
    */
   private int tablePos;
 
   /**
-   * Creates an Epgm vertex from a database row
+   * Creates an Epgm vertex from a database row.
    *
-   * @param vertexFactory Gradoop vertex factory
-   * @param tableName Name of database table
-   * @param tablePos Position of database in list
+   * @param vertexFactory gradoop vertex factory
+   * @param tableName name of database table
+   * @param tablePos position of table iteration
    */
-  public RowToVertex(VertexFactory vertexFactory, String tableName, int tablePos) {
+  RowToVertex(VertexFactory vertexFactory, String tableName, int tablePos) {
     this.vertexFactory = vertexFactory;
     this.tableName = tableName;
     this.tablePos = tablePos;
   }
 
   @Override
-  public Vertex map(Row tuple) throws Exception {
-    this.currentTable = tables.get(tablePos);
-    this.rowheader = currentTable.getRowheader();
+  public void open(Configuration parameters) {
+    this.tables =
+      getRuntimeContext().getBroadcastVariable(BROADCAST_VARIABLE);
+  }
+
+  @Override
+  public Vertex map(Row tuple) {
+    RowHeader rowheader = tables.get(tablePos).getRowheader();
 
     GradoopId id = GradoopId.get();
     String label = tableName;
     Properties properties = AttributesToProperties.getProperties(tuple, rowheader);
-    properties.set(PK_ID,
-      PrimaryKeyConcatString.getPrimaryKeyString(tuple, rowheader));
+    properties.set(PK_ID, getPrimaryKeyString(tuple, rowheader));
 
     return vertexFactory.initVertex(id, label, properties);
   }
 
-  @Override
-  public void open(Configuration parameters) throws Exception {
-    this.tables =
-      getRuntimeContext().getBroadcastVariable(BROADCAST_VARIABLE);
+  /**
+   * Provides a concatenated string of all primary key values.
+   * @param tuple database row
+   * @param rowheader rowheader of table
+   * @return string consisting of primary key values
+   */
+  private String getPrimaryKeyString(Row tuple, RowHeader rowheader) {
+    StringBuilder sb = new StringBuilder();
+
+    for (RowHeaderTuple rht : rowheader.getRowHeader()) {
+      if (rht.getAttType().equals(PK_FIELD)) {
+        sb.append(tuple.getField(rht.getPos()).toString());
+      }
+    }
+
+    return sb.toString();
   }
 }

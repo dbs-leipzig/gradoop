@@ -17,6 +17,7 @@
 package org.gradoop.dataintegration.importer.rdbmsimporter.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -27,17 +28,34 @@ import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.IdKeyTuple;
 /**
  * Creates tuples of gradoop id (fk1), key value (fk2) and belonging properties
  */
+@FunctionAnnotation.ForwardedFieldsFirst("1; 2")
+@FunctionAnnotation.ForwardedFieldsSecond("0")
 public class Tuple2ToIdFkWithProps implements
-    MapFunction<Tuple2<Fk1Fk2Props, IdKeyTuple>, Tuple3<GradoopId, String, Properties>> {
+  MapFunction<Tuple2<Fk1Fk2Props, IdKeyTuple>, Tuple3<GradoopId, String, Properties>> {
 
   /**
    * serial version uid
    */
   private static final long serialVersionUID = 1L;
 
+  /**
+   * Reuse tuple to avoid redundant instantiations.
+   */
+  private Tuple3<GradoopId, String, Properties> reuseTuple;
+
+  /**
+   * Instantiate the reuse tuple.
+   */
+  Tuple2ToIdFkWithProps() {
+    this.reuseTuple = new Tuple3<>();
+  }
+
   @Override
-  public Tuple3<GradoopId, String, Properties> map(Tuple2<Fk1Fk2Props, IdKeyTuple> value)
-      throws Exception {
-    return new Tuple3<GradoopId, String, Properties>(value.f1.f0, value.f0.f1, value.f0.f2);
+  public Tuple3<GradoopId, String, Properties> map(Tuple2<Fk1Fk2Props, IdKeyTuple> value) {
+    reuseTuple.f0 = value.f1.f0;
+    reuseTuple.f1 = value.f0.f1;
+    reuseTuple.f2 = value.f0.f2;
+
+    return reuseTuple;
   }
 }

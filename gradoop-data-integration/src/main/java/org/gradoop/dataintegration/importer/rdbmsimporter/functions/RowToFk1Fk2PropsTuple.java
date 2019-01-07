@@ -30,56 +30,52 @@ import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.Rdbms
 /**
  * Creates a tuple of foreign key one, foreign key two and belonging properties from row
  */
-public class FKandProps extends RichMapFunction<Row, Fk1Fk2Props> {
+public class RowToFk1Fk2PropsTuple extends RichMapFunction<Row, Fk1Fk2Props> {
 
   /**
-   * serial versoin uid
+   * Default serial version uid.
    */
   private static final long serialVersionUID = 1L;
 
   /**
-   * List of all instances going to convert to edges
+   * List of all created {@link TableToEdge} instances.
    */
   private List<TableToEdge> tables;
 
   /**
-   * Current Position of iteration
+   * Current Position of table-iteration.
    */
   private int tablePos;
 
   /**
-   * Current table
+   * Reuse tuple to avoid needless instantiations.
    */
-  private TableToEdge currentTable;
+  private Fk1Fk2Props reuseTuple;
 
   /**
-   * Current rowheader
-   */
-  private RowHeader rowheader;
-
-  /**
-   * Creates a tuple of foreign key one, foreign key two and belonging properties from row
+   * Creates a tuple of foreign key one, foreign key two and belonging properties from row.
    *
-   * @param tablePos Current position of iteration
+   * @param tablePos current position of table-iteration
    */
-  public FKandProps(int tablePos) {
+  public RowToFk1Fk2PropsTuple(int tablePos) {
     this.tablePos = tablePos;
+    reuseTuple = new Fk1Fk2Props();
   }
 
   @Override
-  public Fk1Fk2Props map(Row tuple) throws Exception {
-    this.currentTable = tables.get(tablePos);
-    this.rowheader = currentTable.getRowheader();
-
-    return new Fk1Fk2Props(
-      tuple.getField(rowheader.getForeignKeyHeader().get(0).getPos()).toString(),
-      tuple.getField(rowheader.getForeignKeyHeader().get(1).getPos()).toString(),
-      AttributesToProperties.getPropertiesWithoutFKs(tuple, rowheader));
-  }
-
-  @Override
-  public void open(Configuration parameters) throws Exception {
+  public void open(Configuration parameters) {
     this.tables =
       getRuntimeContext().getBroadcastVariable(BROADCAST_VARIABLE);
+  }
+
+  @Override
+  public Fk1Fk2Props map(Row tuple) {
+    RowHeader rowheader = tables.get(tablePos).getRowheader();
+
+    reuseTuple.f0 = tuple.getField(rowheader.getForeignKeyHeader().get(0).getPos()).toString();
+    reuseTuple.f1 = tuple.getField(rowheader.getForeignKeyHeader().get(1).getPos()).toString();
+    reuseTuple.f2 = AttributesToProperties.getPropertiesWithoutFKs(tuple, rowheader);
+
+    return reuseTuple;
   }
 }

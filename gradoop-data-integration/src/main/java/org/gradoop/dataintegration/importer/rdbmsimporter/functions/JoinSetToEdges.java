@@ -17,6 +17,7 @@
 package org.gradoop.dataintegration.importer.rdbmsimporter.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -27,6 +28,8 @@ import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.LabelIdKeyTuple
  * Creates edges from joined primary key tables respectively foreign key tables
  * of foreign key relations
  */
+@FunctionAnnotation.ForwardedFieldsFirst({"0; 1"})
+@FunctionAnnotation.ForwardedFieldsSecond("1")
 public class JoinSetToEdges
     extends RichMapFunction<Tuple2<LabelIdKeyTuple, LabelIdKeyTuple>, Edge> {
 
@@ -50,7 +53,7 @@ public class JoinSetToEdges
   }
 
   @Override
-  public Edge map(Tuple2<LabelIdKeyTuple, LabelIdKeyTuple> preEdge) throws Exception {
+  public Edge map(Tuple2<LabelIdKeyTuple, LabelIdKeyTuple> preEdge) {
     GradoopId id = GradoopId.get();
     GradoopId sourceVertexId = preEdge.f1.f1;
     GradoopId targetVertexId = preEdge.f0.f1;

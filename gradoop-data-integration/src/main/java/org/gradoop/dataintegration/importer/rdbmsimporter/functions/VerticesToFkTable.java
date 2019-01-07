@@ -25,6 +25,7 @@ import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToEdge;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.LabelIdKeyTuple;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.BROADCAST_VARIABLE;
 
@@ -44,7 +45,13 @@ public class VerticesToFkTable extends RichFlatMapFunction<TableToEdge, LabelIdK
   private List<Vertex> vertices;
 
   @Override
-  public void flatMap(TableToEdge table, Collector<LabelIdKeyTuple> out) throws Exception {
+  public void open(Configuration parameters) {
+    this.vertices =
+      getRuntimeContext().getBroadcastVariable(BROADCAST_VARIABLE);
+  }
+
+  @Override
+  public void flatMap(TableToEdge table, Collector<LabelIdKeyTuple> out) {
     String label = table.getStartAttribute().f0;
     GradoopId id;
     String key;
@@ -52,15 +59,10 @@ public class VerticesToFkTable extends RichFlatMapFunction<TableToEdge, LabelIdK
     for (Vertex v : vertices) {
       if (v.getLabel().equals(table.getStartTableName())) {
         id = v.getId();
-        key = v.getProperties().get(table.getStartAttribute().f0).toString();
+        key =
+          Objects.requireNonNull(v.getProperties()).get(table.getStartAttribute().f0).toString();
         out.collect(new LabelIdKeyTuple(label, id, key));
       }
     }
-  }
-
-  @Override
-  public void open(Configuration parameters) throws Exception {
-    this.vertices =
-      getRuntimeContext().getBroadcastVariable(BROADCAST_VARIABLE);
   }
 }

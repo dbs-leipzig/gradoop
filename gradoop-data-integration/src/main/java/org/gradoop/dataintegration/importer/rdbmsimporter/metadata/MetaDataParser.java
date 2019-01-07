@@ -34,31 +34,31 @@ import java.util.ArrayList;
 public class MetaDataParser {
 
   /**
-   * Database connection
+   * Database connection.
    */
   private Connection con;
 
   /**
-   * Management type of connected rdbms
+   * Management type of connected rdbms.
    */
   private RdbmsType rdbmsType;
 
   /**
-   * Relational database metadata
+   * Relational database metadata.
    */
   private DatabaseMetaData metadata;
 
   /**
-   * Parsed relational database tables
+   * Parsed relational database tables.
    */
   private ArrayList<RdbmsTableBase> tableBase;
 
   /**
-   * Parses the schema of a relational database and provides base classes for graph conversation
+   * Parses the schema of a relational database and provides base classes for graph conversation.
    *
-   * @param con Database connection
-   * @param rdbmsType Management type of connected rdbms
-   * @throws SQLException
+   * @param con database connection
+   * @param rdbmsType management system type of connected rdbms
+   * @throws SQLException if connection is closed or invalid
    */
   public MetaDataParser(Connection con, RdbmsType rdbmsType) throws SQLException {
     this.con = con;
@@ -68,9 +68,10 @@ public class MetaDataParser {
   }
 
   /**
-   * Parses the schema of a relational database to a relational database metadata representation
+   * Parses the schema of the connected relational database to a metadata representation.
    *
-   * @throws SQLException
+   * @throws SQLException if database information are invalid or not accessible or connection is
+   *                      broken
    */
   public void parse() throws SQLException {
     ResultSet rsTables = metadata.getTables(null, "%", "%", new String[]{"TABLE"});
@@ -162,7 +163,7 @@ public class MetaDataParser {
 
       // number of rows (needed for distributed data querying via
       // flink)
-      int rowCount = 0;
+      int rowCount;
       if (schemName == null) {
 
         rowCount = TableRowSize.getTableRowCount(con, tableName);
@@ -181,8 +182,7 @@ public class MetaDataParser {
   /**
    * Creates metadata representations of tables going to convert to vertices.
    *
-   * @return list containing metadata representations of rdbms tables going to convert to
-   * vertices
+   * @return list containing {@link TableToNode} instances.
    */
   public ArrayList<TableToNode> getTablesToNodes() {
     ArrayList<TableToNode> tablesToNodes = Lists.newArrayList();
@@ -201,7 +201,7 @@ public class MetaDataParser {
   /**
    * Creates metadata representations of tables going to convert to edges.
    *
-   * @return list containing metadata representations of rdbms tables going to convert to edges
+   * @return list containing {@link TableToEdge} instances.
    */
   public ArrayList<TableToEdge> getTablesToEdges() {
     ArrayList<TableToEdge> tablesToEdges = Lists.newArrayList();

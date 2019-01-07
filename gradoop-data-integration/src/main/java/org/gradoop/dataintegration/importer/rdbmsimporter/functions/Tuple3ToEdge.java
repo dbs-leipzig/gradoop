@@ -26,40 +26,39 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.IdKeyTuple;
 
 /**
- * Creates edges from joined foreign key sets
+ * Creates edges from joined foreign key sets.
  */
 public class Tuple3ToEdge
     implements MapFunction<Tuple2<Tuple3<GradoopId, String, Properties>, IdKeyTuple>, Edge> {
 
   /**
-   * serial version uid
+   * Default serial version uid.
    */
   private static final long serialVersionUID = 1L;
 
   /**
-   * Gradoop edge factory
+   * Gradoop edge factory.
    */
   private EdgeFactory edgeFactory;
 
   /**
-   * Name of converted table
+   * Name of converted table.
    */
   private String tableName;
 
   /**
-   * Creates edges from joined foreign key sets
+   * Creates edges from joined foreign key sets.
    *
-   * @param edgeFactory Valid gradoop edge factory
-   * @param tableName Name of rdbms table
+   * @param edgeFactory gradoop edge factory
+   * @param tableName name of rdbms table
    */
-  public Tuple3ToEdge(EdgeFactory edgeFactory, String tableName) {
+  Tuple3ToEdge(EdgeFactory edgeFactory, String tableName) {
     this.edgeFactory = edgeFactory;
     this.tableName = tableName;
   }
 
   @Override
-  public Edge map(Tuple2<Tuple3<GradoopId, String, Properties>, IdKeyTuple> value)
-      throws Exception {
+  public Edge map(Tuple2<Tuple3<GradoopId, String, Properties>, IdKeyTuple> value) {
 
     return edgeFactory.initEdge(GradoopId.get(), tableName, value.f0.f0, value.f1.f0, value.f0.f2);
   }

@@ -30,26 +30,9 @@ import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.Rdbms
 public class AttributesToProperties {
 
   /**
-   * Instance variable of class {@link AttributesToProperties}.
-   */
-  private static AttributesToProperties OBJ = null;
-
-  /**
-   * Singleton instance of class {@link AttributesToProperties}.
+   * No instances are needed for this class.
    */
   private AttributesToProperties() { }
-
-  /**
-   * Creates a single instance of class {@link AttributesToProperties}.
-   *
-   * @return single instance of class {@link AttributesToProperties}
-   */
-  public static AttributesToProperties create() {
-    if (OBJ == null) {
-      OBJ = new AttributesToProperties();
-    }
-    return OBJ;
-  }
 
   /**
    * Converts a tuple of a database relation to EPGM properties.
@@ -58,7 +41,7 @@ public class AttributesToProperties {
    * @param rowheader rowheader for this relation
    * @return EPGM properties
    */
-  public static Properties getProperties(Row tuple, RowHeader rowheader) {
+  static Properties getProperties(Row tuple, RowHeader rowheader) {
 
     Logger logger = Logger.getLogger(AttributesToProperties.class);
     Properties properties = Properties.create();
@@ -81,7 +64,7 @@ public class AttributesToProperties {
    * @param rowheader rowheader for this relation
    * @return EPGM properties
    */
-  public static Properties getPropertiesWithoutFKs(Row tuple, RowHeader rowheader) {
+  static Properties getPropertiesWithoutFKs(Row tuple, RowHeader rowheader) {
     Properties properties = new Properties();
     for (RowHeaderTuple rowHeaderTuple : rowheader.getRowHeader()) {
       if (!rowHeaderTuple.getAttType().equals(FK_FIELD)) {

@@ -20,8 +20,8 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 
 /**
- * Tuple for n:m relation conversion f0 : Foreign key one f1 : Foreign key two
- * f2 : Properties of belonging table
+ * Tuple for n:m relation conversion f0 : Foreign key one f1 : Foreign key two f2 : Properties of
+ * belonging table
  */
 public class Fk1Fk2Props extends Tuple3<String, String, Properties> {
 
@@ -48,8 +48,7 @@ public class Fk1Fk2Props extends Tuple3<String, String, Properties> {
   /**
    * Empty Constructor
    */
-  public Fk1Fk2Props() {
-  }
+  public Fk1Fk2Props() { }
 
   /**
    * Constructor
@@ -81,7 +80,7 @@ public class Fk1Fk2Props extends Tuple3<String, String, Properties> {
    * Checks if two Fk1Fk2Props tuples are equal
    *
    * @return <code>true</code> if Object equals Fk1Fk2Props; <code>false</code>
-   *         otherwise
+   * otherwise
    */
   @Override
   public boolean equals(Object o) {

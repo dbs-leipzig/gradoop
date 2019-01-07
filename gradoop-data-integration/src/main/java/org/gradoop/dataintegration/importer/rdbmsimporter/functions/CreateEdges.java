@@ -39,30 +39,12 @@ import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.Rdbms
 /**
  * Creates instances of class {@link org.gradoop.common.model.api.entities.EPGMEdge} from database.
  */
-public class CreateEdgesOfTables {
+public class CreateEdges {
 
   /**
-   * Instance variable of class {@link CreateEdgesOfTables}.
+   * No instances are needed for this class.
    */
-  private static CreateEdgesOfTables OBJ = null;
-
-  /**
-   * Singleton instance of class {@link CreateEdgesOfTables}.
-   */
-  private CreateEdgesOfTables() { }
-
-  /**
-   * Single instance of class {@link CreateEdgesOfTables} for converting database tuples into EPGM
-   * edges.
-   *
-   * @return single instance of class {@link CreateEdgesOfTables}
-   */
-  public static CreateEdgesOfTables create() {
-    if (OBJ == null) {
-      OBJ = new CreateEdgesOfTables();
-    }
-    return OBJ;
-  }
+  private CreateEdges() { }
 
   /**
    * Creates EPGM edges from foreign key respectively n:m relations.
@@ -73,7 +55,7 @@ public class CreateEdgesOfTables {
    * @param vertices set consisting of already converted vertices
    * @return directed and undirected EPGM edges
    */
-  public DataSet<Edge> convert(
+  public static DataSet<Edge> convert(
     GradoopFlinkConfig flinkConfig,
     RdbmsConfig rdbmsConfig,
     MetaDataParser metadataParser,
@@ -121,12 +103,12 @@ public class CreateEdgesOfTables {
           DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper
             .create()
             .getInput(env, rdbmsConfig,
-            table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
+              table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
 
           // Represents the two foreign key attributes and belonging
           // properties
           DataSet<Fk1Fk2Props> fkPropsTable = dsSQLResult
-            .map(new FKandProps(counter))
+            .map(new RowToFk1Fk2PropsTuple(counter))
             .withBroadcastSet(
               env.fromCollection(tablesToEdges), BROADCAST_VARIABLE);
 
@@ -156,7 +138,7 @@ public class CreateEdgesOfTables {
           }
 
           // Creates other direction edges
-          edges = edges.union(dsTupleEdges.map(new EdgeToEdgeComplement(edgeFactory)));
+          edges = edges.union(dsTupleEdges.map(new EdgeToInvertEdge(edgeFactory)));
         }
         counter++;
       }

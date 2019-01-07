@@ -32,10 +32,10 @@ public class TableRowSize {
    * @param con Valid jdbc database connection
    * @param tableName Name of database table
    * @return Number of rows of database
-   * @throws SQLException
+   * @throws SQLException if name of table is not fitting any table in database
    */
   public static int getTableRowCount(Connection con, String tableName) throws SQLException {
-    int rowCount = 0;
+    int rowCount;
     Statement st = con.createStatement();
 
     try {

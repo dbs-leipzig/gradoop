@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.pojo.EdgeFactory;
 /**
  * Creates edges with opposite direction
  */
-public class EdgeToEdgeComplement implements MapFunction<Edge, Edge> {
+public class EdgeToInvertEdge implements MapFunction<Edge, Edge> {
 
   /**
    * serial version uid
@@ -41,7 +41,7 @@ public class EdgeToEdgeComplement implements MapFunction<Edge, Edge> {
    *
    * @param edgeFactory Valid gradoop edge factory
    */
-  public EdgeToEdgeComplement(EdgeFactory edgeFactory) {
+  public EdgeToInvertEdge(EdgeFactory edgeFactory) {
     this.edgeFactory = edgeFactory;
   }
 

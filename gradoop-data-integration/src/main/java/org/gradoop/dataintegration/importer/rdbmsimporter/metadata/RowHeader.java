@@ -40,12 +40,12 @@ public class RowHeader implements Serializable {
   /**
    * Empty constructor
    */
-  public RowHeader() {
-    rowHeader = new ArrayList<RowHeaderTuple>();
+  RowHeader() {
+    rowHeader = new ArrayList<>();
   }
 
   /**
-   * Constructor
+   * Creates an instance of {@link RowHeader} needed to locate database tuple values in {@link org.apache.flink.types.Row}.
    *
    * @param rowHeader List of rowheader tuples
    */
@@ -59,7 +59,7 @@ public class RowHeader implements Serializable {
    * @return List of rowheader tuples of foreign key attributes
    */
   public ArrayList<RowHeaderTuple> getForeignKeyHeader() {
-    ArrayList<RowHeaderTuple> fkHeader = new ArrayList<RowHeaderTuple>();
+    ArrayList<RowHeaderTuple> fkHeader = new ArrayList<>();
     for (RowHeaderTuple rht : this.rowHeader) {
       if (rht.getAttType().equals(FK_FIELD)) {
         fkHeader.add(rht);

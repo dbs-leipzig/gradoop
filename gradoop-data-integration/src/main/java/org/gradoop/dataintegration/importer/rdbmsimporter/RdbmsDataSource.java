@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.dataintegration.importer.rdbmsimporter.connection.RdbmsConfig;
 import org.gradoop.dataintegration.importer.rdbmsimporter.connection.RdbmsConnection;
-import org.gradoop.dataintegration.importer.rdbmsimporter.functions.CreateEdgesOfTables;
+import org.gradoop.dataintegration.importer.rdbmsimporter.functions.CreateEdges;
 import org.gradoop.dataintegration.importer.rdbmsimporter.functions.CreateVertices;
 import org.gradoop.dataintegration.importer.rdbmsimporter.functions.RemovePkFkProperties;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.MetaDataParser;
@@ -95,7 +95,7 @@ public class RdbmsDataSource implements DataSource {
     vertices = CreateVertices.create().convert(flinkConfig, rdbmsConfig, metadataParser);
 
     edges =
-      CreateEdgesOfTables.create().convert(flinkConfig, rdbmsConfig, metadataParser, vertices);
+      CreateEdges.convert(flinkConfig, rdbmsConfig, metadataParser, vertices);
 
     // cleans vertices by deleting primary key and foreign key
     // properties

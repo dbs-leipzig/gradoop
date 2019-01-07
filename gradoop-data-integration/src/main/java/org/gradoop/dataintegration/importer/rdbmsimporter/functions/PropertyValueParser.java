@@ -22,30 +22,35 @@ import java.time.ZoneId;
 import java.util.Date;
 
 /**
- * Converts the jdbc data type to matching EPGM property value if possible
+ * Converts the JDBC data type of a database tuple value to a fitting {@link PropertyValue}.
  */
-public class PropertyValueParser {
+class PropertyValueParser {
 
   /**
-   * Converts jdbc data type to matching EPGM property value if possible
-   *
-   * @param att Database value
-   * @return Gradoop property value
+   * No need to instantiate this class.
    */
-  public static PropertyValue parse(Object att) {
+  private PropertyValueParser() { }
 
-    PropertyValue propValue = null;
+  /**
+   * Converts jdbc data type to matching EPGM property value if possible.
+   *
+   * @param value value of database tuple
+   * @return gradoop property value
+   */
+  static PropertyValue parse(Object value) {
 
-    if (att == null) {
+    PropertyValue propValue;
+
+    if (value == null) {
       propValue = PropertyValue.NULL_VALUE;
     } else {
-      if (att.getClass() == Date.class) {
+      if (value.getClass() == Date.class) {
         propValue = PropertyValue
-            .create(((Date) att).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-      } else if (att.getClass() == byte[].class) {
-        propValue = PropertyValue.create(String.valueOf(att));
+          .create(((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+      } else if (value.getClass() == byte[].class) {
+        propValue = PropertyValue.create(String.valueOf(value));
       } else {
-        propValue = PropertyValue.create(att);
+        propValue = PropertyValue.create(value);
       }
     }
     return propValue;
