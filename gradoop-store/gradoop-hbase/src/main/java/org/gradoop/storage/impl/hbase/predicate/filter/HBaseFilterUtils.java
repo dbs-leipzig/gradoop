@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,17 @@ import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
+import org.apache.hadoop.hbase.filter.FuzzyRowFilter;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.hbase.util.Pair;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -63,19 +67,44 @@ public class HBaseFilterUtils {
    * GradoopIds.
    *
    * @param elementIds a set of graph element GradoopIds to filter
+   * @param isSpreadingByteUsed indicates if the handlers using a spreading byte as prefix
+   *                            of each row key
    * @return a HBase Filter object
    */
-  public static Filter getIdFilter(GradoopIdSet elementIds) {
-    FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ONE);
+  public static Filter getIdFilter(GradoopIdSet elementIds, boolean isSpreadingByteUsed) {
+    Filter filter;
+    if (isSpreadingByteUsed) {
+      // a spreading byte is used as prefix in row key, therefore a FuzzyRowFilter has to be used
+      byte[] dummyByte = new byte[1];
 
-    for (GradoopId gradoopId : elementIds) {
-      RowFilter rowFilter = new RowFilter(
-        CompareFilter.CompareOp.EQUAL,
-        new BinaryComparator(gradoopId.toByteArray())
-      );
-      filterList.addFilter(rowFilter);
+      // instantiate a list of byte array pairs for the fuzzy row filter
+      List<Pair<byte[], byte[]>> fuzzyList = new ArrayList<>();
+
+      // create a byte array and set the first to '1' to identify the position of dynamic bytes
+      byte[] fuzzyInfo = new byte[13];
+      fuzzyInfo[0] = (byte) 1;
+
+      for (GradoopId gradoopId : elementIds) {
+        // for each id create a 13 byte long array from a dummy byte and the 12 byte gradoop id
+        byte[] rowKey = Bytes.add(dummyByte, gradoopId.toByteArray());
+        fuzzyList.add(new Pair<>(rowKey, fuzzyInfo));
+      }
+      filter = new FuzzyRowFilter(fuzzyList);
+    } else {
+      // no spreading byte in row key, therefore a list of RowFilters has to be used
+
+      FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ONE);
+
+      for (GradoopId gradoopId : elementIds) {
+        RowFilter rowFilter = new RowFilter(
+          CompareFilter.CompareOp.EQUAL,
+          new BinaryComparator(gradoopId.toByteArray())
+        );
+        filterList.addFilter(rowFilter);
+      }
+      filter = filterList;
     }
-    return filterList;
+    return filter;
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,20 +24,15 @@ import org.gradoop.storage.impl.hbase.api.GraphElementHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 
 /**
- * Handler class for entities that are contained in logical graphs (i.e.,
- * vertex and edge data).
+ * Handler class for entities that are contained in logical graphs (i.e., vertex and edge data).
  */
-public abstract class HBaseGraphElementHandler extends
-  HBaseElementHandler implements GraphElementHandler {
+public abstract class HBaseGraphElementHandler extends HBaseElementHandler
+  implements GraphElementHandler {
   /**
    * Byte representation of the graphs column identifier.
    */
-  private static final byte[] COL_GRAPHS_BYTES =
-    Bytes.toBytes(HBaseConstants.COL_GRAPHS);
+  private static final byte[] COL_GRAPHS_BYTES = Bytes.toBytes(HBaseConstants.COL_GRAPHS);
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeGraphIds(Put put, EPGMGraphElement graphElement) {
     if (graphElement.getGraphCount() > 0) {
@@ -51,9 +46,6 @@ public abstract class HBaseGraphElementHandler extends
     return put;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopIdSet readGraphIds(Result res) {
     byte[] graphBytes = res.getValue(CF_META_BYTES, COL_GRAPHS_BYTES);
