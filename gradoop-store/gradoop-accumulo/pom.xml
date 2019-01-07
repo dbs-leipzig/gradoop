@@ -126,7 +126,6 @@
                                     <include>com.esotericsoftware.kryo:*</include>
                                     <include>org.apache.flink:flink-core</include>
                                     <include>org.apache.hbase:hbase-common</include>
-                                    <include>org.mongodb:bson</include>
                                 </includes>
                             </artifactSet>
                         </configuration>
