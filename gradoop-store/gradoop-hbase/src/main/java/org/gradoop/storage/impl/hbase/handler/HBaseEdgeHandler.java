@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
+import org.gradoop.storage.utils.RegionSplitter;
 
 import java.io.IOException;
 
@@ -89,7 +90,15 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_META));
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_TYPE));
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_VALUE));
-    admin.createTable(tableDescriptor);
+    if (isPreSplitRegions()) {
+      admin.createTable(
+        tableDescriptor,
+        RegionSplitter.getInstance().getStartKey(),
+        RegionSplitter.getInstance().getEndKey(),
+        RegionSplitter.getInstance().getNumberOfRegions());
+    } else {
+      admin.createTable(tableDescriptor);
+    }
   }
 
   /**
