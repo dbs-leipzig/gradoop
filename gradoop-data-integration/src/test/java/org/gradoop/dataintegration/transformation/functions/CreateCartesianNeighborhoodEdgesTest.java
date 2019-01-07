@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Before;
 import org.junit.Test;
@@ -89,7 +90,7 @@ public class CreateCartesianNeighborhoodEdgesTest extends GradoopFlinkTestBase {
     List<GradoopId> ids = Stream.generate(GradoopId::get).limit(count).collect(Collectors.toList());
     // Create some dummy neighborhood vertex pojos.
     List<NeighborhoodVertex> vertexPojos = ids.stream()
-      .map(id -> new NeighborhoodVertex(id, someVertex.getId(), ""))
+      .map(id -> new NeighborhoodVertex(id, ""))
       .collect(Collectors.toList());
     Tuple2<Vertex, List<NeighborhoodVertex>> inputNonEmpty = new Tuple2<>(someVertex,
       vertexPojos);
@@ -103,7 +104,7 @@ public class CreateCartesianNeighborhoodEdgesTest extends GradoopFlinkTestBase {
     }
     // or duplicate edges.
     long disctinctCount = result.stream()
-      .map(e -> new Tuple2<GradoopId, GradoopId>(e.getSourceId(), e.getTargetId()))
+      .map(e -> new Tuple2<>(e.getSourceId(), e.getTargetId()))
       .distinct().count();
     assertEquals((long) result.size(), disctinctCount);
   }

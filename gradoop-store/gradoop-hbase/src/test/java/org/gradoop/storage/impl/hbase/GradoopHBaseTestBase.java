@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,6 +151,19 @@ public class GradoopHBaseTestBase {
       GradoopHBaseConfig.getDefaultConfig(),
       prefix
     );
+  }
+
+  /**
+   * Open existing EPGMStore for test purposes. If the store does not exist, a
+   * new one will be initialized and returned.
+   *
+   * @param prefix the table prefix
+   * @param gradoopHBaseConfig the gradoop HBase config to use
+   * @return EPGMStore with vertices and edges
+   */
+  public static HBaseEPGMStore openEPGMStore(String prefix, GradoopHBaseConfig gradoopHBaseConfig) {
+    return HBaseEPGMStoreFactory.createOrOpenEPGMStore(utility.getConfiguration(),
+      gradoopHBaseConfig, prefix);
   }
 
 

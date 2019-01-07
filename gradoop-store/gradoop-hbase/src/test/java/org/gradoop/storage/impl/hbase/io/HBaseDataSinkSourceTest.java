@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.storage.common.predicate.query.Query;
+import org.gradoop.storage.config.GradoopHBaseConfig;
 import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBaseLabelIn;
@@ -38,80 +38,132 @@ import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropEquals;
 import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropLargerThan;
 import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropReg;
 import org.gradoop.storage.utils.HBaseFilters;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.junit.runners.Parameterized;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.LABEL_FORUM;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.LABEL_HAS_MEMBER;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.LABEL_HAS_MODERATOR;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.LABEL_TAG;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PATTERN_EDGE;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PATTERN_EDGE_PROP;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PATTERN_GRAPH;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PATTERN_GRAPH_PROP;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PATTERN_VERTEX;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PATTERN_VERTEX_PROP;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PROP_AGE;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PROP_CITY;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PROP_INTEREST;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PROP_NAME;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PROP_SINCE;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PROP_STATUS;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PROP_VERTEX_COUNT;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.createEmptyEPGMStore;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.getSocialEdges;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.getSocialGraphHeads;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.getSocialVertices;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.openEPGMStore;
-import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.writeSocialGraphToStore;
+import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
  * Test class for {@link HBaseDataSource} and {@link HBaseDataSink}
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@RunWith(Parameterized.class)
 public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
   /**
-   * Global Flink config for sources and sinks
+   * A static HBase store with social media graph stored
    */
-  private final GradoopFlinkConfig config =
-    GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-
-  /**
-   * A store with social media data
-   */
-  private HBaseEPGMStore epgmStore;
+  private static HBaseEPGMStore[] epgmStores;
 
   /**
    * Instantiate the EPGMStore with a prefix and persist social media data
    */
-  @Before
-  public void setUp() throws IOException {
-    epgmStore = openEPGMStore("HBaseDataSinkSourceTest.");
-    writeSocialGraphToStore(epgmStore);
+  @BeforeClass
+  public static void setUp() throws IOException {
+    epgmStores = new HBaseEPGMStore[3];
+
+    epgmStores[0] = openEPGMStore("HBaseDataSinkSourceTest.");
+    writeSocialGraphToStore(epgmStores[0]);
+
+    final GradoopHBaseConfig splitConfig = GradoopHBaseConfig.getDefaultConfig();
+    splitConfig.enablePreSplitRegions(32);
+    epgmStores[1] = openEPGMStore("HBaseDataSinkSourceSplitRegionTest.", splitConfig);
+    writeSocialGraphToStore(epgmStores[1]);
+
+    final GradoopHBaseConfig spreadingConfig = GradoopHBaseConfig.getDefaultConfig();
+    spreadingConfig.useSpreadingByte(32);
+    epgmStores[2] = openEPGMStore("HBaseDataSinkSourceSpreadingByteTest.", spreadingConfig);
+    writeSocialGraphToStore(epgmStores[2]);
   }
 
   /**
-   * Close the EPGMStore after each test
+   * Closes the static EPGMStore
    */
-  @After
-  public void tearDown() throws IOException {
-    if (epgmStore != null) {
-      epgmStore.close();
+  @AfterClass
+  public static void tearDown() throws IOException {
+    for (HBaseEPGMStore store : epgmStores) {
+      if (store != null) {
+        store.dropTables();
+        store.close();
+      }
+    }
+  }
+
+  /**
+   * Parameters for tests. 0 => default store config; 1 => pre-split regions; 2 => spreading byte
+   *
+   * @return the integer to choose the epgm store to test
+   */
+  @Parameterized.Parameters
+  public static Collection<Object[]> data() {
+    return Arrays.asList(new Object[][] {{0}, {1}, {2}});
+  }
+
+  /**
+   * The store index to decide which store should be tested.
+   */
+  private int storeIndex;
+
+  /**
+   * Test class constructor creates an instance of this test
+   *
+   * @param storeIndex the store index to decide which store should be tested
+   */
+  public HBaseDataSinkSourceTest(int storeIndex) {
+    this.storeIndex = storeIndex;
+  }
+
+  /**
+   * Test the configuration of the stores.
+   */
+  @Test
+  public void testConfig() {
+    switch (storeIndex) {
+    case 1:
+      assertTrue(epgmStores[storeIndex].getConfig().getVertexHandler().isPreSplitRegions());
+      assertTrue(epgmStores[storeIndex].getConfig().getEdgeHandler().isPreSplitRegions());
+      assertTrue(epgmStores[storeIndex].getConfig().getGraphHeadHandler().isPreSplitRegions());
+
+      assertFalse(epgmStores[storeIndex].getConfig().getVertexHandler().isSpreadingByteUsed());
+      assertFalse(epgmStores[storeIndex].getConfig().getEdgeHandler().isSpreadingByteUsed());
+      assertFalse(epgmStores[storeIndex].getConfig().getGraphHeadHandler().isSpreadingByteUsed());
+      break;
+    case 2:
+      assertFalse(epgmStores[storeIndex].getConfig().getVertexHandler().isPreSplitRegions());
+      assertFalse(epgmStores[storeIndex].getConfig().getEdgeHandler().isPreSplitRegions());
+      assertFalse(epgmStores[storeIndex].getConfig().getGraphHeadHandler().isPreSplitRegions());
+
+      assertTrue(epgmStores[storeIndex].getConfig().getVertexHandler().isSpreadingByteUsed());
+      assertTrue(epgmStores[storeIndex].getConfig().getEdgeHandler().isSpreadingByteUsed());
+      assertTrue(epgmStores[storeIndex].getConfig().getGraphHeadHandler().isSpreadingByteUsed());
+      break;
+    default:
+      assertFalse(epgmStores[storeIndex].getConfig().getVertexHandler().isPreSplitRegions());
+      assertFalse(epgmStores[storeIndex].getConfig().getEdgeHandler().isPreSplitRegions());
+      assertFalse(epgmStores[storeIndex].getConfig().getGraphHeadHandler().isPreSplitRegions());
+
+      assertFalse(epgmStores[storeIndex].getConfig().getVertexHandler().isSpreadingByteUsed());
+      assertFalse(epgmStores[storeIndex].getConfig().getEdgeHandler().isSpreadingByteUsed());
+      assertFalse(epgmStores[storeIndex].getConfig().getGraphHeadHandler().isSpreadingByteUsed());
+      break;
     }
   }
 
@@ -120,10 +172,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testReadFromSource() throws Exception {
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-
     // read social graph from HBase via EPGMDatabase
-    GraphCollection collection = new HBaseDataSource(epgmStore, flinkConfig).getGraphCollection();
+    GraphCollection collection = new HBaseDataSource(epgmStores[storeIndex], getConfig())
+      .getGraphCollection();
 
     Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
     Collection<Vertex> loadedVertices = Lists.newArrayList();
@@ -147,10 +198,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testReadFromSourceWithEmptyPredicates() throws Exception {
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-
     // Define HBase source
-    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, flinkConfig);
+    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStores[storeIndex], getConfig());
 
     // Apply empty graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(Query.elements().fromAll().noFilter());
@@ -195,8 +244,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       testGraphs.stream().map(EPGMIdentifiable::getId).collect(Collectors.toList())
     );
 
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    HBaseDataSource source = new HBaseDataSource(epgmStore, flinkConfig);
+    HBaseDataSource source = new HBaseDataSource(epgmStores[storeIndex], getConfig());
 
     source = source.applyGraphPredicate(
       Query.elements()
@@ -230,8 +278,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       testVertices.stream().map(EPGMIdentifiable::getId).collect(Collectors.toList())
     );
 
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    HBaseDataSource source = new HBaseDataSource(epgmStore, flinkConfig);
+    HBaseDataSource source = new HBaseDataSource(epgmStores[storeIndex], getConfig());
 
     // Apply Vertex-Id predicate
     source = source.applyVertexPredicate(
@@ -266,8 +313,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       testEdges.stream().map(EPGMIdentifiable::getId).collect(Collectors.toList())
     );
 
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    HBaseDataSource source = new HBaseDataSource(epgmStore, flinkConfig);
+    HBaseDataSource source = new HBaseDataSource(epgmStores[storeIndex], getConfig());
 
     // Apply Edge-Id predicate
     source = source.applyEdgePredicate(
@@ -314,8 +360,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       .collect(Collectors.toList());
 
     // Define HBase source
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, flinkConfig);
+    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStores[storeIndex], getConfig());
 
     // Apply graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
@@ -370,8 +415,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       .collect(Collectors.toList());
 
     // Define HBase source
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, flinkConfig);
+    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStores[storeIndex], getConfig());
 
     // Apply empty graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
@@ -430,8 +474,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       .collect(Collectors.toList());
 
     // Define HBase source
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, flinkConfig);
+    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStores[storeIndex], getConfig());
 
     // Apply graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
@@ -494,8 +537,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       .collect(Collectors.toList());
 
     // Define HBase source
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, flinkConfig);
+    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStores[storeIndex], getConfig());
 
     // Apply graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
@@ -558,8 +600,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       .collect(Collectors.toList());
 
     // Define HBase source
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, flinkConfig);
+    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStores[storeIndex], getConfig());
 
     // Apply graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
@@ -622,8 +663,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       .subList(1, 4);
 
     // Define HBase source
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStore, flinkConfig);
+    HBaseDataSource hBaseDataSource = new HBaseDataSource(epgmStores[storeIndex], getConfig());
 
     // Apply graph predicate
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
@@ -675,23 +715,36 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test
   public void testWriteToSink() throws Exception {
     // Create an empty store
-    HBaseEPGMStore newStore = createEmptyEPGMStore("testWriteToSink");
+    HBaseEPGMStore newStore;
 
-    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(config);
+    switch (storeIndex) {
+    case 1:
+      final GradoopHBaseConfig splitConfig = GradoopHBaseConfig.getDefaultConfig();
+      splitConfig.enablePreSplitRegions(32);
+      newStore = openEPGMStore("HBaseDataSinkSplitRegionTest" + storeIndex + ".", splitConfig);
+      break;
+    case 2:
+      final GradoopHBaseConfig spreadingConfig = GradoopHBaseConfig.getDefaultConfig();
+      spreadingConfig.useSpreadingByte(32);
+      newStore = openEPGMStore("HBaseDataSinkSpreadingTest" + storeIndex + ".", spreadingConfig);
+      break;
+    default:
+      newStore = openEPGMStore("HBaseDataSinkTest" + storeIndex + ".");
+      break;
+    }
+
+    FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(getConfig());
 
     InputStream inputStream = getClass()
       .getResourceAsStream(GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE);
 
     loader.initDatabaseFromStream(inputStream);
 
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    new HBaseDataSink(newStore, flinkConfig)
-      .write(flinkConfig
-        .getGraphCollectionFactory()
-        .fromCollections(
-          loader.getGraphHeads(),
-          loader.getVertices(),
-          loader.getEdges()));
+    new HBaseDataSink(newStore, getConfig()).write(getConfig().getGraphCollectionFactory()
+      .fromCollections(
+        loader.getGraphHeads(),
+        loader.getVertices(),
+        loader.getEdges()));
 
     getExecutionEnvironment().execute();
 
@@ -732,11 +785,10 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     // Create an empty store
     HBaseEPGMStore newStore = createEmptyEPGMStore("testWriteToSink");
 
-    GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    GraphCollection graphCollection = flinkConfig.getGraphCollectionFactory()
+    GraphCollection graphCollection = getConfig().getGraphCollectionFactory()
       .createEmptyCollection();
 
-    new HBaseDataSink(newStore, flinkConfig).write(graphCollection, true);
+    new HBaseDataSink(newStore, getConfig()).write(graphCollection, true);
 
     getExecutionEnvironment().execute();
   }

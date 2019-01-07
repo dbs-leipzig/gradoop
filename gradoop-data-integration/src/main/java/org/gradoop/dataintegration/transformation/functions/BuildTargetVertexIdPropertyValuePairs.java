@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
@@ -28,11 +27,11 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  *
  * @param <E> The edge type.
  */
-public class BuildTargetVertexIdPropertyValuePairs<E extends EPGMEdge> implements
-  JoinFunction<Tuple2<GradoopId, PropertyValue>, Edge, Tuple2<GradoopId, PropertyValue>> {
+public class BuildTargetVertexIdPropertyValuePairs<E extends EPGMEdge>
+  implements JoinFunction<Tuple2<GradoopId, PropertyValue>, E, Tuple2<GradoopId, PropertyValue>> {
 
   @Override
-  public Tuple2<GradoopId, PropertyValue> join(Tuple2<GradoopId, PropertyValue> t, Edge e) {
+  public Tuple2<GradoopId, PropertyValue> join(Tuple2<GradoopId, PropertyValue> t, E e) {
     t.f0 = e.getTargetId();
     return t;
   }

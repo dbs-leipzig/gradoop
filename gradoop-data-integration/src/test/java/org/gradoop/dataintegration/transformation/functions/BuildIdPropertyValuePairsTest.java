@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,8 @@ public class BuildIdPropertyValuePairsTest extends GradoopFlinkTestBase {
 
   /**
    * Test if the function selects the correct labels and properties.
-   * @throws Exception
+   *
+   * @throws Exception when the execution in Flink fails.
    */
   @Test
   public void testFunction() throws Exception {

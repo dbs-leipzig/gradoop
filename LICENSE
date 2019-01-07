@@ -217,3 +217,4 @@
     - Flink 1.5.0
     - Hbase 1.3.1
     - Accumulo 1.9.0
+    - MongoDB 3.6.3

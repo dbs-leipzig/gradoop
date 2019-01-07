@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 
 /**
  * Tests for the {@link PropagatePropertyToNeighbor} operator.
@@ -94,7 +93,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
       if (!"Target".equals(v.getLabel()) && !"Target2".equals(v.getLabel())) {
         return v;
       }
-      v.setProperty("t", Arrays.asList(PropertyValue.create(1L)));
+      v.setProperty("t", Collections.singletonList(PropertyValue.create(1L)));
       return v;
     });
     LogicalGraph result = input.callForGraph(operator);
@@ -140,7 +139,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
       if (!"Target".equals(v.getLabel())) {
         return v;
       }
-      v.setProperty("t", Arrays.asList(PropertyValue.create(1L)));
+      v.setProperty("t", Collections.singletonList(PropertyValue.create(1L)));
       return v;
     });
     LogicalGraph result = input.callForGraph(operator);
@@ -158,7 +157,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input2");
     UnaryGraphToGraphOperator operator = new PropagatePropertyToNeighbor("Vertex", "t", "t");
     LogicalGraph expected = input.transformVertices((v, c) -> {
-      v.setProperty("t", Arrays.asList(PropertyValue.create(1L)));
+      v.setProperty("t", Collections.singletonList(PropertyValue.create(1L)));
       return v;
     });
     LogicalGraph result = input.callForGraph(operator);

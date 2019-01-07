@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
-
 
 /**
  * Tests for the {@link EdgeToVertex} operator.
@@ -77,7 +76,7 @@ public class EdgeToVertexTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test if {@link EdgeToVertex#EdgeToVertex(String, String, String, String) the constructor}
+   * Test if the constructor {@link EdgeToVertex#EdgeToVertex(String, String, String, String)}
    * handles null-values as intended.
    */
   @Test

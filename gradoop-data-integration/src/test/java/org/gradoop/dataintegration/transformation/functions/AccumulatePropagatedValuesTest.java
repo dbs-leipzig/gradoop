@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -53,9 +54,9 @@ public class AccumulatePropagatedValuesTest extends GradoopFlinkTestBase {
       .coGroup(getExecutionEnvironment().fromCollection(input))
       .where(0).equalTo(new Id<>())
       .with(new AccumulatePropagatedValues<>("k",
-        new HashSet<>(Arrays.asList("a"))))
+        new HashSet<>(Collections.singletonList("a"))))
       .collect();
-    v1.setProperty("k", PropertyValue.create(Arrays.asList(PropertyValue.create(1L))));
+    v1.setProperty("k", PropertyValue.create(Collections.singletonList(PropertyValue.create(1L))));
     List<Vertex> expected = Arrays.asList(v1, v2, v3);
     Comparator<Vertex> comparator = Comparator.comparing(Vertex::getId);
     expected.sort(comparator);
