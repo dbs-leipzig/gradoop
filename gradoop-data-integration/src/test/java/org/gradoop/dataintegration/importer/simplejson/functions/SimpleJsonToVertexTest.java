@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ public class SimpleJsonToVertexTest extends GradoopFlinkTestBase {
   @Before
   public void setUp() {
     vertexFactory = getConfig().getVertexFactory();
-    expectedValue = vertexFactory.createVertex(SimpleJsonToVertex.DEFAULT_VERTEX_LABEL);
+    expectedValue = vertexFactory.createVertex(SimpleJsonToVertex.JSON_VERTEX_LABEL);
     function = new SimpleJsonToVertex(vertexFactory);
   }
 

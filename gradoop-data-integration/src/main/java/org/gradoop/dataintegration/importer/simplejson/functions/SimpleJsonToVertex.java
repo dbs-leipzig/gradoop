@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Reads vertex data from a json document. The document contains at least
@@ -48,20 +49,20 @@ public class SimpleJsonToVertex implements MapFunction<String, Vertex> {
   /**
    * The default label used for the newly created vertices.
    */
-  public static final String DEFAULT_VERTEX_LABEL = "JsonRowVertex";
+  public static final String JSON_VERTEX_LABEL = "JsonRowVertex";
 
   /**
-   * The factory used to create new vertices.
+   * Reduce object instantiations.
    */
-  private final EPGMVertexFactory<Vertex> vertexFactory;
+  private final Vertex reuse;
 
   /**
    * Creates a new instance of this JSON string to vertex converting function.
    *
-   * @param epgmVertexFactory The vertex factory used to create new vertices.
+   * @param vertexFactory The vertex factory used to create new vertices.
    */
-  public SimpleJsonToVertex(EPGMVertexFactory<Vertex> epgmVertexFactory) {
-    this.vertexFactory = epgmVertexFactory;
+  public SimpleJsonToVertex(EPGMVertexFactory<Vertex> vertexFactory) {
+    this.reuse = Objects.requireNonNull(vertexFactory).createVertex(JSON_VERTEX_LABEL);
   }
 
   /**
@@ -74,7 +75,6 @@ public class SimpleJsonToVertex implements MapFunction<String, Vertex> {
   public Vertex map(String jsonString) throws Exception {
     JSONObject jsonVertex = new JSONObject(jsonString);
 
-    Vertex vertex = vertexFactory.createVertex(DEFAULT_VERTEX_LABEL);
     Properties properties = Properties.create();
 
     for (Iterator it = jsonVertex.keys(); it.hasNext();) {
@@ -83,8 +83,8 @@ public class SimpleJsonToVertex implements MapFunction<String, Vertex> {
       PropertyValue propertyValue = getPropertyValue(jsonVertex, key);
       properties.set(key, propertyValue);
     }
-    vertex.setProperties(properties);
-    return vertex;
+    reuse.setProperties(properties);
+    return reuse;
   }
 
   /**
@@ -95,7 +95,7 @@ public class SimpleJsonToVertex implements MapFunction<String, Vertex> {
    * @return The converted value.
    */
   private PropertyValue getPropertyValue(JSONObject jsonObject, String key) {
-    PropertyValue pv = new PropertyValue();
+    PropertyValue propertyValue = new PropertyValue();
     if (jsonObject.optJSONArray(key) != null) {
       JSONArray array = jsonObject.optJSONArray(key);
       // is it list or object?
@@ -104,17 +104,18 @@ public class SimpleJsonToVertex implements MapFunction<String, Vertex> {
       List<PropertyValue> propertyList = new ArrayList<>();
 
       for (int i = 0; i < array.length(); i++) {
-        String valString = listOrObject ? array.optJSONObject(i).toString() : array.optString(i);
+        String stringValue = listOrObject ? array.optJSONObject(i).toString() : array.optString(i);
 
-        PropertyValue propValue = new PropertyValue();
-        propValue.setString(valString);
-        propertyList.add(propValue);
-        pv.setList(propertyList);
+        PropertyValue listElement = PropertyValue.create(stringValue);
+        propertyList.add(listElement);
+        propertyValue.setList(propertyList);
       }
     } else if (jsonObject.optString(key) != null) {
       String text = jsonObject.optString(key);
-      pv.setString(text);
+      propertyValue.setString(text);
+    } else {
+      propertyValue.setObject(null);
     }
-    return pv;
+    return propertyValue;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -58,14 +57,14 @@ public class SimpleJsonDataImport implements DataSource {
   }
 
   @Override
-  public LogicalGraph getLogicalGraph() throws IOException {
+  public LogicalGraph getLogicalGraph() {
     DataSet<Vertex> vertices = config.getExecutionEnvironment().readTextFile(jsonPath)
       .map(new SimpleJsonToVertex(config.getVertexFactory()));
     return config.getLogicalGraphFactory().fromDataSets(vertices);
   }
 
   @Override
-  public GraphCollection getGraphCollection() throws IOException {
+  public GraphCollection getGraphCollection() {
     return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());
   }
 }
