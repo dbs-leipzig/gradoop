@@ -22,7 +22,6 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.dataintegration.importer.impl.csv.MinimalCSVImporter;
-import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -38,7 +37,7 @@ import java.util.List;
 public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
   /**
-   * Test if the properties of the imported vertices works correct. Set the first line
+   * Test if the property import of the vertices works correct. Set the first line
    * of the file as the column property names.
    *
    * @throws Exception
@@ -53,9 +52,9 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
       new MinimalCSVImporter(csvPath, delimiter, getConfig(), true);
 
     //check the rows for the header line
-    DataSet<ImportVertex<Long>> importVertex = importVertexImporter.importVertices();
+    DataSet<Vertex> importVertex = importVertexImporter.importVertices();
 
-    List<ImportVertex<Long>> lv = new ArrayList<>();
+    List<Vertex> lv = new ArrayList<>();
     importVertex.output(new LocalCollectionOutputFormat<>(lv));
 
     getExecutionEnvironment().execute();
@@ -64,7 +63,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test if the properties of the imported vertices works correct. In this case
+   * Test if the property import of the vertices works correct. In this case
    * the file do not contain a header row. For this the user set a list with
    * the column names.
    *
@@ -79,9 +78,9 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
     List<String> columnNames = Arrays.asList("name", "value1", "value2", "value3");
     MinimalCSVImporter importVertexImporter =
       new MinimalCSVImporter(csvPath, delimiter, getConfig(), columnNames, false);
-    DataSet<ImportVertex<Long>> importVertex = importVertexImporter.importVertices();
+    DataSet<Vertex> importVertex = importVertexImporter.importVertices();
 
-    List<ImportVertex<Long>> lv = new ArrayList<>();
+    List<Vertex> lv = new ArrayList<>();
     importVertex.output(new LocalCollectionOutputFormat<>(lv));
 
     getExecutionEnvironment().execute();
@@ -139,6 +138,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
   /**
    * Test if the reoccurring header flag is set this row will skipped.
+   *
    * @throws Exception
    */
   @Test
@@ -166,6 +166,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
   /**
    * Test if an empty line in the csv file will be skipped.
+   *
    * @throws Exception
    */
   @Test
@@ -186,7 +187,8 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test if a row contains empty entries, no property will be create.
+   * Test if a row contains empty entries no property will be create.
+   *
    * @throws Exception
    */
   @Test
@@ -228,24 +230,24 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    *
    * @param lv list of the import vertices
    */
-  public void assertImportCSV(List<ImportVertex<Long>> lv) {
+  public void assertImportCSV(List<Vertex> lv) {
     assertEquals(3, lv.size());
 
-    for (ImportVertex<Long> v : lv) {
-      if (v.f2.get("name").toString().equals("foo")) {
-        assertEquals(4, v.f2.size());
-        assertEquals("453", v.f2.get("value1").toString());
-        assertEquals("true", v.f2.get("value2").toString());
-        assertEquals("71.03", v.f2.get("value3").toString());
-      } else if (v.f2.get("name").toString().equals("bar")) {
-        assertEquals(4, v.f2.size());
-        assertEquals("76", v.f2.get("value1").toString());
-        assertEquals("false", v.f2.get("value2").toString());
-        assertEquals("33.4", v.f2.get("value3").toString());
-      } else if (v.f2.get("name").toString().equals("bla")) {
-        assertEquals(3, v.f2.size());
-        assertEquals("4568", v.f2.get("value1").toString());
-        assertEquals("9.42", v.f2.get("value3").toString());
+    for (Vertex v : lv) {
+      if (String.valueOf(v.getPropertyValue("name")).equals("foo")) {
+        assertEquals(4, v.getProperties().size());
+        assertEquals("453", String.valueOf(v.getPropertyValue("value1")));
+        assertEquals("true", String.valueOf(v.getPropertyValue("value2")));
+        assertEquals("71.03", String.valueOf(v.getPropertyValue("value3")));
+      } else if (String.valueOf(v.getPropertyValue("name")).equals("bar")) {
+        assertEquals(4, v.getProperties().size());
+        assertEquals("76", String.valueOf(v.getPropertyValue("value1")));
+        assertEquals("false", String.valueOf(v.getPropertyValue("value2")));
+        assertEquals("33.4", String.valueOf(v.getPropertyValue("value3")));
+      } else if (String.valueOf(v.getPropertyValue("name")).equals("bla")) {
+        assertEquals(3, v.getProperties().size());
+        assertEquals("4568", String.valueOf(v.getPropertyValue("value1")));
+        assertEquals("9.42", String.valueOf(v.getPropertyValue("value3")));
       } else {
         fail();
       }

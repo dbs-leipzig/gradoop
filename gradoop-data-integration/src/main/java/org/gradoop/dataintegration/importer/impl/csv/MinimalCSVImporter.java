@@ -15,20 +15,12 @@
  */
 package org.gradoop.dataintegration.importer.impl.csv;
 
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.apache.flink.api.java.utils.DataSetUtils;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.dataintegration.importer.impl.csv.functions.CreateImportVertexCSV;
 import org.gradoop.dataintegration.importer.impl.csv.functions.RowToVertexMapper;
-import org.gradoop.flink.io.impl.graph.functions.InitVertex;
-import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.BufferedReader;
@@ -80,7 +72,7 @@ public class MinimalCSVImporter {
    *
    * @param path the path to the csv file
    * @param tokenSeparator the token delimiter of the csv file
-   * @param config GradoopFlinkConfig
+   * @param config GradoopFlinkConfig configuration
    * @param columnNames property identifier for each column
    * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
    *                               the column property names.
@@ -97,7 +89,7 @@ public class MinimalCSVImporter {
    *
    * @param path the path to the csv file
    * @param tokenSeparator the token delimiter of the csv file
-   * @param config GradoopFlinkConfig
+   * @param config GradoopFlinkConfig configuration
    * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
    *                               the column property names.
    */
@@ -112,7 +104,7 @@ public class MinimalCSVImporter {
    *
    * @param path the path to the csv file
    * @param tokenSeparator the token delimiter of the csv file
-   * @param config GradoopFlinkConfig
+   * @param config GradoopFlinkConfig configuration
    * @param charset the charset used in the csv file
    * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
    *                               the column property names.
@@ -133,7 +125,7 @@ public class MinimalCSVImporter {
    * @return the imported vertices
    * @throws IOException if an error occurred while open the stream
    */
-  public DataSet<ImportVertex<Long>> importVertices()
+  public DataSet<Vertex> importVertices()
     throws IOException {
     if (columnNames == null) {
       return readCSVFile(readHeaderRow(), checkReoccurringHeader);
@@ -150,14 +142,14 @@ public class MinimalCSVImporter {
    *                               reoccurring of the column property names
    * @return a DataSet of all import vertices from one specific file
    */
-  private DataSet<ImportVertex<Long>> readCSVFile(List<String> propertyNames,
+  private DataSet<Vertex> readCSVFile(List<String> propertyNames,
                                                   boolean checkReoccurringHeader) {
 
     DataSet<Properties> lines = config.getExecutionEnvironment()
       .readTextFile(path)
       .flatMap(new RowToVertexMapper(tokenSeparator, propertyNames, checkReoccurringHeader));
 
-    return DataSetUtils.zipWithUniqueId(lines).map(new CreateImportVertexCSV<>());
+    return lines.map(new CreateImportVertexCSV());
   }
 
   /**
@@ -190,18 +182,8 @@ public class MinimalCSVImporter {
    */
   public LogicalGraph getLogicalGraph() throws IOException {
 
-    DataSet<ImportVertex<Long>> importVertices = importVertices();
+    DataSet<Vertex> importVertices = importVertices();
 
-    TypeInformation<Long> externalIdType = ((TupleTypeInfo<?>) importVertices
-      .getType()).getTypeAt(0);
-
-    DataSet<Tuple3<Long, GradoopId, Vertex>> vertexTriples = importVertices
-      .map(new InitVertex<>(
-        config.getVertexFactory(), null, externalIdType));
-
-    DataSet<Vertex> epgmVertices = vertexTriples
-      .map(new Value2Of3<>());
-
-    return config.getLogicalGraphFactory().fromDataSets(epgmVertices);
+    return config.getLogicalGraphFactory().fromDataSets(importVertices);
   }
 }

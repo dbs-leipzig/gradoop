@@ -16,36 +16,34 @@
 package org.gradoop.dataintegration.importer.impl.csv.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
-import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
 
 /**
  * Create an ImportVertex for each tuple of an id and properties.
- *
- * @param <K> id type
  */
-public class CreateImportVertexCSV<K extends Comparable<K>>
-  implements MapFunction<Tuple2<K, Properties>, ImportVertex<K>> {
+public class CreateImportVertexCSV
+  implements MapFunction<Properties, Vertex> {
 
   /**
    * Used ImportVertex
    */
-  private ImportVertex<K> vertex;
+  private Vertex vertex;
 
   /**
    * Create a new CreateImportVertexCSV function
    */
   public CreateImportVertexCSV() {
-    this.vertex = new ImportVertex<>();
+    this.vertex = new Vertex();
     vertex.setLabel(GradoopConstants.DEFAULT_VERTEX_LABEL);
   }
 
   @Override
-  public ImportVertex<K> map(final Tuple2<K, Properties> value) {
-    vertex.setId(value.f0);
-    vertex.setProperties(value.f1);
+  public Vertex map(final Properties value) {
+    vertex.setId(GradoopId.get());
+    vertex.setProperties(value);
     return vertex;
   }
 }
