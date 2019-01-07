@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,11 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * This {@link CoGroupFunction} accumulates all properties that might be send to a vertex and
@@ -66,7 +70,8 @@ public class AccumulatePropagatedValues<V extends EPGMVertex>
       return;
     }
     V targetVertex = iterator.next();
-    // If the vertex is not whitelisted by the targetVertexLabels list, forward it without modification.
+    // If the vertex is not whitelisted by the targetVertexLabels list,
+    // forward it without modification.
     if (targetVertexLabels != null && !targetVertexLabels.contains(targetVertex.getLabel())) {
       out.collect(targetVertex);
       return;

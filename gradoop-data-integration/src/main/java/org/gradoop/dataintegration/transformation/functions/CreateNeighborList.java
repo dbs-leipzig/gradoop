@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,12 +83,12 @@ public class CreateNeighborList
    */
   private GradoopId getNeighborId(GradoopId vertexId, Edge edge) {
     switch (edgeDirection) {
-      case INCOMING:
-        return edge.getSourceId();
-      case OUTGOING:
-        return edge.getTargetId();
-      default:
-        return vertexId.equals(edge.getSourceId()) ? edge.getTargetId() : edge.getSourceId();
+    case INCOMING:
+      return edge.getSourceId();
+    case OUTGOING:
+      return edge.getTargetId();
+    default:
+      return vertexId.equals(edge.getSourceId()) ? edge.getTargetId() : edge.getSourceId();
     }
   }
 }
