@@ -84,11 +84,11 @@ public class MapStrategy implements PropertyValueStrategy<Map> {
 
     try {
       while (inputStream.available() > 0) {
-        value = new PropertyValue();
-        value.read(internalInputView);
-
         key = new PropertyValue();
         key.read(internalInputView);
+
+        value = new PropertyValue();
+        value.read(internalInputView);
 
         map.put(key, value);
       }
