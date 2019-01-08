@@ -93,7 +93,7 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testCreate() throws Exception {
+  public void testCreate() {
     // null
     PropertyValue p = create(null);
     assertTrue(p.isNull());
@@ -279,7 +279,7 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testSetAndGetObject() throws Exception {
+  public void testSetAndGetObject() {
     PropertyValue p = new PropertyValue();
     // null
     p.setObject(null);
@@ -354,7 +354,7 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testIsNull() throws Exception {
+  public void testIsNull() {
     PropertyValue p = PropertyValue.create(null);
     assertTrue(p.isNull());
     assertFalse(p.isBoolean());
@@ -375,7 +375,7 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testIsBoolean() throws Exception {
+  public void testIsBoolean() {
     PropertyValue p = PropertyValue.create(true);
     assertFalse(p.isNull());
     assertTrue(p.isBoolean());
@@ -396,20 +396,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetBoolean() throws Exception {
+  public void testGetBoolean() {
     PropertyValue p = PropertyValue.create(BOOL_VAL_1);
     assertEquals(BOOL_VAL_1, p.getBoolean());
   }
 
   @Test
-  public void testSetBoolean() throws Exception {
+  public void testSetBoolean() {
     PropertyValue p = new PropertyValue();
     p.setBoolean(BOOL_VAL_1);
     assertEquals(BOOL_VAL_1, p.getBoolean());
   }
 
   @Test
-  public void testIsShort() throws Exception {
+  public void testIsShort() {
     PropertyValue p = PropertyValue.create(SHORT_VAL_e);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -430,20 +430,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetShort() throws Exception {
+  public void testGetShort() {
     PropertyValue p = PropertyValue.create(SHORT_VAL_e);
     assertEquals(SHORT_VAL_e, p.getShort());
   }
 
   @Test
-  public void testSetShort() throws Exception {
+  public void testSetShort() {
     PropertyValue p = new PropertyValue();
     p.setShort(SHORT_VAL_e);
     assertEquals(SHORT_VAL_e, p.getShort());
   }
 
   @Test
-  public void testIsInt() throws Exception {
+  public void testIsInt() {
     PropertyValue p = PropertyValue.create(INT_VAL_2);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -464,20 +464,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetInt() throws Exception {
+  public void testGetInt() {
     PropertyValue p = PropertyValue.create(INT_VAL_2);
     assertEquals(INT_VAL_2, p.getInt());
   }
 
   @Test
-  public void testSetInt() throws Exception {
+  public void testSetInt() {
     PropertyValue p = new PropertyValue();
     p.setInt(INT_VAL_2);
     assertEquals(INT_VAL_2, p.getInt());
   }
 
   @Test
-  public void testIsLong() throws Exception {
+  public void testIsLong() {
     PropertyValue p = PropertyValue.create(LONG_VAL_3);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -498,20 +498,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetLong() throws Exception {
+  public void testGetLong() {
     PropertyValue p = PropertyValue.create(LONG_VAL_3);
     assertEquals(LONG_VAL_3, p.getLong());
   }
 
   @Test
-  public void testSetLong() throws Exception {
+  public void testSetLong()  {
     PropertyValue p = new PropertyValue();
     p.setLong(LONG_VAL_3);
     assertEquals(LONG_VAL_3, p.getLong());
   }
 
   @Test
-  public void testIsFloat() throws Exception {
+  public void testIsFloat()  {
     PropertyValue p = PropertyValue.create(FLOAT_VAL_4);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -532,20 +532,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetFloat() throws Exception {
+  public void testGetFloat() {
     PropertyValue p = PropertyValue.create(FLOAT_VAL_4);
     assertEquals(FLOAT_VAL_4, p.getFloat(), 0);
   }
 
   @Test
-  public void testSetFloat() throws Exception {
+  public void testSetFloat() {
     PropertyValue p = new PropertyValue();
     p.setFloat(FLOAT_VAL_4);
     assertEquals(FLOAT_VAL_4, p.getFloat(), 0);
   }
 
   @Test
-  public void testIsDouble() throws Exception {
+  public void testIsDouble() {
     PropertyValue p = PropertyValue.create(DOUBLE_VAL_5);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -566,20 +566,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetDouble() throws Exception {
+  public void testGetDouble() {
     PropertyValue p = PropertyValue.create(DOUBLE_VAL_5);
     assertEquals(DOUBLE_VAL_5, p.getDouble(), 0);
   }
 
   @Test
-  public void testSetDouble() throws Exception {
+  public void testSetDouble() {
     PropertyValue p = new PropertyValue();
     p.setDouble(DOUBLE_VAL_5);
     assertEquals(DOUBLE_VAL_5, p.getDouble(), 0);
   }
 
   @Test
-  public void testIsString() throws Exception {
+  public void testIsString() {
     PropertyValue p = PropertyValue.create(STRING_VAL_6);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -600,20 +600,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetString() throws Exception {
+  public void testGetString() {
     PropertyValue p = PropertyValue.create(STRING_VAL_6);
     assertEquals(STRING_VAL_6, p.getString());
   }
 
   @Test
-  public void testSetString() throws Exception {
+  public void testSetString() {
     PropertyValue p = new PropertyValue();
     p.setString(STRING_VAL_6);
     assertEquals(STRING_VAL_6, p.getString());
   }
 
   @Test
-  public void testIsBigDecimal() throws Exception {
+  public void testIsBigDecimal() {
     PropertyValue p = PropertyValue.create(BIG_DECIMAL_VAL_7);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -634,20 +634,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetBigDecimal() throws Exception {
+  public void testGetBigDecimal() {
     PropertyValue p = PropertyValue.create(BIG_DECIMAL_VAL_7);
     assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
   }
 
   @Test
-  public void testSetBigDecimal() throws Exception {
+  public void testSetBigDecimal() {
     PropertyValue p = new PropertyValue();
     p.setBigDecimal(BIG_DECIMAL_VAL_7);
     assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
   }
 
   @Test
-  public void testIsGradoopId() throws Exception {
+  public void testIsGradoopId() {
     PropertyValue p = PropertyValue.create(GRADOOP_ID_VAL_8);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -668,20 +668,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetGradoopId() throws Exception {
+  public void testGetGradoopId() {
     PropertyValue p = PropertyValue.create(GRADOOP_ID_VAL_8);
     assertEquals(GRADOOP_ID_VAL_8, p.getGradoopId());
   }
 
   @Test
-  public void testSetGradoopId() throws Exception {
+  public void testSetGradoopId() {
     PropertyValue p = new PropertyValue();
     p.setGradoopId(GRADOOP_ID_VAL_8);
     assertEquals(GRADOOP_ID_VAL_8, p.getGradoopId());
   }
 
   @Test
-  public void testIsMap() throws Exception {
+  public void testIsMap() {
     PropertyValue p = PropertyValue.create(MAP_VAL_9);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -702,20 +702,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetMap() throws Exception {
+  public void testGetMap() {
     PropertyValue p = PropertyValue.create(MAP_VAL_9);
     assertEquals(MAP_VAL_9, p.getMap());
   }
 
   @Test
-  public void testSetMap() throws Exception {
+  public void testSetMap() {
     PropertyValue p = new PropertyValue();
     p.setMap(MAP_VAL_9);
     assertEquals(MAP_VAL_9, p.getMap());
   }
 
   @Test
-  public void testIsList() throws Exception {
+  public void testIsList() {
     PropertyValue p = PropertyValue.create(LIST_VAL_a);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -736,20 +736,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetList() throws Exception {
+  public void testGetList() {
     PropertyValue p = PropertyValue.create(LIST_VAL_a);
     assertEquals(LIST_VAL_a, p.getList());
   }
 
   @Test
-  public void testSetList() throws Exception {
+  public void testSetList() {
     PropertyValue p = new PropertyValue();
     p.setList(LIST_VAL_a);
     assertEquals(LIST_VAL_a, p.getList());
   }
 
   @Test
-  public void testIsDate() throws Exception {
+  public void testIsDate() {
     PropertyValue p = PropertyValue.create(DATE_VAL_b);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -770,20 +770,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetDate() throws Exception {
+  public void testGetDate() {
     PropertyValue p = PropertyValue.create(DATE_VAL_b);
     assertEquals(DATE_VAL_b, p.getDate());
   }
 
   @Test
-  public void testSetDate() throws Exception {
+  public void testSetDate() {
     PropertyValue p = new PropertyValue();
     p.setDate(DATE_VAL_b);
     assertEquals(DATE_VAL_b, p.getDate());
   }
 
   @Test
-  public void testIsTime() throws Exception {
+  public void testIsTime() {
     PropertyValue p = PropertyValue.create(TIME_VAL_c);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -804,20 +804,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetTime() throws Exception {
+  public void testGetTime() {
     PropertyValue p = PropertyValue.create(TIME_VAL_c);
     assertEquals(TIME_VAL_c, p.getTime());
   }
 
   @Test
-  public void testSetTime() throws Exception {
+  public void testSetTime() {
     PropertyValue p = new PropertyValue();
     p.setTime(TIME_VAL_c);
     assertEquals(TIME_VAL_c, p.getTime());
   }
 
   @Test
-  public void testIsDateTime() throws Exception {
+  public void testIsDateTime() {
     PropertyValue p = PropertyValue.create(DATETIME_VAL_d);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -838,20 +838,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetDateTime() throws Exception {
+  public void testGetDateTime() {
     PropertyValue p = PropertyValue.create(DATETIME_VAL_d);
     assertEquals(DATETIME_VAL_d, p.getDateTime());
   }
 
   @Test
-  public void testSetDateTime() throws Exception {
+  public void testSetDateTime() {
     PropertyValue p = new PropertyValue();
     p.setDateTime(DATETIME_VAL_d);
     assertEquals(DATETIME_VAL_d, p.getDateTime());
   }
 
   @Test
-  public void testIsSet() throws Exception {
+  public void testIsSet() {
     PropertyValue p = PropertyValue.create(SET_VAL_f);
     assertFalse(p.isNull());
     assertFalse(p.isBoolean());
@@ -872,20 +872,20 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testGetSet() throws Exception {
+  public void testGetSet() {
     PropertyValue p = PropertyValue.create(SET_VAL_f);
     assertEquals(SET_VAL_f, p.getSet());
   }
 
   @Test
-  public void testSetSet() throws Exception {
+  public void testSetSet() {
     PropertyValue p = new PropertyValue();
     p.setSet(SET_VAL_f);
     assertEquals(SET_VAL_f, p.getSet());
   }
 
   @Test
-  public void testIsNumber() throws Exception {
+  public void testIsNumber() {
     PropertyValue p = PropertyValue.create(SHORT_VAL_e);
     assertTrue(p.isNumber());
     p = PropertyValue.create(INT_VAL_2);
@@ -922,7 +922,7 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testEqualsAndHashCode() throws Exception {
+  public void testEqualsAndHashCode() {
     validateEqualsAndHashCode(create(null), create(null), create(false));
 
     validateEqualsAndHashCode(create(true), create(true), create(false));
@@ -1007,7 +1007,7 @@ public class PropertyValueTest {
   }
 
   @Test
-  public void testCompareTo() throws Exception {
+  public void testCompareTo() {
     // null
     assertEquals(create(null).compareTo(create(null)), 0);
     // boolean
@@ -1306,6 +1306,18 @@ public class PropertyValueTest {
   }
 
   @Test
+  public void testReadAndWriteLargeMap() throws Exception {
+    HashMap<PropertyValue, PropertyValue> largeMap = new HashMap<>();
+    long neededEntries = PropertyValue.LARGE_PROPERTY_THRESHOLD;
+    for(int i = 0; i < neededEntries; i++) {
+      largeMap.put(PropertyValue.create("key" + i), PropertyValue.create("value" + i));
+    }
+
+    PropertyValue p = create(largeMap);
+    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
+  }
+
+  @Test
   public void testGetType() {
     PropertyValue p = create(NULL_VAL_0);
     assertNull(p.getType());
@@ -1361,10 +1373,9 @@ public class PropertyValueTest {
    */
   private void validateCompareTo(PropertyValue p1, PropertyValue p2,
     PropertyValue p3) {
-    boolean stop = true;
-    assertTrue(p1.compareTo(p1) == 0);
-    assertTrue(p1.compareTo(p2) == 0);
-    assertTrue(p2.compareTo(p1) == 0);
+    assertEquals(0, p1.compareTo(p1));
+    assertEquals(0, p1.compareTo(p2));
+    assertEquals(0, p2.compareTo(p1));
     assertTrue(p1.compareTo(p3) < 0);
     assertTrue(p3.compareTo(p1) > 0);
     assertTrue(p3.compareTo(p2) > 0);

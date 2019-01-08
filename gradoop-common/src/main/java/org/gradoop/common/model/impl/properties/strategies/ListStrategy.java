@@ -67,7 +67,6 @@ public class ListStrategy implements PropertyValueStrategy<List> {
     // init new array
     byte[] rawBytes = new byte[length];
 
-//    int bytesRead = inputView.read(rawBytes);
     for (int i = 0; i < rawBytes.length; i++) {
       rawBytes[i] = inputView.readByte();
     }
