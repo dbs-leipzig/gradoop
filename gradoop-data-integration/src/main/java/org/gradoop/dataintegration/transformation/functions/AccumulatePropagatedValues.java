@@ -32,7 +32,7 @@ import java.util.Set;
  * This {@link CoGroupFunction} accumulates all properties that might be send to a vertex and
  * stores them in a {@link PropertyValue} list.
  *
- * @param <V> The edge type.
+ * @param <V> The vertex type.
  */
 public class AccumulatePropagatedValues<V extends EPGMVertex>
   implements CoGroupFunction<Tuple2<GradoopId, PropertyValue>, V, V> {

@@ -53,8 +53,7 @@ public class AccumulatePropagatedValuesTest extends GradoopFlinkTestBase {
     List<Vertex> result = getExecutionEnvironment().fromElements(property1, property2)
       .coGroup(getExecutionEnvironment().fromCollection(input))
       .where(0).equalTo(new Id<>())
-      .with(new AccumulatePropagatedValues<>("k",
-        new HashSet<>(Collections.singletonList("a"))))
+      .with(new AccumulatePropagatedValues<>("k", new HashSet<>(Collections.singletonList("a"))))
       .collect();
     v1.setProperty("k", PropertyValue.create(Collections.singletonList(PropertyValue.create(1L))));
     List<Vertex> expected = Arrays.asList(v1, v2, v3);

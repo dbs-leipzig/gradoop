@@ -38,13 +38,13 @@ import java.util.Objects;
  * <p>
  * Each edge that has to be created results from a path in the graph of the following form: <br>
  * {@code (i)-[i_j]->(j)-[j_k]->(k)} <br>
- * The newly created edge goes from: {@code v_i --e_i,k--> v_k} <br>
- * The edge {@code e_i,k} has a user-defined label and besides the original vertex properties three
+ * The newly created edge goes from: {@code (i)-[e_ik]->(k)} <br>
+ * The edge {@code [e_ik]} has a user-defined label and besides the original vertex properties three
  * additional properties:
  * <ul>
  *   <li>{@code originalVertexLabel}</li>
- *   <li>{@code firstEdgeLabel = labelOf(e_i,j)}</li>
- *   <li>{@code secondEdgeLabel = labelOf(e_j,k)}</li>
+ *   <li>{@code firstEdgeLabel = labelOf(i_j)}</li>
+ *   <li>{@code secondEdgeLabel = labelOf(j_k)}</li>
  * </ul>
  */
 public class VertexToEdge implements UnaryGraphToGraphOperator {
