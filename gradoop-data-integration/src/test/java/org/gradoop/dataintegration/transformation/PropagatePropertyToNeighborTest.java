@@ -90,7 +90,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
     UnaryGraphToGraphOperator operator = new PropagatePropertyToNeighbor("Source", "p1", "t",
       Collections.singleton("edge1"), null);
     LogicalGraph expected = input.transformVertices((v, c) -> {
-      if (!"Target".equals(v.getLabel()) && !"Target2".equals(v.getLabel())) {
+      if (!v.getLabel().equals("Target") && !v.getLabel().equals("Target2")) {
         return v;
       }
       v.setProperty("t", Collections.singletonList(PropertyValue.create(1L)));
