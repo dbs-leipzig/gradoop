@@ -67,10 +67,8 @@ public class MapStrategy implements PropertyValueStrategy<Map> {
 
     byte[] rawBytes = new byte[length];
 
-    int bytesRead = inputView.read(rawBytes);
-
-    if (bytesRead != length) {
-      throw new RuntimeException("Error reading input view.");
+    for (int i = 0; i < rawBytes.length; i++) {
+      rawBytes[i] = inputView.readByte();
     }
 
     PropertyValue key;
