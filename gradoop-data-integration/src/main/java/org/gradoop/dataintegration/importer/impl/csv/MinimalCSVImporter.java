@@ -17,9 +17,10 @@ package org.gradoop.dataintegration.importer.impl.csv;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.dataintegration.importer.impl.csv.functions.CreateImportVertexCSV;
-import org.gradoop.dataintegration.importer.impl.csv.functions.RowToVertexMapper;
+import org.gradoop.dataintegration.importer.impl.csv.functions.PropertiesToVertex;
+import org.gradoop.dataintegration.importer.impl.csv.functions.CsvRowToProperties;
+import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -34,48 +35,49 @@ import java.util.Objects;
 /**
  * Read a csv file and import each row as a vertex in EPGM representation.
  */
-public class MinimalCSVImporter {
+public class MinimalCSVImporter implements DataSource {
 
   /**
-   * Token delimiter
+   * Token delimiter of the CSV file.
    */
   private String tokenSeparator;
 
   /**
-   * Path to the csv file
+   * Path to the csv file.
    */
   private String path;
 
   /**
-   * The charset used in the csv file.
+   * The charset used in the csv file, e.g., "UTF-8".
    */
   private String charset;
 
   /**
-   * THe property names for all columns in the file.
+   * The property names for all columns in the file. If {@code null}, the first line will be
+   * interpreted as header row.
    */
   private List<String> columnNames;
 
   /**
-   * set to true if each row of the file should be checked for
-   * reoccurring of the column property names
+   * Flag to specify if each row of the file should be checked for reoccurring of the column
+   * property names.
    */
   private boolean checkReoccurringHeader;
 
   /**
-   * Gradoop Flink configuration
+   * Gradoop Flink configuration.
    */
   private GradoopFlinkConfig config;
 
   /**
-   * Create a new MinimalCSVImporter. The user set a list of the property names.
+   * Create a new MinimalCSVImporter instance by the given parameters.
    *
    * @param path the path to the csv file
    * @param tokenSeparator the token delimiter of the csv file
    * @param config GradoopFlinkConfig configuration
-   * @param columnNames property identifier for each column
+   * @param columnNames property identifiers for each column
    * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
-   *                               the column property names.
+   *                               the column property names
    */
   public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config,
                             List<String> columnNames, boolean checkReoccurringHeader) {
@@ -84,8 +86,9 @@ public class MinimalCSVImporter {
   }
 
   /**
-   * Create a new MinimalCSVImporter. Use the utf-8 charset as default. The first line of the file
-   * will set as the property names for each column.
+   * Create a new MinimalCSVImporter instance by the given parameters.
+   * Use the UTF-8 charset as default. The first line of the file will be set as the property
+   * names for each column.
    *
    * @param path the path to the csv file
    * @param tokenSeparator the token delimiter of the csv file
@@ -119,37 +122,46 @@ public class MinimalCSVImporter {
   }
 
   /**
-   * Import each row of the file as a vertex. If no column property names are set,
-   * read the first line of the file as header and set this values as column names.
+   * Import each row of the file as a vertex and create a logical graph from it.
+   * If no column property names are set, read the first line of the file as header and set this
+   * values as column names.
    *
-   * @return the imported vertices
-   * @throws IOException if an error occurred while open the stream
+   * @return a logical graph with a vertex per csv line and no edges
+   * @throws IOException on failure
    */
-  public DataSet<Vertex> importVertices()
-    throws IOException {
+  @Override
+  public LogicalGraph getLogicalGraph() throws IOException {
+    DataSet<Vertex> vertices;
+
     if (columnNames == null) {
-      return readCSVFile(readHeaderRow(), checkReoccurringHeader);
+      vertices = readCSVFile(readHeaderRow(), checkReoccurringHeader);
     } else {
-      return readCSVFile(columnNames, checkReoccurringHeader);
+      vertices = readCSVFile(columnNames, checkReoccurringHeader);
     }
+
+    return config.getLogicalGraphFactory().fromDataSets(vertices);
+  }
+
+  @Override
+  public GraphCollection getGraphCollection() throws IOException {
+    return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());
   }
 
   /**
-   * Reads the csv file and converts each valid line to a import vertex.
+   * Reads the csv file specified by {@link MinimalCSVImporter#path} and converts each valid line
+   * to a {@link Vertex}.
    *
    * @param propertyNames list of the property identifier names
    * @param checkReoccurringHeader set to true if each row of the file should be checked for
    *                               reoccurring of the column property names
-   * @return a DataSet of all import vertices from one specific file
+   * @return a {@link DataSet} of all vertices from one specific file
    */
-  private DataSet<Vertex> readCSVFile(List<String> propertyNames,
-                                                  boolean checkReoccurringHeader) {
-
-    DataSet<Properties> lines = config.getExecutionEnvironment()
+  private DataSet<Vertex> readCSVFile(List<String> propertyNames, boolean checkReoccurringHeader) {
+    return config.getExecutionEnvironment()
       .readTextFile(path)
-      .flatMap(new RowToVertexMapper(tokenSeparator, propertyNames, checkReoccurringHeader));
-
-    return lines.map(new CreateImportVertexCSV());
+      .flatMap(new CsvRowToProperties(tokenSeparator, propertyNames, checkReoccurringHeader))
+      .map(new PropertiesToVertex<>(config.getVertexFactory()))
+      .returns(config.getVertexFactory().getType());
   }
 
   /**
@@ -161,29 +173,15 @@ public class MinimalCSVImporter {
    */
   private List<String> readHeaderRow() throws IOException {
     try (final BufferedReader reader =
-      new BufferedReader(new InputStreamReader(new FileInputStream(path), charset))) {
+           new BufferedReader(new InputStreamReader(new FileInputStream(path), charset))) {
       String headerLine = reader.readLine();
-      if (headerLine == null) {
-        throw new IOException("The file " + path + " does not contain any rows.");
+      if (headerLine == null || headerLine.isEmpty()) {
+        throw new IOException("The csv file '" + path + "' does not contain any rows.");
       }
 
       return Arrays.asList(headerLine.split(tokenSeparator));
     } catch (IOException ex) {
-      throw new IOException("I/O Error occurred while trying to open a stream to: '" +
-        path + "'.", ex);
+      throw new IOException("Error while opening a stream to '" + path + "'.", ex);
     }
-  }
-
-  /**
-   * Reads the input of the csv file as logical graph.
-   *
-   * @return logical graph of the csv file
-   * @throws IOException
-   */
-  public LogicalGraph getLogicalGraph() throws IOException {
-
-    DataSet<Vertex> importVertices = importVertices();
-
-    return config.getLogicalGraphFactory().fromDataSets(importVertices);
   }
 }

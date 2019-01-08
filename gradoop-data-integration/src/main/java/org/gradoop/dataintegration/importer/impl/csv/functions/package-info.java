@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Functions related to import an external graph from a csv file into EPGM.
+ * Functions related to the simple csv import process.
  */
 package org.gradoop.dataintegration.importer.impl.csv.functions;

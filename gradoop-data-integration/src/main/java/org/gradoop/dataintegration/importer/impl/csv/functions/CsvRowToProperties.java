@@ -22,13 +22,13 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * Map the values of a token separated row of a file to the properties of a EPGM vertex.
- * Each property value will be mapped to property name the user set.
- * This names are stored in a list.
+ * Map the values of a token separated row of a file to the properties of a EPGM element.
+ * Each property value will be mapped to the property name the user set via parameter.
  */
-public class RowToVertexMapper implements FlatMapFunction<String, Properties> {
+public class CsvRowToProperties implements FlatMapFunction<String, Properties> {
 
   /**
    * Token separator for the csv file.
@@ -41,9 +41,14 @@ public class RowToVertexMapper implements FlatMapFunction<String, Properties> {
   private List<String> propertyNames;
 
   /**
-   * True, if the user want to check if each row of the file is equals to the header row.
+   * True, if the user want to check if each row of the file is equals to the header row
    */
   private boolean checkReoccurringHeader;
+
+  /**
+   * Reduce object instantiations
+   */
+  private Properties reuseProperties;
 
   /**
    * Create a new RowToVertexMapper
@@ -52,17 +57,17 @@ public class RowToVertexMapper implements FlatMapFunction<String, Properties> {
    * @param propertyNames list of the property names
    * @param checkReoccurringHeader should the row checked for a occurring of the column names?
    */
-  public RowToVertexMapper(String tokenDelimiter,
-                           List<String> propertyNames, boolean checkReoccurringHeader) {
-    this.tokenSeparator = tokenDelimiter;
-    this.propertyNames = propertyNames;
+  public CsvRowToProperties(String tokenDelimiter, List<String> propertyNames,
+    boolean checkReoccurringHeader) {
+    this.tokenSeparator = Objects.requireNonNull(tokenDelimiter);
+    this.propertyNames = Objects.requireNonNull(propertyNames);
     this.checkReoccurringHeader = checkReoccurringHeader;
+    this.reuseProperties = new Properties();
   }
 
   @Override
   public void flatMap(String line, Collector<Properties> out) {
-
-    // Check if is an empty line
+    // Check if the line is an empty line
     if (line.isEmpty()) {
       return;
     }
@@ -76,13 +81,15 @@ public class RowToVertexMapper implements FlatMapFunction<String, Properties> {
       return;
     }
 
-    Properties properties = new Properties();
+    // clear the properties
+    reuseProperties.clear();
+
     for (int i = 0; i < propertyValues.length; i++) {
       // if a value is empty, do not add a property
       if (!propertyValues[i].isEmpty()) {
-        properties.set(propertyNames.get(i), PropertyValue.create(propertyValues[i]));
+        reuseProperties.set(propertyNames.get(i), PropertyValue.create(propertyValues[i]));
       }
     }
-    out.collect(properties);
+    out.collect(reuseProperties);
   }
 }

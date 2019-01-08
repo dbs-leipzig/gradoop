@@ -16,33 +16,32 @@
 package org.gradoop.dataintegration.importer.impl.csv.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.util.GradoopConstants;
 
 /**
  * Create an ImportVertex for each tuple of an id and properties.
+ *
+ * @param <V> the vertex type
  */
-public class CreateImportVertexCSV
-  implements MapFunction<Properties, Vertex> {
-
+public class PropertiesToVertex<V extends EPGMVertex> implements MapFunction<Properties, V> {
   /**
-   * Used ImportVertex
+   * Reduce object instantiations.
    */
-  private Vertex vertex;
+  private V vertex;
 
   /**
    * Create a new CreateImportVertexCSV function
+   *
+   * @param vertexFactory the factory that is responsible for creating a vertex
    */
-  public CreateImportVertexCSV() {
-    this.vertex = new Vertex();
-    vertex.setLabel(GradoopConstants.DEFAULT_VERTEX_LABEL);
+  public PropertiesToVertex(EPGMVertexFactory<V> vertexFactory) {
+    this.vertex = vertexFactory.createVertex();
   }
 
   @Override
-  public Vertex map(final Properties value) {
-    vertex.setId(GradoopId.get());
+  public V map(final Properties value) {
     vertex.setProperties(value);
     return vertex;
   }
