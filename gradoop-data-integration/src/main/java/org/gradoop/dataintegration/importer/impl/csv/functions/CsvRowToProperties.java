@@ -73,10 +73,9 @@ public class CsvRowToProperties implements FlatMapFunction<String, Properties> {
     }
 
     String[] propertyValues = line.split(tokenSeparator);
-    /*
-     * If the line to read is equals to the header and the checkReoccurringHeader flag is set to
-     * TRUE, we do not import this line.
-     */
+
+    // If the line to read is equals to the header and the checkReoccurringHeader flag is set to
+    // TRUE, we do not import this line.
     if (checkReoccurringHeader && propertyNames.containsAll(Arrays.asList(propertyValues))) {
       return;
     }

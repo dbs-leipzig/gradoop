@@ -54,7 +54,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testImportVertexWithHeader() throws Exception {
-    String csvPath = getFilePath("/csv/input.csv");
+    String csvPath = MinimalCSVImporterTest.class.getResource("/csv/input.csv").getPath();
 
     DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true);
 
@@ -75,7 +75,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testImportGraphCollection() throws Exception {
-    String csvPath = getFilePath("/csv/input.csv");
+    String csvPath = MinimalCSVImporterTest.class.getResource("/csv/input.csv").getPath();
 
     DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true);
 
@@ -98,7 +98,9 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testImportVertexWithoutHeader() throws Exception {
-    String csvPath = getFilePath("/csv/inputWithoutHeader.csv");
+    String csvPath = MinimalCSVImporterTest.class
+      .getResource("/csv/inputWithoutHeader.csv").getPath();
+
     List<String> columnNames = Arrays.asList("name", "value1", "value2", "value3");
 
     DataSource importer = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), columnNames, false);
@@ -155,7 +157,7 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testImportLogicalGraphWithHeader() throws Exception {
-    String csvPath = getFilePath("/csv/input.csv");
+    String csvPath = MinimalCSVImporterTest.class.getResource("/csv/input.csv").getPath();
     FlinkAsciiGraphLoader loader = getLoaderFromFile(getFilePath("/csv/expected.gdl"));
 
     DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true);
@@ -175,7 +177,9 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testImportLogicalGraphWithoutHeader() throws Exception {
-    String csvPath = getFilePath("/csv/inputWithoutHeader.csv");
+    String csvPath = MinimalCSVImporterTest.class
+      .getResource("/csv/inputWithoutHeader.csv").getPath();
+
     FlinkAsciiGraphLoader loader = getLoaderFromFile(getFilePath("/csv/expected.gdl"));
 
     List<String> columnNames = Arrays.asList("name", "value1", "value2", "value3");
@@ -195,8 +199,10 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testReoccurringHeader() throws Exception {
-    String csvPathWithHeader = getFilePath("/csv/input.csv");
-    String csvPathWithoutHeader = getFilePath("/csv/inputWithoutHeader.csv");
+    String csvPathWithHeader = MinimalCSVImporterTest.class
+      .getResource("/csv/input.csv").getPath();
+    String csvPathWithoutHeader = MinimalCSVImporterTest.class
+      .getResource("/csv/inputWithoutHeader.csv").getPath();
 
     //set the first line of the file as column property names and check file of reoccurring and skip
     //header row as vertex
@@ -221,7 +227,9 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testEmptyLines() throws Exception {
-    String csvPath = getFilePath("/csv/inputEmptyLines.csv");
+    String csvPath = MinimalCSVImporterTest.class
+      .getResource("/csv/inputEmptyLines.csv").getPath();
+
     FlinkAsciiGraphLoader loader = getLoaderFromFile(getFilePath("/csv/expected.gdl"));
 
     DataSource importer = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true);
@@ -238,7 +246,8 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testEmptyProperty() throws Exception {
-    String csvPath = getFilePath("/csv/inputEmptyPropertyValues.csv");
+    String csvPath = MinimalCSVImporterTest.class
+      .getResource("/csv/inputEmptyPropertyValues.csv").getPath();
 
     DataSource importer = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true);
     LogicalGraph result = importer.getLogicalGraph();
