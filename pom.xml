@@ -541,6 +541,12 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.gradoop</groupId>
+                <artifactId>gradoop-data-integration</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- Flink -->
             <dependency>
                 <groupId>org.apache.flink</groupId>
@@ -675,6 +681,14 @@
             <dependency>
                 <groupId>org.gradoop</groupId>
                 <artifactId>gradoop-store-api</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.gradoop</groupId>
+                <artifactId>gradoop-data-integration</artifactId>
                 <version>${project.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
