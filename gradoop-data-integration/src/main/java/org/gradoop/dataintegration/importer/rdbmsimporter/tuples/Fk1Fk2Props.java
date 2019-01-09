@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,116 +17,91 @@ package org.gradoop.dataintegration.importer.rdbmsimporter.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.model.impl.properties.Property;
 
 /**
- * Tuple for n:m relation conversion f0 : Foreign key one f1 : Foreign key two f2 : Properties of
- * belonging table
+ * Tuple for table to vertex (n:m relation) conversion
+ * f0 : Foreign key one
+ * f1 : Foreign key two
+ * f2 : Properties
  */
 public class Fk1Fk2Props extends Tuple3<String, String, Properties> {
 
   /**
-   * serial version uid
+   * Default serial version uid.
    */
   private static final long serialVersionUID = 1L;
 
   /**
-   * Foreign key one
-   */
-  private String fk1;
-
-  /**
-   * Foreign key two
-   */
-  private String fk2;
-
-  /**
-   * Properties of n:m table
-   */
-  private Properties props;
-
-  /**
-   * Empty Constructor
+   * Empty Constructor.
    */
   public Fk1Fk2Props() { }
 
   /**
-   * Constructor
+   * Creates an instance of {@link Fk1Fk2Props} to store two foreign key values and belonging
+   * properties.
    *
-   * @param fk1 Name of foreign key one
-   * @param fk2 Name of foreign key two
-   * @param props Relation belonging properties
+   * @param foreignKeyOne Name of foreign key one
+   * @param foreignKeyTwo Name of foreign key two
+   * @param properties Relation belonging properties
    */
-  public Fk1Fk2Props(String fk1, String fk2, Properties props) {
-    this.fk1 = fk1;
-    this.f0 = fk1;
-    this.fk2 = fk2;
-    this.f1 = fk2;
-    this.props = props;
-    this.f2 = props;
-  }
+  public Fk1Fk2Props(String foreignKeyOne, String foreignKeyTwo, Properties properties) {
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((fk1 == null) ? 0 : fk1.hashCode());
-    result = prime * result + ((fk2 == null) ? 0 : fk2.hashCode());
-    result = prime * result + ((props == null) ? 0 : props.hashCode());
-    return result;
+    super(foreignKeyOne, foreignKeyTwo, properties);
   }
 
   /**
-   * Checks if two Fk1Fk2Props tuples are equal
-   *
-   * @return <code>true</code> if Object equals Fk1Fk2Props; <code>false</code>
-   * otherwise
+   * Get serial versoin uid.
+   * @return serial version uid
    */
-  @Override
-  public boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    Fk1Fk2Props ffp = (Fk1Fk2Props) o;
-    boolean equal = true;
-    if (this.f0.equals(ffp.f0) && this.f1.equals(ffp.f1)) {
-      for (Property p : props) {
-        if (!ffp.f2.get(p.getKey()).equals(p.getValue())) {
-          equal = false;
-        }
-      }
-    }
-    return equal;
-  }
-
-  public String getFk1() {
-    return fk1;
-  }
-
-  public void setFk1(String fk1) {
-    this.fk1 = fk1;
-  }
-
-  public String getFk2() {
-    return fk2;
-  }
-
-  public void setFk2(String fk2) {
-    this.fk2 = fk2;
-  }
-
-  public Properties getProps() {
-    return props;
-  }
-
-  public void setProps(Properties props) {
-    this.props = props;
-  }
-
-  public static long getSerialversionuid() {
+  public static long getSerialVersionUID() {
     return serialVersionUID;
+  }
+
+  /**
+   * Get value of foreign key one.
+   * @return foreign key one value
+   */
+  public String getForeignKeyOne() {
+    return this.f0;
+  }
+
+  /**
+   * Get value of foreign key two.
+   * @return foreign key two
+   */
+  public String getForeignKeyTwo() {
+    return this.f1;
+  }
+
+  /**
+   * Get properties.
+   * @return properties
+   */
+  public Properties getProperties() {
+    return this.f2;
+  }
+
+  /**
+   * Set foreign key one.
+   * @param foreignKeyOne foreign key one
+   */
+  public void setForeignKeyOne(String foreignKeyOne) {
+    this.f0 = foreignKeyOne;
+  }
+
+  /**
+   * Set foreign key two.
+   * @param foreignKeyTwo foreign key two.
+   */
+  public void setForeignKeyTwo(String foreignKeyTwo) {
+    this.f1 = foreignKeyTwo;
+  }
+
+  /**
+   * Set properties.
+   * @param properties properties
+   */
+  public void setProperties(Properties properties) {
+    this.f2 = properties;
   }
 }

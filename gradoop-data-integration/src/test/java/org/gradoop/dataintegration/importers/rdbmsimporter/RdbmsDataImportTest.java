@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.gradoop.dataintegration.importers.rdbmsimporter;
 
 import static org.junit.Assert.assertEquals;
@@ -26,7 +25,7 @@ import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstan
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.MetaDataParser;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.RdbmsTableBase;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToEdge;
-import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToNode;
+import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -74,7 +73,7 @@ public class RdbmsDataImportTest extends GradoopFlinkTestBase {
 
   @Test
   public void tablesToNodesTest() throws Exception {
-    List<TableToNode> tablesToNodes = metadataParser.getTablesToNodes();
+    List<TableToVertex> tablesToNodes = metadataParser.getTablesToNodes();
     List<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
 
     assertEquals("Wrong tables to nodes count !", 1, tablesToNodes.size());

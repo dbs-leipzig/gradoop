@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.gradoop.dataintegration.importers.rdbmsimporter;
 
 import java.io.File;
@@ -23,30 +22,32 @@ import java.net.ServerSocket;
 import ru.yandex.qatools.embed.postgresql.EmbeddedPostgres;
 
 /**
- * Wrapper around the PostgreSQL database
+ * Wrapper around the PostgreSQL database.
  */
 public class PostgresWrapper {
 
-  /** The embedded postgres wrapper */
+  /**
+   * The embedded postgresql wrapper.
+   */
   private EmbeddedPostgres embeddedPostgres;
-  /** The URL to connect on */
+
+  /**
+   * The URL to connect on
+   */
   private String connectionUrl;
 
   /**
    * Start PostgreSQL running
    *
-   * @throws IOException
-   *           if an error occurs starting Postgres
+   * @throws IOException if an error occurs starting Postgres
    */
   public void start() throws IOException {
     if (embeddedPostgres == null) {
       int port = getFreePort();
       embeddedPostgres = new EmbeddedPostgres();
       connectionUrl = embeddedPostgres.start("localhost", port, "dbName", "userName", "password");
-      System.out.println(new File(RdbmsDataImportTest.class
-          .getResource("/data/rdbms/input/husband.sql").getFile()));
       embeddedPostgres.getProcess().get().importFromFile(new File(RdbmsDataImportTest.class
-          .getResource("/data/rdbms/input/husband.sql").getFile()));
+        .getResource("/data/rdbms/input/husband.sql").getFile()));
     }
   }
 
@@ -73,8 +74,7 @@ public class PostgresWrapper {
    * Get a free port to listen on
    *
    * @return the port
-   * @throws IOException
-   *           if an error occurs finding a port
+   * @throws IOException if an error occurs finding a port
    */
   private static int getFreePort() throws IOException {
     @SuppressWarnings("resource")

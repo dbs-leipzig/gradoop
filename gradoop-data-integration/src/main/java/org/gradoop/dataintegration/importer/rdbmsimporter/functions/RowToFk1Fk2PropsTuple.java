@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.gradoop.dataintegration.importer.rdbmsimporter.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.types.Row;
+import org.gradoop.dataintegration.importer.rdbmsimporter.connection.Helper;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.RowHeader;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToEdge;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.Fk1Fk2Props;
@@ -57,7 +57,7 @@ public class RowToFk1Fk2PropsTuple extends RichMapFunction<Row, Fk1Fk2Props> {
    *
    * @param tablePos current position of table-iteration
    */
-  public RowToFk1Fk2PropsTuple(int tablePos) {
+  RowToFk1Fk2PropsTuple(int tablePos) {
     this.tablePos = tablePos;
     reuseTuple = new Fk1Fk2Props();
   }
@@ -72,9 +72,11 @@ public class RowToFk1Fk2PropsTuple extends RichMapFunction<Row, Fk1Fk2Props> {
   public Fk1Fk2Props map(Row tuple) {
     RowHeader rowheader = tables.get(tablePos).getRowheader();
 
-    reuseTuple.f0 = tuple.getField(rowheader.getForeignKeyHeader().get(0).getPos()).toString();
-    reuseTuple.f1 = tuple.getField(rowheader.getForeignKeyHeader().get(1).getPos()).toString();
-    reuseTuple.f2 = AttributesToProperties.getPropertiesWithoutFKs(tuple, rowheader);
+    reuseTuple.f0 =
+      tuple.getField(rowheader.getForeignKeyHeader().get(0).getRowPostition()).toString();
+    reuseTuple.f1 =
+      tuple.getField(rowheader.getForeignKeyHeader().get(1).getRowPostition()).toString();
+    reuseTuple.f2 = Helper.parseRowToPropertiesWithoutForeignKeys(tuple, rowheader);
 
     return reuseTuple;
   }

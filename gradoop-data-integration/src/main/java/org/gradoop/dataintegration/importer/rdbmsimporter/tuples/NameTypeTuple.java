@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.gradoop.dataintegration.importer.rdbmsimporter.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -21,84 +20,70 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import java.sql.JDBCType;
 
 /**
- * Tuple representing a key string and belonging data type pair
+ * Represents a pair of [attribute name, JDBC data type]
+ * f0 : attribute name
+ * f1 : JDBC data type
  */
 public class NameTypeTuple extends Tuple2<String, JDBCType> {
 
   /**
-   * serial version uid
+   * Default serial version uid.
    */
   private static final long serialVersionUID = 1L;
 
   /**
-   * Key string
+   * Empty Constructor.
    */
-  private String name;
+  public NameTypeTuple() { }
 
   /**
-   * JDBC data type
-   */
-  private JDBCType type;
-
-  /**
-   * Empty Constructor
-   */
-  public NameTypeTuple() {
-  }
-
-  /**
-   * Constructor
+   * Creates an instance of {@link NameTypeTuple} to store attribute name and belonging JDBC data
+   * type.
    *
-   * @param name Attribute name
-   * @param type Attribute sql type
+   * @param attributeName name of attribute
+   * @param jdbcType JDBC type of attribute
    */
-  public NameTypeTuple(String name, JDBCType type) {
-    this.name = name;
-    this.f0 = name;
-    this.type = type;
-    this.f1 = type;
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((name == null) ? 0 : name.hashCode());
-    result = prime * result + ((type == null) ? 0 : type.hashCode());
-    return result;
+  public NameTypeTuple(String attributeName, JDBCType jdbcType) {
+    super(attributeName, jdbcType);
   }
 
   /**
-   * Checks if two NameTypeTuple tuples are equal
-   *
-   * @return <code>true</code> if Object equals NameTypeTuple; <code>false</code>
-   *         otherwise
+   * Get serial version uid.
+   * @return serial version uid
    */
-  @Override
-  public boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    NameTypeTuple ntt = (NameTypeTuple) o;
-    return this.f0.equals(ntt.f0) && this.f1.equals(ntt.f1);
+  public static long getSerialVersionUID() {
+    return serialVersionUID;
   }
 
-  public String getName() {
-    return name;
+  /**
+   * Get attribute name.
+   * @return attribute name
+   */
+  public String getAttributeName() {
+    return this.f0;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  /**
+   * get JDBC type of attribute.
+   * @return JDBC type
+   */
+  public JDBCType getJdbcType() {
+    return this.f1;
   }
 
-  public JDBCType getType() {
-    return type;
+  /**
+   * Set name of attribute.
+   * @param attributeName attribute name
+   */
+  public void setName(String attributeName) {
+    this.f0 = attributeName;
   }
 
-  public void setType(JDBCType type) {
-    this.type = type;
+  /**
+   * Set JDBC Type of attribute.
+   * @param jdbcType JDBC type
+   */
+  public void setType(JDBCType jdbcType) {
+    this.f1 = jdbcType;
   }
 }

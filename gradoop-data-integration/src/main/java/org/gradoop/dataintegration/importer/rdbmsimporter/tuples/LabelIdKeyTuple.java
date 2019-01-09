@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,110 +13,101 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.gradoop.dataintegration.importer.rdbmsimporter.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Tuple used to represent primary key respectively foreign key site of foreign
- * key relation
+ * Represents primary key respectively foreign key site of foreign
+ * key relation.
+ * f0 : label
+ * f1 : gradoop id
+ * f2 : value string
  *
  */
 public class LabelIdKeyTuple extends Tuple3<String, GradoopId, String> {
 
   /**
-   * serial version uid
+   * Default serial version uid.
    */
   private static final long serialVersionUID = 1L;
 
   /**
-   * Vertex label
+   * Empty Constructor.
    */
-  private String label;
+  public LabelIdKeyTuple() { }
 
   /**
-   * Vertex id
-   */
-  private GradoopId id;
-
-  /**
-   * Attribute value
-   */
-  private String key;
-
-  /**
-   * Empty Constructor
-   */
-  public LabelIdKeyTuple() {
-  }
-
-  /**
-   * Constructor
+   * Creates an instance of {@link LabelIdKeyTuple} to store label, gradoop id and a key string.
    *
    * @param label Vertex label
-   * @param id Valid gradoop id
+   * @param gradoopId Valid gradoop id
    * @param key Key value string
    */
-  public LabelIdKeyTuple(String label, GradoopId id, String key) {
-    this.label = label;
-    this.f0 = label;
-    this.id = id;
-    this.f1 = id;
-    this.key = key;
-    this.f2 = key;
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((id == null) ? 0 : id.hashCode());
-    result = prime * result + ((key == null) ? 0 : key.hashCode());
-    result = prime * result + ((label == null) ? 0 : label.hashCode());
-    return result;
+  public LabelIdKeyTuple(String label, GradoopId gradoopId, String key) {
+    super(label, gradoopId, key);
   }
 
   /**
-   * Checks if two LabelIdKeyTuple tuples are equal
+   * Get serial version uid.
    *
-   * @return <code>true</code> if Object equals LabelIdKeyTuple;
-   *         <code>false</code> otherwise
+   * @return serial version uid
    */
-  @Override
-  public boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    LabelIdKeyTuple lik = (LabelIdKeyTuple) o;
-    return this.f0.equals(lik.f0) && this.f1 == lik.f1 && this.f2.equals(lik.f2);
+  public static long getSerialVersionUID() {
+    return serialVersionUID;
   }
 
+  /**
+   * Get label.
+   *
+   * @return label
+   */
   public String getLabel() {
-    return label;
+    return this.f0;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
+  /**
+   * Get gradoop id.
+   *
+   * @return gradoop id
+   */
   public GradoopId getId() {
-    return id;
+    return this.f1;
   }
 
-  public void setId(GradoopId id) {
-    this.id = id;
-  }
-
+  /**
+   * Get key value.
+   *
+   * @return key value
+   */
   public String getKey() {
-    return key;
+    return this.f2;
   }
 
+  /**
+   * Set label.
+   * @param label label
+   */
+  public void setLabel(String label) {
+    this.f0 = label;
+  }
+
+  /**
+   * Set gradopp id.
+   *
+   * @param gradoopId gradoop id
+   */
+  public void setId(GradoopId gradoopId) {
+    this.f1 = gradoopId;
+  }
+
+  /**
+   * Set key value string.
+   *
+   * @param key key value string
+   */
   public void setKey(String key) {
-    this.key = key;
+    this.f2 = key;
   }
 }

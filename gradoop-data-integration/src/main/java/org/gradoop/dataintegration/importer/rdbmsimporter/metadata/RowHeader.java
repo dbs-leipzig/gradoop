@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.gradoop.dataintegration.importer.rdbmsimporter.metadata;
 
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.RowHeaderTuple;
@@ -61,7 +60,7 @@ public class RowHeader implements Serializable {
   public ArrayList<RowHeaderTuple> getForeignKeyHeader() {
     ArrayList<RowHeaderTuple> fkHeader = new ArrayList<>();
     for (RowHeaderTuple rht : this.rowHeader) {
-      if (rht.getAttType().equals(FK_FIELD)) {
+      if (rht.getAttributeRole().equals(FK_FIELD)) {
         fkHeader.add(rht);
       }
     }

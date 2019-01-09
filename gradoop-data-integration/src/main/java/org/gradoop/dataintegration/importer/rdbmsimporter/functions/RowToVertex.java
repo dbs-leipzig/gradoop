@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.gradoop.dataintegration.importer.rdbmsimporter.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
@@ -23,8 +22,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.dataintegration.importer.rdbmsimporter.connection.Helper;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.RowHeader;
-import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToNode;
+import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToVertex;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.RowHeaderTuple;
 
 import java.util.List;
@@ -52,7 +52,7 @@ public class RowToVertex extends RichMapFunction<Row, Vertex> {
   /**
    * List of all instances converted to vertices.
    */
-  private List<TableToNode> tables;
+  private List<TableToVertex> tables;
 
   /**
    * Name of current database table.
@@ -89,7 +89,7 @@ public class RowToVertex extends RichMapFunction<Row, Vertex> {
 
     GradoopId id = GradoopId.get();
     String label = tableName;
-    Properties properties = AttributesToProperties.getProperties(tuple, rowheader);
+    Properties properties = Helper.parseRowToProperties(tuple, rowheader);
     properties.set(PK_ID, getPrimaryKeyString(tuple, rowheader));
 
     return vertexFactory.initVertex(id, label, properties);
@@ -105,8 +105,8 @@ public class RowToVertex extends RichMapFunction<Row, Vertex> {
     StringBuilder sb = new StringBuilder();
 
     for (RowHeaderTuple rht : rowheader.getRowHeader()) {
-      if (rht.getAttType().equals(PK_FIELD)) {
-        sb.append(tuple.getField(rht.getPos()).toString());
+      if (rht.getAttributeRole().equals(PK_FIELD)) {
+        sb.append(tuple.getField(rht.getRowPostition()).toString());
       }
     }
 

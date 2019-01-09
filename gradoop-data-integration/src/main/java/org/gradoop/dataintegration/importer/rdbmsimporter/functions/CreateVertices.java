@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.gradoop.dataintegration.importer.rdbmsimporter.connection.FlinkDatabaseInputHelper;
+import org.gradoop.dataintegration.importer.rdbmsimporter.connection.Helper;
 import org.gradoop.dataintegration.importer.rdbmsimporter.connection.RdbmsConfig;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.MetaDataParser;
-import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToNode;
+import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToVertex;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.List;
@@ -69,15 +69,14 @@ public class CreateVertices {
     RdbmsConfig rdbmsConfig,
     MetaDataParser metadataParser) {
 
-    List<TableToNode> tablesToNodes = metadataParser.getTablesToNodes();
+    List<TableToVertex> tablesToNodes = metadataParser.getTablesToNodes();
 
     DataSet<Vertex> vertices = null;
     VertexFactory vertexFactory = flinkConfig.getVertexFactory();
 
     int counter = 0;
-    for (TableToNode table : tablesToNodes) {
-      DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper
-        .create().getInput(
+    for (TableToVertex table : tablesToNodes) {
+      DataSet<Row> dsSQLResult = Helper.getRdbmsInput(
           flinkConfig.getExecutionEnvironment(), rdbmsConfig, table.getRowCount(),
           table.getSqlQuery(), table.getRowTypeInfo());
 

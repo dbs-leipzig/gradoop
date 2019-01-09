@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.gradoop.dataintegration.importer.rdbmsimporter.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Tuple representing a gradoop id, key string pair
+ * Represents a [gradoop id, key string] pair
+ * f0 : gradoop id
+ * f1 : key string
  */
 public class IdKeyTuple extends Tuple2<GradoopId, String> {
   /**
@@ -29,74 +30,50 @@ public class IdKeyTuple extends Tuple2<GradoopId, String> {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Gradoop id
-   */
-  private GradoopId id;
-
-  /**
-   * Key string
-   */
-  private String key;
-
-  /**
-   * Empty Constructor
+   * Empty Constructor.
    */
   public IdKeyTuple() {
   }
 
   /**
-   * Constructor
+   * Creates an instance of {@link IdKeyTuple} to store id and key string.
    *
-   * @param id Valid gradoop id
-   * @param key Key value string
+   * @param gradoopId gradoop id
+   * @param key key value
    */
-  public IdKeyTuple(GradoopId id, String key) {
-    this.id = id;
-    this.f0 = id;
-    this.key = key;
-    this.f1 = key;
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((id == null) ? 0 : id.hashCode());
-    result = prime * result + ((key == null) ? 0 : key.hashCode());
-    return result;
+  public IdKeyTuple(GradoopId gradoopId, String key) {
+    super(gradoopId, key);
   }
 
   /**
-   * Checks if two IdKeyTuple tuples are equal
-   *
-   * @return <code>true</code> if Object equals IdKeyTuple; <code>false</code>
-   *         otherwise
+   * Get gradoop id.
+   * @return gradoop id
    */
-  @Override
-  public boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    IdKeyTuple idk = (IdKeyTuple) o;
-    return this.f0.equals(idk.f0) && this.f1.equals(idk.f1);
+  public GradoopId getGradoopId() {
+    return this.f0;
   }
 
-  public GradoopId getId() {
-    return id;
-  }
-
-  public void setId(GradoopId id) {
-    this.id = id;
-  }
-
+  /**
+   * Get key string.
+   * @return key string
+   */
   public String getKey() {
-    return key;
+    return this.f1;
   }
 
+  /**
+   * Set gradoop id.
+   * @param gradoopId gradoop id
+   */
+  public void setId(GradoopId gradoopId) {
+    this.f0 = gradoopId;
+  }
+
+  /**
+   * Set key string.
+   * @param key key string
+   */
   public void setKey(String key) {
-    this.key = key;
+    this.f1 = key;
   }
 }

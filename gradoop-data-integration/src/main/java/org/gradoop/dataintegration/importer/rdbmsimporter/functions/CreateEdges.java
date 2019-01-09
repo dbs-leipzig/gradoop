@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.dataintegration.importer.rdbmsimporter.connection.FlinkDatabaseInputHelper;
+import org.gradoop.dataintegration.importer.rdbmsimporter.connection.Helper;
 import org.gradoop.dataintegration.importer.rdbmsimporter.connection.RdbmsConfig;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.MetaDataParser;
 import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToEdge;
@@ -100,9 +100,7 @@ public class CreateEdges {
 
         if (!table.isDirectionIndicator()) {
 
-          DataSet<Row> dsSQLResult = FlinkDatabaseInputHelper
-            .create()
-            .getInput(env, rdbmsConfig,
+          DataSet<Row> dsSQLResult = Helper.getRdbmsInput(env, rdbmsConfig,
               table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
 
           // Represents the two foreign key attributes and belonging
@@ -114,7 +112,7 @@ public class CreateEdges {
 
           // Represents vertices in relation with foreign key one
           DataSet<IdKeyTuple> idPkTableOne = vertices
-            .filter(new ByLabel<>(table.getStartTableName()))
+            .filter(new ByLabel<>(table.getTableName()))
             .map(new VertexToIdPkTuple());
 
           // Represents vertices in relation with foreign key two

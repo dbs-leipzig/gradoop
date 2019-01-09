@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,15 @@ package org.gradoop.examples.io;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.dataintegration.importer.rdbmsimporter.RdbmsDataSource;
-import org.gradoop.flink.io.impl.csv.CSVDataSink;
+import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * Example program that converts a given relational database into a
- * {@link LogicalGraph} and stores the resulting {@link LogicalGraph} as CSV
- * into declared directory.
+ * Example program that converts a given relational database into a {@link LogicalGraph} and stores
+ * the resulting {@link LogicalGraph} as CSV into declared directory.
  */
-public class RdbmsExample implements ProgramDescription {
+public class RdbmsExample extends AbstractRunner implements ProgramDescription {
 
   /**
    * Converts a relational database to an epgm graph
@@ -47,7 +46,7 @@ public class RdbmsExample implements ProgramDescription {
 
     if (args.length != 6) {
       throw new IllegalArgumentException(
-          "Please provide url, user, pasword, path to jdbc driver jar, jdbc driver class name, " +
+        "Please provide url, user, pasword, path to jdbc driver jar, jdbc driver class name, " +
           "output directory");
     }
     final String url = args[0];
@@ -65,13 +64,9 @@ public class RdbmsExample implements ProgramDescription {
 
     // create DataSource
     RdbmsDataSource dataSource = new RdbmsDataSource(url, user, pw, jdbcDriverPath,
-        jdbcDriverClassName, gfc);
+      jdbcDriverClassName, gfc);
 
-    // get logical graph of data source
-    LogicalGraph schema = dataSource.getLogicalGraph();
-
-    // write conversion result to output path
-    schema.writeTo(new CSVDataSink(outputPath, gfc));
+    writeLogicalGraph(dataSource.getLogicalGraph(), outputPath);
 
     // execute program
     env.execute();
@@ -80,6 +75,6 @@ public class RdbmsExample implements ProgramDescription {
   @Override
   public String getDescription() {
     return "Data import for relational databases, " +
-        "implementing a relational database to epgm graph database conversion.";
+      "implementing a relational database to epgm graph database conversion.";
   }
 }

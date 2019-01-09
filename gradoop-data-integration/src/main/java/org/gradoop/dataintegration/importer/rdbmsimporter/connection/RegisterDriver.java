@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ public class RegisterDriver {
    *
    * @param config database configuration
    */
-  public void register(RdbmsConfig config) {
+  void register(RdbmsConfig config) {
     AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
       @Override
@@ -75,17 +75,12 @@ public class RegisterDriver {
             .getDeclaredConstructor().newInstance();
           DriverManager.registerDriver(new GradoopJDBCDriver(driver));
 
-        } catch (SQLException e) {
-          System.err.println("Cannot register jdbc driver !");
-          logger.error(e);
-        } catch (MalformedURLException e) {
-          System.err.println("Wrong path to jdbc driver !");
-          logger.error(e);
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException |
-            IllegalArgumentException | InvocationTargetException | NoSuchMethodException |
-            SecurityException e) {
+        } catch (SQLException | MalformedURLException | ClassNotFoundException |
+          NoSuchMethodException | InstantiationException | IllegalAccessException |
+          InvocationTargetException e) {
           logger.error(e);
         }
+
         return this;
       }
     });

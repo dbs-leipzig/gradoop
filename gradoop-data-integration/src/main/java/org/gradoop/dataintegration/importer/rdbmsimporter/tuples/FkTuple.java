@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,121 +20,109 @@ import org.apache.flink.api.java.tuple.Tuple4;
 import java.sql.JDBCType;
 
 /**
- * Represents a foreign key f0 : attribute name of referencing foreign key f1 :
- * jdbc type of referencing foreign key f2 : name of referenced primary key
- * attribute f3 : name of referenced table
+ * Represents a foreign key
+ * f0 : attribute name (key) of referencing foreign key
+ * f1 : JDBC type of referencing foreign key value
+ * f2 : name of referenced primary key attribute
+ * f3 : name of referenced table
  */
 public class FkTuple extends Tuple4<String, JDBCType, String, String> {
 
   /**
-   * serial version uid
+   * Default serial version uid.
    */
   private static final long serialVersionUID = 1L;
 
   /**
-   * Foreign key name
-   */
-  private String fkName;
-
-  /**
-   * JDBC data type of foreign key name
-   */
-  private JDBCType type;
-
-  /**
-   * Column name of referenced table
-   */
-  private String refdAttName;
-
-  /**
-   * Name of referenced Table
-   */
-  private String refdTableName;
-
-  /**
-   * Empty Constructor
+   * Empty Constructor.
    */
   public FkTuple() {
   }
 
   /**
-   * Constructor
+   * Creates an instance of {@link FkTuple} to store foreign key relevant information.
    *
-   * @param fkName Foreign key name
-   * @param type SQL Type of foreign key
-   * @param refdAttName Name of referenced primary key
-   * @param refdTableName Name of referenced primary key table
+   * @param foreignKeyName foreign key attribute name
+   * @param jdbcType SQL type of foreign key values
+   * @param referencedAttributeName name of referenced primary key
+   * @param referencedTablename name of referenced table
    */
-  public FkTuple(String fkName, JDBCType type, String refdAttName, String refdTableName) {
-    this.fkName = fkName;
-    this.f0 = fkName;
-    this.type = type;
-    this.f1 = type;
-    this.refdAttName = refdAttName;
-    this.f2 = refdAttName;
-    this.refdTableName = refdTableName;
-    this.f3 = refdTableName;
-  }
+  public FkTuple(
+    String foreignKeyName, JDBCType jdbcType, String referencedAttributeName,
+    String referencedTablename) {
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((fkName == null) ? 0 : fkName.hashCode());
-    result = prime * result + ((refdAttName == null) ? 0 : refdAttName.hashCode());
-    result = prime * result + ((refdTableName == null) ? 0 : refdTableName.hashCode());
-    result = prime * result + ((type == null) ? 0 : type.hashCode());
-    return result;
+    super(foreignKeyName, jdbcType, referencedAttributeName, referencedTablename);
   }
 
   /**
-   * Checks if two FkTuple tuples are equal
-   *
-   * @return <code>true</code> if Object equals FkTuple; <code>false</code>
-   *         otherwise
+   * Get serial version uid.
+   * @return serial version uid
    */
-  @Override
-  public boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    FkTuple fkt = (FkTuple) o;
-    return this.f0.equals(fkt.f0) && this.f1.equals(fkt.f1) && this.f2.equals(fkt.f2) &&
-        this.f3.equals(fkt.f3);
+  public static long getSerialVersionUID() {
+    return serialVersionUID;
   }
 
-  public String getFkName() {
-    return fkName;
+  /**
+   * Get name of foreign key attribute.
+   * @return foreign key attribute name
+   */
+  public String getForeignKeyName() {
+    return this.f0;
   }
 
-  public void setFkName(String fkName) {
-    this.fkName = fkName;
+  /**
+   * Get JDBC type of foreign key values.
+   * @return JDBC type of foreign key values
+   */
+  public JDBCType getJdbcType() {
+    return this.f1;
   }
 
-  public JDBCType getType() {
-    return type;
+  /**
+   * Get name of referenced primary key attribute.
+   * @return referenced primary key attribute
+   */
+  public String getReferencedAttributeName() {
+    return this.f2;
   }
 
-  public void setType(JDBCType type) {
-    this.type = type;
+  /**
+   * Get name of referenced table.
+   * @return name of referenced table
+   */
+  public String getReferencedTablename() {
+    return this.f3;
   }
 
-  public String getRefdAttName() {
-    return refdAttName;
+  /**
+   * Set name of foreign key attribute.
+   * @param foreignKeyName foreign key attribute name
+   */
+  public void setForeignKeyName(String foreignKeyName) {
+    this.f0 = foreignKeyName;
   }
 
-  public void setRefdAttName(String refdAttName) {
-    this.refdAttName = refdAttName;
+  /**
+   * Set JDBC type of foreign key values.
+   * @param jdbcType JDBC type of foreign key values
+   */
+  public void setJdbcType(JDBCType jdbcType) {
+    this.f1 = jdbcType;
   }
 
-  public String getRefdTableName() {
-    return refdTableName;
+  /**
+   * Set name of referenced primary key attribute.
+   * @param referencedAttributeName referenced primary key attribute.
+   */
+  public void setReferencedAttributeName(String referencedAttributeName) {
+    this.f2 = referencedAttributeName;
   }
 
-  public void setRefdTableName(String refdTableName) {
-    this.refdTableName = refdTableName;
+  /**
+   * Set name of referenced table.
+   * @param referencedTablename name of referenced table
+   */
+  public void setReferencedTablename(String referencedTablename) {
+    this.f3 = referencedTablename;
   }
 }

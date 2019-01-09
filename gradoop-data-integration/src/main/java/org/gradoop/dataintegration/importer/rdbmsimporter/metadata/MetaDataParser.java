@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package org.gradoop.dataintegration.importer.rdbmsimporter.metadata;
 
 import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
+import org.gradoop.dataintegration.importer.rdbmsimporter.connection.Helper;
 import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.RdbmsType;
-import org.gradoop.dataintegration.importer.rdbmsimporter.functions.TableRowSize;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.FkTuple;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.NameTypeTuple;
 
@@ -166,12 +166,12 @@ public class MetaDataParser {
       int rowCount;
       if (schemName == null) {
 
-        rowCount = TableRowSize.getTableRowCount(con, tableName);
+        rowCount = Helper.getTableRowCount(con, tableName);
         tableBase.add(
           new RdbmsTableBase(tableName, primaryKeys, foreignKeys, furtherAttributes, rowCount));
       } else {
 
-        rowCount = TableRowSize.getTableRowCount(con, schemName + "." + tableName);
+        rowCount = Helper.getTableRowCount(con, schemName + "." + tableName);
         tableBase.add(new RdbmsTableBase(schemName + "." + tableName, primaryKeys, foreignKeys,
           furtherAttributes, rowCount));
       }
@@ -182,16 +182,16 @@ public class MetaDataParser {
   /**
    * Creates metadata representations of tables going to convert to vertices.
    *
-   * @return list containing {@link TableToNode} instances.
+   * @return list containing {@link TableToVertex} instances.
    */
-  public ArrayList<TableToNode> getTablesToNodes() {
-    ArrayList<TableToNode> tablesToNodes = Lists.newArrayList();
+  public ArrayList<TableToVertex> getTablesToNodes() {
+    ArrayList<TableToVertex> tablesToNodes = Lists.newArrayList();
 
     for (RdbmsTableBase tables : tableBase) {
       if (!(tables.getForeignKeys().size() == 2) || !(tables.getPrimaryKeys().size() == 2)) {
 
         tablesToNodes
-          .add(new TableToNode(rdbmsType, tables.getTableName(), tables.getPrimaryKeys(),
+          .add(new TableToVertex(rdbmsType, tables.getTableName(), tables.getPrimaryKeys(),
             tables.getForeignKeys(), tables.getFurtherAttributes(), tables.getRowCount()));
       }
     }
@@ -229,7 +229,7 @@ public class MetaDataParser {
         } else {
           for (FkTuple fk : table.getForeignKeys()) {
 
-            String refdTableName = fk.getRefdTableName();
+            String refdTableName = fk.getReferencedTablename();
 
             NameTypeTuple startAtt = new NameTypeTuple(fk.f0, fk.f1);
             NameTypeTuple endAtt = new NameTypeTuple(fk.f2, null);

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.gradoop.dataintegration.importer.rdbmsimporter;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.log4j.Logger;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.dataintegration.importer.rdbmsimporter.connection.RdbmsConfig;
@@ -32,6 +31,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Objects;
 
 import static org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.BROADCAST_VARIABLE;
 
@@ -75,8 +75,6 @@ public class RdbmsDataSource implements DataSource {
 
   @Override
   public LogicalGraph getLogicalGraph() {
-    Logger logger = Logger.getLogger(RdbmsDataSource.class);
-
     DataSet<Vertex> vertices;
     DataSet<Edge> edges;
 
@@ -88,22 +86,22 @@ public class RdbmsDataSource implements DataSource {
       metadataParser = new MetaDataParser(con, rdbmsConfig.getRdbmsType());
       metadataParser.parse();
     } catch (SQLException e) {
-      logger.error(e);
+      throw new RuntimeException(e);
     }
 
     // creates vertices from rdbms table tuples
-    vertices = CreateVertices.create().convert(flinkConfig, rdbmsConfig, metadataParser);
+    vertices =
+      CreateVertices.create().convert(flinkConfig, rdbmsConfig, metadataParser);
 
     edges =
       CreateEdges.convert(flinkConfig, rdbmsConfig, metadataParser, vertices);
 
-    // cleans vertices by deleting primary key and foreign key
-    // properties
+    // cleans vertices by deleting primary key and foreign key properties
     vertices = vertices
       .map(new RemovePkFkProperties())
       .withBroadcastSet(
         flinkConfig.getExecutionEnvironment().fromCollection(
-          metadataParser.getTablesToNodes()), BROADCAST_VARIABLE);
+          Objects.requireNonNull(metadataParser).getTablesToNodes()), BROADCAST_VARIABLE);
 
     return flinkConfig.getLogicalGraphFactory().fromDataSets(vertices, edges);
   }

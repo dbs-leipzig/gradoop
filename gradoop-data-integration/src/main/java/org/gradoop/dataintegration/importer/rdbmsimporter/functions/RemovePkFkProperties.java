@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
-import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToNode;
+import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToVertex;
 import org.gradoop.dataintegration.importer.rdbmsimporter.tuples.RowHeaderTuple;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class RemovePkFkProperties extends RichMapFunction<Vertex, Vertex> {
   /**
    * List of tables to nodes representation
    */
-  private List<TableToNode> tablesToNodes;
+  private List<TableToVertex> tablesToNodes;
 
   @Override
   public void open(Configuration parameters) {
@@ -58,12 +58,12 @@ public class RemovePkFkProperties extends RichMapFunction<Vertex, Vertex> {
 
     Properties newProps = Properties.create();
 
-    for (TableToNode table : tablesToNodes) {
+    for (TableToVertex table : tablesToNodes) {
       if (table.getTableName().equals(v.getLabel())) {
 
         ArrayList<String> foreignKeys = Lists.newArrayList();
         for (RowHeaderTuple rht : table.getRowheader().getRowHeader()) {
-          if (rht.getAttType().equals(FK_FIELD)) {
+          if (rht.getAttributeRole().equals(FK_FIELD)) {
             foreignKeys.add(rht.f0);
           }
         }
