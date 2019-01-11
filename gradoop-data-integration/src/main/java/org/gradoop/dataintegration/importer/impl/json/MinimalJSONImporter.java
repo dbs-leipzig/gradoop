@@ -17,7 +17,7 @@ package org.gradoop.dataintegration.importer.impl.json;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.dataintegration.importer.impl.json.functions.SimpleJsonToVertex;
+import org.gradoop.dataintegration.importer.impl.json.functions.MinimalJsonToVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -59,7 +59,7 @@ public class MinimalJSONImporter implements DataSource {
   @Override
   public LogicalGraph getLogicalGraph() {
     DataSet<Vertex> vertices = config.getExecutionEnvironment().readTextFile(jsonPath)
-      .map(new SimpleJsonToVertex(config.getVertexFactory()));
+      .map(new MinimalJsonToVertex(config.getVertexFactory()));
     return config.getLogicalGraphFactory().fromDataSets(vertices);
   }
 

@@ -30,9 +30,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Tests for the {@link SimpleJsonToVertex} function.
+ * Tests for the {@link MinimalJsonToVertex} function.
  */
-public class SimpleJsonToVertexTest extends GradoopFlinkTestBase {
+public class MinimalJsonToVertexTest extends GradoopFlinkTestBase {
 
   /**
    * The factory used to create new vertices.
@@ -47,7 +47,7 @@ public class SimpleJsonToVertexTest extends GradoopFlinkTestBase {
   /**
    * An instance of the function to test.
    */
-  private SimpleJsonToVertex function;
+  private MinimalJsonToVertex function;
 
   /**
    * Initialize this test.
@@ -55,8 +55,8 @@ public class SimpleJsonToVertexTest extends GradoopFlinkTestBase {
   @Before
   public void setUp() {
     vertexFactory = getConfig().getVertexFactory();
-    expectedValue = vertexFactory.createVertex(SimpleJsonToVertex.JSON_VERTEX_LABEL);
-    function = new SimpleJsonToVertex(vertexFactory);
+    expectedValue = vertexFactory.createVertex(MinimalJsonToVertex.JSON_VERTEX_LABEL);
+    function = new MinimalJsonToVertex(vertexFactory);
   }
 
   /**

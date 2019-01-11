@@ -42,7 +42,7 @@ import java.util.Objects;
  * "name":"Alice","gender":"female","age":42
  * }}</pre>
  */
-public class SimpleJsonToVertex implements MapFunction<String, Vertex> {
+public class MinimalJsonToVertex implements MapFunction<String, Vertex> {
 
   /**
    * The default label used for the newly created vertices.
@@ -59,7 +59,7 @@ public class SimpleJsonToVertex implements MapFunction<String, Vertex> {
    *
    * @param vertexFactory The vertex factory used to create new vertices.
    */
-  public SimpleJsonToVertex(EPGMVertexFactory<Vertex> vertexFactory) {
+  public MinimalJsonToVertex(EPGMVertexFactory<Vertex> vertexFactory) {
     this.reuse = Objects.requireNonNull(vertexFactory).createVertex(JSON_VERTEX_LABEL);
     this.reuse.setProperties(Properties.create());
   }
