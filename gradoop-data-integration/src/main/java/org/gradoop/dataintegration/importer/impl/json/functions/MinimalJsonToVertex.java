@@ -75,6 +75,10 @@ public class MinimalJsonToVertex implements MapFunction<String, Vertex> {
     JSONObject jsonVertex = new JSONObject(jsonString);
 
     Properties properties = reuse.getProperties();
+    if (properties == null) {
+      properties = Properties.create();
+      reuse.setProperties(properties);
+    }
     properties.clear();
 
     for (Iterator it = jsonVertex.keys(); it.hasNext();) {
