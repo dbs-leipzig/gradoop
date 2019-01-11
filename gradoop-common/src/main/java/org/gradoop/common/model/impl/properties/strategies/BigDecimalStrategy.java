@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.apache.flink.core.memory.DataOutputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -73,7 +74,7 @@ public class BigDecimalStrategy implements PropertyValueStrategy<BigDecimal> {
       return PropertyValueStrategyUtils.compareNumerical(value, num);
     }
     throw new IllegalArgumentException(String.format(
-      "Incompatible types: %s, %s", value.getClass(), other.getClass()));
+    "Incompatible types: %s, %s", value.getClass(), other.getClass()));
   }
 
   @Override
@@ -117,8 +118,8 @@ public class BigDecimalStrategy implements PropertyValueStrategy<BigDecimal> {
       break;
     default:
       throw new ClassCastException(
-        "Cannot covert " + this.getType().getSimpleName() +
-          " to " + BigDecimal.class.getSimpleName());
+      "Cannot covert " + this.getType().getSimpleName() +
+      " to " + BigDecimal.class.getSimpleName());
     }
     return decimal;
   }

@@ -32,7 +32,6 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

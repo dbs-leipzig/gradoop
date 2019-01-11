@@ -1309,7 +1309,7 @@ public class PropertyValueTest {
   public void testReadAndWriteLargeMap() throws Exception {
     HashMap<PropertyValue, PropertyValue> largeMap = new HashMap<>();
     long neededEntries = PropertyValue.LARGE_PROPERTY_THRESHOLD;
-    for(int i = 0; i < neededEntries; i++) {
+    for (int i = 0; i < neededEntries; i++) {
       largeMap.put(PropertyValue.create("key" + i), PropertyValue.create("value" + i));
     }
 
