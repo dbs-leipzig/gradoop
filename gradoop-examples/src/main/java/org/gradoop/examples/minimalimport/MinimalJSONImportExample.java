@@ -17,19 +17,19 @@ package org.gradoop.examples.minimalimport;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.dataintegration.importer.impl.csv.MinimalCSVImporter;
+import org.gradoop.dataintegration.importer.impl.json.MinimalJSONImporter;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * Example to show the usage of the minimal csv importer {@link MinimalCSVImporter}.
+ * Example to show the usage of the minimal json importer {@link MinimalJSONImporter}.
  */
-public class MinimalCSVImportExample extends AbstractRunner implements ProgramDescription {
+public class MinimalJSONImportExample extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Example method to read a csv file and print the vertices of the generated graph.
+   * Example method to read a json file and print the vertices of the generated graph.
    *
    * @param args program arguments
    * @throws Exception io exception if file not found
@@ -39,10 +39,10 @@ public class MinimalCSVImportExample extends AbstractRunner implements ProgramDe
     ExecutionEnvironment env = getExecutionEnvironment();
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 
-    String exampleFile = MinimalCSVImportExample.class.
-      getResource("/data/csv/minimalcsv/person.csv").getPath();
+    String exampleFile = MinimalJSONImportExample.class.
+      getResource("/data/json/minimaljson/person.json").getPath();
 
-    DataSource source = new MinimalCSVImporter(exampleFile, "\\|", config, true);
+    DataSource source = new MinimalJSONImporter(exampleFile, config);
 
     LogicalGraph graph = source.getLogicalGraph();
 
@@ -51,6 +51,6 @@ public class MinimalCSVImportExample extends AbstractRunner implements ProgramDe
 
   @Override
   public String getDescription() {
-    return MinimalCSVImportExample.class.getName();
+    return MinimalJSONImportExample.class.getName();
   }
 }

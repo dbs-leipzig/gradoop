@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.importer.simplejson;
+package org.gradoop.dataintegration.importer.impl.json;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.dataintegration.importer.simplejson.functions.SimpleJsonToVertex;
+import org.gradoop.dataintegration.importer.impl.json.functions.SimpleJsonToVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -31,7 +31,7 @@ import java.util.Objects;
  * A vertex will be created for each of those objects, properties will be created from
  * the attributes of the JSON object.
  */
-public class SimpleJsonDataImport implements DataSource {
+public class MinimalJSONImporter implements DataSource {
 
   /**
    * The path of the JSON file or directory.
@@ -49,7 +49,7 @@ public class SimpleJsonDataImport implements DataSource {
    * @param jsonPath The path of the JSON file(s).
    * @param config   The config used to read the file(s) and create the graph.
    */
-  public SimpleJsonDataImport(String jsonPath, GradoopFlinkConfig config) {
+  public MinimalJSONImporter(String jsonPath, GradoopFlinkConfig config) {
     Objects.requireNonNull(jsonPath);
     Objects.requireNonNull(config);
     this.jsonPath = jsonPath;

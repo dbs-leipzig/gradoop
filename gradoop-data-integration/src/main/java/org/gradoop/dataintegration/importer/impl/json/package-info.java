@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Functions used by the simple JSON importer.
+ * A data importer capable of creating a graph where every vertex is created from JSON object.
  */
-package org.gradoop.dataintegration.importer.simplejson.functions;
+package org.gradoop.dataintegration.importer.impl.json;

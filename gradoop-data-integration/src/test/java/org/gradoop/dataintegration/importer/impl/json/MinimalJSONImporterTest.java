@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.importer.simplejson;
+package org.gradoop.dataintegration.importer.impl.json;
 
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -23,19 +23,19 @@ import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 /**
- * Tests for {@link SimpleJsonDataImport}.
+ * Tests for {@link MinimalJSONImporter}.
  */
-public class SimpleJsonDataImportTest extends GradoopFlinkTestBase {
+public class MinimalJSONImporterTest extends GradoopFlinkTestBase {
 
   /**
    * The path of the test JSON data.
    */
-  private String dirPath = SimpleJsonDataImport.class.getResource("testdata.json").getFile();
+  private String dirPath = MinimalJSONImporter.class.getResource("/json/testdata.json").getFile();
 
   /**
    * The path of a single file of the test JSON data.
    */
-  private String filePath = SimpleJsonDataImport.class.getResource("testdata.json/2").getFile();
+  private String filePath = MinimalJSONImporter.class.getResource("/json/testdata.json/2").getFile();
 
   /**
    * The loader used to load the expected graph.
@@ -57,7 +57,7 @@ public class SimpleJsonDataImportTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testReadDir() throws Exception {
-    DataSource dataImport = new SimpleJsonDataImport(dirPath, getConfig());
+    DataSource dataImport = new MinimalJSONImporter(dirPath, getConfig());
     LogicalGraph read = dataImport.getLogicalGraph();
     LogicalGraph expected = loader.getLogicalGraph();
     GraphCollection expectedCollection =
@@ -75,7 +75,7 @@ public class SimpleJsonDataImportTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testReadFile() throws Exception {
-    DataSource dataImport = new SimpleJsonDataImport(filePath, getConfig());
+    DataSource dataImport = new MinimalJSONImporter(filePath, getConfig());
     LogicalGraph read = dataImport.getLogicalGraph();
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected2");
     GraphCollection expectedCollection =

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.importer.simplejson.functions;
+package org.gradoop.dataintegration.importer.impl.json.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONArray;

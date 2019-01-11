@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.importer.simplejson.functions;
+package org.gradoop.dataintegration.importer.impl.json.functions;
 
 import org.codehaus.jettison.json.JSONException;
 import org.gradoop.common.model.api.entities.EPGMVertex;
