@@ -23,7 +23,7 @@ import org.apache.flink.util.Collector;
 /**
  * Retrieves the long index for all visited outgoing edges from a gelly source vertex.
  */
-@FunctionAnnotation.ReadFieldsFirst("f1")
+@FunctionAnnotation.ReadFields("f1")
 public class GetVisitedGellyEdgeLongIdsFlatMap implements
   FlatMapFunction<Vertex<Long, VCIVertexValue>, Long> {
 

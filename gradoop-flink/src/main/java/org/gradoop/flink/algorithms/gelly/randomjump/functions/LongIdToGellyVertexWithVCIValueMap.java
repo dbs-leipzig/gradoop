@@ -31,17 +31,17 @@ public class LongIdToGellyVertexWithVCIValueMap implements
   MapFunction<Tuple2<Long, GradoopId>, Vertex<Long, VCIVertexValue>> {
 
   /**
-   * Reduce object instantiation
+   * Reduce object instantiation.
    */
   private final Vertex<Long, VCIVertexValue> reuseVertex;
 
   /**
-   * Reduce object instantiation
+   * Reduce object instantiation.
    */
   private final VCIVertexValue reuseValue;
 
   /**
-   * Creates an instance of LongIdToGellyVertexWithVCIValueMap
+   * Creates an instance of LongIdToGellyVertexWithVCIValueMap.
    */
   public LongIdToGellyVertexWithVCIValueMap() {
     this.reuseVertex = new Vertex<>();

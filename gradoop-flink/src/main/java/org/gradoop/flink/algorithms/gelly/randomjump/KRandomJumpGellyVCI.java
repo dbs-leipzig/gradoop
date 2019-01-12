@@ -66,7 +66,7 @@ public class KRandomJumpGellyVCI
   extends BaseGellyAlgorithm<Long, VCIVertexValue, Long, LogicalGraph> {
 
   /**
-   * Key to access the property value determining if a vertex or edge was visited
+   * Key to access the property value determining if a vertex or edge was visited.
    */
   public static final String PROPERTY_KEY_VISITED = "visited";
 
@@ -76,43 +76,43 @@ public class KRandomJumpGellyVCI
   protected LogicalGraph currentGraph;
 
   /**
-   * Number of starting vertices
+   * Number of starting vertices.
    */
   private final int k;
 
   /**
-   * Value for maximum number of iterations for the algorithm
+   * Value for maximum number of iterations for the algorithm.
    */
   private final int maxIterations;
 
   /**
-   * Probability for jumping to a random vertex instead of walking to a random neighbor
+   * Probability for jumping to a random vertex instead of walking to a random neighbor.
    */
   private final double jumpProbability;
 
   /**
-   * Relative amount of vertices to visit at least
+   * Relative amount of vertices to visit at least.
    */
   private final double percentageToVisit;
 
   /**
-   * DataSet holding the mapping for a long index to its vertex gradoop id
+   * DataSet holding the mapping for a long index to its vertex gradoop id.
    */
   private DataSet<Tuple2<Long, GradoopId>> indexToVertexIdMap;
 
   /**
-   * DataSet holding the mapping for a long index to its edge gradoop id
+   * DataSet holding the mapping for a long index to its edge gradoop id.
    */
   private DataSet<Tuple2<Long, GradoopId>> indexToEdgeIdMap;
 
   /**
    * Creates an instance of KRandomJumpGellyVCI.
    *
-   * @param k Number of starting vertices
-   * @param maxIterations Value for maximum number of iterations for the algorithm
+   * @param k Number of starting vertices.
+   * @param maxIterations Value for maximum number of iterations for the algorithm.
    * @param jumpProbability Probability for jumping to random vertex instead of walking to random
-   *                       neighbor
-   * @param percentageToVisit Relative amount of vertices to visit at least
+   *                       neighbor.
+   * @param percentageToVisit Relative amount of vertices to visit at least.
    */
   public KRandomJumpGellyVCI(int k, int maxIterations, double jumpProbability,
     double percentageToVisit) {
@@ -169,19 +169,15 @@ public class KRandomJumpGellyVCI
     long verticesToVisit = (long) Math.ceil((double) gellyGraph.numberOfVertices() *
       percentageToVisit);
 
-    final String startIndicesBroadcastSet = "startIndices";
-    final String vertexIndicesBroadcastSet = "vertexIndices";
-    final String visitedVerticesAggregatorName = "visitedVerticesAggregator";
-
     VertexCentricConfiguration parameters = new VertexCentricConfiguration();
-    parameters.addBroadcastSet(startIndicesBroadcastSet, startIndices);
-    parameters.addBroadcastSet(vertexIndicesBroadcastSet,
+    parameters.addBroadcastSet(VCIComputeFunction.START_INDICES_BROADCAST_SET, startIndices);
+    parameters.addBroadcastSet(VCIComputeFunction.VERTEX_INDICES_BROADCAST_SET,
       indexToVertexIdMap.map(new Value0Of2<>()));
-    parameters.registerAggregator(visitedVerticesAggregatorName, new LongSumAggregator());
+    parameters.registerAggregator(VCIComputeFunction.VISITED_VERTICES_AGGREGATOR_NAME,
+      new LongSumAggregator());
 
     Graph<Long, VCIVertexValue, Long> resultGraph = gellyGraph.runVertexCentricIteration(
-      new VCIComputeFunction(jumpProbability, verticesToVisit, startIndicesBroadcastSet,
-        vertexIndicesBroadcastSet, visitedVerticesAggregatorName),
+      new VCIComputeFunction(jumpProbability, verticesToVisit),
         null, maxIterations, parameters);
 
     DataSet<GradoopId> visitedGellyEdgeIds = resultGraph.getVertices()

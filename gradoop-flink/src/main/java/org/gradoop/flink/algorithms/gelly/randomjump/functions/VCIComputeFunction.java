@@ -15,108 +15,91 @@
  */
 package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.common.aggregators.LongSumAggregator;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.graph.Edge;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.pregel.ComputeFunction;
 import org.apache.flink.graph.pregel.MessageIterator;
-import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.apache.flink.types.LongValue;
 import org.apache.flink.types.NullValue;
 import org.gradoop.flink.algorithms.gelly.randomjump.KRandomJumpGellyVCI;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * <pre>
- * Compute function for {@link KRandomJumpGellyVCI}.
- * Vertex values are of type {@link VCIVertexValue}, with
- *  - f0: {@code Boolean} set to {@code true} if the vertex was visited, {@code false} otherwise
- *  - f1: {@code List<Long>} containing all long indices from already visited outgoing edges
- *
- * A message of type {@code NullValue} from one vertex to another is a walk resp. a jump to this
- * other vertex and therefor considered as one of {@link KRandomJumpGellyVCI#k} walkers.
- * </pre>
+ * Compute function for {@link KRandomJumpGellyVCI}. Vertex values are of type
+ * {@link VCIVertexValue}, with fields:
+ * <p><ul>
+ * <li>f0: {@code Boolean} set to {@code true} if the vertex was visited, to {@code false}
+ * otherwise
+ * <li>f1: {@code List<Long>} containing all long indices from already visited outgoing edges
+ * </ul></p>
+ * A message of type {@code NullValue} from one vertex to another is a walk respective a jump to
+ * this other vertex and therefor considered as one of {@link KRandomJumpGellyVCI#k} walkers.
  */
 public class VCIComputeFunction extends ComputeFunction<Long, VCIVertexValue, Long, NullValue> {
 
   /**
-   * Probability for jumping to a random vertex instead of walking to a random neighbor
+   * Name of the broadcast set containing the indices for the k starting vertices.
+   */
+  public static final String START_INDICES_BROADCAST_SET = "startIndices";
+
+  /**
+   * Name of the broadcast set containing the graphs vertex indices.
+   */
+  public static final String VERTEX_INDICES_BROADCAST_SET = "vertexIndices";
+
+  /**
+   * Name for the LongSumAggregator used for counting the visited vertices.
+   */
+  public static final String VISITED_VERTICES_AGGREGATOR_NAME = "visitedVerticesAggregator";
+
+  /**
+   * Probability for jumping to a random vertex instead of walking to a random neighbor.
    */
   private final double jumpProbability;
 
   /**
-   * Number of vertices to visit at least
+   * Number of vertices to visit at least.
    */
   private final long verticesToVisit;
 
   /**
-   * Name of the broadcast set containing the indices for the k starting vertices
+   * List with the indices for the k starting vertices.
    */
-  private final String startIndicesBroadcastSet;
+  private List<Long> startIndices;
 
   /**
-   * List with the indices for the k starting vertices
+   * List containing the graphs vertex indices.
    */
-  private List startIndices;
+  private List<Long> vertexIndices;
 
   /**
-   * Name of the broadcast set containing the graphs vertex indices
-   */
-  private final String vertexIndicesBroadcastSet;
-
-  /**
-   * List containing the graphs vertex indices
-   */
-  private List vertexIndices;
-
-  /**
-   * Name for the LongSumAggregator used for counting the visited vertices
-   */
-  private String visitedVerticesAggregatorName;
-
-  /**
-   * The LongSumAggregator used for counting the visited vertices
+   * The LongSumAggregator used for counting the visited vertices.
    */
   private LongSumAggregator visitedVerticesAggregator;
 
   /**
-   * Keeping track of the currently visited vertices at the beginning at each superstep
+   * Keeping track of the currently visited vertices at the beginning at each superstep.
    */
   private long currentVisitedCount;
 
   /**
-   * Random generator to obtain random neighbors and vertices
-   */
-  private final Random random;
-
-  /**
-   * Creates an instance of VCIComputeFunction
+   * Creates an instance of VCIComputeFunction.
    *
    * @param jumpProbability Probability for jumping to random vertex instead of walking to random
-   *                        neighbor
-   * @param verticesToVisit Number of vertices to visit via walk or jump
-   * @param startIndicesBroadcastSet Name of the broadcast set containing the indices of the
-   *                                 starting vertices
-   * @param vertexIndicesBroadcastSet Name of the broadcast set containing the indices of all
-   *                                  vertices
-   * @param visitedVerticesAggregatorName Name for the LongSumAggregator used for counting the
-   *                                      visited vertices
+   *                        neighbor.
+   * @param verticesToVisit Number of vertices to visit via walk or jump.
    */
-  public VCIComputeFunction(double jumpProbability, long verticesToVisit,
-    String startIndicesBroadcastSet, String vertexIndicesBroadcastSet,
-    String visitedVerticesAggregatorName) {
+  public VCIComputeFunction(double jumpProbability, long verticesToVisit) {
     this.jumpProbability = jumpProbability;
     this.verticesToVisit = verticesToVisit;
-    this.startIndicesBroadcastSet = startIndicesBroadcastSet;
-    this.vertexIndicesBroadcastSet = vertexIndicesBroadcastSet;
-    this.visitedVerticesAggregatorName = visitedVerticesAggregatorName;
     this.visitedVerticesAggregator = new LongSumAggregator();
     this.currentVisitedCount = 0L;
-    this.random = new Random();
   }
 
   /**
@@ -128,10 +111,10 @@ public class VCIComputeFunction extends ComputeFunction<Long, VCIVertexValue, Lo
    */
   @Override
   public void preSuperstep() {
-    startIndices = (List) getBroadcastSet(startIndicesBroadcastSet);
-    vertexIndices = (List) getBroadcastSet(vertexIndicesBroadcastSet);
-    visitedVerticesAggregator = getIterationAggregator(visitedVerticesAggregatorName);
-    LongValue previousAggregate = getPreviousIterationAggregate(visitedVerticesAggregatorName);
+    startIndices = (List<Long>) this.<Long>getBroadcastSet(START_INDICES_BROADCAST_SET);
+    vertexIndices = (List<Long>) this.<Long>getBroadcastSet(VERTEX_INDICES_BROADCAST_SET);
+    visitedVerticesAggregator = getIterationAggregator(VISITED_VERTICES_AGGREGATOR_NAME);
+    LongValue previousAggregate = getPreviousIterationAggregate(VISITED_VERTICES_AGGREGATOR_NAME);
     if (previousAggregate != null) {
       currentVisitedCount += previousAggregate.getValue();
     }
@@ -150,7 +133,6 @@ public class VCIComputeFunction extends ComputeFunction<Long, VCIVertexValue, Lo
    */
   @Override
   public void compute(Vertex<Long, VCIVertexValue> vertex, MessageIterator<NullValue> messages) {
-
     if (currentVisitedCount < verticesToVisit) {
       List<Edge<Long, Long>> edgesList = Lists.newArrayList(getEdges());
       Tuple2<VCIVertexValue, Boolean> valueWithHasChanged = Tuple2.of(vertex.getValue(), false);
@@ -183,13 +165,12 @@ public class VCIComputeFunction extends ComputeFunction<Long, VCIVertexValue, Lo
    */
   private Tuple2<VCIVertexValue, Boolean> walkToRandomNeighbor(
     Tuple2<VCIVertexValue, Boolean> valueWithHasChanged, List<Edge<Long, Long>> edgesList) {
-
     if (!valueWithHasChanged.f0.isVisited()) {
       visitedVerticesAggregator.aggregate(1L);
       valueWithHasChanged.f0.setVisited();
       valueWithHasChanged.f1 = true;
     }
-    if ((jumpProbability == 0d) || (jumpProbability < random.nextDouble())) {
+    if ((jumpProbability == 0d) || (jumpProbability < ThreadLocalRandom.current().nextDouble())) {
       List<Tuple2<Long, Long>> unvisitedNeighborWithEdgeId = new ArrayList<>();
       for (Edge<Long, Long> edge : edgesList) {
         if (!valueWithHasChanged.f0.getVisitedOutEdges().contains(edge.getValue())) {
@@ -197,7 +178,7 @@ public class VCIComputeFunction extends ComputeFunction<Long, VCIVertexValue, Lo
         }
       }
       if (!unvisitedNeighborWithEdgeId.isEmpty()) {
-        int randomIndex = random.nextInt(unvisitedNeighborWithEdgeId.size());
+        int randomIndex = ThreadLocalRandom.current().nextInt(unvisitedNeighborWithEdgeId.size());
         Long randomNeighborIndex = unvisitedNeighborWithEdgeId.get(randomIndex).f0;
         valueWithHasChanged.f0.addVisitedOutEdge(unvisitedNeighborWithEdgeId.get(randomIndex).f1);
         sendMessageTo(randomNeighborIndex, new NullValue());
@@ -215,8 +196,8 @@ public class VCIComputeFunction extends ComputeFunction<Long, VCIVertexValue, Lo
    * Jumps to a random vertex in the graph by sending a message to this vertex.
    */
   private void jumpToRandomVertex() {
-    int randomIndex = random.nextInt(vertexIndices.size());
-    Long randomVertexIndex = (Long) vertexIndices.get(randomIndex);
+    int randomIndex = ThreadLocalRandom.current().nextInt(vertexIndices.size());
+    Long randomVertexIndex = vertexIndices.get(randomIndex);
     sendMessageTo(randomVertexIndex, new NullValue());
   }
 }

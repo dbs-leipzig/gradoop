@@ -32,12 +32,12 @@ public class LongIdWithEdgeToTupleJoin implements
   JoinFunction<Edge, Tuple2<Long, GradoopId>, Tuple3<Long, GradoopId, GradoopId>> {
 
   /**
-   * Reduce object instantiation
+   * Reduce object instantiation.
    */
   private final Tuple3<Long, GradoopId, GradoopId> reuseTuple;
 
   /**
-   * Creates an instance of LongIdWithEdgeToTupleJoin
+   * Creates an instance of LongIdWithEdgeToTupleJoin.
    */
   public LongIdWithEdgeToTupleJoin() {
     this.reuseTuple = new Tuple3<>();

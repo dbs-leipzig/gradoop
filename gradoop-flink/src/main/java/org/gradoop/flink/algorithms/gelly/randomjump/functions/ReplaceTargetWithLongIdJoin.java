@@ -31,12 +31,12 @@ public class ReplaceTargetWithLongIdJoin implements
     Tuple3<Long, Long, GradoopId>> {
 
   /**
-   * Reduce object instantiation
+   * Reduce object instantiation.
    */
   private final Tuple3<Long, Long, GradoopId> reuseTuple;
 
   /**
-   * Creates an instance of ReplaceTargetWithLongIdJoin
+   * Creates an instance of ReplaceTargetWithLongIdJoin.
    */
   public ReplaceTargetWithLongIdJoin() {
     this.reuseTuple = new Tuple3<>();

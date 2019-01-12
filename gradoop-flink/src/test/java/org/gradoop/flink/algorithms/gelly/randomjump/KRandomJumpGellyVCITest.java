@@ -22,11 +22,8 @@ import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -35,43 +32,17 @@ import static org.junit.Assert.assertTrue;
 /**
  * Test class for {@link KRandomJumpGellyVCI}
  */
-@RunWith(Parameterized.class)
 public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
 
   /**
-   * Name for test-case
+   * The social graph used for testing
    */
-  private String testName;
+  private LogicalGraph socialGraph;
 
   /**
-   * Value for maximum number of iterations for the algorithm
+   * The custom graph used for testing
    */
-  private final int maxIterations;
-
-  /**
-   * Probability for jumping to a random vertex instead of walking to a random neighbor
-   */
-  private final double jumpProbability;
-
-  /**
-   * Relative amount of vertices to visit via walk or jump
-   */
-  private final double percentageVisited;
-
-  /**
-   * Number of start vertices
-   */
-  private final int k;
-
-  /**
-   * The original graph used for testing
-   */
-  private LogicalGraph graph;
-
-  /**
-   * The result graph used for testing
-   */
-  private LogicalGraph resultGraph;
+  private LogicalGraph customGraph;
 
   /**
    * List for result vertices
@@ -79,82 +50,121 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
   private List<Vertex> resultVertices;
 
   /**
-   * List for result edges
-   */
-  private List<Edge> resultEdges;
-
-  /**
-   * Creates an instance of the base test class.
-   *
-   * @param testName          Name for test-case
-   * @param k                 Number of start vertices
-   * @param maxIterations     Value for maximum number of iterations for the algorithm
-   * @param jumpProbability   Probability for jumping to a random vertex instead of walking to
-   *                          a random neighbor
-   * @param percentageVisited Relative amount of vertices to visit via walk or jump
-   */
-  public KRandomJumpGellyVCITest(String testName, String k, String maxIterations,
-    String jumpProbability, String percentageVisited) {
-    this.testName = testName;
-    this.k = Integer.parseInt(k);
-    this.maxIterations = Integer.parseInt(maxIterations);
-    this.jumpProbability = Double.parseDouble(jumpProbability);
-    this.percentageVisited = Double.parseDouble(percentageVisited);
-  }
-
-  /**
-   * Initialize graph for testing
+   * Initialize graphs for testing
    */
   @Before
-  public void initGraph() throws Exception {
+  public void initGraphs() throws Exception {
+    socialGraph = getSocialNetworkLoader().getLogicalGraph();
+    String graphString = "graph[" +
+      "/* no edges graph */" +
+      "(v0 {id:0, value:\"A\"})" +
+      "(v1 {id:1, value:\"B\"})" +
+      "(v2 {id:2, value:\"C\"})" +
+      "]";
+    customGraph = getLoaderFromString(graphString).getLogicalGraphByVariable("graph");
+  }
 
-    if (testName.contains("visitAllJumpsOnly")) {
-      String graphString = "graph[" +
-        "/* no edges graph */" +
-        "(v0 {id:0, value:\"A\"})" +
-        "(v1 {id:1, value:\"B\"})" +
-        "(v2 {id:2, value:\"C\"})" +
-        "]";
-      graph = getLoaderFromString(graphString).getLogicalGraphByVariable("graph");
-    } else {
-      graph = getSocialNetworkLoader().getLogicalGraph();
-    }
+  /**
+   * Test with social graph, with 1 starting vertex and at least half of the vertices to visit.
+   */
+  @Test
+  public void baseTest() throws Exception {
+    LogicalGraph result = new KRandomJumpGellyVCI(1, 1000, 0.15,
+      0.5).execute(socialGraph);
 
-    resultGraph =
-      new KRandomJumpGellyVCI(k, maxIterations, jumpProbability, percentageVisited).execute(graph);
+    commonValidation(socialGraph, result);
 
+    long visitedVertices = resultVertices.stream().filter(
+      vertex -> vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean())
+      .count();
+    assertTrue("Wrong number of visited vertices, should be at least 6",
+      visitedVertices >= 6L);
+  }
+
+  /**
+   * Test with social graph, with 3 starting vertices and at least half of the vertices to visit.
+   */
+  @Test
+  public void base3StartVerticesTest() throws Exception {
+    LogicalGraph result = new KRandomJumpGellyVCI(3, 1000, 0.15,
+      0.5).execute(socialGraph);
+
+    commonValidation(socialGraph, result);
+
+    long visitedVertices = resultVertices.stream().filter(
+      vertex -> vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean())
+      .count();
+    assertTrue("Wrong number of visited vertices, should be at least 6",
+      visitedVertices >= 6L);
+  }
+
+  /**
+   * Test with social graph, with 1 starting vertex and all of the vertices to visit.
+   */
+  @Test
+  public void visitAllTest() throws Exception {
+    LogicalGraph result = new KRandomJumpGellyVCI(1, 1000, 0.15,
+      1.0).execute(socialGraph);
+
+    commonValidation(socialGraph, result);
+
+    resultVertices.forEach(vertex -> assertTrue(
+      "vertex " + vertex.getId() + " was not visited, all vertices should be",
+      vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()));
+  }
+
+  /**
+   * Test with social graph, with 3 starting vertices and all of the vertices to visit.
+   */
+  @Test
+  public void visitAll3StartVerticesTest() throws Exception {
+    LogicalGraph result = new KRandomJumpGellyVCI(3, 1000, 0.15,
+      1.0).execute(socialGraph);
+
+    commonValidation(socialGraph, result);
+
+    resultVertices.forEach(vertex -> assertTrue(
+      "vertex " + vertex.getId() + " was not visited, all vertices should be",
+      vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()));
+  }
+
+  /**
+   * Test with unconnected custom graph, with 1 starting vertex and all of the vertices to visit.
+   */
+  @Test
+  public void visitAllJumpsOnlyTest() throws Exception {
+    LogicalGraph result = new KRandomJumpGellyVCI(1, 1000, 0.15,
+      1.0).execute(customGraph);
+
+    commonValidation(customGraph, result);
+
+    resultVertices.forEach(vertex -> assertTrue(
+      "vertex " + vertex.getId() + " was not visited, all vertices should be",
+      vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()));
+  }
+
+  /**
+   * Validation for all test-cases. Writes the output, compares the vertex- and edge-count and
+   * checks the annotation with the visited-property.
+   *
+   * @param graph The original graph
+   * @param resultGraph The annotated result graph
+   */
+  private void commonValidation(LogicalGraph graph, LogicalGraph resultGraph) throws Exception {
     resultVertices = new ArrayList<>();
-    resultEdges = new ArrayList<>();
-
+    List<Edge> resultEdges = new ArrayList<>();
     resultGraph.getVertices().output(new LocalCollectionOutputFormat<>(resultVertices));
     resultGraph.getEdges().output(new LocalCollectionOutputFormat<>(resultEdges));
-
     getExecutionEnvironment().execute();
-  }
 
-  /**
-   * Check if all graph elements are annotated
-   */
-  @Test
-  public void validateAnnotation() throws Exception {
-
-    assertEquals("wrong number of vertices in resultGraph", graph.getVertices().count(),
-      resultGraph.getVertices().count());
-    assertEquals("wrong number of edges in resultGraph", graph.getEdges().count(),
-      resultGraph.getEdges().count());
-
+    assertEquals("wrong number of vertices in resultGraph",
+      graph.getVertices().count(), resultGraph.getVertices().count());
+    assertEquals("wrong number of edges in resultGraph",
+      graph.getEdges().count(), resultGraph.getEdges().count());
     resultVertices.forEach(vertex -> assertTrue("vertex " + vertex.getId() + " is not annotated",
       vertex.hasProperty(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED)));
-
     resultEdges.forEach(edge -> assertTrue("edge " + edge.getId() + " is not annotated",
       edge.hasProperty(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED)));
-  }
-
-  /**
-   * Check if the correct number of elements are visited
-   */
-  @Test
-  public void checkVisitedProperty() {
 
     for (Edge edge : resultEdges) {
       if (edge.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()) {
@@ -166,36 +176,5 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
             targetVertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()));
       }
     }
-    if (testName.equals("base") || testName.equals("base3StartVertices")) {
-      long visitedVertices = resultVertices.stream().filter(
-        vertex -> vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean())
-        .count();
-      assertTrue("Wrong number of visited vertices, should be at least 6",
-        visitedVertices >= 6L);
-    } else {
-      resultVertices.forEach(vertex -> assertTrue(
-        "vertex " + vertex.getId() + " was not visited, all vertices should be",
-        vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()));
-    }
-  }
-
-  /**
-   * Parameters called when running the test
-   *
-   * @return List of parameters
-   */
-  @Parameterized.Parameters(name = "{index}: {0}")
-  public static Iterable data() {
-    return Arrays.asList(new String[] {
-      "base", "1", "1000", "0.15", "0.5"
-    }, new String[] {
-      "base3StartVertices", "3", "1000", "0.15", "0.5"
-    }, new String[] {
-      "visitAll", "1", "1000", "0.15", "1.0"
-    }, new String[] {
-      "visitAll3StartVertices", "3", "1000", "0.15", "1.0"
-    }, new String[] {
-      "visitAllJumpsOnly", "1", "1000", "0.15", "1.0"
-    });
   }
 }

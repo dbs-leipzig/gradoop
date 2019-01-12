@@ -31,12 +31,12 @@ public class LongIdTupleToGellyEdgeWithLongValueJoin implements
   JoinFunction<Tuple3<Long, Long, GradoopId>, Tuple2<Long, GradoopId>, Edge<Long, Long>> {
 
   /**
-   * Reduce object instantiation
+   * Reduce object instantiation.
    */
   private final Edge<Long, Long> reuseEdge;
 
   /**
-   * Creates an instance of LongIdTupleToGellyEdgeWithLongValueJoin
+   * Creates an instance of LongIdTupleToGellyEdgeWithLongValueJoin.
    */
   public LongIdTupleToGellyEdgeWithLongValueJoin() {
     this.reuseEdge = new Edge<>();

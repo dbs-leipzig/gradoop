@@ -30,7 +30,7 @@ public class GellyVertexWithEPGMVertexJoin implements
   JoinFunction<org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue>, Vertex, Vertex> {
 
   /**
-   * Key for the boolean property value to assign to the EPGM vertex
+   * Key for the boolean property value to assign to the EPGM vertex.
    */
   private final String propertyKey;
 
@@ -38,7 +38,7 @@ public class GellyVertexWithEPGMVertexJoin implements
    * Creates an instance of GellyVertexWithEPGMVertexJoin with a given key for
    * the boolean property value.
    *
-   * @param propertyKey propertyKey Key for the boolean property value
+   * @param propertyKey Key for the boolean property value.
    */
   public GellyVertexWithEPGMVertexJoin(String propertyKey) {
     this.propertyKey = propertyKey;

@@ -25,7 +25,7 @@ import java.util.List;
 public class VCIVertexValue extends Tuple2<Boolean, List<Long>> {
 
   /**
-   * Creates an empty instance of VCIVertexValue
+   * Creates an empty instance of VCIVertexValue.
    */
   public VCIVertexValue() { }
 
@@ -33,33 +33,33 @@ public class VCIVertexValue extends Tuple2<Boolean, List<Long>> {
    * Creates an instance of VCIVertexValue with the given values.
    *
    * @param visited {@code Boolean} determining if a vertex was visited ({@code true})
-   *                or not ({@code false})
-   * @param visitedOutEdgeIds {@code List} containing the ids of all visited outgoing edges
+   *                or not ({@code false}).
+   * @param visitedOutEdgeIds {@code List} containing the ids of all visited outgoing edges.
    */
-  public VCIVertexValue(Boolean visited, List<Long> visitedOutEdgeIds) {
+  VCIVertexValue(Boolean visited, List<Long> visitedOutEdgeIds) {
     super(visited, visitedOutEdgeIds);
   }
 
   /**
-   * Checks if the vertex was visited
+   * Checks if the vertex was visited.
    *
-   * @return {@code true} if it was visited, {@code false} otherwise
+   * @return {@code true} if it was visited, {@code false} otherwise.
    */
   public boolean isVisited() {
     return this.f0;
   }
 
   /**
-   * Sets the vertex as visited
+   * Sets the vertex as visited.
    */
   public void setVisited() {
     this.f0 = true;
   }
 
   /**
-   * Gets all visited outgoing edges
+   * Gets all visited outgoing edges.
    *
-   * @return List containing the ids off all visited outgoing edges
+   * @return List containing the ids off all visited outgoing edges.
    */
   public List<Long> getVisitedOutEdges() {
     return this.f1;
@@ -68,7 +68,7 @@ public class VCIVertexValue extends Tuple2<Boolean, List<Long>> {
   /**
    * Adds an id to the list of visited outgoing edges.
    *
-   * @param edgeId The newly visited outgoing edge id
+   * @param edgeId The newly visited outgoing edge id.
    */
   public void addVisitedOutEdge(Long edgeId) {
     this.f1.add(edgeId);

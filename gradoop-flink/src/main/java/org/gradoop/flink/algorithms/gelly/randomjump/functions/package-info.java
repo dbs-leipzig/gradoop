@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains user defined functions related to the Random Jump algorithm
+ * Contains user defined functions related to the Random Jump algorithm.
  */
 package org.gradoop.flink.algorithms.gelly.randomjump.functions;

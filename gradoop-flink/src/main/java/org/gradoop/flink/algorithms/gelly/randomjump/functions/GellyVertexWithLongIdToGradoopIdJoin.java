@@ -31,12 +31,12 @@ public class GellyVertexWithLongIdToGradoopIdJoin implements
     Vertex<GradoopId, VCIVertexValue>> {
 
   /**
-   * Reduce object instantiation
+   * Reduce object instantiation.
    */
   private final Vertex<GradoopId, VCIVertexValue> reuseVertex;
 
   /**
-   * Creates an instance of GellyVertexWithLongIdToGradoopIdJoin
+   * Creates an instance of GellyVertexWithLongIdToGradoopIdJoin.
    */
   public GellyVertexWithLongIdToGradoopIdJoin() {
     this.reuseVertex = new Vertex<>();

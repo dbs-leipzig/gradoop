@@ -29,14 +29,14 @@ import org.gradoop.common.model.impl.pojo.Edge;
 public class GetVisitedSourceTargetIdsFlatMap implements FlatMapFunction<Edge, GradoopId> {
 
   /**
-   * Key for the boolean property of the edge
+   * Key for the boolean property value to determine, if the edge was visited.
    */
   private final String propertyKey;
 
   /**
-   * Creates an instance of GetVisitedSourceTargetIdsFlatMap with a given property key
+   * Creates an instance of GetVisitedSourceTargetIdsFlatMap with a given property key.
    *
-   * @param propertyKey propertyKey Key for the boolean property value
+   * @param propertyKey Key for the boolean property value to determine, if the edge was visited.
    */
   public GetVisitedSourceTargetIdsFlatMap(String propertyKey) {
     this.propertyKey = propertyKey;

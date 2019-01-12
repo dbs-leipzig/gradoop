@@ -28,14 +28,14 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 public class VertexWithVisitedSourceTargetIdJoin implements JoinFunction<Vertex, GradoopId, Vertex> {
 
   /**
-   * Key for the boolean property of the edge
+   * Key for the boolean property of the edge.
    */
   private final String propertyKey;
 
   /**
-   * Creates an instance of VertexWithVisitedSourceTargetIdJoin with a given property key
+   * Creates an instance of VertexWithVisitedSourceTargetIdJoin with a given property key.
    *
-   * @param propertyKey propertyKey Key for the boolean property value
+   * @param propertyKey propertyKey Key for the boolean property value.
    */
   public VertexWithVisitedSourceTargetIdJoin(String propertyKey) {
     this.propertyKey = propertyKey;
