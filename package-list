@@ -15,6 +15,10 @@ org.gradoop.common.model.impl.pojo
 org.gradoop.common.model.impl.properties
 org.gradoop.common.util
 org.gradoop.dataintegration.importer
+org.gradoop.dataintegration.importer.impl.csv
+org.gradoop.dataintegration.importer.impl.csv.functions
+org.gradoop.dataintegration.importer.impl.json
+org.gradoop.dataintegration.importer.impl.json.functions
 org.gradoop.dataintegration.transformation.api
 org.gradoop.dataintegration.transformation.impl
 org.gradoop.dataintegration.transformation.impl.config
@@ -27,6 +31,7 @@ org.gradoop.examples.dimspan
 org.gradoop.examples.dimspan.data_source
 org.gradoop.examples.grouping
 org.gradoop.examples.io
+org.gradoop.examples.minimalimport
 org.gradoop.examples.patternmatching
 org.gradoop.examples.rollup
 org.gradoop.examples.rollup.functions
