@@ -33,7 +33,6 @@
         <module>gradoop-checkstyle</module>
         <module>gradoop-store</module>
         <module>gradoop-data-integration</module>
-        <module>gradoop-jmh-benchmarking</module>
     </modules>
 
     <developers>
