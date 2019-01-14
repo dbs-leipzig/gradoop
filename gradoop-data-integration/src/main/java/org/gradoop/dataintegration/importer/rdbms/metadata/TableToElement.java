@@ -90,15 +90,15 @@ public abstract class TableToElement {
   /**
    * Creates an instance of {@link TableToElement} to store database metadata.
    *
-   * @param rdbmsType type of connected database management system
    * @param tableName name of table
+   * @param rdbmsType type of connected database management system
    * @param primaryKeys table's primary keys
    * @param foreignKeys table's foreign keys
    * @param furtherAttributes tables's further attributes
    * @param rowCount count of rows of table
    */
   TableToElement(
-    RdbmsConstants.RdbmsType rdbmsType, String tableName, ArrayList<NameTypeTuple> primaryKeys,
+    String tableName, RdbmsConstants.RdbmsType rdbmsType, ArrayList<NameTypeTuple> primaryKeys,
     ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes, int rowCount) {
     Objects.requireNonNull(rdbmsType);
     Objects.requireNonNull(tableName);

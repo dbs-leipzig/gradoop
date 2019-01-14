@@ -24,6 +24,7 @@ import org.gradoop.dataintegration.importer.rdbms.functions.CreateEdges;
 import org.gradoop.dataintegration.importer.rdbms.functions.CreateVertices;
 import org.gradoop.dataintegration.importer.rdbms.functions.RemovePkFkProperties;
 import org.gradoop.dataintegration.importer.rdbms.metadata.MetaDataParser;
+import org.gradoop.dataintegration.importer.rdbms.metadata.TableToEdge;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -87,6 +88,14 @@ public class RdbmsImporter implements DataSource {
       metadataParser.parse();
     } catch (SQLException e) {
       throw new RuntimeException(e);
+    }
+
+    for (TableToEdge tte : metadataParser.getTablesToEdges()) {
+      System.out.println(tte.getTableName());
+      System.out.println(tte.getStartAttribute());
+      System.out.println(tte.getEndAttribute());
+      System.out.println(tte.getEndTableName());
+      System.out.println(tte.getSqlQuery());
     }
 
     // creates vertices from rdbms table tuples

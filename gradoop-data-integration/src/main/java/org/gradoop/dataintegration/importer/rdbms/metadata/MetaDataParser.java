@@ -223,22 +223,23 @@ public class MetaDataParser {
           NameTypeTuple foreignKeyTwo = new NameTypeTuple(table.getForeignKeys().get(1).f0,
             table.getForeignKeys().get(1).f1);
 
-          tablesToEdges
-            .add(
-              new TableToEdge(rdbmsType, tableName, referencedTableNameOne, referencedTableNameTwo,
-                foreignKeyOne, foreignKeyTwo, table.getFurtherAttributes(), false, rowCount));
+          tablesToEdges.add(
+            new TableToEdge(tableName, rdbmsType, table.getFurtherAttributes(),
+              rowCount, referencedTableNameOne, referencedTableNameTwo, foreignKeyOne,
+              foreignKeyTwo, false));
         } else {
 
           for (FkTuple foreignKey : table.getForeignKeys()) {
 
             String referencedTableName = foreignKey.getReferencedTablename();
 
-            NameTypeTuple startAtt = new NameTypeTuple(foreignKey.f0, foreignKey.f1);
-            NameTypeTuple endAtt = new NameTypeTuple(foreignKey.f2, null);
+            NameTypeTuple startAttribute = new NameTypeTuple(foreignKey.f0, foreignKey.f1);
+            NameTypeTuple endAttribute = new NameTypeTuple(foreignKey.f2, null);
 
-            tablesToEdges
-              .add(new TableToEdge(rdbmsType, null, tableName, referencedTableName, startAtt,
-                endAtt, null, true, rowCount));
+            tablesToEdges.add(
+              new TableToEdge(tableName, rdbmsType, null,
+                0, null, referencedTableName, startAttribute,
+                endAttribute, true));
           }
         }
       }

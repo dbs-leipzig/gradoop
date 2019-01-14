@@ -62,6 +62,7 @@ public class CreateEdges {
     DataSet<Vertex> vertices) {
 
     List<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
+    System.out.println("Tables size = " + tablesToEdges.size());
 
     DataSet<Edge> edges = null;
     EdgeFactory edgeFactory = flinkConfig.getEdgeFactory();
@@ -99,7 +100,6 @@ public class CreateEdges {
       for (TableToEdge table : tablesToEdges) {
 
         if (!table.isDirectionIndicator()) {
-
           DataSet<Row> dsSQLResult = Helper.getRdbmsInput(env, rdbmsConfig,
               table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
 
@@ -112,7 +112,7 @@ public class CreateEdges {
 
           // Represents vertices in relation with foreign key one
           DataSet<IdKeyTuple> idPkTableOne = vertices
-            .filter(new ByLabel<>(table.getTableName()))
+            .filter(new ByLabel<>(table.getStartTableName()))
             .map(new VertexToIdPkTuple());
 
           // Represents vertices in relation with foreign key two
@@ -127,7 +127,7 @@ public class CreateEdges {
             .map(new Tuple2ToIdFkWithProps())
             .join(idPkTableTwo).where(1)
             .equalTo(1)
-            .map(new Tuple3ToEdge(edgeFactory, table.getRelationshipType()));
+            .map(new Tuple3ToEdge(edgeFactory, table.getTableName()));
 
           if (edges == null) {
             edges = dsTupleEdges;

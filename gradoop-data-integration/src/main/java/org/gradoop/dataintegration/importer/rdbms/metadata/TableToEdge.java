@@ -35,9 +35,9 @@ import static org.gradoop.dataintegration.importer.rdbms.constants.RdbmsConstant
 public class TableToEdge extends TableToElement implements Serializable {
 
   /**
-   * Relationship type.
+   * Name of relation start table.
    */
-  private String relationshipType;
+  private String startTableName;
 
   /**
    * Name of relation end table.
@@ -62,23 +62,22 @@ public class TableToEdge extends TableToElement implements Serializable {
   /**
    * Creates an instance of {@link TableToEdge} to store relational table's metadata.
    *
+   * @param tableName name of database table
    * @param rdbmsType management type of connected rdbms
-   * @param relationshipType relationship type
+   * @param furtherAttributes list of further attribute names and datatypes
+   * @param rowCount number of rows
    * @param startTableName name of relation start table
    * @param endTableName name of relation end table
    * @param startAttribute name and type of relation start attribute
    * @param endAttribute name and datatype of relation end attribute
-   * @param furtherAttributes list of further attribute names and datatypes
    * @param directionIndicator direction indicator
-   * @param rowCount number of rows
    */
   TableToEdge(
-    RdbmsType rdbmsType, String relationshipType, String startTableName,
-    String endTableName, NameTypeTuple startAttribute, NameTypeTuple endAttribute,
-    ArrayList<NameTypeTuple> furtherAttributes,
-    boolean directionIndicator, int rowCount) {
-    super(rdbmsType, startTableName, null, null, furtherAttributes, rowCount);
-    this.relationshipType = relationshipType;
+    String tableName, RdbmsType rdbmsType, ArrayList<NameTypeTuple> furtherAttributes,
+    int rowCount, String startTableName, String endTableName, NameTypeTuple startAttribute,
+    NameTypeTuple endAttribute, boolean directionIndicator) {
+    super(tableName, rdbmsType, null, null, furtherAttributes, rowCount);
+    this.startTableName = startTableName;
     this.endTableName = endTableName;
     this.startAttribute = startAttribute;
     this.endAttribute = endAttribute;
@@ -92,7 +91,7 @@ public class TableToEdge extends TableToElement implements Serializable {
    * Assigns proper sql query and generates belonging flink row type information and row header.
    */
   private void init() {
-    TypeInformation<?>[] fieldTypes = null;
+    TypeInformation<?>[] fieldTypes;
 
     setSqlQuery(Helper.getTableToEdgesQuery(getTableName(), this.startAttribute.f0,
       this.endAttribute.f0, getFurtherAttributes(), getRdbmsType()));
@@ -118,22 +117,42 @@ public class TableToEdge extends TableToElement implements Serializable {
     setRowTypeInfo(new RowTypeInfo(fieldTypes));
   }
 
-  public String getRelationshipType() {
-    return relationshipType;
+  /**
+   * Get name of start table.
+   * @return name of start table
+   */
+  public String getStartTableName() {
+    return startTableName;
   }
 
+  /**
+   * Get name of end table.
+   * @return name of end table
+   */
   public String getEndTableName() {
     return endTableName;
   }
 
+  /**
+   * Get name, data type of start attribute.
+   * @return name, data type of start attribute
+   */
   public NameTypeTuple getStartAttribute() {
     return startAttribute;
   }
 
+  /**
+   * Get name, data type of end attribute.
+   * @return name, data type of end attribute
+   */
   public NameTypeTuple getEndAttribute() {
     return endAttribute;
   }
 
+  /**
+   * True, when relation is a directed one.
+   * @return true, when relation is a directed one
+   */
   public boolean isDirectionIndicator() {
     return directionIndicator;
   }

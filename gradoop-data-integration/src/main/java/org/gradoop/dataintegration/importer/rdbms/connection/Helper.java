@@ -106,7 +106,8 @@ public class Helper {
       .setDBUrl(rdbmsConfig.getUrl()).setUsername(rdbmsConfig.getUser())
       .setPassword(rdbmsConfig.getPw())
       .setQuery(sqlQuery + choosePaginationQuery(rdbmsConfig.getRdbmsType()))
-      .setRowTypeInfo(typeInfo).setParametersProvider(new GenericParameterValuesProvider(
+      .setRowTypeInfo(typeInfo)
+      .setParametersProvider(new GenericParameterValuesProvider(
         choosePartitionParameters(rdbmsConfig.getRdbmsType(), parallelism, rowCount)))
       .finish();
     return env.createInput(jdbcInput);
@@ -160,8 +161,8 @@ public class Helper {
     }
 
     int j = 0;
-    for (int i = 0; i < parameters.length; i++) {
-      if (i == parameters.length - 1) {
+    for (int i = 0; i < parallelism; i++) {
+      if (i == parallelism - 1) {
         if (rdbmsType == MYSQL_TYPE) {
           parameters[i] = new Integer[]{partitionNumber + partitionRest, j};
         } else {
@@ -174,6 +175,11 @@ public class Helper {
           parameters[i] = new Integer[]{j, partitionNumber};
         }
         j = j + partitionNumber;
+      }
+    }
+    for (int k = 0; k < parameters.length; k++) {
+      for (int l = 0; l < 2; l++) {
+        System.out.println(parameters[k][l].toString());
       }
     }
     return parameters;

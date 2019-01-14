@@ -19,6 +19,7 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.dataintegration.importer.rdbms.RdbmsImporter;
 import org.gradoop.examples.AbstractRunner;
+import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -66,7 +67,9 @@ public class RdbmsExample extends AbstractRunner implements ProgramDescription {
     RdbmsImporter dataSource = new RdbmsImporter(url, user, password, jdbcDriverPath,
       jdbcDriverClassName, gradoopFlinkConfig);
 
-    writeLogicalGraph(dataSource.getLogicalGraph(), outputPath);
+    dataSource.getLogicalGraph().writeTo(new CSVDataSink(outputPath, gradoopFlinkConfig));
+
+    executionEnvironment.execute();
   }
 
   @Override

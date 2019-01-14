@@ -51,7 +51,7 @@ public class TableToVertex extends TableToElement implements Serializable {
     RdbmsType rdbmsType, String tableName, ArrayList<NameTypeTuple> primaryKeys,
     ArrayList<FkTuple> foreignKeys, ArrayList<NameTypeTuple> furtherAttributes, int rowCount) {
 
-    super(rdbmsType, tableName, primaryKeys, foreignKeys, furtherAttributes, rowCount);
+    super(tableName, rdbmsType, primaryKeys, foreignKeys, furtherAttributes, rowCount);
     this.init();
   }
 
