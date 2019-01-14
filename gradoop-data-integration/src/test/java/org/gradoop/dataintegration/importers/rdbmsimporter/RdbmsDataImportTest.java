@@ -43,7 +43,6 @@ import java.util.List;
 public class RdbmsDataImportTest extends GradoopFlinkTestBase {
 
   private static PostgresWrapper pw;
-  private static Connection con;
   private static MetaDataParser metadataParser;
   private static String gdlPath;
 
@@ -52,7 +51,7 @@ public class RdbmsDataImportTest extends GradoopFlinkTestBase {
     pw = new PostgresWrapper();
     pw.start();
 
-    con = DriverManager.getConnection(pw.getConnectionUrl());
+    Connection con = DriverManager.getConnection(pw.getConnectionUrl());
 
     metadataParser = new MetaDataParser(con, RdbmsType.MYSQL_TYPE);
     metadataParser.parse();
@@ -73,7 +72,7 @@ public class RdbmsDataImportTest extends GradoopFlinkTestBase {
 
   @Test
   public void tablesToNodesTest() throws Exception {
-    List<TableToVertex> tablesToNodes = metadataParser.getTablesToNodes();
+    List<TableToVertex> tablesToNodes = metadataParser.getTablesToVertices();
     List<TableToEdge> tablesToEdges = metadataParser.getTablesToEdges();
 
     assertEquals("Wrong tables to nodes count !", 1, tablesToNodes.size());

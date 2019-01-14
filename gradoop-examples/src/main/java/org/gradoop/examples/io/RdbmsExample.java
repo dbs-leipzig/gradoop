@@ -66,7 +66,7 @@ public class RdbmsExample extends AbstractRunner implements ProgramDescription {
     RdbmsImporter dataSource = new RdbmsImporter(url, user, password, jdbcDriverPath,
       jdbcDriverClassName, gradoopFlinkConfig);
 
-    writeLogicalGraph(dataSource.getLogicalGraph(),outputPath);
+    writeLogicalGraph(dataSource.getLogicalGraph(), outputPath);
   }
 
   @Override
