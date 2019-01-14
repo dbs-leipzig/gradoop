@@ -46,8 +46,9 @@ public class EdgeToInvertEdge implements MapFunction<Edge, Edge> {
 
   @Override
   public Edge map(Edge e) {
-
-    return edgeFactory.initEdge(GradoopId.get(), e.getLabel(), e.getTargetId(), e.getSourceId(),
-        e.getProperties());
+    GradoopId sourceId = e.getSourceId();
+    e.setSourceId(e.getTargetId());
+    e.setTargetId(sourceId);
+    return e;
   }
 }
