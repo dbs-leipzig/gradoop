@@ -17,7 +17,7 @@ package org.gradoop.examples.io;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.dataintegration.importer.rdbmsimporter.RdbmsDataSource;
+import org.gradoop.dataintegration.importer.rdbms.RdbmsImporter;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -51,25 +51,22 @@ public class RdbmsExample extends AbstractRunner implements ProgramDescription {
     }
     final String url = args[0];
     final String user = args[1];
-    final String pw = args[2];
+    final String password = args[2];
     final String jdbcDriverPath = args[3];
     final String jdbcDriverClassName = args[4];
     final String outputPath = args[5];
 
     // initialize Flink execution environment
-    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+    ExecutionEnvironment executionEnvironment = ExecutionEnvironment.getExecutionEnvironment();
 
     // create default Gradoop configuration
-    GradoopFlinkConfig gfc = GradoopFlinkConfig.createConfig(env);
+    GradoopFlinkConfig gradoopFlinkConfig = GradoopFlinkConfig.createConfig(executionEnvironment);
 
     // create DataSource
-    RdbmsDataSource dataSource = new RdbmsDataSource(url, user, pw, jdbcDriverPath,
-      jdbcDriverClassName, gfc);
+    RdbmsImporter dataSource = new RdbmsImporter(url, user, password, jdbcDriverPath,
+      jdbcDriverClassName, gradoopFlinkConfig);
 
-    writeLogicalGraph(dataSource.getLogicalGraph(), outputPath);
-
-    // execute program
-    env.execute();
+    writeLogicalGraph(dataSource.getLogicalGraph(),outputPath);
   }
 
   @Override

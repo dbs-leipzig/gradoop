@@ -20,12 +20,12 @@ import static org.junit.Assert.assertEquals;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.dataintegration.importer.rdbmsimporter.RdbmsDataSource;
-import org.gradoop.dataintegration.importer.rdbmsimporter.constants.RdbmsConstants.RdbmsType;
-import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.MetaDataParser;
-import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.RdbmsTableBase;
-import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToEdge;
-import org.gradoop.dataintegration.importer.rdbmsimporter.metadata.TableToVertex;
+import org.gradoop.dataintegration.importer.rdbms.RdbmsImporter;
+import org.gradoop.dataintegration.importer.rdbms.constants.RdbmsConstants.RdbmsType;
+import org.gradoop.dataintegration.importer.rdbms.metadata.MetaDataParser;
+import org.gradoop.dataintegration.importer.rdbms.metadata.RdbmsTableBase;
+import org.gradoop.dataintegration.importer.rdbms.metadata.TableToEdge;
+import org.gradoop.dataintegration.importer.rdbms.metadata.TableToVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -92,7 +92,7 @@ public class RdbmsDataImportTest extends GradoopFlinkTestBase {
     String jdbcDriverClassName = "org.postgresql.Driver";
 
     // creates rdbms data import of embedded databse
-    DataSource dataSource = new RdbmsDataSource(url, user, password, jdbcDriverPath,
+    DataSource dataSource = new RdbmsImporter(url, user, password, jdbcDriverPath,
       jdbcDriverClassName, getConfig());
 
     LogicalGraph tempInput = dataSource.getLogicalGraph();
