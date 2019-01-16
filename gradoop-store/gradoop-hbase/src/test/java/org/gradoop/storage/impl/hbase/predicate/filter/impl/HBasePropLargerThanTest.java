@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,18 +118,18 @@ public class HBasePropLargerThanTest {
   @Parameterized.Parameters
   public static Collection properties() {
     return Arrays.asList(new Object[][] {
-        {GradoopTestUtils.KEY_2, GradoopTestUtils.INT_VAL_2, true},
-        {GradoopTestUtils.KEY_3, GradoopTestUtils.LONG_VAL_3, true},
-        {GradoopTestUtils.KEY_4, GradoopTestUtils.FLOAT_VAL_4, true},
-        {GradoopTestUtils.KEY_5, GradoopTestUtils.DOUBLE_VAL_5, true},
-        {GradoopTestUtils.KEY_7, GradoopTestUtils.BIG_DECIMAL_VAL_7, true},
-        {GradoopTestUtils.KEY_e, GradoopTestUtils.SHORT_VAL_e, true},
-        {GradoopTestUtils.KEY_2, GradoopTestUtils.INT_VAL_2, false},
-        {GradoopTestUtils.KEY_3, GradoopTestUtils.LONG_VAL_3, false},
-        {GradoopTestUtils.KEY_4, GradoopTestUtils.FLOAT_VAL_4, false},
-        {GradoopTestUtils.KEY_5, GradoopTestUtils.DOUBLE_VAL_5, false},
-        {GradoopTestUtils.KEY_7, GradoopTestUtils.BIG_DECIMAL_VAL_7, false},
-        {GradoopTestUtils.KEY_e, GradoopTestUtils.SHORT_VAL_e, false},
+      {GradoopTestUtils.KEY_2, GradoopTestUtils.INT_VAL_2, true},
+      {GradoopTestUtils.KEY_3, GradoopTestUtils.LONG_VAL_3, true},
+      {GradoopTestUtils.KEY_4, GradoopTestUtils.FLOAT_VAL_4, true},
+      {GradoopTestUtils.KEY_5, GradoopTestUtils.DOUBLE_VAL_5, true},
+      {GradoopTestUtils.KEY_7, GradoopTestUtils.BIG_DECIMAL_VAL_7, true},
+      {GradoopTestUtils.KEY_e, GradoopTestUtils.SHORT_VAL_e, true},
+      {GradoopTestUtils.KEY_2, GradoopTestUtils.INT_VAL_2, false},
+      {GradoopTestUtils.KEY_3, GradoopTestUtils.LONG_VAL_3, false},
+      {GradoopTestUtils.KEY_4, GradoopTestUtils.FLOAT_VAL_4, false},
+      {GradoopTestUtils.KEY_5, GradoopTestUtils.DOUBLE_VAL_5, false},
+      {GradoopTestUtils.KEY_7, GradoopTestUtils.BIG_DECIMAL_VAL_7, false},
+      {GradoopTestUtils.KEY_e, GradoopTestUtils.SHORT_VAL_e, false},
     });
   }
 }

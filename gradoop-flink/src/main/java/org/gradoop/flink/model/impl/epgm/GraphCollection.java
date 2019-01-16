@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,8 +85,7 @@ import java.util.Objects;
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class GraphCollection implements
-  BaseGraphCollection<GraphHead, Vertex, Edge, GraphCollection>,
-  GraphCollectionLayout<GraphHead, Vertex, Edge>, GraphCollectionOperators {
+  BaseGraphCollection<GraphHead, Vertex, Edge, GraphCollection>, GraphCollectionOperators {
   /**
    * Layout for that graph collection
    */

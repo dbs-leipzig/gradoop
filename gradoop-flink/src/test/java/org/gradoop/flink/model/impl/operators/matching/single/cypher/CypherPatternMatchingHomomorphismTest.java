@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,18 +32,18 @@ public class CypherPatternMatchingHomomorphismTest extends SubgraphHomomorphismT
   public static Iterable data() {
     List<String[]> data = Lists.newArrayList(SubgraphHomomorphismTest.data());
     data.add(new String[] {
-        "Graph2_VarLength2",
-        GRAPH_2, VAR_LENGTH_PATH_PATTERN_2,
-        "expected1,expected2",
-        "expected1[(v9)-[e15]->(v9)-[e15]->(v9)]" +
+      "Graph2_VarLength2",
+      GRAPH_2, VAR_LENGTH_PATH_PATTERN_2,
+      "expected1,expected2",
+      "expected1[(v9)-[e15]->(v9)-[e15]->(v9)]" +
         "expected2[(v9)-[e15]->(v9)-[e15]->(v9)-[e15]->(v9)]"
     });
     data.add(new String[] {
-        "Graph3_VarLength3",
-        GRAPH_3, VAR_LENGTH_PATH_PATTERN_3,
-        "expected1,expected2,expected3,expected4,expected5,expected6," +
-          "expected7,expected8,expected9,expected10",
-        "expected1[(v0)]" +
+      "Graph3_VarLength3",
+      GRAPH_3, VAR_LENGTH_PATH_PATTERN_3,
+      "expected1,expected2,expected3,expected4,expected5,expected6," +
+        "expected7,expected8,expected9,expected10",
+      "expected1[(v0)]" +
         "expected2[(v0)-[e0]->(v1)]" +
         "expected3[(v0)-[e0]->(v1)-[e1]->(v2)]" +
         "expected4[(v0)-[e0]->(v1)-[e1]->(v2)-[e2]->(v3)]" +
@@ -55,10 +55,10 @@ public class CypherPatternMatchingHomomorphismTest extends SubgraphHomomorphismT
         "expected10[(v3)]"
     });
     data.add(new String[] {
-        "Graph2_VarLength4",
-        GRAPH_2, VAR_LENGTH_PATH_PATTERN_4,
-        "expected1",
-        "expected1[(v2)-[e8]->(v6)-[e7]->(v2)]"
+      "Graph2_VarLength4",
+      GRAPH_2, VAR_LENGTH_PATH_PATTERN_4,
+      "expected1",
+      "expected1[(v2)-[e8]->(v6)-[e7]->(v2)]"
     });
     return data;
   }

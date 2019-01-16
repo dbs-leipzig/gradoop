@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package org.gradoop.flink.io.impl.csv;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.hadoop.conf.Configuration;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
@@ -28,6 +30,9 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSink;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
@@ -74,15 +79,15 @@ public class CSVDataSinkTest extends CSVTestBase {
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "vertices[" +
-      "(v1:A {keya:1, keyb:2, keyc:\"Foo\"})," +
-      "(v2:A {keya:1.2f, keyb:\"Bar\", keyc:2.3f})," +
-      "(v3:A {keya:\"Bar\", keyb:true})" +
-      "]" +
-      "edges[" +
-      "(v1)-[e1:a {keya:14, keyb:3, keyc:\"Foo\"}]->(v1)," +
-      "(v1)-[e2:a {keya:1.1f, keyb:\"Bar\", keyc:2.5f}]->(v1)," +
-      "(v1)-[e3:a {keya:true, keyb:3.13f}]->(v1)" +
-      "]");
+        "(v1:A {keya:1, keyb:2, keyc:\"Foo\"})," +
+        "(v2:A {keya:1.2f, keyb:\"Bar\", keyc:2.3f})," +
+        "(v3:A {keya:\"Bar\", keyb:true})" +
+        "]" +
+        "edges[" +
+        "(v1)-[e1:a {keya:14, keyb:3, keyc:\"Foo\"}]->(v1)," +
+        "(v1)-[e2:a {keya:1.1f, keyb:\"Bar\", keyc:2.5f}]->(v1)," +
+        "(v1)-[e3:a {keya:true, keyb:3.13f}]->(v1)" +
+        "]");
 
     checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("vertices"));
     checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("edges"));
@@ -101,19 +106,19 @@ public class CSVDataSinkTest extends CSVTestBase {
     // if the metadata is not separated
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "single[" +
-      "(v1:A {keya:2})" +
-      "(v1)-[e1:A {keya:false}]->(v1)," +
-      "]" +
-      "multiple[" +
-      "(v2:B {keya:true, keyb:1, keyc:\"Foo\"})," +
-      "(v3:B {keya:false, keyb:2})," +
-      "(v4:C {keya:2.3f, keyb:\"Bar\"})," +
-      "(v5:C {keya:1.1f})," +
-      "(v2)-[e2:B {keya:1, keyb:2.23d, keyc:3.3d}]->(v3)," +
-      "(v3)-[e3:B {keya:2, keyb:7.2d}]->(v2)," +
-      "(v4)-[e4:C {keya:false}]->(v4)," +
-      "(v5)-[e5:C {keya:true, keyb:13}]->(v5)" +
-      "]");
+        "(v1:A {keya:2})" +
+        "(v1)-[e1:A {keya:false}]->(v1)," +
+        "]" +
+        "multiple[" +
+        "(v2:B {keya:true, keyb:1, keyc:\"Foo\"})," +
+        "(v3:B {keya:false, keyb:2})," +
+        "(v4:C {keya:2.3f, keyb:\"Bar\"})," +
+        "(v5:C {keya:1.1f})," +
+        "(v2)-[e2:B {keya:1, keyb:2.23d, keyc:3.3d}]->(v3)," +
+        "(v3)-[e3:B {keya:2, keyb:7.2d}]->(v2)," +
+        "(v4)-[e4:C {keya:false}]->(v4)," +
+        "(v5)-[e5:C {keya:true, keyb:13}]->(v5)" +
+        "]");
     checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("single"));
     checkCSVWrite(tmpPath, loader.getLogicalGraphByVariable("multiple"));
   }
@@ -230,12 +235,12 @@ public class CSVDataSinkTest extends CSVTestBase {
   }
 
   /**
-   * Test the content of the metadata.csv file
+   * Test the content of the metadata.csv file, written distributed
    *
    * @throws Exception if the execution or IO fails.
    */
   @Test
-  public void testWriteMetadataCsv() throws Exception {
+  public void testWriteMetadataCsvDistributed() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
     LogicalGraph logicalGraph = getExtendedLogicalGraph();
@@ -243,6 +248,35 @@ public class CSVDataSinkTest extends CSVTestBase {
     csvDataSink.write(logicalGraph, true);
 
     getExecutionEnvironment().execute();
+
+    String metadataFile = tmpPath + "/metadata.csv";
+    String line;
+
+    BufferedReader br = new BufferedReader(new FileReader(metadataFile));
+    while ((line = br.readLine()) != null) {
+      System.out.println(line);
+      checkMetadataCsvLine(line);
+    }
+  }
+
+  /**
+   * Test the content of the metadata.csv file, written locally
+   *
+   * @throws Exception if the execution or IO fails.
+   */
+  @Test
+  public void testWriteMetadataCsvLocal() throws Exception {
+    String tmpPath = temporaryFolder.getRoot().getPath();
+
+    LogicalGraph logicalGraph = getExtendedLogicalGraph();
+
+    List<Tuple3<String, String, String>> metaDataTuples = new CSVMetaDataSource()
+      .tuplesFromGraph(logicalGraph).collect();
+
+    CSVMetaData metaData = new CSVMetaDataSource().fromTuples(metaDataTuples);
+    CSVMetaDataSink metaDataSink = new CSVMetaDataSink();
+    metaDataSink.writeLocal(
+      tmpPath + "/metadata.csv", metaData, new Configuration(), true);
 
     String metadataFile = tmpPath + "/metadata.csv";
     String line;
@@ -257,7 +291,7 @@ public class CSVDataSinkTest extends CSVTestBase {
    * Test writing and reading the given graph to and from CSV
    *
    * @param tmpPath path to write csv
-   * @param input logical graph
+   * @param input   logical graph
    * @throws Exception if the execution or IO fails.
    */
   private void checkCSVWrite(String tmpPath, LogicalGraph input) throws Exception {
@@ -268,7 +302,7 @@ public class CSVDataSinkTest extends CSVTestBase {
    * Test writing and reading the given graph to and from CSV
    *
    * @param tmpPath path to write csv
-   * @param input graph collection
+   * @param input   graph collection
    * @throws Exception if the execution or IO fails.
    */
   private void checkCSVWrite(String tmpPath, GraphCollection input) throws Exception {

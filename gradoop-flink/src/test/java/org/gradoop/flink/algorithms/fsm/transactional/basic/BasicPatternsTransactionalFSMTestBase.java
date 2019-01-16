@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,40 +49,40 @@ public abstract class BasicPatternsTransactionalFSMTestBase extends GradoopFlink
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
     return Arrays.asList(new String[] {
-        "Single_Edge",
-        BasicPatternsData.FSM_SINGLE_EDGE,
-        "g1,g2,g3,g4",
-        "s1"
+      "Single_Edge",
+      BasicPatternsData.FSM_SINGLE_EDGE,
+      "g1,g2,g3,g4",
+      "s1"
     }, new String[] {
-        "Simple_Graph",
-        BasicPatternsData.FSM_SIMPLE_GRAPH,
-        "g1,g2,g3",
-        "s1,s2,s3,s4,s5"
+      "Simple_Graph",
+      BasicPatternsData.FSM_SIMPLE_GRAPH,
+      "g1,g2,g3",
+      "s1,s2,s3,s4,s5"
     }, new String[] {
-        "Parallel_Edges",
-        BasicPatternsData.FSM_PARALLEL_EDGES,
-        "g1,g2,g3",
-        "s1,s2"
+      "Parallel_Edges",
+      BasicPatternsData.FSM_PARALLEL_EDGES,
+      "g1,g2,g3",
+      "s1,s2"
     }, new String[] {
-        "Loop",
-        BasicPatternsData.FSM_LOOP,
-        "g1,g2,g3,g4",
-        "s1,s2,s3"
+      "Loop",
+      BasicPatternsData.FSM_LOOP,
+      "g1,g2,g3,g4",
+      "s1,s2,s3"
     }, new String[] {
-        "Diamond",
-        BasicPatternsData.FSM_DIAMOND,
-        "g1,g2,g3",
-        "s1,s2,s3,s4,s5,s6,s7"
+      "Diamond",
+      BasicPatternsData.FSM_DIAMOND,
+      "g1,g2,g3",
+      "s1,s2,s3,s4,s5,s6,s7"
     }, new String[] {
-        "Circle_with_Branch",
-        BasicPatternsData.FSM_CIRCLE_WITH_BRANCH,
-        "g1,g2,g3",
-        "s1,s2,s3,s4,s5,s6,s7,s8,s9,s10"
+      "Circle_with_Branch",
+      BasicPatternsData.FSM_CIRCLE_WITH_BRANCH,
+      "g1,g2,g3",
+      "s1,s2,s3,s4,s5,s6,s7,s8,s9,s10"
     }, new String[] {
-        "Colored Circle",
-        BasicPatternsData.MULTI_LABELED_CIRCLE,
-        "g1,g2",
-        "s1,s2,s3,s4,s5,s6,s7"
+      "Colored Circle",
+      BasicPatternsData.MULTI_LABELED_CIRCLE,
+      "g1,g2",
+      "s1,s2,s3,s4,s5,s6,s7"
     });
   }
 

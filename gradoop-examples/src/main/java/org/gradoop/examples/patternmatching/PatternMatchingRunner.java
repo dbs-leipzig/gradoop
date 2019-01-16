@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,23 +66,23 @@ public class PatternMatchingRunner extends AbstractRunner implements ProgramDesc
    * Used for console output
    */
   private static final String[] AVAILABLE_ALGORITHMS = new String[] {
-      ALGO_DUAL_BULK,
-      ALGO_DUAL_DELTA,
-      ALGO_ISO_EXP,
-      ALGO_ISO_EXP_BC_HASH_FIRST,
-      ALGO_CYPHER
+    ALGO_DUAL_BULK,
+    ALGO_DUAL_DELTA,
+    ALGO_ISO_EXP,
+    ALGO_ISO_EXP_BC_HASH_FIRST,
+    ALGO_CYPHER
   };
   /**
    * Option to declare path to input graph
    */
-  private static final String OPTION_INPUT_PATH  = "i";
+  private static final String OPTION_INPUT_PATH = "i";
   /**
    * Option to declare input graph format (csv, indexed, json)
    */
   private static final String OPTION_INPUT_FORMAT = "f";
   /**
-   *Option to declare path to output graph
-    */
+   * Option to declare path to output graph
+   */
   private static final String OPTION_OUTPUT_PATH = "o";
   /**
    * GDL/Cypher query string
@@ -244,7 +244,7 @@ public class PatternMatchingRunner extends AbstractRunner implements ProgramDesc
         MatchStrategy.ISOMORPHISM, MatchStrategy.ISOMORPHISM,
         statistics);
       break;
-    default :
+    default:
       throw new IllegalArgumentException(algorithm + " not supported");
     }
 

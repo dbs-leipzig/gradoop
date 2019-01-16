@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,9 +188,9 @@ public class EmbeddingTest {
     embedding.add(GradoopId.get(), PropertyValue.create("b"), PropertyValue.create(23));
 
     assertEquals(PropertyValue.create("a"), embedding.getProperty(0));
-    assertEquals(PropertyValue.create(42),  embedding.getProperty(1));
+    assertEquals(PropertyValue.create(42), embedding.getProperty(1));
     assertEquals(PropertyValue.create("b"), embedding.getProperty(2));
-    assertEquals(PropertyValue.create(23),  embedding.getProperty(3));
+    assertEquals(PropertyValue.create(23), embedding.getProperty(3));
   }
 
   @Test(expected = IndexOutOfBoundsException.class)
@@ -249,11 +249,11 @@ public class EmbeddingTest {
     GradoopId b = new GradoopId();
 
     GradoopId[] ab = new GradoopId[] {
-        a, b
+      a, b
     };
 
     GradoopId[] ba = new GradoopId[] {
-        b, a
+      b, a
     };
 
     Embedding embedding = new Embedding();
@@ -273,7 +273,7 @@ public class EmbeddingTest {
     GradoopId d = new GradoopId();
 
     GradoopId[] da = new GradoopId[] {
-        d, a
+      d, a
     };
 
     Embedding embedding = new Embedding();

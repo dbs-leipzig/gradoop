@@ -5,7 +5,7 @@
     <parent>
         <artifactId>gradoop-store</artifactId>
         <groupId>org.gradoop</groupId>
-        <version>0.4.3</version>
+        <version>0.4.4</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -126,7 +126,6 @@
                                     <include>com.esotericsoftware.kryo:*</include>
                                     <include>org.apache.flink:flink-core</include>
                                     <include>org.apache.hbase:hbase-common</include>
-                                    <include>org.mongodb:bson</include>
                                 </includes>
                             </artifactSet>
                         </configuration>

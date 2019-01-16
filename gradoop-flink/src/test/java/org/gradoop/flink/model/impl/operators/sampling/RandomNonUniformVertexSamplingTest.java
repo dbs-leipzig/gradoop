@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,13 +66,13 @@ public class RandomNonUniformVertexSamplingTest extends ParameterizedTestForGrap
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
     return Arrays.asList(new String[] {
-        "NonUniformVertexSamplingTest with seed",
-        "-4181668494294894490",
-        "0.272f"
+      "NonUniformVertexSamplingTest with seed",
+      "-4181668494294894490",
+      "0.272f"
     }, new String[] {
-        "NonUniformVertexSamplingTest without seed",
-        "0",
-        "0.272f"
+      "NonUniformVertexSamplingTest without seed",
+      "0",
+      "0.272f"
     });
   }
 }

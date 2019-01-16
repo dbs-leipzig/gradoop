@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.gradoop</groupId>
         <artifactId>gradoop-parent</artifactId>
-        <version>0.4.3</version>
+        <version>0.4.4</version>
     </parent>
 
     <artifactId>gradoop-common</artifactId>
@@ -135,11 +135,6 @@
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>bson</artifactId>
         </dependency>
 
         <!-- Test dependencies -->

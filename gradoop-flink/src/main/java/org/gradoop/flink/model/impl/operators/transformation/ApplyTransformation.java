@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * Applies the transformation operator on on all logical graphs in a graph
  * collection.
  */
-public class ApplyTransformation extends Transformation
+public class ApplyTransformation extends Transformation<GraphHead, Vertex, Edge, LogicalGraph>
   implements ApplicableUnaryGraphToGraphOperator {
 
   /**
@@ -55,9 +55,9 @@ public class ApplyTransformation extends Transformation
       collection.getGraphHeads(),
       collection.getVertices(),
       collection.getEdges(),
-      collection.getConfig());
+      collection.getConfig().getLogicalGraphFactory());
 
-    return collection.getConfig().getGraphCollectionFactory().fromDataSets(
+    return collection.getFactory().fromDataSets(
       modifiedGraph.getGraphHead(),
       modifiedGraph.getVertices(),
       modifiedGraph.getEdges());
@@ -71,11 +71,11 @@ public class ApplyTransformation extends Transformation
 
     DataSet<GraphTransaction> transformedGraphTransactions = graphTransactions
       .map(new TransformGraphTransaction(
-        config.getGraphHeadFactory(),
+        collection.getFactory().getGraphHeadFactory(),
         graphHeadTransFunc,
-        config.getVertexFactory(),
+        collection.getFactory().getVertexFactory(),
         vertexTransFunc,
-        config.getEdgeFactory(),
+        collection.getFactory().getEdgeFactory(),
         edgeTransFunc
       ));
 

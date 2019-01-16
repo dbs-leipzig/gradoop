@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,46 +15,36 @@
  */
 package org.gradoop.common.model.impl.id;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.MemorySegment;
 import org.apache.flink.types.CopyableValue;
 import org.apache.flink.types.NormalizableKey;
-import org.bson.types.ObjectId;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
-
 import java.io.IOException;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
+import java.security.SecureRandom;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Primary key for an EPGM element.
- *
- * This implementation uses a BSON {@link ObjectId} to guarantee uniqueness. Performance critical
- * methods, e.g. {@link GradoopId#equals(Object)} and {@link GradoopId#hashCode()} contain code
- * copied from {@link ObjectId} to avoid unnecessary object instantiations.
+ * <p>
+ * This implementation reuses much of the code of BSON's ObjectId
+ * (org.bson.types.ObjectId) to guarantee uniqueness. Much of the code is copied directly or
+ * has only small changes.
  *
  * @see EPGMIdentifiable
+ * <p>
+ * references to: org.bson.types.ObjectId
  */
 public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<GradoopId> {
-
-  /**
-   * Represents a null id.
-   */
-  public static final GradoopId NULL_VALUE =
-    new GradoopId(new ObjectId(0, 0, (short) 0, 0));
-
-  /**
-   * Highest possible Gradoop Id.
-   */
-  public static final GradoopId MAX_VALUE = new GradoopId(
-    new ObjectId(Integer.MAX_VALUE, 16777215, Short.MAX_VALUE, 16777215));
-
-  /**
-   * Lowest possible Gradoop Id.
-   */
-  public static final GradoopId MIN_VALUE = new GradoopId(
-    new ObjectId(Integer.MIN_VALUE, 0, Short.MIN_VALUE, 0));
 
   /**
    * Number of bytes to represent an id internally.
@@ -62,31 +52,58 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
   public static final int ID_SIZE = 12;
 
   /**
+   * Represents a null id.
+   */
+  public static final GradoopId NULL_VALUE =
+    new GradoopId(0, 0, (short) 0, 0);
+
+  /**
+   * Integer containing a unique identifier of the machine
+   */
+  private static final int MACHINE_IDENTIFIER;
+
+  /**
+   * Short containing a unique identifier of the process
+   */
+  private static final short PROCESS_IDENTIFIER;
+
+  /**
+   * Integer containing a counter that is increased whenever a new id is created
+   */
+  private static final AtomicInteger NEXT_COUNTER = new AtomicInteger(new SecureRandom().nextInt());
+
+  /**
+   * Bit mask used to extract the lowest three bytes of four
+   */
+  private static final int LOW_ORDER_THREE_BYTES = 0x00ffffff;
+
+  /**
+   * Bit mask used to extract the highest byte of four
+   */
+  private static final int HIGH_ORDER_ONE_BYTE = 0xff000000;
+
+  /**
    * Required for {@link GradoopId#toString()}
    */
   private static final char[] HEX_CHARS = new char[] {
-      '0', '1', '2', '3', '4', '5', '6', '7',
-      '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+    '0', '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
   /**
    * Internal byte representation
    */
   private byte[] bytes;
 
+  static {
+    MACHINE_IDENTIFIER = createMachineIdentifier();
+    PROCESS_IDENTIFIER = createProcessIdentifier();
+  }
+
   /**
    * Required default constructor for instantiation by serialization logic.
    */
   public GradoopId() {
     bytes = new byte[ID_SIZE];
-  }
-
-  /**
-   * Create GradoopId from existing ObjectId.
-   *
-   * @param objectId ObjectId
-   */
-  GradoopId(ObjectId objectId) {
-    this.bytes = objectId.toByteArray();
   }
 
   /**
@@ -99,25 +116,153 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
   }
 
   /**
+   * Creates a GradoopId using the given time, machine identifier, process identifier, and counter.
+   * <p>
+   * Note: Implementation taken from org.bson.types.ObjectId
+   *
+   * @param timestamp         the time in seconds
+   * @param machineIdentifier the machine identifier
+   * @param processIdentifier the process identifier
+   * @param counter           the counter
+   * @throws IllegalArgumentException if the high order byte of machineIdentifier
+   *                                  or counter is not zero
+   */
+  public GradoopId(final int timestamp, final int machineIdentifier,
+    final short processIdentifier, final int counter) {
+    this(timestamp, machineIdentifier, processIdentifier, counter, true);
+  }
+
+
+  /**
+   * Creates a GradoopId using the given time, machine identifier, process identifier, and counter.
+   * <p>
+   * Note: Implementation taken from org.bson.types.ObjectId
+   *
+   * @param timestamp         the time in seconds
+   * @param machineIdentifier the machine identifier
+   * @param processIdentifier the process identifier
+   * @param counter           the counter
+   * @param checkCounter      if the constructor should test if the counter is between 0 and
+   *                          16777215
+   */
+  private GradoopId(final int timestamp, final int machineIdentifier, final short processIdentifier,
+    final int counter, final boolean checkCounter) {
+    if ((machineIdentifier & HIGH_ORDER_ONE_BYTE) != 0) {
+      throw new IllegalArgumentException("The machine identifier must be between 0" +
+        " and 16777215 (it must fit in three bytes).");
+    }
+    if (checkCounter && ((counter & HIGH_ORDER_ONE_BYTE) != 0)) {
+      throw new IllegalArgumentException("The counter must be between 0" +
+        " and 16777215 (it must fit in three bytes).");
+    }
+
+    ByteBuffer buffer = ByteBuffer.allocate(12);
+
+    buffer.put((byte) (timestamp >> 24));
+    buffer.put((byte) (timestamp >> 16));
+    buffer.put((byte) (timestamp >> 8));
+    buffer.put((byte) timestamp);
+
+    buffer.put((byte) (machineIdentifier >> 16));
+    buffer.put((byte) (machineIdentifier >> 8));
+    buffer.put((byte) machineIdentifier);
+
+    buffer.put((byte) (processIdentifier >> 8));
+    buffer.put((byte) processIdentifier);
+
+    buffer.put((byte) (counter >> 16));
+    buffer.put((byte) (counter >> 8));
+    buffer.put((byte) counter);
+
+    this.bytes = buffer.array();
+  }
+
+  /**
+   * Creates the machine identifier from the network interface.
+   * <p>
+   * Note: Implementation taken from org.bson.types.ObjectId
+   *
+   * @return a short representing the process
+   */
+  private static int createMachineIdentifier() {
+    int machinePiece;
+    try {
+      StringBuilder sb = new StringBuilder();
+      Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+      while (e.hasMoreElements()) {
+        NetworkInterface ni = e.nextElement();
+        sb.append(ni.toString());
+        byte[] mac = ni.getHardwareAddress();
+        if (mac != null) {
+          ByteBuffer bb = ByteBuffer.wrap(mac);
+          try {
+            sb.append(bb.getChar());
+            sb.append(bb.getChar());
+            sb.append(bb.getChar());
+          } catch (BufferUnderflowException shortHardwareAddressException) {
+            // mac with less than 6 bytes. continue
+          }
+        }
+      }
+      machinePiece = sb.toString().hashCode();
+    } catch (SocketException t) {
+      machinePiece = new SecureRandom().nextInt();
+    }
+    machinePiece = machinePiece & LOW_ORDER_THREE_BYTES;
+    return machinePiece;
+  }
+
+  /**
+   * Creates the process identifier.  This does not have to be unique per class loader because
+   * NEXT_COUNTER will provide the uniqueness.
+   * <p>
+   * Note: Implementation taken from org.bson.types.ObjectId
+   *
+   * @return a short representing the process
+   */
+  private static short createProcessIdentifier() {
+    short processId;
+    String processName = java.lang.management.ManagementFactory.getRuntimeMXBean().getName();
+    if (processName.contains("@")) {
+      processId = (short) Integer.parseInt(processName.substring(0, processName.indexOf('@')));
+    } else {
+      processId = (short) java.lang.management.ManagementFactory
+        .getRuntimeMXBean().getName().hashCode();
+    }
+
+    return processId;
+  }
+
+  /**
    * Returns a new GradoopId
    *
    * @return new GradoopId
    */
   public static GradoopId get() {
-    return new GradoopId(new ObjectId());
+    return new GradoopId(dateToTimestampSeconds(new Date()), MACHINE_IDENTIFIER,
+      PROCESS_IDENTIFIER, NEXT_COUNTER.getAndIncrement(), false);
+  }
+
+  /**
+   * Converts a date into the seconds since unix epoch.
+   *
+   * @param time a time
+   * @return int representing the seconds between unix epoch and the given time
+   */
+  private static int dateToTimestampSeconds(final Date time) {
+    return (int) (time.getTime() / 1000);
   }
 
   /**
    * Returns the Gradoop ID represented by a specified hexadecimal string.
-   *
-   * Note: Implementation taken from {@link ObjectId#ObjectId(String)} to avoid object
-   * instantiation.
+   * <p>
+   * Note: Implementation taken from org.bson.types.ObjectId
    *
    * @param string hexadecimal GradoopId representation
    * @return GradoopId
    */
   public static GradoopId fromString(String string) {
-    if (!ObjectId.isValid(string)) {
+    if (!GradoopId.isValid(string)) {
       throw new IllegalArgumentException(
         "invalid hexadecimal representation of a GradoopId: [" + string + "]");
     }
@@ -127,6 +272,43 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
       b[i] = (byte) Integer.parseInt(string.substring(i * 2, i * 2 + 2), 16);
     }
     return new GradoopId(b);
+  }
+
+  /**
+   * Checks if a string can be transformed into a GradoopId.
+   * <p>
+   * Note: Implementation taken from org.bson.types.ObjectId
+   *
+   * @param hexString a potential GradoopId as a String.
+   * @return whether the string could be an object id
+   * @throws IllegalArgumentException if hexString is null
+   */
+  public static boolean isValid(final String hexString) {
+    if (hexString == null) {
+      throw new IllegalArgumentException();
+    }
+
+    int len = hexString.length();
+    if (len != 24) {
+      return false;
+    }
+
+    for (int i = 0; i < len; i++) {
+      char c = hexString.charAt(i);
+      if (c >= '0' && c <= '9') {
+        continue;
+      }
+      if (c >= 'a' && c <= 'f') {
+        continue;
+      }
+      if (c >= 'A' && c <= 'F') {
+        continue;
+      }
+
+      return false;
+    }
+
+    return true;
   }
 
   /**
@@ -164,13 +346,20 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
       return false;
     }
 
-    return equals(bytes, ((GradoopId) o).bytes, 0, 0);
+    byte[] firstBytes = this.bytes;
+    byte[] secondBytes = ((GradoopId) o).bytes;
+    for (int i = 0; i < GradoopId.ID_SIZE; i++) {
+      if (firstBytes[i] != secondBytes[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
    * Returns the hash code of this GradoopId.
-   *
-   * Note: Implementation is taken from {@link ObjectId#hashCode()} to avoid object instantiation.
+   * <p>
+   * Note: Implementation taken from org.bson.types.ObjectId
    *
    * @return hash code
    */
@@ -186,19 +375,25 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
   /**
    * Performs a byte-wise comparison of this and the specified GradoopId.
    *
-   * @param o the object to be compared.
-   * @return  a negative integer, zero, or a positive integer as this object
-   *          is less than, equal to, or greater than the specified object.
+   * @param other the object to be compared.
+   * @return a negative integer, zero, or a positive integer as this object
+   * is less than, equal to, or greater than the specified object.
    */
   @Override
-  public int compareTo(GradoopId o) {
-    return compare(this.bytes, o.bytes);
+  public int compareTo(GradoopId other) {
+
+    for (int i = 0; i < GradoopId.ID_SIZE; i++) {
+      if (this.bytes[i] != other.bytes[i]) {
+        return ((this.bytes[i] & 0xff) < (other.bytes[i] & 0xff)) ? -1 : 1;
+      }
+    }
+    return 0;
   }
 
   /**
    * Returns hex string representation of a GradoopId.
-   *
-   * Note: Implementation is taken from {@link ObjectId#toString()} to avoid object instantiation.
+   * <p>
+   * Note: Implementation taken from org.bson.types.ObjectId
    *
    * @return GradoopId string representation.
    */
@@ -210,7 +405,7 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
       chars[i++] = HEX_CHARS[b >> 4 & 0xF];
       chars[i++] = HEX_CHARS[b & 0xF];
     }
-    return new String(chars);
+    return String.valueOf(chars);
   }
 
   //------------------------------------------------------------------------------------------------
@@ -310,108 +505,13 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
    * Compares the given GradoopIds and returns the smaller one. It both are equal, the first
    * argument is returned.
    *
-   * @param first first GradoopId
+   * @param first  first GradoopId
    * @param second second GradoopId
    * @return smaller GradoopId or first if equal
    */
   public static GradoopId min(GradoopId first, GradoopId second) {
     int comparison = first.compareTo(second);
-    return comparison == 0 ? first : (comparison == -1 ? first : second);
-  }
-
-  /**
-   * Checks if the Gradoop ids stored at the specified positions are equal.
-   *
-   * Note: The order in which the id components are compared is taken from
-   * {@link ObjectId#equals(Object)}. However, we compare the values of the byte arrays directly.
-   *
-   * @param first first gradoop id
-   * @param second second gradoop id
-   * @param firstPos start index in the first byte array
-   * @param secondPos start index in the second byte array
-   *
-   * @return true, iff first is equal to second
-   */
-  static boolean equals(byte[] first, byte[] second, int firstPos, int secondPos) {
-    // compare counter (byte 9 to 11)
-    if (!equalsInRange(first, second, firstPos + 9, secondPos + 9, 3)) {
-      return false;
-    }
-    // compare machine identifier (byte 4 to 6)
-    if (!equalsInRange(first, second, firstPos + 4, secondPos + 4, 2)) {
-      return false;
-    }
-    // compare process identifier (byte 7 to 8)
-    if (!equalsInRange(first, second, firstPos + 7, secondPos + 7, 1)) {
-      return false;
-    }
-    // compare timestamp (byte 0 to 3)
-    if (!equalsInRange(first, second, firstPos, secondPos, 3)) {
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
-   * Compares the specified GradoopIds based on their byte representation
-   * (to avoid object instantiation).
-   *
-   * Note: Implementation is taken from {@link ObjectId#compareTo(Object)} to avoid object
-   * instantiation.
-   *
-   * @param first first GradoopId
-   * @param second second GradoopId
-   * @return a negative integer, zero, or a positive integer as this object is less than, equal to,
-   *         or greater than the specified object.
-   */
-  private static int compare(byte[] first, byte[] second) {
-    return compare(first, second, 0, 0, GradoopId.ID_SIZE);
-  }
-
-  /**
-   * Compares multiple GradoopIds represented a byte arrays at the specified ranges.
-   *
-   * @param first first byte representation of multiple gradoop ids
-   * @param second second byte representation of multiple gradoop ids
-   * @param firstPos start index in the first array
-   * @param secondPos start index in the second array
-   * @param length length of the range
-   *
-   * @return a negative integer, zero, or a positive integer as this object is less than, equal to,
-   *         or greater than the specified object.
-   */
-  private static int compare(byte[] first, byte[] second, int firstPos, int secondPos, int length) {
-    for (int i = 0; i < length; i++) {
-      if (first[firstPos + i] != second[secondPos + i]) {
-        return ((first[firstPos + i] & 0xff) < (second[secondPos + i] & 0xff)) ? -1 : 1;
-      }
-    }
-    return 0;
-  }
-
-  /**
-   * Checks if the given byte arrays contain equal elements in specified given range.
-   *
-   * @param first first array
-   * @param second second array
-   * @param firstPos start index in the first array
-   * @param secondPos start index in the second array
-   * @param length number of bytes to compare for equality
-   *
-   * @return true, iff both arrays have equal values in the specified range
-   */
-  private static boolean equalsInRange(byte[] first, byte[] second, int firstPos, int secondPos,
-    int length) {
-    int upperBound = firstPos + length;
-    while (firstPos < upperBound) {
-      if (first[firstPos] != second[secondPos]) {
-        return false;
-      }
-      ++firstPos;
-      ++secondPos;
-    }
-    return true;
+    return comparison == 0 ? first : (comparison < 0 ? first : second);
   }
 
   /**
@@ -421,7 +521,6 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
    * @param b2 byte 2
    * @param b1 byte 1
    * @param b0 byte 0
-   *
    * @return int value
    */
   private static int makeInt(final byte b3, final byte b2, final byte b1, final byte b0) {

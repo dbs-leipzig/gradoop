@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.io.impl.csv.CSVConstants;
+import org.gradoop.flink.io.api.metadata.MetaDataSource;
 
 /**
  * Creates a {@link Vertex} from a CSV string. The function uses a
@@ -49,6 +49,6 @@ public class CSVLineToVertex extends CSVLineToElement<Vertex> {
     return vertexFactory.initVertex(
       GradoopId.fromString(tokens[0]),
       tokens[1],
-      parseProperties(CSVConstants.VERTEX_TYPE, tokens[1], tokens[2]));
+      parseProperties(MetaDataSource.VERTEX_TYPE, tokens[1], tokens[2]));
   }
 }

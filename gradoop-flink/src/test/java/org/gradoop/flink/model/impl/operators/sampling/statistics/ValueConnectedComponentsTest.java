@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ public class ValueConnectedComponentsTest extends GradoopFlinkTestBase {
 
     Map<Long, Long> components = new HashMap<>();
 
-    for (Tuple2<Long, Long> tuple: vertexComponentList) {
+    for (Tuple2<Long, Long> tuple : vertexComponentList) {
       if (!components.containsKey(tuple.f1)) {
         components.put(tuple.f1, 1L);
       } else {

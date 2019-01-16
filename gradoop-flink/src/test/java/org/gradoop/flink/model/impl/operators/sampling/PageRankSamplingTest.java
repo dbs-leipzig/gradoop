@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,50 +158,50 @@ public class PageRankSamplingTest extends ParameterizedTestForGraphSampling {
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
     return Arrays.asList(new String[] {
-        "PageRankSamplingTest with seed, sample vertices with PageRankScore greater than " +
-          "threshold, keep all vertices if they got same score",
-        "-4181668494294894490",
-        "0.272f",
-        "0.5f",
-        "40",
-        "true",
-        "true"
+      "PageRankSamplingTest with seed, sample vertices with PageRankScore greater than " +
+        "threshold, keep all vertices if they got same score",
+      "-4181668494294894490",
+      "0.272f",
+      "0.5f",
+      "40",
+      "true",
+      "true"
     }, new String[] {
-        "PageRankSamplingTest without seed, sample vertices with PageRankScore greater than " +
-          "threshold, keep all vertices if they got same score",
-        "0",
-        "0.272f",
-        "0.5f",
-        "40",
-        "true",
-        "true"
+      "PageRankSamplingTest without seed, sample vertices with PageRankScore greater than " +
+        "threshold, keep all vertices if they got same score",
+      "0",
+      "0.272f",
+      "0.5f",
+      "40",
+      "true",
+      "true"
     }, new String[] {
-        "PageRankSamplingTest without seed, sample vertices with PageRankScore equal/smaller " +
-          "than threshold, keep all vertices if they got same score",
-        "0",
-        "0.272f",
-        "0.5f",
-        "40",
-        "false",
-        "true"
+      "PageRankSamplingTest without seed, sample vertices with PageRankScore equal/smaller " +
+        "than threshold, keep all vertices if they got same score",
+      "0",
+      "0.272f",
+      "0.5f",
+      "40",
+      "false",
+      "true"
     }, new String[] {
-        "PageRankSamplingTest without seed, sample vertices with PageRankScore equal/smaller " +
-          "than threshold, keep no vertices if they got same score",
-        "0",
-        "0.272f",
-        "0.5f",
-        "40",
-        "false",
-        "false"
+      "PageRankSamplingTest without seed, sample vertices with PageRankScore equal/smaller " +
+        "than threshold, keep no vertices if they got same score",
+      "0",
+      "0.272f",
+      "0.5f",
+      "40",
+      "false",
+      "false"
     }, new String[] {
-        "PageRankSamplingTest without seed and sampled vertices with PageRankScore equal/smaller " +
-          "than threshold, iteration = 1, keep all vertices if they got same score",
-        "0",
-        "0.272f",
-        "0.5f",
-        "1",
-        "false",
-        "true"
+      "PageRankSamplingTest without seed and sampled vertices with PageRankScore equal/smaller " +
+        "than threshold, iteration = 1, keep all vertices if they got same score",
+      "0",
+      "0.272f",
+      "0.5f",
+      "1",
+      "false",
+      "true"
     });
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 /**
  * Extracts {@link Embedding}s iteratively from a given graph by traversing the
  * graph according to a given {@link TraversalCode}.
- *
+ * <p>
  * For the iteration the traverser uses a basic for loop.
  *
  * @param <K> key type
@@ -115,12 +115,12 @@ public class SetPairForLoopTraverser<K> extends SetPairTraverser<K> {
         .fromElements(i + 1);
 
       String[] forwardedFieldEdgeSteps = new String[] {
-          // forward edge id
-          "f0",
-          // forward source or target id to tie point id
-          step.isOutgoing() ? "f1->f1" : "f2->f1",
-          // forward source or target id to next id
-          step.isOutgoing() ? "f2->f2" : "f1->f2"
+        // forward edge id
+        "f0",
+        // forward source or target id to tie point id
+        step.isOutgoing() ? "f1->f1" : "f2->f1",
+        // forward source or target id to next id
+        step.isOutgoing() ? "f2->f2" : "f1->f2"
       };
 
       embeddings = traverseEdges(edges, embeddings, superstep,

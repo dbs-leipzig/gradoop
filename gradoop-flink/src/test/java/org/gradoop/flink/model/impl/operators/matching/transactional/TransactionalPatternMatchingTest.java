@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,76 +44,76 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
 
     FlinkAsciiGraphLoader loader = getLoaderFromString(
       "g1:A[" +
-      "(v0:B {id : 0})" +
-      "(v1:A {id : 1})" +
-      "(v2:A {id : 2})" +
-      "(v3:C {id : 3})" +
-      "(v4:B {id : 4})" +
-      "(v5:A {id : 5})" +
-      "(v6:B {id : 6})" +
-      "(v7:C {id : 7})" +
-      "(v8:B {id : 8})" +
-      "(v9:C {id : 9})" +
-      "(v10:D {id : 10})" +
-      "(v0)-[e0:a {id : 0}]->(v1)" +
-      "(v0)-[e1:a {id : 1}]->(v3)" +
-      "(v1)-[e2:a {id : 2}]->(v6)" +
-      "(v2)-[e3:a {id : 3}]->(v6)" +
-      "(v4)-[e4:a {id : 4}]->(v1)" +
-      "(v4)-[e5:b {id : 5}]->(v3)" +
-      "(v5)-[e6:a {id : 6}]->(v4)" +
-      "(v6)-[e7:a {id : 7}]->(v2)" +
-      "(v6)-[e8:a {id : 8}]->(v5)" +
-      "(v6)-[e9:b {id : 9}]->(v7)" +
-      "(v8)-[e10:a {id : 10}]->(v5)" +
-      "(v5)-[e11:a {id : 11}]->(v9)" +
-      "(v9)-[e12:c {id : 12}]->(v10)" +
-      "]" +
-      "g2:B[" +
-      "(v11:B {id : 0})" +
-      "(v12:A {id : 1})" +
-      "(v13:A {id : 2})" +
-      "(v14:A {id : 3})" +
-      "(v15:C {id : 4})" +
-      "(v16:B {id : 5})" +
-      "(v17:B {id : 6})" +
-      "(v18:C {id : 7})" +
-      "(v19:B {id : 8})" +
-      "(v20:B {id : 9})" +
-      "(v21:A {id : 10})" +
-      "(v22:C {id : 11})" +
-      "(v23:D {id : 12})" +
-      "(v12)-[e13:a {id : 0}]->(v11)" +
-      "(v11)-[e14:b {id : 1}]->(v15)" +
-      "(v11)-[e15:a {id : 2}]->(v15)" +
-      "(v11)-[e16:a {id : 3}]->(v14)" +
-      "(v14)-[e17:a {id : 4}]->(v16)" +
-      "(v16)-[e18:a {id : 5}]->(v12)" +
-      "(v12)-[e19:a {id : 6}]->(v17)" +
-      "(v17)-[e20:a {id : 7}]->(v13)" +
-      "(v13)-[e21:a {id : 8}]->(v17)" +
-      "(v16)-[e22:a {id : 9}]->(v15)" +
-      "(v16)-[e23:b {id : 10}]->(v15)" +
-      "(v17)-[e24:b {id : 11}]->(v18)" +
-      "(v19)-[e25:a {id : 12}]->(v18)" +
-      "(v21)-[e26:a {id : 13}]->(v16)" +
-      "(v17)-[e27:a {id : 14}]->(v21)" +
-      "(v20)-[e28:d {id : 15}]->(v20)" +
-      "(v20)-[e29:a {id : 16}]->(v21)" +
-      "(v21)-[e30:d {id : 17}]->(v22)" +
-      "(v22)-[e31:a {id : 18}]->(v23)" +
-      "]" +
-      "g3:C[" +
-      "(v24:A {id : 0})-[e32:a {id : 0}]->(v25:A {id : 1})" +
-      "(v25)-[e33:a {id : 1}]->(v26:A {id : 2})" +
-      "(v26)-[e34:a {id : 2}]->(v27:A {id : 3})" +
-      "]" +
-      "g4:D[" +
-      "(v28:A {id : 0})-[e35:a {id : 0}]->(v29:A {id : 1})" +
-      "(v29)-[e36:a {id : 1}]->(v30:A {id : 2})-[e37:a {id : 3}]->(v31:A {id : 3})" +
-      "(v29)-[e38:a {id : 2}]->(v30)" +
-      "]" +
-      "g5:E[(v32 {id : 0})-[e39 {id : 0}]->(v33 {id : 1})]");
+        "(v0:B {id : 0})" +
+        "(v1:A {id : 1})" +
+        "(v2:A {id : 2})" +
+        "(v3:C {id : 3})" +
+        "(v4:B {id : 4})" +
+        "(v5:A {id : 5})" +
+        "(v6:B {id : 6})" +
+        "(v7:C {id : 7})" +
+        "(v8:B {id : 8})" +
+        "(v9:C {id : 9})" +
+        "(v10:D {id : 10})" +
+        "(v0)-[e0:a {id : 0}]->(v1)" +
+        "(v0)-[e1:a {id : 1}]->(v3)" +
+        "(v1)-[e2:a {id : 2}]->(v6)" +
+        "(v2)-[e3:a {id : 3}]->(v6)" +
+        "(v4)-[e4:a {id : 4}]->(v1)" +
+        "(v4)-[e5:b {id : 5}]->(v3)" +
+        "(v5)-[e6:a {id : 6}]->(v4)" +
+        "(v6)-[e7:a {id : 7}]->(v2)" +
+        "(v6)-[e8:a {id : 8}]->(v5)" +
+        "(v6)-[e9:b {id : 9}]->(v7)" +
+        "(v8)-[e10:a {id : 10}]->(v5)" +
+        "(v5)-[e11:a {id : 11}]->(v9)" +
+        "(v9)-[e12:c {id : 12}]->(v10)" +
+        "]" +
+        "g2:B[" +
+        "(v11:B {id : 0})" +
+        "(v12:A {id : 1})" +
+        "(v13:A {id : 2})" +
+        "(v14:A {id : 3})" +
+        "(v15:C {id : 4})" +
+        "(v16:B {id : 5})" +
+        "(v17:B {id : 6})" +
+        "(v18:C {id : 7})" +
+        "(v19:B {id : 8})" +
+        "(v20:B {id : 9})" +
+        "(v21:A {id : 10})" +
+        "(v22:C {id : 11})" +
+        "(v23:D {id : 12})" +
+        "(v12)-[e13:a {id : 0}]->(v11)" +
+        "(v11)-[e14:b {id : 1}]->(v15)" +
+        "(v11)-[e15:a {id : 2}]->(v15)" +
+        "(v11)-[e16:a {id : 3}]->(v14)" +
+        "(v14)-[e17:a {id : 4}]->(v16)" +
+        "(v16)-[e18:a {id : 5}]->(v12)" +
+        "(v12)-[e19:a {id : 6}]->(v17)" +
+        "(v17)-[e20:a {id : 7}]->(v13)" +
+        "(v13)-[e21:a {id : 8}]->(v17)" +
+        "(v16)-[e22:a {id : 9}]->(v15)" +
+        "(v16)-[e23:b {id : 10}]->(v15)" +
+        "(v17)-[e24:b {id : 11}]->(v18)" +
+        "(v19)-[e25:a {id : 12}]->(v18)" +
+        "(v21)-[e26:a {id : 13}]->(v16)" +
+        "(v17)-[e27:a {id : 14}]->(v21)" +
+        "(v20)-[e28:d {id : 15}]->(v20)" +
+        "(v20)-[e29:a {id : 16}]->(v21)" +
+        "(v21)-[e30:d {id : 17}]->(v22)" +
+        "(v22)-[e31:a {id : 18}]->(v23)" +
+        "]" +
+        "g3:C[" +
+        "(v24:A {id : 0})-[e32:a {id : 0}]->(v25:A {id : 1})" +
+        "(v25)-[e33:a {id : 1}]->(v26:A {id : 2})" +
+        "(v26)-[e34:a {id : 2}]->(v27:A {id : 3})" +
+        "]" +
+        "g4:D[" +
+        "(v28:A {id : 0})-[e35:a {id : 0}]->(v29:A {id : 1})" +
+        "(v29)-[e36:a {id : 1}]->(v30:A {id : 2})-[e37:a {id : 3}]->(v31:A {id : 3})" +
+        "(v29)-[e38:a {id : 2}]->(v30)" +
+        "]" +
+        "g5:E[(v32 {id : 0})-[e39 {id : 0}]->(v33 {id : 1})]");
 
     GraphCollection coll = loader.getGraphCollectionByVariables("g1", "g2", "g3", "g4", "g5");
 
@@ -122,7 +122,7 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
 
       GraphCollection result = coll.match(testPattern, new DepthSearchMatching(), true);
 
-      Collection<GraphHead> originalHeads  = Lists.newArrayList();
+      Collection<GraphHead> originalHeads = Lists.newArrayList();
       Collection<GraphHead> resultHeads = Lists.newArrayList();
 
       coll.getGraphHeads().output(new LocalCollectionOutputFormat<>(
@@ -171,44 +171,44 @@ public class TransactionalPatternMatchingTest extends GradoopFlinkTestBase {
   }
 
   private String[] tests = {
-      TestData.CHAIN_PATTERN_0,
-      TestData.CHAIN_PATTERN_1,
-      TestData.CHAIN_PATTERN_2,
-      TestData.CHAIN_PATTERN_3,
-      TestData.CHAIN_PATTERN_4,
-      TestData.CHAIN_PATTERN_5,
-      TestData.CHAIN_PATTERN_6,
-      TestData.CYCLE_PATTERN_0,
-      TestData.CYCLE_PATTERN_1,
-      TestData.CYCLE_PATTERN_2,
-      TestData.CYCLE_PATTERN_3,
-      TestData.CYCLE_PATTERN_4,
-      TestData.CYCLE_PATTERN_5,
-      TestData.LOOP_PATTERN_0,
-      TestData.UNLABELED_PATTERN_0,
-      TestData.UNLABELED_PATTERN_1,
-      TestData.UNLABELED_PATTERN_2,
-      TestData.UNLABELED_PATTERN_3,
+    TestData.CHAIN_PATTERN_0,
+    TestData.CHAIN_PATTERN_1,
+    TestData.CHAIN_PATTERN_2,
+    TestData.CHAIN_PATTERN_3,
+    TestData.CHAIN_PATTERN_4,
+    TestData.CHAIN_PATTERN_5,
+    TestData.CHAIN_PATTERN_6,
+    TestData.CYCLE_PATTERN_0,
+    TestData.CYCLE_PATTERN_1,
+    TestData.CYCLE_PATTERN_2,
+    TestData.CYCLE_PATTERN_3,
+    TestData.CYCLE_PATTERN_4,
+    TestData.CYCLE_PATTERN_5,
+    TestData.LOOP_PATTERN_0,
+    TestData.UNLABELED_PATTERN_0,
+    TestData.UNLABELED_PATTERN_1,
+    TestData.UNLABELED_PATTERN_2,
+    TestData.UNLABELED_PATTERN_3,
   };
 
   private long[][] resultCounts = {
-      {3, 5, 0, 0, 0},
-      {0, 0, 3, 4, 0},
-      {3, 4, 4, 4, 0},
-      {0, 0, 0, 0, 0},
-      {0, 0, 2, 4, 0},
-      {0, 0, 0, 0, 0},
-      {12, 18, 0, 0, 0},
-      {1, 1, 0, 0, 0},
-      {0, 0, 0, 0, 0},
-      {1, 1, 0, 0, 0},
-      {0, 1, 0, 0, 0},
-      {2, 4, 0, 0, 0},
-      {0, 2, 0, 0, 0},
-      {0, 1, 0, 0, 0},
-      {11, 13, 4, 4, 2},
-      {13, 18, 3, 4, 1},
-      {2, 3, 0, 0, 0},
-      {3, 5, 0, 0, 0}
+    {3, 5, 0, 0, 0},
+    {0, 0, 3, 4, 0},
+    {3, 4, 4, 4, 0},
+    {0, 0, 0, 0, 0},
+    {0, 0, 2, 4, 0},
+    {0, 0, 0, 0, 0},
+    {12, 18, 0, 0, 0},
+    {1, 1, 0, 0, 0},
+    {0, 0, 0, 0, 0},
+    {1, 1, 0, 0, 0},
+    {0, 1, 0, 0, 0},
+    {2, 4, 0, 0, 0},
+    {0, 2, 0, 0, 0},
+    {0, 1, 0, 0, 0},
+    {11, 13, 4, 4, 2},
+    {13, 18, 3, 4, 1},
+    {2, 3, 0, 0, 0},
+    {3, 5, 0, 0, 0}
   };
 }

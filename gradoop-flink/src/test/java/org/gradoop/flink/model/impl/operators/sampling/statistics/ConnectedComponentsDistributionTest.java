@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,15 +156,15 @@ public class ConnectedComponentsDistributionTest extends GradoopFlinkTestBase {
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
     return Arrays.asList(new String[] {
-        "wcc with annotated edges and int.max iterations",
-        "wcc_id",
-        "MAX",
-        "true"
+      "wcc with annotated edges and int.max iterations",
+      "wcc_id",
+      "MAX",
+      "true"
     }, new String[] {
-        "wcc without annotated edges and 10 iterations",
-        "wcc_id",
-        "10",
-        "false"
+      "wcc without annotated edges and 10 iterations",
+      "wcc_id",
+      "10",
+      "false"
     });
   }
 }

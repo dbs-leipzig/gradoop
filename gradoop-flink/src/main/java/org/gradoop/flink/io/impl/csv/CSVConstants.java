@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,18 +43,6 @@ public class CSVConstants {
    * Used to separate key and value of maps in the CSV files.
    */
   public static final String MAP_SEPARATOR = "=";
-  /**
-   * Used to tag a graph head entity.
-   */
-  public static final String GRAPH_TYPE = "g";
-  /**
-   * Used to tag a vertex entity.
-   */
-  public static final String VERTEX_TYPE = "v";
-  /**
-   * Used to tag an edge entity.
-   */
-  public static final String EDGE_TYPE = "e";
   /**
    * System constant file separator.
    */

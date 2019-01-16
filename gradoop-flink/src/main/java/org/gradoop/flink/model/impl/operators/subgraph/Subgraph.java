@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -48,18 +49,27 @@ import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.
  * 2) extract edge-induced subgraph via project + union + join strategy
  * 3) extract subgraph based on vertex and edge filter function
  * 4) extract subgraph based on vertex and edge filter function without verification (no joins)
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the logical graph instance
  */
-public class Subgraph implements UnaryGraphToGraphOperator {
+public class Subgraph<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Used to filter vertices from the logical graph.
    */
-  private final FilterFunction<Vertex> vertexFilterFunction;
+  private final FilterFunction<V> vertexFilterFunction;
 
   /**
    * Used to filter edges from the logical graph.
    */
-  private final FilterFunction<Edge> edgeFilterFunction;
+  private final FilterFunction<E> edgeFilterFunction;
 
   /**
    * Execution strategy for the operator.
@@ -113,8 +123,8 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    * @param edgeFilterFunction    edge filter function
    * @param strategy              sets the execution strategy for the operator
    */
-  public Subgraph(FilterFunction<Vertex> vertexFilterFunction,
-    FilterFunction<Edge> edgeFilterFunction, Strategy strategy) {
+  public Subgraph(FilterFunction<V> vertexFilterFunction,
+    FilterFunction<E> edgeFilterFunction, Strategy strategy) {
 
     if ((strategy == BOTH || strategy == BOTH_VERIFIED) &&
       vertexFilterFunction == null && edgeFilterFunction == null) {
@@ -137,9 +147,9 @@ public class Subgraph implements UnaryGraphToGraphOperator {
   }
 
   @Override
-  public LogicalGraph execute(LogicalGraph superGraph) {
+  public LG execute(LG superGraph) {
 
-    LogicalGraph result;
+    LG result;
     switch (strategy) {
     case BOTH:
       result = subgraph(superGraph);
@@ -170,10 +180,10 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    * @param superGraph supergraph
    * @return vertex-induced subgraph
    */
-  private LogicalGraph vertexInducedSubgraph(LogicalGraph superGraph) {
-    DataSet<Vertex> filteredVertices = superGraph.getVertices().filter(vertexFilterFunction);
+  private LG vertexInducedSubgraph(LG superGraph) {
+    DataSet<V> filteredVertices = superGraph.getVertices().filter(vertexFilterFunction);
 
-    DataSet<Edge> newEdges = superGraph.getEdges()
+    DataSet<E> newEdges = superGraph.getEdges()
       .join(filteredVertices)
       .where(new SourceId<>()).equalTo(new Id<>())
       .with(new LeftSide<>())
@@ -181,7 +191,7 @@ public class Subgraph implements UnaryGraphToGraphOperator {
       .where(new TargetId<>()).equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    return superGraph.getConfig().getLogicalGraphFactory().fromDataSets(filteredVertices, newEdges);
+    return superGraph.getFactory().fromDataSets(filteredVertices, newEdges);
   }
 
   /**
@@ -191,10 +201,10 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    * @param superGraph supergraph
    * @return edge-induced subgraph
    */
-  private LogicalGraph edgeInducedSubgraph(LogicalGraph superGraph) {
-    DataSet<Edge> filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);
+  private LG edgeInducedSubgraph(LG superGraph) {
+    DataSet<E> filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);
 
-    DataSet<Vertex> filteredVertices = filteredEdges
+    DataSet<V> filteredVertices = filteredEdges
       .join(superGraph.getVertices())
       .where(new SourceId<>()).equalTo(new Id<>())
       .with(new RightSide<>())
@@ -204,8 +214,7 @@ public class Subgraph implements UnaryGraphToGraphOperator {
         .with(new RightSide<>()))
       .distinct(new Id<>());
 
-    return superGraph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(filteredVertices, filteredEdges);
+    return superGraph.getFactory().fromDataSets(filteredVertices, filteredEdges);
   }
 
   /**
@@ -215,8 +224,8 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    * @param superGraph supergraph
    * @return edge-induced subgraph
    */
-  private LogicalGraph edgeInducedSubgraphProjectFirst(LogicalGraph superGraph) {
-    DataSet<Edge> filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);
+  private LG edgeInducedSubgraphProjectFirst(LG superGraph) {
+    DataSet<E> filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);
 
     DataSet<Tuple1<GradoopId>> vertexIdentifiers = filteredEdges
       .map(new SourceId<>())
@@ -226,13 +235,12 @@ public class Subgraph implements UnaryGraphToGraphOperator {
         .map(new ObjectTo1<>()))
       .distinct();
 
-    DataSet<Vertex> filteredVertices = vertexIdentifiers
+    DataSet<V> filteredVertices = vertexIdentifiers
       .join(superGraph.getVertices())
       .where(0).equalTo(new Id<>())
       .with(new RightSide<>());
 
-    return superGraph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(filteredVertices, filteredEdges);
+    return superGraph.getFactory().fromDataSets(filteredVertices, filteredEdges);
   }
 
   /**
@@ -246,10 +254,10 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    * @param superGraph supergraph
    * @return subgraph
    */
-  private LogicalGraph subgraph(LogicalGraph superGraph) {
-    return superGraph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(superGraph.getVertices().filter(vertexFilterFunction),
-        superGraph.getEdges().filter(edgeFilterFunction));
+  private LG subgraph(LG superGraph) {
+    return superGraph.getFactory().fromDataSets(
+      superGraph.getVertices().filter(vertexFilterFunction),
+      superGraph.getEdges().filter(edgeFilterFunction));
   }
 
   /**
@@ -259,26 +267,25 @@ public class Subgraph implements UnaryGraphToGraphOperator {
    * @param subgraph supergraph
    * @return verified subgraph
    */
-  private LogicalGraph verify(LogicalGraph subgraph) {
+  private LG verify(LG subgraph) {
 
-    DataSet<Tuple2<Tuple2<Edge, Vertex>, Vertex>> verifiedTriples = subgraph.getEdges()
+    DataSet<Tuple2<Tuple2<E, V>, V>> verifiedTriples = subgraph.getEdges()
       .join(subgraph.getVertices())
       .where(new SourceId<>()).equalTo(new Id<>())
       .join(subgraph.getVertices())
       .where("0.targetId").equalTo(new Id<>());
 
-    DataSet<Edge> verifiedEdges = verifiedTriples
+    DataSet<E> verifiedEdges = verifiedTriples
       .map(new Value0Of2<>())
       .map(new Value0Of2<>());
 
-    DataSet<Vertex> verifiedVertices = verifiedTriples
+    DataSet<V> verifiedVertices = verifiedTriples
       .map(new Value0Of2<>())
       .map(new Value1Of2<>())
       .union(verifiedTriples.map(new Value1Of2<>()))
       .distinct(new Id<>());
 
-    return subgraph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(verifiedVertices, verifiedEdges);
+    return subgraph.getFactory().fromDataSets(verifiedVertices, verifiedEdges);
   }
 
   @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,8 +127,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
-      .getGraphHeadFactory();
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())
@@ -231,8 +230,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
-      .getGraphHeadFactory();
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())
@@ -306,8 +304,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getConfig()
-      .getGraphHeadFactory();
+    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
     DataSet<GraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())

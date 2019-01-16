@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.gradoop.common.model.impl.id;
 
-import org.bson.types.ObjectId;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -26,29 +26,25 @@ import static org.junit.Assert.*;
 public class GradoopIdTest {
 
   @Test
-  public void testEquals() throws Exception {
+  public void testEquals() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
-    GradoopId id3 = id1;
 
-    assertTrue(id1.equals(id1));
-    assertFalse(id1.equals(id2));
-    assertTrue(id1.equals(id3));
+    assertEquals(id1, id1);
+    assertNotEquals(id1, id2);
   }
 
   @Test
-  public void testHashCode() throws Exception {
+  public void testHashCode() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
-    GradoopId id3 = id1;
 
-    assertTrue(id1.hashCode() == id1.hashCode());
-    assertFalse(id1.hashCode() == id2.hashCode());
-    assertTrue(id1.hashCode() == id3.hashCode());
+    assertEquals(id1.hashCode(), id1.hashCode());
+    assertNotEquals(id1.hashCode(), id2.hashCode());
   }
 
   @Test
-  public void testCompareTo() throws Exception {
+  public void testCompareTo() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 
@@ -77,32 +73,34 @@ public class GradoopIdTest {
 
   @Test
   public void testFromBytes() {
-    ObjectId bsonId = ObjectId.get();
-    GradoopId expectedId = new GradoopId(bsonId);
+    int randomTime = ThreadLocalRandom.current().nextInt();
+    int randomMachineId = ThreadLocalRandom.current().nextInt(0, 16777215);
+    short randomProcessId = (short) ThreadLocalRandom.current().nextInt(0, Short.MAX_VALUE);
+    int randomCounter = ThreadLocalRandom.current().nextInt(0, 16777215);
+    GradoopId expectedId = new GradoopId(randomTime, randomMachineId,
+      randomProcessId, randomCounter);
 
     byte[] bytes = new byte[GradoopId.ID_SIZE];
     ByteBuffer buffer = ByteBuffer.wrap(bytes);
 
-    buffer.putInt(bsonId.getTimestamp());
+    buffer.putInt(randomTime);
 
     byte b1;
     byte b2;
     byte b3;
 
-    int machineId = bsonId.getMachineIdentifier();
-    b3 = (byte) (machineId & 0xFF);
-    b2 = (byte) ((machineId >> 8) & 0xFF);
-    b1 = (byte) ((machineId >> 16) & 0xFF);
+    b3 = (byte) (randomMachineId & 0xFF);
+    b2 = (byte) ((randomMachineId >> 8) & 0xFF);
+    b1 = (byte) ((randomMachineId >> 16) & 0xFF);
     buffer.put(b1);
     buffer.put(b2);
     buffer.put(b3);
 
-    buffer.putShort(bsonId.getProcessIdentifier());
+    buffer.putShort(randomProcessId);
 
-    int counter = bsonId.getCounter();
-    b3 = (byte) (counter & 0xFF);
-    b2 = (byte) ((counter >> 8) & 0xFF);
-    b1 = (byte) ((counter >> 16) & 0xFF);
+    b3 = (byte) (randomCounter & 0xFF);
+    b2 = (byte) ((randomCounter >> 8) & 0xFF);
+    b1 = (byte) ((randomCounter >> 16) & 0xFF);
     buffer.put(b1);
     buffer.put(b2);
     buffer.put(b3);

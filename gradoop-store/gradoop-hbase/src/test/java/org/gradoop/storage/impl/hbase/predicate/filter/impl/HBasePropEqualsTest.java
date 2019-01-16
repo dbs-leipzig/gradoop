@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,21 +122,21 @@ public class HBasePropEqualsTest {
     objectMap.put(PropertyValue.create("b"), PropertyValue.create(67.89));
 
     return Arrays.asList(new Object[][] {
-        {GradoopTestUtils.KEY_0, GradoopTestUtils.NULL_VAL_0},
-        {GradoopTestUtils.KEY_1, GradoopTestUtils.BOOL_VAL_1},
-        {GradoopTestUtils.KEY_2, GradoopTestUtils.INT_VAL_2},
-        {GradoopTestUtils.KEY_3, GradoopTestUtils.LONG_VAL_3},
-        {GradoopTestUtils.KEY_4, GradoopTestUtils.FLOAT_VAL_4},
-        {GradoopTestUtils.KEY_5, GradoopTestUtils.DOUBLE_VAL_5},
-        {GradoopTestUtils.KEY_6, GradoopTestUtils.STRING_VAL_6},
-        {GradoopTestUtils.KEY_7, GradoopTestUtils.BIG_DECIMAL_VAL_7},
-        {GradoopTestUtils.KEY_8, GradoopTestUtils.GRADOOP_ID_VAL_8},
-        {GradoopTestUtils.KEY_9, objectMap},
-        {GradoopTestUtils.KEY_a, intList},
-        {GradoopTestUtils.KEY_b, GradoopTestUtils.DATE_VAL_b},
-        {GradoopTestUtils.KEY_c, GradoopTestUtils.TIME_VAL_c},
-        {GradoopTestUtils.KEY_d, GradoopTestUtils.DATETIME_VAL_d},
-        {GradoopTestUtils.KEY_e, GradoopTestUtils.SHORT_VAL_e}
+      {GradoopTestUtils.KEY_0, GradoopTestUtils.NULL_VAL_0},
+      {GradoopTestUtils.KEY_1, GradoopTestUtils.BOOL_VAL_1},
+      {GradoopTestUtils.KEY_2, GradoopTestUtils.INT_VAL_2},
+      {GradoopTestUtils.KEY_3, GradoopTestUtils.LONG_VAL_3},
+      {GradoopTestUtils.KEY_4, GradoopTestUtils.FLOAT_VAL_4},
+      {GradoopTestUtils.KEY_5, GradoopTestUtils.DOUBLE_VAL_5},
+      {GradoopTestUtils.KEY_6, GradoopTestUtils.STRING_VAL_6},
+      {GradoopTestUtils.KEY_7, GradoopTestUtils.BIG_DECIMAL_VAL_7},
+      {GradoopTestUtils.KEY_8, GradoopTestUtils.GRADOOP_ID_VAL_8},
+      {GradoopTestUtils.KEY_9, objectMap},
+      {GradoopTestUtils.KEY_a, intList},
+      {GradoopTestUtils.KEY_b, GradoopTestUtils.DATE_VAL_b},
+      {GradoopTestUtils.KEY_c, GradoopTestUtils.TIME_VAL_c},
+      {GradoopTestUtils.KEY_d, GradoopTestUtils.DATETIME_VAL_d},
+      {GradoopTestUtils.KEY_e, GradoopTestUtils.SHORT_VAL_e}
     });
   }
 }
