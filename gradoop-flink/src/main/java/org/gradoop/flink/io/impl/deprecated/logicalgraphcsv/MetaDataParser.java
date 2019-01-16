@@ -20,7 +20,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 /**
  * Responsible for creating a {@link MetaData} instance from its string representation.
  */
+@Deprecated
 public class MetaDataParser {
   /**
    * Used to separate property meta data.
