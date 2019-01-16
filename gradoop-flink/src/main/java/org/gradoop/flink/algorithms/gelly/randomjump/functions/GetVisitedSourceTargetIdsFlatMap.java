@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
  * Retrieves the source- and target-id from an edge, if this edge was visited, determined by the
  * boolean property.
  */
-@FunctionAnnotation.ReadFieldsFirst("sourceId;targetId")
+@FunctionAnnotation.ReadFields("properties")
 public class GetVisitedSourceTargetIdsFlatMap implements FlatMapFunction<Edge, GradoopId> {
 
   /**

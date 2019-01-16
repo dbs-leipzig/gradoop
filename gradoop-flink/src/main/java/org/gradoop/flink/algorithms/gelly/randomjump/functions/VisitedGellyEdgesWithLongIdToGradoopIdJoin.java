@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Joins an edge index with its index-to-GradoopId-mapping to replace the index with the GradoopId.
  */
-@FunctionAnnotation.ReadFieldsSecond("f1")
+@FunctionAnnotation.ForwardedFieldsSecond("f1->*")
 public class VisitedGellyEdgesWithLongIdToGradoopIdJoin implements
   JoinFunction<Long, Tuple2<Long, GradoopId>, GradoopId> {
 
