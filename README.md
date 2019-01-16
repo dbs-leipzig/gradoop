@@ -134,7 +134,7 @@ Latest nightly build (additional repository is required):
 </dependency>
 
 ```
-In any case you also need Apache Flink (version 1.6.0):
+In any case you also need Apache Flink (version 1.7.0):
 ```
 <dependency>
     <groupId>org.apache.flink</groupId>
