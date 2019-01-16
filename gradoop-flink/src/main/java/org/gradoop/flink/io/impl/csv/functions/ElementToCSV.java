@@ -18,13 +18,14 @@ package org.gradoop.flink.io.impl.csv.functions;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.impl.metadata.MetaData;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
-import org.gradoop.flink.io.impl.csv.metadata.MetaData;
-import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
-import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -44,12 +45,12 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
   /**
    * Meta data that provides parsers for a specific {@link Element}.
    */
-  private MetaData metaData;
+  private CSVMetaData metaData;
 
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    this.metaData = MetaDataParser.create(getRuntimeContext()
+    this.metaData = new CSVMetaDataSource().fromTuples(getRuntimeContext()
       .getBroadcastVariable(CSVDataSource.BC_METADATA));
   }
 
@@ -57,7 +58,7 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
    * Returns the concatenated property values of the specified element according to the meta data.
    *
    * @param element EPGM element
-   * @param type element type
+   * @param type    element type
    * @return property value string
    */
   String getPropertyString(E element, String type) {
@@ -71,14 +72,14 @@ public abstract class ElementToCSV<E extends Element, T extends Tuple>
    * If no matching property is found, an empty string is returned.
    *
    * @param propertyMetaData property metadata of the wanted property value
-   * @param element EPGM element containing the property value
+   * @param element          EPGM element containing the property value
    * @return string representation of matched property value or empty string
    */
   private String getPropertyValueString(PropertyMetaData propertyMetaData, E element) {
     PropertyValue p = element.getPropertyValue(propertyMetaData.getKey());
     // Only properties with matching type get returned
     // to prevent writing values with the wrong type metadata
-    if (p != null && MetaDataParser.getTypeString(p).equals(propertyMetaData.getTypeString())) {
+    if (p != null && MetaData.getTypeString(p).equals(propertyMetaData.getTypeString())) {
       return propertyValueToCsvString(p);
     }
     return EMPTY_STRING;
