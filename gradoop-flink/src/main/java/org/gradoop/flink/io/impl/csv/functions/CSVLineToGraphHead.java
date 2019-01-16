@@ -17,9 +17,9 @@ package org.gradoop.flink.io.impl.csv.functions;
 
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.io.impl.csv.CSVConstants;
-import org.gradoop.flink.io.impl.csv.metadata.MetaData;
+import org.gradoop.flink.io.api.metadata.MetaDataSource;
 
 /**
  * Creates a {@link GraphHead} from a CSV string. The function uses a
@@ -51,7 +51,7 @@ public class CSVLineToGraphHead extends CSVLineToElement<GraphHead> {
     return graphHeadFactory.initGraphHead(
       GradoopId.fromString(tokens[0]),
       label,
-      parseProperties(CSVConstants.GRAPH_TYPE, label, tokens[2])
+      parseProperties(MetaDataSource.GRAPH_TYPE, label, tokens[2])
     );
   }
 }

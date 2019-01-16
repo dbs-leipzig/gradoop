@@ -56,7 +56,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * Represents a property value that is {@code null}.
    */
   public static final PropertyValue NULL_VALUE = PropertyValue.create(null);
-
   /**
    * {@code <property-type>} for empty property value (i.e. {@code null})
    */
