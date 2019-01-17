@@ -16,16 +16,19 @@
 package org.gradoop.dataintegration.importer.impl.csv;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.dataintegration.importer.impl.csv.functions.PropertiesToVertex;
 import org.gradoop.dataintegration.importer.impl.csv.functions.CsvRowToProperties;
+import org.gradoop.dataintegration.importer.impl.csv.functions.PropertiesToVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
@@ -172,16 +175,18 @@ public class MinimalCSVImporter implements DataSource {
    * @throws IOException if an error occurred while open the stream
    */
   private List<String> readHeaderRow() throws IOException {
-    try (final BufferedReader reader =
-           new BufferedReader(new InputStreamReader(new FileInputStream(path), charset))) {
-      String headerLine = reader.readLine();
+    Path filePath = new Path(path);
+    try (FileSystem fs = FileSystem.get(filePath.toUri(), new Configuration())) {
+      FSDataInputStream inputStream = fs.open(filePath);
+      BufferedReader lineReader = new BufferedReader(new InputStreamReader(inputStream, charset));
+      String headerLine = lineReader.readLine();
+      lineReader.close();
       if (headerLine == null || headerLine.isEmpty()) {
         throw new IOException("The csv file '" + path + "' does not contain any rows.");
       }
-
       return Arrays.asList(headerLine.split(tokenSeparator));
-    } catch (IOException ex) {
-      throw new IOException("Error while opening a stream to '" + path + "'.", ex);
+    } catch (IOException ioe) {
+      throw new IOException("Error while opening a stream to '" + path + "'.", ioe);
     }
   }
 }
