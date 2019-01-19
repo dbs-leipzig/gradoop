@@ -11,6 +11,7 @@ org.gradoop.common.exceptions
 org.gradoop.common.model.api.entities
 org.gradoop.common.model.impl.comparators
 org.gradoop.common.model.impl.id
+org.gradoop.common.model.impl.metadata
 org.gradoop.common.model.impl.pojo
 org.gradoop.common.model.impl.properties
 org.gradoop.common.util
@@ -79,6 +80,8 @@ org.gradoop.flink.algorithms.gelly.trianglecounting
 org.gradoop.flink.algorithms.gelly.vertexdegrees
 org.gradoop.flink.algorithms.gelly.vertexdegrees.functions
 org.gradoop.flink.io.api
+org.gradoop.flink.io.api.metadata
+org.gradoop.flink.io.api.metadata.functions
 org.gradoop.flink.io.impl
 org.gradoop.flink.io.impl.csv
 org.gradoop.flink.io.impl.csv.functions
