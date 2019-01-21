@@ -27,10 +27,9 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
 
 /**
  * Test for the {@link AccumulatePropagatedValues} function used in
@@ -53,8 +52,7 @@ public class AccumulatePropagatedValuesTest extends GradoopFlinkTestBase {
     List<Vertex> result = getExecutionEnvironment().fromElements(property1, property2)
       .coGroup(getExecutionEnvironment().fromCollection(input))
       .where(0).equalTo(new Id<>())
-      .with(new AccumulatePropagatedValues<>("k",
-        new HashSet<>(Collections.singletonList("a"))))
+      .with(new AccumulatePropagatedValues<>("k", Collections.singleton("a")))
       .collect();
     v1.setProperty("k", PropertyValue.create(Collections.singletonList(PropertyValue.create(1L))));
     List<Vertex> expected = Arrays.asList(v1, v2, v3);

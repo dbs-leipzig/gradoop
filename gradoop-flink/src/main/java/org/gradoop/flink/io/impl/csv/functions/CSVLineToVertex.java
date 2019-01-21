@@ -17,9 +17,9 @@ package org.gradoop.flink.io.impl.csv.functions;
 
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.io.impl.csv.CSVConstants;
-import org.gradoop.flink.io.impl.csv.metadata.MetaData;
+import org.gradoop.flink.io.api.metadata.MetaDataSource;
 
 /**
  * Creates a {@link Vertex} from a CSV string. The function uses a
@@ -51,7 +51,7 @@ public class CSVLineToVertex extends CSVLineToElement<Vertex> {
     return vertexFactory.initVertex(
       GradoopId.fromString(tokens[0]),
       label,
-      parseProperties(CSVConstants.VERTEX_TYPE, label, tokens[3]),
+      parseProperties(MetaDataSource.VERTEX_TYPE, label, tokens[3]),
       parseGradoopIds(tokens[1])
     );
 

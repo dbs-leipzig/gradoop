@@ -15,6 +15,14 @@
  */
 package org.gradoop.dataintegration.transformation.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -25,8 +33,6 @@ import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.filters.Or;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.*;
 
 /**
  * Tests for the invert edge operator.
