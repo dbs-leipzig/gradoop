@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.csv.functions;
+package org.gradoop.flink.io.api.metadata.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
@@ -23,8 +23,10 @@ import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Property;
+import org.gradoop.flink.io.api.metadata.MetaDataSource;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
-import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
+import org.gradoop.flink.io.impl.csv.functions.StringEscaper;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataParser;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -54,11 +56,11 @@ public class ElementToPropertyMetaData<E extends Element>
     Class<? extends Element> type = e.getClass();
 
     if (type == Edge.class) {
-      reuseTuple.f0 = CSVConstants.EDGE_TYPE;
+      reuseTuple.f0 = MetaDataSource.EDGE_TYPE;
     } else if (type == Vertex.class) {
-      reuseTuple.f0 = CSVConstants.VERTEX_TYPE;
+      reuseTuple.f0 = MetaDataSource.VERTEX_TYPE;
     } else if (type == GraphHead.class) {
-      reuseTuple.f0 = CSVConstants.GRAPH_TYPE;
+      reuseTuple.f0 = MetaDataSource.GRAPH_TYPE;
     } else {
       throw new Exception("Unsupported element class");
     }
@@ -66,7 +68,7 @@ public class ElementToPropertyMetaData<E extends Element>
     reuseTuple.f2.clear();
     if (e.getProperties() != null) {
       for (Property property : e.getProperties()) {
-        reuseTuple.f2.add(MetaDataParser.getPropertyMetaData(property));
+        reuseTuple.f2.add(CSVMetaDataParser.getPropertyMetaData(property));
       }
     }
     return reuseTuple;

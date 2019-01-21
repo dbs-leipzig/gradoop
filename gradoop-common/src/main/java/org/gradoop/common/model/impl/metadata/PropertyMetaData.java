@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.impl.csv.metadata;
+package org.gradoop.common.model.impl.metadata;
 
 import java.util.function.Function;
 
@@ -21,6 +21,14 @@ import java.util.function.Function;
  * Stores the meta data for a property which is the property key and a property value parser.
  */
 public class PropertyMetaData {
+  /**
+   * Used to separate property meta data.
+   */
+  public static final String PROPERTY_DELIMITER = ",";
+  /**
+   * Used to separate property tokens (property-key, property-type)
+   */
+  public static final String PROPERTY_TOKEN_DELIMITER = ":";
   /**
    * Property key.
    */
@@ -37,8 +45,8 @@ public class PropertyMetaData {
   /**
    * Constructor.
    *
-   * @param key property key
-   * @param typeString property type string
+   * @param key         property key
+   * @param typeString  property type string
    * @param valueParser property value parser
    */
   public PropertyMetaData(String key, String typeString, Function<String, Object> valueParser) {
