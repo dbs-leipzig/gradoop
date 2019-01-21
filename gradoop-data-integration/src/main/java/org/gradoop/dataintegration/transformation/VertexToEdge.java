@@ -50,7 +50,7 @@ import java.util.Objects;
 public class VertexToEdge implements UnaryGraphToGraphOperator {
 
   /**
-   * The vertex label of {@code v_j}.
+   * The vertex label of {@code j}.
    */
   private final String centralVertexLabel;
 
