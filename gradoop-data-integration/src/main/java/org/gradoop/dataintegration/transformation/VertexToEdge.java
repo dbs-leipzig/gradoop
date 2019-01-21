@@ -39,8 +39,8 @@ import java.util.Objects;
  * Each edge that has to be created results from a path in the graph of the following form: <br>
  * {@code (i)-[i_j]->(j)-[j_k]->(k)} <br>
  * The newly created edge goes from: {@code (i)-[e_ik]->(k)} <br>
- * The edge {@code [e_ik]} has a user-defined label and besides the original vertex properties three
- * additional properties:
+ * The edge {@code [e_ik]} has a user-defined label and besides the original vertex properties
+ * three additional properties:
  * <ul>
  *   <li>{@code originalVertexLabel}</li>
  *   <li>{@code firstEdgeLabel = labelOf(i_j)}</li>
@@ -62,7 +62,7 @@ public class VertexToEdge implements UnaryGraphToGraphOperator {
   /**
    * The constructor of the operator to transform vertices into edges.
    *
-   * @param centralVertexLabel The vertex label of {@code v_j}.
+   * @param centralVertexLabel The vertex label of {@code j}.
    * @param newEdgeLabel The edge label for new edges.
    */
   public VertexToEdge(String centralVertexLabel, String newEdgeLabel) {

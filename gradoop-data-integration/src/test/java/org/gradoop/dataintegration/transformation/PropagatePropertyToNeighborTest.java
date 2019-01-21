@@ -66,7 +66,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
     UnaryGraphToGraphOperator operator = new PropagatePropertyToNeighbor("Source", "p1", "t");
     // We have to update the vertices manually because the ascii loader does not support lists.
     LogicalGraph expected = input.transformVertices((v, c) -> {
-      if (!"Target".equals(v.getLabel()) && !"Target2".equals(v.getLabel())) {
+      if (!v.getLabel().equals("Target") && !v.getLabel().equals("Target2")) {
         return v;
       }
       v.setProperty("t", Arrays.asList(PropertyValue.create(1L), PropertyValue.create("")));
@@ -111,7 +111,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
     UnaryGraphToGraphOperator operator = new PropagatePropertyToNeighbor("Source", "p1", "t",
       null, Collections.singleton("Target"));
     LogicalGraph expected = input.transformVertices((v, c) -> {
-      if (!"Target".equals(v.getLabel())) {
+      if (!v.getLabel().equals("Target")) {
         return v;
       }
       v.setProperty("t", Arrays.asList(PropertyValue.create(1L), PropertyValue.create("")));
@@ -136,7 +136,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
     UnaryGraphToGraphOperator operator = new PropagatePropertyToNeighbor("Source", "p1", "t",
       Collections.singleton("edge1"), Collections.singleton("Target"));
     LogicalGraph expected = input.transformVertices((v, c) -> {
-      if (!"Target".equals(v.getLabel())) {
+      if (!v.getLabel().equals("Target")) {
         return v;
       }
       v.setProperty("t", Collections.singletonList(PropertyValue.create(1L)));
