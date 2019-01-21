@@ -17,9 +17,9 @@ package org.gradoop.flink.io.impl.csv.functions;
 
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.io.impl.csv.CSVConstants;
-import org.gradoop.flink.io.impl.csv.metadata.MetaData;
+import org.gradoop.flink.io.api.metadata.MetaDataSource;
 
 /**
  * Creates an {@link Edge} from a CSV string. The function uses a
@@ -52,7 +52,7 @@ public class CSVLineToEdge extends CSVLineToElement<Edge> {
       label,
       GradoopId.fromString(tokens[2]),
       GradoopId.fromString(tokens[3]),
-      parseProperties(CSVConstants.EDGE_TYPE, label, tokens[5]),
+      parseProperties(MetaDataSource.EDGE_TYPE, label, tokens[5]),
       parseGradoopIds(tokens[1]));
   }
 }
