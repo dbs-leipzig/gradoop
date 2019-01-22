@@ -19,7 +19,6 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.minicluster.LocalFlinkMiniCluster;
-import org.apache.flink.test.util.TestBaseUtils;
 import org.apache.flink.test.util.TestEnvironment;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMElement;
@@ -36,7 +35,6 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import scala.concurrent.duration.FiniteDuration;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +44,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -168,8 +165,8 @@ public abstract class GradoopFlinkTestBase {
   }
 
   @AfterClass
-  public static void tearDownFlink() throws Exception {
-    TestBaseUtils.stopCluster(CLUSTER, new FiniteDuration(1000, TimeUnit.SECONDS));
+  public static void tearDownFlink() {
+    CLUSTER.stop();
   }
 
   //----------------------------------------------------------------------------

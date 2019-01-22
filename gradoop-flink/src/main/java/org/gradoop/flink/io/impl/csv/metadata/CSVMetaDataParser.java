@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.io.impl.csv.metadata;
 
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.metadata.MetaData;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
@@ -27,28 +27,17 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * Responsible for creating a {@link MetaData} instance from its string representation.
  */
-public class MetaDataParser {
-  /**
-   * Used to separate property meta data.
-   */
-  private static final String PROPERTY_DELIMITER = ",";
-  /**
-   * Used to separate property tokens (property-key, property-type)
-   */
-  private static final String PROPERTY_TOKEN_DELIMITER = ":";
+public class CSVMetaDataParser {
   /**
    * Used to map a type string to its corresponding parsing function
    */
@@ -61,57 +50,39 @@ public class MetaDataParser {
    */
   private static Map<String, Function<String, Object>> getTypeParserMap() {
     Map<String, Function<String, Object>> map = new HashMap<>();
-    map.put(TypeString.SHORT.getTypeString(), Short::parseShort);
-    map.put(TypeString.INTEGER.getTypeString(), Integer::parseInt);
-    map.put(TypeString.LONG.getTypeString(), Long::parseLong);
-    map.put(TypeString.FLOAT.getTypeString(), Float::parseFloat);
-    map.put(TypeString.DOUBLE.getTypeString(), Double::parseDouble);
-    map.put(TypeString.BOOLEAN.getTypeString(), Boolean::parseBoolean);
-    map.put(TypeString.STRING.getTypeString(), MetaDataParser::parseStringProperty);
-    map.put(TypeString.BIGDECIMAL.getTypeString(), BigDecimal::new);
-    map.put(TypeString.GRADOOPID.getTypeString(), GradoopId::fromString);
-    map.put(TypeString.MAP.getTypeString(), MetaDataParser::parseMapProperty);
-    map.put(TypeString.LIST.getTypeString(), MetaDataParser::parseListProperty);
-    map.put(TypeString.LOCALDATE.getTypeString(), LocalDate::parse);
-    map.put(TypeString.LOCALTIME.getTypeString(), LocalTime::parse);
-    map.put(TypeString.LOCALDATETIME.getTypeString(), LocalDateTime::parse);
-    map.put(TypeString.NULL.getTypeString(), MetaDataParser::parseNullProperty);
-    map.put(TypeString.SET.getTypeString(), MetaDataParser::parseSetProperty);
+    map.put(MetaData.TypeString.SHORT.getTypeString(),
+      Short::parseShort);
+    map.put(MetaData.TypeString.INTEGER.getTypeString(),
+      Integer::parseInt);
+    map.put(MetaData.TypeString.LONG.getTypeString(),
+      Long::parseLong);
+    map.put(MetaData.TypeString.FLOAT.getTypeString(),
+      Float::parseFloat);
+    map.put(MetaData.TypeString.DOUBLE.getTypeString(),
+      Double::parseDouble);
+    map.put(MetaData.TypeString.BOOLEAN.getTypeString(),
+      Boolean::parseBoolean);
+    map.put(MetaData.TypeString.STRING.getTypeString(),
+      CSVMetaDataParser::parseStringProperty);
+    map.put(MetaData.TypeString.BIGDECIMAL.getTypeString(),
+      BigDecimal::new);
+    map.put(MetaData.TypeString.GRADOOPID.getTypeString(),
+      GradoopId::fromString);
+    map.put(MetaData.TypeString.MAP.getTypeString(),
+      CSVMetaDataParser::parseMapProperty);
+    map.put(MetaData.TypeString.LIST.getTypeString(),
+      CSVMetaDataParser::parseListProperty);
+    map.put(MetaData.TypeString.LOCALDATE.getTypeString(),
+      LocalDate::parse);
+    map.put(MetaData.TypeString.LOCALTIME.getTypeString(),
+      LocalTime::parse);
+    map.put(MetaData.TypeString.LOCALDATETIME.getTypeString(),
+      LocalDateTime::parse);
+    map.put(MetaData.TypeString.NULL.getTypeString(),
+      CSVMetaDataParser::parseNullProperty);
+    map.put(MetaData.TypeString.SET.getTypeString(),
+      CSVMetaDataParser::parseSetProperty);
     return Collections.unmodifiableMap(map);
-  }
-
-  /**
-   * Creates a {@link MetaData} object from the specified lines. The specified tuple is already
-   * separated into the label and the metadata.
-   *
-   * @param metaDataStrings (element prefix (g,v,e), label, meta-data) tuples
-   * @return Meta Data object
-   */
-  public static MetaData create(List<Tuple3<String, String, String>> metaDataStrings) {
-    Map<Tuple2<String, String>, List<PropertyMetaData>> metaDataMap
-      = new HashMap<>(metaDataStrings.size());
-
-    for (Tuple3<String, String, String> tuple : metaDataStrings) {
-      List<PropertyMetaData> propertyMetaDataList;
-      if (tuple.f2.length() > 0) {
-        String[] propertyStrings = StringEscaper.split(tuple.f2, PROPERTY_DELIMITER);
-        propertyMetaDataList = new ArrayList<>(propertyStrings.length);
-        for (String propertyMetaData : propertyStrings) {
-          String[] propertyMetaDataTokens = StringEscaper.split(propertyMetaData,
-            PROPERTY_TOKEN_DELIMITER, 2);
-          propertyMetaDataList.add(new PropertyMetaData(
-            StringEscaper.unescape(propertyMetaDataTokens[0]),
-            propertyMetaDataTokens[1],
-            getPropertyValueParser(propertyMetaDataTokens[1])));
-        }
-      } else {
-        propertyMetaDataList = new ArrayList<>(0);
-      }
-      metaDataMap.put(new Tuple2<>(tuple.f0, StringEscaper.unescape(tuple.f1)),
-        propertyMetaDataList);
-    }
-
-    return new MetaData(metaDataMap);
   }
 
   /**
@@ -124,20 +95,8 @@ public class MetaDataParser {
   public static String getPropertyMetaData(Property property) {
     return String.format("%s%s%s",
       StringEscaper.escape(property.getKey(), CSVConstants.ESCAPED_CHARACTERS),
-      PROPERTY_TOKEN_DELIMITER,
-      getTypeString(property.getValue())); // no need to escape
-  }
-
-  /**
-   * Sorts and concatenates the specified meta data entries.
-   *
-   * @param propertyMetaDataSet set of property meta data strings
-   * @return sorted and concatenated string
-   */
-  public static String getPropertiesMetaData(Set<String> propertyMetaDataSet) {
-    return propertyMetaDataSet.stream()
-      .sorted()
-      .collect(Collectors.joining(PROPERTY_DELIMITER));
+      MetaData.PROPERTY_TOKEN_DELIMITER,
+      MetaData.getTypeString(property.getValue())); // no need to escape
   }
 
   /**
@@ -146,18 +105,19 @@ public class MetaDataParser {
    * @param propertyType string specifying the property type
    * @return parsing function for the specific type
    */
-  private static Function<String, Object> getPropertyValueParser(String propertyType) {
-    String[] propertyTypeTokens = StringEscaper.split(propertyType, PROPERTY_TOKEN_DELIMITER);
+  static Function<String, Object> getPropertyValueParser(String propertyType) {
+    String[] propertyTypeTokens = StringEscaper.split(
+      propertyType, PropertyMetaData.PROPERTY_TOKEN_DELIMITER);
     if (propertyTypeTokens.length == 2 &&
-      propertyTypeTokens[0].equals(TypeString.LIST.getTypeString())) {
+      propertyTypeTokens[0].equals(MetaData.TypeString.LIST.getTypeString())) {
       // It's a list with one additional data type (type of list items).
       return getListValueParser(propertyTypeTokens[1]);
     } else if (propertyTypeTokens.length == 2 &&
-      propertyTypeTokens[0].equals(TypeString.SET.getTypeString())) {
+      propertyTypeTokens[0].equals(MetaData.TypeString.SET.getTypeString())) {
       // It's a set with one additional data type (type of set items).
       return getSetValueParser(propertyTypeTokens[1]);
     } else if (propertyTypeTokens.length == 3 &&
-      propertyTypeTokens[0].equals(TypeString.MAP.getTypeString())) {
+      propertyTypeTokens[0].equals(MetaData.TypeString.MAP.getTypeString())) {
       // It's a map with two additional data types (key type + value type).
       return getMapValueParser(propertyTypeTokens[1], propertyTypeTokens[2]);
     } else {
@@ -199,7 +159,7 @@ public class MetaDataParser {
   /**
    * Creates a parsing function for map property type.
    *
-   * @param keyType string representation of the map key type, e.g. "String"
+   * @param keyType   string representation of the map key type, e.g. "String"
    * @param valueType string representation of the map value type, e.g. "Double"
    * @return parsing function
    */
@@ -238,6 +198,7 @@ public class MetaDataParser {
 
     return s -> parseSetProperty(s, TYPE_PARSER_MAP.get(itemType));
   }
+
   /**
    * Parse function to translate string representation of a List to a list of PropertyValues
    * Every PropertyValue has the type "string", because there is no parser for the items given
@@ -258,7 +219,7 @@ public class MetaDataParser {
   /**
    * Parse function to translate string representation of a List to a list of PropertyValues
    *
-   * @param s the string to parse as list, e.g. "[myString1,myString2]"
+   * @param s          the string to parse as list, e.g. "[myString1,myString2]"
    * @param itemParser the function to parse the list items
    * @return the list represented by the argument
    */
@@ -292,8 +253,8 @@ public class MetaDataParser {
    * Parse function to translate string representation of a Map to a Map with
    * key and value of type PropertyValue.
    *
-   * @param s the string to parse as map, e.g. "{myString1=myValue1,myString2=myValue2}"
-   * @param keyParser the function to parse the keys
+   * @param s           the string to parse as map, e.g. "{myString1=myValue1,myString2=myValue2}"
+   * @param keyParser   the function to parse the keys
    * @param valueParser the function to parse the values
    * @return the map represented by the argument
    */
@@ -331,7 +292,7 @@ public class MetaDataParser {
   /**
    * Parse function to translate string representation of a Set to a set of PropertyValues.
    *
-   * @param s the string to parse as set, e.g. "[myString1,myString2]"
+   * @param s          the string to parse as set, e.g. "[myString1,myString2]"
    * @param itemParser the function to parse the set items
    * @return the set represented by the argument
    */
@@ -357,162 +318,15 @@ public class MetaDataParser {
    * Parse function to create null from the null string representation.
    *
    * @param nullString The string representing null.
-   * @throws IllegalArgumentException The string that is passed has to represent null.
    * @return Returns null
+   * @throws IllegalArgumentException The string that is passed has to represent null.
    */
   private static Object parseNullProperty(String nullString) throws IllegalArgumentException {
-    if (nullString != null && nullString.equalsIgnoreCase(TypeString.NULL.getTypeString())) {
+    if (nullString != null && nullString.equalsIgnoreCase(
+      MetaData.TypeString.NULL.getTypeString())) {
       return null;
     } else {
       throw new IllegalArgumentException("Only null represents a null string.");
-    }
-  }
-
-  /**
-   * Returns the type string for the specified property value.
-   *
-   * @param propertyValue property value
-   * @return property type string
-   */
-  public static String getTypeString(PropertyValue propertyValue) {
-    if (propertyValue.isNull()) {
-      return TypeString.NULL.getTypeString();
-    } else if (propertyValue.isShort()) {
-      return TypeString.SHORT.getTypeString();
-    } else if (propertyValue.isInt()) {
-      return TypeString.INTEGER.getTypeString();
-    } else if (propertyValue.isLong()) {
-      return TypeString.LONG.getTypeString();
-    } else if (propertyValue.isFloat()) {
-      return TypeString.FLOAT.getTypeString();
-    } else if (propertyValue.isDouble()) {
-      return TypeString.DOUBLE.getTypeString();
-    } else if (propertyValue.isBoolean()) {
-      return TypeString.BOOLEAN.getTypeString();
-    } else if (propertyValue.isString()) {
-      return TypeString.STRING.getTypeString();
-    } else if (propertyValue.isBigDecimal()) {
-      return TypeString.BIGDECIMAL.getTypeString();
-    } else if (propertyValue.isGradoopId()) {
-      return TypeString.GRADOOPID.getTypeString();
-    } else if (propertyValue.isMap()) {
-      // map type string is map:{keyType}:{valueType}
-      return TypeString.MAP.getTypeString() +
-        PROPERTY_TOKEN_DELIMITER +
-        getTypeString(propertyValue.getMap().keySet().iterator().next()) +
-        PROPERTY_TOKEN_DELIMITER +
-        getTypeString(propertyValue.getMap().values().iterator().next());
-    } else if (propertyValue.isList()) {
-      // list type string is list:{itemType}
-      return TypeString.LIST.getTypeString() +
-        PROPERTY_TOKEN_DELIMITER +
-        getTypeString(propertyValue.getList().get(0));
-    } else if (propertyValue.isDate()) {
-      return TypeString.LOCALDATE.getTypeString();
-    } else if (propertyValue.isTime()) {
-      return TypeString.LOCALTIME.getTypeString();
-    } else if (propertyValue.isDateTime()) {
-      return TypeString.LOCALDATETIME.getTypeString();
-    } else if (propertyValue.isSet()) {
-      // set type string is set:{itemType}
-      return TypeString.SET.getTypeString() +
-        PROPERTY_TOKEN_DELIMITER +
-        getTypeString(propertyValue.getSet().iterator().next());
-    } else {
-      throw new IllegalArgumentException("Type " + propertyValue.getType() + " is not supported");
-    }
-  }
-
-  /**
-   * Supported type strings for the CSV format.
-   */
-  private enum TypeString {
-    /**
-     * Null type
-     */
-    NULL("null"),
-    /**
-     * Boolean type
-     */
-    BOOLEAN("boolean"),
-    /**
-     * Short type
-     */
-    SHORT("short"),
-    /**
-     * Integer type
-     */
-    INTEGER("int"),
-    /**
-     * Long type
-     */
-    LONG("long"),
-    /**
-     * Float type
-     */
-    FLOAT("float"),
-    /**
-     * Double type
-     */
-    DOUBLE("double"),
-    /**
-     * String type
-     */
-    STRING("string"),
-    /**
-     * BigDecimal type
-     */
-    BIGDECIMAL("bigdecimal"),
-    /**
-     * GradoopId type
-     */
-    GRADOOPID("gradoopid"),
-    /**
-     * Map type
-     */
-    MAP("map"),
-    /**
-     * List type
-     */
-    LIST("list"),
-    /**
-     * LocalDate type
-     */
-    LOCALDATE("localdate"),
-    /**
-     * LocalTime type
-     */
-    LOCALTIME("localtime"),
-    /**
-     * LocalDateTime type
-     */
-    LOCALDATETIME("localdatetime"),
-    /**
-     * Set type
-     */
-    SET("set");
-
-    /**
-     * String representation
-     */
-    private String typeString;
-
-    /**
-     * Constructor
-     *
-     * @param typeString string representation
-     */
-    TypeString(String typeString) {
-      this.typeString = typeString;
-    }
-
-    /**
-     * Returns the type string.
-     *
-     * @return type string
-     */
-    public String getTypeString() {
-      return typeString;
     }
   }
 }

@@ -17,14 +17,15 @@ package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.io.api.metadata.MetaDataSource;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
 
 /**
  * Converts an {@link Vertex} into a CSV representation.
- *
+ * <p>
  * Forwarded fields:
- *
+ * <p>
  * label
  */
 @FunctionAnnotation.ForwardedFields("label->f2")
@@ -39,7 +40,7 @@ public class VertexToCSVVertex extends ElementToCSV<Vertex, CSVVertex> {
     csvVertex.setId(vertex.getId().toString());
     csvVertex.setGradoopIds(collectionToCsvString(vertex.getGraphIds()));
     csvVertex.setLabel(StringEscaper.escape(vertex.getLabel(), CSVConstants.ESCAPED_CHARACTERS));
-    csvVertex.setProperties(getPropertyString(vertex, CSVConstants.VERTEX_TYPE));
+    csvVertex.setProperties(getPropertyString(vertex, MetaDataSource.VERTEX_TYPE));
     return csvVertex;
   }
 }
