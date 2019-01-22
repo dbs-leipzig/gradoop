@@ -118,8 +118,8 @@ public class BigDecimalStrategy implements PropertyValueStrategy<BigDecimal> {
       break;
     default:
       throw new IllegalArgumentException(
-      "Cannot convert byte array with type byte "  + type
-        + " to " + BigDecimal.class.getSimpleName());
+      "Cannot convert byte array with type byte "  + type + " to " +
+        BigDecimal.class.getSimpleName());
     }
     return decimal;
   }
