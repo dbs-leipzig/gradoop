@@ -31,9 +31,8 @@ import java.util.Arrays;
 public class GradoopIdStrategy implements PropertyValueStrategy<GradoopId> {
 
   @Override
-  public boolean write(GradoopId value, DataOutputView outputView) throws IOException {
+  public void write(GradoopId value, DataOutputView outputView) throws IOException {
     outputView.write(getRawBytes(value));
-    return true;
   }
 
   @Override

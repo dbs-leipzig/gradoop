@@ -32,9 +32,8 @@ import java.util.Arrays;
 public class TimeStrategy implements PropertyValueStrategy<LocalTime> {
 
   @Override
-  public boolean write(LocalTime value, DataOutputView outputView) throws IOException {
+  public void write(LocalTime value, DataOutputView outputView) throws IOException {
     outputView.write(getRawBytes(value));
-    return true;
   }
 
   @Override

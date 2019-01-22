@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,27 +56,8 @@ public class PropertyValueStrategyFactory {
    * Constructor
    */
   private PropertyValueStrategyFactory() {
-    classStrategyMap = new HashMap<>();
-    classStrategyMap.put(Boolean.class, new BooleanStrategy());
-    classStrategyMap.put(Set.class, new SetStrategy());
-    classStrategyMap.put(Integer.class, new IntegerStrategy());
-    classStrategyMap.put(Long.class, new LongStrategy());
-    classStrategyMap.put(Float.class, new FloatStrategy());
-    classStrategyMap.put(Double.class, new DoubleStrategy());
-    classStrategyMap.put(Short.class, new ShortStrategy());
-    classStrategyMap.put(BigDecimal.class, new BigDecimalStrategy());
-    classStrategyMap.put(LocalDate.class, new DateStrategy());
-    classStrategyMap.put(LocalTime.class, new TimeStrategy());
-    classStrategyMap.put(LocalDateTime.class, new DateTimeStrategy());
-    classStrategyMap.put(GradoopId.class, new GradoopIdStrategy());
-    classStrategyMap.put(String.class, new StringStrategy());
-    classStrategyMap.put(List.class, new ListStrategy());
-    classStrategyMap.put(Map.class, new MapStrategy());
-
-    byteStrategyMap = new HashMap<>(classStrategyMap.size());
-    for (PropertyValueStrategy strategy : classStrategyMap.values()) {
-      byteStrategyMap.put(strategy.getRawType(), strategy);
-    }
+    classStrategyMap = initClassStrategyMap();
+    byteStrategyMap = initByteStrategyMap();
   }
 
   /**
@@ -89,12 +71,12 @@ public class PropertyValueStrategyFactory {
   public static PropertyValueStrategy get(Class c) {
     PropertyValueStrategy strategy = INSTANCE.classStrategyMap.get(c);
     if (strategy == null) {
-      for (Map.Entry<Class, PropertyValueStrategy> entry : INSTANCE.classStrategyMap.entrySet()) {
-        if (entry.getKey().isAssignableFrom(c)) {
-          strategy = entry.getValue();
-          INSTANCE.classStrategyMap.put(c, strategy);
-          break;
-        }
+      if (Map.class.isAssignableFrom(c)) {
+        strategy = INSTANCE.classStrategyMap.get(Map.class);
+      } else if (Set.class.isAssignableFrom(c)) {
+        strategy = INSTANCE.classStrategyMap.get(Set.class);
+      } else if (List.class.isAssignableFrom(c)) {
+        strategy = INSTANCE.classStrategyMap.get(List.class);
       }
     }
     return strategy == null ? INSTANCE.noopPropertyValueStrategy : strategy;
@@ -146,7 +128,7 @@ public class PropertyValueStrategyFactory {
   /**
    * Returns strategy mapping to the provided byte value.
    *
-   * @param value representing a data type
+   * @param value representing a data type.
    * @return strategy class.
    */
   public static PropertyValueStrategy get(byte value) {
@@ -165,5 +147,45 @@ public class PropertyValueStrategyFactory {
       return get(value.getClass());
     }
     return INSTANCE.noopPropertyValueStrategy;
+  }
+
+  /**
+   * Initializes class-strategy mapping.
+   *
+   * @return Map of supported class-strategy associations.
+   */
+  private Map<Class, PropertyValueStrategy> initClassStrategyMap() {
+    Map<Class, PropertyValueStrategy> classMapping = new HashMap<>();
+    classMapping.put(Boolean.class, new BooleanStrategy());
+    classMapping.put(Set.class, new SetStrategy());
+    classMapping.put(Integer.class, new IntegerStrategy());
+    classMapping.put(Long.class, new LongStrategy());
+    classMapping.put(Float.class, new FloatStrategy());
+    classMapping.put(Double.class, new DoubleStrategy());
+    classMapping.put(Short.class, new ShortStrategy());
+    classMapping.put(BigDecimal.class, new BigDecimalStrategy());
+    classMapping.put(LocalDate.class, new DateStrategy());
+    classMapping.put(LocalTime.class, new TimeStrategy());
+    classMapping.put(LocalDateTime.class, new DateTimeStrategy());
+    classMapping.put(GradoopId.class, new GradoopIdStrategy());
+    classMapping.put(String.class, new StringStrategy());
+    classMapping.put(List.class, new ListStrategy());
+    classMapping.put(Map.class, new MapStrategy());
+
+    return Collections.unmodifiableMap(classMapping);
+  }
+
+  /**
+   * Initializes byte-strategy mapping.
+   *
+   * @return Map of supported byte-strategy associations.
+   */
+  private Map<Byte, PropertyValueStrategy> initByteStrategyMap() {
+    Map<Byte, PropertyValueStrategy> byteMapping = new HashMap<>(classStrategyMap.size());
+    for (PropertyValueStrategy strategy : classStrategyMap.values()) {
+      byteMapping.put(strategy.getRawType(), strategy);
+    }
+
+    return Collections.unmodifiableMap(byteMapping);
   }
 }

@@ -29,18 +29,19 @@ import java.io.IOException;
 public class IntegerStrategy implements PropertyValueStrategy<Integer> {
 
   @Override
-  public boolean write(Integer value, DataOutputView outputView) throws IOException {
+  public void write(Integer value, DataOutputView outputView) throws IOException {
     outputView.write(getRawBytes(value));
-    return true;
   }
 
   @Override
   public Integer read(DataInputView inputView, byte typeByte) throws IOException {
     int length = Bytes.SIZEOF_INT;
     byte[] rawBytes = new byte[length];
+
     for (int i  = 0; i < rawBytes.length; i++) {
       rawBytes[i] = inputView.readByte();
     }
+
     return Bytes.toInt(rawBytes);
   }
 

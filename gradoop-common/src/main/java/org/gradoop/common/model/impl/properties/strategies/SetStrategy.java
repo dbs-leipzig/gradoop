@@ -38,7 +38,7 @@ import java.util.Set;
 public class SetStrategy implements PropertyValueStrategy<Set> {
 
   @Override
-  public boolean write(Set value, DataOutputView outputView) throws IOException {
+  public void write(Set value, DataOutputView outputView) throws IOException {
     byte[] rawBytes = getRawBytes(value);
     byte type = rawBytes[0];
 
@@ -46,6 +46,7 @@ public class SetStrategy implements PropertyValueStrategy<Set> {
       type |= PropertyValue.FLAG_LARGE;
     }
     outputView.writeByte(type);
+
     // Write length as an int if the "large" flag is set.
     if ((type & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
       outputView.writeInt(rawBytes.length - PropertyValue.OFFSET);
@@ -54,7 +55,6 @@ public class SetStrategy implements PropertyValueStrategy<Set> {
     }
 
     outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);
-    return true;
   }
 
   @Override
@@ -74,9 +74,7 @@ public class SetStrategy implements PropertyValueStrategy<Set> {
     }
 
     PropertyValue entry;
-
     Set<PropertyValue> set = new HashSet<PropertyValue>();
-
     ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
     DataInputStream inputStream = new DataInputStream(byteStream);
     DataInputView internalInputView = new DataInputViewStreamWrapper(inputStream);
@@ -113,16 +111,14 @@ public class SetStrategy implements PropertyValueStrategy<Set> {
   @Override
   public Set get(byte[] bytes) {
     PropertyValue entry;
-
     Set<PropertyValue> set = new HashSet<PropertyValue>();
-
     ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
     DataInputStream inputStream = new DataInputStream(byteStream);
     DataInputView internalInputView = new DataInputViewStreamWrapper(inputStream);
 
-
     try {
       internalInputView.skipBytesToRead(1);
+
       while (inputStream.available() > 0) {
         entry = new PropertyValue();
         entry.read(internalInputView);
@@ -154,6 +150,7 @@ public class SetStrategy implements PropertyValueStrategy<Set> {
 
     try {
       outputStream.write(getRawType());
+
       for (PropertyValue entry : set) {
         entry.write(outputView);
       }

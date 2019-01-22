@@ -29,18 +29,19 @@ import java.io.IOException;
 public class FloatStrategy implements PropertyValueStrategy<Float> {
 
   @Override
-  public boolean write(Float value, DataOutputView outputView) throws IOException {
+  public void write(Float value, DataOutputView outputView) throws IOException {
     outputView.write(getRawBytes(value));
-    return true;
   }
 
   @Override
   public Float read(DataInputView inputView, byte typeByte) throws IOException {
     int length = Bytes.SIZEOF_FLOAT;
     byte[] rawBytes = new byte[length];
+
     for (int i  = 0; i < rawBytes.length; i++) {
       rawBytes[i] = inputView.readByte();
     }
+
     return Bytes.toFloat(rawBytes);
   }
 

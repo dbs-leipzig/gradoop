@@ -32,7 +32,7 @@ import java.util.Arrays;
 public class BigDecimalStrategy implements PropertyValueStrategy<BigDecimal> {
 
   @Override
-  public boolean write(BigDecimal value, DataOutputView outputView) throws IOException {
+  public void write(BigDecimal value, DataOutputView outputView) throws IOException {
     byte[] rawBytes = getRawBytes(value);
     byte type = rawBytes[0];
 
@@ -40,6 +40,7 @@ public class BigDecimalStrategy implements PropertyValueStrategy<BigDecimal> {
       type |= PropertyValue.FLAG_LARGE;
     }
     outputView.writeByte(type);
+
     // Write length as an int if the "large" flag is set.
     if ((type & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
       outputView.writeInt(rawBytes.length - PropertyValue.OFFSET);
@@ -48,7 +49,6 @@ public class BigDecimalStrategy implements PropertyValueStrategy<BigDecimal> {
     }
 
     outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);
-    return true;
   }
 
   @Override

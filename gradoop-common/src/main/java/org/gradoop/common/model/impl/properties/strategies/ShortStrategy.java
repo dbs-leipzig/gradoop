@@ -29,9 +29,8 @@ import java.io.IOException;
 public class ShortStrategy implements PropertyValueStrategy<Short> {
 
   @Override
-  public boolean write(Short value, DataOutputView outputView) throws IOException {
+  public void write(Short value, DataOutputView outputView) throws IOException {
     outputView.write(getRawBytes(value));
-    return true;
   }
 
   @Override
@@ -42,6 +41,7 @@ public class ShortStrategy implements PropertyValueStrategy<Short> {
     for (int i  = 0; i < rawBytes.length; i++) {
       rawBytes[i] = inputView.readByte();
     }
+
     return Bytes.toShort(rawBytes);
   }
 

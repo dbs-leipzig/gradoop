@@ -29,7 +29,7 @@ import java.io.IOException;
 public class StringStrategy implements PropertyValueStrategy<String> {
 
   @Override
-  public boolean write(String value, DataOutputView outputView) throws IOException {
+  public void write(String value, DataOutputView outputView) throws IOException {
     byte[] rawBytes = getRawBytes(value);
     byte type = rawBytes[0];
 
@@ -37,6 +37,7 @@ public class StringStrategy implements PropertyValueStrategy<String> {
       type |= PropertyValue.FLAG_LARGE;
     }
     outputView.writeByte(type);
+
     // Write length as an int if the "large" flag is set.
     if ((type & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
       outputView.writeInt(rawBytes.length - PropertyValue.OFFSET);
@@ -45,7 +46,6 @@ public class StringStrategy implements PropertyValueStrategy<String> {
     }
 
     outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);
-    return true;
   }
 
   @Override
@@ -58,9 +58,11 @@ public class StringStrategy implements PropertyValueStrategy<String> {
       length = inputView.readShort();
     }
     byte[] rawBytes = new byte[length];
+
     for (int i = 0; i < rawBytes.length; i++) {
       rawBytes[i] = inputView.readByte();
     }
+
     return Bytes.toString(rawBytes);
   }
 

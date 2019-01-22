@@ -36,7 +36,7 @@ import java.util.Map;
 public class MapStrategy implements PropertyValueStrategy<Map> {
 
   @Override
-  public boolean write(Map value, DataOutputView outputView) throws IOException {
+  public void write(Map value, DataOutputView outputView) throws IOException {
     byte[] rawBytes = getRawBytes(value);
     byte type = rawBytes[0];
 
@@ -44,6 +44,7 @@ public class MapStrategy implements PropertyValueStrategy<Map> {
       type |= PropertyValue.FLAG_LARGE;
     }
     outputView.writeByte(type);
+
     // Write length as an int if the "large" flag is set.
     if ((type & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
       outputView.writeInt(rawBytes.length - PropertyValue.OFFSET);
@@ -52,7 +53,6 @@ public class MapStrategy implements PropertyValueStrategy<Map> {
     }
 
     outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);
-    return true;
   }
 
   @Override
@@ -73,9 +73,7 @@ public class MapStrategy implements PropertyValueStrategy<Map> {
 
     PropertyValue key;
     PropertyValue value;
-
     Map<PropertyValue, PropertyValue> map = new HashMap<>();
-
     ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
     DataInputStream inputStream = new DataInputStream(byteStream);
     DataInputView internalInputView = new DataInputViewStreamWrapper(inputStream);

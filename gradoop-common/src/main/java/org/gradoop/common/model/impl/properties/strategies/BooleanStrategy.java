@@ -30,9 +30,8 @@ import java.io.IOException;
 public class BooleanStrategy implements PropertyValueStrategy<Boolean> {
 
   @Override
-  public boolean write(Boolean value, DataOutputView outputView) throws IOException {
+  public void write(Boolean value, DataOutputView outputView) throws IOException {
     outputView.write(getRawBytes(value));
-    return true;
   }
 
   @Override

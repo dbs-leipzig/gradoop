@@ -36,7 +36,7 @@ import java.util.List;
 public class ListStrategy implements PropertyValueStrategy<List> {
 
   @Override
-  public boolean write(List value, DataOutputView outputView) throws IOException {
+  public void write(List value, DataOutputView outputView) throws IOException {
     byte[] rawBytes = getRawBytes(value);
     byte type = rawBytes[0];
 
@@ -44,6 +44,7 @@ public class ListStrategy implements PropertyValueStrategy<List> {
       type |= PropertyValue.FLAG_LARGE;
     }
     outputView.writeByte(type);
+
     // Write length as an int if the "large" flag is set.
     if ((type & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
       outputView.writeInt(rawBytes.length - PropertyValue.OFFSET);
@@ -52,7 +53,6 @@ public class ListStrategy implements PropertyValueStrategy<List> {
     }
 
     outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);
-    return true;
   }
 
   @Override

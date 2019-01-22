@@ -29,19 +29,20 @@ import java.io.IOException;
 public class LongStrategy implements PropertyValueStrategy<Long> {
 
   @Override
-  public boolean write(Long value, DataOutputView outputView) throws IOException {
+  public void write(Long value, DataOutputView outputView) throws IOException {
     byte[] rawBytes = getRawBytes(value);
     outputView.write(rawBytes);
-    return true;
   }
 
   @Override
   public Long read(DataInputView inputView, byte typeByte) throws IOException {
     int length = Bytes.SIZEOF_LONG;
     byte[] rawBytes = new byte[length];
+
     for (int i  = 0; i < rawBytes.length; i++) {
       rawBytes[i] = inputView.readByte();
     }
+
     return Bytes.toLong(rawBytes);
   }
 
