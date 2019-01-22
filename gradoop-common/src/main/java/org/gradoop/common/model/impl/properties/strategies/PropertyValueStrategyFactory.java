@@ -139,7 +139,12 @@ public class PropertyValueStrategyFactory {
    * @throws UnsupportedTypeException when there is no matching strategy for a given type byte.
    */
   public static PropertyValueStrategy get(byte value) throws UnsupportedTypeException {
-    PropertyValueStrategy strategy = INSTANCE.byteStrategyMap.get(value);
+    PropertyValueStrategy strategy;
+    if (value == 0) {
+      strategy = INSTANCE.noopPropertyValueStrategy;
+    } else {
+      strategy = INSTANCE.byteStrategyMap.get(value);
+    }
     if (strategy == null) {
       throw new UnsupportedTypeException("No strategy for type byte " + value);
     }

@@ -88,7 +88,7 @@ public class PropertyValueTest {
 
   @Test
   public void testFailedBigDecimalConversion() {
-    exception.expect(ClassCastException.class);
+    exception.expect(IllegalArgumentException.class);
     create(BOOL_VAL_1).getBigDecimal();
   }
 
