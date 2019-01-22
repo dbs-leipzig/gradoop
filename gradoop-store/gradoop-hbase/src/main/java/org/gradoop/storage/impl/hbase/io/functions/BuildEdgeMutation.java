@@ -54,9 +54,6 @@ public class BuildEdgeMutation extends RichMapFunction<Edge, Tuple2<GradoopId, M
     this.edgeHandler = edgeHandler;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple2<GradoopId, Mutation> map(Edge edge) throws Exception {
     GradoopId key = edge.getId();
@@ -68,9 +65,6 @@ public class BuildEdgeMutation extends RichMapFunction<Edge, Tuple2<GradoopId, M
     return reuseTuple;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);

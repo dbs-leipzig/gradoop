@@ -100,9 +100,6 @@ public class PageRank extends GradoopGellyAlgorithm<NullValue, NullValue> {
       currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return PageRank.class.getName();

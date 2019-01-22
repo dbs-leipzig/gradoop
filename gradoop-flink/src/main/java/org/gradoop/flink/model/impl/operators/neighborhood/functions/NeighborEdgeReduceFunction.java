@@ -40,9 +40,6 @@ public class NeighborEdgeReduceFunction
     super(function);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void reduce(Iterable<Tuple2<Edge, Vertex>> tuples, Collector<Vertex> collector) throws
     Exception {

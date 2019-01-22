@@ -29,9 +29,6 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
  */
 public abstract class BaseGellyAlgorithm<K, VV, EV, O> implements UnaryGraphToValueOperator<O> {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public O execute(LogicalGraph graph) {
     try {

@@ -205,9 +205,6 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getDescription() {
     return SubgraphBenchmark.class.getName();

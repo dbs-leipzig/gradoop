@@ -40,9 +40,6 @@ import org.gradoop.flink.model.impl.operators.cloning.functions.Value0Of2ToId;
  */
 public class Cloning implements UnaryGraphToGraphOperator {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
 
@@ -93,9 +90,6 @@ public class Cloning implements UnaryGraphToGraphOperator {
       .fromDataSets(graphHead, vertices, edges);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return Cloning.class.getName();

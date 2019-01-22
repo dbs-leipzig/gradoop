@@ -36,17 +36,11 @@ public class RandomNonUniformVertexSamplingTest extends ParameterizedTestForGrap
     super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SamplingAlgorithm getSamplingOperator() {
     return new RandomNonUniformVertexSampling(sampleSize, seed);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
 

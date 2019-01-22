@@ -295,9 +295,6 @@ public class DualSimulation extends PatternMatching {
       config.getLogicalGraphFactory().fromDataSets(matchVertices, matchEdges));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return DualSimulation.class.getName();

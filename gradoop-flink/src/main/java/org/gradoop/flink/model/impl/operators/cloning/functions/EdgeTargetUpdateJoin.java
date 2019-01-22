@@ -33,9 +33,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 public class EdgeTargetUpdateJoin<E extends Edge>
   implements JoinFunction<E, Tuple2<GradoopId, GradoopId>, E> {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public E join(E e, Tuple2<GradoopId, GradoopId> vertexTuple) {
     e.setTargetId(vertexTuple.f1);

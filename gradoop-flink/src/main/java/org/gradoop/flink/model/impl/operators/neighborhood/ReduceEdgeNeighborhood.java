@@ -46,9 +46,6 @@ public class ReduceEdgeNeighborhood extends EdgeNeighborhood {
     super(function, direction);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     DataSet<Vertex> vertices;
@@ -90,9 +87,6 @@ public class ReduceEdgeNeighborhood extends EdgeNeighborhood {
       vertices, graph.getEdges());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return ReduceEdgeNeighborhood.class.getName();

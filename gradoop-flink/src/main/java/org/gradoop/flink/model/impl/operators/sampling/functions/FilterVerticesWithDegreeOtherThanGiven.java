@@ -42,9 +42,6 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
     this.degree = degree;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
 
@@ -64,9 +61,6 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
       graph.getGraphHead(), newVertices, graph.getEdges());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return FilterVerticesWithDegreeOtherThanGiven.class.getName();

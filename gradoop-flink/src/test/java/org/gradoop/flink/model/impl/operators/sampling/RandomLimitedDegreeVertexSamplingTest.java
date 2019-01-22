@@ -46,17 +46,11 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParameterizedTestForG
       VertexDegree.valueOf(degreeType), Long.parseLong(degreeThreshold));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SamplingAlgorithm getSamplingOperator() {
     return new RandomLimitedDegreeVertexSampling(sampleSize, seed, degreeThreshold, degreeType);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
     List<Vertex> dbDegreeVertices = Lists.newArrayList();

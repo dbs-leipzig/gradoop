@@ -85,9 +85,6 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     this.edgeFilterFunction = edgeFilterFunction;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection executeForGVELayout(GraphCollection collection) {
     return vertexFilterFunction != null && edgeFilterFunction != null ?
@@ -96,9 +93,6 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
         edgeInducedSubgraph(collection);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection executeForTxLayout(GraphCollection collection) {
     return executeForGVELayout(collection);
