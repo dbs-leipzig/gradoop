@@ -59,6 +59,7 @@ public class FilterEmbeddings implements PhysicalOperator {
     this.setName("FilterEmbeddings");
   }
 
+  @Override
   public DataSet<Embedding> evaluate() {
     return input
       .filter(new FilterEmbedding(predicates, metaData))
