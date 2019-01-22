@@ -59,7 +59,6 @@ public class CreateVertices {
 
     int counter = 0;
     for (TableToVertex table : tablesToVertices) {
-      System.out.println(table.getTableName());
       DataSet<Row> dsSQLResult = Helper.getRdbmsInput(
           flinkConfig.getExecutionEnvironment(), rdbmsConfig, table.getRowCount(),
           table.getSqlQuery(), table.getRowTypeInfo());

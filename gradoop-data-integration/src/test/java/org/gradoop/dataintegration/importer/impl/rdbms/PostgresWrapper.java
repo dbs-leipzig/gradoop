@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.dataintegration.importers.rdbmsimporter;
+package org.gradoop.dataintegration.importer.impl.rdbms;
 
 import java.io.File;
 import java.io.IOException;

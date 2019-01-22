@@ -144,7 +144,7 @@ public class Helper {
    * @param rowCount count of database table rows
    * @return 2d array containing pagination border parameters
    */
-  private static Serializable[][] choosePartitionParameters(
+  public static Serializable[][] choosePartitionParameters(
     RdbmsConstants.RdbmsType rdbmsType, int parallelism, int rowCount) {
     Serializable[][] parameters;
 
@@ -161,20 +161,18 @@ public class Helper {
       partitionRest = rowCount % parallelism;
       parameters = new Integer[parallelism][2];
     }
-    System.out.println(parameters.length);
+
     int j = 0;
     for (int i = 0; i < parameters.length; i++) {
       if (i == parameters.length - 1) {
         if (rdbmsType == MYSQL_TYPE) {
           parameters[i] = new Integer[]{partitionNumber + partitionRest, j};
-          System.out.println(partitionNumber + partitionRest + " , " + j);
         } else {
           parameters[i] = new Integer[]{j, partitionNumber + partitionRest};
         }
       } else {
         if (rdbmsType == MYSQL_TYPE) {
           parameters[i] = new Integer[]{partitionNumber, j};
-          System.out.println(partitionNumber + " , " + j);
         } else {
           parameters[i] = new Integer[]{j, partitionNumber};
         }
@@ -379,7 +377,7 @@ public class Helper {
    * @param value value of database tuple
    * @return gradoop property value
    */
-  private static PropertyValue parseAttributeToPropertyValue(Object value) {
+  private static PropertyValue toPropertyValue(Object value) {
 
     PropertyValue propValue;
 
@@ -413,7 +411,7 @@ public class Helper {
     for (RowHeaderTuple rowHeaderTuple : rowHeader) {
       try {
         properties.set(rowHeaderTuple.getAttributeName(),
-          parseAttributeToPropertyValue(tuple.getField(rowHeaderTuple.getRowPostition())));
+          toPropertyValue(tuple.getField(rowHeaderTuple.getRowPostition())));
       } catch (IndexOutOfBoundsException e) {
         logger.warn("Empty value field in column " + rowHeaderTuple.getAttributeName());
       }
@@ -434,7 +432,7 @@ public class Helper {
     for (RowHeaderTuple rowHeaderTuple : rowHeader) {
       if (!rowHeaderTuple.getAttributeRole().equals(FK_FIELD)) {
         properties.set(rowHeaderTuple.getAttributeName(),
-          parseAttributeToPropertyValue(tuple.getField(rowHeaderTuple.getRowPostition())));
+          toPropertyValue(tuple.getField(rowHeaderTuple.getRowPostition())));
       }
     }
     return properties;
