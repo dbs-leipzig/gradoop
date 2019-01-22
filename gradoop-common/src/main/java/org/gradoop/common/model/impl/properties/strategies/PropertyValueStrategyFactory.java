@@ -15,6 +15,7 @@
  */
 package org.gradoop.common.model.impl.properties.strategies;
 
+import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
 
@@ -47,13 +48,15 @@ public class PropertyValueStrategyFactory {
    */
   private final Map<Byte, PropertyValueStrategy> byteStrategyMap;
   /**
-   * Null strategy
+   * Strategy for {@code null}-value properties.
    */
   private final NoopPropertyValueStrategy noopPropertyValueStrategy
   = new NoopPropertyValueStrategy();
 
   /**
-   * Constructor
+   * Constructs an {@code PropertyValueStrategyFactory} with type - strategy mappings as defined in
+   * {@code initClassStrategyMap}.
+   * Only one instance of this class is needed.
    */
   private PropertyValueStrategyFactory() {
     classStrategyMap = initClassStrategyMap();
@@ -65,17 +68,17 @@ public class PropertyValueStrategyFactory {
    * class in the class-strategy map, or the value of the parameter is {@code null}, an instance of
    * {@code NoopPropertyValue} is returned.
    *
-   * @param c some class
+   * @param clazz some class
    * @return strategy class which is able to handle the provided type.
    */
-  public static PropertyValueStrategy get(Class c) {
-    PropertyValueStrategy strategy = INSTANCE.classStrategyMap.get(c);
+  public static PropertyValueStrategy get(Class clazz) {
+    PropertyValueStrategy strategy = INSTANCE.classStrategyMap.get(clazz);
     if (strategy == null) {
-      if (Map.class.isAssignableFrom(c)) {
+      if (Map.class.isAssignableFrom(clazz)) {
         strategy = INSTANCE.classStrategyMap.get(Map.class);
-      } else if (Set.class.isAssignableFrom(c)) {
+      } else if (Set.class.isAssignableFrom(clazz)) {
         strategy = INSTANCE.classStrategyMap.get(Set.class);
-      } else if (List.class.isAssignableFrom(c)) {
+      } else if (List.class.isAssignableFrom(clazz)) {
         strategy = INSTANCE.classStrategyMap.get(List.class);
       }
     }
@@ -96,6 +99,8 @@ public class PropertyValueStrategyFactory {
 
   /**
    * Compares two values.
+   * If {@code other} is not comparable to {@code value}, the used {@link PropertyValueStrategy}
+   * will throw an {@code IllegalArgumentException}.
    *
    * @param value first value.
    * @param other second value.
@@ -108,12 +113,13 @@ public class PropertyValueStrategyFactory {
       return strategy.compare(value, other);
     }
 
-    return 0;
+    return INSTANCE.noopPropertyValueStrategy.compare(value, other);
   }
 
   /**
    * Get byte array representation of the provided object. The object is serialized according to the
    * {@code PropertyValue} standard.
+   * If the given type is not supported, an {@code UnsupportedTypeException} will be thrown.
    *
    * @param value to be serialized.
    * @return byte array representation of the provided object.
@@ -130,9 +136,14 @@ public class PropertyValueStrategyFactory {
    *
    * @param value representing a data type.
    * @return strategy class.
+   * @throws UnsupportedTypeException when there is no matching strategy for a given type byte.
    */
-  public static PropertyValueStrategy get(byte value) {
-    return INSTANCE.byteStrategyMap.get(value);
+  public static PropertyValueStrategy get(byte value) throws UnsupportedTypeException {
+    PropertyValueStrategy strategy = INSTANCE.byteStrategyMap.get(value);
+    if (strategy == null) {
+      throw new UnsupportedTypeException("No strategy for type byte " + value);
+    }
+    return strategy;
   }
 
   /**

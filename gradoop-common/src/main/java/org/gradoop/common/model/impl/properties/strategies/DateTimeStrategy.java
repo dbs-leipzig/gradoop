@@ -16,7 +16,6 @@
 package org.gradoop.common.model.impl.properties.strategies;
 
 import org.apache.flink.core.memory.DataInputView;
-import org.apache.flink.core.memory.DataOutputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.DateTimeSerializer;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -30,11 +29,6 @@ import java.util.Arrays;
  * {@code LocalDateTime}.
  */
 public class DateTimeStrategy implements PropertyValueStrategy<LocalDateTime> {
-
-  @Override
-  public void write(LocalDateTime value, DataOutputView outputView) throws IOException {
-    outputView.write(getRawBytes(value));
-  }
 
   @Override
   public LocalDateTime read(DataInputView inputView, byte typeByte) throws IOException {
@@ -76,7 +70,7 @@ public class DateTimeStrategy implements PropertyValueStrategy<LocalDateTime> {
   }
 
   @Override
-  public Byte getRawType() {
+  public byte getRawType() {
     return PropertyValue.TYPE_DATETIME;
   }
 

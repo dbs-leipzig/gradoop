@@ -16,7 +16,6 @@
 package org.gradoop.common.model.impl.properties.strategies;
 
 import org.apache.flink.core.memory.DataInputView;
-import org.apache.flink.core.memory.DataOutputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -29,11 +28,6 @@ import java.util.Arrays;
  * {@code GradoopIdStrategy}.
  */
 public class GradoopIdStrategy implements PropertyValueStrategy<GradoopId> {
-
-  @Override
-  public void write(GradoopId value, DataOutputView outputView) throws IOException {
-    outputView.write(getRawBytes(value));
-  }
 
   @Override
   public GradoopId read(DataInputView inputView, byte typeByte) throws IOException {
@@ -75,7 +69,7 @@ public class GradoopIdStrategy implements PropertyValueStrategy<GradoopId> {
   }
 
   @Override
-  public Byte getRawType() {
+  public byte getRawType() {
     return PropertyValue.TYPE_GRADOOP_ID;
   }
 

@@ -18,12 +18,15 @@ package org.gradoop.common.model.impl.properties.strategies;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
 import java.io.IOException;
 
 /**
  * Strategy class for handling {@code PropertyValue} operations when the value is {@code null}.
  */
 public class NoopPropertyValueStrategy implements PropertyValueStrategy {
+
   @Override
   public void write(Object value, DataOutputView outputView) throws IOException {
     outputView.write(new byte[]{0});
@@ -36,7 +39,10 @@ public class NoopPropertyValueStrategy implements PropertyValueStrategy {
 
   @Override
   public int compare(Object value, Object other) {
-    return 0;
+    if (value == null && other == null) {
+      return 0;
+    }
+    return -1;
   }
 
   @Override
@@ -55,8 +61,8 @@ public class NoopPropertyValueStrategy implements PropertyValueStrategy {
   }
 
   @Override
-  public Byte getRawType() {
-    return null;
+  public byte getRawType() {
+    return PropertyValue.TYPE_NULL;
   }
 
   @Override

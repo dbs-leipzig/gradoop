@@ -144,7 +144,7 @@ public class MapStrategy implements PropertyValueStrategy<Map> {
   }
 
   @Override
-  public Byte getRawType() {
+  public byte getRawType() {
     return PropertyValue.TYPE_MAP;
   }
 

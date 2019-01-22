@@ -16,7 +16,6 @@
 package org.gradoop.common.model.impl.properties.strategies;
 
 import org.apache.flink.core.memory.DataInputView;
-import org.apache.flink.core.memory.DataOutputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
@@ -28,11 +27,6 @@ import java.io.IOException;
  * {@code Boolean}.
  */
 public class BooleanStrategy implements PropertyValueStrategy<Boolean> {
-
-  @Override
-  public void write(Boolean value, DataOutputView outputView) throws IOException {
-    outputView.write(getRawBytes(value));
-  }
 
   @Override
   public Boolean read(DataInputView inputView, byte typeByte) throws IOException {
@@ -64,10 +58,14 @@ public class BooleanStrategy implements PropertyValueStrategy<Boolean> {
   }
 
   @Override
-  public Byte getRawType() {
+  public byte getRawType() {
     return PropertyValue.TYPE_BOOLEAN;
   }
 
+  /**
+   * Warning: Please note that if {@code null} is passed as an argument, it is going to be evaluated
+   * as if it was false.
+   */
   @Override
   public byte[] getRawBytes(Boolean value) {
     byte[] rawBytes = new byte[PropertyValue.OFFSET + Bytes.SIZEOF_BOOLEAN];

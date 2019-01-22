@@ -138,7 +138,7 @@ public class ListStrategy implements PropertyValueStrategy<List> {
   }
 
   @Override
-  public Byte getRawType() {
+  public byte getRawType() {
     return PropertyValue.TYPE_LIST;
   }
 

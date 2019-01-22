@@ -133,7 +133,7 @@ public class SetStrategy implements PropertyValueStrategy<Set> {
   }
 
   @Override
-  public Byte getRawType() {
+  public byte getRawType() {
     return PropertyValue.TYPE_SET;
   }
 

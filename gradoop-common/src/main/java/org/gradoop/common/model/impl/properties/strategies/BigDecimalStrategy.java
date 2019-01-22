@@ -117,15 +117,15 @@ public class BigDecimalStrategy implements PropertyValueStrategy<BigDecimal> {
       decimal = new BigDecimal(Bytes.toString(valueBytes));
       break;
     default:
-      throw new ClassCastException(
-      "Cannot covert " + this.getType().getSimpleName() +
-      " to " + BigDecimal.class.getSimpleName());
+      throw new IllegalArgumentException(
+      "Cannot convert byte array with type byte "  + type
+        + " to " + BigDecimal.class.getSimpleName());
     }
     return decimal;
   }
 
   @Override
-  public Byte getRawType() {
+  public byte getRawType() {
     return PropertyValue.TYPE_BIG_DECIMAL;
   }
 

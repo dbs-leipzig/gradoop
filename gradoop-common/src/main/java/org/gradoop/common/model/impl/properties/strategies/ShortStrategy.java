@@ -16,7 +16,6 @@
 package org.gradoop.common.model.impl.properties.strategies;
 
 import org.apache.flink.core.memory.DataInputView;
-import org.apache.flink.core.memory.DataOutputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
@@ -27,11 +26,6 @@ import java.io.IOException;
  * {@code Short}.
  */
 public class ShortStrategy implements PropertyValueStrategy<Short> {
-
-  @Override
-  public void write(Short value, DataOutputView outputView) throws IOException {
-    outputView.write(getRawBytes(value));
-  }
 
   @Override
   public Short read(DataInputView inputView, byte typeByte) throws IOException {
@@ -71,7 +65,7 @@ public class ShortStrategy implements PropertyValueStrategy<Short> {
   }
 
   @Override
-  public Byte getRawType() {
+  public byte getRawType() {
     return PropertyValue.TYPE_SHORT;
   }
 

@@ -47,6 +47,10 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    */
   public static final PropertyValue NULL_VALUE = PropertyValue.create(null);
   /**
+   * {@code <property-type>} for empty property value (i.e. {@code null})
+   */
+  public static final transient byte TYPE_NULL         = 0x00;
+  /**
    * {@code <property-type>} for {@link java.lang.Boolean}
    */
   public static final transient byte TYPE_BOOLEAN      = 0x01;
@@ -128,17 +132,12 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public static final transient int LARGE_PROPERTY_THRESHOLD = Short.MAX_VALUE;
 
   /**
-   * {@code <property-type>} for empty property value (i.e. {@code null})
-   */
-  static final transient byte TYPE_NULL         = 0x00;
-
-  /**
    * Class version for serialization.
    */
   private static final long serialVersionUID = 1L;
 
   /**
-   * Mapping from byte value to associated Class
+   * Actual value.
    */
   private Object value;
 
@@ -205,7 +204,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   //----------------------------------------------------------------------------
 
   /**
-   * Checks if the field {@code value} is of the same type as the provided class.
+   * Check if the property value type is an instance of a certain class.
    *
    * @param c class to check against.
    * @return true if the attribute {@code value} is an object of the provided class, false
@@ -741,7 +740,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * byte 2 - end : value bytes
    *
    * @param outputView data output to write data to
-   * @throws IOException
+   * @throws IOException if write to output view fails.
    */
   @Override
   public void write(DataOutputView outputView) throws IOException {
@@ -758,7 +757,8 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(type);
 
     if (strategy == null) {
-      value = null;
+      throw new UnsupportedTypeException(
+              "No strategy for type byte from input view fround");
     } else {
       value = strategy.read(inputView, typeByte);
     }
@@ -767,7 +767,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   @Override
   public String toString() {
     return getObject() != null ?
-            getObject().toString() :
-            GradoopConstants.NULL_STRING;
+      getObject().toString() :
+      GradoopConstants.NULL_STRING;
   }
 }

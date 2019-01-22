@@ -91,7 +91,7 @@ public class StringStrategy implements PropertyValueStrategy<String> {
   }
 
   @Override
-  public Byte getRawType() {
+  public byte getRawType() {
     return PropertyValue.TYPE_STRING;
   }
 

@@ -31,12 +31,15 @@ public interface PropertyValueStrategy<T> {
 
   /**
    * Writes the given value to the provided {@code DataOutputView}.
+   * The argument {@code value} can not be {@code null}.
    *
    * @param value      to be written to the {@code DataOutputView}.
    * @param outputView that the value is written to.
    * @throws IOException if write process fails.
    */
-  void write(T value, DataOutputView outputView) throws IOException;
+  default void write(T value, DataOutputView outputView) throws IOException {
+    outputView.write(getRawBytes(value));
+  }
 
   /**
    * Reads raw bytes from the given {@code DataInputView} and deserializes the contained object.
@@ -71,7 +74,7 @@ public interface PropertyValueStrategy<T> {
   /**
    * Gets the class of the data type the specific strategy handles.
    *
-   * @return some class <T>.
+   * @return class of the type handled by this strategy.
    */
   Class<T> getType();
 
@@ -79,7 +82,7 @@ public interface PropertyValueStrategy<T> {
    * Deserializes an object from the provided byte array.
    *
    * @param bytes representing a serialized object.
-   * @return object which is an instance of the class <T>
+   * @return an instance of the type handled by this strategy.
    */
   T get(byte[] bytes);
 
@@ -88,10 +91,11 @@ public interface PropertyValueStrategy<T> {
    *
    * @return a byte.
    */
-  Byte getRawType();
+  byte getRawType();
 
   /**
    * Serializes the given object.
+   * The argument {@code value} can not be {@code null}.
    *
    * @param value the object to be serialized.
    * @return byte array representation of the provided object.

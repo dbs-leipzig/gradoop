@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Contains the {@code PropertyValueStrategy} interface.
+ * Contains interfaces that are related to property value strategies.
  */
 package org.gradoop.common.model.api.strategies;

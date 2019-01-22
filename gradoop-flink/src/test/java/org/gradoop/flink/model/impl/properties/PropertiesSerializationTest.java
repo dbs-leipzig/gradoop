@@ -105,7 +105,7 @@ public class PropertiesSerializationTest extends GradoopFlinkTestBase {
   @Test
   public void testLargePropertyMap() throws Exception {
     HashMap<PropertyValue, PropertyValue> largeMap = new HashMap<>();
-    long neededEntries = PropertyValue.LARGE_PROPERTY_THRESHOLD;
+    long neededEntries = PropertyValue.LARGE_PROPERTY_THRESHOLD / 10;
     for (int i = 0; i < neededEntries; i++) {
       largeMap.put(PropertyValue.create("key" + i), PropertyValue.create("value" + i));
     }
