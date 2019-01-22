@@ -97,7 +97,7 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
   }
 
   /**
-   * Wraps an test function.
+   * Wraps a test function.
    */
   public interface SocialTestContext {
 
