@@ -96,13 +96,23 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
     return ret;
   }
 
+  /**
+   * Wraps an test function.
+   */
   public interface SocialTestContext {
 
+    /**
+     * Run the test.
+     *
+     * @param loader The loader used for access to a test graph.
+     * @param store The store instance to test.
+     * @param config The gradoop flink config used to run tests.
+     * @throws Throwable an Exception thrown by the test.
+     */
     void test(
       AsciiGraphLoader<GraphHead, Vertex, Edge> loader,
       AccumuloEPGMStore store,
       GradoopFlinkConfig config
     ) throws Throwable;
-
   }
 }
