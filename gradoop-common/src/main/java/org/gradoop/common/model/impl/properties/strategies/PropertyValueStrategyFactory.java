@@ -113,7 +113,7 @@ public class PropertyValueStrategyFactory {
       return strategy.compare(value, other);
     }
 
-    return INSTANCE.noopPropertyValueStrategy.compare(value, other);
+    return 0;
   }
 
   /**
