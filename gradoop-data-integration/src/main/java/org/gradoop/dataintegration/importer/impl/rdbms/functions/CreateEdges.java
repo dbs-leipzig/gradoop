@@ -96,7 +96,6 @@ public class CreateEdges {
        */
       int counter = 0;
       for (TableToEdge table : tablesToEdges) {
-        System.out.println(table.getTableName());
         if (!table.isDirectionIndicator()) {
           DataSet<Row> dsSQLResult = Helper.getRdbmsInput(env, rdbmsConfig,
               table.getRowCount(), table.getSqlQuery(), table.getRowTypeInfo());
