@@ -17,14 +17,15 @@ package org.gradoop.common.model.api.strategies;
 
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.io.IOException;
 
 /**
  * Interface defining the methods necessary to handle the (de-) serialization of a
- * {@code PropertyValue}'s value.
+ * {@link PropertyValue}'s value.
  *
- * @param <T> Generic
+ * @param <T> The property value type.
  */
 public interface PropertyValueStrategy<T> {
 
@@ -43,7 +44,7 @@ public interface PropertyValueStrategy<T> {
    * @param inputView containing serialized object.
    * @param typeByte  byte needed to indicate whether serialized object has a variable length.
    * @return deserialized object.
-   * @throws IOException of deserialization fails.
+   * @throws IOException when reading or deserialization of the object fails.
    */
   T read(DataInputView inputView, byte typeByte) throws IOException;
 
@@ -54,6 +55,7 @@ public interface PropertyValueStrategy<T> {
    * @param other second object.
    * @return a negative integer, zero, or a positive integer as first object is less than, equal to,
    * or greater than the second object.
+   * @throws IllegalArgumentException when {@code other} is not comparable to {@code value}.
    */
   int compare(T value, Object other);
 

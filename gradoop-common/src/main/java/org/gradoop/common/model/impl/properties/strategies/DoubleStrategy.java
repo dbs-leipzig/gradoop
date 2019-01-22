@@ -29,31 +29,19 @@ import java.io.IOException;
 public class DoubleStrategy implements PropertyValueStrategy<Double> {
 
   @Override
-<<<<<<< HEAD
-  public boolean write(Double value, DataOutputView outputView) throws IOException {
-    outputView.write(getRawBytes(value));
-    return true;
-=======
   public void write(Double value, DataOutputView outputView) throws IOException {
     outputView.write(getRawBytes(value));
->>>>>>> c737b343803e03061d2f3bfc6894d5e91c2d7b51
   }
 
   @Override
   public Double read(DataInputView inputView, byte typeByte) throws IOException {
     int length = Bytes.SIZEOF_DOUBLE;
     byte[] rawBytes = new byte[length];
-<<<<<<< HEAD
-    for (int i  = 0; i < rawBytes.length; i++) {
-      rawBytes[i] = inputView.readByte();
-    }
-=======
 
     for (int i  = 0; i < rawBytes.length; i++) {
       rawBytes[i] = inputView.readByte();
     }
 
->>>>>>> c737b343803e03061d2f3bfc6894d5e91c2d7b51
     return Bytes.toDouble(rawBytes);
   }
 

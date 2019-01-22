@@ -40,8 +40,4 @@
             files="[/\\]src[/\\]test[/\\]java[/\\]"/>
   <suppress checks="StaticVariableName"
             files="[/\\]src[/\\]test[/\\]java[/\\]"/>
-  <suppress files="PropertyValueStrategy.java"
-            checks="[a-zA-Z0-9]*"/>
-  <suppress files="PropertyValue.java"
-            checks="[a-zA-Z0-9]*"/>
 </suppressions>
