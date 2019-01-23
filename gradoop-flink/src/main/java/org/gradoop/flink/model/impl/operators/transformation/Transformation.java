@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,16 @@ package org.gradoop.flink.model.impl.operators.transformation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformEdge;
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformGraphHead;
 import org.gradoop.flink.model.impl.operators.transformation.functions.TransformVertex;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * The modification operators is a unary graph operator that takes a logical
@@ -34,23 +34,32 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * elements of that graph as well as on its graph head.
  *
  * The identity of the elements is preserved.
+ *
+ * @param <G> the EPGM graph head type
+ * @param <V> the EPGM vertex type
+ * @param <E> the EPGM edge type
+ * @param <LG> the logical graph type
  */
-public class Transformation implements UnaryGraphToGraphOperator {
+public class Transformation<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Modification function for graph heads
    */
-  protected final TransformationFunction<GraphHead> graphHeadTransFunc;
+  protected final TransformationFunction<G> graphHeadTransFunc;
 
   /**
    * Modification function for vertices
    */
-  protected final TransformationFunction<Vertex> vertexTransFunc;
+  protected final TransformationFunction<V> vertexTransFunc;
 
   /**
    * Modification function for edges
    */
-  protected final TransformationFunction<Edge> edgeTransFunc;
+  protected final TransformationFunction<E> edgeTransFunc;
 
   /**
    * Creates a new operator instance.
@@ -59,15 +68,13 @@ public class Transformation implements UnaryGraphToGraphOperator {
    * @param vertexTransFunc     vertex transformation function
    * @param edgeTransFunc       edge transformation function
    */
-  public Transformation(TransformationFunction<GraphHead> graphHeadTransFunc,
-    TransformationFunction<Vertex> vertexTransFunc,
-    TransformationFunction<Edge> edgeTransFunc) {
+  public Transformation(
+    TransformationFunction<G> graphHeadTransFunc,
+    TransformationFunction<V> vertexTransFunc,
+    TransformationFunction<E> edgeTransFunc) {
 
-    if (graphHeadTransFunc == null &&
-      vertexTransFunc == null &&
-      edgeTransFunc == null) {
-      throw new IllegalArgumentException(
-        "Provide at least one transformation function.");
+    if (graphHeadTransFunc == null && vertexTransFunc == null && edgeTransFunc == null) {
+      throw new IllegalArgumentException("Provide at least one transformation function.");
     }
     this.graphHeadTransFunc = graphHeadTransFunc;
     this.vertexTransFunc    = vertexTransFunc;
@@ -75,50 +82,40 @@ public class Transformation implements UnaryGraphToGraphOperator {
   }
 
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
+  public LG execute(LG graph) {
     return executeInternal(
       graph.getGraphHead(),
       graph.getVertices(),
       graph.getEdges(),
-      graph.getConfig());
+      graph.getFactory());
   }
 
   /**
    * Applies the transformation functions on the given datasets.
    *
-   * @param graphHeads  graph heads
-   * @param vertices    vertices
-   * @param edges       edges
-   * @param config      gradoop flink config
+   * @param graphHeads graph heads
+   * @param vertices vertices
+   * @param edges edges
+   * @param factory the factory that is responsible for creating an instance of the logical graph
    * @return transformed logical graph
    */
   @SuppressWarnings("unchecked")
-  protected LogicalGraph executeInternal(DataSet<GraphHead> graphHeads,
-    DataSet<Vertex> vertices, DataSet<Edge> edges, GradoopFlinkConfig config) {
+  protected LG executeInternal(DataSet<G> graphHeads, DataSet<V> vertices, DataSet<E> edges,
+    BaseGraphFactory<G, V, E, LG> factory) {
 
-    DataSet<GraphHead> transformedGraphHeads = graphHeadTransFunc != null ?
-      graphHeads.map(new TransformGraphHead(
-        graphHeadTransFunc, config.getGraphHeadFactory()))
-        .returns(TypeExtractor.createTypeInfo(
-          config.getGraphHeadFactory().getType())) : graphHeads;
+    DataSet<G> transformedGraphHeads = graphHeadTransFunc != null ? graphHeads
+      .map(new TransformGraphHead(graphHeadTransFunc, factory.getGraphHeadFactory()))
+      .returns(TypeExtractor.createTypeInfo(factory.getGraphHeadFactory().getType())) : graphHeads;
 
-    DataSet<Vertex> transformedVertices = vertexTransFunc != null ?
-      vertices.map(new TransformVertex(
-        vertexTransFunc, config.getVertexFactory()))
-        .returns(TypeExtractor.createTypeInfo(
-          config.getVertexFactory().getType())) : vertices;
+    DataSet<V> transformedVertices = vertexTransFunc != null ? vertices
+      .map(new TransformVertex(vertexTransFunc, factory.getVertexFactory()))
+      .returns(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())) : vertices;
 
-    DataSet<Edge> transformedEdges = edgeTransFunc != null ?
-      edges.map(new TransformEdge(
-        edgeTransFunc, config.getEdgeFactory()))
-        .returns(TypeExtractor.createTypeInfo(
-          config.getEdgeFactory().getType())) : edges;
+    DataSet<E> transformedEdges = edgeTransFunc != null ? edges
+      .map(new TransformEdge(edgeTransFunc, factory.getEdgeFactory()))
+      .returns(TypeExtractor.createTypeInfo(factory.getEdgeFactory().getType())) : edges;
 
-    return config.getLogicalGraphFactory().fromDataSets(
-      transformedGraphHeads,
-      transformedVertices,
-      transformedEdges
-    );
+    return factory.fromDataSets(transformedGraphHeads, transformedVertices, transformedEdges);
   }
 
   @Override

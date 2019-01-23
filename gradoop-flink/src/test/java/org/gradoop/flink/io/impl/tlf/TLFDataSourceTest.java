@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,7 @@ import org.junit.Test;
 public class TLFDataSourceTest extends GradoopFlinkTestBase {
   @Test
   public void testRead() throws Exception {
-    String tlfFile = TLFDataSinkTest.class
-      .getResource("/data/tlf/io_test_string.tlf").getFile();
+    String tlfFile = getFilePath("/data/tlf/io_test_string.tlf");
 
     // create datasource
     DataSource dataSource = new TLFDataSource(tlfFile, getConfig());
@@ -40,7 +39,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
 
     collectAndAssertTrue(
-      loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
+      loader.getGraphCollectionByVariables("g1", "g2").equalsByGraphData(
         getConfig().getGraphCollectionFactory().fromTransactions(transactions)
       )
     );
@@ -48,8 +47,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
 
   @Test
   public void testReadWithoutEdges() throws Exception {
-    String tlfFile = TLFDataSinkTest.class
-    .getResource("/data/tlf/io_test_string_without_edges.tlf").getFile();
+    String tlfFile = getFilePath("/data/tlf/io_test_string_without_edges.tlf");
 
     // create datasource
     DataSource dataSource = new TLFDataSource(tlfFile, getConfig());
@@ -63,7 +61,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
 
     collectAndAssertTrue(
-    loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
+    loader.getGraphCollectionByVariables("g1", "g2").equalsByGraphData(
     getConfig().getGraphCollectionFactory().fromTransactions(transactions)
     )
     );
@@ -71,12 +69,9 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
 
   @Test
   public void testReadWithDictionary() throws Exception {
-    String tlfFile = TLFDataSinkTest.class
-      .getResource("/data/tlf/io_test.tlf").getFile();
-    String tlfVertexDictionaryFile = TLFDataSinkTest.class
-      .getResource("/data/tlf/io_test_vertex_dictionary.tlf").getFile();
-    String tlfEdgeDictionaryFile = TLFDataSinkTest.class
-      .getResource("/data/tlf/io_test_edge_dictionary.tlf").getFile();
+    String tlfFile = getFilePath("/data/tlf/io_test.tlf");
+    String tlfVertexDictionaryFile = getFilePath("/data/tlf/io_test_vertex_dictionary.tlf");
+    String tlfEdgeDictionaryFile = getFilePath("/data/tlf/io_test_edge_dictionary.tlf");
 
     // create datasource
     DataSource dataSource = new TLFDataSource(tlfFile, tlfVertexDictionaryFile,
@@ -91,7 +86,7 @@ public class TLFDataSourceTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getLoaderFromString(asciiGraphs);
 
     collectAndAssertTrue(
-      loader.getGraphCollectionByVariables("g1","g2").equalsByGraphData(
+      loader.getGraphCollectionByVariables("g1", "g2").equalsByGraphData(
         getConfig().getGraphCollectionFactory().fromTransactions(transactions)
       )
     );

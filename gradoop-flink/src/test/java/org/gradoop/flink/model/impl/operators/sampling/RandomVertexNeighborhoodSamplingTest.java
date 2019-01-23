@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,13 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertFalse;
-
-public class RandomVertexNeighborhoodSamplingTest extends ParametrizedTestForGraphSampling {
+public class RandomVertexNeighborhoodSamplingTest extends ParameterizedTestForGraphSampling {
 
   /**
    * Creates a new RandomVertexNeighborhoodSamplingTest instance.
@@ -36,32 +32,20 @@ public class RandomVertexNeighborhoodSamplingTest extends ParametrizedTestForGra
    * @param neighborType The vertex neighborhood type, e.g. Neighborhood.BOTH
    */
   public RandomVertexNeighborhoodSamplingTest(String testName, String seed, String sampleSize,
-    String neighborType) {
+                                              String neighborType) {
     super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize),
       Neighborhood.valueOf(neighborType));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SamplingAlgorithm getSamplingOperator() {
     return new RandomVertexNeighborhoodSampling(sampleSize, seed, neighborType);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
-
-    dbEdges.removeAll(newEdges);
-    for (Edge edge : dbEdges) {
-      assertFalse("edge from original graph was not sampled but source and target were",
-        newVertexIDs.contains(edge.getSourceId()) &&
-          newVertexIDs.contains(edge.getTargetId()));
-    }
   }
+
 
   /**
    * Parameters called when running the test
@@ -70,30 +54,26 @@ public class RandomVertexNeighborhoodSamplingTest extends ParametrizedTestForGra
    */
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
-    return Arrays.asList(
-      new String[] {
-        "VertexNeighborhoodSamplingTest with seed and both neighborhood",
-        "-4181668494294894490",
-        "0.272f",
-        "BOTH"
-      },
-      new String[] {
-        "VertexNeighborhoodSamplingTest without seed and both neighborhood",
-        "0",
-        "0.272f",
-        "BOTH"
-      },
-      new String[] {
-        "VertexNeighborhoodSamplingTest with seed and input neighborhood",
-        "-4181668494294894490",
-        "0.272f",
-        "IN"
-      },
-      new String[] {
-        "VertexNeighborhoodSamplingTest with seed and output neighborhood",
-        "-4181668494294894490",
-        "0.272f",
-        "OUT"
-      });
+    return Arrays.asList(new String[] {
+      "VertexNeighborhoodSamplingTest with seed and both neighborhood",
+      "-4181668494294894490",
+      "0.272f",
+      "BOTH"
+    }, new String[] {
+      "VertexNeighborhoodSamplingTest without seed and both neighborhood",
+      "0",
+      "0.272f",
+      "BOTH"
+    }, new String[] {
+      "VertexNeighborhoodSamplingTest with seed and input neighborhood",
+      "-4181668494294894490",
+      "0.272f",
+      "IN"
+    }, new String[] {
+      "VertexNeighborhoodSamplingTest with seed and output neighborhood",
+      "-4181668494294894490",
+      "0.272f",
+      "OUT"
+    });
   }
 }

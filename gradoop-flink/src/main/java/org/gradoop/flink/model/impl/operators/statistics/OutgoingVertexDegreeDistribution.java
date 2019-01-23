@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
 import org.gradoop.flink.model.impl.functions.tuple.Tuple2ToWithCount;
 import org.gradoop.flink.model.impl.operators.count.Count;
@@ -36,5 +36,10 @@ public class OutgoingVertexDegreeDistribution
         .execute(graph)
         .<Tuple1<Long>>project(1))
       .map(new Tuple2ToWithCount<>());
+  }
+
+  @Override
+  public String getName() {
+    return OutgoingVertexDegreeDistribution.class.getName();
   }
 }

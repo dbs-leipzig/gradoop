@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ public class DFSTraverserTest {
       new Step(2L, 3L, 2L, true),
       new Step(2L, 1L, 1L, false),
       new Step(1L, 0L, 0L, false),
-      new Step(0L, 2L, 1L, false) 
+      new Step(0L, 2L, 1L, false)
     )));
   }
 

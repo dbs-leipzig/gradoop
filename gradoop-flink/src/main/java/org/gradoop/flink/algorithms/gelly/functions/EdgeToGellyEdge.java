@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@
  */
 package org.gradoop.flink.algorithms.gelly.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 
 /**
  * Convert a Gradoop {@link Edge} to a Gelly Edge.
  *
- * @param <E> Type of the output Gelly Edge.
+ * @param <EV> Value type of the output gelly edge.
  */
-public interface EdgeToGellyEdge<E> extends MapFunction<Edge, org.apache.flink.graph.Edge<GradoopId, E>> {
+public interface EdgeToGellyEdge<EV> extends ElementToGellyEdge<Edge, GradoopId, EV> {
 }

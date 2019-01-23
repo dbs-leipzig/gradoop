@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ public class GradoopTestUtils {
   public static final LocalDate           DATE_VAL_b                = LocalDate.now();
   public static final LocalTime           TIME_VAL_c                = LocalTime.now();
   public static final LocalDateTime       DATETIME_VAL_d            = LocalDateTime.now();
-  public static final short               SHORT_VAL_e               = (short)23;
+  public static final short               SHORT_VAL_e               = (short) 23;
   public static final Set<PropertyValue>  SET_VAL_f                 = new HashSet<>();
 
   private static Comparator<EPGMIdentifiable> ID_COMPARATOR = new EPGMIdentifiableComparator();
@@ -200,8 +200,8 @@ public class GradoopTestUtils {
     Iterator<GradoopId> it1 = list1.iterator();
     Iterator<GradoopId> it2 = list2.iterator();
 
-    while(it1.hasNext()) {
-      assertTrue("id mismatch", it1.next().equals(it2.next()));
+    while (it1.hasNext()) {
+      assertEquals("id mismatch", it1.next(), it2.next());
     }
     assertFalse("too many elements in first collection", it1.hasNext());
     assertFalse("too many elements in second collection", it2.hasNext());
@@ -219,7 +219,7 @@ public class GradoopTestUtils {
 
     for (GradoopId id1 : collection1) {
       for (GradoopId id2 : collection2) {
-        assertFalse("id in both collections", id1.equals(id2));
+        assertNotEquals("id in both collections", id1, id2);
       }
     }
   }
@@ -236,8 +236,9 @@ public class GradoopTestUtils {
     Collection<? extends EPGMElement> collection2) {
     assertNotNull("first collection was null", collection1);
     assertNotNull("second collection was null", collection1);
-    assertTrue(String.format("collections of different size: %d and %d", collection1.size(),
-      collection2.size()), collection1.size() == collection2.size());
+    assertEquals(String.format(
+      "collections of different size: %d and %d", collection1.size(), collection2.size()),
+      collection1.size(), collection2.size());
 
     List<? extends EPGMElement> list1 = Lists.newArrayList(collection1);
     List<? extends EPGMElement> list2 = Lists.newArrayList(collection2);
@@ -248,7 +249,7 @@ public class GradoopTestUtils {
     Iterator<? extends EPGMElement> it1 = list1.iterator();
     Iterator<? extends EPGMElement> it2 = list2.iterator();
 
-    while(it1.hasNext()) {
+    while (it1.hasNext()) {
       validateEPGMElements(
         it1.next(),
         it2.next());
@@ -279,7 +280,7 @@ public class GradoopTestUtils {
     Iterator<? extends EPGMGraphElement> it1 = list1.iterator();
     Iterator<? extends EPGMGraphElement> it2 = list2.iterator();
 
-    while(it1.hasNext()) {
+    while (it1.hasNext()) {
       validateEPGMGraphElements(it1.next(), it2.next());
     }
     assertFalse("too many elements in first collection", it1.hasNext());
@@ -420,7 +421,11 @@ public class GradoopTestUtils {
    * @throws Exception in case anything goes wrong
    */
   @SuppressWarnings("unchecked")
-  public static <T1, T2> T1 call(Class<T2> clazz, T2 object, String methodName, Class<?>[] parameterTypes, Object[] args)
+  public static <T1, T2> T1 call(
+    Class<T2> clazz,
+    T2 object,
+    String methodName,
+    Class<?>[] parameterTypes, Object[] args)
     throws Exception {
     Method m = parameterTypes != null ?
       clazz.getDeclaredMethod(methodName, parameterTypes) : clazz.getDeclaredMethod(methodName);

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,24 @@
  */
 package org.gradoop.flink.model.impl.layouts.gve;
 
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.LogicalGraphLayoutFactoryTest;
 import org.gradoop.flink.util.GradoopFlinkConfig;
-import org.junit.Test;
 
+/**
+ * Test class {@link GVEGraphLayoutFactory}.
+ */
 public class GVEGraphLayoutFactoryTest extends LogicalGraphLayoutFactoryTest {
   @Override
-  protected LogicalGraphLayoutFactory getFactory() {
-    GVEGraphLayoutFactory logicalGraphLayoutFactory = new GVEGraphLayoutFactory();
+  protected LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> getFactory() {
+    // create the factory to test
+    GVEGraphLayoutFactory factory = new GVEGraphLayoutFactory();
+    // create a default gradoop flink config and set it to the layout
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-    config.setLogicalGraphLayoutFactory(logicalGraphLayoutFactory);
-    return logicalGraphLayoutFactory;
+    factory.setGradoopFlinkConfig(config);
+    return factory;
   }
 }

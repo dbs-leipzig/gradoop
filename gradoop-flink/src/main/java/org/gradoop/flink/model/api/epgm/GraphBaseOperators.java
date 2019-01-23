@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,16 @@ package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 
 /**
  * Operators that are available at all graph structures.
  *
- * @see LogicalGraph
- * @see GraphCollection
+ * @see BaseGraph
+ * @see BaseGraphCollection
  */
 public interface GraphBaseOperators {
-
-  /**
-   * Returns the Gradoop Flink configuration.
-   *
-   * @return Gradoop Flink configuration
-   */
-  GradoopFlinkConfig getConfig();
 
   //----------------------------------------------------------------------------
   // Utility methods

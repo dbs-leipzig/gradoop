@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -173,7 +173,7 @@ public abstract class GraphStatisticsTest {
   @Test
   public void testDistinctVertexPropertyValuesByPropertyName() throws Exception {
     assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties( "name"),
+      TEST_STATISTICS.getDistinctVertexProperties("name"),
       is(9L));
     assertThat(
       TEST_STATISTICS.getDistinctVertexProperties("gender"),
@@ -182,13 +182,13 @@ public abstract class GraphStatisticsTest {
       TEST_STATISTICS.getDistinctVertexProperties("city"),
       is(3L));
     assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties( "age"),
+      TEST_STATISTICS.getDistinctVertexProperties("age"),
       is(4L));
     assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties( "speaks"),
+      TEST_STATISTICS.getDistinctVertexProperties("speaks"),
       is(1L));
     assertThat(
-      TEST_STATISTICS.getDistinctVertexProperties( "locIP"),
+      TEST_STATISTICS.getDistinctVertexProperties("locIP"),
       is(1L));
     assertThat(
       TEST_STATISTICS.getDistinctVertexProperties("title"),

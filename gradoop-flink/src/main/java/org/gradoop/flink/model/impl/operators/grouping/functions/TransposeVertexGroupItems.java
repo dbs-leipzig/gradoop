@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
-import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -27,6 +26,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -86,7 +86,7 @@ public class TransposeVertexGroupItems
 
     boolean isFirst = true;
 
-    Set<GradoopId> superVertexIds = Sets.newHashSet();
+    Set<GradoopId> superVertexIds = new HashSet<>();
 
     for (VertexGroupItem groupItem : vertexGroupItems) {
       if (isFirst) {
@@ -100,22 +100,20 @@ public class TransposeVertexGroupItems
       // store the super vertex id created in the previous combiner
       superVertexIds.add(groupItem.getSuperVertexId());
 
-      if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
-        aggregate(groupItem.getAggregateValues(), vertexLabelGroup.getAggregators());
-      }
+      vertexLabelGroup.aggregate(groupItem.getAggregateValues());
     }
 
     reuseInnerTuple.setId(superVertexId);
     reuseInnerTuple.setIdSet(GradoopIdSet.fromExisting(superVertexIds));
 
     reuseOuterTuple.f0 = createSuperVertexTuple(superVertexId, groupLabel,
-      groupPropertyValues, vertexLabelGroup.getAggregators());
+      groupPropertyValues, vertexLabelGroup.getAggregateValueList());
     reuseOuterTuple.f0.setSuperVertexId(superVertexId);
     reuseOuterTuple.f0.setLabelGroup(vertexLabelGroup);
     reuseOuterTuple.f1 = reuseInnerTuple;
 
     // collect single item representing the whole group
-    resetAggregators(reuseOuterTuple.f0.getLabelGroup().getAggregators());
+    reuseOuterTuple.f0.getLabelGroup().resetAggregateValues();
     out.collect(reuseOuterTuple);
   }
 }

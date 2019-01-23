@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,21 @@ public class SamplingEvaluationConstants {
    * Filename for the saved connected components distribution of the graph
    */
   public static final String FILE_CONNECTED_COMPONENTS_DIST = "connected_components_distribution";
+
+  /**
+   * Filename for the saved average clustering coefficient of the graph
+   */
+  public static final String FILE_CLUSTERING_COEFFICIENT_AVERAGE = "clustering_coefficient_average";
+
+  /**
+   * Filename for the saved global clustering coefficient of the graph
+   */
+  public static final String FILE_CLUSTERING_COEFFICIENT_GLOBAL = "clustering_coefficient_global";
+
+  /**
+   * Filename for the saved triangle count of the graph
+   */
+  public static final String FILE_TRIANGLE_COUNT = "triangle_count";
 
   /**
    * private Constructor

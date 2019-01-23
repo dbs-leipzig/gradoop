@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,6 @@ import org.gradoop.common.model.impl.pojo.Element;
 public class ElementIdUpdater<EL extends Element>
   implements MapFunction<Tuple2<EL, GradoopId>, EL> {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public EL map(Tuple2<EL, GradoopId> tuple2) {
     tuple2.f0.setId(tuple2.f1);

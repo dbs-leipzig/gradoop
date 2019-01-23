@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,24 +18,23 @@ package org.gradoop.examples.biiig;
 import org.apache.commons.io.IOUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.examples.utils.ExampleOutput;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.transactional.CategoryCharacteristicSubgraphs;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.transformation.ApplyTransformation;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
-
 import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SOURCEID_KEY;
 import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERCLASS_VALUE_MASTER;
 import static org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs.SUPERCLASS_VALUE_TRANSACTIONAL;
@@ -80,31 +79,25 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
     out.add("Business Transaction Graphs with Measures", btgs);
 
-    btgs = btgs.apply(new ApplyTransformation(
+    btgs = btgs.apply(new ApplyTransformation((graph, copy) -> {
       // Transformation function to categorize graphs
-      (graph, copy) -> {
-        String category = graph.getPropertyValue("soCount").getInt() > 0 ?
-          "won" : "lost";
-        copy.setProperty(CATEGORY_KEY, PropertyValue.create(category));
-        return copy;
-      },
+      String category = graph.getPropertyValue("soCount").getInt() > 0 ? "won" : "lost";
+      copy.setProperty(CATEGORY_KEY, PropertyValue.create(category));
+      return copy;
+    }, (vertex, copy) -> {
       // Transformation function to relabel vertices and to drop properties
-      (vertex, copy) -> {
-        String superType = vertex.getPropertyValue(SUPERTYPE_KEY).toString();
+      String superType = vertex.getPropertyValue(SUPERTYPE_KEY).toString();
 
-        if (superType.equals(SUPERCLASS_VALUE_TRANSACTIONAL)) {
-          copy.setLabel(vertex.getLabel());
-        } else { // master data
-          copy.setLabel(vertex.getPropertyValue(SOURCEID_KEY).toString());
-        }
-        return copy;
-      },
-      // Transformation function to drop properties of edges
-      (edge, copy) -> {
-        copy.setLabel(edge.getLabel());
-
-        return copy;
-      })
+      if (superType.equals(SUPERCLASS_VALUE_TRANSACTIONAL)) {
+        copy.setLabel(vertex.getLabel());
+      } else { // master data
+        copy.setLabel(vertex.getPropertyValue(SOURCEID_KEY).toString());
+      }
+      return copy;
+    }, (edge, copy) -> {
+      copy.setLabel(edge.getLabel());
+      return copy;
+    })
     );
 
     out.add("Business Transaction Graphs after Transformation", btgs);
@@ -151,10 +144,9 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
   }
 
   /**
-   * Aggregate function to determine "isClosed" measure
+   * Aggregate function to determine "isClosed" measure.
    */
-  private static class IsClosedAggregateFunction extends Or
-    implements VertexAggregateFunction {
+  private static class IsClosedAggregateFunction implements Or, VertexAggregateFunction {
 
     @Override
     public String getAggregatePropertyKey() {
@@ -162,7 +154,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     }
 
     @Override
-    public PropertyValue getVertexIncrement(Vertex vertex) {
+    public PropertyValue getIncrement(Element vertex) {
       boolean isClosedQuotation =
         vertex.getLabel().equals("Quotation") &&
           !vertex.getPropertyValue("status").toString().equals("open");
@@ -174,18 +166,18 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
   /**
    * Aggregate function to count sales orders per graph.
    */
-  private static class CountSalesOrdersAggregateFunction
-    extends Count implements VertexAggregateFunction {
+  private static class CountSalesOrdersAggregateFunction extends VertexCount {
 
-    @Override
-    public PropertyValue getVertexIncrement(Vertex vertex) {
-      return PropertyValue.create(
-        vertex.getLabel().equals("SalesOrder") ? 1 : 0);
+    /**
+     * Creates a new instance of a CountSalesOrderAggregateFunction aggregate function.
+     */
+    CountSalesOrdersAggregateFunction() {
+      super("soCount");
     }
 
     @Override
-    public String getAggregatePropertyKey() {
-      return "soCount";
+    public PropertyValue getIncrement(Element vertex) {
+      return PropertyValue.create(vertex.getLabel().equals("SalesOrder") ? 1 : 0);
     }
   }
 

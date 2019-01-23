@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,39 +16,45 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
- * Joins to get the edge source
+ * Joins to get the edge source:
+ * (edge),(vertex) -> (edge,edge.targetId,(bool)vertex[propertyKey])
  */
-public class EdgeSourceVertexJoin implements JoinFunction<Tuple3<Edge, GradoopId, GradoopId>,
-        Tuple2<Vertex, GradoopId>, Tuple3<Edge, Vertex, GradoopId>> {
+@FunctionAnnotation.ForwardedFieldsFirst({"*->f0", "id->f1"})
+@FunctionAnnotation.ReadFieldsSecond("properties")
+public class EdgeSourceVertexJoin
+  implements JoinFunction<Edge, Vertex, Tuple3<Edge, GradoopId, Boolean>> {
   /**
-   *  Reduce object instantiations
+   * Reduce object instantiations
    */
-  private Tuple3<Edge, Vertex, GradoopId> reuse;
+  private Tuple3<Edge, GradoopId, Boolean> reuse;
 
   /**
-   * Constructor
+   * Property key of marked value
    */
-  public EdgeSourceVertexJoin() {
-    reuse = new Tuple3<>();
+  private String propertyKey;
+
+  /**
+   * Creates an instance of this join function
+   *
+   * @param propertyKey vertex property key
+   */
+  public EdgeSourceVertexJoin(String propertyKey) {
+    this.reuse = new Tuple3<>();
+    this.propertyKey = propertyKey;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public Tuple3<Edge, Vertex, GradoopId> join(
-          Tuple3<Edge, GradoopId, GradoopId> edgeWithItsVerticesIds,
-          Tuple2<Vertex, GradoopId> vertexWithItsId) {
-    reuse.f0 = edgeWithItsVerticesIds.f0;
-    reuse.f1 = vertexWithItsId.f0;
-    reuse.f2 = edgeWithItsVerticesIds.f2;
+  public Tuple3<Edge, GradoopId, Boolean> join(Edge edge, Vertex vertex) throws Exception {
+    reuse.f0 = edge;
+    reuse.f1 = edge.getTargetId();
+    reuse.f2 = vertex.getPropertyValue(propertyKey).getBoolean();
     return reuse;
   }
 }

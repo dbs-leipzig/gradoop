@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,36 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
 
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
-import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.Sum;
 
 /**
  * Superclass of counting aggregate functions.
  */
-public abstract class Count
-  implements AggregateFunction, AggregateDefaultValue {
+public class Count extends BaseAggregateFunction implements Sum, AggregateDefaultValue {
+
+  /**
+   * Creates a new instance of a Count aggregate function.
+   */
+  public Count() {
+    super("count");
+  }
+
+  /**
+   * Creates a new instance of a Count aggregate function.
+   *
+   * @param aggregatePropertyKey aggregate property key
+   */
+  public Count(String aggregatePropertyKey) {
+    super(aggregatePropertyKey);
+  }
 
   @Override
-  public PropertyValue aggregate(
-    PropertyValue aggregate, PropertyValue increment) {
-    return PropertyValueUtils.Numeric.add(aggregate, increment);
+  public PropertyValue getIncrement(Element element) {
+    return PropertyValue.create(1L);
   }
 
   @Override

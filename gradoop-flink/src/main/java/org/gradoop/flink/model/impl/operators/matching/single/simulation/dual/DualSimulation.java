@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ import org.apache.log4j.Logger;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.GraphCollectionFactory;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.epgm.LogicalGraphFactory;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
@@ -295,9 +295,6 @@ public class DualSimulation extends PatternMatching {
       config.getLogicalGraphFactory().fromDataSets(matchVertices, matchEdges));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return DualSimulation.class.getName();

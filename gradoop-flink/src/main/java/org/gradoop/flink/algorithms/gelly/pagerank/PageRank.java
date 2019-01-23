@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,18 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
+import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
 import org.gradoop.flink.algorithms.gelly.pagerank.functions.PageRankToAttribute;
 import org.gradoop.flink.algorithms.gelly.pagerank.functions.PageRankResultKey;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
  * A gradoop operator wrapping {@link org.apache.flink.graph.library.linkanalysis.PageRank}.
  */
-public class PageRank extends GellyAlgorithm<NullValue, NullValue> {
+public class PageRank extends GradoopGellyAlgorithm<NullValue, NullValue> {
 
   /**
    * Property key to store the page rank in.
@@ -49,37 +49,57 @@ public class PageRank extends GellyAlgorithm<NullValue, NullValue> {
   private final int iterations;
 
   /**
-   * Constructor for Page Rank with fixed number of iterations.
+   * Whether to include "zero-degree" vertices in the PageRank computation and result. These
+   * vertices only affect the scores of other vertices indirectly through influencing the initial
+   * proportional score of {@code (1 - damping factor) / number of vertices}.
+   * If set to {@code false}, these vertices will NOT be part of the computation and the returned
+   * result graph.
+   */
+  private final boolean includeZeroDegrees;
+
+  /**
+   * Constructor for Page Rank with fixed number of iterations and {@link #includeZeroDegrees}
+   * set to {@code false}.
    *
-   * @param propertyKey   Property key to store the rank in.
+   * @param propertyKey Property key to store the page rank in.
    * @param dampingFactor Damping factor.
    * @param iterations    Number of iterations.
    */
   public PageRank(String propertyKey, double dampingFactor, int iterations) {
+    this(propertyKey, dampingFactor, iterations, false);
+  }
+
+  /**
+   * Constructor for Page Rank with fixed number of iterations.
+   *
+   * @param propertyKey Property key to store the page rank in.
+   * @param dampingFactor Damping factor.
+   * @param iterations    Number of iterations.
+   * @param includeZeroDegrees Whether to include "zero-degree" vertices in the PageRank
+   *                                  computation and result.
+   */
+  public PageRank(String propertyKey, double dampingFactor, int iterations,
+    boolean includeZeroDegrees) {
     super(new VertexToGellyVertexWithNullValue(), new EdgeToGellyEdgeWithNullValue());
     this.propertyKey = propertyKey;
     this.dampingFactor = dampingFactor;
     this.iterations = iterations;
+    this.includeZeroDegrees = includeZeroDegrees;
   }
 
   @Override
-  protected LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
+  public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
     throws Exception {
     DataSet<Vertex> newVertices =
       new org.apache.flink.graph.library.linkanalysis.PageRank<GradoopId, NullValue, NullValue>(
-        dampingFactor, iterations)
-      .run(graph)
+        dampingFactor, iterations).setIncludeZeroDegreeVertices(includeZeroDegrees).run(graph)
       .join(currentGraph.getVertices())
-      .where(new PageRankResultKey())
-      .equalTo(new Id<>())
+      .where(new PageRankResultKey()).equalTo(new Id<>())
       .with(new PageRankToAttribute(propertyKey));
-    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices,
-      currentGraph.getEdges());
+    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
+      currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return PageRank.class.getName();

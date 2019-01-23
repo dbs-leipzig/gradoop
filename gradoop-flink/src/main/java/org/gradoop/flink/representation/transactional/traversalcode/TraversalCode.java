@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,8 +110,7 @@ public class TraversalCode<C extends Comparable<C>> implements Serializable, Com
 
       // if two DFS-Codes share initial traversals,
       // the first different traversal will decide about comparison
-      while (comparison == 0 && thisIterator.hasNext() && thatIterator.hasNext())
-      {
+      while (comparison == 0 && thisIterator.hasNext() && thatIterator.hasNext()) {
         comparison = thisIterator.next().compareTo(thatIterator.next());
       }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,12 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
 import org.gradoop.flink.util.GradoopFlinkConfig;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * An example for the subgraph operator using combined filter functions.
@@ -33,13 +35,6 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * @see org.gradoop.flink.model.impl.functions.filters.CombinableFilter
  */
 public class SubgraphExample {
-
-  /**
-   * Path of the input graph.
-   */
-  private static final String DATA_PATH =
-    SubgraphExample.class.getResource("/data/csv/sna").getFile();
-
   /**
    * Run an example subgraph operation on the example social media graph.
    *
@@ -52,7 +47,9 @@ public class SubgraphExample {
     // Create Gradoop config.
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(executionEnvironment);
     // Read the input graph.
-    LogicalGraph inputGraph = new CSVDataSource(DATA_PATH, config).getLogicalGraph();
+    LogicalGraph inputGraph = new CSVDataSource(
+      URLDecoder.decode(SubgraphExample.class.getResource("/data/csv/sna").getFile(),
+        StandardCharsets.UTF_8.name()), config).getLogicalGraph();
 
     // Create a filter for vertices accepting:
     // 1. Vertices with label "Forum" and a property "title" set to "Graph Processing"

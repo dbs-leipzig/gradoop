@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
  */
 package org.gradoop.flink.algorithms.gelly.functions;
 
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Convert a Gradoop {@link Vertex} to a Gelly Vertex.
  *
- * @param <E> Type of the output Gelly Vertex.
+ * @param <VV> Value type of the output gelly vertex.
  */
-public interface VertexToGellyVertex<E>
-  extends MapFunction<org.gradoop.common.model.impl.pojo.Vertex, Vertex<GradoopId, E>> {
+public interface VertexToGellyVertex<VV>
+  extends ElementToGellyVertex<org.gradoop.common.model.impl.pojo.Vertex, GradoopId, VV> {
 }

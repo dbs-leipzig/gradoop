@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -98,17 +98,11 @@ public class HBaseDataSource extends HBaseBase
     this.edgeQuery = edgeQuery;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph getLogicalGraph() {
     return getGraphCollection().reduce(new ReduceCombination());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection getGraphCollection() {
     GradoopFlinkConfig config = getFlinkConfig();
@@ -138,9 +132,6 @@ public class HBaseDataSource extends HBaseBase
     return config.getGraphCollectionFactory().fromDataSets(graphHeads, vertices, edges);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   public HBaseDataSource applyGraphPredicate(
@@ -149,9 +140,6 @@ public class HBaseDataSource extends HBaseBase
     return new HBaseDataSource(getStore(), getFlinkConfig(), query, vertexQuery, edgeQuery);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   public HBaseDataSource applyVertexPredicate(
@@ -160,9 +148,6 @@ public class HBaseDataSource extends HBaseBase
     return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, query, edgeQuery);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   public HBaseDataSource applyEdgePredicate(
@@ -171,9 +156,6 @@ public class HBaseDataSource extends HBaseBase
     return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, vertexQuery, query);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean isFilterPushedDown() {
     return this.graphHeadQuery != null || this.vertexQuery != null || this.edgeQuery != null;

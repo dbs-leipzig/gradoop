@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsLocalFSReader;
 import org.junit.BeforeClass;
@@ -25,8 +28,9 @@ public abstract class EstimatorTestBase {
 
   @BeforeClass
   public static void setUp() throws Exception {
-    String path = JoinEstimatorTest.class
-      .getResource("/data/json/sna/statistics").getFile();
+    String path = URLDecoder.decode(
+      JoinEstimatorTest.class.getResource("/data/json/sna/statistics").getFile(),
+      StandardCharsets.UTF_8.name());
     STATS = GraphStatisticsLocalFSReader.read(path);
   }
 }

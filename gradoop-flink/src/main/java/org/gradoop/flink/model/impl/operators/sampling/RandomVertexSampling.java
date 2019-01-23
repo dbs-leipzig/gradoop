@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.sampling;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -26,9 +26,9 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
 
 /**
- * Takes a logical graph and a user defined aggregate function as input. The
- * aggregate function is applied on the logical graph and the resulting
- * aggregate is stored as an additional property at the result graph.
+ * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
+ * amount. Retains all edges which source- and target-vertices were chosen. There may retain some
+ * unconnected vertices in the sampled graph.
  */
 public class RandomVertexSampling extends SamplingAlgorithm {
   /**
@@ -62,9 +62,6 @@ public class RandomVertexSampling extends SamplingAlgorithm {
     this.randomSeed = randomSeed;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
@@ -82,9 +79,6 @@ public class RandomVertexSampling extends SamplingAlgorithm {
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return RandomVertexSampling.class.getName();

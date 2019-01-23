@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@ import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.algorithms.gelly.GellyAlgorithm;
+import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithPropertyValue;
 import org.gradoop.flink.algorithms.gelly.labelpropagation.functions.LPVertexJoin;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -43,7 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * The computation will terminate if no new values are assigned.
  */
-public abstract class LabelPropagation extends GellyAlgorithm<PropertyValue, NullValue> {
+public abstract class LabelPropagation extends GradoopGellyAlgorithm<PropertyValue, NullValue> {
 
   /**
    * Counter to define maximum number of iterations for the algorithm
@@ -68,11 +68,8 @@ public abstract class LabelPropagation extends GellyAlgorithm<PropertyValue, Nul
     this.propertyKey = checkNotNull(propertyKey);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  protected LogicalGraph executeInGelly(Graph<GradoopId, PropertyValue, NullValue> graph) {
+  public LogicalGraph executeInGelly(Graph<GradoopId, PropertyValue, NullValue> graph) {
     DataSet<Vertex> labeledVertices = executeInternal(graph)
       .join(currentGraph.getVertices())
       .where(0).equalTo(new Id<>())
@@ -101,9 +98,6 @@ public abstract class LabelPropagation extends GellyAlgorithm<PropertyValue, Nul
     return maxIterations;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return LabelPropagation.class.getName();

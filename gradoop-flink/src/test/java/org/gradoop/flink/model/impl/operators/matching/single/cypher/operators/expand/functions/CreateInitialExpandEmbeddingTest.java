@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,58 +52,58 @@ public class CreateInitialExpandEmbeddingTest {
 
   @Test
   public void testHomomorphismWithDuplicateBaseEdge() throws Exception {
-    testJoin(buildEdge(n ,e0 ,a), new ArrayList<>(), new ArrayList<>(), -1, true);
+    testJoin(buildEdge(n, e0, a), new ArrayList<>(), new ArrayList<>(), -1, true);
   }
 
   @Test
   public void testHomomorphismWithLoop() throws Exception {
-    testJoin(buildEdge(n,e1,m), new ArrayList<>(), new ArrayList<>(), 0, true);
+    testJoin(buildEdge(n, e1, m), new ArrayList<>(), new ArrayList<>(), 0, true);
   }
 
   //VertexIsomorphism
   @Test
   public void testVertexIsomorphismWithoutDuplicates() throws Exception {
-    testJoin(buildEdge(n, e1, a), Lists.newArrayList(0,2), new ArrayList<>(), -1, true);
+    testJoin(buildEdge(n, e1, a), Lists.newArrayList(0, 2), new ArrayList<>(), -1, true);
   }
 
   @Test
   public void testVertexIsomorphismWithDuplicateBaseVertex() throws Exception {
-    testJoin(buildEdge(n, e1, m), Lists.newArrayList(0,2), new ArrayList<>(), -1, false);
-    testJoin(buildEdge(n, e1, n), Lists.newArrayList(0,2), new ArrayList<>(), -1, false);
+    testJoin(buildEdge(n, e1, m), Lists.newArrayList(0, 2), new ArrayList<>(), -1, false);
+    testJoin(buildEdge(n, e1, n), Lists.newArrayList(0, 2), new ArrayList<>(), -1, false);
   }
 
   @Test
   public void testVertexIsomorphismWithDuplicateBaseEdge() throws Exception {
-    testJoin(buildEdge(n, e0, a), Lists.newArrayList(0,2), new ArrayList<>(), -1, true);
+    testJoin(buildEdge(n, e0, a), Lists.newArrayList(0, 2), new ArrayList<>(), -1, true);
   }
 
   @Test
   public void testVertexIsomorphismWithLoop() throws Exception {
-    testJoin(buildEdge(n,e1,m), Lists.newArrayList(0,2), new ArrayList<>(), 0, true);
-    testJoin(buildEdge(n,e1,n), Lists.newArrayList(0,2), new ArrayList<>(), 2, true);
+    testJoin(buildEdge(n, e1, m), Lists.newArrayList(0, 2), new ArrayList<>(), 0, true);
+    testJoin(buildEdge(n, e1, n), Lists.newArrayList(0, 2), new ArrayList<>(), 2, true);
   }
 
   //EdgeIsomorphism
   @Test
   public void testEdgeIsomorphismWithoutDuplicates() throws Exception {
-    testJoin(buildEdge(n, e1, a), new ArrayList<>(), Lists.newArrayList(0,1), -1, true);
+    testJoin(buildEdge(n, e1, a), new ArrayList<>(), Lists.newArrayList(0, 1), -1, true);
   }
 
   @Test
   public void testEdgeIsomorphismWithDuplicateBaseVertex() throws Exception {
-    testJoin(buildEdge(n, e1, m), new ArrayList<>(), Lists.newArrayList(0,1), -1, true);
-    testJoin(buildEdge(n, e1, n), new ArrayList<>(), Lists.newArrayList(0,1), -1, true);
+    testJoin(buildEdge(n, e1, m), new ArrayList<>(), Lists.newArrayList(0, 1), -1, true);
+    testJoin(buildEdge(n, e1, n), new ArrayList<>(), Lists.newArrayList(0, 1), -1, true);
   }
 
   @Test
   public void testEdgeIsomorphismWithDuplicateBaseEdge() throws Exception {
-    testJoin(buildEdge(n, e0, a), new ArrayList<>(), Lists.newArrayList(0,1), -1, false);
+    testJoin(buildEdge(n, e0, a), new ArrayList<>(), Lists.newArrayList(0, 1), -1, false);
   }
 
   @Test
   public void testEdgeIsomorphismWithLoop() throws Exception {
-    testJoin(buildEdge(n, e1, m), new ArrayList<>(), Lists.newArrayList(0,1), 0, true);
-    testJoin(buildEdge(n, e0, m), new ArrayList<>(), Lists.newArrayList(0,1), 0, false);
+    testJoin(buildEdge(n, e1, m), new ArrayList<>(), Lists.newArrayList(0, 1), 0, true);
+    testJoin(buildEdge(n, e0, m), new ArrayList<>(), Lists.newArrayList(0, 1), 0, false);
   }
 
 
@@ -133,7 +133,7 @@ public class CreateInitialExpandEmbeddingTest {
     List<ExpandEmbedding> results = new ArrayList<>();
     op.join(base, edgeTuple, new ListCollector<>(results));
 
-    assertEquals(isResult ? 1:0, results.size());
+    assertEquals(isResult ? 1 : 0, results.size());
 
     if (isResult) {
       assertEquals(base, results.get(0).getBase());

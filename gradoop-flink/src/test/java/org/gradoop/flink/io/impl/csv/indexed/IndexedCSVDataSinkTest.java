@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,9 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.edgelist.VertexLabeledEdgeListDataSourceTest;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Rule;
@@ -187,21 +186,20 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     String string1 = "abc;,|:\n=\\ def";
     String string2 = "def;,|:\n=\\ ghi";
 
-    List<PropertyValue> list = Arrays.asList(PropertyValue.create(string2),
-      PropertyValue.create(string1));
+    List<PropertyValue> list = Arrays.asList(PropertyValue.create(string2), PropertyValue.create(string1));
     Set<PropertyValue> set = new HashSet<>(list);
-    Map<PropertyValue, PropertyValue> map1 = new HashMap<PropertyValue, PropertyValue>() {{
-      put(PropertyValue.create(string1), PropertyValue.create(string2));
-      put(PropertyValue.create("key"), PropertyValue.create(string1));
-    }};
-    Map<PropertyValue, PropertyValue> map2 = new HashMap<PropertyValue, PropertyValue>() {{
-      put(PropertyValue.create(string1), PropertyValue.create(1));
-      put(PropertyValue.create("key"), PropertyValue.create(2));
-    }};
-    Map<PropertyValue, PropertyValue> map3 = new HashMap<PropertyValue, PropertyValue>() {{
-      put(PropertyValue.create(1), PropertyValue.create(string2));
-      put(PropertyValue.create(2), PropertyValue.create(string1));
-    }};
+
+    Map<PropertyValue, PropertyValue> map1 = new HashMap<>();
+    map1.put(PropertyValue.create(string1), PropertyValue.create(string2));
+    map1.put(PropertyValue.create("key"), PropertyValue.create(string1));
+
+    Map<PropertyValue, PropertyValue> map2 = new HashMap<>();
+    map2.put(PropertyValue.create(string1), PropertyValue.create(1));
+    map2.put(PropertyValue.create("key"), PropertyValue.create(2));
+
+    Map<PropertyValue, PropertyValue> map3 = new HashMap<>();
+    map3.put(PropertyValue.create(1), PropertyValue.create(string2));
+    map3.put(PropertyValue.create(2), PropertyValue.create(string1));
 
     Properties props = Properties.create();
     props.set(string1, string2);
@@ -270,11 +268,9 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
   public void testWriteWithExistingMetaData() throws Exception {
     String tmpPath = temporaryFolder.getRoot().getPath();
 
-    String csvPath = VertexLabeledEdgeListDataSourceTest.class
-      .getResource("/data/csv/input_indexed").getFile();
+    String csvPath = getFilePath("/data/csv/input_indexed");
 
-    String gdlPath = IndexedCSVDataSourceTest.class
-      .getResource("/data/csv/expected/expected_graph_collection.gdl").getFile();
+    String gdlPath = getFilePath("/data/csv/expected/expected_graph_collection.gdl");
 
     GraphCollection input = getLoaderFromFile(gdlPath).getGraphCollectionByVariables("expected1",
       "expected2");

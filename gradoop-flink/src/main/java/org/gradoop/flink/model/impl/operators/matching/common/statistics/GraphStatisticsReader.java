@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -237,17 +237,17 @@ public abstract class GraphStatisticsReader {
     lines
       .map(line -> line.split(TOKEN_SEPARATOR))
       .forEach(tokens -> {
-          String vertexLabel = tokens[0];
-          String edgeLabel = tokens[1];
-          Long edgeCount = Long.parseLong(tokens[2]);
-          if (mapping.containsKey(vertexLabel)) {
-            mapping.get(vertexLabel).put(edgeLabel, edgeCount);
-          } else {
-            Map<String, Long> value = new HashMap<>();
-            value.put(edgeLabel, edgeCount);
-            mapping.put(vertexLabel, value);
-          }
-        });
+        String vertexLabel = tokens[0];
+        String edgeLabel = tokens[1];
+        Long edgeCount = Long.parseLong(tokens[2]);
+        if (mapping.containsKey(vertexLabel)) {
+          mapping.get(vertexLabel).put(edgeLabel, edgeCount);
+        } else {
+          Map<String, Long> value = new HashMap<>();
+          value.put(edgeLabel, edgeCount);
+          mapping.put(vertexLabel, value);
+        }
+      });
 
     return mapping;
   }

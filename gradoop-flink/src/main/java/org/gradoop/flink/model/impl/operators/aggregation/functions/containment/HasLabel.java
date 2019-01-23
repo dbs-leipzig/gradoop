@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,32 +15,60 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.containment;
 
-import org.apache.flink.api.common.functions.FilterFunction;
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
 
+import java.util.Objects;
+
 /**
- * superclass of aggregate and filter functions that check vertex or edge label
+ * Superclass of aggregate and filter functions that check vertex or edge label
  * presence in a graph.
  *
- * Usage: First, aggregate and, second, filter using the same UDF instance.
+ * <pre>
+ * Usage:
+ * <ol>
+ * <li>aggregate
+ * <li>filter using the same UDF instance.
+ * </ol>
+ * </pre>
  */
-public abstract class HasLabel extends Or
-  implements AggregateFunction, FilterFunction<GraphHead> {
+public class HasLabel extends BaseAggregateFunction
+  implements Or, AggregateFunction, CombinableFilter<GraphHead> {
 
   /**
-   * label to check presence of
+   * Label to check presence of.
    */
-  protected final String label;
+  private final String label;
 
   /**
-   * Constructor.
+   * Creates a new instance of a HasLabel aggregate function.
    *
-   * @param label label to check presence of
+   * @param label element label to check presence of
    */
   public HasLabel(String label) {
+    this(label, "hasLabel_" + label);
+  }
+
+  /**
+   * Creates a new instance of a HasLabel aggregate function.
+   *
+   * @param label label to check presence of
+   * @param aggregatePropertyKey aggregate property key
+   */
+  public HasLabel(String label, String aggregatePropertyKey) {
+    super(aggregatePropertyKey);
+    Objects.requireNonNull(label);
     this.label = label;
+  }
+
+  @Override
+  public PropertyValue getIncrement(Element element) {
+    return PropertyValue.create(element.getLabel().equals(label));
   }
 
   @Override

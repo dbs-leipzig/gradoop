@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.gradoop.flink.model.api.functions;
 
+import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 
 import java.io.Serializable;
 
 /**
- * Describes an aggregate function as input for the
- * {@link Aggregation} operator.
+ * Describes an aggregate function as input for the {@link Aggregation} operator.
  */
 public interface AggregateFunction extends Serializable {
 
@@ -37,9 +37,34 @@ public interface AggregateFunction extends Serializable {
   PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment);
 
   /**
-   * Sets the property key used to store the aggregate value.
+   * Returns the property key used to store the aggregate value.
    *
    * @return aggregate property key
    */
   String getAggregatePropertyKey();
+
+  /**
+   * Describes the increment of an element that should be added to the aggregate.
+   *
+   * @param element element used to get the increment
+   * @return increment, may be NULL, which is handled in the operator
+   */
+  PropertyValue getIncrement(Element element);
+
+  /**
+   * Returns whether this function aggregates vertices.
+   *
+   * @return true, if it aggregates vertices
+   */
+  default boolean isVertexAggregation() {
+    return true;
+  }
+  /**
+   * Returns whether this function aggregates edges.
+   *
+   * @return true, if it aggregates edges
+   */
+  default boolean isEdgeAggregation() {
+    return true;
+  }
 }

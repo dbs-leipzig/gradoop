@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,23 +60,17 @@ public class VertexTableInputFormat extends BaseTableInputFormat<Vertex> {
     scan.setCaching(EPGMGraphOutput.DEFAULT_CACHE_SIZE);
 
     if (vertexHandler.getQuery() != null) {
-      attachFilter(vertexHandler.getQuery(), scan);
+      attachFilter(vertexHandler.getQuery(), scan, vertexHandler.isSpreadingByteUsed());
     }
 
     return scan;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String getTableName() {
     return vertexTableName;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Tuple1<Vertex> mapResultToTuple(Result result) {
     return new Tuple1<>(vertexHandler.readVertex(result));

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
@@ -52,7 +51,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
       .collect();
 
     assertEquals(1, result.size());
-    assertTrue(result.get(0).getId(1).equals(e1.getId()));
+    assertEquals(result.get(0).getId(1), e1.getId());
   }
 
   @Test
@@ -75,7 +74,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
       .collect();
 
     assertEquals(1, result.size());
-    assertTrue(result.get(0).getId(1).equals(e1.getId()));
+    assertEquals(result.get(0).getId(1), e1.getId());
   }
 
   @Test
@@ -92,7 +91,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
       .collect();
 
     assertEquals(1, result.size());
-    assertTrue(result.get(0).getId(1).equals(e1.getId()));
+    assertEquals(result.get(0).getId(1), e1.getId());
   }
 
   @Test
@@ -115,7 +114,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
   }
 
   @Test
-  public void testProjectionOfAvailableValues() throws Exception{
+  public void testProjectionOfAvailableValues() throws Exception {
     CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
     Properties properties = Properties.create();
@@ -129,11 +128,11 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     Embedding result = new FilterAndProjectEdges(edges, predicates, projectionPropertyKeys, false)
       .evaluate().collect().get(0);
 
-    assertTrue(result.getProperty(0).equals(PropertyValue.create("Alice")));
+    assertEquals(result.getProperty(0), PropertyValue.create("Alice"));
   }
 
   @Test
-  public void testProjectionOfMissingValues() throws Exception{
+  public void testProjectionOfMissingValues() throws Exception {
     CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.name = \"Alice\"");
 
     Properties properties = Properties.create();
@@ -142,13 +141,13 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
 
-    List<String> projectionPropertyKeys = Lists.newArrayList("name","since");
+    List<String> projectionPropertyKeys = Lists.newArrayList("name", "since");
 
     Embedding result = new FilterAndProjectEdges(edges, predicates, projectionPropertyKeys, false)
       .evaluate().collect().get(0);
 
-    assertTrue(result.getProperty(0).equals(PropertyValue.create("Alice")));
-    assertTrue(result.getProperty(1).equals(PropertyValue.NULL_VALUE));
+    assertEquals(result.getProperty(0), PropertyValue.create("Alice"));
+    assertEquals(result.getProperty(1), PropertyValue.NULL_VALUE);
   }
 
   @Test

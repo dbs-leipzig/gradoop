@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
  * Computes an edge sampling of the graph. First selects randomly chosen vertices of a given
- * relative amount and all edges which source- and target-vertices where chosen. Then randomly
+ * relative amount and all edges which source- and target-vertices were chosen. Then randomly
  * chooses edges from this set of edges and their associated source- and target-vertices.
  * No unconnected vertices will retain in the sampled graph.
  */
@@ -112,9 +112,6 @@ public class RandomVertexEdgeSampling extends SamplingAlgorithm {
     this.vertexEdgeSamplingType = vertexEdgeSamplingType;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
@@ -138,9 +135,6 @@ public class RandomVertexEdgeSampling extends SamplingAlgorithm {
     return graph;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return RandomVertexEdgeSampling.class.getName();

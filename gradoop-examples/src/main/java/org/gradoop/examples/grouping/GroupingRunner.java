@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package org.gradoop.examples.grouping;
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 
 /**
  * A dedicated program for parametrized graph grouping.
@@ -137,8 +137,8 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
       .addEdgeGroupingKey(edgeKey)
       .useVertexLabel(useVertexLabels)
       .useEdgeLabel(useEdgeLabels)
-      .addVertexAggregator(new CountAggregator())
-      .addEdgeAggregator(new CountAggregator())
+      .addVertexAggregateFunction(new Count())
+      .addEdgeAggregateFunction(new Count())
       .build();
   }
 
@@ -158,9 +158,6 @@ public class GroupingRunner extends AbstractRunner implements ProgramDescription
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getDescription() {
     return GroupingRunner.class.getName();

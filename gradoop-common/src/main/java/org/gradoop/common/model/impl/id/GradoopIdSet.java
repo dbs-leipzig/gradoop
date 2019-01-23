@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -265,9 +265,6 @@ public class GradoopIdSet extends AbstractSet<GradoopId> implements Value {
     return ids.isEmpty();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Iterator<GradoopId> iterator() {
     return ids.iterator();

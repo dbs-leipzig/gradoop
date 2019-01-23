@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,23 @@
 package org.gradoop.flink.model.api.layouts;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
- * A graph collection layout defines the Flink internal (DataSet) representation of a
- * {@link org.gradoop.flink.model.api.epgm.GraphCollection}.
+ * A graph collection layout defines the Flink internal (DataSet) representation of a graph
+ * collection containing elements of the specified types.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
  */
-public interface GraphCollectionLayout extends Layout {
+public interface GraphCollectionLayout<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge> extends Layout<V, E> {
 
   /**
    * True, if the layout is based on three separate datasets.
@@ -51,7 +60,7 @@ public interface GraphCollectionLayout extends Layout {
    *
    * @return graph heads
    */
-  DataSet<GraphHead> getGraphHeads();
+  DataSet<G> getGraphHeads();
 
   /**
    * Returns the graph heads associated with the logical graphs in that
@@ -60,7 +69,7 @@ public interface GraphCollectionLayout extends Layout {
    * @param label graph head label
    * @return graph heads
    */
-  DataSet<GraphHead> getGraphHeadsByLabel(String label);
+  DataSet<G> getGraphHeadsByLabel(String label);
 
   /**
    * Returns the graph collection represented as graph transactions. Each transactions represents

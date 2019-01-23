@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import java.util.List;
 /**
  * Takes an EPGM edge as input and creates a {@link EdgeGroupItem} which
  * contains only necessary information for further processing.
- *
  */
 @FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1;")
 @FunctionAnnotation.ReadFields("label;properties")
@@ -43,17 +42,14 @@ public class BuildEdgeGroupItem
   /**
    * Creates map function.
    *
-   * @param useLabel                        true, if vertex label shall be used
-   * @param edgeLabelGroups                 stores grouping properties for edge labels
+   * @param useLabel true, if vertex label shall be used
+   * @param edgeLabelGroups stores grouping properties for edge labels
    */
   public BuildEdgeGroupItem(boolean useLabel, List<LabelGroup> edgeLabelGroups) {
     super(useLabel, edgeLabelGroups);
     this.reuseEdgeGroupItem = new EdgeGroupItem();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void flatMap(Edge edge, Collector<EdgeGroupItem> collector) throws Exception {
     boolean usedEdgeLabelGroup = false;

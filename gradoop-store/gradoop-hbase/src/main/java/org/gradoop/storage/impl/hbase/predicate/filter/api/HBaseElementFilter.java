@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,27 +33,18 @@ import java.io.Serializable;
 public interface HBaseElementFilter<T extends EPGMElement>
   extends ElementFilter<HBaseElementFilter<T>>, Serializable {
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   default HBaseElementFilter<T> or(@Nonnull HBaseElementFilter<T> another) {
     return Or.create(this, another);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   default HBaseElementFilter<T> and(@Nonnull HBaseElementFilter<T> another) {
     return And.create(this, another);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   default HBaseElementFilter<T> negate() {

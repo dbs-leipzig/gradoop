@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 public class ReverseEdgeEmbeddingTest {
   @Test
-  public void testReversingAnEdgeEmbedding() throws Exception{
+  public void testReversingAnEdgeEmbedding() throws Exception {
     GradoopId a = GradoopId.get();
     GradoopId e = GradoopId.get();
     GradoopId b = GradoopId.get();

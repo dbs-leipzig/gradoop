@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,13 @@
  */
 package org.gradoop.examples.patternmatching;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsLocalFSReader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -51,7 +54,8 @@ public class CypherExample {
     // create a Gradoop config
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
     // create a datasource
-    CSVDataSource csvDataSource = new CSVDataSource(DATA_PATH, config);
+    CSVDataSource csvDataSource = new CSVDataSource(
+      URLDecoder.decode(DATA_PATH, StandardCharsets.UTF_8.name()), config);
     // load graph statistics
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(STATISTICS_PATH);
 

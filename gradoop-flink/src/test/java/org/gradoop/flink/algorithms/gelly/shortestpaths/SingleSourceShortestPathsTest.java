@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.gradoop.flink.algorithms.gelly.shortestpaths;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -54,7 +54,7 @@ public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
       "(v7)-[e12 {edgeValue:5.0d}]->(v9)" +
       "(v8)-[e13 {edgeValue:1.0d}]->(v9)" +
       "]";
-    
+
     String graphs = "input[" +
         "(v0 {id:0, vertexValue:0.0})" +
         "(v1 {id:1, vertexValue:NULL})" +
@@ -93,7 +93,7 @@ public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
     LogicalGraph outputGraphDouble = inputDouble.callForGraph(new SingleSourceShortestPaths(srcVertexIdDouble,
       "edgeValue", 10, "vertexValue"));
     LogicalGraph expectDouble = loaderDouble.getLogicalGraphByVariable("result");
-    
+
     collectAndAssertTrue(outputGraphDouble.equalsByElementData(expectDouble));
 
   //test a graph with float values as input
@@ -105,7 +105,7 @@ public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
     LogicalGraph outputGraph = input.callForGraph(new SingleSourceShortestPaths(srcVertexId,
       "edgeValue", 10, "vertexValue"));
     LogicalGraph expect = loader.getLogicalGraphByVariable("result");
-    
+
     collectAndAssertTrue(outputGraph.equalsByElementData(expect));
   }
 }

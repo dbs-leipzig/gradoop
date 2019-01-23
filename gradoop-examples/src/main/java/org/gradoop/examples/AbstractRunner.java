@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@ import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSink;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.io.impl.deprecated.json.JSONDataSink;
 import org.gradoop.flink.io.impl.deprecated.json.JSONDataSource;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.flink.io.impl.deprecated.logicalgraphcsv.LogicalGraphCSVDataSource;
 import org.gradoop.flink.io.impl.deprecated.logicalgraphcsv.LogicalGraphIndexedCSVDataSource;
@@ -92,7 +92,7 @@ public abstract class AbstractRunner {
    * @throws IOException on failure
    */
   protected static LogicalGraph readLogicalGraph(String directory, String format)
-    throws IOException {
+      throws IOException {
     return getDataSource(directory, format).getLogicalGraph();
   }
 
@@ -105,7 +105,7 @@ public abstract class AbstractRunner {
    * @throws IOException on failure
    */
   protected static GraphCollection readGraphCollection(String directory, String format)
-    throws IOException {
+      throws IOException {
     return getDataSource(directory, format).getGraphCollection();
   }
 
@@ -129,8 +129,8 @@ public abstract class AbstractRunner {
    * @throws Exception on failure
    */
   protected static void writeLogicalGraph(LogicalGraph graph, String directory, String format)
-    throws Exception {
-    graph.writeTo(getDataSink(directory, format, graph.getConfig()));
+      throws Exception {
+    graph.writeTo(getDataSink(directory, format, graph.getConfig()), true);
     getExecutionEnvironment().execute();
   }
 
@@ -142,7 +142,7 @@ public abstract class AbstractRunner {
    * @throws Exception on failure
    */
   protected static void writeGraphCollection(GraphCollection collection, String directory)
-    throws Exception {
+      throws Exception {
     writeGraphCollection(collection, directory, DEFAULT_FORMAT);
   }
 
@@ -157,7 +157,7 @@ public abstract class AbstractRunner {
   protected static void writeGraphCollection(GraphCollection collection,
                                              String directory,
                                              String format)
-    throws Exception {
+      throws Exception {
     collection.writeTo(getDataSink(directory, format, collection.getConfig()));
     getExecutionEnvironment().execute();
   }

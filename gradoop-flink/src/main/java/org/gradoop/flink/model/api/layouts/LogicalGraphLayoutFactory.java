@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,31 @@
 package org.gradoop.flink.model.api.layouts;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 
 import java.util.Collection;
 import java.util.Map;
 
 /**
  * Enables the construction of a {@link LogicalGraphLayout}.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
  */
-public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
+public interface LogicalGraphLayoutFactory<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge> extends BaseLayoutFactory {
   /**
    * Creates a logical graph layout from the given vertex dataset.
    *
    * @param vertices  Vertex dataset
    * @return Logical graph layout
    */
-  LogicalGraphLayout fromDataSets(DataSet<Vertex> vertices);
+  LogicalGraphLayout<G, V, E> fromDataSets(DataSet<V> vertices);
 
   /**
    * Creates a logical graph layout from given vertex and edge datasets.
@@ -45,7 +52,7 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
    * @param edges    Edge DataSet
    * @return Logical graph layout
    */
-  LogicalGraphLayout fromDataSets(DataSet<Vertex> vertices, DataSet<Edge> edges);
+  LogicalGraphLayout<G, V, E> fromDataSets(DataSet<V> vertices, DataSet<E> edges);
 
   /**
    * Creates a logical graph layout from given graphHead, vertex and edge datasets.
@@ -58,8 +65,8 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
    * @param edges       Edge DataSet
    * @return Logical graph layout
    */
-  LogicalGraphLayout fromDataSets(DataSet<GraphHead> graphHead, DataSet<Vertex> vertices,
-    DataSet<Edge> edges);
+  LogicalGraphLayout<G, V, E> fromDataSets(DataSet<G> graphHead, DataSet<V> vertices,
+    DataSet<E> edges);
 
   /**
    * Creates a graph layout from the given datasets indexed by label.
@@ -68,8 +75,8 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
    * @param edges Mapping from label to edge dataset
    * @return Logical graph layout
    */
-  LogicalGraphLayout fromIndexedDataSets(Map<String, DataSet<Vertex>> vertices,
-    Map<String, DataSet<Edge>> edges);
+  LogicalGraphLayout<G, V, E> fromIndexedDataSets(Map<String, DataSet<V>> vertices,
+    Map<String, DataSet<E>> edges);
 
   /**
    * Creates a graph layout from the given datasets indexed by label.
@@ -82,8 +89,8 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
    * @param edges Mapping from label to edge dataset
    * @return Logical graph layout
    */
-  LogicalGraphLayout fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
-    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges);
+  LogicalGraphLayout<G, V, E> fromIndexedDataSets(Map<String, DataSet<G>> graphHeads,
+    Map<String, DataSet<V>> vertices, Map<String, DataSet<E>> edges);
 
   /**
    * Creates a logical graph layout from the given graphHead, vertex and edge collections.
@@ -96,8 +103,8 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
    * @param edges     Edge collection
    * @return Logical graph layout
    */
-  LogicalGraphLayout fromCollections(GraphHead graphHead, Collection<Vertex> vertices,
-    Collection<Edge> edges);
+  LogicalGraphLayout<G, V, E> fromCollections(G graphHead, Collection<V> vertices,
+    Collection<E> edges);
 
   /**
    * Creates a logical graph layout from the given vertex and edge collections. A new graph head is
@@ -107,12 +114,12 @@ public interface LogicalGraphLayoutFactory extends BaseLayoutFactory {
    * @param edges       Edge collection
    * @return Logical graph layout
    */
-  LogicalGraphLayout fromCollections(Collection<Vertex> vertices, Collection<Edge> edges);
+  LogicalGraphLayout<G, V, E> fromCollections(Collection<V> vertices, Collection<E> edges);
 
   /**
    * Creates a layout representing the empty graph.
    *
    * @return empty graph
    */
-  LogicalGraphLayout createEmptyGraph();
+  LogicalGraphLayout<G, V, E> createEmptyGraph();
 }

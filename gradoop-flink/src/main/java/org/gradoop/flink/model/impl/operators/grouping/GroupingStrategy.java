@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
 package org.gradoop.flink.model.impl.operators.grouping;
 
 /**
- * Used to define the grouping strategy which is used for computing the summary
- * graph.
+ * Used to define the grouping strategy which is used for computing the summary graph.
  */
 public enum GroupingStrategy {
   /**

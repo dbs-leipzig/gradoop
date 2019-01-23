@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -31,7 +31,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.VertexToDegreeM
 
 /**
  * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
- * amount and all edges which source- and target-vertices where chosen. A degree-dependent value
+ * amount and all edges which source- and target-vertices were chosen. A degree-dependent value
  * is taken into account to have a bias towards high-degree vertices. There may retain some
  * unconnected vertices in the sampled graph.
  */
@@ -68,9 +68,6 @@ public class RandomNonUniformVertexSampling extends SamplingAlgorithm {
     this.randomSeed = randomSeed;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
@@ -110,9 +107,6 @@ public class RandomNonUniformVertexSampling extends SamplingAlgorithm {
       .fromDataSets(graph.getGraphHead(), newVertices, newEdges);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return RandomNonUniformVertexSampling.class.getName();

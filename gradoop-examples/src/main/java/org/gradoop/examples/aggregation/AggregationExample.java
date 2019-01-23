@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,13 @@
  */
 package org.gradoop.examples.aggregation;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.aggregation.functions.AddPropertyMeanAgeToGraphHead;
 import org.gradoop.examples.aggregation.functions.AggregateListOfNames;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
@@ -55,9 +58,6 @@ public class AggregationExample {
    * Documentation for all available aggregation functions as well as a detailed description of the
    * aggregate method can be found in the projects wiki.
    *
-   * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Unary-Logical-Graph-Operators">
-   * Gradoop Wiki</a>
-   *
    * Using the social network graph in the resources directory, the program will:
    * 1. extract a subgraph only containing vertices which are labeled "person"
    * 2. concatenate the values of the vertex property "name" of each vertex in the subgraph
@@ -66,6 +66,9 @@ public class AggregationExample {
    * 5. add the property "meanAge" to the graph head using a graph head transformation
    *
    * @param args arguments
+   *
+   * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Unary-Logical-Graph-Operators">
+   * Gradoop Wiki</a>
    */
   public static void main(String[] args) throws Exception {
     // init execution environment
@@ -75,7 +78,8 @@ public class AggregationExample {
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(GradoopFlinkConfig.createConfig(env));
 
     // load data
-    loader.initDatabaseFromFile(EXAMPLE_DATA_FILE);
+    loader.initDatabaseFromFile(
+      URLDecoder.decode(EXAMPLE_DATA_FILE, StandardCharsets.UTF_8.name()));
 
     // get LogicalGraph representation of the social network graph
     LogicalGraph networkGraph = loader.getLogicalGraph();

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package org.gradoop.storage.impl.accumulo;
 
 import org.apache.accumulo.minicluster.MiniAccumuloCluster;
 import org.apache.accumulo.minicluster.MiniAccumuloConfig;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.storage.config.GradoopAccumuloConfig;
 import org.gradoop.storage.impl.accumulo.basic.StoreTest;
 import org.gradoop.storage.impl.accumulo.io.IOBasicTest;
@@ -38,6 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import static org.gradoop.storage.config.GradoopAccumuloConfig.ACCUMULO_INSTANCE;
 import static org.gradoop.storage.config.GradoopAccumuloConfig.ACCUMULO_PASSWD;
@@ -130,7 +131,9 @@ public class AccumuloTestSuite {
     tmp.create();
     File tmpFolder = tmp.newFolder();
     MiniAccumuloConfig config = new MiniAccumuloConfig(tmpFolder, PASSWD);
-    config.setNativeLibPaths(AccumuloTestSuite.class.getResource("/").getFile());
+    config.setNativeLibPaths(
+      URLDecoder.decode(AccumuloTestSuite.class.getResource("/").getFile(),
+      StandardCharsets.UTF_8.name()));
     accumulo = new MiniAccumuloCluster(config);
     accumulo.start();
     LOG.info("create mini accumulo start success!");

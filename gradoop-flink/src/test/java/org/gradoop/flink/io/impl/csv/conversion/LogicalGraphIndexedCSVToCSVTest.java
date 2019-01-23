@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.io.impl.deprecated.logicalgraphcsv.LogicalGraphIndexedCSVDataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -41,9 +41,7 @@ public class LogicalGraphIndexedCSVToCSVTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testConversion() throws Exception {
-    String csvPath = LogicalGraphCSVToCSVTest.class
-      .getResource("/data/csv/input_indexed_deprecated")
-      .getFile();
+    String csvPath = getFilePath("/data/csv/input_indexed_deprecated");
 
     DataSource lgIndexedCSVDataSource = new LogicalGraphIndexedCSVDataSource(csvPath, getConfig());
 

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,8 @@ import java.util.Random;
 /**
  * Creates a random value for each vertex and marks those that are below a
  * given threshold.
- *
- * @param <V> EPGM vertex type
  */
-public class VertexRandomMarkedMap<V extends Vertex> implements MapFunction<V, V> {
+public class VertexRandomMarkedMap implements MapFunction<Vertex, Vertex> {
   /**
    * Threshold to decide if a vertex needs to be filtered.
    */
@@ -53,11 +51,8 @@ public class VertexRandomMarkedMap<V extends Vertex> implements MapFunction<V, V
     this.randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public V map(V vertex) throws Exception {
+  public Vertex map(Vertex vertex) throws Exception {
     if (randomGenerator.nextFloat() <= sampleSize) {
       vertex.setProperty(mark, true);
     } else {

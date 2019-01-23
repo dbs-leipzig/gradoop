@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.grouping;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWithSuperVertex;
@@ -72,9 +72,6 @@ public class GroupingGroupReduce extends Grouping {
       useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected LogicalGraph groupInternal(LogicalGraph graph) {
 
@@ -105,9 +102,6 @@ public class GroupingGroupReduce extends Grouping {
     return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return GroupingGroupReduce.class.getName();

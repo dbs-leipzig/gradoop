@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -31,7 +31,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 /**
  * Computes a vertex sampling of the graph. Retains all vertices with a degree greater than a given
  * degree threshold and degree type. Also retains randomly chosen vertices with a degree smaller
- * or equal this threshold. Retains all edges which source- and target-vertices where chosen.
+ * or equal this threshold. Retains all edges which source- and target-vertices were chosen.
  */
 public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
 
@@ -111,9 +111,6 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
     this.degreeType = degreeType;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
@@ -142,9 +139,6 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
       .fromDataSets(graph.getGraphHead(), newVertices, newEdges);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return RandomLimitedDegreeVertexSampling.class.getName();

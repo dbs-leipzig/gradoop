@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,14 +30,14 @@ abstract class BuildSuperEdge extends BuildBase {
   /**
    * Creates group reducer / combiner
    *
-   * @param useLabel    use edge label
+   * @param useLabel use edge label
    */
-  public BuildSuperEdge(boolean useLabel) {
+  BuildSuperEdge(boolean useLabel) {
     super(useLabel);
   }
 
   /**
-   * Iterators the given edge group items and build a group representative item.
+   * Iterates the given edge group items and build a group representative item.
    *
    * @param edgeGroupItems edge group items
    * @return group representative item
@@ -58,16 +58,10 @@ abstract class BuildSuperEdge extends BuildBase {
         firstElement = false;
       }
 
-      if (doAggregate(edgeGroupItem.getLabelGroup().getAggregators())) {
-        aggregate(edge.getAggregateValues(), edgeGroupItem.getLabelGroup().getAggregators());
-      } else {
-        // no need to iterate further
-        break;
-      }
+      edgeGroupItem.getLabelGroup().aggregate(edge.getAggregateValues());
     }
 
-    edgeGroupItem.setAggregateValues(
-      getAggregateValues(edgeGroupItem.getLabelGroup().getAggregators()));
+    edgeGroupItem.setAggregateValues(edgeGroupItem.getLabelGroup().getAggregateValueList());
     return edgeGroupItem;
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.statistics;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import org.junit.BeforeClass;
 
 public class GraphStatisticsLocalFSReaderTest extends GraphStatisticsTest {
@@ -22,6 +25,8 @@ public class GraphStatisticsLocalFSReaderTest extends GraphStatisticsTest {
   @BeforeClass
   public static void setUp() throws Exception {
     TEST_STATISTICS = GraphStatisticsLocalFSReader.read(
-      GraphStatisticsLocalFSReaderTest.class.getResource("/data/json/sna/statistics").getFile());
+      URLDecoder.decode(
+        GraphStatisticsLocalFSReaderTest.class.getResource("/data/json/sna/statistics")
+        .getFile(), StandardCharsets.UTF_8.name()));
   }
 }

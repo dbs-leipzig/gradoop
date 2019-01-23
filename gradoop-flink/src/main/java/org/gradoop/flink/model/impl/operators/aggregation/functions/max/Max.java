@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,12 @@ import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 /**
- * Superclass of aggregate functions that determine a maximal value.
+ * Interface of aggregate functions that determine a maximal value.
  */
-public abstract class Max implements AggregateFunction {
+public interface Max extends AggregateFunction {
 
   @Override
-  public PropertyValue aggregate(
-    PropertyValue aggregate, PropertyValue increment) {
+  default PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
     return PropertyValueUtils.Numeric.max(aggregate, increment);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,9 @@ import static org.junit.Assert.assertEquals;
 public class ProjectVerticesTest extends PhysicalOperatorTest {
 
   @Test
-  public void returnsEmbeddingWithOneProjection() throws Exception{
+  public void returnsEmbeddingWithOneProjection() throws Exception {
     DataSet<Vertex> edgeDataSet = createVerticesWithProperties(
-      Lists.newArrayList("foo", "bar","baz")
+      Lists.newArrayList("foo", "bar", "baz")
     );
 
     ArrayList<String> extractedPropertyKeys = Lists.newArrayList("foo", "baz");
@@ -41,7 +41,7 @@ public class ProjectVerticesTest extends PhysicalOperatorTest {
     ProjectVertices operator = new ProjectVertices(edgeDataSet, extractedPropertyKeys);
     DataSet<Embedding> results = operator.evaluate();
 
-    assertEquals(2,results.count());
+    assertEquals(2, results.count());
 
     assertEveryEmbedding(results, (embedding) -> {
       assertEquals(1, embedding.size());

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,37 +38,35 @@ public class PostProcessExpandEmbeddingTest {
     base.add(c);
 
     return new ExpandEmbedding(
-      base,
-      new GradoopId[] {GradoopId.get(), GradoopId.get(), GradoopId.get(), a}
-    );
+      base, GradoopId.get(), GradoopId.get(), GradoopId.get(), a);
   }
 
 
   @Test
-  public void testReturnNothingForFalseCircles() throws Exception{
+  public void testReturnNothingForFalseCircles() throws Exception {
     List<Embedding> result = new ArrayList<>();
-    new PostProcessExpandEmbedding(0,2).flatMap(expandEmbedding(), new ListCollector<>(result));
+    new PostProcessExpandEmbedding(0, 2).flatMap(expandEmbedding(), new ListCollector<>(result));
     assertEquals(0, result.size());
   }
 
   @Test
-  public void testDoTransformationForClosedCircles() throws Exception{
+  public void testDoTransformationForClosedCircles() throws Exception {
     List<Embedding> result = new ArrayList<>();
-    new PostProcessExpandEmbedding(0,0).flatMap(expandEmbedding(), new ListCollector<>(result));
+    new PostProcessExpandEmbedding(0, 0).flatMap(expandEmbedding(), new ListCollector<>(result));
     assertEquals(1, result.size());
   }
 
   @Test
-  public void testReturnNothingForShortsResults() throws Exception{
+  public void testReturnNothingForShortsResults() throws Exception {
     List<Embedding> result = new ArrayList<>();
-    new PostProcessExpandEmbedding(3,-1).flatMap(expandEmbedding(), new ListCollector<>(result));
+    new PostProcessExpandEmbedding(3, -1).flatMap(expandEmbedding(), new ListCollector<>(result));
     assertEquals(0, result.size());
   }
 
   @Test
-  public void testDoTransformationForResultsThatFitLowerBound() throws Exception{
+  public void testDoTransformationForResultsThatFitLowerBound() throws Exception {
     List<Embedding> result = new ArrayList<>();
-    new PostProcessExpandEmbedding(2,-1).flatMap(expandEmbedding(), new ListCollector<>(result));
+    new PostProcessExpandEmbedding(2, -1).flatMap(expandEmbedding(), new ListCollector<>(result));
     assertEquals(1, result.size());
   }
 }

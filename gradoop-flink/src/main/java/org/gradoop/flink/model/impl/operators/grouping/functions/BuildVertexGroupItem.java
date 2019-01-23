@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,8 @@ import java.util.List;
 /**
  * Creates a minimal representation of vertex data to be used for label specific grouping.
  *
- * The output of that mapper is {@link VertexGroupItem} that contains
- * the vertex id, vertex label, vertex group properties and vertex aggregate
- * properties.
+ * The output of that mapper is {@link VertexGroupItem} that contains the vertex id,
+ * vertex label, vertex group properties and vertex aggregate properties.
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 @FunctionAnnotation.ReadFields("label;properties")
@@ -46,7 +45,7 @@ public class BuildVertexGroupItem
   /**
    * Creates map function
    *
-   * @param useLabel          true, if label shall be considered
+   * @param useLabel true, if label shall be considered
    * @param vertexLabelGroups stores grouping properties for vertex labels
    */
   public BuildVertexGroupItem(boolean useLabel, List<LabelGroup> vertexLabelGroups) {
@@ -57,9 +56,6 @@ public class BuildVertexGroupItem
     this.reuseVertexGroupItem.setSuperVertex(false);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void flatMap(Vertex vertex, Collector<VertexGroupItem> collector) throws Exception {
     boolean usedVertexLabelGroup = false;

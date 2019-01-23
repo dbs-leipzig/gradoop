@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
@@ -25,14 +25,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Transformation map function for graph heads.
+ *
+ * @param <G> the type of the EPGM graph head
  */
 @FunctionAnnotation.ForwardedFields("id")
-public class TransformGraphHead extends TransformBase<GraphHead> {
+public class TransformGraphHead<G extends EPGMGraphHead> extends TransformBase<G> {
 
   /**
    * Factory to init modified graph head.
    */
-  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
+  private final EPGMGraphHeadFactory<G> graphHeadFactory;
 
   /**
    * Constructor
@@ -41,15 +43,14 @@ public class TransformGraphHead extends TransformBase<GraphHead> {
    * @param epgmGraphHeadFactory      graph head factory
    */
   public TransformGraphHead(
-    TransformationFunction<GraphHead> transformationFunction,
-    EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory) {
+    TransformationFunction<G> transformationFunction,
+    EPGMGraphHeadFactory<G> epgmGraphHeadFactory) {
     super(transformationFunction);
     this.graphHeadFactory = checkNotNull(epgmGraphHeadFactory);
   }
 
   @Override
-  protected GraphHead initFrom(GraphHead graphHead) {
-    return graphHeadFactory.initGraphHead(
-      graphHead.getId(), GradoopConstants.DEFAULT_GRAPH_LABEL);
+  protected G initFrom(G graphHead) {
+    return graphHeadFactory.initGraphHead(graphHead.getId(), GradoopConstants.DEFAULT_GRAPH_LABEL);
   }
 }

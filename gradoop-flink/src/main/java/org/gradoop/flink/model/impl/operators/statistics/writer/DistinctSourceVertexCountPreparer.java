@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.statistics.writer;
 
 import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctSourceIds;
@@ -37,5 +37,10 @@ public class DistinctSourceVertexCountPreparer implements UnaryGraphToValueOpera
     return new DistinctSourceIds()
         .execute(graph)
         .map(new ObjectTo1<>());
+  }
+
+  @Override
+  public String getName() {
+    return DistinctSourceVertexCountPreparer.class.getName();
   }
 }

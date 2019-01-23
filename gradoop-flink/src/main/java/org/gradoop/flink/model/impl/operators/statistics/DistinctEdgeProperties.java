@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.statistics.functions.ExtractPropertyValues;
 
 import java.util.Set;
@@ -32,5 +32,10 @@ public class DistinctEdgeProperties extends DistinctProperties<Edge, String> {
   @Override
   protected DataSet<Tuple2<String, Set<PropertyValue>>> extractValuePairs(LogicalGraph graph) {
     return graph.getEdges().flatMap(new ExtractPropertyValues<>());
+  }
+
+  @Override
+  public String getName() {
+    return DistinctEdgeProperties.class.getName();
   }
 }

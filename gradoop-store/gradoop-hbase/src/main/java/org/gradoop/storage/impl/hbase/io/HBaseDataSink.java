@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import org.apache.flink.api.java.hadoop.mapreduce.HadoopOutputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.model.api.epgm.GraphCollection;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.storage.impl.hbase.HBaseEPGMStore;
 import org.gradoop.storage.impl.hbase.io.functions.BuildEdgeMutation;
@@ -50,33 +50,21 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
     super(epgmStore, flinkConfig);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(LogicalGraph logicalGraph) throws IOException {
     write(logicalGraph, false);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(GraphCollection graphCollection) throws IOException {
     write(graphCollection, false);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
     write(getFlinkConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
     if (overWrite) {

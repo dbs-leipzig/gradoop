@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,20 @@
  */
 package org.gradoop.flink.model.api.functions;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 
 /**
- * Describes an edge aggregate function as input for the
- * {@link Aggregation} operator.
+ * Describes an edge aggregate function as input for the {@link Aggregation} operator.
  */
 public interface EdgeAggregateFunction extends AggregateFunction {
 
-  /**
-   * Describes the increment of an edge that should be added to the aggregate.
-   *
-   * @param edge edge
-   *
-   * @return increment, may be NULL, which is handled in the operator
-   */
-  PropertyValue getEdgeIncrement(Edge edge);
+  @Override
+  default boolean isVertexAggregation() {
+    return false;
+  }
+
+  @Override
+  default boolean isEdgeAggregation() {
+    return true;
+  }
 }

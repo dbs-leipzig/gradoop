@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,16 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.hadoop.conf.Configuration;
 import org.gradoop.benchmark.sna.functions.CountFilter;
-import org.gradoop.benchmark.subgraph.SubgraphBenchmark;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation.CountAggregator;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsHDFSReader;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
@@ -97,7 +96,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
    * @throws Exception IO or execution Exception
    */
   public static void main(String[] args) throws Exception {
-    CommandLine cmd = parseArguments(args, SubgraphBenchmark.class.getName());
+    CommandLine cmd = parseArguments(args, SocialNetworkAnalyticsExample.class.getName());
 
     if (cmd == null) {
       System.exit(1);
@@ -141,7 +140,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
       .setStrategy(GroupingStrategy.GROUP_COMBINE)
       .addVertexGroupingKey("name")
       .useEdgeLabel(true).useVertexLabel(true)
-      .addEdgeAggregator(new CountAggregator())
+      .addEdgeAggregateFunction(new Count())
       .build().execute(graph);
 
     // filter all edges below a fixed threshold
@@ -189,7 +188,7 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
    * @return used construction pattern
    */
   private static String getConstruction() {
-    return "CONSTRUCT (ca)-[new:hasInterest]->(t)";
+    return "(ca)-[new:hasInterest]->(t)";
   }
 
   /**
@@ -207,16 +206,13 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
     if (!cmd.hasOption(OPTION_OUTPUT_PATH)) {
       throw new IllegalArgumentException("Define a graph output directory.");
     }
-    if (!cmd.hasOption(OPTION_STATISTICS_PATH)) {
-      throw new IllegalArgumentException("Define a path to generated statistics.");
-    }
   }
 
   /**
    * Method to create and add lines to a csv-file
    *
    * @param env given ExecutionEnvironment
-   * @throws IOException exeption during file writing
+   * @throws IOException exception during file writing
    */
   private static void writeCSV(ExecutionEnvironment env) throws IOException {
 
@@ -241,9 +237,6 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getDescription() {
     return SocialNetworkAnalyticsExample.class.getName();

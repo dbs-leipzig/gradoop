@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.HashMap;
@@ -31,7 +30,7 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Sets aggregate values of a graph heads.
+ * Sets aggregate values of graph heads.
  */
 public class SetAggregateProperties implements
   CoGroupFunction<GraphHead, Tuple2<GradoopId, Map<String, PropertyValue>>, GraphHead> {
@@ -42,7 +41,7 @@ public class SetAggregateProperties implements
   private final Map<String, PropertyValue> defaultValues;
 
   /**
-   * Constructor.
+   * Creates a new instance of a SetAggregateProperties coGroup function.
    *
    * @param aggregateFunctions aggregate functions
    */
@@ -54,10 +53,7 @@ public class SetAggregateProperties implements
     defaultValues = new HashMap<>();
 
     for (AggregateFunction func : aggregateFunctions) {
-      defaultValues.put(func.getAggregatePropertyKey(),
-        func instanceof AggregateDefaultValue ?
-          ((AggregateDefaultValue) func).getDefaultValue() :
-          PropertyValue.NULL_VALUE);
+      defaultValues.put(func.getAggregatePropertyKey(), AggregateUtil.getDefaultAggregate(func));
     }
   }
 

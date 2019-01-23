@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /**
- * An example for the {@link org.gradoop.flink.model.api.epgm.LogicalGraph#subgraph(
+ * An example for the {@link org.gradoop.flink.model.impl.epgm.LogicalGraph#subgraph(
  * org.apache.flink.api.common.functions.FilterFunction,
  * org.apache.flink.api.common.functions.FilterFunction) subgraph} operator and the use of
  * {@link org.gradoop.flink.model.impl.functions.filters.CombinableFilter combinable filters},

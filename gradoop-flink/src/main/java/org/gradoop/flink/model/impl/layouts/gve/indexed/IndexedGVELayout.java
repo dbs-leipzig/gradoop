@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@ import java.util.Map;
  * addition, the datasets are separated by labels and accesses by known labels are much more
  * efficient as they avoid duplicating rows during program execution.
  */
-public class IndexedGVELayout extends GVELayout implements LogicalGraphLayout, GraphCollectionLayout {
+public class IndexedGVELayout extends GVELayout implements
+  LogicalGraphLayout<GraphHead, Vertex, Edge>, GraphCollectionLayout<GraphHead, Vertex, Edge> {
   /**
    * Mapping from graph label to graph heads with that label.
    */

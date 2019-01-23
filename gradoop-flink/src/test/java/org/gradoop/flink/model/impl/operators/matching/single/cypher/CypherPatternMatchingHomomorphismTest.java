@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,11 @@ import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.SubgraphHomomorphismTest;
-import org.gradoop.flink.model.impl.operators.matching.single.SubgraphIsomorphismTest;
 import org.junit.runners.Parameterized;
 
 import java.util.List;
 
 import static org.gradoop.flink.model.impl.operators.matching.TestData.*;
-import static org.gradoop.flink.model.impl.operators.matching.TestData.VAR_LENGTH_PATH_PATTERN_2;
 
 public class CypherPatternMatchingHomomorphismTest extends SubgraphHomomorphismTest {
 
@@ -38,7 +36,7 @@ public class CypherPatternMatchingHomomorphismTest extends SubgraphHomomorphismT
       GRAPH_2, VAR_LENGTH_PATH_PATTERN_2,
       "expected1,expected2",
       "expected1[(v9)-[e15]->(v9)-[e15]->(v9)]" +
-      "expected2[(v9)-[e15]->(v9)-[e15]->(v9)-[e15]->(v9)]"
+        "expected2[(v9)-[e15]->(v9)-[e15]->(v9)-[e15]->(v9)]"
     });
     data.add(new String[] {
       "Graph3_VarLength3",
@@ -46,15 +44,15 @@ public class CypherPatternMatchingHomomorphismTest extends SubgraphHomomorphismT
       "expected1,expected2,expected3,expected4,expected5,expected6," +
         "expected7,expected8,expected9,expected10",
       "expected1[(v0)]" +
-      "expected2[(v0)-[e0]->(v1)]" +
-      "expected3[(v0)-[e0]->(v1)-[e1]->(v2)]" +
-      "expected4[(v0)-[e0]->(v1)-[e1]->(v2)-[e2]->(v3)]" +
-      "expected5[(v1)]" +
-      "expected6[(v1)-[e1]->(v2)]" +
-      "expected7[(v1)-[e1]->(v2)-[e2]->(v3)]" +
-      "expected8[(v2)]" +
-      "expected9[(v2)-[e2]->(v3)]" +
-      "expected10[(v3)]"
+        "expected2[(v0)-[e0]->(v1)]" +
+        "expected3[(v0)-[e0]->(v1)-[e1]->(v2)]" +
+        "expected4[(v0)-[e0]->(v1)-[e1]->(v2)-[e2]->(v3)]" +
+        "expected5[(v1)]" +
+        "expected6[(v1)-[e1]->(v2)]" +
+        "expected7[(v1)-[e1]->(v2)-[e2]->(v3)]" +
+        "expected8[(v2)]" +
+        "expected9[(v2)-[e2]->(v3)]" +
+        "expected10[(v3)]"
     });
     data.add(new String[] {
       "Graph2_VarLength4",

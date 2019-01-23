@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ public class GraphMetricsTest {
     assertEquals(2, components.size());
     assertTrue(components.containsKey(0));
     assertTrue(components.containsKey(1));
-    assertEquals(Sets.newHashSet("v1","v2","v3"), components.get(0));
-    assertEquals(Sets.newHashSet("v4","v5","v6"), components.get(1));
+    assertEquals(Sets.newHashSet("v1", "v2", "v3"), components.get(0));
+    assertEquals(Sets.newHashSet("v4", "v5", "v6"), components.get(1));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
+import org.gradoop.storage.utils.RegionSplitter;
 
 import java.io.IOException;
 
@@ -80,53 +81,43 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
     this.edgeFactory = edgeFactory;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void createTable(final Admin admin, final HTableDescriptor tableDescriptor)
     throws IOException {
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_META));
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_TYPE));
     tableDescriptor.addFamily(new HColumnDescriptor(HBaseConstants.CF_PROPERTY_VALUE));
-    admin.createTable(tableDescriptor);
+    if (isPreSplitRegions()) {
+      admin.createTable(
+        tableDescriptor,
+        RegionSplitter.getInstance().getStartKey(),
+        RegionSplitter.getInstance().getEndKey(),
+        RegionSplitter.getInstance().getNumberOfRegions());
+    } else {
+      admin.createTable(tableDescriptor);
+    }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeSource(final Put put, final GradoopId sourceId) {
     return put.addColumn(CF_META_BYTES, COL_SOURCE_BYTES, sourceId.toByteArray());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopId readSourceId(Result res) {
     return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_SOURCE_BYTES));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeTarget(Put put, GradoopId targetId) {
     return put.addColumn(CF_META_BYTES, COL_TARGET_BYTES, targetId.toByteArray());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopId readTargetId(Result res) {
     return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_TARGET_BYTES));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeEdge(Put put, EPGMEdge edgeData) {
     writeLabel(put, edgeData);
@@ -137,27 +128,18 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
     return put;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Edge readEdge(Result res) {
     return edgeFactory.initEdge(readId(res), readLabel(res), readSourceId(res), readTargetId(res),
         readProperties(res), readGraphIds(res));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public EdgeHandler applyQuery(ElementQuery<HBaseElementFilter<Edge>> query) {
     this.edgeQuery = query;
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ElementQuery<HBaseElementFilter<Edge>> getQuery() {
     return this.edgeQuery;

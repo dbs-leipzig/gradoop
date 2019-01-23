@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,7 +142,7 @@ public class ElementTest {
       .useConstructor(gradoopId, "someLabel", properties)
       .defaultAnswer(CALLS_REAL_METHODS));
 
-    for(String key : elementMock.getPropertyKeys()) {
+    for (String key : elementMock.getPropertyKeys()) {
       assertTrue(key.equals(KEY_0) || key.equals(KEY_1) || key.equals(KEY_2));
     }
   }

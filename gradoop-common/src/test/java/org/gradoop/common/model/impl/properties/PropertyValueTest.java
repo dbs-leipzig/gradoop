@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -828,7 +828,7 @@ public class PropertyValueTest {
 
     validateEqualsAndHashCode(create(true), create(true), create(false));
 
-    validateEqualsAndHashCode(create((short)10), create((short)10), create((short)11));
+    validateEqualsAndHashCode(create((short) 10), create((short) 10), create((short) 11));
 
     validateEqualsAndHashCode(create(10), create(10), create(11));
 
@@ -893,7 +893,8 @@ public class PropertyValueTest {
     set2.add(PropertyValue.create("bar"));
     Set<PropertyValue> set3 = new HashSet<>();
     set3.add(PropertyValue.create("baz"));
-    validateEqualsAndHashCode(create(set1), create(set2), create(set3));  }
+    validateEqualsAndHashCode(create(set1), create(set2), create(set3));
+  }
 
   private void validateEqualsAndHashCode(PropertyValue p1, PropertyValue p2,
     PropertyValue p3) {
@@ -913,21 +914,21 @@ public class PropertyValueTest {
     // boolean
     validateCompareTo(create(false), create(false), create(true));
     // short
-    validateCompareTo(create((short)-10), create((short)-10), create((short)12));
-    validateCompareTo(create((short)10), create((short)10), create((short)12));
-    validateCompareTo(create((short)-10), create(-10), create(12));
-    validateCompareTo(create((short)10), create(10), create(12));
-    validateCompareTo(create((short)-10), create(-10L), create(12L));
-    validateCompareTo(create((short)10), create(10L), create(12L));
-    validateCompareTo(create((short)-10), create(-10F), create(12F));
-    validateCompareTo(create((short)10), create(10F), create(12F));
-    validateCompareTo(create((short)-10), create(-10D), create(12D));
-    validateCompareTo(create((short)10), create(10D), create(12D));
-    validateCompareTo(create((short)-10), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
-    validateCompareTo(create((short)10), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create((short) -10), create((short) -10), create((short) 12));
+    validateCompareTo(create((short) 10), create((short) 10), create((short) 12));
+    validateCompareTo(create((short) -10), create(-10), create(12));
+    validateCompareTo(create((short) 10), create(10), create(12));
+    validateCompareTo(create((short) -10), create(-10L), create(12L));
+    validateCompareTo(create((short) 10), create(10L), create(12L));
+    validateCompareTo(create((short) -10), create(-10F), create(12F));
+    validateCompareTo(create((short) 10), create(10F), create(12F));
+    validateCompareTo(create((short) -10), create(-10D), create(12D));
+    validateCompareTo(create((short) 10), create(10D), create(12D));
+    validateCompareTo(create((short) -10), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
+    validateCompareTo(create((short) 10), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
     // int
-    validateCompareTo(create(-10), create((short)-10), create((short)12));
-    validateCompareTo(create(10), create((short)10), create((short)12));
+    validateCompareTo(create(-10), create((short) -10), create((short) 12));
+    validateCompareTo(create(10), create((short) 10), create((short) 12));
     validateCompareTo(create(-10), create(-10), create(12));
     validateCompareTo(create(10), create(10), create(12));
     validateCompareTo(create(-10), create(-10L), create(12L));
@@ -939,8 +940,8 @@ public class PropertyValueTest {
     validateCompareTo(create(-10), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
     validateCompareTo(create(10), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
     // long
-    validateCompareTo(create(-10L), create((short)-10), create((short)12));
-    validateCompareTo(create(10L), create((short)10), create((short)12));
+    validateCompareTo(create(-10L), create((short) -10), create((short) 12));
+    validateCompareTo(create(10L), create((short) 10), create((short) 12));
     validateCompareTo(create(-10L), create(-10), create(12));
     validateCompareTo(create(10L), create(10), create(12));
     validateCompareTo(create(-10L), create(-10L), create(12L));
@@ -952,8 +953,8 @@ public class PropertyValueTest {
     validateCompareTo(create(-10L), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
     validateCompareTo(create(10L), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
     // float
-    validateCompareTo(create(-10F), create((short)-10), create((short)12));
-    validateCompareTo(create(10F), create((short)10), create((short)12));
+    validateCompareTo(create(-10F), create((short) -10), create((short) 12));
+    validateCompareTo(create(10F), create((short) 10), create((short) 12));
     validateCompareTo(create(-10F), create(-10), create(12));
     validateCompareTo(create(10F), create(10), create(12));
     validateCompareTo(create(-10F), create(-10L), create(12L));
@@ -965,8 +966,8 @@ public class PropertyValueTest {
     validateCompareTo(create(-10F), create(BigDecimal.valueOf(-10)), create(BigDecimal.valueOf(12)));
     validateCompareTo(create(10F), create(BigDecimal.valueOf(10)), create(BigDecimal.valueOf(12)));
     // double
-    validateCompareTo(create(-10D), create((short)-10), create((short)12));
-    validateCompareTo(create(10D), create((short)10), create((short)12));
+    validateCompareTo(create(-10D), create((short) -10), create((short) 12));
+    validateCompareTo(create(10D), create((short) 10), create((short) 12));
     validateCompareTo(create(-10D), create(-10), create(12));
     validateCompareTo(create(10D), create(10), create(12));
     validateCompareTo(create(-10D), create(-10L), create(12L));
@@ -980,8 +981,8 @@ public class PropertyValueTest {
     // string
     validateCompareTo(create("10"), create("10"), create("12"));
     // BigDecimal
-    validateCompareTo(create(BigDecimal.valueOf(-10)), create((short)-10), create((short)12));
-    validateCompareTo(create(BigDecimal.valueOf(10)), create((short)10), create((short)12));
+    validateCompareTo(create(BigDecimal.valueOf(-10)), create((short) -10), create((short) 12));
+    validateCompareTo(create(BigDecimal.valueOf(10)), create((short) 10), create((short) 12));
     validateCompareTo(create(BigDecimal.valueOf(-10)), create(-10), create(12));
     validateCompareTo(create(BigDecimal.valueOf(10)), create(10), create(12));
     validateCompareTo(create(BigDecimal.valueOf(-10)), create(-10L), create(12L));
@@ -1064,7 +1065,7 @@ public class PropertyValueTest {
   public void testListValueMaxSize() {
     int n = PropertyValue.LARGE_PROPERTY_THRESHOLD / 9;
     List<PropertyValue> list = new ArrayList<>(n);
-    while ( n-- > 0 ){
+    while (n-- > 0) {
       list.add(create(Math.random()));
     }
     create(list);
@@ -1075,7 +1076,7 @@ public class PropertyValueTest {
     // 8 bytes per double + 1 byte overhead
     int n = PropertyValue.LARGE_PROPERTY_THRESHOLD / 9 + 1;
     List<PropertyValue> list = new ArrayList<>(n);
-    while ( n-- > 0 ){
+    while (n-- > 0) {
       list.add(create(Math.random()));
     }
     create(list);

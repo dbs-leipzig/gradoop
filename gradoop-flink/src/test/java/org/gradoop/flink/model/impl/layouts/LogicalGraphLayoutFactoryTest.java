@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.api.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase {
 
-  protected abstract LogicalGraphLayoutFactory getFactory();
+  protected abstract LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> getFactory();
 
   @Test
   public void testFromDataSets() throws Exception {
@@ -55,7 +55,7 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
     DataSet<Vertex> vertexDataSet = getExecutionEnvironment().fromCollection(vertices);
     DataSet<Edge> edgeDataSet = getExecutionEnvironment().fromCollection(edges);
 
-    LogicalGraphLayout logicalGraphLayout = getFactory()
+    LogicalGraphLayout<GraphHead, Vertex, Edge> logicalGraphLayout = getFactory()
       .fromDataSets(graphHeadDataSet, vertexDataSet, edgeDataSet);
 
     Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
@@ -94,7 +94,7 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
       .collect(Collectors.groupingBy(Edge::getLabel)).entrySet().stream()
       .collect(Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
 
-    LogicalGraphLayout logicalGraphLayout = getFactory()
+    LogicalGraphLayout<GraphHead, Vertex, Edge> logicalGraphLayout = getFactory()
       .fromIndexedDataSets(indexedGraphHead, indexedVertices, indexedEdges);
 
     Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
@@ -121,7 +121,7 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
   public void testFromDataSetsWithoutGraphHead() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("()-->()<--()-->()");
 
-    LogicalGraphLayout logicalGraphLayout = getFactory()
+    LogicalGraphLayout<GraphHead, Vertex, Edge> logicalGraphLayout = getFactory()
       .fromDataSets(
         getExecutionEnvironment().fromCollection(loader.getVertices()),
         getExecutionEnvironment().fromCollection(loader.getEdges()));
@@ -159,7 +159,7 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
 
     GraphHead graphHead = loader.getGraphHeadByVariable("g0");
 
-    LogicalGraphLayout logicalGraphLayout = getFactory()
+    LogicalGraphLayout<GraphHead, Vertex, Edge> logicalGraphLayout = getFactory()
       .fromCollections(graphHead,
         loader.getVerticesByGraphVariables("g0"),
         loader.getEdgesByGraphVariables("g0"));
@@ -195,11 +195,13 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
 
     Collection<Vertex> vertices = loader.getVertices();
     Collection<Edge> edges = loader.getEdges();
-    LogicalGraphLayout fromCollections = getFactory().fromCollections(vertices, edges);
+    LogicalGraphLayout<GraphHead, Vertex, Edge> fromCollections = getFactory()
+      .fromCollections(vertices, edges);
 
     DataSet<Vertex> vertexDataSet = getExecutionEnvironment().fromCollection(vertices);
     DataSet<Edge> edgeDataSet = getExecutionEnvironment().fromCollection(edges);
-    LogicalGraphLayout fromDataSets = getFactory().fromDataSets(vertexDataSet, edgeDataSet);
+    LogicalGraphLayout<GraphHead, Vertex, Edge> fromDataSets = getFactory()
+      .fromDataSets(vertexDataSet, edgeDataSet);
 
     LogicalGraph graphFromCollections = getConfig().getLogicalGraphFactory()
       .fromDataSets(fromCollections.getGraphHead(), fromCollections.getVertices(),
@@ -212,7 +214,8 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
 
   @Test
   public void testCreateEmptyGraph() throws Exception {
-    LogicalGraphLayout logicalGraphLayout = getFactory().createEmptyGraph();
+    LogicalGraphLayout<GraphHead, Vertex, Edge> logicalGraphLayout = getFactory()
+      .createEmptyGraph();
 
     Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
     Collection<Vertex> loadedVertices = Lists.newArrayList();

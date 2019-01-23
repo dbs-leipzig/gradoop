@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,6 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
-
 public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
 
   protected DataSet<Vertex> createVerticesWithProperties(List<String> propertyNames) {
@@ -39,8 +37,8 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     VertexFactory vertexFactory = new VertexFactory();
 
     List<Vertex> vertices = Lists.newArrayList(
-      vertexFactory.createVertex("Label1",properties),
-      vertexFactory.createVertex("Label2",properties)
+      vertexFactory.createVertex("Label1", properties),
+      vertexFactory.createVertex("Label2", properties)
     );
 
     return getExecutionEnvironment().fromCollection(vertices);
@@ -62,8 +60,8 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     PropertyValue[] propertyValues = new PropertyValue[propertyNames.size()];
 
     int i = 0;
-    for(String property_name : propertyNames) {
-      propertyValues[i++] = PropertyValue.create(property_name);
+    for (String propertyName : propertyNames) {
+      propertyValues[i++] = PropertyValue.create(propertyName);
     }
 
     return propertyValues;
@@ -72,8 +70,8 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
   protected Properties getProperties(List<String> propertyNames) {
     Properties properties = new Properties();
 
-    for(String property_name : propertyNames) {
-      properties.set(property_name, property_name);
+    for (String propertyName : propertyNames) {
+      properties.set(propertyName, propertyName);
     }
 
     return properties;

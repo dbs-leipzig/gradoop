@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,16 @@
  */
 package org.gradoop.flink.model.impl.layouts.transactional;
 
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.GraphCollectionLayoutFactoryTest;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 public class TxCollectionLayoutFactoryTest extends GraphCollectionLayoutFactoryTest {
   @Override
-  protected GraphCollectionLayoutFactory getFactory() {
+  protected GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> getFactory() {
     TxCollectionLayoutFactory txCollectionLayoutFactory = new TxCollectionLayoutFactory();
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
     config.setGraphCollectionLayoutFactory(txCollectionLayoutFactory);

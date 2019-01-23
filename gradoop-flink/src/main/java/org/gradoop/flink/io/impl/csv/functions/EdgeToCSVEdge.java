@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.io.api.metadata.MetaDataSource;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
 
@@ -41,7 +42,7 @@ public class EdgeToCSVEdge extends ElementToCSV<Edge, CSVEdge> {
     csvEdge.setSourceId(edge.getSourceId().toString());
     csvEdge.setTargetId(edge.getTargetId().toString());
     csvEdge.setLabel(StringEscaper.escape(edge.getLabel(), CSVConstants.ESCAPED_CHARACTERS));
-    csvEdge.setProperties(getPropertyString(edge, CSVConstants.EDGE_TYPE));
+    csvEdge.setProperties(getPropertyString(edge, MetaDataSource.EDGE_TYPE));
     return csvEdge;
   }
 }

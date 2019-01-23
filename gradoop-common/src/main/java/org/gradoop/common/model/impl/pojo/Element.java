@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,75 +64,48 @@ public abstract class Element implements EPGMElement {
     this.properties = properties;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopId getId() {
     return id;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setId(GradoopId id) {
     this.id = id;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getLabel() {
     return label;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setLabel(String label) {
     this.label = label;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   @Nullable
   public Properties getProperties() {
     return properties;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Iterable<String> getPropertyKeys() {
     return (properties != null) ? properties.getKeys() : null;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public PropertyValue getPropertyValue(String key) {
     // TODO: return PropertyValue.NULL_VALUE instead?
     return (properties != null) ? properties.get(key) : null;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setProperties(Properties properties) {
     this.properties = properties;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setProperty(Property property) {
     Preconditions.checkNotNull(property, "Property was null");
@@ -140,27 +113,18 @@ public abstract class Element implements EPGMElement {
     this.properties.set(property);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setProperty(String key, Object value) {
     initProperties();
     this.properties.set(key, value);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setProperty(String key, PropertyValue value) {
     initProperties();
     this.properties.set(key, value);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public PropertyValue removeProperty(String key) {
     return this.properties != null ? properties.remove(key) : null;
@@ -171,17 +135,11 @@ public abstract class Element implements EPGMElement {
     return (this.properties != null) ? this.properties.size() : 0;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean hasProperty(String key) {
     return this.properties != null && this.properties.containsKey(key);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -196,9 +154,6 @@ public abstract class Element implements EPGMElement {
     return !(id != null ? !id.equals(that.id) : that.id != null);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int hashCode() {
     int result = id.hashCode();

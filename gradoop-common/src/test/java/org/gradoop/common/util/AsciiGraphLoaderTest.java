@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +22,18 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.junit.Test;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 import static org.junit.Assert.*;
 
 public class AsciiGraphLoaderTest {
 
-  private GradoopConfig<GraphHead, Vertex, Edge> config = 
-    GradoopConfig.getDefaultConfig();
+  private GradoopConfig<GraphHead, Vertex, Edge> config = GradoopConfig.getDefaultConfig();
 
   @Test
-  public void testFromString() throws Exception {
+  public void testFromString() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("[()-->()]", config);
 
@@ -42,7 +43,8 @@ public class AsciiGraphLoaderTest {
 
   @Test
   public void testFromFile() throws Exception {
-    String file = getClass().getResource("/data/gdl/example.gdl").getFile();
+    String file = URLDecoder.decode(
+        getClass().getResource("/data/gdl/example.gdl").getFile(), StandardCharsets.UTF_8.name());
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromFile(file, config);
 
@@ -59,7 +61,8 @@ public class AsciiGraphLoaderTest {
     validateCaches(asciiGraphLoader, 0, 0, 0);
 
     for (GraphHead graphHead : asciiGraphLoader.getGraphHeads()) {
-      assertEquals("Graph has wrong label",
+      assertEquals(
+        "Graph has wrong label",
         GradoopConstants.DEFAULT_GRAPH_LABEL, graphHead.getLabel());
     }
   }
