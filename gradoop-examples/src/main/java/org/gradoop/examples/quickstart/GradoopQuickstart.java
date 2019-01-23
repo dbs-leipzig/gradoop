@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,16 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+/**
+ * Simple Gradoop Example that walks through the process of loading data, doing a simple graph
+ * transformation and storing the results
+ * */
 public class GradoopQuickstart {
 
   /**
-   * Simple Gradoop Example that walks through the process of loading data, doing a simple graph
-   * transformation and storing the results
+   * run the example
    *
-   * @param args
+   * @param args no args used
    */
   public static void main(String[] args) throws Exception {
 
@@ -80,7 +83,8 @@ public class GradoopQuickstart {
         v -> true,
         e -> e.getLabel().equals("worksAt"));
 
-    WeaklyConnectedComponentsAsCollection weaklyConnectedComponents = new WeaklyConnectedComponentsAsCollection (10);
+    WeaklyConnectedComponentsAsCollection weaklyConnectedComponents =
+      new WeaklyConnectedComponentsAsCollection(10);
     GraphCollection components = weaklyConnectedComponents.execute(workGraph);
 
     DataSink sink3 = new DOTDataSink("out/workspace.dot", true);
