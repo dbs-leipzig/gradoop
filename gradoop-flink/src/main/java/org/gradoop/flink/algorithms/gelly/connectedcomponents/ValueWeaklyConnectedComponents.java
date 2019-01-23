@@ -100,9 +100,6 @@ public class ValueWeaklyConnectedComponents
       .run(graph).map(new MapVertexIdComponentId());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return ValueWeaklyConnectedComponents.class.getName();

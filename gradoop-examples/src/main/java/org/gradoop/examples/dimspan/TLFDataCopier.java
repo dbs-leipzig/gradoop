@@ -130,9 +130,6 @@ public class TLFDataCopier extends AbstractRunner implements ProgramDescription 
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getDescription() {
     return TLFDataCopier.class.getName();

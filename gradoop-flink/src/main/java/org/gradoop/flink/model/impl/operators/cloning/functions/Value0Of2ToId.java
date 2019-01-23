@@ -37,9 +37,6 @@ public class Value0Of2ToId<EL extends Element, T>
    */
   private final Tuple2<GradoopId, T> reuseTuple = new Tuple2<>();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple2<GradoopId, T> map(Tuple2<EL, T> tuple2) {
     reuseTuple.setFields(tuple2.f0.getId(), tuple2.f1);

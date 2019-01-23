@@ -91,9 +91,6 @@ public class InitEdge<K extends Comparable<K>>
     return reuseTuple;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public TypeInformation<Tuple2<K, Edge>> getProducedType() {
     return new TupleTypeInfo<>(getKeyTypeInfo(),

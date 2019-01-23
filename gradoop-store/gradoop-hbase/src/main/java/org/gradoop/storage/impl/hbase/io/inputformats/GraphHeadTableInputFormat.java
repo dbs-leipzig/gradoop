@@ -67,17 +67,11 @@ public class GraphHeadTableInputFormat extends BaseTableInputFormat<GraphHead> {
     return scan;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String getTableName() {
     return graphHeadTableName;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Tuple1<GraphHead> mapResultToTuple(Result result) {
     return new Tuple1<>(graphHeadHandler.readGraphHead(result));
