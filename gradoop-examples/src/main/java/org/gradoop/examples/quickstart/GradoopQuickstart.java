@@ -32,7 +32,6 @@ public class GradoopQuickstart {
 
   /**
    * run the example
-   *
    * @param args no args used
    */
   public static void main(String[] args) throws Exception {
@@ -40,7 +39,7 @@ public class GradoopQuickstart {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     GradoopFlinkConfig cfg = GradoopFlinkConfig.createConfig(env);
 
-    // Create the sample Graph
+    // Create the sample Graphs
     String graph = "g1:graph[" +
       "(p1:Person {name: \"Bob\", age: 24})-[:friendsWith]->" +
       "(p2:Person{name: \"Alice\", age: 30})-[:friendsWith]->(p1)" +
@@ -62,33 +61,34 @@ public class GradoopQuickstart {
       "(p7)-[:worksAt]->(c2) " +
       "(p8)-[:worksAt]->(c1) " + "]";
 
+    //LOAD INPUT GRAPHS (from above)
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(cfg);
     loader.initDatabaseFromString(graph);
 
-    GraphCollection c1 = loader.getGraphCollectionByVariables("g1", "g2");
-    DataSink sink1 = new DOTDataSink("out/input.dot", true);
-    c1.writeTo(sink1, true);
+    GraphCollection inputGraphs = loader.getGraphCollectionByVariables("g1", "g2");
+    DataSink inputGraphSink = new DOTDataSink("out/input.dot", true);
+    inputGraphs.writeTo(inputGraphSink, true);
 
 
     // OVERLAP
-    LogicalGraph n1 = loader.getLogicalGraphByVariable("g1");
-    LogicalGraph n2 = loader.getLogicalGraphByVariable("g2");
-    LogicalGraph overlap = n2.overlap(n1);
-    DataSink sink2 = new DOTDataSink("out/overlap.dot", true);
-    overlap.writeTo(sink2, true);
+    LogicalGraph graph1 = loader.getLogicalGraphByVariable("g1");
+    LogicalGraph graph2 = loader.getLogicalGraphByVariable("g2");
+    LogicalGraph overlap = graph2.overlap(graph1);
+    DataSink overlapSink = new DOTDataSink("out/overlap.dot", true);
+    overlap.writeTo(overlapSink, true);
 
-    // WORKS AT
-    LogicalGraph workGraph = n1.combine(n2)
+    LogicalGraph workGraph = graph1.combine(graph2)
       .subgraph(
         v -> true,
         e -> e.getLabel().equals("worksAt"));
 
+    // Weakly Connected Components Algorithm
     WeaklyConnectedComponentsAsCollection weaklyConnectedComponents =
       new WeaklyConnectedComponentsAsCollection(10);
-    GraphCollection components = weaklyConnectedComponents.execute(workGraph);
+    GraphCollection workspaces = weaklyConnectedComponents.execute(workGraph);
 
-    DataSink sink3 = new DOTDataSink("out/workspace.dot", true);
-    components.writeTo(sink3, true);
+    DataSink workspaceSink = new DOTDataSink("out/workspace.dot", true);
+    workspaces.writeTo(workspaceSink, true);
 
     env.execute();
   }
