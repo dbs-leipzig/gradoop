@@ -287,9 +287,4 @@ public class Subgraph<
 
     return subgraph.getFactory().fromDataSets(verifiedVertices, verifiedEdges);
   }
-
-  @Override
-  public String getName() {
-    return Subgraph.class.getName();
-  }
 }

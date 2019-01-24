@@ -99,9 +99,4 @@ public class ValueWeaklyConnectedComponents
     return new ConnectedComponents<Long, Long, NullValue>(maxIteration)
       .run(graph).map(new MapVertexIdComponentId());
   }
-
-  @Override
-  public String getName() {
-    return ValueWeaklyConnectedComponents.class.getName();
-  }
 }

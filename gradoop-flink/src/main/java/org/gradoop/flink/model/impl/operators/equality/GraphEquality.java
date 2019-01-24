@@ -64,9 +64,4 @@ public class GraphEquality implements BinaryGraphToValueOperator<Boolean> {
     return collectionEquality
       .execute(collectionFactory.fromGraph(firstGraph), collectionFactory.fromGraph(secondGraph));
   }
-
-  @Override
-  public String getName() {
-    return this.getClass().getSimpleName();
-  }
 }

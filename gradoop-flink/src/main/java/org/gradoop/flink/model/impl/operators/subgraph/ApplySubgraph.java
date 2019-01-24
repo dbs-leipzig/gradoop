@@ -347,9 +347,4 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     return collection.getConfig().getGraphCollectionFactory()
       .fromDataSets(newGraphHeads, newVertices, newEdges);
   }
-
-  @Override
-  public String getName() {
-    return ApplySubgraph.class.getName();
-  }
 }

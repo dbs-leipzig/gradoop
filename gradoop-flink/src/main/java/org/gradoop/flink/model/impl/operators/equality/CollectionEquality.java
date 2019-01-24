@@ -65,9 +65,4 @@ public class CollectionEquality
       canonicalAdjacencyMatrixBuilder.execute(secondCollection)
     );
   }
-
-  @Override
-  public String getName() {
-    return this.getClass().getSimpleName();
-  }
 }

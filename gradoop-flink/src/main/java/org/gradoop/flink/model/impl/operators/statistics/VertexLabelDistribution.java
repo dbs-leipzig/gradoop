@@ -34,9 +34,4 @@ public class VertexLabelDistribution
   public DataSet<WithCount<String>> execute(LogicalGraph graph) {
     return new VertexValueDistribution<>(new Label<>()).execute(graph);
   }
-
-  @Override
-  public String getName() {
-    return VertexLabelDistribution.class.getName();
-  }
 }

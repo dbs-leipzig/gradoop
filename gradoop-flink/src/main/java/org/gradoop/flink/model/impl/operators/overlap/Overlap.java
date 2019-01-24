@@ -56,10 +56,5 @@ public class Overlap implements BinaryGraphToGraphOperator {
     return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
   }
 
-  @Override
-  public String getName() {
-    return Overlap.class.getName();
-  }
-
 
 }
