@@ -227,6 +227,37 @@ public class AccumuloEPGMStore implements
     }
   }
 
+  /**
+   * Drop all tables used by this store instance.
+   *
+   * @throws IOException when deleting tables fails.
+   */
+  public void dropTables() throws IOException {
+    for (String tableName : new String[] {
+      getVertexTableName(), getEdgeTableName(), getGraphHeadName()}) {
+      try {
+        dropTableIfExists(tableName);
+      } catch (AccumuloSecurityException | AccumuloException e) {
+        throw new IOException("Failed to delete table " + tableName, e);
+      }
+    }
+  }
+
+  /**
+   * Truncate all tables handled by this store instance, i.e. delete all rows.
+   * The current implementations simply drops all tables and creates new ones.
+   *
+   * @throws IOException when deleting or creating tables fails.
+   */
+  public void truncateTables() throws IOException {
+    dropTables();
+    try {
+      createTablesIfNotExists();
+    } catch (AccumuloSecurityException | AccumuloException e) {
+      throw new IOException("Failed to create tables.", e);
+    }
+  }
+
   @Nullable
   @Override
   public GraphHead readGraph(@Nonnull GradoopId graphId) throws IOException {
@@ -468,4 +499,22 @@ public class AccumuloEPGMStore implements
     }
   }
 
+  /**
+   * Delete a table if it exists.
+   *
+   * @param tableName The table name.
+   * @throws AccumuloSecurityException if the user does not have persmissions to delete the table.
+   * @throws AccumuloException         if a general Accumulo error occurs.
+   */
+  private void dropTableIfExists(@Nonnull String tableName) throws AccumuloSecurityException,
+    AccumuloException {
+    if (conn.tableOperations().exists(tableName)) {
+      try {
+        conn.tableOperations().delete(tableName);
+      } catch (TableNotFoundException e) {
+        // We checked before if it exists, so this should not happen.
+        throw new IllegalStateException(e);
+      }
+    }
+  }
 }
