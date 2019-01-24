@@ -98,7 +98,7 @@ public class PageRankSampling extends SamplingAlgorithm {
 
   /**
    * {@inheritDoc}
-   *
+   * <p>
    * Vertices are sampled by using the Gradoop-Wrapper of Flinks PageRank-algorithm
    * {@link PageRank}. If they got different PageRank-scores, all scores are scaled
    * in a range between 0 and 1.
@@ -144,9 +144,6 @@ public class PageRankSampling extends SamplingAlgorithm {
     return graph;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return PageRankSampling.class.getName();

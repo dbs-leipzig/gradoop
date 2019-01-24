@@ -265,9 +265,6 @@ public class GradoopIdSet extends AbstractSet<GradoopId> implements Value {
     return ids.isEmpty();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Iterator<GradoopId> iterator() {
     return ids.iterator();

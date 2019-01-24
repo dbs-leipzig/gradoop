@@ -28,9 +28,6 @@ import org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
  */
 public class Union extends SetOperatorBase {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected DataSet<Vertex> computeNewVertices(
     DataSet<GraphHead> newGraphHeads) {
@@ -39,9 +36,6 @@ public class Union extends SetOperatorBase {
       .distinct(new Id<Vertex>());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected DataSet<GraphHead> computeNewGraphHeads() {
     return firstCollection.getGraphHeads()
@@ -49,9 +43,6 @@ public class Union extends SetOperatorBase {
       .distinct(new Id<GraphHead>());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected DataSet<Edge> computeNewEdges(DataSet<Vertex> newVertices) {
     return firstCollection.getEdges()
@@ -59,9 +50,6 @@ public class Union extends SetOperatorBase {
       .distinct(new Id<Edge>());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return Union.class.getName();

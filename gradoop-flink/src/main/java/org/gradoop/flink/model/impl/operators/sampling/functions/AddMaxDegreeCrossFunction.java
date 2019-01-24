@@ -38,9 +38,6 @@ public class AddMaxDegreeCrossFunction implements CrossFunction<Tuple1<Long>, Ve
     this.nameOfMaxDegreeProperty = nameOfMaxDegreeProperty;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Vertex cross(Tuple1<Long> longTuple1, Vertex vertex) {
     vertex.setProperty(nameOfMaxDegreeProperty, longTuple1.f0);

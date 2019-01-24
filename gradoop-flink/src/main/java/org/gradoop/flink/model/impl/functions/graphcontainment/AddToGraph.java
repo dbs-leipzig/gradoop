@@ -42,9 +42,6 @@ public class AddToGraph<GE extends GraphElement> implements
     this.graphHeadId = graphHead.getId();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GE map(GE graphElement) throws Exception {
     graphElement.addGraphId(graphHeadId);

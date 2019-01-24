@@ -31,9 +31,6 @@ import java.util.List;
  */
 public class GraphTransactionsToGDL implements GroupReduceFunction<GraphTransaction, String> {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void reduce(Iterable<GraphTransaction> graphTransactions, Collector<String> out)
     throws Exception {

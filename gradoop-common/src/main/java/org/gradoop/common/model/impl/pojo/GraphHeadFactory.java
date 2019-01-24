@@ -34,49 +34,31 @@ public class GraphHeadFactory implements EPGMGraphHeadFactory<GraphHead>,
    */
   private static final long serialVersionUID = 42L;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphHead createGraphHead() {
     return initGraphHead(GradoopId.get());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphHead initGraphHead(final GradoopId id) {
     return initGraphHead(id, GradoopConstants.DEFAULT_GRAPH_LABEL, null);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphHead createGraphHead(String label) {
     return initGraphHead(GradoopId.get(), label);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphHead initGraphHead(final GradoopId id, final String label) {
     return initGraphHead(id, label, null);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphHead createGraphHead(String label, Properties properties) {
     return initGraphHead(GradoopId.get(), label, properties);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphHead initGraphHead(final GradoopId id, final String label,
     Properties properties) {

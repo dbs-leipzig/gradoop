@@ -39,9 +39,6 @@ public class VertexIdsWithEdge implements FlatMapFunction<Edge, Tuple2<GradoopId
     reuseTuple = new Tuple2<GradoopId, Edge>();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void flatMap(Edge edge, Collector<Tuple2<GradoopId, Edge>> collector) throws Exception {
     reuseTuple.setFields(edge.getSourceId(), edge);

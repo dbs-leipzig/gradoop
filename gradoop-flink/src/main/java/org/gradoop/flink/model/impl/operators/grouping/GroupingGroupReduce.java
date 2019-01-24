@@ -72,9 +72,6 @@ public class GroupingGroupReduce extends Grouping {
       useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected LogicalGraph groupInternal(LogicalGraph graph) {
 
@@ -105,9 +102,6 @@ public class GroupingGroupReduce extends Grouping {
     return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return GroupingGroupReduce.class.getName();

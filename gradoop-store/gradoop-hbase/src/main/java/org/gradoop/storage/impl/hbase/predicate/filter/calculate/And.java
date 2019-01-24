@@ -65,9 +65,6 @@ public final class And<T extends EPGMElement> implements HBaseElementFilter<T> {
     return new And<>(formula);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   public Filter toHBaseFilter(boolean negate) {
@@ -83,9 +80,6 @@ public final class And<T extends EPGMElement> implements HBaseElementFilter<T> {
     return filterList;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     StringJoiner joiner = new StringJoiner(" AND ");

@@ -59,8 +59,8 @@ public class CSVMetaData extends MetaData {
     case MetaDataSource.EDGE_TYPE:
       return this.edgeMetaData.getOrDefault(label, new ArrayList<>());
     default:
-      throw new IllegalArgumentException("Entity type " + type + " is not supported. Supported" +
-        "types are g,v and e.");
+      throw new IllegalArgumentException("Entity type " + type + " is not supported. Supported " +
+        "types are g, v and e.");
     }
   }
 }

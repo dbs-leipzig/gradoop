@@ -88,9 +88,6 @@ public class InitVertex<K extends Comparable<K>>
     return reuseTuple;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public TypeInformation<Tuple3<K, GradoopId, Vertex>> getProducedType() {
     return new TupleTypeInfo<>(getKeyTypeInfo(),

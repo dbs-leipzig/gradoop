@@ -24,9 +24,6 @@ import org.apache.flink.graph.Vertex;
  */
 public class MapVertexIdComponentId implements MapFunction<Vertex<Long, Long>, Tuple2<Long, Long>> {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple2<Long, Long> map(Vertex<Long, Long> gellyVertex) throws Exception {
     return gellyVertex;
