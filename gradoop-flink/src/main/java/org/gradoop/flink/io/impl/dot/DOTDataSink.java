@@ -114,18 +114,12 @@ public class DOTDataSink implements DataSink {
       super(outputPath);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void open(int taskNumber, int numTasks) throws IOException {
       super.open(taskNumber, numTasks);
       super.writeRecord("digraph {\n");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void close() throws IOException {
       super.writeRecord("}");

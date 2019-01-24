@@ -235,9 +235,6 @@ public class CypherBenchmark extends AbstractRunner implements ProgramDescriptio
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getDescription() {
     return CypherBenchmark.class.getName();

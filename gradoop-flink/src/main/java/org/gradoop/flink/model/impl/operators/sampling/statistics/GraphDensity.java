@@ -29,9 +29,6 @@ import org.gradoop.flink.model.impl.operators.sampling.statistics.functions.Calc
  */
 public class GraphDensity implements UnaryGraphToGraphOperator {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     DataSet<GraphHead> newGraphHead = graph

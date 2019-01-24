@@ -36,9 +36,6 @@ public class VertexWithId implements MapFunction<Vertex, Tuple2<Vertex, GradoopI
     this.reuse = new Tuple2<>();
   }
 
-   /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple2<Vertex, GradoopId> map(Vertex vertex) throws Exception {
     reuse.f0 = vertex;

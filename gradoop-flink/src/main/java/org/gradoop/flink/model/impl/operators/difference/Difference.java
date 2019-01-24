@@ -56,9 +56,6 @@ public class Difference extends SetOperatorBase {
       .reduceGroup(new RemoveCut<GraphHead>());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return Difference.class.getName();

@@ -41,9 +41,6 @@ public class EdgesWithSampledVerticesFilter
     this.neighborType = neighborType;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean filter(Tuple3<Edge, Boolean, Boolean> tuple) {
 

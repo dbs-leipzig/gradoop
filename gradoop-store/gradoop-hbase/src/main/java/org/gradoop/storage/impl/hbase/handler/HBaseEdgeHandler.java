@@ -81,9 +81,6 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
     this.edgeFactory = edgeFactory;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void createTable(final Admin admin, final HTableDescriptor tableDescriptor)
     throws IOException {
@@ -101,41 +98,26 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeSource(final Put put, final GradoopId sourceId) {
     return put.addColumn(CF_META_BYTES, COL_SOURCE_BYTES, sourceId.toByteArray());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopId readSourceId(Result res) {
     return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_SOURCE_BYTES));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeTarget(Put put, GradoopId targetId) {
     return put.addColumn(CF_META_BYTES, COL_TARGET_BYTES, targetId.toByteArray());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopId readTargetId(Result res) {
     return GradoopId.fromByteArray(res.getValue(CF_META_BYTES, COL_TARGET_BYTES));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeEdge(Put put, EPGMEdge edgeData) {
     writeLabel(put, edgeData);
@@ -146,27 +128,18 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
     return put;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Edge readEdge(Result res) {
     return edgeFactory.initEdge(readId(res), readLabel(res), readSourceId(res), readTargetId(res),
         readProperties(res), readGraphIds(res));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public EdgeHandler applyQuery(ElementQuery<HBaseElementFilter<Edge>> query) {
     this.edgeQuery = query;
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ElementQuery<HBaseElementFilter<Edge>> getQuery() {
     return this.edgeQuery;

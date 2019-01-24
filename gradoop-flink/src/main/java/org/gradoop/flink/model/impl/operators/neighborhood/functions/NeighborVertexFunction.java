@@ -36,9 +36,6 @@ public class NeighborVertexFunction implements NeighborFunction {
     this.function = function;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public VertexAggregateFunction getFunction() {
     return function;

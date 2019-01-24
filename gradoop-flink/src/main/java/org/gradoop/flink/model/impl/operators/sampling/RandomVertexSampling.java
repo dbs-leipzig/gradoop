@@ -62,9 +62,6 @@ public class RandomVertexSampling extends SamplingAlgorithm {
     this.randomSeed = randomSeed;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
@@ -82,9 +79,6 @@ public class RandomVertexSampling extends SamplingAlgorithm {
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return RandomVertexSampling.class.getName();

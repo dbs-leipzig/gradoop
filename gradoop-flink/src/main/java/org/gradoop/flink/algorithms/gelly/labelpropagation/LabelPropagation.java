@@ -68,9 +68,6 @@ public abstract class LabelPropagation extends GradoopGellyAlgorithm<PropertyVal
     this.propertyKey = checkNotNull(propertyKey);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph executeInGelly(Graph<GradoopId, PropertyValue, NullValue> graph) {
     DataSet<Vertex> labeledVertices = executeInternal(graph)
@@ -101,9 +98,6 @@ public abstract class LabelPropagation extends GradoopGellyAlgorithm<PropertyVal
     return maxIterations;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return LabelPropagation.class.getName();

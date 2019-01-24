@@ -41,9 +41,6 @@ public class HBasePropEquals<T extends EPGMElement> extends PropEquals<HBaseElem
     super(key, value);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   @Nonnull
   public Filter toHBaseFilter(boolean negate) {

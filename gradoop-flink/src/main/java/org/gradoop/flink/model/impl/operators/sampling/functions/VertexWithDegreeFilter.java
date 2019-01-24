@@ -44,9 +44,6 @@ public class VertexWithDegreeFilter<V extends Vertex> implements FilterFunction<
     this.degreePropertyName = degreePropertyName;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean filter(V vertex) throws Exception {
     if (vertex.hasProperty(degreePropertyName)) {

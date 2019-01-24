@@ -42,9 +42,6 @@ public class HBasePropLargerThan<T extends EPGMElement>
     super(key, min, include);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   public Filter toHBaseFilter(boolean negate) {
