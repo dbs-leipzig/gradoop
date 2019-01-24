@@ -220,9 +220,6 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
       .fromDataSets(newHeads, newVertices, newEdges);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return TransactionalPatternMatching.class.getName();

@@ -42,9 +42,6 @@ public class HBasePropReg<T extends EPGMElement> extends PropReg<HBaseElementFil
     super(key, reg);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   public Filter toHBaseFilter(boolean negate) {

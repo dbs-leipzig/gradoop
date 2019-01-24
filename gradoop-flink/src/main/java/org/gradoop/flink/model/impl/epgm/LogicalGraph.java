@@ -163,27 +163,18 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   // Unary Operators
   //----------------------------------------------------------------------------
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   @Deprecated
   public GraphCollection cypher(String query) {
     return cypher(query, new GraphStatistics(1, 1, 1, 1));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   @Deprecated
   public GraphCollection cypher(String query, String constructionPattern) {
     return cypher(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   @Deprecated
   public GraphCollection cypher(String query, GraphStatistics graphStatistics) {
@@ -191,9 +182,6 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
       MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   @Deprecated
   public GraphCollection cypher(String query, String constructionPattern,
@@ -202,10 +190,6 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
             MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   @Deprecated
   public GraphCollection cypher(String query, boolean attachData, MatchStrategy vertexStrategy,
@@ -213,9 +197,6 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
     return cypher(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   @Deprecated
   public GraphCollection cypher(String query, String constructionPattern, boolean attachData,
@@ -224,34 +205,22 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
             vertexStrategy, edgeStrategy, graphStatistics));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection query(String query) {
     return query(query, new GraphStatistics(1, 1, 1, 1));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection query(String query, String constructionPattern) {
     return query(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection query(String query, GraphStatistics graphStatistics) {
     return query(query, true,
       MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection query(String query, String constructionPattern,
                                 GraphStatistics graphStatistics) {
@@ -259,19 +228,12 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
       MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
                                 MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     return query(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection query(String query, String constructionPattern, boolean attachData,
                                MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
@@ -280,17 +242,11 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
       vertexStrategy, edgeStrategy, graphStatistics));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph copy() {
     return callForGraph(new Cloning());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph transform(
     TransformationFunction<GraphHead> graphHeadTransformationFunction,
@@ -320,9 +276,6 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
     return transform(null, null, edgeTransformationFunction);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph vertexInducedSubgraph(
     FilterFunction<Vertex> vertexFilterFunction) {
@@ -331,9 +284,6 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
       new Subgraph<>(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph edgeInducedSubgraph(
     FilterFunction<Edge> edgeFilterFunction) {
@@ -341,9 +291,6 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
     return callForGraph(new Subgraph<>(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
     FilterFunction<Edge> edgeFilterFunction, Subgraph.Strategy strategy) {
@@ -351,41 +298,26 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
       new Subgraph<>(vertexFilterFunction, edgeFilterFunction, strategy));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph aggregate(AggregateFunction... aggregateFunctions) {
     return callForGraph(new Aggregation(aggregateFunctions));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph sample(SamplingAlgorithm algorithm) {
     return callForGraph(algorithm);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph groupBy(List<String> vertexGroupingKeys) {
     return groupBy(vertexGroupingKeys, null);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph groupBy(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
     return groupBy(vertexGroupingKeys, null, edgeGroupingKeys, null, GroupingStrategy.GROUP_REDUCE);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph groupBy(
     List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
@@ -412,18 +344,12 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
     return callForGraph(builder.build());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph reduceOnEdges(
     EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
     return callForGraph(new ReduceEdgeNeighborhood(function, edgeDirection));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph reduceOnNeighbors(
     VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
@@ -458,33 +384,21 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   // Binary Operators
   //----------------------------------------------------------------------------
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph combine(LogicalGraph otherGraph) {
     return callForGraph(new Combination(), otherGraph);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph overlap(LogicalGraph otherGraph) {
     return callForGraph(new Overlap(), otherGraph);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph exclude(LogicalGraph otherGraph) {
     return callForGraph(new Exclusion(), otherGraph);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataSet<Boolean> equalsByElementIds(LogicalGraph other) {
     return new GraphEquality(
@@ -493,9 +407,6 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
       new EdgeToIdString(), true).execute(this, other);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataSet<Boolean> equalsByElementData(LogicalGraph other) {
     return new GraphEquality(
@@ -504,9 +415,6 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
       new EdgeToDataString(), true).execute(this, other);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataSet<Boolean> equalsByData(LogicalGraph other) {
     return new GraphEquality(
@@ -519,42 +427,27 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   // Auxiliary Operators
   //----------------------------------------------------------------------------
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<LogicalGraph> operator) {
     return operator.execute(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph callForGraph(BinaryGraphToGraphOperator operator, LogicalGraph otherGraph) {
     return operator.execute(this, otherGraph);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph callForGraph(GraphsToGraphOperator operator,
     LogicalGraph... otherGraphs) {
     return operator.execute(this, otherGraphs);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection callForCollection(UnaryGraphToCollectionOperator operator) {
     return operator.execute(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection splitBy(String propertyKey) {
     return callForCollection(new Split(new PropertyGetter<>(Lists.newArrayList(propertyKey))));
@@ -564,9 +457,6 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   // Utility methods
   //----------------------------------------------------------------------------
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataSet<Boolean> isEmpty() {
     return getVertices()

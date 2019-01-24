@@ -237,9 +237,6 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getDescription() {
     return SocialNetworkAnalyticsExample.class.getName();

@@ -43,17 +43,11 @@ public class InitGraphHead implements MapFunction<Tuple1<GradoopId>, GraphHead>,
     this.graphHeadFactory = epgmGraphHeadFactory;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphHead map(Tuple1<GradoopId> idTuple) {
     return graphHeadFactory.initGraphHead(idTuple.f0);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public TypeInformation<GraphHead> getProducedType() {
     return TypeExtractor.createTypeInfo(graphHeadFactory.getType());

@@ -120,9 +120,6 @@ public class DIMSpanRunner extends AbstractRunner implements ProgramDescription 
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getDescription() {
     return DIMSpanRunner.class.getName();

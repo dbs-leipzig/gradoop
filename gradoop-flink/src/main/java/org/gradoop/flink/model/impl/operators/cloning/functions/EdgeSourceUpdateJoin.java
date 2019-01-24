@@ -32,9 +32,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 @FunctionAnnotation.ForwardedFieldsSecond("f1->sourceId")
 public class EdgeSourceUpdateJoin<E extends Edge>
   implements JoinFunction<E, Tuple2<GradoopId, GradoopId>, E> {
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   public E join(E e, Tuple2<GradoopId, GradoopId> vertexTuple) {
     e.setSourceId(vertexTuple.f1);

@@ -68,9 +68,6 @@ public class RandomNonUniformVertexSampling extends SamplingAlgorithm {
     this.randomSeed = randomSeed;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
@@ -110,9 +107,6 @@ public class RandomNonUniformVertexSampling extends SamplingAlgorithm {
       .fromDataSets(graph.getGraphHead(), newVertices, newEdges);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getName() {
     return RandomNonUniformVertexSampling.class.getName();

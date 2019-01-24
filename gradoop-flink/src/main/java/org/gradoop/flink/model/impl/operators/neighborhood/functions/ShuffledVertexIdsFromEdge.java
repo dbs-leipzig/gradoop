@@ -40,9 +40,6 @@ public class ShuffledVertexIdsFromEdge
     reuseTuple = new Tuple2<GradoopId, GradoopId>();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void flatMap(Edge edge, Collector<Tuple2<GradoopId, GradoopId>> collector)
     throws Exception {
