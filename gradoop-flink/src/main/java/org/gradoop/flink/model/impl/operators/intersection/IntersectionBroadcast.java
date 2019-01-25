@@ -44,9 +44,4 @@ public class IntersectionBroadcast extends Intersection {
       .filter(new InAnyGraphBroadcast<Vertex>())
       .withBroadcastSet(ids, GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }
-
-  @Override
-  public String getName() {
-    return IntersectionBroadcast.class.getName();
-  }
 }

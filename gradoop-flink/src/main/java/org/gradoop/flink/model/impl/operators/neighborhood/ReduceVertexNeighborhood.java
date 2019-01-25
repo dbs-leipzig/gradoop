@@ -110,9 +110,4 @@ public class ReduceVertexNeighborhood extends VertexNeighborhood {
     return graph.getConfig().getLogicalGraphFactory()
       .fromDataSets(graph.getGraphHead(), vertices, graph.getEdges());
   }
-
-  @Override
-  public String getName() {
-    return ReduceVertexNeighborhood.class.getName();
-  }
 }

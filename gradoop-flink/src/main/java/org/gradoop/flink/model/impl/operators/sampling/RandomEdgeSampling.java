@@ -81,9 +81,4 @@ public class RandomEdgeSampling extends SamplingAlgorithm {
     DataSet<Vertex> newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id<>());
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
   }
-
-  @Override
-  public String getName() {
-    return RandomEdgeSampling.class.getName();
-  }
 }

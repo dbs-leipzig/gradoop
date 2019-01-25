@@ -32,9 +32,4 @@ public class DistinctById implements UnaryCollectionToCollectionOperator {
       collection.getVertices(),
       collection.getEdges());
   }
-
-  @Override
-  public String getName() {
-    return DistinctById.class.getName();
-  }
 }

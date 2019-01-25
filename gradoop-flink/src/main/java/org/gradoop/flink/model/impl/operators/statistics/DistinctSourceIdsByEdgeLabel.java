@@ -42,9 +42,4 @@ public class DistinctSourceIdsByEdgeLabel
       .sum(1)
       .map(new Tuple2ToWithCount<>());
   }
-
-  @Override
-  public String getName() {
-    return DistinctSourceIdsByEdgeLabel.class.getName();
-  }
 }

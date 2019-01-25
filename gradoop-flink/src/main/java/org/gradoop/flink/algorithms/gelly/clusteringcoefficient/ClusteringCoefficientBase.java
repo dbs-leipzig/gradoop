@@ -72,9 +72,4 @@ public abstract class ClusteringCoefficientBase extends
    */
   protected abstract LogicalGraph executeInternal(Graph<GradoopId, NullValue, NullValue> gellyGraph)
     throws Exception;
-
-  @Override
-  public String getName() {
-    return ClusteringCoefficientBase.class.getName();
-  }
 }

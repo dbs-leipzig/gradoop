@@ -139,9 +139,4 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
       .fromDataSets(graph.getGraphHead(), newVertices, newEdges);
   }
 
-  @Override
-  public String getName() {
-    return RandomLimitedDegreeVertexSampling.class.getName();
-  }
-
 }

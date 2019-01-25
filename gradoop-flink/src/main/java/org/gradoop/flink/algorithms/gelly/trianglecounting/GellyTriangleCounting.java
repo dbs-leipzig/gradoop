@@ -65,9 +65,4 @@ public class GellyTriangleCounting extends GradoopGellyAlgorithm<NullValue, Null
     return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
       resultHead, currentGraph.getVertices(), currentGraph.getEdges());
   }
-
-  @Override
-  public String getName() {
-    return GellyTriangleCounting.class.getName();
-  }
 }

@@ -48,9 +48,4 @@ public class ReduceOverlap extends OverlapBase implements
       getEdges(collection.getEdges(), graphIDs)
     );
   }
-
-  @Override
-  public String getName() {
-    return ReduceOverlap.class.getName();
-  }
 }

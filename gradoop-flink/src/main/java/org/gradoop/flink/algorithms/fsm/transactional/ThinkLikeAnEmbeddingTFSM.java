@@ -125,9 +125,4 @@ public class ThinkLikeAnEmbeddingTFSM
         .withBroadcastSet(minFrequency, DIMSpanConstants.MIN_FREQUENCY);
   }
 
-  @Override
-  public String getName() {
-    return this.getClass().getSimpleName();
-  }
-
 }

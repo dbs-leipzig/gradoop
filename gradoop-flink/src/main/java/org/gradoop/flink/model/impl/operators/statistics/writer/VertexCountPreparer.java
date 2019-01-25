@@ -38,9 +38,4 @@ public class VertexCountPreparer implements UnaryGraphToValueOperator<MapOperato
         .execute(graph)
         .map(new ObjectTo1<>());
   }
-
-  @Override
-  public String getName() {
-    return VertexCountPreparer.class.getName();
-  }
 }

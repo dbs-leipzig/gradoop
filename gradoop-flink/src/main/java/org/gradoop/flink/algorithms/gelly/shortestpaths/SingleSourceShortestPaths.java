@@ -86,9 +86,4 @@ public class SingleSourceShortestPaths extends GradoopGellyAlgorithm<NullValue, 
     return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices,
       currentGraph.getEdges());
   }
-
-  @Override
-  public String getName() {
-    return SingleSourceShortestPaths.class.getName();
-  }
 }
