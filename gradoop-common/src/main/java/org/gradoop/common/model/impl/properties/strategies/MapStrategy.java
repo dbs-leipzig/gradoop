@@ -32,10 +32,11 @@ import java.util.Map;
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code Map}.
  */
-public class MapStrategy extends AbstractVariableSizedPropertyValueStrategy<Map> {
+public class MapStrategy
+  extends AbstractVariableSizedPropertyValueStrategy<Map<PropertyValue, PropertyValue>> {
 
   @Override
-  public Map read(DataInputView inputView, byte typeByte) throws IOException {
+  public Map<PropertyValue, PropertyValue> read(DataInputView inputView, byte typeByte) throws IOException {
     int length;
     // read length
     if ((typeByte & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
@@ -83,16 +84,27 @@ public class MapStrategy extends AbstractVariableSizedPropertyValueStrategy<Map>
 
   @Override
   public boolean is(Object value) {
-    return value instanceof Map;
+    boolean keyIsPropertyValue = false;
+    boolean valIsPropertyValue = false;
+
+    if (value instanceof Map) {
+      for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) value).entrySet()) {
+        keyIsPropertyValue = entry.getKey() instanceof PropertyValue;
+        valIsPropertyValue = entry.getValue() instanceof PropertyValue;
+        if (keyIsPropertyValue == false || valIsPropertyValue == false) break;
+      }
+    }
+
+    return keyIsPropertyValue && valIsPropertyValue;
   }
 
   @Override
-  public Class<Map> getType() {
-    return Map.class;
+  public Class<Map<PropertyValue, PropertyValue>> getType() {
+    return (Class) Map.class;
   }
 
   @Override
-  public Map get(byte[] bytes) {
+  public Map<PropertyValue, PropertyValue> get(byte[] bytes) {
     PropertyValue key;
     PropertyValue value;
 
@@ -128,12 +140,9 @@ public class MapStrategy extends AbstractVariableSizedPropertyValueStrategy<Map>
   }
 
   @Override
-  public byte[] getRawBytes(Map value) {
-    Map<PropertyValue, PropertyValue> map = value;
-
-    int size =
-      map.keySet().stream().mapToInt(PropertyValue::byteSize).sum() +
-        map.values().stream().mapToInt(PropertyValue::byteSize).sum() +
+  public byte[] getRawBytes(Map<PropertyValue, PropertyValue> value) {
+    int size = value.keySet().stream().mapToInt(PropertyValue::byteSize).sum() +
+        value.values().stream().mapToInt(PropertyValue::byteSize).sum() +
         PropertyValue.OFFSET;
 
     ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
@@ -142,7 +151,7 @@ public class MapStrategy extends AbstractVariableSizedPropertyValueStrategy<Map>
 
     try {
       outputStream.write(PropertyValue.TYPE_MAP);
-      for (Map.Entry<PropertyValue, PropertyValue> entry : map.entrySet()) {
+      for (Map.Entry<PropertyValue, PropertyValue> entry : value.entrySet()) {
         entry.getKey().write(outputView);
         entry.getValue().write(outputView);
       }

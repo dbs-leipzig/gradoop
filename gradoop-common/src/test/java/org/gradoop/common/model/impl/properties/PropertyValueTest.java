@@ -735,6 +735,33 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  @Test(expected = UnsupportedTypeException.class)
+  public void testCreateWrongParameterizedList() {
+    List<String> list = new ArrayList<>();
+    list.add("test1");
+    list.add("test2");
+    list.add("test3");
+    PropertyValue p = PropertyValue.create(list);
+  }
+
+  @Test(expected = UnsupportedTypeException.class)
+  public void testCreateWrongParameterizedMap() {
+    Map<String, String> map = new HashMap<>();
+    map.put("key1", "val1");
+    map.put("key2", "val2");
+    map.put("key3", "val3");
+    PropertyValue p = PropertyValue.create(map);
+  }
+
+  @Test(expected = UnsupportedTypeException.class)
+  public void testCreateWrongParameterizedSet() {
+    Set<String> set = new HashSet<>();
+    set.add("test1");
+    set.add("test2");
+    set.add("test3");
+    PropertyValue p = PropertyValue.create(set);
+  }
+
   @Test
   public void testGetList() {
     PropertyValue p = PropertyValue.create(LIST_VAL_a);

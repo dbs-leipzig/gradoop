@@ -34,10 +34,10 @@ import java.util.Set;
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code Set}.
  */
-public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set> {
+public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<PropertyValue>> {
 
   @Override
-  public Set read(DataInputView inputView, byte typeByte) throws IOException {
+  public Set<PropertyValue> read(DataInputView inputView, byte typeByte) throws IOException {
     int length;
     // read length
     if ((typeByte & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
@@ -53,7 +53,7 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set>
     }
 
     PropertyValue entry;
-    Set<PropertyValue> set = new HashSet<PropertyValue>();
+    Set<PropertyValue> set = new HashSet<>();
     ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
     DataInputStream inputStream = new DataInputStream(byteStream);
     DataInputView internalInputView = new DataInputViewStreamWrapper(inputStream);
@@ -79,16 +79,25 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set>
 
   @Override
   public boolean is(Object value) {
-    return value instanceof Set;
+    boolean isSet = false;
+
+    if (value instanceof Set) {
+      for (Object item : (Set) value) {
+        isSet = item instanceof PropertyValue;
+        if (isSet == false) break;
+      }
+    }
+
+    return isSet;
   }
 
   @Override
-  public Class<Set> getType() {
-    return Set.class;
+  public Class<Set<PropertyValue>> getType() {
+    return (Class) Set.class;
   }
 
   @Override
-  public Set get(byte[] bytes) {
+  public Set<PropertyValue> get(byte[] bytes) {
     PropertyValue entry;
     Set<PropertyValue> set = new HashSet<PropertyValue>();
     ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
@@ -117,10 +126,8 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set>
   }
 
   @Override
-  public byte[] getRawBytes(Set value) {
-    Set<PropertyValue> set = value;
-
-    int size = set.stream().mapToInt(PropertyValue::byteSize)
+  public byte[] getRawBytes(Set<PropertyValue> value) {
+    int size = value.stream().mapToInt(PropertyValue::byteSize)
       .sum() + PropertyValue.OFFSET + Bytes.SIZEOF_SHORT;
 
     ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
@@ -130,7 +137,7 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set>
     try {
       outputStream.write(getRawType());
 
-      for (PropertyValue entry : set) {
+      for (PropertyValue entry : value) {
         entry.write(outputView);
       }
     } catch (IOException e) {

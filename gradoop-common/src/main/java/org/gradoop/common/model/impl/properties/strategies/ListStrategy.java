@@ -32,10 +32,10 @@ import java.util.List;
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code List}.
  */
-public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<List> {
+public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<List<PropertyValue>> {
 
   @Override
-  public List read(DataInputView inputView, byte typeByte) throws IOException {
+  public List<PropertyValue> read(DataInputView inputView, byte typeByte) throws IOException {
     int length;
     // read length
     if ((typeByte & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
@@ -81,16 +81,25 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
 
   @Override
   public boolean is(Object value) {
-    return value instanceof List;
+    boolean isList = false;
+
+    if (value instanceof List) {
+      for (Object item : (List) value) {
+        isList = item instanceof PropertyValue;
+        if (isList == false) break;
+      }
+    }
+
+    return isList;
   }
 
   @Override
-  public Class<List> getType() {
-    return List.class;
+  public Class<List<PropertyValue>> getType() {
+    return (Class) List.class;
   }
 
   @Override
-  public List get(byte[] bytes) {
+  public List<PropertyValue> get(byte[] bytes) {
     PropertyValue entry;
 
     List<PropertyValue> list = new ArrayList<>();
@@ -122,10 +131,8 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
   }
 
   @Override
-  public byte[] getRawBytes(List value) {
-    List<PropertyValue> list = value;
-
-    int size = list.stream().mapToInt(PropertyValue::byteSize).sum() +
+  public byte[] getRawBytes(List<PropertyValue> value) {
+    int size = value.stream().mapToInt(PropertyValue::byteSize).sum() +
       PropertyValue.OFFSET;
 
     ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
@@ -134,7 +141,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
 
     try {
       outputStream.write(getRawType());
-      for (PropertyValue entry : list) {
+      for (PropertyValue entry : value) {
         entry.write(outputView);
       }
     } catch (IOException e) {
