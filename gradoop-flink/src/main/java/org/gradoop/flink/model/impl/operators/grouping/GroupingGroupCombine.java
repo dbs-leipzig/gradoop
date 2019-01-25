@@ -121,9 +121,4 @@ public class GroupingGroupCombine extends Grouping {
 
     return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
   }
-
-  @Override
-  public String getName() {
-    return GroupingGroupCombine.class.getName();
-  }
 }

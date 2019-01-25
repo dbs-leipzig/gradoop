@@ -78,9 +78,4 @@ public class RandomVertexSampling extends SamplingAlgorithm {
 
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
   }
-
-  @Override
-  public String getName() {
-    return RandomVertexSampling.class.getName();
-  }
 }

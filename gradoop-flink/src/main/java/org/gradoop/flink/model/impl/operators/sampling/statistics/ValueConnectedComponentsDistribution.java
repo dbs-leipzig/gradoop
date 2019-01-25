@@ -48,9 +48,4 @@ public class ValueConnectedComponentsDistribution
   public DataSet<Tuple2<Long, Long>> execute(LogicalGraph graph) {
     return new ValueWeaklyConnectedComponents(maxIteration).execute(graph);
   }
-
-  @Override
-  public String getName() {
-    return ValueConnectedComponentsDistribution.class.getName();
-  }
 }

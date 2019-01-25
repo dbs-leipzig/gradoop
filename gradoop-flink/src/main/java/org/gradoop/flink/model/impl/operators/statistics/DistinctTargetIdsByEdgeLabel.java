@@ -42,9 +42,4 @@ public class DistinctTargetIdsByEdgeLabel
       .sum(1)
       .map(new Tuple2ToWithCount<>());
   }
-
-  @Override
-  public String getName() {
-    return DistinctTargetIdsByEdgeLabel.class.getName();
-  }
 }

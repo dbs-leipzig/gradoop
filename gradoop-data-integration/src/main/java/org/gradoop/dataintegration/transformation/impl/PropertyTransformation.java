@@ -140,9 +140,4 @@ public class PropertyTransformation<
       .execute(graph);
   }
 
-  @Override
-  public String getName() {
-    return PropertyTransformation.class.getName();
-  }
-
 }

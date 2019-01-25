@@ -89,9 +89,4 @@ public class Cloning implements UnaryGraphToGraphOperator {
     return graph.getConfig().getLogicalGraphFactory()
       .fromDataSets(graphHead, vertices, edges);
   }
-
-  @Override
-  public String getName() {
-    return Cloning.class.getName();
-  }
 }

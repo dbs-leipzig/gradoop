@@ -99,9 +99,4 @@ public class PageRank extends GradoopGellyAlgorithm<NullValue, NullValue> {
     return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
       currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());
   }
-
-  @Override
-  public String getName() {
-    return PageRank.class.getName();
-  }
 }

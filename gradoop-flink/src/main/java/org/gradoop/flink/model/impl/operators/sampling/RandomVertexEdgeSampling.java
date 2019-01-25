@@ -134,9 +134,4 @@ public class RandomVertexEdgeSampling extends SamplingAlgorithm {
 
     return graph;
   }
-
-  @Override
-  public String getName() {
-    return RandomVertexEdgeSampling.class.getName();
-  }
 }

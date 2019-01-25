@@ -114,9 +114,4 @@ public class HITS extends GradoopGellyAlgorithm<NullValue, NullValue> {
       .fromDataSets(newVertices, currentGraph.getEdges());
   }
 
-  @Override
-  public String getName() {
-    return HITS.class.getName();
-  }
-
 }

@@ -78,9 +78,4 @@ public class Exclusion implements BinaryGraphToGraphOperator {
 
     return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertexSet, newEdgeSet);
   }
-
-  @Override
-  public String getName() {
-    return Exclusion.class.getName();
-  }
 }

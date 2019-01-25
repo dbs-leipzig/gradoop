@@ -100,9 +100,4 @@ public class Aggregation implements UnaryGraphToGraphOperator {
       .filter(AggregateFunction::isEdgeAggregation)
       .collect(Collectors.toSet())));
   }
-
-  @Override
-  public String getName() {
-    return Aggregation.class.getName();
-  }
 }

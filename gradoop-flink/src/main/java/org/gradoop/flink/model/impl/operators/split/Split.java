@@ -143,9 +143,4 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
     return graph.getConfig().getGraphCollectionFactory()
       .fromDataSets(newGraphs, vertices, edges);
   }
-
-  @Override
-  public String getName() {
-    return Split.class.getName();
-  }
 }
