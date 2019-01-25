@@ -65,9 +65,4 @@ public class GellyGlobalClusteringCoefficientUndirected extends ClusteringCoeffi
     return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
       resultHead, currentGraph.getVertices(), currentGraph.getEdges());
   }
-
-  @Override
-  public String getName() {
-    return GellyGlobalClusteringCoefficientUndirected.class.getName();
-  }
 }

@@ -60,9 +60,4 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(
       graph.getGraphHead(), newVertices, graph.getEdges());
   }
-
-  @Override
-  public String getName() {
-    return FilterVerticesWithDegreeOtherThanGiven.class.getName();
-  }
 }

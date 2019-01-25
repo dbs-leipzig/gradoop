@@ -117,9 +117,4 @@ public class Transformation<
 
     return factory.fromDataSets(transformedGraphHeads, transformedVertices, transformedEdges);
   }
-
-  @Override
-  public String getName() {
-    return Transformation.class.getName();
-  }
 }

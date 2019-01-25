@@ -97,9 +97,4 @@ public abstract class LabelPropagation extends GradoopGellyAlgorithm<PropertyVal
   protected int getMaxIterations() {
     return maxIterations;
   }
-
-  @Override
-  public String getName() {
-    return LabelPropagation.class.getName();
-  }
 }

@@ -86,9 +86,4 @@ public class ReduceEdgeNeighborhood extends EdgeNeighborhood {
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getGraphHead(),
       vertices, graph.getEdges());
   }
-
-  @Override
-  public String getName() {
-    return ReduceEdgeNeighborhood.class.getName();
-  }
 }

@@ -122,9 +122,4 @@ public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
 
     return graph;
   }
-
-  @Override
-  public String getName() {
-    return RandomVertexNeighborhoodSampling.class.getName();
-  }
 }
