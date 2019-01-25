@@ -763,6 +763,12 @@ public class PropertyValueTest {
   }
 
   @Test
+  public void testCreateEmptyList() {
+    List<PropertyValue> list = new ArrayList<>();
+    PropertyValue p = PropertyValue.create(list);
+  }
+
+  @Test
   public void testGetList() {
     PropertyValue p = PropertyValue.create(LIST_VAL_a);
     assertEquals(LIST_VAL_a, p.getList());

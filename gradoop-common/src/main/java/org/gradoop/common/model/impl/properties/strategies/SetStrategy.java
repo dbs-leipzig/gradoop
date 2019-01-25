@@ -82,9 +82,13 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
     boolean isSet = false;
 
     if (value instanceof Set) {
+      // set to true so empty sets get handled correctly
+      isSet = true;
       for (Object item : (Set) value) {
         isSet = item instanceof PropertyValue;
-        if (isSet == false) break;
+        if (!isSet) {
+          break;
+        }
       }
     }
 

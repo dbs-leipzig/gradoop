@@ -84,9 +84,13 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
     boolean isList = false;
 
     if (value instanceof List) {
+      // set to true so empty lists get handled correctly
+      isList = true;
       for (Object item : (List) value) {
         isList = item instanceof PropertyValue;
-        if (isList == false) break;
+        if (!isList) {
+          break;
+        }
       }
     }
 

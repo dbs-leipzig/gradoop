@@ -36,7 +36,8 @@ public class MapStrategy
   extends AbstractVariableSizedPropertyValueStrategy<Map<PropertyValue, PropertyValue>> {
 
   @Override
-  public Map<PropertyValue, PropertyValue> read(DataInputView inputView, byte typeByte) throws IOException {
+  public Map<PropertyValue, PropertyValue> read(DataInputView inputView, byte typeByte)
+      throws IOException {
     int length;
     // read length
     if ((typeByte & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
@@ -88,10 +89,15 @@ public class MapStrategy
     boolean valIsPropertyValue = false;
 
     if (value instanceof Map) {
+      // set to true so empty maps get handled correctly
+      keyIsPropertyValue = true;
+      valIsPropertyValue = true;
       for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) value).entrySet()) {
         keyIsPropertyValue = entry.getKey() instanceof PropertyValue;
         valIsPropertyValue = entry.getValue() instanceof PropertyValue;
-        if (keyIsPropertyValue == false || valIsPropertyValue == false) break;
+        if (!keyIsPropertyValue || !valIsPropertyValue) {
+          break;
+        }
       }
     }
 
