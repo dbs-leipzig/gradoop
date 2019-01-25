@@ -18,14 +18,13 @@ package org.gradoop.common.model.impl.properties.strategies;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
 import java.io.IOException;
 
 /**
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code Double}.
  */
-public class DoubleStrategy implements PropertyValueStrategy<Double> {
+public class DoubleStrategy extends AbstractFixSizedPropertyValueStrategy<Double> {
 
   @Override
   public Double read(DataInputView inputView, byte typeByte) throws IOException {

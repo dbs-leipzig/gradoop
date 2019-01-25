@@ -37,9 +37,7 @@ public interface PropertyValueStrategy<T> {
    * @param outputView that the value is written to.
    * @throws IOException if write process fails.
    */
-  default void write(T value, DataOutputView outputView) throws IOException {
-    outputView.write(getRawBytes(value));
-  }
+  void write(T value, DataOutputView outputView) throws IOException;
 
   /**
    * Reads raw bytes from the given {@code DataInputView} and deserializes the contained object.

@@ -19,7 +19,6 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.DateTimeSerializer;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -28,7 +27,7 @@ import java.util.Arrays;
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code LocalTime}.
  */
-public class TimeStrategy implements PropertyValueStrategy<LocalTime> {
+public class TimeStrategy extends AbstractFixSizedPropertyValueStrategy<LocalTime> {
 
   @Override
   public LocalTime read(DataInputView inputView, byte typeByte) throws IOException {

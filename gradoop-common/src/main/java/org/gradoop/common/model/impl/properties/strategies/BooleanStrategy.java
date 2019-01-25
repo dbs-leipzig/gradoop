@@ -18,7 +18,6 @@ package org.gradoop.common.model.impl.properties.strategies;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
 
 import java.io.IOException;
 
@@ -26,7 +25,7 @@ import java.io.IOException;
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code Boolean}.
  */
-public class BooleanStrategy implements PropertyValueStrategy<Boolean> {
+public class BooleanStrategy extends AbstractFixSizedPropertyValueStrategy<Boolean> {
 
   @Override
   public Boolean read(DataInputView inputView, byte typeByte) throws IOException {
@@ -63,6 +62,8 @@ public class BooleanStrategy implements PropertyValueStrategy<Boolean> {
   }
 
   /**
+   * {@inheritDoc}
+   *
    * Warning: Please note that if {@code null} is passed as an argument, it is going to be evaluated
    * as if it was false.
    */

@@ -19,7 +19,6 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -27,7 +26,7 @@ import java.util.Arrays;
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code GradoopIdStrategy}.
  */
-public class GradoopIdStrategy implements PropertyValueStrategy<GradoopId> {
+public class GradoopIdStrategy extends AbstractFixSizedPropertyValueStrategy<GradoopId> {
 
   @Override
   public GradoopId read(DataInputView inputView, byte typeByte) throws IOException {

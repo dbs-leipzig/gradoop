@@ -21,7 +21,6 @@ import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,27 +34,7 @@ import java.util.Set;
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code Set}.
  */
-public class SetStrategy implements PropertyValueStrategy<Set> {
-
-  @Override
-  public void write(Set value, DataOutputView outputView) throws IOException {
-    byte[] rawBytes = getRawBytes(value);
-    byte type = rawBytes[0];
-
-    if (rawBytes.length > PropertyValue.LARGE_PROPERTY_THRESHOLD) {
-      type |= PropertyValue.FLAG_LARGE;
-    }
-    outputView.writeByte(type);
-
-    // Write length as an int if the "large" flag is set.
-    if ((type & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
-      outputView.writeInt(rawBytes.length - PropertyValue.OFFSET);
-    } else {
-      outputView.writeShort(rawBytes.length - PropertyValue.OFFSET);
-    }
-
-    outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);
-  }
+public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set> {
 
   @Override
   public Set read(DataInputView inputView, byte typeByte) throws IOException {

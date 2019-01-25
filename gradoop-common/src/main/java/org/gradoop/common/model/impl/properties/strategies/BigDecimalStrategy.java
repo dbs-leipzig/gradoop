@@ -16,10 +16,8 @@
 package org.gradoop.common.model.impl.properties.strategies;
 
 import org.apache.flink.core.memory.DataInputView;
-import org.apache.flink.core.memory.DataOutputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -29,27 +27,7 @@ import java.util.Arrays;
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code BigDecimal}.
  */
-public class BigDecimalStrategy implements PropertyValueStrategy<BigDecimal> {
-
-  @Override
-  public void write(BigDecimal value, DataOutputView outputView) throws IOException {
-    byte[] rawBytes = getRawBytes(value);
-    byte type = rawBytes[0];
-
-    if (rawBytes.length > PropertyValue.LARGE_PROPERTY_THRESHOLD) {
-      type |= PropertyValue.FLAG_LARGE;
-    }
-    outputView.writeByte(type);
-
-    // Write length as an int if the "large" flag is set.
-    if ((type & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
-      outputView.writeInt(rawBytes.length - PropertyValue.OFFSET);
-    } else {
-      outputView.writeShort(rawBytes.length - PropertyValue.OFFSET);
-    }
-
-    outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);
-  }
+public class BigDecimalStrategy extends AbstractVariableSizedPropertyValueStrategy<BigDecimal> {
 
   @Override
   public BigDecimal read(DataInputView inputView, byte typeByte) throws IOException {
