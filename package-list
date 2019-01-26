@@ -34,6 +34,7 @@ org.gradoop.examples.grouping
 org.gradoop.examples.io
 org.gradoop.examples.minimalimport
 org.gradoop.examples.patternmatching
+org.gradoop.examples.quickstart
 org.gradoop.examples.rollup
 org.gradoop.examples.rollup.functions
 org.gradoop.examples.sna
