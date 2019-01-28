@@ -54,9 +54,6 @@ public class VertexIdsFromEdge
     this.switched = switched;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple2<GradoopId, GradoopId> map(Edge edge) throws Exception {
     if (switched) {

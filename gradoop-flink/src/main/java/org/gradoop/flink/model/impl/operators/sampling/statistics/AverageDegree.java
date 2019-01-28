@@ -50,9 +50,4 @@ public class AverageDegree implements UnaryGraphToGraphOperator {
     return graph.getConfig().getLogicalGraphFactory()
       .fromDataSets(newGraphHead, graph.getVertices(), graph.getEdges());
   }
-
-  @Override
-  public String getName() {
-    return AverageDegree.class.getName();
-  }
 }

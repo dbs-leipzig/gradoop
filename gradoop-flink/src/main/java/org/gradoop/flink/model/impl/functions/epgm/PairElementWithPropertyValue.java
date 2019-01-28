@@ -51,9 +51,6 @@ public class PairElementWithPropertyValue<EL extends Element>
     this.reuseTuple   = new Tuple2<>();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple2<GradoopId, PropertyValue> map(EL el) throws Exception {
     reuseTuple.f0 = el.getId();

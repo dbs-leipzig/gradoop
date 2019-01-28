@@ -83,9 +83,6 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
     this.edgeDict = new HashMap<>();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public List<Embedding<GradoopId>> findEmbeddings(GraphWithCandidates graph,
     String query) {
@@ -141,9 +138,6 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
     return results;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Boolean hasEmbedding(GraphWithCandidates graph, String query) {
 

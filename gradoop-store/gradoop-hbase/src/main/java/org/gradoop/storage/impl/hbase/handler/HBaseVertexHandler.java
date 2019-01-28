@@ -70,9 +70,6 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
     this.vertexFactory = vertexFactory;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void createTable(final Admin admin, final HTableDescriptor tableDescriptor)
     throws IOException {
@@ -90,9 +87,6 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeVertex(Put put, EPGMVertex vertexData) {
     writeLabel(put, vertexData);
@@ -101,27 +95,18 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
     return put;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Vertex readVertex(final Result res) {
     return vertexFactory.initVertex(readId(res), readLabel(res), readProperties(res),
       readGraphIds(res));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public VertexHandler applyQuery(ElementQuery<HBaseElementFilter<Vertex>> query) {
     this.vertexQuery = query;
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ElementQuery<HBaseElementFilter<Vertex>> getQuery() {
     return this.vertexQuery;

@@ -37,17 +37,11 @@ public class RandomVertexNeighborhoodSamplingTest extends ParameterizedTestForGr
       Neighborhood.valueOf(neighborType));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SamplingAlgorithm getSamplingOperator() {
     return new RandomVertexNeighborhoodSampling(sampleSize, seed, neighborType);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
   }

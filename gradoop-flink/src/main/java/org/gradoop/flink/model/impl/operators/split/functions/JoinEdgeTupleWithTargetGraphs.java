@@ -41,9 +41,6 @@ public class JoinEdgeTupleWithTargetGraphs<E extends Edge>
   private final Tuple3<E, GradoopIdSet, GradoopIdSet> reuseTuple =
     new Tuple3<>();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple3<E, GradoopIdSet, GradoopIdSet> join(
     Tuple2<E, GradoopIdSet> left,

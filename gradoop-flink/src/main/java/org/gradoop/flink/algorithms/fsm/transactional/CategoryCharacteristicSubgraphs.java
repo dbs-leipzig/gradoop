@@ -248,9 +248,4 @@ public class CategoryCharacteristicSubgraphs
       .withBroadcastSet(categoryMinFrequencies, DIMSpanConstants.MIN_FREQUENCY);
   }
 
-  @Override
-  public String getName() {
-    return this.getClass().getSimpleName();
-  }
-
 }

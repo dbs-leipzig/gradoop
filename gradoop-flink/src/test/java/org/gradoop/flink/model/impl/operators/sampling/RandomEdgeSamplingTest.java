@@ -39,17 +39,11 @@ public class RandomEdgeSamplingTest extends ParameterizedTestForGraphSampling {
     super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SamplingAlgorithm getSamplingOperator() {
     return new RandomEdgeSampling(sampleSize, seed);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
     Set<GradoopId> connectedVerticesIDs = new HashSet<>();

@@ -49,9 +49,4 @@ public class DistinctByIsomorphism extends GroupByIsomorphism {
 
     return selectVerticesAndEdges(collection, graphHeads);
   }
-
-  @Override
-  public String getName() {
-    return DistinctByIsomorphism.class.getName();
-  }
 }

@@ -169,9 +169,4 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
       .getLogicalGraphFactory()
       .fromDataSets(logicalGraph.getGraphHead(), vertices, edges);
   }
-
-  @Override
-  public String getName() {
-    return ExtractPropertyFromVertex.class.getName();
-  }
 }

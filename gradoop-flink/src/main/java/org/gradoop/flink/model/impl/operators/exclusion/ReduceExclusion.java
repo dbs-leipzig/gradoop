@@ -75,9 +75,4 @@ public class ReduceExclusion implements ReducibleBinaryGraphToGraphOperator {
 
     return collection.getConfig().getLogicalGraphFactory().fromDataSets(vertices, edges);
   }
-
-  @Override
-  public String getName() {
-    return ReduceExclusion.class.getName();
-  }
 }

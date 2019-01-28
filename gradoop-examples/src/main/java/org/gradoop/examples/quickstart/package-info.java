@@ -13,20 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.statistics;
-
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
-import org.gradoop.flink.model.impl.operators.count.Count;
-
 /**
- * Computes the number of vertices in the given graph.
+ *  Simple Gradoop Example that walks through the process of loading data, doing a simple graph
+ *   transformation and storing the results
  */
-public class VertexCount implements UnaryGraphToValueOperator<DataSet<Long>> {
-
-  @Override
-  public DataSet<Long> execute(LogicalGraph graph) {
-    return Count.count(graph.getVertices());
-  }
-}
+package org.gradoop.examples.quickstart;

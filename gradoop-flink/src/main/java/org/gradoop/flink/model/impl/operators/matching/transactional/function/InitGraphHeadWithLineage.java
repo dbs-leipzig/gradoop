@@ -45,9 +45,6 @@ public class InitGraphHeadWithLineage
     this.graphHeadFactory = epgmGraphHeadFactory;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphHead map(Tuple2<GradoopId, GradoopId> idTuple) {
     GraphHead head = graphHeadFactory.initGraphHead(idTuple.f0);
@@ -57,9 +54,6 @@ public class InitGraphHeadWithLineage
     return head;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public TypeInformation<GraphHead> getProducedType() {
     return TypeExtractor.createTypeInfo(graphHeadFactory.getType());

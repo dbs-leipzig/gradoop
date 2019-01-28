@@ -53,9 +53,6 @@ public final class Not<T extends EPGMElement> implements HBaseElementFilter<T> {
     return new Not<>(predicate);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   public Filter toHBaseFilter(boolean negate) {
@@ -63,9 +60,6 @@ public final class Not<T extends EPGMElement> implements HBaseElementFilter<T> {
     return predicate.toHBaseFilter(!negate);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return "NOT " + predicate;

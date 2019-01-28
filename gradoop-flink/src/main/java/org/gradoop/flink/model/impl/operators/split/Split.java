@@ -67,9 +67,6 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
     this.function = function;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection execute(LogicalGraph graph) {
 
@@ -145,13 +142,5 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
 
     return graph.getConfig().getGraphCollectionFactory()
       .fromDataSets(newGraphs, vertices, edges);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return Split.class.getName();
   }
 }

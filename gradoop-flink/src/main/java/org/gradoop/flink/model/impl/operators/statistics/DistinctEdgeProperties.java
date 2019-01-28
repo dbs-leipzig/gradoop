@@ -33,9 +33,4 @@ public class DistinctEdgeProperties extends DistinctProperties<Edge, String> {
   protected DataSet<Tuple2<String, Set<PropertyValue>>> extractValuePairs(LogicalGraph graph) {
     return graph.getEdges().flatMap(new ExtractPropertyValues<>());
   }
-
-  @Override
-  public String getName() {
-    return DistinctEdgeProperties.class.getName();
-  }
 }

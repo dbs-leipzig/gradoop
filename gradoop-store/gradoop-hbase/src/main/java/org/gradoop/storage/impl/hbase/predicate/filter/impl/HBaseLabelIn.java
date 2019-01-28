@@ -40,9 +40,6 @@ public class HBaseLabelIn<T extends EPGMElement> extends LabelIn<HBaseElementFil
     super(labels);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   public Filter toHBaseFilter(boolean negate) {

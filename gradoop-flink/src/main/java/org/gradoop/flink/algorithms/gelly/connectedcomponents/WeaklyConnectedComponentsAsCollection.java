@@ -78,9 +78,4 @@ public class WeaklyConnectedComponentsAsCollection implements UnaryGraphToCollec
       split.getVertices().map(new PropertyRemover<>(propertyKey)),
       split.getEdges().map(new PropertyRemover<>(propertyKey)));
   }
-
-  @Override
-  public String getName() {
-    return WeaklyConnectedComponentsAsCollection.class.getName();
-  }
 }

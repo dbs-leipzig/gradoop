@@ -111,9 +111,6 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
     this.degreeType = degreeType;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
@@ -140,14 +137,6 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
 
     return graph.getConfig().getLogicalGraphFactory()
       .fromDataSets(graph.getGraphHead(), newVertices, newEdges);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return RandomLimitedDegreeVertexSampling.class.getName();
   }
 
 }
