@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,13 +96,23 @@ public class AccumuloStoreTestBase extends GradoopFlinkTestBase {
     return ret;
   }
 
+  /**
+   * Wraps a test function.
+   */
   public interface SocialTestContext {
 
+    /**
+     * Run the test.
+     *
+     * @param loader The loader used for access to a test graph.
+     * @param store The store instance to test.
+     * @param config The gradoop flink config used to run tests.
+     * @throws Throwable an Exception thrown by the test.
+     */
     void test(
       AsciiGraphLoader<GraphHead, Vertex, Edge> loader,
       AccumuloEPGMStore store,
       GradoopFlinkConfig config
     ) throws Throwable;
-
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,23 +60,17 @@ public class EdgeTableInputFormat extends BaseTableInputFormat<Edge> {
     scan.setCaching(EPGMGraphOutput.DEFAULT_CACHE_SIZE);
 
     if (edgeHandler.getQuery() != null) {
-      attachFilter(edgeHandler.getQuery(), scan);
+      attachFilter(edgeHandler.getQuery(), scan, edgeHandler.isSpreadingByteUsed());
     }
 
     return scan;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String getTableName() {
     return edgeTableName;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Tuple1<Edge> mapResultToTuple(Result result) {
     return new Tuple1<>(edgeHandler.readEdge(result));

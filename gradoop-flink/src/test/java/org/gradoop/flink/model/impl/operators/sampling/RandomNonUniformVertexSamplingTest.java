@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,17 +36,11 @@ public class RandomNonUniformVertexSamplingTest extends ParameterizedTestForGrap
     super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SamplingAlgorithm getSamplingOperator() {
     return new RandomNonUniformVertexSampling(sampleSize, seed);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
 

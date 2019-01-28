@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,10 +64,5 @@ public class CollectionEquality
       canonicalAdjacencyMatrixBuilder.execute(firstCollection),
       canonicalAdjacencyMatrixBuilder.execute(secondCollection)
     );
-  }
-
-  @Override
-  public String getName() {
-    return this.getClass().getSimpleName();
   }
 }

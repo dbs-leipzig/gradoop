@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * Represents a property value that is {@code null}.
    */
   public static final PropertyValue NULL_VALUE = PropertyValue.create(null);
-
   /**
    * {@code <property-type>} for empty property value (i.e. {@code null})
    */

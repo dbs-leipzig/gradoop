@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,43 +59,26 @@ public class Edge extends GraphElement implements EPGMEdge {
     this.targetId = targetId;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopId getSourceId() {
     return sourceId;
   }
 
-  /**
-   * {@inheritDoc}
-   * @param sourceId
-   */
   @Override
   public void setSourceId(GradoopId sourceId) {
     this.sourceId = sourceId;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopId getTargetId() {
     return targetId;
   }
 
-  /**
-   * {@inheritDoc}
-   * @param targetId
-   */
   @Override
   public void setTargetId(GradoopId targetId) {
     this.targetId = targetId;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return String.format("(%s)-[%s]->(%s)",

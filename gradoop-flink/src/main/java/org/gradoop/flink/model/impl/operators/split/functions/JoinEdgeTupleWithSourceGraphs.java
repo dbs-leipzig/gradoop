@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,6 @@ public class JoinEdgeTupleWithSourceGraphs<E extends Edge>
    */
   private final Tuple2<E, GradoopIdSet> reuseTuple = new Tuple2<>();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple2<E, GradoopIdSet> join(
     E left, Tuple2<GradoopId, GradoopIdSet> right) {

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,9 +85,6 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     this.edgeFilterFunction = edgeFilterFunction;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection executeForGVELayout(GraphCollection collection) {
     return vertexFilterFunction != null && edgeFilterFunction != null ?
@@ -96,9 +93,6 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
         edgeInducedSubgraph(collection);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection executeForTxLayout(GraphCollection collection) {
     return executeForGVELayout(collection);
@@ -352,10 +346,5 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
 
     return collection.getConfig().getGraphCollectionFactory()
       .fromDataSets(newGraphHeads, newVertices, newEdges);
-  }
-
-  @Override
-  public String getName() {
-    return ApplySubgraph.class.getName();
   }
 }

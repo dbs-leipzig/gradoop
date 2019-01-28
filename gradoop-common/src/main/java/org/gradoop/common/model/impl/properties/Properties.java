@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,9 +258,6 @@ public class Properties implements Iterable<Property>, Value, Serializable {
     return properties != null ? properties.hashCode() : 0;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Iterator<Property> iterator() {
     return toList().iterator();
@@ -277,9 +274,6 @@ public class Properties implements Iterable<Property>, Value, Serializable {
             .collect(Collectors.toList());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(DataOutputView outputView) throws IOException {
     outputView.writeInt(properties.size());
@@ -290,10 +284,6 @@ public class Properties implements Iterable<Property>, Value, Serializable {
     }
   }
 
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void read(DataInputView inputView) throws IOException {
     int propertyCount = inputView.readInt();
@@ -310,9 +300,6 @@ public class Properties implements Iterable<Property>, Value, Serializable {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return toList().stream()

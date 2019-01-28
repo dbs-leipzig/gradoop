@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,5 @@ public class DistinctEdgePropertiesByLabel
   protected DataSet<Tuple2<Tuple2<String, String>, Set<PropertyValue>>> extractValuePairs(
     LogicalGraph graph) {
     return graph.getEdges().flatMap(new ExtractPropertyValuesByLabel<>());
-  }
-
-  @Override
-  public String getName() {
-    return DistinctEdgePropertiesByLabel.class.getName();
   }
 }

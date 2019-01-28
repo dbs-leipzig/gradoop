@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,9 +45,6 @@ public class InitGraphHeadWithLineage
     this.graphHeadFactory = epgmGraphHeadFactory;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphHead map(Tuple2<GradoopId, GradoopId> idTuple) {
     GraphHead head = graphHeadFactory.initGraphHead(idTuple.f0);
@@ -57,9 +54,6 @@ public class InitGraphHeadWithLineage
     return head;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public TypeInformation<GraphHead> getProducedType() {
     return TypeExtractor.createTypeInfo(graphHeadFactory.getType());

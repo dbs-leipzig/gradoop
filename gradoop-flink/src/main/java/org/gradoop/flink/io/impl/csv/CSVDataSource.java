@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToEdge;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToGraphHead;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToVertex;
-import org.gradoop.flink.io.impl.csv.metadata.MetaData;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
@@ -32,15 +32,15 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * A graph data source for CSV files.
- *
+ * <p>
  * The datasource expects files separated by vertices and edges, e.g. in the following directory
  * structure:
- *
+ * <p>
  * csvRoot
- *   |- vertices.csv # all vertex data
- *   |- edges.csv    # all edge data
- *   |- graphs.csv   # all graph head data
- *   |- metadata.csv # Meta data for all data contained in the graph
+ * |- vertices.csv # all vertex data
+ * |- edges.csv    # all edge data
+ * |- graphs.csv   # all graph head data
+ * |- metadata.csv # Meta data for all data contained in the graph
  */
 public class CSVDataSource extends CSVBase implements DataSource {
 
@@ -48,7 +48,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
    * Creates a new CSV data source.
    *
    * @param csvPath path to the directory containing the CSV files
-   * @param config Gradoop Flink configuration
+   * @param config  Gradoop Flink configuration
    */
   public CSVDataSource(String csvPath, GradoopFlinkConfig config) {
     super(csvPath, config);
@@ -56,7 +56,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
 
   /**
    * {@inheritDoc}
-   *
+   * <p>
    * Graph heads will be disposed at the moment. The following issue attempts to provide
    * alternatives to keep graph heads: https://github.com/dbs-leipzig/gradoop/issues/974
    */
@@ -68,7 +68,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
   @Override
   public GraphCollection getGraphCollection() {
     DataSet<Tuple3<String, String, String>> metaData =
-      MetaData.fromFile(getMetaDataPath(), getConfig());
+      new CSVMetaDataSource().readDistributed(getMetaDataPath(), getConfig());
 
     DataSet<GraphHead> graphHeads = getConfig().getExecutionEnvironment()
       .readTextFile(getGraphHeadCSVPath())

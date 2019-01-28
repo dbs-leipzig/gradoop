@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 import org.gradoop.storage.impl.hbase.handler.HBaseEdgeHandler;
 import org.gradoop.storage.impl.hbase.handler.HBaseGraphHeadHandler;
 import org.gradoop.storage.impl.hbase.handler.HBaseVertexHandler;
+import org.gradoop.storage.utils.RegionSplitter;
+import org.gradoop.storage.utils.RowKeyDistributor;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -220,5 +222,44 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
    */
   public EdgeHandler getEdgeHandler() {
     return edgeHandler;
+  }
+
+  /**
+   * Enable/Disable the usage of pre-splitting regions at the moment of table creation.
+   * If the HBase table size grows, it should be created with pre-split regions in order to avoid
+   * region hotspots. If certain region servers are stressed by very intensive write/read
+   * operations, HBase may drop that region server because the Zookeeper connection will timeout.
+   *
+   * Note that this flag has no effect if the tables already exist.
+   *
+   * @param numberOfRegions the number of regions used for splitting
+   * @return this modified config
+   */
+  public GradoopHBaseConfig enablePreSplitRegions(final int numberOfRegions) {
+    RegionSplitter.getInstance().setNumberOfRegions(numberOfRegions);
+    this.vertexHandler.setPreSplitRegions(true);
+    this.edgeHandler.setPreSplitRegions(true);
+    this.graphHeadHandler.setPreSplitRegions(true);
+    return this;
+  }
+
+  /**
+   * Enable/Disable the usage of a spreading byte as prefix of each HBase row key. This affects
+   * reading and writing from/to HBase.
+   *
+   * Records in HBase are sorted lexicographically by the row key. This allows fast access to
+   * an individual record by its key and fast fetching of a range of data given start and stop keys.
+   * But writing records with such naive keys will cause hotspotting because of how HBase writes
+   * data to its Regions. With this option you can disable this hotspotting.
+   *
+   * @param bucketCount the number of spreading bytes to use
+   * @return this modified config
+   */
+  public GradoopHBaseConfig useSpreadingByte(final int bucketCount) {
+    RowKeyDistributor.getInstance().setBucketCount((byte) bucketCount);
+    this.vertexHandler.setSpreadingByteUsage(true);
+    this.edgeHandler.setSpreadingByteUsage(true);
+    this.graphHeadHandler.setSpreadingByteUsage(true);
+    return this;
   }
 }

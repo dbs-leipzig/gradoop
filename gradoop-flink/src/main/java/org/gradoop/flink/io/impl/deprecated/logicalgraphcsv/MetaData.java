@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.gradoop.flink.io.api.metadata.MetaDataSource;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
-import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.BufferedReader;
@@ -103,7 +104,7 @@ public class MetaData {
    */
   public Set<String> getVertexLabels() {
     return metaData.keySet().stream()
-      .filter(key -> key.f0.equals(CSVConstants.VERTEX_TYPE))
+      .filter(key -> key.f0.equals(MetaDataSource.VERTEX_TYPE))
       .map(key -> key.f1)
       .collect(Collectors.toSet());
   }
@@ -115,7 +116,7 @@ public class MetaData {
    */
   public Set<String> getEdgeLabels() {
     return metaData.keySet().stream()
-      .filter(key -> key.f0.equals(CSVConstants.EDGE_TYPE))
+      .filter(key -> key.f0.equals(MetaDataSource.EDGE_TYPE))
       .map(key -> key.f1)
       .collect(Collectors.toSet());
   }

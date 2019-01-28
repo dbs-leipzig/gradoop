@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,7 @@
  */
 package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;
 
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
-import org.gradoop.flink.io.impl.csv.functions.ElementToPropertyMetaData;
-import org.gradoop.flink.io.impl.csv.functions.ReducePropertyMetaData;
-import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;
@@ -138,37 +129,5 @@ public abstract class LogicalGraphCSVBase {
 
   protected GradoopFlinkConfig getConfig() {
     return config;
-  }
-
-  /**
-   * Creates the meta data for the given graph.
-   *
-   * @param graph logical graph
-   * @return meta data information
-   */
-  protected DataSet<Tuple3<String, String, String>> createMetaData(LogicalGraph graph) {
-    return createMetaData(graph.getVertices())
-      .union(createMetaData(graph.getEdges()));
-  }
-
-  /**
-   * Creates the meta data for the specified data set of EPGM elements.
-   *
-   * @param elements EPGM elements
-   * @param <E> EPGM element type
-   * @return meta data information
-   */
-  protected <E extends Element> DataSet<Tuple3<String, String, String>> createMetaData(
-    DataSet<E> elements) {
-    return elements
-      .map(new ElementToPropertyMetaData<>())
-      .groupBy(1)
-      .reduce(new ReducePropertyMetaData())
-      .map(tuple -> Tuple3.of(tuple.f0, tuple.f1, MetaDataParser.getPropertiesMetaData(tuple.f2)))
-      .returns(new TupleTypeInfo<>(
-        BasicTypeInfo.STRING_TYPE_INFO,
-        BasicTypeInfo.STRING_TYPE_INFO,
-        BasicTypeInfo.STRING_TYPE_INFO))
-      .withForwardedFields("f0", "f1");
   }
 }

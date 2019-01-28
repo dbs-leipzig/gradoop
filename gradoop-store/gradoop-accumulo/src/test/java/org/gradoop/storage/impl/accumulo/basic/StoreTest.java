@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
+import org.apache.accumulo.core.client.Connector;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
@@ -83,8 +84,7 @@ import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections
 import static org.gradoop.common.GradoopTestUtils.validateEPGMElements;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
 import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElements;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Accumulo graph store test
@@ -97,6 +97,66 @@ public class StoreTest extends AccumuloStoreTestBase {
   private static final String TEST03 = "basic_03";
   private static final String TEST04 = "basic_04";
   private static final String TEST05 = "basic_05";
+
+  /**
+   * Creates tables, deletes them and checks if they were deleted.
+   *
+   * @throws AccumuloSecurityException when the user does not have permissions for some actions.
+   * @throws AccumuloException on general accumulo errors.
+   * @throws IOException when deleting tables fails.
+   */
+  @Test
+  public void deleteTablesTest() throws AccumuloSecurityException, AccumuloException, IOException {
+    final String table = "test_to_delete";
+    GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(table);
+    AccumuloEPGMStore store = new AccumuloEPGMStore(config);
+    Connector connector = store.createConnector();
+    // Make sure that the tables were created.
+    assertTrue(connector.tableOperations().exists(store.getVertexTableName()));
+    assertTrue(connector.tableOperations().exists(store.getEdgeTableName()));
+    assertTrue(connector.tableOperations().exists(store.getGraphHeadName()));
+    // Delete tables.
+    store.dropTables();
+    // Check if they were deleted.
+    assertFalse(connector.tableOperations().exists(store.getVertexTableName()));
+    assertFalse(connector.tableOperations().exists(store.getEdgeTableName()));
+    assertFalse(connector.tableOperations().exists(store.getGraphHeadName()));
+  }
+
+  /**
+   * Stores a graph, truncates tables and checks if the tables still exist and if they are empty.
+   *
+   * @throws AccumuloSecurityException when the user does not have permissions for some actions.
+   * @throws AccumuloException on general accumulo errors.
+   */
+  @Test
+  public void truncateTablesTest() throws AccumuloSecurityException, AccumuloException,
+    IOException {
+    final String table = "test_to_truncate";
+    GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(table);
+
+    AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
+
+    AsciiGraphLoader<GraphHead, Vertex, Edge> loader = getMinimalFullFeaturedGraphLoader();
+
+    GraphHead graphHead = loader.getGraphHeads().iterator().next();
+    Vertex vertex = loader.getVertices().iterator().next();
+    Edge edge = loader.getEdges().iterator().next();
+
+    graphStore.writeGraphHead(graphHead);
+    graphStore.writeVertex(vertex);
+    graphStore.writeEdge(edge);
+
+    // re-open
+    graphStore.close();
+    graphStore = new AccumuloEPGMStore(config);
+    graphStore.truncateTables();
+
+    assertFalse(graphStore.getVertexSpace().hasNext());
+    assertFalse(graphStore.getEdgeSpace().hasNext());
+    assertFalse(graphStore.getGraphSpace().hasNext());
+    graphStore.close();
+  }
 
   /**
    * Creates persistent graph, vertex and edge data. Writes data to Accumulo,

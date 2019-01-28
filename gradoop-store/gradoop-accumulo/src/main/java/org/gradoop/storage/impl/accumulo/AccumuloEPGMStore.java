@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -224,6 +224,37 @@ public class AccumuloEPGMStore implements
       edgeWriter.close();
     } catch (MutationsRejectedException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Drop all tables used by this store instance.
+   *
+   * @throws IOException when deleting tables fails.
+   */
+  public void dropTables() throws IOException {
+    for (String tableName : new String[] {
+      getVertexTableName(), getEdgeTableName(), getGraphHeadName()}) {
+      try {
+        dropTableIfExists(tableName);
+      } catch (AccumuloSecurityException | AccumuloException e) {
+        throw new IOException("Failed to delete table " + tableName, e);
+      }
+    }
+  }
+
+  /**
+   * Truncate all tables handled by this store instance, i.e. delete all rows.
+   * The current implementations simply drops all tables and creates new ones.
+   *
+   * @throws IOException when deleting or creating tables fails.
+   */
+  public void truncateTables() throws IOException {
+    dropTables();
+    try {
+      createTablesIfNotExists();
+    } catch (AccumuloSecurityException | AccumuloException e) {
+      throw new IOException("Failed to create tables.", e);
     }
   }
 
@@ -468,4 +499,22 @@ public class AccumuloEPGMStore implements
     }
   }
 
+  /**
+   * Delete a table if it exists.
+   *
+   * @param tableName The table name.
+   * @throws AccumuloSecurityException if the user does not have persmissions to delete the table.
+   * @throws AccumuloException         if a general Accumulo error occurs.
+   */
+  private void dropTableIfExists(@Nonnull String tableName) throws AccumuloSecurityException,
+    AccumuloException {
+    if (conn.tableOperations().exists(tableName)) {
+      try {
+        conn.tableOperations().delete(tableName);
+      } catch (TableNotFoundException e) {
+        // We checked before if it exists, so this should not happen.
+        throw new IllegalStateException(e);
+      }
+    }
+  }
 }

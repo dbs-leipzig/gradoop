@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,6 @@ import org.apache.flink.graph.Vertex;
  */
 public class MapVertexIdComponentId implements MapFunction<Vertex<Long, Long>, Tuple2<Long, Long>> {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple2<Long, Long> map(Vertex<Long, Long> gellyVertex) throws Exception {
     return gellyVertex;

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,6 @@ public class VertexLabelDecoder extends
    */
   private Map<Integer, String> vertexDictionary;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
@@ -49,9 +46,6 @@ public class VertexLabelDecoder extends
       .get(0);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphTransaction map(GraphTransaction graphTransaction)
       throws Exception {

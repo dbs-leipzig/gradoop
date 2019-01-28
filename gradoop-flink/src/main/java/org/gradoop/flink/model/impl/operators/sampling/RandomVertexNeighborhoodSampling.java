@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,18 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
-import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeWithSourceTarget;
-import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
-import org.gradoop.flink.model.impl.operators.sampling.functions.VertexRandomMarkedMap;
-import org.gradoop.flink.model.impl.operators.sampling.functions.VertexWithId;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeSourceVertexJoin;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeTargetVertexJoin;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgesWithSampledVerticesFilter;
 import org.gradoop.flink.model.impl.operators.sampling.functions.FilterVerticesWithDegreeOtherThanGiven;
+import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
+import org.gradoop.flink.model.impl.operators.sampling.functions.VertexRandomMarkedMap;
 
 /**
  * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
@@ -103,39 +100,26 @@ public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
     this.neighborType = neighborType;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
-    DataSet<Tuple2<Vertex, GradoopId>> sampledVerticesWithId = graph.getVertices()
-      .map(new VertexRandomMarkedMap<>(sampleSize, randomSeed, PROPERTY_KEY_SAMPLED))
-      .map(new VertexWithId());
 
-    DataSet<Tuple3<Edge, GradoopId, GradoopId>> edgeSourceIdTargetId = graph.getEdges()
-      .map(new EdgeWithSourceTarget());
+    DataSet<Vertex> sampledVertices = graph.getVertices()
+      .map(new VertexRandomMarkedMap(sampleSize, randomSeed, PROPERTY_KEY_SAMPLED));
 
-    DataSet<Edge> newEdges = edgeSourceIdTargetId
-      .join(sampledVerticesWithId)
-      .where(1).equalTo(1)
-      .with(new EdgeSourceVertexJoin())
-      .join(sampledVerticesWithId)
-      .where(2).equalTo(1)
-      .with(new EdgeTargetVertexJoin())
-      .filter(new EdgesWithSampledVerticesFilter(PROPERTY_KEY_SAMPLED, neighborType))
+    DataSet<Edge> newEdges = graph.getEdges()
+      .join(sampledVertices)
+      .where(new SourceId<>()).equalTo(new Id<>())
+      .with(new EdgeSourceVertexJoin(PROPERTY_KEY_SAMPLED))
+      .join(sampledVertices)
+      .where(1).equalTo(new Id<>())
+      .with(new EdgeTargetVertexJoin(PROPERTY_KEY_SAMPLED))
+      .filter(new EdgesWithSampledVerticesFilter(neighborType))
       .map(new Value0Of3<>());
 
-    graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(graph.getVertices(), newEdges);
+    graph = graph.getFactory().fromDataSets(graph.getVertices(), newEdges);
+
     graph = new FilterVerticesWithDegreeOtherThanGiven(0L).execute(graph);
 
     return graph;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return RandomVertexNeighborhoodSampling.class.getName();
   }
 }

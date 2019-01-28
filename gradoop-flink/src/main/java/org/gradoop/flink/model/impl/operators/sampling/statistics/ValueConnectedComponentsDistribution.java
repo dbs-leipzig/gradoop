@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,19 +44,8 @@ public class ValueConnectedComponentsDistribution
     this.maxIteration = maxiIteration;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataSet<Tuple2<Long, Long>> execute(LogicalGraph graph) {
     return new ValueWeaklyConnectedComponents(maxIteration).execute(graph);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return ValueConnectedComponentsDistribution.class.getName();
   }
 }

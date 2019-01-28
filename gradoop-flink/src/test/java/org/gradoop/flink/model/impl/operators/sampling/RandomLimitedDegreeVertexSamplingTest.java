@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,17 +46,11 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParameterizedTestForG
       VertexDegree.valueOf(degreeType), Long.parseLong(degreeThreshold));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SamplingAlgorithm getSamplingOperator() {
     return new RandomLimitedDegreeVertexSampling(sampleSize, seed, degreeThreshold, degreeType);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
     List<Vertex> dbDegreeVertices = Lists.newArrayList();
