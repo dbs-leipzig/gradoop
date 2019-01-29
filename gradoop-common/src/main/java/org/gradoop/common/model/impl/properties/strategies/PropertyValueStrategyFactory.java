@@ -64,28 +64,6 @@ public class PropertyValueStrategyFactory {
   }
 
   /**
-   * Get a strategy which corresponds the provided class. If there is no mapping for the provided
-   * class in the class-strategy map, or the value of the parameter is {@code null}, an instance of
-   * {@code NoopPropertyValue} is returned.
-   *
-   * @param clazz some class
-   * @return strategy class which is able to handle the provided type.
-   */
-  public static PropertyValueStrategy get(Class clazz) {
-    PropertyValueStrategy strategy = INSTANCE.classStrategyMap.get(clazz);
-    if (strategy == null) {
-      if (Map.class.isAssignableFrom(clazz)) {
-        strategy = INSTANCE.classStrategyMap.get(Map.class);
-      } else if (Set.class.isAssignableFrom(clazz)) {
-        strategy = INSTANCE.classStrategyMap.get(Set.class);
-      } else if (List.class.isAssignableFrom(clazz)) {
-        strategy = INSTANCE.classStrategyMap.get(List.class);
-      }
-    }
-    return strategy == null ? INSTANCE.nullStrategy : strategy;
-  }
-
-  /**
    * Returns value which is represented by the the provided byte array. Assumes that the value is
    * serialized according to the {@code PropertyValue} standard.
    *
@@ -148,14 +126,52 @@ public class PropertyValueStrategyFactory {
   }
 
   /**
+   * Get a strategy which corresponds the provided class. If there is no mapping for the provided
+   * class in the class-strategy map, or the value of the parameter is {@code null}, an instance of
+   * {@code NoopPropertyValue} is returned.
+   *
+   * @param clazz some class
+   * @return strategy class which is able to handle the provided type.
+   * @throws UnsupportedTypeException when there is no matching strategy for the given class.
+   */
+  public static PropertyValueStrategy get(Class clazz) throws UnsupportedTypeException {
+    if (clazz == null) {
+      return INSTANCE.nullStrategy;
+    }
+
+    PropertyValueStrategy strategy = INSTANCE.classStrategyMap.get(clazz);
+    // class could be some implementation of List/Map/Set that we don't register in the class-
+    // strategy map, so we need to check for that.
+    if (strategy == null) {
+      if (Map.class.isAssignableFrom(clazz)) {
+        strategy = INSTANCE.classStrategyMap.get(Map.class);
+      } else if (Set.class.isAssignableFrom(clazz)) {
+        strategy = INSTANCE.classStrategyMap.get(Set.class);
+      } else if (List.class.isAssignableFrom(clazz)) {
+        strategy = INSTANCE.classStrategyMap.get(List.class);
+      }
+    }
+    if (strategy == null) {
+      throw new UnsupportedTypeException("No strategy for class " + clazz);
+    }
+
+    return strategy;
+  }
+
+  /**
    * Get strategy by object.
    *
    * @param value some object.
    * @return strategy that handles operations on the provided object type or
    * {@code NullStrategy} if no mapping for the given type exists.
+   * @throws UnsupportedTypeException when there is no matching strategy for a given object.
    */
-  public static PropertyValueStrategy get(Object value) {
+  public static PropertyValueStrategy get(Object value) throws UnsupportedTypeException {
     if (value != null) {
+      PropertyValueStrategy strategy = get(value.getClass());
+      if (strategy == null) {
+        throw new UnsupportedTypeException("No strategy for class " + value.getClass());
+      }
       return get(value.getClass());
     }
     return INSTANCE.nullStrategy;
