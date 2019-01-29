@@ -42,6 +42,7 @@ import java.util.Set;
  * A property value wraps a value that implements a supported data type.
  */
 public class PropertyValue implements Value, Serializable, Comparable<PropertyValue> {
+
   /**
    * Represents a property value that is {@code null}.
    */
@@ -137,7 +138,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   private static final long serialVersionUID = 1L;
 
   /**
-   * Actual value.
+   * Stores the object representation of the value
    */
   private Object value;
 
@@ -181,7 +182,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
-   * Create a {@link PropertyValue} that wraps a byte array
+   * Create a {@link PropertyValue} that wraps a byte array.
    *
    * @param rawBytes array to wrap
    * @return new instance of {@link PropertyValue}
@@ -206,9 +207,9 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   /**
    * Check if the property value type is an instance of a certain class.
    *
-   * @param c class to check against.
+   * @param c class to check against
    * @return true if the attribute {@code value} is an object of the provided class, false
-   * otherwise.
+   * otherwise
    */
   public boolean is(Class c) {
     return PropertyValueStrategyFactory.get(c).is(value);
@@ -693,8 +694,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
 
   @Override
   public boolean equals(Object o) {
-    return o == null ||
-      (o instanceof PropertyValue && Objects.equals(value, ((PropertyValue) o).value));
+    return o instanceof PropertyValue && Objects.equals(value, ((PropertyValue) o).value);
   }
 
   @Override
@@ -758,7 +758,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
 
     if (strategy == null) {
       throw new UnsupportedTypeException(
-              "No strategy for type byte from input view fround");
+              "No strategy for type byte from input view found");
     } else {
       value = strategy.read(inputView, typeByte);
     }

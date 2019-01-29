@@ -18,6 +18,7 @@ package org.gradoop.common.model.impl.properties.strategies;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -50,8 +51,7 @@ public class PropertyValueStrategyFactory {
   /**
    * Strategy for {@code null}-value properties.
    */
-  private final NoopPropertyValueStrategy noopPropertyValueStrategy
-  = new NoopPropertyValueStrategy();
+  private final NullStrategy nullStrategy = new NullStrategy();
 
   /**
    * Constructs an {@code PropertyValueStrategyFactory} with type - strategy mappings as defined in
@@ -82,7 +82,7 @@ public class PropertyValueStrategyFactory {
         strategy = INSTANCE.classStrategyMap.get(List.class);
       }
     }
-    return strategy == null ? INSTANCE.noopPropertyValueStrategy : strategy;
+    return strategy == null ? INSTANCE.nullStrategy : strategy;
   }
 
   /**
@@ -108,12 +108,12 @@ public class PropertyValueStrategyFactory {
    * to, or greater than {@code other}.
    */
   public static int compare(Object value, Object other) {
-    if (value != null) {
+    if (value == null) {
+      return INSTANCE.nullStrategy.compare(null, other);
+    } else {
       PropertyValueStrategy strategy = get(value.getClass());
       return strategy.compare(value, other);
     }
-
-    return 0;
   }
 
   /**
@@ -128,7 +128,7 @@ public class PropertyValueStrategyFactory {
     if (value != null) {
       return get(value.getClass()).getRawBytes(value);
     }
-    return new byte[] {0};
+    return new byte[] {PropertyValue.TYPE_NULL};
   }
 
   /**
@@ -139,15 +139,11 @@ public class PropertyValueStrategyFactory {
    * @throws UnsupportedTypeException when there is no matching strategy for a given type byte.
    */
   public static PropertyValueStrategy get(byte value) throws UnsupportedTypeException {
-    PropertyValueStrategy strategy;
-    if (value == 0) {
-      strategy = INSTANCE.noopPropertyValueStrategy;
-    } else {
-      strategy = INSTANCE.byteStrategyMap.get(value);
-    }
+    PropertyValueStrategy strategy = INSTANCE.byteStrategyMap.get(value);
     if (strategy == null) {
       throw new UnsupportedTypeException("No strategy for type byte " + value);
     }
+
     return strategy;
   }
 
@@ -156,13 +152,13 @@ public class PropertyValueStrategyFactory {
    *
    * @param value some object.
    * @return strategy that handles operations on the provided object type or
-   * {@code NoopPropertyValueStrategy} if no mapping for the given type exists.
+   * {@code NullStrategy} if no mapping for the given type exists.
    */
   public static PropertyValueStrategy get(Object value) {
     if (value != null) {
       return get(value.getClass());
     }
-    return INSTANCE.noopPropertyValueStrategy;
+    return INSTANCE.nullStrategy;
   }
 
   /**
@@ -201,6 +197,7 @@ public class PropertyValueStrategyFactory {
     for (PropertyValueStrategy strategy : classStrategyMap.values()) {
       byteMapping.put(strategy.getRawType(), strategy);
     }
+    byteMapping.put(PropertyValue.TYPE_NULL, new NullStrategy());
 
     return Collections.unmodifiableMap(byteMapping);
   }

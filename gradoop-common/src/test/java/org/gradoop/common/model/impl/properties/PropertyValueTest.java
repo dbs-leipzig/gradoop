@@ -1040,6 +1040,12 @@ public class PropertyValueTest {
   }
 
   @Test
+  public void testEqualsWithNull() {
+    PropertyValue p = PropertyValue.create(null);
+    assertNotEquals(p, null);
+  }
+
+  @Test
   public void testCompareTo() {
     // null
     assertEquals(create(null).compareTo(create(null)), 0);

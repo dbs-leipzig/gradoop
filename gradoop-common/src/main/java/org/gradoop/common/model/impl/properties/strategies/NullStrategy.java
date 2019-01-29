@@ -25,11 +25,11 @@ import java.io.IOException;
 /**
  * Strategy class for handling {@code PropertyValue} operations when the value is {@code null}.
  */
-public class NoopPropertyValueStrategy implements PropertyValueStrategy {
+public class NullStrategy implements PropertyValueStrategy {
 
   @Override
   public void write(Object value, DataOutputView outputView) throws IOException {
-    outputView.write(new byte[]{0});
+    outputView.write(new byte[]{getRawType()});
   }
 
   @Override
