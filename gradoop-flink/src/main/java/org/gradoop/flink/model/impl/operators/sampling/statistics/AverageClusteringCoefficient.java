@@ -54,9 +54,4 @@ public class AverageClusteringCoefficient implements UnaryGraphToGraphOperator {
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(
       graphHead, graph.getVertices(), graph.getEdges());
   }
-
-  @Override
-  public String getName() {
-    return AverageClusteringCoefficient.class.getName();
-  }
 }

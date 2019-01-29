@@ -36,9 +36,6 @@ public class EdgeWithSourceTarget implements MapFunction<Edge, Tuple3<Edge, Grad
     reuse = new Tuple3<>();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple3<Edge, GradoopId, GradoopId> map(Edge edge) throws Exception {
     reuse.f0 = edge;

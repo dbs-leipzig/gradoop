@@ -35,9 +35,4 @@ public class VertexDegrees implements UnaryGraphToValueOperator<DataSet<WithCoun
       .where(0).equalTo(0)
       .with(new SumCounts<>());
   }
-
-  @Override
-  public String getName() {
-    return VertexDegrees.class.getName();
-  }
 }

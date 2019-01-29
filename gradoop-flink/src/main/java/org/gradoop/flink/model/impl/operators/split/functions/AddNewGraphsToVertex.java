@@ -31,9 +31,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 @FunctionAnnotation.ReadFieldsSecond("f1")
 public class AddNewGraphsToVertex<V extends Vertex>
   implements JoinFunction<V, Tuple2<GradoopId, GradoopIdSet>, V> {
-  /**
-   * {@inheritDoc}
-   */
+
   @Override
   public V join(V vertex,
     Tuple2<GradoopId, GradoopIdSet> vertexWithGraphIds) {

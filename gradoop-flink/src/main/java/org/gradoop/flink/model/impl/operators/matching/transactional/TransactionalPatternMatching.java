@@ -219,12 +219,4 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     return collection.getConfig().getGraphCollectionFactory()
       .fromDataSets(newHeads, newVertices, newEdges);
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return TransactionalPatternMatching.class.getName();
-  }
 }

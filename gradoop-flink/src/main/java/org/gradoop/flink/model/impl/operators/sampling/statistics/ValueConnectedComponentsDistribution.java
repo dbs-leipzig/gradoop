@@ -44,19 +44,8 @@ public class ValueConnectedComponentsDistribution
     this.maxIteration = maxiIteration;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataSet<Tuple2<Long, Long>> execute(LogicalGraph graph) {
     return new ValueWeaklyConnectedComponents(maxIteration).execute(graph);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return ValueConnectedComponentsDistribution.class.getName();
   }
 }

@@ -50,9 +50,6 @@ public class EdgeSourceVertexJoin
     this.propertyKey = propertyKey;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple3<Edge, GradoopId, Boolean> join(Edge edge, Vertex vertex) throws Exception {
     reuse.f0 = edge;

@@ -109,9 +109,4 @@ public class ConnectedComponentsDistribution
     return graphWithWccIds.getGraphHead().flatMap(
       new GetConnectedComponentDistributionFlatMap(propertyKey, annotateEdges));
   }
-
-  @Override
-  public String getName() {
-    return ConnectedComponentsDistribution.class.getName();
-  }
 }

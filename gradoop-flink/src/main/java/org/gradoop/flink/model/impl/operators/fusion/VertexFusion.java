@@ -149,11 +149,4 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
 
     return searchGraph.getConfig().getLogicalGraphFactory().fromDataSets(gh, vToRet, edges);
   }
-
-
-
-  @Override
-  public String getName() {
-    return VertexFusion.class.getName();
-  }
 }

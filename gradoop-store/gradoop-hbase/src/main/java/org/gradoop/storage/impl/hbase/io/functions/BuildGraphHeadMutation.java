@@ -55,18 +55,12 @@ public class BuildGraphHeadMutation extends
     this.graphHeadHandler = graphHeadHandler;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
     reuseTuple = new Tuple2<>();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple2<GradoopId, Mutation> map(GraphHead graphHead) throws Exception {
     GradoopId key = graphHead.getId();

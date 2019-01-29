@@ -60,9 +60,4 @@ public class CollectionEqualityByGraphIds
 
     return Not.map(Or.reduce(d));
   }
-
-  @Override
-  public String getName() {
-    return this.getClass().getSimpleName();
-  }
 }

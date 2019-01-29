@@ -39,9 +39,6 @@ public class EdgeLabelDecoder extends
    */
   private Map<Integer, String> edgeDictionary;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
@@ -50,9 +47,6 @@ public class EdgeLabelDecoder extends
       .get(0);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphTransaction map(GraphTransaction graphTransaction)
       throws Exception {

@@ -49,9 +49,6 @@ public class ElementGraphUpdater<EL extends GraphElement>
       .getBroadcastVariable(GRAPHID).get(0);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public EL map(EL element) {
     element.setGraphIds(GradoopIdSet.fromExisting(graphId));

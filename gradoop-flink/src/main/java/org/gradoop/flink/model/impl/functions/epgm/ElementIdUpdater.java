@@ -33,9 +33,6 @@ import org.gradoop.common.model.impl.pojo.Element;
 public class ElementIdUpdater<EL extends Element>
   implements MapFunction<Tuple2<EL, GradoopId>, EL> {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public EL map(Tuple2<EL, GradoopId> tuple2) {
     tuple2.f0.setId(tuple2.f1);

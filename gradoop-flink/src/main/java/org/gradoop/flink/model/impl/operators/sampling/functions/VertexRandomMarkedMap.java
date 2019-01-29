@@ -51,9 +51,6 @@ public class VertexRandomMarkedMap implements MapFunction<Vertex, Vertex> {
     this.randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Vertex map(Vertex vertex) throws Exception {
     if (randomGenerator.nextFloat() <= sampleSize) {

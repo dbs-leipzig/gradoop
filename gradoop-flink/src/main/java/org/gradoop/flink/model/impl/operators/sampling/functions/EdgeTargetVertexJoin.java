@@ -51,9 +51,6 @@ public class EdgeTargetVertexJoin implements
     this.propertyKey = propertyKey;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple3<Edge, Boolean, Boolean> join(Tuple3<Edge, GradoopId, Boolean> interim,
     Vertex vertex) {

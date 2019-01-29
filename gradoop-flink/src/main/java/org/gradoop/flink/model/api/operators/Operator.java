@@ -21,8 +21,11 @@ package org.gradoop.flink.model.api.operators;
 public interface Operator {
   /**
    * Returns the operators name.
+   * The operator name is the same as the class name, per default.
    *
    * @return operator name
    */
-  String getName();
+  default String getName() {
+    return this.getClass().getName();
+  }
 }

@@ -66,17 +66,11 @@ public class VertexTableInputFormat extends BaseTableInputFormat<Vertex> {
     return scan;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String getTableName() {
     return vertexTableName;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Tuple1<Vertex> mapResultToTuple(Result result) {
     return new Tuple1<>(vertexHandler.readVertex(result));

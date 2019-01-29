@@ -38,9 +38,6 @@ public class VertexLabelDecoder extends
    */
   private Map<Integer, String> vertexDictionary;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
@@ -49,9 +46,6 @@ public class VertexLabelDecoder extends
       .get(0);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphTransaction map(GraphTransaction graphTransaction)
       throws Exception {

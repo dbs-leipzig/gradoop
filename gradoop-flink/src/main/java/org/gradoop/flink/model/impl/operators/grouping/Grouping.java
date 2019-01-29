@@ -130,9 +130,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     this.edgeLabelGroups   = edgeLabelGroups;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     LogicalGraph result;
