@@ -15,11 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.cypher.capf.query;
 
-import com.google.common.collect.ImmutableMap;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.table.api.scala.BatchTableEnvironment;
 import org.apache.flink.types.Row;
@@ -197,10 +195,10 @@ public class TestCAPFQuery extends GradoopFlinkTestBase {
     DataSet<Row> resultDataSet = tenv.toDataSet(result.getTable(), TypeInformation.of(Row.class)).javaSet();
 
     try {
-      Integer[][] expectedIds = {
-        {0, 1, 1, 1, 2, 2, 2, 4, 5, 5, 5, 6, 6, 6, 8, 8},
-        {1, 6, 6, 6, 6, 6, 6, 1, 4, 4, 9, 2, 5, 5, 5, 5},
-        {6, 2, 5, 7, 2, 5, 7, 6, 1, 3, 10, 6, 4, 9, 4, 9}
+      Long[][] expectedIds = {
+        {0L, 1L, 1L, 1L, 2L, 2L, 2L, 4L, 5L, 5L, 5L, 6L, 6L, 6L, 8L, 8L},
+        {1L, 6L, 6L, 6L, 6L, 6L, 6L, 1L, 4L, 4L, 9L, 2L, 5L, 5L, 5L, 5L},
+        {6L, 2L, 5L, 7L, 2L, 5L, 7L, 6L, 1L, 3L, 10L, 6L, 4L, 9L, 4L, 9L}
       };
 
       List<Row> resultList = resultDataSet.collect();
@@ -213,7 +211,7 @@ public class TestCAPFQuery extends GradoopFlinkTestBase {
 
       resultList.sort((r1, r2) -> {
         for (int i = 0; i < r1.getArity(); i++) {
-          int comp = ((Integer) r1.getField(i)).compareTo((Integer) r2.getField(i));
+          int comp = ((Long) r1.getField(i)).compareTo((Long) r2.getField(i));
           if (comp != 0) {
             return comp;
           }

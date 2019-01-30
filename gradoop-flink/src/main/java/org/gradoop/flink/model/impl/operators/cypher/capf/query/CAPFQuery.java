@@ -24,10 +24,10 @@ import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.types.Row;
+import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.flink.io.impl.csv.metadata.MetaData;
 import org.gradoop.flink.model.api.operators.Operator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Label;
@@ -46,12 +46,13 @@ import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.Vertex
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
 import org.opencypher.flink.api.CAPFSession;
 import org.opencypher.flink.api.CAPFSession$;
-import org.opencypher.flink.api.io.CAPFEntityTable;
 import org.opencypher.flink.api.io.CAPFNodeTable;
 import org.opencypher.flink.api.io.CAPFRelationshipTable;
+import org.opencypher.flink.impl.table.FlinkCypherTable;
 import org.opencypher.okapi.api.graph.PropertyGraph;
 import org.opencypher.okapi.api.io.conversion.NodeMapping;
 import org.opencypher.okapi.api.io.conversion.RelationshipMapping;
+import org.opencypher.okapi.relational.api.io.EntityTable;
 import scala.collection.JavaConversions;
 import scala.collection.mutable.Seq;
 import scala.reflect.ClassTag$;
@@ -177,10 +178,12 @@ public class CAPFQuery implements Operator {
 
     // if there are no nodes, no edges can exit either, so we can terminate early
     if (nodeTables.size() > 0) {
-      List<CAPFEntityTable> tables = new ArrayList<>(nodeTables.subList(1, nodeTables.size()));
+      List<EntityTable<FlinkCypherTable.FlinkTable>> tables = new ArrayList<>(
+        nodeTables.subList(1, nodeTables.size()));
       tables.addAll(relTables);
 
-      Seq<CAPFEntityTable> tableSeq = JavaConversions.asScalaBuffer(tables);
+      Seq<EntityTable<FlinkCypherTable.FlinkTable>> tableSeq =
+        JavaConversions.asScalaBuffer(tables);
 
       PropertyGraph g = session.readFrom(nodeTables.get(0), tableSeq);
 

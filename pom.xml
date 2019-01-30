@@ -147,6 +147,7 @@
         <dep.kryo.version>4.0.2</dep.kryo.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.mockito.version>2.21.0</dep.mockito.version>
+        <dep.okapi.version>0.2.4-SNAPSHOT</dep.okapi.version>
 
         <log4j.properties>log4j-test.properties</log4j.properties>
         <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
@@ -165,7 +166,6 @@
         <plugin.maven-site.version>3.4</plugin.maven-site.version>
         <plugin.maven-scm-publish.version>1.1</plugin.maven-scm-publish.version>
         <plugin.maven-jacoco.version>0.8.1</plugin.maven-jacoco.version>
-        <dep.okapi.version>0.2.1-SNAPSHOT</dep.okapi.version>
     </properties>
 
     <profiles>
