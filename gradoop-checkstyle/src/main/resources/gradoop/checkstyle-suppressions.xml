@@ -16,7 +16,7 @@
             lines="70-77"/>
   <suppress checks="IllegalCatch"
             files="CAPFQuery"
-            lines="240-250"/>
+            lines="250-260"/>
   <suppress checks="IllegalCatch"
             files="PrintTableSink"
             lines="90-100"/>
