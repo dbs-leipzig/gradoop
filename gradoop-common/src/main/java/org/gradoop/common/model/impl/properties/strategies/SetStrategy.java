@@ -66,7 +66,7 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
         set.add(entry);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue");
+      throw new RuntimeException("Error reading PropertyValue", e);
     }
 
     return set;
@@ -74,25 +74,23 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
 
   @Override
   public int compare(Set value, Object other) {
-    throw new UnsupportedOperationException("Method compareTo() is not supported");
+    throw new UnsupportedOperationException("Method compareTo() is not supported for Set.");
   }
 
   @Override
   public boolean is(Object value) {
-    boolean isSet = false;
-
-    if (value instanceof Set) {
-      // set to true so empty sets get handled correctly
-      isSet = true;
-      for (Object item : (Set) value) {
-        isSet = item instanceof PropertyValue;
-        if (!isSet) {
-          break;
-        }
+    if (!(value instanceof Set)) {
+      return false;
+    }
+    for (Object item : (Set) value) {
+      // Set is not a valid property value if it contains any object
+      // that is not a property value itself.
+      if (!(item instanceof PropertyValue)) {
+        return false;
       }
     }
 
-    return isSet;
+    return true;
   }
 
   @Override
@@ -118,7 +116,7 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
         set.add(entry);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue");
+      throw new RuntimeException("Error reading PropertyValue", e);
     }
 
     return set;
@@ -145,7 +143,7 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
         entry.write(outputView);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error writing PropertyValue");
+      throw new RuntimeException("Error writing PropertyValue", e);
     }
 
     return byteStream.toByteArray();

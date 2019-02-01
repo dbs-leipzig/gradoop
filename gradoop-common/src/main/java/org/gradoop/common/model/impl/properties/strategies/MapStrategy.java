@@ -70,7 +70,7 @@ public class MapStrategy
         map.put(key, value);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue");
+      throw new RuntimeException("Error reading PropertyValue", e);
     }
 
     return map;
@@ -79,29 +79,25 @@ public class MapStrategy
   @Override
   public int compare(Map value, Object other) {
     throw new UnsupportedOperationException(
-      "Method compareTo() is not supported for Map;"
+      "Method compareTo() is not supported for Map."
     );
   }
 
   @Override
   public boolean is(Object value) {
-    boolean keyIsPropertyValue = false;
-    boolean valIsPropertyValue = false;
-
-    if (value instanceof Map) {
-      // set to true so empty maps get handled correctly
-      keyIsPropertyValue = true;
-      valIsPropertyValue = true;
-      for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) value).entrySet()) {
-        keyIsPropertyValue = entry.getKey() instanceof PropertyValue;
-        valIsPropertyValue = entry.getValue() instanceof PropertyValue;
-        if (!keyIsPropertyValue || !valIsPropertyValue) {
-          break;
-        }
+    if (!(value instanceof Map)) {
+      return false;
+    }
+    for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) value).entrySet()) {
+      // Map is not a valid property value if it contains any object
+      // that is not a property value itself.
+      if (!(entry.getKey() instanceof PropertyValue) ||
+        !(entry.getValue() instanceof PropertyValue)) {
+        return false;
       }
     }
 
-    return keyIsPropertyValue && valIsPropertyValue;
+    return true;
   }
 
   @Override
@@ -134,7 +130,7 @@ public class MapStrategy
         map.put(key, value);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue");
+      throw new RuntimeException("Error reading PropertyValue", e);
     }
 
     return map;
@@ -162,7 +158,7 @@ public class MapStrategy
         entry.getValue().write(outputView);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error writing PropertyValue");
+      throw new RuntimeException("Error writing PropertyValue", e);
     }
 
     return byteStream.toByteArray();

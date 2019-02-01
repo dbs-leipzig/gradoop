@@ -66,7 +66,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
         list.add(entry);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue");
+      throw new RuntimeException("Error reading PropertyValue", e);
     }
 
     return list;
@@ -75,26 +75,24 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
   @Override
   public int compare(List value, Object other) {
     throw new UnsupportedOperationException(
-      "Method compareTo() is not supported for List;"
+      "Method compareTo() is not supported for List."
     );
   }
 
   @Override
   public boolean is(Object value) {
-    boolean isList = false;
-
-    if (value instanceof List) {
-      // set to true so empty lists get handled correctly
-      isList = true;
-      for (Object item : (List) value) {
-        isList = item instanceof PropertyValue;
-        if (!isList) {
-          break;
-        }
+    if (!(value instanceof List)) {
+      return false;
+    }
+    for (Object item : (List) value) {
+      // List is not a valid property value if it contains any object
+      // that is not a property value itself.
+      if (!(item instanceof PropertyValue)) {
+        return false;
       }
     }
 
-    return isList;
+    return true;
   }
 
   @Override
@@ -123,7 +121,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
         list.add(entry);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue");
+      throw new RuntimeException("Error reading PropertyValue", e);
     }
 
     return list;
@@ -149,7 +147,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
         entry.write(outputView);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error writing PropertyValue");
+      throw new RuntimeException("Error writing PropertyValue", e);
     }
 
     return byteStream.toByteArray();
