@@ -45,7 +45,7 @@ public class PropertyValueStrategyFactory {
    */
   private final Map<Class, PropertyValueStrategy> classStrategyMap;
   /**
-   * Map which link a type byte to a strategy class
+   * Map which links a type byte to a strategy class
    */
   private final Map<Byte, PropertyValueStrategy> byteStrategyMap;
   /**

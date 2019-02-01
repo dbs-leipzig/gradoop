@@ -15,7 +15,6 @@
  */
 package org.gradoop.common.model.impl.properties;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.types.Value;
@@ -207,12 +206,12 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   /**
    * Check if the property value type is an instance of a certain class.
    *
-   * @param c class to check against
+   * @param clazz class to check against
    * @return true if the attribute {@code value} is an object of the provided class, false
    * otherwise
    */
-  public boolean is(Class c) {
-    return PropertyValueStrategyFactory.get(c).is(value);
+  public boolean is(Class clazz) {
+    return PropertyValueStrategyFactory.get(clazz).is(value);
   }
 
   /**
@@ -232,6 +231,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isBoolean() {
     return is(Boolean.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code short}.
    *
@@ -240,6 +240,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isShort() {
     return is(Short.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code int}.
    *
@@ -248,6 +249,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isInt() {
     return is(Integer.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code long}.
    *
@@ -256,6 +258,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isLong() {
     return is(Long.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code float}.
    *
@@ -264,6 +267,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isFloat() {
     return is(Float.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code double}.
    *
@@ -272,6 +276,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isDouble() {
     return is(Double.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code String}.
    *
@@ -280,6 +285,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isString() {
     return is(String.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code BigDecimal}.
    *
@@ -289,6 +295,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isBigDecimal() {
     return is(BigDecimal.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code GradoopId}.
    *
@@ -297,6 +304,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isGradoopId() {
     return is(GradoopId.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code Map}.
    *
@@ -305,6 +313,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isMap() {
     return is(Map.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code List}.
    *
@@ -313,6 +322,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isList() {
     return is(List.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code LocalDate}.
    *
@@ -321,6 +331,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isDate() {
     return is(LocalDate.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code LocalTime}.
    *
@@ -329,6 +340,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isTime() {
     return is(LocalTime.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code LocalDateTime}.
    *
@@ -337,6 +349,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public boolean isDateTime() {
     return is(LocalDateTime.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code Set}.
    *
@@ -363,12 +376,13 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * Returns the value as the specified type. If it is already of the same type as requested, we
    * just return the value. If not, then we try to cast the value via the requested types strategy
    * get method.
-   * @param c the requested value type
+   *
+   * @param clazz the requested value type
    * @param <T> PropertyValue supported type
    * @return value
    */
-  public <T> T get(Class<T> c) {
-    PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(c);
+  public <T> T get(Class<T> clazz) {
+    PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(clazz);
     if (strategy.is(value)) {
       return (T) value;
     }
@@ -388,6 +402,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     }
     return obj;
   }
+
   /**
    * Returns the wrapped value as {@code boolean}.
    *
@@ -405,6 +420,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public short getShort() {
     return get(Short.class);
   }
+
   /**
    * Returns the wrapped value as {@code int}.
    *
@@ -413,6 +429,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public int getInt() {
     return get(Integer.class);
   }
+
   /**
    * Returns the wrapped value as {@code long}.
    *
@@ -421,6 +438,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public long getLong() {
     return get(Long.class);
   }
+
   /**
    * Returns the wrapped value as {@code float}.
    *
@@ -429,6 +447,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public float getFloat() {
     return get(Float.class);
   }
+
   /**
    * Returns the wrapped value as {@code double}.
    *
@@ -437,6 +456,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public double getDouble() {
     return get(Double.class);
   }
+
   /**
    * Returns the wrapped value as {@code String}.
    *
@@ -445,6 +465,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public String getString() {
     return get(String.class);
   }
+
   /**
    * Returns the wrapped value as {@code BigDecimal}.
    *
@@ -454,6 +475,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public BigDecimal getBigDecimal() {
     return get(BigDecimal.class);
   }
+
   /**
    * Returns the wrapped value as {@code GradoopId}.
    *
@@ -480,6 +502,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public List<PropertyValue> getList() {
     return get(List.class);
   }
+
   /**
    * Returns the wrapped List as {@code LocalDate}.
    *
@@ -488,6 +511,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public LocalDate getDate() {
     return get(LocalDate.class);
   }
+
   /**
    * Returns the wrapped List as {@code LocalTime}.
    *
@@ -496,6 +520,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public LocalTime getTime() {
     return get(LocalTime.class);
   }
+
   /**
    * Returns the wrapped List as {@code LocalDateTime}.
    *
@@ -504,6 +529,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public LocalDateTime getDateTime() {
     return get(LocalDateTime.class);
   }
+
   /**
    * Returns the wrapped Set as {@code Set<PropertyValue>}.
    *
@@ -529,6 +555,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     }
     this.value = value;
   }
+
   /**
    * Sets the wrapped value as {@code boolean} value.
    *
@@ -546,6 +573,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public void setShort(short shortValue) {
     setObject(shortValue);
   }
+
   /**
    * Sets the wrapped value as {@code int} value.
    *
@@ -554,6 +582,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public void setInt(int intValue) {
     setObject(intValue);
   }
+
   /**
    * Sets the wrapped value as {@code long} value.
    *
@@ -562,6 +591,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public void setLong(long longValue) {
     setObject(longValue);
   }
+
   /**
    * Sets the wrapped value as {@code float} value.
    *
@@ -570,6 +600,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public void setFloat(float floatValue) {
     setObject(floatValue);
   }
+
   /**
    * Sets the wrapped value as {@code double} value.
    *
@@ -578,6 +609,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public void setDouble(double doubleValue) {
     setObject(doubleValue);
   }
+
   /**
    * Sets the wrapped value as {@code String} value.
    *
@@ -586,6 +618,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public void setString(String stringValue) {
     setObject(stringValue);
   }
+
   /**
    * Sets the wrapped value as {@code BigDecimal} value.
    *
@@ -594,6 +627,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public void setBigDecimal(BigDecimal bigDecimalValue) {
     setObject(bigDecimalValue);
   }
+
   /**
    * Sets the wrapped value as {@code GradoopId} value.
    *
@@ -630,6 +664,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public void setDate(LocalDate date) {
     setObject(date);
   }
+
   /**
    * Sets the wrapped value as {@code LocalTime} value.
    *
@@ -638,6 +673,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   public void setTime(LocalTime time) {
     setObject(time);
   }
+
   /**
    * Sets the wrapped value as {@code LocalDateTime} value.
    *
@@ -661,40 +697,39 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   //----------------------------------------------------------------------------
 
   /**
-   * Get the data type as class object according to the first position of the rawBytes[] array
+   * Get the data type as class object according to the first position of the rawBytes[] array.
    *
    * @return Class object
    */
   public Class<?> getType() {
-    Class<?> c = null;
+    Class<?> clazz = null;
     if (value != null) {
-      c = PropertyValueStrategyFactory.get(value.getClass()).getType();
+      clazz = PropertyValueStrategyFactory.get(value.getClass()).getType();
     }
 
-    return c;
+    return clazz;
   }
 
   public int getByteSize() {
     return getRawBytes().length;
   }
 
-  @SuppressWarnings("EI_EXPOSE_REP")
   public byte[] getRawBytes() {
     return PropertyValueStrategyFactory.getRawBytes(value);
   }
 
   /**
-   * Set internal byte representation
-   * @param bytes array
+   * Set internal byte representation.
+   *
+   *  @param bytes array
    */
-  @SuppressWarnings("EI_EXPOSE_REP")
   public void setBytes(byte[] bytes) {
     value = PropertyValueStrategyFactory.fromRawBytes(bytes);
   }
 
   @Override
-  public boolean equals(Object o) {
-    return o instanceof PropertyValue && Objects.equals(value, ((PropertyValue) o).value);
+  public boolean equals(Object object) {
+    return object instanceof PropertyValue && Objects.equals(value, ((PropertyValue) object).value);
   }
 
   @Override
@@ -703,13 +738,14 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   @Override
-  public int compareTo(PropertyValue o) {
-    return PropertyValueStrategyFactory.compare(value, o.value);
+  public int compareTo(PropertyValue other) {
+    return PropertyValueStrategyFactory.compare(value, other.value);
   }
 
   /**
-   * Returns the byte size of the properties internal representation
-   * @return byte size
+   * Returns the byte size of the properties internal representation.
+   *
+   *  @return byte size
    */
   public int byteSize() {
     byte[] rawBytes = PropertyValueStrategyFactory.getRawBytes(value);
