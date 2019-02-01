@@ -38,21 +38,9 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
 
   @Override
   public Set<PropertyValue> read(DataInputView inputView, byte typeByte) throws IOException {
-    int length;
-    // read length
-    if ((typeByte & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
-      length = inputView.readInt();
-    } else {
-      length = inputView.readShort();
-    }
-    // init new array
-    byte[] rawBytes = new byte[length];
+    byte[] rawBytes = readVariableSizedData(inputView, typeByte);
 
-    for (int i = 0; i < rawBytes.length; i++) {
-      rawBytes[i] = inputView.readByte();
-    }
-
-    PropertyValue entry;
+    PropertyValue item;
     Set<PropertyValue> set = new HashSet<>();
     ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
     DataInputStream inputStream = new DataInputStream(byteStream);
@@ -60,10 +48,10 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
 
     try {
       while (inputStream.available() > 0) {
-        entry = new PropertyValue();
-        entry.read(internalInputView);
+        item = new PropertyValue();
+        item.read(internalInputView);
 
-        set.add(entry);
+        set.add(item);
       }
     } catch (IOException e) {
       throw new RuntimeException("Error reading PropertyValue", e);

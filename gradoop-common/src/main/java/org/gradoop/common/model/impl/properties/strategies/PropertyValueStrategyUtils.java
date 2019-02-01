@@ -16,9 +16,7 @@
 package org.gradoop.common.model.impl.properties.strategies;
 
 import org.gradoop.common.exceptions.UnsupportedTypeException;
-
 import java.math.BigDecimal;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**

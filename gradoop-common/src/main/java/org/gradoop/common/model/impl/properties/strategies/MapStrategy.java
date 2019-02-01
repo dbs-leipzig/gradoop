@@ -38,19 +38,7 @@ public class MapStrategy
   @Override
   public Map<PropertyValue, PropertyValue> read(DataInputView inputView, byte typeByte)
       throws IOException {
-    int length;
-    // read length
-    if ((typeByte & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
-      length = inputView.readInt();
-    } else {
-      length = inputView.readShort();
-    }
-
-    byte[] rawBytes = new byte[length];
-
-    for (int i = 0; i < rawBytes.length; i++) {
-      rawBytes[i] = inputView.readByte();
-    }
+    byte[] rawBytes = readVariableSizedData(inputView, typeByte);
 
     PropertyValue key;
     PropertyValue value;

@@ -15,6 +15,7 @@
  */
 package org.gradoop.common.model.impl.properties.strategies;
 
+import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -47,6 +48,33 @@ public abstract class AbstractVariableSizedPropertyValueStrategy<T> implements P
     }
 
     outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);
+  }
+
+  /**
+   * Reads data of variable size from a data input view. The size of the data is determined by the
+   * type byte and {@see org.gradoop.common.model.impl.properties.PropertyValue#FLAG_LARGE}.
+   *
+   * @param inputView Data input view to read from
+   * @param typeByte Byte indicating the type of the serialized data
+   * @return The serialized data in the data input view
+   * @throws IOException when reading a byte goes wrong
+   */
+  byte[] readVariableSizedData(DataInputView inputView, byte typeByte) throws IOException {
+    int length;
+    // read length
+    if ((typeByte & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
+      length = inputView.readInt();
+    } else {
+      length = inputView.readShort();
+    }
+    // init new array
+    byte[] rawBytes = new byte[length];
+
+    for (int i = 0; i < rawBytes.length; i++) {
+      rawBytes[i] = inputView.readByte();
+    }
+
+    return rawBytes;
   }
 
 }

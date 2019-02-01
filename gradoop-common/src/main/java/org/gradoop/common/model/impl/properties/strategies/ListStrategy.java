@@ -36,34 +36,21 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
 
   @Override
   public List<PropertyValue> read(DataInputView inputView, byte typeByte) throws IOException {
-    int length;
-    // read length
-    if ((typeByte & PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {
-      length = inputView.readInt();
-    } else {
-      length = inputView.readShort();
-    }
-    // init new array
-    byte[] rawBytes = new byte[length];
+    byte[] rawBytes = readVariableSizedData(inputView, typeByte);
 
-    for (int i = 0; i < rawBytes.length; i++) {
-      rawBytes[i] = inputView.readByte();
-    }
-
-    PropertyValue entry;
-
+    PropertyValue item;
     List<PropertyValue> list = new ArrayList<>();
 
     ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
     DataInputStream inputStream = new DataInputStream(byteStream);
-    DataInputView internalInputView = new DataInputViewStreamWrapper(inputStream);
+    DataInputViewStreamWrapper internalInputView = new DataInputViewStreamWrapper(inputStream);
 
     try {
-      while (inputStream.available() > 0) {
-        entry = new PropertyValue();
-        entry.read(internalInputView);
+      while (internalInputView.available() > 0) {
+        item = new PropertyValue();
+        item.read(internalInputView);
 
-        list.add(entry);
+        list.add(item);
       }
     } catch (IOException e) {
       throw new RuntimeException("Error reading PropertyValue", e);
@@ -102,23 +89,22 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
 
   @Override
   public List<PropertyValue> get(byte[] bytes) {
-    PropertyValue entry;
-
+    PropertyValue item;
     List<PropertyValue> list = new ArrayList<>();
 
     ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
     DataInputStream inputStream = new DataInputStream(byteStream);
-    DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
+    DataInputViewStreamWrapper inputView = new DataInputViewStreamWrapper(inputStream);
 
     try {
-      if (inputStream.skipBytes(PropertyValue.OFFSET) != PropertyValue.OFFSET) {
+      if (inputView.skipBytes(PropertyValue.OFFSET) != PropertyValue.OFFSET) {
         throw new RuntimeException("Malformed entry in PropertyValue List");
       }
-      while (inputStream.available() > 0) {
-        entry = new PropertyValue();
-        entry.read(inputView);
+      while (inputView.available() > 0) {
+        item = new PropertyValue();
+        item.read(inputView);
 
-        list.add(entry);
+        list.add(item);
       }
     } catch (IOException e) {
       throw new RuntimeException("Error reading PropertyValue", e);
@@ -151,5 +137,11 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
     }
 
     return byteStream.toByteArray();
+  }
+
+  private DataInputView createInputView(byte[] bytes) {
+    ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
+    DataInputStream inputStream = new DataInputStream(byteStream);
+    return new DataInputViewStreamWrapper(inputStream);
   }
 }
