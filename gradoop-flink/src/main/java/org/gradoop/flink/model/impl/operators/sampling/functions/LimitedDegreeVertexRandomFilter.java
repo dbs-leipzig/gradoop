@@ -67,9 +67,6 @@ public class LimitedDegreeVertexRandomFilter<V extends Vertex>
     this.degreeType = degreeType;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean filter(V vertex) throws Exception {
     long degree = Long.parseLong(vertex.getPropertyValue(degreeType.getName()).toString());

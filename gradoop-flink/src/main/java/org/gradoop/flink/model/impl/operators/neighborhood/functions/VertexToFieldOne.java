@@ -33,9 +33,6 @@ public class VertexToFieldOne<K, V>
    */
   private Tuple2<K, Vertex> reuseTuple = new Tuple2<K, Vertex>();
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple2<K, Vertex> join(Tuple2<K, V> tuple, Vertex vertex) throws Exception {
     reuseTuple.setFields(tuple.f0, vertex);

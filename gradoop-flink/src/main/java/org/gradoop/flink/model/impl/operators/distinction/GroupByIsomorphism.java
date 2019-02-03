@@ -75,9 +75,4 @@ public class GroupByIsomorphism extends SelectionBase {
     return camBuilder
       .getGraphHeadStrings(collection);
   }
-
-  @Override
-  public String getName() {
-    return GroupByIsomorphism.class.getName();
-  }
 }

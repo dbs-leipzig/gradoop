@@ -78,9 +78,4 @@ public class Selection extends SelectionBase {
     return collection.getConfig().getGraphCollectionFactory()
       .fromTransactions(filteredTransactions);
   }
-
-  @Override
-  public String getName() {
-    return Selection.class.getName();
-  }
 }

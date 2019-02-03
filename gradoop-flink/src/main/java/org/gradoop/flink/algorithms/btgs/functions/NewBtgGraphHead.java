@@ -54,9 +54,6 @@ public class NewBtgGraphHead<G extends EPGMGraphHead>
     return graphHead;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<G> getProducedType() {

@@ -36,9 +36,6 @@ public abstract class NeighborEdgeFunction implements NeighborFunction {
     this.function = function;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public EdgeAggregateFunction getFunction() {
     return function;

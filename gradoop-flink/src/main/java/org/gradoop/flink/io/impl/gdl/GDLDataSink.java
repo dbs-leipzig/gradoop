@@ -45,33 +45,21 @@ public class GDLDataSink implements DataSink {
     this.path = path;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(LogicalGraph logicalGraph) throws IOException {
     write(logicalGraph, false);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(GraphCollection graphCollection) throws IOException {
     write(graphCollection, false);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
     write(logicalGraph.getConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(GraphCollection graphCollection, boolean overwrite) throws IOException {
     FileSystem.WriteMode writeMode =

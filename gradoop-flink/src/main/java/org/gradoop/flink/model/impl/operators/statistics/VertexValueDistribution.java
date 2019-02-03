@@ -41,9 +41,4 @@ public class VertexValueDistribution<T> extends ValueDistribution<Vertex, T> {
   public DataSet<WithCount<T>> execute(LogicalGraph graph) {
     return compute(graph.getVertices());
   }
-
-  @Override
-  public String getName() {
-    return VertexValueDistribution.class.getName();
-  }
 }

@@ -33,9 +33,4 @@ public class DistinctVertexProperties extends DistinctProperties<Vertex, String>
   protected DataSet<Tuple2<String, Set<PropertyValue>>> extractValuePairs(LogicalGraph graph) {
     return graph.getVertices().flatMap(new ExtractPropertyValues<>());
   }
-
-  @Override
-  public String getName() {
-    return DistinctVertexProperties.class.getName();
-  }
 }

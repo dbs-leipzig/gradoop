@@ -62,9 +62,6 @@ public class RandomEdgeSampling extends SamplingAlgorithm {
     this.randomSeed = randomSeed;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
     DataSet<Edge> newEdges = graph.getEdges().filter(new RandomFilter<>(sampleSize, randomSeed));
@@ -83,13 +80,5 @@ public class RandomEdgeSampling extends SamplingAlgorithm {
 
     DataSet<Vertex> newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id<>());
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return RandomEdgeSampling.class.getName();
   }
 }

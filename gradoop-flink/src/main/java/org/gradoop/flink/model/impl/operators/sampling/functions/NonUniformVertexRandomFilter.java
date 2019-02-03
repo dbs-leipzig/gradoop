@@ -62,9 +62,6 @@ implements FilterFunction<V> {
     this.propertyNameofMaxDegree = propertyNameofMaxDegree;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean filter(V vertex) throws Exception {
     long degree = Long.parseLong(vertex.getPropertyValue(propertyNameOfDegree).toString());

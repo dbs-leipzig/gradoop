@@ -37,17 +37,11 @@ public class RandomVertexEdgeSamplingTest extends ParameterizedTestForGraphSampl
       RandomVertexEdgeSampling.VertexEdgeSamplingType.valueOf(vertexEdgeSamplingType));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SamplingAlgorithm getSamplingOperator() {
     return new RandomVertexEdgeSampling(sampleSize, edgeSampleSize, seed, vertexEdgeSamplingType);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) { }
 

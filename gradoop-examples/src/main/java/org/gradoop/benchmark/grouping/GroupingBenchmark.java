@@ -486,9 +486,6 @@ public class GroupingBenchmark extends AbstractRunner
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getDescription() {
     return GroupingBenchmark.class.getName();

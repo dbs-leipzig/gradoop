@@ -100,9 +100,6 @@ public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
     this.neighborType = neighborType;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
@@ -124,13 +121,5 @@ public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
     graph = new FilterVerticesWithDegreeOtherThanGiven(0L).execute(graph);
 
     return graph;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return RandomVertexNeighborhoodSampling.class.getName();
   }
 }
