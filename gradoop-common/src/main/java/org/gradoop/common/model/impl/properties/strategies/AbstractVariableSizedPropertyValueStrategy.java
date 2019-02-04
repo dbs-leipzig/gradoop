@@ -16,10 +16,13 @@
 package org.gradoop.common.model.impl.properties.strategies;
 
 import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputView;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
@@ -77,4 +80,9 @@ public abstract class AbstractVariableSizedPropertyValueStrategy<T> implements P
     return rawBytes;
   }
 
+  DataInputViewStreamWrapper createInputView(byte[] bytes) {
+    ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
+    DataInputStream inputStream = new DataInputStream(byteStream);
+    return new DataInputViewStreamWrapper(inputStream);
+  }
 }

@@ -40,10 +40,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
 
     PropertyValue item;
     List<PropertyValue> list = new ArrayList<>();
-
-    ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
-    DataInputStream inputStream = new DataInputStream(byteStream);
-    DataInputViewStreamWrapper internalInputView = new DataInputViewStreamWrapper(inputStream);
+    DataInputViewStreamWrapper internalInputView = createInputView(rawBytes);
 
     try {
       while (internalInputView.available() > 0) {
@@ -137,11 +134,5 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
     }
 
     return byteStream.toByteArray();
-  }
-
-  private DataInputView createInputView(byte[] bytes) {
-    ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
-    DataInputStream inputStream = new DataInputStream(byteStream);
-    return new DataInputViewStreamWrapper(inputStream);
   }
 }

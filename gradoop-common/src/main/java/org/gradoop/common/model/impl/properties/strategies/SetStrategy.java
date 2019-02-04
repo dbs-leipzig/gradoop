@@ -42,12 +42,10 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
 
     PropertyValue item;
     Set<PropertyValue> set = new HashSet<>();
-    ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
-    DataInputStream inputStream = new DataInputStream(byteStream);
-    DataInputView internalInputView = new DataInputViewStreamWrapper(inputStream);
+    DataInputViewStreamWrapper internalInputView = createInputView(rawBytes);
 
     try {
-      while (inputStream.available() > 0) {
+      while (internalInputView.available() > 0) {
         item = new PropertyValue();
         item.read(internalInputView);
 

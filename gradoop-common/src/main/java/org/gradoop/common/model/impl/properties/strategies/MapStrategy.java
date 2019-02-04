@@ -43,12 +43,10 @@ public class MapStrategy
     PropertyValue key;
     PropertyValue value;
     Map<PropertyValue, PropertyValue> map = new HashMap<>();
-    ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
-    DataInputStream inputStream = new DataInputStream(byteStream);
-    DataInputView internalInputView = new DataInputViewStreamWrapper(inputStream);
+    DataInputViewStreamWrapper internalInputView = createInputView(rawBytes);
 
     try {
-      while (inputStream.available() > 0) {
+      while (internalInputView.available() > 0) {
         key = new PropertyValue();
         key.read(internalInputView);
 
