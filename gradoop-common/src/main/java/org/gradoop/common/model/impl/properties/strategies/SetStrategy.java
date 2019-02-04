@@ -17,7 +17,6 @@ package org.gradoop.common.model.impl.properties.strategies;
 
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataInputViewStreamWrapper;
-import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -88,11 +87,12 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
   public Set<PropertyValue> get(byte[] bytes) {
     PropertyValue entry;
     Set<PropertyValue> set = new HashSet<PropertyValue>();
-    ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
-    DataInputStream inputStream = new DataInputStream(byteStream);
-    DataInputView internalInputView = new DataInputViewStreamWrapper(inputStream);
 
-    try {
+    try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
+        DataInputStream inputStream = new DataInputStream(byteStream);
+        DataInputViewStreamWrapper internalInputView =
+           new DataInputViewStreamWrapper(inputStream)) {
+
       internalInputView.skipBytesToRead(1);
 
       while (inputStream.available() > 0) {
@@ -118,20 +118,19 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
     int size = value.stream().mapToInt(PropertyValue::byteSize)
       .sum() + PropertyValue.OFFSET + Bytes.SIZEOF_SHORT;
 
-    ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
-    DataOutputStream outputStream = new DataOutputStream(byteStream);
-    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
+    try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
+        DataOutputStream outputStream = new DataOutputStream(byteStream);
+        DataOutputViewStreamWrapper outputView = new DataOutputViewStreamWrapper(outputStream)) {
 
-    try {
       outputStream.write(getRawType());
 
       for (PropertyValue entry : value) {
         entry.write(outputView);
       }
+
+      return byteStream.toByteArray();
     } catch (IOException e) {
       throw new RuntimeException("Error writing PropertyValue", e);
     }
-
-    return byteStream.toByteArray();
   }
 }

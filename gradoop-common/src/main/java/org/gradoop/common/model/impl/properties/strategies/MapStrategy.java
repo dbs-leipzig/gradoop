@@ -17,7 +17,6 @@ package org.gradoop.common.model.impl.properties.strategies;
 
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataInputViewStreamWrapper;
-import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import java.io.ByteArrayInputStream;
@@ -98,14 +97,14 @@ public class MapStrategy
 
     Map<PropertyValue, PropertyValue> map = new HashMap<PropertyValue, PropertyValue>();
 
-    ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
-    DataInputStream inputStream = new DataInputStream(byteStream);
-    DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
+    try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
+        DataInputStream inputStream = new DataInputStream(byteStream);
+        DataInputViewStreamWrapper inputView = new DataInputViewStreamWrapper(inputStream)) {
 
-    try {
       if (inputStream.skipBytes(PropertyValue.OFFSET) != PropertyValue.OFFSET) {
         throw new RuntimeException("Malformed entry in PropertyValue List");
       }
+
       while (inputStream.available() > 0) {
         key = new PropertyValue();
         key.read(inputView);
@@ -133,20 +132,19 @@ public class MapStrategy
         value.values().stream().mapToInt(PropertyValue::byteSize).sum() +
         PropertyValue.OFFSET;
 
-    ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
-    DataOutputStream outputStream = new DataOutputStream(byteStream);
-    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
+    try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
+        DataOutputStream outputStream = new DataOutputStream(byteStream);
+        DataOutputViewStreamWrapper outputView = new DataOutputViewStreamWrapper(outputStream)) {
 
-    try {
       outputStream.write(PropertyValue.TYPE_MAP);
       for (Map.Entry<PropertyValue, PropertyValue> entry : value.entrySet()) {
         entry.getKey().write(outputView);
         entry.getValue().write(outputView);
       }
+
+      return byteStream.toByteArray();
     } catch (IOException e) {
       throw new RuntimeException("Error writing PropertyValue", e);
     }
-
-    return byteStream.toByteArray();
   }
 }

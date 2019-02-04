@@ -17,7 +17,6 @@ package org.gradoop.common.model.impl.properties.strategies;
 
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataInputViewStreamWrapper;
-import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import java.io.ByteArrayInputStream;
@@ -89,11 +88,10 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
     PropertyValue item;
     List<PropertyValue> list = new ArrayList<>();
 
-    ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
-    DataInputStream inputStream = new DataInputStream(byteStream);
-    DataInputViewStreamWrapper inputView = new DataInputViewStreamWrapper(inputStream);
+    try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
+        DataInputStream inputStream = new DataInputStream(byteStream);
+        DataInputViewStreamWrapper inputView = new DataInputViewStreamWrapper(inputStream)) {
 
-    try {
       if (inputView.skipBytes(PropertyValue.OFFSET) != PropertyValue.OFFSET) {
         throw new RuntimeException("Malformed entry in PropertyValue List");
       }
@@ -120,19 +118,18 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
     int size = value.stream().mapToInt(PropertyValue::byteSize).sum() +
       PropertyValue.OFFSET;
 
-    ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
-    DataOutputStream outputStream = new DataOutputStream(byteStream);
-    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
+    try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
+        DataOutputStream outputStream = new DataOutputStream(byteStream);
+        DataOutputViewStreamWrapper outputView = new DataOutputViewStreamWrapper(outputStream)) {
 
-    try {
       outputStream.write(getRawType());
       for (PropertyValue entry : value) {
         entry.write(outputView);
       }
+
+      return byteStream.toByteArray();
     } catch (IOException e) {
       throw new RuntimeException("Error writing PropertyValue", e);
     }
-
-    return byteStream.toByteArray();
   }
 }
