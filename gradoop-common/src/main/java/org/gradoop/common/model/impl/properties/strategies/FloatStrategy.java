@@ -40,12 +40,7 @@ public class FloatStrategy extends AbstractFixSizedPropertyValueStrategy<Float> 
 
   @Override
   public int compare(Float value, Object other) {
-    if (other instanceof Number) {
-      Number num = (Number) other;
-      return PropertyValueStrategyUtils.compareNumerical(value, num);
-    }
-    throw new IllegalArgumentException(String.format(
-      "Incompatible types: %s, %s", value.getClass(), other.getClass()));
+    return PropertyValueStrategyUtils.compareNumerical(value, other);
   }
 
   @Override

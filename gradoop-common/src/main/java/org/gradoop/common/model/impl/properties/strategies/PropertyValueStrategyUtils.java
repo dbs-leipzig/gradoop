@@ -50,15 +50,21 @@ class PropertyValueStrategyUtils {
   private static final int BIG_DECIMAL = 5;
 
   /**
-   * Compare two numerical values.
+   * Compares a numerical to an object. The object needs to be an instance of {@code Number}.
    *
    * @param aValue first value
-   * @param bValue second value
+   * @param other second value
    * @return a negative integer, zero, or a positive integer as aValue is less than, equal to, or
    * greater than bValue.
+   * @throws IllegalArgumentException if other is not an instance of number.
    */
-  static int compareNumerical(Number aValue, Number bValue) {
+  static int compareNumerical(Number aValue, Object other) {
+    if (!(other instanceof Number)) {
+      throw new IllegalArgumentException(String.format(
+        "Incompatible types: %s, %s", aValue.getClass(), other.getClass()));
+    }
 
+    Number bValue = (Number) other;
     int aType = getType(aValue);
     int bType = getType(bValue);
 

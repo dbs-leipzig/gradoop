@@ -80,6 +80,12 @@ public abstract class AbstractVariableSizedPropertyValueStrategy<T> implements P
     return rawBytes;
   }
 
+  /**
+   * Creates an instance of {@link DataInputViewStreamWrapper} from a byte array.
+   *
+   * @param bytes input byte array
+   * @return A DataInputViewStreamWrapper
+   */
   DataInputViewStreamWrapper createInputView(byte[] bytes) {
     ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
     DataInputStream inputStream = new DataInputStream(byteStream);
