@@ -47,6 +47,11 @@ public class RdbmsConstants {
   public static final String BROADCAST_VARIABLE = "broadcastVariable";
 
   /**
+   * Delimiter needed for edge comparison.
+   */
+  public static final String EDGE_DELIMITER = ";";
+
+  /**
    * Database management system identifier.
    */
   public enum RdbmsType {

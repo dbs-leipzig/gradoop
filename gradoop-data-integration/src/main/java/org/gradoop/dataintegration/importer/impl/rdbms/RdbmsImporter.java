@@ -79,7 +79,7 @@ public class RdbmsImporter implements DataSource {
     DataSet<Edge> edges;
 
     Connection con = RdbmsConnection.create().getConnection(rdbmsConfig);
-    MetaDataParser metadataParser = null;
+    MetaDataParser metadataParser;
 
     try {
       rdbmsConfig.setRdbmsType(con.getMetaData().getDatabaseProductName().toLowerCase());

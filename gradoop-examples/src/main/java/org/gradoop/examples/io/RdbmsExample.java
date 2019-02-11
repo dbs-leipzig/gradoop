@@ -23,6 +23,7 @@ import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+
 /**
  * Example program that converts a given relational database into a {@link LogicalGraph} and stores
  * the resulting {@link LogicalGraph} as CSV into declared directory.

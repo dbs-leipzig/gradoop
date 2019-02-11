@@ -45,11 +45,11 @@ public class RemovePkFkProperties extends RichMapFunction<Vertex, Vertex> {
   /**
    * List of tables to nodes representation
    */
-  private List<TableToVertex> tablesToNodes;
+  private List<TableToVertex> tablesToVertices;
 
   @Override
   public void open(Configuration parameters) {
-    this.tablesToNodes = getRuntimeContext()
+    this.tablesToVertices = getRuntimeContext()
       .getBroadcastVariable(BROADCAST_VARIABLE);
   }
 
@@ -58,7 +58,7 @@ public class RemovePkFkProperties extends RichMapFunction<Vertex, Vertex> {
 
     Properties newProps = Properties.create();
 
-    for (TableToVertex table : tablesToNodes) {
+    for (TableToVertex table : tablesToVertices) {
       if (table.getTableName().equals(v.getLabel())) {
 
         ArrayList<String> foreignKeys = Lists.newArrayList();
@@ -70,7 +70,7 @@ public class RemovePkFkProperties extends RichMapFunction<Vertex, Vertex> {
 
         for (Property oldProperty : Objects.requireNonNull(v.getProperties())) {
           if (!oldProperty.getKey().equals(PK_ID) &&
-              !foreignKeys.contains(oldProperty.getKey())) {
+            !foreignKeys.contains(oldProperty.getKey())) {
             newProps.set(oldProperty);
           }
         }

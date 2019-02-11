@@ -184,7 +184,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
 
   @Override
   @Deprecated
-  public GraphCollection cypher(String query, String constructionPattern,
+    public GraphCollection cypher(String query, String constructionPattern,
     GraphStatistics graphStatistics) {
     return cypher(query, constructionPattern, true,
             MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);

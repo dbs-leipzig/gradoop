@@ -21,6 +21,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.dataintegration.importer.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.dataintegration.importer.impl.rdbms.tuples.LabelIdKeyTuple;
 
 /**
@@ -56,7 +57,7 @@ public class JoinSetToEdges
     GradoopId id = GradoopId.get();
     GradoopId sourceVertexId = preEdge.f1.f1;
     GradoopId targetVertexId = preEdge.f0.f1;
-    String label = preEdge.f0.f0;
+    String label = preEdge.f0.f0.split(RdbmsConstants.EDGE_DELIMITER)[0];
     return edgeFactory.initEdge(id, label, sourceVertexId, targetVertexId);
   }
 }
