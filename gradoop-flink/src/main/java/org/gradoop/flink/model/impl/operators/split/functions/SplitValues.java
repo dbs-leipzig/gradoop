@@ -52,9 +52,6 @@ public class SplitValues<V extends Vertex>
     this.function = checkNotNull(function);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void flatMap(V vertex,
     Collector<Tuple2<GradoopId, PropertyValue>> collector) throws Exception {

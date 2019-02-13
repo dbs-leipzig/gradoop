@@ -99,9 +99,4 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm<NullValue, Null
     return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices,
       currentGraph.getEdges());
   }
-
-  @Override
-  public String getName() {
-    return DistinctVertexDegrees.class.getName();
-  }
 }

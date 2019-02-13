@@ -48,9 +48,6 @@ public class RandomFilter<E extends EPGMElement> implements CombinableFilter<E> 
     randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean filter(E e) throws Exception {
     return randomGenerator.nextFloat() <= threshold;

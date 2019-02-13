@@ -43,12 +43,4 @@ public class Intersection extends SetOperatorBase {
       .groupBy(new Id<GraphHead>())
       .reduceGroup(new GroupCountEquals<GraphHead>(2));
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return Intersection.class.getName();
-  }
 }

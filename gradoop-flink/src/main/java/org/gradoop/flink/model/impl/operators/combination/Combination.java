@@ -51,12 +51,4 @@ public class Combination implements BinaryGraphToGraphOperator {
     return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertexSet, newEdgeSet);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return Combination.class.getName();
-  }
-
 }

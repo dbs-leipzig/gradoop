@@ -66,17 +66,11 @@ public class EdgeTableInputFormat extends BaseTableInputFormat<Edge> {
     return scan;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected String getTableName() {
     return edgeTableName;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected Tuple1<Edge> mapResultToTuple(Result result) {
     return new Tuple1<>(edgeHandler.readEdge(result));

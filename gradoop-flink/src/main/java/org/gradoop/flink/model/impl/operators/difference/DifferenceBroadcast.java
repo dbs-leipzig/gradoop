@@ -53,12 +53,4 @@ public class DifferenceBroadcast extends Difference {
       .withBroadcastSet(identifiers,
         GraphsContainmentFilterBroadcast.GRAPH_IDS);
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return DifferenceBroadcast.class.getName();
-  }
 }

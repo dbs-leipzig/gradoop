@@ -173,7 +173,7 @@ public class CSVMetaDataParser {
     final String valueTypeLowerCase = valueType.toLowerCase();
     // check the validity of the map value type
     if (!TYPE_PARSER_MAP.containsKey(valueTypeLowerCase)) {
-      throw new TypeNotPresentException(keyTypeLowerCase, null);
+      throw new TypeNotPresentException(valueTypeLowerCase, null);
     }
 
     return s -> parseMapProperty(
@@ -263,12 +263,7 @@ public class CSVMetaDataParser {
     s = s.substring(1, s.length() - 1);
     return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))
       .map(st -> StringEscaper.split(st, CSVConstants.MAP_SEPARATOR))
-      .map(strings -> {
-        Object[] objects = new Object[2];
-        objects[0] = keyParser.apply(strings[0]);
-        objects[1] = valueParser.apply(strings[1]);
-        return objects;
-      })
+      .map(strings -> new Object[]{keyParser.apply(strings[0]), valueParser.apply(strings[1])})
       .collect(Collectors.toMap(e -> PropertyValue.create(e[0]), e -> PropertyValue.create(e[1])));
   }
 

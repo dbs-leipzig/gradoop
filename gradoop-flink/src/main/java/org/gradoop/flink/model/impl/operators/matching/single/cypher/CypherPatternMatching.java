@@ -203,9 +203,4 @@ public class CypherPatternMatching extends PatternMatching {
     }
     return newMetaData;
   }
-
-  @Override
-  public String getName() {
-    return CypherPatternMatching.class.getName();
-  }
 }

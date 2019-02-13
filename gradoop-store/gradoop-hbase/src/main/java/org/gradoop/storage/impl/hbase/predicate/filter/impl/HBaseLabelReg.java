@@ -41,9 +41,6 @@ public class HBaseLabelReg<T extends EPGMElement> extends LabelReg<HBaseElementF
     super(reg);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   public Filter toHBaseFilter(boolean negate) {

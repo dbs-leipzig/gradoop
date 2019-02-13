@@ -224,11 +224,6 @@ public class ExplorativePatternMatching
       PostProcessor.extractGraphCollection(elements, graph.getConfig(), true);
   }
 
-  @Override
-  public String getName() {
-    return ExplorativePatternMatching.class.getName();
-  }
-
 
   /**
    * Used for configuring and creating a new {@link ExplorativePatternMatching}

@@ -90,18 +90,12 @@ public abstract class HBaseElementHandler implements ElementHandler {
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeLabel(final Put put, final EPGMElement entity) {
     return (entity.getLabel() == null) ? put :
       put.addColumn(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel()));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeProperty(final Put put, Property property) {
     byte[] type = PropertyValueUtils.Bytes.getTypeByte(property.getValue());
@@ -111,9 +105,6 @@ public abstract class HBaseElementHandler implements ElementHandler {
     return put;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeProperties(final Put put, final EPGMElement entity) {
     if (entity.getProperties() != null && entity.getPropertyCount() > 0) {
@@ -124,17 +115,11 @@ public abstract class HBaseElementHandler implements ElementHandler {
     return put;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String readLabel(final Result res) {
     return Bytes.toString(res.getValue(CF_META_BYTES, COL_LABEL_BYTES));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Properties readProperties(final Result res) {
     Properties properties = Properties.create();

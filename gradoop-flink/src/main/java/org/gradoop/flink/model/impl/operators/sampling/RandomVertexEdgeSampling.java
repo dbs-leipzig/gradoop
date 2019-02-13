@@ -112,9 +112,6 @@ public class RandomVertexEdgeSampling extends SamplingAlgorithm {
     this.vertexEdgeSamplingType = vertexEdgeSamplingType;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
@@ -136,13 +133,5 @@ public class RandomVertexEdgeSampling extends SamplingAlgorithm {
     }
 
     return graph;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return RandomVertexEdgeSampling.class.getName();
   }
 }
