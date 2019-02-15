@@ -46,9 +46,7 @@ public class UniqueIdWithOffset<E> extends RichMapFunction<E, Tuple2<Long, E>> {
    */
   private Tuple2<Long, E> returnTuple = new Tuple2<>();
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public void open(Configuration parameters) {
 
     idCounter = 0L;

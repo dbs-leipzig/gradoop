@@ -349,12 +349,4 @@ public class CAPFQuery implements Operator {
 
     return relTables;
   }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return CAPFQuery.class.getName();
-  }
 }
