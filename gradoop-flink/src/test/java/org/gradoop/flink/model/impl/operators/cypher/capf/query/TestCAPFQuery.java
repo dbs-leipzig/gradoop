@@ -18,10 +18,12 @@ package org.gradoop.flink.model.impl.operators.cypher.capf.query;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.table.api.scala.BatchTableEnvironment;
 import org.apache.flink.types.Row;
+import org.gradoop.common.model.impl.metadata.MetaData;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -30,11 +32,10 @@ import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.fail;
@@ -42,7 +43,7 @@ import static junit.framework.TestCase.fail;
 public class TestCAPFQuery extends GradoopFlinkTestBase {
 
   @Test
-  public void testCAPFProjection() {
+  public void testCAPFProjection() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TestData.GRAPH_1);
 
     loader.appendToDatabaseFromString(
@@ -51,26 +52,25 @@ public class TestCAPFQuery extends GradoopFlinkTestBase {
 
     LogicalGraph graph = loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
 
-    Map<String, Set<Tuple2<String, Class<?>>>> vertexPropertyMap = new HashMap<>();
-    Map<String, Set<Tuple2<String, Class<?>>>> edgePropertyMap = new HashMap<>();
+    Map<String, List<PropertyMetaData>> vertexPropertyMap = new HashMap<>();
+    Map<String, List<PropertyMetaData>> edgePropertyMap = new HashMap<>();
 
-    Set<Tuple2<String, Class<?>>> propertySet = new HashSet<>();
-    propertySet.add(new Tuple2<>("id", Integer.class));
+    List<PropertyMetaData> propertyList = new ArrayList<>();
+    propertyList.add(new PropertyMetaData("id", MetaData.TypeString.INTEGER.getTypeString(),
+      null));
 
-    vertexPropertyMap.put("A", propertySet);
-    vertexPropertyMap.put("B", propertySet);
-    vertexPropertyMap.put("C", propertySet);
-    vertexPropertyMap.put("D", propertySet);
+    vertexPropertyMap.put("A", propertyList);
+    vertexPropertyMap.put("B", propertyList);
+    vertexPropertyMap.put("C", propertyList);
+    vertexPropertyMap.put("D", propertyList);
 
-    edgePropertyMap.put("a", propertySet);
-    edgePropertyMap.put("b", propertySet);
-    edgePropertyMap.put("c", propertySet);
+    edgePropertyMap.put("a", propertyList);
+    edgePropertyMap.put("b", propertyList);
+    edgePropertyMap.put("c", propertyList);
 
-    CAPFQueryResult result = graph.cypher(
-      "MATCH (n1)-->(n2)<--(n3) RETURN n2",
-      vertexPropertyMap,
-      edgePropertyMap
-    );
+    MetaData metaData = new CSVMetaData(new HashMap<>(), vertexPropertyMap, edgePropertyMap);
+
+    CAPFQueryResult result = graph.cypher("MATCH (n1)-->(n2)<--(n3) RETURN n2", metaData);
 
     // because the pattern is symmetric, each result exists twice
     GraphCollection expectedGraphs = loader.getGraphCollectionByVariables(
@@ -90,7 +90,7 @@ public class TestCAPFQuery extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testCAPFProjectionWithoutPropertyMaps() {
+  public void testCAPFProjectionWithoutPropertyMaps() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TestData.GRAPH_1);
 
     loader.appendToDatabaseFromString(
@@ -123,7 +123,7 @@ public class TestCAPFQuery extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testCAPFWithByteArrayPayload() {
+  public void testCAPFWithByteArrayPayload() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TestData.GRAPH_1);
 
     loader.appendToDatabaseFromString(
@@ -165,31 +165,32 @@ public class TestCAPFQuery extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testCAPFProperties() {
+  public void testCAPFProperties() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TestData.GRAPH_1);
 
     LogicalGraph graph = loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
 
-    Map<String, Set<Tuple2<String, Class<?>>>> vertexPropertyMap = new HashMap<>();
-    Map<String, Set<Tuple2<String, Class<?>>>> edgePropertyMap = new HashMap<>();
+    Map<String, List<PropertyMetaData>> vertexPropertyMap = new HashMap<>();
+    Map<String, List<PropertyMetaData>> edgePropertyMap = new HashMap<>();
 
-    Set<Tuple2<String, Class<?>>> propertySet = new HashSet<>();
-    propertySet.add(new Tuple2<>("id", Integer.class));
+    List<PropertyMetaData> propertyList = new ArrayList<>();
+    propertyList.add(new PropertyMetaData("id", MetaData.TypeString.INTEGER.getTypeString(),
+      null));
 
-    vertexPropertyMap.put("A", propertySet);
-    vertexPropertyMap.put("B", propertySet);
-    vertexPropertyMap.put("C", propertySet);
-    vertexPropertyMap.put("D", propertySet);
+    vertexPropertyMap.put("A", propertyList);
+    vertexPropertyMap.put("B", propertyList);
+    vertexPropertyMap.put("C", propertyList);
+    vertexPropertyMap.put("D", propertyList);
 
-    edgePropertyMap.put("a", propertySet);
-    edgePropertyMap.put("b", propertySet);
-    edgePropertyMap.put("c", propertySet);
+    edgePropertyMap.put("a", propertyList);
+    edgePropertyMap.put("b", propertyList);
+    edgePropertyMap.put("c", propertyList);
+
+    MetaData metaData = new CSVMetaData(new HashMap<>(), vertexPropertyMap, edgePropertyMap);
 
     CAPFQueryResult result = graph.cypher(
       "MATCH (n1)-->(n2)-->(n3) RETURN n1.id, n2.id, n3.id",
-      vertexPropertyMap,
-      edgePropertyMap
-    );
+      metaData);
 
     BatchTableEnvironment tenv = (BatchTableEnvironment) result.getTable().tableEnv();
     DataSet<Row> resultDataSet = tenv.toDataSet(result.getTable(), TypeInformation.of(Row.class)).javaSet();
@@ -231,31 +232,33 @@ public class TestCAPFQuery extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testCAPFAggregation() {
+  public void testCAPFAggregation() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString(TestData.GRAPH_2);
 
     LogicalGraph graph = loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
 
-    Map<String, Set<Tuple2<String, Class<?>>>> vertexPropertyMap = new HashMap<>();
-    Map<String, Set<Tuple2<String, Class<?>>>> edgePropertyMap = new HashMap<>();
+    Map<String, List<PropertyMetaData>> vertexPropertyMap = new HashMap<>();
+    Map<String, List<PropertyMetaData>> edgePropertyMap = new HashMap<>();
 
-    Set<Tuple2<String, Class<?>>> propertySet = new HashSet<>();
-    propertySet.add(new Tuple2<>("id", Integer.class));
+    List<PropertyMetaData> propertyList = new ArrayList<>();
+    propertyList.add(new PropertyMetaData("id", MetaData.TypeString.INTEGER.getTypeString(),
+      null));
 
-    vertexPropertyMap.put("A", propertySet);
-    vertexPropertyMap.put("B", propertySet);
-    vertexPropertyMap.put("C", propertySet);
-    vertexPropertyMap.put("D", propertySet);
+    vertexPropertyMap.put("A", propertyList);
+    vertexPropertyMap.put("B", propertyList);
+    vertexPropertyMap.put("C", propertyList);
+    vertexPropertyMap.put("D", propertyList);
 
-    edgePropertyMap.put("a", propertySet);
-    edgePropertyMap.put("b", propertySet);
-    edgePropertyMap.put("c", propertySet);
-    edgePropertyMap.put("d", propertySet);
+    edgePropertyMap.put("a", propertyList);
+    edgePropertyMap.put("b", propertyList);
+    edgePropertyMap.put("c", propertyList);
+    edgePropertyMap.put("d", propertyList);
+
+    MetaData metaData = new CSVMetaData(new HashMap<>(), vertexPropertyMap, edgePropertyMap);
 
     CAPFQueryResult result = graph.cypher(
       "MATCH (n1) RETURN avg(n1.id)",
-      vertexPropertyMap,
-      edgePropertyMap
+      metaData
     );
 
     BatchTableEnvironment tenv = (BatchTableEnvironment) result.getTable().tableEnv();

@@ -18,17 +18,7 @@ package org.gradoop.flink.model.impl.operators.cypher.capf.query;
 /**
  * Class containing string constants used for the execution of cypher queries via CAPF.
  */
-public class CAPFQueryConstants {
-
-  /**
-   * Constant used to mark a tuple as a vertex tuple
-   */
-  static final String VERTEX_TUPLE = "v";
-
-  /**
-   * Constant used to mark a tuple as an edge tuple
-   */
-  static final String EDGE_TUPLE = "e";
+class CAPFQueryConstants {
 
   /**
    * Constant used to name the id field in a node table

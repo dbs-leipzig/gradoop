@@ -17,7 +17,7 @@ package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -41,9 +41,7 @@ import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Defines the operators that are available on a {@link LogicalGraph}.
@@ -60,17 +58,11 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * result is a CAPFQueryResult, containing a flink table that can be converted to a
    * GraphCollection, if it contains vertices or edges.
    *
-   * @param query                    the query string
-   * @param vertexPropertiesPerLabel mapping between vertex labels and all property keys and types
-   *                                 that vertices with this label have
-   * @param edgePropertiesPerLabel   mapping between edge labels and all property keys and types
-   *                                 that edges with this label have
+   * @param query    the query string
+   * @param metaData metaData object
    * @return the result, containing a flink table and possibly a GraphCollection
    */
-  CAPFQueryResult cypher(
-    String query,
-    Map<String, Set<Tuple2<String, Class<?>>>> vertexPropertiesPerLabel,
-    Map<String, Set<Tuple2<String, Class<?>>>> edgePropertiesPerLabel);
+  CAPFQueryResult cypher(String query, MetaData metaData) throws Exception;
 
   /**
    * Evaluates the given cypher query using CAPF (Cypher for Apache Flink). CAPF implements the
@@ -85,8 +77,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param query the query string
    * @return the result, containing a flink table and possibly a GraphCollection
    */
-  CAPFQueryResult cypher(String query);
-
+  CAPFQueryResult cypher(String query) throws Exception;
 
   /**
    * Evaluates the given query using the Cypher query engine. The engine uses default morphism

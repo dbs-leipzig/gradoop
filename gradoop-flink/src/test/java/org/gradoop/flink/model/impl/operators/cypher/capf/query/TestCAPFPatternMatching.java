@@ -17,11 +17,13 @@ package org.gradoop.flink.model.impl.operators.cypher.capf.query;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.sinks.BatchTableSink;
 import org.apache.flink.types.Row;
+import org.gradoop.common.model.impl.metadata.MetaData;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -50,8 +52,7 @@ public class TestCAPFPatternMatching extends GradoopFlinkTestBase {
 
   protected final String expectedCollection;
 
-  private final Map<String, Set<Tuple2<String, Class<?>>>> vertexPropertyMap;
-  private final Map<String, Set<Tuple2<String, Class<?>>>> edgePropertyMap;
+  private final MetaData metaData;
 
   public TestCAPFPatternMatching(String testName, String dataGraph, String queryGraph,
     String expectedGraphVariables, String expectedCollection) {
@@ -61,21 +62,24 @@ public class TestCAPFPatternMatching extends GradoopFlinkTestBase {
     this.expectedGraphVariables = expectedGraphVariables.split(",");
     this.expectedCollection = expectedCollection;
 
-    vertexPropertyMap = new HashMap<>();
-    edgePropertyMap = new HashMap<>();
+    Map<String, List<PropertyMetaData>> vertexPropertyMap = new HashMap<>();
+    Map<String, List<PropertyMetaData>> edgePropertyMap = new HashMap<>();
 
-    Set<Tuple2<String, Class<?>>> propertySet = new HashSet<>();
-    propertySet.add(new Tuple2<>("id", Integer.class));
+    List<PropertyMetaData> propertyList = new ArrayList<>();
+    propertyList.add(new PropertyMetaData("id", MetaData.TypeString.INTEGER.getTypeString(),
+      null));
 
-    vertexPropertyMap.put("A", propertySet);
-    vertexPropertyMap.put("B", propertySet);
-    vertexPropertyMap.put("C", propertySet);
-    vertexPropertyMap.put("D", propertySet);
+    vertexPropertyMap.put("A", propertyList);
+    vertexPropertyMap.put("B", propertyList);
+    vertexPropertyMap.put("C", propertyList);
+    vertexPropertyMap.put("D", propertyList);
 
-    edgePropertyMap.put("a", propertySet);
-    edgePropertyMap.put("b", propertySet);
-    edgePropertyMap.put("c", propertySet);
-    edgePropertyMap.put("d", propertySet);
+    edgePropertyMap.put("a", propertyList);
+    edgePropertyMap.put("b", propertyList);
+    edgePropertyMap.put("c", propertyList);
+    edgePropertyMap.put("d", propertyList);
+
+    metaData = new CSVMetaData(new HashMap<>(), vertexPropertyMap, edgePropertyMap);
   }
 
   @Test
@@ -89,7 +93,7 @@ public class TestCAPFPatternMatching extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString(expectedCollection);
 
     // execute and validate
-    CAPFQueryResult capfResult = db.cypher(queryGraph, vertexPropertyMap, edgePropertyMap);
+    CAPFQueryResult capfResult = db.cypher(queryGraph, metaData);
     if (capfResult.containsGraphs()) {
       GraphCollection result = capfResult.getGraphs();
       GraphCollection expected = loader.getGraphCollectionByVariables(expectedGraphVariables);
@@ -110,7 +114,7 @@ public class TestCAPFPatternMatching extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString(expectedCollection);
 
     // execute and validate
-    CAPFQueryResult capfResult = db.cypher(queryGraph, vertexPropertyMap, edgePropertyMap);
+    CAPFQueryResult capfResult = db.cypher(queryGraph, metaData);
     if (capfResult.containsGraphs()) {
       GraphCollection result = capfResult.getGraphs();
       GraphCollection expected = loader.getGraphCollectionByVariables(expectedGraphVariables);

@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.epgm;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -72,9 +72,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * A logical graph is one of the base concepts of the Extended Property Graph Model. A logical graph
@@ -169,7 +167,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   //----------------------------------------------------------------------------
 
   @Override
-  public CAPFQueryResult cypher(String query) {
+  public CAPFQueryResult cypher(String query) throws Exception {
     CAPFQuery capfQuery = new CAPFQuery(
       query, this.config.getExecutionEnvironment()
     );
@@ -177,13 +175,9 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   }
 
   @Override
-  public CAPFQueryResult cypher(
-    String query,
-    Map<String, Set<Tuple2<String, Class<?>>>> vertexPropertiesPerLabel,
-    Map<String, Set<Tuple2<String, Class<?>>>> edgePropertiesPerLabel) {
+  public CAPFQueryResult cypher(String query, MetaData metaData) throws Exception {
     CAPFQuery capfQuery = new CAPFQuery(
-      query, vertexPropertiesPerLabel,
-      edgePropertiesPerLabel, this.config.getExecutionEnvironment());
+      query, metaData, this.config.getExecutionEnvironment());
     return capfQuery.execute(this);
   }
 

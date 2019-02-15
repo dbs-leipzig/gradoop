@@ -19,23 +19,22 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.metadata.MetaData;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 import org.gradoop.flink.model.api.operators.Operator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.Label;
 import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.EdgeLabelFilter;
 import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.EdgeToTuple;
 import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.IdOfF1;
-import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.PropertyCollector;
 import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.PropertyEncoder;
 import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.ReplaceSourceId;
 import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.ReplaceTargetId;
@@ -58,19 +57,14 @@ import scala.collection.mutable.Seq;
 import scala.reflect.ClassTag$;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.EDGE_ID;
-import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.EDGE_TUPLE;
 import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.END_NODE;
 import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.NODE_ID;
 import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.OFFSET;
 import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.PROPERTY_PREFIX;
 import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.START_NODE;
-import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.VERTEX_TUPLE;
 
 
 /**
@@ -85,18 +79,9 @@ public class CAPFQuery implements Operator {
   private String query;
 
   /**
-   * asdf
+   * MetaData object
    */
-  private MetaData meta;
-  /**
-   * A map specifying the property keys and property types per each vertex label.
-   */
-  private Map<String, Set<Tuple2<String, Class<?>>>> vertexPropertiesPerLabel;
-
-  /**
-   * A map specifying the property keys and property types per each edge label.
-   */
-  private Map<String, Set<Tuple2<String, Class<?>>>> edgePropertiesPerLabel;
+  private MetaData metaData;
 
   /**
    * The CAPF session the query will be executed in.
@@ -137,38 +122,32 @@ public class CAPFQuery implements Operator {
   /**
    * Constructor
    *
-   * @param query                    the query string
-   * @param vertexPropertiesPerLabel mapping between vertex labels,
-   *                                 possible property keys and property types
-   * @param edgePropertiesPerLabel   mapping between edge labels,
-   *                                 possible property keys and property types
-   * @param env                      the execution environment
+   * @param query    the query string
+   * @param metaData metaData object
+   * @param env      the execution environment
    */
   public CAPFQuery(
-    String query,
-    Map<String, Set<Tuple2<String, Class<?>>>> vertexPropertiesPerLabel,
-    Map<String, Set<Tuple2<String, Class<?>>>> edgePropertiesPerLabel,
-    ExecutionEnvironment env) {
+    String query, MetaData metaData, ExecutionEnvironment env) {
     this.query = query;
-    this.vertexPropertiesPerLabel = vertexPropertiesPerLabel;
-    this.edgePropertiesPerLabel = edgePropertiesPerLabel;
+    this.metaData = metaData;
     this.vertexCount = null;
     this.session = CAPFSession$.MODULE$.create(
       new org.apache.flink.api.scala.ExecutionEnvironment(env));
   }
-
 
   /**
    * Execute a cypher query on a given graph via the CAPF API.
    *
    * @param graph the graph that the query shall be executed on
    * @return the result of the query, either a graph collection or a flink table
+   * @throws Exception if the execution or IO fails.
    */
-  public CAPFQueryResult execute(LogicalGraph graph) {
+  public CAPFQueryResult execute(LogicalGraph graph) throws Exception {
 
-    if (vertexPropertiesPerLabel == null || edgePropertiesPerLabel == null) {
+    if (metaData == null) {
       graph = transformGraphProperties(graph);
-      constructPropertyMaps(graph);
+      metaData = new CSVMetaDataSource()
+        .fromTuples(new CSVMetaDataSource().tuplesFromGraph(graph).collect());
     }
     // create flink tables of nodes as required by CAPF
     List<CAPFNodeTable> nodeTables = createNodeTables(graph);
@@ -221,41 +200,6 @@ public class CAPFQuery implements Operator {
   }
 
   /**
-   * Construct the vertex and edge property maps, mapping the labels to sets of property names and
-   * classes.
-   *
-   * @param graph the graph from which the property maps should be constructed
-   */
-  private void constructPropertyMaps(LogicalGraph graph) {
-
-    vertexPropertiesPerLabel = new HashMap<>();
-    edgePropertiesPerLabel = new HashMap<>();
-
-    DataSet<Tuple3<String, String, Set<Tuple2<String, Class<?>>>>> vertexProperties =
-      graph.getVertices().groupBy(new Label<>())
-        .reduceGroup(new PropertyCollector<>(VERTEX_TUPLE));
-
-    DataSet<Tuple3<String, String, Set<Tuple2<String, Class<?>>>>> edgeProperties =
-      graph.getEdges().groupBy(new Label<>())
-        .reduceGroup(new PropertyCollector<>(EDGE_TUPLE));
-
-    DataSet<Tuple3<String, String, Set<Tuple2<String, Class<?>>>>> properties =
-      vertexProperties.union(edgeProperties);
-
-    try {
-      for (Tuple3<String, String, Set<Tuple2<String, Class<?>>>> property : properties.collect()) {
-        if (property.f0.equals(VERTEX_TUPLE)) {
-          vertexPropertiesPerLabel.put(property.f1, property.f2);
-        } else if (property.f0.equals(EDGE_TUPLE)) {
-          edgePropertiesPerLabel.put(property.f1, property.f2);
-        }
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  /**
    * Method to transform a DataSet of vertices into the flink table format
    * required by CAPF: Unique long ids for each vertex, one table per
    * vertex label and each property in a unique row field.
@@ -264,20 +208,14 @@ public class CAPFQuery implements Operator {
    * @return a list of node tables, one table per vertex label
    */
   private List<CAPFNodeTable> createNodeTables(LogicalGraph graph) {
-
     List<CAPFNodeTable> nodeTables = new ArrayList<>();
 
     verticesWithIds = graph.getVertices().map(new UniqueIdWithOffset<>());
     vertexCount = Count.count(graph.getVertices());
 
-
     // construct a table for each vertex label
-    for (Map.Entry<String, Set<Tuple2<String, Class<?>>>> entry :
-      this.vertexPropertiesPerLabel.entrySet()) {
-
-      String label = entry.getKey();
-
-      Set<Tuple2<String, Class<?>>> propertyTypes = entry.getValue();
+    for (String label : metaData.getVertexLabels()) {
+      List<PropertyMetaData> propertyTypes = metaData.getVertexPropertyMetaData(label);
 
       // list of all row field types
       TypeInformation<?>[] types = new TypeInformation<?>[propertyTypes.size() + 1];
@@ -286,12 +224,10 @@ public class CAPFQuery implements Operator {
       // first field is long id
       types[0] = TypeInformation.of(Long.class);
 
-      // other fields are properties
-      int i = 1;
-      for (Tuple2<String, Class<?>> tuple : propertyTypes) {
-        propKeys.add(tuple.f0);
-        types[i] = TypeInformation.of(tuple.f1);
-        i++;
+      for (int i = 0; i < propertyTypes.size(); i++) {
+        PropertyMetaData pmd = propertyTypes.get(i);
+        propKeys.add(pmd.getKey());
+        types[i + 1] = TypeInformation.of(MetaData.getClassFromTypeString(pmd.getTypeString()));
       }
 
       RowTypeInfo info = new RowTypeInfo(types);
@@ -341,7 +277,6 @@ public class CAPFQuery implements Operator {
   private List<CAPFRelationshipTable> createRelationshipTables(LogicalGraph graph) {
     List<CAPFRelationshipTable> relTables = new ArrayList<>();
 
-
     edgesWithIds = graph.getEdges().map(new UniqueIdWithOffset<>())
       .withBroadcastSet(vertexCount, OFFSET);
 
@@ -354,12 +289,8 @@ public class CAPFQuery implements Operator {
       .where(2).equalTo(new IdOfF1<>()).with(new ReplaceTargetId());
 
     // construct a table for each edge label
-    for (Map.Entry<String, Set<Tuple2<String, Class<?>>>> entry :
-      this.edgePropertiesPerLabel.entrySet()) {
-
-      String label = entry.getKey();
-
-      Set<Tuple2<String, Class<?>>> propertyTypes = entry.getValue();
+    for (String label : metaData.getEdgeLabels()) {
+      List<PropertyMetaData> propertyTypes = metaData.getEdgePropertyMetaData(label);
 
       // list of all row field types
       TypeInformation<?>[] types = new TypeInformation<?>[propertyTypes.size() + 3];
@@ -371,11 +302,10 @@ public class CAPFQuery implements Operator {
       types[2] = TypeInformation.of(Long.class); // target
 
       // other fields are properties
-      int i = 3;
-      for (Tuple2<String, Class<?>> tuple : propertyTypes) {
-        propKeys.add(tuple.f0);
-        types[i] = TypeInformation.of(tuple.f1);
-        i++;
+      for (int i = 0; i < propertyTypes.size(); i++) {
+        PropertyMetaData pmd = propertyTypes.get(i);
+        propKeys.add(pmd.getKey());
+        types[i + 3] = TypeInformation.of(MetaData.getClassFromTypeString(pmd.getTypeString()));
       }
 
       RowTypeInfo info = new RowTypeInfo(types);
@@ -415,7 +345,6 @@ public class CAPFQuery implements Operator {
         .fromDataSet(scalaRowDataSet).as(schemaString);
 
       relTables.add(CAPFRelationshipTable.fromMapping(relMapping, edgeTable));
-
     }
 
     return relTables;
