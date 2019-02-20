@@ -37,9 +37,4 @@ public class OutgoingVertexDegreeDistribution
         .<Tuple1<Long>>project(1))
       .map(new Tuple2ToWithCount<>());
   }
-
-  @Override
-  public String getName() {
-    return OutgoingVertexDegreeDistribution.class.getName();
-  }
 }

@@ -38,9 +38,4 @@ public class DistinctTargetVertexCountPreparer implements UnaryGraphToValueOpera
         .execute(graph)
         .map(new ObjectTo1<>());
   }
-
-  @Override
-  public String getName() {
-    return DistinctTargetVertexCountPreparer.class.getName();
-  }
 }

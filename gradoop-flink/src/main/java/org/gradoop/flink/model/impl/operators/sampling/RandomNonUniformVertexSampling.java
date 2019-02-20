@@ -106,9 +106,4 @@ public class RandomNonUniformVertexSampling extends SamplingAlgorithm {
     return graph.getConfig().getLogicalGraphFactory()
       .fromDataSets(graph.getGraphHead(), newVertices, newEdges);
   }
-
-  @Override
-  public String getName() {
-    return RandomNonUniformVertexSampling.class.getName();
-  }
 }

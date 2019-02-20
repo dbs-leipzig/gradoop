@@ -49,9 +49,4 @@ public class Union extends SetOperatorBase {
       .union(secondCollection.getEdges())
       .distinct(new Id<Edge>());
   }
-
-  @Override
-  public String getName() {
-    return Union.class.getName();
-  }
 }

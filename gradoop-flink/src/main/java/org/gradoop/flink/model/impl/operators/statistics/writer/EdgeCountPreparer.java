@@ -38,9 +38,4 @@ public class EdgeCountPreparer implements UnaryGraphToValueOperator<MapOperator<
         .execute(graph)
         .map(new ObjectTo1<>());
   }
-
-  @Override
-  public String getName() {
-    return EdgeCountPreparer.class.getName();
-  }
 }

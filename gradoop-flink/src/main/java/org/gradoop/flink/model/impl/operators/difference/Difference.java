@@ -55,9 +55,4 @@ public class Difference extends SetOperatorBase {
       .groupBy(new IdOf0InTuple2<GraphHead, Long>())
       .reduceGroup(new RemoveCut<GraphHead>());
   }
-
-  @Override
-  public String getName() {
-    return Difference.class.getName();
-  }
 }

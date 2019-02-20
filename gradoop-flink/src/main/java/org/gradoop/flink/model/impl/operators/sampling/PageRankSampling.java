@@ -143,9 +143,4 @@ public class PageRankSampling extends SamplingAlgorithm {
 
     return graph;
   }
-
-  @Override
-  public String getName() {
-    return PageRankSampling.class.getName();
-  }
 }
