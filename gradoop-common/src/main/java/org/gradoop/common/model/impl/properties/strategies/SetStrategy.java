@@ -51,7 +51,7 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
         set.add(item);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue", e);
+      throw new IOException("Error reading PropertyValue with SetStrategy.", e);
     }
 
     return set;
@@ -84,9 +84,9 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
   }
 
   @Override
-  public Set<PropertyValue> get(byte[] bytes) {
+  public Set<PropertyValue> get(byte[] bytes) throws IOException {
     PropertyValue entry;
-    Set<PropertyValue> set = new HashSet<PropertyValue>();
+    Set<PropertyValue> set = new HashSet<>();
 
     try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
         DataInputStream inputStream = new DataInputStream(byteStream);
@@ -102,7 +102,7 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
         set.add(entry);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue", e);
+      throw new IOException("Error reading PropertyValue with SetStrategy.", e);
     }
 
     return set;
@@ -114,7 +114,7 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
   }
 
   @Override
-  public byte[] getRawBytes(Set<PropertyValue> value) {
+  public byte[] getRawBytes(Set<PropertyValue> value) throws IOException {
     int size = value.stream().mapToInt(PropertyValue::byteSize)
       .sum() + PropertyValue.OFFSET + Bytes.SIZEOF_SHORT;
 
@@ -130,7 +130,7 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
 
       return byteStream.toByteArray();
     } catch (IOException e) {
-      throw new RuntimeException("Error writing PropertyValue", e);
+      throw new IOException("Error writing PropertyValue with SetStrategy.", e);
     }
   }
 }

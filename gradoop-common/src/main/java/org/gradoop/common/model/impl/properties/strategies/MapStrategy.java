@@ -19,9 +19,7 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,34 +36,13 @@ public class MapStrategy
   public Map<PropertyValue, PropertyValue> read(DataInputView inputView, byte typeByte)
       throws IOException {
     byte[] rawBytes = readVariableSizedData(inputView, typeByte);
-
-    PropertyValue key;
-    PropertyValue value;
-    Map<PropertyValue, PropertyValue> map = new HashMap<>();
     DataInputViewStreamWrapper internalInputView = createInputView(rawBytes);
-
-    try {
-      while (internalInputView.available() > 0) {
-        key = new PropertyValue();
-        key.read(internalInputView);
-
-        value = new PropertyValue();
-        value.read(internalInputView);
-
-        map.put(key, value);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue", e);
-    }
-
-    return map;
+    return createMap(internalInputView);
   }
 
   @Override
   public int compare(Map value, Object other) {
-    throw new UnsupportedOperationException(
-      "Method compareTo() is not supported for Map."
-    );
+    throw new UnsupportedOperationException("Method compareTo() is not supported for Map.");
   }
 
   @Override
@@ -73,7 +50,7 @@ public class MapStrategy
     if (!(value instanceof Map)) {
       return false;
     }
-    for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) value).entrySet()) {
+    for (Map.Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {
       // Map is not a valid property value if it contains any object
       // that is not a property value itself.
       if (!(entry.getKey() instanceof PropertyValue) ||
@@ -91,31 +68,17 @@ public class MapStrategy
   }
 
   @Override
-  public Map<PropertyValue, PropertyValue> get(byte[] bytes) {
-    PropertyValue key;
-    PropertyValue value;
+  public Map<PropertyValue, PropertyValue> get(byte[] bytes) throws IOException {
+    DataInputViewStreamWrapper inputView = createInputView(bytes);
+    Map<PropertyValue, PropertyValue> map;
 
-    Map<PropertyValue, PropertyValue> map = new HashMap<PropertyValue, PropertyValue>();
-
-    try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);
-        DataInputStream inputStream = new DataInputStream(byteStream);
-        DataInputViewStreamWrapper inputView = new DataInputViewStreamWrapper(inputStream)) {
-
-      if (inputStream.skipBytes(PropertyValue.OFFSET) != PropertyValue.OFFSET) {
-        throw new RuntimeException("Malformed entry in PropertyValue List");
+    try {
+      if (inputView.skipBytes(PropertyValue.OFFSET) != PropertyValue.OFFSET) {
+        throw new IOException("Malformed entry in PropertyValue Map.");
       }
-
-      while (inputStream.available() > 0) {
-        key = new PropertyValue();
-        key.read(inputView);
-
-        value = new PropertyValue();
-        value.read(inputView);
-
-        map.put(key, value);
-      }
+      map = createMap(inputView);
     } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue", e);
+      throw new IOException("Error while processing DataInputViewStreamWrapper.");
     }
 
     return map;
@@ -127,7 +90,7 @@ public class MapStrategy
   }
 
   @Override
-  public byte[] getRawBytes(Map<PropertyValue, PropertyValue> value) {
+  public byte[] getRawBytes(Map<PropertyValue, PropertyValue> value) throws IOException{
     int size = value.keySet().stream().mapToInt(PropertyValue::byteSize).sum() +
         value.values().stream().mapToInt(PropertyValue::byteSize).sum() +
         PropertyValue.OFFSET;
@@ -144,7 +107,36 @@ public class MapStrategy
 
       return byteStream.toByteArray();
     } catch (IOException e) {
-      throw new RuntimeException("Error writing PropertyValue", e);
+      throw new IOException("Error writing PropertyValue with MapStrategy.", e);
     }
+  }
+
+  /**
+   * Creates a map with data read from an {@link DataInputViewStreamWrapper}.
+   *
+   * @param inputView {@link DataInputViewStreamWrapper} containing data
+   * @return a map containing the deserialized data
+   */
+  private Map<PropertyValue, PropertyValue> createMap(DataInputViewStreamWrapper inputView)
+    throws IOException {
+    PropertyValue key;
+    PropertyValue value;
+
+    Map<PropertyValue, PropertyValue> map = new HashMap<>();
+
+    try {
+      while (inputView.available() > 0) {
+        key = new PropertyValue();
+        key.read(inputView);
+
+        value = new PropertyValue();
+        value.read(inputView);
+
+        map.put(key, value);
+      }
+    } catch (IOException e) {
+      throw new IOException("Error reading PropertyValue with MapStrategy.", e);
+    }
+    return map;
   }
 }

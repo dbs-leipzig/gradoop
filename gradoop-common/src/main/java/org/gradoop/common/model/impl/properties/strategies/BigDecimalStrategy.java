@@ -42,7 +42,7 @@ public class BigDecimalStrategy extends AbstractVariableSizedPropertyValueStrate
       return PropertyValueStrategyUtils.compareNumerical(value, num);
     }
     throw new IllegalArgumentException(String.format(
-    "Incompatible types: %s, %s", value.getClass(), other.getClass()));
+      "Incompatible types: %s, %s", value.getClass(), other.getClass()));
   }
 
   @Override
@@ -86,7 +86,7 @@ public class BigDecimalStrategy extends AbstractVariableSizedPropertyValueStrate
       break;
     default:
       throw new IllegalArgumentException(
-      "Cannot convert byte array with type byte "  + type + " to " +
+        "Cannot convert byte array with type byte "  + type + " to " +
         BigDecimal.class.getSimpleName());
     }
     return decimal;

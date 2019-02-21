@@ -49,7 +49,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
         list.add(item);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue", e);
+      throw new IOException("Error reading PropertyValue with ListStrategy.", e);
     }
 
     return list;
@@ -84,7 +84,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
   }
 
   @Override
-  public List<PropertyValue> get(byte[] bytes) {
+  public List<PropertyValue> get(byte[] bytes) throws IOException {
     PropertyValue item;
     List<PropertyValue> list = new ArrayList<>();
 
@@ -93,7 +93,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
         DataInputViewStreamWrapper inputView = new DataInputViewStreamWrapper(inputStream)) {
 
       if (inputView.skipBytes(PropertyValue.OFFSET) != PropertyValue.OFFSET) {
-        throw new RuntimeException("Malformed entry in PropertyValue List");
+        throw new IOException("Malformed entry in PropertyValue List.");
       }
       while (inputView.available() > 0) {
         item = new PropertyValue();
@@ -102,7 +102,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
         list.add(item);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue", e);
+      throw new IOException("Error reading PropertyValue with ListStrategy.", e);
     }
 
     return list;
@@ -114,7 +114,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
   }
 
   @Override
-  public byte[] getRawBytes(List<PropertyValue> value) {
+  public byte[] getRawBytes(List<PropertyValue> value) throws IOException{
     int size = value.stream().mapToInt(PropertyValue::byteSize).sum() +
       PropertyValue.OFFSET;
 
@@ -129,7 +129,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
 
       return byteStream.toByteArray();
     } catch (IOException e) {
-      throw new RuntimeException("Error writing PropertyValue", e);
+      throw new IOException("Error writing PropertyValue with ListStrategy.", e);
     }
   }
 }

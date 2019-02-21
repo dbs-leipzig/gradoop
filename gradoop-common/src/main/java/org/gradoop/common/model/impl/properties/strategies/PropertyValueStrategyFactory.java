@@ -128,7 +128,7 @@ public class PropertyValueStrategyFactory {
   /**
    * Get a strategy which corresponds the provided class. If there is no mapping for the provided
    * class in the class-strategy map, or the value of the parameter is {@code null}, an instance of
-   * {@code NoopPropertyValue} is returned.
+   * {@link NullStrategy} is returned.
    *
    * @param clazz some class
    * @return strategy class which is able to handle the provided type.
@@ -162,8 +162,8 @@ public class PropertyValueStrategyFactory {
    * Get strategy by object.
    *
    * @param value some object.
-   * @return strategy that handles operations on the provided object type or
-   * {@code NullStrategy} if no mapping for the given type exists.
+   * @return strategy that handles operations on the provided object type. If value is {@code null},
+   * {@link NullStrategy} is returned.
    * @throws UnsupportedTypeException when there is no matching strategy for a given object.
    */
   public static PropertyValueStrategy get(Object value) throws UnsupportedTypeException {

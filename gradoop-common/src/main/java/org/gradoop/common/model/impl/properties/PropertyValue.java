@@ -387,7 +387,11 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
       return (T) value;
     }
     byte[] bytes = PropertyValueStrategyFactory.getRawBytes(value);
-    return (T) strategy.get(bytes);
+    try {
+      return  (T) strategy.get(bytes);
+    } catch (IOException e) {
+      throw new RuntimeException("Cannot convert " + value + " to " + clazz);
+    }
   }
 
   /**
@@ -793,8 +797,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(type);
 
     if (strategy == null) {
-      throw new UnsupportedTypeException(
-              "No strategy for type byte from input view found");
+      throw new UnsupportedTypeException("No strategy for type byte from input view found");
     } else {
       value = strategy.read(inputView, typeByte);
     }

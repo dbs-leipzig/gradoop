@@ -82,7 +82,7 @@ public interface PropertyValueStrategy<T> {
    * @param bytes representing a serialized object.
    * @return an instance of the type handled by this strategy.
    */
-  T get(byte[] bytes);
+  T get(byte[] bytes) throws IOException;
 
   /**
    * Gets a byte which represents the data type the specific strategy handles.
@@ -98,5 +98,5 @@ public interface PropertyValueStrategy<T> {
    * @param value the object to be serialized.
    * @return byte array representation of the provided object.
    */
-  byte[] getRawBytes(T value);
+  byte[] getRawBytes(T value) throws IOException;
 }
