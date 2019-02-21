@@ -114,7 +114,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
   }
 
   @Override
-  public byte[] getRawBytes(List<PropertyValue> value) throws IOException{
+  public byte[] getRawBytes(List<PropertyValue> value) throws IOException {
     int size = value.stream().mapToInt(PropertyValue::byteSize).sum() +
       PropertyValue.OFFSET;
 

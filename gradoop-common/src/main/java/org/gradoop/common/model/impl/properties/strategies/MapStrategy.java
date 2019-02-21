@@ -90,7 +90,7 @@ public class MapStrategy
   }
 
   @Override
-  public byte[] getRawBytes(Map<PropertyValue, PropertyValue> value) throws IOException{
+  public byte[] getRawBytes(Map<PropertyValue, PropertyValue> value) throws IOException {
     int size = value.keySet().stream().mapToInt(PropertyValue::byteSize).sum() +
         value.values().stream().mapToInt(PropertyValue::byteSize).sum() +
         PropertyValue.OFFSET;

@@ -20,6 +20,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -72,7 +73,11 @@ public class PropertyValueStrategyFactory {
    */
   public static Object fromRawBytes(byte[] bytes) {
     PropertyValueStrategy strategy = INSTANCE.byteStrategyMap.get(bytes[0]);
-    return strategy == null ? null : strategy.get(bytes);
+    try {
+      return strategy == null ? null : strategy.get(bytes);
+    } catch (IOException e) {
+      throw new RuntimeException("Error while deserializing object.", e);
+    }
   }
 
   /**
@@ -104,7 +109,11 @@ public class PropertyValueStrategyFactory {
    */
   public static byte[] getRawBytes(Object value) {
     if (value != null) {
-      return get(value.getClass()).getRawBytes(value);
+      try {
+        return get(value.getClass()).getRawBytes(value);
+      } catch (IOException e) {
+        throw new RuntimeException("Error while serializing object.", e);
+      }
     }
     return new byte[] {PropertyValue.TYPE_NULL};
   }
