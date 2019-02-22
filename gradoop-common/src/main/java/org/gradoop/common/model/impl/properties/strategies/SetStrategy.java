@@ -59,7 +59,7 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
 
   @Override
   public int compare(Set value, Object other) {
-    throw new UnsupportedOperationException("Method compareTo() is not supported for Set.");
+    throw new UnsupportedOperationException("Method compare() is not supported for Set.");
   }
 
   @Override

@@ -57,9 +57,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
 
   @Override
   public int compare(List value, Object other) {
-    throw new UnsupportedOperationException(
-      "Method compareTo() is not supported for List."
-    );
+    throw new UnsupportedOperationException("Method compare() is not supported for List.");
   }
 
   @Override

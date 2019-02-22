@@ -42,7 +42,7 @@ public class MapStrategy
 
   @Override
   public int compare(Map value, Object other) {
-    throw new UnsupportedOperationException("Method compareTo() is not supported for Map.");
+    throw new UnsupportedOperationException("Method compare() is not supported for Map.");
   }
 
   @Override
