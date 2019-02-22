@@ -83,6 +83,10 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
     return (Class) List.class;
   }
 
+  /**
+   * {@inheritDoc}
+   * @throws IOException if converting the byte array to a List fails.
+   */
   @Override
   public List<PropertyValue> get(byte[] bytes) throws IOException {
     PropertyValue item;
@@ -113,6 +117,10 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
     return PropertyValue.TYPE_LIST;
   }
 
+  /**
+   * {@inheritDoc}
+   * @throws IOException if converting the value to a byte array fails.
+   */
   @Override
   public byte[] getRawBytes(List<PropertyValue> value) throws IOException {
     int size = value.stream().mapToInt(PropertyValue::byteSize).sum() +

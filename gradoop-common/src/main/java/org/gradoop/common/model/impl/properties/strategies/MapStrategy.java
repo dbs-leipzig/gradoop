@@ -67,6 +67,10 @@ public class MapStrategy
     return (Class) Map.class;
   }
 
+  /**
+   * {@inheritDoc}
+   * @throws IOException if converting the byte array to a Map fails.
+   */
   @Override
   public Map<PropertyValue, PropertyValue> get(byte[] bytes) throws IOException {
     DataInputViewStreamWrapper inputView = createInputView(bytes);
@@ -89,6 +93,10 @@ public class MapStrategy
     return PropertyValue.TYPE_MAP;
   }
 
+  /**
+   * {@inheritDoc}
+   * @throws IOException if converting the value to a byte array fails.
+   */
   @Override
   public byte[] getRawBytes(Map<PropertyValue, PropertyValue> value) throws IOException {
     int size = value.keySet().stream().mapToInt(PropertyValue::byteSize).sum() +

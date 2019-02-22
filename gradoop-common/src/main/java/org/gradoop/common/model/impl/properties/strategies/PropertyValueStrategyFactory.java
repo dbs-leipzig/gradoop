@@ -33,12 +33,12 @@ import java.util.Set;
 
 /**
  * Factory class responsible for instantiating strategy classes that manage every kind of access to
- * the current {@code PropertyValue} value.
+ * the current {@link PropertyValue} value.
  */
 public class PropertyValueStrategyFactory {
 
   /**
-   * {@code PropertyValueStrategyFactory} instance
+   * {@link PropertyValueStrategyFactory} instance
    */
   private static PropertyValueStrategyFactory INSTANCE = new PropertyValueStrategyFactory();
   /**
@@ -46,33 +46,34 @@ public class PropertyValueStrategyFactory {
    */
   private final Map<Class, PropertyValueStrategy> classStrategyMap;
   /**
-   * Map which links a type byte to a strategy class
+   * Array which links a type byte (as index) to a strategy class
    */
-  private final Map<Byte, PropertyValueStrategy> byteStrategyMap;
+  private final PropertyValueStrategy[] byteStrategyMap;
   /**
-   * Strategy for {@code null}-value properties.
+   * Strategy for {@code null}-value properties
    */
-  private final NullStrategy nullStrategy = new NullStrategy();
+  private final NullStrategy nullStrategy;
 
   /**
-   * Constructs an {@code PropertyValueStrategyFactory} with type - strategy mappings as defined in
+   * Constructs an {@link PropertyValueStrategyFactory} with type - strategy mappings as defined in
    * {@code initClassStrategyMap}.
    * Only one instance of this class is needed.
    */
   private PropertyValueStrategyFactory() {
+    nullStrategy = new NullStrategy();
     classStrategyMap = initClassStrategyMap();
     byteStrategyMap = initByteStrategyMap();
   }
 
   /**
    * Returns value which is represented by the the provided byte array. Assumes that the value is
-   * serialized according to the {@code PropertyValue} standard.
+   * serialized according to the {@link PropertyValue} standard.
    *
    * @param bytes byte array of raw bytes.
    * @return Object which is the result of the deserialization.
    */
   public static Object fromRawBytes(byte[] bytes) {
-    PropertyValueStrategy strategy = INSTANCE.byteStrategyMap.get(bytes[0]);
+    PropertyValueStrategy strategy = INSTANCE.byteStrategyMap[bytes[0]];
     try {
       return strategy == null ? null : strategy.get(bytes);
     } catch (IOException e) {
@@ -101,7 +102,7 @@ public class PropertyValueStrategyFactory {
 
   /**
    * Get byte array representation of the provided object. The object is serialized according to the
-   * {@code PropertyValue} standard.
+   * {@link PropertyValue} standard.
    * If the given type is not supported, an {@code UnsupportedTypeException} will be thrown.
    *
    * @param value to be serialized.
@@ -126,7 +127,7 @@ public class PropertyValueStrategyFactory {
    * @throws UnsupportedTypeException when there is no matching strategy for a given type byte.
    */
   public static PropertyValueStrategy get(byte value) throws UnsupportedTypeException {
-    PropertyValueStrategy strategy = INSTANCE.byteStrategyMap.get(value);
+    PropertyValueStrategy strategy = INSTANCE.byteStrategyMap[value];
     if (strategy == null) {
       throw new UnsupportedTypeException("No strategy for type byte " + value);
     }
@@ -215,15 +216,16 @@ public class PropertyValueStrategyFactory {
   /**
    * Initializes byte-strategy mapping.
    *
-   * @return Map of supported byte-strategy associations.
+   * @return Array containing PropertyValueStrategies with their respective type byte as index.
    */
-  private Map<Byte, PropertyValueStrategy> initByteStrategyMap() {
-    Map<Byte, PropertyValueStrategy> byteMapping = new HashMap<>(classStrategyMap.size());
+  private PropertyValueStrategy[] initByteStrategyMap() {
+    PropertyValueStrategy[] byteMapping = new PropertyValueStrategy[classStrategyMap.size() + 1];
     for (PropertyValueStrategy strategy : classStrategyMap.values()) {
-      byteMapping.put(strategy.getRawType(), strategy);
+      byteMapping[strategy.getRawType()] = strategy;
     }
-    byteMapping.put(PropertyValue.TYPE_NULL, new NullStrategy());
+    byteMapping[nullStrategy.getRawType()] = nullStrategy;
 
-    return Collections.unmodifiableMap(byteMapping);
+    return byteMapping;
+
   }
 }

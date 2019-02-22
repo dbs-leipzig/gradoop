@@ -83,6 +83,10 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
     return (Class) Set.class;
   }
 
+  /**
+   * {@inheritDoc}
+   * @throws IOException if converting the byte array to a Set fails.
+   */
   @Override
   public Set<PropertyValue> get(byte[] bytes) throws IOException {
     PropertyValue entry;
@@ -113,6 +117,10 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
     return PropertyValue.TYPE_SET;
   }
 
+  /**
+   * {@inheritDoc}
+   * @throws IOException if converting the value to a byte array fails.
+   */
   @Override
   public byte[] getRawBytes(Set<PropertyValue> value) throws IOException {
     int size = value.stream().mapToInt(PropertyValue::byteSize)
