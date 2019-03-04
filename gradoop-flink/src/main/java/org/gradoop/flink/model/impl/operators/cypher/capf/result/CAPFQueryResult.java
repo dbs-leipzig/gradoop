@@ -15,10 +15,14 @@
  */
 package org.gradoop.flink.model.impl.operators.cypher.capf.result;
 
+import org.apache.calcite.plan.RelOptRule;
+import org.apache.calcite.tools.RuleSets;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.table.api.Table;
+import org.apache.flink.table.calcite.CalciteConfig;
+import org.apache.flink.table.calcite.CalciteConfigBuilder;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -171,10 +175,12 @@ public class CAPFQueryResult {
 
     TypeInformation<Row> rowTypeInfo = TypeInformation.of(Row.class);
 
+    // Workaround for usable optimizer times
+    removeSlowOptimizationRule();
+
     // entities, others, id
     org.apache.flink.api.scala.DataSet<Row> scalarowsWithNewIds = session.tableEnv()
-      .toDataSet(
-        records.table().table().select(fieldString), rowTypeInfo);
+      .toDataSet(records.table().table().select(fieldString), rowTypeInfo);
 
     DataSet<Row> rowsWithNewIds = scalarowsWithNewIds.javaSet()
       .map(new AddGradoopIdToRow());
@@ -213,6 +219,46 @@ public class CAPFQueryResult {
     edges = edges.map(new PropertyDecoder<>());
 
     return config.getGraphCollectionFactory().fromDataSets(graphHeads, vertices, edges);
+  }
+
+  /**
+   * Workaround to remove the logical optimization rule {@code FilterJoinRule:FilterJoinRule:filter}
+   * which would otherwise result in very long optimization times (30 min for simple queries).
+   *
+   * This method accesses protected scala flink functions.
+   */
+  private void removeSlowOptimizationRule() {
+    List<RelOptRule> ruleList = new ArrayList<>();
+    for (RelOptRule rule : session.tableEnv().getLogicalOptRuleSet()) {
+      if (!rule.toString().equals("FilterJoinRule:FilterJoinRule:filter")) {
+        ruleList.add(rule);
+      }
+    }
+    CalciteConfigBuilder builder = new CalciteConfigBuilder()
+      .replaceLogicalOptRuleSet(RuleSets.ofList(ruleList));
+
+    // rebuild old calcite config
+    CalciteConfig calciteConfig = session.tableEnv().config().getCalciteConfig();
+    if (calciteConfig.replacesDecoRuleSet()) {
+      builder.replaceDecoRuleSet(calciteConfig.getDecoRuleSet().get());
+    }
+    if (calciteConfig.replacesNormRuleSet()) {
+      builder.replaceNormRuleSet(calciteConfig.getNormRuleSet().get());
+    }
+    if (calciteConfig.replacesPhysicalOptRuleSet()) {
+      builder.replacePhysicalOptRuleSet(calciteConfig.getPhysicalOptRuleSet().get());
+    }
+    if (calciteConfig.replacesSqlOperatorTable()) {
+      builder.replaceSqlOperatorTable(calciteConfig.getSqlOperatorTable().get());
+    }
+    if (calciteConfig.getSqlParserConfig().isDefined()) {
+      builder.replaceSqlParserConfig(calciteConfig.getSqlParserConfig().get());
+    }
+    if (calciteConfig.getSqlToRelConverterConfig().isDefined()) {
+      builder.replaceSqlToRelConverterConfig(calciteConfig.getSqlToRelConverterConfig().get());
+    }
+
+    session.tableEnv().config().setCalciteConfig(builder.build());
   }
 
   /**
