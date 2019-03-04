@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.fail;
 
 public class TestCAPFQuery extends GradoopFlinkTestBase {
 
@@ -79,14 +78,7 @@ public class TestCAPFQuery extends GradoopFlinkTestBase {
 
     // execute and validate
     GraphCollection resultGraphs = result.getGraphs();
-
-
-    try {
-      collectAndAssertTrue(resultGraphs.equalsByGraphElementIds(expectedGraphs));
-    } catch (Exception e) {
-      fail();
-      e.printStackTrace();
-    }
+    collectAndAssertTrue(resultGraphs.equalsByGraphElementIds(expectedGraphs));
   }
 
   @Test
@@ -113,13 +105,7 @@ public class TestCAPFQuery extends GradoopFlinkTestBase {
 
     // execute and validate
     GraphCollection resultGraphs = result.getGraphs();
-
-    try {
-      collectAndAssertTrue(resultGraphs.equalsByGraphElementIds(expectedGraphs));
-    } catch (Exception e) {
-      fail();
-      e.printStackTrace();
-    }
+    collectAndAssertTrue(resultGraphs.equalsByGraphElementIds(expectedGraphs));
   }
 
   @Test
@@ -155,13 +141,7 @@ public class TestCAPFQuery extends GradoopFlinkTestBase {
 
     // execute and validate
     GraphCollection resultGraphs = result.getGraphs();
-
-    try {
-      collectAndAssertTrue(resultGraphs.equalsByGraphElementIds(expectedGraphs));
-    } catch (Exception e) {
-      fail();
-      e.printStackTrace();
-    }
+    collectAndAssertTrue(resultGraphs.equalsByGraphElementIds(expectedGraphs));
   }
 
   @Test
@@ -193,41 +173,37 @@ public class TestCAPFQuery extends GradoopFlinkTestBase {
       metaData);
 
     BatchTableEnvironment tenv = (BatchTableEnvironment) result.getTable().tableEnv();
-    DataSet<Row> resultDataSet = tenv.toDataSet(result.getTable(), TypeInformation.of(Row.class)).javaSet();
+    DataSet<Row> resultDataSet =
+      tenv.toDataSet(result.getTable(), TypeInformation.of(Row.class)).javaSet();
 
-    try {
-      Long[][] expectedIds = {
-        {0L, 1L, 1L, 1L, 2L, 2L, 2L, 4L, 5L, 5L, 5L, 6L, 6L, 6L, 8L, 8L},
-        {1L, 6L, 6L, 6L, 6L, 6L, 6L, 1L, 4L, 4L, 9L, 2L, 5L, 5L, 5L, 5L},
-        {6L, 2L, 5L, 7L, 2L, 5L, 7L, 6L, 1L, 3L, 10L, 6L, 4L, 9L, 4L, 9L}
-      };
+    Long[][] expectedIds = {
+      {0L, 1L, 1L, 1L, 2L, 2L, 2L, 4L, 5L, 5L, 5L, 6L, 6L, 6L, 8L, 8L},
+      {1L, 6L, 6L, 6L, 6L, 6L, 6L, 1L, 4L, 4L, 9L, 2L, 5L, 5L, 5L, 5L},
+      {6L, 2L, 5L, 7L, 2L, 5L, 7L, 6L, 1L, 3L, 10L, 6L, 4L, 9L, 4L, 9L}
+    };
 
-      List<Row> resultList = resultDataSet.collect();
+    List<Row> resultList = resultDataSet.collect();
 
-      assertEquals(expectedIds[0].length, resultList.size());
+    assertEquals(expectedIds[0].length, resultList.size());
 
-      for (Row r : resultList) {
-        assertEquals(3, r.getArity());
-      }
+    for (Row r : resultList) {
+      assertEquals(3, r.getArity());
+    }
 
-      resultList.sort((r1, r2) -> {
-        for (int i = 0; i < r1.getArity(); i++) {
-          int comp = ((Long) r1.getField(i)).compareTo((Long) r2.getField(i));
-          if (comp != 0) {
-            return comp;
-          }
+    resultList.sort((r1, r2) -> {
+      for (int i = 0; i < r1.getArity(); i++) {
+        int comp = ((Long) r1.getField(i)).compareTo((Long) r2.getField(i));
+        if (comp != 0) {
+          return comp;
         }
-        return 0;
-      });
-
-      for (int i = 0; i < expectedIds.length; i++) {
-        assertEquals(expectedIds[0][i], resultList.get(i).getField(0));
-        assertEquals(expectedIds[1][i], resultList.get(i).getField(1));
-        assertEquals(expectedIds[2][i], resultList.get(i).getField(2));
       }
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
+      return 0;
+    });
+
+    for (int i = 0; i < expectedIds.length; i++) {
+      assertEquals(expectedIds[0][i], resultList.get(i).getField(0));
+      assertEquals(expectedIds[1][i], resultList.get(i).getField(1));
+      assertEquals(expectedIds[2][i], resultList.get(i).getField(2));
     }
   }
 
@@ -264,14 +240,9 @@ public class TestCAPFQuery extends GradoopFlinkTestBase {
     BatchTableEnvironment tenv = (BatchTableEnvironment) result.getTable().tableEnv();
     DataSet<Row> resultDataSet = tenv.toDataSet(result.getTable(), TypeInformation.of(Row.class)).javaSet();
 
-    try {
-      List<Row> resultList = resultDataSet.collect();
-      assertEquals(1, resultList.size());
-      assertEquals(1, resultList.get(0).getArity());
-      assertEquals(6L, (long) resultList.get(0).getField(0));
-    } catch (Exception e) {
-      e.printStackTrace();
-      fail();
-    }
+    List<Row> resultList = resultDataSet.collect();
+    assertEquals(1, resultList.size());
+    assertEquals(1, resultList.get(0).getArity());
+    assertEquals(6L, (long) resultList.get(0).getField(0));
   }
 }
