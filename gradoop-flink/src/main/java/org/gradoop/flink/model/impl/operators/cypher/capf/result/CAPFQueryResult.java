@@ -44,7 +44,7 @@ import org.opencypher.okapi.ir.api.expr.Var;
 import scala.collection.Iterator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,15 +57,10 @@ public class CAPFQueryResult {
   /**
    * Logical optimizer rules to be removed for better optimizer performance.
    *
-   * {@code FilterJoinRule:FilterJoinRule:filter} would result in very long optimization times
-   * (30 min for simple queries) for most queries.
-   * {@code ProjectMergeRule:force_mode} would result in long optimization times for queries
-   * having cycles with an even number of nodes.
+   * {@code ProjectMergeRule:force_mode} would result in long optimization times.
    */
-  private static final List<String> DISABLED_RULES = Arrays.asList(
-    "FilterJoinRule:FilterJoinRule:filter",
-    "ProjectMergeRule:force_mode"
-  );
+  private static final List<String> DISABLED_RULES =
+    Collections.singletonList("ProjectMergeRule:force_mode");
 
   /**
    * The wrapped CAPFRecords.
