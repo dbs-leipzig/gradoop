@@ -44,6 +44,7 @@ import org.opencypher.okapi.ir.api.expr.Var;
 import scala.collection.Iterator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -82,6 +83,19 @@ public class CAPFQueryResult {
    * The GradoopFlinkConfig.
    */
   private GradoopFlinkConfig config;
+
+  /**
+   * Logical optimizer rules to be removed for better optimizer performance.
+   *
+   * {@code FilterJoinRule:FilterJoinRule:filter} would result in very long optimization times
+   * (30 min for simple queries) for most queries.
+   * {@code ProjectMergeRule:force_mode} would result in long optimization times for queries
+   * having cycles with an even number of nodes.
+   */
+  private final List<String> DISABLED_RULES = Arrays.asList(
+    "FilterJoinRule:FilterJoinRule:filter",
+    "ProjectMergeRule:force_mode"
+  );
 
   /**
    * Constructor;
@@ -222,15 +236,15 @@ public class CAPFQueryResult {
   }
 
   /**
-   * Workaround to remove the logical optimization rule {@code FilterJoinRule:FilterJoinRule:filter}
-   * which would otherwise result in very long optimization times (30 min for simple queries).
+   * Workaround to remove slow logical optimization rules listed in
+   * {@link CAPFQueryResult#DISABLED_RULES}.
    *
    * This method accesses protected scala flink functions.
    */
   private void removeSlowOptimizationRule() {
     List<RelOptRule> ruleList = new ArrayList<>();
     for (RelOptRule rule : session.tableEnv().getLogicalOptRuleSet()) {
-      if (!rule.toString().equals("FilterJoinRule:FilterJoinRule:filter")) {
+      if (!DISABLED_RULES.contains(rule.toString())) {
         ruleList.add(rule);
       }
     }
