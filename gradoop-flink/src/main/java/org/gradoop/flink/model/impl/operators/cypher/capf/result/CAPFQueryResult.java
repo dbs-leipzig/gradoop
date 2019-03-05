@@ -55,6 +55,19 @@ import java.util.Set;
 public class CAPFQueryResult {
 
   /**
+   * Logical optimizer rules to be removed for better optimizer performance.
+   *
+   * {@code FilterJoinRule:FilterJoinRule:filter} would result in very long optimization times
+   * (30 min for simple queries) for most queries.
+   * {@code ProjectMergeRule:force_mode} would result in long optimization times for queries
+   * having cycles with an even number of nodes.
+   */
+  private static final List<String> DISABLED_RULES = Arrays.asList(
+    "FilterJoinRule:FilterJoinRule:filter",
+    "ProjectMergeRule:force_mode"
+  );
+
+  /**
    * The wrapped CAPFRecords.
    */
   private CAPFRecords records;
@@ -83,19 +96,6 @@ public class CAPFQueryResult {
    * The GradoopFlinkConfig.
    */
   private GradoopFlinkConfig config;
-
-  /**
-   * Logical optimizer rules to be removed for better optimizer performance.
-   *
-   * {@code FilterJoinRule:FilterJoinRule:filter} would result in very long optimization times
-   * (30 min for simple queries) for most queries.
-   * {@code ProjectMergeRule:force_mode} would result in long optimization times for queries
-   * having cycles with an even number of nodes.
-   */
-  private final List<String> DISABLED_RULES = Arrays.asList(
-    "FilterJoinRule:FilterJoinRule:filter",
-    "ProjectMergeRule:force_mode"
-  );
 
   /**
    * Constructor;
