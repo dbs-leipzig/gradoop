@@ -28,6 +28,7 @@ import org.gradoop.flink.io.impl.csv.functions.StringEscaper;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -103,7 +104,7 @@ public class CSVMetaDataSource implements MetaDataSource<CSVMetaData> {
     Charset charset = Charset.forName("UTF-8");
 
     if (!fs.exists(file)) {
-      return null;
+      throw new FileNotFoundException(path);
     } else {
 
       try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(file), charset))) {
