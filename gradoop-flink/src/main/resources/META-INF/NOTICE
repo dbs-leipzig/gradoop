@@ -6,3 +6,6 @@ This project bundles the following dependencies under the Apache Software Licens
 - me.lemire.integercompression:JavaFastPFOR:0.1.10
 - me.lemire.integercompression:IntCompressor:0.1.10
 - me.lemire.integercompression:Simple16:0.1.10
+- org.apache.flink:flink-hbase_2.11:1.7.0
+- org.apache.flink:flink-java:1.7.0
+- org.apache.flink:flink-gelly_2.11:1.7.0
