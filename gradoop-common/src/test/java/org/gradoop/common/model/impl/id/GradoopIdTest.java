@@ -15,7 +15,11 @@
  */
 package org.gradoop.common.model.impl.id;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.NamedParameters;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.ThreadLocalRandom;
@@ -23,6 +27,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
+@RunWith(JUnitParamsRunner.class)
 public class GradoopIdTest {
 
   @Test
@@ -122,4 +127,30 @@ public class GradoopIdTest {
     assertTrue("Second ID is smaller then the minimum.", second.compareTo(min) >= 0);
     assertTrue(first == min || second == min);
   }
+
+  @Test
+  @Parameters(named = "invalid strings")
+  public void testIsValidWithInvalidInput(String input) {
+    assertFalse(GradoopId.isValid(input));
+  }
+
+  @NamedParameters("invalid strings")
+  private String[] invalidStringsDataProvider() {
+    return new String[] { "HEX", "12345678910111211314151617", "12345678910111211314151G"};
+  }
+
+  @Test
+  @Parameters(named = "valid strings")
+  public void testIsValidWithValidInput(String input) {
+    assertTrue(GradoopId.isValid(input));
+  }
+
+  @NamedParameters("valid strings")
+  private String[] validStringDataProvider() {
+    return new String[] {
+      "912345678910111213141516",
+      "1AB363914FD1325CC43790AB",
+      "bcdef12345678910bac76d4e"};
+  }
+
 }
