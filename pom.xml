@@ -142,6 +142,7 @@
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
         <dep.junit.version>4.12</dep.junit.version>
+        <dep.junitparams.version>1.1.1</dep.junitparams.version>
         <dep.jettison.version>1.3.7</dep.jettison.version>
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.kryo.version>4.0.2</dep.kryo.version>
@@ -762,6 +763,13 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${dep.junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>pl.pragmatists</groupId>
+                <artifactId>JUnitParams</artifactId>
+                <version>${dep.junitparams.version}</version>
                 <scope>test</scope>
             </dependency>
 
