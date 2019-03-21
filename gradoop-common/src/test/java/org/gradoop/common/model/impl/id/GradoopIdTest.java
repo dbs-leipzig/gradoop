@@ -128,6 +128,10 @@ public class GradoopIdTest {
     assertTrue(first == min || second == min);
   }
 
+  /**
+   * Test if {@code isValid()} returns false for invalid input strings
+   * @param input an invalid input string
+   */
   @Test
   @Parameters(named = "invalid strings")
   public void testIsValidWithInvalidInput(String input) {
@@ -139,6 +143,10 @@ public class GradoopIdTest {
     return new String[] { "HEX", "12345678910111211314151617", "12345678910111211314151G"};
   }
 
+  /**
+   * Test if {@code isValid()} returns true for valid input strings.
+   * @param input a valid input string
+   */
   @Test
   @Parameters(named = "valid strings")
   public void testIsValidWithValidInput(String input) {
