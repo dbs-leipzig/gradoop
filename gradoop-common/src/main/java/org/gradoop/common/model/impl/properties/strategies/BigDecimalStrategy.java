@@ -24,8 +24,8 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 
 /**
- * Strategy class for handling {@code PropertyValue} operations with a value of the type
- * {@code BigDecimal}.
+ * Strategy class for handling {@link PropertyValue} operations with a value of the type
+ * {@link BigDecimal}.
  */
 public class BigDecimalStrategy extends AbstractVariableSizedPropertyValueStrategy<BigDecimal> {
 
@@ -86,7 +86,7 @@ public class BigDecimalStrategy extends AbstractVariableSizedPropertyValueStrate
       break;
     default:
       throw new IllegalArgumentException(
-        "Cannot convert byte array with type byte "  + type + " to " +
+        "Cannot convert byte array with type byte " + type + " to " +
         BigDecimal.class.getSimpleName());
     }
     return decimal;

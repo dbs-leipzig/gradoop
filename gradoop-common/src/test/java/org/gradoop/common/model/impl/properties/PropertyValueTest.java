@@ -16,6 +16,8 @@
 package org.gradoop.common.model.impl.properties;
 
 import com.google.common.collect.Lists;
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataOutputView;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.junit.Rule;
@@ -46,6 +48,10 @@ public class PropertyValueTest {
   @Rule
   public ExpectedException exception = ExpectedException.none();
 
+  /**
+   * Tests conversions of different types to {@link BigDecimal} through
+   * {@link PropertyValue#getBigDecimal()}.
+   */
   @Test
   public void testBigDecimalConversion() {
     PropertyValue property;
@@ -86,11 +92,17 @@ public class PropertyValueTest {
     property.getBigDecimal();
   }
 
+  /**
+   * Tests if conversion to {@link BigDecimal} fails if incompatible type is given.
+   */
   @Test(expected = IllegalArgumentException.class)
   public void testFailedBigDecimalConversion() {
     create(BOOL_VAL_1).getBigDecimal();
   }
 
+  /**
+   * Tests if {@link PropertyValue#create(Object)} works with supported types.
+   */
   @Test
   public void testCreate() {
     // null
@@ -170,6 +182,9 @@ public class PropertyValueTest {
     assertNotSame(p, copy);
   }
 
+  /**
+   * Tests if {@link PropertyValue#copy()} works when a float type is wrapped.
+   */
   @Test
   public void testCopyFloat() {
     PropertyValue p = create(FLOAT_VAL_4);
@@ -179,6 +194,9 @@ public class PropertyValueTest {
     assertNotSame(FLOAT_VAL_4, copy.getObject());
   }
 
+  /**
+   * Tests if {@link PropertyValue#copy()} works when a double type is wrapped.
+   */
   @Test
   public void testCopyDouble() {
     PropertyValue p = create(DOUBLE_VAL_5);
@@ -188,6 +206,9 @@ public class PropertyValueTest {
     assertNotSame(DOUBLE_VAL_5, copy.getObject());
   }
 
+  /**
+   * Tests if {@link PropertyValue#copy()} works when a {@link BigDecimal} type is wrapped.
+   */
   @Test
   public void testCopyBigDecimal() {
     PropertyValue p = create(BIG_DECIMAL_VAL_7);
@@ -197,6 +218,9 @@ public class PropertyValueTest {
     assertNotSame(BIG_DECIMAL_VAL_7, copy.getObject());
   }
 
+  /**
+   * Tests if {@link PropertyValue#copy()} works when a {@link GradoopId} type is wrapped.
+   */
   @Test
   public void testCopyGradoopId() {
     PropertyValue p = create(GRADOOP_ID_VAL_8);
@@ -206,6 +230,9 @@ public class PropertyValueTest {
     assertNotSame(GRADOOP_ID_VAL_8, copy.getObject());
   }
 
+  /**
+   * Tests if {@link PropertyValue#copy()} works when a {@link LocalDate} type is wrapped.
+   */
   @Test
   public void testCopyDate() {
     PropertyValue p = create(DATE_VAL_b);
@@ -215,6 +242,9 @@ public class PropertyValueTest {
     assertNotSame(DATE_VAL_b, copy.getObject());
   }
 
+  /**
+   * Tests if {@link PropertyValue#copy()} works when a {@link LocalDateTime} type is wrapped.
+   */
   @Test
   public void testCopyDateTime() {
     PropertyValue p = create(DATETIME_VAL_d);
@@ -224,6 +254,9 @@ public class PropertyValueTest {
     assertNotSame(DATETIME_VAL_d, copy.getObject());
   }
 
+  /**
+   * Tests if {@link PropertyValue#copy()} works when a {@link LocalTime} type is wrapped.
+   */
   @Test
   public void testCopyTime() {
     PropertyValue p = create(TIME_VAL_c);
@@ -233,6 +266,9 @@ public class PropertyValueTest {
     assertNotSame(TIME_VAL_c, copy.getObject());
   }
 
+  /**
+   * Tests if {@link PropertyValue#copy()} works when an int type is wrapped.
+   */
   @Test
   public void testCopyInteger() {
     PropertyValue p = create(INT_VAL_2);
@@ -241,6 +277,9 @@ public class PropertyValueTest {
     assertNotSame(p, copy);
   }
 
+  /**
+   * Tests if {@link PropertyValue#copy()} works when a {@link String} type is wrapped.
+   */
   @Test
   public void testCopyString() {
     PropertyValue p = create(STRING_VAL_6);
@@ -250,6 +289,9 @@ public class PropertyValueTest {
     assertNotSame(STRING_VAL_6, copy.getObject());
   }
 
+  /**
+   * Tests if {@link PropertyValue#copy()} works when a {@link Map} type is wrapped.
+   */
   @Test
   public void testCopyMap() {
     PropertyValue p = create(MAP_VAL_9);
@@ -259,6 +301,9 @@ public class PropertyValueTest {
     assertNotSame(MAP_VAL_9, copy.getObject());
   }
 
+  /**
+   * Tests if {@link PropertyValue#copy()} works when a {@link List} type is wrapped.
+   */
   @Test
   public void testCopyList() {
     PropertyValue p = create(LIST_VAL_a);
@@ -268,6 +313,9 @@ public class PropertyValueTest {
     assertNotSame(LIST_VAL_a, copy.getObject());
   }
 
+  /**
+   * Tests if {@link PropertyValue#copy()} works when a {@link Set} type is wrapped.
+   */
   @Test
   public void testCopySet() {
     PropertyValue p = create(SET_VAL_f);
@@ -277,6 +325,10 @@ public class PropertyValueTest {
     assertNotSame(SET_VAL_f, copy.getObject());
   }
 
+  /**
+   * Tests if {@link PropertyValue} setter and getter methods work as expected.
+   * X -> p.setObject(X) -> p.getObject() -> X | where X equals X
+   */
   @Test
   public void testSetAndGetObject() {
     PropertyValue p = new PropertyValue();
@@ -346,12 +398,19 @@ public class PropertyValueTest {
     assertEquals(SET_VAL_f, p.getSet());
   }
 
+  /**
+   * Tests if {@link PropertyValue#setObject(Object)} throws an {@link UnsupportedTypeException} if
+   * an unsupported type is passed as an argument.
+   */
   @Test(expected = UnsupportedTypeException.class)
   public void testSetObjectWithUnsupportedType() {
     PropertyValue p = new PropertyValue();
     p.setObject(new PriorityQueue<>());
   }
 
+  /**
+   * Tests whether {@link PropertyValue#isNull()} returns true iff the instance wraps {@code null}.
+   */
   @Test
   public void testIsNull() {
     PropertyValue p = PropertyValue.create(null);
@@ -373,6 +432,10 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests whether {@link PropertyValue#isBoolean()} returns true iff the instance wraps a
+   * {@code boolean}.
+   */
   @Test
   public void testIsBoolean() {
     PropertyValue p = PropertyValue.create(true);
@@ -394,12 +457,18 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#getBoolean()}.
+   */
   @Test
   public void testGetBoolean() {
     PropertyValue p = PropertyValue.create(BOOL_VAL_1);
     assertEquals(BOOL_VAL_1, p.getBoolean());
   }
 
+  /**
+   * Tests {@link PropertyValue#setBoolean(boolean)}.
+   */
   @Test
   public void testSetBoolean() {
     PropertyValue p = new PropertyValue();
@@ -407,6 +476,9 @@ public class PropertyValueTest {
     assertEquals(BOOL_VAL_1, p.getBoolean());
   }
 
+  /**
+   * Tests {@link PropertyValue#isShort()}.
+   */
   @Test
   public void testIsShort() {
     PropertyValue p = PropertyValue.create(SHORT_VAL_e);
@@ -428,12 +500,18 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#getShort()}.
+   */
   @Test
   public void testGetShort() {
     PropertyValue p = PropertyValue.create(SHORT_VAL_e);
     assertEquals(SHORT_VAL_e, p.getShort());
   }
 
+  /**
+   * Tests {@link PropertyValue#setShort(short)}.
+   */
   @Test
   public void testSetShort() {
     PropertyValue p = new PropertyValue();
@@ -441,6 +519,9 @@ public class PropertyValueTest {
     assertEquals(SHORT_VAL_e, p.getShort());
   }
 
+  /**
+   * Tests {@link PropertyValue#isInt()}.
+   */
   @Test
   public void testIsInt() {
     PropertyValue p = PropertyValue.create(INT_VAL_2);
@@ -462,12 +543,18 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#getInt()}.
+   */
   @Test
   public void testGetInt() {
     PropertyValue p = PropertyValue.create(INT_VAL_2);
     assertEquals(INT_VAL_2, p.getInt());
   }
 
+  /**
+   * Tests {@link PropertyValue#setInt(int)}.
+   */
   @Test
   public void testSetInt() {
     PropertyValue p = new PropertyValue();
@@ -475,6 +562,9 @@ public class PropertyValueTest {
     assertEquals(INT_VAL_2, p.getInt());
   }
 
+  /**
+   * Tests {@link PropertyValue#isLong()}.
+   */
   @Test
   public void testIsLong() {
     PropertyValue p = PropertyValue.create(LONG_VAL_3);
@@ -496,12 +586,18 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#getLong()}.
+   */
   @Test
   public void testGetLong() {
     PropertyValue p = PropertyValue.create(LONG_VAL_3);
     assertEquals(LONG_VAL_3, p.getLong());
   }
 
+  /**
+   * Tests {@link PropertyValue#setLong(long)}.
+   */
   @Test
   public void testSetLong()  {
     PropertyValue p = new PropertyValue();
@@ -509,6 +605,9 @@ public class PropertyValueTest {
     assertEquals(LONG_VAL_3, p.getLong());
   }
 
+  /**
+   * Tests {@link PropertyValue#isFloat()}.
+   */
   @Test
   public void testIsFloat()  {
     PropertyValue p = PropertyValue.create(FLOAT_VAL_4);
@@ -530,12 +629,18 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#getFloat()}.
+   */
   @Test
   public void testGetFloat() {
     PropertyValue p = PropertyValue.create(FLOAT_VAL_4);
     assertEquals(FLOAT_VAL_4, p.getFloat(), 0);
   }
 
+  /**
+   * Tests {@link PropertyValue#setFloat(float)}.
+   */
   @Test
   public void testSetFloat() {
     PropertyValue p = new PropertyValue();
@@ -543,6 +648,9 @@ public class PropertyValueTest {
     assertEquals(FLOAT_VAL_4, p.getFloat(), 0);
   }
 
+  /**
+   * Tests {@link PropertyValue#isDouble()}.
+   */
   @Test
   public void testIsDouble() {
     PropertyValue p = PropertyValue.create(DOUBLE_VAL_5);
@@ -564,12 +672,18 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#getDouble()}.
+   */
   @Test
   public void testGetDouble() {
     PropertyValue p = PropertyValue.create(DOUBLE_VAL_5);
     assertEquals(DOUBLE_VAL_5, p.getDouble(), 0);
   }
 
+  /**
+   * Tests {@link PropertyValue#setDouble(double)}.
+   */
   @Test
   public void testSetDouble() {
     PropertyValue p = new PropertyValue();
@@ -577,6 +691,9 @@ public class PropertyValueTest {
     assertEquals(DOUBLE_VAL_5, p.getDouble(), 0);
   }
 
+  /**
+   * Tests {@link PropertyValue#isString()}.
+   */
   @Test
   public void testIsString() {
     PropertyValue p = PropertyValue.create(STRING_VAL_6);
@@ -598,12 +715,18 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#getString()}.
+   */
   @Test
   public void testGetString() {
     PropertyValue p = PropertyValue.create(STRING_VAL_6);
     assertEquals(STRING_VAL_6, p.getString());
   }
 
+  /**
+   * Tests {@link PropertyValue#setString(String)}.
+   */
   @Test
   public void testSetString() {
     PropertyValue p = new PropertyValue();
@@ -611,6 +734,9 @@ public class PropertyValueTest {
     assertEquals(STRING_VAL_6, p.getString());
   }
 
+  /**
+   * Tests {@link PropertyValue#isBigDecimal()}.
+   */
   @Test
   public void testIsBigDecimal() {
     PropertyValue p = PropertyValue.create(BIG_DECIMAL_VAL_7);
@@ -632,12 +758,18 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#getBigDecimal()}.
+   */
   @Test
   public void testGetBigDecimal() {
     PropertyValue p = PropertyValue.create(BIG_DECIMAL_VAL_7);
     assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
   }
 
+  /**
+   * Tests {@link PropertyValue#setBigDecimal(BigDecimal)}.
+   */
   @Test
   public void testSetBigDecimal() {
     PropertyValue p = new PropertyValue();
@@ -645,6 +777,9 @@ public class PropertyValueTest {
     assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
   }
 
+  /**
+   * Tests {@link PropertyValue#isGradoopId()}.
+   */
   @Test
   public void testIsGradoopId() {
     PropertyValue p = PropertyValue.create(GRADOOP_ID_VAL_8);
@@ -666,12 +801,18 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#getGradoopId()}.
+   */
   @Test
   public void testGetGradoopId() {
     PropertyValue p = PropertyValue.create(GRADOOP_ID_VAL_8);
     assertEquals(GRADOOP_ID_VAL_8, p.getGradoopId());
   }
 
+  /**
+   * Tests {@link PropertyValue#setGradoopId(GradoopId)}.
+   */
   @Test
   public void testSetGradoopId() {
     PropertyValue p = new PropertyValue();
@@ -679,6 +820,9 @@ public class PropertyValueTest {
     assertEquals(GRADOOP_ID_VAL_8, p.getGradoopId());
   }
 
+  /**
+   * Tests {@link PropertyValue#isMap()}.
+   */
   @Test
   public void testIsMap() {
     PropertyValue p = PropertyValue.create(MAP_VAL_9);
@@ -700,12 +844,18 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#getMap()}.
+   */
   @Test
   public void testGetMap() {
     PropertyValue p = PropertyValue.create(MAP_VAL_9);
     assertEquals(MAP_VAL_9, p.getMap());
   }
 
+  /**
+   * Tests {@link PropertyValue#setMap(Map)}.
+   */
   @Test
   public void testSetMap() {
     PropertyValue p = new PropertyValue();
@@ -713,6 +863,9 @@ public class PropertyValueTest {
     assertEquals(MAP_VAL_9, p.getMap());
   }
 
+  /**
+   * Tests {@link PropertyValue#isList()}.
+   */
   @Test
   public void testIsList() {
     PropertyValue p = PropertyValue.create(LIST_VAL_a);
@@ -734,6 +887,10 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests whether passing a {@link List} which is not parametrized as {@link PropertyValue} to
+   * {@link PropertyValue#create(Object)} will result in an {@link UnsupportedTypeException}.
+   */
   @Test(expected = UnsupportedTypeException.class)
   public void testCreateWrongParameterizedList() {
     List<String> list = new ArrayList<>();
@@ -743,6 +900,10 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(list);
   }
 
+  /**
+   * Tests whether passing a {@link Map} which is not parametrized as {@link PropertyValue} to
+   * {@link PropertyValue#create(Object)} will result in an {@link UnsupportedTypeException}.
+   */
   @Test(expected = UnsupportedTypeException.class)
   public void testCreateWrongParameterizedMap() {
     Map<String, String> map = new HashMap<>();
@@ -752,6 +913,10 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(map);
   }
 
+  /**
+   * Tests whether passing a {@link Set} which is not parametrized as {@link PropertyValue} to
+   * {@link PropertyValue#create(Object)} will result in an {@link UnsupportedTypeException}.
+   */
   @Test(expected = UnsupportedTypeException.class)
   public void testCreateWrongParameterizedSet() {
     Set<String> set = new HashSet<>();
@@ -761,18 +926,28 @@ public class PropertyValueTest {
     PropertyValue p = PropertyValue.create(set);
   }
 
+  /**
+   * Tests whether {@link PropertyValue#create(Object)} works when an empty {@link List} is
+   * provided.
+   */
   @Test
   public void testCreateEmptyList() {
     List<PropertyValue> list = new ArrayList<>();
     PropertyValue p = PropertyValue.create(list);
   }
 
+  /**
+   * Tests {@link PropertyValue#getList()}.
+   */
   @Test
   public void testGetList() {
     PropertyValue p = PropertyValue.create(LIST_VAL_a);
     assertEquals(LIST_VAL_a, p.getList());
   }
 
+  /**
+   * Tests {@link PropertyValue#setList(List)}.
+   */
   @Test
   public void testSetList() {
     PropertyValue p = new PropertyValue();
@@ -780,6 +955,9 @@ public class PropertyValueTest {
     assertEquals(LIST_VAL_a, p.getList());
   }
 
+  /**
+   * Tests {@link PropertyValue#isDate()}.
+   */
   @Test
   public void testIsDate() {
     PropertyValue p = PropertyValue.create(DATE_VAL_b);
@@ -801,12 +979,18 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#getDate()}.
+   */
   @Test
   public void testGetDate() {
     PropertyValue p = PropertyValue.create(DATE_VAL_b);
     assertEquals(DATE_VAL_b, p.getDate());
   }
 
+  /**
+   * Tests {@link PropertyValue#setDate(LocalDate)}.
+   */
   @Test
   public void testSetDate() {
     PropertyValue p = new PropertyValue();
@@ -814,6 +998,9 @@ public class PropertyValueTest {
     assertEquals(DATE_VAL_b, p.getDate());
   }
 
+  /**
+   * Tests {@link PropertyValue#isTime()}.
+   */
   @Test
   public void testIsTime() {
     PropertyValue p = PropertyValue.create(TIME_VAL_c);
@@ -835,12 +1022,18 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * tests {@link PropertyValue#getTime()}.
+   */
   @Test
   public void testGetTime() {
     PropertyValue p = PropertyValue.create(TIME_VAL_c);
     assertEquals(TIME_VAL_c, p.getTime());
   }
 
+  /**
+   * Tests {@link PropertyValue#setTime(LocalTime)}.
+   */
   @Test
   public void testSetTime() {
     PropertyValue p = new PropertyValue();
@@ -848,6 +1041,9 @@ public class PropertyValueTest {
     assertEquals(TIME_VAL_c, p.getTime());
   }
 
+  /**
+   * Tests {@link PropertyValue#isDateTime()}.
+   */
   @Test
   public void testIsDateTime() {
     PropertyValue p = PropertyValue.create(DATETIME_VAL_d);
@@ -869,12 +1065,18 @@ public class PropertyValueTest {
     assertFalse(p.isSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#getDateTime()}.
+   */
   @Test
   public void testGetDateTime() {
     PropertyValue p = PropertyValue.create(DATETIME_VAL_d);
     assertEquals(DATETIME_VAL_d, p.getDateTime());
   }
 
+  /**
+   * Tests {@link PropertyValue#setDateTime(LocalDateTime)}.
+   */
   @Test
   public void testSetDateTime() {
     PropertyValue p = new PropertyValue();
@@ -882,6 +1084,9 @@ public class PropertyValueTest {
     assertEquals(DATETIME_VAL_d, p.getDateTime());
   }
 
+  /**
+   * Tests {@link PropertyValue#isSet()}.
+   */
   @Test
   public void testIsSet() {
     PropertyValue p = PropertyValue.create(SET_VAL_f);
@@ -903,12 +1108,18 @@ public class PropertyValueTest {
     assertTrue(p.isSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#getSet()}.
+   */
   @Test
   public void testGetSet() {
     PropertyValue p = PropertyValue.create(SET_VAL_f);
     assertEquals(SET_VAL_f, p.getSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#setSet(Set)}.
+   */
   @Test
   public void testSetSet() {
     PropertyValue p = new PropertyValue();
@@ -916,6 +1127,9 @@ public class PropertyValueTest {
     assertEquals(SET_VAL_f, p.getSet());
   }
 
+  /**
+   * Tests {@link PropertyValue#isNumber()}.
+   */
   @Test
   public void testIsNumber() {
     PropertyValue p = PropertyValue.create(SHORT_VAL_e);
@@ -953,6 +1167,9 @@ public class PropertyValueTest {
     assertFalse(p.isNumber());
   }
 
+  /**
+   * Tests {@link PropertyValue#equals(Object)} and {@link PropertyValue#hashCode()}.
+   */
   @Test
   public void testEqualsAndHashCode() {
     validateEqualsAndHashCode(create(null), create(null), create(false));
@@ -1027,8 +1244,7 @@ public class PropertyValueTest {
     validateEqualsAndHashCode(create(set1), create(set2), create(set3));
   }
 
-  private void validateEqualsAndHashCode(PropertyValue p1, PropertyValue p2,
-    PropertyValue p3) {
+  private void validateEqualsAndHashCode(PropertyValue p1, PropertyValue p2, PropertyValue p3) {
     assertEquals(p1, p1);
     assertEquals(p1, p2);
     assertNotEquals(p1, p3);
@@ -1038,12 +1254,19 @@ public class PropertyValueTest {
     assertNotEquals(p1.hashCode(), p3.hashCode());
   }
 
+  /**
+   * Tests whether an instance of {@link PropertyValue} which was created with {@code null} equals
+   * {@code null}.
+   */
   @Test
   public void testEqualsWithNull() {
     PropertyValue p = PropertyValue.create(null);
     assertNotEquals(p, null);
   }
 
+  /**
+   * Tests {@link PropertyValue#compareTo(PropertyValue)}.
+   */
   @Test
   public void testCompareTo() {
     // null
@@ -1156,48 +1379,79 @@ public class PropertyValueTest {
     );
   }
 
+  /**
+   * Tests whether {@link PropertyValue#compareTo(PropertyValue)} throws an
+   * {@link IllegalArgumentException} when the instances types are incomparable.
+   */
   @Test(expected = IllegalArgumentException.class)
   public void testCompareToWithIncompatibleTypes() {
     create(10).compareTo(create("10"));
   }
 
+  /**
+   * Tests whether {@link PropertyValue#compareTo(PropertyValue)} throws an
+   * {@link IllegalArgumentException} if the instance is of {@link Map}.
+   */
   @Test(expected = UnsupportedOperationException.class)
   public void testCompareToWithMap() {
     create(MAP_VAL_9).compareTo(create(MAP_VAL_9));
   }
 
+  /**
+   * Tests whether {@link PropertyValue#compareTo(PropertyValue)} throws an
+   * {@link IllegalArgumentException} if the instance is of {@link List}.
+   */
   @Test(expected = UnsupportedOperationException.class)
   public void testCompareToWithList() {
     create(LIST_VAL_a).compareTo(create(LIST_VAL_a));
   }
 
+  /**
+   * Tests whether {@link PropertyValue#compareTo(PropertyValue)} throws an
+   * {@link IllegalArgumentException} if the instance is of {@link Set}.
+   */
   @Test(expected = UnsupportedOperationException.class)
   public void testCompareToWithSet() {
     create(SET_VAL_f).compareTo(create(SET_VAL_f));
   }
 
+  /**
+   * Tests {@link PropertyValue#setBytes(byte[])}.
+   */
   @Test
   public void testArrayValueMaxSize() {
     PropertyValue property = new PropertyValue();
     property.setBytes(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD]);
   }
 
+  /**
+   * Tests {@link PropertyValue#setBytes(byte[])} with value greater than {@link Short#MAX_VALUE}.
+   */
   @Test
   public void testLargeArrayValue() {
     PropertyValue property = new PropertyValue();
     property.setBytes(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD + 1]);
   }
 
+  /**
+   * Tests {@link PropertyValue#create(Object)} with large string.
+   */
   @Test
   public void testStringValueMaxSize() {
     create(new String(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD]));
   }
 
+  /**
+   * Tests {@link PropertyValue#create(Object)} with string larger than {@link Short#MAX_VALUE}.
+   */
   @Test
   public void testLargeString() {
     create(new String(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD + 10]));
   }
 
+  /**
+   * Tests {@link PropertyValue#create(Object)} with big {@link List}.
+   */
   @Test
   public void testListValueMaxSize() {
     int n = PropertyValue.LARGE_PROPERTY_THRESHOLD / 9;
@@ -1208,6 +1462,10 @@ public class PropertyValueTest {
     create(list);
   }
 
+  /**
+   * Tests {@link PropertyValue#create(Object)} with {@link List} of
+   * length > {@link Short#MAX_VALUE}.
+   */
   @Test
   public void testLargeListValue() {
     // 8 bytes per double + 1 byte overhead
@@ -1219,6 +1477,9 @@ public class PropertyValueTest {
     create(list);
   }
 
+  /**
+   * Tests {@link PropertyValue#create(Object)} with big {@link Map}.
+   */
   @Test
   public void testMapValueMaxSize() {
     Map<PropertyValue, PropertyValue> m = new HashMap<>();
@@ -1230,6 +1491,10 @@ public class PropertyValueTest {
     create(m);
   }
 
+  /**
+   * Tests {@link PropertyValue#create(Object)} with {@link Map} of
+   * size > {@link Short#MAX_VALUE}.
+   */
   @Test
   public void testLargeMapValue() {
     Map<PropertyValue, PropertyValue> m = new HashMap<>();
@@ -1241,6 +1506,9 @@ public class PropertyValueTest {
     create(m);
   }
 
+  /**
+   * Tests {@link PropertyValue#create(Object)} with big {@link Set}.
+   */
   @Test
   public void testSetValueMaxSize() {
     Set<PropertyValue> s = new HashSet<>();
@@ -1252,6 +1520,10 @@ public class PropertyValueTest {
     create(s);
   }
 
+  /**
+   * Tests {@link PropertyValue#create(Object)} with {@link Set} of
+   * size > {@link Short#MAX_VALUE}.
+   */
   @Test
   public void testLargeSetValue() {
     Set<PropertyValue> s = new HashSet<>();
@@ -1263,6 +1535,9 @@ public class PropertyValueTest {
     create(s);
   }
 
+  /**
+   * Tests {@link PropertyValue#create} with big {@link BigDecimal}.
+   */
   @Test
   public void testBigDecimalValueMaxSize() {
     // internal representation of BigInteger needs 5 bytes
@@ -1271,6 +1546,9 @@ public class PropertyValueTest {
     create(new BigDecimal(new BigInteger(bigendian)));
   }
 
+  /**
+   * Tests {@link PropertyValue#create} large {@link BigDecimal}.
+   */
   @Test
   public void testLargeBigDecimal() {
     byte [] bigendian = new byte[Short.MAX_VALUE + 10];
@@ -1278,6 +1556,12 @@ public class PropertyValueTest {
     create(new BigDecimal(new BigInteger(bigendian)));
   }
 
+  /**
+   * Tests {@link PropertyValue#write(DataOutputView)} and
+   * {@link PropertyValue#read(DataInputView)}.
+   *
+   * @throws IOException if something goes wrong.
+   */
   @Test
   public void testWriteAndReadFields() throws IOException {
     PropertyValue p = create(NULL_VAL_0);
@@ -1329,12 +1613,24 @@ public class PropertyValueTest {
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
   }
 
+  /**
+   * Tests that {@link PropertyValue#read(DataInputView)} and
+   * {@link PropertyValue#write(DataOutputView)} can handle large {@link String} values.
+   *
+   * @throws Exception when something goes wrong.
+   */
   @Test
   public void testReadAndWriteLargeString() throws Exception {
     PropertyValue p = create(new String(new byte[PropertyValue.LARGE_PROPERTY_THRESHOLD]));
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
   }
 
+  /**
+   * Tests that {@link PropertyValue#read(DataInputView)} and
+   * {@link PropertyValue#write(DataOutputView)} can handle large {@link BigDecimal} values.
+   *
+   * @throws Exception when something goes wrong.
+   */
   @Test
   public void testReadAndWriteLargeBigDecimal() throws Exception {
     byte [] bigEndian = new byte[Short.MAX_VALUE + 10];
@@ -1343,6 +1639,12 @@ public class PropertyValueTest {
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
   }
 
+  /**
+   * Tests that {@link PropertyValue#read(DataInputView)} and
+   * {@link PropertyValue#write(DataOutputView)} can handle large {@link Map} values.
+   *
+   * @throws Exception when something goes wrong.
+   */
   @Test
   public void testReadAndWriteLargeMap() throws Exception {
     HashMap<PropertyValue, PropertyValue> largeMap = new HashMap<>();
@@ -1355,6 +1657,9 @@ public class PropertyValueTest {
     assertEquals(p, writeAndReadFields(PropertyValue.class, p));
   }
 
+  /**
+   * Tests {@link PropertyValue#getType()}.
+   */
   @Test
   public void testGetType() {
     PropertyValue p = create(NULL_VAL_0);
@@ -1409,8 +1714,7 @@ public class PropertyValueTest {
   /**
    * Assumes that p1 == p2 < p3
    */
-  private void validateCompareTo(PropertyValue p1, PropertyValue p2,
-    PropertyValue p3) {
+  private void validateCompareTo(PropertyValue p1, PropertyValue p2, PropertyValue p3) {
     assertEquals(0, p1.compareTo(p1));
     assertEquals(0, p1.compareTo(p2));
     assertEquals(0, p2.compareTo(p1));

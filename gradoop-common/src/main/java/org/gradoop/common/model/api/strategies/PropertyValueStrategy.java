@@ -30,17 +30,17 @@ import java.io.IOException;
 public interface PropertyValueStrategy<T> {
 
   /**
-   * Writes the given value to the provided {@code DataOutputView}.
+   * Writes the given value to the provided {@link DataOutputView}.
    * The argument {@code value} can not be {@code null}.
    *
-   * @param value      to be written to the {@code DataOutputView}.
+   * @param value      to be written to the {@link DataOutputView}.
    * @param outputView that the value is written to.
    * @throws IOException if write process fails.
    */
   void write(T value, DataOutputView outputView) throws IOException;
 
   /**
-   * Reads raw bytes from the given {@code DataInputView} and deserializes the contained object.
+   * Reads raw bytes from the given {@link DataInputView} and deserializes the contained object.
    *
    * @param inputView containing serialized object.
    * @param typeByte  byte needed to indicate whether serialized object has a variable length.

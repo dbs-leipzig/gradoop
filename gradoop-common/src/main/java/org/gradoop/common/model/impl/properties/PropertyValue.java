@@ -278,18 +278,18 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
-   * True, if the wrapped value is of type {@code String}.
+   * True, if the wrapped value is of type {@link String}.
    *
-   * @return true, if {@code String} value
+   * @return true, if {@link String} value
    */
   public boolean isString() {
     return is(String.class);
   }
 
   /**
-   * True, if the wrapped value is of type {@code BigDecimal}.
+   * True, if the wrapped value is of type {@link BigDecimal}.
    *
-   * @return true, if {@code BigDecimal} value
+   * @return true, if {@link BigDecimal} value
    * @see BigDecimal
    */
   public boolean isBigDecimal() {
@@ -297,72 +297,72 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
-   * True, if the wrapped value is of type {@code GradoopId}.
+   * True, if the wrapped value is of type {@link GradoopId}.
    *
-   * @return true, if {@code GradoopId} value
+   * @return true, if {@link GradoopId} value
    */
   public boolean isGradoopId() {
     return is(GradoopId.class);
   }
 
   /**
-   * True, if the wrapped value is of type {@code Map}.
+   * True, if the wrapped value is of type {@link Map}.
    *
-   * @return true, if {@code Map} value
+   * @return true, if {@link Map} value
    */
   public boolean isMap() {
     return is(Map.class);
   }
 
   /**
-   * True, if the wrapped value is of type {@code List}.
+   * True, if the wrapped value is of type {@link List}.
    *
-   * @return true, if {@code List} value
+   * @return true, if {@link List} value
    */
   public boolean isList() {
     return is(List.class);
   }
 
   /**
-   * True, if the wrapped value is of type {@code LocalDate}.
+   * True, if the wrapped value is of type {@link LocalDate}.
    *
-   * @return true, if {@code LocalDate} value
+   * @return true, if {@link LocalDate} value
    */
   public boolean isDate() {
     return is(LocalDate.class);
   }
 
   /**
-   * True, if the wrapped value is of type {@code LocalTime}.
+   * True, if the wrapped value is of type {@link LocalTime}.
    *
-   * @return true, if {@code LocalTime} value
+   * @return true, if {@link LocalTime} value
    */
   public boolean isTime() {
     return is(LocalTime.class);
   }
 
   /**
-   * True, if the wrapped value is of type {@code LocalDateTime}.
+   * True, if the wrapped value is of type {@link LocalDateTime}.
    *
-   * @return true, if {@code LocalDateTime} value
+   * @return true, if {@link LocalDateTime} value
    */
   public boolean isDateTime() {
     return is(LocalDateTime.class);
   }
 
   /**
-   * True, if the wrapped value is of type {@code Set}.
+   * True, if the wrapped value is of type {@link Set}.
    *
-   * @return true, if {@code Set} value
+   * @return true, if {@link Set} value
    */
   public boolean isSet() {
     return is(Set.class);
   }
 
   /**
-   * True, if the wrapped value is a subtype of {@code Number}.
+   * True, if the wrapped value is a subtype of {@link Number}.
    *
-   * @return true, if {@code Number} value
+   * @return true, if {@link Number} value
    */
   public boolean isNumber() {
     return !isNull() && Number.class.isAssignableFrom(getType());
@@ -462,18 +462,18 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
-   * Returns the wrapped value as {@code String}.
+   * Returns the wrapped value as {@link String}.
    *
-   * @return {@code String} value
+   * @return {@link String} value
    */
   public String getString() {
     return get(String.class);
   }
 
   /**
-   * Returns the wrapped value as {@code BigDecimal}.
+   * Returns the wrapped value as {@link BigDecimal}.
    *
-   * @return {@code BigDecimal} value
+   * @return {@link BigDecimal} value
    * @see BigDecimal
    */
   public BigDecimal getBigDecimal() {
@@ -481,9 +481,9 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
-   * Returns the wrapped value as {@code GradoopId}.
+   * Returns the wrapped value as {@link GradoopId}.
    *
-   * @return {@code GradoopId} value
+   * @return {@link GradoopId} value
    */
   public GradoopId getGradoopId() {
     return get(GradoopId.class);
@@ -508,27 +508,27 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
-   * Returns the wrapped List as {@code LocalDate}.
+   * Returns the wrapped List as {@link LocalDate}.
    *
-   * @return {@code LocalDate} value
+   * @return {@link LocalDate} value
    */
   public LocalDate getDate() {
     return get(LocalDate.class);
   }
 
   /**
-   * Returns the wrapped List as {@code LocalTime}.
+   * Returns the wrapped List as {@link LocalTime}.
    *
-   * @return {@code LocalTime} value
+   * @return {@link LocalTime} value
    */
   public LocalTime getTime() {
     return get(LocalTime.class);
   }
 
   /**
-   * Returns the wrapped List as {@code LocalDateTime}.
+   * Returns the wrapped List as {@link LocalDateTime}.
    *
-   * @return {@code LocalDateTime} value
+   * @return {@link LocalDateTime} value
    */
   public LocalDateTime getDateTime() {
     return get(LocalDateTime.class);
@@ -615,7 +615,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
-   * Sets the wrapped value as {@code String} value.
+   * Sets the wrapped value as {@link String} value.
    *
    * @param stringValue value
    */
@@ -624,7 +624,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
-   * Sets the wrapped value as {@code BigDecimal} value.
+   * Sets the wrapped value as {@link BigDecimal} value.
    *
    * @param bigDecimalValue value
    */
@@ -633,7 +633,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
-   * Sets the wrapped value as {@code GradoopId} value.
+   * Sets the wrapped value as {@link GradoopId} value.
    *
    * @param gradoopIdValue value
    */
@@ -642,7 +642,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
-   * Sets the wrapped value as {@code Map} value.
+   * Sets the wrapped value as {@link Map} value.
    *
    * @param map value
    */
@@ -651,17 +651,16 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
-   * Sets the wrapped value as {@code List} value.
+   * Sets the wrapped value as {@link List} value.
    *
    * @param list value
    */
   public void setList(List<PropertyValue> list) {
-
     setObject(list);
   }
 
   /**
-   * Sets the wrapped value as {@code LocalDate} value.
+   * Sets the wrapped value as {@link LocalDate} value.
    *
    * @param date value
    */
@@ -670,7 +669,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
-   * Sets the wrapped value as {@code LocalTime} value.
+   * Sets the wrapped value as {@link LocalTime} value.
    *
    * @param time value
    */
@@ -725,7 +724,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   /**
    * Set internal byte representation.
    *
-   *  @param bytes array
+   * @param bytes array
    */
   public void setBytes(byte[] bytes) {
     value = PropertyValueStrategyFactory.fromRawBytes(bytes);
@@ -749,7 +748,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   /**
    * Returns the byte size of the properties internal representation.
    *
-   *  @return byte size
+   * @return byte size
    */
   public int byteSize() {
     byte[] rawBytes = PropertyValueStrategyFactory.getRawBytes(value);
