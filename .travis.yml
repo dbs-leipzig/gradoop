@@ -10,7 +10,6 @@ os:
 matrix:
   allow_failures:
     - os: windows
-    - os: osx
 
 cache:
   directories:

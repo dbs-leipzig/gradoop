@@ -133,7 +133,7 @@
         <dep.gdl.version>0.3</dep.gdl.version>
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
-        <dep.junit.version>4.11</dep.junit.version>
+        <dep.junit.version>4.12</dep.junit.version>
         <dep.jettison.version>1.3.7</dep.jettison.version>
         <dep.jsonassert.version>1.2.3</dep.jsonassert.version>
         <dep.kryo.version>4.0.2</dep.kryo.version>
