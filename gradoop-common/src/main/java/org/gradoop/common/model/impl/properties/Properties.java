@@ -237,14 +237,11 @@ public class Properties implements Iterable<Property>, Value, Serializable {
     if (this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if (!(o instanceof Properties)) {
       return false;
     }
-
     Properties that = (Properties) o;
-
-    return !(properties != null ? !properties.equals(that.properties) :
-      that.properties != null);
+    return properties.equals(that.properties);
   }
 
   /**
