@@ -129,7 +129,8 @@ public class GradoopIdTest {
   }
 
   /**
-   * Test if {@code isValid()} returns false for invalid input strings
+   * Test if {@link GradoopId#isValid(String)} returns false for invalid input strings
+   *
    * @param input an invalid input string
    */
   @Test
@@ -140,11 +141,15 @@ public class GradoopIdTest {
 
   @NamedParameters("invalid strings")
   private String[] invalidStringsDataProvider() {
-    return new String[] { "HEX", "12345678910111211314151617", "12345678910111211314151G"};
+    return new String[] {
+      "HEX",                        // too short
+      "12345678910111211314151617", // too long
+      "12345678910111211314151G"};  // 'G' is not a valid char in a hex string
   }
 
   /**
-   * Test if {@code isValid()} returns true for valid input strings.
+   * Test if {@link GradoopId#isValid(String)} returns true for valid input strings.
+   *
    * @param input a valid input string
    */
   @Test
