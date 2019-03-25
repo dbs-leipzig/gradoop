@@ -136,15 +136,16 @@ public class GradoopIdTest {
   @Test
   @Parameters(named = "invalid strings")
   public void testIsValidWithInvalidInput(String input) {
-    assertFalse(GradoopId.isValid(input));
+    assertFalse("Invalid input string was evaluated as valid: " + input,
+      GradoopId.isValid(input));
   }
 
   @NamedParameters("invalid strings")
   private String[] invalidStringsDataProvider() {
     return new String[] {
-      "HEX",                        // too short
-      "12345678910111211314151617", // too long
-      "12345678910111211314151G"};  // 'G' is not a valid char in a hex string
+      "abc3451d98ebd3452fff32a",   // too short
+      "1234567891011121131415161", // too long
+      "12345678910111211314151G"}; // 'G' is not a valid char in a hex string
   }
 
   /**
@@ -155,7 +156,8 @@ public class GradoopIdTest {
   @Test
   @Parameters(named = "valid strings")
   public void testIsValidWithValidInput(String input) {
-    assertTrue(GradoopId.isValid(input));
+    assertTrue("Valid input string was evaluated as invalid: " + input,
+      GradoopId.isValid(input));
   }
 
   @NamedParameters("valid strings")
