@@ -105,12 +105,13 @@
                     </includes>
                 </configuration>
             </plugin>
-            <!-- Creates an gradoop-accumulo-iterator.jar for tserver dependency -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <executions>
+                    <!-- Creates an gradoop-accumulo-iterator.jar for tserver dependency -->
                     <execution>
+                        <id>create-iterator-jar</id>
                         <phase>package</phase>
                         <goals>
                             <goal>shade</goal>
@@ -126,8 +127,54 @@
                                     <include>com.esotericsoftware.kryo:*</include>
                                     <include>org.apache.flink:flink-core</include>
                                     <include>org.apache.hbase:hbase-common</include>
+                                    <include>org.objenesis:objenesis</include>
                                 </includes>
                             </artifactSet>
+                            <relocations>
+                                <!-- Relocate Kryo and it's dependencies since Flink uses a
+                                different version of kryo. -->
+                                <relocation>
+                                    <pattern>com.esotericsoftware</pattern>
+                                    <shadedPattern>org.gradoop.thirdparty.com.esotericsoftware</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.objenesis</pattern>
+                                    <shadedPattern>org.gradoop.thirdparty.org.objenesis</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- Apply relocations to the release JAR too. -->
+                        <id>shade-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>${project.groupId}:${project.artifactId}</include>
+                                    <!-- We need to include Kryo in this JAR too, since references
+                                    to classes are changed with the relocation uses. -->
+                                    <include>com.esotericsoftware.minlog:*</include>
+                                    <include>com.esotericsoftware.kryo:*</include>
+                                    <include>org.objenesis:objenesis</include>
+                                </includes>
+                            </artifactSet>
+                            <relocations>
+                                <!-- Use the same relocations as the iterator jar. -->
+                                <relocation>
+                                    <pattern>com.esotericsoftware</pattern>
+                                    <shadedPattern>org.gradoop.thirdparty.com.esotericsoftware</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.objenesis</pattern>
+                                    <shadedPattern>org.gradoop.thirdparty.org.objenesis</shadedPattern>
+                                </relocation>
+                            </relocations>
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
                     </execution>
                 </executions>
@@ -160,7 +207,7 @@
         <!-- Kryo for object serialization -->
         <dependency>
             <groupId>com.esotericsoftware</groupId>
-            <artifactId>kryo-shaded</artifactId>
+            <artifactId>kryo</artifactId>
         </dependency>
 
         <!-- Test dependencies -->
