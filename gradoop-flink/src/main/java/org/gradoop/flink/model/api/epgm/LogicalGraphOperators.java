@@ -559,6 +559,15 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
     List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
     List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions);
 
+  /**
+   * Verifies this graph, removing dangling edges, i.e. edges pointing to or from
+   * a vertex not contained in this graph.<br>
+   * This operator may be applied after an operator that did not check for dangling edges.
+   *
+   * @return this graph with all dangling edges removed.
+   */
+  LogicalGraph verify();
+
   //----------------------------------------------------------------------------
   // Binary Operators
   //----------------------------------------------------------------------------
