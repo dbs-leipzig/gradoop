@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,8 +85,7 @@ import java.util.Objects;
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class GraphCollection implements
-  BaseGraphCollection<GraphHead, Vertex, Edge, GraphCollection>,
-  GraphCollectionLayout<GraphHead, Vertex, Edge>, GraphCollectionOperators {
+  BaseGraphCollection<GraphHead, Vertex, Edge, GraphCollection>, GraphCollectionOperators {
   /**
    * Layout for that graph collection
    */
@@ -147,9 +146,7 @@ public class GraphCollection implements
     return layout.getEdgesByLabel(label);
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
   public DataSet<GraphHead> getGraphHeads() {
     return layout.getGraphHeads();
   }
@@ -168,9 +165,6 @@ public class GraphCollection implements
   // Logical Graph / Graph Head Getters
   //----------------------------------------------------------------------------
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph getGraph(final GradoopId graphID) {
     // filter vertices and edges based on given graph id
@@ -186,9 +180,6 @@ public class GraphCollection implements
       getConfig());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection getGraphs(final GradoopId... identifiers) {
 
@@ -201,9 +192,6 @@ public class GraphCollection implements
     return getGraphs(graphIds);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection getGraphs(final GradoopIdSet identifiers) {
 
@@ -231,33 +219,21 @@ public class GraphCollection implements
   // Unary Operators
   //----------------------------------------------------------------------------
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection select(final FilterFunction<GraphHead> predicate) {
     return callForCollection(new Selection(predicate));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection sortBy(String propertyKey, Order order) {
     throw new NotImplementedException();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection limit(int n) {
     return callForCollection(new Limit(n));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection match(
     String pattern,
@@ -273,25 +249,16 @@ public class GraphCollection implements
   // Binary Operators
   //----------------------------------------------------------------------------
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection union(GraphCollection otherCollection) {
     return callForCollection(new Union(), otherCollection);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection intersect(GraphCollection otherCollection) {
     return callForCollection(new Intersection(), otherCollection);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection intersectWithSmallResult(
     GraphCollection otherCollection) {
@@ -299,17 +266,11 @@ public class GraphCollection implements
       otherCollection);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection difference(GraphCollection otherCollection) {
     return callForCollection(new Difference(), otherCollection);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection differenceWithSmallResult(
     GraphCollection otherCollection) {
@@ -317,17 +278,11 @@ public class GraphCollection implements
       otherCollection);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataSet<Boolean> equalsByGraphIds(GraphCollection other) {
     return new CollectionEqualityByGraphIds().execute(this, other);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataSet<Boolean> equalsByGraphElementIds(GraphCollection other) {
     return new CollectionEquality(
@@ -336,9 +291,6 @@ public class GraphCollection implements
       new EdgeToIdString(), true).execute(this, other);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataSet<Boolean> equalsByGraphElementData(GraphCollection other) {
     return new CollectionEquality(
@@ -347,9 +299,6 @@ public class GraphCollection implements
       new EdgeToDataString(), true).execute(this, other);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataSet<Boolean> equalsByGraphData(GraphCollection other) {
     return new CollectionEquality(
@@ -362,18 +311,12 @@ public class GraphCollection implements
   // Auxiliary Operators
   //----------------------------------------------------------------------------
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection callForCollection(
     UnaryCollectionToCollectionOperator op) {
     return op.execute(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection callForCollection(
     BinaryCollectionToCollectionOperator op,
@@ -381,25 +324,16 @@ public class GraphCollection implements
     return op.execute(this, otherCollection);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph callForGraph(UnaryCollectionToGraphOperator op) {
     return op.execute(this);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection apply(ApplicableUnaryGraphToGraphOperator op) {
     return callForCollection(op);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph reduce(ReducibleBinaryGraphToGraphOperator op) {
     return callForGraph(op);
@@ -419,9 +353,6 @@ public class GraphCollection implements
     return config.getGraphCollectionFactory();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public DataSet<Boolean> isEmpty() {
     return getGraphHeads()
@@ -432,17 +363,11 @@ public class GraphCollection implements
       .map(new Not());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection distinctById() {
     return callForCollection(new DistinctById());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection distinctByIsomorphism() {
     return callForCollection(new DistinctByIsomorphism());

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,9 +44,6 @@ public class ReduceVertexNeighborhood extends VertexNeighborhood {
     super(function, direction);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     DataSet<Vertex> vertices;
@@ -112,13 +109,5 @@ public class ReduceVertexNeighborhood extends VertexNeighborhood {
     }
     return graph.getConfig().getLogicalGraphFactory()
       .fromDataSets(graph.getGraphHead(), vertices, graph.getEdges());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return ReduceVertexNeighborhood.class.getName();
   }
 }

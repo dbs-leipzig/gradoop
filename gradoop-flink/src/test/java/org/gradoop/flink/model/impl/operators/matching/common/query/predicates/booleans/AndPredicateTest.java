@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ public class AndPredicateTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    AndPredicate andPredicate = new AndPredicate(new And(a,b));
+    AndPredicate andPredicate = new AndPredicate(new And(a, b));
 
     CNF reference = andPredicate.getLhs().asCNF().and(andPredicate.getRhs().asCNF());
 
@@ -44,7 +44,7 @@ public class AndPredicateTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    AndPredicate andPredicate = new AndPredicate(new And(a,b));
+    AndPredicate andPredicate = new AndPredicate(new And(a, b));
 
     assertEquals(new ComparisonExpression(a), andPredicate.getLhs());
   }
@@ -54,7 +54,7 @@ public class AndPredicateTest {
     Comparison a = getComparison();
     Comparison b = getComparison();
 
-    AndPredicate andPredicate = new AndPredicate(new And(a,b));
+    AndPredicate andPredicate = new AndPredicate(new And(a, b));
 
     assertEquals(new ComparisonExpression(b), andPredicate.getRhs());
   }

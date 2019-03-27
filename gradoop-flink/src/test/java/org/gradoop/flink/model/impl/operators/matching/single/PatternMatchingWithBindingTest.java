@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public abstract class PatternMatchingWithBindingTest extends PatternMatchingTest
 
   public PatternMatchingWithBindingTest(String testName, String dataGraph, String queryGraph,
     String expectedGraphVariables, String expectedCollection) {
-    super(testName,dataGraph,queryGraph,expectedGraphVariables,expectedCollection);
+    super(testName, dataGraph, queryGraph, expectedGraphVariables, expectedCollection);
   }
 
   @Test
@@ -51,7 +51,7 @@ public abstract class PatternMatchingWithBindingTest extends PatternMatchingTest
     List<GraphHead> graphHeads = getImplementation(queryGraph, false).execute(db).
       getGraphHeads().collect();
 
-    for(GraphHead graphHead : graphHeads) {
+    for (GraphHead graphHead : graphHeads) {
       assertTrue(graphHead.hasProperty(PatternMatching.VARIABLE_MAPPING_KEY));
     }
 

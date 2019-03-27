@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
@@ -25,14 +25,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Transformation map function for vertices.
+ *
+ * @param <V> the type of the EPGM vertex
  */
 @FunctionAnnotation.ForwardedFields("id;graphIds")
-public class TransformVertex extends TransformBase<Vertex> {
+public class TransformVertex<V extends EPGMVertex> extends TransformBase<V> {
 
   /**
    * Factory to init modified vertex.
    */
-  private final EPGMVertexFactory<Vertex> vertexFactory;
+  private final EPGMVertexFactory<V> vertexFactory;
 
   /**
    * Constructor
@@ -40,14 +42,14 @@ public class TransformVertex extends TransformBase<Vertex> {
    * @param transformationFunction  vertex modification function
    * @param epgmVertexFactory         vertex factory
    */
-  public TransformVertex(TransformationFunction<Vertex> transformationFunction,
-    EPGMVertexFactory<Vertex> epgmVertexFactory) {
+  public TransformVertex(TransformationFunction<V> transformationFunction,
+    EPGMVertexFactory<V> epgmVertexFactory) {
     super(transformationFunction);
     this.vertexFactory = checkNotNull(epgmVertexFactory);
   }
 
   @Override
-  protected Vertex initFrom(Vertex element) {
+  protected V initFrom(V element) {
     return vertexFactory.initVertex(
       element.getId(), GradoopConstants.DEFAULT_VERTEX_LABEL, element.getGraphIds());
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
 import org.gradoop.storage.impl.accumulo.io.outputformats.ElementOutputFormat;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 
 /**
  * Write graph or graph collection into accumulo store
@@ -46,22 +47,25 @@ public class AccumuloDataSink extends AccumuloBase implements DataSink {
   }
 
   @Override
-  public void write(LogicalGraph logicalGraph) {
+  public void write(LogicalGraph logicalGraph) throws IOException {
     write(logicalGraph, false);
   }
 
   @Override
-  public void write(GraphCollection graphCollection) {
+  public void write(GraphCollection graphCollection) throws IOException {
     write(graphCollection, false);
   }
 
   @Override
-  public void write(LogicalGraph logicalGraph, boolean overwrite) {
+  public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
     write(getFlinkConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
   @Override
-  public void write(GraphCollection graphCollection, boolean overWrite) {
+  public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
+    if (overWrite) {
+      getStore().truncateTables();
+    }
     graphCollection.getGraphHeads()
       .output(new ElementOutputFormat<>(GraphHead.class, getAccumuloConfig()));
     graphCollection.getVertices()

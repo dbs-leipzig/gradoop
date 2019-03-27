@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 
-public class RandomVertexEdgeSamplingTest extends ParametrizedTestForGraphSampling {
+public class RandomVertexEdgeSamplingTest extends ParameterizedTestForGraphSampling {
 
   /**
    * Creates a new RandomVertexEdgeSamplingTest instance.
@@ -37,19 +37,13 @@ public class RandomVertexEdgeSamplingTest extends ParametrizedTestForGraphSampli
       RandomVertexEdgeSampling.VertexEdgeSamplingType.valueOf(vertexEdgeSamplingType));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SamplingAlgorithm getSamplingOperator() {
     return new RandomVertexEdgeSampling(sampleSize, edgeSampleSize, seed, vertexEdgeSamplingType);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void validateSpecific(LogicalGraph input, LogicalGraph output) {}
+  public void validateSpecific(LogicalGraph input, LogicalGraph output) { }
 
   /**
    * Parameters called when running the test
@@ -58,34 +52,30 @@ public class RandomVertexEdgeSamplingTest extends ParametrizedTestForGraphSampli
    */
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
-    return Arrays.asList(
-      new String[] {
-        "VertexEdgeSamplingTest with seed and simple version",
-        "-4181668494294894490",
-        "0.272f",
-        "0.272f",
-        "SimpleVersion"
-      },
-      new String[] {
-        "VertexEdgeSamplingTest without seed and simple version",
-        "0",
-        "0.272f",
-        "0.272f",
-        "SimpleVersion"
-      },
-      new String[] {
-        "VertexEdgeSamplingTest without seed and nonuniform version",
-        "0",
-        "0.272f",
-        "0.272f",
-        "NonuniformVersion"
-      },
-      new String[] {
-        "VertexEdgeSamplingTest without seed and nonuniform hybrid version",
-        "0",
-        "0.272f",
-        "0.272f",
-        "NonuniformHybridVersion"
-      });
+    return Arrays.asList(new String[] {
+      "VertexEdgeSamplingTest with seed and simple version",
+      "-4181668494294894490",
+      "0.272f",
+      "0.272f",
+      "SimpleVersion"
+    }, new String[] {
+      "VertexEdgeSamplingTest without seed and simple version",
+      "0",
+      "0.272f",
+      "0.272f",
+      "SimpleVersion"
+    }, new String[] {
+      "VertexEdgeSamplingTest without seed and nonuniform version",
+      "0",
+      "0.272f",
+      "0.272f",
+      "NonuniformVersion"
+    }, new String[] {
+      "VertexEdgeSamplingTest without seed and nonuniform hybrid version",
+      "0",
+      "0.272f",
+      "0.272f",
+      "NonuniformHybridVersion"
+    });
   }
 }

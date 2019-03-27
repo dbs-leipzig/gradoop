@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ public class NotPredicateTest {
   public void convertNestedAndToCnfTest() {
     Comparison a = getComparison();
     Comparison b = getComparison();
-    And and = new And(a,b);
+    And and = new And(a, b);
     NotPredicate notPredicate = new NotPredicate(new Not(and));
 
     CNF reference =
@@ -73,7 +73,7 @@ public class NotPredicateTest {
   public void convertNestedOrToCnfTest() {
     Comparison a = getComparison();
     Comparison b = getComparison();
-    Or or = new Or(a,b);
+    Or or = new Or(a, b);
     NotPredicate notPredicate = new NotPredicate(new Not(or));
 
     CNF reference =
@@ -86,13 +86,13 @@ public class NotPredicateTest {
   public void convertNestedXorToCnfTest() {
     Comparison a = getComparison();
     Comparison b = getComparison();
-    Xor xor = new Xor(a,b);
+    Xor xor = new Xor(a, b);
     NotPredicate notPredicate = new NotPredicate(new Not(xor));
 
     CNF reference =
       QueryPredicate.createFrom(
         new Or(
-          new And(a,b),
+          new And(a, b),
           new And(
             new Not(a),
             new Not(b)

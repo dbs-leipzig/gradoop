@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ package org.gradoop.common.util;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-public class NetworkHelperTest {
 
+public class NetworkHelperTest {
   @Test
-  public void getLocalHost() throws Exception {
-    assertFalse(
-      NetworkHelper.getLocalHost().equals(NetworkHelper.LOCAL_HOST));
+  public void getLocalHost() {
+    assertNotEquals(NetworkHelper.getLocalHost(), NetworkHelper.LOCAL_HOST);
   }
 }

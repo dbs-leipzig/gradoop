@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ public class DOTDataSink implements DataSink {
 
     graphCollection
       .getGraphTransactions()
-      .map(tx -> dotFileFormat.format(tx))
+      .map(dotFileFormat::format)
       .output(graphvizWriter)
       .setParallelism(1);
   }
@@ -102,7 +102,7 @@ public class DOTDataSink implements DataSink {
      * @param outputPath graphviz dot file name
      * @param charset encoding
      */
-    public GraphvizWriter(Path outputPath, String charset) {
+    GraphvizWriter(Path outputPath, String charset) {
       super(outputPath, charset);
     }
 
@@ -110,22 +110,16 @@ public class DOTDataSink implements DataSink {
      * see super constructor.
      * @param outputPath graphviz dot file name
      */
-    public GraphvizWriter(Path outputPath) {
+    GraphvizWriter(Path outputPath) {
       super(outputPath);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void open(int taskNumber, int numTasks) throws IOException {
       super.open(taskNumber, numTasks);
       super.writeRecord("digraph {\n");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void close() throws IOException {
       super.writeRecord("}");

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,17 +77,15 @@ public class ReduceVertexGroupItems
       // collect updated vertex item
       collector.collect(reuseTuple);
 
-      if (doAggregate(groupItem.getLabelGroup().getAggregators())) {
-        aggregate(groupItem.getAggregateValues(), reuseTuple.getLabelGroup().getAggregators());
-      }
+      reuseTuple.getLabelGroup().aggregate(groupItem.getAggregateValues());
     }
 
     VertexGroupItem superVertex = createSuperVertexTuple(
       superVertexId,
       groupLabel,
       groupPropertyValues,
-      reuseTuple.getLabelGroup().getAggregators());
-    resetAggregators(superVertex.getLabelGroup().getAggregators());
+      reuseTuple.getLabelGroup().getAggregateValueList());
+    superVertex.getLabelGroup().resetAggregateValues();
     collector.collect(superVertex);
   }
 }

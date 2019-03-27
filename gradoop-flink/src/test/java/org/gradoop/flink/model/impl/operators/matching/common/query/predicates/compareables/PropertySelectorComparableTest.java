@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ public class PropertySelectorComparableTest {
   @Test
   public void testEvaluationReturnsPropertyValue() {
     PropertySelector
-      selector = new PropertySelector("a","age");
+      selector = new PropertySelector("a", "age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
     Embedding embedding = new Embedding();
@@ -48,7 +48,7 @@ public class PropertySelectorComparableTest {
 
   @Test(expected = NoSuchElementException.class)
   public void testThrowErrorIfPropertyIsMissing() {
-    PropertySelector selector = new PropertySelector("a","age");
+    PropertySelector selector = new PropertySelector("a", "age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
     Embedding embedding = new Embedding();
@@ -61,9 +61,9 @@ public class PropertySelectorComparableTest {
     wrapper.evaluate(embedding, metaData);
   }
 
-  @Test(expected= NoSuchElementException.class)
+  @Test(expected = NoSuchElementException.class)
   public void testThrowErrorIfElementNotPresent() {
-    PropertySelector selector = new PropertySelector("a","age");
+    PropertySelector selector = new PropertySelector("a", "age");
     PropertySelectorComparable wrapper = new PropertySelectorComparable(selector);
 
     Embedding embedding = new Embedding();

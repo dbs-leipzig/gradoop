@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,12 @@ import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.storage.impl.hbase.api.ElementHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
+import org.gradoop.storage.utils.RowKeyDistributor;
 
-import java.io.IOException;
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,36 +61,41 @@ public abstract class HBaseElementHandler implements ElementHandler {
     Bytes.toBytes(HBaseConstants.CF_PROPERTY_VALUE);
 
   /**
-   * {@inheritDoc}
+   * Flag to identify if a pre-splitting of HBase regions should be used
    */
-  @Override
-  public byte[] getRowKey(final GradoopId elementId) throws IOException {
-    return elementId.toByteArray();
-  }
+  private boolean usePreSplitRegions;
+
+  /**
+   * Flag to identify if a spreading byte should be used as prefix of each row key
+   */
+  private boolean useSpreadingByte;
 
   /**
    * {@inheritDoc}
+   * Used for writing the rowKey to HBase.
    */
   @Override
-  public GradoopId getId(final byte[] rowKey) throws IOException {
-    if (rowKey == null) {
-      throw new IllegalArgumentException("rowKey must not be null");
+  public byte[] getRowKey(@Nonnull final GradoopId elementId) {
+    return useSpreadingByte ?
+      RowKeyDistributor.getInstance().getDistributedKey(elementId.toByteArray()) :
+      elementId.toByteArray();
+  }
+
+  @Override
+  public GradoopId readId(@Nonnull final Result res) {
+    if (useSpreadingByte) {
+      return GradoopId.fromByteArray(RowKeyDistributor.getInstance().getOriginalKey(res.getRow()));
+    } else {
+      return GradoopId.fromByteArray(res.getRow());
     }
-    return GradoopId.fromByteArray(rowKey);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeLabel(final Put put, final EPGMElement entity) {
     return (entity.getLabel() == null) ? put :
       put.addColumn(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel()));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeProperty(final Put put, Property property) {
     byte[] type = PropertyValueUtils.Bytes.getTypeByte(property.getValue());
@@ -96,9 +105,6 @@ public abstract class HBaseElementHandler implements ElementHandler {
     return put;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeProperties(final Put put, final EPGMElement entity) {
     if (entity.getProperties() != null && entity.getPropertyCount() > 0) {
@@ -109,17 +115,11 @@ public abstract class HBaseElementHandler implements ElementHandler {
     return put;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String readLabel(final Result res) {
     return Bytes.toString(res.getValue(CF_META_BYTES, COL_LABEL_BYTES));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Properties readProperties(final Result res) {
     Properties properties = Properties.create();
@@ -140,13 +140,33 @@ public abstract class HBaseElementHandler implements ElementHandler {
     return properties;
   }
 
-  /**
-   * Deserializes a gradoop id from HBase row key.
-   *
-   * @param res HBase row
-   * @return gradoop id
-   */
-  GradoopId readId(Result res) {
-    return GradoopId.fromByteArray(res.getRow());
+  @Override
+  public boolean isPreSplitRegions() {
+    return this.usePreSplitRegions;
+  }
+
+  @Override
+  public void setPreSplitRegions(boolean usePreSplitRegions) {
+    this.usePreSplitRegions = usePreSplitRegions;
+  }
+
+  @Override
+  public boolean isSpreadingByteUsed() {
+    return this.useSpreadingByte;
+  }
+
+  @Override
+  public void setSpreadingByteUsage(boolean useSpreadingByte) {
+    this.useSpreadingByte = useSpreadingByte;
+  }
+
+  @Override
+  public List<byte[]> getPossibleRowKeys(@Nonnull final GradoopId elementId) {
+    List<byte[]> possibleKeys = new ArrayList<>();
+    final byte[][] allDistributedKeys = RowKeyDistributor.getInstance()
+      .getAllDistributedKeys(elementId.toByteArray());
+
+    Collections.addAll(possibleKeys, allDistributedKeys);
+    return possibleKeys;
   }
 }

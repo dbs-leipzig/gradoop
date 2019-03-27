@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public class CartesianProductTest extends PhysicalOperatorTest {
     l2.add(e1, PropertyValue.create("Foobar"));
     l2.add(e2, PropertyValue.create(42));
     l2.add(e3);
-    DataSet<Embedding> left = getExecutionEnvironment().fromElements(l1,l2);
+    DataSet<Embedding> left = getExecutionEnvironment().fromElements(l1, l2);
 
     Embedding r1 = new Embedding();
     r1.add(v2, PropertyValue.create("Baz"));
@@ -55,7 +55,7 @@ public class CartesianProductTest extends PhysicalOperatorTest {
     Embedding r2 = new Embedding();
     r2.add(v0, PropertyValue.create("Baz"));
     r2.add(e2);
-    DataSet<Embedding> right = getExecutionEnvironment().fromElements(r1,r2);
+    DataSet<Embedding> right = getExecutionEnvironment().fromElements(r1, r2);
 
     PhysicalOperator join = new CartesianProduct(
       left, right, 2,
@@ -76,9 +76,9 @@ public class CartesianProductTest extends PhysicalOperatorTest {
       )
     ));
 
-    assertEmbeddingExists(result, v0,e0,v1,v2,e1);
-    assertEmbeddingExists(result, v0,e0,v1,v0,e2);
-    assertEmbeddingExists(result, e1,e2,e3,v2,e1);
-    assertEmbeddingExists(result, e1,e2,e3,v0,e2);
+    assertEmbeddingExists(result, v0, e0, v1, v2, e1);
+    assertEmbeddingExists(result, v0, e0, v1, v0, e2);
+    assertEmbeddingExists(result, e1, e2, e3, v2, e1);
+    assertEmbeddingExists(result, e1, e2, e3, v0, e2);
   }
 }

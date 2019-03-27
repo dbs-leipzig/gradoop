@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,6 @@ import org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
  */
 public class Union extends SetOperatorBase {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected DataSet<Vertex> computeNewVertices(
     DataSet<GraphHead> newGraphHeads) {
@@ -39,9 +36,6 @@ public class Union extends SetOperatorBase {
       .distinct(new Id<Vertex>());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected DataSet<GraphHead> computeNewGraphHeads() {
     return firstCollection.getGraphHeads()
@@ -49,21 +43,10 @@ public class Union extends SetOperatorBase {
       .distinct(new Id<GraphHead>());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected DataSet<Edge> computeNewEdges(DataSet<Vertex> newVertices) {
     return firstCollection.getEdges()
       .union(secondCollection.getEdges())
       .distinct(new Id<Edge>());
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return Union.class.getName();
   }
 }

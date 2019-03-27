@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
    * @throws Throwable if error
    */
   @Test
-  public void test01_findPersonByName() throws Throwable {
+  public void findPersonByName() throws Throwable {
     doTest(TEST01, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = sample(loader.getVertices()
@@ -90,7 +90,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
    * @throws Throwable if error
    */
   @Test
-  public void test02_findPersonByAge() throws Throwable {
+  public void findPersonByAge() throws Throwable {
     doTest(TEST02, (loader, store, config) -> {
       //vertex label and property query
       List<Vertex> inputVertices = loader.getVertices()
@@ -117,7 +117,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
    * @throws Throwable if error
    */
   @Test
-  public void test03_findGraphByIdsAndProperty() throws Throwable {
+  public void findGraphByIdsAndProperty() throws Throwable {
     doTest(TEST03, (loader, store, config) -> {
       List<GraphHead> samples = sample(new ArrayList<>(loader.getGraphHeads()), 3);
 

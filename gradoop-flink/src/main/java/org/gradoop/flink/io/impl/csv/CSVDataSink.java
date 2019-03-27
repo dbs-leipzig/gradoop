@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.csv.functions.EdgeToCSVEdge;
 import org.gradoop.flink.io.impl.csv.functions.GraphHeadToCSVGraphHead;
 import org.gradoop.flink.io.impl.csv.functions.VertexToCSVVertex;
-import org.gradoop.flink.io.impl.csv.metadata.MetaData;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSink;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
 import org.gradoop.flink.io.impl.csv.tuples.CSVGraphHead;
 import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
@@ -45,7 +46,7 @@ public class CSVDataSink extends CSVBase implements DataSink {
    * Creates a new CSV data sink. Computes the meta data based on the given graph.
    *
    * @param csvPath directory to write to
-   * @param config Gradoop Flink configuration
+   * @param config  Gradoop Flink configuration
    */
   public CSVDataSink(String csvPath, GradoopFlinkConfig config) {
     super(csvPath, config);
@@ -55,9 +56,9 @@ public class CSVDataSink extends CSVBase implements DataSink {
   /**
    * Creates a new CSV data sink. Uses the specified meta data to write the CSV output.
    *
-   * @param csvPath directory to write CSV files to
+   * @param csvPath      directory to write CSV files to
    * @param metaDataPath path to meta data CSV file
-   * @param config Gradoop Flink configuration
+   * @param config       Gradoop Flink configuration
    */
   public CSVDataSink(String csvPath, String metaDataPath, GradoopFlinkConfig config) {
     super(csvPath, config);
@@ -85,10 +86,11 @@ public class CSVDataSink extends CSVBase implements DataSink {
       FileSystem.WriteMode.OVERWRITE : FileSystem.WriteMode.NO_OVERWRITE;
 
     DataSet<Tuple3<String, String, String>> metaData;
+    CSVMetaDataSource source = new CSVMetaDataSource();
     if (!reuseMetadata()) {
-      metaData = createMetaData(graphCollection);
+      metaData = source.tuplesFromCollection(graphCollection);
     } else {
-      metaData = MetaData.fromFile(metaDataPath, getConfig());
+      metaData = source.readDistributed(metaDataPath, getConfig());
     }
 
     DataSet<CSVGraphHead> csvGraphHeads = graphCollection.getGraphHeads()
@@ -105,8 +107,7 @@ public class CSVDataSink extends CSVBase implements DataSink {
 
     // Write metadata only if the path is not the same or reuseMetadata is false.
     if (!getMetaDataPath().equals(metaDataPath) || !reuseMetadata()) {
-      metaData.writeAsCsv(getMetaDataPath(), CSVConstants.ROW_DELIMITER,
-        CSVConstants.TOKEN_DELIMITER, writeMode).setParallelism(1);
+      new CSVMetaDataSink().writeDistributed(getMetaDataPath(), metaData, writeMode);
     }
 
     csvGraphHeads.writeAsCsv(getGraphHeadCSVPath(), CSVConstants.ROW_DELIMITER,

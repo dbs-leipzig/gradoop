@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,31 +79,25 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
     out.add("Business Transaction Graphs with Measures", btgs);
 
-    btgs = btgs.apply(new ApplyTransformation(
+    btgs = btgs.apply(new ApplyTransformation((graph, copy) -> {
       // Transformation function to categorize graphs
-      (graph, copy) -> {
-        String category = graph.getPropertyValue("soCount").getInt() > 0 ?
-          "won" : "lost";
-        copy.setProperty(CATEGORY_KEY, PropertyValue.create(category));
-        return copy;
-      },
+      String category = graph.getPropertyValue("soCount").getInt() > 0 ? "won" : "lost";
+      copy.setProperty(CATEGORY_KEY, PropertyValue.create(category));
+      return copy;
+    }, (vertex, copy) -> {
       // Transformation function to relabel vertices and to drop properties
-      (vertex, copy) -> {
-        String superType = vertex.getPropertyValue(SUPERTYPE_KEY).toString();
+      String superType = vertex.getPropertyValue(SUPERTYPE_KEY).toString();
 
-        if (superType.equals(SUPERCLASS_VALUE_TRANSACTIONAL)) {
-          copy.setLabel(vertex.getLabel());
-        } else { // master data
-          copy.setLabel(vertex.getPropertyValue(SOURCEID_KEY).toString());
-        }
-        return copy;
-      },
-      // Transformation function to drop properties of edges
-      (edge, copy) -> {
-        copy.setLabel(edge.getLabel());
-
-        return copy;
-      })
+      if (superType.equals(SUPERCLASS_VALUE_TRANSACTIONAL)) {
+        copy.setLabel(vertex.getLabel());
+      } else { // master data
+        copy.setLabel(vertex.getPropertyValue(SOURCEID_KEY).toString());
+      }
+      return copy;
+    }, (edge, copy) -> {
+      copy.setLabel(edge.getLabel());
+      return copy;
+    })
     );
 
     out.add("Business Transaction Graphs after Transformation", btgs);

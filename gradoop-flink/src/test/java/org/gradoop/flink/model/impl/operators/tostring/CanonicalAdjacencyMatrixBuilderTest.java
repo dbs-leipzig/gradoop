@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataStr
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
 
@@ -47,7 +47,7 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
     String expectation = FileUtils.readFileToString(
       FileUtils.getFile(getFilePath("/data/expected/cam_test_directed")));
 
-    assertTrue(expectation.equals(result));
+    assertEquals(expectation, result);
   }
 
   @Test
@@ -69,7 +69,6 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
     String expectation = FileUtils.readFileToString(
       FileUtils.getFile(getFilePath("/data/expected/cam_test_undirected")));
 
-    assertTrue(expectation.equals(result));
+    assertEquals(expectation, result);
   }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 public class IdOf0InTuple2<GD extends GraphHead, C>
   implements KeySelector<Tuple2<GD, C>, GradoopId> {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopId getKey(Tuple2<GD, C> pair) throws Exception {
     return pair.f0.getId();

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertFalse;
 
-public class RandomNonUniformVertexSamplingTest extends ParametrizedTestForGraphSampling {
+public class RandomNonUniformVertexSamplingTest extends ParameterizedTestForGraphSampling {
 
   /**
    * Creates a new RandomNonUniformVertexSamplingTest instance.
@@ -36,17 +36,11 @@ public class RandomNonUniformVertexSamplingTest extends ParametrizedTestForGraph
     super(testName, Long.parseLong(seed), Float.parseFloat(sampleSize));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public SamplingAlgorithm getSamplingOperator() {
     return new RandomNonUniformVertexSampling(sampleSize, seed);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
 
@@ -65,16 +59,14 @@ public class RandomNonUniformVertexSamplingTest extends ParametrizedTestForGraph
    */
   @Parameterized.Parameters(name = "{index}: {0}")
   public static Iterable data() {
-    return Arrays.asList(
-      new String[] {
-        "NonUniformVertexSamplingTest with seed",
-        "-4181668494294894490",
-        "0.272f"
-      },
-      new String[] {
-        "NonUniformVertexSamplingTest without seed",
-        "0",
-        "0.272f"
-      });
+    return Arrays.asList(new String[] {
+      "NonUniformVertexSamplingTest with seed",
+      "-4181668494294894490",
+      "0.272f"
+    }, new String[] {
+      "NonUniformVertexSamplingTest without seed",
+      "0",
+      "0.272f"
+    });
   }
 }

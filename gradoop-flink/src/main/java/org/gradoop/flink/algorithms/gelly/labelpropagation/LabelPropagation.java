@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,9 +68,6 @@ public abstract class LabelPropagation extends GradoopGellyAlgorithm<PropertyVal
     this.propertyKey = checkNotNull(propertyKey);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph executeInGelly(Graph<GradoopId, PropertyValue, NullValue> graph) {
     DataSet<Vertex> labeledVertices = executeInternal(graph)
@@ -99,13 +96,5 @@ public abstract class LabelPropagation extends GradoopGellyAlgorithm<PropertyVal
    */
   protected int getMaxIterations() {
     return maxIterations;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return LabelPropagation.class.getName();
   }
 }

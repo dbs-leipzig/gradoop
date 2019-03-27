@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public class ReduceEdgeGroupItems
   /**
    * Creates group reducer
    *
-   * @param useLabel        use edge label
+   * @param useLabel use edge label
    * @param epgmEdgeFactory edge factory
    */
   public ReduceEdgeGroupItems(boolean useLabel, EPGMEdgeFactory<Edge> epgmEdgeFactory) {
@@ -72,15 +72,13 @@ public class ReduceEdgeGroupItems
 
     setGroupProperties(
       superEdge, edgeGroupItem.getGroupingValues(), edgeGroupItem.getLabelGroup());
-    setAggregateValues(superEdge, edgeGroupItem.getLabelGroup().getAggregators());
-    resetAggregators(edgeGroupItem.getLabelGroup().getAggregators());
+    setAggregateProperties(superEdge, edgeGroupItem.getLabelGroup().getAggregateValueList(),
+      edgeGroupItem.getLabelGroup().getAggregateFunctions());
+    edgeGroupItem.getLabelGroup().resetAggregateValues();
 
     collector.collect(superEdge);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<Edge> getProducedType() {

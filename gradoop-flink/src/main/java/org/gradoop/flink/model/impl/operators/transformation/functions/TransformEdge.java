@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.common.util.GradoopConstants;
 
@@ -25,14 +25,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Transformation map function for edges.
+ *
+ * @param <E> the type of the EPGM edge
  */
 @FunctionAnnotation.ForwardedFields("id;sourceId;targetId;graphIds")
-public class TransformEdge extends TransformBase<Edge> {
+public class TransformEdge<E extends EPGMEdge> extends TransformBase<E> {
 
   /**
    * Factory to init modified edge.
    */
-  private final EPGMEdgeFactory<Edge> edgeFactory;
+  private final EPGMEdgeFactory<E> edgeFactory;
 
   /**
    * Constructor
@@ -40,15 +42,17 @@ public class TransformEdge extends TransformBase<Edge> {
    * @param transformationFunction  edge modification function
    * @param epgmEdgeFactory           edge factory
    */
-  public TransformEdge(TransformationFunction<Edge> transformationFunction,
-    EPGMEdgeFactory<Edge> epgmEdgeFactory) {
+  public TransformEdge(
+    TransformationFunction<E> transformationFunction,
+    EPGMEdgeFactory<E> epgmEdgeFactory) {
     super(transformationFunction);
     this.edgeFactory = checkNotNull(epgmEdgeFactory);
   }
 
   @Override
-  protected Edge initFrom(Edge edge) {
-    return edgeFactory.initEdge(edge.getId(),
+  protected E initFrom(E edge) {
+    return edgeFactory.initEdge(
+      edge.getId(),
       GradoopConstants.DEFAULT_EDGE_LABEL,
       edge.getSourceId(),
       edge.getTargetId(),

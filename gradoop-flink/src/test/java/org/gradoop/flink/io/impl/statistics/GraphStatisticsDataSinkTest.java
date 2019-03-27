@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -284,13 +284,13 @@ public class GraphStatisticsDataSinkTest extends GradoopFlinkTestBase {
 
     GraphStatistics statistics = GraphStatisticsLocalFSReader.read(tmpPath);
 
-    assertThat(statistics.getDistinctVertexProperties( "name"), is(9L));
-    assertThat(statistics.getDistinctVertexProperties("gender"), is(2L));
-    assertThat(statistics.getDistinctVertexProperties("city"), is(3L));
-    assertThat(statistics.getDistinctVertexProperties( "age"), is(4L));
-    assertThat(statistics.getDistinctVertexProperties( "speaks"), is(1L));
-    assertThat(statistics.getDistinctVertexProperties( "locIP"), is(1L));
-    assertThat(statistics.getDistinctVertexProperties("title"), is(2L));
+    assertThat(statistics.getDistinctVertexProperties("name"),    is(9L));
+    assertThat(statistics.getDistinctVertexProperties("gender"),  is(2L));
+    assertThat(statistics.getDistinctVertexProperties("city"),    is(3L));
+    assertThat(statistics.getDistinctVertexProperties("age"),     is(4L));
+    assertThat(statistics.getDistinctVertexProperties("speaks"),  is(1L));
+    assertThat(statistics.getDistinctVertexProperties("locIP"),   is(1L));
+    assertThat(statistics.getDistinctVertexProperties("title"),   is(2L));
   }
 
 }

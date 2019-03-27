@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,14 @@ import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
 
@@ -71,13 +70,12 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
         .collect();
 
     assertEquals(1, result.size());
-    assertTrue(result.get(0).getId(0).equals(v1.getId()));
+    assertEquals(result.get(0).getId(0), v1.getId());
   }
 
   @Test
   public void testFilterVerticesByLabel() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a:Person)");
-
 
     VertexFactory vertexFactory = new VertexFactory();
     Vertex v1 = vertexFactory.createVertex("Person");
@@ -90,7 +88,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
       .collect();
 
     assertEquals(1, result.size());
-    assertTrue(result.get(0).getId(0).equals(v1.getId()));
+    assertEquals(result.get(0).getId(0), v1.getId());
   }
 
   @Test
@@ -111,8 +109,8 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
       .get(0);
 
     assertEquals(person.getId(), result.getId(0));
-    assertTrue(result.getId(0).equals(person.getId()));
-    assertTrue(result.getProperty(0).equals(PropertyValue.create("Alice")));
+    assertEquals(result.getId(0), person.getId());
+    assertEquals(result.getProperty(0), PropertyValue.create("Alice"));
   }
 
   @Test
@@ -124,7 +122,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     Vertex person = new VertexFactory().createVertex("Person", properties);
     DataSource<Vertex> vertices = getExecutionEnvironment().fromElements(person);
 
-    List<String> projectionPropertyKeys = Lists.newArrayList("name","age");
+    List<String> projectionPropertyKeys = Lists.newArrayList("name", "age");
 
     Embedding result =
       new FilterAndProjectVertices(vertices, predicates, projectionPropertyKeys)
@@ -133,7 +131,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
       .get(0);
 
     assertEquals(person.getId(), result.getId(0));
-    assertTrue(result.getProperty(0).equals(PropertyValue.create("Alice")));
-    assertTrue(result.getProperty(1).equals(PropertyValue.NULL_VALUE));
+    assertEquals(result.getProperty(0), PropertyValue.create("Alice"));
+    assertEquals(result.getProperty(1), PropertyValue.NULL_VALUE);
   }
 }

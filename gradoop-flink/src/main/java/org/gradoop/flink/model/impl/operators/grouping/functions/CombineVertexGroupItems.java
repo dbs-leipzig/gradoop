@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 @FunctionAnnotation.ForwardedFields(
     "f0;" + // vertexId
     "f3;" + // label
-    "f4;"  + // properties
+    "f4;" + // properties
     "f6"    // label group
 )
 public class CombineVertexGroupItems
@@ -42,7 +42,7 @@ public class CombineVertexGroupItems
   /**
    * Creates group reduce function.
    *
-   * @param useLabel                        true, iff labels are used for grouping
+   * @param useLabel true, iff labels are used for grouping
    */
   public CombineVertexGroupItems(boolean useLabel) {
     super(useLabel);

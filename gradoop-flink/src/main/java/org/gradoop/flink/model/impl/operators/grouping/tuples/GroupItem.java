@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,14 +54,14 @@ public interface GroupItem {
   /**
    * Returns the aggregate values of the group item.
    *
-   * @return property value list of aggregates
+   * @return property value list of aggregate values
    */
   PropertyValueList getAggregateValues();
 
   /**
    * Sets the aggregate values of the group item.
    *
-   * @param aggregateValues property value list of aggregates
+   * @param aggregateValues property value list of aggregate values
    */
   void setAggregateValues(PropertyValueList aggregateValues);
 

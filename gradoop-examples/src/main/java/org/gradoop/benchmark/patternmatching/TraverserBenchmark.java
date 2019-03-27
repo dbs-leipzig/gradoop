@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -298,7 +298,7 @@ abstract class TraverserBenchmark extends AbstractRunner {
      *
      * @param vertexCount number of query vertices
      */
-    public GetIdWithCandidates(int vertexCount) {
+    GetIdWithCandidates(int vertexCount) {
       reuseTuple = new IdWithCandidates<>();
       boolean[] candidates = new boolean[vertexCount];
       for (int i = 0; i < vertexCount; i++) {
@@ -330,7 +330,7 @@ abstract class TraverserBenchmark extends AbstractRunner {
      *
      * @param edgeCount number of query edges
      */
-    public GetTriplesWithCandidates(int edgeCount) {
+    GetTriplesWithCandidates(int edgeCount) {
       reuseTuple = new TripleWithCandidates<>();
       boolean[] candidates = new boolean[edgeCount];
       for (int i = 0; i < edgeCount; i++) {

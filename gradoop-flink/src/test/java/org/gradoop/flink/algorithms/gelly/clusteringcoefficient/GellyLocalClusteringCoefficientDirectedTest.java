@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,9 @@ public class GellyLocalClusteringCoefficientDirectedTest
     validateGraphProperties(fullGraph);
     List<Vertex> vertices = fullGraph.getVertices().collect();
     for (Vertex v : vertices) {
-      assertEquals("Wrong local value for clique-vertex '" + v.getId().toString() +
-          "', should be 1", 1d,
+      assertEquals(
+        "Wrong local value for clique-vertex '" + v.getId().toString() + "', should be 1",
+        1d,
         v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
     }
   }
@@ -50,8 +51,9 @@ public class GellyLocalClusteringCoefficientDirectedTest
     validateGraphProperties(nonConnectedGraph);
     List<Vertex> vertices = nonConnectedGraph.getVertices().collect();
     for (Vertex v : vertices) {
-      assertEquals("Wrong local value for not connected vertex: " + v.getId().toString() +
-          ", should be 0",0d,
+      assertEquals(
+        "Wrong local value for not connected vertex: " + v.getId().toString() + ", should be 0",
+        0d,
         v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.0);
     }
   }
@@ -79,15 +81,15 @@ public class GellyLocalClusteringCoefficientDirectedTest
     List<Vertex> vertices = result.getVertices().collect();
     for (Vertex v : vertices) {
       if (v.getPropertyValue("id").getInt() == 0) {
-        assertEquals("vertex with id 0 has wrong local value, should be 0.1666", (1d/6d),
+        assertEquals("vertex with id 0 has wrong local value, should be 0.1666", 1d / 6d,
           v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.00001);
       }
       if (v.getPropertyValue("id").getInt() == 1) {
-        assertEquals("vertex with id 1 has wrong local value, should be 0.5", (1d/2d),
+        assertEquals("vertex with id 1 has wrong local value, should be 0.5", 1d / 2d,
           v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.00001);
       }
       if (v.getPropertyValue("id").getInt() == 2) {
-        assertEquals("vertex with id 2 has wrong local value, should be 0.5", (1d/2d),
+        assertEquals("vertex with id 2 has wrong local value, should be 0.5", 1d / 2d,
           v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.00001);
       }
       if (v.getPropertyValue("id").getInt() == 3) {

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,18 +35,12 @@ public class EdgeFactory implements EPGMEdgeFactory<Edge>, Serializable {
    */
   private static final long serialVersionUID = 42L;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Edge createEdge(GradoopId sourceVertexId,
     GradoopId targetVertexId) {
     return initEdge(GradoopId.get(), sourceVertexId, targetVertexId);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Edge initEdge(final GradoopId id, final GradoopId sourceVertexId,
     final GradoopId targetVertexId) {
@@ -54,27 +48,18 @@ public class EdgeFactory implements EPGMEdgeFactory<Edge>, Serializable {
       targetVertexId);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Edge createEdge(String label, GradoopId sourceVertexId,
     GradoopId targetVertexId) {
     return initEdge(GradoopId.get(), label, sourceVertexId, targetVertexId);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Edge initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId) {
     return initEdge(id, label, sourceVertexId, targetVertexId, null, null);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Edge createEdge(String label, GradoopId sourceVertexId,
     GradoopId targetVertexId, Properties properties) {
@@ -82,9 +67,6 @@ public class EdgeFactory implements EPGMEdgeFactory<Edge>, Serializable {
       label, sourceVertexId, targetVertexId, properties);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Edge initEdge(
     GradoopId id,
@@ -97,9 +79,6 @@ public class EdgeFactory implements EPGMEdgeFactory<Edge>, Serializable {
       initEdge(id, label, sourceVertexId, targetVertexId, properties, null);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Edge createEdge(String label, GradoopId sourceVertexId,
     GradoopId targetVertexId, GradoopIdSet graphIds) {
@@ -107,9 +86,6 @@ public class EdgeFactory implements EPGMEdgeFactory<Edge>, Serializable {
       label, sourceVertexId, targetVertexId, graphIds);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Edge initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,
@@ -117,9 +93,6 @@ public class EdgeFactory implements EPGMEdgeFactory<Edge>, Serializable {
     return initEdge(id, label, sourceVertexId, targetVertexId, null, graphs);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Edge createEdge(String label, GradoopId sourceVertexId,
     GradoopId targetVertexId, Properties properties,
@@ -128,9 +101,6 @@ public class EdgeFactory implements EPGMEdgeFactory<Edge>, Serializable {
       label, sourceVertexId, targetVertexId, properties, graphIds);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Edge initEdge(final GradoopId id, final String label,
     final GradoopId sourceVertexId, final GradoopId targetVertexId,

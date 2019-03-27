@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,11 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.MockPlanNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData.EntryType;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.MockPlanNode;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
 import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,7 +34,7 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class ProjectEmbeddingsNodeTest extends GradoopFlinkTestBase {
 
@@ -44,7 +44,7 @@ public class ProjectEmbeddingsNodeTest extends GradoopFlinkTestBase {
     inputMetaData.setEntryColumn("a", EntryType.VERTEX, 0);
     inputMetaData.setEntryColumn("b", EntryType.VERTEX, 1);
     inputMetaData.setPropertyColumn("a", "age", 0);
-    inputMetaData.setPropertyColumn("b","name", 1);
+    inputMetaData.setPropertyColumn("b", "name", 1);
 
     PlanNode mockNode = new MockPlanNode(null, inputMetaData);
     List<Pair<String, String>> projectedKeys = new ArrayList<>();
@@ -83,9 +83,9 @@ public class ProjectEmbeddingsNodeTest extends GradoopFlinkTestBase {
     List<Embedding> result = new ProjectEmbeddingsNode(mockChild, projectedKeys).execute().collect();
 
     Assert.assertThat(result.size(), Is.is(1));
-    assertTrue(result.get(0).getId(0).equals(vertexAId));
-    assertTrue(result.get(0).getId(1).equals(vertexBId));
+    assertEquals(result.get(0).getId(0), vertexAId);
+    assertEquals(result.get(0).getId(1), vertexBId);
     assertThat(result.get(0).getProperties().size(), is(1));
-    assertTrue(result.get(0).getProperty(0).equals(PropertyValue.create(42)));
+    assertEquals(result.get(0).getProperty(0), PropertyValue.create(42));
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,17 +52,11 @@ public abstract class GraphElement
     this.graphIds = graphIds;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopIdSet getGraphIds() {
     return graphIds;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void addGraphId(GradoopId graphId) {
     if (graphIds == null) {
@@ -71,17 +65,11 @@ public abstract class GraphElement
     graphIds.add(graphId);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setGraphIds(GradoopIdSet graphIds) {
     this.graphIds = graphIds;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void resetGraphIds() {
     if (graphIds != null) {
@@ -89,17 +77,11 @@ public abstract class GraphElement
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getGraphCount() {
     return (graphIds != null) ? graphIds.size() : 0;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return String.format("%s @ %s", super.toString(), graphIds);

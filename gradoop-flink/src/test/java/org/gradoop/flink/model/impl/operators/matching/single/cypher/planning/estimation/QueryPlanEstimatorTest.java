@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -201,9 +201,9 @@ public class QueryPlanEstimatorTest extends EstimatorTestBase  {
     LeafNode dNode = new FilterAndProjectVerticesNode(null, "d",
       queryHandler.getPredicates().getSubCNF("d"), Sets.newHashSet());
 
-    LeafNode e1Node = new FilterAndProjectEdgesNode(null, "a","e1","b",
+    LeafNode e1Node = new FilterAndProjectEdgesNode(null, "a", "e1", "b",
       queryHandler.getPredicates().getSubCNF("e1"), Sets.newHashSet(), false);
-    LeafNode e2Node = new FilterAndProjectEdgesNode(null, "c","e2","d",
+    LeafNode e2Node = new FilterAndProjectEdgesNode(null, "c", "e2", "d",
       queryHandler.getPredicates().getSubCNF("e2"), Sets.newHashSet(), false);
 
     BinaryNode ae1 = new JoinEmbeddingsNode(aNode, e1Node, Lists.newArrayList("a"),

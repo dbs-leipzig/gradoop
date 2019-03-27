@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,15 +52,15 @@ public class CombineEdgeGroupItems
   /**
    * Reduces edge group items to a single edge group item and collects it.
    *
-   * @param edgeGroupItems  edge group items
-   * @param collector       output collector
-   * @throws Exception
+   * @param edgeGroupItems edge group items
+   * @param collector output collector
+   * @throws Exception on failure
    */
   @Override
   public void combine(Iterable<EdgeGroupItem> edgeGroupItems,
     Collector<EdgeGroupItem> collector) throws Exception {
     reuseEdgeGroupItem = reduceInternal(edgeGroupItems);
-    resetAggregators(reuseEdgeGroupItem.getLabelGroup().getAggregators());
+    reuseEdgeGroupItem.getLabelGroup().resetAggregateValues();
     collector.collect(reuseEdgeGroupItem);
   }
 }

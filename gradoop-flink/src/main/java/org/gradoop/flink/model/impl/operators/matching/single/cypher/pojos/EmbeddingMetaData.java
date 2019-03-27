@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,15 +106,14 @@ public class EmbeddingMetaData implements Serializable {
     this.directionMapping = new HashMap<>(metaData.getPathCount());
 
     metaData.getVariables().forEach(var -> {
-        this.entryMapping.put(
-          Pair.of(var, metaData.getEntryType(var)), metaData.getEntryColumn(var));
-        metaData.getPropertyKeys(var).forEach(key ->
-          this.propertyMapping.put(Pair.of(var, key), metaData.getPropertyColumn(var, key)));
-        if (metaData.getEntryType(var) == EntryType.PATH) {
-          this.directionMapping.put(var, metaData.getDirection(var));
-        }
+      this.entryMapping.put(
+        Pair.of(var, metaData.getEntryType(var)), metaData.getEntryColumn(var));
+      metaData.getPropertyKeys(var).forEach(key ->
+        this.propertyMapping.put(Pair.of(var, key), metaData.getPropertyColumn(var, key)));
+      if (metaData.getEntryType(var) == EntryType.PATH) {
+        this.directionMapping.put(var, metaData.getDirection(var));
       }
-    );
+    });
   }
 
   public Map<Pair<String, EntryType>, Integer> getEntryMapping() {

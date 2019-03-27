@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCellCo
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
 import org.gradoop.flink.representation.transactional.AdjacencyList;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.junit.Assert;
 
 import java.util.Collection;
 import java.util.List;
@@ -164,19 +165,19 @@ public class GradoopFlinkTestUtils {
   }
 
   private static void assertEqualEdges(EPGMEdge a, EPGMEdge b) {
-    assertTrue(a.getSourceId().equals(b.getSourceId()));
-    assertTrue(a.getTargetId().equals(b.getTargetId()));
+    Assert.assertEquals(a.getSourceId(), b.getSourceId());
+    Assert.assertEquals(a.getTargetId(), b.getTargetId());
     assertEqualGraphElements(a, b);
   }
 
   private static void assertEqualGraphElements(EPGMGraphElement a, EPGMGraphElement b) {
-    assertTrue(a.getGraphIds().equals(b.getGraphIds()));
+    Assert.assertEquals(a.getGraphIds(), b.getGraphIds());
     assertEqualElements(a, b);
   }
 
   private static void assertEqualElements(EPGMElement a, EPGMElement b) {
-    assertTrue(a.getId().equals(b.getId()));
-    assertTrue(a.getLabel().equals(b.getLabel()));
+    Assert.assertEquals(a.getId(), b.getId());
+    Assert.assertEquals(a.getLabel(), b.getLabel());
     assertTrue(a.getProperties() == null && b.getProperties() == null ||
       a.getProperties().equals(b.getProperties()));
   }
@@ -191,7 +192,7 @@ public class GradoopFlinkTestUtils {
     Map<GradoopId, AdjacencyListRow<GradoopId, GradoopId>> aRows = a.getOutgoingRows();
     Map<GradoopId, AdjacencyListRow<GradoopId, GradoopId>> bRows = b.getOutgoingRows();
 
-    assertTrue(aRows.size() == bRows.size());
+    Assert.assertEquals(aRows.size(), bRows.size());
 
     for (GradoopId vertexId : aRows.keySet()) {
       ids.add(vertexId);
@@ -202,12 +203,12 @@ public class GradoopFlinkTestUtils {
       List<AdjacencyListCell<GradoopId, GradoopId>> bCells =
         Lists.newArrayList(aRows.get(vertexId).getCells());
 
-      assertTrue(aCells.size() == bCells.size());
+      Assert.assertEquals(aCells.size(), bCells.size());
 
       aCells.sort(new AdjacencyListCellComparator<>());
       bCells.sort(new AdjacencyListCellComparator<>());
 
-      assertTrue(aCells.equals(bCells));
+      Assert.assertEquals(aCells, bCells);
 
       for (AdjacencyListCell<GradoopId, GradoopId> cell : aCells) {
         ids.add(cell.getVertexData());
@@ -215,12 +216,12 @@ public class GradoopFlinkTestUtils {
     }
 
     for (GradoopId id : ids) {
-      assertTrue(a.getLabel(id).equals(b.getLabel(id)));
+      Assert.assertEquals(a.getLabel(id), b.getLabel(id));
       Properties aProperties = a.getProperties(id);
       Properties bProperties = b.getProperties(id);
 
-      assertTrue(aProperties == null && bProperties == null
-        || aProperties.equals(bProperties));
+      assertTrue(
+        aProperties == null && bProperties == null || aProperties.equals(bProperties));
 
     }
   }

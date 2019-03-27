@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,9 +48,6 @@ public class RandomFilter<E extends EPGMElement> implements CombinableFilter<E> 
     randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public boolean filter(E e) throws Exception {
     return randomGenerator.nextFloat() <= threshold;

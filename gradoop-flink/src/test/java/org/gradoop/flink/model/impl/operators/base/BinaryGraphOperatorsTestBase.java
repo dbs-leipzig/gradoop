@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@ public class BinaryGraphOperatorsTestBase extends GradoopFlinkTestBase {
 
   protected void checkElementMatches(Set<GraphElement> inElements,
     Set<GraphElement> outElements) {
-    for(GraphElement outElement : outElements) {
+    for (GraphElement outElement : outElements) {
       boolean match = false;
 
       String elementClassName = outElement.getClass().getSimpleName();
 
-      for(GraphElement inVertex : inElements) {
+      for (GraphElement inVertex : inElements) {
         if (outElement.getId().equals(inVertex.getId())) {
           assertEquals(
             "wrong number of graphs for " + elementClassName,
@@ -43,7 +43,7 @@ public class BinaryGraphOperatorsTestBase extends GradoopFlinkTestBase {
           break;
         }
       }
-      assertTrue("expected " + elementClassName + " not found",match);
+      assertTrue("expected " + elementClassName + " not found", match);
     }
   }
 }

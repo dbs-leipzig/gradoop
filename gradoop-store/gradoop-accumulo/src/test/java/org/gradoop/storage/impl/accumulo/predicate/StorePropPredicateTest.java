@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
    * @throws Throwable if error
    */
   @Test
-  public void test01_vertexPropEquals() throws Throwable {
+  public void vertexPropEquals() throws Throwable {
     doTest(TEST01, (loader, store, config) -> {
       List<Vertex> inputVertices = loader.getVertices().stream()
         .filter(it -> {
@@ -78,7 +78,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
    * @throws Throwable if error
    */
   @Test
-  public void test02_edgePropEquals() throws Throwable {
+  public void edgePropEquals() throws Throwable {
     doTest(TEST02, (loader, store, config) -> {
       List<Edge> inputVertices = loader.getEdges().stream()
         .filter(it -> {
@@ -107,7 +107,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
    * @throws Throwable if error
    */
   @Test
-  public void test03_propRegex() throws Throwable {
+  public void propRegex() throws Throwable {
     doTest(TEST03, (loader, store, config) -> {
       Pattern queryFormula = Pattern.compile("(Leipzig|Dresden)");
 
@@ -139,7 +139,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
    * @throws Throwable if error
    */
   @Test
-  public void test04_propLargerThan() throws Throwable {
+  public void propLargerThan() throws Throwable {
     doTest(TEST04, (loader, store, config) -> {
       List<Edge> inputVertices = loader.getEdges().stream()
         .filter(it -> {
@@ -170,7 +170,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
    * @throws Throwable if error
    */
   @Test
-  public void test05_propSmallerThan() throws Throwable {
+  public void propSmallerThan() throws Throwable {
     doTest(TEST05, (loader, store, config) -> {
       List<GraphHead> inputVertices = loader.getGraphHeads()
         .stream()

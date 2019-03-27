@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.rollup;
 
+import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
-import org.gradoop.flink.model.impl.operators.grouping.functions.aggregation
-  .PropertyValueAggregator;
 
 import java.util.List;
 
@@ -47,9 +46,9 @@ public class VertexRollUp extends RollUp {
    */
   public VertexRollUp(
     List<String> vertexGroupingKeys,
-    List<PropertyValueAggregator> vertexAggregateFunctions,
+    List<AggregateFunction> vertexAggregateFunctions,
     List<String> edgeGroupingKeys,
-    List<PropertyValueAggregator> edgeAggregateFunctions
+    List<AggregateFunction> edgeAggregateFunctions
   ) {
     super(vertexGroupingKeys, vertexAggregateFunctions, edgeGroupingKeys, edgeAggregateFunctions);
   }
@@ -68,10 +67,5 @@ public class VertexRollUp extends RollUp {
   @Override
   List<List<String>> getGroupingKeyCombinations() {
     return createGroupingKeyCombinations(vertexGroupingKeys);
-  }
-
-  @Override
-  public String getName() {
-    return VertexRollUp.class.getName();
   }
 }

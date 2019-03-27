@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,16 +34,16 @@ import static org.junit.Assert.assertEquals;
 public class ProjectEdgesTest extends PhysicalOperatorTest {
 
   @Test
-  public void returnsEmbeddingWithIdProjectionId() throws Exception{
+  public void returnsEmbeddingWithIdProjectionId() throws Exception {
     DataSet<Edge> edgeDataSet = createEdgesWithProperties(Lists.newArrayList("foo", "bar", "baz"));
     ArrayList<String> extractedPropertyKeys = Lists.newArrayList("foo", "bar");
 
     ProjectEdges operator = new ProjectEdges(edgeDataSet, extractedPropertyKeys, false);
     DataSet<Embedding> results = operator.evaluate();
 
-    assertEquals(2,results.count());
+    assertEquals(2, results.count());
     assertEveryEmbedding(results, (embedding) -> {
-      assertEquals(3,embedding.size());
+      assertEquals(3, embedding.size());
       assertEquals(PropertyValue.create("foo"), embedding.getProperty(0));
       assertEquals(PropertyValue.create("bar"), embedding.getProperty(1));
     });

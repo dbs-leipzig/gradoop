@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,14 +77,14 @@ public class EdgeListExample implements ProgramDescription {
 
     // transform labels on vertices ...
     logicalGraph = logicalGraph.transformVertices((current, transformed) -> {
-        transformed.setLabel("Node");
-        return transformed;
-      });
+      transformed.setLabel("Node");
+      return transformed;
+    });
     // ... and edges
     logicalGraph = logicalGraph.transformEdges((current, transformed) -> {
-        transformed.setLabel("link");
-        return transformed;
-      });
+      transformed.setLabel("link");
+      return transformed;
+    });
 
     // do some analytics (e.g. match two-node cycles)
     String query = "(a:Node)-[:link]->(b:Node)-[:link]->(a)";

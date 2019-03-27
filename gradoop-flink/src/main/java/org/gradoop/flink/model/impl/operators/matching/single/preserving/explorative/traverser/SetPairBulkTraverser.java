@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ public class SetPairBulkTraverser<K> extends SetPairTraverser<K> {
 
     // traverse to outgoing/incoming edges
     String[] forwardedFieldsEdgeSteps = new String[] {
-        "f0" // forward edge id
+      "f0" // forward edge id
     };
     DataSet<EmbeddingWithTiePoint<K>> nextWorkSet = traverseEdges(edges,
       embeddings, superstep, TraverserStrategy.SET_PAIR_BULK_ITERATION,

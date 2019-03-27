@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
 
   @Test
-  public void projectEmbedding() throws Exception{
+  public void projectEmbedding() throws Exception {
     Embedding embedding = new Embedding();
     embedding.add(GradoopId.get());
     embedding.add(GradoopId.get(), getPropertyValues(Lists.newArrayList("m", "n", "o")));
@@ -39,18 +39,17 @@ public class ProjectEmbeddingsTest extends PhysicalOperatorTest {
     DataSet<Embedding> embeddings =
       getExecutionEnvironment().fromElements(embedding, embedding);
 
-    List<Integer> extractedPropertyKeys = Lists.newArrayList(0,2);
-    
+    List<Integer> extractedPropertyKeys = Lists.newArrayList(0, 2);
+
     ProjectEmbeddings operator = new ProjectEmbeddings(embeddings, extractedPropertyKeys);
 
     DataSet<Embedding> results = operator.evaluate();
-    assertEquals(2,results.count());
-    
+    assertEquals(2, results.count());
+
     assertEveryEmbedding(results, (e) -> {
-      assertEquals(2,                        e.size());
+      assertEquals(2, e.size());
       assertEquals(PropertyValue.create("m"), e.getProperty(0));
       assertEquals(PropertyValue.create("o"), e.getProperty(1));
     });
   }
-
 }

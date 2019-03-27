@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ import org.junit.Test;
 import java.util.Set;
 
 public class RepresentationConverterTest extends GradoopFlinkTestBase {
-
 
   @Test
   public void testGraphTransactionAdjacencyList() throws Exception {
@@ -71,16 +70,11 @@ public class RepresentationConverterTest extends GradoopFlinkTestBase {
 
     Properties loopProperties = new Properties();
 
-    edges.add(
-      new Edge(GradoopId.get(), "loop", v1.getId(), v1.getId(), loopProperties, graphIds));
-    edges.add(
-      new Edge(GradoopId.get(), "m", v1.getId(), v2.getId(), null, graphIds));
-    edges.add(
-      new Edge(GradoopId.get(), "m", v1.getId(), v2.getId(), null, graphIds));
-    edges.add(
-      new Edge(GradoopId.get(), "m", v2.getId(), v1.getId(), null, graphIds));
+    edges.add(new Edge(GradoopId.get(), "loop", v1.getId(), v1.getId(), loopProperties, graphIds));
+    edges.add(new Edge(GradoopId.get(), "m", v1.getId(), v2.getId(), null, graphIds));
+    edges.add(new Edge(GradoopId.get(), "m", v1.getId(), v2.getId(), null, graphIds));
+    edges.add(new Edge(GradoopId.get(), "m", v2.getId(), v1.getId(), null, graphIds));
 
     return new GraphTransaction(graphHead, vertices, edges);
   }
-
 }

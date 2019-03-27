@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
     // count vertex and edge lines
     for (String line : dotLines) {
 
-      if(line.contains("digraph") && lines == 0) {
+      if (line.contains("digraph") && lines == 0) {
         graphLines++;
       } else  if (line.contains("->")) {
         edgeLines++;
@@ -95,5 +95,5 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
     assertEquals("Wrong number of graph lines", 1, graphLines);
     assertEquals("Wrong number of edge lines", 4, edgeLines);
     assertEquals("Wrong number of vertex lines", 3, vertexLines);
- }
+  }
 }

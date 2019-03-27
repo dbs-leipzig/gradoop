@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,14 +54,14 @@ public class EqualityTest extends GradoopFlinkTestBase {
 
   @Test
   public void testCollectionEqualityByGraphElementIds() throws Exception {
+
     FlinkAsciiGraphLoader loader = getTestGraphLoader();
-    
+
     CollectionEquality equality = new CollectionEquality(
       new GraphHeadToEmptyString(),
       new VertexToIdString(),
       new EdgeToIdString(),
-      true
-    );
+      true);
 
     GraphCollection gRef = loader
       .getGraphCollectionByVariables("gRef", "gClone", "gEmpty");

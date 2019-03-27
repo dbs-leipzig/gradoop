@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.junit.Test;
 
 import static org.gradoop.common.GradoopTestUtils.writeAndReadValue;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 public class EmbeddingTest {
@@ -66,7 +65,7 @@ public class EmbeddingTest {
     GradoopId id = GradoopId.get();
 
     Embedding embedding = createEmbedding(4);
-    embedding.add(id,PropertyValue.create("String"), PropertyValue.create(42));
+    embedding.add(id, PropertyValue.create("String"), PropertyValue.create(42));
 
     assertEquals(5, embedding.size());
 
@@ -189,9 +188,9 @@ public class EmbeddingTest {
     embedding.add(GradoopId.get(), PropertyValue.create("b"), PropertyValue.create(23));
 
     assertEquals(PropertyValue.create("a"), embedding.getProperty(0));
-    assertEquals(PropertyValue.create(42),  embedding.getProperty(1));
+    assertEquals(PropertyValue.create(42), embedding.getProperty(1));
     assertEquals(PropertyValue.create("b"), embedding.getProperty(2));
-    assertEquals(PropertyValue.create(23),  embedding.getProperty(3));
+    assertEquals(PropertyValue.create(23), embedding.getProperty(3));
   }
 
   @Test(expected = IndexOutOfBoundsException.class)
@@ -250,11 +249,11 @@ public class EmbeddingTest {
     GradoopId b = new GradoopId();
 
     GradoopId[] ab = new GradoopId[] {
-      a,b
+      a, b
     };
 
     GradoopId[] ba = new GradoopId[] {
-      b,a
+      b, a
     };
 
     Embedding embedding = new Embedding();
@@ -262,8 +261,8 @@ public class EmbeddingTest {
     embedding.add(ab);
     embedding.add(ba);
 
-    assertEquals(Lists.newArrayList(a,b), embedding.getIdAsList(1));
-    assertEquals(Lists.newArrayList(b,a), embedding.getIdAsList(2));
+    assertEquals(Lists.newArrayList(a, b), embedding.getIdAsList(1));
+    assertEquals(Lists.newArrayList(b, a), embedding.getIdAsList(2));
   }
 
   @Test
@@ -274,7 +273,7 @@ public class EmbeddingTest {
     GradoopId d = new GradoopId();
 
     GradoopId[] da = new GradoopId[] {
-      d,a
+      d, a
     };
 
     Embedding embedding = new Embedding();
@@ -283,9 +282,9 @@ public class EmbeddingTest {
     embedding.add(c);
     embedding.add(da);
 
-    assertEquals(Lists.newArrayList(a,b,c), embedding.getIdsAsList(Lists.newArrayList(0,1,2)));
-    assertEquals(Lists.newArrayList(a,c), embedding.getIdsAsList(Lists.newArrayList(0,2)));
-    assertEquals(Lists.newArrayList(b,d,a), embedding.getIdsAsList(Lists.newArrayList(1,3)));
+    assertEquals(Lists.newArrayList(a, b, c), embedding.getIdsAsList(Lists.newArrayList(0, 1, 2)));
+    assertEquals(Lists.newArrayList(a, c), embedding.getIdsAsList(Lists.newArrayList(0, 2)));
+    assertEquals(Lists.newArrayList(b, d, a), embedding.getIdsAsList(Lists.newArrayList(1, 3)));
   }
 
   @Test
@@ -310,7 +309,7 @@ public class EmbeddingTest {
     GradoopId id = GradoopId.get();
     embedding.add(id, PropertyValue.create("a"), PropertyValue.create(42), PropertyValue.create("foobar"));
 
-    Embedding projection = embedding.project(Lists.newArrayList(0,2));
+    Embedding projection = embedding.project(Lists.newArrayList(0, 2));
     assertEquals(PropertyValue.create("a"), projection.getProperty(0));
     assertEquals(PropertyValue.create("foobar"), projection.getProperty(1));
   }
@@ -359,7 +358,7 @@ public class EmbeddingTest {
   }
 
   @Test
-  public void testWriteRead() throws Exception{
+  public void testWriteRead() throws Exception {
     Embedding inEmbedding = new Embedding();
     Embedding outEmbedding = writeAndReadValue(Embedding.class, inEmbedding);
     assertEquals(inEmbedding, outEmbedding);

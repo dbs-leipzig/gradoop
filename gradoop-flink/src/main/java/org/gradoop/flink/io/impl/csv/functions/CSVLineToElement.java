@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,14 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.metadata.MetaData;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
-import org.gradoop.flink.io.impl.csv.metadata.MetaData;
-import org.gradoop.flink.io.impl.csv.metadata.MetaDataParser;
-import org.gradoop.flink.io.impl.csv.metadata.PropertyMetaData;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
   /**
    * Meta data that provides parsers for a specific {@link Element}.
    */
-  private MetaData metaData;
+  private CSVMetaData metaData;
 
   /**
    * Constructor
@@ -56,7 +57,7 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
   @Override
   public void open(Configuration parameters) throws Exception {
     super.open(parameters);
-    this.metaData = MetaDataParser.create(getRuntimeContext()
+    this.metaData = new CSVMetaDataSource().fromTuples(getRuntimeContext()
       .getBroadcastVariable(CSVDataSource.BC_METADATA));
   }
 
@@ -64,8 +65,8 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
    * Parses the given property values according to the meta data associated with the specified
    * label.
    *
-   * @param type element type
-   * @param label element label
+   * @param type                element type
+   * @param label               element label
    * @param propertyValueString string representation of elements' property values
    * @return parsed properties
    */
@@ -95,7 +96,7 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
       .split(CSVConstants.LIST_DELIMITER);
 
     GradoopIdSet gradoopIdSet = new GradoopIdSet();
-    for (String g: gradoopIds) {
+    for (String g : gradoopIds) {
       gradoopIdSet.add(GradoopId.fromString(g.trim()));
     }
     return gradoopIdSet;
@@ -104,7 +105,7 @@ abstract class CSVLineToElement<E extends Element> extends RichMapFunction<Strin
   /**
    * Splits the specified string.
    *
-   * @param s string
+   * @param s     string
    * @param limit resulting array length
    * @return tokens
    */

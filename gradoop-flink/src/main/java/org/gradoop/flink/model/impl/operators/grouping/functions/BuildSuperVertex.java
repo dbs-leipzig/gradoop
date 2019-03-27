@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ public class BuildSuperVertex
   /**
    * Creates map function.
    *
-   * @param useLabel          true, if vertex label shall be considered
+   * @param useLabel true, if vertex label shall be considered
    * @param epgmVertexFactory vertex factory
    */
   public BuildSuperVertex(boolean useLabel, EPGMVertexFactory<Vertex> epgmVertexFactory) {
@@ -51,12 +51,12 @@ public class BuildSuperVertex
   }
 
   /**
-   * Creates a {@link Vertex} object from the given {@link
-   * VertexGroupItem} and returns a new {@link org.apache.flink.graph.Vertex}.
+   * Creates a {@link Vertex} object from the given {@link VertexGroupItem}
+   * and returns a new {@link org.apache.flink.graph.Vertex}.
    *
    * @param groupItem vertex group item
    * @return vertex including new vertex data
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public Vertex map(VertexGroupItem groupItem) throws
@@ -65,17 +65,14 @@ public class BuildSuperVertex
 
     supVertex.setLabel(groupItem.getGroupLabel());
     setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getLabelGroup());
-    setAggregateValues(
+    setAggregateProperties(
       supVertex,
       groupItem.getAggregateValues(),
-      groupItem.getLabelGroup().getAggregators());
+      groupItem.getLabelGroup().getAggregateFunctions());
 
     return supVertex;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<Vertex> getProducedType() {

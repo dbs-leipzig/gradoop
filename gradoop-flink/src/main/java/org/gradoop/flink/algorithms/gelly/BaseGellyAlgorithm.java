@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2018 Leipzig University (Database Research Group)
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,6 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
  */
 public abstract class BaseGellyAlgorithm<K, VV, EV, O> implements UnaryGraphToValueOperator<O> {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public O execute(LogicalGraph graph) {
     try {
