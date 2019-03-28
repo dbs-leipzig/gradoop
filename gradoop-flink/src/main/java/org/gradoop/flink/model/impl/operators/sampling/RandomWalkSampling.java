@@ -27,6 +27,7 @@ import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeSourceVertexJoin;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeTargetVertexJoin;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgesWithSampledVerticesFilter;
+import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
 
 /**
  * Computes a random walk sampling of the graph. Retains visited vertices and edges where source
@@ -98,7 +99,7 @@ public class RandomWalkSampling extends SamplingAlgorithm {
       .join(sampledVertices)
       .where(1).equalTo(new Id<>())
       .with(new EdgeTargetVertexJoin(PROPERTY_KEY_SAMPLED))
-      .filter(new EdgesWithSampledVerticesFilter())
+      .filter(new EdgesWithSampledVerticesFilter(Neighborhood.BOTH))
       .map(new Value0Of3<>());
 
     return graph.getFactory().fromDataSets(sampledVertices, sampledEdges);

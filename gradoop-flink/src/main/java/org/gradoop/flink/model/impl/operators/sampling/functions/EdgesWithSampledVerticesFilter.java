@@ -34,13 +34,6 @@ public class EdgesWithSampledVerticesFilter
 
   /**
    * Constructor
-   */
-  public EdgesWithSampledVerticesFilter() {
-    neighborType = Neighborhood.BOTH;
-  }
-
-  /**
-   * Constructor
    *
    * @param neighborType type of neighborhood
    */
