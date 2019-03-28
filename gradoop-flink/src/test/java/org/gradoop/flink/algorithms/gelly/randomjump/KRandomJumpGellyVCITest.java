@@ -20,6 +20,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +34,6 @@ import static org.junit.Assert.assertTrue;
  * Test class for {@link KRandomJumpGellyVCI}
  */
 public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
-
   /**
    * The social graph used for testing
    */
@@ -75,7 +75,7 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
     commonValidation(socialGraph, result);
 
     long visitedVertices = resultVertices.stream().filter(
-      vertex -> vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean())
+      vertex -> vertex.getPropertyValue(SamplingAlgorithm.PROPERTY_KEY_SAMPLED).getBoolean())
       .count();
     assertTrue("Wrong number of visited vertices, should be at least 6",
       visitedVertices >= 6L);
@@ -92,7 +92,7 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
     commonValidation(socialGraph, result);
 
     long visitedVertices = resultVertices.stream().filter(
-      vertex -> vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean())
+      vertex -> vertex.getPropertyValue(SamplingAlgorithm.PROPERTY_KEY_SAMPLED).getBoolean())
       .count();
     assertTrue("Wrong number of visited vertices, should be at least 6",
       visitedVertices >= 6L);
@@ -110,7 +110,7 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
 
     resultVertices.forEach(vertex -> assertTrue(
       "vertex " + vertex.getId() + " was not visited, all vertices should be",
-      vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()));
+      vertex.getPropertyValue(SamplingAlgorithm.PROPERTY_KEY_SAMPLED).getBoolean()));
   }
 
   /**
@@ -125,7 +125,7 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
 
     resultVertices.forEach(vertex -> assertTrue(
       "vertex " + vertex.getId() + " was not visited, all vertices should be",
-      vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()));
+      vertex.getPropertyValue(SamplingAlgorithm.PROPERTY_KEY_SAMPLED).getBoolean()));
   }
 
   /**
@@ -140,7 +140,7 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
 
     resultVertices.forEach(vertex -> assertTrue(
       "vertex " + vertex.getId() + " was not visited, all vertices should be",
-      vertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()));
+      vertex.getPropertyValue(SamplingAlgorithm.PROPERTY_KEY_SAMPLED).getBoolean()));
   }
 
   /**
@@ -162,18 +162,18 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
     assertEquals("wrong number of edges in resultGraph",
       graph.getEdges().count(), resultGraph.getEdges().count());
     resultVertices.forEach(vertex -> assertTrue("vertex " + vertex.getId() + " is not annotated",
-      vertex.hasProperty(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED)));
+      vertex.hasProperty(SamplingAlgorithm.PROPERTY_KEY_SAMPLED)));
     resultEdges.forEach(edge -> assertTrue("edge " + edge.getId() + " is not annotated",
-      edge.hasProperty(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED)));
+      edge.hasProperty(SamplingAlgorithm.PROPERTY_KEY_SAMPLED)));
 
     for (Edge edge : resultEdges) {
-      if (edge.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()) {
+      if (edge.getPropertyValue(SamplingAlgorithm.PROPERTY_KEY_SAMPLED).getBoolean()) {
         resultVertices.stream().filter(vertex -> vertex.getId().equals(edge.getSourceId())).forEach(
           sourceVertex -> assertTrue("source of visited edge is not visited",
-            sourceVertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()));
+            sourceVertex.getPropertyValue(SamplingAlgorithm.PROPERTY_KEY_SAMPLED).getBoolean()));
         resultVertices.stream().filter(vertex -> vertex.getId().equals(edge.getTargetId())).forEach(
           targetVertex -> assertTrue("target of visited edge is not visited",
-            targetVertex.getPropertyValue(KRandomJumpGellyVCI.PROPERTY_KEY_VISITED).getBoolean()));
+            targetVertex.getPropertyValue(SamplingAlgorithm.PROPERTY_KEY_SAMPLED).getBoolean()));
       }
     }
   }

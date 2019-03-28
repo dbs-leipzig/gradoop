@@ -42,6 +42,7 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
+import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -50,7 +51,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Performs the RandomJump using Gellys VertexCentricIteration (VCI).
- * Uniformly at random picks {@link #k} starting vertices and then simulates a RandomWalk for each
+ * Uniformly at random picks {@link #numberOfStartVertices} starting vertices and then simulates a RandomWalk for each
  * starting vertex on the graph, where once visited edges are not used again. For each walker,
  * with a given {@link #jumpProbability}, or if the walk ends in a sink, or if all outgoing edges
  * of the current vertex were visited, randomly jumps to any vertex in the graph and starts a new
@@ -60,16 +61,10 @@ import static com.google.common.base.Preconditions.checkArgument;
  * has been reached, or enough vertices have been visited (with the percentage of vertices to
  * visit at least given in {@link #percentageToVisit}).
  * Returns the initial graph with vertices and edges annotated by a boolean property named
- * {@value #PROPERTY_KEY_VISITED}, which is set to {@code true} if visited, or {@code false} if not.
+ * "sampled", which is set to {@code true} if visited, or {@code false} if not.
  */
 public class KRandomJumpGellyVCI
   extends BaseGellyAlgorithm<Long, VCIVertexValue, Long, LogicalGraph> {
-
-  /**
-   * Key to access the property value determining if a vertex or edge was visited.
-   */
-  public static final String PROPERTY_KEY_VISITED = "visited";
-
   /**
    * The graph used in {@link KRandomJumpGellyVCI#execute(LogicalGraph)}.
    */
@@ -78,7 +73,7 @@ public class KRandomJumpGellyVCI
   /**
    * Number of starting vertices.
    */
-  private final int k;
+  private final int numberOfStartVertices;
 
   /**
    * Value for maximum number of iterations for the algorithm.
@@ -108,23 +103,23 @@ public class KRandomJumpGellyVCI
   /**
    * Creates an instance of KRandomJumpGellyVCI.
    *
-   * @param k Number of starting vertices.
+   * @param numberOfStartVertices Number of starting vertices.
    * @param maxIterations Value for maximum number of iterations for the algorithm.
    * @param jumpProbability Probability for jumping to random vertex instead of walking to random
    *                       neighbor.
    * @param percentageToVisit Relative amount of vertices to visit at least.
    */
-  public KRandomJumpGellyVCI(int k, int maxIterations, double jumpProbability,
+  public KRandomJumpGellyVCI(int numberOfStartVertices, int maxIterations, double jumpProbability,
     double percentageToVisit) {
-    checkArgument(k >= 1,
-      "at least 1 starting vertex is needed, k must be equal or greater 1");
+    checkArgument(numberOfStartVertices >= 1,
+      "at least 1 starting vertex is needed, numberOfStartVertices must be equal or greater 1");
     checkArgument(maxIterations > 0,
       "maxIterations must be greater than 0");
     checkArgument(jumpProbability >= 0d && jumpProbability <= 1d,
       "jumpProbability must be equal/greater than 0.0 and smaller/equal 1.0");
     checkArgument(percentageToVisit > 0d && percentageToVisit <= 1d,
       "percentageToVisit must be greater than 0.0 and smaller/equal 1.0");
-    this.k = k;
+    this.numberOfStartVertices = numberOfStartVertices;
     this.maxIterations = maxIterations;
     this.jumpProbability = jumpProbability;
     this.percentageToVisit = percentageToVisit;
@@ -158,17 +153,25 @@ public class KRandomJumpGellyVCI
   public LogicalGraph executeInGelly(Graph<Long, VCIVertexValue, Long> gellyGraph)
     throws Exception {
 
+    Long vertexCount = gellyGraph.numberOfVertices();
+
+    //--------------------------------------------------------------------------
+    // pre compute
+    //--------------------------------------------------------------------------
+
+    // define start vertices
     Set<Long> randomStartIndices = new HashSet<>();
-    while (randomStartIndices.size() < k) {
-      long randomLongInBounds = (long) (Math.random() * (gellyGraph.numberOfVertices() - 1L));
+    while (randomStartIndices.size() < numberOfStartVertices) {
+      long randomLongInBounds = (long) (Math.random() * (vertexCount - 1L));
       randomStartIndices.add(randomLongInBounds);
     }
     DataSet<Long> startIndices = currentGraph.getConfig().getExecutionEnvironment()
       .fromCollection(randomStartIndices);
 
-    long verticesToVisit = (long) Math.ceil((double) gellyGraph.numberOfVertices() *
-      percentageToVisit);
+    // define how many vertices to visit
+    long verticesToVisit = (long) Math.ceil((double) vertexCount * percentageToVisit);
 
+    // set compute parameters
     VertexCentricConfiguration parameters = new VertexCentricConfiguration();
     parameters.addBroadcastSet(VCIComputeFunction.START_INDICES_BROADCAST_SET, startIndices);
     parameters.addBroadcastSet(VCIComputeFunction.VERTEX_INDICES_BROADCAST_SET,
@@ -176,9 +179,14 @@ public class KRandomJumpGellyVCI
     parameters.registerAggregator(VCIComputeFunction.VISITED_VERTICES_AGGREGATOR_NAME,
       new LongSumAggregator());
 
+    // run gelly
     Graph<Long, VCIVertexValue, Long> resultGraph = gellyGraph.runVertexCentricIteration(
       new VCIComputeFunction(jumpProbability, verticesToVisit),
         null, maxIterations, parameters);
+
+    //--------------------------------------------------------------------------
+    // post compute
+    //--------------------------------------------------------------------------
 
     DataSet<GradoopId> visitedGellyEdgeIds = resultGraph.getVertices()
       .flatMap(new GetVisitedGellyEdgeLongIdsFlatMap())
@@ -186,28 +194,32 @@ public class KRandomJumpGellyVCI
       .where("*").equalTo(0)
       .with(new VisitedGellyEdgesWithLongIdToGradoopIdJoin());
 
-    DataSet<org.gradoop.common.model.impl.pojo.Edge> annotatedEdges = currentGraph.getEdges()
+    // compute new visited edges
+    DataSet<org.gradoop.common.model.impl.pojo.Edge> visitedEdges = currentGraph.getEdges()
       .leftOuterJoin(visitedGellyEdgeIds)
       .where(new Id<>()).equalTo("*")
-      .with(new EPGMEdgeWithGellyEdgeIdJoin(PROPERTY_KEY_VISITED));
+      .with(new EPGMEdgeWithGellyEdgeIdJoin(SamplingAlgorithm.PROPERTY_KEY_SAMPLED));
 
-    DataSet<GradoopId> visitedSourceTargetIds = annotatedEdges
-      .flatMap(new GetVisitedSourceTargetIdsFlatMap(PROPERTY_KEY_VISITED)).distinct();
+    DataSet<GradoopId> visitedSourceTargetIds = visitedEdges
+      .flatMap(new GetVisitedSourceTargetIdsFlatMap(SamplingAlgorithm.PROPERTY_KEY_SAMPLED))
+      .distinct();
 
-    DataSet<org.gradoop.common.model.impl.pojo.Vertex> annotatedVertices = resultGraph.getVertices()
+    // compute new visited vertices
+    DataSet<org.gradoop.common.model.impl.pojo.Vertex> visitedVertices = resultGraph.getVertices()
       .join(indexToVertexIdMap)
       .where(0).equalTo(0)
       .with(new GellyVertexWithLongIdToGradoopIdJoin())
       .join(currentGraph.getVertices())
       .where(0).equalTo(new Id<>())
-      .with(new GellyVertexWithEPGMVertexJoin(PROPERTY_KEY_VISITED));
+      .with(new GellyVertexWithEPGMVertexJoin(SamplingAlgorithm.PROPERTY_KEY_SAMPLED));
 
-    annotatedVertices = annotatedVertices.leftOuterJoin(visitedSourceTargetIds)
+    visitedVertices = visitedVertices.leftOuterJoin(visitedSourceTargetIds)
       .where(new Id<>()).equalTo("*")
-      .with(new VertexWithVisitedSourceTargetIdJoin(PROPERTY_KEY_VISITED));
+      .with(new VertexWithVisitedSourceTargetIdJoin(SamplingAlgorithm.PROPERTY_KEY_SAMPLED));
 
+    // return graph
     return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
-      currentGraph.getGraphHead(), annotatedVertices, annotatedEdges);
+      currentGraph.getGraphHead(), visitedVertices, visitedEdges);
   }
 
   @Override
