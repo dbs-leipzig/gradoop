@@ -1,16 +1,19 @@
-gradoop-accumulo
+gradoop-examples
 Copyright 2014-2019 Leipzig University (Database Research Group)
 
 This project bundles the following dependencies under the Apache Software License 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-- org.apache.flink:flink-gelly_2.11:1.7.0
+- com.github.s1ck:gdl:0.3
+- com.google.guava:guava
+- commons-cli:commons-cli:1.4
+- log4j:log4j:1.2.17
+- me.lemire.integercompression:JavaFastPFOR:0.1.10
+- org.apache.flink:flink-clients_2.11:1.7.0
 - org.apache.flink:flink-hadoop-compatibility_2.11:1.7.0
-- org.apache.flink:flink-hbase_2.11:1.7.0
 - org.apache.flink:flink-java:1.7.0
 - org.apache.flink:flink-shaded-hadoop2:1.7.0
-- org.objenesis:objenesis:2.5.1
+- org.codehaus.jettison:jettison:1.3.7
 
 This project bundles the following dependencies under the BSD license.
 
-- com.esotericsoftware:kryo:4.0.2
-- com.esotericsoftware:minlog:1.3.0
+- org.antlr:antlr4-runtime
