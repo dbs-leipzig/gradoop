@@ -220,13 +220,11 @@ public abstract class GradoopFlinkTestBase {
   // Test helper
   //----------------------------------------------------------------------------
 
-  protected void collectAndAssertTrue(DataSet<Boolean> result) throws
-    Exception {
+  protected void collectAndAssertTrue(DataSet<Boolean> result) throws Exception {
     assertTrue("expected true", result.collect().get(0));
   }
 
-  protected void collectAndAssertFalse(DataSet<Boolean> result) throws
-    Exception {
+  protected void collectAndAssertFalse(DataSet<Boolean> result) throws Exception {
     assertFalse("expected false", result.collect().get(0));
   }
 
