@@ -15,21 +15,14 @@
  */
 package org.gradoop.common.model.impl.properties;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import org.apache.flink.core.memory.DataInputView;
-import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputView;
-import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.flink.types.Value;
-import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
+import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.strategies.PropertyValueStrategyFactory;
 import org.gradoop.common.util.GradoopConstants;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -37,12 +30,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -120,7 +110,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * {@code <property-type>} for {@link java.util.Set}
    */
   public static final transient byte TYPE_SET          = 0x0f;
-
   /**
    * Value offset in byte
    */
@@ -148,14 +137,9 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   private static final long serialVersionUID = 1L;
 
   /**
-   * Mapping from byte value to associated Class
+   * Stores the object representation of the value
    */
-  private static final Map<Byte, Class> TYPE_MAPPING = getTypeMap();
-
-  /**
-   * Stores the type and the value
-    */
-  private byte[] rawBytes;
+  private Object value;
 
   /**
    * Default constructor.
@@ -197,12 +181,22 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   }
 
   /**
+   * Create a {@link PropertyValue} that wraps a byte array.
+   *
+   * @param rawBytes array to wrap
+   * @return new instance of {@link PropertyValue}
+   */
+  public static PropertyValue fromRawBytes(byte[] rawBytes) {
+    return new PropertyValue(rawBytes);
+  }
+
+  /**
    * Creates a deep copy of the property value.
    *
    * @return property value
    */
   public PropertyValue copy() {
-    return create(getObject());
+    return new PropertyValue(getRawBytes());
   }
 
   //----------------------------------------------------------------------------
@@ -210,12 +204,23 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   //----------------------------------------------------------------------------
 
   /**
+   * Check if the property value type is an instance of a certain class.
+   *
+   * @param clazz class to check against
+   * @return true if the attribute {@code value} is an object of the provided class, false
+   * otherwise
+   */
+  public boolean is(Class clazz) {
+    return PropertyValueStrategyFactory.get(clazz).is(value);
+  }
+
+  /**
    * True, if the value represents {@code null}.
    *
    * @return true, if {@code null} value
    */
   public boolean isNull() {
-    return rawBytes[0] == TYPE_NULL;
+    return getRawBytes()[0] == PropertyValue.TYPE_NULL;
   }
 
   /**
@@ -224,126 +229,140 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return true, if {@code boolean} value
    */
   public boolean isBoolean() {
-    return rawBytes[0] == TYPE_BOOLEAN;
+    return is(Boolean.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code short}.
    *
    * @return true, if {@code short} value
    */
   public boolean isShort() {
-    return rawBytes[0] == TYPE_SHORT;
+    return is(Short.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code int}.
    *
    * @return true, if {@code int} value
    */
   public boolean isInt() {
-    return rawBytes[0] == TYPE_INTEGER;
+    return is(Integer.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code long}.
    *
    * @return true, if {@code long} value
    */
   public boolean isLong() {
-    return rawBytes[0] == TYPE_LONG;
+    return is(Long.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code float}.
    *
    * @return true, if {@code float} value
    */
   public boolean isFloat() {
-    return rawBytes[0] == TYPE_FLOAT;
+    return is(Float.class);
   }
+
   /**
    * True, if the wrapped value is of type {@code double}.
    *
    * @return true, if {@code double} value
    */
   public boolean isDouble() {
-    return rawBytes[0] == TYPE_DOUBLE;
-  }
-  /**
-   * True, if the wrapped value is of type {@code String}.
-   *
-   * @return true, if {@code String} value
-   */
-  public boolean isString() {
-    return rawBytes[0] == TYPE_STRING;
-  }
-  /**
-   * True, if the wrapped value is of type {@code BigDecimal}.
-   *
-   * @return true, if {@code BigDecimal} value
-   * @see BigDecimal
-   */
-  public boolean isBigDecimal() {
-    return rawBytes[0] == TYPE_BIG_DECIMAL;
-  }
-  /**
-   * True, if the wrapped value is of type {@code GradoopId}.
-   *
-   * @return true, if {@code GradoopId} value
-   */
-  public boolean isGradoopId() {
-    return rawBytes[0] == TYPE_GRADOOP_ID;
-  }
-  /**
-   * True, if the wrapped value is of type {@code Map}.
-   *
-   * @return true, if {@code Map} value
-   */
-  public boolean isMap() {
-    return rawBytes[0] == TYPE_MAP;
-  }
-  /**
-   * True, if the wrapped value is of type {@code List}.
-   *
-   * @return true, if {@code List} value
-   */
-  public boolean isList() {
-    return rawBytes[0] == TYPE_LIST;
-  }
-  /**
-   * True, if the wrapped value is of type {@code LocalDate}.
-   *
-   * @return true, if {@code LocalDate} value
-   */
-  public boolean isDate() {
-    return rawBytes[0] == TYPE_DATE;
-  }
-  /**
-   * True, if the wrapped value is of type {@code LocalTime}.
-   *
-   * @return true, if {@code LocalTime} value
-   */
-  public boolean isTime() {
-    return rawBytes[0] == TYPE_TIME;
-  }
-  /**
-   * True, if the wrapped value is of type {@code LocalDateTime}.
-   *
-   * @return true, if {@code LocalDateTime} value
-   */
-  public boolean isDateTime() {
-    return rawBytes[0] == TYPE_DATETIME;
-  }
-  /**
-   * True, if the wrapped value is of type {@code Set}.
-   *
-   * @return true, if {@code Set} value
-   */
-  public boolean isSet() {
-    return rawBytes[0] == TYPE_SET;
+    return is(Double.class);
   }
 
   /**
-   * True, if the wrapped value is a subtype of {@code Number}.
+   * True, if the wrapped value is of type {@link String}.
    *
-   * @return true, if {@code Number} value
+   * @return true, if {@link String} value
+   */
+  public boolean isString() {
+    return is(String.class);
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link BigDecimal}.
+   *
+   * @return true, if {@link BigDecimal} value
+   * @see BigDecimal
+   */
+  public boolean isBigDecimal() {
+    return is(BigDecimal.class);
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link GradoopId}.
+   *
+   * @return true, if {@link GradoopId} value
+   */
+  public boolean isGradoopId() {
+    return is(GradoopId.class);
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link Map}.
+   *
+   * @return true, if {@link Map} value
+   */
+  public boolean isMap() {
+    return is(Map.class);
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link List}.
+   *
+   * @return true, if {@link List} value
+   */
+  public boolean isList() {
+    return is(List.class);
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link LocalDate}.
+   *
+   * @return true, if {@link LocalDate} value
+   */
+  public boolean isDate() {
+    return is(LocalDate.class);
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link LocalTime}.
+   *
+   * @return true, if {@link LocalTime} value
+   */
+  public boolean isTime() {
+    return is(LocalTime.class);
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link LocalDateTime}.
+   *
+   * @return true, if {@link LocalDateTime} value
+   */
+  public boolean isDateTime() {
+    return is(LocalDateTime.class);
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link Set}.
+   *
+   * @return true, if {@link Set} value
+   */
+  public boolean isSet() {
+    return is(Set.class);
+  }
+
+  /**
+   * True, if the wrapped value is a subtype of {@link Number}.
+   *
+   * @return true, if {@link Number} value
    */
   public boolean isNumber() {
     return !isNull() && Number.class.isAssignableFrom(getType());
@@ -354,35 +373,47 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   //----------------------------------------------------------------------------
 
   /**
+   * Returns the value as the specified type. If it is already of the same type as requested, we
+   * just return the value. If not, then we try to cast the value via the requested types strategy
+   * get method.
+   *
+   * @param clazz the requested value type
+   * @param <T> PropertyValue supported type
+   * @return value
+   */
+  public <T> T get(Class<T> clazz) {
+    PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(clazz);
+    if (strategy.is(value)) {
+      return (T) value;
+    }
+    byte[] bytes = PropertyValueStrategyFactory.getRawBytes(value);
+    try {
+      return  (T) strategy.get(bytes);
+    } catch (IOException e) {
+      throw new RuntimeException("Cannot convert " + value + " to " + clazz);
+    }
+  }
+
+  /**
    * Returns the wrapped value as object.
    *
    * @return value or {@code null} if the value is empty
    */
   public Object getObject() {
-    return isBoolean() ? getBoolean() :
-      isShort() ? getShort() :
-        isInt() ? getInt() :
-          isLong() ? getLong() :
-            isFloat() ? getFloat() :
-              isDouble() ? getDouble() :
-                isString() ? getString() :
-                  isBigDecimal() ? getBigDecimal() :
-                    isGradoopId() ? getGradoopId() :
-                      isMap() ? getMap() :
-                        isList() ? getList() :
-                          isDate() ? getDate() :
-                            isTime() ? getTime() :
-                              isDateTime() ? getDateTime() :
-                                isSet() ? getSet() :
-                                  null;
+    Object obj = null;
+    if (value != null) {
+      obj = get(value.getClass());
+    }
+    return obj;
   }
+
   /**
    * Returns the wrapped value as {@code boolean}.
    *
    * @return {@code boolean} value
    */
   public boolean getBoolean() {
-    return rawBytes[1] == -1;
+    return get(Boolean.class);
   }
 
   /**
@@ -391,86 +422,71 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return {@code short} value
    */
   public short getShort() {
-    return Bytes.toShort(rawBytes, OFFSET);
+    return get(Short.class);
   }
+
   /**
    * Returns the wrapped value as {@code int}.
    *
    * @return {@code int} value
    */
   public int getInt() {
-    return Bytes.toInt(rawBytes, OFFSET);
+    return get(Integer.class);
   }
+
   /**
    * Returns the wrapped value as {@code long}.
    *
    * @return {@code long} value
    */
   public long getLong() {
-    return Bytes.toLong(rawBytes, OFFSET);
+    return get(Long.class);
   }
+
   /**
    * Returns the wrapped value as {@code float}.
    *
    * @return {@code float} value
    */
   public float getFloat() {
-    return Bytes.toFloat(rawBytes, OFFSET);
+    return get(Float.class);
   }
+
   /**
    * Returns the wrapped value as {@code double}.
    *
    * @return {@code double} value
    */
   public double getDouble() {
-    return Bytes.toDouble(rawBytes, OFFSET);
+    return get(Double.class);
   }
+
   /**
-   * Returns the wrapped value as {@code String}.
+   * Returns the wrapped value as {@link String}.
    *
-   * @return {@code String} value
+   * @return {@link String} value
    */
   public String getString() {
-    return Bytes.toString(rawBytes, OFFSET, rawBytes.length - OFFSET);
+    return get(String.class);
   }
+
   /**
-   * Returns the wrapped value as {@code BigDecimal}.
+   * Returns the wrapped value as {@link BigDecimal}.
    *
-   * @return {@code BigDecimal} value
+   * @return {@link BigDecimal} value
    * @see BigDecimal
    */
   public BigDecimal getBigDecimal() {
-    BigDecimal decimal;
-
-    if (isBigDecimal()) {
-      decimal = Bytes.toBigDecimal(rawBytes, OFFSET, rawBytes.length - OFFSET);
-    } else if (isFloat()) {
-      decimal = BigDecimal.valueOf(getFloat());
-    } else if (isDouble()) {
-      decimal = BigDecimal.valueOf(getDouble());
-    } else if (isShort()) {
-      decimal = BigDecimal.valueOf(getShort());
-    } else if (isInt()) {
-      decimal = BigDecimal.valueOf(getInt());
-    } else if (isLong()) {
-      decimal = BigDecimal.valueOf(getLong());
-    } else if (isString()) {
-      decimal = new BigDecimal(getString());
-    } else {
-      throw new ClassCastException(
-        "Cannot covert " + this.getType().getSimpleName() +
-          " to " + BigDecimal.class.getSimpleName());
-    }
-    return decimal;
+    return get(BigDecimal.class);
   }
+
   /**
-   * Returns the wrapped value as {@code GradoopId}.
+   * Returns the wrapped value as {@link GradoopId}.
    *
-   * @return {@code GradoopId} value
+   * @return {@link GradoopId} value
    */
   public GradoopId getGradoopId() {
-    return GradoopId.fromByteArray(
-      Arrays.copyOfRange(rawBytes, OFFSET, GradoopId.ID_SIZE + OFFSET));
+    return get(GradoopId.class);
   }
 
   /**
@@ -479,33 +495,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return {@code Map<PropertyValue, PropertyValue>} value
    */
   public Map<PropertyValue, PropertyValue> getMap() {
-    PropertyValue key;
-    PropertyValue value;
-
-    Map<PropertyValue, PropertyValue> map = new HashMap<>();
-
-    ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
-    DataInputStream inputStream = new DataInputStream(byteStream);
-    DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
-
-    try {
-      if (inputStream.skipBytes(OFFSET) != OFFSET) {
-        throw new RuntimeException("Malformed entry in PropertyValue List");
-      }
-      while (inputStream.available() > 0) {
-        key = new PropertyValue();
-        key.read(inputView);
-
-        value = new PropertyValue();
-        value.read(inputView);
-
-        map.put(key, value);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue");
-    }
-
-    return map;
+    return get(Map.class);
   }
 
   /**
@@ -514,86 +504,43 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return {@code List<PropertyValue>} value
    */
   public List<PropertyValue> getList() {
-    PropertyValue entry;
-
-    List<PropertyValue> list = new ArrayList<>();
-
-    ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
-    DataInputStream inputStream = new DataInputStream(byteStream);
-    DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
-
-    try {
-      if (inputStream.skipBytes(OFFSET) != OFFSET) {
-        throw new RuntimeException("Malformed entry in PropertyValue List");
-      }
-      while (inputStream.available() > 0) {
-        entry = new PropertyValue();
-        entry.read(inputView);
-
-        list.add(entry);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue");
-    }
-
-    return list;
+    return get(List.class);
   }
+
   /**
-   * Returns the wrapped List as {@code LocalDate}.
+   * Returns the wrapped List as {@link LocalDate}.
    *
-   * @return {@code LocalDate} value
+   * @return {@link LocalDate} value
    */
   public LocalDate getDate() {
-    return DateTimeSerializer.deserializeDate(
-      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATE + OFFSET));
+    return get(LocalDate.class);
   }
+
   /**
-   * Returns the wrapped List as {@code LocalTime}.
+   * Returns the wrapped List as {@link LocalTime}.
    *
-   * @return {@code LocalTime} value
+   * @return {@link LocalTime} value
    */
   public LocalTime getTime() {
-    return DateTimeSerializer.deserializeTime(
-      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_TIME + OFFSET));
+    return get(LocalTime.class);
   }
+
   /**
-   * Returns the wrapped List as {@code LocalDateTime}.
+   * Returns the wrapped List as {@link LocalDateTime}.
    *
-   * @return {@code LocalDateTime} value
+   * @return {@link LocalDateTime} value
    */
   public LocalDateTime getDateTime() {
-    return DateTimeSerializer.deserializeDateTime(
-      Arrays.copyOfRange(rawBytes, OFFSET, DateTimeSerializer.SIZEOF_DATETIME + OFFSET));
+    return get(LocalDateTime.class);
   }
+
   /**
    * Returns the wrapped Set as {@code Set<PropertyValue>}.
    *
    * @return {@code Set<PropertyValue>} value
    */
   public Set<PropertyValue> getSet() {
-    PropertyValue entry;
-
-    Set<PropertyValue> set = new HashSet<>();
-
-    ByteArrayInputStream byteStream = new ByteArrayInputStream(rawBytes);
-    DataInputStream inputStream = new DataInputStream(byteStream);
-    DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
-
-    try {
-      if (inputStream.skipBytes(OFFSET) != OFFSET) {
-        throw new RuntimeException("Malformed entry in PropertyValue Set");
-      }
-      while (inputStream.available() > 0) {
-        entry = new PropertyValue();
-        entry.read(inputView);
-
-        set.add(entry);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException("Error reading PropertyValue");
-    }
-
-    return set;
+    return get(Set.class);
   }
 
   //----------------------------------------------------------------------------
@@ -607,51 +554,19 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @throws UnsupportedTypeException if the type of the Object is not supported
    */
   public void setObject(Object value) {
-    if (value == null) {
-      rawBytes = new byte[] {TYPE_NULL};
-    } else if (value instanceof Boolean) {
-      setBoolean((Boolean) value);
-    } else if (value instanceof Short) {
-      setShort((Short) value);
-    } else if (value instanceof Integer) {
-      setInt((Integer) value);
-    } else if (value instanceof Long) {
-      setLong((Long) value);
-    } else if (value instanceof Float) {
-      setFloat((Float) value);
-    } else if (value instanceof Double) {
-      setDouble((Double) value);
-    } else if (value instanceof String) {
-      setString((String) value);
-    } else if (value instanceof BigDecimal) {
-      setBigDecimal((BigDecimal) value);
-    } else if (value instanceof GradoopId) {
-      setGradoopId((GradoopId) value);
-    } else if (value instanceof Map) {
-      setMap((Map) value);
-    } else if (value instanceof List) {
-      setList((List) value);
-    } else if (value instanceof LocalDate) {
-      setDate((LocalDate) value);
-    } else if (value instanceof LocalTime) {
-      setTime((LocalTime) value);
-    } else if (value instanceof LocalDateTime) {
-      setDateTime((LocalDateTime) value);
-    } else if (value instanceof Set) {
-      setSet((Set) value);
-    } else {
+    if (value != null && !PropertyValueStrategyFactory.get(value.getClass()).is(value)) {
       throw new UnsupportedTypeException(value.getClass());
     }
+    this.value = value;
   }
+
   /**
    * Sets the wrapped value as {@code boolean} value.
    *
    * @param booleanValue value
    */
   public void setBoolean(boolean booleanValue) {
-    rawBytes = new byte[OFFSET + Bytes.SIZEOF_BOOLEAN];
-    rawBytes[0] = TYPE_BOOLEAN;
-    Bytes.putByte(rawBytes, OFFSET, (byte) (booleanValue ? -1 : 0));
+    setObject(booleanValue);
   }
 
   /**
@@ -660,169 +575,115 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @param shortValue value
    */
   public void setShort(short shortValue) {
-    rawBytes = new byte[OFFSET + Bytes.SIZEOF_SHORT];
-    rawBytes[0] = TYPE_SHORT;
-    Bytes.putShort(rawBytes, OFFSET, shortValue);
+    setObject(shortValue);
   }
+
   /**
    * Sets the wrapped value as {@code int} value.
    *
    * @param intValue intValue
    */
   public void setInt(int intValue) {
-    rawBytes = new byte[OFFSET + Bytes.SIZEOF_INT];
-    rawBytes[0] = TYPE_INTEGER;
-    Bytes.putInt(rawBytes, OFFSET, intValue);
+    setObject(intValue);
   }
+
   /**
    * Sets the wrapped value as {@code long} value.
    *
    * @param longValue value
    */
   public void setLong(long longValue) {
-    rawBytes = new byte[OFFSET + Bytes.SIZEOF_LONG];
-    rawBytes[0] = TYPE_LONG;
-    Bytes.putLong(rawBytes, OFFSET, longValue);
+    setObject(longValue);
   }
+
   /**
    * Sets the wrapped value as {@code float} value.
    *
    * @param floatValue value
    */
   public void setFloat(float floatValue) {
-    rawBytes = new byte[OFFSET + Bytes.SIZEOF_FLOAT];
-    rawBytes[0] = TYPE_FLOAT;
-    Bytes.putFloat(rawBytes, OFFSET, floatValue);
+    setObject(floatValue);
   }
+
   /**
    * Sets the wrapped value as {@code double} value.
    *
    * @param doubleValue value
    */
   public void setDouble(double doubleValue) {
-    rawBytes = new byte[OFFSET + Bytes.SIZEOF_DOUBLE];
-    rawBytes[0] = TYPE_DOUBLE;
-    Bytes.putDouble(rawBytes, OFFSET, doubleValue);
+    setObject(doubleValue);
   }
+
   /**
-   * Sets the wrapped value as {@code String} value.
+   * Sets the wrapped value as {@link String} value.
    *
    * @param stringValue value
    */
   public void setString(String stringValue) {
-    byte[] valueBytes = Bytes.toBytes(stringValue);
-    rawBytes = new byte[OFFSET + valueBytes.length];
-    rawBytes[0] = TYPE_STRING;
-    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+    setObject(stringValue);
   }
+
   /**
-   * Sets the wrapped value as {@code BigDecimal} value.
+   * Sets the wrapped value as {@link BigDecimal} value.
    *
    * @param bigDecimalValue value
    */
   public void setBigDecimal(BigDecimal bigDecimalValue) {
-    byte[] valueBytes = Bytes.toBytes(bigDecimalValue);
-    rawBytes = new byte[OFFSET + valueBytes.length];
-    rawBytes[0] = TYPE_BIG_DECIMAL;
-    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+    setObject(bigDecimalValue);
   }
+
   /**
-   * Sets the wrapped value as {@code GradoopId} value.
+   * Sets the wrapped value as {@link GradoopId} value.
    *
    * @param gradoopIdValue value
    */
   public void setGradoopId(GradoopId gradoopIdValue) {
-    byte[] valueBytes = gradoopIdValue.toByteArray();
-    rawBytes = new byte[OFFSET + GradoopId.ID_SIZE];
-    rawBytes[0] = TYPE_GRADOOP_ID;
-    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+    setObject(gradoopIdValue);
   }
 
   /**
-   * Sets the wrapped value as {@code Map} value.
+   * Sets the wrapped value as {@link Map} value.
    *
    * @param map value
    */
   public void setMap(Map<PropertyValue, PropertyValue> map) {
-    int size =
-      map.keySet().stream().mapToInt(PropertyValue::byteSize).sum() +
-      map.values().stream().mapToInt(PropertyValue::byteSize).sum() +
-      OFFSET;
-
-    ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
-    DataOutputStream outputStream = new DataOutputStream(byteStream);
-    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
-
-    try {
-      outputStream.write(TYPE_MAP);
-      for (Map.Entry<PropertyValue, PropertyValue> entry : map.entrySet()) {
-        entry.getKey().write(outputView);
-        entry.getValue().write(outputView);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException("Error writing PropertyValue");
-    }
-
-    this.rawBytes = byteStream.toByteArray();
+    setObject(map);
   }
 
   /**
-   * Sets the wrapped value as {@code List} value.
+   * Sets the wrapped value as {@link List} value.
    *
    * @param list value
    */
   public void setList(List<PropertyValue> list) {
-    int size = list.stream().mapToInt(PropertyValue::byteSize).sum() +
-      OFFSET;
-
-    ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
-    DataOutputStream outputStream = new DataOutputStream(byteStream);
-    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
-
-    try {
-      outputStream.write(TYPE_LIST);
-      for (PropertyValue entry : list) {
-        entry.write(outputView);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException("Error writing PropertyValue");
-    }
-
-    this.rawBytes = byteStream.toByteArray();
+    setObject(list);
   }
 
   /**
-   * Sets the wrapped value as {@code LocalDate} value.
+   * Sets the wrapped value as {@link LocalDate} value.
    *
    * @param date value
    */
   public void setDate(LocalDate date) {
-    byte[] valueBytes = DateTimeSerializer.serializeDate(date);
-    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_DATE];
-    rawBytes[0] = TYPE_DATE;
-    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+    setObject(date);
   }
+
   /**
-   * Sets the wrapped value as {@code LocalTime} value.
+   * Sets the wrapped value as {@link LocalTime} value.
    *
    * @param time value
    */
   public void setTime(LocalTime time) {
-    byte[] valueBytes = DateTimeSerializer.serializeTime(time);
-    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_TIME];
-    rawBytes[0] = TYPE_TIME;
-    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+    setObject(time);
   }
+
   /**
    * Sets the wrapped value as {@code LocalDateTime} value.
    *
    * @param dateTime value
    */
   public void setDateTime(LocalDateTime dateTime) {
-    byte[] valueBytes = DateTimeSerializer.serializeDateTime(dateTime);
-    rawBytes = new byte[OFFSET + DateTimeSerializer.SIZEOF_DATETIME];
-    rawBytes[0] = TYPE_DATETIME;
-    Bytes.putBytes(rawBytes, OFFSET, valueBytes, 0, valueBytes.length);
+    setObject(dateTime);
   }
 
   /**
@@ -831,22 +692,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @param set value
    */
   public void setSet(Set<PropertyValue> set) {
-    int size = set.stream().mapToInt(PropertyValue::byteSize).sum() + OFFSET;
-
-    ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);
-    DataOutputStream outputStream = new DataOutputStream(byteStream);
-    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);
-
-    try {
-      outputStream.write(TYPE_SET);
-      for (PropertyValue entry : set) {
-        entry.write(outputView);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException("Error writing PropertyValue");
-    }
-
-    this.rawBytes = byteStream.toByteArray();
+    setObject(set);
   }
 
   //----------------------------------------------------------------------------
@@ -854,121 +700,58 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
   //----------------------------------------------------------------------------
 
   /**
-   * Get the data type as class object according to the first position of the rawBytes[] array
+   * Get the data type as class object according to the first position of the rawBytes[] array.
    *
    * @return Class object
    */
   public Class<?> getType() {
-    return TYPE_MAPPING.get(rawBytes[0]);
-  }
+    Class<?> clazz = null;
+    if (value != null) {
+      clazz = PropertyValueStrategyFactory.get(value.getClass()).getType();
+    }
 
-  /**
-   * Creates a type mapping HashMap to assign a byte value to its represented Class
-   *
-   * @return a Map with byte to class assignments
-   */
-  private static Map<Byte, Class> getTypeMap() {
-    Map<Byte, Class> map = new HashMap<>();
-    map.put(TYPE_BOOLEAN, Boolean.class);
-    map.put(TYPE_SHORT, Short.class);
-    map.put(TYPE_INTEGER, Integer.class);
-    map.put(TYPE_LONG, Long.class);
-    map.put(TYPE_FLOAT, Float.class);
-    map.put(TYPE_DOUBLE, Double.class);
-    map.put(TYPE_STRING, String.class);
-    map.put(TYPE_BIG_DECIMAL, BigDecimal.class);
-    map.put(TYPE_GRADOOP_ID, GradoopId.class);
-    map.put(TYPE_MAP, Map.class);
-    map.put(TYPE_LIST, List.class);
-    map.put(TYPE_DATE, LocalDate.class);
-    map.put(TYPE_TIME, LocalTime.class);
-    map.put(TYPE_DATETIME, LocalDateTime.class);
-    map.put(TYPE_SET, Set.class);
-    return Collections.unmodifiableMap(map);
+    return clazz;
   }
 
   public int getByteSize() {
-    return rawBytes.length;
+    return getRawBytes().length;
   }
 
-  @SuppressWarnings("EI_EXPOSE_REP")
   public byte[] getRawBytes() {
-    return this.rawBytes;
+    return PropertyValueStrategyFactory.getRawBytes(value);
   }
 
   /**
-   * Set internal byte representation
+   * Set internal byte representation.
+   *
    * @param bytes array
    */
-  @SuppressWarnings("EI_EXPOSE_REP")
   public void setBytes(byte[] bytes) {
-    this.rawBytes = bytes;
-  }
-
-  /**
-   * Create a {@link PropertyValue} that wraps a byte array
-   * @param rawBytes array to wrap
-   * @return new instance of {@link PropertyValue}
-   */
-  public static PropertyValue fromRawBytes(byte[] rawBytes) {
-    return new PropertyValue(rawBytes);
+    value = PropertyValueStrategyFactory.fromRawBytes(bytes);
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof PropertyValue)) {
-      return false;
-    }
-    PropertyValue that = (PropertyValue) o;
-    return Arrays.equals(rawBytes, that.rawBytes);
+  public boolean equals(Object object) {
+    return object instanceof PropertyValue && Objects.equals(value, ((PropertyValue) object).value);
   }
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(rawBytes);
+    return Arrays.hashCode(PropertyValueStrategyFactory.getRawBytes(value));
   }
 
   @Override
-  public int compareTo(PropertyValue o) {
-    int result;
-
-    if (this.isNull() && o.isNull()) {
-      result = 0;
-    } else if (this.isNumber() && o.isNumber()) {
-      result = PropertyValueUtils.Numeric.compare(this, o);
-    } else if (this.isBoolean() && o.isBoolean()) {
-      result = Boolean.compare(this.getBoolean(), o.getBoolean());
-    } else if (this.isString() && o.isString()) {
-      result = this.getString().compareTo(o.getString());
-    } else if (this.isGradoopId() && o.isGradoopId()) {
-      result = this.getGradoopId().compareTo(o.getGradoopId());
-    } else if (this.isDate() && o.isDate()) {
-      result = this.getDate().compareTo(o.getDate());
-    } else if (this.isTime() && o.isTime()) {
-      result = this.getTime().compareTo(o.getTime());
-    } else if (this.isDateTime() && o.isDateTime()) {
-      result = this.getDateTime().compareTo(o.getDateTime());
-    } else if (this.isMap() || o.isMap() ||
-        this.isList() || o.isList() ||
-        this.isSet() || o.isSet()) {
-      throw new UnsupportedOperationException(String.format(
-        "Method compareTo() is not supported for %s, %s", this.getClass(), o.getClass()));
-    } else {
-      throw new IllegalArgumentException(String.format(
-        "Incompatible types: %s, %s", this.getClass(), o.getClass()));
-    }
-
-    return result;
+  public int compareTo(PropertyValue other) {
+    return PropertyValueStrategyFactory.compare(value, other.value);
   }
 
   /**
-   * Returns the byte size of the properties internal representation
+   * Returns the byte size of the properties internal representation.
+   *
    * @return byte size
    */
   public int byteSize() {
+    byte[] rawBytes = PropertyValueStrategyFactory.getRawBytes(value);
     return rawBytes.length;
   }
 
@@ -996,76 +779,26 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * byte 2 - end : value bytes
    *
    * @param outputView data output to write data to
-   * @throws IOException
+   * @throws IOException if write to output view fails.
    */
   @Override
   public void write(DataOutputView outputView) throws IOException {
-    // null?
-    // Write type.
-    byte type = rawBytes[0];
-    if (rawBytes.length > LARGE_PROPERTY_THRESHOLD) {
-      type |= FLAG_LARGE;
-    }
-    outputView.writeByte(type);
-    // Write length for types with a variable length.
-    if (isString() || isBigDecimal() || isMap() || isList() || isSet()) {
-      // Write length as an int if the "large" flag is set.
-      if ((type & FLAG_LARGE) == FLAG_LARGE) {
-        outputView.writeInt(rawBytes.length - OFFSET);
-      } else {
-        outputView.writeShort(rawBytes.length - OFFSET);
-      }
-    }
-    // write data
-    outputView.write(rawBytes, OFFSET, rawBytes.length - OFFSET);
+    PropertyValueStrategyFactory.get(value).write(value, outputView);
   }
 
   @Override
   public void read(DataInputView inputView) throws IOException {
-    int length = 0;
     // type
     byte typeByte = inputView.readByte();
     // Apply bitmask to get the actual type.
-    byte type = (byte) (~FLAG_LARGE & typeByte);
-    // dynamic type?
-    if (type == TYPE_STRING || type == TYPE_BIG_DECIMAL || type == TYPE_MAP ||
-      type == TYPE_LIST || type == TYPE_SET) {
-      // read length
-      if ((typeByte & FLAG_LARGE) == FLAG_LARGE) {
-        length = inputView.readInt();
-      } else {
-        length = inputView.readShort();
-      }
-    } else if (type == TYPE_NULL) {
-      length = 0;
-    } else if (type == TYPE_BOOLEAN) {
-      length = Bytes.SIZEOF_BOOLEAN;
-    } else if (type == TYPE_SHORT) {
-      length = Bytes.SIZEOF_SHORT;
-    } else if (type == TYPE_INTEGER) {
-      length = Bytes.SIZEOF_INT;
-    } else if (type == TYPE_LONG) {
-      length = Bytes.SIZEOF_LONG;
-    } else if (type == TYPE_FLOAT) {
-      length = Bytes.SIZEOF_FLOAT;
-    } else if (type == TYPE_DOUBLE) {
-      length = Bytes.SIZEOF_DOUBLE;
-    } else if (type == TYPE_GRADOOP_ID) {
-      length = GradoopId.ID_SIZE;
-    } else if (type == TYPE_DATE) {
-      length = DateTimeSerializer.SIZEOF_DATE;
-    } else if (type == TYPE_TIME) {
-      length = DateTimeSerializer.SIZEOF_TIME;
-    } else if (type == TYPE_DATETIME) {
-      length = DateTimeSerializer.SIZEOF_DATETIME;
-    }
-    // init new array
-    rawBytes = new byte[OFFSET + length];
-    // read type info
-    rawBytes[0] = type;
-    // read data
-    for (int i = OFFSET; i < rawBytes.length; i++) {
-      rawBytes[i] = inputView.readByte();
+    byte type = (byte) (~PropertyValue.FLAG_LARGE & typeByte);
+
+    PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(type);
+
+    if (strategy == null) {
+      throw new UnsupportedTypeException("No strategy for type byte from input view found");
+    } else {
+      value = strategy.read(inputView, typeByte);
     }
   }
 
