@@ -9,11 +9,13 @@ org.gradoop.benchmark.subgraph
 org.gradoop.common.config
 org.gradoop.common.exceptions
 org.gradoop.common.model.api.entities
+org.gradoop.common.model.api.strategies
 org.gradoop.common.model.impl.comparators
 org.gradoop.common.model.impl.id
 org.gradoop.common.model.impl.metadata
 org.gradoop.common.model.impl.pojo
 org.gradoop.common.model.impl.properties
+org.gradoop.common.model.impl.properties.strategies
 org.gradoop.common.util
 org.gradoop.dataintegration.importer
 org.gradoop.dataintegration.importer.impl.csv
@@ -77,6 +79,8 @@ org.gradoop.flink.algorithms.gelly.labelpropagation
 org.gradoop.flink.algorithms.gelly.labelpropagation.functions
 org.gradoop.flink.algorithms.gelly.pagerank
 org.gradoop.flink.algorithms.gelly.pagerank.functions
+org.gradoop.flink.algorithms.gelly.randomjump
+org.gradoop.flink.algorithms.gelly.randomjump.functions
 org.gradoop.flink.algorithms.gelly.shortestpaths
 org.gradoop.flink.algorithms.gelly.shortestpaths.functions
 org.gradoop.flink.algorithms.gelly.trianglecounting
@@ -238,6 +242,7 @@ org.gradoop.flink.model.impl.operators.tostring.tuples
 org.gradoop.flink.model.impl.operators.transformation
 org.gradoop.flink.model.impl.operators.transformation.functions
 org.gradoop.flink.model.impl.operators.union
+org.gradoop.flink.model.impl.operators.verify
 org.gradoop.flink.model.impl.tuples
 org.gradoop.flink.representation
 org.gradoop.flink.representation.common.adjacencylist
