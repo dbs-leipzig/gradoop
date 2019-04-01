@@ -45,8 +45,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <V>  The vertex type.
  * @param <E>  The edge type.
  */
-public class Aggregation<LG extends BaseGraph<G, V, E, LG>, G extends EPGMGraphHead,
-  V extends EPGMVertex, E extends EPGMEdge> implements UnaryBaseGraphToBaseGraphOperator<LG> {
+public class Aggregation<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * User-defined aggregate functions which are applied on a single logical graph.
