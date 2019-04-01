@@ -65,6 +65,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmpt
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
+import org.gradoop.flink.model.impl.operators.verify.Verify;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -378,6 +379,11 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
 
     return callForCollection(new EdgeRollUp(vertexGroupingKeys, vertexAggregateFunctions,
       edgeGroupingKeys, edgeAggregateFunctions));
+  }
+
+  @Override
+  public LogicalGraph verify() {
+    return callForGraph(new Verify<>());
   }
 
   //----------------------------------------------------------------------------
