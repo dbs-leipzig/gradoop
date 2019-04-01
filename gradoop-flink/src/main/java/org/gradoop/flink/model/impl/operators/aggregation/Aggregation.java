@@ -40,10 +40,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * aggregate functions are applied on the logical graph and the resulting
  * aggregate is stored as additional properties at the result graph.
  *
- * @param <LG> The type of the graph.
  * @param <G>  The graph head type.
  * @param <V>  The vertex type.
  * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
  */
 public class Aggregation<
   G extends EPGMGraphHead,
