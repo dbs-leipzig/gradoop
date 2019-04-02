@@ -39,6 +39,7 @@ public class RandomWalkSamplingRunner extends AbstractRunner implements ProgramD
    * args[7] - format of output graph (csv, json, indexed)
    *
    * @param args arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
 

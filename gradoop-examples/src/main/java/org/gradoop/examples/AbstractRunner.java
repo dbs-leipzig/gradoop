@@ -78,6 +78,7 @@ public abstract class AbstractRunner {
    *
    * @param directory path to EPGM database
    * @return EPGM logical graph
+   * @throws IOException on failure
    */
   protected static LogicalGraph readLogicalGraph(String directory) throws IOException {
     return readLogicalGraph(directory, DEFAULT_FORMAT);
@@ -210,9 +211,8 @@ public abstract class AbstractRunner {
    * @param directory input path
    * @param format format in which the data is stored (csv, indexed, json)
    * @return DataSource for EPGM Data
-   * @throws IOException on failure
    */
-  private static DataSource getDataSource(String directory, String format) throws IOException {
+  private static DataSource getDataSource(String directory, String format) {
     directory = appendSeparator(directory);
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
     format = format.toLowerCase();

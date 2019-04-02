@@ -42,6 +42,7 @@ public class PageRankSamplingRunner extends AbstractRunner implements ProgramDes
    * </pre>
    *
    * @param args arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);

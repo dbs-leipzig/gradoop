@@ -205,7 +205,7 @@ public class GroupingBenchmark extends AbstractRunner
    * Main program to run the benchmark. Arguments are the available options.
    *
    * @param args program arguments
-   * @throws Exception
+   * @throws Exception on failure
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {
@@ -458,7 +458,7 @@ public class GroupingBenchmark extends AbstractRunner
 
   /**
    * Method to create and add lines to a csv-file
-   * @throws IOException
+   * @throws IOException on failure
    */
   private static void writeCSV() throws IOException {
 

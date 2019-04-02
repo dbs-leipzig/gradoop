@@ -35,7 +35,7 @@ public class Properties<L extends EPGMElement>
   }
 
   @Override
-  public org.gradoop.common.model.impl.properties.Properties getKey(L l) throws Exception {
+  public org.gradoop.common.model.impl.properties.Properties getKey(L l) {
     return l.getProperties();
   }
 }

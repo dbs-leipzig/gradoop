@@ -72,7 +72,7 @@ public class InitVertex<K extends Comparable<K>>
    *
    * @param importVertex import vertex
    * @return triple containing import and EPGM id as well as the EPGM vertex
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public Tuple3<K, GradoopId, Vertex> map(ImportVertex<K> importVertex) throws

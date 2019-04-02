@@ -120,6 +120,7 @@ public class SamplingBenchmark extends AbstractRunner implements ProgramDescript
    * Other arguments are the available options.
    *
    * @param args program arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     CommandLine cmd = parseArguments(args, SamplingBenchmark.class.getName());

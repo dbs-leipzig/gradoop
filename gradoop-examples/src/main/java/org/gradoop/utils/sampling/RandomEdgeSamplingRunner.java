@@ -37,6 +37,7 @@ public class RandomEdgeSamplingRunner extends AbstractRunner implements ProgramD
    * args[4] - sampling threshold
    *
    * @param args arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);

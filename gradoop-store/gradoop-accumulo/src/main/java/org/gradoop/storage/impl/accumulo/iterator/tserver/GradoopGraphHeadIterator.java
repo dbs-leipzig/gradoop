@@ -70,6 +70,7 @@ public class GradoopGraphHeadIterator extends BaseElementIterator<EPGMGraphHead>
    *
    * @param source origin store source
    * @return decoded epgm element
+   * @throws IOException on failure
    */
   @Nullable
   public GraphHead readLine(

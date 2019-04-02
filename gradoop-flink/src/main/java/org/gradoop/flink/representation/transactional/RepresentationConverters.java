@@ -49,6 +49,7 @@ public class RepresentationConverters {
    * @param <VD> vertex data
    *
    * @return adjacency list
+   * @throws Exception on failure
    */
   public static <ED, VD> AdjacencyList<GradoopId, String, ED, VD> getAdjacencyList(
     GraphTransaction transaction,

@@ -38,7 +38,7 @@ public class UpdateEdge<E extends Edge, K extends Comparable<K>>
    * @param targetIdEdgePair import target id and EPGM edge
    * @param vertexIdPair     import target vertex id and EPGM vertex id
    * @return EPGM edge with updated target vertex id
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public E join(Tuple2<K, E> targetIdEdgePair,

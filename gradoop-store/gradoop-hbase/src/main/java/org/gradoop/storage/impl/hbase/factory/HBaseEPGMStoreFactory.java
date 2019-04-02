@@ -233,6 +233,7 @@ public class HBaseEPGMStoreFactory {
    *
    * @param admin HBase admin
    * @param tableName name of the table to delete
+   * @throws IOException on failure
    */
   private static void deleteTable(final Admin admin, final TableName tableName) throws IOException {
     admin.disableTable(tableName);

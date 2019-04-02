@@ -32,7 +32,9 @@ public class GradoopQuickstart {
 
   /**
    * run the example
+   *
    * @param args no args used
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
 

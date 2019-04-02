@@ -130,6 +130,7 @@ public abstract class BaseInputFormat<T extends Element> extends GenericInputFor
    *
    * @param row accumulo result
    * @return gradoop element
+   * @throws IOException on failure
    */
   protected abstract T mapRow(Map.Entry<Key, Value> row) throws IOException;
 

@@ -49,6 +49,8 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
   /**
    * Creates persistent graph, vertex and edge data. Writes data to HBase,
    * closes the store, opens it and reads/validates the data again.
+   *
+   * @throws IOException on failure
    */
   @Test
   public void writeCloseOpenReadTest() throws IOException {
@@ -78,6 +80,8 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
   /**
    * Creates persistent graph, vertex and edge data. Writes data to HBase,
    * closes the store, opens it and reads/validates the data again.
+   *
+   * @throws IOException on failure
    */
   @Test
   public void writeCloseOpenReadTestWithPrefix() throws IOException {
@@ -108,6 +112,8 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
   /**
    * Creates persistent graph, vertex and edge data. Writes data to HBase,
    * flushes the tables and reads/validates the data.
+   *
+   * @throws IOException on failure
    */
   @Test
   public void writeFlushReadTest() throws IOException {
@@ -191,6 +197,8 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
 
   /**
    * Tries to add an unsupported property type {@link Queue} as property value.
+   *
+   * @throws IOException on failure
    */
   @Test(expected = UnsupportedTypeException.class)
   public void wrongPropertyTypeTest() throws IOException {
@@ -215,6 +223,8 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
 
   /**
    * Checks if property values are read correctly.
+   *
+   * @throws IOException on failure
    */
   @SuppressWarnings("Duplicates")
   @Test

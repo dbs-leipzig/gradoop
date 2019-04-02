@@ -120,7 +120,7 @@ public class PropertyValueListTest {
   }
 
   @Test
-  public void testEmptyIterator() throws Exception {
+  public void testEmptyIterator() {
     PropertyValueList p = new PropertyValueList();
 
     List<PropertyValue> expected = Lists.newArrayList(p);
