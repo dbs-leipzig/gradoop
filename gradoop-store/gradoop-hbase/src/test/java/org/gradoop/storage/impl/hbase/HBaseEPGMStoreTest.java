@@ -342,6 +342,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
     store.writeGraphHead(graphHead);
     store.writeVertex(vertex);
     store.writeEdge(edge);
+    store.close();
   }
 
   /**
