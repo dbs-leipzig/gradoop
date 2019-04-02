@@ -301,7 +301,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
 
   @Override
   public LogicalGraph aggregate(AggregateFunction... aggregateFunctions) {
-    return callForGraph(new Aggregation(aggregateFunctions));
+    return callForGraph(new Aggregation<>(aggregateFunctions));
   }
 
   @Override
