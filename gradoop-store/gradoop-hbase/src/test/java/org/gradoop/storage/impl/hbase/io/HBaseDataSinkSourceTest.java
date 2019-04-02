@@ -794,7 +794,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     testGraph2.writeTo(new HBaseDataSink(store, getConfig()), true);
     getExecutionEnvironment().execute();
     collectAndAssertTrue(new HBaseDataSource(store, getConfig()).getLogicalGraph()
-      .equalsByData(testGraph2));
+      .equalsByElementData(testGraph2));
     store.close();
   }
 }
