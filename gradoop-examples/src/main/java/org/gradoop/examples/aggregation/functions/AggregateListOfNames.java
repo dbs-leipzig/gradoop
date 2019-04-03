@@ -15,7 +15,7 @@
  */
 package org.gradoop.examples.aggregation.functions;
 
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
@@ -40,7 +40,7 @@ public class AggregateListOfNames extends BaseAggregateFunction implements Verte
   }
 
   @Override
-  public PropertyValue getIncrement(Element vertex) {
+  public PropertyValue getIncrement(EPGMElement vertex) {
     return PropertyValue.create(vertex.getPropertyValue(PROPERTY_KEY_NAME).toString());
   }
 
