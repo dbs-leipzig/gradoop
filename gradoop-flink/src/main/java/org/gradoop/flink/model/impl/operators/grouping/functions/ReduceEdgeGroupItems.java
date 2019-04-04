@@ -57,7 +57,7 @@ public class ReduceEdgeGroupItems
    *
    * @param edgeGroupItems  edge group items
    * @param collector       output collector
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public void reduce(Iterable<EdgeGroupItem> edgeGroupItems,

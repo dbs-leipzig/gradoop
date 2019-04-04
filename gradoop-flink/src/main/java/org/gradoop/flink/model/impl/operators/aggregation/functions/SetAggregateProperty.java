@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
@@ -30,10 +30,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Sets aggregate values of a graph head.
+ *
+ * @param <G> The graph head type.
  */
 @FunctionAnnotation.ForwardedFields("id")
-public class SetAggregateProperty
-  extends RichMapFunction<GraphHead, GraphHead> {
+public class SetAggregateProperty<G extends EPGMGraphHead>
+  extends RichMapFunction<G, G> {
 
   /**
    * constant string for accessing broadcast variable "property values"
@@ -84,7 +86,7 @@ public class SetAggregateProperty
   }
 
   @Override
-  public GraphHead map(GraphHead graphHead) throws Exception {
+  public G map(G graphHead) throws Exception {
     aggregateValues.forEach(graphHead::setProperty);
     return graphHead;
   }

@@ -79,7 +79,7 @@ public class TLFRecordReader extends RecordReader<LongWritable, Text> {
    *
    * @param split the split of the file containing all TLF content
    * @param conf the configuration of the task attempt context
-   * @throws IOException
+   * @throws IOException on failure
    */
   public TLFRecordReader(FileSplit split, Configuration conf) throws
     IOException {
@@ -98,7 +98,7 @@ public class TLFRecordReader extends RecordReader<LongWritable, Text> {
    * @param key the new key
    * @param value the new value
    * @return true if a key/value pair was found
-   * @throws IOException
+   * @throws IOException on failure
    */
   private boolean next(LongWritable key, Text value) throws IOException {
     if (fsin.getPos() < end &&
@@ -135,7 +135,7 @@ public class TLFRecordReader extends RecordReader<LongWritable, Text> {
    * @param withinBlock specifies if match is within the graph block
    * @return true if match was found or the end of file was reached, so
    * that the current block can be closed
-   * @throws IOException
+   * @throws IOException on failure
    */
   private boolean readUntilMatch(byte[] match, boolean withinBlock) throws
     IOException {
@@ -169,7 +169,7 @@ public class TLFRecordReader extends RecordReader<LongWritable, Text> {
   /**
    * Closes open buffers
    *
-   * @throws IOException
+   * @throws IOException on failure
    */
   @Override
   public void close() throws IOException {
@@ -181,7 +181,7 @@ public class TLFRecordReader extends RecordReader<LongWritable, Text> {
    * Returns the current process of input streaming.
    *
    * @return percentage of the completion
-   * @throws IOException
+   * @throws IOException on failure
    */
   @Override
   public float getProgress() throws IOException {
@@ -192,8 +192,8 @@ public class TLFRecordReader extends RecordReader<LongWritable, Text> {
    * Returns the current key.
    *
    * @return the current key.
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException on failure
+   * @throws InterruptedException if interrupted
    */
   @Override
   public LongWritable getCurrentKey() throws IOException,
@@ -205,8 +205,8 @@ public class TLFRecordReader extends RecordReader<LongWritable, Text> {
    * Returns the current value.
    *
    * @return the current value
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException on failure
+   * @throws InterruptedException if interrupted
    */
   @Override
   public Text getCurrentValue() throws IOException, InterruptedException {
@@ -218,8 +218,8 @@ public class TLFRecordReader extends RecordReader<LongWritable, Text> {
    *
    * @param split the split of the file containing all TLF content
    * @param context current task attempt context
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException on failure
+   * @throws InterruptedException if interrupted
    */
   @Override
   public void initialize(InputSplit split, TaskAttemptContext context)
@@ -230,8 +230,8 @@ public class TLFRecordReader extends RecordReader<LongWritable, Text> {
    * Reads the next kex/value pair from the input for processing.
    *
    * @return true if a key/value pair was found
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException on failure
+   * @throws InterruptedException if interrupted
    */
   @Override
   public boolean nextKeyValue() throws IOException, InterruptedException {

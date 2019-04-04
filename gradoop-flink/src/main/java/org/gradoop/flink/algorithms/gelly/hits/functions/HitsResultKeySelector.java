@@ -31,7 +31,7 @@ public class HitsResultKeySelector
    *
    * @param gradoopIdResult HITS Algorithm result
    * @return selects gradoop id
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public GradoopId getKey(HITS.Result<GradoopId> gradoopIdResult) throws Exception {

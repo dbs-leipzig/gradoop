@@ -56,6 +56,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
 
   /**
    * Instantiate the EPGMStore with a prefix and persist social media data
+   *
+   * @throws IOException on failure
    */
   @BeforeClass
   public static void setUp() throws IOException {
@@ -65,6 +67,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
 
   /**
    * Closes the static EPGMStore
+   *
+   * @throws IOException on failure
    */
   @AfterClass
   public static void tearDown() throws IOException {
@@ -76,6 +80,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
 
   /**
    * Test the getGraphSpace() method with an id filter predicate
+   *
+   * @throws IOException on failure
    */
   @Test
   public void testGetGraphSpaceWithIdPredicate() throws IOException {
@@ -99,6 +105,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
 
   /**
    * Test the getGraphSpace() method without an id filter predicate
+   *
+   * @throws IOException on failure
    */
   @Test
   public void testGetGraphSpaceWithoutIdPredicate() throws IOException {
@@ -116,6 +124,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
 
   /**
    * Test the getVertexSpace() method with an id filter predicate
+   *
+   * @throws IOException on failure
    */
   @Test
   public void testGetVertexSpaceWithIdPredicate() throws IOException {
@@ -140,6 +150,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
 
   /**
    * Test the getVertexSpace() method without an id filter predicate
+   *
+   * @throws IOException on failure
    */
   @Test
   public void testGetVertexSpaceWithoutIdPredicate() throws IOException {
@@ -157,6 +169,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
 
   /**
    * Test the getEdgeSpace() method with an id filter predicate
+   *
+   * @throws IOException on failure
    */
   @Test
   public void testGetEdgeSpaceWithIdPredicate() throws IOException {
@@ -180,6 +194,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
 
   /**
    * Test the getEdgeSpace() method without an id filter predicate
+   *
+   * @throws IOException on failure
    */
   @Test
   public void testGetEdgeSpaceWithoutIdPredicate() throws IOException {
@@ -198,6 +214,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
   /**
    * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
    * with the {@link HBaseLabelIn} predicate
+   *
+   * @throws IOException on failure
    */
   @Test
   public void testGetElementSpaceWithLabelInPredicate() throws IOException {
@@ -245,6 +263,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
   /**
    * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
    * with the {@link HBaseLabelReg} predicate
+   *
+   * @throws IOException on failure
    */
   @Test
   public void testGetElementSpaceWithLabelRegPredicate() throws IOException {
@@ -291,6 +311,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
   /**
    * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
    * with the {@link HBasePropEquals} predicate
+   *
+   * @throws IOException on failure
    */
   @Test
   public void testGetElementSpaceWithPropEqualsPredicate() throws IOException {
@@ -345,6 +367,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
   /**
    * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
    * with the {@link HBasePropLargerThan} predicate
+   *
+   * @throws IOException on failure
    */
   @Test
   public void testGetElementSpaceWithPropLargerThanPredicate() throws IOException {
@@ -403,6 +427,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
   /**
    * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
    * with the {@link HBasePropReg} predicate
+   *
+   * @throws IOException on failure
    */
   @Test
   public void testGetElementSpaceWithPropRegPredicate() throws IOException {
@@ -460,6 +486,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
   /**
    * Test the getGraphSpace(), getVertexSpace() and getEdgeSpace() method
    * with complex predicates
+   *
+   * @throws IOException on failure
    */
   @Test
   public void testGetElementSpaceWithChainedPredicates() throws IOException {

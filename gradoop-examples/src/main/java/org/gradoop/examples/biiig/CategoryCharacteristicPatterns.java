@@ -18,15 +18,15 @@ package org.gradoop.examples.biiig;
 import org.apache.commons.io.IOUtils;
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.examples.utils.ExampleOutput;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.flink.algorithms.fsm.transactional.CategoryCharacteristicSubgraphs;
 import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.operators.aggregation.ApplyAggregation;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.bool.Or;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
@@ -54,8 +54,9 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
   /**
    * main method
+   *
    * @param args arguments (none required)
-   * @throws Exception
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
 
@@ -114,8 +115,9 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
   /**
    * Returns example integrated instance graph from GDL input.
+   *
    * @return integrated instance graph
-   * @throws IOException
+   * @throws IOException on failure
    */
   public static LogicalGraph getIntegratedInstanceGraph() throws IOException {
 
@@ -154,7 +156,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     }
 
     @Override
-    public PropertyValue getIncrement(Element vertex) {
+    public PropertyValue getIncrement(EPGMElement vertex) {
       boolean isClosedQuotation =
         vertex.getLabel().equals("Quotation") &&
           !vertex.getPropertyValue("status").toString().equals("open");
@@ -176,7 +178,7 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
     }
 
     @Override
-    public PropertyValue getIncrement(Element vertex) {
+    public PropertyValue getIncrement(EPGMElement vertex) {
       return PropertyValue.create(vertex.getLabel().equals("SalesOrder") ? 1 : 0);
     }
   }

@@ -82,7 +82,7 @@ public class SNABenchmark2 extends AbstractRunner implements
    * 10K   - 2,450,000
    *
    * @param args args[0]: input dir, args[1]: input format, args[2]: output dir, args[3]: threshold
-   * @throws Exception
+   * @throws Exception on failure
    */
   @SuppressWarnings({
     "unchecked",
@@ -105,7 +105,7 @@ public class SNABenchmark2 extends AbstractRunner implements
    * in a given format (csv, indexed, json)
    *
    * @param args args[0]: input dir, args[1]: input format, args[2]: output dir, args[3]: threshold
-   * @throws Exception
+   * @throws Exception on failure
    */
   @SuppressWarnings("unchecked")
   private static void executeWithExternalData(String[] args) throws Exception {
@@ -126,7 +126,7 @@ public class SNABenchmark2 extends AbstractRunner implements
    * Runs the benchmark with demo data.
    *
    * @param gradoopConf gradoop config
-   * @throws Exception
+   * @throws Exception on failure
    */
   private static void executeWithDemoData(GradoopFlinkConfig gradoopConf)
       throws Exception {

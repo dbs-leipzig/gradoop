@@ -56,6 +56,7 @@ public class EdgeListExample implements ProgramDescription {
    * args[1]: token separator (optional, default is single whitespace)
    *
    * @param args program arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     if (args.length == 0) {

@@ -137,7 +137,7 @@ public abstract class GradoopFlinkTestBase {
    * TODO: remove, when future issue is fixed
    * {@see http://mail-archives.apache.org/mod_mbox/flink-dev/201511.mbox/%3CCAC27z=PmPMeaiNkrkoxNFzoR26BOOMaVMghkh1KLJFW4oxmUmw@mail.gmail.com%3E}
    *
-   * @throws Exception
+   * @throws Exception on failure
    */
   @BeforeClass
   public static void setupFlink() throws Exception {

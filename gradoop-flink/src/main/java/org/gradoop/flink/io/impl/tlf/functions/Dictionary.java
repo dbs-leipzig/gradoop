@@ -34,7 +34,7 @@ public class Dictionary
    *
    * @param iterable containing tuples of integer and string
    * @param collector collects one map from integer to string
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public void reduce(

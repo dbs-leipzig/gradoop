@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling.statistics.functions;
 
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
@@ -48,7 +48,7 @@ public class AggregateListOfWccVertices implements VertexAggregateFunction {
   }
 
   @Override
-  public PropertyValue getIncrement(Element vertex) {
+  public PropertyValue getIncrement(EPGMElement vertex) {
     List<PropertyValue> valueList = new ArrayList<>();
     valueList.add(PropertyValue.create(vertex.getPropertyValue(wccPropertyKey).toString()));
     return PropertyValue.create(valueList);

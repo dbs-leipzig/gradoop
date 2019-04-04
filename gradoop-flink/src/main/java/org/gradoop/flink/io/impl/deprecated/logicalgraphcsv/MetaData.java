@@ -82,7 +82,7 @@ public class MetaData {
    * @param path path to metadata csv file
    * @param hdfsConfig file system configuration
    * @return meta data
-   * @throws IOException
+   * @throws IOException on failure
    */
   public static MetaData fromFile(String path, Configuration hdfsConfig) throws IOException {
     FileSystem fs = FileSystem.get(hdfsConfig);

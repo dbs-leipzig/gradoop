@@ -75,6 +75,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
   /**
    * Instantiate the EPGMStore with a prefix and persist social media data
+   *
+   * @throws IOException on failure
    */
   @BeforeClass
   public static void setUp() throws IOException {
@@ -96,6 +98,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
   /**
    * Closes the static EPGMStore
+   *
+   * @throws IOException on failure
    */
   @AfterClass
   public static void tearDown() throws IOException {
@@ -169,6 +173,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
   /**
    * Test reading a graph collection from {@link HBaseDataSource}
+   *
+   * @throws IOException on failure
    */
   @Test
   public void testReadFromSource() throws Exception {
@@ -195,6 +201,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
   /**
    * Test reading a graph collection from {@link HBaseDataSource} with empty predicates
+   *
+   * @throws Exception on failure
    */
   @Test
   public void testReadFromSourceWithEmptyPredicates() throws Exception {
@@ -339,6 +347,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   /**
    * Test reading a graph collection from {@link HBaseDataSource}
    * with a {@link HBaseLabelIn} predicate on each graph element
+   *
+   * @throws Exception on failure
    */
   @Test
   public void testReadWithLabelInPredicate() throws Exception {
@@ -395,6 +405,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   /**
    * Test reading a graph collection from {@link HBaseDataSource}
    * with a {@link HBaseLabelReg} predicate on each graph element
+   *
+   * @throws Exception on failure
    */
   @Test
   public void testReadWithLabelRegPredicate() throws Exception {
@@ -447,6 +459,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   /**
    * Test reading a graph collection from {@link HBaseDataSource}
    * with a {@link HBasePropEquals} predicate on each graph element
+   *
+   * @throws Exception on failure
    */
   @Test
   public void testReadWithPropEqualsPredicate() throws Exception {
@@ -507,6 +521,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   /**
    * Test reading a graph collection from {@link HBaseDataSource}
    * with a {@link HBasePropLargerThan} predicate on each graph element
+   *
+   * @throws Exception on failure
    */
   @Test
   public void testReadWithPropLargerThanPredicate() throws Exception {
@@ -573,6 +589,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   /**
    * Test reading a graph collection from {@link HBaseDataSource}
    * with a {@link HBasePropReg} predicate on each graph element
+   *
+   * @throws Exception on failure
    */
   @Test
   public void testReadWithPropRegPredicate() throws Exception {
@@ -639,6 +657,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   /**
    * Test reading a graph collection from {@link HBaseDataSource}
    * with logical chained predicates on each graph element
+   *
+   * @throws Exception on failure
    */
   @Test
   public void testReadWithChainedPredicates() throws Exception {
@@ -711,6 +731,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
   /**
    * Test writing a graph to {@link HBaseDataSink}
+   *
+   * @throws Exception on failure
    */
   @Test
   public void testWriteToSink() throws Exception {
@@ -779,6 +801,8 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
   /**
    * Test writing a graph to {@link HBaseDataSink} with overwrite flag, that results in an exception
+   *
+   * @throws Exception on failure
    */
   @Test
   public void testWriteToSinkWithOverWrite() throws Exception {

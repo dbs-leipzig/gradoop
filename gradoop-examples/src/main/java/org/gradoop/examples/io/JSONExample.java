@@ -77,6 +77,7 @@ public class JSONExample extends AbstractRunner implements ProgramDescription {
    * args[1]: path to output graph
    *
    * @param args program arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     if (args.length != 2) {

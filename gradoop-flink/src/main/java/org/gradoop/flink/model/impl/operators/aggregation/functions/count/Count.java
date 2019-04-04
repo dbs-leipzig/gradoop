@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.count;
 
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
@@ -43,7 +43,7 @@ public class Count extends BaseAggregateFunction implements Sum, AggregateDefaul
   }
 
   @Override
-  public PropertyValue getIncrement(Element element) {
+  public PropertyValue getIncrement(EPGMElement element) {
     return PropertyValue.create(1L);
   }
 
