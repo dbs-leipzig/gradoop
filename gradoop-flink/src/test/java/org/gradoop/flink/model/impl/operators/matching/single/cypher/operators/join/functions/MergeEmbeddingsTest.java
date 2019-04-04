@@ -495,7 +495,7 @@ public class MergeEmbeddingsTest extends PhysicalOperatorTest {
    * @param distinctVertexColumnsLeft join operator argument
    * @param distinctEdgeColumnsLeft   join operator argument
    * @param expectedEmbedding         expected result
-   * @throws Exception
+   * @throws Exception on failure
    */
   private void testMorphisms(List<Integer> distinctVertexColumnsLeft, List<Integer> distinctVertexColumnsRight,
     List<Integer> distinctEdgeColumnsLeft, List<Integer> distinctEdgeColumnsRight, List<Embedding> expectedEmbedding) throws Exception {

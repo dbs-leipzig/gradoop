@@ -52,7 +52,7 @@ public class VertexFromId implements
    *
    * @param gradoopId Gradoop identifier
    * @return EPGM vertex
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public Vertex map(Tuple1<GradoopId> gradoopId) throws Exception {

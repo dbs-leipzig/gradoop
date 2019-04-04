@@ -56,7 +56,7 @@ public class GraphStatisticsHDFSReaderTest extends GraphStatisticsTest {
   /**
    * Stops the test cluster after the test.
    *
-   * @throws Exception
+   * @throws Exception on failure
    */
   @AfterClass
   public static void tearDown() throws Exception {

@@ -60,6 +60,7 @@ public class SetPairTraverserBenchmark extends TraverserBenchmark {
    * -t,--traverser <arg>   [loop|bulk]
    *
    * @param args program arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     CommandLine cmd = parseArguments(args, SetPairTraverserBenchmark.class.getName());

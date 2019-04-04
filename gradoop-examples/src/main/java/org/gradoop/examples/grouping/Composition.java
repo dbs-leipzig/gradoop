@@ -27,7 +27,6 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVerte
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,7 +47,7 @@ public class Composition extends AbstractRunner {
    * args[1] - output path
    *
    * @param args arguments
-   * @throws IOException if something goes wrong
+   * @throws Exception if something goes wrong
    */
   public static void main(String[] args) throws Exception {
     String inputPath = args[0];

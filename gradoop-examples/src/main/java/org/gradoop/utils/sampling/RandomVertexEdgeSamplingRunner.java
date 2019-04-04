@@ -39,6 +39,7 @@ public class RandomVertexEdgeSamplingRunner extends AbstractRunner implements Pr
    * args[6] - sampling type (SimpleVersion, NonuniformVersion, NonuniformHybridVersion)
    *
    * @param args arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     RandomVertexEdgeSampling.VertexEdgeSamplingType vertexEdgeSamplingType =

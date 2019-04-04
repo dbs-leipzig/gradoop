@@ -59,7 +59,7 @@ public class JSONToGraphHead extends JSONToEntity
    *
    * @param s json string representation
    * @return SubgraphWithCount storing graph data
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public GraphHead map(String s) throws Exception {

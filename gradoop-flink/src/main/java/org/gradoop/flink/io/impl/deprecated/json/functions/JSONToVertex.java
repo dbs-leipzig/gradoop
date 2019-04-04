@@ -61,7 +61,7 @@ public class JSONToVertex extends JSONToEntity
    *
    * @param s json string
    * @return Gelly vertex storing gradoop vertex data
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public Vertex map(String s) throws Exception {

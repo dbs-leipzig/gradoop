@@ -40,6 +40,7 @@ public interface ElementHandler extends Serializable {
    *
    * @param gradoopId the gradoop id used to create row key from
    * @return persistent entity identifier
+   * @throws IOException on failure
    */
   byte[] getRowKey(@Nonnull final GradoopId gradoopId) throws IOException;
 
@@ -85,6 +86,7 @@ public interface ElementHandler extends Serializable {
    *
    * @param res row result
    * @return entity identifier
+   * @throws IOException on failure
    */
   GradoopId readId(@Nonnull final Result res) throws IOException;
 

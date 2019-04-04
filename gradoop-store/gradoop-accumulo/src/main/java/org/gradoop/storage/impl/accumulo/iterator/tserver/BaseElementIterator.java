@@ -73,6 +73,7 @@ public abstract class BaseElementIterator<E extends EPGMElement> implements
    *
    * @param pair k-v pair from accumulo row
    * @return gradoop element instance
+   * @throws IOException on failure
    */
   @Nonnull
   public abstract E fromRow(@Nonnull Map.Entry<Key, Value> pair) throws IOException;
@@ -82,6 +83,7 @@ public abstract class BaseElementIterator<E extends EPGMElement> implements
    *
    * @param record gradoop element instance
    * @return k-v pair as accumulo row
+   * @throws IOException on failure
    */
   @Nonnull
   public abstract Pair<Key, Value> toRow(@Nonnull E record) throws IOException;
@@ -92,6 +94,7 @@ public abstract class BaseElementIterator<E extends EPGMElement> implements
    *
    * @param source origin store source
    * @return decoded epgm element
+   * @throws IOException on failure
    */
   @Nullable
   public abstract E readLine(

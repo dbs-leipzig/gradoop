@@ -65,7 +65,7 @@ public class TLFDataSource extends TLFBase implements DataSource {
    * @param config Gradoop Flink configuration
    */
   public TLFDataSource(String tlfPath, String tlfVertexDictionaryPath,
-    String tlfEdgeDictionaryPath, GradoopFlinkConfig config) throws Exception {
+    String tlfEdgeDictionaryPath, GradoopFlinkConfig config) {
     super(tlfPath, tlfVertexDictionaryPath, tlfEdgeDictionaryPath, config);
     ExecutionEnvironment env = config.getExecutionEnvironment();
     if (hasVertexDictionary()) {

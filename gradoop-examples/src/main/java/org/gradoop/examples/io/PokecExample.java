@@ -138,7 +138,7 @@ public class PokecExample {
    * args[0]: path to directory that contains pokec files (e.g. hdfs:///pokec/)
    * args[1]: path to write the output graph to (e.g. hdfs:///output/)
    * @param args arguments
-   * @throws Exception
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     final String inputDir = args[0];
@@ -171,7 +171,7 @@ public class PokecExample {
 
         @SuppressWarnings("Duplicates")
         @Override
-        public ImportVertex<Long> map(String line) throws Exception {
+        public ImportVertex<Long> map(String line) {
           String[] fields = line.split(splitPattern.pattern());
 
           importVertex.setId(Long.parseLong(fields[0])); // user-id
@@ -262,7 +262,7 @@ public class PokecExample {
 
         @Override
         public ImportEdge<Long> map(
-          Tuple2<Long, Tuple2<Long, Long>> value) throws Exception {
+          Tuple2<Long, Tuple2<Long, Long>> value) {
           importEdge.setId(value.f0);
           importEdge.setSourceId(value.f1.f0);
           importEdge.setTargetId(value.f1.f1);

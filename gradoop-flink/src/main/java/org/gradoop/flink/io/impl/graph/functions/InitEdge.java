@@ -76,7 +76,7 @@ public class InitEdge<K extends Comparable<K>>
    * @param importEdge    import edge
    * @param vertexIdPair  pair of import id and corresponding Gradoop vertex id
    * @return pair of import target vertex id and EPGM edge
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public Tuple2<K, Edge> join(ImportEdge<K> importEdge,

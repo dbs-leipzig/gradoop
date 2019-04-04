@@ -131,6 +131,7 @@ public class PatternMatchingRunner extends AbstractRunner implements ProgramDesc
    * -s, --statistics (path to input graph statistics, used for cypher engine)<br />
    *
    * @param args option line
+   * @throws Exception on failure
    */
   @SuppressWarnings("unchecked")
   public static void main(String[] args) throws Exception {

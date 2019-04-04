@@ -82,7 +82,7 @@ public class QueryEngineITTests extends GradoopFlinkTestBase {
    * @param q cypher query
    * @param estimatedCardinality estimated cardinality of the result
    * @param exactCardinality exact cardinality of the result
-   * @throws Exception
+   * @throws Exception on failure
    */
   private void assertCardinalities(String q, long estimatedCardinality, int exactCardinality)
     throws Exception {
