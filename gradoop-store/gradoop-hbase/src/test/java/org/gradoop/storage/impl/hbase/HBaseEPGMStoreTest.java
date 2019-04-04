@@ -31,14 +31,17 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.AsciiGraphLoader;
+import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -321,6 +324,52 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
     }
 
     graphStore.close();
+  }
+
+  /**
+   * Test the truncate tables functionality.
+   */
+  @Test
+  public void truncateTablesTest() throws IOException {
+    HBaseEPGMStore store = createEmptyEPGMStore("truncateTest");
+    AsciiGraphLoader<GraphHead, Vertex, Edge> loader = getMinimalFullFeaturedGraphLoader();
+    checkIfStoreIsEmpty("Store was not empty before writing anything.", store);
+    // Now write something to the store, check if it was written (i.e. the store is not empty).
+    GraphHead graphHead = loader.getGraphHeads().iterator().next();
+    Vertex vertex = loader.getVertices().iterator().next();
+    Edge edge = loader.getEdges().iterator().next();
+    store.writeGraphHead(graphHead);
+    store.writeVertex(vertex);
+    store.writeEdge(edge);
+    store.flush();
+    validateGraphHead(store, graphHead);
+    validateVertex(store, vertex);
+    validateEdge(store, edge);
+    // Now truncate and check if the store if empty afterwards.
+    store.truncateTables();
+    checkIfStoreIsEmpty("Store was not empty after truncating.", store);
+    // Finally check if we can write elements.
+    store.writeGraphHead(graphHead);
+    store.writeVertex(vertex);
+    store.writeEdge(edge);
+    store.close();
+  }
+
+  /**
+   * Check if all tables of are store are empty.
+   *
+   * @param message The messenge used in the assertion.
+   * @param store The HBase store to check.
+   * @throws IOException when accessing the store fails.
+   */
+  private void checkIfStoreIsEmpty(String message, HBaseEPGMStore store) throws IOException {
+    for (ClosableIterator<?> space : Arrays.asList(store.getGraphSpace(),
+      store.getVertexSpace(), store.getEdgeSpace())) {
+      boolean hasNext = space.hasNext();
+      // Make sure to close the iterator before the assertion.
+      space.close();
+      assertFalse(message, hasNext);
+    }
   }
 
   private AsciiGraphLoader<GraphHead, Vertex, Edge> getMinimalFullFeaturedGraphLoader() {

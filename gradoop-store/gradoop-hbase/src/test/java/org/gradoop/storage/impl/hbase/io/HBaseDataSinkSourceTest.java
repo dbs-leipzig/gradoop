@@ -16,7 +16,6 @@
 package org.gradoop.storage.impl.hbase.io;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
@@ -27,6 +26,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.config.GradoopHBaseConfig;
@@ -804,16 +804,21 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    *
    * @throws Exception on failure
    */
-  @Test(expected = NotImplementedException.class)
+  @Test
   public void testWriteToSinkWithOverWrite() throws Exception {
     // Create an empty store
-    HBaseEPGMStore newStore = createEmptyEPGMStore("testWriteToSink");
-
-    GraphCollection graphCollection = getConfig().getGraphCollectionFactory()
-      .createEmptyCollection();
-
-    new HBaseDataSink(newStore, getConfig()).write(graphCollection, true);
-
+    HBaseEPGMStore store = createEmptyEPGMStore("testWriteToSinkWithOverwrite");
+    // Get a test graph and write it to the store.
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+    LogicalGraph testGraph = loader.getLogicalGraphByVariable("g0");
+    testGraph.writeTo(new HBaseDataSink(store, getConfig()), false);
     getExecutionEnvironment().execute();
+    // Now write a different graph with overwrite and validate it by reading it again.
+    LogicalGraph testGraph2 = loader.getLogicalGraphByVariable("g1");
+    testGraph2.writeTo(new HBaseDataSink(store, getConfig()), true);
+    getExecutionEnvironment().execute();
+    collectAndAssertTrue(new HBaseDataSource(store, getConfig()).getLogicalGraph()
+      .equalsByElementData(testGraph2));
+    store.close();
   }
 }
