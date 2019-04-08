@@ -24,7 +24,7 @@ import java.util.Random;
  * Creates a random value for each vertex and marks those that are below a
  * given threshold.
  */
-public class VertexRandomMarkedMap implements MapFunction<Vertex, Vertex> {
+public class RandomVertex implements MapFunction<Vertex, Vertex> {
   /**
    * Threshold to decide if a vertex needs to be filtered.
    */
@@ -43,10 +43,10 @@ public class VertexRandomMarkedMap implements MapFunction<Vertex, Vertex> {
    *
    * @param sampleSize relative sample size
    * @param randomSeed random seed (can be 0)
-   * @param mark the name of property for sampled vertices
+   * @param samplingKey the name of property for sampled vertices
    */
-  public VertexRandomMarkedMap(float sampleSize, long randomSeed, String mark) {
-    this.mark = mark;
+  public RandomVertex(float sampleSize, long randomSeed, String samplingKey) {
+    this.mark = samplingKey;
     this.sampleSize = sampleSize;
     this.randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
   }

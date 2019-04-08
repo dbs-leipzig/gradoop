@@ -24,6 +24,7 @@ import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeSourceVertexJoin;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeTargetVertexJoin;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgesWithSampledVerticesFilter;
@@ -90,15 +91,15 @@ public class RandomWalkSampling extends SamplingAlgorithm {
       jumpProbability, sampleSize).execute(graph);
 
     DataSet<Vertex> sampledVertices = gellyResult.getVertices()
-      .filter(new ByProperty<>(PROPERTY_KEY_SAMPLED));
+      .filter(new ByProperty<>(SamplingConstants.PROPERTY_KEY_SAMPLED));
 
     DataSet<Edge> sampledEdges = graph.getEdges()
       .join(sampledVertices)
       .where(new SourceId<>()).equalTo(new Id<>())
-      .with(new EdgeSourceVertexJoin(PROPERTY_KEY_SAMPLED))
+      .with(new EdgeSourceVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED))
       .join(sampledVertices)
       .where(1).equalTo(new Id<>())
-      .with(new EdgeTargetVertexJoin(PROPERTY_KEY_SAMPLED))
+      .with(new EdgeTargetVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED))
       .filter(new EdgesWithSampledVerticesFilter(Neighborhood.BOTH))
       .map(new Value0Of3<>());
 

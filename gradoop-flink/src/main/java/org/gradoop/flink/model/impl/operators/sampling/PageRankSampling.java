@@ -28,6 +28,7 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Vertex
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 import org.gradoop.flink.model.impl.operators.sampling.functions.AddPageRankScoresToVertexCrossFunction;
 import org.gradoop.flink.model.impl.operators.sampling.functions.PageRankResultVertexFilter;
 
@@ -113,15 +114,18 @@ public class PageRankSampling extends SamplingAlgorithm {
   public LogicalGraph sample(LogicalGraph graph) {
 
     LogicalGraph pageRankGraph = new PageRank(
-      PAGE_RANK_SCORE_PROPERTY_KEY, dampeningFactor, maxIteration, true).execute(graph);
+      SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY,
+      dampeningFactor,
+      maxIteration,
+      true).execute(graph);
 
     graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(
       graph.getGraphHead(), pageRankGraph.getVertices(), pageRankGraph.getEdges());
 
     graph = graph
-      .aggregate(new MinVertexProperty(PAGE_RANK_SCORE_PROPERTY_KEY),
-        new MaxVertexProperty(PAGE_RANK_SCORE_PROPERTY_KEY),
-        new SumVertexProperty(PAGE_RANK_SCORE_PROPERTY_KEY),
+      .aggregate(new MinVertexProperty(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
+        new MaxVertexProperty(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
+        new SumVertexProperty(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
         new VertexCount());
 
     DataSet<Vertex> scaledVertices = graph.getVertices()

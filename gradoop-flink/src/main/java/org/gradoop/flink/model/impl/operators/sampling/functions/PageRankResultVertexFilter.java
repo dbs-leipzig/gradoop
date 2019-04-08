@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.operators.sampling.PageRankSampling;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 
 /**
  * Retains all vertices with a PageRank-score greater or equal/smaller than a given
@@ -59,8 +59,8 @@ public class PageRankResultVertexFilter implements FilterFunction<Vertex> {
 
   @Override
   public boolean filter(Vertex v) throws Exception {
-    if (v.hasProperty(PageRankSampling.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
-      double pr = v.getPropertyValue(PageRankSampling.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
+    if (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
+      double pr = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
         .getDouble();
       if (sampleGreaterThanThreshold) {
         return pr > threshold;

@@ -25,6 +25,7 @@ import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 import org.gradoop.flink.model.impl.operators.sampling.functions.LimitedDegreeVertexRandomFilter;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 
@@ -115,17 +116,17 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
   public LogicalGraph sample(LogicalGraph graph) {
 
     graph = new DistinctVertexDegrees(
-      DEGREE_PROPERTY_KEY,
-      IN_DEGREE_PROPERTY_KEY,
-      OUT_DEGREE_PROPERTY_KEY,
+      SamplingConstants.DEGREE_PROPERTY_KEY,
+      SamplingConstants.IN_DEGREE_PROPERTY_KEY,
+      SamplingConstants.OUT_DEGREE_PROPERTY_KEY,
       true).execute(graph);
 
     DataSet<Vertex> newVertices = graph.getVertices()
       .filter(new LimitedDegreeVertexRandomFilter<>(
         sampleSize, randomSeed, degreeThreshold, degreeType))
-      .map(new PropertyRemover<>(DEGREE_PROPERTY_KEY))
-      .map(new PropertyRemover<>(IN_DEGREE_PROPERTY_KEY))
-      .map(new PropertyRemover<>(OUT_DEGREE_PROPERTY_KEY));
+      .map(new PropertyRemover<>(SamplingConstants.DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(SamplingConstants.IN_DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(SamplingConstants.OUT_DEGREE_PROPERTY_KEY));
 
     DataSet<Edge> newEdges = graph.getEdges()
       .join(newVertices)
