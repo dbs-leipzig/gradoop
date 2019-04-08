@@ -13,31 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.utils.sampling.statistics;
+package org.gradoop.utils.statistics;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.examples.AbstractRunner;
+import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
+import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyGlobalClusteringCoefficientDirected;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.GraphDensity;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
- * Calls the graph density computation for a logical graph.
- * Writes the result to a csv-file named {@value SamplingEvaluationConstants#FILE_DENSITY} in
- * the output directory, containing a single line with the graph density value, e.g.:
+ * Calls the computation of the global clustering coefficient for a directed logical graph.
+ * Uses the Gradoop-Wrapper {@link GellyGlobalClusteringCoefficientDirected} of Flinks
+ * ClusteringCoefficient-algorithm. Writes the global value to a csv-file named
+ * {@value SamplingEvaluationConstants#FILE_CLUSTERING_COEFFICIENT_GLOBAL} in the output directory,
+ * e.g.:
  * <pre>
  * BOF
- * 0.281
+ * 0.2916
  * EOF
  * </pre>
  */
-public class GraphDensityRunner extends AbstractRunner implements ProgramDescription {
+public class GlobalClusteringCoefficientRunner
+  extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Calls the graph density computation for the graph.
+   * Calls the computation of the global clustering coefficient for the graph.
    *
    * <pre>
    * args[0] - path to graph
@@ -52,17 +56,19 @@ public class GraphDensityRunner extends AbstractRunner implements ProgramDescrip
 
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
-    DataSet<Double> density = graph.callForGraph(new GraphDensity()).getGraphHead()
-      .map(gh -> gh.getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY).getDouble());
+    graph = new GellyGlobalClusteringCoefficientDirected().execute(graph);
 
-    StatisticWriter.writeCSV(density.map(new ObjectTo1<>()),
-      appendSeparator(args[2]) + SamplingEvaluationConstants.FILE_DENSITY);
+    DataSet<Double> global = graph.getGraphHead()
+      .map(gh -> gh.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL).getDouble());
 
-    getExecutionEnvironment().execute("Sampling Statistics: Graph density");
+    StatisticWriter.writeCSV(global.map(new ObjectTo1<>()), appendSeparator(args[2]) +
+      SamplingEvaluationConstants.FILE_CLUSTERING_COEFFICIENT_GLOBAL);
+
+    getExecutionEnvironment().execute("Sampling Statistics: Global clustering coefficient");
   }
 
   @Override
   public String getDescription() {
-    return GraphDensityRunner.class.getName();
+    return AverageClusteringCoefficientRunner.class.getName();
   }
 }

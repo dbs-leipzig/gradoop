@@ -13,32 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.utils.sampling.statistics;
+package org.gradoop.utils.statistics;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.algorithms.gelly.trianglecounting.GellyTriangleCounting;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
+import org.gradoop.flink.model.impl.operators.statistics.AverageIncomingDegree;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
- * Calls the computation of the triangle count (closed triplets) for a logical graph.
- * Uses the Gradoop-Wrapper {@link GellyTriangleCounting} of Flinks TriangleEnumerator-algorithm.
- * Writes the value to a csv-file named {@value SamplingEvaluationConstants#FILE_TRIANGLE_COUNT}
- * in the output directory, e.g.:
+ * Calls the average incoming degree computation for a logical graph. Writes the result to a
+ * csv-file named {@value SamplingEvaluationConstants#FILE_AVERAGE_INCOMING_DEGREE}
+ * in the output directory, containing a single line with the average incoming degree value, e.g.:
  * <pre>
  * BOF
- * 8
+ * 4
  * EOF
  * </pre>
  */
-public class TriangleCountingRunner extends AbstractRunner implements ProgramDescription {
+public class AverageIncomingDegreeRunner extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Calls the computation of the triangle count (closed triplets) for the graph.
+   * Calls the average incoming degree computation for the graph.
    *
    * <pre>
    * args[0] - path to graph
@@ -53,17 +52,19 @@ public class TriangleCountingRunner extends AbstractRunner implements ProgramDes
 
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
-    DataSet<Long> triangleCount = new GellyTriangleCounting().execute(graph).getGraphHead()
-      .map(gh -> gh.getPropertyValue(GellyTriangleCounting.PROPERTY_KEY_TRIANGLES).getLong());
+    DataSet<Long> averageIncomingDegree = graph.callForGraph(new AverageIncomingDegree())
+      .getGraphHead()
+      .map(gh -> gh.getPropertyValue(
+        SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_INCOMING_DEGREE).getLong());
 
-    StatisticWriter.writeCSV(triangleCount.map(new ObjectTo1<>()),
-      appendSeparator(args[2]) + SamplingEvaluationConstants.FILE_TRIANGLE_COUNT);
+    StatisticWriter.writeCSV(averageIncomingDegree.map(new ObjectTo1<>()),
+      appendSeparator(args[2]) + SamplingEvaluationConstants.FILE_AVERAGE_INCOMING_DEGREE);
 
-    getExecutionEnvironment().execute("Sampling Statistics: Triangle count");
+    getExecutionEnvironment().execute("Sampling Statistics: Average incoming degree");
   }
 
   @Override
   public String getDescription() {
-    return TriangleCountingRunner.class.getName();
+    return AverageIncomingDegreeRunner.class.getName();
   }
 }

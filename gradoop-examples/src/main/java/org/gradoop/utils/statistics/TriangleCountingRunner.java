@@ -13,35 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.utils.sampling.statistics;
+package org.gradoop.utils.statistics;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.examples.AbstractRunner;
-import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
-import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyGlobalClusteringCoefficientDirected;
+import org.gradoop.flink.algorithms.gelly.trianglecounting.GellyTriangleCounting;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
- * Calls the computation of the global clustering coefficient for a directed logical graph.
- * Uses the Gradoop-Wrapper {@link GellyGlobalClusteringCoefficientDirected} of Flinks
- * ClusteringCoefficient-algorithm. Writes the global value to a csv-file named
- * {@value SamplingEvaluationConstants#FILE_CLUSTERING_COEFFICIENT_GLOBAL} in the output directory,
- * e.g.:
+ * Calls the computation of the triangle count (closed triplets) for a logical graph.
+ * Uses the Gradoop-Wrapper {@link GellyTriangleCounting} of Flinks TriangleEnumerator-algorithm.
+ * Writes the value to a csv-file named {@value SamplingEvaluationConstants#FILE_TRIANGLE_COUNT}
+ * in the output directory, e.g.:
  * <pre>
  * BOF
- * 0.2916
+ * 8
  * EOF
  * </pre>
  */
-public class GlobalClusteringCoefficientRunner
-  extends AbstractRunner implements ProgramDescription {
+public class TriangleCountingRunner extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Calls the computation of the global clustering coefficient for the graph.
+   * Calls the computation of the triangle count (closed triplets) for the graph.
    *
    * <pre>
    * args[0] - path to graph
@@ -56,19 +53,17 @@ public class GlobalClusteringCoefficientRunner
 
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
-    graph = new GellyGlobalClusteringCoefficientDirected().execute(graph);
+    DataSet<Long> triangleCount = new GellyTriangleCounting().execute(graph).getGraphHead()
+      .map(gh -> gh.getPropertyValue(GellyTriangleCounting.PROPERTY_KEY_TRIANGLES).getLong());
 
-    DataSet<Double> global = graph.getGraphHead()
-      .map(gh -> gh.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL).getDouble());
+    StatisticWriter.writeCSV(triangleCount.map(new ObjectTo1<>()),
+      appendSeparator(args[2]) + SamplingEvaluationConstants.FILE_TRIANGLE_COUNT);
 
-    StatisticWriter.writeCSV(global.map(new ObjectTo1<>()), appendSeparator(args[2]) +
-      SamplingEvaluationConstants.FILE_CLUSTERING_COEFFICIENT_GLOBAL);
-
-    getExecutionEnvironment().execute("Sampling Statistics: Global clustering coefficient");
+    getExecutionEnvironment().execute("Sampling Statistics: Triangle count");
   }
 
   @Override
   public String getDescription() {
-    return AverageClusteringCoefficientRunner.class.getName();
+    return TriangleCountingRunner.class.getName();
   }
 }

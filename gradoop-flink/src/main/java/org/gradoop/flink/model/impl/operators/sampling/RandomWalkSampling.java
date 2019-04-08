@@ -39,7 +39,7 @@ public class RandomWalkSampling extends SamplingAlgorithm {
   /**
    * Sample size
    */
-  private final double sampleSize;
+  private final float sampleSize;
   /**
    * Number of start vertices
    */
@@ -47,7 +47,7 @@ public class RandomWalkSampling extends SamplingAlgorithm {
   /**
    * Probability of jumping instead of walking along edges
    */
-  private final double jumpProbability;
+  private final float jumpProbability;
   /**
    * Max iteration count
    */
@@ -60,10 +60,10 @@ public class RandomWalkSampling extends SamplingAlgorithm {
    * @param sampleSize              sample size
    * @param numberOfStartVertices   number of start vertices
    */
-  public RandomWalkSampling(double sampleSize, int numberOfStartVertices) {
+  public RandomWalkSampling(float sampleSize, int numberOfStartVertices) {
     this.sampleSize = sampleSize;
     this.numberOfStartVertices = numberOfStartVertices;
-    this.jumpProbability = 0.1d;
+    this.jumpProbability = 0.1f;
     this.maxIteration = Integer.MAX_VALUE;
   }
 
@@ -75,8 +75,8 @@ public class RandomWalkSampling extends SamplingAlgorithm {
    * @param jumpProbability         probability to jump instead of walk
    * @param maxIteration            max gelly iteration count
    */
-  public RandomWalkSampling(double sampleSize, int numberOfStartVertices,
-    double jumpProbability, int maxIteration) {
+  public RandomWalkSampling(float sampleSize, int numberOfStartVertices,
+    float jumpProbability, int maxIteration) {
 
     this.sampleSize = sampleSize;
     this.numberOfStartVertices = numberOfStartVertices;

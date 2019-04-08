@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.statistics.functions;
+package org.gradoop.flink.model.impl.operators.statistics.functions;
 
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.gradoop.common.model.impl.id.GradoopId;

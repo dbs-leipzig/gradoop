@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.statistics;
+package org.gradoop.flink.model.impl.operators.sampling.common;
+
+import org.gradoop.flink.model.impl.operators.statistics.AverageDegree;
+import org.gradoop.flink.model.impl.operators.statistics.AverageIncomingDegree;
+import org.gradoop.flink.model.impl.operators.statistics.AverageOutgoingDegree;
+import org.gradoop.flink.model.impl.operators.statistics.ConnectedComponentsDistribution;
+import org.gradoop.flink.model.impl.operators.statistics.GraphDensity;
 
 /**
  * Collected constants for sampling evaluation

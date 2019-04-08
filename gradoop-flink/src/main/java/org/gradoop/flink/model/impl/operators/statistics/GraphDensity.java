@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.statistics;
+package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.GraphHead;
@@ -21,7 +21,8 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.functions.CalculateDensity;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
+import org.gradoop.flink.model.impl.operators.statistics.functions.CalculateDensity;
 
 /**
  * Computes the density of a graph and writes it to the graph head.

@@ -13,10 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.utils.sampling.statistics;
+package org.gradoop.utils.sampling;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.gradoop.examples.AbstractRunner;
+import org.gradoop.utils.statistics.AverageClusteringCoefficientRunner;
+import org.gradoop.utils.statistics.AverageDegreeRunner;
+import org.gradoop.utils.statistics.AverageIncomingDegreeRunner;
+import org.gradoop.utils.statistics.AverageOutgoingDegreeRunner;
+import org.gradoop.utils.statistics.ConnectedComponentsDistributionRunner;
+import org.gradoop.utils.statistics.DegreeCentralityRunner;
+import org.gradoop.utils.statistics.GlobalClusteringCoefficientRunner;
+import org.gradoop.utils.statistics.GraphDensityRunner;
+import org.gradoop.utils.statistics.TriangleCountingRunner;
 import org.gradoop.utils.statistics.VertexDegreeDistributionRunner;
 import org.gradoop.utils.statistics.VertexIncomingDegreeDistributionRunner;
 import org.gradoop.utils.statistics.VertexOutgoingDegreeDistributionRunner;

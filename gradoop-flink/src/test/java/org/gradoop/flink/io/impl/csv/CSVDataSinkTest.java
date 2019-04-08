@@ -254,7 +254,6 @@ public class CSVDataSinkTest extends CSVTestBase {
 
     BufferedReader br = new BufferedReader(new FileReader(metadataFile));
     while ((line = br.readLine()) != null) {
-      System.out.println(line);
       checkMetadataCsvLine(line);
     }
   }

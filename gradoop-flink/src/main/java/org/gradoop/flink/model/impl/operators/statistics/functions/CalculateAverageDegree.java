@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.statistics.functions;
+package org.gradoop.flink.model.impl.operators.statistics.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 
 /**
  * Calculates the average degree, depending on the sum-value of the degree type

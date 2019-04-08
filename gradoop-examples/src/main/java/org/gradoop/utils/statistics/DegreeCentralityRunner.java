@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.utils.sampling.statistics;
+package org.gradoop.utils.statistics;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
@@ -21,8 +21,8 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.DegreeCentrality;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
+import org.gradoop.flink.model.impl.operators.statistics.DegreeCentrality;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**

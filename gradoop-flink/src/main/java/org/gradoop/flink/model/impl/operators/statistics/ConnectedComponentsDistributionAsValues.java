@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.statistics;
+package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -27,7 +27,7 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
  *
  * Returns a mapping of VertexId -> ComponentId
  */
-public class ValueConnectedComponentsDistribution
+public class ConnectedComponentsDistributionAsValues
   implements UnaryGraphToValueOperator<DataSet<Tuple2<Long, Long>>> {
 
   /**
@@ -40,7 +40,7 @@ public class ValueConnectedComponentsDistribution
    *
    * @param maxiIteration max iteration count.
    */
-  public ValueConnectedComponentsDistribution(int maxiIteration) {
+  public ConnectedComponentsDistributionAsValues(int maxiIteration) {
     this.maxIteration = maxiIteration;
   }
 

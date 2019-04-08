@@ -13,31 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.utils.sampling.statistics;
+package org.gradoop.utils.statistics;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.AverageDegree;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
+import org.gradoop.flink.model.impl.operators.statistics.GraphDensity;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
- * Calls the average degree computation for a logical graph. Writes the result to a csv-file
- * named {@value SamplingEvaluationConstants#FILE_AVERAGE_DEGREE}
- * in the output directory, containing a single line with the average degree value, e.g.:
+ * Calls the graph density computation for a logical graph.
+ * Writes the result to a csv-file named {@value SamplingEvaluationConstants#FILE_DENSITY} in
+ * the output directory, containing a single line with the graph density value, e.g.:
  * <pre>
  * BOF
- * 4
+ * 0.281
  * EOF
  * </pre>
  */
-public class AverageDegreeRunner extends AbstractRunner implements ProgramDescription {
+public class GraphDensityRunner extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Calls the average degree computation for the graph.
+   * Calls the graph density computation for the graph.
    *
    * <pre>
    * args[0] - path to graph
@@ -52,18 +52,17 @@ public class AverageDegreeRunner extends AbstractRunner implements ProgramDescri
 
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
-    DataSet<Long> averageDegree = graph.callForGraph(new AverageDegree()).getGraphHead()
-      .map(gh -> gh.getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_DEGREE)
-        .getLong());
+    DataSet<Double> density = graph.callForGraph(new GraphDensity()).getGraphHead()
+      .map(gh -> gh.getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY).getDouble());
 
-    StatisticWriter.writeCSV(averageDegree.map(new ObjectTo1<>()),
-      appendSeparator(args[2]) + SamplingEvaluationConstants.FILE_AVERAGE_DEGREE);
+    StatisticWriter.writeCSV(density.map(new ObjectTo1<>()),
+      appendSeparator(args[2]) + SamplingEvaluationConstants.FILE_DENSITY);
 
-    getExecutionEnvironment().execute("Sampling Statistics: Average degree");
+    getExecutionEnvironment().execute("Sampling Statistics: Graph density");
   }
 
   @Override
   public String getDescription() {
-    return AverageDegreeRunner.class.getName();
+    return GraphDensityRunner.class.getName();
   }
 }

@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.statistics;
+package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.AnnotateWeaklyConnectedComponents;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.functions.AggregateListOfWccEdges;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.functions.AggregateListOfWccVertices;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.functions.GetConnectedComponentDistributionFlatMap;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
+import org.gradoop.flink.model.impl.operators.statistics.functions.AggregateListOfWccEdges;
+import org.gradoop.flink.model.impl.operators.statistics.functions.AggregateListOfWccVertices;
+import org.gradoop.flink.model.impl.operators.statistics.functions.GetConnectedComponentDistributionFlatMap;
 
 /**
  * Computes the weakly connected components of a graph. Uses the gradoop wrapper

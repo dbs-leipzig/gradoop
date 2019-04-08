@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling.statistics.functions;
+package org.gradoop.flink.model.impl.operators.statistics.functions;
 
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Aggregates the connected component ids from all edges as list of propertyValues.
+ * Aggregates the connected component ids from all vertices as list of propertyValues.
  */
-public class AggregateListOfWccEdges implements EdgeAggregateFunction {
+public class AggregateListOfWccVertices implements VertexAggregateFunction {
 
   /**
    * Property key to retrieve property values
@@ -38,19 +38,19 @@ public class AggregateListOfWccEdges implements EdgeAggregateFunction {
   private final String listOfWccIDsPropertyKey;
 
   /**
-   * Creates a new instance of a AggregateListOfWccEdges aggregate function.
+   * Creates a new instance of a AggregateListOfWccVertices aggregate function.
    *
    * @param wccPropertyKey Property key to retrieve property values
    */
-  public AggregateListOfWccEdges(String wccPropertyKey) {
+  public AggregateListOfWccVertices(String wccPropertyKey) {
     this.wccPropertyKey = wccPropertyKey;
-    this.listOfWccIDsPropertyKey = "edges_" + this.wccPropertyKey;
+    this.listOfWccIDsPropertyKey = "vertices_" + this.wccPropertyKey;
   }
 
   @Override
-  public PropertyValue getIncrement(EPGMElement edge) {
+  public PropertyValue getIncrement(EPGMElement vertex) {
     List<PropertyValue> valueList = new ArrayList<>();
-    valueList.add(PropertyValue.create(edge.getPropertyValue(wccPropertyKey).toString()));
+    valueList.add(PropertyValue.create(vertex.getPropertyValue(wccPropertyKey).toString()));
     return PropertyValue.create(valueList);
   }
 

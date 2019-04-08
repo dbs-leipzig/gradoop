@@ -13,31 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.utils.sampling.statistics;
+package org.gradoop.utils.statistics;
 
 import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.AverageOutgoingDegree;
-import org.gradoop.flink.model.impl.operators.sampling.statistics.SamplingEvaluationConstants;
+import org.gradoop.flink.model.impl.operators.statistics.AverageDegree;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 import org.gradoop.flink.model.impl.operators.statistics.writer.StatisticWriter;
 
 /**
- * Calls the average outgoing degree computation for a logical graph. Writes the result to a
- * csv-file named {@value SamplingEvaluationConstants#FILE_AVERAGE_OUTGOING_DEGREE}
- * in the output directory, containing a single line with the average outgoing degree value, e.g.:
+ * Calls the average degree computation for a logical graph. Writes the result to a csv-file
+ * named {@value SamplingEvaluationConstants#FILE_AVERAGE_DEGREE}
+ * in the output directory, containing a single line with the average degree value, e.g.:
  * <pre>
  * BOF
  * 4
  * EOF
  * </pre>
  */
-public class AverageOutgoingDegreeRunner extends AbstractRunner implements ProgramDescription {
+public class AverageDegreeRunner extends AbstractRunner implements ProgramDescription {
 
   /**
-   * Calls the average outgoing degree computation for the graph.
+   * Calls the average degree computation for the graph.
    *
    * <pre>
    * args[0] - path to graph
@@ -52,19 +52,18 @@ public class AverageOutgoingDegreeRunner extends AbstractRunner implements Progr
 
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
-    DataSet<Long> averageOutgoingDegree = graph.callForGraph(new AverageOutgoingDegree())
-      .getGraphHead()
-      .map(gh -> gh.getPropertyValue(
-        SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_OUTGOING_DEGREE).getLong());
+    DataSet<Long> averageDegree = graph.callForGraph(new AverageDegree()).getGraphHead()
+      .map(gh -> gh.getPropertyValue(SamplingEvaluationConstants.PROPERTY_KEY_AVERAGE_DEGREE)
+        .getLong());
 
-    StatisticWriter.writeCSV(averageOutgoingDegree.map(new ObjectTo1<>()),
-      appendSeparator(args[2]) + SamplingEvaluationConstants.FILE_AVERAGE_OUTGOING_DEGREE);
+    StatisticWriter.writeCSV(averageDegree.map(new ObjectTo1<>()),
+      appendSeparator(args[2]) + SamplingEvaluationConstants.FILE_AVERAGE_DEGREE);
 
-    getExecutionEnvironment().execute("Sampling Statistics: Average outgoing degree");
+    getExecutionEnvironment().execute("Sampling Statistics: Average degree");
   }
 
   @Override
   public String getDescription() {
-    return AverageOutgoingDegreeRunner.class.getName();
+    return AverageDegreeRunner.class.getName();
   }
 }
