@@ -170,7 +170,7 @@ abstract class TraverserBenchmark extends AbstractRunner {
    * the results are appended.
    *
    * @param csvFile path to csv file
-   * @throws IOException
+   * @throws IOException on failure
    */
   private void writeResults(String csvFile) throws IOException {
     String header = "Input|Parallelism|Strategy|Query|Embeddings|Runtime[ms]";
@@ -221,13 +221,15 @@ abstract class TraverserBenchmark extends AbstractRunner {
 
   /**
    * Run the benchmark.
+   *
+   * @throws Exception on failure
    */
   abstract void run() throws Exception;
 
   /**
    * Writes the results to file or prints it.
    *
-   * @throws IOException
+   * @throws IOException on failure
    */
   void close() throws IOException {
     if (csvPath != null) {
@@ -308,7 +310,7 @@ abstract class TraverserBenchmark extends AbstractRunner {
     }
 
     @Override
-    public IdWithCandidates<Long> map(Tuple1<Long> value) throws Exception {
+    public IdWithCandidates<Long> map(Tuple1<Long> value) {
       reuseTuple.setId(value.f0);
       return reuseTuple;
     }
@@ -341,7 +343,7 @@ abstract class TraverserBenchmark extends AbstractRunner {
 
     @Override
     public TripleWithCandidates<Long> map(
-      Tuple3<Long, Long, Long> value) throws Exception {
+      Tuple3<Long, Long, Long> value) {
       reuseTuple.setEdgeId(value.f0);
       reuseTuple.setSourceId(value.f1);
       reuseTuple.setTargetId(value.f2);

@@ -48,7 +48,7 @@ public abstract class TransformBase<EL extends EPGMElement>
    *
    * @param element current element
    * @return modified element
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public EL map(EL element) throws Exception {

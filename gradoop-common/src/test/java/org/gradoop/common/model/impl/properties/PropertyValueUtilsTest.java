@@ -70,8 +70,9 @@ public class PropertyValueUtilsTest {
    * Test class of {@link PropertyValueUtils.Numeric}
    */
   public static class NumericTest {
+
     @Test
-    public void testAddReturningBigDecimal() throws Exception {
+    public void testAddReturningBigDecimal() {
       PropertyValue p;
 
       // BigDecimal
@@ -244,7 +245,7 @@ public class PropertyValueUtilsTest {
     }
 
     @Test
-    public void testMultiplyReturningBigDecimal() throws Exception {
+    public void testMultiplyReturningBigDecimal() {
       PropertyValue p;
 
       // BigDecimal
@@ -417,7 +418,7 @@ public class PropertyValueUtilsTest {
     }
 
     @Test
-    public void testMin() throws Exception {
+    public void testMin() {
       PropertyValue p;
       BigDecimal minBigDecimal = new BigDecimal("10");
       BigDecimal maxBigDecimal = new BigDecimal("11");
@@ -692,7 +693,7 @@ public class PropertyValueUtilsTest {
     }
 
     @Test
-    public void testMax() throws Exception {
+    public void testMax() {
       PropertyValue p;
       BigDecimal minBigDecimal = new BigDecimal("10");
       BigDecimal maxBigDecimal = new BigDecimal("11");

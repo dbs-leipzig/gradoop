@@ -116,7 +116,7 @@ public class CreateInitialExpandEmbeddingTest {
    * @param distinctEdges distinct edge columns of the base embedding
    * @param closingColumn closing column
    * @param isResult if true it is expected that the join yields exactly one result, 0 otherwise
-   * @throws Exception
+   * @throws Exception on failure
    */
   private void testJoin(Embedding edge, List<Integer> distinctVertices,
     List<Integer> distinctEdges, int closingColumn, boolean isResult) throws Exception {

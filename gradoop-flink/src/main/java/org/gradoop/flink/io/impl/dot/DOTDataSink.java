@@ -99,6 +99,7 @@ public class DOTDataSink implements DataSink {
 
     /**
      * see super constructor.
+     *
      * @param outputPath graphviz dot file name
      * @param charset encoding
      */
@@ -108,6 +109,7 @@ public class DOTDataSink implements DataSink {
 
     /**
      * see super constructor.
+     *
      * @param outputPath graphviz dot file name
      */
     GraphvizWriter(Path outputPath) {

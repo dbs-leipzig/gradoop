@@ -63,6 +63,7 @@ public class RollUpExample extends AbstractRunner {
    *
    * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Unary-Logical-Graph-Operators">
    * Gradoop Wiki</a>
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     // init execution environment

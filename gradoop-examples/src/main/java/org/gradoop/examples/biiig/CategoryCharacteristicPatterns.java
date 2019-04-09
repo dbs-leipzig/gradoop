@@ -54,8 +54,9 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
   /**
    * main method
+   *
    * @param args arguments (none required)
-   * @throws Exception
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
 
@@ -114,8 +115,9 @@ public class CategoryCharacteristicPatterns implements ProgramDescription {
 
   /**
    * Returns example integrated instance graph from GDL input.
+   *
    * @return integrated instance graph
-   * @throws IOException
+   * @throws IOException on failure
    */
   public static LogicalGraph getIntegratedInstanceGraph() throws IOException {
 

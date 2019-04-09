@@ -33,6 +33,7 @@ public class GradoopFormatConverter extends AbstractRunner implements ProgramDes
    * args[3] - format of output graph (csv, json, indexed)
    *
    * @param args arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);

@@ -79,7 +79,8 @@ public class ExampleOutput {
 
   /**
    * print output
-   * @throws Exception
+   *
+   * @throws Exception on failure
    */
   public void print() throws Exception {
     outSet
@@ -110,7 +111,7 @@ public class ExampleOutput {
     MapFunction<ArrayList<String>, String> {
 
     @Override
-    public String map(ArrayList<String> lines) throws Exception {
+    public String map(ArrayList<String> lines) {
 
       return StringUtils.join(lines, "\n");
     }

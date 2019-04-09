@@ -40,6 +40,7 @@ public class DOTExample extends AbstractRunner implements ProgramDescription {
    * args[3]: flag to write graph head information
    *
    * @param args program arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     if (args.length != 5) {

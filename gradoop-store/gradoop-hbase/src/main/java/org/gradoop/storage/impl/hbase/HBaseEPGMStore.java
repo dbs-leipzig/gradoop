@@ -40,11 +40,11 @@ import org.gradoop.storage.config.GradoopHBaseConfig;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
-import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
-import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 import org.gradoop.storage.impl.hbase.iterator.HBaseEdgeIterator;
 import org.gradoop.storage.impl.hbase.iterator.HBaseGraphIterator;
 import org.gradoop.storage.impl.hbase.iterator.HBaseVertexIterator;
+import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -333,6 +333,21 @@ public class HBaseEPGMStore implements
     admin.deleteTable(vertexTable.getName());
     admin.deleteTable(edgeTable.getName());
     admin.deleteTable(graphHeadTable.getName());
+  }
+
+  /**
+   * First disable, then truncate all tables handled by this store instance, i.e. delete all rows.
+   *
+   * @throws IOException when truncating any table fails.
+   */
+  public void truncateTables() throws IOException {
+    admin.disableTable(graphHeadTable.getName());
+    admin.disableTable(vertexTable.getName());
+    admin.disableTable(edgeTable.getName());
+
+    admin.truncateTable(getConfig().getGraphTableName(), true);
+    admin.truncateTable(getConfig().getVertexTableName(), true);
+    admin.truncateTable(getConfig().getEdgeTableName(), true);
   }
 
   /**

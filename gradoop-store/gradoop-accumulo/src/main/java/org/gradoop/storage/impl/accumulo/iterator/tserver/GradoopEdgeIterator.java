@@ -74,6 +74,7 @@ public class GradoopEdgeIterator extends BaseElementIterator<EPGMEdge> {
    *
    * @param source origin store source
    * @return decoded epgm element
+   * @throws IOException on failure
    */
   @Nullable
   public Edge readLine(

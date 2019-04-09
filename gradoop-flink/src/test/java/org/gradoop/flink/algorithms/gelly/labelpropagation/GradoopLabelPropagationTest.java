@@ -86,10 +86,9 @@ public class GradoopLabelPropagationTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Tests, if the resulting graph contains the same elements as the input
-   * graph.
+   * Tests, if the resulting graph contains the same elements as the input graph.
    *
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Test
   public void testByElementIds() throws Exception {

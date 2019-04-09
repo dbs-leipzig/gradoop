@@ -23,13 +23,13 @@ import static org.junit.Assert.*;
 public class PropertyTest {
 
   @Test
-  public void testGetKey() throws Exception {
+  public void testGetKey() {
     Property property = new Property("key", PropertyValue.create(10));
     assertEquals("key", property.getKey());
   }
 
   @Test
-  public void testSetKey() throws Exception {
+  public void testSetKey() {
     Property property = new Property("key", PropertyValue.create(10));
     property.setKey("newKey");
     assertEquals("newKey", property.getKey());
@@ -58,14 +58,14 @@ public class PropertyTest {
   }
 
   @Test
-  public void testGetValue() throws Exception {
+  public void testGetValue() {
     PropertyValue propertyValue = PropertyValue.create(10);
     Property p = new Property("key", propertyValue);
     assertEquals(propertyValue, p.getValue());
   }
 
   @Test
-  public void testSetValue() throws Exception {
+  public void testSetValue() {
     PropertyValue propertyValue = PropertyValue.create(10);
     Property p = new Property("key", PropertyValue.create(11));
     p.setValue(propertyValue);
@@ -84,7 +84,7 @@ public class PropertyTest {
   }
 
   @Test
-  public void testEqualsAndHashCode() throws Exception {
+  public void testEqualsAndHashCode() {
     Property p1 = new Property("key1", PropertyValue.create(10));
     Property p2 = new Property("key1", PropertyValue.create(10));
     Property p3 = new Property("key1", PropertyValue.create(11));
@@ -105,7 +105,7 @@ public class PropertyTest {
   }
 
   @Test
-  public void testCompareTo() throws Exception {
+  public void testCompareTo() {
     Property p1 = new Property("key1", PropertyValue.create(10));
     Property p2 = new Property("key1", PropertyValue.create(10));
     Property p3 = new Property("key2", PropertyValue.create(10));

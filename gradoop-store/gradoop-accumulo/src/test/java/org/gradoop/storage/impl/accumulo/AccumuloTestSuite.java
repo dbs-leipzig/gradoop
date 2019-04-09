@@ -123,6 +123,8 @@ public class AccumuloTestSuite {
 
   /**
    * Create mini cluster accumulo instance for test
+   *
+   * @throws Exception on failure
    */
   @BeforeClass
   public static void setupAccumulo() throws Exception {
@@ -141,6 +143,8 @@ public class AccumuloTestSuite {
 
   /**
    * Terminate and remove temporary file
+   *
+   * @throws Exception on failure
    */
   @AfterClass
   public static void terminateAccumulo() throws Exception {

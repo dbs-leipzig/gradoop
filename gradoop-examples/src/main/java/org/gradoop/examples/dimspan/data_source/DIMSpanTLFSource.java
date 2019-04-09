@@ -62,6 +62,7 @@ public class DIMSpanTLFSource {
    * Reads the input as dataset of TLFGraphs.
    *
    * @return io graphs
+   * @throws IOException on failure
    */
   public DataSet<LabeledGraphStringString> getGraphs() throws IOException {
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();

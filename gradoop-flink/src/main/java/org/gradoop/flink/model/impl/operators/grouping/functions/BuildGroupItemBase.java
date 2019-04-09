@@ -78,6 +78,7 @@ public class BuildGroupItemBase extends BuildBase {
    * @param groupItem the group item to be set
    * @param element the epgm element
    * @param labelGroup label group to be assigned
+   * @throws IOException on failure
    */
   protected void setGroupItem(GroupItem groupItem, EPGMElement element, LabelGroup labelGroup)
     throws IOException {
