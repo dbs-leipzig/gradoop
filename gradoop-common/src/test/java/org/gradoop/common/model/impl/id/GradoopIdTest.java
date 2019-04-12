@@ -15,19 +15,15 @@
  */
 package org.gradoop.common.model.impl.id;
 
-import junitparams.JUnitParamsRunner;
-import junitparams.NamedParameters;
-import junitparams.Parameters;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.AssertJUnit.*;
 
-@RunWith(JUnitParamsRunner.class)
 public class GradoopIdTest {
 
   @Test
@@ -53,7 +49,7 @@ public class GradoopIdTest {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 
-    assertThat(id1.compareTo(id1), is(0));
+    assertEquals(id1.compareTo(id1), 0);
     assertTrue(id1.compareTo(id2) != 0);
   }
 
@@ -133,19 +129,18 @@ public class GradoopIdTest {
    *
    * @param input an invalid input string
    */
-  @Test
-  @Parameters(named = "invalid strings")
+  @Test(dataProvider = "invalid strings")
   public void testIsValidWithInvalidInput(String input) {
     assertFalse("Invalid input string was evaluated as valid: " + input,
       GradoopId.isValid(input));
   }
 
-  @NamedParameters("invalid strings")
-  private String[] invalidStringsDataProvider() {
-    return new String[] {
-      "abc3451d98ebd3452fff32a",   // too short
-      "1234567891011121131415161", // too long
-      "12345678910111211314151G"}; // 'G' is not a valid char in a hex string
+  @DataProvider(name = "invalid strings")
+  private Object[][] invalidStringsDataProvider() {
+    return new Object[][] {
+      {"abc3451d98ebd3452fff32a"},   // too short
+      {"1234567891011121131415161"}, // too long
+      {"12345678910111211314151G"}}; // 'G' is not a valid char in a hex string
   }
 
   /**
@@ -153,19 +148,18 @@ public class GradoopIdTest {
    *
    * @param input a valid input string
    */
-  @Test
-  @Parameters(named = "valid strings")
+  @Test(dataProvider = "valid strings")
   public void testIsValidWithValidInput(String input) {
     assertTrue("Valid input string was evaluated as invalid: " + input,
       GradoopId.isValid(input));
   }
 
-  @NamedParameters("valid strings")
-  private String[] validStringDataProvider() {
-    return new String[] {
-      "912345678910111213141516",
-      "1AB363914FD1325CC43790AB",
-      "bcdef12345678910bac76d4e"};
+  @DataProvider(name = "valid strings")
+  private Object[][] validStringDataProvider() {
+    return new Object[][] {
+      {"912345678910111213141516"},
+      {"1AB363914FD1325CC43790AB"},
+      {"bcdef12345678910bac76d4e"}};
   }
 
 }
