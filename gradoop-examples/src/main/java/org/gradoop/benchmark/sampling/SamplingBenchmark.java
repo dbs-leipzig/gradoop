@@ -55,6 +55,7 @@ public class SamplingBenchmark extends AbstractRunner implements ProgramDescript
    * 4 ---> RandomVertexEdgeSampling
    * 5 ---> RandomVertexNeighborhoodSampling
    * 6 ---> RandomVertexSampling
+   * 7 ---> RandomWalkSampling
    */
   private static final String OPTION_SELECTED_ALGORITHM = "a";
   /**

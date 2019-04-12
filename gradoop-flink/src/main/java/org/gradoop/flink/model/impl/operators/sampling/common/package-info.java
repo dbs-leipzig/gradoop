@@ -13,26 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling;
-
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-
 /**
- * Abstract class to provide methods for sampling algorithms.
+ * Contains a collection of graph sampling methods.
  */
-public abstract class SamplingAlgorithm implements UnaryGraphToGraphOperator {
-
-  @Override
-  public LogicalGraph execute(LogicalGraph graph) {
-    return sample(graph);
-  }
-
-  /**
-   * Each sampling method should prepare a sample method
-   *
-   * @param graph graph that will be sampled of
-   * @return sampled graph
-   */
-  protected abstract LogicalGraph sample(LogicalGraph graph);
-}
+package org.gradoop.flink.model.impl.operators.sampling.common;

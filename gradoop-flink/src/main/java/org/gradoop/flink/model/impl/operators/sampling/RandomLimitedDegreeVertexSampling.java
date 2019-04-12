@@ -25,13 +25,15 @@ import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 import org.gradoop.flink.model.impl.operators.sampling.functions.LimitedDegreeVertexRandomFilter;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
 
 /**
- * Computes a vertex sampling of the graph. Retains all vertices with a degree greater than a given
- * degree threshold and degree type. Also retains randomly chosen vertices with a degree smaller
- * or equal this threshold. Retains all edges which source- and target-vertices were chosen.
+ * Computes a vertex sampling of the graph (new graph head will be generated). Retains all vertices
+ * with a degree greater than a given degree threshold and degree type. Also retains randomly
+ * chosen vertices with a degree smaller or equal this threshold. Retains all edges which source-
+ * and target-vertices were chosen.
  */
 public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
 
@@ -115,17 +117,17 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
   public LogicalGraph sample(LogicalGraph graph) {
 
     graph = new DistinctVertexDegrees(
-      DEGREE_PROPERTY_KEY,
-      IN_DEGREE_PROPERTY_KEY,
-      OUT_DEGREE_PROPERTY_KEY,
+      SamplingConstants.DEGREE_PROPERTY_KEY,
+      SamplingConstants.IN_DEGREE_PROPERTY_KEY,
+      SamplingConstants.OUT_DEGREE_PROPERTY_KEY,
       true).execute(graph);
 
     DataSet<Vertex> newVertices = graph.getVertices()
       .filter(new LimitedDegreeVertexRandomFilter<>(
         sampleSize, randomSeed, degreeThreshold, degreeType))
-      .map(new PropertyRemover<>(DEGREE_PROPERTY_KEY))
-      .map(new PropertyRemover<>(IN_DEGREE_PROPERTY_KEY))
-      .map(new PropertyRemover<>(OUT_DEGREE_PROPERTY_KEY));
+      .map(new PropertyRemover<>(SamplingConstants.DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(SamplingConstants.IN_DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(SamplingConstants.OUT_DEGREE_PROPERTY_KEY));
 
     DataSet<Edge> newEdges = graph.getEdges()
       .join(newVertices)
@@ -135,8 +137,7 @@ public class RandomLimitedDegreeVertexSampling extends SamplingAlgorithm {
       .where(new TargetId<>()).equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    return graph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(graph.getGraphHead(), newVertices, newEdges);
+    return graph.getFactory().fromDataSets(newVertices, newEdges);
   }
 
 }

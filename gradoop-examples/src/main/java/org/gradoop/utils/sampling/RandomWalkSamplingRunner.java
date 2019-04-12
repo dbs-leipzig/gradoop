@@ -46,8 +46,8 @@ public class RandomWalkSamplingRunner extends AbstractRunner implements ProgramD
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
     LogicalGraph sampledGraph = graph.callForGraph(new RandomWalkSampling(
-      Double.parseDouble(args[2]), Integer.parseInt(args[3]),
-      Double.parseDouble(args[4]), Integer.parseInt(args[5])));
+      Float.parseFloat(args[2]), Integer.parseInt(args[3]),
+      Float.parseFloat(args[4]), Integer.parseInt(args[5])));
 
     writeLogicalGraph(sampledGraph, args[6], args[7]);
   }

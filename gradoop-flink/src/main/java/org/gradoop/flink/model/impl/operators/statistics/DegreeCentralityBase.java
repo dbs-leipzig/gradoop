@@ -13,26 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.sampling;
-
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+package org.gradoop.flink.model.impl.operators.statistics;
 
 /**
- * Abstract class to provide methods for sampling algorithms.
+ * Base class with constants for DegreeCentrality
  */
-public abstract class SamplingAlgorithm implements UnaryGraphToGraphOperator {
-
-  @Override
-  public LogicalGraph execute(LogicalGraph graph) {
-    return sample(graph);
-  }
-
+public abstract class DegreeCentralityBase {
   /**
-   * Each sampling method should prepare a sample method
-   *
-   * @param graph graph that will be sampled of
-   * @return sampled graph
+   * Name for broadcasting variable
    */
-  protected abstract LogicalGraph sample(LogicalGraph graph);
+  static final String BROADCAST_NAME = "degree_max";
 }

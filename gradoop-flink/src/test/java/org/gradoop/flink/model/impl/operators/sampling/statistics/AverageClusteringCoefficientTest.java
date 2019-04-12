@@ -18,6 +18,7 @@ package org.gradoop.flink.model.impl.operators.sampling.statistics;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.statistics.AverageClusteringCoefficient;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Before;
 import org.junit.Test;
