@@ -31,10 +31,10 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.NonUniformVerte
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexToDegreeMap;
 
 /**
- * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
- * amount and all edges which source- and target-vertices were chosen. A degree-dependent value
- * is taken into account to have a bias towards high-degree vertices. There may retain some
- * unconnected vertices in the sampled graph.
+ * Computes a vertex sampling of the graph (new graph head will be generated). Retains randomly
+ * chosen vertices of a given relative amount and all edges which source- and target-vertices
+ * were chosen. A degree-dependent value is taken into account to have a bias towards high-degree
+ * vertices. There may retain some unconnected vertices in the sampled graph.
  */
 public class RandomNonUniformVertexSampling extends SamplingAlgorithm {
 

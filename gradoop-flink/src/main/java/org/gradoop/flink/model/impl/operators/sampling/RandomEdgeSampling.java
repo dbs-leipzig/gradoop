@@ -26,9 +26,9 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
 
 /**
- * Computes an edge sampling of the graph. Retains randomly chosen edges of a given relative amount
- * and their associated source- and target-vertices. No unconnected vertices will retain in the
- * sampled graph.
+ * Computes an edge sampling of the graph (new graph head will be generated). Retains randomly
+ * chosen edges of a given relative amount and their associated source- and target-vertices. No
+ * unconnected vertices will retain in the sampled graph.
  */
 public class RandomEdgeSampling extends SamplingAlgorithm {
   /**

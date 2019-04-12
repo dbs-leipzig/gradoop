@@ -31,8 +31,8 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.EdgesWithSample
 import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
 
 /**
- * Computes a random walk sampling of the graph. Retains visited vertices and edges where source
- * and target vertex has been sampled.
+ * Computes a random walk sampling of the graph (new graph head will be generated). Retains visited
+ * vertices and edges where source and target vertex has been sampled.
  */
 public class RandomWalkSampling extends SamplingAlgorithm {
 

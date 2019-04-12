@@ -36,7 +36,7 @@ public class RandomVertex implements MapFunction<Vertex, Vertex> {
   /**
    * Property name for marking the vertex
    */
-  private final String mark;
+  private final String samplingKey;
 
   /**
    * Creates a new filter instance.
@@ -46,7 +46,7 @@ public class RandomVertex implements MapFunction<Vertex, Vertex> {
    * @param samplingKey the name of property for sampled vertices
    */
   public RandomVertex(float sampleSize, long randomSeed, String samplingKey) {
-    this.mark = samplingKey;
+    this.samplingKey = samplingKey;
     this.sampleSize = sampleSize;
     this.randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
   }
@@ -54,9 +54,9 @@ public class RandomVertex implements MapFunction<Vertex, Vertex> {
   @Override
   public Vertex map(Vertex vertex) throws Exception {
     if (randomGenerator.nextFloat() <= sampleSize) {
-      vertex.setProperty(mark, true);
+      vertex.setProperty(samplingKey, true);
     } else {
-      vertex.setProperty(mark, false);
+      vertex.setProperty(samplingKey, false);
     }
     return vertex;
   }

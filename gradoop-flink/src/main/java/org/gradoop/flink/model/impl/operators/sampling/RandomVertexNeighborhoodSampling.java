@@ -31,9 +31,9 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
 import org.gradoop.flink.model.impl.operators.sampling.functions.RandomVertex;
 
 /**
- * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
- * amount and includes all neighbors of those vertices in the sampling. All edges which source-
- * and target-vertices were chosen are sampled, too.
+ * Computes a vertex sampling of the graph (new graph head will be generated). Retains randomly
+ * chosen vertices of a given relative amount and includes all neighbors of those vertices in the
+ * sampling. All edges which source- and target-vertices were chosen are sampled, too.
  */
 public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
 

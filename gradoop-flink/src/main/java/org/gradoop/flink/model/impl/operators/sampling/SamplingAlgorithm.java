@@ -19,7 +19,7 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
- * Abstract class to provide property keys and methods for sampling algorithms.
+ * Abstract class to provide methods for sampling algorithms.
  */
 public abstract class SamplingAlgorithm implements UnaryGraphToGraphOperator {
 

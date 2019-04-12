@@ -33,7 +33,7 @@ import org.gradoop.flink.model.impl.operators.sampling.functions.AddPageRankScor
 import org.gradoop.flink.model.impl.operators.sampling.functions.PageRankResultVertexFilter;
 
 /**
- * Computes a PageRank-Sampling of the graph.
+ * Computes a PageRank-Sampling of the graph (new graph head will be generated).
  *
  * Uses the Gradoop-Wrapper of Flinks PageRank-algorithm {@link PageRank} with a dampening factor
  * and a number of maximum iterations. It computes a per-vertex score which is the sum of the
@@ -142,7 +142,7 @@ public class PageRankSampling extends SamplingAlgorithm {
       .where(new TargetId<>()).equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(scaledVertices, newEdges);
+    graph = graph.getFactory().fromDataSets(scaledVertices, newEdges);
 
     return graph;
   }
