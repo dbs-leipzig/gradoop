@@ -79,6 +79,7 @@ public class RandomEdgeSampling extends SamplingAlgorithm {
       .distinct(new Id<>());
 
     DataSet<Vertex> newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id<>());
-    return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
+
+    return graph.getFactory().fromDataSets(newVertices, newEdges);
   }
 }

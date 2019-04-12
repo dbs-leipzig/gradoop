@@ -76,6 +76,6 @@ public class RandomVertexSampling extends SamplingAlgorithm {
       .where(new TargetId<>()).equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
+    return graph.getFactory().fromDataSets(newVertices, newEdges);
   }
 }
