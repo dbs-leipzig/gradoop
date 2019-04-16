@@ -62,7 +62,7 @@ public class JSONToEdge extends JSONToEntity
    *
    * @param s json string
    * @return Gelly edge storing gradoop edge data
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public Edge map(String s) throws Exception {
@@ -84,7 +84,7 @@ public class JSONToEdge extends JSONToEntity
    *
    * @param jsonEdge json string representation
    * @return source vertex identifier
-   * @throws JSONException
+   * @throws JSONException if failed to parse JSON
    */
   private GradoopId getSourceId(JSONObject jsonEdge) throws JSONException {
     return GradoopId.fromString(jsonEdge.getString(JSONConstants.EDGE_SOURCE));
@@ -95,7 +95,7 @@ public class JSONToEdge extends JSONToEntity
    *
    * @param jsonEdge json string representation
    * @return target vertex identifier
-   * @throws JSONException
+   * @throws JSONException if failed to parse JSON
    */
   private GradoopId getTargetId(JSONObject jsonEdge) throws JSONException {
     return GradoopId.fromString(jsonEdge.getString(JSONConstants.EDGE_TARGET));

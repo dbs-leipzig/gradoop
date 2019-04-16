@@ -42,7 +42,7 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
-import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -198,10 +198,10 @@ public class KRandomJumpGellyVCI
     DataSet<org.gradoop.common.model.impl.pojo.Edge> visitedEdges = currentGraph.getEdges()
       .leftOuterJoin(visitedGellyEdgeIds)
       .where(new Id<>()).equalTo("*")
-      .with(new EPGMEdgeWithGellyEdgeIdJoin(SamplingAlgorithm.PROPERTY_KEY_SAMPLED));
+      .with(new EPGMEdgeWithGellyEdgeIdJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));
 
     DataSet<GradoopId> visitedSourceTargetIds = visitedEdges
-      .flatMap(new GetVisitedSourceTargetIdsFlatMap(SamplingAlgorithm.PROPERTY_KEY_SAMPLED))
+      .flatMap(new GetVisitedSourceTargetIdsFlatMap(SamplingConstants.PROPERTY_KEY_SAMPLED))
       .distinct();
 
     // compute new visited vertices
@@ -211,11 +211,11 @@ public class KRandomJumpGellyVCI
       .with(new GellyVertexWithLongIdToGradoopIdJoin())
       .join(currentGraph.getVertices())
       .where(0).equalTo(new Id<>())
-      .with(new GellyVertexWithEPGMVertexJoin(SamplingAlgorithm.PROPERTY_KEY_SAMPLED));
+      .with(new GellyVertexWithEPGMVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));
 
     visitedVertices = visitedVertices.leftOuterJoin(visitedSourceTargetIds)
       .where(new Id<>()).equalTo("*")
-      .with(new VertexWithVisitedSourceTargetIdJoin(SamplingAlgorithm.PROPERTY_KEY_SAMPLED));
+      .with(new VertexWithVisitedSourceTargetIdJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));
 
     // return graph
     return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(

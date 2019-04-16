@@ -89,7 +89,7 @@ public class ElementLabelEncoder extends
    * @param graphTransaction graph transaction with label format:
    *                         'dictionarylabel'
    * @return graph transaction with label format: 'simpleLabel' (Integer)
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public GraphTransaction map(GraphTransaction graphTransaction)

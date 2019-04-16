@@ -53,7 +53,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetGraphHeads() throws Exception {
+  public void testGetGraphHeads() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("[()]", config);
 
@@ -68,7 +68,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetGraphHeadByVariable() throws Exception {
+  public void testGetGraphHeadByVariable() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()];h[()]", config);
 
@@ -83,7 +83,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetGraphHeadsByVariables() throws Exception {
+  public void testGetGraphHeadsByVariables() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()],h[()]", config);
 
@@ -94,7 +94,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetVertices() throws Exception {
+  public void testGetVertices() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("[()]", config);
 
@@ -122,7 +122,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetVerticesByVariables() throws Exception {
+  public void testGetVerticesByVariables() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("[(a),(b),(a)]", config);
 
@@ -141,7 +141,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetVerticesByGraphIds() throws Exception {
+  public void testGetVerticesByGraphIds() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[(a),(b)],h[(a),(c)]", config);
 
@@ -177,7 +177,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetVerticesByGraphVariables() throws Exception {
+  public void testGetVerticesByGraphVariables() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[(a),(b)],h[(a),(c)]", config);
 
@@ -210,7 +210,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetEdges() throws Exception {
+  public void testGetEdges() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("[()-->()]", config);
 
@@ -224,7 +224,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetEdgesByVariables() throws Exception {
+  public void testGetEdgesByVariables() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("[()-[e]->()<-[f]-()]", config);
 
@@ -243,7 +243,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetEdgesByGraphIds() throws Exception {
+  public void testGetEdgesByGraphIds() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()-[a]->()<-[b]-()],h[()-[c]->()-[d]->()]",
         config);
@@ -282,7 +282,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetEdgesByGraphVariables() throws Exception {
+  public void testGetEdgesByGraphVariables() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()-[a]->()<-[b]-()],h[()-[c]->()-[d]->()]",
         config);
@@ -318,7 +318,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetGraphHeadCache() throws Exception {
+  public void testGetGraphHeadCache() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()],h[()],[()]",
         config);
@@ -337,7 +337,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetVertexCache() throws Exception {
+  public void testGetVertexCache() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("(a),(b),()", config);
 
@@ -355,7 +355,7 @@ public class AsciiGraphLoaderTest {
   }
 
   @Test
-  public void testGetEdgeCache() throws Exception {
+  public void testGetEdgeCache() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("()-[e]->()<-[f]-()-->()", config);
 

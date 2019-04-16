@@ -29,6 +29,7 @@ public interface DataSink {
    * Writes a logical graph to the data sink.
    *
    * @param logicalGraph logical graph
+   * @throws IOException on failure
    */
   void write(LogicalGraph logicalGraph) throws IOException;
 
@@ -36,6 +37,7 @@ public interface DataSink {
    * Writes a graph collection graph to the data sink.
    *
    * @param graphCollection graph collection
+   * @throws IOException on failure
    */
   void write(GraphCollection graphCollection) throws IOException;
 
@@ -44,6 +46,7 @@ public interface DataSink {
    *
    * @param logicalGraph logical graph
    * @param overwrite true, if existing files should be overwritten
+   * @throws IOException on failure
    */
   void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException;
 
@@ -52,6 +55,7 @@ public interface DataSink {
    *
    * @param graphCollection graph collection
    * @param overwrite true, if existing files should be overwritten
+   * @throws IOException on failure
    */
   void write(GraphCollection graphCollection, boolean overwrite) throws IOException;
 }

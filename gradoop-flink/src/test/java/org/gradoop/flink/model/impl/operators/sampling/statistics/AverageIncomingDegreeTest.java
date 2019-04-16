@@ -17,6 +17,8 @@ package org.gradoop.flink.model.impl.operators.sampling.statistics;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.statistics.AverageIncomingDegree;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

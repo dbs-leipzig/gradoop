@@ -52,10 +52,9 @@ public class CreateImportEdge<K extends Comparable<K>>
   /**
    * Method to create ImportEdge
    *
-   * @param idTuple     tuple that contains unique line id + source and
-   *                    target ids
-   * @return            initialized reuseEdge
-   * @throws Exception
+   * @param idTuple    tuple that contains unique line id + source and target ids
+   * @return           initialized reuseEdge
+   * @throws Exception on failure
    */
   @Override
   public ImportEdge<K> map(Tuple2<K, Tuple2<K, K>> idTuple) throws Exception {

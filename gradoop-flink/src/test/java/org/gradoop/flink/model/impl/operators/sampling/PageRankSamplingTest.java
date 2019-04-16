@@ -21,6 +21,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
@@ -70,17 +71,17 @@ public class PageRankSamplingTest extends ParameterizedTestForGraphSampling {
     try {
       // test normal graph
       GraphHead normalGh = output.getGraphHead().collect().get(0);
-      double minScore = normalGh.getPropertyValue(PageRankSampling.MIN_PAGE_RANK_SCORE_PROPERTY_KEY)
+      double minScore = normalGh.getPropertyValue(SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY)
         .getDouble();
-      double maxScore = normalGh.getPropertyValue(PageRankSampling.MAX_PAGE_RANK_SCORE_PROPERTY_KEY)
+      double maxScore = normalGh.getPropertyValue(SamplingConstants.MAX_PAGE_RANK_SCORE_PROPERTY_KEY)
         .getDouble();
       if (minScore != maxScore) {
         for (Vertex v : newVertices) {
           assertTrue("vertex does not have scaled PageRank-score property (should have):" +
-            v.toString(), v.hasProperty(PageRankSampling.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY));
+            v.toString(), v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY));
 
-          if (v.hasProperty(PageRankSampling.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
-            double score = v.getPropertyValue(PageRankSampling.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
+          if (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
+            double score = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
               .getDouble();
             if (sampleGreaterThanThreshold) {
               assertTrue("sampled vertex has PageRankScore smaller or equal than threshold",
@@ -129,9 +130,9 @@ public class PageRankSamplingTest extends ParameterizedTestForGraphSampling {
 
       GraphHead specialGh = sampledGraph.getGraphHead().collect().get(0);
       double minScore1 = specialGh.getPropertyValue(
-        PageRankSampling.MIN_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
+        SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
       double maxScore1 = specialGh.getPropertyValue(
-        PageRankSampling.MAX_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
+        SamplingConstants.MAX_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
 
       assertEquals("min PageRankScore is not equal to max PageRankScore",
         minScore1, maxScore1, 0.0);

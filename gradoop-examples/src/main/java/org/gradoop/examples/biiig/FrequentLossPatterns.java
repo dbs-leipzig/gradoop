@@ -16,8 +16,8 @@
 package org.gradoop.examples.biiig;
 
 import org.apache.flink.api.common.ProgramDescription;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -236,7 +236,7 @@ public class FrequentLossPatterns
 
 
     @Override
-    public PropertyValue getIncrement(Element vertex) {
+    public PropertyValue getIncrement(EPGMElement vertex) {
       PropertyValue increment;
 
       if (vertex.hasProperty(REVENUE_KEY)) {
@@ -262,7 +262,7 @@ public class FrequentLossPatterns
   private static class DetermineMasterDataSurplus implements Sum, VertexAggregateFunction {
 
     @Override
-    public PropertyValue getIncrement(Element vertex) {
+    public PropertyValue getIncrement(EPGMElement vertex) {
       return vertex.getLabel().startsWith(MASTER_PREFIX) ?
         PropertyValue.create(1) : PropertyValue.create(-1);
     }

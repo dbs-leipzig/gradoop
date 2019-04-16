@@ -39,14 +39,15 @@ public class RandomWalkSamplingRunner extends AbstractRunner implements ProgramD
    * args[7] - format of output graph (csv, json, indexed)
    *
    * @param args arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
 
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);
 
     LogicalGraph sampledGraph = graph.callForGraph(new RandomWalkSampling(
-      Double.parseDouble(args[2]), Integer.parseInt(args[3]),
-      Double.parseDouble(args[4]), Integer.parseInt(args[5])));
+      Float.parseFloat(args[2]), Integer.parseInt(args[3]),
+      Float.parseFloat(args[4]), Integer.parseInt(args[5])));
 
     writeLogicalGraph(sampledGraph, args[6], args[7]);
   }

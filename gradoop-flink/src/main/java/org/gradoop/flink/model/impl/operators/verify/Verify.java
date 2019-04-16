@@ -30,13 +30,16 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
  * Verifies a graph's edge set, removing dangling edges, i.e. edges with a source- or target-id
  * not matching any vertices of this graph.
  *
- * @param <LG> The graph type.
  * @param <G>  The graph head type.
  * @param <V>  The vertex type.
  * @param <E>  The edge type.
+ * @param <LG> The graph type.
  */
-public class Verify<LG extends BaseGraph<G, V, E, LG>, G extends EPGMGraphHead,
-  V extends EPGMVertex, E extends EPGMEdge> implements UnaryBaseGraphToBaseGraphOperator<LG> {
+public class Verify<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   @Override
   public LG execute(LG graph) {

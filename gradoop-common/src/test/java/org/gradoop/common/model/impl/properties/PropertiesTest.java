@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 public class PropertiesTest {
 
   @Test
-  public void testCreateFromMap() throws Exception {
+  public void testCreateFromMap() {
     Properties properties = Properties.createFromMap(SUPPORTED_PROPERTIES);
 
     assertEquals(SUPPORTED_PROPERTIES.size(), properties.size());
@@ -41,7 +41,7 @@ public class PropertiesTest {
   }
 
   @Test
-  public void testGetKeys() throws Exception {
+  public void testGetKeys() {
     Properties properties = Properties.createFromMap(SUPPORTED_PROPERTIES);
 
     List<String> keyList = Lists.newArrayList(properties.getKeys());
@@ -53,7 +53,7 @@ public class PropertiesTest {
   }
 
   @Test
-  public void testContainsKey() throws Exception {
+  public void testContainsKey() {
     Properties properties = Properties.create();
 
     assertFalse("unexpected key found", properties.containsKey(KEY_1));
@@ -63,7 +63,7 @@ public class PropertiesTest {
   }
 
   @Test
-  public void testGet() throws Exception {
+  public void testGet() {
     Properties properties = Properties.createFromMap(SUPPORTED_PROPERTIES);
 
     assertNotNull("property was null", properties.get(KEY_1));
@@ -72,7 +72,7 @@ public class PropertiesTest {
   }
 
   @Test
-  public void testSet() throws Exception {
+  public void testSet() {
     Properties properties = Properties.create();
 
     properties.set(Property.create(KEY_1, BOOL_VAL_1));
@@ -84,7 +84,7 @@ public class PropertiesTest {
   }
 
   @Test
-  public void testSet1() throws Exception {
+  public void testSet1() {
     Properties properties = Properties.create();
 
     properties.set(KEY_1, PropertyValue.create(BOOL_VAL_1));
@@ -96,7 +96,7 @@ public class PropertiesTest {
   }
 
   @Test
-  public void testSet2() throws Exception {
+  public void testSet2() {
     Properties properties = Properties.create();
 
     properties.set(KEY_1, BOOL_VAL_1);
@@ -108,7 +108,7 @@ public class PropertiesTest {
   }
 
   @Test
-  public void testRemove() throws Exception {
+  public void testRemove() {
     Properties properties = Properties.create();
     PropertyValue removed;
 
@@ -124,7 +124,7 @@ public class PropertiesTest {
   }
 
   @Test
-  public void testRemove2() throws Exception {
+  public void testRemove2() {
     Properties properties = Properties.create();
     PropertyValue removed;
 
@@ -140,7 +140,7 @@ public class PropertiesTest {
   }
 
   @Test
-  public void testClear() throws Exception {
+  public void testClear() {
     Properties properties = Properties.create();
     properties.set(KEY_1, BOOL_VAL_1);
     properties.clear();
@@ -148,7 +148,7 @@ public class PropertiesTest {
   }
 
   @Test
-  public void testSize() throws Exception {
+  public void testSize() {
     Properties properties = Properties.create();
     assertEquals("wrong size", 0, properties.size());
     properties.set(KEY_1, BOOL_VAL_1);
@@ -161,7 +161,7 @@ public class PropertiesTest {
   }
 
   @Test
-  public void testIsEmpty() throws Exception {
+  public void testIsEmpty() {
     Properties properties = Properties.create();
     assertTrue("properties was not empty", properties.isEmpty());
     properties.set(KEY_1, BOOL_VAL_1);
@@ -169,7 +169,7 @@ public class PropertiesTest {
   }
 
   @Test
-  public void testEqualsAndHashCode() throws Exception {
+  public void testEqualsAndHashCode() {
     Properties properties1 = Properties.createFromMap(SUPPORTED_PROPERTIES);
     Properties properties2 = Properties.createFromMap(SUPPORTED_PROPERTIES);
     Properties properties3 = Properties.createFromMap(SUPPORTED_PROPERTIES);
@@ -194,7 +194,7 @@ public class PropertiesTest {
   }
 
   @Test
-  public void testIterator() throws Exception {
+  public void testIterator() {
     Properties properties = Properties.createFromMap(SUPPORTED_PROPERTIES);
 
     for (Property property : properties) {

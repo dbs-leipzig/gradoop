@@ -172,6 +172,7 @@ public class GradoopTestUtils {
    * gradoop/dev-support/social-network.pdf
    *
    * @return graph store containing a simple social network for tests.
+   * @throws IOException on failure
    */
   public static AsciiGraphLoader<GraphHead, Vertex, Edge> getSocialNetworkLoader()
     throws IOException {

@@ -124,7 +124,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
   /**
    * Tests the data in the resulting graph.
    *
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Test
   public void testDataEquality() throws Exception {

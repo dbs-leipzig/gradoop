@@ -38,7 +38,7 @@ public class DIMSpanGraphFromText
   public static final char COLUMN_SEPARATOR = ' ';
 
   @Override
-  public LabeledGraphStringString map(Tuple2<LongWritable, Text> inputTuple) throws Exception {
+  public LabeledGraphStringString map(Tuple2<LongWritable, Text> inputTuple) {
     LabeledGraphStringString setPair = LabeledGraphStringString.getEmptyOne();
 
     // create character array

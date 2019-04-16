@@ -28,7 +28,7 @@ public class BtgUpdater
 
   @Override
   public void updateVertex(Vertex<GradoopId, GradoopId> vertex,
-    MessageIterator<GradoopId> messageIterator) throws Exception {
+    MessageIterator<GradoopId> messageIterator) {
 
     GradoopId lastComponent = vertex.getValue();
     GradoopId newComponent = lastComponent;
