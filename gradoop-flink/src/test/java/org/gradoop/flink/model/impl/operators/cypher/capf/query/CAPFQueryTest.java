@@ -39,7 +39,7 @@ import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class TestCAPFQuery extends GradoopFlinkTestBase {
+public class CAPFQueryTest extends GradoopFlinkTestBase {
 
   @Test
   public void testCAPFProjection() throws Exception {

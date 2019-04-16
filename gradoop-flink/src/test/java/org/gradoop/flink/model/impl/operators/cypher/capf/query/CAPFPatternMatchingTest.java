@@ -40,7 +40,7 @@ import static junit.framework.TestCase.fail;
 import static org.gradoop.flink.model.impl.operators.cypher.capf.TestData.*;
 
 @RunWith(Parameterized.class)
-public class TestCAPFPatternMatching extends GradoopFlinkTestBase {
+public class CAPFPatternMatchingTest extends GradoopFlinkTestBase {
 
   protected final String testName;
 
@@ -54,8 +54,8 @@ public class TestCAPFPatternMatching extends GradoopFlinkTestBase {
 
   private final MetaData metaData;
 
-  public TestCAPFPatternMatching(String testName, String dataGraph, String queryGraph,
-    String expectedGraphVariables, String expectedCollection) {
+  public CAPFPatternMatchingTest(String testName, String dataGraph, String queryGraph,
+                                 String expectedGraphVariables, String expectedCollection) {
     this.testName = testName;
     this.dataGraph = dataGraph;
     this.queryGraph = queryGraph;

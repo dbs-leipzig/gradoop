@@ -234,7 +234,8 @@ public class CAPFQueryResult {
    * Workaround to remove slow logical optimization rules listed in
    * {@link CAPFQueryResult#DISABLED_RULES}.
    *
-   * This method accesses protected scala flink functions.
+   * This method accesses protected scala flink functions. See Issue #1221
+   * (https://github.com/dbs-leipzig/gradoop/issues/1221).
    */
   private void removeSlowOptimizationRule() {
     List<RelOptRule> ruleList = new ArrayList<>();
