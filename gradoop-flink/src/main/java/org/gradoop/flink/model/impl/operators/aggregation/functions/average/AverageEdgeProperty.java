@@ -18,18 +18,29 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions.average;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
- * Calculates the average of a numberic property value of all edges.<br>
- * <i>Hint: </i> Call {@link FinishAverage} after using this aggregate function to get the final
- * aggregation result.
+ * Calculates the average of a numeric property value of all edges.
+ *
+ * @see AverageProperty more details.
  */
 public class AverageEdgeProperty extends AverageProperty implements EdgeAggregateFunction {
 
   /**
-   * Creates a new instance of this average aggregate function.
+   * Create an instance of this average aggregate function with a default aggregate property key.
+   * The key will be the original key, prefixed with {@code avg_}.
    *
-   * @param aggregatePropertyKey aggregate property key
+   * @param propertyKey Key of the property to aggregate.
    */
-  public AverageEdgeProperty(String aggregatePropertyKey) {
-    super(aggregatePropertyKey);
+  public AverageEdgeProperty(String propertyKey) {
+    super(propertyKey);
+  }
+
+  /**
+   * Create an instance of this average aggregate function.
+   *
+   * @param propertyKey          Key of the property to aggregate.
+   * @param aggregatePropertyKey Key used to store the aggregate.
+   */
+  public AverageEdgeProperty(String propertyKey, String aggregatePropertyKey) {
+    super(propertyKey, aggregatePropertyKey);
   }
 }

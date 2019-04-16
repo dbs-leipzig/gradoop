@@ -18,18 +18,29 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions.average;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
- * Calculates the average of a numberic property value of all vertices.<br>
- * <i>Hint: </i> Call {@link FinishAverage} after using this aggregate function to get the final
- * aggregation result.
+ * Calculates the average of a numeric property value of all vertices.
+ *
+ * @see AverageProperty more details.
  */
 public class AverageVertexProperty extends AverageProperty implements VertexAggregateFunction {
 
   /**
-   * Creates a new instance of this average aggregate function.
+   * Create an instance of this average aggregate function with a default aggregate property key.
+   * The key will be the original key, prefixed with {@code avg_}.
    *
-   * @param aggregatePropertyKey aggregate property key
+   * @param propertyKey Key of the property to aggregate.
    */
-  public AverageVertexProperty(String aggregatePropertyKey) {
-    super(aggregatePropertyKey);
+  public AverageVertexProperty(String propertyKey) {
+    super(propertyKey);
+  }
+
+  /**
+   * Create an instance of this average aggregate function.
+   *
+   * @param propertyKey          Key of the property to aggregate.
+   * @param aggregatePropertyKey Key used to store the aggregate.
+   */
+  public AverageVertexProperty(String propertyKey, String aggregatePropertyKey) {
+    super(propertyKey, aggregatePropertyKey);
   }
 }
