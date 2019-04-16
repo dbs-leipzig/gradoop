@@ -66,9 +66,8 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
    *
    * @param csvPath root path of csv files
    * @param config  gradoop configuration
-   * @throws IOException on failure
    */
-  public IndexedCSVDataSource(String csvPath, GradoopFlinkConfig config) throws IOException {
+  public IndexedCSVDataSource(String csvPath, GradoopFlinkConfig config) {
     this(csvPath, config, new Configuration());
   }
 
@@ -78,7 +77,6 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
    * @param csvPath  root path of csv files
    * @param conf     gradoop configuration
    * @param hdfsConf HDFS configuration
-   * @throws IOException on failure
    */
   public IndexedCSVDataSource(String csvPath, GradoopFlinkConfig conf, Configuration hdfsConf) {
     super(csvPath, conf);

@@ -18,10 +18,14 @@ package org.gradoop.storage.utils;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.serializers.JavaSerializer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Map;
 
@@ -41,6 +45,9 @@ public final class KryoUtils {
       kryo.setReferences(false);
       kryo.register(Collection.class);
       kryo.register(Map.class);
+      kryo.register(LocalDateTime.class, new JavaSerializer());
+      kryo.register(LocalTime.class, new JavaSerializer());
+      kryo.register(LocalDate.class, new JavaSerializer());
       return kryo;
     });
   }

@@ -41,6 +41,7 @@ public class RandomLimitedDegreeVertexSamplingRunner extends AbstractRunner impl
    * args[6] - vertex degree type (IN, OUT, BOTH)
    *
    * @param args arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     LogicalGraph graph = readLogicalGraph(args[0], args[1]);

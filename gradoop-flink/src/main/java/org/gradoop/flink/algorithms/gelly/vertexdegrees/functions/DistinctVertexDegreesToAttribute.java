@@ -25,46 +25,45 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 /**
  * Stores the in-degree, out-degree and the sum of both as a property in vertex
  */
-public class DistinctVertexDegreesToAttribute implements JoinFunction<org.apache.flink.graph.Vertex<GradoopId, VertexDegrees.Degrees>, Vertex, Vertex> {
+public class DistinctVertexDegreesToAttribute
+  implements JoinFunction
+  <org.apache.flink.graph.Vertex<GradoopId, VertexDegrees.Degrees>, Vertex, Vertex> {
 
   /**
    * Property to store the sum of vertex degrees in.
    */
-  private final String vertexDegreesPropery;
+  private final String vertexDegreesProperty;
   /**
    * Property to store the in vertex degree in.
    */
-  private final String vertexInDegreePropery;
+  private final String vertexInDegreeProperty;
   /**
    * Property to store the out vertex degree in.
    */
-  private final String vertexOutDegreePropery;
+  private final String vertexOutDegreeProperty;
 
   /**
    * Stores the in, out and sum of in and out degrees of a vertex.
    *
-   * @param vertexDegreesPropery property key to store sum degree
-   * @param vertexInDegreesPropery property key to store in degree
-   * @param vertexOutDegreesPropery property key to store out degree
+   * @param vertexDegreesProperty property key to store sum degree
+   * @param vertexInDegreesProperty property key to store in degree
+   * @param vertexOutDegreesProperty property key to store out degree
    */
-  public DistinctVertexDegreesToAttribute(String vertexDegreesPropery,
-      String vertexInDegreesPropery, String vertexOutDegreesPropery) {
-    this.vertexDegreesPropery = vertexDegreesPropery;
-    this.vertexInDegreePropery = vertexInDegreesPropery;
-    this.vertexOutDegreePropery = vertexOutDegreesPropery;
+  public DistinctVertexDegreesToAttribute(String vertexDegreesProperty,
+      String vertexInDegreesProperty, String vertexOutDegreesProperty) {
+    this.vertexDegreesProperty = vertexDegreesProperty;
+    this.vertexInDegreeProperty = vertexInDegreesProperty;
+    this.vertexOutDegreeProperty = vertexOutDegreesProperty;
   }
 
   @Override
   public Vertex join(org.apache.flink.graph.Vertex<GradoopId, Degrees> degree, Vertex vertex)
     throws Exception {
-    vertex.setProperty(
-        vertexDegreesPropery,
+    vertex.setProperty(vertexDegreesProperty,
         PropertyValue.create(degree.getValue().getDegree().getValue()));
-    vertex.setProperty(
-        vertexInDegreePropery,
+    vertex.setProperty(vertexInDegreeProperty,
         PropertyValue.create(degree.getValue().getInDegree().getValue()));
-    vertex.setProperty(
-        vertexOutDegreePropery,
+    vertex.setProperty(vertexOutDegreeProperty,
         PropertyValue.create(degree.getValue().getOutDegree().getValue()));
     return vertex;
   }

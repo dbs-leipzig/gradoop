@@ -198,7 +198,7 @@ public class GraphCollection implements
     DataSet<GraphHead> newGraphHeads = this.getGraphHeads()
       .filter(new FilterFunction<GraphHead>() {
         @Override
-        public boolean filter(GraphHead graphHead) throws Exception {
+        public boolean filter(GraphHead graphHead) {
           return identifiers.contains(graphHead.getId());
         }
       });

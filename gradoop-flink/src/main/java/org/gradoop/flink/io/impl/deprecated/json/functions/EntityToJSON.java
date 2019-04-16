@@ -36,7 +36,7 @@ public class EntityToJSON {
    *
    * @param entity entity with key-value properties
    * @return json object containing the properties
-   * @throws JSONException
+   * @throws JSONException if failed to create JSON
    */
   protected JSONObject writeProperties(EPGMAttributed entity) throws
     JSONException {
@@ -57,7 +57,7 @@ public class EntityToJSON {
    * @param entity labeled graph element (e.g., vertex and edge)
    * @param <T>    input element type
    * @return json object containing meta information
-   * @throws JSONException
+   * @throws JSONException if failed to create JSON
    */
   protected <T extends EPGMLabeled & EPGMGraphElement> JSONObject
   writeGraphElementMeta(
@@ -76,7 +76,7 @@ public class EntityToJSON {
    * @param entity logical graph data
    * @param <T>    graph data type
    * @return json object with graph meta data
-   * @throws JSONException
+   * @throws JSONException if failed to create JSON
    */
   protected <T extends GraphHead> JSONObject
   writeGraphMeta(T entity) throws JSONException {
@@ -88,7 +88,7 @@ public class EntityToJSON {
    *
    * @param entity labeled entity
    * @return json object with meta data containing the label
-   * @throws JSONException
+   * @throws JSONException if failed to create JSON
    */
   private JSONObject writeMeta(EPGMLabeled entity) throws JSONException {
     JSONObject meta = new JSONObject();

@@ -33,12 +33,12 @@ public interface GraphElementHandler extends ElementHandler {
    * @param put          {@link Put} to add graph identifiers to
    * @param graphElement graph element
    * @return put with graph identifiers
+   * @throws IOException on failure
    */
   Put writeGraphIds(
     final Put put,
     final EPGMGraphElement graphElement
-  ) throws
-    IOException;
+  ) throws IOException;
 
   /**
    * Reads the graph identifiers from the given {@link Result}.

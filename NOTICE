@@ -4,10 +4,25 @@ Copyright 2014-2019 Leipzig University (Database Research Group)
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
-=======================================================================
+This project bundles the following dependencies under the Apache Software License 2.0. (http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-Gradoop contains subcomponents with separate copyright notices and
-license terms. Your use of the source code for these subcomponents
-is subject to the terms and conditions of their respective licenses.
+- com.github.s1ck:gdl:0.3
+- commons-cli:commons-cli:1.4
+- log4j:log4j:1.2.17
+- me.lemire.integercompression:JavaFastPFOR:0.1.10
+- org.apache.accumulo:accumulo-core:1.9.0
+- org.apache.flink:flink-clients_2.11:1.7.0
+- org.apache.flink:flink-core:1.7.0
+- org.apache.flink:flink-gelly_2.11:1.7.0
+- org.apache.flink:flink-hadoop-compatibility_2.11:1.7.0
+- org.apache.flink:flink-hbase_2.11:1.7.0
+- org.apache.flink:flink-java:1.7.0
+- org.apache.flink:flink-shaded-hadoop2:1.7.0
+- org.apache.hbase:hbase-hadoop-compat:1.4.3
+- org.apache.hbase:hbase-server:1.4.3
+- org.codehaus.jettison:jettison:1.3.7
 
-See the LICENSE file for a list of subcomponents respective licenses.
+This project bundles the following dependencies under the BSD license.
+See bundled license files for details.
+
+- com.esotericsoftware:kryo:4.0.2

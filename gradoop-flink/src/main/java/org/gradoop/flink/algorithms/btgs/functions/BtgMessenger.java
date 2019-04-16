@@ -28,7 +28,7 @@ public class BtgMessenger
 
   @Override
   public void sendMessages(
-    Vertex<GradoopId, GradoopId> vertex) throws Exception {
+    Vertex<GradoopId, GradoopId> vertex) {
 
     sendMessageToAllNeighbors(vertex.getValue());
   }

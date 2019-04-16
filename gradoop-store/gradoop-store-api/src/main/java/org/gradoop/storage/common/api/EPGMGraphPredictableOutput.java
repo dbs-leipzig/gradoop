@@ -64,6 +64,7 @@ public interface EPGMGraphPredictableOutput<
    *
    * @param query element query predicate
    * @return Graph Heads
+   * @throws IOException on failure
    */
   @Nonnull
   default ClosableIterator<GraphHead> getGraphSpace(
@@ -78,6 +79,7 @@ public interface EPGMGraphPredictableOutput<
    * @param query element query predicate
    * @param cacheSize client result cache size
    * @return Graph Heads
+   * @throws IOException on failure
    */
   @Nonnull
   ClosableIterator<GraphHead> getGraphSpace(
@@ -90,6 +92,7 @@ public interface EPGMGraphPredictableOutput<
    *
    * @param query element query predicate
    * @return Vertices
+   * @throws IOException on failure
    */
   @Nonnull
   default ClosableIterator<Vertex> getVertexSpace(
@@ -104,6 +107,7 @@ public interface EPGMGraphPredictableOutput<
    * @param query element query predicate
    * @param cacheSize result cache size
    * @return Vertices
+   * @throws IOException on failure
    */
   @Nonnull
   ClosableIterator<Vertex> getVertexSpace(
@@ -116,6 +120,7 @@ public interface EPGMGraphPredictableOutput<
    *
    * @param query element query predicate
    * @return edges
+   * @throws IOException on failure
    */
   @Nonnull
   default ClosableIterator<Edge> getEdgeSpace(
@@ -130,6 +135,7 @@ public interface EPGMGraphPredictableOutput<
    * @param query element query predicate
    * @param cacheSize result cache size
    * @return edges
+   * @throws IOException on failure
    */
   @Nonnull
   ClosableIterator<Edge> getEdgeSpace(

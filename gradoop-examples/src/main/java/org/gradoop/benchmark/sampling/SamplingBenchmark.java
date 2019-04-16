@@ -55,6 +55,7 @@ public class SamplingBenchmark extends AbstractRunner implements ProgramDescript
    * 4 ---> RandomVertexEdgeSampling
    * 5 ---> RandomVertexNeighborhoodSampling
    * 6 ---> RandomVertexSampling
+   * 7 ---> RandomWalkSampling
    */
   private static final String OPTION_SELECTED_ALGORITHM = "a";
   /**
@@ -120,6 +121,7 @@ public class SamplingBenchmark extends AbstractRunner implements ProgramDescript
    * Other arguments are the available options.
    *
    * @param args program arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     CommandLine cmd = parseArguments(args, SamplingBenchmark.class.getName());

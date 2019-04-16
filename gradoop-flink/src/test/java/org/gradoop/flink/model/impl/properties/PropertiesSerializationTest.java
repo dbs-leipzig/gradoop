@@ -24,6 +24,8 @@ import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -94,9 +96,41 @@ public class PropertiesSerializationTest extends GradoopFlinkTestBase {
       .collect(Collectors.toList());
     PropertyValue largeValue = PropertyValue.create(largeList);
     // Make sure the List was large enough.
-    assertTrue("PropertyValue to large enough.",
+    assertTrue("PropertyValue not large enough.",
      largeValue.byteSize() > PropertyValue.LARGE_PROPERTY_THRESHOLD);
     assertEquals("Property values were not equal.", largeValue,
       GradoopFlinkTestUtils.writeAndRead(largeValue, getExecutionEnvironment()));
+  }
+
+  @Test
+  public void testLargePropertyMap() throws Exception {
+    HashMap<PropertyValue, PropertyValue> largeMap = new HashMap<>();
+    long neededEntries = PropertyValue.LARGE_PROPERTY_THRESHOLD / 10;
+    for (int i = 0; i < neededEntries; i++) {
+      largeMap.put(PropertyValue.create("key" + i), PropertyValue.create("value" + i));
+    }
+
+    PropertyValue largeValue = PropertyValue.create(largeMap);
+    // Make sure the map was large enough.
+    assertTrue("PropertyValue not large enough.",
+    largeValue.byteSize() > PropertyValue.LARGE_PROPERTY_THRESHOLD);
+    assertEquals("Property values were not equal.", largeValue,
+    GradoopFlinkTestUtils.writeAndRead(largeValue, getExecutionEnvironment()));
+  }
+
+  @Test
+  public void testLargePropertySet() throws Exception {
+    HashSet<PropertyValue> largeSet = new HashSet<>();
+    long neededEntries = PropertyValue.LARGE_PROPERTY_THRESHOLD;
+    for (int i = 0; i < neededEntries; i++) {
+      largeSet.add(PropertyValue.create("entryNr" + i));
+    }
+
+    PropertyValue largeValue = PropertyValue.create(largeSet);
+    // Make sure the set was large enough.
+    assertTrue("PropertyValue not large enough.",
+    largeValue.byteSize() > PropertyValue.LARGE_PROPERTY_THRESHOLD);
+    assertEquals("Property values were not equal.", largeValue,
+    GradoopFlinkTestUtils.writeAndRead(largeValue, getExecutionEnvironment()));
   }
 }

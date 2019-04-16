@@ -57,7 +57,7 @@ public class EmbeddingTestUtils {
    *
    * @param embeddings data set containing embedding
    * @param path expected path
-   * @throws Exception
+   * @throws Exception on failure
    */
   public static void assertEmbeddingExists(DataSet<Embedding> embeddings, GradoopId... path)
     throws Exception {
@@ -72,7 +72,7 @@ public class EmbeddingTestUtils {
    *
    * @param embeddings data set containing embeddings
    * @param predicate predicate
-   * @throws Exception
+   * @throws Exception on failure
    */
   public static void assertEmbeddingExists(DataSet<Embedding> embeddings,
     Predicate<Embedding> predicate) throws Exception {
@@ -94,7 +94,7 @@ public class EmbeddingTestUtils {
    *
    * @param dataSet data set containing embeddings
    * @param consumer consumer
-   * @throws Exception
+   * @throws Exception on failure
    */
   public static void assertEveryEmbedding(DataSet<Embedding> dataSet, Consumer<Embedding> consumer)
     throws Exception {

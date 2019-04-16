@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 public class GradoopIdsTest {
 
   @Test
-  public void testAdd() throws Exception {
+  public void testAdd() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 
@@ -57,7 +57,7 @@ public class GradoopIdsTest {
   }
 
   @Test
-  public void testContains() throws Exception {
+  public void testContains() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 
@@ -70,7 +70,7 @@ public class GradoopIdsTest {
   }
 
   @Test
-  public void testAddAllCollection() throws Exception {
+  public void testAddAllCollection() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
     GradoopId id3 = GradoopId.get();
@@ -88,7 +88,7 @@ public class GradoopIdsTest {
   }
 
   @Test
-  public void testAddAllGradoopIds() throws Exception {
+  public void testAddAllGradoopIds() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
     GradoopIdSet list1 = new GradoopIdSet();
@@ -107,7 +107,7 @@ public class GradoopIdsTest {
   }
 
   @Test
-  public void testContainsAllCollection() throws Exception {
+  public void testContainsAllCollection() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
     GradoopId id3 = GradoopId.get();
@@ -123,7 +123,7 @@ public class GradoopIdsTest {
   }
 
   @Test
-  public void testContainsAllGradoopIds() throws Exception {
+  public void testContainsAllGradoopIds() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
     GradoopId id3 = GradoopId.get();
@@ -140,7 +140,7 @@ public class GradoopIdsTest {
   }
 
   @Test
-  public void testContainsAny() throws Exception {
+  public void testContainsAny() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
     GradoopId id3 = GradoopId.get();
@@ -157,7 +157,7 @@ public class GradoopIdsTest {
   }
 
   @Test
-  public void testContainsAny1() throws Exception {
+  public void testContainsAny1() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
     GradoopId id3 = GradoopId.get();
@@ -173,7 +173,7 @@ public class GradoopIdsTest {
   }
 
   @Test
-  public void testIsEmpty() throws Exception {
+  public void testIsEmpty() {
     GradoopIdSet set1 = GradoopIdSet.fromExisting(GradoopId.get());
 
     assertFalse(set1.isEmpty());
@@ -204,7 +204,7 @@ public class GradoopIdsTest {
   }
 
   @Test
-  public void testIterator() throws Exception {
+  public void testIterator() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 
@@ -220,7 +220,7 @@ public class GradoopIdsTest {
   }
 
   @Test(expected = NoSuchElementException.class)
-  public void testIteratorException() throws Exception {
+  public void testIteratorException() {
     GradoopIdSet ids = new GradoopIdSet();
 
     Iterator<GradoopId> idsIterator = ids.iterator();
@@ -230,7 +230,7 @@ public class GradoopIdsTest {
   }
 
   @Test
-  public void testClear() throws Exception {
+  public void testClear() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 
@@ -246,7 +246,7 @@ public class GradoopIdsTest {
   }
 
   @Test
-  public void testSize() throws Exception {
+  public void testSize() {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 

@@ -36,7 +36,7 @@ public class JSONToEntity {
    *
    * @param object json object
    * @return entity identifier
-   * @throws JSONException
+   * @throws JSONException if failed to parse JSON
    */
   protected GradoopId getID(JSONObject object) throws JSONException {
     return GradoopId.fromString(object.getString(JSONConstants.IDENTIFIER));
@@ -47,7 +47,7 @@ public class JSONToEntity {
    *
    * @param object json object
    * @return entity label
-   * @throws JSONException
+   * @throws JSONException if failed to parse JSON
    */
   protected String getLabel(JSONObject object) throws JSONException {
     return object
@@ -60,7 +60,7 @@ public class JSONToEntity {
    *
    * @param object json object
    * @return key-value properties
-   * @throws JSONException
+   * @throws JSONException if failed to parse JSON
    */
   protected Map<String, Object> getProperties(JSONObject object) throws
     JSONException {
@@ -81,7 +81,7 @@ public class JSONToEntity {
    *
    * @param object json object
    * @return graph identifiers
-   * @throws JSONException
+   * @throws JSONException if failed to parse JSON
    */
   protected GradoopIdSet getGraphs(JSONObject object) throws JSONException {
     GradoopIdSet result;
@@ -100,7 +100,7 @@ public class JSONToEntity {
    *
    * @param array json array
    * @return long values
-   * @throws JSONException
+   * @throws JSONException if failed to parse JSON
    */
   protected GradoopIdSet getArrayValues(JSONArray array) throws
     JSONException {
