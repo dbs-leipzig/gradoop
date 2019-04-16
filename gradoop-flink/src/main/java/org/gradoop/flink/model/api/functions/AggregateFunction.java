@@ -67,4 +67,17 @@ public interface AggregateFunction extends Serializable {
   default boolean isEdgeAggregation() {
     return true;
   }
+
+  /**
+   * Compute the final result after the aggregation step was completed. This method may be
+   * implemented if the aggregate function uses some internal aggregate value not equal to the
+   * result.<br>
+   * The default implementation of this method does nothing, it returns the result unchanged.
+   *
+   * @param result The result of the aggregation step.
+   * @return The final result, computed from the previous result in a post-processing step.
+   */
+  default PropertyValue postAggregate(PropertyValue result) {
+    return result;
+  }
 }

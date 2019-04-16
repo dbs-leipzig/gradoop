@@ -43,6 +43,11 @@ public class SetAggregateProperty<G extends EPGMGraphHead>
   public static final String VALUE = "value";
 
   /**
+   * The set of used aggregate functions.
+   */
+  private final Set<AggregateFunction> aggregateFunctions;
+
+  /**
    * map from aggregate property key to its value
    */
   private Map<String, PropertyValue> aggregateValues;
@@ -63,6 +68,7 @@ public class SetAggregateProperty<G extends EPGMGraphHead>
     for (AggregateFunction func : aggregateFunctions) {
       checkNotNull(func);
     }
+    this.aggregateFunctions = aggregateFunctions;
 
     defaultValues = new HashMap<>();
 
@@ -82,6 +88,11 @@ public class SetAggregateProperty<G extends EPGMGraphHead>
       aggregateValues = (Map<String, PropertyValue>) getRuntimeContext()
         .getBroadcastVariable(VALUE).get(0);
       defaultValues.forEach(aggregateValues::putIfAbsent);
+    }
+    // Compute post-aggregate functions.
+    for (AggregateFunction function : aggregateFunctions) {
+      aggregateValues.compute(function.getAggregatePropertyKey(),
+        (k, v) -> function.postAggregate(v));
     }
   }
 
