@@ -45,7 +45,7 @@ public class DictionaryEntry implements
    *
    * @param tuple tuple received from TextInputFormat, for each line
    * @return tuple of the text, which was split into integer and string
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public Tuple2<Integer, String> map(Tuple2<LongWritable, Text> tuple) throws Exception {

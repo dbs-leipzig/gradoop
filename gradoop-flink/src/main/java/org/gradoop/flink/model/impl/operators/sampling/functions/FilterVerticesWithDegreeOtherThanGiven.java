@@ -18,10 +18,10 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
-import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 
 /**
  * Retains all vertices which do not have the given degree.
@@ -46,16 +46,16 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
   public LogicalGraph execute(LogicalGraph graph) {
 
     DistinctVertexDegrees distinctVertexDegrees = new DistinctVertexDegrees(
-      SamplingAlgorithm.DEGREE_PROPERTY_KEY,
-      SamplingAlgorithm.IN_DEGREE_PROPERTY_KEY,
-      SamplingAlgorithm.OUT_DEGREE_PROPERTY_KEY,
+      SamplingConstants.DEGREE_PROPERTY_KEY,
+      SamplingConstants.IN_DEGREE_PROPERTY_KEY,
+      SamplingConstants.OUT_DEGREE_PROPERTY_KEY,
       true);
 
     DataSet<Vertex> newVertices = distinctVertexDegrees.execute(graph).getVertices()
-      .filter(new VertexWithDegreeFilter<>(degree, SamplingAlgorithm.DEGREE_PROPERTY_KEY))
-      .map(new PropertyRemover<>(SamplingAlgorithm.DEGREE_PROPERTY_KEY))
-      .map(new PropertyRemover<>(SamplingAlgorithm.IN_DEGREE_PROPERTY_KEY))
-      .map(new PropertyRemover<>(SamplingAlgorithm.OUT_DEGREE_PROPERTY_KEY));
+      .filter(new VertexWithDegreeFilter<>(degree, SamplingConstants.DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(SamplingConstants.DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(SamplingConstants.IN_DEGREE_PROPERTY_KEY))
+      .map(new PropertyRemover<>(SamplingConstants.OUT_DEGREE_PROPERTY_KEY));
 
     return graph.getConfig().getLogicalGraphFactory().fromDataSets(
       graph.getGraphHead(), newVertices, graph.getEdges());

@@ -32,7 +32,7 @@ public class IdOf0InTuple2<GD extends GraphHead, C>
   implements KeySelector<Tuple2<GD, C>, GradoopId> {
 
   @Override
-  public GradoopId getKey(Tuple2<GD, C> pair) throws Exception {
+  public GradoopId getKey(Tuple2<GD, C> pair) {
     return pair.f0.getId();
   }
 }

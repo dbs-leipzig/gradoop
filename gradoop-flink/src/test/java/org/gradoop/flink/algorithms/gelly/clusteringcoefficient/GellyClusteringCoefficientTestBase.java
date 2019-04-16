@@ -77,23 +77,31 @@ public abstract class GellyClusteringCoefficientTestBase extends GradoopFlinkTes
 
   /**
    * Checks if clustering coefficient properties are written
+   *
+   * @throws Exception on failure
    */
   public abstract void validateGraphProperties(LogicalGraph graph) throws Exception;
 
   /**
    * Test for a fully connected graph
+   *
+   * @throws Exception on failure
    */
   @Test
   public abstract void testFullyConnectedGraph() throws Exception;
 
   /**
    * Test for a graph with no connections
+   *
+   * @throws Exception on failure
    */
   @Test
   public abstract void testNonConnectedGraph() throws Exception;
 
   /**
    * Test for a specific graph regarding directed vs. undirected
+   *
+   * @throws Exception on failure
    */
   @Test
   public abstract void testSpecific() throws Exception;

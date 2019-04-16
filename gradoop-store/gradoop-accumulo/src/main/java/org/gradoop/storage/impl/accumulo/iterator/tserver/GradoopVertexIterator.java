@@ -72,6 +72,7 @@ public class GradoopVertexIterator extends BaseElementIterator<EPGMVertex> {
    *
    * @param source origin store source
    * @return decoded epgm element
+   * @throws IOException on failure
    */
   @Nullable
   public Vertex readLine(

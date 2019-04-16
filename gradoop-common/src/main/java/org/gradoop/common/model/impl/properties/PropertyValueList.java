@@ -77,8 +77,8 @@ public class PropertyValueList
    * Creates a Property value list from a collection of property values.
    *
    * @param propertyValues property values
-   *
    * @return property value list containing the given properties
+   * @throws IOException on failure
    */
   public static PropertyValueList fromPropertyValues(
     Collection<PropertyValue> propertyValues) throws IOException {

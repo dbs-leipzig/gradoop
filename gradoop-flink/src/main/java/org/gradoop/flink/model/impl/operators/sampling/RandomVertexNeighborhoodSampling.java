@@ -22,17 +22,18 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeSourceVertexJoin;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeTargetVertexJoin;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgesWithSampledVerticesFilter;
 import org.gradoop.flink.model.impl.operators.sampling.functions.FilterVerticesWithDegreeOtherThanGiven;
 import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
-import org.gradoop.flink.model.impl.operators.sampling.functions.VertexRandomMarkedMap;
+import org.gradoop.flink.model.impl.operators.sampling.functions.RandomVertex;
 
 /**
- * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
- * amount and includes all neighbors of those vertices in the sampling. All edges which source-
- * and target-vertices were chosen are sampled, too.
+ * Computes a vertex sampling of the graph (new graph head will be generated). Retains randomly
+ * chosen vertices of a given relative amount and includes all neighbors of those vertices in the
+ * sampling. All edges which source- and target-vertices were chosen are sampled, too.
  */
 public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
 
@@ -104,15 +105,15 @@ public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
   public LogicalGraph sample(LogicalGraph graph) {
 
     DataSet<Vertex> sampledVertices = graph.getVertices()
-      .map(new VertexRandomMarkedMap(sampleSize, randomSeed, PROPERTY_KEY_SAMPLED));
+      .map(new RandomVertex(sampleSize, randomSeed, SamplingConstants.PROPERTY_KEY_SAMPLED));
 
     DataSet<Edge> newEdges = graph.getEdges()
       .join(sampledVertices)
       .where(new SourceId<>()).equalTo(new Id<>())
-      .with(new EdgeSourceVertexJoin(PROPERTY_KEY_SAMPLED))
+      .with(new EdgeSourceVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED))
       .join(sampledVertices)
       .where(1).equalTo(new Id<>())
-      .with(new EdgeTargetVertexJoin(PROPERTY_KEY_SAMPLED))
+      .with(new EdgeTargetVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED))
       .filter(new EdgesWithSampledVerticesFilter(neighborType))
       .map(new Value0Of3<>());
 

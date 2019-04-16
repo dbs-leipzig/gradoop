@@ -128,6 +128,7 @@ public interface MetaDataSource<M extends MetaData> {
    * @param path       path to metadata csv file
    * @param hdfsConfig file system configuration
    * @return meta data
+   * @throws IOException on failure
    */
   M readLocal(String path, Configuration hdfsConfig) throws IOException;
 }
