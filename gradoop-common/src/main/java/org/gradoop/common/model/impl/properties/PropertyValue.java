@@ -121,7 +121,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    *
    * @see #write(DataOutputView)
    */
-  public static final transient byte FLAG_LARGE = 0x10;
+  public static final transient byte FLAG_LARGE = (byte) 0x80;
 
   /**
    * If the length of the byte representation is larger than this value, the length will be
