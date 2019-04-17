@@ -52,6 +52,7 @@ public class Exclusion implements BinaryGraphToGraphOperator {
    * Creates a new logical graph containing only vertices and edges that exist
    * in the first input graph but not in the second input graph. Vertex and edge
    * equality is based on their respective identifiers.
+   * The graph head of the first input graph is retained.
    *
    * @param firstGraph  first input graph
    * @param secondGraph second input graph
@@ -76,6 +77,7 @@ public class Exclusion implements BinaryGraphToGraphOperator {
       .equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertexSet, newEdgeSet);
+    return firstGraph.getConfig().getLogicalGraphFactory()
+      .fromDataSets(firstGraph.getGraphHead(), newVertexSet, newEdgeSet);
   }
 }

@@ -191,7 +191,8 @@ public class Subgraph<
       .where(new TargetId<>()).equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    return superGraph.getFactory().fromDataSets(filteredVertices, newEdges);
+    return superGraph.getFactory()
+      .fromDataSets(superGraph.getGraphHead(), filteredVertices, newEdges);
   }
 
   /**
@@ -214,7 +215,8 @@ public class Subgraph<
         .with(new RightSide<>()))
       .distinct(new Id<>());
 
-    return superGraph.getFactory().fromDataSets(filteredVertices, filteredEdges);
+    return superGraph.getFactory()
+      .fromDataSets(superGraph.getGraphHead(), filteredVertices, filteredEdges);
   }
 
   /**
@@ -240,7 +242,8 @@ public class Subgraph<
       .where(0).equalTo(new Id<>())
       .with(new RightSide<>());
 
-    return superGraph.getFactory().fromDataSets(filteredVertices, filteredEdges);
+    return superGraph.getFactory()
+      .fromDataSets(superGraph.getGraphHead(), filteredVertices, filteredEdges);
   }
 
   /**
@@ -256,6 +259,7 @@ public class Subgraph<
    */
   private LG subgraph(LG superGraph) {
     return superGraph.getFactory().fromDataSets(
+      superGraph.getGraphHead(),
       superGraph.getVertices().filter(vertexFilterFunction),
       superGraph.getEdges().filter(edgeFilterFunction));
   }
@@ -285,6 +289,7 @@ public class Subgraph<
       .union(verifiedTriples.map(new Value1Of2<>()))
       .distinct(new Id<>());
 
-    return subgraph.getFactory().fromDataSets(verifiedVertices, verifiedEdges);
+    return subgraph.getFactory()
+      .fromDataSets(subgraph.getGraphHead(), verifiedVertices, verifiedEdges);
   }
 }
