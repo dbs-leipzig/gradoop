@@ -30,10 +30,10 @@ import java.util.Objects;
  * This aggregate function uses a list of two property values for aggregation internally.
  * The list will contain two values:
  * <ol start=0>
- *   <li>The sum all values considered by the average.</li>
+ *   <li>The sum of all values considered by the average.</li>
  *   <li>The number of values added to the sum.</li>
  * </ol>
- * A post-processing step is necessary, after the aggregation, to get the final average value.
+ * A post-processing step is necessary after the aggregation, to get the final average value.
  * The final value will be a {@code double} value or {@link PropertyValue#NULL_VALUE null},
  * if there were no elements aggregated (i.e. if the property was not set on any element).
  */
