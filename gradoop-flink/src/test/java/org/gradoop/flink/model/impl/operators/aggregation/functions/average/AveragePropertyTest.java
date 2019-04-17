@@ -20,22 +20,25 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 
 import static org.gradoop.common.model.impl.properties.PropertyValue.create;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 /**
  * Test for the average property aggregate function.
  */
 public class AveragePropertyTest extends GradoopFlinkTestBase {
+
+  /**
+   * Rule used to check for expected exception.
+   */
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   /**
    * Test the average aggregation on a graph with some values.
@@ -77,55 +80,7 @@ public class AveragePropertyTest extends GradoopFlinkTestBase {
     assertEquals(create(Arrays.asList(create(2L), create(1L))),
       AverageProperty.asInternalAggregate(PropertyValue.create(2L)));
     // Check an unsupported value.
-    try {
-      AverageProperty.asInternalAggregate(create(""));
-      fail();
-    } catch (IllegalArgumentException expected) {
-      // Exception is expected.
-    }
-  }
-
-  /**
-   * Test the function validating the interval representation.
-   */
-  @Test
-  public void testValidateAndGetValue() {
-    final PropertyValue zerol = create(0L);
-    final PropertyValue empty = create("");
-    // Check unsupported types.
-    assertInvalidType("Null valued properties are not supported.", PropertyValue.NULL_VALUE);
-    assertInvalidType("String values are not supported.", create(""));
-    assertInvalidType("Set values are not supported.", create(new HashSet<PropertyValue>()));
-    assertInvalidType("Map values are not supported.",
-      create(new HashMap<PropertyValue, PropertyValue>()));
-    // Check invalid list size.
-    assertInvalidType("List size was not valid.", create(Collections.emptyList()));
-    assertInvalidType("List size was not valid.", create(Collections.singletonList(zerol)));
-    assertInvalidType("List size was not valid.", create(Arrays.asList(zerol, zerol, zerol)));
-    // Check invalid list contents.
-    assertInvalidType("List contained invalid type.", create(Arrays.asList(zerol, empty)));
-    assertInvalidType("List contained invalid type.",
-      create(Arrays.asList(create(0d), empty)));
-    assertInvalidType("List contained invalid type.", create(Arrays.asList(empty, zerol)));
-    // Check with valid contents.
-    List<PropertyValue> contents = Arrays.asList(create(2.1d), create(4L));
-    List<PropertyValue> values = AverageProperty.validateAndGetValue(create(contents));
-    assertEquals(contents, values);
-  }
-
-  /**
-   * Check that {@link AverageProperty#validateAndGetValue(PropertyValue)} throws an exception
-   * for some invalid property value.
-   *
-   * @param msg   The invalid value.
-   * @param value A message used in case the assertion fails.
-   */
-  private void assertInvalidType(String msg, PropertyValue value) {
-    try {
-      AverageProperty.validateAndGetValue(value);
-      fail(msg);
-    } catch (IllegalArgumentException expected) {
-      // This exception is expected.
-    }
+    expectedException.expect(IllegalArgumentException.class);
+    AverageProperty.asInternalAggregate(create(""));
   }
 }

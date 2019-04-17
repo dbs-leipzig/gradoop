@@ -79,15 +79,16 @@ public abstract class AverageProperty extends BaseAggregateFunction
 
   @Override
   public PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
-    List<PropertyValue> aggregateValue = validateAndGetValue(aggregate);
-    List<PropertyValue> incrementValue = validateAndGetValue(increment);
+    List<PropertyValue> aggregateValue = aggregate.getList();
+    List<PropertyValue> incrementValue = increment.getList();
     PropertyValue sum = PropertyValueUtils.Numeric.add(aggregateValue.get(0),
       incrementValue.get(0));
     PropertyValue count = PropertyValueUtils.Numeric.add(aggregateValue.get(1),
       incrementValue.get(1));
     aggregateValue.set(0, sum);
     aggregateValue.set(1, count);
-    return PropertyValue.create(aggregateValue);
+    aggregate.setList(aggregateValue);
+    return aggregate;
   }
 
   @Override
@@ -109,7 +110,7 @@ public abstract class AverageProperty extends BaseAggregateFunction
    */
   @Override
   public PropertyValue postAggregate(PropertyValue result) {
-    List<PropertyValue> value = validateAndGetValue(result);
+    List<PropertyValue> value = result.getList();
     // Convert the two list values to a double.
     // The first was some unknown number type, the second a long.
     double sum = ((Number) value.get(0).getObject()).doubleValue();
@@ -120,7 +121,8 @@ public abstract class AverageProperty extends BaseAggregateFunction
     } else if (count == 0) {
       return PropertyValue.NULL_VALUE;
     } else {
-      return PropertyValue.create(sum / count);
+      result.setDouble(sum / count);
+      return result;
     }
   }
 
@@ -136,28 +138,5 @@ public abstract class AverageProperty extends BaseAggregateFunction
       throw new IllegalArgumentException("Property value has to be a number.");
     }
     return PropertyValue.create(Arrays.asList(value, ONE));
-  }
-
-  /**
-   * Check if a property has the correct type used internally in this aggregate function
-   * and return the value. Otherwise an {@link IllegalArgumentException} will be thrown.
-   *
-   * @param value The property value.
-   * @return A list containing the actual values used in the aggregation.
-   * @throws IllegalArgumentException when the value does not have the correct type or format.
-   */
-  static List<PropertyValue> validateAndGetValue(PropertyValue value) {
-    Objects.requireNonNull(value);
-    if (!value.isList()) {
-      throw new IllegalArgumentException("Property value is not a list: " + value);
-    }
-    List<PropertyValue> valueList = value.getList();
-    if (valueList.size() != 2) {
-      throw new IllegalArgumentException("Property value list does not have the expected size.");
-    }
-    if (!valueList.get(0).isNumber() || !valueList.get(1).isLong()) {
-      throw new IllegalArgumentException("Property values do not have supported types.");
-    }
-    return valueList;
   }
 }
