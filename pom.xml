@@ -7,7 +7,7 @@
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.5.0-SNAPSHOT</version>
+    <version>0.4.5</version>
 
     <name>Gradoop Parent</name>
     <url>http://www.gradoop.org</url>
@@ -154,7 +154,7 @@
 
         <plugin.maven-compiler.version>3.5.1</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>3.0.0</plugin.maven-checkstyle.version>
-        <plugin.maven-findbugs.version>3.0.1</plugin.maven-findbugs.version>
+        <plugin.maven-findbugs.version>3.0.5</plugin.maven-findbugs.version>
         <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
         <plugin.maven-release.version>2.5.3</plugin.maven-release.version>
         <plugin.maven-surefire.version>2.19.1</plugin.maven-surefire.version>
