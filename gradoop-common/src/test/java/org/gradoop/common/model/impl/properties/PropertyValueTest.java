@@ -20,9 +20,7 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -44,61 +42,6 @@ import static org.gradoop.common.model.impl.properties.PropertyValue.create;
 import static org.junit.Assert.*;
 
 public class PropertyValueTest {
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
-
-  /**
-   * Tests conversions of different types to {@link BigDecimal} through
-   * {@link PropertyValue#getBigDecimal()}.
-   */
-  @Test
-  public void testBigDecimalConversion() {
-    PropertyValue property;
-    BigDecimal decimalValue;
-
-    // SHORT
-    property = create(SHORT_VAL_e);
-    decimalValue = BigDecimal.valueOf(SHORT_VAL_e);
-    assertEquals(decimalValue, property.getBigDecimal());
-
-    // INT
-    property = create(INT_VAL_2);
-    decimalValue = BigDecimal.valueOf(INT_VAL_2);
-    assertEquals(decimalValue, property.getBigDecimal());
-
-    // LONG
-    property = create(LONG_VAL_3);
-    decimalValue = BigDecimal.valueOf(LONG_VAL_3);
-    assertEquals(decimalValue, property.getBigDecimal());
-
-    // FLOAT
-    property = create(FLOAT_VAL_4);
-    decimalValue = BigDecimal.valueOf(FLOAT_VAL_4);
-    assertEquals(decimalValue, property.getBigDecimal());
-
-    // DOUBLE
-    property = create(DOUBLE_VAL_5);
-    decimalValue = BigDecimal.valueOf(DOUBLE_VAL_5);
-    assertEquals(decimalValue, property.getBigDecimal());
-
-    // STRING
-    property = create("-3.5");
-    decimalValue = new BigDecimal("-3.5");
-    assertEquals(decimalValue, property.getBigDecimal());
-
-    exception.expect(NumberFormatException.class);
-    property = create("No Number");
-    property.getBigDecimal();
-  }
-
-  /**
-   * Tests if conversion to {@link BigDecimal} fails if incompatible type is given.
-   */
-  @Test(expected = IllegalArgumentException.class)
-  public void testFailedBigDecimalConversion() {
-    create(BOOL_VAL_1).getBigDecimal();
-  }
 
   /**
    * Tests if {@link PropertyValue#create(Object)} works with supported types.
