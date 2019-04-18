@@ -56,6 +56,8 @@ public class CSVDataSource extends CSVBase implements DataSource {
   /**
    * Will use a single graph head of the collection as final graph head for the graph.
    * Issue #1217 (https://github.com/dbs-leipzig/gradoop/issues/1217) will optimize further.
+   *
+   * {@inheritDoc}
    */
   @Override
   public LogicalGraph getLogicalGraph() {
