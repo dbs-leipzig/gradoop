@@ -41,9 +41,6 @@ import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -321,14 +318,8 @@ public abstract class ApplyAggregationTest extends AggregationTest {
 
       if (graphHead.getId().equals(g0Id)) {
         assertEquals(1.5f, vertexAggregate.getFloat(), 0.00001);
-        assertEquals(
-          new BigDecimal("4.0"),
-          edgeAggregate.getBigDecimal()
-            .round(new MathContext(2, RoundingMode.HALF_UP)));
-        assertEquals(
-          new BigDecimal("5.5"),
-          elementAggregate.getBigDecimal()
-            .round(new MathContext(2, RoundingMode.HALF_UP)));
+        assertEquals(4.0f, edgeAggregate.getFloat(), 0.00001);
+        assertEquals(5.5f, elementAggregate.getFloat(), 0.00001);
       } else if (graphHead.getId().equals(g1Id)) {
         assertEquals(0.5f, vertexAggregate.getFloat(), 0.00001);
         assertEquals(2L, edgeAggregate.getLong());
