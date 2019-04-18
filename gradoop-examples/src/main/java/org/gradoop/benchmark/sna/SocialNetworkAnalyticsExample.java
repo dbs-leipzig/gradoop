@@ -33,7 +33,7 @@ import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsHDFSReader;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.LabelIsIn;
+import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;
@@ -237,9 +237,6 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getDescription() {
     return SocialNetworkAnalyticsExample.class.getName();

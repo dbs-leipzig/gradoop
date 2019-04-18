@@ -36,7 +36,7 @@ public class CSVMetaData extends MetaData {
    * @param vertexMetaData a map between each vertex label and its property metadata
    * @param edgeMetaData   a map between each edge label and its property metadata
    */
-  CSVMetaData(
+  public CSVMetaData(
     Map<String, List<PropertyMetaData>> graphMetaData,
     Map<String, List<PropertyMetaData>> vertexMetaData,
     Map<String, List<PropertyMetaData>> edgeMetaData) {
@@ -59,8 +59,8 @@ public class CSVMetaData extends MetaData {
     case MetaDataSource.EDGE_TYPE:
       return this.edgeMetaData.getOrDefault(label, new ArrayList<>());
     default:
-      throw new IllegalArgumentException("Entity type " + type + " is not supported. Supported" +
-        "types are g,v and e.");
+      throw new IllegalArgumentException("Entity type " + type + " is not supported. Supported " +
+        "types are g, v and e.");
     }
   }
 }

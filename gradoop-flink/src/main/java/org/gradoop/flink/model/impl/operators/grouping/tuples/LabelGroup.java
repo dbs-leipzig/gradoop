@@ -252,6 +252,7 @@ public class LabelGroup
    *
    * @param element attributed EPGM element
    * @return property values for aggregation
+   * @throws IOException on failure
    */
   public PropertyValueList getIncrementValues(EPGMElement element) throws IOException {
     if (f3.isEmpty()) {

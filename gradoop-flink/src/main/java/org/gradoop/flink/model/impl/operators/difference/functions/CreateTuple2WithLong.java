@@ -42,9 +42,6 @@ public class CreateTuple2WithLong<O> implements
     this.reuseTuple.f1 = secondField;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Tuple2<O, Long> map(O o) throws Exception {
     reuseTuple.f0 = o;

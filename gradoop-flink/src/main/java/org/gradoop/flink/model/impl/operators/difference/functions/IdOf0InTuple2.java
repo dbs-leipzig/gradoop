@@ -31,11 +31,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 public class IdOf0InTuple2<GD extends GraphHead, C>
   implements KeySelector<Tuple2<GD, C>, GradoopId> {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public GradoopId getKey(Tuple2<GD, C> pair) throws Exception {
+  public GradoopId getKey(Tuple2<GD, C> pair) {
     return pair.f0.getId();
   }
 }

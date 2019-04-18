@@ -68,9 +68,4 @@ public class VertexRollUp extends RollUp {
   List<List<String>> getGroupingKeyCombinations() {
     return createGroupingKeyCombinations(vertexGroupingKeys);
   }
-
-  @Override
-  public String getName() {
-    return VertexRollUp.class.getName();
-  }
 }

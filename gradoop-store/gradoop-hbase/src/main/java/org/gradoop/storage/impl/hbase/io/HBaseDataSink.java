@@ -15,7 +15,6 @@
  */
 package org.gradoop.storage.impl.hbase.io;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.flink.api.java.hadoop.mapreduce.HadoopOutputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.mapreduce.Job;
@@ -50,37 +49,25 @@ public class HBaseDataSink extends HBaseBase implements DataSink {
     super(epgmStore, flinkConfig);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(LogicalGraph logicalGraph) throws IOException {
     write(logicalGraph, false);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(GraphCollection graphCollection) throws IOException {
     write(graphCollection, false);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
     write(getFlinkConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
     if (overWrite) {
-      throw new NotImplementedException("Overwriting graphs is not implemented in this sink.");
+      getStore().truncateTables();
     }
 
     // transform graph data to persistent graph data and write it

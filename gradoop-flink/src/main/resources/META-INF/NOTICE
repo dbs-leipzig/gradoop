@@ -1,0 +1,11 @@
+gradoop-flink
+Copyright 2014-2019 Leipzig University (Database Research Group)
+
+This project bundles the following dependencies under the Apache Software License 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+- me.lemire.integercompression:JavaFastPFOR:0.1.10
+- me.lemire.integercompression:IntCompressor:0.1.10
+- me.lemire.integercompression:Simple16:0.1.10
+- org.apache.flink:flink-hbase_2.11:1.7.0
+- org.apache.flink:flink-java:1.7.0
+- org.apache.flink:flink-gelly_2.11:1.7.0

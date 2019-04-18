@@ -40,11 +40,11 @@ import org.gradoop.storage.config.GradoopHBaseConfig;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
-import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
-import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 import org.gradoop.storage.impl.hbase.iterator.HBaseEdgeIterator;
 import org.gradoop.storage.impl.hbase.iterator.HBaseGraphIterator;
 import org.gradoop.storage.impl.hbase.iterator.HBaseVertexIterator;
+import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -115,41 +115,26 @@ public class HBaseEPGMStore implements
     this.admin = Preconditions.checkNotNull(admin);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopHBaseConfig getConfig() {
     return config;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getVertexTableName() {
     return vertexTable.getName().getNameAsString();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getEdgeTableName() {
     return edgeTable.getName().getNameAsString();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String getGraphHeadName() {
     return graphHeadTable.getName().getNameAsString();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeGraphHead(@Nonnull final EPGMGraphHead graphHead) throws IOException {
     GraphHeadHandler graphHeadHandler = config.getGraphHeadHandler();
@@ -164,9 +149,6 @@ public class HBaseEPGMStore implements
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeVertex(@Nonnull final EPGMVertex vertexData) throws IOException {
     VertexHandler vertexHandler = config.getVertexHandler();
@@ -181,9 +163,6 @@ public class HBaseEPGMStore implements
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void writeEdge(@Nonnull final EPGMEdge edgeData) throws IOException {
     // write to table
@@ -198,9 +177,6 @@ public class HBaseEPGMStore implements
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphHead readGraph(@Nonnull final GradoopId graphId) throws IOException {
     GraphHead graphData = null;
@@ -224,9 +200,6 @@ public class HBaseEPGMStore implements
     return graphData;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Vertex readVertex(@Nonnull final GradoopId vertexId) throws IOException {
     Vertex vertexData = null;
@@ -277,9 +250,6 @@ public class HBaseEPGMStore implements
     return edgeData;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   public ClosableIterator<GraphHead> getGraphSpace(
@@ -297,9 +267,6 @@ public class HBaseEPGMStore implements
     return new HBaseGraphIterator(graphHeadTable.getScanner(scan), config.getGraphHeadHandler());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   public ClosableIterator<Vertex> getVertexSpace(
@@ -317,9 +284,6 @@ public class HBaseEPGMStore implements
     return new HBaseVertexIterator(vertexTable.getScanner(scan), config.getVertexHandler());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   public ClosableIterator<Edge> getEdgeSpace(
@@ -337,17 +301,11 @@ public class HBaseEPGMStore implements
     return new HBaseEdgeIterator(edgeTable.getScanner(scan), config.getEdgeHandler());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setAutoFlush(boolean autoFlush) {
     this.autoFlush = autoFlush;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void flush() throws IOException {
     admin.flush(vertexTable.getName());
@@ -355,9 +313,6 @@ public class HBaseEPGMStore implements
     admin.flush(graphHeadTable.getName());
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void close() throws IOException {
     vertexTable.close();
@@ -378,6 +333,21 @@ public class HBaseEPGMStore implements
     admin.deleteTable(vertexTable.getName());
     admin.deleteTable(edgeTable.getName());
     admin.deleteTable(graphHeadTable.getName());
+  }
+
+  /**
+   * First disable, then truncate all tables handled by this store instance, i.e. delete all rows.
+   *
+   * @throws IOException when truncating any table fails.
+   */
+  public void truncateTables() throws IOException {
+    admin.disableTable(graphHeadTable.getName());
+    admin.disableTable(vertexTable.getName());
+    admin.disableTable(edgeTable.getName());
+
+    admin.truncateTable(getConfig().getGraphTableName(), true);
+    admin.truncateTable(getConfig().getVertexTableName(), true);
+    admin.truncateTable(getConfig().getEdgeTableName(), true);
   }
 
   /**

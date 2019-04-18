@@ -50,7 +50,7 @@ public class GroupCountEquals<O> implements GroupReduceFunction<O, O> {
    *
    * @param iterable  graph data
    * @param collector output collector (contains 0 or 1 graph)
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public void reduce(Iterable<O> iterable,

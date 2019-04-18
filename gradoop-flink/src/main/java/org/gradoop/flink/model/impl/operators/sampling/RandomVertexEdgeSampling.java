@@ -18,10 +18,10 @@ package org.gradoop.flink.model.impl.operators.sampling;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
- * Computes an edge sampling of the graph. First selects randomly chosen vertices of a given
- * relative amount and all edges which source- and target-vertices were chosen. Then randomly
- * chooses edges from this set of edges and their associated source- and target-vertices.
- * No unconnected vertices will retain in the sampled graph.
+ * Computes an edge sampling of the graph (new graph head will be generated). First selects
+ * randomly chosen vertices of a given relative amount and all edges which source- and
+ * target-vertices were chosen. Then randomly chooses edges from this set of edges and their
+ * associated source- and target-vertices. No unconnected vertices will retain in the sampled graph.
  */
 public class RandomVertexEdgeSampling extends SamplingAlgorithm {
 
@@ -112,9 +112,6 @@ public class RandomVertexEdgeSampling extends SamplingAlgorithm {
     this.vertexEdgeSamplingType = vertexEdgeSamplingType;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
@@ -136,13 +133,5 @@ public class RandomVertexEdgeSampling extends SamplingAlgorithm {
     }
 
     return graph;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return RandomVertexEdgeSampling.class.getName();
   }
 }

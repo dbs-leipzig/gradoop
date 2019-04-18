@@ -50,9 +50,6 @@ public class BuildEdgeGroupItem
     this.reuseEdgeGroupItem = new EdgeGroupItem();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void flatMap(Edge edge, Collector<EdgeGroupItem> collector) throws Exception {
     boolean usedEdgeLabelGroup = false;

@@ -80,6 +80,7 @@ public class TransactionalBenchmark extends AbstractRunner {
    * -t,--traverser <arg>   [loop|bulk]
    *
    * @param args program arguments
+   * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
     CommandLine cmd =
@@ -148,7 +149,7 @@ public class TransactionalBenchmark extends AbstractRunner {
   private static class SecondFieldTrue<T> implements
     FilterFunction<Tuple2<T, Boolean>> {
     @Override
-    public boolean filter(Tuple2<T, Boolean> tuple2) throws Exception {
+    public boolean filter(Tuple2<T, Boolean> tuple2) {
       return tuple2.f1;
     }
   }

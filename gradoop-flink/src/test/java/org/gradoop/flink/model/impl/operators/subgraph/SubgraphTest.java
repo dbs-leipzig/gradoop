@@ -106,7 +106,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
   /**
    * Extracts a subgraph which is empty.
    *
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Test
   public void testEmptySubgraph() throws Exception {

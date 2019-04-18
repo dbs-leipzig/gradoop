@@ -59,43 +59,26 @@ public class Edge extends GraphElement implements EPGMEdge {
     this.targetId = targetId;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopId getSourceId() {
     return sourceId;
   }
 
-  /**
-   * {@inheritDoc}
-   * @param sourceId
-   */
   @Override
   public void setSourceId(GradoopId sourceId) {
     this.sourceId = sourceId;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopId getTargetId() {
     return targetId;
   }
 
-  /**
-   * {@inheritDoc}
-   * @param targetId
-   */
   @Override
   public void setTargetId(GradoopId targetId) {
     this.targetId = targetId;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return String.format("(%s)-[%s]->(%s)",

@@ -33,27 +33,18 @@ import java.io.Serializable;
 public interface HBaseElementFilter<T extends EPGMElement>
   extends ElementFilter<HBaseElementFilter<T>>, Serializable {
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   default HBaseElementFilter<T> or(@Nonnull HBaseElementFilter<T> another) {
     return Or.create(this, another);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   default HBaseElementFilter<T> and(@Nonnull HBaseElementFilter<T> another) {
     return And.create(this, another);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Nonnull
   @Override
   default HBaseElementFilter<T> negate() {

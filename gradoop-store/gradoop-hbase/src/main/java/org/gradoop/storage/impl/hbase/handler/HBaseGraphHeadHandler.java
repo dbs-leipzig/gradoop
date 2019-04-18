@@ -69,9 +69,6 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
     this.graphHeadFactory = graphHeadFactory;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void createTable(final Admin admin, final HTableDescriptor tableDescriptor)
     throws IOException {
@@ -81,9 +78,6 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
     admin.createTable(tableDescriptor);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public Put writeGraphHead(final Put put, final EPGMGraphHead graphData) {
     writeLabel(put, graphData);
@@ -91,26 +85,17 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
     return put;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphHead readGraphHead(final Result res) {
     return graphHeadFactory.initGraphHead(readId(res), readLabel(res), readProperties(res));
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphHeadHandler applyQuery(ElementQuery<HBaseElementFilter<GraphHead>> query) {
     this.graphQuery = query;
     return this;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public ElementQuery<HBaseElementFilter<GraphHead>> getQuery() {
     return this.graphQuery;

@@ -39,9 +39,6 @@ public class NeighborVertexReduceFunction
     super(function);
   }
 
-   /**
-    * {@inheritDoc}
-    */
   @Override
   public void reduce(Iterable<Tuple2<Vertex, Vertex>> tuples,
     Collector<Vertex> collector) throws Exception {

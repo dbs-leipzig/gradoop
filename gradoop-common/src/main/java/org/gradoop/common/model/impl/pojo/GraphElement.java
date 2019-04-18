@@ -52,17 +52,11 @@ public abstract class GraphElement
     this.graphIds = graphIds;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GradoopIdSet getGraphIds() {
     return graphIds;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void addGraphId(GradoopId graphId) {
     if (graphIds == null) {
@@ -71,17 +65,11 @@ public abstract class GraphElement
     graphIds.add(graphId);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void setGraphIds(GradoopIdSet graphIds) {
     this.graphIds = graphIds;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void resetGraphIds() {
     if (graphIds != null) {
@@ -89,17 +77,11 @@ public abstract class GraphElement
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getGraphCount() {
     return (graphIds != null) ? graphIds.size() : 0;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public String toString() {
     return String.format("%s @ %s", super.toString(), graphIds);

@@ -49,7 +49,7 @@ public class SNABenchmark1 extends AbstractRunner implements
    * Needs a (possibly HDFS) output directory to write the resulting graph to.
    *
    * @param args args[0] = input dir, args[1] input format, args[2] output dir
-   * @throws Exception
+   * @throws Exception on failure
    */
   @SuppressWarnings({
     "unchecked",

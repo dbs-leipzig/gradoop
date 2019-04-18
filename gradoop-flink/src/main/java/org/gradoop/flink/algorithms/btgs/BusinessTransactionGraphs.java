@@ -147,9 +147,4 @@ public class BusinessTransactionGraphs implements
     return iig.getConfig().getGraphCollectionFactory()
       .fromDataSets(graphHeads, transVertices.union(masterVertices), btgEdges);
   }
-
-  @Override
-  public String getName() {
-    return BusinessTransactionGraphs.class.getName();
-  }
 }

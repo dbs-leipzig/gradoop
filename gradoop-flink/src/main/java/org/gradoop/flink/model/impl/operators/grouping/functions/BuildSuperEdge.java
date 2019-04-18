@@ -41,6 +41,7 @@ abstract class BuildSuperEdge extends BuildBase {
    *
    * @param edgeGroupItems edge group items
    * @return group representative item
+   * @throws IOException on failure
    */
   protected EdgeGroupItem reduceInternal(
     Iterable<EdgeGroupItem> edgeGroupItems) throws IOException {

@@ -52,7 +52,7 @@ public class CollectGradoopIds implements
 
   @Override
   public void combine(Iterable<Tuple2<GradoopId, GradoopIdSet>> mappings,
-    Collector<Tuple2<GradoopId, GradoopIdSet>> collector) throws Exception {
+    Collector<Tuple2<GradoopId, GradoopIdSet>> collector) {
 
     boolean first = true;
     GradoopId vertexId = null;

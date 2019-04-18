@@ -17,6 +17,7 @@ package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -30,6 +31,7 @@ import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
@@ -51,135 +53,37 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   //----------------------------------------------------------------------------
 
   /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
+   * Evaluates the given cypher query using CAPF (Cypher for Apache Flink). CAPF implements the
+   * default cypher morphism strategies, which is vertex homomorphism and edge isomorphism. The
+   * result is a CAPFQueryResult, containing a flink table that can be converted to a
+   * GraphCollection, if it contains vertices or edges.
    *
-   * Note, that this method used no statistics about the data graph which may result in bad
-   * runtime performance. Use {@link LogicalGraphOperators#cypher(String, GraphStatistics)} to
-   * provide statistics for the query planner.
-   *
-   * @param query Cypher query
-   * @return graph collection containing matching subgraphs
-   * @deprecated because of API restructuring.
-   * Please use {@link LogicalGraph#query(String)} instead.
+   * @param query    the query string
+   * @param metaData metaData object
+   * @return the result, containing a flink table and possibly a GraphCollection
    */
-  @Deprecated
-  GraphCollection cypher(String query);
+  CAPFQueryResult cypher(String query, MetaData metaData) throws Exception;
+
+  /**
+   * Evaluates the given cypher query using CAPF (Cypher for Apache Flink). CAPF implements the
+   * default cypher morphism strategies, which is vertex homomorphism and edge isomorphism. The
+   * result is a CAPFQueryResult, containing a flink table that can be converted to a
+   * GraphCollection, if it contains vertices or edges.
+   * <p>
+   * In this overloaded function, the property maps are constructed automatically. This is
+   * a lot slower and actually requires the job to be split in two parts to collect the property
+   * maps.
+   *
+   * @param query the query string
+   * @return the result, containing a flink table and possibly a GraphCollection
+   */
+  CAPFQueryResult cypher(String query) throws Exception;
 
   /**
    * Evaluates the given query using the Cypher query engine. The engine uses default morphism
    * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
    * the data graph elements is attached to the resulting vertices.
-   *
-   * Note, that this method used no statistics about the data graph which may result in bad
-   * runtime performance. Use {@link LogicalGraphOperators#cypher(String, GraphStatistics)} to
-   * provide statistics for the query planner.
-   *
-   * In addition, the operator can be supplied with a construction pattern allowing the creation
-   * of new graph elements based on variable bindings of the match pattern. Consider the following
-   * example:
-   *
-   * <pre>
-   * <code>graph.cypher(
-   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
-   *  "(a)-[:CO_AUTHOR]->(b)")
-   * </code>
-   * </pre>
-   *
-   * The query pattern is looking for pairs of authors that worked on the same paper. The
-   * construction pattern defines a new edge of type CO_AUTHOR between the two entities.
-   *
-   * @param query Cypher query string
-   * @param constructionPattern Construction pattern
-   * @return graph collection containing the output of the construct pattern
-   * @deprecated because of API restructuring.
-   * Please use {@link LogicalGraph#query(String, String)} instead.
-   */
-  @Deprecated
-  GraphCollection cypher(String query, String constructionPattern);
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   *
-   * @param query Cypher query
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing matching subgraphs
-   * @deprecated because of API restructuring.
-   * Please use {@link LogicalGraph#query(String, GraphStatistics)} instead.
-   */
-  @Deprecated
-  GraphCollection cypher(String query, GraphStatistics graphStatistics);
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   *
-   * In addition, the operator can be supplied with a construction pattern allowing the creation
-   * of new graph elements based on variable bindings of the match pattern. Consider the following
-   * example:
-   *
-   * <pre>
-   * <code>graph.cypher(
-   *  "MATCH (a:Author)-[:WROTE]->(:Paper)<-[:WROTE]-(b:Author) WHERE a <> b",
-   *  "(a)-[:CO_AUTHOR]->(b)")
-   * </code>
-   * </pre>
-   *
-   * The query pattern is looking for pairs of authors that worked on the same paper. The
-   * construction pattern defines a new edge of type CO_AUTHOR between the two entities.
-   *
-   * @param query Cypher query
-   * @param constructionPattern Construction pattern
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing the output of the construct pattern
-   * @deprecated because of API restructuring.
-   * Please use {@link LogicalGraph#query(String, String, GraphStatistics)} instead.
-   */
-  @Deprecated
-  GraphCollection cypher(String query, String constructionPattern, GraphStatistics graphStatistics);
-
-  /**
-   * Evaluates the given query using the Cypher query engine.
-   *
-   * @param query Cypher query
-   * @param attachData  attach original vertex and edge data to the result
-   * @param vertexStrategy morphism setting for vertex mapping
-   * @param edgeStrategy morphism setting for edge mapping
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing matching subgraphs
-   * @deprecated because of API restructuring.
-   * Please use {@link LogicalGraph#query(String, boolean, MatchStrategy, MatchStrategy, GraphStatistics)} instead.
-   */
-  @Deprecated
-  GraphCollection cypher(String query, boolean attachData,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
-
-  /**
-   * Evaluates the given query using the Cypher query engine.
-   *
-   * @param query Cypher query
-   * @param constructionPattern Construction pattern
-   * @param attachData  attach original vertex and edge data to the result
-   * @param vertexStrategy morphism setting for vertex mapping
-   * @param edgeStrategy morphism setting for edge mapping
-   * @param graphStatistics statistics about the data graph
-   * @return graph collection containing matching subgraphs
-   * @deprecated because of API restructuring.
-   * Please use {@link LogicalGraph#query(String, String, boolean, MatchStrategy, MatchStrategy, GraphStatistics)} instead.
-   */
-  @Deprecated
-  GraphCollection cypher(String query, String constructionPattern, boolean attachData,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
-
-  /**
-   * Evaluates the given query using the Cypher query engine. The engine uses default morphism
-   * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
-   * the data graph elements is attached to the resulting vertices.
-   *
+   * <p>
    * Note, that this method used no statistics about the data graph which may result in bad
    * runtime performance. Use {@link LogicalGraphOperators#query(String, GraphStatistics)} to
    * provide statistics for the query planner.
@@ -193,11 +97,11 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * Evaluates the given query using the Cypher query engine. The engine uses default morphism
    * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
    * the data graph elements is attached to the resulting vertices.
-   *
+   * <p>
    * Note, that this method used no statistics about the data graph which may result in bad
    * runtime performance. Use {@link LogicalGraphOperators#query(String, GraphStatistics)} to
    * provide statistics for the query planner.
-   *
+   * <p>
    * In addition, the operator can be supplied with a construction pattern allowing the creation
    * of new graph elements based on variable bindings of the match pattern. Consider the following
    * example:
@@ -208,11 +112,11 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    *  "(a)-[:CO_AUTHOR]->(b)")
    * </code>
    * </pre>
-   *
+   * <p>
    * The query pattern is looking for pairs of authors that worked on the same paper. The
    * construction pattern defines a new edge of type CO_AUTHOR between the two entities.
    *
-   * @param query Cypher query string
+   * @param query               Cypher query string
    * @param constructionPattern Construction pattern
    * @return graph collection containing the output of the construct pattern
    */
@@ -223,7 +127,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
    * the data graph elements is attached to the resulting vertices.
    *
-   * @param query Cypher query
+   * @param query           Cypher query
    * @param graphStatistics statistics about the data graph
    * @return graph collection containing matching subgraphs
    */
@@ -233,7 +137,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * Evaluates the given query using the Cypher query engine. The engine uses default morphism
    * strategies, which is vertex homomorphism and edge isomorphism. The vertex and edge data of
    * the data graph elements is attached to the resulting vertices.
-   *
+   * <p>
    * In addition, the operator can be supplied with a construction pattern allowing the creation
    * of new graph elements based on variable bindings of the match pattern. Consider the following
    * example:
@@ -244,13 +148,13 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    *  "(a)-[:CO_AUTHOR]->(b)")
    * </code>
    * </pre>
-   *
+   * <p>
    * The query pattern is looking for pairs of authors that worked on the same paper. The
    * construction pattern defines a new edge of type CO_AUTHOR between the two entities.
    *
-   * @param query Cypher query
+   * @param query               Cypher query
    * @param constructionPattern Construction pattern
-   * @param graphStatistics statistics about the data graph
+   * @param graphStatistics     statistics about the data graph
    * @return graph collection containing the output of the construct pattern
    */
   GraphCollection query(String query, String constructionPattern, GraphStatistics graphStatistics);
@@ -258,33 +162,34 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   /**
    * Evaluates the given query using the Cypher query engine.
    *
-   * @param query Cypher query
-   * @param attachData  attach original vertex and edge data to the result
-   * @param vertexStrategy morphism setting for vertex mapping
-   * @param edgeStrategy morphism setting for edge mapping
+   * @param query           Cypher query
+   * @param attachData      attach original vertex and edge data to the result
+   * @param vertexStrategy  morphism setting for vertex mapping
+   * @param edgeStrategy    morphism setting for edge mapping
    * @param graphStatistics statistics about the data graph
    * @return graph collection containing matching subgraphs
    */
   GraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
-                        MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
+    MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
 
   /**
    * Evaluates the given query using the Cypher query engine.
    *
-   * @param query Cypher query
+   * @param query               Cypher query
    * @param constructionPattern Construction pattern
-   * @param attachData  attach original vertex and edge data to the result
-   * @param vertexStrategy morphism setting for vertex mapping
-   * @param edgeStrategy morphism setting for edge mapping
-   * @param graphStatistics statistics about the data graph
+   * @param attachData          attach original vertex and edge data to the result
+   * @param vertexStrategy      morphism setting for vertex mapping
+   * @param edgeStrategy        morphism setting for edge mapping
+   * @param graphStatistics     statistics about the data graph
    * @return graph collection containing matching subgraphs
    */
   GraphCollection query(String query, String constructionPattern, boolean attachData,
-      MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics);
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
+    GraphStatistics graphStatistics);
 
   /**
    * Creates a copy of the logical graph.
-   *
+   * <p>
    * Note that this method creates new graph head, vertex and edge instances.
    *
    * @return projected logical graph
@@ -355,14 +260,14 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * Returns a subgraph of the logical graph which contains only those vertices
    * and edges that fulfil the given vertex and edge filter function
    * respectively.
-   *
+   * <p>
    * Note, that the operator does not verify the consistency of the resulting
    * graph. Use {#toGellyGraph().subgraph()} for that behaviour.
    *
-   * @param vertexFilterFunction  vertex filter function
-   * @param edgeFilterFunction    edge filter function
-   * @return  logical graph which fulfils the given predicates and is a subgraph
-   *          of that graph
+   * @param vertexFilterFunction vertex filter function
+   * @param edgeFilterFunction   edge filter function
+   * @return logical graph which fulfils the given predicates and is a subgraph
+   * of that graph
    */
   default LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
     FilterFunction<Edge> edgeFilterFunction) {
@@ -375,15 +280,15 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * Returns a subgraph of the logical graph which contains only those vertices
    * and edges that fulfil the given vertex and edge filter function
    * respectively.
-   *
+   * <p>
    * Note, that the operator does not verify the consistency of the resulting
    * graph. Use {#toGellyGraph().subgraph()} for that behaviour.
    *
-   * @param vertexFilterFunction  vertex filter function
-   * @param edgeFilterFunction    edge filter function
-   * @param strategy              execution strategy for the operator
-   * @return  logical graph which fulfils the given predicates and is a subgraph
-   *          of that graph
+   * @param vertexFilterFunction vertex filter function
+   * @param edgeFilterFunction   edge filter function
+   * @param strategy             execution strategy for the operator
+   * @return logical graph which fulfils the given predicates and is a subgraph
+   * of that graph
    */
   LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
     FilterFunction<Edge> edgeFilterFunction, Subgraph.Strategy strategy);
@@ -410,15 +315,14 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   /**
    * Creates a condensed version of the logical graph by grouping vertices based on the specified
    * property keys.
-   *
+   * <p>
    * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
    * incident vertices.
-   *
+   * <p>
    * Note: To group vertices by their type label, one needs to add the specific symbol
    * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
    *
    * @param vertexGroupingKeys property keys to group vertices
-   *
    * @return summary graph
    * @see Grouping
    */
@@ -427,19 +331,18 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   /**
    * Creates a condensed version of the logical graph by grouping vertices and edges based on given
    * property keys.
-   *
+   * <p>
    * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
    * incident vertices and explicitly by the specified edge grouping keys.
-   *
+   * <p>
    * One needs to at least specify a list of vertex grouping keys. Any other argument may be
    * {@code null}.
-   *
+   * <p>
    * Note: To group vertices/edges by their type label, one needs to add the specific symbol
    * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
    *
    * @param vertexGroupingKeys property keys to group vertices
-   * @param edgeGroupingKeys property keys to group edges
-   *
+   * @param edgeGroupingKeys   property keys to group edges
    * @return summary graph
    * @see Grouping
    */
@@ -448,24 +351,23 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   /**
    * Creates a condensed version of the logical graph by grouping vertices and edges based on given
    * property keys.
-   *
+   * <p>
    * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
    * incident vertices and explicitly by the specified edge grouping keys. Furthermore, one can
    * specify sets of vertex and edge aggregate functions which are applied on vertices/edges
    * represented by the same super vertex/edge.
-   *
+   * <p>
    * One needs to at least specify a list of vertex grouping keys. Any other argument may be
    * {@code null}.
-   *
+   * <p>
    * Note: To group vertices/edges by their type label, one needs to add the specific symbol
    * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
    *
-   * @param vertexGroupingKeys property keys to group vertices
+   * @param vertexGroupingKeys       property keys to group vertices
    * @param vertexAggregateFunctions aggregate functions to apply on super vertices
-   * @param edgeGroupingKeys property keys to group edges
-   * @param edgeAggregateFunctions aggregate functions to apply on super edges
-   * @param groupingStrategy execution strategy for vertex grouping
-   *
+   * @param edgeGroupingKeys         property keys to group edges
+   * @param edgeAggregateFunctions   aggregate functions to apply on super edges
+   * @param groupingStrategy         execution strategy for vertex grouping
    * @return summary graph
    * @see Grouping
    */
@@ -479,9 +381,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * the vertex is relevant get joined first and then grouped. The relevant edges are specified
    * using the direction which may direct to the vertex, or from the vertex or both.
    *
-   * @param function aggregate function
+   * @param function      aggregate function
    * @param edgeDirection incoming, outgoing edges or both
-   *
    * @return logical graph where vertices store aggregated information about connected edges
    */
   LogicalGraph reduceOnEdges(
@@ -492,9 +393,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * of relevant edges get joined first and then grouped by the vertex. The relevant edges are
    * specified using the direction which may direct to the vertex, or from the vertex or both.
    *
-   * @param function aggregate function
+   * @param function      aggregate function
    * @param edgeDirection incoming, outgoing edges or both
-   *
    * @return logical graph where vertices store aggregated information about connected vertices
    */
   LogicalGraph reduceOnNeighbors(
@@ -533,10 +433,10 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * grouping operations. For example, specifying the vertex grouping keys A, B and C leads to
    * three differently grouped graphs {A,B,C},{A,B},{A} within the resulting graph collection.
    *
-   * @param vertexGroupingKeys grouping keys to group vertices
+   * @param vertexGroupingKeys       grouping keys to group vertices
    * @param vertexAggregateFunctions aggregate functions to apply on super vertices
-   * @param edgeGroupingKeys grouping keys to group edges
-   * @param edgeAggregateFunctions aggregate functions to apply on super edges
+   * @param edgeGroupingKeys         grouping keys to group edges
+   * @param edgeAggregateFunctions   aggregate functions to apply on super edges
    * @return graph collection containing all resulting graphs
    */
   GraphCollection groupVerticesByRollUp(
@@ -549,15 +449,25 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * grouping operations. For example, specifying the edge grouping keys A, B and C leads to
    * three differently grouped graphs {A,B,C},{A,B},{A} within the resulting graph collection.
    *
-   * @param vertexGroupingKeys grouping keys to group vertices
+   * @param vertexGroupingKeys       grouping keys to group vertices
    * @param vertexAggregateFunctions aggregate functions to apply on super vertices
-   * @param edgeGroupingKeys grouping keys to group edges
-   * @param edgeAggregateFunctions aggregate functions to apply on super edges
+   * @param edgeGroupingKeys         grouping keys to group edges
+   * @param edgeAggregateFunctions   aggregate functions to apply on super edges
    * @return graph collection containing all resulting graphs
    */
   GraphCollection groupEdgesByRollUp(
     List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
     List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions);
+
+  /**
+   * Verifies this graph, removing dangling edges, i.e. edges pointing to or from
+   * a vertex not contained in this graph.<br>
+   * This operator can be applied after an operator that has not checked the graphs validity.
+   * The graph head of this logical graph remains unchanged.
+   *
+   * @return this graph with all dangling edges removed.
+   */
+  LogicalGraph verify();
 
   //----------------------------------------------------------------------------
   // Binary Operators

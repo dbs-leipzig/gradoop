@@ -38,9 +38,6 @@ public abstract class BinaryCollectionToCollectionOperatorBase
    */
   protected GraphCollection secondCollection;
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public GraphCollection execute(
     GraphCollection firstCollection,

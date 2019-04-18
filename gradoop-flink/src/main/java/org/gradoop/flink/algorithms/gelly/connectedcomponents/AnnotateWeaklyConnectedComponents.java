@@ -107,9 +107,4 @@ public class AnnotateWeaklyConnectedComponents extends GradoopGellyAlgorithm<Gra
     return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(
       currentGraph.getGraphHead(), annotatedVertices, edges);
   }
-
-  @Override
-  public String getName() {
-    return AnnotateWeaklyConnectedComponents.class.getName();
-  }
 }

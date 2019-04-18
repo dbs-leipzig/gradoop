@@ -31,6 +31,8 @@ public class HBaseSplitRegionGraphStoreTest extends HBaseDefaultGraphStoreTest {
   /**
    * Instantiate the EPGMStore with a prefix and persist social media data.
    * In addition, use pre-split regions.
+   *
+   * @throws IOException on failure
    */
   @BeforeClass
   public static void setUp() throws IOException {

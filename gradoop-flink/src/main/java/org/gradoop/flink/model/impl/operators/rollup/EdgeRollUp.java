@@ -67,9 +67,4 @@ public class EdgeRollUp extends RollUp {
   List<List<String>> getGroupingKeyCombinations() {
     return createGroupingKeyCombinations(edgeGroupingKeys);
   }
-
-  @Override
-  public String getName() {
-    return EdgeRollUp.class.getName();
-  }
 }

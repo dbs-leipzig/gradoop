@@ -129,9 +129,4 @@ public class ApplyAggregation
         .filter(AggregateFunction::isEdgeAggregation)
         .collect(Collectors.toSet())));
   }
-
-  @Override
-  public String getName() {
-    return ApplyAggregation.class.getName();
-  }
 }

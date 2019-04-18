@@ -66,9 +66,4 @@ public class Limit implements UnaryCollectionToCollectionOperator {
     return collection.getConfig().getGraphCollectionFactory()
       .fromDataSets(graphHeads, filteredVertices, filteredEdges);
   }
-
-  @Override
-  public String getName() {
-    return Limit.class.getName();
-  }
 }

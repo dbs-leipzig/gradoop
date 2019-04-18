@@ -29,9 +29,6 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
  */
 public abstract class BaseGellyAlgorithm<K, VV, EV, O> implements UnaryGraphToValueOperator<O> {
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public O execute(LogicalGraph graph) {
     try {
@@ -54,6 +51,7 @@ public abstract class BaseGellyAlgorithm<K, VV, EV, O> implements UnaryGraphToVa
    *
    * @param graph The Gelly graph.
    * @return output format.
+   * @throws Exception on failure
    */
   public abstract O executeInGelly(Graph<K, VV, EV> graph) throws Exception;
 }

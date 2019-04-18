@@ -14,6 +14,9 @@
   <suppress checks="IllegalCatch"
             files="GradoopGellyAlgorithm.java"
             lines="70-77"/>
+  <suppress checks="IllegalCatch"
+            files="PrintTableSink"
+            lines="90-100"/>
 
   <!-- less restrictive checkstyle for tests -->
   <suppress checks="JavadocMethod"

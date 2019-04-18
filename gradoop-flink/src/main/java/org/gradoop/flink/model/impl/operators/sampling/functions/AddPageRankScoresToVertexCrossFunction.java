@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 
 /**
  * Writes the PageRank-scores stored in the graphHead to all vertices.
@@ -32,22 +32,22 @@ public class AddPageRankScoresToVertexCrossFunction
   @Override
   public Vertex cross(Vertex vertex, GraphHead graphHead) {
     double min = graphHead.getPropertyValue(
-      SamplingAlgorithm.MIN_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
+      SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
     double max = graphHead.getPropertyValue(
-      SamplingAlgorithm.MAX_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
+      SamplingConstants.MAX_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
     double sum = graphHead.getPropertyValue(
-      SamplingAlgorithm.SUM_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
+      SamplingConstants.SUM_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
 
-    vertex.setProperty(SamplingAlgorithm.MIN_PAGE_RANK_SCORE_PROPERTY_KEY, min);
-    vertex.setProperty(SamplingAlgorithm.MAX_PAGE_RANK_SCORE_PROPERTY_KEY, max);
-    vertex.setProperty(SamplingAlgorithm.SUM_PAGE_RANK_SCORE_PROPERTY_KEY, sum);
+    vertex.setProperty(SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY, min);
+    vertex.setProperty(SamplingConstants.MAX_PAGE_RANK_SCORE_PROPERTY_KEY, max);
+    vertex.setProperty(SamplingConstants.SUM_PAGE_RANK_SCORE_PROPERTY_KEY, sum);
     vertex.setProperty("vertexCount", graphHead.getPropertyValue("vertexCount"));
 
     if (min != max) {
       double score = vertex.getPropertyValue(
-        SamplingAlgorithm.PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
+        SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
       vertex.setProperty(
-        SamplingAlgorithm.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY, (score - min) / (max - min));
+        SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY, (score - min) / (max - min));
     }
 
     return vertex;

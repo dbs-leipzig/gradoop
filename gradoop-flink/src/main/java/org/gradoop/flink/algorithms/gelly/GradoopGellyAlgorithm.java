@@ -62,9 +62,6 @@ public abstract class GradoopGellyAlgorithm<VV, EV>
     this.toGellyEdge = edgeValue;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     this.currentGraph = graph;
@@ -94,6 +91,7 @@ public abstract class GradoopGellyAlgorithm<VV, EV>
    *
    * @param graph The Gelly graph.
    * @return The Gradoop graph.
+   * @throws Exception on failure
    */
   public abstract LogicalGraph executeInGelly(Graph<GradoopId, VV, EV> graph) throws Exception;
 }

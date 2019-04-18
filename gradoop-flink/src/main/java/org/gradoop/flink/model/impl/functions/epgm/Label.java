@@ -35,7 +35,7 @@ public class Label<L extends EPGMLabeled>
   }
 
   @Override
-  public String getKey(L l) throws Exception {
+  public String getKey(L l) {
     return l.getLabel();
   }
 }

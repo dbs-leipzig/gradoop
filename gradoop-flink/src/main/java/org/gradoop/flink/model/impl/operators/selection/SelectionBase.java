@@ -62,7 +62,4 @@ public abstract class SelectionBase implements UnaryCollectionToCollectionOperat
     return collection.getConfig().getGraphCollectionFactory()
       .fromDataSets(graphHeads, vertices, edges);
   }
-
-  @Override
-  public abstract String getName();
 }
