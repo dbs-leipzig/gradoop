@@ -121,7 +121,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    *
    * @see #write(DataOutputView)
    */
-  public static final transient byte FLAG_LARGE = 0x10;
+  public static final transient byte FLAG_LARGE = (byte) 0x80;
 
   /**
    * If the length of the byte representation is larger than this value, the length will be
@@ -374,24 +374,21 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
 
   /**
    * Returns the value as the specified type. If it is already of the same type as requested, we
-   * just return the value. If not, then we try to cast the value via the requested types strategy
-   * get method.
+   * just return the value. If not, an {@link UnsupportedOperationException} is thrown.
    *
    * @param clazz the requested value type
    * @param <T> PropertyValue supported type
    * @return value
+   * @throws UnsupportedOperationException when trying to get the wrong type
    */
-  public <T> T get(Class<T> clazz) {
+  @SuppressWarnings("unchecked")
+  public <T> T get(Class<T> clazz) throws UnsupportedOperationException {
     PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(clazz);
     if (strategy.is(value)) {
       return (T) value;
     }
-    byte[] bytes = PropertyValueStrategyFactory.getRawBytes(value);
-    try {
-      return  (T) strategy.get(bytes);
-    } catch (IOException e) {
-      throw new RuntimeException("Cannot convert " + value + " to " + clazz);
-    }
+    throw new UnsupportedOperationException("Value '" + value + "' of type " +
+      value.getClass().getSimpleName() + ", cannot be accessed as " + clazz.getSimpleName());
   }
 
   /**
