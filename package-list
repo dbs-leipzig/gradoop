@@ -109,6 +109,7 @@ org.gradoop.flink.io.impl.graph
 org.gradoop.flink.io.impl.graph.functions
 org.gradoop.flink.io.impl.graph.tuples
 org.gradoop.flink.io.impl.statistics
+org.gradoop.flink.io.impl.table
 org.gradoop.flink.io.impl.tlf
 org.gradoop.flink.io.impl.tlf.constants
 org.gradoop.flink.io.impl.tlf.functions
@@ -149,6 +150,11 @@ org.gradoop.flink.model.impl.operators.cloning.functions
 org.gradoop.flink.model.impl.operators.combination
 org.gradoop.flink.model.impl.operators.count
 org.gradoop.flink.model.impl.operators.count.functions
+org.gradoop.flink.model.impl.operators.cypher.capf
+org.gradoop.flink.model.impl.operators.cypher.capf.query
+org.gradoop.flink.model.impl.operators.cypher.capf.query.functions
+org.gradoop.flink.model.impl.operators.cypher.capf.result
+org.gradoop.flink.model.impl.operators.cypher.capf.result.functions
 org.gradoop.flink.model.impl.operators.difference
 org.gradoop.flink.model.impl.operators.difference.functions
 org.gradoop.flink.model.impl.operators.distinction
