@@ -134,16 +134,7 @@ public class PageRankSampling extends SamplingAlgorithm {
       .filter(new PageRankResultVertexFilter(
         threshold, sampleGreaterThanThreshold, keepVerticesIfSameScore));
 
-    DataSet<Edge> newEdges = graph.getEdges()
-      .join(scaledVertices)
-      .where(new SourceId<>()).equalTo(new Id<>())
-      .with(new LeftSide<>())
-      .join(scaledVertices)
-      .where(new TargetId<>()).equalTo(new Id<>())
-      .with(new LeftSide<>());
-
-    graph = graph.getFactory().fromDataSets(graph.getGraphHead(), scaledVertices, newEdges);
-
-    return graph;
+    return graph.getFactory()
+      .fromDataSets(graph.getGraphHead(), scaledVertices, graph.getEdges()).verify();
   }
 }
