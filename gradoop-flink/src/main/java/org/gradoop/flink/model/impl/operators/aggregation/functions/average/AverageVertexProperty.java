@@ -20,7 +20,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 /**
  * Calculates the average of a numeric property value of all vertices.
  *
- * @see AverageProperty more details.
+ * @see AverageProperty
  */
 public class AverageVertexProperty extends AverageProperty implements VertexAggregateFunction {
 

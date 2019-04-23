@@ -20,7 +20,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 /**
  * Calculates the average of a numeric property value of all edges.
  *
- * @see AverageProperty more details.
+ * @see AverageProperty
  */
 public class AverageEdgeProperty extends AverageProperty implements EdgeAggregateFunction {
 
