@@ -106,6 +106,14 @@
         </developerConnection>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>dbleipzig</id>
+            <name>DB Leipzig Archiva</name>
+            <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
+        </repository>
+    </repositories>
+
     <distributionManagement>
         <snapshotRepository>
             <id>release_artifacts_gradoop</id>
@@ -129,7 +137,7 @@
         <!-- alpha order require -->
         <dep.accumulo.version>1.9.0</dep.accumulo.version>
         <dep.commons-cli.version>1.4</dep.commons-cli.version>
-        <dep.flink.version>1.7.0</dep.flink.version>
+        <dep.flink.version>1.7.2</dep.flink.version>
         <dep.gdl.version>0.3</dep.gdl.version>
         <dep.hbase.version>1.4.3</dep.hbase.version>
         <dep.javafastpfor.version>0.1.10</dep.javafastpfor.version>
@@ -139,13 +147,14 @@
         <dep.kryo.version>4.0.2</dep.kryo.version>
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.mockito.version>2.21.0</dep.mockito.version>
+        <dep.okapi.version>0.2.4-SNAPSHOT</dep.okapi.version>
 
         <log4j.properties>log4j-test.properties</log4j.properties>
         <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
 
         <plugin.maven-compiler.version>3.5.1</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>3.0.0</plugin.maven-checkstyle.version>
-        <plugin.maven-findbugs.version>3.0.1</plugin.maven-findbugs.version>
+        <plugin.maven-findbugs.version>3.0.5</plugin.maven-findbugs.version>
         <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
         <plugin.maven-release.version>2.5.3</plugin.maven-release.version>
         <plugin.maven-surefire.version>2.19.1</plugin.maven-surefire.version>
@@ -500,7 +509,9 @@
                                 <goal>report</goal>
                             </goals>
                             <configuration>
-                                <outputDirectory>${session.executionRootDirectory}/target/coverage-reports/${project.name}</outputDirectory>
+                                <outputDirectory>
+                                    ${session.executionRootDirectory}/target/coverage-reports/${project.name}
+                                </outputDirectory>
                                 <title>${project.name}</title>
                                 <footer>Code Coverage Report for Gradoop ${project.version}</footer>
                             </configuration>
@@ -617,6 +628,25 @@
                 <groupId>com.esotericsoftware</groupId>
                 <artifactId>kryo</artifactId>
                 <version>${dep.kryo.version}</version>
+            </dependency>
+
+            <!-- CAPF -->
+            <dependency>
+                <groupId>org.opencypher</groupId>
+                <artifactId>flink-cypher</artifactId>
+                <version>${dep.okapi.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-nop</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.opencypher</groupId>
+                <artifactId>spark-cypher</artifactId>
+                <version>${dep.okapi.version}</version>
             </dependency>
 
             <!-- Others -->

@@ -13,31 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.api;
-
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-
-import java.io.IOException;
-
 /**
- * Data source in analytical programs.
+ * Contains implementation for the transformation of graphs to CAPF compatible Flink tables
+ * and the execution of cypher queries on them via CAPF
  */
-public interface DataSource {
-
-  /**
-   * Reads the input as logical graph.
-   *
-   * @return logical graph
-   * @throws IOException on failure
-   */
-  LogicalGraph getLogicalGraph() throws IOException;
-
-  /**
-   * Reads the input as graph collection.
-   *
-   * @return graph collection
-   * @throws IOException on failure
-   */
-  GraphCollection getGraphCollection() throws IOException;
-}
+package org.gradoop.flink.model.impl.operators.cypher.capf.query;

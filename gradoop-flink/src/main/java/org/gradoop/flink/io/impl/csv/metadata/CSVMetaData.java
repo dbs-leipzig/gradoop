@@ -36,7 +36,7 @@ public class CSVMetaData extends MetaData {
    * @param vertexMetaData a map between each vertex label and its property metadata
    * @param edgeMetaData   a map between each edge label and its property metadata
    */
-  CSVMetaData(
+  public CSVMetaData(
     Map<String, List<PropertyMetaData>> graphMetaData,
     Map<String, List<PropertyMetaData>> vertexMetaData,
     Map<String, List<PropertyMetaData>> edgeMetaData) {

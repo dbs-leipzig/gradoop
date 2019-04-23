@@ -13,31 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.io.api;
-
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-
-import java.io.IOException;
-
 /**
- * Data source in analytical programs.
+ * Contains all classes related to the input and output of Flink tables.
  */
-public interface DataSource {
-
-  /**
-   * Reads the input as logical graph.
-   *
-   * @return logical graph
-   * @throws IOException on failure
-   */
-  LogicalGraph getLogicalGraph() throws IOException;
-
-  /**
-   * Reads the input as graph collection.
-   *
-   * @return graph collection
-   * @throws IOException on failure
-   */
-  GraphCollection getGraphCollection() throws IOException;
-}
+package org.gradoop.flink.io.impl.table;
