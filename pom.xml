@@ -152,18 +152,18 @@
         <log4j.properties>log4j-test.properties</log4j.properties>
         <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
 
-        <plugin.maven-compiler.version>3.5.1</plugin.maven-compiler.version>
+        <plugin.maven-compiler.version>3.8.0</plugin.maven-compiler.version>
         <plugin.maven-checkstyle.version>3.0.0</plugin.maven-checkstyle.version>
-        <plugin.maven-findbugs.version>3.0.5</plugin.maven-findbugs.version>
-        <plugin.maven-jar.version>2.3.2</plugin.maven-jar.version>
+        <plugin.maven-spotbugs.version>3.1.11</plugin.maven-spotbugs.version>
+        <plugin.maven-jar.version>3.1.1</plugin.maven-jar.version>
         <plugin.maven-release.version>2.5.3</plugin.maven-release.version>
-        <plugin.maven-surefire.version>2.19.1</plugin.maven-surefire.version>
+        <plugin.maven-surefire.version>2.22.1</plugin.maven-surefire.version>
         <plugin.maven-shade.version>3.2.1</plugin.maven-shade.version>
         <plugin.maven-source.version>3.0.1</plugin.maven-source.version>
         <plugin.maven-javadoc.version>3.0.1</plugin.maven-javadoc.version>
         <plugin.maven-gpg.version>1.6</plugin.maven-gpg.version>
         <plugin.maven-nexus-staging.version>1.6.7</plugin.maven-nexus-staging.version>
-        <plugin.maven-site.version>3.4</plugin.maven-site.version>
+        <plugin.maven-site.version>3.7.1</plugin.maven-site.version>
         <plugin.maven-scm-publish.version>1.1</plugin.maven-scm-publish.version>
         <plugin.maven-jacoco.version>0.8.1</plugin.maven-jacoco.version>
     </properties>
@@ -409,12 +409,11 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>${plugin.maven-findbugs.version}</version>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>${plugin.maven-spotbugs.version}</version>
                     <configuration>
                         <xmlOutput>true</xmlOutput>
-                        <findbugsXmlOutput>false</findbugsXmlOutput>
                     </configuration>
                     <executions>
                         <execution>
