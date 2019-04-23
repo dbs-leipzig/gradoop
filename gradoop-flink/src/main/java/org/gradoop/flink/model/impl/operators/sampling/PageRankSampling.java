@@ -142,7 +142,7 @@ public class PageRankSampling extends SamplingAlgorithm {
       .where(new TargetId<>()).equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    graph = graph.getFactory().fromDataSets(scaledVertices, newEdges);
+    graph = graph.getFactory().fromDataSets(graph.getGraphHead(), scaledVertices, newEdges);
 
     return graph;
   }
