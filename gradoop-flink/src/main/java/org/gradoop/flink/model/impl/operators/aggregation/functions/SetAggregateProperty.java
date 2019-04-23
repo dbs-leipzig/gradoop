@@ -87,12 +87,12 @@ public class SetAggregateProperty<G extends EPGMGraphHead>
     } else {
       aggregateValues = (Map<String, PropertyValue>) getRuntimeContext()
         .getBroadcastVariable(VALUE).get(0);
+      // Compute post-aggregate functions.
+      for (AggregateFunction function : aggregateFunctions) {
+        aggregateValues.computeIfPresent(function.getAggregatePropertyKey(),
+          (k, v) -> function.postAggregate(v));
+      }
       defaultValues.forEach(aggregateValues::putIfAbsent);
-    }
-    // Compute post-aggregate functions.
-    for (AggregateFunction function : aggregateFunctions) {
-      aggregateValues.compute(function.getAggregatePropertyKey(),
-        (k, v) -> function.postAggregate(v));
     }
   }
 

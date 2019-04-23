@@ -18,10 +18,16 @@ package org.gradoop.flink.model.impl.operators.aggregation;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
+import org.gradoop.flink.model.impl.operators.grouping.Grouping;
+import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Test if post-processing is handled as expected after aggregation.
@@ -60,12 +66,12 @@ public class AggregationWithPostProcessingTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test the aggregation with a post-processing step.
+   * Test the aggregation with a post-processing step on a logical graph.
    *
    * @throws Exception when the execution in Flink fails.
    */
   @Test
-  public void testAggregationWithPostAggregate() throws Exception {
+  public void testAggregationWithPostAggregateForGraph() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("input [" +
       "(i1 {a: 1L}) (i2 {a: 2L}) (i3 {a: -1L}) (i4 {a: 3L})" +
       "] expected {sum_a: 5L, sum_a_plusone: 6L} [" +
@@ -75,6 +81,52 @@ public class AggregationWithPostProcessingTest extends GradoopFlinkTestBase {
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
     LogicalGraph result = input.aggregate(new SumVertexProperty("a", "sum_a"),
       new SumPlusOne("a", "sum_a_plusone"));
+    collectAndAssertTrue(expected.equalsByData(result));
+  }
+
+  /**
+   * Test the aggregation with a post-processing step on a graph collection.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testAggregationWithPostAggregateForGraphCollection() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input1 [" +
+      "(i1 {a: 1L}) (i2 {a: 2L})" +
+      "] input2 [" +
+      "(i3 {a: -1L}) (i4 {a: 3L})" +
+      "] input3 [] expected1 {sum_a: 3L, sum_a_plusone: 4L} [" +
+      "(i1)(i2)" +
+      "] expected2 {sum_a: 2L, sum_a_plusone: 3L} [" +
+      "(i3)(i4)" +
+      "] expected3 {sum_a: NULL, sum_a_plusone: NULL} []");
+    GraphCollection input = loader.getGraphCollectionByVariables("input1", "input2", "input3");
+    GraphCollection expected = loader.getGraphCollectionByVariables("expected1", "expected2",
+      "expected3");
+    GraphCollection result = input.apply(new ApplyAggregation(
+      new SumVertexProperty("a", "sum_a"),
+      new SumPlusOne("a", "sum_a_plusone")));
+    collectAndAssertTrue(expected.equalsByGraphData(result));
+  }
+
+  /**
+   * Test the aggregation with a post-processing step during graph grouping.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testAggregationWithPostAggregateForGraphGrouping() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
+      "(:A {p: 1L})(:A {p: 2L})(:B {p: -1L})(:B {p: -1L})" +
+      "] expected [" +
+      "(:A {sum_p: 3L, sum_p_plusone: 4L})(:B{sum_p: -2L, sum_p_plusone: -1L})" +
+      "]");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+    LogicalGraph result = input.groupBy(
+      Arrays.asList(Grouping.LABEL_SYMBOL), Arrays.asList(new SumVertexProperty("p", "sum_p"),
+        new SumPlusOne("p", "sum_p_plusone")),
+      Collections.emptyList(), Collections.emptyList(), GroupingStrategy.GROUP_REDUCE);
     collectAndAssertTrue(expected.equalsByData(result));
   }
 }
