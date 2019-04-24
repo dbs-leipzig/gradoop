@@ -76,16 +76,14 @@ public class PageRankSamplingTest extends ParameterizedTestForGraphSampling {
         assertTrue("vertex does not have scaled PageRank-score property (should have): " +
           v.toString(), v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY));
 
-        if (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
-          double score = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
-            .getDouble();
-          if (sampleGreaterThanThreshold) {
-            assertTrue("sampled vertex has PageRankScore smaller or equal than threshold",
-              score > sampleSize);
-          } else {
-            assertTrue("sampled vertex has PageRankScore greater than threshold",
-              score <= sampleSize);
-          }
+        double score = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
+          .getDouble();
+        if (sampleGreaterThanThreshold) {
+          assertTrue("sampled vertex has PageRankScore smaller or equal than threshold",
+            score > sampleSize);
+        } else {
+          assertTrue("sampled vertex has PageRankScore greater than threshold",
+            score <= sampleSize);
         }
       }
     } else {
