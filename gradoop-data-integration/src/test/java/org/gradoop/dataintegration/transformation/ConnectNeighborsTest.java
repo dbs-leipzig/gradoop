@@ -30,7 +30,7 @@ public class ConnectNeighborsTest extends GradoopFlinkTestBase {
   /**
    * The loader used to get the test graphs.
    */
-  private FlinkAsciiGraphLoader loader = getLoaderFromString("input:test[" +
+  private FlinkAsciiGraphLoader loader = getLoaderFromString("input:test [" +
     "(i:V)-->(c:Center)-->(o:V)" +
     "(i2:V)-->(c)-->(o2:V)" +
     "(:other)-->(c)-->(:other)" +
@@ -38,9 +38,25 @@ public class ConnectNeighborsTest extends GradoopFlinkTestBase {
     "expectedIncoming:test [" +
     "(i)-[:neighbor]->(i2)" +
     "(i2)-[:neighbor]->(i)" +
-    "] expectedOutgoing [" +
+    "(i:V)-->(c:Center)-->(o:V)" +
+    "(i2:V)-->(c)-->(o2:V)" +
+    "(:other)-->(c)-->(:other)" +
+    "]" +
+    "expectedOutgoing:test [" +
     "(o)-[:neighbor]->(o2)" +
     "(o2)-[:neighbor]->(o)" +
+    "(i:V)-->(c:Center)-->(o:V)" +
+    "(i2:V)-->(c)-->(o2:V)" +
+    "(:other)-->(c)-->(:other)" +
+    "]" +
+    "expectedUndirected:test [" +
+    "(i)-[:neighbor]->(i2)" +
+    "(i2)-[:neighbor]->(i)" +
+    "(o)-[:neighbor]->(o2)" +
+    "(o2)-[:neighbor]->(o)" +
+    "(i:V)-->(c:Center)-->(o:V)" +
+    "(i2:V)-->(c)-->(o2:V)" +
+    "(:other)-->(c)-->(:other)" +
     "]");
 
   /**
@@ -53,7 +69,7 @@ public class ConnectNeighborsTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
     UnaryGraphToGraphOperator operator =
       new ConnectNeighbors("Center", Neighborhood.EdgeDirection.INCOMING, "V", "neighbor");
-    LogicalGraph expected = loader.getLogicalGraphByVariable("expectedIncoming").combine(input);
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expectedIncoming");
 
     collectAndAssertTrue(expected.equalsByData(input.callForGraph(operator)));
   }
@@ -68,7 +84,7 @@ public class ConnectNeighborsTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
     UnaryGraphToGraphOperator operator =
       new ConnectNeighbors("Center", Neighborhood.EdgeDirection.OUTGOING, "V", "neighbor");
-    LogicalGraph expected = loader.getLogicalGraphByVariable("expectedOutgoing").combine(input);
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expectedOutgoing");
 
     collectAndAssertTrue(expected.equalsByData(input.callForGraph(operator)));
   }
@@ -83,9 +99,7 @@ public class ConnectNeighborsTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
     UnaryGraphToGraphOperator operator =
       new ConnectNeighbors("Center", Neighborhood.EdgeDirection.UNDIRECTED, "V", "neighbor");
-    LogicalGraph expected = loader.getLogicalGraphByVariable("expectedOutgoing")
-      .combine(loader.getLogicalGraphByVariable("expectedIncoming"))
-      .combine(input);
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expectedUndirected");
 
     collectAndAssertTrue(expected.equalsByData(input.callForGraph(operator)));
   }
