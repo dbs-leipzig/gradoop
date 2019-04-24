@@ -76,7 +76,7 @@ public class Exclusion implements BinaryGraphToGraphOperator {
       .equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    return firstGraph.getConfig().getLogicalGraphFactory()
+    return firstGraph.getFactory()
       .fromDataSets(firstGraph.getGraphHead(), newVertexSet, newEdgeSet);
   }
 }
