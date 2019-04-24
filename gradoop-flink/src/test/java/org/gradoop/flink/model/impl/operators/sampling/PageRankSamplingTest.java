@@ -73,7 +73,7 @@ public class PageRankSamplingTest extends ParameterizedTestForGraphSampling {
       .getDouble();
     if (minScore != maxScore) {
       for (Vertex v : newVertices) {
-        assertTrue("vertex does not have scaled PageRank-score property (should have):" +
+        assertTrue("vertex does not have scaled PageRank-score property (should have): " +
           v.toString(), v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY));
 
         if (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
