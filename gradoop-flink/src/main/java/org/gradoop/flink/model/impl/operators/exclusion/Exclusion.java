@@ -49,10 +49,9 @@ import org.gradoop.flink.model.impl.functions.utils.LeftWhenRightIsNull;
 public class Exclusion implements BinaryGraphToGraphOperator {
 
   /**
-   * Creates a new logical graph containing only vertices and edges that exist
-   * in the first input graph but not in the second input graph. Vertex and edge
-   * equality is based on their respective identifiers.
-   * The graph head of the first input graph is retained.
+   * Reduces the first input graph to contain only vertices and edges that don't exist in
+   * the second graph. The graph head of the first graph is retained. Vertex and edge equality
+   * is based on their respective identifiers.
    *
    * @param firstGraph  first input graph
    * @param secondGraph second input graph

@@ -50,9 +50,9 @@ public class ReduceExclusion implements ReducibleBinaryGraphToGraphOperator {
   }
 
   /**
-   * Creates a new logical graph that contains only vertices and edges that
-   * are contained in the starting graph but not in any other graph that is part
-   * of the given collection. The graph head of the starting graph is retained.
+   * Reduces the starting graph to contain only vertices and edges that are not contained in any
+   * other graph that is part of the given collection.
+   * The graph head of the starting graph is retained.
    *
    * @param collection input collection
    * @return excluded graph

@@ -42,6 +42,7 @@ import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.
 
 /**
  * Extracts a subgraph from a logical graph using the given filter functions.
+ * The graph head stays unchanged for the subgraph.
  *
  * The operator is able to:
  * 1) extract vertex-induced subgraph
