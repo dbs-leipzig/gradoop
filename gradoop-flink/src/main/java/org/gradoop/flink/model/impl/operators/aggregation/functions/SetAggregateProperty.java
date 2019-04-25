@@ -24,9 +24,8 @@ import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Sets aggregate values of a graph head.
@@ -65,14 +64,12 @@ public class SetAggregateProperty<G extends EPGMGraphHead>
    * @param aggregateFunctions aggregate functions
    */
   public SetAggregateProperty(Set<AggregateFunction> aggregateFunctions) {
-    for (AggregateFunction func : aggregateFunctions) {
-      checkNotNull(func);
-    }
-    this.aggregateFunctions = aggregateFunctions;
+    this.aggregateFunctions = Objects.requireNonNull(aggregateFunctions);
 
     defaultValues = new HashMap<>();
 
     for (AggregateFunction func : aggregateFunctions) {
+      Objects.requireNonNull(func);
       defaultValues.put(func.getAggregatePropertyKey(), AggregateUtil.getDefaultAggregate(func));
     }
   }

@@ -92,10 +92,10 @@ public interface Average extends AggregateFunction {
     // Convert the two list values to a double.
     // The first was some unknown number type, the second a long.
     double sum = ((Number) value.get(0).getObject()).doubleValue();
-    double count = (double) value.get(1).getLong();
+    long count = value.get(1).getLong();
     if (count < 0) {
-      throw new IllegalArgumentException("Invalid number of elements " + count + ", expected " +
-        "value greater than zero.");
+      throw new IllegalArgumentException("Invalid number of elements " + count +
+        ", expected value greater than zero.");
     } else if (count == 0) {
       return PropertyValue.NULL_VALUE;
     } else {
