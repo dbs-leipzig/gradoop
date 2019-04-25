@@ -26,9 +26,9 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.sampling.functions.RandomFilter;
 
 /**
- * Computes a vertex sampling of the graph. Retains randomly chosen vertices of a given relative
- * amount. Retains all edges which source- and target-vertices were chosen. There may retain some
- * unconnected vertices in the sampled graph.
+ * Computes a vertex sampling of the graph (new graph head will be generated). Retains randomly
+ * chosen vertices of a given relative amount. Retains all edges which source- and
+ * target-vertices were chosen. There may retain some unconnected vertices in the sampled graph.
  */
 public class RandomVertexSampling extends SamplingAlgorithm {
   /**
@@ -76,6 +76,6 @@ public class RandomVertexSampling extends SamplingAlgorithm {
       .where(new TargetId<>()).equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    return graph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
+    return graph.getFactory().fromDataSets(newVertices, newEdges);
   }
 }

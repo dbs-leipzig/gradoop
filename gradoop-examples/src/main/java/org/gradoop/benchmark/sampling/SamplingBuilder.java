@@ -22,6 +22,7 @@ import org.gradoop.flink.model.impl.operators.sampling.RandomNonUniformVertexSam
 import org.gradoop.flink.model.impl.operators.sampling.RandomLimitedDegreeVertexSampling;
 import org.gradoop.flink.model.impl.operators.sampling.RandomEdgeSampling;
 import org.gradoop.flink.model.impl.operators.sampling.PageRankSampling;
+import org.gradoop.flink.model.impl.operators.sampling.RandomWalkSampling;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
 
 /**
@@ -47,7 +48,9 @@ class SamplingBuilder {
     /** RandomVertexNeighborhoodSampling enum constant */
     RANDOM_VERTEX_NEIGHBORHOOD_SAMPLING(RandomVertexNeighborhoodSampling.class.getSimpleName()),
     /** RandomVertexSampling enum constant */
-    RANDOM_VERTEX_SAMPLING(RandomVertexSampling.class.getSimpleName());
+    RANDOM_VERTEX_SAMPLING(RandomVertexSampling.class.getSimpleName()),
+    /** RandomWalkSampling enum constant */
+    RANDOM_WALK_SAMPLING(RandomWalkSampling.class.getSimpleName());
 
     /** Property denoting the simple classname of a sampling algorithm */
     private final String name;
@@ -158,6 +161,19 @@ class SamplingBuilder {
       } else {
         throw createInstantiationException(Algorithm.RANDOM_VERTEX_SAMPLING.name,
           new String[]{"1", "2"}, constructorParams.length);
+      }
+
+    case RANDOM_WALK_SAMPLING:
+      if (constructorParams.length == 2) {
+        return new RandomWalkSampling(Float.parseFloat(constructorParams[0]),
+          Integer.parseInt(constructorParams[1]));
+      } else if (constructorParams.length == 4) {
+        return new RandomWalkSampling(Float.parseFloat(constructorParams[0]),
+          Integer.parseInt(constructorParams[1]), Float.parseFloat(constructorParams[2]),
+          Integer.parseInt(constructorParams[3]));
+      } else {
+        throw createInstantiationException(Algorithm.RANDOM_WALK_SAMPLING.name,
+        new String[]{"1", "2"}, constructorParams.length);
       }
 
     default:

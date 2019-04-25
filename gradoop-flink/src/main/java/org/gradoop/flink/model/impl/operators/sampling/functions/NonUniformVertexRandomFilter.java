@@ -51,21 +51,21 @@ implements FilterFunction<V> {
    *
    * @param sampleSize relative sample size
    * @param randomSeed random seed (can be 0)
-   * @param propertyNameOfDegree proeprty name of degree
-   * @param propertyNameofMaxDegree property name of max degree
+   * @param propertyNameOfDegree property name of degree
+   * @param propertyNameOfMaxDegree property name of max degree
    */
   public NonUniformVertexRandomFilter(float sampleSize, long randomSeed,
-    String propertyNameOfDegree, String propertyNameofMaxDegree) {
+    String propertyNameOfDegree, String propertyNameOfMaxDegree) {
     threshold = sampleSize;
     randomGenerator = (randomSeed != 0L) ? new Random(randomSeed) : new Random();
     this.propertyNameOfDegree = propertyNameOfDegree;
-    this.propertyNameofMaxDegree = propertyNameofMaxDegree;
+    this.propertyNameofMaxDegree = propertyNameOfMaxDegree;
   }
 
   @Override
   public boolean filter(V vertex) throws Exception {
-    long degree = Long.parseLong(vertex.getPropertyValue(propertyNameOfDegree).toString());
-    long maxDegree = Long.parseLong(vertex.getPropertyValue(propertyNameofMaxDegree).toString());
+    long degree = vertex.getPropertyValue(propertyNameOfDegree).getLong();
+    long maxDegree = vertex.getPropertyValue(propertyNameofMaxDegree).getLong();
     return randomGenerator.nextFloat() <= (degree / (double) maxDegree) * threshold;
   }
 }

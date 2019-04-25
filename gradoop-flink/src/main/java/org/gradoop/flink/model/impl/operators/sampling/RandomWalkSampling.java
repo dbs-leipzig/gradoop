@@ -24,21 +24,22 @@ import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeSourceVertexJoin;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgeTargetVertexJoin;
 import org.gradoop.flink.model.impl.operators.sampling.functions.EdgesWithSampledVerticesFilter;
 import org.gradoop.flink.model.impl.operators.sampling.functions.Neighborhood;
 
 /**
- * Computes a random walk sampling of the graph. Retains visited vertices and edges where source
- * and target vertex has been sampled.
+ * Computes a random walk sampling of the graph (new graph head will be generated). Retains visited
+ * vertices and edges where source and target vertex has been sampled.
  */
 public class RandomWalkSampling extends SamplingAlgorithm {
 
   /**
    * Sample size
    */
-  private final double sampleSize;
+  private final float sampleSize;
   /**
    * Number of start vertices
    */
@@ -46,7 +47,7 @@ public class RandomWalkSampling extends SamplingAlgorithm {
   /**
    * Probability of jumping instead of walking along edges
    */
-  private final double jumpProbability;
+  private final float jumpProbability;
   /**
    * Max iteration count
    */
@@ -59,10 +60,10 @@ public class RandomWalkSampling extends SamplingAlgorithm {
    * @param sampleSize              sample size
    * @param numberOfStartVertices   number of start vertices
    */
-  public RandomWalkSampling(double sampleSize, int numberOfStartVertices) {
+  public RandomWalkSampling(float sampleSize, int numberOfStartVertices) {
     this.sampleSize = sampleSize;
     this.numberOfStartVertices = numberOfStartVertices;
-    this.jumpProbability = 0.1d;
+    this.jumpProbability = 0.1f;
     this.maxIteration = Integer.MAX_VALUE;
   }
 
@@ -74,8 +75,8 @@ public class RandomWalkSampling extends SamplingAlgorithm {
    * @param jumpProbability         probability to jump instead of walk
    * @param maxIteration            max gelly iteration count
    */
-  public RandomWalkSampling(double sampleSize, int numberOfStartVertices,
-    double jumpProbability, int maxIteration) {
+  public RandomWalkSampling(float sampleSize, int numberOfStartVertices,
+    float jumpProbability, int maxIteration) {
 
     this.sampleSize = sampleSize;
     this.numberOfStartVertices = numberOfStartVertices;
@@ -90,15 +91,15 @@ public class RandomWalkSampling extends SamplingAlgorithm {
       jumpProbability, sampleSize).execute(graph);
 
     DataSet<Vertex> sampledVertices = gellyResult.getVertices()
-      .filter(new ByProperty<>(PROPERTY_KEY_SAMPLED));
+      .filter(new ByProperty<>(SamplingConstants.PROPERTY_KEY_SAMPLED));
 
     DataSet<Edge> sampledEdges = graph.getEdges()
       .join(sampledVertices)
       .where(new SourceId<>()).equalTo(new Id<>())
-      .with(new EdgeSourceVertexJoin(PROPERTY_KEY_SAMPLED))
+      .with(new EdgeSourceVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED))
       .join(sampledVertices)
       .where(1).equalTo(new Id<>())
-      .with(new EdgeTargetVertexJoin(PROPERTY_KEY_SAMPLED))
+      .with(new EdgeTargetVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED))
       .filter(new EdgesWithSampledVerticesFilter(Neighborhood.BOTH))
       .map(new Value0Of3<>());
 

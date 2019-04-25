@@ -28,7 +28,7 @@ public interface DataSource {
   /**
    * Reads the input as logical graph.
    *
-   * @return logial graph
+   * @return logical graph
    * @throws IOException on failure
    */
   LogicalGraph getLogicalGraph() throws IOException;
