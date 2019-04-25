@@ -25,7 +25,7 @@ import java.util.Objects;
 /**
  * Base class for aggregate functions determining the average of a numeric property value.
  */
-public abstract class AverageProperty extends BaseAggregateFunction implements Average {
+public class AverageProperty extends BaseAggregateFunction implements Average {
 
   /**
    * A property value containing the number {@code 1}, as a {@code long}.

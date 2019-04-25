@@ -42,8 +42,8 @@ public interface Average extends AggregateFunction {
 
   /**
    * The default value used internally in this aggregation.
-   * Implementations of {@link #getIncrement(EPGMElement)} should return this value as a default
-   * value.
+   * Implementations of {@link #getIncrement(EPGMElement)} should return this value when the
+   * element is ignored, i.e. when it does not have the attribute aggregated by this function.
    */
   PropertyValue IGNORED_VALUE = PropertyValue.create(
     Arrays.asList(PropertyValue.create(0L), PropertyValue.create(0L)));
@@ -74,7 +74,7 @@ public interface Average extends AggregateFunction {
    * Calculate the average from the internally used aggregate value.
    *
    * @param result The result of the aggregation step.
-   * @return The average value (or null, if the there were no element to get the average of).
+   * @return The average value (or null, if there were no elements to get the average of).
    * @throws IllegalArgumentException if the previous result had an invalid format.
    */
   @Override
@@ -87,7 +87,7 @@ public interface Average extends AggregateFunction {
       throw new IllegalArgumentException("The aggregate value list is expected to have size 2.");
     }
     if (!value.get(0).isNumber() || !value.get(1).isLong()) {
-      throw new IllegalArgumentException("The aggregate value list contained unsupported types.");
+      throw new IllegalArgumentException("The aggregate value list contains unsupported types.");
     }
     // Convert the two list values to a double.
     // The first was some unknown number type, the second a long.
