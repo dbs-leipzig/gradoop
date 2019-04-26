@@ -136,8 +136,6 @@ public class CAPFQuery implements Operator {
   }
 
   /**
-   * Execute a cypher query on a given graph via the CAPF API.
-   *
    * @param graph the graph that the query shall be executed on
    * @return the result of the query, either a graph collection or a flink table
    * @throws Exception if the execution or IO fails.

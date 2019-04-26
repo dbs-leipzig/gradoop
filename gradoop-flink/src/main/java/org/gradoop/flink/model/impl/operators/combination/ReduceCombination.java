@@ -21,13 +21,12 @@ import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator
 
 /**
  * Computes the combined graph from a collection of logical graphs.
+ * Creates a new logical graph by union the vertex and edge sets of all graph
+ * contained in the given collection.
  */
 public class ReduceCombination implements ReducibleBinaryGraphToGraphOperator {
 
   /**
-   * Creates a new logical graph by union the vertex and edge sets of all graph
-   * contained in the given collection.
-   *
    * @param collection input collection
    * @return combined graph
    */

@@ -25,14 +25,13 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 /**
  * Computes the overlap graph from two logical graphs.
+ * Creates a new logical graph containing the overlapping vertex and edge
+ * sets of two input graphs. Vertex and edge equality is based on their
+ * respective identifiers.
  */
 public class Overlap implements BinaryGraphToGraphOperator {
 
   /**
-   * Creates a new logical graph containing the overlapping vertex and edge
-   * sets of two input graphs. Vertex and edge equality is based on their
-   * respective identifiers.
-   *
    * @param firstGraph  first input graph
    * @param secondGraph second input graph
    * @return graph with overlapping elements from both input graphs

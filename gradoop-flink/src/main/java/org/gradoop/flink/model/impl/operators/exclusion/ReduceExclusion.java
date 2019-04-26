@@ -30,6 +30,9 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphsBroadc
 
 /**
  * Computes the exclusion graph from a collection of logical graphs.
+ * Creates a new logical graph that contains only vertices and edges that
+ * are contained in the starting graph but not in any other graph that is part
+ * of the given collection.
  */
 public class ReduceExclusion implements ReducibleBinaryGraphToGraphOperator {
 
@@ -50,10 +53,6 @@ public class ReduceExclusion implements ReducibleBinaryGraphToGraphOperator {
   }
 
   /**
-   * Creates a new logical graph that contains only vertices and edges that
-   * are contained in the starting graph but not in any other graph that is part
-   * of the given collection.
-   *
    * @param collection input collection
    * @return excluded graph
    */

@@ -61,9 +61,7 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
 public class VertexFusion implements BinaryGraphToGraphOperator {
 
   /**
-   * Fusing the already-combined sources
-   *
-   * @param searchGraph            Logical Graph defining the data lake
+   * @param searchGraph   Logical Graph defining the data lake
    * @param graphPatterns Collection of elements representing which vertices will be merged into
    *                      a vertex
    * @return              A single merged graph
@@ -80,9 +78,7 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
 
 
   /**
-   * Fusing the already-combined sources
-   *
-   * @param searchGraph            Logical Graph defining the data lake
+   * @param searchGraph   Logical Graph defining the data lake
    * @param graphPatterns Collection of elements representing which vertices will be merged into
    *                      a vertex
    * @return              A single merged graph

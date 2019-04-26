@@ -45,14 +45,13 @@ import org.gradoop.flink.model.impl.functions.utils.LeftWhenRightIsNull;
 
 /**
  * Computes the exclusion graph from two logical graphs.
+ * Creates a new logical graph containing only vertices and edges that exist
+ * in the first input graph but not in the second input graph. Vertex and edge
+ * equality is based on their respective identifiers.
  */
 public class Exclusion implements BinaryGraphToGraphOperator {
 
   /**
-   * Creates a new logical graph containing only vertices and edges that exist
-   * in the first input graph but not in the second input graph. Vertex and edge
-   * equality is based on their respective identifiers.
-   *
    * @param firstGraph  first input graph
    * @param secondGraph second input graph
    * @return first graph without elements from second graph

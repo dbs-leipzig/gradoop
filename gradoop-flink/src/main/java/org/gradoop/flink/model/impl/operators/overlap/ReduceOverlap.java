@@ -25,15 +25,14 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Computes the overlap graph from a collection of logical graphs.
+ * Creates a new logical graph containing the overlapping vertex and edge sets
+ * of the graphs contained in the given collection. Vertex and edge equality
+ * is based on their respective identifiers.
  */
 public class ReduceOverlap extends OverlapBase implements
   ReducibleBinaryGraphToGraphOperator {
 
   /**
-   * Creates a new logical graph containing the overlapping vertex and edge sets
-   * of the graphs contained in the given collection. Vertex and edge equality
-   * is based on their respective identifiers.
-   *
    * @param collection input collection
    * @return graph with overlapping elements from the input collection
    */
