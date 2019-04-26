@@ -23,11 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.gradoop.common.model.impl.properties.PropertyValue.create;
@@ -103,32 +99,38 @@ public class PropertyValueTestProvider {
   }
 
   /**
-   * Provides PropertyValues and related array of booleans
-   * @return
+   * Provides PropertyValues and the object that was used to create a given instance.
+   *
+   * @return Array of PropertyValues
    */
   @DataProvider
   private Object[][] testIsProvider() {
     return new Object[][] {
-      {create(NULL_VAL_0), new boolean[]{true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
-      {create(BOOL_VAL_1), new boolean[] {false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
-      {create(INT_VAL_2), new boolean[] {false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false}},
-      {create(LONG_VAL_3), new boolean[] {false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false}},
-      {create(FLOAT_VAL_4), new boolean[] {false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false}},
-      {create(DOUBLE_VAL_5), new boolean[] {false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false}},
-      {create(STRING_VAL_6), new boolean[] {false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false}},
-      {create(BIG_DECIMAL_VAL_7), new boolean[]{false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false}},
-      {create(GRADOOP_ID_VAL_8), new boolean[] {false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false}},
-      {create(MAP_VAL_9), new boolean[] {false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false}},
-      {create(LIST_VAL_a), new boolean[] {false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false}},
-      {create(DATE_VAL_b), new boolean[] {false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false}},
-      {create(TIME_VAL_c), new boolean[] {false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false}},
-      {create(DATETIME_VAL_d), new boolean[] {false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false}},
-      {create(SHORT_VAL_e), new boolean[] {false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false}},
-      {create(SET_VAL_f), new boolean[] {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true}},
+      {create(NULL_VAL_0), NULL_VAL_0},
+      {create(BOOL_VAL_1), BOOL_VAL_1},
+      {create(INT_VAL_2), INT_VAL_2},
+      {create(LONG_VAL_3), LONG_VAL_3},
+      {create(FLOAT_VAL_4), FLOAT_VAL_4},
+      {create(DOUBLE_VAL_5), DOUBLE_VAL_5},
+      {create(STRING_VAL_6), STRING_VAL_6},
+      {create(BIG_DECIMAL_VAL_7), BIG_DECIMAL_VAL_7},
+      {create(GRADOOP_ID_VAL_8), GRADOOP_ID_VAL_8},
+      {create(MAP_VAL_9), MAP_VAL_9},
+      {create(LIST_VAL_a), LIST_VAL_a},
+      {create(DATE_VAL_b), DATE_VAL_b},
+      {create(TIME_VAL_c), TIME_VAL_c},
+      {create(DATETIME_VAL_d), DATETIME_VAL_d},
+      {create(SHORT_VAL_e), SHORT_VAL_e},
+      {create(SET_VAL_f), SET_VAL_f},
     };
   }
 
-
+  /**
+   * Provides an array of different PropertyValues and booleans that indicate whether a given value
+   * represents a number.
+   *
+   * @return Array of PropertyValues
+   */
   @DataProvider
   private Object[][] testIsNumberProvider() {
     return new Object[][] {
@@ -152,31 +154,37 @@ public class PropertyValueTestProvider {
   }
 
 
+  /**
+   * Provides triples of PropertyValues that are used to test {@link PropertyValue#hashCode()} and
+   * {@link PropertyValue#equals(Object)}.
+   *
+   * @return Array of PropertyValue triples.
+   */
   @DataProvider
   private Object[][] testEqualsAndHashCodeProvider() {
     Map<PropertyValue, PropertyValue> map1 = new HashMap<>();
-    map1.put(PropertyValue.create("foo"), PropertyValue.create("bar"));
+    map1.put(create("foo"), create("bar"));
     Map<PropertyValue, PropertyValue> map2 = new HashMap<>();
-    map2.put(PropertyValue.create("foo"), PropertyValue.create("bar"));
+    map2.put(create("foo"), create("bar"));
     Map<PropertyValue, PropertyValue> map3 = new HashMap<>();
-    map3.put(PropertyValue.create("foo"), PropertyValue.create("baz"));
+    map3.put(create("foo"), create("baz"));
 
     List<PropertyValue> list1 = Lists.newArrayList(
-      PropertyValue.create("foo"), PropertyValue.create("bar")
+      create("foo"), create("bar")
     );
     List<PropertyValue> list2 = Lists.newArrayList(
-      PropertyValue.create("foo"), PropertyValue.create("bar")
+      create("foo"), create("bar")
     );
     List<PropertyValue> list3 = Lists.newArrayList(
-      PropertyValue.create("foo"), PropertyValue.create("baz")
+      create("foo"), create("baz")
     );
 
     Set<PropertyValue> set1 = new HashSet<>();
-    set1.add(PropertyValue.create("bar"));
+    set1.add(create("bar"));
     Set<PropertyValue> set2 = new HashSet<>();
-    set2.add(PropertyValue.create("bar"));
+    set2.add(create("bar"));
     Set<PropertyValue> set3 = new HashSet<>();
-    set3.add(PropertyValue.create("baz"));
+    set3.add(create("baz"));
 
     LocalDate date1 = LocalDate.MAX;
     LocalDate date2 = LocalDate.MAX;

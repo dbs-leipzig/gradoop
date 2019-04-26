@@ -119,24 +119,30 @@ public class PropertyValueTest {
     p.setObject(new PriorityQueue<>());
   }
 
+  /**
+   * Tests whether isX only returns true iff the given value represents type X.
+   *
+   * @param value a PropertyValue
+   * @param expectedType the type which is represented by value
+   */
   @Test(dataProvider = "testIsProvider", dataProviderClass = PropertyValueTestProvider.class)
-  public void testIs(PropertyValue value, boolean[] truthValues) {
-    assertEquals(truthValues[0], value.isNull());
-    assertEquals(truthValues[1], value.isBoolean());
-    assertEquals(truthValues[2], value.isShort());
-    assertEquals(truthValues[3], value.isInt());
-    assertEquals(truthValues[4], value.isLong());
-    assertEquals(truthValues[5], value.isFloat());
-    assertEquals(truthValues[6], value.isDouble());
-    assertEquals(truthValues[7], value.isString());
-    assertEquals(truthValues[8], value.isBigDecimal());
-    assertEquals(truthValues[9], value.isGradoopId());
-    assertEquals(truthValues[10], value.isMap());
-    assertEquals(truthValues[11], value.isList());
-    assertEquals(truthValues[12], value.isDate());
-    assertEquals(truthValues[13], value.isTime());
-    assertEquals(truthValues[14], value.isDateTime());
-    assertEquals(truthValues[15], value.isSet());
+  public void testIs(PropertyValue value, Object expectedType) {
+    assertEquals(Objects.equals(expectedType, NULL_VAL_0), value.isNull());
+    assertEquals(Objects.equals(expectedType, BOOL_VAL_1), value.isBoolean());
+    assertEquals(Objects.equals(expectedType, INT_VAL_2), value.isInt());
+    assertEquals(Objects.equals(expectedType, LONG_VAL_3), value.isLong());
+    assertEquals(Objects.equals(expectedType, FLOAT_VAL_4), value.isFloat());
+    assertEquals(Objects.equals(expectedType, DOUBLE_VAL_5), value.isDouble());
+    assertEquals(Objects.equals(expectedType, STRING_VAL_6), value.isString());
+    assertEquals(Objects.equals(expectedType, BIG_DECIMAL_VAL_7), value.isBigDecimal());
+    assertEquals(Objects.equals(expectedType, GRADOOP_ID_VAL_8), value.isGradoopId());
+    assertEquals(Objects.equals(expectedType, MAP_VAL_9), value.isMap());
+    assertEquals(Objects.equals(expectedType, LIST_VAL_a), value.isList());
+    assertEquals(Objects.equals(expectedType, DATE_VAL_b), value.isDate());
+    assertEquals(Objects.equals(expectedType, TIME_VAL_c), value.isTime());
+    assertEquals(Objects.equals(expectedType, DATETIME_VAL_d), value.isDateTime());
+    assertEquals(Objects.equals(expectedType, SHORT_VAL_e), value.isShort());
+    assertEquals(Objects.equals(expectedType, SET_VAL_f), value.isSet());
   }
 
   /**
