@@ -169,6 +169,11 @@ The main contents of that module are the EPGM data model and a corresponding POJ
 implementation which is used in Flink&trade;. The persistent representation of the EPGM
 is also contained in gradoop-common and together with its mapping to HBase&trade;.
 
+### gradoop-data-integration
+
+This module contains graph importers (e.g from CSV files) and transformations on graphs (e.g
+conversion of edges to vertices and vice versa).
+
 ### gradoop-accumulo
 
 Input and output formats for reading and writing graph collections from [Apache Accumulo](https://accumulo.apache.org/).
