@@ -54,13 +54,37 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 
 #### Unary logical graph operators (one graph as input):
 
-| Operator      | Output | Output description                                           | Impl |
-|:--------------|:-------|:-------------------------------------------------------------|:----:|
-| Aggregation   | G      | Graph with result of an aggregate function as a new property | Yes  |
-| Matching      | GC     | Graphs that match a given graph pattern                      | Yes  |
-| Transformation| G      | Graph with transformed (graph, vertex, edge) data            | Yes  |
-| Grouping      | G      | Structural condense of the input graph                       | Yes  |
-| Subgraph      | G      | Subgraph that fulfils given vertex and edge predicates       | Yes  |
+| Operator                    | Output | Output description                                           | Impl |
+|:----------------------------|:-------|:-------------------------------------------------------------|:----:|
+| Aggregation                 | G      | Graph with result of an aggregate function as a new property | Yes  |
+| Matching                    | GC     | Graphs that match a given graph pattern                      | Yes  |
+| Transformation              | G      | Graph with transformed (graph, vertex, edge) data            | Yes  |
+| Grouping                    | G      | Structural condense of the input graph                       | Yes  |
+| Subgraph                    | G      | Subgraph that fulfils given vertex and edge predicates       | Yes  |
+| Cloning                     | G      | Creates a copy of a logical graph.                           | Yes  |
+| PageRankSampling            | G      | Creates a PageRank-Sampling of a logical graph.              | Yes  |
+| EdgeSampling                | G      | Creates an edge sampling of a logical graph.                 | Yes  |
+| VertexSampling              | G      | Creates a vertex sampling of a logical graph.                | Yes  |
+| WalkSampling                | G      | Creates a walk sampling of a logical graph.                  | Yes  |
+| AverageClusteringCoefficient| G      | Calculates the average local clustering coefficient.         | Yes  |
+| AverageDegree               | G      | Calculates the average degree of a logical graph.            | Yes  |
+| GraphDensity                | G      | Calculates the density of a logical graph.                   | Yes  |
+| ClusteringCoefficient       | G      | Calculates the local/ global clustering coefficient.         | Yes  |
+| WeaklyConnectedComponents   | G/GC   | Calculates or annotates weakly connected components using Flink&trade; Gelly.         | Yes  |
+| HITS                        | G      | Operator wrapping Flink&trade; Gelly's HITS.                | Yes  |
+| LabelPropagation            | G      | Operator executing label propagation integrated in Flink&trade; Gelly. | Yes  |
+| PageRank                    | G      | Operator wrapping PageRank integrated in Flink&trade; Gelly.      | Yes  |
+| RandomJump                  | G      | Performs RandomJump, using VertexCentricIteration Flink&trade; Gelly. | Yes  |
+| SingleSourceShortestPaths   | G      | Operator wrapping SingleSourceShortestPaths integrated in Flink&trade; Gelly. | Yes  |
+| TriangleCounting            | G      | Operator wrapping TriangleCounting integrated in Flink&trade; Gelly. | Yes  |
+| DistinctVertexDegrees       | G      | Operator VertexDegrees calculation integrated in Flink&trade; Gelly. | Yes  |
+| PropertyExtraction          | G      | Extracts a property of a vertex.                             | Yes  |
+| ConnectNeighbors            | G      | Connects neighbors of a vertex.                              | Yes  |
+| EdgeToVertex                | G      | Converts an edge to a vertex.                                | Yes  |
+| VertexToEdge                | G      | Converts a vertex to an edge.                                | Yes  |
+| RollUp                      | GC     | Generates combinations according to the rollup operation in SQL. | Yes  |
+| Split                       | GC     | Splits a logical graph into a GraphCollection. | Yes  |
+| BusinessTransactionGraphs   | GC     | EPGMVertex-centric implementation to isolate business transaction graphs. | Yes  |
 
 #### Binary logical graph operators (two graphs as input):
 
