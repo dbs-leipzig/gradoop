@@ -51,9 +51,6 @@ public class BuildSuperVertex
   }
 
   /**
-   * Creates a {@link Vertex} object from the given {@link VertexGroupItem}
-   * and returns a new {@link org.apache.flink.graph.Vertex}.
-   *
    * @param groupItem vertex group item
    * @return vertex including new vertex data
    * @throws Exception on failure

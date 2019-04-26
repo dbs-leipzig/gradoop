@@ -44,14 +44,6 @@ public class GroupCountEquals<O> implements GroupReduceFunction<O, O> {
     this.expectedGroupSize = expectedGroupSize;
   }
 
-  /**
-   * If the number of elements in the group is equal to the user expected
-   * group size, the last element is returned.
-   *
-   * @param iterable  graph data
-   * @param collector output collector (contains 0 or 1 graph)
-   * @throws Exception on failure
-   */
   @Override
   public void reduce(Iterable<O> iterable,
     Collector<O> collector) throws Exception {

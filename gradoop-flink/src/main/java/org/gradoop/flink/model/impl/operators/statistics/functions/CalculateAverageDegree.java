@@ -40,8 +40,6 @@ public class CalculateAverageDegree implements MapFunction<GraphHead, GraphHead>
   }
 
   /**
-   * Calculates the average degree and safes the value as property to the graphHead.
-   *
    * @param graphHead The graphHead the average degree property shall be written to
    * @return GraphHead The graphHead the average degree property is written to
    */

@@ -56,8 +56,6 @@ public class SetProperty<E extends Element> implements MapFunction<E, E> {
   }
 
   /**
-   * Adds a new property to the element.
-   *
    * @param element original element to be updated
    * @return updated element
    */

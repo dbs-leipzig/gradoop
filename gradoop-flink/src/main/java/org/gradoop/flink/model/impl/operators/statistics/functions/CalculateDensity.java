@@ -38,8 +38,6 @@ public class CalculateDensity implements MapFunction<GraphHead, GraphHead> {
   }
 
   /**
-   * Calculates the graph density and safes the value as property to the graphHead.
-   *
    * @param graphHead The graphHead the density shall be written to
    * @return GraphHead The graphHead the density is written to
    */

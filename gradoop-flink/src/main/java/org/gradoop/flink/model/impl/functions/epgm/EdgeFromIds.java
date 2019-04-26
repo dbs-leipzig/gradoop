@@ -28,6 +28,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Initializes an {@link Vertex} from a given {@link GradoopId} triple.
+ * The triple consists of edge id, source vertex id and target vertex id.
  *
  * (edgeId, sourceId, targetId) -> edge
  *
@@ -57,9 +58,6 @@ public class EdgeFromIds implements
   }
 
   /**
-   * Initializes an {@link Edge} from a given {@link GradoopId} triple. The
-   * triple consists of edge id, source vertex id and target vertex id.
-   *
    * @param idTriple triple containing (in that order) edge id, source vertex
    *                 id, target vertex id
    * @return EPGM edge

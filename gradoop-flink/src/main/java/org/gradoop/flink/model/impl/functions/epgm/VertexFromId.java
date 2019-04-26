@@ -48,8 +48,6 @@ public class VertexFromId implements
   }
 
   /**
-   * Initializes an {@link Vertex} from a given {@link GradoopId}.
-   *
    * @param gradoopId Gradoop identifier
    * @return EPGM vertex
    * @throws Exception on failure
