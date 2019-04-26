@@ -15,12 +15,10 @@
  */
 package org.gradoop.common.model.impl.properties;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -42,17 +40,10 @@ public class PropertyValueTest {
    * Tests if conversion to {@link BigDecimal} fails if incompatible type is given.
    */
   @Test(expectedExceptions = UnsupportedOperationException.class,
-    dataProvider = "nonNumericalPropertyValueProvider")
+    dataProvider = "nonNumericalPropertyValueProvider",
+    dataProviderClass = PropertyValueTestProvider.class)
   public void testUnsupportedBigDecimalConversionThrowsException(PropertyValue actual) {
     actual.getBigDecimal();
-  }
-
-  @DataProvider
-  private Object[][] nonNumericalPropertyValueProvider() {
-    return new Object [][] {
-      {create(BOOL_VAL_1)},
-      {create("Not a number")}
-    };
   }
 
   @Test
@@ -65,31 +56,11 @@ public class PropertyValueTest {
   /**
    * Tests if {@link PropertyValue#create(Object)} works with supported types.
    */
-  @Test(dataProvider = "supportedTypeProvider")
+  @Test(dataProvider = "supportedTypeProvider", dataProviderClass = PropertyValueTestProvider.class)
   public void testCreate(Object supportedValue) {
     PropertyValue p = create(supportedValue);
     assertTrue(p.is(supportedValue.getClass()));
     assertEquals(supportedValue, p.get(supportedValue.getClass()));
-  }
-  @DataProvider
-  private Object[][] supportedTypeProvider() {
-    return new Object[][] {
-      {BOOL_VAL_1},
-      {INT_VAL_2},
-      {LONG_VAL_3},
-      {FLOAT_VAL_4},
-      {DOUBLE_VAL_5},
-      {STRING_VAL_6},
-      {BIG_DECIMAL_VAL_7},
-      {GRADOOP_ID_VAL_8},
-      {MAP_VAL_9},
-      {LIST_VAL_a},
-      {DATE_VAL_b},
-      {TIME_VAL_c},
-      {DATETIME_VAL_d},
-      {SHORT_VAL_e},
-      {SET_VAL_f}
-    };
   }
 
   /**
@@ -106,40 +77,18 @@ public class PropertyValueTest {
   /**
    * Tests if {@link PropertyValue#copy()} works for every supported type.
    */
-  @Test(dataProvider = "propertyValueProvider")
+  @Test(dataProvider = "propertyValueProvider", dataProviderClass = PropertyValueTestProvider.class)
   public void testCopy(PropertyValue value) {
     PropertyValue copy = value.copy();
     assertEquals(value, copy);
     assertNotSame(value, copy);
   }
 
-  @DataProvider
-  private Object[][] propertyValueProvider() {
-    return new Object[][] {
-      {create(NULL_VAL_0)},
-      {create(BOOL_VAL_1)},
-      {create(INT_VAL_2)},
-      {create(LONG_VAL_3)},
-      {create(FLOAT_VAL_4)},
-      {create(DOUBLE_VAL_5)},
-      {create(STRING_VAL_6)},
-      {create(BIG_DECIMAL_VAL_7)},
-      {create(GRADOOP_ID_VAL_8)},
-      {create(MAP_VAL_9)},
-      {create(LIST_VAL_a)},
-      {create(DATE_VAL_b)},
-      {create(TIME_VAL_c)},
-      {create(DATETIME_VAL_d)},
-      {create(SHORT_VAL_e)},
-      {create(SET_VAL_f)},
-    };
-  }
-
   /**
    * Tests if {@link PropertyValue} setter and getter methods work as expected.
    * X -> p.setObject(X) -> p.getObject() -> X | where X equals X
    */
-  @Test(dataProvider = "supportedTypeProvider")
+  @Test(dataProvider = "supportedTypeProvider", dataProviderClass = PropertyValueTestProvider.class)
   public void testSetAndGetObject(Object supportedObject) {
     PropertyValue value = new PropertyValue();
 
@@ -170,7 +119,7 @@ public class PropertyValueTest {
     p.setObject(new PriorityQueue<>());
   }
 
-  @Test(dataProvider = "testIsProvider")
+  @Test(dataProvider = "testIsProvider", dataProviderClass = PropertyValueTestProvider.class)
   public void testIs(PropertyValue value, boolean[] truthValues) {
     assertEquals(truthValues[0], value.isNull());
     assertEquals(truthValues[1], value.isBoolean());
@@ -190,27 +139,6 @@ public class PropertyValueTest {
     assertEquals(truthValues[15], value.isSet());
   }
 
-  @DataProvider
-  private Object[][] testIsProvider() {
-    return new Object[][] {
-      {create(NULL_VAL_0), new boolean[]{true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
-      {create(BOOL_VAL_1), new boolean[] {false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false}},
-      {create(INT_VAL_2), new boolean[] {false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false}},
-      {create(LONG_VAL_3), new boolean[] {false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false}},
-      {create(FLOAT_VAL_4), new boolean[] {false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false}},
-      {create(DOUBLE_VAL_5), new boolean[] {false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false}},
-      {create(STRING_VAL_6), new boolean[] {false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false}},
-      {create(BIG_DECIMAL_VAL_7), new boolean[]{false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false}},
-      {create(GRADOOP_ID_VAL_8), new boolean[] {false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false}},
-      {create(MAP_VAL_9), new boolean[] {false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false}},
-      {create(LIST_VAL_a), new boolean[] {false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false}},
-      {create(DATE_VAL_b), new boolean[] {false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false}},
-      {create(TIME_VAL_c), new boolean[] {false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false}},
-      {create(DATETIME_VAL_d), new boolean[] {false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false}},
-      {create(SHORT_VAL_e), new boolean[] {false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false}},
-      {create(SET_VAL_f), new boolean[] {false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true}},
-    };
-  }
   /**
    * Tests {@link PropertyValue#getBoolean()}.
    */
@@ -543,99 +471,20 @@ public class PropertyValueTest {
   /**
    * Tests {@link PropertyValue#isNumber()}.
    */
-  @Test(dataProvider = "testIsNumberProvider")
+  @Test(dataProvider = "testIsNumberProvider", dataProviderClass = PropertyValueTestProvider.class)
   public void testIsNumber(PropertyValue value, boolean expected) {
     assertEquals(expected, value.isNumber());
-  }
-
-  @DataProvider
-  private Object[][] testIsNumberProvider() {
-    return new Object[][] {
-      // Actual PropertyValue, expected output
-      {create(SHORT_VAL_e), true},
-      {create(LONG_VAL_3), true},
-      {create(FLOAT_VAL_4), true},
-      {create(DOUBLE_VAL_5), true},
-      {create(BIG_DECIMAL_VAL_7), true},
-      {create(NULL_VAL_0), false},
-      {create(BOOL_VAL_1), false},
-      {create(STRING_VAL_6), false},
-      {create(GRADOOP_ID_VAL_8), false},
-      {create(MAP_VAL_9), false},
-      {create(LIST_VAL_a), false},
-      {create(DATE_VAL_b), false},
-      {create(TIME_VAL_c), false},
-      {create(DATETIME_VAL_d), false},
-      {create(SET_VAL_f), false}
-    };
   }
 
   /**
    * Tests {@link PropertyValue#equals(Object)} and {@link PropertyValue#hashCode()}.
    */
-  @Test(dataProvider = "testEqualsAndHashCodeProvider")
+  @Test(dataProvider = "testEqualsAndHashCodeProvider",
+    dataProviderClass = PropertyValueTestProvider.class)
   public void testEqualsAndHashCode(PropertyValue value1, PropertyValue value2, PropertyValue value3) {
     validateEqualsAndHashCode(value1, value2, value3);
   }
 
-  @DataProvider
-  private Object[][] testEqualsAndHashCodeProvider() {
-    Map<PropertyValue, PropertyValue> map1 = new HashMap<>();
-    map1.put(PropertyValue.create("foo"), PropertyValue.create("bar"));
-    Map<PropertyValue, PropertyValue> map2 = new HashMap<>();
-    map2.put(PropertyValue.create("foo"), PropertyValue.create("bar"));
-    Map<PropertyValue, PropertyValue> map3 = new HashMap<>();
-    map3.put(PropertyValue.create("foo"), PropertyValue.create("baz"));
-
-    List<PropertyValue> list1 = Lists.newArrayList(
-      PropertyValue.create("foo"), PropertyValue.create("bar")
-    );
-    List<PropertyValue> list2 = Lists.newArrayList(
-      PropertyValue.create("foo"), PropertyValue.create("bar")
-    );
-    List<PropertyValue> list3 = Lists.newArrayList(
-      PropertyValue.create("foo"), PropertyValue.create("baz")
-    );
-
-    Set<PropertyValue> set1 = new HashSet<>();
-    set1.add(PropertyValue.create("bar"));
-    Set<PropertyValue> set2 = new HashSet<>();
-    set2.add(PropertyValue.create("bar"));
-    Set<PropertyValue> set3 = new HashSet<>();
-    set3.add(PropertyValue.create("baz"));
-
-    LocalDate date1 = LocalDate.MAX;
-    LocalDate date2 = LocalDate.MAX;
-    LocalDate date3 = LocalDate.now();
-
-    LocalTime time1 = LocalTime.MAX;
-    LocalTime time2 = LocalTime.MAX;
-    LocalTime time3 = LocalTime.now();
-
-    LocalDateTime dateTime1 = LocalDateTime.of(date1, time1);
-    LocalDateTime dateTime2 = LocalDateTime.of(date2, time2);
-    LocalDateTime dateTime3 = LocalDateTime.of(date3, time3);
-
-    return new Object[][] {
-      {create(null), create(null), create(false)},
-      {create(true), create(true), create(false)},
-      {create((short) 10), create((short) 10), create((short) 11)},
-      {create(10), create(10), create(11)},
-      {create(10L), create(10L), create(11L)},
-      {create(10F), create(10F), create(11F)},
-      {create(10.), create(10.), create(11.)},
-      {create("10"), create("10"), create("11")},
-      {create(new BigDecimal(10)), create(new BigDecimal(10)), create(new BigDecimal(11))},
-      {create(GradoopId.fromString("583ff8ffbd7d222690a90999")),
-        create(GradoopId.fromString("583ff8ffbd7d222690a90999")),
-        create(GradoopId.fromString("583ff8ffbd7d222690a9099a"))},
-      {create(map1), create(map2), create(map3)},
-      {create(list1), create(list2), create(list3)},
-      {create(time1), create(time2), create(time3)},
-      {create(dateTime1), create(dateTime2), create(dateTime3)},
-      {create(set1), create(set2), create(set3)}
-    };
-  }
 
   private void validateEqualsAndHashCode(PropertyValue p1, PropertyValue p2, PropertyValue p3) {
     assertEquals(p1, p1);
@@ -955,7 +804,7 @@ public class PropertyValueTest {
    *
    * @throws IOException if something goes wrong.
    */
-  @Test(dataProvider = "propertyValueProvider")
+  @Test(dataProvider = "propertyValueProvider", dataProviderClass = PropertyValueTestProvider.class)
   public void testWriteAndReadFields(PropertyValue value) throws IOException {
     assertEquals(value, writeAndReadFields(PropertyValue.class, value));
   }
@@ -1007,7 +856,7 @@ public class PropertyValueTest {
   /**
    * Tests {@link PropertyValue#getType()}.
    */
-  @Test(dataProvider = "supportedTypeProvider")
+  @Test(dataProvider = "supportedTypeProvider", dataProviderClass = PropertyValueTestProvider.class)
   public void testGetType(Object supportedProperty) {
     PropertyValue value = create(supportedProperty);
     if (supportedProperty instanceof List || supportedProperty instanceof Map || supportedProperty instanceof Set) {
