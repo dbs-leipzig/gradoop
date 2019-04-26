@@ -39,30 +39,9 @@ import static org.testng.AssertJUnit.*;
 public class PropertyValueTest {
 
   /**
-   * Tests conversions of different types to {@link BigDecimal} through
-   * {@link PropertyValue#getBigDecimal()}.
-   */
-  @Test(dataProvider = "testBigDecimalConversionProvider")
-  public void testBigDecimalConversion(PropertyValue actual, BigDecimal expected) {
-    assertEquals(expected, actual.getBigDecimal());
-  }
-
-  @DataProvider
-  private Object[][] testBigDecimalConversionProvider() {
-    return new Object[][] {
-      {create(SHORT_VAL_e), BigDecimal.valueOf(SHORT_VAL_e)},
-      {create(INT_VAL_2), BigDecimal.valueOf(INT_VAL_2)},
-      {create(LONG_VAL_3), BigDecimal.valueOf(LONG_VAL_3)},
-      {create(FLOAT_VAL_4), BigDecimal.valueOf(FLOAT_VAL_4)},
-      {create(DOUBLE_VAL_5), BigDecimal.valueOf(DOUBLE_VAL_5)},
-      {create("-3.5"), new BigDecimal("-3.5")}
-    };
-  }
-
-  /**
    * Tests if conversion to {@link BigDecimal} fails if incompatible type is given.
    */
-  @Test(expectedExceptions = IllegalArgumentException.class,
+  @Test(expectedExceptions = UnsupportedOperationException.class,
     dataProvider = "nonNumericalPropertyValueProvider")
   public void testUnsupportedBigDecimalConversionThrowsException(PropertyValue actual) {
     actual.getBigDecimal();
@@ -197,18 +176,18 @@ public class PropertyValueTest {
     assertEquals(truthValues[1], value.isBoolean());
     assertEquals(truthValues[2], value.isShort());
     assertEquals(truthValues[3], value.isInt());
-    assertEquals(truthValues[3], value.isLong());
-    assertEquals(truthValues[4], value.isFloat());
-    assertEquals(truthValues[5], value.isDouble());
-    assertEquals(truthValues[6], value.isString());
-    assertEquals(truthValues[7], value.isBigDecimal());
-    assertEquals(truthValues[8], value.isGradoopId());
-    assertEquals(truthValues[9], value.isMap());
-    assertEquals(truthValues[10], value.isList());
-    assertEquals(truthValues[11], value.isDate());
-    assertEquals(truthValues[12], value.isTime());
-    assertEquals(truthValues[13], value.isDateTime());
-    assertEquals(truthValues[14], value.isSet());
+    assertEquals(truthValues[4], value.isLong());
+    assertEquals(truthValues[5], value.isFloat());
+    assertEquals(truthValues[6], value.isDouble());
+    assertEquals(truthValues[7], value.isString());
+    assertEquals(truthValues[8], value.isBigDecimal());
+    assertEquals(truthValues[9], value.isGradoopId());
+    assertEquals(truthValues[10], value.isMap());
+    assertEquals(truthValues[11], value.isList());
+    assertEquals(truthValues[12], value.isDate());
+    assertEquals(truthValues[13], value.isTime());
+    assertEquals(truthValues[14], value.isDateTime());
+    assertEquals(truthValues[15], value.isSet());
   }
 
   @DataProvider
@@ -564,41 +543,31 @@ public class PropertyValueTest {
   /**
    * Tests {@link PropertyValue#isNumber()}.
    */
-  @Test
-  public void testIsNumber() {
-    PropertyValue p = PropertyValue.create(SHORT_VAL_e);
-    assertTrue(p.isNumber());
-    p = PropertyValue.create(INT_VAL_2);
-    assertTrue(p.isNumber());
-    p = PropertyValue.create(LONG_VAL_3);
-    assertTrue(p.isNumber());
-    p = PropertyValue.create(FLOAT_VAL_4);
-    assertTrue(p.isNumber());
-    p = PropertyValue.create(DOUBLE_VAL_5);
-    assertTrue(p.isNumber());
-    p = PropertyValue.create(BIG_DECIMAL_VAL_7);
-    assertTrue(p.isNumber());
+  @Test(dataProvider = "testIsNumberProvider")
+  public void testIsNumber(PropertyValue value, boolean expected) {
+    assertEquals(expected, value.isNumber());
+  }
 
-    p = PropertyValue.create(NULL_VAL_0);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(BOOL_VAL_1);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(STRING_VAL_6);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(GRADOOP_ID_VAL_8);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(MAP_VAL_9);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(LIST_VAL_a);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(DATE_VAL_b);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(TIME_VAL_c);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(DATETIME_VAL_d);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(SET_VAL_f);
-    assertFalse(p.isNumber());
+  @DataProvider
+  private Object[][] testIsNumberProvider() {
+    return new Object[][] {
+      // Actual PropertyValue, expected output
+      {create(SHORT_VAL_e), true},
+      {create(LONG_VAL_3), true},
+      {create(FLOAT_VAL_4), true},
+      {create(DOUBLE_VAL_5), true},
+      {create(BIG_DECIMAL_VAL_7), true},
+      {create(NULL_VAL_0), false},
+      {create(BOOL_VAL_1), false},
+      {create(STRING_VAL_6), false},
+      {create(GRADOOP_ID_VAL_8), false},
+      {create(MAP_VAL_9), false},
+      {create(LIST_VAL_a), false},
+      {create(DATE_VAL_b), false},
+      {create(TIME_VAL_c), false},
+      {create(DATETIME_VAL_d), false},
+      {create(SET_VAL_f), false}
+    };
   }
 
   /**
