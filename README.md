@@ -71,7 +71,7 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 | GraphDensity                | G      | Calculates the density of a logical graph.                   | Yes  |
 | ClusteringCoefficient       | G      | Calculates the local/ global clustering coefficient.         | Yes  |
 | WeaklyConnectedComponents   | G/GC   | Calculates or annotates weakly connected components using Flink&trade; Gelly.         | Yes  |
-| HITS                        | G      | Operator wrapping Flink&trade; Gelly's HITS.                | Yes  |
+| HITS                        | G      | Operator wrapping Flink&trade; Gelly's Hyperlink-Induced Topic Search.                | Yes  |
 | LabelPropagation            | G      | Operator executing label propagation integrated in Flink&trade; Gelly. | Yes  |
 | PageRank                    | G      | Operator wrapping PageRank integrated in Flink&trade; Gelly.      | Yes  |
 | RandomJump                  | G      | Performs RandomJump, using VertexCentricIteration Flink&trade; Gelly. | Yes  |
