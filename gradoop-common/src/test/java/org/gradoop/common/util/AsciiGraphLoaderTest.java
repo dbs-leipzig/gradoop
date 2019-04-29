@@ -20,13 +20,14 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
-import static org.junit.Assert.*;
+import static org.testng.AssertJUnit.*;
+import static org.testng.Assert.assertNotEquals;
 
 public class AsciiGraphLoaderTest {
 
@@ -79,7 +80,7 @@ public class AsciiGraphLoaderTest {
     GraphHead h = asciiGraphLoader.getGraphHeadByVariable("h");
     assertNotNull("graphHead was null", g);
     assertNotNull("graphHead was null", h);
-    assertNotEquals("graphHeads were equal", g, h);
+    assertNotEquals(g, h, "graphHeads were equal");
   }
 
   @Test

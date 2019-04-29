@@ -161,5 +161,4 @@ public class GradoopIdTest {
       {"1AB363914FD1325CC43790AB"},
       {"bcdef12345678910bac76d4e"}};
   }
-
 }

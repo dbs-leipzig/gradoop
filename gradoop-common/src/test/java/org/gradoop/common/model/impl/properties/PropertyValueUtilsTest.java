@@ -15,29 +15,21 @@
  */
 package org.gradoop.common.model.impl.properties;
 
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Collection;
 
 import static org.gradoop.common.GradoopTestUtils.*;
+import static org.gradoop.common.model.impl.properties.PropertyValue.create;
 import static org.gradoop.common.model.impl.properties.PropertyValueUtils.Boolean.or;
 import static org.gradoop.common.model.impl.properties.PropertyValueUtils.Numeric.*;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import static org.gradoop.common.model.impl.properties.PropertyValue.create;
+import static org.testng.AssertJUnit.*;
 
 /**
  * Test class of {@link PropertyValueUtils}
  */
-@RunWith(Enclosed.class)
+@Test
 public class PropertyValueUtilsTest {
 
   /**
@@ -971,59 +963,13 @@ public class PropertyValueUtilsTest {
   /**
    * Test class for {@link PropertyValueUtils.Bytes} class
    */
-  @RunWith(Parameterized.class)
   public static class BytesTest {
-    /**
-     * The property value to test
-     */
-    private PropertyValue propertyValue;
-
-    /**
-     * The property value type byte
-     */
-    private byte type;
-
-    /**
-     * Constructor to use with parameterized class
-     *
-     * @param propertyValue the property value to test
-     */
-    public BytesTest(PropertyValue propertyValue, byte type) {
-      this.propertyValue = propertyValue;
-      this.type = type;
-    }
-
-    /**
-     * Properties to use as parameters
-     *
-     * @return a collection of property values and their type bytes
-     */
-    @Parameterized.Parameters
-    public static Collection properties() {
-      return Arrays.asList(new Object[][] {
-        {create(NULL_VAL_0), PropertyValue.TYPE_NULL},
-        {create(BOOL_VAL_1), PropertyValue.TYPE_BOOLEAN},
-        {create(INT_VAL_2), PropertyValue.TYPE_INTEGER},
-        {create(LONG_VAL_3), PropertyValue.TYPE_LONG},
-        {create(FLOAT_VAL_4), PropertyValue.TYPE_FLOAT},
-        {create(DOUBLE_VAL_5), PropertyValue.TYPE_DOUBLE},
-        {create(STRING_VAL_6), PropertyValue.TYPE_STRING},
-        {create(BIG_DECIMAL_VAL_7), PropertyValue.TYPE_BIG_DECIMAL},
-        {create(GRADOOP_ID_VAL_8), PropertyValue.TYPE_GRADOOP_ID},
-        {create(MAP_VAL_9), PropertyValue.TYPE_MAP},
-        {create(LIST_VAL_a), PropertyValue.TYPE_LIST},
-        {create(DATE_VAL_b), PropertyValue.TYPE_DATE},
-        {create(TIME_VAL_c), PropertyValue.TYPE_TIME},
-        {create(DATETIME_VAL_d), PropertyValue.TYPE_DATETIME},
-        {create(SHORT_VAL_e), PropertyValue.TYPE_SHORT}
-      });
-    }
 
     /**
      * Test static function {@link PropertyValueUtils.Bytes#getRawBytesWithoutType(PropertyValue)}
      */
-    @Test
-    public void testGetRawBytesWithoutType() {
+    @Test(dataProviderClass = PropertyValueTestProvider.class, dataProvider = "propertiesProvider")
+    public void testGetRawBytesWithoutType(PropertyValue propertyValue, byte type) {
       assertArrayEquals(Arrays.copyOfRange(propertyValue.getRawBytes(), 1, propertyValue.getRawBytes().length),
         PropertyValueUtils.Bytes.getRawBytesWithoutType(propertyValue));
     }
@@ -1031,16 +977,16 @@ public class PropertyValueUtilsTest {
     /**
      * Test static function {@link PropertyValueUtils.Bytes#getTypeByte(PropertyValue)}
      */
-    @Test
-    public void testGetTypeByte() {
+    @Test(dataProviderClass = PropertyValueTestProvider.class, dataProvider = "propertiesProvider")
+    public void testGetTypeByte(PropertyValue propertyValue, byte type) {
       assertArrayEquals(new byte[] {type}, PropertyValueUtils.Bytes.getTypeByte(propertyValue));
     }
 
     /**
      * Test static function {@link PropertyValueUtils.Bytes#createFromTypeValueBytes(byte[], byte[])}}
      */
-    @Test
-    public void testCreateFromTypeValueBytes() {
+    @Test(dataProviderClass = PropertyValueTestProvider.class, dataProvider = "propertiesProvider")
+    public void testCreateFromTypeValueBytes(PropertyValue propertyValue, byte type) {
       assertEquals(propertyValue, PropertyValueUtils.Bytes
         .createFromTypeValueBytes(new byte[] {type},
           Arrays.copyOfRange(propertyValue.getRawBytes(),

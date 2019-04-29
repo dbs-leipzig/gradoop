@@ -17,13 +17,14 @@ package org.gradoop.common.model.impl.properties;
 
 import com.google.common.collect.Lists;
 import org.gradoop.common.GradoopTestUtils;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.List;
 
 import static org.gradoop.common.GradoopTestUtils.writeAndReadFields;
-import static org.junit.Assert.*;
+import static org.testng.AssertJUnit.*;
+import static org.testng.Assert.assertNotEquals;
 
 public class PropertyValueListTest {
 
@@ -39,10 +40,10 @@ public class PropertyValueListTest {
       Lists.newArrayList(PropertyValue.create(1L), PropertyValue.create(3L))
     );
 
-    assertTrue(p1.equals(p2));
-    assertFalse(p1.equals(p3));
+    assertEquals(p2, p1);
+    assertNotEquals(p3, p1);
 
-    assertTrue(p1.hashCode() == p2.hashCode());
+    assertEquals(p2.hashCode(), p1.hashCode());
     assertFalse(p1.hashCode() == p3.hashCode());
   }
 
@@ -58,7 +59,7 @@ public class PropertyValueListTest {
       Lists.newArrayList(PropertyValue.create(1L), PropertyValue.create(4L))
     );
 
-    assertTrue(p1.compareTo(p2) == 0);
+    assertEquals(p1.compareTo(p2), 0);
     assertTrue(p1.compareTo(p3) < 0);
     assertTrue(p3.compareTo(p1) > 0);
   }

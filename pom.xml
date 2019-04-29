@@ -148,6 +148,7 @@
         <dep.log4j.version>1.2.17</dep.log4j.version>
         <dep.mockito.version>2.21.0</dep.mockito.version>
         <dep.okapi.version>0.2.4-SNAPSHOT</dep.okapi.version>
+        <dep.testng.version>6.14.3</dep.testng.version>
 
         <log4j.properties>log4j-test.properties</log4j.properties>
         <argLine>-Xmx1G -Dlog4j.configuration=${log4j.properties}</argLine>
@@ -445,12 +446,6 @@
                         <excludes>
                             <exclude>**/*TestBase*.class</exclude>
                         </excludes>
-                        <properties>
-                            <property>
-                                <name>usedefaultlisteners</name>
-                                <value>false</value>
-                            </property>
-                        </properties>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -775,6 +770,13 @@
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
                 <version>${dep.mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>${dep.testng.version}</version>
                 <scope>test</scope>
             </dependency>
 
