@@ -70,7 +70,7 @@ public class NetworkHelper {
         }
       }
     } catch (UnknownHostException | SocketException e) {
-      e.printStackTrace();
+      throw new IllegalStateException(e);
     }
     return address;
   }

@@ -49,9 +49,9 @@ public class CSVMetaDataSink implements MetaDataSink<CSVMetaData> {
     String metaDataPath,
     CSVMetaData metaData,
     Configuration hdfsConfig,
-    boolean overwrite) {
-    try {
-      org.apache.hadoop.fs.FileSystem fs = org.apache.hadoop.fs.FileSystem.get(hdfsConfig);
+    boolean overwrite) throws IOException {
+    FSDataOutputStream outputStream = null;
+    try(org.apache.hadoop.fs.FileSystem fs = org.apache.hadoop.fs.FileSystem.get(hdfsConfig)) {
       Path file = new Path(metaDataPath);
       if (fs.exists(file)) {
         if (!overwrite) {
@@ -60,7 +60,7 @@ public class CSVMetaDataSink implements MetaDataSink<CSVMetaData> {
           fs.delete(file, false);
         }
       }
-      FSDataOutputStream outputStream = fs.create(file);
+      outputStream = fs.create(file);
 
       for (String graphLabel : metaData.getGraphLabels()) {
         outputStream.writeBytes(constructMetaDataString(
@@ -88,9 +88,11 @@ public class CSVMetaDataSink implements MetaDataSink<CSVMetaData> {
 
       outputStream.flush();
       outputStream.close();
-
-    } catch (IOException e) {
-      e.printStackTrace();
+    } finally {
+      // cleanup
+      if (outputStream != null) {
+        outputStream.close();
+      }
     }
   }
 

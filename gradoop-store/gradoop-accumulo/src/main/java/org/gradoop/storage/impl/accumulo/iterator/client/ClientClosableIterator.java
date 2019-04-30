@@ -28,6 +28,7 @@ import org.gradoop.storage.impl.accumulo.iterator.tserver.BaseElementIterator;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -117,7 +118,7 @@ public class ClientClosableIterator<R extends Element, E extends EPGMElement>
         try {
           next = codec.fromRow(inner.next());
         } catch (IOException e) {
-          e.printStackTrace();
+          throw new UncheckedIOException(e);
         }
         cache.add(next);
       }

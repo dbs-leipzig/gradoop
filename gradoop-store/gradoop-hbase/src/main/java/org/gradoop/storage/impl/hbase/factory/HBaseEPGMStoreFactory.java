@@ -81,9 +81,7 @@ public class HBaseEPGMStoreFactory {
     final Configuration config,
     final GradoopHBaseConfig gradoopHBaseConfig
   ) {
-    try {
-      Connection connection = ConnectionFactory.createConnection(config);
-
+    try (Connection connection = ConnectionFactory.createConnection(config)) {
       createTablesIfNotExists(
         connection.getAdmin(),
         gradoopHBaseConfig.getVertexHandler(),

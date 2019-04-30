@@ -359,8 +359,7 @@ public class GradoopTestUtils {
     try {
       out = clazz.newInstance();
     } catch (Exception e) {
-      e.printStackTrace();
-      throw new IOException("Cannot initialize the class: " + clazz);
+      throw new IOException("Cannot initialize the class: " + clazz, e);
     }
 
     // read from byte[]
@@ -381,8 +380,7 @@ public class GradoopTestUtils {
     try {
       out = clazz.newInstance();
     } catch (Exception e) {
-      e.printStackTrace();
-      throw new IOException("Cannot initialize the class: " + clazz);
+      throw new IOException("Cannot initialize the class: " + clazz, e);
     }
 
     // read from byte[]

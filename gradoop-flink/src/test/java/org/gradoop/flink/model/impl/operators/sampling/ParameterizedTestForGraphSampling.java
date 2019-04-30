@@ -259,6 +259,7 @@ public abstract class ParameterizedTestForGraphSampling extends GradoopFlinkTest
    *
    * @param input The input graph
    * @param output The sampled graph
+   * @throws Exception on failure
    */
-  public abstract void validateSpecific(LogicalGraph input, LogicalGraph output);
+  public abstract void validateSpecific(LogicalGraph input, LogicalGraph output) throws Exception;
 }

@@ -29,6 +29,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -178,7 +179,7 @@ public class PropertyValueList
         try {
           inputStream.close();
         } catch (IOException e) {
-          e.printStackTrace();
+          throw new UncheckedIOException(e);
         }
         hasNext = false;
       }
