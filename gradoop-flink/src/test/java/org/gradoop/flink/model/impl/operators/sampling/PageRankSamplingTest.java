@@ -16,7 +16,6 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
@@ -63,19 +62,27 @@ public class PageRankSamplingTest extends ParameterizedTestForGraphSampling {
   }
 
   @Override
-  public void validateSpecific(LogicalGraph input, LogicalGraph output) throws Exception {
+  public void validateSpecific(LogicalGraph input, LogicalGraph output) {
 
-    // test normal graph
-    GraphHead normalGh = output.getGraphHead().collect().get(0);
-    double minScore = normalGh.getPropertyValue(SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY)
-      .getDouble();
-    double maxScore = normalGh.getPropertyValue(SamplingConstants.MAX_PAGE_RANK_SCORE_PROPERTY_KEY)
-      .getDouble();
-    if (minScore != maxScore) {
+    boolean allHaveScore = true;
+    boolean noneHasScore = true;
+
+    for (Vertex v : newVertices) {
+      if (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
+        noneHasScore = false;
+      } else {
+        allHaveScore = false;
+      }
+    }
+
+    assertTrue("some vertices do and some do not have scaled PageRank-score property",
+      noneHasScore || allHaveScore);
+
+    if (newVertices.isEmpty()) {
+      assertTrue("some vertices got sampled (should NOT be)",
+        dbVertices.isEmpty() || !keepVerticesIfSameScore);
+    } else if (allHaveScore) {
       for (Vertex v : newVertices) {
-        assertTrue("vertex does not have scaled PageRank-score property (should have): " +
-          v.toString(), v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY));
-
         double score = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
           .getDouble();
         if (sampleGreaterThanThreshold) {
@@ -86,14 +93,9 @@ public class PageRankSamplingTest extends ParameterizedTestForGraphSampling {
             score <= sampleSize);
         }
       }
-    } else {
-      if (keepVerticesIfSameScore) {
-        assertEquals("not all vertices got sampled (should be, all got same score)",
-          dbVertices.size(), newVertices.size());
-      } else {
-        assertTrue("some vertices got sampled (should NOT be, all got same score)",
-          newVertices.isEmpty());
-      }
+    } else if (keepVerticesIfSameScore) {
+      assertEquals("not all vertices got sampled (should be, all got same score)",
+        dbVertices.size(), newVertices.size());
     }
     dbEdges.removeAll(newEdges);
     for (Edge edge : dbEdges) {
