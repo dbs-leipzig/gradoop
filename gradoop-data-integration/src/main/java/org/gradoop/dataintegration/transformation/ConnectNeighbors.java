@@ -90,7 +90,7 @@ public class ConnectNeighbors implements UnaryGraphToGraphOperator {
 
     // calculate the new edges and add them to the original graph
     DataSet<Edge> newEdges = neighborhood.flatMap(
-      new CreateCartesianNeighborhoodEdges<>(graph.getConfig().getEdgeFactory(), newEdgeLabel))
+      new CreateCartesianNeighborhoodEdges<>(graph.getFactory().getEdgeFactory(), newEdgeLabel))
       .map(new AddToGraphBroadcast<>())
       .withBroadcastSet(graph.getGraphHead().map(new Id<>()), AddToGraphBroadcast.GRAPH_ID);
 
