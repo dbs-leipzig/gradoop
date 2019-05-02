@@ -131,7 +131,7 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 
 Stable:
 
-```
+```xml
 <dependency>
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-flink</artifactId>
@@ -140,7 +140,7 @@ Stable:
 ```
 
 Latest nightly build (additional repository is required):
-```
+```xml
 <repositories>
     <repository>
         <id>oss.sonatype.org-snapshot</id>
@@ -159,7 +159,7 @@ Latest nightly build (additional repository is required):
 
 ```
 In any case you also need Apache Flink (version 1.7.2):
-```
+```xml
 <dependency>
     <groupId>org.apache.flink</groupId>
     <artifactId>flink-java</artifactId>
