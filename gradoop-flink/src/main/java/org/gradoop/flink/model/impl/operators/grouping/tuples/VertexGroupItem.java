@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping.tuples;
 
-import org.apache.flink.api.java.tuple.Tuple7;
+import org.apache.flink.api.java.tuple.Tuple8;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 
@@ -32,10 +32,10 @@ import org.gradoop.common.model.impl.properties.PropertyValueList;
  * f6: vertex label group
  * </pre>
  */
-public class VertexGroupItem
-  extends Tuple7
-  <GradoopId, GradoopId, String, PropertyValueList, PropertyValueList, Boolean, LabelGroup>
-  implements GroupItem {
+public class VertexGroupItem extends
+  Tuple8<GradoopId, GradoopId, String, PropertyValueList, PropertyValueList, Boolean, LabelGroup,
+    Boolean> implements
+  GroupItem {
 
   public GradoopId getVertexId() {
     return f0;
@@ -91,5 +91,13 @@ public class VertexGroupItem
 
   public void setLabelGroup(LabelGroup vertexLabelGroup) {
     f6 = vertexLabelGroup;
+  }
+
+  public boolean hasTemporaryLabel() {
+    return f7;
+  }
+
+  public void setTemporaryLabel(boolean temporaryLabel) {
+    f7 = temporaryLabel;
   }
 }

@@ -62,14 +62,16 @@ public class GroupingGroupReduce extends Grouping {
    * @param useEdgeLabels     group on edge label true/false
    * @param vertexLabelGroups stores grouping properties for vertex labels
    * @param edgeLabelGroups   stores grouping properties for edge labels
+   * @param keepVertices      keep vertices without labels (when grouping by label)
    */
   GroupingGroupReduce(
     boolean useVertexLabels,
     boolean useEdgeLabels,
     List<LabelGroup> vertexLabelGroups,
-    List<LabelGroup> edgeLabelGroups) {
+    List<LabelGroup> edgeLabelGroups,
+    boolean keepVertices) {
     super(
-      useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);
+      useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups, keepVertices);
   }
 
   @Override
@@ -77,7 +79,7 @@ public class GroupingGroupReduce extends Grouping {
 
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
       // map vertex to vertex group item
-      .flatMap(new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups()));
+      .flatMap(new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups(), isKeepingVertices()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> vertexGroupItems = groupVertices(verticesForGrouping)

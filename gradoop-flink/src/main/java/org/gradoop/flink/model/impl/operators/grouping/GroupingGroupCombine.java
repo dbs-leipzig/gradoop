@@ -72,20 +72,22 @@ public class GroupingGroupCombine extends Grouping {
    * @param useEdgeLabels     group on edge label true/false
    * @param vertexLabelGroups stores grouping properties for vertex labels
    * @param edgeLabelGroups   stores grouping properties for edge labels
+   * @param keepVertices      keep vertices without labels (when grouping by label)
    */
   GroupingGroupCombine(
     boolean useVertexLabels,
     boolean useEdgeLabels,
     List<LabelGroup> vertexLabelGroups,
-    List<LabelGroup> edgeLabelGroups) {
-    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);
+    List<LabelGroup> edgeLabelGroups,
+    boolean keepVertices) {
+    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups, keepVertices);
   }
 
   @Override
   protected LogicalGraph groupInternal(LogicalGraph graph) {
     // map vertex to vertex group item
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
-      .flatMap(new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups()));
+      .flatMap(new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups(), true));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> combinedVertexGroupItems = groupVertices(verticesForGrouping)
