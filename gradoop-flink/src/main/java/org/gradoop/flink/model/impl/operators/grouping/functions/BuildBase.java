@@ -47,7 +47,6 @@ abstract class BuildBase implements Serializable {
    */
   protected BuildBase(boolean useLabel) {
     this.useLabel = useLabel;
-
   }
 
   //----------------------------------------------------------------------------
@@ -99,7 +98,8 @@ abstract class BuildBase implements Serializable {
     if (!valueAggregators.isEmpty()) {
       Iterator<PropertyValue> valueIt = values.iterator();
       for (AggregateFunction valueAggregator : valueAggregators) {
-        element.setProperty(valueAggregator.getAggregatePropertyKey(), valueIt.next());
+        element.setProperty(valueAggregator.getAggregatePropertyKey(),
+          valueAggregator.postAggregate(valueIt.next()));
       }
     }
   }
