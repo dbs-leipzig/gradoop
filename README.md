@@ -18,6 +18,10 @@ and Flink&trade; libraries (i.e. Gelly, ML and Table).
 Gradoop is **work in progress** which means APIs may change. It is currently used
 as a proof of concept implementation and far from production ready.
 
+The project's documentation can be found in our [Wiki](https://github.com/dbs-leipzig/gradoop/wiki). 
+The Wiki also contains a [tutorial](https://github.com/dbs-leipzig/gradoop/wiki/Getting-started) to 
+help getting started using Gradoop.
+
 ##### Further Information (articles and talks)
 
 * [Declarative and distributed graph analytics with GRADOOP, VLDB Demo, August 2018](http://www.vldb.org/pvldb/vol11/p2006-junghanns.pdf)
