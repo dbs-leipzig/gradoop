@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Collects the aggregated values for connected components and computes the distribution of
+ * Collects the aggregated component ids from vertices and edges. Extracts the distribution for
  * vertices and edges over this components.
  */
 public class GetConnectedComponentDistributionFlatMap implements
@@ -57,9 +57,6 @@ public class GetConnectedComponentDistributionFlatMap implements
   }
 
   /**
-   * Collects the aggregated component ids from vertices and edges. Extracts the distribution for
-   * vertices and edges over this components.
-   *
    * @param graphHead The graph head with the aggregated components
    * @param out The connected component distribution as {@code Tuple3<String, Long, Long>}
    */
