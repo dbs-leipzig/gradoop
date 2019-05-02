@@ -150,7 +150,8 @@ Latest nightly build (additional repository is required):
     </repository>
 </repositories>
 ```
-```
+
+```xml
 <dependency>
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-flink</artifactId>
