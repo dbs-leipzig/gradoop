@@ -18,15 +18,18 @@ package org.gradoop.flink.model.impl.operators.grouping;
 import com.google.common.collect.Lists;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.SumPlusOne;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping.GroupingBuilder;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.gradoop.common.util.GradoopConstants.NULL_STRING;
 
@@ -1822,5 +1825,26 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v3)-[:knows {since : 2013}]->(v5)" +
       "(v5)-[:knows {since : 2013}]->(v4)" +
       "]";
+  }
+
+  /**
+   * Test the aggregation with a post-processing step during graph grouping.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testAggregationWithPostAggregateForGraphGrouping() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
+      "(:A {p: 1L})(:A {p: 2L})(:B {p: -1L})(:B {p: -1L})" +
+      "] expected [" +
+      "(:A {sum_p: 3L, sum_p_plusone: 4L})(:B{sum_p: -2L, sum_p_plusone: -1L})" +
+      "]");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+    LogicalGraph result = input.groupBy(
+      Arrays.asList(Grouping.LABEL_SYMBOL), Arrays.asList(new SumVertexProperty("p", "sum_p"),
+        new SumPlusOne("p", "sum_p_plusone")),
+      Collections.emptyList(), Collections.emptyList(), getStrategy());
+    collectAndAssertTrue(expected.equalsByData(result));
   }
 }
