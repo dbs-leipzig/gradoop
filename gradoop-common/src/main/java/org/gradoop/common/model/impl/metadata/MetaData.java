@@ -17,6 +17,7 @@ package org.gradoop.common.model.impl.metadata;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -87,22 +88,22 @@ public class MetaData {
    */
   private static Map<String, Class<?>> createStringToClassMap() {
     Map<String, Class<?>> stringClassMap = new HashMap<>();
-    stringClassMap.put(TypeString.NULL.getTypeString(), null);
-    stringClassMap.put(TypeString.SHORT.getTypeString(), Short.class);
-    stringClassMap.put(TypeString.INTEGER.getTypeString(), Integer.class);
-    stringClassMap.put(TypeString.LONG.getTypeString(), Long.class);
-    stringClassMap.put(TypeString.FLOAT.getTypeString(), Float.class);
-    stringClassMap.put(TypeString.DOUBLE.getTypeString(), Double.class);
-    stringClassMap.put(TypeString.BOOLEAN.getTypeString(), Boolean.class);
-    stringClassMap.put(TypeString.STRING.getTypeString(), String.class);
-    stringClassMap.put(TypeString.BIGDECIMAL.getTypeString(), BigDecimal.class);
-    stringClassMap.put(TypeString.GRADOOPID.getTypeString(), GradoopId.class);
-    stringClassMap.put(TypeString.MAP.getTypeString(), Map.class);
-    stringClassMap.put(TypeString.LIST.getTypeString(), List.class);
-    stringClassMap.put(TypeString.LOCALDATE.getTypeString(), LocalDate.class);
-    stringClassMap.put(TypeString.LOCALTIME.getTypeString(), LocalTime.class);
-    stringClassMap.put(TypeString.LOCALDATETIME.getTypeString(), LocalDateTime.class);
-    stringClassMap.put(TypeString.SET.getTypeString(), Set.class);
+    stringClassMap.put(Type.NULL.asString(), null);
+    stringClassMap.put(Type.SHORT.asString(), Short.class);
+    stringClassMap.put(Type.INTEGER.asString(), Integer.class);
+    stringClassMap.put(Type.LONG.asString(), Long.class);
+    stringClassMap.put(Type.FLOAT.asString(), Float.class);
+    stringClassMap.put(Type.DOUBLE.asString(), Double.class);
+    stringClassMap.put(Type.BOOLEAN.asString(), Boolean.class);
+    stringClassMap.put(Type.STRING.asString(), String.class);
+    stringClassMap.put(Type.BIG_DECIMAL.asString(), BigDecimal.class);
+    stringClassMap.put(Type.GRADOOP_ID.asString(), GradoopId.class);
+    stringClassMap.put(Type.MAP.asString(), Map.class);
+    stringClassMap.put(Type.LIST.asString(), List.class);
+    stringClassMap.put(Type.DATE.asString(), LocalDate.class);
+    stringClassMap.put(Type.TIME.asString(), LocalTime.class);
+    stringClassMap.put(Type.DATE_TIME.asString(), LocalDateTime.class);
+    stringClassMap.put(Type.SET.asString(), Set.class);
     return Collections.unmodifiableMap(stringClassMap);
   }
 
@@ -172,46 +173,46 @@ public class MetaData {
    */
   public static String getTypeString(PropertyValue propertyValue) {
     if (propertyValue.isNull()) {
-      return TypeString.NULL.getTypeString();
+      return Type.NULL.asString();
     } else if (propertyValue.isShort()) {
-      return TypeString.SHORT.getTypeString();
+      return Type.SHORT.asString();
     } else if (propertyValue.isInt()) {
-      return TypeString.INTEGER.getTypeString();
+      return Type.INTEGER.asString();
     } else if (propertyValue.isLong()) {
-      return TypeString.LONG.getTypeString();
+      return Type.LONG.asString();
     } else if (propertyValue.isFloat()) {
-      return TypeString.FLOAT.getTypeString();
+      return Type.FLOAT.asString();
     } else if (propertyValue.isDouble()) {
-      return TypeString.DOUBLE.getTypeString();
+      return Type.DOUBLE.asString();
     } else if (propertyValue.isBoolean()) {
-      return TypeString.BOOLEAN.getTypeString();
+      return Type.BOOLEAN.asString();
     } else if (propertyValue.isString()) {
-      return TypeString.STRING.getTypeString();
+      return Type.STRING.asString();
     } else if (propertyValue.isBigDecimal()) {
-      return TypeString.BIGDECIMAL.getTypeString();
+      return Type.BIG_DECIMAL.asString();
     } else if (propertyValue.isGradoopId()) {
-      return TypeString.GRADOOPID.getTypeString();
+      return Type.GRADOOP_ID.asString();
     } else if (propertyValue.isMap()) {
       // map type string is map:{keyType}:{valueType}
-      return TypeString.MAP.getTypeString() +
+      return Type.MAP.asString() +
         PROPERTY_TOKEN_DELIMITER +
         getTypeString(propertyValue.getMap().keySet().iterator().next()) +
         PROPERTY_TOKEN_DELIMITER +
         getTypeString(propertyValue.getMap().values().iterator().next());
     } else if (propertyValue.isList()) {
       // list type string is list:{itemType}
-      return TypeString.LIST.getTypeString() +
+      return Type.LIST.asString() +
         PROPERTY_TOKEN_DELIMITER +
         getTypeString(propertyValue.getList().get(0));
     } else if (propertyValue.isDate()) {
-      return TypeString.LOCALDATE.getTypeString();
+      return Type.DATE.asString();
     } else if (propertyValue.isTime()) {
-      return TypeString.LOCALTIME.getTypeString();
+      return Type.TIME.asString();
     } else if (propertyValue.isDateTime()) {
-      return TypeString.LOCALDATETIME.getTypeString();
+      return Type.DATE_TIME.asString();
     } else if (propertyValue.isSet()) {
       // set type string is set:{itemType}
-      return TypeString.SET.getTypeString() +
+      return Type.SET.asString() +
         PROPERTY_TOKEN_DELIMITER +
         getTypeString(propertyValue.getSet().iterator().next());
     } else {
@@ -219,96 +220,96 @@ public class MetaData {
     }
   }
 
-  /**
-   * Supported type strings for the CSV format.
-   */
-  public enum TypeString {
-    /**
-     * Null type
-     */
-    NULL("null"),
-    /**
-     * Boolean type
-     */
-    BOOLEAN("boolean"),
-    /**
-     * Short type
-     */
-    SHORT("short"),
-    /**
-     * Integer type
-     */
-    INTEGER("int"),
-    /**
-     * Long type
-     */
-    LONG("long"),
-    /**
-     * Float type
-     */
-    FLOAT("float"),
-    /**
-     * Double type
-     */
-    DOUBLE("double"),
-    /**
-     * String type
-     */
-    STRING("string"),
-    /**
-     * BigDecimal type
-     */
-    BIGDECIMAL("bigdecimal"),
-    /**
-     * GradoopId type
-     */
-    GRADOOPID("gradoopid"),
-    /**
-     * Map type
-     */
-    MAP("map"),
-    /**
-     * List type
-     */
-    LIST("list"),
-    /**
-     * LocalDate type
-     */
-    LOCALDATE("localdate"),
-    /**
-     * LocalTime type
-     */
-    LOCALTIME("localtime"),
-    /**
-     * LocalDateTime type
-     */
-    LOCALDATETIME("localdatetime"),
-    /**
-     * Set type
-     */
-    SET("set");
-
-    /**
-     * String representation
-     */
-    private String typeString;
-
-    /**
-     * Constructor
-     *
-     * @param typeString string representation
-     */
-    TypeString(String typeString) {
-      this.typeString = typeString;
-    }
-
-    /**
-     * Returns the type string.
-     *
-     * @return type string
-     */
-    public String getTypeString() {
-      return typeString;
-    }
-  }
+//  /**
+//   * Supported type strings for the CSV format.
+//   */
+//  public enum TypeString {
+//    /**
+//     * Null type
+//     */
+//    NULL("null"),
+//    /**
+//     * Boolean type
+//     */
+//    BOOLEAN("boolean"),
+//    /**
+//     * Short type
+//     */
+//    SHORT("short"),
+//    /**
+//     * Integer type
+//     */
+//    INTEGER("int"),
+//    /**
+//     * Long type
+//     */
+//    LONG("long"),
+//    /**
+//     * Float type
+//     */
+//    FLOAT("float"),
+//    /**
+//     * Double type
+//     */
+//    DOUBLE("double"),
+//    /**
+//     * String type
+//     */
+//    STRING("string"),
+//    /**
+//     * BigDecimal type
+//     */
+//    BIGDECIMAL("bigdecimal"),
+//    /**
+//     * GradoopId type
+//     */
+//    GRADOOPID("gradoopid"),
+//    /**
+//     * Map type
+//     */
+//    MAP("map"),
+//    /**
+//     * List type
+//     */
+//    LIST("list"),
+//    /**
+//     * LocalDate type
+//     */
+//    LOCALDATE("localdate"),
+//    /**
+//     * LocalTime type
+//     */
+//    LOCALTIME("localtime"),
+//    /**
+//     * LocalDateTime type
+//     */
+//    LOCALDATETIME("localdatetime"),
+//    /**
+//     * Set type
+//     */
+//    SET("set");
+//
+//    /**
+//     * String representation
+//     */
+//    private String typeString;
+//
+//    /**
+//     * Constructor
+//     *
+//     * @param typeString string representation
+//     */
+//    TypeString(String typeString) {
+//      this.typeString = typeString;
+//    }
+//
+//    /**
+//     * Returns the type string.
+//     *
+//     * @return type string
+//     */
+//    public String getTypeString() {
+//      return typeString;
+//    }
+//  }
 }
