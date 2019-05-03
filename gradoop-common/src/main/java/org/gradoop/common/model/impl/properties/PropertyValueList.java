@@ -193,7 +193,6 @@ public class PropertyValueList
         DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
         nextValue.read(inputView);
       } catch (IOException e) {
-        e.printStackTrace();
         throw new NoSuchElementException("Error while reading from input stream.");
       }
       return nextValue;
