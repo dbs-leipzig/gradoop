@@ -137,6 +137,7 @@ org.gradoop.flink.model.impl.layouts.transactional.tuples
 org.gradoop.flink.model.impl.operators
 org.gradoop.flink.model.impl.operators.aggregation
 org.gradoop.flink.model.impl.operators.aggregation.functions
+org.gradoop.flink.model.impl.operators.aggregation.functions.average
 org.gradoop.flink.model.impl.operators.aggregation.functions.bool
 org.gradoop.flink.model.impl.operators.aggregation.functions.containment
 org.gradoop.flink.model.impl.operators.aggregation.functions.count
