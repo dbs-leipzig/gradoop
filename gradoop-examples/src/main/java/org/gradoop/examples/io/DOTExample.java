@@ -19,14 +19,14 @@ import org.apache.flink.api.common.ProgramDescription;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.AbstractRunner;
 import org.gradoop.flink.io.impl.dot.DOTDataSink;
-import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
+import org.gradoop.flink.io.impl.dot.functions.DotFileFormatHtml;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 
 /**
  * Example program that reads a graph from an EPGM format (csv, indexed, json)
  * into a {@link GraphCollection} and stores the
  * resulting {@link GraphCollection} as DOT.
- * The resulting format is described in {@link DOTFileFormat}.
+ * The resulting format is described in {@link DotFileFormatHtml}.
  */
 public class DOTExample extends AbstractRunner implements ProgramDescription {
 

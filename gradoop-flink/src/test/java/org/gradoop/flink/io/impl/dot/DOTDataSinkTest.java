@@ -44,6 +44,7 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
     // load input graph
     LogicalGraph inputGraph = loader.getLogicalGraphByVariable("input");
 
+
     // create temp directory
     String tmpDir = temporaryFolder.getRoot().toString();
 

@@ -19,7 +19,7 @@ import org.apache.flink.api.java.io.TextOutputFormat;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
+import org.gradoop.flink.io.impl.dot.functions.DotFileFormatHtml;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -28,7 +28,7 @@ import java.io.IOException;
 
 /**
  * Writes an EPGM representation into one DOT file. The format
- * is documented at {@link DOTFileFormat}.
+ * is documented at {@link DotFileFormatHtml}.
  *
  * For more information see:
  * https://en.wikipedia.org/wiki/DOT_(graph_description_language)
@@ -75,7 +75,7 @@ public class DOTDataSink implements DataSink {
     FileSystem.WriteMode writeMode =
       overwrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
 
-    DOTFileFormat dotFileFormat = new DOTFileFormat(graphInformation);
+    DotFileFormatHtml dotFileFormat = new DotFileFormatHtml(graphInformation, "#AAAAAA");
     GraphvizWriter graphvizWriter = new GraphvizWriter(new Path(path));
     graphvizWriter.setWriteMode(writeMode);
 
