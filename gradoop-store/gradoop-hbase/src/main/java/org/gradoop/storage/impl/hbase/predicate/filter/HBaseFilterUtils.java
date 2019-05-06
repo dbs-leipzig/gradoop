@@ -219,7 +219,7 @@ public class HBaseFilterUtils {
       CF_PROPERTY_TYPE_BYTES,
       Bytes.toBytesBinary(key),
       compareOp,
-      new byte[] {Type.STRING.asByte()});
+      new byte[] {Type.STRING.getTypeByte()});
 
     // Define that the entire row will be skipped if the column is not found
     typeFilter.setFilterIfMissing(true);

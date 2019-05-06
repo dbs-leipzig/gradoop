@@ -72,7 +72,7 @@ public class TimeStrategy extends AbstractFixSizedPropertyValueStrategy<LocalTim
 
   @Override
   public byte getRawType() {
-    return Type.TIME.asByte();
+    return Type.TIME.getTypeByte();
   }
 
   @Override

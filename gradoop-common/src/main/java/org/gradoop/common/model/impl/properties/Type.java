@@ -78,7 +78,7 @@ public enum Type {
    *
    * @return type byte
    */
-  public byte asByte() {
+  public byte getTypeByte() {
     return typeByte;
   }
 
@@ -87,7 +87,8 @@ public enum Type {
    *
    * @return type string
    */
-  public String asString() {
+  @Override
+  public String toString() {
     return typeString;
   }
 }

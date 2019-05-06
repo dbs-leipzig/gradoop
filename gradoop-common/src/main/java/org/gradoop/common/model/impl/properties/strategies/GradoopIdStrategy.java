@@ -71,7 +71,7 @@ public class GradoopIdStrategy extends AbstractFixSizedPropertyValueStrategy<Gra
 
   @Override
   public byte getRawType() {
-    return Type.GRADOOP_ID.asByte();
+    return Type.GRADOOP_ID.getTypeByte();
   }
 
   @Override

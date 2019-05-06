@@ -115,7 +115,7 @@ public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy<Set<
 
   @Override
   public byte getRawType() {
-    return Type.SET.asByte();
+    return Type.SET.getTypeByte();
   }
 
   /**

@@ -72,7 +72,7 @@ public class DateStrategy extends AbstractFixSizedPropertyValueStrategy<LocalDat
 
   @Override
   public byte getRawType() {
-    return Type.DATE.asByte();
+    return Type.DATE.getTypeByte();
   }
 
   @Override

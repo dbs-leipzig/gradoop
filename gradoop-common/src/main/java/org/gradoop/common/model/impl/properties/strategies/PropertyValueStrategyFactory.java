@@ -117,7 +117,7 @@ public class PropertyValueStrategyFactory {
         throw new RuntimeException("Error while serializing object.", e);
       }
     }
-    return new byte[] {Type.NULL.asByte()};
+    return new byte[] {Type.NULL.getTypeByte()};
   }
 
   /**

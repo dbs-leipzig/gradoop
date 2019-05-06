@@ -157,7 +157,7 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * @return true, if {@code null} value
    */
   public boolean isNull() {
-    return getRawBytes()[0] == Type.NULL.asByte();
+    return getRawBytes()[0] == Type.NULL.getTypeByte();
   }
 
   /**

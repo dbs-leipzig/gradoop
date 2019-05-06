@@ -62,7 +62,7 @@ public class LongStrategy extends AbstractFixSizedPropertyValueStrategy<Long> {
 
   @Override
   public byte getRawType() {
-    return Type.LONG.asByte();
+    return Type.LONG.getTypeByte();
   }
 
   @Override

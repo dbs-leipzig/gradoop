@@ -114,7 +114,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
 
   @Override
   public byte getRawType() {
-    return Type.LIST.asByte();
+    return Type.LIST.getTypeByte();
   }
 
   /**

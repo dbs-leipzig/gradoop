@@ -67,7 +67,7 @@ public class CAPFPatternMatchingTest extends GradoopFlinkTestBase {
     Map<String, List<PropertyMetaData>> edgePropertyMap = new HashMap<>();
 
     List<PropertyMetaData> propertyList = new ArrayList<>();
-    propertyList.add(new PropertyMetaData("id", Type.INTEGER.asString(),
+    propertyList.add(new PropertyMetaData("id", Type.INTEGER.toString(),
       null));
 
     vertexPropertyMap.put("A", propertyList);

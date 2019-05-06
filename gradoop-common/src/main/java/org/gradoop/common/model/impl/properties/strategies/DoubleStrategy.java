@@ -62,7 +62,7 @@ public class DoubleStrategy extends AbstractFixSizedPropertyValueStrategy<Double
 
   @Override
   public byte getRawType() {
-    return Type.DOUBLE.asByte();
+    return Type.DOUBLE.getTypeByte();
   }
 
   @Override

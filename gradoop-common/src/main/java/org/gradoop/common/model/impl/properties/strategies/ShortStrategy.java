@@ -62,7 +62,7 @@ public class ShortStrategy extends AbstractFixSizedPropertyValueStrategy<Short> 
 
   @Override
   public byte getRawType() {
-    return Type.SHORT.asByte();
+    return Type.SHORT.getTypeByte();
   }
 
   @Override

@@ -59,7 +59,7 @@ public class HBasePropRegTest {
       Bytes.toBytesBinary(CF_PROPERTY_TYPE),
       Bytes.toBytesBinary(key),
       CompareFilter.CompareOp.EQUAL,
-      new byte[] {Type.STRING.asByte()});
+      new byte[] {Type.STRING.getTypeByte()});
 
     // Define that the entire row will be skipped if the column is not found
     typeFilter.setFilterIfMissing(true);

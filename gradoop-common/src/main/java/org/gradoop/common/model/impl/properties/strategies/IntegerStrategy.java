@@ -62,7 +62,7 @@ public class IntegerStrategy extends AbstractFixSizedPropertyValueStrategy<Integ
 
   @Override
   public byte getRawType() {
-    return Type.INTEGER.asByte();
+    return Type.INTEGER.getTypeByte();
   }
 
   @Override

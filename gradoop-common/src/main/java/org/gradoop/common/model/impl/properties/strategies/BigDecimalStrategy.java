@@ -62,7 +62,7 @@ public class BigDecimalStrategy extends AbstractVariableSizedPropertyValueStrate
 
   @Override
   public byte getRawType() {
-    return Type.BIG_DECIMAL.asByte();
+    return Type.BIG_DECIMAL.getTypeByte();
   }
 
   @Override

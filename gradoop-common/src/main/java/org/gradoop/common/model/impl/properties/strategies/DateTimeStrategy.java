@@ -72,7 +72,7 @@ public class DateTimeStrategy extends AbstractFixSizedPropertyValueStrategy<Loca
 
   @Override
   public byte getRawType() {
-    return Type.DATE_TIME.asByte();
+    return Type.DATE_TIME.getTypeByte();
   }
 
   @Override

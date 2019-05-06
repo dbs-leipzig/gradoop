@@ -62,7 +62,7 @@ public class FloatStrategy extends AbstractFixSizedPropertyValueStrategy<Float> 
 
   @Override
   public byte getRawType() {
-    return Type.FLOAT.asByte();
+    return Type.FLOAT.getTypeByte();
   }
 
   @Override

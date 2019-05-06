@@ -59,7 +59,7 @@ public class BooleanStrategy extends AbstractFixSizedPropertyValueStrategy<Boole
 
   @Override
   public byte getRawType() {
-    return Type.BOOLEAN.asByte();
+    return Type.BOOLEAN.getTypeByte();
   }
 
   /**

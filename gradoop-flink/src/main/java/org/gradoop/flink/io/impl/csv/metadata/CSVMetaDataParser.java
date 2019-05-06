@@ -53,19 +53,19 @@ public class CSVMetaDataParser {
    */
   private static Map<String, Function<String, Object>> getSimpleTypeParserMap() {
     Map<String, Function<String, Object>> map = new HashMap<>();
-    map.put(Type.SHORT.asString(), Short::parseShort);
-    map.put(Type.INTEGER.asString(), Integer::parseInt);
-    map.put(Type.LONG.asString(), Long::parseLong);
-    map.put(Type.FLOAT.asString(), Float::parseFloat);
-    map.put(Type.DOUBLE.asString(), Double::parseDouble);
-    map.put(Type.BOOLEAN.asString(), Boolean::parseBoolean);
-    map.put(Type.STRING.asString(), StringEscaper::unescape);
-    map.put(Type.BIG_DECIMAL.asString(), BigDecimal::new);
-    map.put(Type.GRADOOP_ID.asString(), GradoopId::fromString);
-    map.put(Type.DATE.asString(), LocalDate::parse);
-    map.put(Type.TIME.asString(), LocalTime::parse);
-    map.put(Type.DATE_TIME.asString(), LocalDateTime::parse);
-    map.put(Type.NULL.asString(), CSVMetaDataParser::parseNullProperty);
+    map.put(Type.SHORT.toString(), Short::parseShort);
+    map.put(Type.INTEGER.toString(), Integer::parseInt);
+    map.put(Type.LONG.toString(), Long::parseLong);
+    map.put(Type.FLOAT.toString(), Float::parseFloat);
+    map.put(Type.DOUBLE.toString(), Double::parseDouble);
+    map.put(Type.BOOLEAN.toString(), Boolean::parseBoolean);
+    map.put(Type.STRING.toString(), StringEscaper::unescape);
+    map.put(Type.BIG_DECIMAL.toString(), BigDecimal::new);
+    map.put(Type.GRADOOP_ID.toString(), GradoopId::fromString);
+    map.put(Type.DATE.toString(), LocalDate::parse);
+    map.put(Type.TIME.toString(), LocalTime::parse);
+    map.put(Type.DATE_TIME.toString(), LocalDateTime::parse);
+    map.put(Type.NULL.toString(), CSVMetaDataParser::parseNullProperty);
     return Collections.unmodifiableMap(map);
   }
 
@@ -94,11 +94,11 @@ public class CSVMetaDataParser {
       propertyType.toLowerCase(), PropertyMetaData.PROPERTY_TOKEN_DELIMITER);
     String mainType = typeTokens[0];
 
-    if (mainType.equals(Type.LIST.asString())) {
+    if (mainType.equals(Type.LIST.toString())) {
       return getListValueParser(typeTokens);
-    } else if (mainType.equals(Type.SET.asString())) {
+    } else if (mainType.equals(Type.SET.toString())) {
       return getSetValueParser(typeTokens);
-    } else if (mainType.equals(Type.MAP.asString())) {
+    } else if (mainType.equals(Type.MAP.toString())) {
       return getMapValueParser(typeTokens);
     } else if (SIMPLE_TYPE_PARSER_MAP.containsKey(mainType)) {
       return SIMPLE_TYPE_PARSER_MAP.get(mainType);
@@ -237,7 +237,7 @@ public class CSVMetaDataParser {
    */
   private static Object parseNullProperty(String nullString) throws IllegalArgumentException {
     if (nullString != null && nullString.equalsIgnoreCase(
-      Type.NULL.asString())) {
+      Type.NULL.toString())) {
       return null;
     } else {
       throw new IllegalArgumentException("Only null represents a null string.");

@@ -88,22 +88,22 @@ public class MetaData {
    */
   private static Map<String, Class<?>> createStringToClassMap() {
     Map<String, Class<?>> stringClassMap = new HashMap<>();
-    stringClassMap.put(Type.NULL.asString(), null);
-    stringClassMap.put(Type.SHORT.asString(), Short.class);
-    stringClassMap.put(Type.INTEGER.asString(), Integer.class);
-    stringClassMap.put(Type.LONG.asString(), Long.class);
-    stringClassMap.put(Type.FLOAT.asString(), Float.class);
-    stringClassMap.put(Type.DOUBLE.asString(), Double.class);
-    stringClassMap.put(Type.BOOLEAN.asString(), Boolean.class);
-    stringClassMap.put(Type.STRING.asString(), String.class);
-    stringClassMap.put(Type.BIG_DECIMAL.asString(), BigDecimal.class);
-    stringClassMap.put(Type.GRADOOP_ID.asString(), GradoopId.class);
-    stringClassMap.put(Type.MAP.asString(), Map.class);
-    stringClassMap.put(Type.LIST.asString(), List.class);
-    stringClassMap.put(Type.DATE.asString(), LocalDate.class);
-    stringClassMap.put(Type.TIME.asString(), LocalTime.class);
-    stringClassMap.put(Type.DATE_TIME.asString(), LocalDateTime.class);
-    stringClassMap.put(Type.SET.asString(), Set.class);
+    stringClassMap.put(Type.NULL.toString(), null);
+    stringClassMap.put(Type.SHORT.toString(), Short.class);
+    stringClassMap.put(Type.INTEGER.toString(), Integer.class);
+    stringClassMap.put(Type.LONG.toString(), Long.class);
+    stringClassMap.put(Type.FLOAT.toString(), Float.class);
+    stringClassMap.put(Type.DOUBLE.toString(), Double.class);
+    stringClassMap.put(Type.BOOLEAN.toString(), Boolean.class);
+    stringClassMap.put(Type.STRING.toString(), String.class);
+    stringClassMap.put(Type.BIG_DECIMAL.toString(), BigDecimal.class);
+    stringClassMap.put(Type.GRADOOP_ID.toString(), GradoopId.class);
+    stringClassMap.put(Type.MAP.toString(), Map.class);
+    stringClassMap.put(Type.LIST.toString(), List.class);
+    stringClassMap.put(Type.DATE.toString(), LocalDate.class);
+    stringClassMap.put(Type.TIME.toString(), LocalTime.class);
+    stringClassMap.put(Type.DATE_TIME.toString(), LocalDateTime.class);
+    stringClassMap.put(Type.SET.toString(), Set.class);
     return Collections.unmodifiableMap(stringClassMap);
   }
 
@@ -173,46 +173,46 @@ public class MetaData {
    */
   public static String getTypeString(PropertyValue propertyValue) {
     if (propertyValue.isNull()) {
-      return Type.NULL.asString();
+      return Type.NULL.toString();
     } else if (propertyValue.isShort()) {
-      return Type.SHORT.asString();
+      return Type.SHORT.toString();
     } else if (propertyValue.isInt()) {
-      return Type.INTEGER.asString();
+      return Type.INTEGER.toString();
     } else if (propertyValue.isLong()) {
-      return Type.LONG.asString();
+      return Type.LONG.toString();
     } else if (propertyValue.isFloat()) {
-      return Type.FLOAT.asString();
+      return Type.FLOAT.toString();
     } else if (propertyValue.isDouble()) {
-      return Type.DOUBLE.asString();
+      return Type.DOUBLE.toString();
     } else if (propertyValue.isBoolean()) {
-      return Type.BOOLEAN.asString();
+      return Type.BOOLEAN.toString();
     } else if (propertyValue.isString()) {
-      return Type.STRING.asString();
+      return Type.STRING.toString();
     } else if (propertyValue.isBigDecimal()) {
-      return Type.BIG_DECIMAL.asString();
+      return Type.BIG_DECIMAL.toString();
     } else if (propertyValue.isGradoopId()) {
-      return Type.GRADOOP_ID.asString();
+      return Type.GRADOOP_ID.toString();
     } else if (propertyValue.isMap()) {
       // map type string is map:{keyType}:{valueType}
-      return Type.MAP.asString() +
+      return Type.MAP.toString() +
         PROPERTY_TOKEN_DELIMITER +
         getTypeString(propertyValue.getMap().keySet().iterator().next()) +
         PROPERTY_TOKEN_DELIMITER +
         getTypeString(propertyValue.getMap().values().iterator().next());
     } else if (propertyValue.isList()) {
       // list type string is list:{itemType}
-      return Type.LIST.asString() +
+      return Type.LIST.toString() +
         PROPERTY_TOKEN_DELIMITER +
         getTypeString(propertyValue.getList().get(0));
     } else if (propertyValue.isDate()) {
-      return Type.DATE.asString();
+      return Type.DATE.toString();
     } else if (propertyValue.isTime()) {
-      return Type.TIME.asString();
+      return Type.TIME.toString();
     } else if (propertyValue.isDateTime()) {
-      return Type.DATE_TIME.asString();
+      return Type.DATE_TIME.toString();
     } else if (propertyValue.isSet()) {
       // set type string is set:{itemType}
-      return Type.SET.asString() +
+      return Type.SET.toString() +
         PROPERTY_TOKEN_DELIMITER +
         getTypeString(propertyValue.getSet().iterator().next());
     } else {

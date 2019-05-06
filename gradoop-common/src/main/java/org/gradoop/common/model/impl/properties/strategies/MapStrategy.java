@@ -92,7 +92,7 @@ public class MapStrategy
 
   @Override
   public byte getRawType() {
-    return Type.MAP.asByte();
+    return Type.MAP.getTypeByte();
   }
 
   /**
@@ -109,7 +109,7 @@ public class MapStrategy
         DataOutputStream outputStream = new DataOutputStream(byteStream);
         DataOutputViewStreamWrapper outputView = new DataOutputViewStreamWrapper(outputStream)) {
 
-      outputStream.write(Type.MAP.asByte());
+      outputStream.write(Type.MAP.getTypeByte());
       for (Map.Entry<PropertyValue, PropertyValue> entry : value.entrySet()) {
         entry.getKey().write(outputView);
         entry.getValue().write(outputView);

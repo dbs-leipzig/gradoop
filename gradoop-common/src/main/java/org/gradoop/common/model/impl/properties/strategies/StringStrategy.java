@@ -60,7 +60,7 @@ public class StringStrategy extends AbstractVariableSizedPropertyValueStrategy<S
 
   @Override
   public byte getRawType() {
-    return Type.STRING.asByte();
+    return Type.STRING.getTypeByte();
   }
 
   @Override
