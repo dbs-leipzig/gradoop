@@ -24,7 +24,9 @@ import org.gradoop.dataintegration.transformation.impl.Neighborhood;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraphBroadcast;
 
 import java.util.List;
 import java.util.Objects;
@@ -88,10 +90,12 @@ public class ConnectNeighbors implements UnaryGraphToGraphOperator {
 
     // calculate the new edges and add them to the original graph
     DataSet<Edge> newEdges = neighborhood.flatMap(
-      new CreateCartesianNeighborhoodEdges<>(graph.getConfig().getEdgeFactory(), newEdgeLabel));
+      new CreateCartesianNeighborhoodEdges<>(graph.getFactory().getEdgeFactory(), newEdgeLabel))
+      .map(new AddToGraphBroadcast<>())
+      .withBroadcastSet(graph.getGraphHead().map(new Id<>()), AddToGraphBroadcast.GRAPH_ID);
 
-    return graph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(graph.getVertices(), graph.getEdges().union(newEdges));
+    return graph.getFactory()
+      .fromDataSets(graph.getGraphHead(), graph.getVertices(), graph.getEdges().union(newEdges));
   }
 
   @Override

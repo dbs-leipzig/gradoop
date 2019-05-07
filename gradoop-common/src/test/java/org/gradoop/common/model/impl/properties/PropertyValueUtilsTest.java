@@ -1001,21 +1001,21 @@ public class PropertyValueUtilsTest {
     @Parameterized.Parameters
     public static Collection properties() {
       return Arrays.asList(new Object[][] {
-        {create(NULL_VAL_0), PropertyValue.TYPE_NULL},
-        {create(BOOL_VAL_1), PropertyValue.TYPE_BOOLEAN},
-        {create(INT_VAL_2), PropertyValue.TYPE_INTEGER},
-        {create(LONG_VAL_3), PropertyValue.TYPE_LONG},
-        {create(FLOAT_VAL_4), PropertyValue.TYPE_FLOAT},
-        {create(DOUBLE_VAL_5), PropertyValue.TYPE_DOUBLE},
-        {create(STRING_VAL_6), PropertyValue.TYPE_STRING},
-        {create(BIG_DECIMAL_VAL_7), PropertyValue.TYPE_BIG_DECIMAL},
-        {create(GRADOOP_ID_VAL_8), PropertyValue.TYPE_GRADOOP_ID},
-        {create(MAP_VAL_9), PropertyValue.TYPE_MAP},
-        {create(LIST_VAL_a), PropertyValue.TYPE_LIST},
-        {create(DATE_VAL_b), PropertyValue.TYPE_DATE},
-        {create(TIME_VAL_c), PropertyValue.TYPE_TIME},
-        {create(DATETIME_VAL_d), PropertyValue.TYPE_DATETIME},
-        {create(SHORT_VAL_e), PropertyValue.TYPE_SHORT}
+        {create(NULL_VAL_0), Type.NULL.getTypeByte()},
+        {create(BOOL_VAL_1), Type.BOOLEAN.getTypeByte()},
+        {create(INT_VAL_2), Type.INTEGER.getTypeByte()},
+        {create(LONG_VAL_3), Type.LONG.getTypeByte()},
+        {create(FLOAT_VAL_4), Type.FLOAT.getTypeByte()},
+        {create(DOUBLE_VAL_5), Type.DOUBLE.getTypeByte()},
+        {create(STRING_VAL_6), Type.STRING.getTypeByte()},
+        {create(BIG_DECIMAL_VAL_7), Type.BIG_DECIMAL.getTypeByte()},
+        {create(GRADOOP_ID_VAL_8), Type.GRADOOP_ID.getTypeByte()},
+        {create(MAP_VAL_9), Type.MAP.getTypeByte()},
+        {create(LIST_VAL_a), Type.LIST.getTypeByte()},
+        {create(DATE_VAL_b), Type.DATE.getTypeByte()},
+        {create(TIME_VAL_c), Type.TIME.getTypeByte()},
+        {create(DATETIME_VAL_d), Type.DATE_TIME.getTypeByte()},
+        {create(SHORT_VAL_e), Type.SHORT.getTypeByte()}
       });
     }
 
