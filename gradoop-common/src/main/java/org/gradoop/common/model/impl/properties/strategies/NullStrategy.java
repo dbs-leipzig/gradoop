@@ -67,6 +67,6 @@ public class NullStrategy implements PropertyValueStrategy {
 
   @Override
   public byte[] getRawBytes(Object value) {
-    return null;
+    return new byte[] {getRawType()};
   }
 }
