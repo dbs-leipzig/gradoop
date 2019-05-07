@@ -79,9 +79,11 @@ public class PageRankSamplingTest extends ParameterizedTestForGraphSampling {
       noneHasScore || allHaveScore);
 
     if (newVertices.isEmpty()) {
+      // Result is empty, if input is empty
+      // OR all have the same score and keepVerticesIfSameScore = false
       assertTrue("some vertices got sampled (should NOT be)",
         dbVertices.isEmpty() || !keepVerticesIfSameScore);
-    } else if (allHaveScore) {
+    } else if (allHaveScore) { // normal case
       for (Vertex v : newVertices) {
         double score = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
           .getDouble();
@@ -93,7 +95,7 @@ public class PageRankSamplingTest extends ParameterizedTestForGraphSampling {
             score <= sampleSize);
         }
       }
-    } else if (keepVerticesIfSameScore) {
+    } else if (keepVerticesIfSameScore) { // and noneHasScore
       assertEquals("not all vertices got sampled (should be, all got same score)",
         dbVertices.size(), newVertices.size());
     }
