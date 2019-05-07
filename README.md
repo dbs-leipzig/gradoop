@@ -12,8 +12,8 @@ extends the widespread [property graph model](https://github.com/tinkerpop/bluep
 by the concept of logical graphs and further provides operators that can be applied 
 on single logical graphs and collections of logical graphs. The combination of these 
 operators allows the flexible, declarative definition of graph analytical workflows.
-Gradoop can be easily integrated in a workflow which already uses Flink&trade; operators
-and Flink&trade; libraries (i.e. Gelly, ML and Table).
+Gradoop can be easily integrated in a workflow which already uses Flink&reg; operators
+and Flink&reg; libraries (i.e. Gelly, ML and Table).
 
 Gradoop is **work in progress** which means APIs may change. It is currently used
 as a proof of concept implementation and far from production ready.
@@ -58,38 +58,32 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 
 #### Unary logical graph operators (one graph as input):
 
-| Operator                      | Output   | Output description                                                             | Impl   |
-| :---------------------------- | :------- | :----------------------------------------------------------------------------- | :----: |
-| Aggregation                   | G        | Graph with result of an aggregate function as a new property                   | Yes    |
-| Cypher                        | GC       | Graphs that match a given Cypher graph pattern                                 | Yes    |
-| Query                         | GC       | Graphs that match a given Cypher-based GDL graph pattern                       | Yes    |
-| Transformation                | G        | Graph with transformed (graph, vertex, edge) data                              | Yes    |
-| Grouping                      | G        | Structural condense of the input graph                                         | Yes    |
-| Subgraph                      | G        | Subgraph that fulfils given vertex and edge predicates                         | Yes    |
-| Cloning                       | G        | Creates a copy of a logical graph.                                             | Yes    |
-| PageRankSampling              | G        | Creates a PageRank-Sampling of a logical graph.                                | Yes    |
-| EdgeSampling                  | G        | Creates an edge sampling of a logical graph.                                   | Yes    |
-| VertexSampling                | G        | Creates a vertex sampling of a logical graph.                                  | Yes    |
-| WalkSampling                  | G        | Creates a walk sampling of a logical graph.                                    | Yes    |
-| AverageClusteringCoefficient  | G        | Calculates the average local clustering coefficient.                           | Yes    |
-| AverageDegree                 | G        | Calculates the average degree of a logical graph.                              | Yes    |
-| GraphDensity                  | G        | Calculates the density of a logical graph.                                     | Yes    |
-| ClusteringCoefficient         | G        | Calculates the local/ global clustering coefficient.                           | Yes    |
-| WeaklyConnectedComponents     | G/GC     | Calculates or annotates weakly connected components using Flink&trade; Gelly.  | Yes    |
-| HITS                          | G        | Operator wrapping Flink&trade; Gelly's Hyperlink-Induced Topic Search.         | Yes    |
-| LabelPropagation              | G        | Operator executing label propagation integrated in Flink&trade; Gelly.         | Yes    |
-| PageRank                      | G        | Operator wrapping PageRank integrated in Flink&trade; Gelly.                   | Yes    |
-| RandomJump                    | G        | Performs RandomJump, using VertexCentricIteration Flink&trade; Gelly.          | Yes    |
-| SingleSourceShortestPaths     | G        | Operator wrapping SingleSourceShortestPaths integrated in Flink&trade; Gelly.  | Yes    |
-| TriangleCounting              | G        | Operator wrapping TriangleCounting integrated in Flink&trade; Gelly.           | Yes    |
-| DistinctVertexDegrees         | G        | Operator VertexDegrees calculation integrated in Flink&trade; Gelly.           | Yes    |
-| PropertyExtraction            | G        | Extracts a property of a vertex.                                               | Yes    |
-| ConnectNeighbors              | G        | Connects neighbors of a vertex.                                                | Yes    |
-| EdgeToVertex                  | G        | Converts an edge to a vertex.                                                  | Yes    |
-| VertexToEdge                  | G        | Converts a vertex to an edge.                                                  | Yes    |
-| RollUp                        | GC       | Generates combinations according to the rollup operation in SQL.               | Yes    |
-| Split                         | GC       | Splits a logical graph into a GraphCollection.                                 | Yes    |
-| BusinessTransactionGraphs     | GC       | EPGMVertex-centric implementation to isolate business transaction graphs.      | Yes    |
+| Operator                      | Output   | Output description                                                                 | Impl   |
+| :---------------------------- | :------- | :-----------------------------------------------------------------------------     | :----: |
+| Aggregation                   | G        | Graph with result of an aggregate function as a new property                       | Yes    |
+| Cypher                        | GC       | Graphs that match a given Cypher graph pattern                                     | Yes    |
+| Query                         | GC       | Graphs that match a given Cypher-based GDL graph pattern                           | Yes    |
+| Transformation                | G        | Graph with transformed (graph, vertex, edge) data                                  | Yes    |
+| Grouping                      | G        | Structural condense of the input graph                                             | Yes    |
+| RollUp                        | GC       | Graphs representing structural condense of the input graph according to SQL RollUp | Yes    |
+| Subgraph                      | G        | Subgraph that fulfils given vertex and edge predicates                             | Yes    |
+| Cloning                       | G        | Creates a copy of a logical graph                                                  | Yes    |
+| Sampling                      | G        | Create samplings of logical graphs (e.g PageRank-Sampling)                         | Yes    |
+| AverageClusteringCoefficient  | G        | Calculates the average local clustering coefficient                                | Yes    |
+| AverageDegree                 | G        | Calculates the average degree of a logical graph                                   | Yes    |
+| GraphDensity                  | G        | Calculates the density of a logical graph                                          | Yes    |
+| ClusteringCoefficient         | G        | Calculates the local/ global clustering coefficient                                | Yes    |
+| WeaklyConnectedComponents     | G/GC     | Calculates or annotates weakly connected components using Flink&reg; Gelly    | Yes    |
+| HITS                          | G        | Operator wrapping Flink&reg; Gelly's Hyperlink-Induced Topic Search           | Yes    |
+| LabelPropagation              | G        | Operator executing label propagation integrated in Flink&reg; Gelly           | Yes    |
+| PageRank                      | G        | Operator wrapping PageRank integrated in Flink&reg; Gelly                     | Yes    |
+| RandomJump                    | G        | Performs RandomJump, using VertexCentricIteration Flink&reg; Gelly            | Yes    |
+| SingleSourceShortestPaths     | G        | Operator wrapping SingleSourceShortestPaths integrated in Flink&reg; Gelly    | Yes    |
+| TriangleCounting              | G        | Operator wrapping TriangleCounting integrated in Flink&reg; Gelly             | Yes    |
+| DistinctVertexDegrees         | G        | Operator VertexDegrees calculation integrated in Flink&reg; Gelly             | Yes    |
+| PropertyExtraction            | G        | Extracts a property of a vertex to a new vertex                                    | Yes    |
+| ConnectNeighbors              | G        | Connects neighbors of a vertex with newly created edges                            | Yes    |
+| EdgeToVertex                  | G        | Converts an edge to a vertex                                                       | Yes    |
 
 #### Binary logical graph operators (two graphs as input):
 
@@ -197,7 +191,7 @@ In any case you also need Apache Flink (version 1.7.2):
 ### gradoop-common
 
 The main contents of that module are the EPGM data model and a corresponding POJO 
-implementation which is used in Flink&trade;. The persistent representation of the EPGM
+implementation which is used in Flink&reg;. The persistent representation of the EPGM
 is also contained in gradoop-common and together with its mapping to HBase&trade;.
 
 ### gradoop-data-integration
@@ -217,7 +211,7 @@ Input and output formats for reading and writing graph collections from [Apache 
 ### gradoop-flink
 
 This module contains reference implementations of the EPGM operators. The 
-EPGM is mapped to Flink&trade; DataSets while the operators are implemented
+EPGM is mapped to Flink&reg; DataSets while the operators are implemented
 using DataSet transformations. The module also contains implementations of 
 general graph algorithms (e.g. Label Propagation, Frequent Subgraph Mining)
 adapted to be used with the EPGM model.
@@ -241,7 +235,7 @@ See the [Changelog](https://github.com/dbs-leipzig/gradoop/wiki/Changelog) at th
 
 ### Disclaimer
 
-Apache&reg;, Apache Accumulo&reg;, Apache Flink, Flink&trade;, Apache HBase&trade; and 
+Apache&reg;, Apache Accumulo&reg;, Apache Flink, Flink&reg;, Apache HBase&trade; and 
 HBase&trade; are either registered trademarks or trademarks of the Apache Software Foundation 
 in the United States and/or other countries.
 
