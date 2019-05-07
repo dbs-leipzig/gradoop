@@ -32,10 +32,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
 public class ReduceOverlap extends OverlapBase implements
   ReducibleBinaryGraphToGraphOperator {
 
-  /**
-   * @param collection input collection
-   * @return graph with overlapping elements from the input collection
-   */
   @Override
   public LogicalGraph execute(GraphCollection collection) {
     DataSet<GraphHead> graphHeads = collection.getGraphHeads();

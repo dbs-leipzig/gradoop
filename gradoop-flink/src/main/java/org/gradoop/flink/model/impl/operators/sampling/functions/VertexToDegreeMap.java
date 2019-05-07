@@ -37,10 +37,6 @@ public class VertexToDegreeMap implements MapFunction<Vertex, Tuple1<Long>> {
     this.nameOfDegreeProperty = nameOfDegreeProperty;
   }
 
-  /**
-   * @param vertex the given vertex
-   * @return the degree of that vertex
-   */
   @Override
   public Tuple1<Long> map(Vertex vertex) {
     return new Tuple1<>(Long.parseLong(vertex.getPropertyValue(nameOfDegreeProperty).toString()));

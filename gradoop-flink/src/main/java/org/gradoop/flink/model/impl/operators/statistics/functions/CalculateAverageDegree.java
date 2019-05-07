@@ -39,10 +39,6 @@ public class CalculateAverageDegree implements MapFunction<GraphHead, GraphHead>
     this.propertyKey = propertyKey;
   }
 
-  /**
-   * @param graphHead The graphHead the average degree property shall be written to
-   * @return GraphHead The graphHead the average degree property is written to
-   */
   @Override
   public GraphHead map(GraphHead graphHead) {
     long numVertices = graphHead.getPropertyValue("vertexCount").getLong();

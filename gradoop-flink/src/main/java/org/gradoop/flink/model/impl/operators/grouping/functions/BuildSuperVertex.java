@@ -50,11 +50,6 @@ public class BuildSuperVertex
     this.vertexFactory = epgmVertexFactory;
   }
 
-  /**
-   * @param groupItem vertex group item
-   * @return vertex including new vertex data
-   * @throws Exception on failure
-   */
   @Override
   public Vertex map(VertexGroupItem groupItem) throws
     Exception {

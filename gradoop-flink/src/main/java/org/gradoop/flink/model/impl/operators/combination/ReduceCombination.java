@@ -26,10 +26,6 @@ import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator
  */
 public class ReduceCombination implements ReducibleBinaryGraphToGraphOperator {
 
-  /**
-   * @param collection input collection
-   * @return combined graph
-   */
   @Override
   public LogicalGraph execute(GraphCollection collection) {
     return collection.getConfig().getLogicalGraphFactory().fromDataSets(

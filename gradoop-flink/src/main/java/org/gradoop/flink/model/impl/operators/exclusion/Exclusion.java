@@ -51,11 +51,6 @@ import org.gradoop.flink.model.impl.functions.utils.LeftWhenRightIsNull;
  */
 public class Exclusion implements BinaryGraphToGraphOperator {
 
-  /**
-   * @param firstGraph  first input graph
-   * @param secondGraph second input graph
-   * @return first graph without elements from second graph
-   */
   @Override
   public LogicalGraph execute(
     LogicalGraph firstGraph, LogicalGraph secondGraph) {

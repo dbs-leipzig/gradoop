@@ -31,11 +31,6 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
  */
 public class Overlap implements BinaryGraphToGraphOperator {
 
-  /**
-   * @param firstGraph  first input graph
-   * @param secondGraph second input graph
-   * @return graph with overlapping elements from both input graphs
-   */
   @Override
   public LogicalGraph execute(
     LogicalGraph firstGraph, LogicalGraph secondGraph) {

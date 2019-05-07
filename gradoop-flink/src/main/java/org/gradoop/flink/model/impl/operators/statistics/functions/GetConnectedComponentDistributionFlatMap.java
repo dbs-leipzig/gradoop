@@ -56,10 +56,6 @@ public class GetConnectedComponentDistributionFlatMap implements
     this.annotateEdges = annotateEdges;
   }
 
-  /**
-   * @param graphHead The graph head with the aggregated components
-   * @param out The connected component distribution as {@code Tuple3<String, Long, Long>}
-   */
   @Override
   public void flatMap(GraphHead graphHead, Collector<Tuple3<String, Long, Long>> out) {
     List<String> vertexWcc = graphHead.getPropertyValue(

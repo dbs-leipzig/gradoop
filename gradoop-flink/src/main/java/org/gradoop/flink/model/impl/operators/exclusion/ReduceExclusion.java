@@ -52,10 +52,6 @@ public class ReduceExclusion implements ReducibleBinaryGraphToGraphOperator {
     this.startId = startId;
   }
 
-  /**
-   * @param collection input collection
-   * @return excluded graph
-   */
   @Override
   public LogicalGraph execute(GraphCollection collection) {
     DataSet<GradoopId> excludedGraphIds = collection.getGraphHeads()

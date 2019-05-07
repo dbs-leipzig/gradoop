@@ -30,10 +30,6 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 public class DegreeCentrality extends DegreeCentralityBase
   implements UnaryGraphToValueOperator<DataSet<Double>> {
 
-  /**
-   * @param graph input graph
-   * @return DataSet with one degree centrality value
-   */
   @Override
   public DataSet<Double> execute(LogicalGraph graph) {
 

@@ -68,11 +68,6 @@ public class DegreeDistanceFunction extends RichMapFunction<WithCount<GradoopId>
       .get(0);
   }
 
-  /**
-   * @param value degree of vertex
-   * @return degree distance
-   * @throws Exception throws any Exception
-   */
   @Override
   public Tuple1<Long> map(WithCount<GradoopId> value) throws Exception {
     reuse.f0 = maxDegree.f1 - value.f1;

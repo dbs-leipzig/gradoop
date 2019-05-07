@@ -37,10 +37,6 @@ public class CalculateDensity implements MapFunction<GraphHead, GraphHead> {
     this.propertyKey = key;
   }
 
-  /**
-   * @param graphHead The graphHead the density shall be written to
-   * @return GraphHead The graphHead the density is written to
-   */
   @Override
   public GraphHead map(GraphHead graphHead) {
     double vc1 = (double) graphHead.getPropertyValue("vertexCount").getLong();

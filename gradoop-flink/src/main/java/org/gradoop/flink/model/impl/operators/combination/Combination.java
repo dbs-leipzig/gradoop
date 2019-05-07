@@ -30,11 +30,6 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
  */
 public class Combination implements BinaryGraphToGraphOperator {
 
-  /**
-   * @param firstGraph  first input graph
-   * @param secondGraph second input graph
-   * @return combined graph
-   */
   @Override
   public LogicalGraph execute(LogicalGraph firstGraph,
     LogicalGraph secondGraph) {
