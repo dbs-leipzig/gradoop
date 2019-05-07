@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
  * Computes the combined graph from two logical graphs.
- * Creates a new logical graph by union the vertex and edge sets of two
+ * Creates a new logical graph by union of the vertex and edge sets of two
  * input graphs. Vertex and edge equality is based on their respective
  * identifiers.
  */
