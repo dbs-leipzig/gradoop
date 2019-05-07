@@ -28,15 +28,16 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Initializes an {@link Vertex} from a given {@link GradoopId} triple.
- * The triple consists of edge id, source vertex id and target vertex id.
- *
- * (edgeId, sourceId, targetId) -> edge
- *
+ * The triple consists of {@code edge id}, {@code source vertex id} and
+ * {@code target vertex id}
+ * <p>
  * Forwarded fields:
- *
- * f0->id:        edge id
- * f1->sourceId:  source vertex id
- * f2->targetId:  target vertex id
+ * <p>
+ * {@code f0->id:        edge id}
+ * <p>
+ * {@code f1->sourceId:  source vertex id}
+ * <p>
+ * {@code f2->targetId:  target vertex id}
  */
 @FunctionAnnotation.ForwardedFields("f0->id;f1->sourceId;f2->targetId")
 public class EdgeFromIds implements
@@ -57,12 +58,6 @@ public class EdgeFromIds implements
     this.edgeFactory = epgmEdgeFactory;
   }
 
-  /**
-   * @param idTriple triple containing (in that order) edge id, source vertex
-   *                 id, target vertex id
-   * @return EPGM edge
-   * @throws Exception on failure
-   */
   @Override
   public Edge map(Tuple3<GradoopId, GradoopId, GradoopId> idTriple) throws
     Exception {
