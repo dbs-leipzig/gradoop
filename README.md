@@ -54,74 +54,7 @@ properties even if they have the same label.
 
 The EPGM provides operators for both single logical graphs as well as collections 
 of logical graphs; operators may also return single graphs or graph collections. 
-The following tables contains an overview (GC = Graph Collection, G = Logical Graph).
-
-#### Unary logical graph operators (one graph as input):
-
-| Operator                      | Output   | Output description                                                                 | Impl   |
-| :---------------------------- | :------- | :-----------------------------------------------------------------------------     | :----: |
-| Aggregation                   | G        | Graph with result of an aggregate function as a new property                       | Yes    |
-| Cypher                        | GC       | Graphs that match a given Cypher graph pattern                                     | Yes    |
-| Query                         | GC       | Graphs that match a given Cypher-based GDL graph pattern                           | Yes    |
-| Transformation                | G        | Graph with transformed (graph, vertex, edge) data                                  | Yes    |
-| Grouping                      | G        | Structural condense of the input graph                                             | Yes    |
-| RollUp                        | GC       | Graphs representing structural condense of the input graph according to SQL RollUp | Yes    |
-| Subgraph                      | G        | Subgraph that fulfils given vertex and edge predicates                             | Yes    |
-| Cloning                       | G        | Creates a copy of a logical graph                                                  | Yes    |
-| Sampling                      | G        | Create samplings of logical graphs (e.g PageRank-Sampling)                         | Yes    |
-| AverageClusteringCoefficient  | G        | Calculates the average local clustering coefficient                                | Yes    |
-| AverageDegree                 | G        | Calculates the average degree of a logical graph                                   | Yes    |
-| GraphDensity                  | G        | Calculates the density of a logical graph                                          | Yes    |
-| ClusteringCoefficient         | G        | Calculates the local/ global clustering coefficient                                | Yes    |
-| WeaklyConnectedComponents     | G/GC     | Calculates or annotates weakly connected components using Flink&reg; Gelly    | Yes    |
-| HITS                          | G        | Operator wrapping Flink&reg; Gelly's Hyperlink-Induced Topic Search           | Yes    |
-| LabelPropagation              | G        | Operator executing label propagation integrated in Flink&reg; Gelly           | Yes    |
-| PageRank                      | G        | Operator wrapping PageRank integrated in Flink&reg; Gelly                     | Yes    |
-| RandomJump                    | G        | Performs RandomJump, using VertexCentricIteration Flink&reg; Gelly            | Yes    |
-| SingleSourceShortestPaths     | G        | Operator wrapping SingleSourceShortestPaths integrated in Flink&reg; Gelly    | Yes    |
-| TriangleCounting              | G        | Operator wrapping TriangleCounting integrated in Flink&reg; Gelly             | Yes    |
-| DistinctVertexDegrees         | G        | Operator VertexDegrees calculation integrated in Flink&reg; Gelly             | Yes    |
-| PropertyExtraction            | G        | Extracts a property of a vertex to a new vertex                                    | Yes    |
-| ConnectNeighbors              | G        | Connects neighbors of a vertex with newly created edges                            | Yes    |
-| EdgeToVertex                  | G        | Converts an edge to a vertex                                                       | Yes    |
-
-#### Binary logical graph operators (two graphs as input):
-
-| Operator        | Output          | Output description                                                       | Impl   |
-| :-------------- | :-------------- | :----------------------------------------------------------------------- | :----: |
-| Combination     | G               | Graph with vertices and edges from both input graphs                     | Yes    |
-| Overlap         | G               | Graph with vertices and edges that exist in both input graphs            | Yes    |
-| Exclusion       | G               | Graph with vertices and edges that exist only in the first graph         | Yes    |
-| Equality        | {true, false}   | Compare graphs in terms of identity or equality of contained elements    | Yes    |
-| VertexFusion    | G               | The second graph is fused to a single vertex within the first graph      | Yes    |
-
-#### Unary graph collection operators (one collection as input):
-
-| Operator        | Output    | Output description                                                    | Impl   |
-| :-------------- | :-------- | :-------------------------------------------------------------------- | :----: |
-| Cypher          | GC        | Graphs that match a given Cypher graph pattern                        | Yes    |
-| Query           | GC        | Graphs that match a given Cypher-based GDL graph pattern              | Yes    |
-| Selection       | GC        | Filter graphs based on their attached data (i.e. label, properties)   | Yes    |
-| Distinct        | GC        | Collection with no duplicate graphs                                   | Yes    |
-| SortBy          | GC        | Collection sorted by values of a given property key                   | No     |
-| Limit           | GC        | The first n arbitrary elements of the input collection                | Yes    |
-
-#### Binary graph collection operators (two collections as input):
-
-| Operator        | Output          | Output description                                                           | Impl   |
-| :-------------- | :-------------- | :--------------------------------------------------------------------------- | :----: |
-| Union           | GC              | All graphs from both input collections                                       | Yes    |
-| Intersection    | GC              | Only graphs that exist in both collections                                   | Yes    |
-| Difference      | GC              | Only graphs that exist only in the first collection                          | Yes    |
-| Equality        | {true, false}   | Compare collections in terms of identity or equality of contained elements   | Yes    |
-
-#### Auxiliary operators:
-
-| Operator        | In     | Out    | Output description                                                        | Impl   |
-| :-------------- | :----- | :----- | :------------------------------------------------------------------------ | :----: |
-| Apply           | GC     | GC     | Applies unary operator (e.g. aggregate) on each graph in the collection   | Yes    |
-| Reduce          | GC     | G      | Reduces collection to single graph using binary operator (e.g. combine)   | Yes    |
-| Call            | GC/G   | GC/G   | Applies external algorithm on graph or graph collection                   | Yes    |
+An overview of the implemented operators can be found [here](https://github.com/dbs-leipzig/gradoop/wiki/List-of-Operators).
 
 ## Setup
 
