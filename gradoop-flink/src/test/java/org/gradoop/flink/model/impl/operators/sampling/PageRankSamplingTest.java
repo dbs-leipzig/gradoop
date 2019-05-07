@@ -15,21 +15,17 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
-import com.google.common.collect.Lists;
-import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
+import org.junit.Test;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -68,87 +64,68 @@ public class PageRankSamplingTest extends ParameterizedTestForGraphSampling {
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
 
-    try {
-      // test normal graph
-      GraphHead normalGh = output.getGraphHead().collect().get(0);
-      double minScore = normalGh.getPropertyValue(SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY)
-        .getDouble();
-      double maxScore = normalGh.getPropertyValue(SamplingConstants.MAX_PAGE_RANK_SCORE_PROPERTY_KEY)
-        .getDouble();
-      if (minScore != maxScore) {
-        for (Vertex v : newVertices) {
-          assertTrue("vertex does not have scaled PageRank-score property (should have):" +
-            v.toString(), v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY));
+    boolean allHaveScore = true;
+    boolean noneHasScore = true;
 
-          if (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
-            double score = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
-              .getDouble();
-            if (sampleGreaterThanThreshold) {
-              assertTrue("sampled vertex has PageRankScore smaller or equal than threshold",
-                score > sampleSize);
-            } else {
-              assertTrue("sampled vertex has PageRankScore greater than threshold",
-                score <= sampleSize);
-            }
-          }
-        }
+    for (Vertex v : newVertices) {
+      if (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
+        noneHasScore = false;
       } else {
-        if (keepVerticesIfSameScore) {
-          assertEquals("not all vertices got sampled (should be, all got same score)",
-            dbVertices.size(), newVertices.size());
-        } else {
-          assertTrue("some vertices got sampled (should NOT be, all got same score)",
-            newVertices.isEmpty());
-        }
+        allHaveScore = false;
       }
-      dbEdges.removeAll(newEdges);
-      for (Edge edge : dbEdges) {
-        assertFalse("edge from original graph was not sampled but source and target were",
-          newVertexIDs.contains(edge.getSourceId()) &&
-            newVertexIDs.contains(edge.getTargetId()));
-      }
-
-      // test special graph
-      LogicalGraph specialGraph = getLoaderFromString(
-        "(alice:Person {name : \"Alice\"})\n" +
-          "(eve:Person {name : \"Eve\"})\n" +
-          "g0:Community {interest : \"Friends\", vertexCount : 2} [\n" +
-          "(eve)-[eka:knows {since : 2013}]->(alice)\n" +
-          "(alice)-[ake:knows {since : 2013}]->(eve)]").getLogicalGraphByVariable("g0");
-
-      LogicalGraph sampledGraph = getSamplingOperator().sample(specialGraph);
-
-      List<Vertex> specialVertices = Lists.newArrayList();
-      List<Vertex> specialSampledVertices = Lists.newArrayList();
-
-      specialGraph.getVertices().output(new LocalCollectionOutputFormat<>(specialVertices));
-      sampledGraph.getVertices().output(new LocalCollectionOutputFormat<>(specialSampledVertices));
-
-      getExecutionEnvironment().execute();
-
-      assertNotNull("graph was null", sampledGraph);
-
-      GraphHead specialGh = sampledGraph.getGraphHead().collect().get(0);
-      double minScore1 = specialGh.getPropertyValue(
-        SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
-      double maxScore1 = specialGh.getPropertyValue(
-        SamplingConstants.MAX_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
-
-      assertEquals("min PageRankScore is not equal to max PageRankScore",
-        minScore1, maxScore1, 0.0);
-
-      if (keepVerticesIfSameScore) {
-        assertEquals(
-          "special: not all vertices got sampled (should be, all got same score)",
-          specialVertices.size(), specialSampledVertices.size());
-      } else {
-        assertTrue(
-          "special: some vertices got sampled (should NOT be, all got same score)",
-          specialSampledVertices.isEmpty());
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
     }
+
+    assertTrue("some vertices do and some do not have scaled PageRank-score property",
+      noneHasScore || allHaveScore);
+
+    if (newVertices.isEmpty()) {
+      // Result is empty, if input is empty
+      // OR all have the same score and keepVerticesIfSameScore = false
+      assertTrue("some vertices got sampled (should NOT be)",
+        dbVertices.isEmpty() || !keepVerticesIfSameScore);
+    } else if (allHaveScore) { // normal case
+      for (Vertex v : newVertices) {
+        double score = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
+          .getDouble();
+        if (sampleGreaterThanThreshold) {
+          assertTrue("sampled vertex has PageRankScore smaller or equal than threshold",
+            score > sampleSize);
+        } else {
+          assertTrue("sampled vertex has PageRankScore greater than threshold",
+            score <= sampleSize);
+        }
+      }
+    } else if (keepVerticesIfSameScore) { // and noneHasScore
+      assertEquals("not all vertices got sampled (should be, all got same score)",
+        dbVertices.size(), newVertices.size());
+    }
+    dbEdges.removeAll(newEdges);
+    for (Edge edge : dbEdges) {
+      assertFalse("edge from original graph was not sampled but source and target were",
+        newVertexIDs.contains(edge.getSourceId()) &&
+          newVertexIDs.contains(edge.getTargetId()));
+    }
+  }
+
+  /**
+   * Test special graph with the same page rank score for each vertex.
+   *
+   * @throws Exception on failure
+   */
+  @Test
+  public void testGraphWithSameScore() throws Exception {
+    // test special graph
+    LogicalGraph specialGraph = getLoaderFromString(
+      "(alice:Person {name : \"Alice\"})\n" +
+        "(eve:Person {name : \"Eve\"})\n" +
+        "g0:Community {interest : \"Friends\", vertexCount : 2} [\n" +
+        "(eve)-[eka:knows {since : 2013}]->(alice)\n" +
+        "(alice)-[ake:knows {since : 2013}]->(eve)]").getLogicalGraphByVariable("g0");
+
+    LogicalGraph sampledGraph = getSamplingOperator().sample(specialGraph);
+
+    validateGraph(specialGraph, sampledGraph);
+    validateSpecific(specialGraph, sampledGraph);
   }
 
   /**
