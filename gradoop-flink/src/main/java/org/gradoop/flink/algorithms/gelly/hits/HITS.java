@@ -111,7 +111,7 @@ public class HITS extends GradoopGellyAlgorithm<NullValue, NullValue> {
       .with(new HITSToAttributes(authorityPropertyKey, hubPropertyKey));
 
     return currentGraph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(newVertices, currentGraph.getEdges());
+      .fromDataSets(currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());
   }
 
 }
