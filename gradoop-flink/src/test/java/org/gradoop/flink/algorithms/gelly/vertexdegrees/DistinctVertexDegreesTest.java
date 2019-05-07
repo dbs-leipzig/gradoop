@@ -26,7 +26,7 @@ public class DistinctVertexDegreesTest extends GradoopFlinkTestBase {
   public void testByElementData() throws Exception {
 
     String graph =
-      "input[" +
+      "input:test[" +
         "(v0 {id:0})" +
         "(v1 {id:1})" +
         "(v2 {id:2})" +
@@ -37,7 +37,7 @@ public class DistinctVertexDegreesTest extends GradoopFlinkTestBase {
         "(v2)-[e3]->(v1)" +
         "(v3)-[e4]->(v2)" +
         "]" +
-        "result[" +
+        "result:test[" +
         "(v4 {id:0, degree:2L, inDegree:0L, outDegree:2L})" +
         "(v5 {id:1, degree:2L, inDegree:2L, outDegree:0L})" +
         "(v6 {id:2, degree:3L, inDegree:2L, outDegree:2L})" +
@@ -55,6 +55,6 @@ public class DistinctVertexDegreesTest extends GradoopFlinkTestBase {
       input.callForGraph(new DistinctVertexDegrees("degree", "inDegree", "outDegree", false));
     LogicalGraph expect = loader.getLogicalGraphByVariable("result");
 
-    collectAndAssertTrue(outputGraph.equalsByElementData(expect));
+    collectAndAssertTrue(outputGraph.equalsByData(expect));
   }
 }
