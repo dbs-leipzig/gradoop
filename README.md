@@ -200,8 +200,9 @@ is also contained in gradoop-common and together with its mapping to HBase&trade
 
 ### gradoop-data-integration
 
-This module contains graph importers (e.g from CSV files) and transformations on graphs (e.g
-conversion of edges to vertices and vice versa).
+Provides functionalities to support graph data integration.
+This includes minimal CSV and JSON importers as well as graph transformation operators
+(e.g. connect neighbors or conversion of edges to vertices and vice versa).
 
 ### gradoop-accumulo
 
