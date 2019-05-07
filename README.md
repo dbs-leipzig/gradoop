@@ -7,7 +7,7 @@
 ## Gradoop: Distributed Graph Analytics on Hadoop
 
 [Gradoop](http://www.gradoop.com) is an open source (ALv2) research framework for scalable 
-graph analytics built on top of [Apache Flink&trade;](http://flink.apache.org/). It offers a graph data model which 
+graph analytics built on top of [Apache Flink](http://flink.apache.org/). It offers a graph data model which 
 extends the widespread [property graph model](https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model) 
 by the concept of logical graphs and further provides operators that can be applied 
 on single logical graphs and collections of logical graphs. The combination of these 
@@ -205,11 +205,11 @@ conversion of edges to vertices and vice versa).
 
 ### gradoop-accumulo
 
-Input and output formats for reading and writing graph collections from [Apache Accumulo](https://accumulo.apache.org/).
+Input and output formats for reading and writing graph collections from [Apache Accumulo&reg;](https://accumulo.apache.org/).
 
 ### gradoop-hbase
 
-Input and output formats for reading and writing graph collections from [Apache HBase](https://hbase.apache.org/).
+Input and output formats for reading and writing graph collections from [Apache HBase&trade;](https://hbase.apache.org/).
 
 ### gradoop-flink
 
@@ -238,8 +238,8 @@ See the [Changelog](https://github.com/dbs-leipzig/gradoop/wiki/Changelog) at th
 
 ### Disclaimer
 
-Apache®, Apache Flink&trade;, Flink&trade;, Apache HBase&trade; and HBase&trade; 
-are either registered trademarks or trademarks of the Apache Software Foundation 
+Apache&reg;, Apache Accumulo&reg;, Apache Flink, Flink&trade;, Apache HBase&trade; and 
+HBase&trade; are either registered trademarks or trademarks of the Apache Software Foundation 
 in the United States and/or other countries.
 
 
