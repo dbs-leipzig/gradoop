@@ -7,16 +7,20 @@
 ## Gradoop: Distributed Graph Analytics on Hadoop
 
 [Gradoop](http://www.gradoop.com) is an open source (ALv2) research framework for scalable 
-graph analytics built on top of [Apache Flink&trade;](http://flink.apache.org/). It offers a graph data model which 
+graph analytics built on top of [Apache Flink](http://flink.apache.org/). It offers a graph data model which 
 extends the widespread [property graph model](https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model) 
 by the concept of logical graphs and further provides operators that can be applied 
 on single logical graphs and collections of logical graphs. The combination of these 
 operators allows the flexible, declarative definition of graph analytical workflows.
-Gradoop can be easily integrated in a workflow which already uses Flink&trade; operators
-and Flink&trade; libraries (i.e. Gelly, ML and Table).
+Gradoop can be easily integrated in a workflow which already uses Flink&reg; operators
+and Flink&reg; libraries (i.e. Gelly, ML and Table).
 
 Gradoop is **work in progress** which means APIs may change. It is currently used
 as a proof of concept implementation and far from production ready.
+
+The project's documentation can be found in our [Wiki](https://github.com/dbs-leipzig/gradoop/wiki). 
+The Wiki also contains a [tutorial](https://github.com/dbs-leipzig/gradoop/wiki/Getting-started) to 
+help getting started using Gradoop.
 
 ##### Further Information (articles and talks)
 
@@ -50,54 +54,7 @@ properties even if they have the same label.
 
 The EPGM provides operators for both single logical graphs as well as collections 
 of logical graphs; operators may also return single graphs or graph collections. 
-The following tables contains an overview (GC = Graph Collection, G = Logical Graph).
-
-#### Unary logical graph operators (one graph as input):
-
-| Operator      | Output | Output description                                           | Impl |
-|:--------------|:-------|:-------------------------------------------------------------|:----:|
-| Aggregation   | G      | Graph with result of an aggregate function as a new property | Yes  |
-| Matching      | GC     | Graphs that match a given graph pattern                      | Yes  |
-| Transformation| G      | Graph with transformed (graph, vertex, edge) data            | Yes  |
-| Grouping      | G      | Structural condense of the input graph                       | Yes  |
-| Subgraph      | G      | Subgraph that fulfils given vertex and edge predicates       | Yes  |
-
-#### Binary logical graph operators (two graphs as input):
-
-| Operator      | Output        | Output description                                                     | Impl |
-|:--------------|:--------------|:-----------------------------------------------------------------------|:----:|
-| Combination   | G             | Graph with vertices and edges from both input graphs                   | Yes  |
-| Overlap       | G             | Graph with vertices and edges that exist in both input graphs          | Yes  |
-| Exclusion     | G             | Graph with vertices and edges that exist only in the first graph       | Yes  |
-| Equality      | {true, false} | Compare graphs in terms of identity or equality of contained elements  | Yes  |
-| VertexFusion  | G             | The second graph is fused to a single vertex within the first graph    | Yes  |
-
-#### Unary graph collection operators (one collection as input):
-
-| Operator      | Output  | Output description                                                  | Impl |
-|:--------------|:--------|:--------------------------------------------------------------------|:----:|
-| Matching      | GC      | Graphs that match a given graph pattern                             | Yes  |
-| Selection     | GC      | Filter graphs based on their attached data (i.e. label, properties) | Yes  |
-| Distinct      | GC      | Collection with no duplicate graphs                                 | Yes  |
-| SortBy        | GC      | Collection sorted by values of a given property key                 | No   |
-| Limit         | GC      | The first n arbitrary elements of the input collection              | Yes  |
-
-#### Binary graph collection operators (two collections as input):
-
-| Operator      | Output        | Output description                                                         | Impl |
-|:--------------|:--------------|:---------------------------------------------------------------------------|:----:|
-| Union         | GC            | All graphs from both input collections                                     | Yes  |
-| Intersection  | GC            | Only graphs that exist in both collections                                 | Yes  |
-| Difference    | GC            | Only graphs that exist only in the first collection                        | Yes  |
-| Equality      | {true, false} | Compare collections in terms of identity or equality of contained elements | Yes  |
-
-#### Auxiliary operators:
-
-| Operator      | In   | Out  | Output description                                                      | Impl |
-|:--------------|:-----|:-----|:------------------------------------------------------------------------|:----:|
-| Apply         | GC   | GC   | Applies unary operator (e.g. aggregate) on each graph in the collection | Yes  |
-| Reduce        | GC   | G    | Reduces collection to single graph using binary operator (e.g. combine) | Yes  |
-| Call          | GC/G | GC/G | Applies external algorithm on graph or graph collection                 | Yes  |
+An overview and detailed descriptions of the implemented operators can be found in the [Gradoop Wiki](https://github.com/dbs-leipzig/gradoop/wiki/List-of-Operators).
 
 ## Setup
 
@@ -107,7 +64,7 @@ The following tables contains an overview (GC = Graph Collection, G = Logical Gr
 
 Stable:
 
-```
+```xml
 <dependency>
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-flink</artifactId>
@@ -116,7 +73,7 @@ Stable:
 ```
 
 Latest nightly build (additional repository is required):
-```
+```xml
 <repositories>
     <repository>
         <id>oss.sonatype.org-snapshot</id>
@@ -126,7 +83,8 @@ Latest nightly build (additional repository is required):
     </repository>
 </repositories>
 ```
-```
+
+```xml
 <dependency>
     <groupId>org.gradoop</groupId>
     <artifactId>gradoop-flink</artifactId>
@@ -135,7 +93,7 @@ Latest nightly build (additional repository is required):
 
 ```
 In any case you also need Apache Flink (version 1.7.2):
-```
+```xml
 <dependency>
     <groupId>org.apache.flink</groupId>
     <artifactId>flink-java</artifactId>
@@ -166,21 +124,27 @@ In any case you also need Apache Flink (version 1.7.2):
 ### gradoop-common
 
 The main contents of that module are the EPGM data model and a corresponding POJO 
-implementation which is used in Flink&trade;. The persistent representation of the EPGM
+implementation which is used in Flink&reg;. The persistent representation of the EPGM
 is also contained in gradoop-common and together with its mapping to HBase&trade;.
+
+### gradoop-data-integration
+
+Provides functionalities to support graph data integration.
+This includes minimal CSV and JSON importers as well as graph transformation operators
+(e.g. connect neighbors or conversion of edges to vertices and vice versa).
 
 ### gradoop-accumulo
 
-Input and output formats for reading and writing graph collections from [Apache Accumulo](https://accumulo.apache.org/).
+Input and output formats for reading and writing graph collections from [Apache Accumulo&reg;](https://accumulo.apache.org/).
 
 ### gradoop-hbase
 
-Input and output formats for reading and writing graph collections from [Apache HBase](https://hbase.apache.org/).
+Input and output formats for reading and writing graph collections from [Apache HBase&trade;](https://hbase.apache.org/).
 
 ### gradoop-flink
 
 This module contains reference implementations of the EPGM operators. The 
-EPGM is mapped to Flink&trade; DataSets while the operators are implemented
+EPGM is mapped to Flink&reg; DataSets while the operators are implemented
 using DataSet transformations. The module also contains implementations of 
 general graph algorithms (e.g. Label Propagation, Frequent Subgraph Mining)
 adapted to be used with the EPGM model.
@@ -204,8 +168,8 @@ See the [Changelog](https://github.com/dbs-leipzig/gradoop/wiki/Changelog) at th
 
 ### Disclaimer
 
-Apache®, Apache Flink&trade;, Flink&trade;, Apache HBase&trade; and HBase&trade; 
-are either registered trademarks or trademarks of the Apache Software Foundation 
+Apache&reg;, Apache Accumulo&reg;, Apache Flink, Flink&reg;, Apache HBase&trade; and 
+HBase&trade; are either registered trademarks or trademarks of the Apache Software Foundation 
 in the United States and/or other countries.
 
 
