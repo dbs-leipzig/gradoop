@@ -98,6 +98,14 @@
         </developer>
     </developers>
 
+    <contributors>
+        <contributor>
+            <name>Philip Fritzsche</name>
+            <organization>University of Leipzig</organization>
+            <timezone>+1</timezone>
+        </contributor>
+    </contributors>
+
     <scm>
         <url>http://github.com/dbs-leipzig/gradoop.git</url>
         <connection>scm:git:git@github.com:dbs-leipzig/gradoop.git</connection>
@@ -105,6 +113,16 @@
             scm:git:dbs-leipzig@github.com/dbs-leipzig/gradoop.git
         </developerConnection>
     </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/dbs-leipzig/gradoop/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>Travis CI</system>
+        <url>https://travis-ci.org/dbs-leipzig/gradoop/</url>
+    </ciManagement>
 
     <repositories>
         <repository>
@@ -115,6 +133,10 @@
     </repositories>
 
     <distributionManagement>
+        <site>
+            <id>site_gradoop</id>
+            <url>${maven.site.url}</url>
+        </site>
         <snapshotRepository>
             <id>release_artifacts_gradoop</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -166,6 +188,8 @@
         <plugin.maven-site.version>3.7.1</plugin.maven-site.version>
         <plugin.maven-scm-publish.version>1.1</plugin.maven-scm-publish.version>
         <plugin.maven-jacoco.version>0.8.1</plugin.maven-jacoco.version>
+
+        <maven.site.url>http://localhost/gradoop/site</maven.site.url>
     </properties>
 
     <profiles>
@@ -296,43 +320,14 @@
         </profile>
         <profile>
             <id>javadoc</id>
+            <properties>
+                <maven.site.url>https://dbs-leipzig.github.io/gradoop/</maven.site.url>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>${plugin.maven-javadoc.version}</version>
-                        <configuration>
-                            <quiet>true</quiet>
-                            <doclint>none</doclint>
-                            <detectOfflineLinks>false</detectOfflineLinks>
-                            <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
-                            <reportOutputDirectory>${project.build.directory}</reportOutputDirectory>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>javadoc</id>
-                                <goals>
-                                    <goal>javadoc</goal>
-                                </goals>
-                                <phase>site</phase>
-                            </execution>
-                            <execution>
-                                <id>aggregate</id>
-                                <goals>
-                                    <goal>aggregate</goal>
-                                </goals>
-                                <phase>site</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <artifactId>maven-site-plugin</artifactId>
-                        <version>${plugin.maven-site.version}</version>
-                        <configuration>
-                            <skip>true</skip>
-                            <skipDeploy>true</skipDeploy>
-                        </configuration>
                     </plugin>
                     <plugin>
                         <artifactId>maven-scm-publish-plugin</artifactId>
@@ -342,8 +337,8 @@
                             <serverId>github</serverId>
                             <pubScmUrl>scm:git:https://github.com/dbs-leipzig/gradoop.git</pubScmUrl>
                             <scmBranch>gh-pages</scmBranch>
-                            <checkinComment>Updated JavaDocs via Maven</checkinComment>
-                            <content>${project.build.directory}/apidocs</content>
+                            <checkinComment>Updated Site via Maven</checkinComment>
+                            <content>${project.build.directory}/staging</content>
                             <siteOutputEncoding>UTF-8</siteOutputEncoding>
                             <tryUpdate>true</tryUpdate>
                         </configuration>
@@ -352,7 +347,7 @@
                                 <goals>
                                     <goal>publish-scm</goal>
                                 </goals>
-                                <phase>site</phase>
+                                <phase>site-deploy</phase>
                             </execution>
                         </executions>
                     </plugin>
@@ -517,10 +512,93 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>${plugin.maven-site.version}</version>
+                    <configuration>
+                        <skipDeploy>true</skipDeploy>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
 
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${plugin.maven-checkstyle.version}</version>
+                <configuration>
+                    <configLocation>gradoop/checkstyle.xml</configLocation>
+                    <headerLocation>gradoop/LICENSE.txt</headerLocation>
+                    <includeResources>false</includeResources>
+                    <includeTestResources>false</includeTestResources>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <suppressionsLocation>
+                        /gradoop/checkstyle-suppressions.xml
+                    </suppressionsLocation>
+                    <suppressionsFileExpression>
+                        checkstyle.suppressions.file
+                    </suppressionsFileExpression>
+                    <failsOnError>false</failsOnError>
+                    <consoleOutput>false</consoleOutput>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${plugin.maven-javadoc.version}</version>
+                <configuration>
+                    <doclint>none</doclint>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${plugin.maven-surefire.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${plugin.maven-jacoco.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <reports>
+                            <report>report-aggregate</report>
+                        </reports>
+                        <inherited>false</inherited>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${plugin.maven-spotbugs.version}</version>
+                <configuration>
+                    <xmlOutput>true</xmlOutput>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 
     <dependencyManagement>
         <dependencies>
