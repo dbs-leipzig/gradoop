@@ -223,7 +223,7 @@ public abstract class ParameterizedTestForGraphSampling extends GradoopFlinkTest
    * @param input The input graph
    * @param output The sampled graph
    */
-  private void validateGraph(LogicalGraph input, LogicalGraph output) throws Exception {
+  void validateGraph(LogicalGraph input, LogicalGraph output) throws Exception {
     dbVertices = Lists.newArrayList();
     dbEdges = Lists.newArrayList();
     newVertices = Lists.newArrayList();

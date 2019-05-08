@@ -23,7 +23,7 @@ import org.junit.Test;
 public class GradoopLabelPropagationTest extends GradoopFlinkTestBase {
   @Test
   public void testByElementData() throws Exception {
-    String graph = "input[" +
+    String graph = "input:test[" +
       "/* first community */" +
       "(v0 {id:0, value:\"A\"})" +
       "(v1 {id:1, value:\"A\"})" +
@@ -50,7 +50,7 @@ public class GradoopLabelPropagationTest extends GradoopFlinkTestBase {
       "(v6)-[e14]->(v4)" +
       "(v6)-[e15]->(v5)" +
       "]" +
-      "result[" +
+      "result:test[" +
       "(v7 {id:0, value:\"A\"})" +
       "(v8 {id:1, value:\"A\"})" +
       "(v9 {id:2, value:\"A\"})" +
@@ -81,7 +81,7 @@ public class GradoopLabelPropagationTest extends GradoopFlinkTestBase {
     LogicalGraph outputGraph = loader.getLogicalGraphByVariable("input")
       .callForGraph(new GradoopLabelPropagation(10, "value"));
 
-    collectAndAssertTrue(outputGraph.equalsByElementData(
+    collectAndAssertTrue(outputGraph.equalsByData(
       loader.getLogicalGraphByVariable("result")));
   }
 

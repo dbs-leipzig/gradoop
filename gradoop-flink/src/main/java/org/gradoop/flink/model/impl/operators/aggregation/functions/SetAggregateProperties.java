@@ -18,16 +18,15 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Sets aggregate values of graph heads.
@@ -41,18 +40,22 @@ public class SetAggregateProperties implements
   private final Map<String, PropertyValue> defaultValues;
 
   /**
+   * Aggregate functions from the aggregation step.
+   */
+  private final Set<AggregateFunction> aggregateFunctions;
+
+  /**
    * Creates a new instance of a SetAggregateProperties coGroup function.
    *
    * @param aggregateFunctions aggregate functions
    */
   public SetAggregateProperties(final Set<AggregateFunction> aggregateFunctions) {
-    for (AggregateFunction func : aggregateFunctions) {
-      checkNotNull(func);
-    }
 
     defaultValues = new HashMap<>();
+    this.aggregateFunctions = Objects.requireNonNull(aggregateFunctions);
 
     for (AggregateFunction func : aggregateFunctions) {
+      Objects.requireNonNull(func);
       defaultValues.put(func.getAggregatePropertyKey(), AggregateUtil.getDefaultAggregate(func));
     }
   }
@@ -64,7 +67,13 @@ public class SetAggregateProperties implements
     for (GraphHead leftElem : left) {
       boolean rightEmpty = true;
       for (Tuple2<GradoopId, Map<String, PropertyValue>> rightElem : right) {
-        rightElem.f1.forEach(leftElem::setProperty);
+        Map<String, PropertyValue> values = rightElem.f1;
+        // Apply post-aggregation step.
+        for (AggregateFunction function : aggregateFunctions) {
+          values.computeIfPresent(function.getAggregatePropertyKey(),
+            (k, v) -> function.postAggregate(v));
+        }
+        values.forEach(leftElem::setProperty);
         out.collect(leftElem);
         rightEmpty = false;
       }
