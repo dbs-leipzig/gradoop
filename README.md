@@ -54,7 +54,7 @@ properties even if they have the same label.
 
 The EPGM provides operators for both single logical graphs as well as collections 
 of logical graphs; operators may also return single graphs or graph collections. 
-An overview of the implemented operators can be found [here](https://github.com/dbs-leipzig/gradoop/wiki/List-of-Operators).
+An overview and detailed descriptions of the implemented operators can be found in the [Gradoop Wiki](https://github.com/dbs-leipzig/gradoop/wiki/List-of-Operators).
 
 ## Setup
 
