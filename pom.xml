@@ -639,6 +639,10 @@
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-nop</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.mockito</groupId>
+                        <artifactId>mockito-all</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
 
