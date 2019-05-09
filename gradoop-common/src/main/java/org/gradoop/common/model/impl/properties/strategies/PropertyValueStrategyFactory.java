@@ -16,9 +16,10 @@
 package org.gradoop.common.model.impl.properties.strategies;
 
 import org.gradoop.common.exceptions.UnsupportedTypeException;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -116,7 +117,7 @@ public class PropertyValueStrategyFactory {
         throw new RuntimeException("Error while serializing object.", e);
       }
     }
-    return new byte[] {PropertyValue.TYPE_NULL};
+    return new byte[] {Type.NULL.getTypeByte()};
   }
 
   /**

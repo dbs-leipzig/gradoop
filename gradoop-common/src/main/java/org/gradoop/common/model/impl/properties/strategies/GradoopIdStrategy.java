@@ -19,6 +19,8 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
+
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -69,7 +71,7 @@ public class GradoopIdStrategy extends AbstractFixSizedPropertyValueStrategy<Gra
 
   @Override
   public byte getRawType() {
-    return PropertyValue.TYPE_GRADOOP_ID;
+    return Type.GRADOOP_ID.getTypeByte();
   }
 
   @Override

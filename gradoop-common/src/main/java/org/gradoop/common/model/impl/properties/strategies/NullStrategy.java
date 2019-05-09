@@ -18,7 +18,7 @@ package org.gradoop.common.model.impl.properties.strategies;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
-import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 
 import java.io.IOException;
 
@@ -62,7 +62,7 @@ public class NullStrategy implements PropertyValueStrategy {
 
   @Override
   public byte getRawType() {
-    return PropertyValue.TYPE_NULL;
+    return Type.NULL.getTypeByte();
   }
 
   @Override
