@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RegionSplitter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop HBase</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.utils</a> &gt; <span class="el_source">RegionSplitter.java</span></div><h1>RegionSplitter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.utils;
+
+/**
+ * Singleton helper class providing functions for pre-splitting of hbase regions.
+ */
+public class RegionSplitter {
+
+  /**
+   * Default number of regions
+   */
+  private static final int DEFAULT_REGIONS = 64;
+
+  /**
+   * Singleton instance
+   */
+<span class="fc" id="L31">  private static RegionSplitter INSTANCE = null;</span>
+
+  /**
+   * Number of regions, default {@link RegionSplitter#DEFAULT_REGIONS}
+   */
+  private int numberOfRegions;
+
+  /**
+   * The first key of the regions
+   */
+  private byte[] startKey;
+
+  /**
+   * The last key of the regions
+   */
+  private byte[] endKey;
+
+  /**
+   * Creates an instance of this singleton with setting the number of regions to the default
+   * value {@link RegionSplitter#DEFAULT_REGIONS}.
+   */
+<span class="fc" id="L52">  private RegionSplitter() {</span>
+<span class="fc" id="L53">    this.numberOfRegions = DEFAULT_REGIONS;</span>
+<span class="fc" id="L54">  }</span>
+
+  /**
+   * Static function to return the instance of this RegionSplitter.
+   *
+   * @return the instance of this singleton
+   */
+  public static RegionSplitter getInstance() {
+<span class="fc bfc" id="L62" title="All 2 branches covered.">    if (INSTANCE == null) {</span>
+<span class="fc" id="L63">      INSTANCE = new RegionSplitter();</span>
+    }
+<span class="fc" id="L65">    return INSTANCE;</span>
+  }
+
+  /**
+   * Returns the start key of the row key range, i.e., 13 Bytes initialized with '0'.
+   *
+   * @return the start key of the row key range
+   */
+  public byte[] getStartKey() {
+<span class="fc bfc" id="L74" title="All 2 branches covered.">    if (startKey == null) {</span>
+<span class="fc" id="L75">      startKey = new byte[13];</span>
+    }
+<span class="fc" id="L77">    return startKey.clone();</span>
+  }
+
+  /**
+   * Returns the end key of the row key range, i.e., 13 Bytes where position 0 is initialized
+   * with the number of regions and positions 1 - 12 are initialized with '1'.
+   *
+   * @return the start key of the row key range
+   */
+  public byte[] getEndKey() {
+<span class="fc bfc" id="L87" title="All 2 branches covered.">    if (endKey == null) {</span>
+<span class="fc" id="L88">      endKey = new byte[13];</span>
+
+<span class="fc" id="L90">      endKey[0] = (byte) numberOfRegions;</span>
+
+<span class="fc bfc" id="L92" title="All 2 branches covered.">      for (int i = 1; i &lt; 13; i++) {</span>
+<span class="fc" id="L93">        endKey[i] = Byte.MAX_VALUE;</span>
+      }
+    }
+<span class="fc" id="L96">    return endKey.clone();</span>
+  }
+
+  /**
+   * Get the number of regions.
+   *
+   * @return the number of regions
+   */
+  public int getNumberOfRegions() {
+<span class="fc" id="L105">    return numberOfRegions;</span>
+  }
+
+  /**
+   * Set the number of regions. The default value is {@link RegionSplitter#DEFAULT_REGIONS}.
+   *
+   * @param numberOfRegions the number of regions to use
+   */
+  public void setNumberOfRegions(int numberOfRegions) {
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">    if (numberOfRegions &lt;= 0) {</span>
+<span class="nc" id="L115">      throw new IllegalArgumentException(&quot;The number of regions has to be a positive integer.&quot;);</span>
+    }
+<span class="fc" id="L117">    this.numberOfRegions = numberOfRegions;</span>
+<span class="fc" id="L118">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropertySelectorComparable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables</a> &gt; <span class="el_source">PropertySelectorComparable.java</span></div><h1>PropertySelectorComparable.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables;
+
+import com.google.common.collect.Sets;
+import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.s1ck.gdl.model.comparables.PropertySelector;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Wraps a {@link PropertySelector}
+ */
+public class PropertySelectorComparable extends QueryComparable {
+  /**
+   * Holds the wrapped property selector
+   */
+  private final PropertySelector propertySelector;
+
+  /**
+   * Creates a new wrapper
+   * @param propertySelector the wrapped property selector
+   */
+<span class="fc" id="L42">  public PropertySelectorComparable(PropertySelector propertySelector) {</span>
+<span class="fc" id="L43">    this.propertySelector = propertySelector;</span>
+<span class="fc" id="L44">  }</span>
+
+  /**
+   * Returns the query variable of the property selector.
+   *
+   * @return query variable
+   */
+  public String getVariable() {
+<span class="fc" id="L52">    return this.propertySelector.getVariable();</span>
+  }
+
+  /**
+   * Returns the property key of the property selector.
+   *
+   * @return property key
+   */
+  public String getPropertyKey() {
+<span class="fc" id="L61">    return this.propertySelector.getPropertyName();</span>
+  }
+
+  /**
+   * Returns the specified property as property value
+   *
+   * @param embedding the embedding holding the data
+   * @param metaData meta data describing the embedding
+   * @return the property value
+   */
+  @Override
+  public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
+<span class="fc" id="L73">    int propertyColumn = metaData</span>
+<span class="fc" id="L74">      .getPropertyColumn(propertySelector.getVariable(), propertySelector.getPropertyName());</span>
+
+<span class="fc" id="L76">    return embedding.getProperty(propertyColumn);</span>
+  }
+
+  @Override
+  public PropertyValue evaluate(GraphElement element) {
+<span class="fc bfc" id="L81" title="All 2 branches covered.">    if (propertySelector.getPropertyName().equals(&quot;__label__&quot;)) {</span>
+<span class="fc" id="L82">      return PropertyValue.create(element.getLabel());</span>
+    }
+
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    return element.hasProperty(propertySelector.getPropertyName()) ? element.getPropertyValue</span>
+<span class="fc" id="L86">      (propertySelector.getPropertyName()) : PropertyValue.NULL_VALUE;</span>
+  }
+
+  @Override
+  public Set&lt;String&gt; getPropertyKeys(String variable) {
+<span class="fc bfc" id="L91" title="All 2 branches covered.">    return variable.equals(propertySelector.getVariable()) ?</span>
+<span class="fc" id="L92">      Sets.newHashSet(propertySelector.getPropertyName()) : new HashSet&lt;&gt;(0);</span>
+  }
+
+  @Override
+  public boolean equals(Object o) {
+<span class="nc bnc" id="L97" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L98">      return true;</span>
+    }
+<span class="nc bnc" id="L100" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L101">      return false;</span>
+    }
+
+<span class="nc" id="L104">    PropertySelectorComparable that = (PropertySelectorComparable) o;</span>
+
+<span class="nc bnc" id="L106" title="All 2 branches missed.">    return propertySelector != null ?</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">      propertySelector.equals(that.propertySelector) :</span>
+      that.propertySelector == null;
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc bnc" id="L113" title="All 2 branches missed.">    return propertySelector != null ? propertySelector.hashCode() : 0;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

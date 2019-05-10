@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DualSimulation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.simulation.dual</a> &gt; <span class="el_source">DualSimulation.java</span></div><h1>DualSimulation.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.DeltaIteration;
+import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.log4j.Logger;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
+import org.gradoop.flink.model.impl.functions.utils.RightSide;
+import org.gradoop.flink.model.impl.operators.matching.common.PostProcessor;
+import org.gradoop.flink.model.impl.operators.matching.common.PreProcessor;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug.PrintDeletion;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug.PrintFatVertex;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.debug.PrintMessage;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.BuildFatVertex;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.CloneAndReverse;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.CombinedMessages;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.GroupedFatVertices;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.GroupedMessages;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.UpdateVertexState;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.UpdatedFatVertices;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.ValidFatVertices;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.ValidateNeighborhood;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Deletion;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Message;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
+
+/**
+ * Vertex-centric Dual-Simulation.
+ */
+public class DualSimulation extends PatternMatching {
+
+  /**
+   * Logger
+   */
+<span class="fc" id="L64">  private static Logger LOG = Logger.getLogger(DualSimulation.class);</span>
+
+  /**
+   * If true, the algorithm uses bulk iteration for the core iteration.
+   * Otherwise it uses delta iteration.
+   */
+  private final boolean useBulkIteration;
+
+  /**
+   * Creates a new operator instance.
+   *
+   * @param query       GDL based query
+   * @param attachData  attach original data to resulting vertices/edges
+   * @param useBulk     true to use bulk, false to use delta iteration
+   */
+  public DualSimulation(String query, boolean attachData, boolean useBulk) {
+<span class="fc" id="L80">    super(query, attachData, LOG);</span>
+<span class="fc" id="L81">    this.useBulkIteration = useBulk;</span>
+<span class="fc" id="L82">  }</span>
+
+  @Override
+  protected GraphCollection executeForVertex(
+    LogicalGraph graph)  {
+<span class="fc" id="L87">    DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; matchingVertexIds = PreProcessor</span>
+<span class="fc" id="L88">      .filterVertices(graph, getQuery())</span>
+<span class="fc" id="L89">      .project(0);</span>
+
+<span class="fc" id="L91">    LogicalGraphFactory graphFactory = graph.getConfig()</span>
+<span class="fc" id="L92">      .getLogicalGraphFactory();</span>
+<span class="fc" id="L93">    GraphCollectionFactory collectionFactory = graph.getConfig()</span>
+<span class="fc" id="L94">      .getGraphCollectionFactory();</span>
+
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    if (doAttachData()) {</span>
+<span class="fc" id="L97">      return collectionFactory.fromGraph(</span>
+<span class="fc" id="L98">        graphFactory.fromDataSets(matchingVertexIds</span>
+<span class="fc" id="L99">            .join(graph.getVertices())</span>
+<span class="fc" id="L100">            .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L101">            .with(new RightSide&lt;&gt;())));</span>
+    } else {
+<span class="fc" id="L103">      return collectionFactory.fromGraph(</span>
+<span class="fc" id="L104">        graphFactory.fromDataSets(matchingVertexIds</span>
+<span class="fc" id="L105">            .map(new VertexFromId(graph.getConfig().getVertexFactory()))));</span>
+    }
+  }
+
+  /**
+   * Performs dual simulation based on the given query.
+   *
+   * @param graph data graph
+   * @return match graph
+   */
+  protected GraphCollection executeForPattern(
+    LogicalGraph graph) {
+    //--------------------------------------------------------------------------
+    // Pre-processing (filter candidates + build initial working set)
+    //--------------------------------------------------------------------------
+
+<span class="fc" id="L121">    DataSet&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; triples = filterTriples(graph);</span>
+<span class="fc" id="L122">    DataSet&lt;FatVertex&gt; fatVertices = buildInitialWorkingSet(triples);</span>
+
+    //--------------------------------------------------------------------------
+    // Dual Simulation
+    //--------------------------------------------------------------------------
+
+<span class="fc bfc" id="L128" title="All 2 branches covered.">    DataSet&lt;FatVertex&gt; result = useBulkIteration ?</span>
+<span class="fc" id="L129">      simulateBulk(fatVertices) : simulateDelta(fatVertices);</span>
+
+    //--------------------------------------------------------------------------
+    // Post-processing (build maximum match graph)
+    //--------------------------------------------------------------------------
+
+<span class="fc" id="L135">    return postProcess(graph, result);</span>
+  }
+
+  /**
+   * Extracts valid triples from the input graph based on the query.
+   *
+   * @param g input graph
+   * @return triples that have a match in the query graph
+   */
+  private DataSet&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; filterTriples(
+    LogicalGraph g) {
+    // filter vertex-edge-vertex triples by query predicates
+<span class="fc" id="L147">    return PreProcessor.filterTriplets(g, getQuery());</span>
+  }
+
+  /**
+   * Prepares the initial working set for the bulk iteration.
+   *
+   * @param triples matching triples from the input graph
+   * @return data set containing fat vertices
+   */
+  private DataSet&lt;FatVertex&gt; buildInitialWorkingSet(
+    DataSet&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; triples) {
+<span class="fc" id="L158">    return triples.flatMap(new CloneAndReverse())</span>
+<span class="fc" id="L159">      .groupBy(1) // sourceId</span>
+<span class="fc" id="L160">      .combineGroup(new BuildFatVertex(getQuery()))</span>
+<span class="fc" id="L161">      .groupBy(0) // vertexId</span>
+<span class="fc" id="L162">      .reduceGroup(new GroupedFatVertices());</span>
+  }
+
+  /**
+   * Performs dual simulation using bulk iteration.
+   *
+   * @param vertices fat vertices
+   * @return remaining fat vertices after dual simulation
+   */
+  private DataSet&lt;FatVertex&gt; simulateBulk(DataSet&lt;FatVertex&gt; vertices) {
+
+<span class="fc" id="L173">    vertices = log(vertices, new PrintFatVertex(false, &quot;iteration start&quot;),</span>
+<span class="fc" id="L174">      getVertexMapping(), getEdgeMapping());</span>
+
+    // ITERATION HEAD
+<span class="fc" id="L177">    IterativeDataSet&lt;FatVertex&gt; workSet = vertices.iterate(Integer.MAX_VALUE);</span>
+
+    // ITERATION BODY
+
+    // validate neighborhood of each vertex and create deletions
+<span class="fc" id="L182">    DataSet&lt;Deletion&gt; deletions = workSet</span>
+<span class="fc" id="L183">      .filter(new UpdatedFatVertices())</span>
+<span class="fc" id="L184">      .flatMap(new ValidateNeighborhood(getQuery()));</span>
+
+<span class="fc" id="L186">    deletions = log(deletions, new PrintDeletion(true, &quot;deletion&quot;),</span>
+<span class="fc" id="L187">      getVertexMapping(), getEdgeMapping());</span>
+
+    // combine deletions to message
+<span class="fc" id="L190">    DataSet&lt;Message&gt; combinedMessages = deletions</span>
+<span class="fc" id="L191">      .groupBy(0)</span>
+<span class="fc" id="L192">      .combineGroup(new CombinedMessages());</span>
+
+<span class="fc" id="L194">    combinedMessages = log(combinedMessages, new PrintMessage(true, &quot;combined&quot;),</span>
+<span class="fc" id="L195">      getVertexMapping(), getEdgeMapping());</span>
+
+    // group messages to final message
+<span class="fc" id="L198">    DataSet&lt;Message&gt; messages = combinedMessages</span>
+<span class="fc" id="L199">      .groupBy(0)</span>
+<span class="fc" id="L200">      .reduceGroup(new GroupedMessages());</span>
+
+<span class="fc" id="L202">    messages = log(messages, new PrintMessage(true, &quot;grouped&quot;),</span>
+<span class="fc" id="L203">      getVertexMapping(), getEdgeMapping());</span>
+
+    // update candidates and build next working set
+<span class="fc" id="L206">    DataSet&lt;FatVertex&gt; nextWorkingSet = workSet</span>
+<span class="fc" id="L207">      .leftOuterJoin(messages)</span>
+<span class="fc" id="L208">      .where(0).equalTo(0) // vertexId == recipientId</span>
+<span class="fc" id="L209">      .with(new UpdateVertexState(getQuery()))</span>
+<span class="fc" id="L210">      .filter(new ValidFatVertices());</span>
+
+<span class="fc" id="L212">    nextWorkingSet = log(nextWorkingSet,</span>
+      new PrintFatVertex(true, &quot;next workset&quot;),
+<span class="fc" id="L214">      getVertexMapping(), getEdgeMapping());</span>
+
+    // ITERATION FOOTER
+<span class="fc" id="L217">    return workSet.closeWith(nextWorkingSet, deletions);</span>
+  }
+
+  /**
+   * Performs dual simulation using delta iteration.
+   *
+   * @param vertices fat vertices
+   * @return remaining fat vertices after dual simulation
+   */
+  private DataSet&lt;FatVertex&gt; simulateDelta(DataSet&lt;FatVertex&gt; vertices) {
+    // prepare initial working set
+<span class="fc" id="L228">    DataSet&lt;Message&gt; initialWorkingSet = vertices</span>
+<span class="fc" id="L229">      .flatMap(new ValidateNeighborhood(getQuery()))</span>
+<span class="fc" id="L230">      .groupBy(0)</span>
+<span class="fc" id="L231">      .combineGroup(new CombinedMessages())</span>
+<span class="fc" id="L232">      .groupBy(0)</span>
+<span class="fc" id="L233">      .reduceGroup(new GroupedMessages());</span>
+
+<span class="fc" id="L235">    vertices = log(vertices, new PrintFatVertex(false, &quot;initial solution set&quot;),</span>
+<span class="fc" id="L236">      getVertexMapping(), getEdgeMapping());</span>
+
+<span class="fc" id="L238">    initialWorkingSet = log(initialWorkingSet,</span>
+      new PrintMessage(false, &quot;initial working set&quot;),
+<span class="fc" id="L240">      getVertexMapping(), getEdgeMapping());</span>
+
+    // ITERATION HEAD
+<span class="fc" id="L243">    DeltaIteration&lt;FatVertex, Message&gt; iteration = vertices</span>
+<span class="fc" id="L244">      .iterateDelta(initialWorkingSet, Integer.MAX_VALUE, 0);</span>
+
+    // ITERATION BODY
+
+    // get updated vertices
+<span class="fc" id="L249">    DataSet&lt;FatVertex&gt; deltas = iteration.getSolutionSet()</span>
+<span class="fc" id="L250">      .join(iteration.getWorkset())</span>
+<span class="fc" id="L251">      .where(0).equalTo(0)</span>
+<span class="fc" id="L252">      .with(new UpdateVertexState(getQuery()));</span>
+
+<span class="fc" id="L254">    deltas = log(deltas, new PrintFatVertex(true, &quot;solution set delta&quot;),</span>
+<span class="fc" id="L255">      getVertexMapping(), getEdgeMapping());</span>
+
+    // prepare new messages for the next round from updates
+<span class="fc" id="L258">    DataSet&lt;Message&gt; updates = deltas</span>
+<span class="fc" id="L259">      .filter(new ValidFatVertices())</span>
+<span class="fc" id="L260">      .flatMap(new ValidateNeighborhood(getQuery()))</span>
+<span class="fc" id="L261">      .groupBy(0)</span>
+<span class="fc" id="L262">      .combineGroup(new CombinedMessages())</span>
+<span class="fc" id="L263">      .groupBy(0)</span>
+<span class="fc" id="L264">      .reduceGroup(new GroupedMessages());</span>
+
+<span class="fc" id="L266">    updates = log(updates, new PrintMessage(true, &quot;next working set&quot;),</span>
+<span class="fc" id="L267">      getVertexMapping(), getEdgeMapping());</span>
+
+    // ITERATION FOOTER
+    // filter vertices with no candidates after iteration
+<span class="fc" id="L271">    return iteration.closeWith(deltas, updates).filter(new ValidFatVertices());</span>
+  }
+
+  /**
+   * Extracts vertices and edges from the query result and constructs a
+   * maximum match graph.
+   *
+   * @param graph    input graph
+   * @param vertices valid vertices after simulation
+   * @return maximum match graph
+   */
+  private GraphCollection postProcess(LogicalGraph graph,
+    DataSet&lt;FatVertex&gt; vertices) {
+<span class="fc" id="L284">    GradoopFlinkConfig config = graph.getConfig();</span>
+
+<span class="fc bfc" id="L286" title="All 2 branches covered.">    DataSet&lt;Vertex&gt; matchVertices = doAttachData() ?</span>
+<span class="fc" id="L287">      PostProcessor.extractVerticesWithData(vertices, graph.getVertices()) :</span>
+<span class="fc" id="L288">      PostProcessor.extractVertices(vertices, config.getVertexFactory());</span>
+
+<span class="fc bfc" id="L290" title="All 2 branches covered.">    DataSet&lt;Edge&gt; matchEdges = doAttachData() ?</span>
+<span class="fc" id="L291">      PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :</span>
+<span class="fc" id="L292">      PostProcessor.extractEdges(vertices, config.getEdgeFactory());</span>
+
+<span class="fc" id="L294">    return config.getGraphCollectionFactory().fromGraph(</span>
+<span class="fc" id="L295">      config.getLogicalGraphFactory().fromDataSets(matchVertices, matchEdges));</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

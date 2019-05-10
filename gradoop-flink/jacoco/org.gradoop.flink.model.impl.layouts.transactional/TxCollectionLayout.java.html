@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TxCollectionLayout.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.layouts.transactional</a> &gt; <span class="el_source">TxCollectionLayout.java</span></div><h1>TxCollectionLayout.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.layouts.transactional;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.util.GradoopConstants;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.ByDifferentGraphId;
+import org.gradoop.flink.model.impl.functions.epgm.ByDifferentId;
+import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.TransactionEdges;
+import org.gradoop.flink.model.impl.functions.epgm.TransactionGraphHead;
+import org.gradoop.flink.model.impl.functions.epgm.TransactionVertices;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+
+/**
+ * Represents a {@link GraphCollection} with a single dataset.
+ * Each row in the dataset represents a single {@link LogicalGraph}
+ * with all its associated vertex and edge data.
+ */
+public class TxCollectionLayout implements GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; {
+  /**
+   * Flink dataset holding the actual data of that layout.
+   */
+  private final DataSet&lt;GraphTransaction&gt; transactions;
+
+  /**
+   * Creates a new transactional collection layout.
+   *
+   * @param transactions graph transactions
+   */
+<span class="fc" id="L51">  TxCollectionLayout(DataSet&lt;GraphTransaction&gt; transactions) {</span>
+<span class="fc" id="L52">    this.transactions = transactions;</span>
+<span class="fc" id="L53">  }</span>
+
+  @Override
+  public boolean isGVELayout() {
+<span class="fc" id="L57">    return false;</span>
+  }
+
+  @Override
+  public boolean isIndexedGVELayout() {
+<span class="nc" id="L62">    return false;</span>
+  }
+
+  @Override
+  public boolean isTransactionalLayout() {
+<span class="fc" id="L67">    return true;</span>
+  }
+
+  @Override
+  public DataSet&lt;GraphHead&gt; getGraphHeads() {
+<span class="fc" id="L72">    return transactions</span>
+<span class="fc" id="L73">      .map(new TransactionGraphHead&lt;&gt;())</span>
+<span class="fc" id="L74">      .filter(new ByDifferentId&lt;&gt;(GradoopConstants.DB_GRAPH_ID));</span>
+  }
+
+  @Override
+  public DataSet&lt;GraphHead&gt; getGraphHeadsByLabel(String label) {
+<span class="fc" id="L79">    return getGraphHeads().filter(new ByLabel&lt;&gt;(label));</span>
+  }
+
+  @Override
+  public DataSet&lt;GraphTransaction&gt; getGraphTransactions() {
+<span class="fc" id="L84">    return transactions.filter(new ByDifferentGraphId(GradoopConstants.DB_GRAPH_ID));</span>
+  }
+
+  @Override
+  public DataSet&lt;Vertex&gt; getVertices() {
+<span class="fc" id="L89">    return transactions</span>
+<span class="fc" id="L90">      .flatMap(new TransactionVertices&lt;&gt;())</span>
+<span class="fc" id="L91">      .distinct(new Id&lt;&gt;());</span>
+  }
+
+  @Override
+  public DataSet&lt;Vertex&gt; getVerticesByLabel(String label) {
+<span class="fc" id="L96">    return getVertices().filter(new ByLabel&lt;&gt;(label));</span>
+  }
+
+  @Override
+  public DataSet&lt;Edge&gt; getEdges() {
+<span class="fc" id="L101">    return transactions</span>
+<span class="fc" id="L102">      .flatMap(new TransactionEdges&lt;&gt;())</span>
+<span class="fc" id="L103">      .distinct(new Id&lt;&gt;());</span>
+  }
+
+  @Override
+  public DataSet&lt;Edge&gt; getEdgesByLabel(String label) {
+<span class="fc" id="L108">    return getEdges().filter(new ByLabel&lt;&gt;(label));</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

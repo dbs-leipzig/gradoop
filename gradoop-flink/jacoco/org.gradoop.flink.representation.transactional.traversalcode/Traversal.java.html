@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Traversal.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.representation.transactional.traversalcode</a> &gt; <span class="el_source">Traversal.java</span></div><h1>Traversal.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.representation.transactional.traversalcode;
+
+import java.io.Serializable;
+
+/**
+ * DFSStep of an embedding.
+ *
+ * @param &lt;C&gt; vertex and edge value type
+ */
+public class Traversal&lt;C extends Comparable&lt;C&gt;&gt;
+  implements Serializable, Comparable&lt;Traversal&lt;C&gt;&gt; {
+
+  /**
+   * separator between vertex time and label
+   */
+  private static final char TIME_LABEL_SEPARATOR = ':';
+  /**
+   * outgoing edge start
+   */
+  private static final char OUTGOING_CHAR = '&gt;';
+  /**
+   * incoming edge start
+   */
+  private static final char INCOMING_CHAR = '&lt;';
+  /**
+   * edge start of undirected and end of all edges
+   */
+  private static final char EDGE_CHAR = '-';
+
+  /**
+   * extension start time
+   */
+  private final int fromTime;
+  /**
+   * extension start label
+   */
+  private final C fromValue;
+  /**
+   * outgoing or incoming traversal
+   */
+  private final boolean outgoing;
+  /**
+   * edge label
+   */
+  private final C edgeValue;
+  /**
+   * traversal end time
+   */
+  private final int toTime;
+  /**
+   * traversal end label
+   */
+  private final C toValue;
+
+  /**
+   * Constructor
+   * @param fromTime    extension start time
+   * @param fromValue   extension start label
+   * @param outgoing    outgoing or incoming traversal
+   * @param edgeValue   edge label
+   * @param toTime      traversal end time
+   * @param toValue     traversal end label
+   */
+  public Traversal(
+<span class="nc" id="L80">    int fromTime, C fromValue, boolean outgoing, C edgeValue, int toTime,  C toValue) {</span>
+<span class="nc" id="L81">    this.fromTime = fromTime;</span>
+<span class="nc" id="L82">    this.fromValue = fromValue;</span>
+<span class="nc" id="L83">    this.outgoing = outgoing;</span>
+<span class="nc" id="L84">    this.edgeValue = edgeValue;</span>
+<span class="nc" id="L85">    this.toTime = toTime;</span>
+<span class="nc" id="L86">    this.toValue = toValue;</span>
+<span class="nc" id="L87">  }</span>
+
+  public boolean isBackwards() {
+<span class="nc bnc" id="L90" title="All 2 branches missed.">    return toTime &lt;= fromTime;</span>
+  }
+
+  public boolean isLoop() {
+<span class="nc bnc" id="L94" title="All 2 branches missed.">    return fromTime == toTime;</span>
+  }
+
+  public int getFromTime() {
+<span class="nc" id="L98">    return fromTime;</span>
+  }
+
+  public C getFromValue() {
+<span class="nc" id="L102">    return fromValue;</span>
+  }
+
+  public boolean isOutgoing() {
+<span class="nc" id="L106">    return outgoing;</span>
+  }
+
+  public C getEdgeValue() {
+<span class="nc" id="L110">    return edgeValue;</span>
+  }
+
+  public int getToTime() {
+<span class="nc" id="L114">    return toTime;</span>
+  }
+
+  public C getToValue() {
+<span class="nc" id="L118">    return toValue;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc bnc" id="L123" title="All 2 branches missed.">    return String.valueOf(fromTime) + TIME_LABEL_SEPARATOR + fromValue +</span>
+      (outgoing ? OUTGOING_CHAR : INCOMING_CHAR) + edgeValue + EDGE_CHAR +
+      toTime + TIME_LABEL_SEPARATOR + toValue;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+<span class="nc bnc" id="L130" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L131">      return true;</span>
+    }
+<span class="nc bnc" id="L133" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L134">      return false;</span>
+    }
+
+<span class="nc" id="L137">    Traversal&lt;?&gt; that = (Traversal&lt;?&gt;) o;</span>
+
+<span class="nc bnc" id="L139" title="All 2 branches missed.">    if (fromTime != that.fromTime) {</span>
+<span class="nc" id="L140">      return false;</span>
+    }
+<span class="nc bnc" id="L142" title="All 2 branches missed.">    if (outgoing != that.outgoing) {</span>
+<span class="nc" id="L143">      return false;</span>
+    }
+<span class="nc bnc" id="L145" title="All 2 branches missed.">    if (toTime != that.toTime) {</span>
+<span class="nc" id="L146">      return false;</span>
+    }
+<span class="nc bnc" id="L148" title="All 2 branches missed.">    if (!fromValue.equals(that.fromValue)) {</span>
+<span class="nc" id="L149">      return false;</span>
+    }
+<span class="nc bnc" id="L151" title="All 2 branches missed.">    if (!edgeValue.equals(that.edgeValue)) {</span>
+<span class="nc" id="L152">      return false;</span>
+    }
+<span class="nc" id="L154">    return toValue.equals(that.toValue);</span>
+
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L160">    int result = fromTime;</span>
+<span class="nc" id="L161">    result = 31 * result + fromValue.hashCode();</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">    result = 31 * result + (outgoing ? 1 : 0);</span>
+<span class="nc" id="L163">    result = 31 * result + edgeValue.hashCode();</span>
+<span class="nc" id="L164">    result = 31 * result + toTime;</span>
+<span class="nc" id="L165">    result = 31 * result + toValue.hashCode();</span>
+<span class="nc" id="L166">    return result;</span>
+  }
+
+  /**
+   * Comparison according to gSpan lexicographic order.
+   *
+   * @param that other extension
+   * @return comparison result
+   */
+  @Override
+  public int compareTo(Traversal&lt;C&gt; that) {
+
+    int comparison;
+
+    // no difference is times
+<span class="nc bnc" id="L181" title="All 4 branches missed.">    if (this.fromTime == that.fromTime &amp;&amp; this.toTime == that.toTime) {</span>
+
+      // compare from values
+<span class="nc" id="L184">      comparison = this.fromValue.compareTo(that.fromValue);</span>
+
+<span class="nc bnc" id="L186" title="All 2 branches missed.">      if (comparison == 0) {</span>
+
+        // compare direction
+<span class="nc" id="L189">        boolean thisIsOutgoing = this.isOutgoing();</span>
+<span class="nc" id="L190">        boolean thatIsOutgoing = that.isOutgoing();</span>
+
+<span class="nc bnc" id="L192" title="All 4 branches missed.">        if (thisIsOutgoing &amp;&amp; !thatIsOutgoing) {</span>
+<span class="nc" id="L193">          comparison = -1;</span>
+<span class="nc bnc" id="L194" title="All 4 branches missed.">        } else if (thatIsOutgoing &amp;&amp; !thisIsOutgoing) {</span>
+<span class="nc" id="L195">          comparison = 1;</span>
+        } else {
+
+          // compare edge values
+<span class="nc" id="L199">          comparison = this.edgeValue.compareTo(that.edgeValue);</span>
+
+<span class="nc bnc" id="L201" title="All 2 branches missed.">          if (comparison == 0) {</span>
+
+            // compare to values
+<span class="nc" id="L204">            comparison = this.toValue.compareTo(that.toValue);</span>
+          }
+        }
+<span class="nc" id="L207">      }</span>
+
+      // time differences
+    } else {
+
+      // compare backtracking
+<span class="nc" id="L213">      boolean thisIsBacktrack = this.isBackwards();</span>
+<span class="nc" id="L214">      boolean thatIsBacktrack = that.isBackwards();</span>
+
+<span class="nc bnc" id="L216" title="All 4 branches missed.">      if (thisIsBacktrack &amp;&amp; !thatIsBacktrack) {</span>
+<span class="nc" id="L217">        comparison = -1;</span>
+<span class="nc bnc" id="L218" title="All 4 branches missed.">      } else if (thatIsBacktrack &amp;&amp; !thisIsBacktrack) {</span>
+<span class="nc" id="L219">        comparison = 1;</span>
+      } else {
+
+        // both forwards
+<span class="nc bnc" id="L223" title="All 2 branches missed.">        if (thatIsBacktrack) {</span>
+
+          // back to earlier vertex is smaller
+<span class="nc" id="L226">          comparison = this.toTime - that.toTime;</span>
+
+          // both backwards
+        } else {
+
+          // forwards from later vertex is smaller
+<span class="nc" id="L232">          comparison = that.fromTime - this.fromTime;</span>
+        }
+      }
+    }
+
+<span class="nc" id="L237">    return comparison;</span>
+  }
+
+  public boolean isForwards() {
+<span class="nc bnc" id="L241" title="All 2 branches missed.">    return !isBackwards();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

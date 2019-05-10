@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EdgeRollUp.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.rollup</a> &gt; <span class="el_source">EdgeRollUp.java</span></div><h1>EdgeRollUp.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.rollup;
+
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+
+import java.util.List;
+
+/**
+ * Applies the groupBy-operator multiple times on a logical graph using different combinations of
+ * the given edge grouping keys according to the definition of the rollUp operation in SQL.
+ *
+ * See the description of the abstract class {@link RollUp} for further details.
+ */
+public class EdgeRollUp extends RollUp {
+  /**
+   * Property key used to store the grouping keys used for rollUp on edges.
+   */
+  private static final String EDGE_GROUPING_KEYS_PROPERTY = &quot;edgeRollUpGroupingKeys&quot;;
+
+  /**
+   * Creates a edgeRollUp operator instance with {@link GroupingStrategy#GROUP_REDUCE} as grouping
+   * strategy. Use {@link RollUp#setGroupingStrategy(GroupingStrategy)} to define a different
+   * grouping strategy.
+   *
+   * @param vertexGroupingKeys grouping keys to group vertices
+   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
+   * @param edgeGroupingKeys grouping keys to group edges
+   * @param edgeAggregateFunctions aggregate functions to apply on super edges
+   */
+  public EdgeRollUp(
+    List&lt;String&gt; vertexGroupingKeys,
+    List&lt;AggregateFunction&gt; vertexAggregateFunctions,
+    List&lt;String&gt; edgeGroupingKeys,
+    List&lt;AggregateFunction&gt; edgeAggregateFunctions
+  ) {
+<span class="fc" id="L52">    super(vertexGroupingKeys, vertexAggregateFunctions, edgeGroupingKeys, edgeAggregateFunctions);</span>
+<span class="fc" id="L53">  }</span>
+
+  @Override
+  String getGraphPropertyKey() {
+<span class="fc" id="L57">    return EDGE_GROUPING_KEYS_PROPERTY;</span>
+  }
+
+  @Override
+  LogicalGraph applyGrouping(LogicalGraph graph, List&lt;String&gt; groupingKeys) {
+<span class="fc" id="L62">    return graph.groupBy(vertexGroupingKeys, vertexAggregateFunctions, groupingKeys,</span>
+      edgeAggregateFunctions, strategy);
+  }
+
+  @Override
+  List&lt;List&lt;String&gt;&gt; getGroupingKeyCombinations() {
+<span class="fc" id="L68">    return createGroupingKeyCombinations(edgeGroupingKeys);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConnectNeighbors.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation</a> &gt; <span class="el_source">ConnectNeighbors.java</span></div><h1>ConnectNeighbors.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.dataintegration.transformation.functions.CreateCartesianNeighborhoodEdges;
+import org.gradoop.dataintegration.transformation.impl.Neighborhood;
+import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
+import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
+
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * This graph transformation adds new edges to the graph. Those edges are created if a vertex of a
+ * user-defined label has two neighbors of another user-defined label. A bidirectional (two edges
+ * in gradoop) edge is then created between those two neighbors.
+ */
+public class ConnectNeighbors implements UnaryGraphToGraphOperator {
+
+  /**
+   * The label of the vertices the neighborhood is connected.
+   */
+  private final String sourceVertexLabel;
+
+  /**
+   * The edge direction to consider.
+   */
+  private final Neighborhood.EdgeDirection edgeDirection;
+
+  /**
+   * The label of the neighboring vertices that should be connected.
+   */
+  private final String neighborhoodVertexLabel;
+
+  /**
+   * The label of the created edge between the neighbors.
+   */
+  private final String newEdgeLabel;
+
+  /**
+   * The constructor to connect the neighbors of vertices with a certain label.
+   *
+   * @param sourceVertexLabel       The label of the vertices the neighborhood is connected.
+   * @param edgeDirection           The edge direction to consider.
+   * @param neighborhoodVertexLabel The label of the neighboring vertices that should be connected.
+   * @param newEdgeLabel            The label of the created edge between the neighbors.
+   */
+  public ConnectNeighbors(String sourceVertexLabel, Neighborhood.EdgeDirection edgeDirection,
+<span class="fc" id="L68">    String neighborhoodVertexLabel, String newEdgeLabel) {</span>
+<span class="fc" id="L69">    this.sourceVertexLabel = Objects.requireNonNull(sourceVertexLabel);</span>
+<span class="fc" id="L70">    this.edgeDirection = Objects.requireNonNull(edgeDirection);</span>
+<span class="fc" id="L71">    this.neighborhoodVertexLabel = Objects.requireNonNull(neighborhoodVertexLabel);</span>
+<span class="fc" id="L72">    this.newEdgeLabel = Objects.requireNonNull(newEdgeLabel);</span>
+<span class="fc" id="L73">  }</span>
+
+  @Override
+  public LogicalGraph execute(LogicalGraph graph) {
+
+    // determine the vertices the neighborhood should be calculated for
+<span class="fc" id="L79">    DataSet&lt;Vertex&gt; verticesByLabel = graph.getVerticesByLabel(sourceVertexLabel);</span>
+
+    // prepare the graph
+<span class="fc" id="L82">    LogicalGraph reducedGraph = graph</span>
+<span class="fc" id="L83">      .vertexInducedSubgraph(new LabelIsIn&lt;&gt;(sourceVertexLabel, neighborhoodVertexLabel));</span>
+
+    // determine the neighborhood by edge direction
+<span class="fc" id="L86">    DataSet&lt;Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; neighborhood =</span>
+<span class="fc" id="L87">      Neighborhood.getPerVertex(reducedGraph, verticesByLabel, edgeDirection);</span>
+
+    // calculate the new edges and add them to the original graph
+<span class="fc" id="L90">    DataSet&lt;Edge&gt; newEdges = neighborhood.flatMap(</span>
+<span class="fc" id="L91">      new CreateCartesianNeighborhoodEdges&lt;&gt;(graph.getConfig().getEdgeFactory(), newEdgeLabel));</span>
+
+<span class="fc" id="L93">    return graph.getConfig().getLogicalGraphFactory()</span>
+<span class="fc" id="L94">      .fromDataSets(graph.getVertices(), graph.getEdges().union(newEdges));</span>
+  }
+
+  @Override
+  public String getName() {
+<span class="nc" id="L99">    return ConnectNeighbors.class.getName();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

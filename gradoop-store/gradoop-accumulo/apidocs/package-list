@@ -1,0 +1,14 @@
+org.gradoop.storage.config
+org.gradoop.storage.impl.accumulo
+org.gradoop.storage.impl.accumulo.constants
+org.gradoop.storage.impl.accumulo.handler
+org.gradoop.storage.impl.accumulo.io
+org.gradoop.storage.impl.accumulo.io.inputformats
+org.gradoop.storage.impl.accumulo.io.outputformats
+org.gradoop.storage.impl.accumulo.iterator.client
+org.gradoop.storage.impl.accumulo.iterator.tserver
+org.gradoop.storage.impl.accumulo.predicate.filter.api
+org.gradoop.storage.impl.accumulo.predicate.filter.calculate
+org.gradoop.storage.impl.accumulo.predicate.filter.impl
+org.gradoop.storage.impl.accumulo.predicate.query
+org.gradoop.storage.utils

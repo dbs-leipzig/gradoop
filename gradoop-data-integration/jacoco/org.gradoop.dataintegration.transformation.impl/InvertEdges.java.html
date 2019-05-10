@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InvertEdges.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation.impl</a> &gt; <span class="el_source">InvertEdges.java</span></div><h1>InvertEdges.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation.impl;
+
+import org.apache.flink.util.Preconditions;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.model.api.functions.TransformationFunction;
+
+/**
+ * An edge transformation that swaps the source and target of an edge with a given label and
+ * renames it.
+ */
+public class InvertEdges implements TransformationFunction&lt;Edge&gt; {
+
+  /**
+   * The label of the edges that should be inverted.
+   */
+  private final String forEdgeLabel;
+
+  /**
+   * The label of the inverted edges.
+   */
+  private final String newLabel;
+
+  /**
+   * Constructs a new InvertEdges edge transformation function.
+   *
+   * @param forEdgeLabel The label of the edges that should be inverted.
+   * @param newLabel     The label of the inverted edges.
+   */
+<span class="fc" id="L45">  public InvertEdges(String forEdgeLabel, String newLabel) {</span>
+<span class="fc" id="L46">    this.forEdgeLabel = Preconditions.checkNotNull(forEdgeLabel);</span>
+<span class="fc" id="L47">    this.newLabel = Preconditions.checkNotNull(newLabel);</span>
+<span class="fc" id="L48">  }</span>
+
+  @Override
+  public Edge apply(Edge current, Edge transformed) {
+<span class="fc bfc" id="L52" title="All 2 branches covered.">    if (current.getLabel().equals(forEdgeLabel)) {</span>
+<span class="fc" id="L53">      GradoopId source = current.getSourceId();</span>
+<span class="fc" id="L54">      GradoopId target = current.getTargetId();</span>
+
+<span class="fc" id="L56">      current.setSourceId(target);</span>
+<span class="fc" id="L57">      current.setTargetId(source);</span>
+<span class="fc" id="L58">      current.setLabel(newLabel);</span>
+    }
+<span class="fc" id="L60">    return current;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

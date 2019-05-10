@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GDLConsoleOutput.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.gdl</a> &gt; <span class="el_source">GDLConsoleOutput.java</span></div><h1>GDLConsoleOutput.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.gdl;
+
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Allows to print graphs and graph collections to the standard output.
+ */
+<span class="nc" id="L32">public class GDLConsoleOutput {</span>
+
+  /**
+   * Prints the logical graph to the standard output.
+   *
+   * @param logicalGraph The logical graph that is supposed to be printed.
+   * @throws Exception Forwarded from flink execute.
+   */
+  public static void print(LogicalGraph logicalGraph) throws Exception {
+<span class="nc" id="L41">    GraphCollectionFactory collectionFactory = logicalGraph.getConfig().getGraphCollectionFactory();</span>
+<span class="nc" id="L42">    GraphCollection graphCollection = collectionFactory.fromGraph(logicalGraph);</span>
+
+<span class="nc" id="L44">    print(graphCollection);</span>
+<span class="nc" id="L45">  }</span>
+
+  /**
+   * Prints the graph collection to the standard output.
+   *
+   * @param graphCollection The graph collection that is supposed to be printed.
+   * @throws Exception Forwarded from flink execute.
+   */
+  public static void print(GraphCollection graphCollection) throws Exception {
+<span class="nc" id="L54">    List&lt;GraphHead&gt; graphHeads = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L55">    graphCollection.getGraphHeads().output(new LocalCollectionOutputFormat&lt;&gt;(graphHeads));</span>
+
+<span class="nc" id="L57">    List&lt;Vertex&gt; vertices = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L58">    graphCollection.getVertices().output(new LocalCollectionOutputFormat&lt;&gt;(vertices));</span>
+
+<span class="nc" id="L60">    List&lt;Edge&gt; edges = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L61">    graphCollection.getEdges().output(new LocalCollectionOutputFormat&lt;&gt;(edges));</span>
+
+<span class="nc" id="L63">    graphCollection.getConfig().getExecutionEnvironment().execute();</span>
+
+<span class="nc" id="L65">    GDLEncoder encoder = new GDLEncoder(graphHeads, vertices, edges);</span>
+<span class="nc" id="L66">    String graphString = encoder.getGDLString();</span>
+
+<span class="nc" id="L68">    System.out.println(graphString);</span>
+<span class="nc" id="L69">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropertyMetaData.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.metadata</a> &gt; <span class="el_source">PropertyMetaData.java</span></div><h1>PropertyMetaData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.metadata;
+
+import java.util.function.Function;
+
+/**
+ * Stores the meta data for a property which is the property key and a property value parser.
+ */
+public class PropertyMetaData {
+  /**
+   * Used to separate property meta data.
+   */
+  public static final String PROPERTY_DELIMITER = &quot;,&quot;;
+  /**
+   * Used to separate property tokens (property-key, property-type)
+   */
+  public static final String PROPERTY_TOKEN_DELIMITER = &quot;:&quot;;
+  /**
+   * Property key.
+   */
+  private String key;
+  /**
+   * Property type string.
+   */
+  private String typeString;
+  /**
+   * A function that parses a string to the typed property value.
+   */
+  private Function&lt;String, Object&gt; valueParser;
+
+  /**
+   * Constructor.
+   *
+   * @param key         property key
+   * @param typeString  property type string
+   * @param valueParser property value parser
+   */
+<span class="fc" id="L52">  public PropertyMetaData(String key, String typeString, Function&lt;String, Object&gt; valueParser) {</span>
+<span class="fc" id="L53">    this.key = key;</span>
+<span class="fc" id="L54">    this.typeString = typeString;</span>
+<span class="fc" id="L55">    this.valueParser = valueParser;</span>
+<span class="fc" id="L56">  }</span>
+
+  /**
+   * Returns the property key.
+   *
+   * @return property key
+   */
+  public String getKey() {
+<span class="nc" id="L64">    return key;</span>
+  }
+
+  /**
+   * Returns the property type string.
+   *
+   * @return property type string
+   */
+  public String getTypeString() {
+<span class="nc" id="L73">    return typeString;</span>
+  }
+
+  /**
+   * Returns a parser for the property value.
+   *
+   * @return value parser
+   */
+  public Function&lt;String, Object&gt; getValueParser() {
+<span class="nc" id="L82">    return valueParser;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BuildFatVertex.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions</a> &gt; <span class="el_source">BuildFatVertex.java</span></div><h1>BuildFatVertex.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.apache.flink.api.common.functions.RichGroupCombineFunction;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.IdPair;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.TripleWithDirection;
+
+/**
+ * Combines a collection of {@link TripleWithDirection} to a {@link FatVertex}.
+ */
+public class BuildFatVertex
+  extends RichGroupCombineFunction&lt;TripleWithDirection, FatVertex&gt; {
+
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
+
+  /**
+   * Reduce instantiations
+   */
+  private final FatVertex reuseVertex;
+
+  /**
+   * GDL query
+   */
+  private final String query;
+
+  /**
+   * Query handler
+   */
+  private transient QueryHandler qHandler;
+
+  /**
+   * Constructor
+   *
+   * @param query GDL query
+   */
+<span class="fc" id="L59">  public BuildFatVertex(String query) {</span>
+<span class="fc" id="L60">    this.query        = query;</span>
+<span class="fc" id="L61">    this.reuseVertex  = new FatVertex();</span>
+<span class="fc" id="L62">  }</span>
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="fc" id="L66">    super.open(parameters);</span>
+<span class="fc" id="L67">    this.qHandler = new QueryHandler(query);</span>
+<span class="fc" id="L68">  }</span>
+
+  @Override
+  public void combine(Iterable&lt;TripleWithDirection&gt; triples,
+    Collector&lt;FatVertex&gt; collector) throws Exception {
+
+<span class="fc" id="L74">    boolean first = true;</span>
+
+<span class="fc bfc" id="L76" title="All 2 branches covered.">    for (TripleWithDirection triple : triples) {</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">      if (first) {</span>
+<span class="fc" id="L78">        initFatVertex(triple);</span>
+<span class="fc" id="L79">        first = false;</span>
+      }
+
+<span class="fc bfc" id="L82" title="All 2 branches covered.">      if (triple.isOutgoing()) {</span>
+<span class="fc" id="L83">        processOutgoingEdgeTriple(triple);</span>
+      } else {
+<span class="fc" id="L85">        processIncomingEdgeTriple(triple);</span>
+      }
+<span class="fc" id="L87">    }</span>
+<span class="fc" id="L88">    collector.collect(reuseVertex);</span>
+<span class="fc" id="L89">  }</span>
+
+  /**
+   * Initializes the fat vertex.
+   *
+   * @param triple edge triple
+   */
+  private void initFatVertex(TripleWithDirection triple) {
+<span class="fc" id="L97">    reuseVertex.setVertexId(triple.getSourceId());</span>
+<span class="fc" id="L98">    reuseVertex.setCandidates(Lists.newArrayList());</span>
+<span class="fc" id="L99">    reuseVertex.setParentIds(Lists.newArrayList());</span>
+<span class="fc" id="L100">    reuseVertex.setIncomingCandidateCounts(new int[qHandler.getEdgeCount()]);</span>
+<span class="fc" id="L101">    reuseVertex.setEdgeCandidates(Maps.newHashMap());</span>
+<span class="fc" id="L102">    reuseVertex.setUpdated(true);</span>
+<span class="fc" id="L103">  }</span>
+
+  /**
+   * Updates vertex candidates and outgoing edges of the fat vertex based on the
+   * given outgoing edge triple.
+   *
+   * @param triple outgoing edge tripe
+   */
+  private void processOutgoingEdgeTriple(TripleWithDirection triple) {
+<span class="fc bfc" id="L112" title="All 2 branches covered.">    for (int eQ = 0; eQ &lt; triple.getCandidates().length; eQ++) {</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">      if (triple.getCandidates()[eQ]) {</span>
+<span class="fc" id="L114">        updateCandidates(qHandler.getEdgeById((long) eQ).getSourceVertexId());</span>
+      }
+    }
+    // update outgoing edges (OUT_CA)
+<span class="fc" id="L118">    updateOutgoingEdges(triple);</span>
+<span class="fc" id="L119">  }</span>
+
+  /**
+   * Updates query candidates of the resulting fat vertex.
+   *
+   * @param candidate query vertex id
+   */
+  private void updateCandidates(Long candidate) {
+<span class="fc bfc" id="L127" title="All 2 branches covered.">    if (!reuseVertex.getCandidates().contains(candidate)) {</span>
+<span class="fc" id="L128">      reuseVertex.getCandidates().add(candidate);</span>
+    }
+<span class="fc" id="L130">  }</span>
+
+  /**
+   * Updates outgoing edges of the resulting fat vertex.
+   *
+   * @param triple outgoing edge triple
+   */
+  private void updateOutgoingEdges(TripleWithDirection triple) {
+<span class="fc" id="L138">    IdPair idPair = new IdPair();</span>
+<span class="fc" id="L139">    idPair.setEdgeId(triple.getEdgeId());</span>
+<span class="fc" id="L140">    idPair.setTargetId(triple.getTargetId());</span>
+<span class="fc" id="L141">    reuseVertex.getEdgeCandidates().put(idPair, triple.getCandidates());</span>
+<span class="fc" id="L142">  }</span>
+
+  /**
+   * Updates vertex candidates, parent ids and incoming edge candidate counts of
+   * the fat vertex based on the given incoming edge triple.
+   *
+   * @param triple incoming edge triple
+   */
+  private void processIncomingEdgeTriple(TripleWithDirection triple) {
+<span class="fc bfc" id="L151" title="All 2 branches covered.">    for (int eQ = 0; eQ &lt; triple.getCandidates().length; eQ++) {</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">      if (triple.getCandidates()[eQ]) {</span>
+        // update incoming edge counts (IN_CA)
+<span class="fc" id="L154">        reuseVertex.getIncomingCandidateCounts()[eQ]++;</span>
+        // update parent ids (P_IDs)
+<span class="fc" id="L156">        updateParentIds(triple);</span>
+        // update vertex candidates (CA)
+<span class="fc" id="L158">        updateCandidates(qHandler.getEdgeById((long) eQ).getTargetVertexId());</span>
+      }
+    }
+<span class="fc" id="L161">  }</span>
+
+  /**
+   * Adds the targetId of the given triple to the parent ids.
+   *
+   * @param triple incoming edge triple
+   */
+  private void updateParentIds(TripleWithDirection triple) {
+<span class="fc bfc" id="L169" title="All 2 branches covered.">    if (!reuseVertex.getParentIds().contains(triple.getTargetId())) {</span>
+<span class="fc" id="L170">      reuseVertex.getParentIds().add(triple.getTargetId());</span>
+    }
+<span class="fc" id="L172">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

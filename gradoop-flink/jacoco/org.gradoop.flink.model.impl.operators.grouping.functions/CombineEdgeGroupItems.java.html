@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CombineEdgeGroupItems.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.grouping.functions</a> &gt; <span class="el_source">CombineEdgeGroupItems.java</span></div><h1>CombineEdgeGroupItems.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.grouping.functions;
+
+import org.apache.flink.api.common.functions.GroupCombineFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
+
+/**
+ * Combines a group of {@link EdgeGroupItem} to a single {@link EdgeGroupItem}.
+ */
+@FunctionAnnotation.ForwardedFields(
+    &quot;f0;&quot; + // sourceId
+    &quot;f1;&quot; + // targetId
+    &quot;f2;&quot; + // group label
+    &quot;f3;&quot; + // properties
+    &quot;f4;&quot; + // aggregates
+    &quot;f5&quot;    // label group
+)
+public class CombineEdgeGroupItems
+  extends BuildSuperEdge
+  implements GroupCombineFunction&lt;EdgeGroupItem, EdgeGroupItem&gt; {
+
+  /**
+   * Avoid object instantiation.
+   */
+  private EdgeGroupItem reuseEdgeGroupItem;
+
+  /**
+   * Creates group reducer
+   *
+   * @param useLabel use edge label
+   */
+  public CombineEdgeGroupItems(boolean useLabel) {
+<span class="fc" id="L49">    super(useLabel);</span>
+<span class="fc" id="L50">  }</span>
+
+  /**
+   * Reduces edge group items to a single edge group item and collects it.
+   *
+   * @param edgeGroupItems edge group items
+   * @param collector output collector
+   * @throws Exception on failure
+   */
+  @Override
+  public void combine(Iterable&lt;EdgeGroupItem&gt; edgeGroupItems,
+    Collector&lt;EdgeGroupItem&gt; collector) throws Exception {
+<span class="fc" id="L62">    reuseEdgeGroupItem = reduceInternal(edgeGroupItems);</span>
+<span class="fc" id="L63">    reuseEdgeGroupItem.getLabelGroup().resetAggregateValues();</span>
+<span class="fc" id="L64">    collector.collect(reuseEdgeGroupItem);</span>
+<span class="fc" id="L65">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CartesianProductNode.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary</a> &gt; <span class="el_source">CartesianProductNode.java</span></div><h1>CartesianProductNode.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary;
+
+import org.apache.flink.api.common.operators.base.CrossOperatorBase;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.CartesianProduct;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Binary node that wraps a {@link CartesianProduct} operator.
+ */
+public class CartesianProductNode extends BinaryNode implements JoinNode {
+  /**
+   * Morphism type for vertices
+   */
+  private final MatchStrategy vertexStrategy;
+  /**
+   * Morphism type for edges
+   */
+  private final MatchStrategy edgeStrategy;
+  /**
+   * Cross hint for Flink optimizer
+   */
+  private final CrossOperatorBase.CrossHint crossHint;
+
+  /**
+   * Creates  a new node.
+   *
+   * @param leftChild left input plan node
+   * @param rightChild right right input plan node
+   * @param vertexStrategy morphism setting for vertices
+   * @param edgeStrategy morphism setting for edges
+   */
+  public CartesianProductNode(PlanNode leftChild, PlanNode rightChild,
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy) {
+<span class="fc" id="L59">    this(leftChild, rightChild,</span>
+      vertexStrategy, edgeStrategy, CrossOperatorBase.CrossHint.OPTIMIZER_CHOOSES);
+<span class="fc" id="L61">  }</span>
+
+  /**
+   * Creates a new node.
+   *
+   * @param leftChild left input plan node
+   * @param rightChild right input plan node
+   * @param vertexStrategy morphism setting for vertices
+   * @param edgeStrategy morphism setting for edges
+   * @param crossHint Join hint for the Flink optimizer
+   */
+  public CartesianProductNode(PlanNode leftChild, PlanNode rightChild,
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
+    CrossOperatorBase.CrossHint crossHint) {
+<span class="fc" id="L75">    super(leftChild, rightChild);</span>
+<span class="fc" id="L76">    this.vertexStrategy = vertexStrategy;</span>
+<span class="fc" id="L77">    this.edgeStrategy = edgeStrategy;</span>
+<span class="fc" id="L78">    this.crossHint = crossHint;</span>
+<span class="fc" id="L79">  }</span>
+
+  @Override
+  public DataSet&lt;Embedding&gt; execute() {
+<span class="fc" id="L83">    CartesianProduct op = new CartesianProduct(getLeftChild().execute(), getRightChild().execute(),</span>
+<span class="fc" id="L84">      getRightChild().getEmbeddingMetaData().getEntryCount(),</span>
+<span class="fc" id="L85">      getDistinctVertexColumnsLeft(), getDistinctVertexColumnsRight(),</span>
+<span class="fc" id="L86">      getDistinctEdgeColumnsLeft(), getDistinctEdgeColumnsRight(), crossHint);</span>
+<span class="fc" id="L87">    op.setName(this.toString());</span>
+<span class="fc" id="L88">    return op.evaluate();</span>
+  }
+
+  @Override
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
+<span class="fc" id="L93">    EmbeddingMetaData leftInputMetaData = getLeftChild().getEmbeddingMetaData();</span>
+<span class="fc" id="L94">    EmbeddingMetaData rightInputMetaData = getRightChild().getEmbeddingMetaData();</span>
+<span class="fc" id="L95">    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData(leftInputMetaData);</span>
+
+<span class="fc" id="L97">    int entryCount = leftInputMetaData.getEntryCount();</span>
+
+    // append the non-join entry mappings from the right to the left side
+<span class="fc bfc" id="L100" title="All 2 branches covered.">    for (String var : rightInputMetaData.getVariables()) {</span>
+<span class="fc" id="L101">      embeddingMetaData.setEntryColumn(var, rightInputMetaData.getEntryType(var), entryCount++);</span>
+<span class="fc" id="L102">    }</span>
+
+    // append all property mappings from the right to the left side
+<span class="fc" id="L105">    int propertyCount = leftInputMetaData.getPropertyCount();</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">    for (String var : rightInputMetaData.getVariables()) {</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">      for (String key : rightInputMetaData.getPropertyKeys(var)) {</span>
+<span class="fc" id="L108">        embeddingMetaData.setPropertyColumn(var, key, propertyCount++);</span>
+<span class="fc" id="L109">      }</span>
+<span class="fc" id="L110">    }</span>
+<span class="fc" id="L111">    return embeddingMetaData;</span>
+  }
+
+  /**
+   * According to the specified {@link CartesianProductNode#vertexStrategy}, the method returns
+   * the columns that need to contain distinct entries in the left embedding.
+   *
+   * @return distinct vertex columns of the left embedding
+   */
+  private List&lt;Integer&gt; getDistinctVertexColumnsLeft() {
+<span class="fc" id="L121">    return getDistinctVertexColumns(getLeftChild().getEmbeddingMetaData());</span>
+  }
+
+  /**
+   * According to the specified {@link CartesianProductNode#vertexStrategy}, the method returns
+   * the columns that need to contain distinct entries in the right embedding.
+   *
+   * @return distinct vertex columns of the right embedding
+   */
+  private List&lt;Integer&gt; getDistinctVertexColumnsRight() {
+<span class="fc" id="L131">    return getDistinctVertexColumns(getRightChild().getEmbeddingMetaData());</span>
+  }
+
+  /**
+   * According to the specified {@link CartesianProductNode#vertexStrategy} and the specified
+   * {@link EmbeddingMetaData}, the method returns the columns that need to contain distinct
+   * entries.
+   *
+   * @param metaData meta data for the embedding
+   * @return distinct vertex columns
+   */
+  private List&lt;Integer&gt; getDistinctVertexColumns(final EmbeddingMetaData metaData) {
+<span class="fc bfc" id="L143" title="All 2 branches covered.">    return vertexStrategy == MatchStrategy.ISOMORPHISM ?</span>
+<span class="fc" id="L144">      metaData.getVertexVariables().stream()</span>
+<span class="fc" id="L145">        .map(metaData::getEntryColumn)</span>
+<span class="fc" id="L146">        .collect(Collectors.toList()) : Collections.emptyList();</span>
+  }
+
+  /**
+   * According to the specified {@link CartesianProductNode#edgeStrategy}, the method returns
+   * the columns that need to contain distinct entries in the left embedding.
+   *
+   * @return distinct edge columns of the left embedding
+   */
+  private List&lt;Integer&gt; getDistinctEdgeColumnsLeft() {
+<span class="fc" id="L156">    return getDistinctEdgeColumns(getLeftChild().getEmbeddingMetaData());</span>
+  }
+
+  /**
+   * According to the specified {@link CartesianProductNode#edgeStrategy}, the method returns
+   * the columns that need to contain distinct entries in the right embedding.
+   *
+   * @return distinct edge columns of the right embedding
+   */
+  private List&lt;Integer&gt; getDistinctEdgeColumnsRight() {
+<span class="fc" id="L166">    return getDistinctEdgeColumns(getRightChild().getEmbeddingMetaData());</span>
+  }
+
+  /**
+   * According to the specified {@link CartesianProductNode#edgeStrategy} and the specified
+   * {@link EmbeddingMetaData}, the method returns the columns that need to contain distinct
+   * entries.
+   *
+   * @param metaData meta data for the embedding
+   * @return distinct edge columns
+   */
+  private List&lt;Integer&gt; getDistinctEdgeColumns(EmbeddingMetaData metaData) {
+<span class="fc bfc" id="L178" title="All 2 branches covered.">    return edgeStrategy == MatchStrategy.ISOMORPHISM ?</span>
+<span class="fc" id="L179">      metaData.getEdgeVariables().stream()</span>
+<span class="fc" id="L180">        .map(metaData::getEntryColumn)</span>
+<span class="fc" id="L181">        .collect(Collectors.toList()) : Collections.emptyList();</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="fc" id="L186">    return String.format(&quot;CartesianProductNode{&quot; +</span>
+      &quot;vertexMorphismType=%s, &quot; +
+      &quot;edgeMorphismType=%s}&quot;,
+      vertexStrategy, edgeStrategy);
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

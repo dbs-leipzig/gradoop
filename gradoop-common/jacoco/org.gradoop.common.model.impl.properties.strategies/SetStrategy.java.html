@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SetStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.properties.strategies</a> &gt; <span class="el_source">SetStrategy.java</span></div><h1>SetStrategy.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.properties.strategies;
+
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataInputViewStreamWrapper;
+import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
+import org.apache.hadoop.hbase.util.Bytes;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Strategy class for handling {@code PropertyValue} operations with a value of the type
+ * {@code Set}.
+ */
+<span class="fc" id="L36">public class SetStrategy extends AbstractVariableSizedPropertyValueStrategy&lt;Set&lt;PropertyValue&gt;&gt; {</span>
+
+  @Override
+  public Set&lt;PropertyValue&gt; read(DataInputView inputView, byte typeByte) throws IOException {
+<span class="fc" id="L40">    byte[] rawBytes = readVariableSizedData(inputView, typeByte);</span>
+
+    PropertyValue item;
+<span class="fc" id="L43">    Set&lt;PropertyValue&gt; set = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L44">    DataInputViewStreamWrapper internalInputView = createInputView(rawBytes);</span>
+
+    try {
+<span class="fc bfc" id="L47" title="All 2 branches covered.">      while (internalInputView.available() &gt; 0) {</span>
+<span class="fc" id="L48">        item = new PropertyValue();</span>
+<span class="fc" id="L49">        item.read(internalInputView);</span>
+
+<span class="fc" id="L51">        set.add(item);</span>
+      }
+<span class="nc" id="L53">    } catch (IOException e) {</span>
+<span class="nc" id="L54">      throw new IOException(&quot;Error reading PropertyValue with SetStrategy.&quot;, e);</span>
+<span class="fc" id="L55">    }</span>
+
+<span class="fc" id="L57">    return set;</span>
+  }
+
+  @Override
+  public int compare(Set value, Object other) {
+<span class="fc" id="L62">    throw new UnsupportedOperationException(&quot;Method compare() is not supported for Set.&quot;);</span>
+  }
+
+  @Override
+  public boolean is(Object value) {
+<span class="fc bfc" id="L67" title="All 2 branches covered.">    if (!(value instanceof Set)) {</span>
+<span class="fc" id="L68">      return false;</span>
+    }
+<span class="fc bfc" id="L70" title="All 2 branches covered.">    for (Object item : (Set) value) {</span>
+      // Set is not a valid property value if it contains any object
+      // that is not a property value itself.
+<span class="fc bfc" id="L73" title="All 2 branches covered.">      if (!(item instanceof PropertyValue)) {</span>
+<span class="fc" id="L74">        return false;</span>
+      }
+<span class="fc" id="L76">    }</span>
+
+<span class="fc" id="L78">    return true;</span>
+  }
+
+  @Override
+  public Class&lt;Set&lt;PropertyValue&gt;&gt; getType() {
+<span class="fc" id="L83">    return (Class) Set.class;</span>
+  }
+
+  /**
+   * {@inheritDoc}
+   * @throws IOException if converting the byte array to a Set fails.
+   */
+  @Override
+  public Set&lt;PropertyValue&gt; get(byte[] bytes) throws IOException {
+    PropertyValue entry;
+<span class="fc" id="L93">    Set&lt;PropertyValue&gt; set = new HashSet&lt;&gt;();</span>
+
+<span class="fc" id="L95">    try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);</span>
+<span class="fc" id="L96">        DataInputStream inputStream = new DataInputStream(byteStream);</span>
+<span class="fc" id="L97">        DataInputViewStreamWrapper internalInputView =</span>
+           new DataInputViewStreamWrapper(inputStream)) {
+
+<span class="fc" id="L100">      internalInputView.skipBytesToRead(1);</span>
+
+<span class="fc bfc" id="L102" title="All 2 branches covered.">      while (inputStream.available() &gt; 0) {</span>
+<span class="fc" id="L103">        entry = new PropertyValue();</span>
+<span class="fc" id="L104">        entry.read(internalInputView);</span>
+
+<span class="fc" id="L106">        set.add(entry);</span>
+      }
+<span class="nc" id="L108">    } catch (IOException e) {</span>
+<span class="nc" id="L109">      throw new IOException(&quot;Error reading PropertyValue with SetStrategy.&quot;, e);</span>
+<span class="fc" id="L110">    }</span>
+
+<span class="fc" id="L112">    return set;</span>
+  }
+
+  @Override
+  public byte getRawType() {
+<span class="fc" id="L117">    return PropertyValue.TYPE_SET;</span>
+  }
+
+  /**
+   * {@inheritDoc}
+   * @throws IOException if converting the value to a byte array fails.
+   */
+  @Override
+  public byte[] getRawBytes(Set&lt;PropertyValue&gt; value) throws IOException {
+<span class="fc" id="L126">    int size = value.stream().mapToInt(PropertyValue::byteSize)</span>
+<span class="fc" id="L127">      .sum() + PropertyValue.OFFSET + Bytes.SIZEOF_SHORT;</span>
+
+<span class="fc" id="L129">    try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);</span>
+<span class="fc" id="L130">        DataOutputStream outputStream = new DataOutputStream(byteStream);</span>
+<span class="fc" id="L131">        DataOutputViewStreamWrapper outputView = new DataOutputViewStreamWrapper(outputStream)) {</span>
+
+<span class="fc" id="L133">      outputStream.write(getRawType());</span>
+
+<span class="fc bfc" id="L135" title="All 2 branches covered.">      for (PropertyValue entry : value) {</span>
+<span class="fc" id="L136">        entry.write(outputView);</span>
+<span class="fc" id="L137">      }</span>
+
+<span class="fc" id="L139">      return byteStream.toByteArray();</span>
+<span class="nc" id="L140">    } catch (IOException e) {</span>
+<span class="nc" id="L141">      throw new IOException(&quot;Error writing PropertyValue with SetStrategy.&quot;, e);</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

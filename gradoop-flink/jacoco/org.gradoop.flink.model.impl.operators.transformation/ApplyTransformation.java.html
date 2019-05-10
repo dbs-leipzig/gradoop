@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApplyTransformation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.transformation</a> &gt; <span class="el_source">ApplyTransformation.java</span></div><h1>ApplyTransformation.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.transformation;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.model.impl.operators.transformation.functions.TransformGraphTransaction;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+/**
+ * Applies the transformation operator on on all logical graphs in a graph
+ * collection.
+ */
+public class ApplyTransformation extends Transformation&lt;GraphHead, Vertex, Edge, LogicalGraph&gt;
+  implements ApplicableUnaryGraphToGraphOperator {
+
+  /**
+   * Creates a new operator instance.
+   *
+   * @param graphHeadModFunc graph head transformation function
+   * @param vertexModFunc    vertex transformation function
+   * @param edgeModFunc      edge transformation function
+   */
+  public ApplyTransformation(TransformationFunction&lt;GraphHead&gt; graphHeadModFunc,
+    TransformationFunction&lt;Vertex&gt; vertexModFunc,
+    TransformationFunction&lt;Edge&gt; edgeModFunc) {
+<span class="fc" id="L47">    super(graphHeadModFunc, vertexModFunc, edgeModFunc);</span>
+<span class="fc" id="L48">  }</span>
+
+
+  @Override
+  public GraphCollection executeForGVELayout(GraphCollection collection) {
+    // the resulting logical graph holds multiple graph heads
+<span class="fc" id="L54">    LogicalGraph modifiedGraph = executeInternal(</span>
+<span class="fc" id="L55">      collection.getGraphHeads(),</span>
+<span class="fc" id="L56">      collection.getVertices(),</span>
+<span class="fc" id="L57">      collection.getEdges(),</span>
+<span class="fc" id="L58">      collection.getConfig().getLogicalGraphFactory());</span>
+
+<span class="fc" id="L60">    return collection.getFactory().fromDataSets(</span>
+<span class="fc" id="L61">      modifiedGraph.getGraphHead(),</span>
+<span class="fc" id="L62">      modifiedGraph.getVertices(),</span>
+<span class="fc" id="L63">      modifiedGraph.getEdges());</span>
+  }
+
+  @Override
+  public GraphCollection executeForTxLayout(GraphCollection collection) {
+<span class="fc" id="L68">    DataSet&lt;GraphTransaction&gt; graphTransactions = collection.getGraphTransactions();</span>
+
+<span class="fc" id="L70">    GradoopFlinkConfig config = collection.getConfig();</span>
+
+<span class="fc" id="L72">    DataSet&lt;GraphTransaction&gt; transformedGraphTransactions = graphTransactions</span>
+<span class="fc" id="L73">      .map(new TransformGraphTransaction(</span>
+<span class="fc" id="L74">        collection.getFactory().getGraphHeadFactory(),</span>
+        graphHeadTransFunc,
+<span class="fc" id="L76">        collection.getFactory().getVertexFactory(),</span>
+        vertexTransFunc,
+<span class="fc" id="L78">        collection.getFactory().getEdgeFactory(),</span>
+        edgeTransFunc
+      ));
+
+<span class="fc" id="L82">    return config.getGraphCollectionFactory().fromTransactions(transformedGraphTransactions);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

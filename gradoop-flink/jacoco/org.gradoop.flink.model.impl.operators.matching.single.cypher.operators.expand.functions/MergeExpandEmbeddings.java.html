@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MergeExpandEmbeddings.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions</a> &gt; <span class="el_source">MergeExpandEmbeddings.java</span></div><h1>MergeExpandEmbeddings.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions;
+
+import org.apache.flink.api.common.functions.RichFlatJoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.EdgeWithTiePoint;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
+
+import java.util.List;
+
+/**
+ * Combines the results of a join between ExpandIntermediateResults and an edge embedding by growing
+ * the intermediate result.
+ * Before growing it is checked whether distinctiveness conditions would still apply.
+ */
+@FunctionAnnotation.ForwardedFieldsFirst(&quot;f0&quot;)
+@FunctionAnnotation.ForwardedFieldsSecond(&quot;f2&quot;)
+public class MergeExpandEmbeddings
+  extends RichFlatJoinFunction&lt;ExpandEmbedding, EdgeWithTiePoint, ExpandEmbedding&gt; {
+
+  /**
+   * Holds the index of all vertex columns that should be distinct
+   */
+  private final List&lt;Integer&gt; distinctVertices;
+  /**
+   * Holds the index of all edge columns that should be distinct
+   */
+  private final List&lt;Integer&gt; distinctEdges;
+  /**
+   * Specifies a base column that should be equal to the paths end node
+   */
+  private final int closingColumn;
+
+  /**
+   * Create a new Combine Expand Embeddings Operator
+   * @param distinctVertices distinct vertex columns
+   * @param distinctEdges distinct edge columns
+   * @param closingColumn base column that should be equal to a paths end node
+   */
+  public MergeExpandEmbeddings(List&lt;Integer&gt; distinctVertices,
+<span class="fc" id="L57">    List&lt;Integer&gt; distinctEdges, int closingColumn) {</span>
+
+<span class="fc" id="L59">    this.distinctVertices = distinctVertices;</span>
+<span class="fc" id="L60">    this.distinctEdges = distinctEdges;</span>
+<span class="fc" id="L61">    this.closingColumn = closingColumn;</span>
+<span class="fc" id="L62">  }</span>
+
+  @Override
+  public void join(ExpandEmbedding base, EdgeWithTiePoint edge,
+    Collector&lt;ExpandEmbedding&gt; out) throws Exception {
+
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    if (checkDistinctiveness(base, edge)) {</span>
+<span class="fc" id="L69">      out.collect(base.grow(edge));</span>
+    }
+<span class="fc" id="L71">  }</span>
+
+  /**
+   * Checks the distinctiveness criteria for the expansion
+   * @param prev previous intermediate result
+   * @param edge edge along which we expand
+   * @return true if distinct criteria apply for the expansion
+   */
+  private boolean checkDistinctiveness(ExpandEmbedding prev, EdgeWithTiePoint edge) {
+<span class="fc bfc" id="L80" title="All 4 branches covered.">    if (distinctVertices.isEmpty() &amp;&amp; distinctEdges.isEmpty()) {</span>
+<span class="fc" id="L81">      return true;</span>
+    }
+
+    // the new candidate is invalid under vertex isomorphism
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    if (edge.getSource().equals(edge.getTarget()) &amp;&amp;</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">      !distinctVertices.isEmpty()) {</span>
+<span class="fc" id="L87">      return false;</span>
+    }
+
+    // check if there are any clashes in the path
+<span class="fc bfc" id="L91" title="All 2 branches covered.">    for (GradoopId ref : prev.getPath()) {</span>
+<span class="pc bpc" id="L92" title="1 of 4 branches missed.">      if ((ref.equals(edge.getSource()) || ref.equals(edge.getTarget()) &amp;&amp;</span>
+<span class="pc bpc" id="L93" title="1 of 6 branches missed.">        !distinctVertices.isEmpty()) || (ref.equals(edge.getId()) &amp;&amp; !distinctEdges.isEmpty())) {</span>
+<span class="fc" id="L94">        return false;</span>
+      }
+    }
+
+    List&lt;GradoopId&gt; ref;
+
+    // check for clashes with distinct vertices in the base
+<span class="fc bfc" id="L101" title="All 2 branches covered.">    for (int i : distinctVertices) {</span>
+<span class="fc" id="L102">      ref = prev.getBase().getIdAsList(i);</span>
+<span class="fc bfc" id="L103" title="All 4 branches covered.">      if ((ref.contains(edge.getTarget()) &amp;&amp; i != closingColumn) ||</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">        ref.contains(edge.getSource())) {</span>
+<span class="fc" id="L105">        return false;</span>
+      }
+<span class="fc" id="L107">    }</span>
+
+    // check for clashes with distinct edges in the base
+<span class="fc" id="L110">    ref = prev.getBase().getIdsAsList(distinctEdges);</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">    return !ref.contains(edge.getId());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

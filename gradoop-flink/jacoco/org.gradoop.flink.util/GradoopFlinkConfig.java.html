@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GradoopFlinkConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.util</a> &gt; <span class="el_source">GradoopFlinkConfig.java</span></div><h1>GradoopFlinkConfig.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.util;
+
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.config.GradoopConfig;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
+import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
+
+import java.util.Objects;
+
+/**
+ * Configuration for Gradoop running on Flink.
+ */
+public class GradoopFlinkConfig extends GradoopConfig&lt;GraphHead, Vertex, Edge&gt; {
+
+  /**
+   * Flink execution environment.
+   */
+  private final ExecutionEnvironment executionEnvironment;
+
+  /**
+   * Creates instances of {@link LogicalGraph}
+   */
+  private final BaseGraphFactory&lt;GraphHead, Vertex, Edge, LogicalGraph&gt; logicalGraphFactory;
+
+  /**
+   * Creates instances of {@link GraphCollection}
+   */
+  private final BaseGraphCollectionFactory&lt;GraphHead, Vertex, Edge, GraphCollection&gt;
+    graphCollectionFactory;
+
+  /**
+   * Creates a new Configuration.
+   *
+   * @param executionEnvironment Flink execution environment
+   * @param logicalGraphLayoutFactory Factory for creating logical graphs
+   * @param graphCollectionLayoutFactory Factory for creating graph collections
+   */
+  protected GradoopFlinkConfig(
+    ExecutionEnvironment executionEnvironment,
+    LogicalGraphLayoutFactory&lt;GraphHead, Vertex, Edge&gt; logicalGraphLayoutFactory,
+    GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; graphCollectionLayoutFactory) {
+<span class="fc" id="L68">    super();</span>
+
+<span class="fc" id="L70">    Objects.requireNonNull(executionEnvironment);</span>
+<span class="fc" id="L71">    Objects.requireNonNull(logicalGraphLayoutFactory);</span>
+<span class="fc" id="L72">    Objects.requireNonNull(graphCollectionLayoutFactory);</span>
+
+<span class="fc" id="L74">    this.executionEnvironment = executionEnvironment;</span>
+
+    // init with default layout factories
+<span class="fc" id="L77">    this.logicalGraphFactory = new LogicalGraphFactory(this);</span>
+<span class="fc" id="L78">    this.logicalGraphFactory.setLayoutFactory(logicalGraphLayoutFactory);</span>
+
+<span class="fc" id="L80">    this.graphCollectionFactory = new GraphCollectionFactory(this);</span>
+<span class="fc" id="L81">    this.graphCollectionFactory.setLayoutFactory(graphCollectionLayoutFactory);</span>
+<span class="fc" id="L82">  }</span>
+
+  /**
+   * Creates a default Gradoop Flink configuration using POJO handlers.
+   *
+   * @param env Flink execution environment.
+   *
+   * @return the Gradoop Flink configuration
+   */
+  public static GradoopFlinkConfig createConfig(ExecutionEnvironment env) {
+<span class="fc" id="L92">    return new GradoopFlinkConfig(env,</span>
+      new GVEGraphLayoutFactory(), new GVECollectionLayoutFactory());
+  }
+
+  /**
+   * Creates a Gradoop Flink configuration using the given parameters.
+   *
+   * @param env Flink execution environment
+   * @param logicalGraphLayoutFactory factory to create logical graph layouts
+   * @param graphCollectionLayoutFactory factory to create graph collection layouts
+   * @return Gradoop Flink configuration
+   */
+  public static GradoopFlinkConfig createConfig(ExecutionEnvironment env,
+    LogicalGraphLayoutFactory&lt;GraphHead, Vertex, Edge&gt; logicalGraphLayoutFactory,
+    GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; graphCollectionLayoutFactory) {
+<span class="fc" id="L107">    return new GradoopFlinkConfig(env, logicalGraphLayoutFactory, graphCollectionLayoutFactory);</span>
+  }
+
+  /**
+   * Returns the Flink execution environment.
+   *
+   * @return Flink execution environment
+   */
+  public ExecutionEnvironment getExecutionEnvironment() {
+<span class="fc" id="L116">    return executionEnvironment;</span>
+  }
+
+  /**
+   * Returns a factory that is able to create logical graph layouts.
+   *
+   * @return factory for logical graph layouts
+   */
+  public LogicalGraphFactory getLogicalGraphFactory() {
+<span class="fc" id="L125">    return (LogicalGraphFactory) logicalGraphFactory;</span>
+  }
+
+  /**
+   * Returns a factory that is able to create graph collection layouts.
+   *
+   * @return factory for graph collection layouts
+   */
+  public GraphCollectionFactory getGraphCollectionFactory() {
+<span class="fc" id="L134">    return (GraphCollectionFactory) graphCollectionFactory;</span>
+  }
+
+  /**
+   * Sets the layout factory for building layouts that represent a
+   * {@link LogicalGraph}.
+   *
+   * @param factory logical graph layout factor
+   */
+  public void setLogicalGraphLayoutFactory(
+    LogicalGraphLayoutFactory&lt;GraphHead, Vertex, Edge&gt; factory) {
+<span class="fc" id="L145">    Objects.requireNonNull(factory);</span>
+<span class="fc" id="L146">    factory.setGradoopFlinkConfig(this);</span>
+<span class="fc" id="L147">    logicalGraphFactory.setLayoutFactory(factory);</span>
+<span class="fc" id="L148">  }</span>
+
+  /**
+   * Sets the layout factory for building layouts that represent a
+   * {@link GraphCollection}.
+   *
+   * @param factory graph collection layout factory
+   */
+  public void setGraphCollectionLayoutFactory(
+    GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; factory) {
+<span class="fc" id="L158">    Objects.requireNonNull(factory);</span>
+<span class="fc" id="L159">    factory.setGradoopFlinkConfig(this);</span>
+<span class="fc" id="L160">    graphCollectionFactory.setLayoutFactory(factory);</span>
+<span class="fc" id="L161">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

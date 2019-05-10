@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GroupCountEquals.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.intersection.functions</a> &gt; <span class="el_source">GroupCountEquals.java</span></div><h1>GroupCountEquals.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.intersection.functions;
+
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.impl.operators.intersection.Intersection;
+
+import java.util.Iterator;
+
+/**
+ * If the number of grouped elements equals a given expected size, return the
+ * last element.
+ *
+ * @param &lt;O&gt; any object type
+ * @see Intersection
+ */
+public class GroupCountEquals&lt;O&gt; implements GroupReduceFunction&lt;O, O&gt; {
+
+  /**
+   * User defined expectedGroupSize.
+   */
+  private final long expectedGroupSize;
+
+  /**
+   * Constructor
+   *
+   * @param expectedGroupSize expected group size
+   */
+<span class="fc" id="L43">  public GroupCountEquals(long expectedGroupSize) {</span>
+<span class="fc" id="L44">    this.expectedGroupSize = expectedGroupSize;</span>
+<span class="fc" id="L45">  }</span>
+
+  /**
+   * If the number of elements in the group is equal to the user expected
+   * group size, the last element is returned.
+   *
+   * @param iterable  graph data
+   * @param collector output collector (contains 0 or 1 graph)
+   * @throws Exception on failure
+   */
+  @Override
+  public void reduce(Iterable&lt;O&gt; iterable,
+    Collector&lt;O&gt; collector) throws Exception {
+<span class="fc" id="L58">    Iterator&lt;O&gt; iterator = iterable.iterator();</span>
+<span class="fc" id="L59">    long count = 0L;</span>
+<span class="fc" id="L60">    O object = null;</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
+<span class="fc" id="L62">      object = iterator.next();</span>
+<span class="fc" id="L63">      count++;</span>
+    }
+<span class="fc bfc" id="L65" title="All 2 branches covered.">    if (count == expectedGroupSize) {</span>
+<span class="fc" id="L66">      collector.collect(object);</span>
+    }
+<span class="fc" id="L68">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

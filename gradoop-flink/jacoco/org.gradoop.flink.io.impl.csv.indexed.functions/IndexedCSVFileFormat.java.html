@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IndexedCSVFileFormat.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.csv.indexed.functions</a> &gt; <span class="el_source">IndexedCSVFileFormat.java</span></div><h1>IndexedCSVFileFormat.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.csv.indexed.functions;
+
+import org.apache.flink.api.common.io.OutputFormat;
+import org.apache.flink.api.java.io.CsvOutputFormat;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.core.fs.Path;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
+import org.gradoop.flink.io.impl.csv.tuples.CSVElement;
+
+/**
+ * This is an OutputFormat to serialize {@link Tuple}s to text by their labels.
+ * The output is structured by record delimiters and field delimiters as common in CSV files.
+ * Record delimiter separate records from each other ('\n' is common). Field
+ * delimiters separate fields within a record.
+ *
+ * @param &lt;T&gt; Tuple that will be written to csv
+ *
+ * references to: org.apache.flink.api.java.io.CSVOutputFormat
+ */
+public class IndexedCSVFileFormat&lt;T extends Tuple &amp; CSVElement&gt;
+  extends MultipleFileOutputFormat&lt;T&gt; {
+
+  /**
+   * The default line delimiter if no one is set.
+   */
+<span class="fc" id="L42">  public static final String DEFAULT_LINE_DELIMITER = CSVConstants.ROW_DELIMITER;</span>
+
+  /**
+   * The default field delimiter if no is set.
+   */
+  public static final String DEFAULT_FIELD_DELIMITER = CSVConstants.TOKEN_DELIMITER;
+
+  // --------------------------------------------------------------------------------
+
+  /**
+   * The character the fields should be separated.
+   */
+  private String fieldDelimiter;
+
+  /**
+   * The character the lines should be separated.
+   */
+  private String recordDelimiter;
+
+  /**
+   * The charset that is used for the output encoding.
+   */
+<span class="fc" id="L64">  private String charsetName = null;</span>
+
+  /**
+   * Creates a new instance of an IndexedCSVFileFormat. Use the default record delimiter '\n'
+   * and the default field delimiter ','.
+   *
+   * @param outputPath The path where the CSV file will be written.
+   */
+  public IndexedCSVFileFormat(Path outputPath) {
+<span class="nc" id="L73">    this(outputPath, DEFAULT_LINE_DELIMITER, DEFAULT_FIELD_DELIMITER);</span>
+<span class="nc" id="L74">  }</span>
+
+  /**
+   * Creates a new instance of an IndexedCSVFileFormat. Use the default record delimiter '\n'.
+   *
+   * @param outputPath The path where the CSV file will be written.
+   * @param fieldDelimiter The field delimiter for the CSV file.
+   */
+  public IndexedCSVFileFormat(Path outputPath, String fieldDelimiter) {
+<span class="nc" id="L83">    this(outputPath, DEFAULT_LINE_DELIMITER, fieldDelimiter);</span>
+<span class="nc" id="L84">  }</span>
+
+  /**
+   * Creates a new instance of an IndexedCSVFileFormat.
+   *
+   * @param outputPath The path where the CSV file will be written.
+   * @param recordDelimiter The record delimiter for the CSV file.
+   * @param fieldDelimiter The field delimiter for the CSV file.
+   */
+  public IndexedCSVFileFormat(Path outputPath, String recordDelimiter, String fieldDelimiter) {
+<span class="fc" id="L94">    super(outputPath);</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">    if (recordDelimiter == null) {</span>
+<span class="nc" id="L96">      throw new IllegalArgumentException(&quot;RecordDelmiter shall not be null.&quot;);</span>
+    }
+
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">    if (fieldDelimiter == null) {</span>
+<span class="nc" id="L100">      throw new IllegalArgumentException(&quot;FieldDelimiter shall not be null.&quot;);</span>
+    }
+
+<span class="fc" id="L103">    this.fieldDelimiter = fieldDelimiter;</span>
+<span class="fc" id="L104">    this.recordDelimiter = recordDelimiter;</span>
+<span class="fc" id="L105">  }</span>
+
+  /**
+   * Sets the charset with which the CSV strings are written to the file.
+   * If not specified, the output format uses the systems default character encoding.
+   *
+   * @param charsetName The name of charset to use for encoding the output.
+   */
+  public void setCharsetName(String charsetName) {
+<span class="nc" id="L114">    this.charsetName = charsetName;</span>
+<span class="nc" id="L115">  }</span>
+
+  @Override
+  protected OutputFormat&lt;T&gt; createFormatForDirectory(Path directory) {
+<span class="fc" id="L119">    CsvOutputFormat&lt;T&gt; format = new CsvOutputFormat&lt;&gt;(directory, recordDelimiter, fieldDelimiter);</span>
+    // OVERWRITE in a distributed fs would delete the label directory including already written
+    // files of other workers. In a local fs it does not delete the directory but it would not
+    // overwrite files of workers not having a specific label.
+    // initializeGlobal() takes care of OVERWRITE.
+<span class="fc" id="L124">    format.setWriteMode(FileSystem.WriteMode.NO_OVERWRITE);</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">    if (charsetName != null) {</span>
+<span class="nc" id="L126">      format.setCharsetName(charsetName);</span>
+    }
+<span class="fc" id="L128">    format.configure(configuration);</span>
+<span class="fc" id="L129">    return format;</span>
+  }
+
+  @Override
+  protected String getDirectoryForRecord(T record) {
+<span class="fc" id="L134">    String label = record.getLabel();</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">    if (label.isEmpty()) {</span>
+<span class="fc" id="L136">      return cleanFilename(CSVConstants.DEFAULT_DIRECTORY) + Path.SEPARATOR +</span>
+        CSVConstants.SIMPLE_FILE;
+    } else {
+<span class="fc" id="L139">      return cleanFilename(label) + Path.SEPARATOR + CSVConstants.SIMPLE_FILE;</span>
+    }
+  }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

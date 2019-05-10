@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VCIComputeFunction.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.gelly.randomjump.functions</a> &gt; <span class="el_source">VCIComputeFunction.java</span></div><h1>VCIComputeFunction.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.gelly.randomjump.functions;
+
+import com.google.common.collect.Lists;
+import org.apache.flink.api.common.aggregators.LongSumAggregator;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.graph.Edge;
+import org.apache.flink.graph.Vertex;
+import org.apache.flink.graph.pregel.ComputeFunction;
+import org.apache.flink.graph.pregel.MessageIterator;
+import org.apache.flink.types.LongValue;
+import org.apache.flink.types.NullValue;
+import org.gradoop.flink.algorithms.gelly.randomjump.KRandomJumpGellyVCI;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
+/**
+ * Compute function for {@link KRandomJumpGellyVCI}. Vertex values are of type
+ * {@link VCIVertexValue}, with fields:
+ * &lt;p&gt;&lt;ul&gt;
+ * &lt;li&gt;f0: {@code Boolean} set to {@code true} if the vertex was visited, to {@code false}
+ * otherwise
+ * &lt;li&gt;f1: {@code List&lt;Long&gt;} containing all long indices from already visited outgoing edges
+ * &lt;/ul&gt;&lt;/p&gt;
+ * A message of type {@code NullValue} from one vertex to another is a walk respective a jump to
+ * this other vertex and therefor considered as one of {@link KRandomJumpGellyVCI#k} walkers.
+ */
+public class VCIComputeFunction extends ComputeFunction&lt;Long, VCIVertexValue, Long, NullValue&gt; {
+
+  /**
+   * Name of the broadcast set containing the indices for the k starting vertices.
+   */
+  public static final String START_INDICES_BROADCAST_SET = &quot;startIndices&quot;;
+
+  /**
+   * Name of the broadcast set containing the graphs vertex indices.
+   */
+  public static final String VERTEX_INDICES_BROADCAST_SET = &quot;vertexIndices&quot;;
+
+  /**
+   * Name for the LongSumAggregator used for counting the visited vertices.
+   */
+  public static final String VISITED_VERTICES_AGGREGATOR_NAME = &quot;visitedVerticesAggregator&quot;;
+
+  /**
+   * Probability for jumping to a random vertex instead of walking to a random neighbor.
+   */
+  private final double jumpProbability;
+
+  /**
+   * Number of vertices to visit at least.
+   */
+  private final long verticesToVisit;
+
+  /**
+   * List with the indices for the k starting vertices.
+   */
+  private List&lt;Long&gt; startIndices;
+
+  /**
+   * List containing the graphs vertex indices.
+   */
+  private List&lt;Long&gt; vertexIndices;
+
+  /**
+   * The LongSumAggregator used for counting the visited vertices.
+   */
+  private LongSumAggregator visitedVerticesAggregator;
+
+  /**
+   * Keeping track of the currently visited vertices at the beginning at each superstep.
+   */
+  private long currentVisitedCount;
+
+  /**
+   * Creates an instance of VCIComputeFunction.
+   *
+   * @param jumpProbability Probability for jumping to random vertex instead of walking to random
+   *                        neighbor.
+   * @param verticesToVisit Number of vertices to visit via walk or jump.
+   */
+<span class="fc" id="L98">  public VCIComputeFunction(double jumpProbability, long verticesToVisit) {</span>
+<span class="fc" id="L99">    this.jumpProbability = jumpProbability;</span>
+<span class="fc" id="L100">    this.verticesToVisit = verticesToVisit;</span>
+<span class="fc" id="L101">    this.visitedVerticesAggregator = new LongSumAggregator();</span>
+<span class="fc" id="L102">    this.currentVisitedCount = 0L;</span>
+<span class="fc" id="L103">  }</span>
+
+  /**
+   * {@inheritDoc}
+   *
+   * Reads the broadcast sets for the starting vertices and the graph vertices. Retrieves the
+   * aggregator for visited vertices and accumulates the visited vertices from the previous
+   * superstep.
+   */
+  @Override
+  public void preSuperstep() {
+<span class="fc" id="L114">    startIndices = (List&lt;Long&gt;) this.&lt;Long&gt;getBroadcastSet(START_INDICES_BROADCAST_SET);</span>
+<span class="fc" id="L115">    vertexIndices = (List&lt;Long&gt;) this.&lt;Long&gt;getBroadcastSet(VERTEX_INDICES_BROADCAST_SET);</span>
+<span class="fc" id="L116">    visitedVerticesAggregator = getIterationAggregator(VISITED_VERTICES_AGGREGATOR_NAME);</span>
+<span class="fc" id="L117">    LongValue previousAggregate = getPreviousIterationAggregate(VISITED_VERTICES_AGGREGATOR_NAME);</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">    if (previousAggregate != null) {</span>
+<span class="fc" id="L119">      currentVisitedCount += previousAggregate.getValue();</span>
+    }
+<span class="fc" id="L121">  }</span>
+
+  /**
+   * {@inheritDoc}
+   *
+   * Initially starts the first walk or jump from the given start vertices. Afterwards starts a
+   * walk or jump from a vertex, if it received messages from other vertices. Stops the
+   * computation and therefor the iteration if the number of currently visited vertices exceeds
+   * the number of vertices to visit.
+   *
+   * @param vertex The vertex this computation in a superstep is running for.
+   * @param messages Iterator over all incoming messages
+   */
+  @Override
+  public void compute(Vertex&lt;Long, VCIVertexValue&gt; vertex, MessageIterator&lt;NullValue&gt; messages) {
+<span class="fc bfc" id="L136" title="All 2 branches covered.">    if (currentVisitedCount &lt; verticesToVisit) {</span>
+<span class="fc" id="L137">      List&lt;Edge&lt;Long, Long&gt;&gt; edgesList = Lists.newArrayList(getEdges());</span>
+<span class="fc" id="L138">      Tuple2&lt;VCIVertexValue, Boolean&gt; valueWithHasChanged = Tuple2.of(vertex.getValue(), false);</span>
+<span class="fc bfc" id="L139" title="All 4 branches covered.">      if (startIndices.contains(vertex.getId()) &amp;&amp; !valueWithHasChanged.f0.isVisited()) {</span>
+<span class="fc" id="L140">        valueWithHasChanged = walkToRandomNeighbor(valueWithHasChanged, edgesList);</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">      } else if (messages.hasNext()) {</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        for (NullValue msg : messages) {</span>
+<span class="fc" id="L143">          valueWithHasChanged = walkToRandomNeighbor(valueWithHasChanged, edgesList);</span>
+<span class="fc" id="L144">        }</span>
+      }
+<span class="fc bfc" id="L146" title="All 2 branches covered.">      if (valueWithHasChanged.f1) {</span>
+<span class="fc" id="L147">        setNewVertexValue(valueWithHasChanged.f0);</span>
+      }
+    }
+<span class="fc" id="L150">  }</span>
+
+  /**
+   * Performs a walk to a random neighbor by sending a message to a target from an unvisited
+   * outgoing edge. Sets the vertex value as visited if necessary and updates the visited edge ids.
+   * Sets a boolean flag, if the vertex value has changed.
+   * Alternatively performs a jump to a random vertex with a probability given in
+   * {@link #jumpProbability} or if there are no unvisited outgoing edges.
+   * Returns the vertex value with the boolean flag as {@code Tuple2} eventually.
+   *
+   * @param valueWithHasChanged {@code Tuple2} containing the vertex value and a boolean flag
+   *                            determining if the value has changed
+   * @param edgesList List of all outgoing edge for the vertex
+   * @return {@code Tuple2} containing the vertex value and a boolean flag determining if the
+   *         value has changed
+   */
+  private Tuple2&lt;VCIVertexValue, Boolean&gt; walkToRandomNeighbor(
+    Tuple2&lt;VCIVertexValue, Boolean&gt; valueWithHasChanged, List&lt;Edge&lt;Long, Long&gt;&gt; edgesList) {
+<span class="fc bfc" id="L168" title="All 2 branches covered.">    if (!valueWithHasChanged.f0.isVisited()) {</span>
+<span class="fc" id="L169">      visitedVerticesAggregator.aggregate(1L);</span>
+<span class="fc" id="L170">      valueWithHasChanged.f0.setVisited();</span>
+<span class="fc" id="L171">      valueWithHasChanged.f1 = true;</span>
+    }
+<span class="pc bpc" id="L173" title="1 of 4 branches missed.">    if ((jumpProbability == 0d) || (jumpProbability &lt; ThreadLocalRandom.current().nextDouble())) {</span>
+<span class="fc" id="L174">      List&lt;Tuple2&lt;Long, Long&gt;&gt; unvisitedNeighborWithEdgeId = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">      for (Edge&lt;Long, Long&gt; edge : edgesList) {</span>
+<span class="fc bfc" id="L176" title="All 2 branches covered.">        if (!valueWithHasChanged.f0.getVisitedOutEdges().contains(edge.getValue())) {</span>
+<span class="fc" id="L177">          unvisitedNeighborWithEdgeId.add(Tuple2.of(edge.getTarget(), edge.getValue()));</span>
+        }
+<span class="fc" id="L179">      }</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">      if (!unvisitedNeighborWithEdgeId.isEmpty()) {</span>
+<span class="fc" id="L181">        int randomIndex = ThreadLocalRandom.current().nextInt(unvisitedNeighborWithEdgeId.size());</span>
+<span class="fc" id="L182">        Long randomNeighborIndex = unvisitedNeighborWithEdgeId.get(randomIndex).f0;</span>
+<span class="fc" id="L183">        valueWithHasChanged.f0.addVisitedOutEdge(unvisitedNeighborWithEdgeId.get(randomIndex).f1);</span>
+<span class="fc" id="L184">        sendMessageTo(randomNeighborIndex, new NullValue());</span>
+<span class="fc" id="L185">        valueWithHasChanged.f1 = true;</span>
+<span class="fc" id="L186">      } else {</span>
+<span class="fc" id="L187">        jumpToRandomVertex();</span>
+      }
+<span class="fc" id="L189">    } else {</span>
+<span class="fc" id="L190">      jumpToRandomVertex();</span>
+    }
+<span class="fc" id="L192">    return valueWithHasChanged;</span>
+  }
+
+  /**
+   * Jumps to a random vertex in the graph by sending a message to this vertex.
+   */
+  private void jumpToRandomVertex() {
+<span class="fc" id="L199">    int randomIndex = ThreadLocalRandom.current().nextInt(vertexIndices.size());</span>
+<span class="fc" id="L200">    Long randomVertexIndex = vertexIndices.get(randomIndex);</span>
+<span class="fc" id="L201">    sendMessageTo(randomVertexIndex, new NullValue());</span>
+<span class="fc" id="L202">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

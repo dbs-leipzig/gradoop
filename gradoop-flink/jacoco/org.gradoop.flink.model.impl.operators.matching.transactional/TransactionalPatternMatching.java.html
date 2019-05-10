@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TransactionalPatternMatching.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.transactional</a> &gt; <span class="el_source">TransactionalPatternMatching.java</span></div><h1>TransactionalPatternMatching.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.transactional;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple4;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.tuple.Project4To0And1;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingEdges;
+import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingVertices;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.ExpandFirstField;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.FindEmbeddings;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.HasEmbeddings;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.MergeSecondField;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.AddMatchesToProperties;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.BuildGraphWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.BuildIdWithCandidatesAndGraphs;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.BuildTripleWithCandidatesAndGraphs;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.InitGraphHeadWithLineage;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.Project4To0And2AndSwitch;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.Project4To0And3AndSwitch;
+import org.gradoop.flink.model.impl.operators.matching.transactional.tuples.GraphWithCandidates;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
+
+/**
+ * Operator to match a given pattern on a graph collection
+ */
+public class TransactionalPatternMatching implements UnaryCollectionToCollectionOperator {
+  /**
+   * Query Pattern
+   */
+  private String query;
+  /**
+   * Actual used algorithm
+   */
+  private PatternMatchingAlgorithm algorithm;
+
+  /**
+   * Flag that determines what the result consists of:
+   * false: source graphs with an new property that is true iff the pattern
+   *        was found in this graph
+   * true:  one graph per found embedding
+   */
+  private boolean findEmbeddings;
+
+  /**
+   * Constructor
+   *
+   * @param algorithm pattern matching algorithm
+   * @param query     given query-pattern
+   * @param findEmbeddings  flag that determines the type of the return
+   *                        false:  source graphs with an new property that is
+   *                                true iff the pattern was found in this graph
+   *                        true:   one graph per found embedding
+   */
+  public TransactionalPatternMatching(
+    String query,
+    PatternMatchingAlgorithm algorithm,
+<span class="fc" id="L84">    boolean findEmbeddings) {</span>
+<span class="fc" id="L85">    this.query = query;</span>
+<span class="fc" id="L86">    this.algorithm = algorithm;</span>
+<span class="fc" id="L87">    this.findEmbeddings = findEmbeddings;</span>
+<span class="fc" id="L88">  }</span>
+
+  @Override
+  public GraphCollection execute(GraphCollection collection) {
+
+    //--------------------------------------------------------------------------
+    // generate graph-id set witch will be used for generating mappings
+    //--------------------------------------------------------------------------
+<span class="fc" id="L96">    DataSet&lt;GradoopId&gt; graphIds = collection.getGraphHeads().map(new Id&lt;&gt;());</span>
+
+    //--------------------------------------------------------------------------
+    // generate mapping from graph-id to vertex candidates
+    //--------------------------------------------------------------------------
+<span class="fc" id="L101">    DataSet&lt;Tuple2&lt;GradoopId, IdWithCandidates&lt;GradoopId&gt;&gt;&gt; vertexCandidatesWithGraphs =</span>
+<span class="fc" id="L102">      collection.getVertices()</span>
+<span class="fc" id="L103">        .filter(new MatchingVertices&lt;&gt;(query))</span>
+<span class="fc" id="L104">        .map(new BuildIdWithCandidatesAndGraphs&lt;&gt;(query))</span>
+<span class="fc" id="L105">        .flatMap(new ExpandFirstField&lt;&gt;())</span>
+<span class="fc" id="L106">        .join(graphIds)</span>
+<span class="fc" id="L107">        .where(0).equalTo(&quot;*&quot;)</span>
+<span class="fc" id="L108">        .with(new LeftSide&lt;&gt;());</span>
+
+    //--------------------------------------------------------------------------
+    // generate mapping from graph-id to edge candidates
+    //--------------------------------------------------------------------------
+<span class="fc" id="L113">    DataSet&lt;Tuple2&lt;GradoopId, TripleWithCandidates&lt;GradoopId&gt;&gt;&gt; edgeCandidatesWithGraphs =</span>
+<span class="fc" id="L114">      collection.getEdges()</span>
+<span class="fc" id="L115">        .filter(new MatchingEdges&lt;&gt;(query))</span>
+<span class="fc" id="L116">        .map(new BuildTripleWithCandidatesAndGraphs&lt;&gt;(query))</span>
+<span class="fc" id="L117">        .flatMap(new ExpandFirstField&lt;&gt;())</span>
+<span class="fc" id="L118">        .join(graphIds)</span>
+<span class="fc" id="L119">        .where(0).equalTo(&quot;*&quot;)</span>
+<span class="fc" id="L120">        .with(new LeftSide&lt;&gt;());</span>
+
+    //--------------------------------------------------------------------------
+    // generate graphs with the candidates for their elements
+    //--------------------------------------------------------------------------
+<span class="fc" id="L125">    DataSet&lt;GraphWithCandidates&gt; graphs = vertexCandidatesWithGraphs</span>
+<span class="fc" id="L126">      .coGroup(edgeCandidatesWithGraphs)</span>
+<span class="fc" id="L127">      .where(0).equalTo(0)</span>
+<span class="fc" id="L128">      .with(new BuildGraphWithCandidates());</span>
+
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">    if (findEmbeddings) {</span>
+<span class="fc" id="L131">      return findEmbeddings(collection, graphs);</span>
+    } else {
+<span class="nc" id="L133">      return hasEmbeddings(collection, graphs);</span>
+    }
+  }
+
+  /**
+   * Returns the input graph collection with a new property for each graph, that
+   * states if it contains the embedding.
+   * @param collection input graph collection
+   * @param graphs graphs with candidates of their elements
+   * @return input graph collection with new boolean property
+   */
+  private GraphCollection hasEmbeddings(GraphCollection collection,
+    DataSet&lt;GraphWithCandidates&gt; graphs) {
+    //--------------------------------------------------------------------------
+    // run matching algorithm
+    //--------------------------------------------------------------------------
+<span class="nc" id="L149">    DataSet&lt;Tuple2&lt;GradoopId, Boolean&gt;&gt; matches = graphs.map(new HasEmbeddings(algorithm, query));</span>
+
+    //--------------------------------------------------------------------------
+    // join matches to graph heads
+    //--------------------------------------------------------------------------
+<span class="nc" id="L154">    DataSet&lt;GraphHead&gt; newHeads = collection.getGraphHeads()</span>
+<span class="nc" id="L155">      .coGroup(matches)</span>
+<span class="nc" id="L156">      .where(new Id&lt;&gt;()).equalTo(0)</span>
+<span class="nc" id="L157">      .with(new AddMatchesToProperties());</span>
+
+    //--------------------------------------------------------------------------
+    // return updated graph collection
+    //--------------------------------------------------------------------------
+<span class="nc" id="L162">    return collection.getConfig().getGraphCollectionFactory().fromDataSets(</span>
+<span class="nc" id="L163">      newHeads, collection.getVertices(), collection.getEdges());</span>
+  }
+
+
+  /**
+   * Finds all embeddings in the given graph and constructs a new graph
+   * collection consisting of these embeddings.
+   * @param collection input graph collection
+   * @param graphs graphs with candidates of their elements
+   * @return collection of found embeddings
+   */
+  private GraphCollection findEmbeddings(GraphCollection collection,
+    DataSet&lt;GraphWithCandidates&gt; graphs) {
+
+    //--------------------------------------------------------------------------
+    // run the matching algorithm
+    //--------------------------------------------------------------------------
+<span class="fc" id="L180">    DataSet&lt;Tuple4&lt;GradoopId, GradoopId, GradoopIdSet, GradoopIdSet&gt;&gt; embeddings = graphs</span>
+<span class="fc" id="L181">      .flatMap(new FindEmbeddings(algorithm, query));</span>
+
+    //--------------------------------------------------------------------------
+    // create new graph heads
+    //--------------------------------------------------------------------------
+<span class="fc" id="L186">    DataSet&lt;GraphHead&gt; newHeads = embeddings</span>
+<span class="fc" id="L187">      .map(new Project4To0And1&lt;&gt;())</span>
+<span class="fc" id="L188">      .map(new InitGraphHeadWithLineage(collection.getConfig().getGraphHeadFactory()));</span>
+
+    //--------------------------------------------------------------------------
+    // update vertex graphs
+    //--------------------------------------------------------------------------
+<span class="fc" id="L193">    DataSet&lt;Tuple2&lt;GradoopId, GradoopIdSet&gt;&gt; verticesWithGraphs = embeddings</span>
+<span class="fc" id="L194">      .map(new Project4To0And2AndSwitch&lt;&gt;())</span>
+<span class="fc" id="L195">      .flatMap(new ExpandFirstField&lt;&gt;()).groupBy(0)</span>
+<span class="fc" id="L196">      .reduceGroup(new MergeSecondField&lt;&gt;());</span>
+
+<span class="fc" id="L198">    DataSet&lt;Vertex&gt; newVertices = verticesWithGraphs</span>
+<span class="fc" id="L199">      .join(collection.getVertices())</span>
+<span class="fc" id="L200">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L201">      .with(new AddGraphsToElements&lt;&gt;());</span>
+
+    //--------------------------------------------------------------------------
+    // update edge graphs
+    //--------------------------------------------------------------------------
+<span class="fc" id="L206">    DataSet&lt;Tuple2&lt;GradoopId, GradoopIdSet&gt;&gt; edgesWithGraphs = embeddings</span>
+<span class="fc" id="L207">      .map(new Project4To0And3AndSwitch&lt;&gt;())</span>
+<span class="fc" id="L208">      .flatMap(new ExpandFirstField&lt;&gt;()).groupBy(0)</span>
+<span class="fc" id="L209">      .reduceGroup(new MergeSecondField&lt;&gt;());</span>
+
+<span class="fc" id="L211">    DataSet&lt;Edge&gt; newEdges = edgesWithGraphs</span>
+<span class="fc" id="L212">      .join(collection.getEdges())</span>
+<span class="fc" id="L213">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L214">      .with(new AddGraphsToElements&lt;&gt;());</span>
+
+    //--------------------------------------------------------------------------
+    // return the embeddings
+    //--------------------------------------------------------------------------
+<span class="fc" id="L219">    return collection.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L220">      .fromDataSets(newHeads, newVertices, newEdges);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

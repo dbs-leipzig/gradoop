@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Properties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.properties</a> &gt; <span class="el_source">Properties.java</span></div><h1>Properties.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.properties;
+
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.types.Value;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+/**
+ * Represents the properties of an {@link org.gradoop.common.model.impl.pojo.Element}.
+ */
+public class Properties implements Iterable&lt;Property&gt;, Value, Serializable {
+
+  /**
+   * Default capacity for new property lists.
+   */
+  private static final int DEFAULT_CAPACITY = 10;
+
+  /**
+   * Internal representation
+   */
+  private Map&lt;String, PropertyValue&gt; properties;
+
+  /**
+   * Default constructor
+   */
+<span class="fc" id="L49">  public Properties() {</span>
+<span class="fc" id="L50">    properties = new HashMap&lt;&gt;(DEFAULT_CAPACITY);</span>
+<span class="fc" id="L51">  }</span>
+
+  /**
+   * Creates property list with given capacity.
+   *
+   * @param capacity initial capacity
+   */
+<span class="fc" id="L58">  private Properties(int capacity) {</span>
+<span class="fc" id="L59">    properties = new HashMap&lt;&gt;(capacity);</span>
+<span class="fc" id="L60">  }</span>
+
+  /**
+   * Creates a new property list.
+   *
+   * @return PropertyList
+   */
+  public static Properties create() {
+<span class="fc" id="L68">    return new Properties();</span>
+  }
+
+  /**
+   * Creates a new property list with the given initial capacity.
+   *
+   * @param capacity initial capacity
+   * @return PropertyList
+   */
+  public static Properties createWithCapacity(int capacity) {
+<span class="fc" id="L78">    return new Properties(capacity);</span>
+  }
+
+  /**
+   * Creates a new property collection from a given map.
+   *
+   * If map is {@code null} an empty properties instance will be returned.
+   *
+   * @param map key value map
+   * @return PropertyList
+   */
+  public static Properties createFromMap(Map&lt;String, Object&gt; map) {
+    Properties properties;
+
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">    if (map == null) {</span>
+<span class="nc" id="L93">      properties = Properties.createWithCapacity(0);</span>
+    } else {
+<span class="fc" id="L95">      properties = Properties.createWithCapacity(map.size());</span>
+
+<span class="fc bfc" id="L97" title="All 2 branches covered.">      for (Map.Entry&lt;String, Object&gt; entry : map.entrySet()) {</span>
+<span class="fc" id="L98">        properties.set(entry.getKey(), PropertyValue.create(entry.getValue()));</span>
+<span class="fc" id="L99">      }</span>
+    }
+
+<span class="fc" id="L102">    return properties;</span>
+  }
+
+  /**
+   * Returns property keys in insertion order.
+   *
+   * @return property keys
+   */
+  public Iterable&lt;String&gt; getKeys() {
+<span class="fc" id="L111">    return properties.keySet();</span>
+  }
+
+  /**
+   * Checks if a property with the given key is contained in the properties.
+   *
+   * @param key property key
+   * @return true, if there is a property with the given key
+   */
+  public boolean containsKey(String key) {
+<span class="fc bfc" id="L121" title="All 2 branches covered.">    return get(key) != null;</span>
+  }
+
+  /**
+   * Returns the value to the given key of {@code null} if the value does not
+   * exist.
+   *
+   * @param key property key
+   * @return property value or {@code null} if key does not exist
+   */
+  public PropertyValue get(String key) {
+<span class="fc" id="L132">    Objects.requireNonNull(key);</span>
+<span class="fc" id="L133">    return properties.get(key);</span>
+  }
+
+  /**
+   * Sets the given property. If a property with the same property key already
+   * exists, it will be replaced by the given property.
+   *
+   * @param property property
+   */
+  public void set(Property property) {
+<span class="fc" id="L143">    set(property.getKey(), property.getValue());</span>
+<span class="fc" id="L144">  }</span>
+
+  /**
+   * Sets the given property. If a property with the same property key already
+   * exists, it will be replaced by the given property.
+   *
+   * @param key   property key
+   * @param value property value
+   */
+  public void set(String key, PropertyValue value) {
+<span class="fc" id="L154">    Objects.requireNonNull(key);</span>
+<span class="fc" id="L155">    Objects.requireNonNull(value);</span>
+<span class="fc" id="L156">    properties.put(key, value);</span>
+<span class="fc" id="L157">  }</span>
+
+  /**
+   * Sets the given property. If a property with the same property key already
+   * exists, it will be replaced by the given property.
+   *
+   * @param key   property key
+   * @param value property value
+   */
+  public void set(String key, Object value) {
+    PropertyValue propertyValue;
+
+<span class="pc bpc" id="L169" title="1 of 2 branches missed.">    if (value instanceof PropertyValue) {</span>
+<span class="nc" id="L170">      propertyValue = (PropertyValue) value;</span>
+    } else {
+<span class="fc" id="L172">      propertyValue = PropertyValue.create(value);</span>
+    }
+
+<span class="fc" id="L175">    set(key, propertyValue);</span>
+<span class="fc" id="L176">  }</span>
+
+  /**
+   * Removes the property of the given key from the list.
+   *
+   * @param key property key
+   * @return the previous value associated with &lt;tt&gt;key&lt;/tt&gt;, or
+   *         &lt;tt&gt;null&lt;/tt&gt; if there was no mapping for &lt;tt&gt;key&lt;/tt&gt;.
+   */
+  public PropertyValue remove(String key) {
+<span class="fc" id="L186">    Objects.requireNonNull(key);</span>
+<span class="fc" id="L187">    return properties.remove(key);</span>
+  }
+
+  /**
+   * Removes the given property from the list.
+   *
+   * @param property property
+   * @return the previous value associated with &lt;tt&gt;key&lt;/tt&gt;, or
+   *         &lt;tt&gt;null&lt;/tt&gt; if there was no mapping for &lt;tt&gt;key&lt;/tt&gt;.
+   */
+  public PropertyValue remove(Property property) {
+<span class="fc" id="L198">    Objects.requireNonNull(property);</span>
+<span class="fc" id="L199">    return remove(property.getKey());</span>
+  }
+
+  /**
+   * Removes all elements from these properties.
+   */
+  public void clear() {
+<span class="fc" id="L206">    this.properties.clear();</span>
+<span class="fc" id="L207">  }</span>
+
+  /**
+   * Returns the number of properties.
+   *
+   * @return number of properties
+   */
+  public int size() {
+<span class="fc" id="L215">    return properties.size();</span>
+  }
+
+  /**
+   * True, if the properties collection does not store any properties.
+   *
+   * @return true if collection is empty, false otherwise
+   */
+  public boolean isEmpty() {
+<span class="fc bfc" id="L224" title="All 2 branches covered.">    return size() == 0;</span>
+  }
+
+  /**
+   * Two properties collections are considered equal, if they contain the
+   * same properties in the same order.
+   *
+   * @param o other properties collection
+   * @return  true, iff the two property collections contain the same elements
+   *          in the same order
+   */
+  @Override
+  public boolean equals(Object o) {
+<span class="pc bpc" id="L237" title="1 of 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L238">      return true;</span>
+    }
+<span class="pc bpc" id="L240" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L241">      return false;</span>
+    }
+
+<span class="fc" id="L244">    Properties that = (Properties) o;</span>
+
+<span class="pc bpc" id="L246" title="3 of 6 branches missed.">    return !(properties != null ? !properties.equals(that.properties) :</span>
+      that.properties != null);
+  }
+
+  /**
+   * Two properties collections have identical hash codes, if they contain the
+   * same properties in the same order.
+   *
+   * @return hash code
+   */
+  @Override
+  public int hashCode() {
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">    return properties != null ? properties.hashCode() : 0;</span>
+  }
+
+  @Override
+  public Iterator&lt;Property&gt; iterator() {
+<span class="fc" id="L263">    return toList().iterator();</span>
+  }
+
+  /**
+   * Returns a list of properties.
+   *
+   * @return List of properties
+   */
+  public List&lt;Property&gt; toList() {
+<span class="fc" id="L272">    return  properties.entrySet().stream()</span>
+<span class="fc" id="L273">            .map(e -&gt; Property.create(e.getKey(), e.getValue()))</span>
+<span class="fc" id="L274">            .collect(Collectors.toList());</span>
+  }
+
+  @Override
+  public void write(DataOutputView outputView) throws IOException {
+<span class="fc" id="L279">    outputView.writeInt(properties.size());</span>
+
+<span class="fc bfc" id="L281" title="All 2 branches covered.">    for (Map.Entry&lt;String, PropertyValue&gt; entry : properties.entrySet()) {</span>
+<span class="fc" id="L282">      outputView.writeUTF(entry.getKey());</span>
+<span class="fc" id="L283">      entry.getValue().write(outputView);</span>
+<span class="fc" id="L284">    }</span>
+<span class="fc" id="L285">  }</span>
+
+  @Override
+  public void read(DataInputView inputView) throws IOException {
+<span class="fc" id="L289">    int propertyCount = inputView.readInt();</span>
+<span class="fc" id="L290">    this.properties = new HashMap&lt;&gt;(propertyCount);</span>
+
+    String key;
+    PropertyValue value;
+
+<span class="fc bfc" id="L295" title="All 2 branches covered.">    for (int i = 0; i &lt; propertyCount; i++) {</span>
+<span class="fc" id="L296">      key = inputView.readUTF();</span>
+<span class="fc" id="L297">      value = new PropertyValue();</span>
+<span class="fc" id="L298">      value.read(inputView);</span>
+<span class="fc" id="L299">      properties.put(key, value);</span>
+    }
+<span class="fc" id="L301">  }</span>
+
+  @Override
+  public String toString() {
+<span class="nc" id="L305">    return toList().stream()</span>
+<span class="nc" id="L306">      .map(Property::toString)</span>
+<span class="nc" id="L307">      .collect(Collectors.joining(&quot;,&quot;));</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

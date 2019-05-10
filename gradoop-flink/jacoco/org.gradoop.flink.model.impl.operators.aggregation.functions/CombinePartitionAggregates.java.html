@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CombinePartitionAggregates.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.aggregation.functions</a> &gt; <span class="el_source">CombinePartitionAggregates.java</span></div><h1>CombinePartitionAggregates.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.aggregation.functions;
+
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Aggregates the aggregate values of different partitions
+ */
+public class CombinePartitionAggregates
+  implements GroupReduceFunction&lt;Map&lt;String, PropertyValue&gt;, Map&lt;String, PropertyValue&gt;&gt; {
+
+  /**
+   * Aggregate Functions
+   */
+  private final Set&lt;AggregateFunction&gt; aggregateFunctions;
+
+  /**
+   * Creates a new instance of a CombinePartitionAggregates group reduce function.
+   *
+   * @param aggregateFunctions aggregate functions
+   */
+<span class="fc" id="L43">  public CombinePartitionAggregates(Set&lt;AggregateFunction&gt; aggregateFunctions) {</span>
+<span class="fc" id="L44">    this.aggregateFunctions = aggregateFunctions;</span>
+<span class="fc" id="L45">  }</span>
+
+  @Override
+  public void reduce(Iterable&lt;Map&lt;String, PropertyValue&gt;&gt; partitionAggregates,
+    Collector&lt;Map&lt;String, PropertyValue&gt;&gt; out) throws Exception {
+
+<span class="fc" id="L51">    Iterator&lt;Map&lt;String, PropertyValue&gt;&gt; iterator = partitionAggregates.iterator();</span>
+<span class="fc" id="L52">    Map&lt;String, PropertyValue&gt; aggregate = iterator.next();</span>
+
+<span class="fc bfc" id="L54" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
+<span class="fc" id="L55">      Map&lt;String, PropertyValue&gt; next = iterator.next();</span>
+
+<span class="fc bfc" id="L57" title="All 2 branches covered.">      for (AggregateFunction aggFunc : aggregateFunctions) {</span>
+<span class="fc" id="L58">        String propertyKey = aggFunc.getAggregatePropertyKey();</span>
+<span class="fc" id="L59">        PropertyValue nextAgg = next.get(propertyKey);</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">        if (nextAgg != null) {</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">          aggregate.compute(propertyKey, (key, agg) -&gt; agg == null ?</span>
+<span class="fc" id="L62">            nextAgg : aggFunc.aggregate(agg, nextAgg));</span>
+        }
+<span class="fc" id="L64">      }</span>
+<span class="fc" id="L65">    }</span>
+
+<span class="fc" id="L67">    out.collect(aggregate);</span>
+<span class="fc" id="L68">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EdgesFromLocalTransitiveClosure.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation.functions</a> &gt; <span class="el_source">EdgesFromLocalTransitiveClosure.java</span></div><h1>EdgesFromLocalTransitiveClosure.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation.functions;
+
+import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * This function supports the calculation of the transitive closure in the direct neighborhood of a
+ * vertex. For each transitive connection an edge is created containing the properties of the
+ * central vertex and the labels of the first and second edge that need to be traversed for the
+ * transitive connection.
+ *
+ * @param &lt;V&gt; The vertex type.
+ * @param &lt;E&gt; The edge type.
+ */
+public class EdgesFromLocalTransitiveClosure&lt;V extends EPGMVertex, E extends EPGMEdge&gt;
+  implements CoGroupFunction&lt;Tuple2&lt;V, List&lt;NeighborhoodVertex&gt;&gt;,
+    Tuple2&lt;V, List&lt;NeighborhoodVertex&gt;&gt;, E&gt;, ResultTypeQueryable&lt;E&gt; {
+
+  /**
+   * The property key used to store the original vertex label on the new edge.
+   */
+  public static final String ORIGINAL_VERTEX_LABEL = &quot;originalVertexLabel&quot;;
+
+  /**
+   * The property key used to store the first label of the combined edges on the new edge.
+   */
+  public static final String FIRST_EDGE_LABEL = &quot;firstEdgeLabel&quot;;
+
+  /**
+   * The property key used to store the second label of the combined edges on the new edge.
+   */
+  public static final String SECOND_EDGE_LABEL = &quot;secondEdgeLabel&quot;;
+
+  /**
+   * The type of the edges created by the factory..
+   */
+  private final Class&lt;E&gt; edgeType;
+
+  /**
+   * Reduce object instantiations.
+   */
+  private final E reuse;
+
+  /**
+   * The constructor of the CoGroup function to created new edges based on transitivity.
+   *
+   * @param newEdgeLabel The edge label of the newly created edge.
+   * @param factory The {@link EdgeFactory} new edges are created with.
+   */
+<span class="fc" id="L78">  public EdgesFromLocalTransitiveClosure(String newEdgeLabel, EPGMEdgeFactory&lt;E&gt; factory) {</span>
+<span class="fc" id="L79">    this.edgeType = Objects.requireNonNull(factory).getType();</span>
+<span class="fc" id="L80">    this.reuse = factory.createEdge(Objects.requireNonNull(newEdgeLabel), GradoopId.NULL_VALUE,</span>
+      GradoopId.NULL_VALUE);
+<span class="fc" id="L82">  }</span>
+
+  @Override
+  public void coGroup(Iterable&lt;Tuple2&lt;V, List&lt;NeighborhoodVertex&gt;&gt;&gt; incoming,
+                      Iterable&lt;Tuple2&lt;V, List&lt;NeighborhoodVertex&gt;&gt;&gt; outgoing,
+                      Collector&lt;E&gt; edges) {
+
+<span class="fc" id="L89">    Iterator&lt;Tuple2&lt;V, List&lt;NeighborhoodVertex&gt;&gt;&gt; incIt = incoming.iterator();</span>
+<span class="fc" id="L90">    Iterator&lt;Tuple2&lt;V, List&lt;NeighborhoodVertex&gt;&gt;&gt; outIt = outgoing.iterator();</span>
+
+<span class="pc bpc" id="L92" title="2 of 4 branches missed.">    if (incIt.hasNext() &amp;&amp; outIt.hasNext()) {</span>
+      // each of the incoming and outgoing sets should be represented only once.
+<span class="fc" id="L94">      Tuple2&lt;V, List&lt;NeighborhoodVertex&gt;&gt; first = incIt.next();</span>
+<span class="fc" id="L95">      V centralVertex = first.f0;</span>
+<span class="fc" id="L96">      List&lt;NeighborhoodVertex&gt; in = first.f1;</span>
+<span class="fc" id="L97">      List&lt;NeighborhoodVertex&gt; out = outIt.next().f1;</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">      if (in.isEmpty()) {</span>
+<span class="nc" id="L99">        return;</span>
+      }
+<span class="fc" id="L101">      reuse.setProperties(centralVertex.getProperties());</span>
+<span class="fc" id="L102">      reuse.setProperty(ORIGINAL_VERTEX_LABEL, centralVertex.getLabel());</span>
+
+<span class="fc bfc" id="L104" title="All 2 branches covered.">      for (NeighborhoodVertex source : in) {</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        for (NeighborhoodVertex target : out) {</span>
+<span class="fc" id="L106">          reuse.setId(GradoopId.get());</span>
+<span class="fc" id="L107">          reuse.setSourceId(source.getNeighborId());</span>
+<span class="fc" id="L108">          reuse.setTargetId(target.getNeighborId());</span>
+
+<span class="fc" id="L110">          reuse.setProperty(FIRST_EDGE_LABEL, source.getConnectingEdgeLabel());</span>
+<span class="fc" id="L111">          reuse.setProperty(SECOND_EDGE_LABEL, target.getConnectingEdgeLabel());</span>
+
+<span class="fc" id="L113">          edges.collect(reuse);</span>
+<span class="fc" id="L114">        }</span>
+<span class="fc" id="L115">      }</span>
+    }
+<span class="fc" id="L117">  }</span>
+
+  @Override
+  public TypeInformation&lt;E&gt; getProducedType() {
+<span class="fc" id="L121">    return TypeInformation.of(edgeType);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

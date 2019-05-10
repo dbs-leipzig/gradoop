@@ -1,0 +1,11 @@
+org.gradoop.common.config
+org.gradoop.common.exceptions
+org.gradoop.common.model.api.entities
+org.gradoop.common.model.api.strategies
+org.gradoop.common.model.impl.comparators
+org.gradoop.common.model.impl.id
+org.gradoop.common.model.impl.metadata
+org.gradoop.common.model.impl.pojo
+org.gradoop.common.model.impl.properties
+org.gradoop.common.model.impl.properties.strategies
+org.gradoop.common.util

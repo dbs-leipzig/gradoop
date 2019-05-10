@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StringEscaper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.csv.functions</a> &gt; <span class="el_source">StringEscaper.java</span></div><h1>StringEscaper.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.csv.functions;
+
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Escapes characters in strings and allows to split escaped strings.
+ */
+<span class="nc" id="L28">public class StringEscaper {</span>
+  /**
+   * Escape character.
+   */
+  private static final char ESCAPE_CHARACTER = '\\';
+  /**
+   * Custom escape sequences to avoid disruptive behavior of the file reader (e.g. newline).
+   */
+<span class="fc" id="L36">  private static final BiMap&lt;Character, CharSequence&gt; CUSTOM_ESCAPE_SEQUENCES =</span>
+    new ImmutableBiMap.Builder&lt;Character, CharSequence&gt;()
+<span class="fc" id="L38">      .put('\t', String.format(&quot;%c%c&quot;, ESCAPE_CHARACTER, 't'))</span>
+<span class="fc" id="L39">      .put('\b', String.format(&quot;%c%c&quot;, ESCAPE_CHARACTER, 'b'))</span>
+<span class="fc" id="L40">      .put('\n', String.format(&quot;%c%c&quot;, ESCAPE_CHARACTER, 'n'))</span>
+<span class="fc" id="L41">      .put('\r', String.format(&quot;%c%c&quot;, ESCAPE_CHARACTER, 'r'))</span>
+<span class="fc" id="L42">      .put('\f', String.format(&quot;%c%c&quot;, ESCAPE_CHARACTER, 'f'))</span>
+<span class="fc" id="L43">      .build();</span>
+
+  /**
+   * Escapes the {@code escapedCharacters} in a string.
+   *
+   * @param string string to be escaped
+   * @param escapedCharacters characters to be escaped
+   * @return escaped string
+   */
+  public static String escape(String string, Set&lt;Character&gt; escapedCharacters) {
+<span class="fc" id="L53">    StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">    for (char c : string.toCharArray()) {</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">      if (escapedCharacters.contains(c)) {</span>
+<span class="fc" id="L56">        sb.append(escapeCharacter(c));</span>
+      } else {
+<span class="fc" id="L58">        sb.append(c);</span>
+      }
+    }
+<span class="fc" id="L61">    return sb.toString();</span>
+  }
+
+  /**
+   * Unescapes the escaped characters in a string.
+   *
+   * @param escapedString string to be unescaped
+   * @return unescaped string
+   */
+  public static String unescape(String escapedString) {
+<span class="fc" id="L71">    StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L72">    boolean escaped = false;</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">    for (int i = 0; i &lt; escapedString.length(); i++) {</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">      if (escaped) {</span>
+<span class="fc" id="L75">        escaped = false;</span>
+<span class="fc" id="L76">        sb.append(unescapeSequence(escapedString.subSequence(i - 1, i + 1)));</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">      } else if (escapedString.charAt(i) == ESCAPE_CHARACTER) {</span>
+<span class="fc" id="L78">        escaped = true;</span>
+      } else {
+<span class="fc" id="L80">        sb.append(escapedString.charAt(i));</span>
+      }
+    }
+<span class="fc" id="L83">    return sb.toString();</span>
+  }
+
+  /**
+   * Splits an escaped string while ignoring escaped delimiters. Does not unescape the tokens.
+   *
+   * @param escapedString escaped string to be split
+   * @param delimiter delimiter string
+   * @return string array with still escaped strings split by the delimiter
+   * @throws IllegalArgumentException if the delimiter contains the escape character
+   */
+  public static String[] split(String escapedString, String delimiter)
+    throws IllegalArgumentException {
+<span class="fc" id="L96">    return split(escapedString, delimiter, 0);</span>
+  }
+
+  /**
+   * Splits an escaped string while ignoring escaped delimiters. Does not unescape the tokens.
+   *
+   * @param escapedString escaped string to be split
+   * @param delimiter delimiter string
+   * @param limit limits the size of the output
+   * @return string array with still escaped strings split by the delimiter
+   * @throws IllegalArgumentException if the delimiter contains the escape character
+   */
+  public static String[] split(String escapedString, String delimiter, int limit)
+    throws IllegalArgumentException {
+<span class="fc bfc" id="L110" title="All 2 branches covered.">    if (delimiter.contains(Character.toString(ESCAPE_CHARACTER))) {</span>
+<span class="fc" id="L111">      throw new IllegalArgumentException(String.format(</span>
+<span class="fc" id="L112">        &quot;Delimiter must not contain the escape character: '%c'&quot;, ESCAPE_CHARACTER));</span>
+    }
+<span class="fc bfc" id="L114" title="All 2 branches covered.">    if (limit &lt;= 0) {</span>
+<span class="fc" id="L115">      limit = escapedString.length() + 1;</span>
+    }
+
+<span class="fc" id="L118">    List&lt;String&gt; tokens = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L119">    StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L120">    boolean escaped = false;</span>
+<span class="fc" id="L121">    int delimiterIndex = 0;</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">    for (char c : escapedString.toCharArray()) {</span>
+      // parse and match delimiter
+<span class="fc bfc" id="L124" title="All 4 branches covered.">      if (!escaped &amp;&amp; c == delimiter.charAt(delimiterIndex)) {</span>
+<span class="fc" id="L125">        delimiterIndex++;</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">        if (delimiterIndex == delimiter.length()) {</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">          if (tokens.size() &lt; limit - 1) {</span>
+<span class="fc" id="L128">            tokens.add(sb.toString());</span>
+<span class="fc" id="L129">            sb.setLength(0);</span>
+          } else {
+<span class="fc" id="L131">            sb.append(delimiter, 0, delimiterIndex);</span>
+          }
+<span class="fc" id="L133">          delimiterIndex = 0;</span>
+        }
+      } else {
+        // reset delimiter parsing
+<span class="fc" id="L137">        sb.append(delimiter, 0, delimiterIndex);</span>
+<span class="fc" id="L138">        delimiterIndex = 0;</span>
+
+        // escape
+<span class="fc bfc" id="L141" title="All 2 branches covered.">        if (escaped) {</span>
+<span class="fc" id="L142">          escaped = false;</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">        } else if (c == ESCAPE_CHARACTER) {</span>
+<span class="fc" id="L144">          escaped = true;</span>
+        }
+
+<span class="fc" id="L147">        sb.append(c);</span>
+      }
+    }
+<span class="fc" id="L150">    sb.append(delimiter, 0, delimiterIndex);</span>
+<span class="fc" id="L151">    tokens.add(sb.toString());</span>
+<span class="fc" id="L152">    return tokens.toArray(new String[0]);</span>
+  }
+
+  /**
+   * Returns the escape sequence of a given character.
+   *
+   * @param character character to be escaped
+   * @return escape sequence
+   */
+  private static CharSequence escapeCharacter(char character) {
+<span class="fc bfc" id="L162" title="All 2 branches covered.">    if (CUSTOM_ESCAPE_SEQUENCES.containsKey(character)) {</span>
+<span class="fc" id="L163">      return CUSTOM_ESCAPE_SEQUENCES.get(character);</span>
+    }
+<span class="fc" id="L165">    return String.format(&quot;%c%c&quot;, ESCAPE_CHARACTER, character);</span>
+  }
+
+  /**
+   * Returns the character of a given escape sequence.
+   *
+   * @param sequence escape sequence
+   * @return escaped character
+   */
+  private static char unescapeSequence(CharSequence sequence) {
+<span class="fc bfc" id="L175" title="All 2 branches covered.">    if (CUSTOM_ESCAPE_SEQUENCES.containsValue(sequence)) {</span>
+<span class="fc" id="L176">      return CUSTOM_ESCAPE_SEQUENCES.inverse().get(sequence);</span>
+    }
+<span class="fc" id="L178">    return sequence.charAt(1);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

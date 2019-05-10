@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Or.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop HBase</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.impl.hbase.predicate.filter.calculate</a> &gt; <span class="el_source">Or.java</span></div><h1>Or.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.impl.hbase.predicate.filter.calculate;
+
+import org.apache.hadoop.hbase.filter.Filter;
+import org.apache.hadoop.hbase.filter.FilterList;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
+
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringJoiner;
+
+/**
+ * Disjunctive predicate filter
+ *
+ * @param &lt;T&gt; element type
+ */
+public final class Or&lt;T extends EPGMElement&gt; implements HBaseElementFilter&lt;T&gt; {
+
+  /**
+   * Predicate list
+   */
+<span class="fc" id="L39">  private final List&lt;HBaseElementFilter&lt;T&gt;&gt; predicates = new ArrayList&lt;&gt;();</span>
+
+  /**
+   * Creates a new disjunctive filter chain
+   *
+   * @param predicates the predicates to combine with a logical or
+   */
+<span class="fc" id="L46">  private Or(List&lt;HBaseElementFilter&lt;T&gt;&gt; predicates) {</span>
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">    if (predicates.size() &lt; 2) {</span>
+<span class="nc" id="L48">      throw new IllegalArgumentException(String.format(&quot;predicates len(=%d) &lt; 2&quot;,</span>
+<span class="nc" id="L49">        predicates.size()));</span>
+    }
+<span class="fc" id="L51">    this.predicates.addAll(predicates);</span>
+<span class="fc" id="L52">  }</span>
+
+  /**
+   * Create a disjunctive formula
+   *
+   * @param predicates filter predicate
+   * @param &lt;T&gt; input type
+   * @return Disjunctive filter instance
+   */
+  @SafeVarargs
+  public static &lt;T extends EPGMElement&gt; Or&lt;T&gt; create(HBaseElementFilter&lt;T&gt;... predicates) {
+<span class="fc" id="L63">    List&lt;HBaseElementFilter&lt;T&gt;&gt; formula = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L64">    Collections.addAll(formula, predicates);</span>
+<span class="fc" id="L65">    return new Or&lt;&gt;(formula);</span>
+  }
+
+  @Nonnull
+  @Override
+  public Filter toHBaseFilter(boolean negate) {
+    // If filter is negated, logical OR will be transformed to logical AND
+<span class="fc bfc" id="L72" title="All 2 branches covered.">    FilterList.Operator listOperator = negate ? FilterList.Operator.MUST_PASS_ALL :</span>
+      FilterList.Operator.MUST_PASS_ONE;
+<span class="fc" id="L74">    FilterList filterList = new FilterList(listOperator);</span>
+    // Add each filter to filter list
+<span class="fc" id="L76">    predicates.stream()</span>
+<span class="fc" id="L77">      .map(predicate -&gt; predicate.toHBaseFilter(negate))</span>
+<span class="fc" id="L78">      .forEach(filterList::addFilter);</span>
+
+<span class="fc" id="L80">    return filterList;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L85">    StringJoiner joiner = new StringJoiner(&quot; OR &quot;);</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">    for (HBaseElementFilter&lt;T&gt; predicate : predicates) {</span>
+<span class="nc" id="L87">      joiner.add(&quot;(&quot; + predicate.toString() + &quot;)&quot;);</span>
+<span class="nc" id="L88">    }</span>
+<span class="nc" id="L89">    return joiner.toString();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

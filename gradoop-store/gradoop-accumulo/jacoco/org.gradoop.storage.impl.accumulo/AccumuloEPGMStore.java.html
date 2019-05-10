@@ -1,0 +1,521 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccumuloEPGMStore.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Accumulo</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.impl.accumulo</a> &gt; <span class="el_source">AccumuloEPGMStore.java</span></div><h1>AccumuloEPGMStore.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.impl.accumulo;
+
+import com.google.common.collect.Lists;
+import org.apache.accumulo.core.client.AccumuloException;
+import org.apache.accumulo.core.client.AccumuloSecurityException;
+import org.apache.accumulo.core.client.BatchScanner;
+import org.apache.accumulo.core.client.BatchWriter;
+import org.apache.accumulo.core.client.BatchWriterConfig;
+import org.apache.accumulo.core.client.Connector;
+import org.apache.accumulo.core.client.IteratorSetting;
+import org.apache.accumulo.core.client.MutationsRejectedException;
+import org.apache.accumulo.core.client.NamespaceExistsException;
+import org.apache.accumulo.core.client.TableExistsException;
+import org.apache.accumulo.core.client.TableNotFoundException;
+import org.apache.accumulo.core.client.ZooKeeperInstance;
+import org.apache.accumulo.core.client.security.tokens.PasswordToken;
+import org.apache.accumulo.core.data.Key;
+import org.apache.accumulo.core.data.Mutation;
+import org.apache.accumulo.core.data.Range;
+import org.apache.accumulo.core.data.Value;
+import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.storage.common.api.EPGMConfigProvider;
+import org.gradoop.storage.common.api.EPGMGraphInput;
+import org.gradoop.storage.common.api.EPGMGraphPredictableOutput;
+import org.gradoop.storage.common.iterator.ClosableIterator;
+import org.gradoop.storage.common.iterator.EmptyClosableIterator;
+import org.gradoop.storage.common.predicate.query.ElementQuery;
+import org.gradoop.storage.common.predicate.query.Query;
+import org.gradoop.storage.config.GradoopAccumuloConfig;
+import org.gradoop.storage.impl.accumulo.constants.AccumuloDefault;
+import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
+import org.gradoop.storage.impl.accumulo.handler.AccumuloRowHandler;
+import org.gradoop.storage.impl.accumulo.iterator.client.ClientClosableIterator;
+import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopEdgeIterator;
+import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopGraphHeadIterator;
+import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopVertexIterator;
+import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * Default Accumulo EPGM graph store that handles reading and writing vertices and
+ * graphs from and to Accumulo, It is designed thread-safe.
+ * Store contains instances are divided by {@link GradoopAccumuloConfig#ACCUMULO_TABLE_PREFIX}
+ *
+ * @see EPGMGraphPredictableOutput
+ */
+public class AccumuloEPGMStore implements
+  EPGMConfigProvider&lt;GradoopAccumuloConfig&gt;,
+  EPGMGraphInput,
+  EPGMGraphPredictableOutput&lt;
+    AccumuloElementFilter&lt;GraphHead&gt;,
+    AccumuloElementFilter&lt;Vertex&gt;,
+    AccumuloElementFilter&lt;Edge&gt;&gt; {
+
+  /**
+   * accumulo epgm store logger
+   */
+<span class="fc" id="L90">  private static final Logger LOG = LoggerFactory.getLogger(AccumuloEPGMStore.class);</span>
+
+  /**
+   * gradoop accumulo configuration
+   */
+  private final GradoopAccumuloConfig config;
+
+  /**
+   * accumulo client connector
+   */
+  private final Connector conn;
+
+  /**
+   * batch writer for epgm graph head table
+   */
+  private final BatchWriter graphWriter;
+
+  /**
+   * batch writer for epgm vertex table
+   */
+  private final BatchWriter vertexWriter;
+
+  /**
+   * batch writer for epgm edge table
+   */
+  private final BatchWriter edgeWriter;
+
+  /**
+   * auto flush flag, default false
+   */
+  private volatile boolean autoFlush;
+
+  /**
+   * Creates an AccumuloEPGMStore based on the given parameters.
+   * Tables with given prefix will be auto-create if not exists
+   *
+   * @param config                      accumulo store configuration
+   * @throws AccumuloSecurityException  for security violations,
+   *                                    authentication failures,
+   *                                    authorization failures,
+   *                                    etc.
+   * @throws AccumuloException          generic Accumulo Exception for general accumulo failures.
+   */
+  public AccumuloEPGMStore(@Nonnull GradoopAccumuloConfig config)
+<span class="fc" id="L134">    throws AccumuloSecurityException, AccumuloException {</span>
+<span class="fc" id="L135">    this.config = config;</span>
+<span class="fc" id="L136">    this.conn = createConnector();</span>
+<span class="fc" id="L137">    createTablesIfNotExists();</span>
+    try {
+<span class="fc" id="L139">      graphWriter = conn.createBatchWriter(getGraphHeadName(), new BatchWriterConfig());</span>
+<span class="fc" id="L140">      vertexWriter = conn.createBatchWriter(getVertexTableName(), new BatchWriterConfig());</span>
+<span class="fc" id="L141">      edgeWriter = conn.createBatchWriter(getEdgeTableName(), new BatchWriterConfig());</span>
+<span class="nc" id="L142">    } catch (TableNotFoundException e) {</span>
+<span class="nc" id="L143">      throw new IllegalStateException(e); //should not be here</span>
+<span class="fc" id="L144">    }</span>
+<span class="fc" id="L145">  }</span>
+
+  /**
+   * Create an accumulo client connector with given configuration
+   *
+   * @return accumulo client connector instance
+   * @throws AccumuloSecurityException  for security violations,
+   *                                    authentication failures,
+   *                                    authorization failures,
+   *                                    etc.
+   * @throws AccumuloException          generic Accumulo Exception for general accumulo failures.
+   */
+  public Connector createConnector() throws AccumuloSecurityException, AccumuloException {
+<span class="fc" id="L158">    return new ZooKeeperInstance(</span>
+<span class="fc" id="L159">      /*instannce*/config.get(GradoopAccumuloConfig.ACCUMULO_INSTANCE, AccumuloDefault.INSTANCE),</span>
+<span class="fc" id="L160">      /*zookeepers*/config.get(GradoopAccumuloConfig.ZOOKEEPER_HOSTS, AccumuloDefault.ZOOKEEPERS)</span>
+<span class="fc" id="L161">    ).getConnector(</span>
+<span class="fc" id="L162">      /*user*/config.get(GradoopAccumuloConfig.ACCUMULO_USER, AccumuloDefault.USER),</span>
+      /*password*/
+<span class="fc" id="L164">      new PasswordToken(config.get(GradoopAccumuloConfig.ACCUMULO_PASSWD, AccumuloDefault</span>
+        .PASSWORD)));
+  }
+
+  @Override
+  public GradoopAccumuloConfig getConfig() {
+<span class="fc" id="L170">    return config;</span>
+  }
+
+  @Override
+  public String getVertexTableName() {
+<span class="fc" id="L175">    return config.getVertexTable();</span>
+  }
+
+  @Override
+  public String getEdgeTableName() {
+<span class="fc" id="L180">    return config.getEdgeTable();</span>
+  }
+
+  @Override
+  public String getGraphHeadName() {
+<span class="fc" id="L185">    return config.getGraphHeadTable();</span>
+  }
+
+  @Override
+  public void writeGraphHead(@Nonnull EPGMGraphHead record) {
+<span class="fc" id="L190">    writeRecord(record, graphWriter, config.getGraphHandler());</span>
+<span class="fc" id="L191">  }</span>
+
+  @Override
+  public void writeVertex(@Nonnull EPGMVertex record) {
+<span class="fc" id="L195">    writeRecord(record, vertexWriter, config.getVertexHandler());</span>
+<span class="fc" id="L196">  }</span>
+
+  @Override
+  public void writeEdge(@Nonnull EPGMEdge record) {
+<span class="fc" id="L200">    writeRecord(record, edgeWriter, config.getEdgeHandler());</span>
+<span class="fc" id="L201">  }</span>
+
+  @Override
+  public void setAutoFlush(boolean autoFlush) {
+<span class="fc" id="L205">    this.autoFlush = autoFlush;</span>
+<span class="fc" id="L206">  }</span>
+
+  @Override
+  public void flush() {
+    try {
+<span class="fc" id="L211">      graphWriter.flush();</span>
+<span class="fc" id="L212">      vertexWriter.flush();</span>
+<span class="fc" id="L213">      edgeWriter.flush();</span>
+<span class="nc" id="L214">    } catch (MutationsRejectedException e) {</span>
+<span class="nc" id="L215">      throw new RuntimeException(e);</span>
+<span class="fc" id="L216">    }</span>
+<span class="fc" id="L217">  }</span>
+
+  @Override
+  public void close() {
+    try {
+<span class="fc" id="L222">      graphWriter.close();</span>
+<span class="fc" id="L223">      vertexWriter.close();</span>
+<span class="fc" id="L224">      edgeWriter.close();</span>
+<span class="nc" id="L225">    } catch (MutationsRejectedException e) {</span>
+<span class="nc" id="L226">      throw new RuntimeException(e);</span>
+<span class="fc" id="L227">    }</span>
+<span class="fc" id="L228">  }</span>
+
+  /**
+   * Drop all tables used by this store instance.
+   *
+   * @throws IOException when deleting tables fails.
+   */
+  public void dropTables() throws IOException {
+<span class="fc bfc" id="L236" title="All 2 branches covered.">    for (String tableName : new String[] {</span>
+<span class="fc" id="L237">      getVertexTableName(), getEdgeTableName(), getGraphHeadName()}) {</span>
+      try {
+<span class="fc" id="L239">        dropTableIfExists(tableName);</span>
+<span class="nc" id="L240">      } catch (AccumuloSecurityException | AccumuloException e) {</span>
+<span class="nc" id="L241">        throw new IOException(&quot;Failed to delete table &quot; + tableName, e);</span>
+<span class="fc" id="L242">      }</span>
+    }
+<span class="fc" id="L244">  }</span>
+
+  /**
+   * Truncate all tables handled by this store instance, i.e. delete all rows.
+   * The current implementations simply drops all tables and creates new ones.
+   *
+   * @throws IOException when deleting or creating tables fails.
+   */
+  public void truncateTables() throws IOException {
+<span class="fc" id="L253">    dropTables();</span>
+    try {
+<span class="fc" id="L255">      createTablesIfNotExists();</span>
+<span class="nc" id="L256">    } catch (AccumuloSecurityException | AccumuloException e) {</span>
+<span class="nc" id="L257">      throw new IOException(&quot;Failed to create tables.&quot;, e);</span>
+<span class="fc" id="L258">    }</span>
+<span class="fc" id="L259">  }</span>
+
+  @Nullable
+  @Override
+  public GraphHead readGraph(@Nonnull GradoopId graphId) throws IOException {
+    ElementQuery&lt;AccumuloElementFilter&lt;GraphHead&gt;&gt; query = Query
+<span class="fc" id="L265">      .elements()</span>
+<span class="fc" id="L266">      .fromSets(graphId)</span>
+<span class="fc" id="L267">      .noFilter();</span>
+<span class="fc" id="L268">    try (ClosableIterator&lt;GraphHead&gt; it = getGraphSpace(query, 1)) {</span>
+<span class="pc bpc" id="L269" title="1 of 2 branches missed.">      return it.hasNext() ? it.next() : null;</span>
+    }
+  }
+
+  @Nullable
+  @Override
+  public Vertex readVertex(@Nonnull GradoopId vertexId) throws IOException {
+    ElementQuery&lt;AccumuloElementFilter&lt;Vertex&gt;&gt; query = Query
+<span class="fc" id="L277">      .elements()</span>
+<span class="fc" id="L278">      .fromSets(vertexId)</span>
+<span class="fc" id="L279">      .noFilter();</span>
+<span class="fc" id="L280">    try (ClosableIterator&lt;Vertex&gt; it = getVertexSpace(query, 1)) {</span>
+<span class="pc bpc" id="L281" title="1 of 2 branches missed.">      return it.hasNext() ? it.next() : null;</span>
+    }
+  }
+
+  @Nullable
+  @Override
+  public Edge readEdge(@Nonnull GradoopId edgeId) throws IOException {
+    ElementQuery&lt;AccumuloElementFilter&lt;Edge&gt;&gt; query = Query
+<span class="fc" id="L289">      .elements()</span>
+<span class="fc" id="L290">      .fromSets(edgeId)</span>
+<span class="fc" id="L291">      .noFilter();</span>
+<span class="fc" id="L292">    try (ClosableIterator&lt;Edge&gt; it = getEdgeSpace(query, 1)) {</span>
+<span class="pc bpc" id="L293" title="1 of 2 branches missed.">      return it.hasNext() ? it.next() : null;</span>
+    }
+  }
+
+  @Nonnull
+  @Override
+  public ClosableIterator&lt;GraphHead&gt; getGraphSpace(
+    @Nullable ElementQuery&lt;AccumuloElementFilter&lt;GraphHead&gt;&gt; query,
+    int cacheSize
+  ) throws IOException {
+<span class="fc bfc" id="L303" title="All 2 branches covered.">    if (query != null &amp;&amp;</span>
+<span class="fc bfc" id="L304" title="All 2 branches covered.">      query.getQueryRanges() != null &amp;&amp;</span>
+<span class="pc bpc" id="L305" title="1 of 2 branches missed.">      query.getQueryRanges().isEmpty()) {</span>
+<span class="nc" id="L306">      return new EmptyClosableIterator&lt;&gt;();</span>
+    }
+
+<span class="fc bfc" id="L309" title="All 2 branches covered.">    if (query != null) {</span>
+<span class="fc" id="L310">      LOG.info(query.toString());</span>
+    }
+
+<span class="fc" id="L313">    BatchScanner scanner = createBatchScanner(</span>
+<span class="fc" id="L314">      getGraphHeadName(),</span>
+      GradoopGraphHeadIterator.class,
+      query);
+<span class="fc" id="L317">    Iterator&lt;Map.Entry&lt;Key, Value&gt;&gt; iterator = scanner.iterator();</span>
+<span class="fc bfc" id="L318" title="All 2 branches covered.">    if (!iterator.hasNext()) {</span>
+<span class="fc" id="L319">      return new EmptyClosableIterator&lt;&gt;();</span>
+    } else {
+<span class="fc" id="L321">      return new ClientClosableIterator&lt;&gt;(scanner,</span>
+        new GradoopGraphHeadIterator(),
+<span class="fc" id="L323">        config.getGraphHandler(),</span>
+        cacheSize);
+    }
+  }
+
+  @Nonnull
+  @Override
+  public ClosableIterator&lt;Vertex&gt; getVertexSpace(
+    @Nullable ElementQuery&lt;AccumuloElementFilter&lt;Vertex&gt;&gt; query,
+    int cacheSize
+  ) throws IOException {
+<span class="fc bfc" id="L334" title="All 2 branches covered.">    if (query != null &amp;&amp;</span>
+<span class="fc bfc" id="L335" title="All 2 branches covered.">      query.getQueryRanges() != null &amp;&amp;</span>
+<span class="pc bpc" id="L336" title="1 of 2 branches missed.">      query.getQueryRanges().isEmpty()) {</span>
+<span class="nc" id="L337">      return new EmptyClosableIterator&lt;&gt;();</span>
+    }
+
+<span class="fc bfc" id="L340" title="All 2 branches covered.">    if (query != null) {</span>
+<span class="fc" id="L341">      LOG.info(query.toString());</span>
+    }
+
+<span class="fc" id="L344">    BatchScanner scanner = createBatchScanner(</span>
+<span class="fc" id="L345">      getVertexTableName(),</span>
+      GradoopVertexIterator.class,
+      query);
+<span class="fc" id="L348">    Iterator&lt;Map.Entry&lt;Key, Value&gt;&gt; iterator = scanner.iterator();</span>
+<span class="fc bfc" id="L349" title="All 2 branches covered.">    if (!iterator.hasNext()) {</span>
+<span class="fc" id="L350">      return new EmptyClosableIterator&lt;&gt;();</span>
+    } else {
+<span class="fc" id="L352">      return new ClientClosableIterator&lt;&gt;(scanner,</span>
+        new GradoopVertexIterator(),
+<span class="fc" id="L354">        config.getVertexHandler(),</span>
+        cacheSize);
+    }
+  }
+
+  @Nonnull
+  @Override
+  public ClosableIterator&lt;Edge&gt; getEdgeSpace(
+    @Nullable ElementQuery&lt;AccumuloElementFilter&lt;Edge&gt;&gt; query,
+    int cacheSize
+  ) throws IOException {
+<span class="fc bfc" id="L365" title="All 2 branches covered.">    if (query != null &amp;&amp;</span>
+<span class="fc bfc" id="L366" title="All 2 branches covered.">      query.getQueryRanges() != null &amp;&amp;</span>
+<span class="pc bpc" id="L367" title="1 of 2 branches missed.">      query.getQueryRanges().isEmpty()) {</span>
+<span class="nc" id="L368">      return new EmptyClosableIterator&lt;&gt;();</span>
+    }
+
+<span class="fc bfc" id="L371" title="All 2 branches covered.">    if (query != null) {</span>
+<span class="fc" id="L372">      LOG.info(query.toString());</span>
+    }
+
+<span class="fc" id="L375">    BatchScanner scanner = createBatchScanner(</span>
+<span class="fc" id="L376">      getEdgeTableName(),</span>
+      GradoopEdgeIterator.class,
+      query);
+<span class="fc" id="L379">    Iterator&lt;Map.Entry&lt;Key, Value&gt;&gt; iterator = scanner.iterator();</span>
+<span class="fc bfc" id="L380" title="All 2 branches covered.">    if (!iterator.hasNext()) {</span>
+<span class="fc" id="L381">      return new EmptyClosableIterator&lt;&gt;();</span>
+    } else {
+<span class="fc" id="L383">      return new ClientClosableIterator&lt;&gt;(scanner,</span>
+        new GradoopEdgeIterator(),
+<span class="fc" id="L385">        config.getEdgeHandler(),</span>
+        cacheSize);
+    }
+  }
+
+  /**
+   * Write an EPGM Element instance into table
+   *
+   * @param record  gradoop EPGM element
+   * @param writer  accumulo batch writer
+   * @param handler accumulo row handler
+   * @param &lt;T&gt;     element type
+   */
+  private &lt;T extends EPGMElement&gt; void writeRecord(
+    @Nonnull T record,
+    @Nonnull BatchWriter writer,
+    @Nonnull AccumuloRowHandler handler
+  ) {
+<span class="fc" id="L403">    Mutation mutation = new Mutation(record.getId().toString());</span>
+    //noinspection unchecked
+<span class="fc" id="L405">    mutation = handler.writeRow(mutation, record);</span>
+    try {
+<span class="fc" id="L407">      writer.addMutation(mutation);</span>
+<span class="pc bpc" id="L408" title="1 of 2 branches missed.">      if (autoFlush) {</span>
+<span class="nc" id="L409">        writer.flush();</span>
+      }
+<span class="nc" id="L411">    } catch (MutationsRejectedException e) {</span>
+<span class="nc" id="L412">      throw new RuntimeException(e);</span>
+<span class="fc" id="L413">    }</span>
+<span class="fc" id="L414">  }</span>
+
+  /**
+   * Create accumulo batch scanner with element predicate
+   *
+   * @param table  table name
+   * @param iterator iterator class
+   * @param predicate accumulo predicate
+   * @param &lt;T&gt; epgm element type
+   * @return batch scanner instance
+   * @throws IOException if create fail
+   */
+  private &lt;T extends EPGMElement&gt; BatchScanner createBatchScanner(
+    String table,
+    Class&lt;? extends SortedKeyValueIterator&lt;Key, Value&gt;&gt; iterator,
+    @Nullable ElementQuery&lt;AccumuloElementFilter&lt;T&gt;&gt; predicate
+  ) throws IOException {
+<span class="fc" id="L431">    Map&lt;String, String&gt; options = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L432" title="All 4 branches covered.">    if (predicate != null &amp;&amp; predicate.getFilterPredicate() != null) {</span>
+<span class="fc" id="L433">      options.put(AccumuloTables.KEY_PREDICATE, predicate.getFilterPredicate().encode());</span>
+    }
+    BatchScanner scanner;
+    try {
+<span class="fc" id="L437">      scanner = conn.createBatchScanner(table,</span>
+<span class="fc" id="L438">        config.get(GradoopAccumuloConfig.ACCUMULO_AUTHORIZATIONS,</span>
+          AccumuloDefault.AUTHORIZATION),
+<span class="fc" id="L440">        config.get(GradoopAccumuloConfig.GRADOOP_BATCH_SCANNER_THREADS,</span>
+<span class="fc" id="L441">          AccumuloDefault.BATCH_SCANNER_THREADS));</span>
+<span class="fc" id="L442">      int priority =</span>
+<span class="fc" id="L443">        config.get(GradoopAccumuloConfig.GRADOOP_ITERATOR_PRIORITY, AccumuloDefault</span>
+          .ITERATOR_PRIORITY);
+<span class="fc" id="L445">      scanner.addScanIterator(new IteratorSetting(</span>
+        /*iterator priority*/priority,
+        /*iterator class*/iterator,
+        /*args*/options));
+
+<span class="fc bfc" id="L450" title="All 2 branches covered.">      if (predicate == null ||</span>
+<span class="fc bfc" id="L451" title="All 2 branches covered.">        predicate.getQueryRanges() == null) {</span>
+<span class="fc" id="L452">        scanner.setRanges(Lists.newArrayList(new Range()));</span>
+      } else {
+<span class="fc" id="L454">        scanner.setRanges(Range.mergeOverlapping(predicate.getQueryRanges()</span>
+<span class="fc" id="L455">          .stream()</span>
+<span class="fc" id="L456">          .map(GradoopId::toString)</span>
+<span class="fc" id="L457">          .map(Range::exact)</span>
+<span class="fc" id="L458">          .collect(Collectors.toList())));</span>
+      }
+<span class="fc" id="L460">      return scanner;</span>
+
+<span class="nc" id="L462">    } catch (TableNotFoundException e) {</span>
+<span class="nc" id="L463">      throw new IOException(e);</span>
+    }
+  }
+
+  /**
+   * Create tables (and their namespaces, if defined by table prefix) if not exists
+   *
+   * @throws AccumuloSecurityException  for security violations,
+   *                                    authentication failures,
+   *                                    authorization failures,
+   *                                    etc.
+   * @throws AccumuloException          generic Accumulo Exception for general accumulo failures.
+   */
+  private void createTablesIfNotExists() throws AccumuloSecurityException, AccumuloException {
+<span class="fc" id="L477">    String prefix =</span>
+<span class="fc" id="L478">      config.get(GradoopAccumuloConfig.ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX);</span>
+<span class="pc bpc" id="L479" title="1 of 2 branches missed.">    if (prefix.contains(&quot;.&quot;)) {</span>
+<span class="fc" id="L480">      String namespace = prefix.substring(0, prefix.indexOf(&quot;.&quot;));</span>
+      try {
+<span class="fc bfc" id="L482" title="All 2 branches covered.">        if (!conn.namespaceOperations().exists(namespace)) {</span>
+<span class="fc" id="L483">          conn.namespaceOperations().create(namespace);</span>
+        }
+<span class="nc" id="L485">      } catch (NamespaceExistsException ignore) {</span>
+        //ignore if it is exists, maybe create by another process or thread
+<span class="fc" id="L487">      }</span>
+    }
+<span class="fc bfc" id="L489" title="All 2 branches covered.">    for (String table : new String[] {</span>
+<span class="fc" id="L490">      getVertexTableName(), getEdgeTableName(), getGraphHeadName()</span>
+    }) {
+      try {
+<span class="fc bfc" id="L493" title="All 2 branches covered.">        if (!conn.tableOperations().exists(table)) {</span>
+<span class="fc" id="L494">          conn.tableOperations().create(table);</span>
+        }
+<span class="nc" id="L496">      } catch (TableExistsException ignore) {</span>
+        //ignore if it is exists, maybe create by another process or thread
+<span class="fc" id="L498">      }</span>
+    }
+<span class="fc" id="L500">  }</span>
+
+  /**
+   * Delete a table if it exists.
+   *
+   * @param tableName The table name.
+   * @throws AccumuloSecurityException if the user does not have persmissions to delete the table.
+   * @throws AccumuloException         if a general Accumulo error occurs.
+   */
+  private void dropTableIfExists(@Nonnull String tableName) throws AccumuloSecurityException,
+    AccumuloException {
+<span class="pc bpc" id="L511" title="1 of 2 branches missed.">    if (conn.tableOperations().exists(tableName)) {</span>
+      try {
+<span class="fc" id="L513">        conn.tableOperations().delete(tableName);</span>
+<span class="nc" id="L514">      } catch (TableNotFoundException e) {</span>
+        // We checked before if it exists, so this should not happen.
+<span class="nc" id="L516">        throw new IllegalStateException(e);</span>
+<span class="fc" id="L517">      }</span>
+    }
+<span class="fc" id="L519">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

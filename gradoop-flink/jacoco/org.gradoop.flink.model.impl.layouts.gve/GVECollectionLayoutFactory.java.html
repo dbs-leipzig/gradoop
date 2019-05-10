@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GVECollectionLayoutFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.layouts.gve</a> &gt; <span class="el_source">GVECollectionLayoutFactory.java</span></div><h1>GVECollectionLayoutFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.layouts.gve;
+
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.TransactionEdges;
+import org.gradoop.flink.model.impl.functions.epgm.TransactionGraphHead;
+import org.gradoop.flink.model.impl.functions.epgm.TransactionVertices;
+import org.gradoop.flink.model.impl.functions.utils.First;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * Responsible for creating a {@link GVELayout} from given data.
+ */
+<span class="fc" id="L41">public class GVECollectionLayoutFactory extends GVEBaseFactory</span>
+  implements GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; {
+
+  @Override
+  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromDataSets(DataSet&lt;GraphHead&gt; graphHeads,
+    DataSet&lt;Vertex&gt; vertices) {
+<span class="fc" id="L47">    return fromDataSets(graphHeads, vertices,</span>
+<span class="fc" id="L48">      createEdgeDataSet(new ArrayList&lt;&gt;(0)));</span>
+  }
+
+  @Override
+  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromDataSets(
+    DataSet&lt;GraphHead&gt; graphHeads,
+    DataSet&lt;Vertex&gt; vertices,
+    DataSet&lt;Edge&gt; edges) {
+<span class="fc" id="L56">    return create(graphHeads, vertices, edges);</span>
+  }
+
+  @Override
+  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromIndexedDataSets(
+    Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads,
+    Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
+    Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
+<span class="fc" id="L64">    return create(graphHeads, vertices, edges);</span>
+  }
+
+  @Override
+  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromCollections(
+    Collection&lt;GraphHead&gt; graphHeads,
+    Collection&lt;Vertex&gt; vertices,
+    Collection&lt;Edge&gt; edges) {
+<span class="fc" id="L72">    return fromDataSets(</span>
+<span class="fc" id="L73">      createGraphHeadDataSet(Objects.requireNonNull(graphHeads, &quot;GraphHead collection was null&quot;)),</span>
+<span class="fc" id="L74">      createVertexDataSet(Objects.requireNonNull(vertices, &quot;Vertex collection was null&quot;)),</span>
+<span class="fc" id="L75">      createEdgeDataSet(Objects.requireNonNull(edges, &quot;Edge collection was null&quot;)));</span>
+  }
+
+  @Override
+  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromGraphLayout(
+    LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; graph) {
+<span class="fc" id="L81">    return fromDataSets(graph.getGraphHead(), graph.getVertices(), graph.getEdges());</span>
+  }
+
+  @Override
+  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromTransactions(
+    DataSet&lt;GraphTransaction&gt; transactions) {
+<span class="fc" id="L87">    GroupReduceFunction&lt;Vertex, Vertex&gt; vertexReducer = new First&lt;&gt;();</span>
+<span class="fc" id="L88">    GroupReduceFunction&lt;Edge, Edge&gt; edgeReducer = new First&lt;&gt;();</span>
+
+<span class="fc" id="L90">    return fromTransactions(transactions, vertexReducer, edgeReducer);</span>
+  }
+
+  @Override
+  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromTransactions(
+    DataSet&lt;GraphTransaction&gt; transactions,
+    GroupReduceFunction&lt;Vertex, Vertex&gt; vertexMergeReducer,
+    GroupReduceFunction&lt;Edge, Edge&gt; edgeMergeReducer) {
+
+<span class="fc" id="L99">    DataSet&lt;GraphHead&gt; graphHeads = transactions.map(new TransactionGraphHead&lt;&gt;());</span>
+
+<span class="fc" id="L101">    DataSet&lt;Vertex&gt; vertices = transactions</span>
+<span class="fc" id="L102">      .flatMap(new TransactionVertices&lt;&gt;())</span>
+<span class="fc" id="L103">      .groupBy(new Id&lt;&gt;())</span>
+<span class="fc" id="L104">      .reduceGroup(vertexMergeReducer);</span>
+
+<span class="fc" id="L106">    DataSet&lt;Edge&gt; edges = transactions</span>
+<span class="fc" id="L107">      .flatMap(new TransactionEdges&lt;&gt;())</span>
+<span class="fc" id="L108">      .groupBy(new Id&lt;&gt;())</span>
+<span class="fc" id="L109">      .reduceGroup(edgeMergeReducer);</span>
+
+<span class="fc" id="L111">    return fromDataSets(graphHeads, vertices, edges);</span>
+  }
+
+  @Override
+  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; createEmptyCollection() {
+<span class="fc" id="L116">    Collection&lt;GraphHead&gt; graphHeads = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L117">    Collection&lt;Vertex&gt; vertices = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L118">    Collection&lt;Edge&gt; edges = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L120">    return fromCollections(graphHeads, vertices, edges);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

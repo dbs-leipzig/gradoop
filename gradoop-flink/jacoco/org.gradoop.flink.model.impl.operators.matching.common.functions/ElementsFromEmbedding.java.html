@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElementsFromEmbedding.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.common.functions</a> &gt; <span class="el_source">ElementsFromEmbedding.java</span></div><h1>ElementsFromEmbedding.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.common.functions;
+
+import com.google.common.collect.Maps;
+import org.apache.flink.api.common.functions.RichFlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
+import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
+import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * Extracts {@link Element} instances from an {@link Embedding}.
+ */
+public class ElementsFromEmbedding
+  extends RichFlatMapFunction&lt;Tuple1&lt;Embedding&lt;GradoopId&gt;&gt;, Element&gt; {
+
+  /**
+   * Maps edge candidates to the step in which they are traversed
+   */
+  private final Map&lt;Integer, Step&gt; edgeToStep;
+  /**
+   * Constructs EPGM graph heads
+   */
+  private final EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory;
+  /**
+   * Constructs EPGM vertices
+   */
+  private final EPGMVertexFactory&lt;Vertex&gt; vertexFactory;
+  /**
+   * Constructs EPGM edges
+   */
+  private final EPGMEdgeFactory&lt;Edge&gt; edgeFactory;
+  /**
+   * Maps query vertex ids to variables
+   */
+  private final Map&lt;Long, String&gt; queryVertexMapping;
+  /**
+   * Maps query edge ids to variables
+   */
+  private final Map&lt;Long, String&gt; queryEdgeMapping;
+  /**
+   * Reuse map for storing the variable mapping
+   */
+  private Map&lt;PropertyValue, PropertyValue&gt; reuseVariableMapping;
+  /**
+   * Constructor
+   *
+   * @param traversalCode     traversal code to retrieve sourceId/targetId
+   * @param epgmGraphHeadFactory  EPGM graph head factory
+   * @param epgmVertexFactory     EPGM vertex factory
+   * @param epgmEdgeFactory       EPGM edge factory
+   * @param query             query handler
+   */
+  public ElementsFromEmbedding(TraversalCode traversalCode,
+    EPGMGraphHeadFactory&lt;GraphHead&gt; epgmGraphHeadFactory,
+    EPGMVertexFactory&lt;Vertex&gt; epgmVertexFactory,
+    EPGMEdgeFactory&lt;Edge&gt; epgmEdgeFactory,
+<span class="fc" id="L90">    QueryHandler query) {</span>
+<span class="fc" id="L91">    this.graphHeadFactory = epgmGraphHeadFactory;</span>
+<span class="fc" id="L92">    this.vertexFactory = epgmVertexFactory;</span>
+<span class="fc" id="L93">    this.edgeFactory = epgmEdgeFactory;</span>
+
+<span class="fc" id="L95">    this.queryVertexMapping = query.getVertices()</span>
+<span class="fc" id="L96">      .stream()</span>
+<span class="fc" id="L97">      .collect(Collectors.toMap(v -&gt; v.getId(), v -&gt; v.getVariable()));</span>
+
+<span class="fc" id="L99">    this.queryEdgeMapping = query.getEdges()</span>
+<span class="fc" id="L100">      .stream()</span>
+<span class="fc" id="L101">      .collect(Collectors.toMap(e -&gt; e.getId(), e -&gt; e.getVariable()));</span>
+
+<span class="fc" id="L103">    List&lt;Step&gt; steps = traversalCode.getSteps();</span>
+<span class="fc" id="L104">    edgeToStep = Maps.newHashMapWithExpectedSize(steps.size());</span>
+
+<span class="fc bfc" id="L106" title="All 2 branches covered.">    for (Step step : steps) {</span>
+<span class="fc" id="L107">      edgeToStep.put((int) step.getVia(), step);</span>
+<span class="fc" id="L108">    }</span>
+<span class="fc" id="L109">  }</span>
+
+  @Override
+  public void open(Configuration conf) {
+<span class="fc" id="L113">    this.reuseVariableMapping = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L114">  }</span>
+
+  @Override
+  public void flatMap(Tuple1&lt;Embedding&lt;GradoopId&gt;&gt; embedding, Collector&lt;Element&gt; out)
+      throws Exception {
+
+<span class="fc" id="L120">    GradoopId[] vertexMapping = embedding.f0.getVertexMapping();</span>
+<span class="fc" id="L121">    GradoopId[] edgeMapping = embedding.f0.getEdgeMapping();</span>
+
+
+    // create graph head for this embedding
+<span class="fc" id="L125">    GraphHead graphHead = graphHeadFactory.createGraphHead();</span>
+
+    // collect vertices (and assign to graph head)
+<span class="fc bfc" id="L128" title="All 2 branches covered.">    for (int i = 0; i &lt; vertexMapping.length; i++) {</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">      if (!isProcessed(vertexMapping, i)) {</span>
+<span class="fc" id="L130">        Vertex v = vertexFactory.initVertex(vertexMapping[i]);</span>
+<span class="fc" id="L131">        v.addGraphId(graphHead.getId());</span>
+<span class="fc" id="L132">        out.collect(v);</span>
+      }
+
+<span class="fc" id="L135">      reuseVariableMapping.put(</span>
+<span class="fc" id="L136">        PropertyValue.create(queryVertexMapping.get((long) i)),</span>
+<span class="fc" id="L137">        PropertyValue.create(vertexMapping[i])</span>
+      );
+    }
+
+    // collect edges (and assign to graph head)
+<span class="fc bfc" id="L142" title="All 2 branches covered.">    for (int i = 0; i &lt; edgeMapping.length; i++) {</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">      if (!isProcessed(edgeMapping, i)) {</span>
+<span class="fc" id="L144">        Step s = edgeToStep.get(i);</span>
+        // get sourceId/targetId according to traversal step
+<span class="fc bfc" id="L146" title="All 2 branches covered.">        GradoopId sourceId = s.isOutgoing() ?</span>
+<span class="fc" id="L147">          vertexMapping[(int) s.getFrom()] : vertexMapping[(int) s.getTo()];</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">        GradoopId targetId = s.isOutgoing() ?</span>
+<span class="fc" id="L149">          vertexMapping[(int) s.getTo()] : vertexMapping[(int) s.getFrom()];</span>
+<span class="fc" id="L150">        Edge e = edgeFactory.initEdge(edgeMapping[i], sourceId, targetId);</span>
+<span class="fc" id="L151">        e.addGraphId(graphHead.getId());</span>
+<span class="fc" id="L152">        out.collect(e);</span>
+      }
+
+<span class="fc" id="L155">      reuseVariableMapping.put(</span>
+<span class="fc" id="L156">        PropertyValue.create(queryEdgeMapping.get((long) i)),</span>
+<span class="fc" id="L157">        PropertyValue.create(edgeMapping[i])</span>
+      );
+    }
+
+<span class="fc" id="L161">    graphHead.setProperty(PatternMatching.VARIABLE_MAPPING_KEY, reuseVariableMapping);</span>
+<span class="fc" id="L162">    out.collect(graphHead);</span>
+<span class="fc" id="L163">  }</span>
+
+  /**
+   * Checks if the the id at the specified index has been processed before.
+   *
+   * @param mapping id mapping
+   * @param i index
+   * @return true, iff the element at position i is present at a position between 0 and i
+   */
+  private boolean isProcessed(GradoopId[] mapping, int i) {
+<span class="fc bfc" id="L173" title="All 2 branches covered.">    for (int j = 0; j &lt; i; j++) {</span>
+<span class="fc bfc" id="L174" title="All 2 branches covered.">      if (mapping[j].equals(mapping[i])) {</span>
+<span class="fc" id="L175">        return true;</span>
+      }
+    }
+<span class="fc" id="L178">    return false;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

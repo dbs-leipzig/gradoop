@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EdgeToVertex.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation</a> &gt; <span class="el_source">EdgeToVertex.java</span></div><h1>EdgeToVertex.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.dataintegration.transformation.functions.CreateEdgesFromTriple;
+import org.gradoop.dataintegration.transformation.functions.CreateVertexFromEdges;
+import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
+
+import java.util.Objects;
+
+/**
+ * For edges of a specific label this graph transformation creates a new vertex containing the
+ * properties of the edge and two new edges respecting the direction of the original edge.
+ * The newly created edges and vertex labels are user-defined.
+ * &lt;p&gt;
+ * The original edges are still part of the resulting graph.
+ * Use a {@link org.apache.flink.api.common.functions.FilterFunction} on the original label to
+ * remove them.
+ */
+public class EdgeToVertex implements UnaryGraphToGraphOperator {
+
+  /**
+   * The label of the edges use for the transformation.
+   */
+  private final String edgeLabel;
+
+  /**
+   * The label of the newly created vertex.
+   */
+  private final String newVertexLabel;
+
+  /**
+   * The label of the newly created edge which points to the newly created vertex.
+   */
+  private final String edgeLabelSourceToNew;
+
+  /**
+   * The label of the newly created edge which starts at the newly created vertex.
+   */
+  private final String edgeLabelNewToTarget;
+
+  /**
+   * The constructor for the structural transformation.
+   *
+   * @param edgeLabel            The label of the edges use for the transformation.
+   *                             (No edges will be transformed if this parameter is {@code null}).
+   * @param newVertexLabel       The label of the newly created vertex.
+   * @param edgeLabelSourceToNew The label of the newly created edge which points to the newly
+   *                             created vertex.
+   * @param edgeLabelNewToTarget The label of the newly created edge which starts at the newly
+   *                             created vertex.
+   */
+  public EdgeToVertex(String edgeLabel, String newVertexLabel, String edgeLabelSourceToNew,
+<span class="fc" id="L74">    String edgeLabelNewToTarget) {</span>
+<span class="fc" id="L75">    this.edgeLabel = edgeLabel;</span>
+<span class="fc" id="L76">    this.newVertexLabel = Objects.requireNonNull(newVertexLabel);</span>
+<span class="fc" id="L77">    this.edgeLabelSourceToNew = Objects.requireNonNull(edgeLabelSourceToNew);</span>
+<span class="fc" id="L78">    this.edgeLabelNewToTarget = Objects.requireNonNull(edgeLabelNewToTarget);</span>
+<span class="fc" id="L79">  }</span>
+
+  @Override
+  public LogicalGraph execute(LogicalGraph graph) {
+<span class="fc" id="L83">    DataSet&lt;Edge&gt; relevantEdges = graph.getEdgesByLabel(edgeLabel);</span>
+
+    // create new vertices
+<span class="fc" id="L86">    DataSet&lt;Tuple3&lt;Vertex, GradoopId, GradoopId&gt;&gt; newVerticesAndOriginIds = relevantEdges</span>
+<span class="fc" id="L87">      .map(new CreateVertexFromEdges&lt;&gt;(newVertexLabel, graph.getFactory().getVertexFactory()));</span>
+
+<span class="fc" id="L89">    DataSet&lt;Vertex&gt; newVertices = newVerticesAndOriginIds</span>
+<span class="fc" id="L90">      .map(new Value0Of3&lt;&gt;())</span>
+<span class="fc" id="L91">      .union(graph.getVertices());</span>
+
+    // create edges to the newly created vertex
+<span class="fc" id="L94">    DataSet&lt;Edge&gt; newEdges = newVerticesAndOriginIds</span>
+<span class="fc" id="L95">      .flatMap(new CreateEdgesFromTriple&lt;&gt;(graph.getFactory().getEdgeFactory(),</span>
+        edgeLabelSourceToNew, edgeLabelNewToTarget))
+<span class="fc" id="L97">      .union(graph.getEdges());</span>
+
+<span class="fc" id="L99">    return graph.getFactory().fromDataSets(newVertices, newEdges);</span>
+  }
+
+  @Override
+  public String getName() {
+<span class="nc" id="L104">    return EdgeToVertex.class.getName();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

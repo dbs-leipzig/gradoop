@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClusteringCoefficientBase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.gelly.clusteringcoefficient</a> &gt; <span class="el_source">ClusteringCoefficientBase.java</span></div><h1>ClusteringCoefficientBase.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
+
+import org.apache.flink.graph.Graph;
+import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
+import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
+import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+
+/**
+ * Base class for Gradoop EPGM model wrapper for Flink Gellys implementation of the clustering
+ * coefficient algorithm. Implementations compute the local and global clustering coefficient of
+ * a graph, where:
+ * &lt;pre&gt;
+ *   local - connectedness of a single vertex regarding the connections of its neighborhood, with
+ *           value between 0.0 (no edges between neighbors) and 1.0 (neighbors fully connected)
+ *   global - connectedness of the graph as ratio from closed triplets (triangles) to all triplets
+ *            with value between 0.0 (no closed triplets) and 1.0 (all triplets closed)
+ * &lt;/pre&gt;
+ */
+public abstract class ClusteringCoefficientBase extends
+  GradoopGellyAlgorithm&lt;NullValue, NullValue&gt; {
+
+  /**
+   * Property key to access the local clustering coefficient value stored in the vertices
+   */
+  public static final String PROPERTY_KEY_LOCAL = &quot;clustering_coefficient_local&quot;;
+
+  /**
+   * Property key to access the global clustering coefficient value stored the graph head
+   */
+  public static final String PROPERTY_KEY_GLOBAL = &quot;clustering_coefficient_global&quot;;
+
+  /**
+   * Creates an instance of the ClusteringCoefficientBase wrapper class.
+   * Calls constructor of super class {@link GradoopGellyAlgorithm}
+   */
+  public ClusteringCoefficientBase() {
+<span class="fc" id="L55">    super(new VertexToGellyVertexWithNullValue(),</span>
+      new EdgeToGellyEdgeWithNullValue());
+<span class="fc" id="L57">  }</span>
+
+  @Override
+  public LogicalGraph executeInGelly(Graph&lt;GradoopId, NullValue, NullValue&gt; graph)
+    throws Exception {
+<span class="fc" id="L62">    return executeInternal(graph);</span>
+  }
+
+  /**
+   * Executes the computation of the clustering coefficient.
+   *
+   * @param gellyGraph Gelly graph with initialized vertices
+   * @return {@link LogicalGraph} with local values written to the vertices or global value
+   * written to the graph head
+   * @throws Exception Thrown if the gelly algorithm fails
+   */
+  protected abstract LogicalGraph executeInternal(Graph&lt;GradoopId, NullValue, NullValue&gt; gellyGraph)
+    throws Exception;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

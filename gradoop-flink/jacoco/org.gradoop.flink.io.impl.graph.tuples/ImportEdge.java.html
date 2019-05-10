@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ImportEdge.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.graph.tuples</a> &gt; <span class="el_source">ImportEdge.java</span></div><h1>ImportEdge.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.graph.tuples;
+
+import org.apache.flink.api.java.tuple.Tuple5;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.util.GradoopConstants;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Represents an external edge which can be imported into the EPGM.
+ *
+ * f0: edge identifier or null
+ * f1: source vertex identifier
+ * f2: target vertex identifier
+ * f3: edge label
+ * f4: edge properties
+ *
+ * @param &lt;K&gt; vertex/edge identifier type
+ */
+public class ImportEdge&lt;K extends Comparable&lt;K&gt;&gt;
+  extends Tuple5&lt;K, K, K, String, Properties&gt; {
+
+  /**
+   * Default constructor for (de-)serialization.
+   */
+<span class="fc" id="L41">  public ImportEdge() { }</span>
+
+  /**
+   * Creates a new import edge.
+   *
+   * @param edgeId    import edge id (i.e. identifier in source system)
+   * @param sourceId  import source vertex id
+   * @param targetId  import target vertex id
+   */
+  public ImportEdge(K edgeId, K sourceId, K targetId) {
+<span class="fc" id="L51">    this(edgeId, sourceId, targetId, GradoopConstants.DEFAULT_EDGE_LABEL);</span>
+<span class="fc" id="L52">  }</span>
+
+  /**
+   * Creates a new import edge.
+   *
+   * @param edgeId    import edge id (i.e. identifier in source system)
+   * @param sourceId  import source vertex id
+   * @param targetId  import target vertex id
+   * @param label     edge label
+   */
+  public ImportEdge(K edgeId, K sourceId, K targetId, String label) {
+<span class="fc" id="L63">    this(edgeId, sourceId, targetId, label,</span>
+<span class="fc" id="L64">      Properties.createWithCapacity(0));</span>
+<span class="fc" id="L65">  }</span>
+
+  /**
+   * Creates a new import edge.
+   *
+   * @param edgeId      import edge id (i.e. identifier in source system)
+   * @param sourceId    import source vertex id
+   * @param targetId    import target vertex id
+   * @param label       edge label
+   * @param properties  edge properties
+   */
+  public ImportEdge(K edgeId, K sourceId, K targetId, String label,
+<span class="fc" id="L77">    Properties properties) {</span>
+<span class="fc" id="L78">    setId(edgeId);</span>
+<span class="fc" id="L79">    setSourceId(sourceId);</span>
+<span class="fc" id="L80">    setTargetId(targetId);</span>
+<span class="fc" id="L81">    setLabel(label);</span>
+<span class="fc" id="L82">    setProperties(properties);</span>
+<span class="fc" id="L83">  }</span>
+
+  public K getId() {
+<span class="fc" id="L86">    return f0;</span>
+  }
+
+  public void setId(K id) {
+<span class="fc" id="L90">    this.f0 = checkNotNull(id, &quot;id was null&quot;);</span>
+<span class="fc" id="L91">  }</span>
+
+  public K getSourceId() {
+<span class="nc" id="L94">    return f1;</span>
+  }
+
+  public void setSourceId(K sourceVertexId) {
+<span class="fc" id="L98">    f1 = checkNotNull(sourceVertexId, &quot;sourceId was null&quot;);</span>
+<span class="fc" id="L99">  }</span>
+
+  public K getTargetId() {
+<span class="fc" id="L102">    return f2;</span>
+  }
+
+  public void setTargetId(K targetVertexId) {
+<span class="fc" id="L106">    f2 = checkNotNull(targetVertexId, &quot;targetId was null&quot;);</span>
+<span class="fc" id="L107">  }</span>
+
+  public String getLabel() {
+<span class="fc" id="L110">    return f3;</span>
+  }
+
+  public void setLabel(String label) {
+<span class="fc" id="L114">    f3 = checkNotNull(label, &quot;label was null&quot;);</span>
+<span class="fc" id="L115">  }</span>
+
+  public Properties getProperties() {
+<span class="fc" id="L118">    return f4;</span>
+  }
+
+  public void setProperties(Properties properties) {
+<span class="fc" id="L122">    f4 = checkNotNull(properties, &quot;properties were null&quot;);</span>
+<span class="fc" id="L123">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

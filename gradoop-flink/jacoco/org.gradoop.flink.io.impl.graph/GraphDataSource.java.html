@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GraphDataSource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.graph</a> &gt; <span class="el_source">GraphDataSource.java</span></div><h1>GraphDataSource.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.graph;
+
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.io.impl.graph.functions.InitEdge;
+import org.gradoop.flink.io.impl.graph.functions.InitVertex;
+import org.gradoop.flink.io.impl.graph.functions.UpdateEdge;
+import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
+import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.tuple.Project3To0And1;
+import org.gradoop.flink.model.impl.functions.tuple.Value2Of3;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.IOException;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Transforms an external graph into an EPGM database. The external graph needs
+ * to be represented by a data set of {@link ImportVertex} and a data set of
+ * {@link ImportEdge}. This class transforms the external graph into an EPGM
+ * {@link LogicalGraph}.
+ *
+ * @param &lt;K&gt; External vertex/edge identifier type
+ */
+public class GraphDataSource&lt;K extends Comparable&lt;K&gt;&gt; implements DataSource {
+
+  /**
+   * Vertices to import.
+   */
+  private final DataSet&lt;ImportVertex&lt;K&gt;&gt; importVertices;
+
+  /**
+   * Edges to import.
+   */
+  private final DataSet&lt;ImportEdge&lt;K&gt;&gt; importEdges;
+
+  /**
+   * Used to store the lineage information at the resulting EPGM element.
+   */
+  private final String lineagePropertyKey;
+
+  /**
+   * Gradoop config
+   */
+  private final GradoopFlinkConfig config;
+
+
+  /**
+   * Creates a new graph reader with no lineage information stored at the
+   * resulting EPGM graph.
+   *
+   * @param importVertices  vertices to import
+   * @param importEdges     edges to import
+   * @param config          gradoop config
+   */
+  public GraphDataSource(DataSet&lt;ImportVertex&lt;K&gt;&gt; importVertices,
+    DataSet&lt;ImportEdge&lt;K&gt;&gt; importEdges, GradoopFlinkConfig config) {
+<span class="fc" id="L83">    this(importVertices, importEdges, null, config);</span>
+<span class="fc" id="L84">  }</span>
+
+  /**
+   * Creates a new graph reader.
+   *
+   * If the given {@code lineagePropertyKey} is {@code null}, no lineage info
+   * is stored.
+   *
+   * @param importVertices      vertices to import
+   * @param importEdges         edges to import
+   * @param lineagePropertyKey  property key to store import identifiers
+   *                            (can be {@code null})
+   * @param config              gradoop config
+   */
+  public GraphDataSource(DataSet&lt;ImportVertex&lt;K&gt;&gt; importVertices,
+    DataSet&lt;ImportEdge&lt;K&gt;&gt; importEdges, String lineagePropertyKey,
+<span class="fc" id="L100">    GradoopFlinkConfig config) {</span>
+<span class="fc" id="L101">    this.importVertices     = checkNotNull(importVertices);</span>
+<span class="fc" id="L102">    this.importEdges        = checkNotNull(importEdges);</span>
+<span class="fc" id="L103">    this.lineagePropertyKey = lineagePropertyKey;</span>
+<span class="fc" id="L104">    this.config             = checkNotNull(config);</span>
+<span class="fc" id="L105">  }</span>
+
+  /**
+   * Transforms the import graph into a logical graph.
+   *
+   * @return logical graph
+   */
+  @Override
+  public LogicalGraph getLogicalGraph() {
+
+<span class="fc" id="L115">    TypeInformation&lt;K&gt; externalIdType = ((TupleTypeInfo&lt;?&gt;) importVertices</span>
+<span class="fc" id="L116">      .getType()).getTypeAt(0);</span>
+
+<span class="fc" id="L118">    DataSet&lt;Tuple3&lt;K, GradoopId, Vertex&gt;&gt; vertexTriples = importVertices</span>
+<span class="fc" id="L119">      .map(new InitVertex&lt;K&gt;(</span>
+<span class="fc" id="L120">        config.getVertexFactory(), lineagePropertyKey, externalIdType));</span>
+
+<span class="fc" id="L122">    DataSet&lt;Vertex&gt; epgmVertices = vertexTriples</span>
+<span class="fc" id="L123">      .map(new Value2Of3&lt;K, GradoopId, Vertex&gt;());</span>
+
+<span class="fc" id="L125">    DataSet&lt;Tuple2&lt;K, GradoopId&gt;&gt; vertexIdPair = vertexTriples</span>
+<span class="fc" id="L126">      .map(new Project3To0And1&lt;K, GradoopId, Vertex&gt;());</span>
+
+<span class="fc" id="L128">    DataSet&lt;Edge&gt; epgmEdges = importEdges</span>
+<span class="fc" id="L129">      .join(vertexIdPair)</span>
+<span class="fc" id="L130">      .where(1).equalTo(0)</span>
+<span class="fc" id="L131">      .with(new InitEdge&lt;K&gt;(</span>
+<span class="fc" id="L132">        config.getEdgeFactory(), lineagePropertyKey, externalIdType))</span>
+<span class="fc" id="L133">      .join(vertexIdPair)</span>
+<span class="fc" id="L134">      .where(0).equalTo(0)</span>
+<span class="fc" id="L135">      .with(new UpdateEdge&lt;Edge, K&gt;());</span>
+
+<span class="fc" id="L137">    return config.getLogicalGraphFactory().fromDataSets(epgmVertices, epgmEdges);</span>
+  }
+
+  @Override
+  public GraphCollection getGraphCollection() throws IOException {
+<span class="fc" id="L142">    return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

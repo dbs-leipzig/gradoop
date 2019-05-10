@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElementToCSV.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.csv.functions</a> &gt; <span class="el_source">ElementToCSV.java</span></div><h1>ElementToCSV.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.csv.functions;
+
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.impl.metadata.MetaData;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
+import org.gradoop.flink.io.impl.csv.CSVDataSource;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+/**
+ * Base class to convert an EPGM element into a CSV representation.
+ *
+ * @param &lt;E&gt; EPGM element type
+ * @param &lt;T&gt; output tuple type
+ */
+<span class="fc" id="L39">public abstract class ElementToCSV&lt;E extends Element, T extends Tuple&gt;</span>
+  extends RichMapFunction&lt;E, T&gt; {
+  /**
+   * Constant for an empty string.
+   */
+  private static final String EMPTY_STRING = &quot;&quot;;
+  /**
+   * Meta data that provides parsers for a specific {@link Element}.
+   */
+  private CSVMetaData metaData;
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="fc" id="L52">    super.open(parameters);</span>
+<span class="fc" id="L53">    this.metaData = new CSVMetaDataSource().fromTuples(getRuntimeContext()</span>
+<span class="fc" id="L54">      .getBroadcastVariable(CSVDataSource.BC_METADATA));</span>
+<span class="fc" id="L55">  }</span>
+
+  /**
+   * Returns the concatenated property values of the specified element according to the meta data.
+   *
+   * @param element EPGM element
+   * @param type    element type
+   * @return property value string
+   */
+  String getPropertyString(E element, String type) {
+<span class="fc" id="L65">    return metaData.getPropertyMetaData(type, element.getLabel()).stream()</span>
+<span class="fc" id="L66">      .map(propertyMetaData -&gt; this.getPropertyValueString(propertyMetaData, element))</span>
+<span class="fc" id="L67">      .collect(Collectors.joining(CSVConstants.VALUE_DELIMITER));</span>
+  }
+
+  /**
+   * Returns the string representation of the property value matching the given property metadata.
+   * If no matching property is found, an empty string is returned.
+   *
+   * @param propertyMetaData property metadata of the wanted property value
+   * @param element          EPGM element containing the property value
+   * @return string representation of matched property value or empty string
+   */
+  private String getPropertyValueString(PropertyMetaData propertyMetaData, E element) {
+<span class="fc" id="L79">    PropertyValue p = element.getPropertyValue(propertyMetaData.getKey());</span>
+    // Only properties with matching type get returned
+    // to prevent writing values with the wrong type metadata
+<span class="fc bfc" id="L82" title="All 4 branches covered.">    if (p != null &amp;&amp; MetaData.getTypeString(p).equals(propertyMetaData.getTypeString())) {</span>
+<span class="fc" id="L83">      return propertyValueToCsvString(p);</span>
+    }
+<span class="fc" id="L85">    return EMPTY_STRING;</span>
+  }
+
+  /**
+   * Returns a CSV string representation of the property value.
+   *
+   * @param p property value
+   * @return CSV string
+   */
+  private String propertyValueToCsvString(PropertyValue p) {
+<span class="fc bfc" id="L95" title="All 4 branches covered.">    if (p.isList() || p.isSet()) {</span>
+<span class="fc" id="L96">      return collectionToCsvString((Collection) p.getObject());</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">    } else if (p.isMap()) {</span>
+<span class="fc" id="L98">      return p.getMap().entrySet().stream()</span>
+<span class="fc" id="L99">        .map(e -&gt; escape(e.getKey()) + CSVConstants.MAP_SEPARATOR + escape(e.getValue()))</span>
+<span class="fc" id="L100">        .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, &quot;{&quot;, &quot;}&quot;));</span>
+    } else {
+<span class="fc" id="L102">      return escape(p);</span>
+    }
+  }
+
+  /**
+   * Returns a CSV string representation of a collection.
+   *
+   * @param collection collection
+   * @return CSV string
+   */
+  String collectionToCsvString(Collection&lt;?&gt; collection) {
+<span class="fc" id="L113">    return collection.stream()</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">      .map(o -&gt; o instanceof PropertyValue ? escape((PropertyValue) o) : o.toString())</span>
+<span class="fc" id="L115">      .collect(Collectors.joining(CSVConstants.LIST_DELIMITER, &quot;[&quot;, &quot;]&quot;));</span>
+  }
+
+  /**
+   * Returns a escaped string representation of a property value.
+   *
+   * @param propertyValue property value to be escaped
+   * @return escaped string representation
+   */
+  private static String escape(PropertyValue propertyValue) {
+<span class="fc bfc" id="L125" title="All 2 branches covered.">    if (propertyValue.isString()) {</span>
+<span class="fc" id="L126">      return StringEscaper.escape(propertyValue.toString(), CSVConstants.ESCAPED_CHARACTERS);</span>
+    }
+<span class="fc" id="L128">    return propertyValue.toString();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

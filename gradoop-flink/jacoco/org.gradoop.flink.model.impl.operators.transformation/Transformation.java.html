@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Transformation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.transformation</a> &gt; <span class="el_source">Transformation.java</span></div><h1>Transformation.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.transformation;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
+import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.impl.operators.transformation.functions.TransformEdge;
+import org.gradoop.flink.model.impl.operators.transformation.functions.TransformGraphHead;
+import org.gradoop.flink.model.impl.operators.transformation.functions.TransformVertex;
+
+/**
+ * The modification operators is a unary graph operator that takes a logical
+ * graph as input and applies user defined modification functions on the
+ * elements of that graph as well as on its graph head.
+ *
+ * The identity of the elements is preserved.
+ *
+ * @param &lt;G&gt; the EPGM graph head type
+ * @param &lt;V&gt; the EPGM vertex type
+ * @param &lt;E&gt; the EPGM edge type
+ * @param &lt;LG&gt; the logical graph type
+ */
+public class Transformation&lt;
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph&lt;G, V, E, LG&gt;&gt; implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
+
+  /**
+   * Modification function for graph heads
+   */
+  protected final TransformationFunction&lt;G&gt; graphHeadTransFunc;
+
+  /**
+   * Modification function for vertices
+   */
+  protected final TransformationFunction&lt;V&gt; vertexTransFunc;
+
+  /**
+   * Modification function for edges
+   */
+  protected final TransformationFunction&lt;E&gt; edgeTransFunc;
+
+  /**
+   * Creates a new operator instance.
+   *
+   * @param graphHeadTransFunc  graph head transformation function
+   * @param vertexTransFunc     vertex transformation function
+   * @param edgeTransFunc       edge transformation function
+   */
+  public Transformation(
+    TransformationFunction&lt;G&gt; graphHeadTransFunc,
+    TransformationFunction&lt;V&gt; vertexTransFunc,
+<span class="fc" id="L74">    TransformationFunction&lt;E&gt; edgeTransFunc) {</span>
+
+<span class="fc bfc" id="L76" title="All 6 branches covered.">    if (graphHeadTransFunc == null &amp;&amp; vertexTransFunc == null &amp;&amp; edgeTransFunc == null) {</span>
+<span class="fc" id="L77">      throw new IllegalArgumentException(&quot;Provide at least one transformation function.&quot;);</span>
+    }
+<span class="fc" id="L79">    this.graphHeadTransFunc = graphHeadTransFunc;</span>
+<span class="fc" id="L80">    this.vertexTransFunc    = vertexTransFunc;</span>
+<span class="fc" id="L81">    this.edgeTransFunc      = edgeTransFunc;</span>
+<span class="fc" id="L82">  }</span>
+
+  @Override
+  public LG execute(LG graph) {
+<span class="fc" id="L86">    return executeInternal(</span>
+<span class="fc" id="L87">      graph.getGraphHead(),</span>
+<span class="fc" id="L88">      graph.getVertices(),</span>
+<span class="fc" id="L89">      graph.getEdges(),</span>
+<span class="fc" id="L90">      graph.getFactory());</span>
+  }
+
+  /**
+   * Applies the transformation functions on the given datasets.
+   *
+   * @param graphHeads graph heads
+   * @param vertices vertices
+   * @param edges edges
+   * @param factory the factory that is responsible for creating an instance of the logical graph
+   * @return transformed logical graph
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  protected LG executeInternal(DataSet&lt;G&gt; graphHeads, DataSet&lt;V&gt; vertices, DataSet&lt;E&gt; edges,
+    BaseGraphFactory&lt;G, V, E, LG&gt; factory) {
+
+<span class="fc bfc" id="L106" title="All 2 branches covered.">    DataSet&lt;G&gt; transformedGraphHeads = graphHeadTransFunc != null ? graphHeads</span>
+<span class="fc" id="L107">      .map(new TransformGraphHead(graphHeadTransFunc, factory.getGraphHeadFactory()))</span>
+<span class="fc" id="L108">      .returns(TypeExtractor.createTypeInfo(factory.getGraphHeadFactory().getType())) : graphHeads;</span>
+
+<span class="fc bfc" id="L110" title="All 2 branches covered.">    DataSet&lt;V&gt; transformedVertices = vertexTransFunc != null ? vertices</span>
+<span class="fc" id="L111">      .map(new TransformVertex(vertexTransFunc, factory.getVertexFactory()))</span>
+<span class="fc" id="L112">      .returns(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())) : vertices;</span>
+
+<span class="fc bfc" id="L114" title="All 2 branches covered.">    DataSet&lt;E&gt; transformedEdges = edgeTransFunc != null ? edges</span>
+<span class="fc" id="L115">      .map(new TransformEdge(edgeTransFunc, factory.getEdgeFactory()))</span>
+<span class="fc" id="L116">      .returns(TypeExtractor.createTypeInfo(factory.getEdgeFactory().getType())) : edges;</span>
+
+<span class="fc" id="L118">    return factory.fromDataSets(transformedGraphHeads, transformedVertices, transformedEdges);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

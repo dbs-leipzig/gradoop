@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExpandEmbeddingsForLoop.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand</a> &gt; <span class="el_source">ExpandEmbeddingsForLoop.java</span></div><h1>ExpandEmbeddingsForLoop.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand;
+
+import com.google.common.collect.Lists;
+import org.apache.flink.api.common.operators.base.JoinOperatorBase;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.functions.MergeExpandEmbeddings;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.tuples.ExpandEmbedding;
+
+import java.util.List;
+
+/**
+ * Expands an vertex along the edges. The number of hops can be specified via upper and lower bound
+ * The input embedding is appended by 2 Entries, the first one represents the path (edge, vertex,
+ * edge, vertex, ..., edge), the second one the end vertex
+ *
+ * Iteration is done with {@code LoopUnrolling}
+ */
+public class ExpandEmbeddingsForLoop extends ExpandEmbeddings {
+
+  /**
+   * New Expand One Operator
+   *
+   * @param input the embedding which should be expanded
+   * @param candidateEdges candidate edges along which we expand
+   * @param expandColumn specifies the input column that represents the vertex from which we expand
+   * @param lowerBound specifies the minimum hops we want to expand
+   * @param upperBound specifies the maximum hops we want to expand
+   * @param direction direction of the expansion {@see ExpandDirection}
+   * @param distinctVertexColumns indices of distinct input vertex columns
+   * @param distinctEdgeColumns indices of distinct input edge columns
+   * @param closingColumn defines the column which should be equal with the paths end
+   * @param joinHint join strategy
+   */
+  public ExpandEmbeddingsForLoop(DataSet&lt;Embedding&gt; input, DataSet&lt;Embedding&gt; candidateEdges,
+    int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
+    List&lt;Integer&gt; distinctVertexColumns, List&lt;Integer&gt; distinctEdgeColumns, int closingColumn,
+    JoinOperatorBase.JoinHint joinHint) {
+
+<span class="fc" id="L56">    super(input, candidateEdges, expandColumn, lowerBound, upperBound, direction,</span>
+      distinctVertexColumns, distinctEdgeColumns, closingColumn, joinHint);
+<span class="fc" id="L58">  }</span>
+
+  /**
+   * New Expand One Operator with default join strategy
+   *
+   * @param input the embedding which should be expanded
+   * @param candidateEdges candidate edges along which we expand
+   * @param expandColumn specifies the column that represents the vertex from which we expand
+   * @param lowerBound specifies the minimum hops we want to expand
+   * @param upperBound specifies the maximum hops we want to expand
+   * @param direction direction of the expansion {@see ExpandDirection}
+   * @param distinctVertexColumns indices of distinct vertex columns
+   * @param distinctEdgeColumns indices of distinct edge columns
+   * @param closingColumn defines the column which should be equal with the paths end
+   */
+  public ExpandEmbeddingsForLoop(DataSet&lt;Embedding&gt; input, DataSet&lt;Embedding&gt; candidateEdges,
+    int expandColumn, int lowerBound, int upperBound, ExpandDirection direction,
+    List&lt;Integer&gt; distinctVertexColumns, List&lt;Integer&gt; distinctEdgeColumns, int closingColumn) {
+
+<span class="fc" id="L77">    this(input, candidateEdges, expandColumn, lowerBound, upperBound, direction,</span>
+      distinctVertexColumns, distinctEdgeColumns, closingColumn,
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+<span class="fc" id="L80">  }</span>
+
+  /**
+   * New Expand One Operator with no upper bound
+   *
+   * @param input the embedding which should be expanded
+   * @param candidateEdges candidate edges along which we expand
+   * @param expandColumn specifies the column that represents the vertex from which we expand
+   * @param lowerBound specifies the minimum hops we want to expand
+   * @param direction direction of the expansion {@see ExpandDirection}
+   * @param distinctVertexColumns indices of distinct vertex columns
+   * @param distinctEdgeColumns indices of distinct edge columns
+   * @param closingColumn defines the column which should be equal with the paths end
+   */
+  public ExpandEmbeddingsForLoop(DataSet&lt;Embedding&gt; input, DataSet&lt;Embedding&gt; candidateEdges,
+    int expandColumn, int lowerBound, ExpandDirection direction,
+    List&lt;Integer&gt; distinctVertexColumns, List&lt;Integer&gt; distinctEdgeColumns, int closingColumn) {
+
+<span class="nc" id="L98">    this(input, candidateEdges, expandColumn, lowerBound, Integer.MAX_VALUE, direction,</span>
+      distinctVertexColumns, distinctEdgeColumns, closingColumn,
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+<span class="nc" id="L101">  }</span>
+
+  @Override
+  protected DataSet&lt;ExpandEmbedding&gt; iterate(DataSet&lt;ExpandEmbedding&gt; initialWorkingSet) {
+<span class="fc" id="L105">    List&lt;DataSet&lt;ExpandEmbedding&gt;&gt; intermediateResults = Lists.newArrayList(initialWorkingSet);</span>
+
+<span class="fc bfc" id="L107" title="All 2 branches covered.">    for (int i = 1; i &lt; upperBound; i++) {</span>
+<span class="fc" id="L108">      DataSet&lt;ExpandEmbedding&gt; nextResult =</span>
+<span class="fc" id="L109">        intermediateResults.get(i - 1)</span>
+<span class="fc" id="L110">          .join(candidateEdgeTuples, joinHint)</span>
+<span class="fc" id="L111">            .where(2).equalTo(0)</span>
+<span class="fc" id="L112">            .with(new MergeExpandEmbeddings(distinctVertexColumns, distinctEdgeColumns,</span>
+              closingColumn))
+<span class="fc" id="L114">            .name(getName() + &quot; - Expansion &quot; + i);</span>
+
+<span class="fc" id="L116">      intermediateResults.add(nextResult);</span>
+    }
+
+<span class="fc" id="L119">    int startIndex = Math.max(lowerBound - 1, 0);</span>
+<span class="fc" id="L120">    DataSet&lt;ExpandEmbedding&gt; result = intermediateResults.get(startIndex);</span>
+
+<span class="fc bfc" id="L122" title="All 2 branches covered.">    for (int i = startIndex + 1; i &lt; upperBound; i++) {</span>
+<span class="fc" id="L123">      result = result.union(intermediateResults.get(i));</span>
+    }
+
+<span class="fc" id="L126">    return result;</span>
+  }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

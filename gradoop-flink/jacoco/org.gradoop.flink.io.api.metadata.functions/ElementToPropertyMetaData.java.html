@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElementToPropertyMetaData.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.api.metadata.functions</a> &gt; <span class="el_source">ElementToPropertyMetaData.java</span></div><h1>ElementToPropertyMetaData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.api.metadata.functions;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.Property;
+import org.gradoop.flink.io.api.metadata.MetaDataSource;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
+import org.gradoop.flink.io.impl.csv.functions.StringEscaper;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataParser;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * (element) -&gt; (elementType, elementLabel, {key_1:type_1,key_2:type_2,...,key_n:type_n})
+ *
+ * @param &lt;E&gt; EPGM element type
+ */
+@FunctionAnnotation.ForwardedFields(&quot;label-&gt;f1&quot;)
+public class ElementToPropertyMetaData&lt;E extends Element&gt;
+  implements MapFunction&lt;E, Tuple3&lt;String, String, Set&lt;String&gt;&gt;&gt; {
+  /**
+   * Reduce object instantiations.
+   */
+  private final Tuple3&lt;String, String, Set&lt;String&gt;&gt; reuseTuple;
+  /**
+   * Constructor
+   */
+<span class="fc" id="L49">  public ElementToPropertyMetaData() {</span>
+<span class="fc" id="L50">    reuseTuple = new Tuple3&lt;&gt;();</span>
+<span class="fc" id="L51">    reuseTuple.f2 = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L52">  }</span>
+
+  @Override
+  public Tuple3&lt;String, String, Set&lt;String&gt;&gt; map(E e) throws Exception {
+<span class="fc" id="L56">    Class&lt;? extends Element&gt; type = e.getClass();</span>
+
+<span class="fc bfc" id="L58" title="All 2 branches covered.">    if (type == Edge.class) {</span>
+<span class="fc" id="L59">      reuseTuple.f0 = MetaDataSource.EDGE_TYPE;</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">    } else if (type == Vertex.class) {</span>
+<span class="fc" id="L61">      reuseTuple.f0 = MetaDataSource.VERTEX_TYPE;</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    } else if (type == GraphHead.class) {</span>
+<span class="fc" id="L63">      reuseTuple.f0 = MetaDataSource.GRAPH_TYPE;</span>
+    } else {
+<span class="nc" id="L65">      throw new Exception(&quot;Unsupported element class&quot;);</span>
+    }
+<span class="fc" id="L67">    reuseTuple.f1 = StringEscaper.escape(e.getLabel(), CSVConstants.ESCAPED_CHARACTERS);</span>
+<span class="fc" id="L68">    reuseTuple.f2.clear();</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">    if (e.getProperties() != null) {</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">      for (Property property : e.getProperties()) {</span>
+<span class="fc" id="L71">        reuseTuple.f2.add(CSVMetaDataParser.getPropertyMetaData(property));</span>
+<span class="fc" id="L72">      }</span>
+    }
+<span class="fc" id="L74">    return reuseTuple;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

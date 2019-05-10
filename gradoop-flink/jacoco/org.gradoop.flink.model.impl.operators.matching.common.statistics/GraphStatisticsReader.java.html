@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GraphStatisticsReader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.common.statistics</a> &gt; <span class="el_source">GraphStatisticsReader.java</span></div><h1>GraphStatisticsReader.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.common.statistics;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+/**
+ * Base class for reading a {@link GraphStatistics} object from file system.
+ */
+<span class="nc" id="L27">public abstract class GraphStatisticsReader {</span>
+  /**
+   * Separates tokens in a single line
+   */
+  public static final String TOKEN_SEPARATOR = &quot;,&quot;;
+  /**
+   * Single line containing the total vertex count, e.g.
+   *
+   * BOF
+   * 23
+   * EOF
+   */
+  public static final String FILE_VERTEX_COUNT = &quot;vertex_count&quot;;
+  /**
+   * Single line containing the total edge count, e.g.
+   *
+   * BOF
+   * 42
+   * EOF
+   */
+  public static final String FILE_EDGE_COUNT = &quot;edge_count&quot;;
+  /**
+   * Each line contains the label and its count, e.g.
+   *
+   * BOF
+   * Person,12
+   * University,11
+   * EOF
+   */
+  public static final String FILE_VERTEX_COUNT_BY_LABEL = &quot;vertex_count_by_label&quot;;
+  /**
+   * Each line contains a vertex and its degree, e.g.
+   *
+   * BOF
+   * v1,6
+   * v2,12
+   * EOF
+   */
+  public static final String FILE_VERTEX_DEGREE_DISTRIBUTION = &quot;vertex_degree_distribution&quot;;
+  /**
+   * Each line contains a vertex and its in-degree, e.g.
+   *
+   * BOF
+   * v1,3
+   * v2,4
+   * EOF
+   */
+  public static final String INCOMING_VERTEX_DEGREE_DISTRIBUTION =
+    &quot;incoming_vertex_degree_distribution&quot;;
+  /**
+   * Each line contains a vertex and its out-degree, e.g.
+   *
+   * BOF
+   * v1,3
+   * v2,8
+   * EOF
+   */
+  public static final String OUTGOING_VERTEX_DEGREE_DISTRIBUTION =
+    &quot;outgoing_vertex_degree_distribution&quot;;
+  /**
+   * Each line contains the label and its count, e.g.
+   *
+   * BOF
+   * knows,30
+   * studyAt,12
+   * EOF
+   */
+  public static final String FILE_EDGE_COUNT_BY_LABEL = &quot;edge_count_by_label&quot;;
+  /**
+   *  Each line contains the source vertex label, the edge label and the frequency., e.g.
+   *
+   *  BOF
+   *  Person,knows,30
+   *  Person,studyAt,12
+   *  EOF
+   */
+  public static final String FILE_EDGE_COUNT_BY_SOURCE_VERTEX_AND_EDGE_LABEL =
+    &quot;edge_count_by_source_vertex_and_edge_label&quot;;
+  /**
+   * Each line contains the target vertex label, the edge label and the frequency, e.g.
+   *
+   * BOF
+   * Person,knows,30
+   * University,studyAt,12
+   * EOF
+   */
+  public static final String FILE_EDGE_COUNT_BY_TARGET_VERTEX_AND_EDGE_LABEL =
+    &quot;edge_count_by_target_vertex_and_edge_label&quot;;
+  /**
+   * One line containing the number of distinct source vertices, e.g.
+   *
+   * BOF
+   * 23
+   * EOF
+   */
+  public static final String FILE_DISTINCT_SOURCE_VERTEX_COUNT = &quot;distinct_source_vertex_count&quot;;
+  /**
+   * One line containing the number of distinct target vertices, e.g.
+   *
+   * BOF
+   * 42
+   * EOF
+   */
+  public static final String FILE_DISTINCT_TARGET_VERTEX_COUNT = &quot;distinct_target_vertex_count&quot;;
+  /**
+   * Each line contains the edge label and the number of distinct source ids, e.g.
+   *
+   * BOF
+   * knows,10
+   * studyAt,12
+   * EOF
+   */
+  public static final String FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL =
+    &quot;distinct_source_vertex_count_by_edge_label&quot;;
+  /**
+   * Each line contains the edge label and the number of distinct target ids, e.g.
+   *
+   * BOF
+   * knows,10
+   * studyAt,12
+   * EOF
+   */
+  public static final String FILE_DISTINCT_TARGET_VERTEX_COUNT_BY_EDGE_LABEL =
+    &quot;distinct_target_vertex_count_by_edge_label&quot;;
+
+  /**
+   * Each line contains the edge label a property name and the number of distinct property
+   * values for that pair, e.g.
+   *
+   * BOF
+   * knows,since,73
+   * connecting,isActive,2
+   * EOF
+   */
+  public static final String FILE_DISTINCT_EDGE_PROPERTIES_BY_LABEL =
+    &quot;distinct_edge_properties_by_label&quot;;
+
+  /**
+   * Each line contains the vertex label a property name and the number of distinct property
+   * values for that pair, e.g.
+   *
+   * BOF
+   * Person,age,100
+   * City,name,25
+   * EOF
+   */
+  public static final String FILE_DISTINCT_VERTEX_PROPERTIES_BY_LABEL =
+    &quot;distinct_vertex_properties_by_label&quot;;
+
+  /**
+   * Each line contains the edge property name and the number of distinct property
+   * values for that value
+   *
+   * BOF
+   * since,73
+   * isActive,2
+   * EOF
+   */
+  public static final String FILE_DISTINCT_EDGE_PROPERTIES = &quot;distinct_edge_properties&quot;;
+
+  /**
+   * Each line contains the vertex property name and the number of distinct property
+   * values for that value
+   *
+   * BOF
+   * age,100
+   * name,25
+   * EOF
+   */
+  public static final String FILE_DISTINCT_VERTEX_PROPERTIES = &quot;distinct_vertex_properties&quot;;
+
+  /**
+   * Reads a single {@link Long} value from the specified file.
+   *
+   * @param lines stream of lines in the file
+   * @return long value in first line of file
+   * @throws IOException if an I/O error occurs opening the file
+   */
+  static Long readSingleValue(Stream&lt;String&gt; lines) throws IOException {
+<span class="fc" id="L206">    return lines</span>
+<span class="fc" id="L207">      .map(Long::parseLong)</span>
+<span class="fc" id="L208">      .collect(Collectors.toList())</span>
+<span class="fc" id="L209">      .get(0);</span>
+  }
+
+  /**
+   * Reads a key value map from the specified file.
+   *
+   * @param lines stream of lines in the file
+   * @return key value map
+   * @throws IOException if an I/O error occurs opening the file
+   */
+  static Map&lt;String, Long&gt; readKeyValueMap(Stream&lt;String&gt; lines) throws IOException {
+<span class="fc" id="L220">    return lines</span>
+<span class="fc" id="L221">      .map(s -&gt; s.split(TOKEN_SEPARATOR))</span>
+<span class="fc" id="L222">      .collect(Collectors.toMap(tokens -&gt; tokens[0], tokens -&gt; Long.parseLong(tokens[1])));</span>
+  }
+
+  /**
+   * Reads a key value mapped from the given file grouped by the first token in each line.
+   *
+   * @param lines stream of lines in the file
+   * @return nested key value map
+   * @throws IOException if an I/O error occurs opening the file
+   */
+  static Map&lt;String, Map&lt;String, Long&gt;&gt; readNestedKeyValueMap(Stream&lt;String&gt; lines)
+      throws IOException {
+
+<span class="fc" id="L235">    final Map&lt;String, Map&lt;String, Long&gt;&gt; mapping = new HashMap&lt;&gt;();</span>
+
+<span class="fc" id="L237">    lines</span>
+<span class="fc" id="L238">      .map(line -&gt; line.split(TOKEN_SEPARATOR))</span>
+<span class="fc" id="L239">      .forEach(tokens -&gt; {</span>
+<span class="fc" id="L240">        String vertexLabel = tokens[0];</span>
+<span class="fc" id="L241">        String edgeLabel = tokens[1];</span>
+<span class="fc" id="L242">        Long edgeCount = Long.parseLong(tokens[2]);</span>
+<span class="fc bfc" id="L243" title="All 2 branches covered.">        if (mapping.containsKey(vertexLabel)) {</span>
+<span class="fc" id="L244">          mapping.get(vertexLabel).put(edgeLabel, edgeCount);</span>
+        } else {
+<span class="fc" id="L246">          Map&lt;String, Long&gt; value = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L247">          value.put(edgeLabel, edgeCount);</span>
+<span class="fc" id="L248">          mapping.put(vertexLabel, value);</span>
+        }
+<span class="fc" id="L250">      });</span>
+
+<span class="fc" id="L252">    return mapping;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PatternEmbeddingsMap.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.dimspan.tuples</a> &gt; <span class="el_source">PatternEmbeddingsMap.java</span></div><h1>PatternEmbeddingsMap.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.dimspan.tuples;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.Simple16Compressor;
+import org.gradoop.flink.model.impl.tuples.WithCount;
+
+import java.util.Objects;
+
+/**
+ * f0 : [pattern1,..,patternN]
+ * f1 : [[vertexCount,edgeCount,v11,..,vj1,e11,..,ek1,v21,..]1,..]
+ */
+public class PatternEmbeddingsMap extends Tuple2&lt;int[][], int[][]&gt; {
+
+  /**
+   * Default Constructor.
+   */
+<span class="fc" id="L35">  public PatternEmbeddingsMap() {</span>
+<span class="fc" id="L36">  }</span>
+
+  /**
+   * Valued constructor.
+   *
+   * @param patternMuxes multiplexes of patterns
+   * @param embeddingMuxes multiplexes of embeddings
+   */
+  public PatternEmbeddingsMap(
+    int[][] patternMuxes, int[][] embeddingMuxes) {
+<span class="fc" id="L46">    super(patternMuxes, embeddingMuxes);</span>
+<span class="fc" id="L47">  }</span>
+
+  /**
+   * Convenience method.
+   *
+   * @return number of contained patterns
+   */
+  public int getPatternCount() {
+<span class="fc" id="L55">    return getKeys().length;</span>
+  }
+
+
+  /**
+   * Convenience method to check is an embeddings map is empty
+   *
+   * @return true, if empty
+   */
+  public boolean isEmpty() {
+<span class="fc bfc" id="L65" title="All 2 branches covered.">    return getPatternCount() == 0;</span>
+  }
+
+  /**
+   * Returns a pattern at a given index.
+   *
+   * @param index index
+   *
+   * @return pattern multiplex
+   */
+  public int[] getPattern(int index) {
+<span class="fc" id="L76">    return getKeys()[index];</span>
+  }
+
+  /**
+   * Find index of a given pattern
+   *
+   * @param  patternMux search pattern
+   *
+   * @return index if contained, -1 otherwise
+   */
+  public int getIndex(int[] patternMux) {
+<span class="fc" id="L87">    int index = -1;</span>
+<span class="fc" id="L88">    int i = 0;</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">    for (int[] mux : getKeys()) {</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">      if (Objects.deepEquals(mux, patternMux)) {</span>
+<span class="fc" id="L91">        index = i;</span>
+<span class="fc" id="L92">        break;</span>
+      }
+<span class="fc" id="L94">      i++;</span>
+    }
+
+<span class="fc" id="L97">    return index;</span>
+  }
+
+  /**
+   * Creates an entry for a pattern including an initial embedding or just adds an embedding.
+   *
+   * @param patternMux pattern
+   * @param vertexIds the embedding's vertex ids
+   * @param edgeIds the embedding's edge ids
+   */
+  public void put(int[] patternMux, int[] vertexIds, int[] edgeIds) {
+<span class="fc" id="L108">    int patternIndex = getIndex(patternMux);</span>
+<span class="fc" id="L109">    int[] vertexEdgeIds = ArrayUtils.addAll(vertexIds, edgeIds);</span>
+
+<span class="fc bfc" id="L111" title="All 2 branches covered.">    if (patternIndex &lt; 0) {</span>
+      // insert
+<span class="fc" id="L113">      setKeys(ArrayUtils.add(getKeys(), patternMux));</span>
+
+<span class="fc" id="L115">      int[] embeddingData = new int[] {vertexIds.length, edgeIds.length};</span>
+<span class="fc" id="L116">      embeddingData = ArrayUtils.addAll(embeddingData, vertexEdgeIds);</span>
+
+<span class="fc" id="L118">      setValues(ArrayUtils.add(getValues(), embeddingData));</span>
+<span class="fc" id="L119">    } else {</span>
+      // update
+<span class="fc" id="L121">      getValues()[patternIndex] =</span>
+<span class="fc" id="L122">        ArrayUtils.addAll(getValues()[patternIndex], vertexEdgeIds);</span>
+    }
+<span class="fc" id="L124">  }</span>
+
+  /**
+   * Adds a pattern and existing embeddings.
+   *
+   * @param patternMux pattern
+   * @param embeddingsMux embeddings
+   */
+  public void put(int[] patternMux, int[] embeddingsMux) {
+<span class="nc" id="L133">    setKeys(ArrayUtils.add(getKeys(), patternMux));</span>
+<span class="nc" id="L134">    setValues(ArrayUtils.add(getValues(), embeddingsMux));</span>
+<span class="nc" id="L135">  }</span>
+
+  /**
+   * Adds all patterns and embeddings of another map.
+   *
+   * @param that other map
+   */
+  public void append(PatternEmbeddingsMap that) {
+<span class="fc" id="L143">    setKeys(ArrayUtils.addAll(this.getKeys(), that.getKeys()));</span>
+<span class="fc" id="L144">    setValues(ArrayUtils.addAll(this.getValues(), that.getValues()));</span>
+<span class="fc" id="L145">  }</span>
+
+
+  /**
+   * Adds a pattern but no embeddings.
+   *
+   * @param muxWithCount pattern
+   */
+  public void collect(WithCount&lt;int[]&gt; muxWithCount) {
+<span class="fc" id="L154">    setKeys(ArrayUtils.add(getKeys(), muxWithCount.getObject()));</span>
+<span class="fc" id="L155">    setValues(ArrayUtils.add(getValues(), new int[] {(int) muxWithCount.getCount()}));</span>
+<span class="fc" id="L156">  }</span>
+
+  /**
+   * Returns all embeddings for a give pattern index.
+   *
+   * @param index pattern index
+   * @param uncompress true, if embeddings need to be uncompressed
+   *
+   * @return array of embeddings
+   */
+  public int[][] getEmbeddings(int index, boolean uncompress) {
+<span class="fc" id="L167">    int[] embeddingData = getValues()[index];</span>
+
+<span class="fc bfc" id="L169" title="All 2 branches covered.">    if (uncompress) {</span>
+<span class="fc" id="L170">      embeddingData = Simple16Compressor.uncompress(embeddingData);</span>
+    }
+
+<span class="fc" id="L173">    int vertexCount = embeddingData[0];</span>
+<span class="fc" id="L174">    int edgeCount = embeddingData[1];</span>
+<span class="fc" id="L175">    int embeddingLength = vertexCount + edgeCount;</span>
+<span class="fc" id="L176">    int embeddingCount = (embeddingData.length - 2) / embeddingLength;</span>
+
+<span class="fc" id="L178">    int[][] embeddings = new int[2 * embeddingCount][];</span>
+
+<span class="fc" id="L180">    int i = 2;</span>
+<span class="fc bfc" id="L181" title="All 2 branches covered.">    for (int m = 0; m &lt; embeddingCount; m++) {</span>
+
+<span class="fc" id="L183">      int[] vertexIds = new int[vertexCount];</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">      for (int v = 0; v &lt; vertexCount; v++) {</span>
+<span class="fc" id="L185">        vertexIds[v] = embeddingData[i];</span>
+<span class="fc" id="L186">        i++;</span>
+      }
+<span class="fc" id="L188">      embeddings[2 * m] = vertexIds;</span>
+
+<span class="fc" id="L190">      int[] edgeIds = new int[edgeCount];</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">      for (int e = 0; e &lt; edgeCount; e++) {</span>
+<span class="fc" id="L192">        edgeIds[e] = embeddingData[i];</span>
+<span class="fc" id="L193">        i++;</span>
+      }
+<span class="fc" id="L195">      embeddings[2 * m + 1] = edgeIds;</span>
+    }
+
+<span class="fc" id="L198">    return embeddings;</span>
+  }
+
+  // GETTERS AND SETTERS
+
+  public int[][] getKeys() {
+<span class="fc" id="L204">    return this.f0;</span>
+  }
+
+  public int[][] getValues() {
+<span class="fc" id="L208">    return this.f1;</span>
+  }
+
+  private void setKeys(int[][] patternMuxes) {
+<span class="fc" id="L212">    this.f0 = patternMuxes;</span>
+<span class="fc" id="L213">  }</span>
+
+  private void setValues(int[][] embeddingMuxes) {
+<span class="fc" id="L216">    this.f1 = embeddingMuxes;</span>
+<span class="fc" id="L217">  }</span>
+
+  @Override
+  public String toString() {
+<span class="nc" id="L221">    StringBuilder builder = new StringBuilder();</span>
+
+<span class="nc bnc" id="L223" title="All 2 branches missed.">    for (int i = 0; i &lt; getPatternCount(); i++) {</span>
+<span class="nc" id="L224">      builder.append(new Tuple1&lt;&gt;(getPattern(i)));</span>
+<span class="nc" id="L225">      builder.append(&quot;\t&quot;);</span>
+<span class="nc" id="L226">      builder.append(new Tuple1&lt;&gt;(getValues()[i]));</span>
+<span class="nc" id="L227">      builder.append(&quot;\n&quot;);</span>
+    }
+
+<span class="nc" id="L230">    return builder.toString();</span>
+  }
+
+  /**
+   * Convenience method to create and empty map.
+   *
+   * @return empty map
+   */
+  public static PatternEmbeddingsMap getEmptyOne() {
+<span class="fc" id="L239">    return new PatternEmbeddingsMap(new int[0][], new int[0][]);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

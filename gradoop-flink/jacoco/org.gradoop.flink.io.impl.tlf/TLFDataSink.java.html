@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TLFDataSink.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.tlf</a> &gt; <span class="el_source">TLFDataSink.java</span></div><h1>TLFDataSink.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.tlf;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.core.fs.FileSystem;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.tlf.functions.EdgeLabelList;
+import org.gradoop.flink.io.impl.tlf.functions.ElementLabelEncoder;
+import org.gradoop.flink.io.impl.tlf.functions.TLFDictionaryFileFormat;
+import org.gradoop.flink.io.impl.tlf.functions.TLFDictionaryMapGroupReducer;
+import org.gradoop.flink.io.impl.tlf.functions.TLFFileFormat;
+import org.gradoop.flink.io.impl.tlf.functions.VertexLabelList;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.IOException;
+import java.util.Map;
+
+/**
+ * Writes an EPGM representation into one TLF file. The format
+ * is documented at {@link TLFFileFormat}.
+ */
+public class TLFDataSink extends TLFBase implements DataSink {
+
+  /**
+   * Creates a new data sink. Paths can be local (file://) or HDFS (hdfs://).
+   *
+   * @param tlfPath tlf data file
+   * @param config Gradoop Flink configuration
+   */
+  public TLFDataSink(String tlfPath, GradoopFlinkConfig config) {
+<span class="fc" id="L48">    super(tlfPath, &quot;&quot;, &quot;&quot;, config);</span>
+<span class="fc" id="L49">  }</span>
+
+  /**
+   * Creates a new data sink. Paths can be local (file://) or HDFS (hdfs://).
+   *
+   * @param tlfPath tlf data file
+   * @param tlfVertexDictionaryPath tlf vertex dictionary file
+   * @param tlfEdgeDictionaryPath tlf edge dictionary file
+   * @param config Gradoop Flink configuration
+   */
+  public TLFDataSink(String tlfPath, String tlfVertexDictionaryPath,
+    String tlfEdgeDictionaryPath, GradoopFlinkConfig config) {
+<span class="fc" id="L61">    super(tlfPath, tlfVertexDictionaryPath, tlfEdgeDictionaryPath, config);</span>
+<span class="fc" id="L62">  }</span>
+
+  @Override
+  public void write(LogicalGraph logicalGraph) throws IOException {
+<span class="nc" id="L66">    write(logicalGraph, false);</span>
+<span class="nc" id="L67">  }</span>
+
+  @Override
+  public void write(GraphCollection graphCollection) throws
+    IOException {
+<span class="nc" id="L72">    write(graphCollection, false);</span>
+<span class="nc" id="L73">  }</span>
+
+  @Override
+  public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
+<span class="nc" id="L77">    write(logicalGraph.getConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);</span>
+<span class="nc" id="L78">  }</span>
+
+  @Override
+  public void write(GraphCollection graphCollection, boolean overWrite) throws IOException {
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">    FileSystem.WriteMode writeMode =</span>
+      overWrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
+
+<span class="fc" id="L85">    DataSet&lt;GraphTransaction&gt; graphTransactions = graphCollection.getGraphTransactions();</span>
+    DataSet&lt;GraphTransaction&gt; simpleLabelTransaction;
+<span class="fc" id="L87">    DataSet&lt;Map&lt;String, Integer&gt;&gt; vertexDictionary = null;</span>
+<span class="fc" id="L88">    DataSet&lt;Map&lt;String, Integer&gt;&gt; edgeDictionary = null;</span>
+    // if the graph transaction vertex labels are set by a dictionary
+<span class="fc bfc" id="L90" title="All 2 branches covered.">    if (hasVertexDictionary()) {</span>
+
+<span class="fc" id="L92">      vertexDictionary = graphTransactions</span>
+        // get a vertex dictionary for each transaction
+<span class="fc" id="L94">        .flatMap(new VertexLabelList())</span>
+<span class="fc" id="L95">        .distinct()</span>
+        // reduce them to one dictionary without duplicates
+<span class="fc" id="L97">        .reduceGroup(new TLFDictionaryMapGroupReducer());</span>
+      // write the vertex dictionary
+<span class="fc" id="L99">      vertexDictionary</span>
+<span class="fc" id="L100">        .writeAsFormattedText(</span>
+<span class="fc" id="L101">          getTLFVertexDictionaryPath(),</span>
+          writeMode,
+          new TLFDictionaryFileFormat());
+    }
+
+<span class="fc bfc" id="L106" title="All 2 branches covered.">    if (hasEdgeDictionary()) {</span>
+<span class="fc" id="L107">      edgeDictionary = graphTransactions</span>
+        // get an edge dictionary for each transaction
+<span class="fc" id="L109">        .flatMap(new EdgeLabelList())</span>
+<span class="fc" id="L110">        .distinct()</span>
+        // reduce them to one dictionary without duplicates
+<span class="fc" id="L112">        .reduceGroup(new TLFDictionaryMapGroupReducer());</span>
+      // write the edge dictionary
+<span class="fc" id="L114">      edgeDictionary</span>
+<span class="fc" id="L115">        .writeAsFormattedText(</span>
+<span class="fc" id="L116">          getTLFEdgeDictionaryPath(),</span>
+          writeMode,
+          new TLFDictionaryFileFormat());
+    }
+
+<span class="pc bpc" id="L121" title="1 of 4 branches missed.">    if (hasVertexDictionary() || hasEdgeDictionary()) {</span>
+<span class="pc bpc" id="L122" title="1 of 4 branches missed.">      if (hasVertexDictionary() &amp;&amp; hasEdgeDictionary()) {</span>
+<span class="fc" id="L123">        simpleLabelTransaction = graphTransactions</span>
+          // map the simple integer-like labels
+<span class="fc" id="L125">          .map(new ElementLabelEncoder(</span>
+<span class="fc" id="L126">            hasVertexDictionary(), hasEdgeDictionary()))</span>
+<span class="fc" id="L127">          .withBroadcastSet(vertexDictionary,</span>
+            TLFConstants.VERTEX_DICTIONARY)
+<span class="fc" id="L129">          .withBroadcastSet(edgeDictionary,</span>
+            TLFConstants.EDGE_DICTIONARY);
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">      } else if (hasVertexDictionary()) {</span>
+<span class="fc" id="L132">        simpleLabelTransaction = graphTransactions</span>
+          // map the simple integer-like labels
+<span class="fc" id="L134">          .map(new ElementLabelEncoder(</span>
+<span class="fc" id="L135">            hasVertexDictionary(), hasEdgeDictionary()))</span>
+<span class="fc" id="L136">          .withBroadcastSet(vertexDictionary,</span>
+            TLFConstants.VERTEX_DICTIONARY);
+      } else {
+<span class="nc" id="L139">        simpleLabelTransaction = graphTransactions</span>
+          // map the simple integer-like labels
+<span class="nc" id="L141">          .map(new ElementLabelEncoder(</span>
+<span class="nc" id="L142">            hasVertexDictionary(), hasEdgeDictionary()))</span>
+<span class="nc" id="L143">          .withBroadcastSet(edgeDictionary,</span>
+            TLFConstants.EDGE_DICTIONARY);
+      }
+      // write the TLF format adjusted graphs to file
+<span class="fc" id="L147">      simpleLabelTransaction</span>
+<span class="fc" id="L148">        .writeAsFormattedText(getTLFPath(), writeMode, new TLFFileFormat());</span>
+      // if there was no dictionary used the graphs can simply be written
+    } else {
+<span class="fc" id="L151">      graphTransactions</span>
+<span class="fc" id="L152">        .writeAsFormattedText(getTLFPath(), writeMode, new TLFFileFormat());</span>
+    }
+<span class="fc" id="L154">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

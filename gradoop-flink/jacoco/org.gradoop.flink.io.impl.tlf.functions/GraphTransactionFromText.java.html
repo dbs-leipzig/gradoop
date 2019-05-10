@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GraphTransactionFromText.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.tlf.functions</a> &gt; <span class="el_source">GraphTransactionFromText.java</span></div><h1>GraphTransactionFromText.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.tlf.functions;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.flink.io.impl.tlf.TLFConstants;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * Reads graph imported from a TLF file. The result of the mapping is a
+ * dataset of of tlf graphs, with each TLFGraph consisting of a tlf graph
+ * head, a collection of tlf vertices and a collection of tlf edges.
+ */
+public class GraphTransactionFromText
+  implements MapFunction&lt;Tuple2&lt;LongWritable, Text&gt;, GraphTransaction&gt; {
+
+  /**
+   * Graph head factory.
+   */
+  private GraphHeadFactory graphHeadFactory;
+  /**
+   * Vertex factory.
+   */
+  private VertexFactory vertexFactory;
+  /**
+   * Edge factory.
+   */
+  private EdgeFactory edgeFactory;
+
+  /**
+   * Valued constructor.
+   *
+   * @param config gradoop flink config
+   */
+<span class="fc" id="L66">  public GraphTransactionFromText(GradoopFlinkConfig config) {</span>
+<span class="fc" id="L67">    this.graphHeadFactory = config.getGraphHeadFactory();</span>
+<span class="fc" id="L68">    this.vertexFactory = config.getVertexFactory();</span>
+<span class="fc" id="L69">    this.edgeFactory = config.getEdgeFactory();</span>
+<span class="fc" id="L70">  }</span>
+
+  /**
+   * Cunstructs a dataset containing TLFGraph(s).
+   *
+   * @param inputTuple consists of a key(LongWritable) and a value(Text)
+   * @return a TLFGraph created by the input text
+   * @throws Exception on failure
+   */
+  @Override
+  public GraphTransaction map(Tuple2&lt;LongWritable, Text&gt; inputTuple) throws Exception {
+<span class="fc" id="L81">    Map&lt;Long, GradoopId&gt; idMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L82">    Set&lt;Vertex&gt; vertices = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L83">    Set&lt;Edge&gt; edges = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L84">    GraphHead graphHead = null;</span>
+
+<span class="fc" id="L86">    String[] lines = inputTuple.f1.toString().split(&quot;\\R&quot;, -1);</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">    for (int i = 0; i &lt; lines.length; i++) {</span>
+<span class="fc" id="L88">      String[] fields = lines[i].trim().split(&quot; &quot;);</span>
+<span class="fc" id="L89">      GradoopId gradoopId = GradoopId.get();</span>
+
+<span class="fc bfc" id="L91" title="All 2 branches covered.">      if (i == 0) {</span>
+<span class="fc" id="L92">        idMap.put(Long.valueOf(fields[2]), gradoopId);</span>
+<span class="fc" id="L93">        graphHead = graphHeadFactory.initGraphHead(gradoopId);</span>
+
+<span class="fc bfc" id="L95" title="All 2 branches covered.">      } else if (TLFConstants.VERTEX_SYMBOL.equals(fields[0])) {</span>
+<span class="fc" id="L96">        idMap.put(Long.valueOf(fields[1]), gradoopId);</span>
+<span class="fc" id="L97">        Vertex vertex = vertexFactory.initVertex(gradoopId, getLabel(fields, 2));</span>
+<span class="fc" id="L98">        vertex.addGraphId(graphHead.getId());</span>
+<span class="fc" id="L99">        vertices.add(vertex);</span>
+
+<span class="fc bfc" id="L101" title="All 2 branches covered.">      } else if (TLFConstants.EDGE_SYMBOL.equals(fields[0])) {</span>
+<span class="fc" id="L102">        Edge edge = edgeFactory.initEdge(gradoopId,</span>
+<span class="fc" id="L103">          getLabel(fields, 3),</span>
+<span class="fc" id="L104">          idMap.get(Long.valueOf(fields[1])),</span>
+<span class="fc" id="L105">          idMap.get(Long.valueOf(fields[2]))</span>
+        );
+<span class="fc" id="L107">        edge.addGraphId(graphHead.getId());</span>
+<span class="fc" id="L108">        edges.add(edge);</span>
+      }
+    }
+
+<span class="fc" id="L112">    return new GraphTransaction(graphHead, vertices, edges);</span>
+  }
+
+  /**
+   * Builds a label from the current fields. If the label is split by whitespaces the last fields
+   * which represent the label will be concatenated.
+   *
+   * @param fields graph element fields
+   * @param labelStart field where the label starts
+   * @return full label
+   */
+  private String getLabel(String[] fields, int labelStart) {
+<span class="fc" id="L124">    return Arrays.stream(fields).skip(labelStart).collect(Collectors.joining(&quot; &quot;));</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

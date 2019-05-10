@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FlatJoinSourceEdgeReference.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.fusion.functions</a> &gt; <span class="el_source">FlatJoinSourceEdgeReference.java</span></div><h1>FlatJoinSourceEdgeReference.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.fusion.functions;
+
+import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+
+/**
+ * Function updating the edges' sources or destination
+ * for each newly created hypervertex
+ */
+public class FlatJoinSourceEdgeReference
+  implements FlatJoinFunction&lt;Edge, Tuple2&lt;Vertex, GradoopId&gt;, Edge&gt; {
+
+  /**
+   * Checking if the stuff is actually updating the sources.
+   * Otherwise, it updates the targets
+   */
+  private final boolean isItSourceDoingNow;
+
+  /**
+   * Default constructor
+   * @param isItSourceDoingNow  If true, it does test the vertices. The targets are tested,
+   *                            otherwise
+   */
+<span class="fc" id="L43">  public FlatJoinSourceEdgeReference(boolean isItSourceDoingNow) {</span>
+<span class="fc" id="L44">    this.isItSourceDoingNow = isItSourceDoingNow;</span>
+<span class="fc" id="L45">  }</span>
+
+  @Override
+  public void join(Edge first, Tuple2&lt;Vertex, GradoopId&gt; second, Collector&lt;Edge&gt; out)
+      throws Exception {
+<span class="pc bpc" id="L50" title="1 of 4 branches missed.">    if (second != null &amp;&amp; !(second.f1.equals(GradoopId.NULL_VALUE))) {</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">      if (isItSourceDoingNow) {</span>
+<span class="fc" id="L52">        first.setSourceId(second.f1);</span>
+      } else {
+<span class="fc" id="L54">        first.setTargetId(second.f1);</span>
+      }
+    }
+<span class="fc" id="L57">    out.collect(first);</span>
+<span class="fc" id="L58">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

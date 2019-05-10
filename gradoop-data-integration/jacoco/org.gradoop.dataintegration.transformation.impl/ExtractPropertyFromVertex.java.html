@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExtractPropertyFromVertex.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation.impl</a> &gt; <span class="el_source">ExtractPropertyFromVertex.java</span></div><h1>ExtractPropertyFromVertex.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation.impl;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Preconditions;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.dataintegration.transformation.impl.config.EdgeDirection;
+import org.gradoop.dataintegration.transformation.impl.functions.CreateNewEdges;
+import org.gradoop.dataintegration.transformation.impl.functions.CreateNewVertex;
+import org.gradoop.dataintegration.transformation.impl.functions.CreateNewVertexWithEqualityCondense;
+import org.gradoop.dataintegration.transformation.impl.functions.ExtractPropertyWithOriginId;
+import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
+import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
+
+import java.util.List;
+
+/**
+ * This operator is executed on the vertex dataset and extracts a property to a newly created vertex
+ * which can be connected to the vertex it was created from. If the property is a list every
+ * element of the list is a new vertex.
+ */
+public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
+
+  /**
+   * The vertices the extraction is executed for.
+   */
+  private String forVerticesOfLabel;
+
+  /**
+   * The property key at the original vertex.
+   */
+  private String originalPropertyName;
+
+  /**
+   * The label of the extracted vertex.
+   */
+  private String newVertexLabel;
+
+  /**
+   * The property name of the extracted property at the new vertex.
+   */
+  private String newPropertyName;
+
+  /**
+   * The direction of the created edge(s).
+   */
+  private EdgeDirection edgeDirection;
+
+  /**
+   * The label of the newly created edge(s).
+   */
+  private String edgeLabel;
+
+  /**
+   * If true, all property values got condensed based on their equality.
+   * So that every newly created vertex has a unique property value.
+   * The default value is 'true'.
+   */
+<span class="fc" id="L79">  private boolean condense = true;</span>
+
+  /**
+   * Constructs a new {@link UnaryGraphToGraphOperator} which extracts properties from vertices into
+   * newly created vertices.
+   *
+   * @param forVerticesOfLabel   The vertices the extraction is executed for.
+   * @param originalPropertyName The property key at the original vertex.
+   * @param newVertexLabel       The label of the extracted vertex.
+   * @param newPropertyName      The property name of the extracted property at the new vertex.
+   */
+  public ExtractPropertyFromVertex(String forVerticesOfLabel, String originalPropertyName,
+                                   String newVertexLabel, String newPropertyName) {
+<span class="fc" id="L92">    this(forVerticesOfLabel, originalPropertyName, newVertexLabel, newPropertyName,</span>
+      EdgeDirection.NONE, null);
+<span class="fc" id="L94">  }</span>
+
+  /**
+   * Constructs a new {@link UnaryGraphToGraphOperator} which extracts properties from vertices into
+   * newly created vertices and connects original and new vertex with each other.
+   *
+   * @param forVerticesOfLabel   The vertices the extraction is executed for.
+   * @param originalPropertyName The property key at the original vertex.
+   * @param newVertexLabel       The label of the extracted vertex.
+   * @param newPropertyName      The property name of the extracted property at the new vertex.
+   * @param edgeDirection        The direction of the created edge(s).
+   * @param edgeLabel            The label of the newly created edge.
+   */
+  public ExtractPropertyFromVertex(String forVerticesOfLabel, String originalPropertyName,
+                                   String newVertexLabel, String newPropertyName,
+<span class="fc" id="L109">                                   EdgeDirection edgeDirection, String edgeLabel) {</span>
+<span class="fc" id="L110">    this.forVerticesOfLabel = Preconditions.checkNotNull(forVerticesOfLabel);</span>
+<span class="fc" id="L111">    this.originalPropertyName = Preconditions.checkNotNull(originalPropertyName);</span>
+<span class="fc" id="L112">    this.newVertexLabel = Preconditions.checkNotNull(newVertexLabel);</span>
+<span class="fc" id="L113">    this.newPropertyName = Preconditions.checkNotNull(newPropertyName);</span>
+<span class="fc" id="L114">    this.edgeDirection = Preconditions.checkNotNull(edgeDirection);</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">    if (!edgeDirection.equals(EdgeDirection.NONE)) {</span>
+<span class="fc" id="L116">      this.edgeLabel = Preconditions.checkNotNull(edgeLabel);</span>
+    }
+<span class="fc" id="L118">  }</span>
+
+  /**
+   * This method sets whether property value based condensation should be executed or not.
+   * The default value is 'true'.
+   *
+   * @param condense If true, all property values got condensed based on their equality.
+   *                 So that every newly created vertex has a unique property value.
+   */
+  public void setCondensation(boolean condense) {
+<span class="fc" id="L128">    this.condense = condense;</span>
+<span class="fc" id="L129">  }</span>
+
+  @Override
+  public LogicalGraph execute(LogicalGraph logicalGraph) {
+    // filter the vertices by the given label
+<span class="fc" id="L134">    DataSet&lt;Vertex&gt; filteredVertices = logicalGraph</span>
+<span class="fc" id="L135">      .getVertices()</span>
+<span class="fc" id="L136">      .filter(new ByLabel&lt;&gt;(forVerticesOfLabel));</span>
+
+    // calculate new vertices and store the origin for linking
+<span class="fc" id="L139">    DataSet&lt;Tuple2&lt;PropertyValue, GradoopId&gt;&gt; candidates = filteredVertices</span>
+<span class="fc" id="L140">      .flatMap(new ExtractPropertyWithOriginId(originalPropertyName));</span>
+
+    // extract the new vertices
+    DataSet&lt;Tuple2&lt;Vertex, List&lt;GradoopId&gt;&gt;&gt; newVerticesAndOriginIds;
+<span class="fc bfc" id="L144" title="All 2 branches covered.">    if (condense) {</span>
+<span class="fc" id="L145">      newVerticesAndOriginIds = candidates</span>
+<span class="fc" id="L146">        .groupBy(0)</span>
+<span class="fc" id="L147">        .reduceGroup(new CreateNewVertexWithEqualityCondense(</span>
+<span class="fc" id="L148">          logicalGraph.getConfig().getVertexFactory(), newVertexLabel, newPropertyName));</span>
+    } else {
+<span class="fc" id="L150">      newVerticesAndOriginIds = candidates</span>
+<span class="fc" id="L151">        .map(new CreateNewVertex(logicalGraph.getConfig().getVertexFactory(), newVertexLabel,</span>
+          newPropertyName));
+    }
+
+<span class="fc" id="L155">    DataSet&lt;Vertex&gt; vertices = newVerticesAndOriginIds</span>
+<span class="fc" id="L156">      .map(new Value0Of2&lt;&gt;())</span>
+<span class="fc" id="L157">      .union(logicalGraph.getVertices());</span>
+
+    // the newly created vertices should be linked to the original vertices
+<span class="fc" id="L160">    DataSet&lt;Edge&gt; edges = logicalGraph.getEdges();</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">    if (!edgeDirection.equals(EdgeDirection.NONE)) {</span>
+<span class="fc" id="L162">      edges = newVerticesAndOriginIds</span>
+<span class="fc" id="L163">        .flatMap(new CreateNewEdges(logicalGraph.getConfig().getEdgeFactory(), edgeDirection,</span>
+          edgeLabel))
+<span class="fc" id="L165">        .union(edges);</span>
+    }
+
+<span class="fc" id="L168">    return logicalGraph.getConfig()</span>
+<span class="fc" id="L169">      .getLogicalGraphFactory()</span>
+<span class="fc" id="L170">      .fromDataSets(logicalGraph.getGraphHead(), vertices, edges);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

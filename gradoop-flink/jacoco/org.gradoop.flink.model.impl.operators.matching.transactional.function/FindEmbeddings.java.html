@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FindEmbeddings.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.transactional.function</a> &gt; <span class="el_source">FindEmbeddings.java</span></div><h1>FindEmbeddings.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.transactional.function;
+
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
+import org.gradoop.flink.model.impl.operators.matching.transactional.tuples.GraphWithCandidates;
+
+import java.util.List;
+
+/**
+ * Mapping function that applies a custom pattern matching algorithm to
+ * a GraphWithCandidates, representing a graph, its elements and their
+ * candidates. Returns the found embeddings.
+ */
+public class FindEmbeddings
+  implements FlatMapFunction&lt;
+  GraphWithCandidates,
+  Tuple4&lt;GradoopId, GradoopId, GradoopIdSet, GradoopIdSet&gt;&gt; {
+
+  /**
+   * The pattern matching algorithm.
+   */
+  private PatternMatchingAlgorithm algo;
+
+  /**
+   * The query string, input fo the pattern matching algorithm.
+   */
+  private String query;
+
+  /**
+   * Constructor
+   * @param algo custom algorithm
+   * @param query query string
+   */
+<span class="fc" id="L54">  public FindEmbeddings(PatternMatchingAlgorithm algo, String query) {</span>
+<span class="fc" id="L55">    this.algo = algo;</span>
+<span class="fc" id="L56">    this.query = query;</span>
+<span class="fc" id="L57">  }</span>
+
+
+  @Override
+  public void flatMap(GraphWithCandidates graphWithCandidates,
+    Collector&lt;Tuple4&lt;GradoopId, GradoopId, GradoopIdSet, GradoopIdSet&gt;&gt; collector) throws
+    Exception {
+<span class="fc" id="L64">    List&lt;Embedding&lt;GradoopId&gt;&gt; embeddings =</span>
+<span class="fc" id="L65">      this.algo.findEmbeddings(graphWithCandidates, this.query);</span>
+
+<span class="fc bfc" id="L67" title="All 2 branches covered.">    for (Embedding&lt;GradoopId&gt; embedding : embeddings) {</span>
+<span class="fc" id="L68">      GradoopId newGraphId = GradoopId.get();</span>
+<span class="fc" id="L69">      collector.collect(new Tuple4&lt;&gt;(newGraphId,</span>
+        graphWithCandidates.f0,
+<span class="fc" id="L71">        GradoopIdSet.fromExisting(embedding.getVertexMapping()),</span>
+<span class="fc" id="L72">        GradoopIdSet.fromExisting(embedding.getEdgeMapping())));</span>
+<span class="fc" id="L73">    }</span>
+<span class="fc" id="L74">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

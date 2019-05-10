@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CCSSubgraph.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.transactional.tle.tuples</a> &gt; <span class="el_source">CCSSubgraph.java</span></div><h1>CCSSubgraph.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.transactional.tle.tuples;
+
+import org.apache.flink.api.java.tuple.Tuple5;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.Embedding;
+
+/**
+ * Representation of a subgraph.
+ *
+ * (canonicalLabel, frequency, sample embedding)
+ */
+public class CCSSubgraph
+  extends Tuple5&lt;String, Long, Embedding, String, Boolean&gt; implements Subgraph {
+
+  /**
+   * Default constructor.
+   */
+  public CCSSubgraph() {
+<span class="nc" id="L33">    super();</span>
+<span class="nc" id="L34">  }</span>
+
+  /**
+   * Constructor.
+   * @param category category
+   * @param subgraph canonical label
+   * @param frequency frequency
+   * @param embedding sample embedding
+   * @param interesting true, if interesting
+   */
+  public CCSSubgraph(String category, String subgraph, Long frequency,
+    Embedding embedding, Boolean interesting) {
+<span class="nc" id="L46">    super(subgraph, frequency, embedding, category, interesting);</span>
+<span class="nc" id="L47">  }</span>
+
+  @Override
+  public String getCanonicalLabel() {
+<span class="nc" id="L51">    return f0;</span>
+  }
+
+  @Override
+  public void setCanonicalLabel(String subgraph) {
+<span class="nc" id="L56">    f0 = subgraph;</span>
+<span class="nc" id="L57">  }</span>
+
+  @Override
+  public long getCount() {
+<span class="nc" id="L61">    return f1;</span>
+  }
+
+  @Override
+  public void setCount(long frequency) {
+<span class="nc" id="L66">    f1 = frequency;</span>
+<span class="nc" id="L67">  }</span>
+
+  @Override
+  public Embedding getEmbedding() {
+<span class="nc" id="L71">    return f2;</span>
+  }
+
+  @Override
+  public void setEmbedding(Embedding embedding) {
+<span class="nc" id="L76">    f2 = embedding;</span>
+<span class="nc" id="L77">  }</span>
+
+  public String getCategory() {
+<span class="nc" id="L80">    return f3;</span>
+  }
+
+  public void setCategory(String category) {
+<span class="nc" id="L84">    this.f3 = category;</span>
+<span class="nc" id="L85">  }</span>
+
+  public boolean isInteresting() {
+<span class="nc" id="L88">    return f4;</span>
+  }
+
+  public void setInteresting(boolean interesting) {
+<span class="nc" id="L92">    this.f4 = interesting;</span>
+<span class="nc" id="L93">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

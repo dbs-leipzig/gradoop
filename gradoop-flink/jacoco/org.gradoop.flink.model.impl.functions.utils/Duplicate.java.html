@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Duplicate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.functions.utils</a> &gt; <span class="el_source">Duplicate.java</span></div><h1>Duplicate.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.functions.utils;
+
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.util.Collector;
+
+/**
+ * Duplicates a data set element k times.
+ *
+ * @param &lt;T&gt; element type
+ */
+public class Duplicate&lt;T&gt; implements FlatMapFunction&lt;T, T&gt; {
+
+  /**
+   * number of duplicates per input element (k)
+   */
+  private final int multiplicand;
+
+  /**
+   * Constructor.
+   *
+   * @param multiplicand number of duplicates per input element
+   */
+<span class="nc" id="L38">  public Duplicate(int multiplicand) {</span>
+<span class="nc" id="L39">    this.multiplicand = multiplicand;</span>
+<span class="nc" id="L40">  }</span>
+
+  @Override
+  public void flatMap(T original, Collector&lt;T&gt; duplicates) throws  Exception {
+<span class="nc bnc" id="L44" title="All 2 branches missed.">    for (int i = 1; i &lt;= multiplicand; i++) {</span>
+<span class="nc" id="L45">      duplicates.collect(original);</span>
+    }
+<span class="nc" id="L47">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

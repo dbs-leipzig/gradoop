@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>KRandomJumpGellyVCI.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.gelly.randomjump</a> &gt; <span class="el_source">KRandomJumpGellyVCI.java</span></div><h1>KRandomJumpGellyVCI.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.gelly.randomjump;
+
+import org.apache.flink.api.common.aggregators.LongSumAggregator;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.utils.DataSetUtils;
+import org.apache.flink.graph.Edge;
+import org.apache.flink.graph.Graph;
+import org.apache.flink.graph.Vertex;
+import org.apache.flink.graph.pregel.VertexCentricConfiguration;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.algorithms.gelly.BaseGellyAlgorithm;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.EPGMEdgeWithGellyEdgeIdJoin;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.GellyVertexWithEPGMVertexJoin;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.GellyVertexWithLongIdToGradoopIdJoin;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.GetVisitedGellyEdgeLongIdsFlatMap;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.GetVisitedSourceTargetIdsFlatMap;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.LongIdToGellyVertexWithVCIValueMap;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.LongIdTupleToGellyEdgeWithLongValueJoin;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.LongIdWithEdgeToTupleJoin;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.ReplaceTargetWithLongIdJoin;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.VCIComputeFunction;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.VCIVertexValue;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.VertexWithVisitedSourceTargetIdJoin;
+import org.gradoop.flink.algorithms.gelly.randomjump.functions.VisitedGellyEdgesWithLongIdToGradoopIdJoin;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
+import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
+/**
+ * Performs the RandomJump using Gellys VertexCentricIteration (VCI).
+ * Uniformly at random picks {@link #numberOfStartVertices} starting vertices and then simulates a RandomWalk for each
+ * starting vertex on the graph, where once visited edges are not used again. For each walker,
+ * with a given {@link #jumpProbability}, or if the walk ends in a sink, or if all outgoing edges
+ * of the current vertex were visited, randomly jumps to any vertex in the graph and starts a new
+ * RandomWalk from there.
+ * Unlike the RandomWalk algorithm, RandomJump does not have problems of getting stuck or not being
+ * able to visit enough vertices. The algorithm converges when the maximum number of iterations
+ * has been reached, or enough vertices have been visited (with the percentage of vertices to
+ * visit at least given in {@link #percentageToVisit}).
+ * Returns the initial graph with vertices and edges annotated by a boolean property named
+ * &quot;sampled&quot;, which is set to {@code true} if visited, or {@code false} if not.
+ */
+public class KRandomJumpGellyVCI
+  extends BaseGellyAlgorithm&lt;Long, VCIVertexValue, Long, LogicalGraph&gt; {
+  /**
+   * The graph used in {@link KRandomJumpGellyVCI#execute(LogicalGraph)}.
+   */
+  protected LogicalGraph currentGraph;
+
+  /**
+   * Number of starting vertices.
+   */
+  private final int numberOfStartVertices;
+
+  /**
+   * Value for maximum number of iterations for the algorithm.
+   */
+  private final int maxIterations;
+
+  /**
+   * Probability for jumping to a random vertex instead of walking to a random neighbor.
+   */
+  private final double jumpProbability;
+
+  /**
+   * Relative amount of vertices to visit at least.
+   */
+  private final double percentageToVisit;
+
+  /**
+   * DataSet holding the mapping for a long index to its vertex gradoop id.
+   */
+  private DataSet&lt;Tuple2&lt;Long, GradoopId&gt;&gt; indexToVertexIdMap;
+
+  /**
+   * DataSet holding the mapping for a long index to its edge gradoop id.
+   */
+  private DataSet&lt;Tuple2&lt;Long, GradoopId&gt;&gt; indexToEdgeIdMap;
+
+  /**
+   * Creates an instance of KRandomJumpGellyVCI.
+   *
+   * @param numberOfStartVertices Number of starting vertices.
+   * @param maxIterations Value for maximum number of iterations for the algorithm.
+   * @param jumpProbability Probability for jumping to random vertex instead of walking to random
+   *                       neighbor.
+   * @param percentageToVisit Relative amount of vertices to visit at least.
+   */
+  public KRandomJumpGellyVCI(int numberOfStartVertices, int maxIterations, double jumpProbability,
+<span class="fc" id="L113">    double percentageToVisit) {</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">    checkArgument(numberOfStartVertices &gt;= 1,</span>
+      &quot;at least 1 starting vertex is needed, numberOfStartVertices must be equal or greater 1&quot;);
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">    checkArgument(maxIterations &gt; 0,</span>
+      &quot;maxIterations must be greater than 0&quot;);
+<span class="pc bpc" id="L118" title="2 of 4 branches missed.">    checkArgument(jumpProbability &gt;= 0d &amp;&amp; jumpProbability &lt;= 1d,</span>
+      &quot;jumpProbability must be equal/greater than 0.0 and smaller/equal 1.0&quot;);
+<span class="pc bpc" id="L120" title="2 of 4 branches missed.">    checkArgument(percentageToVisit &gt; 0d &amp;&amp; percentageToVisit &lt;= 1d,</span>
+      &quot;percentageToVisit must be greater than 0.0 and smaller/equal 1.0&quot;);
+<span class="fc" id="L122">    this.numberOfStartVertices = numberOfStartVertices;</span>
+<span class="fc" id="L123">    this.maxIterations = maxIterations;</span>
+<span class="fc" id="L124">    this.jumpProbability = jumpProbability;</span>
+<span class="fc" id="L125">    this.percentageToVisit = percentageToVisit;</span>
+<span class="fc" id="L126">  }</span>
+
+  @Override
+  public Graph&lt;Long, VCIVertexValue, Long&gt; transformToGelly(LogicalGraph graph) {
+<span class="fc" id="L130">    this.currentGraph = graph;</span>
+
+<span class="fc" id="L132">    indexToVertexIdMap = DataSetUtils.zipWithIndex(graph.getVertices().map(new Id&lt;&gt;()));</span>
+<span class="fc" id="L133">    indexToEdgeIdMap = DataSetUtils.zipWithIndex(graph.getEdges().map(new Id&lt;&gt;()));</span>
+
+<span class="fc" id="L135">    DataSet&lt;Vertex&lt;Long, VCIVertexValue&gt;&gt; vertices = indexToVertexIdMap</span>
+<span class="fc" id="L136">      .map(new LongIdToGellyVertexWithVCIValueMap());</span>
+
+<span class="fc" id="L138">    DataSet&lt;Edge&lt;Long, Long&gt;&gt; edges = graph.getEdges()</span>
+<span class="fc" id="L139">      .join(indexToVertexIdMap)</span>
+<span class="fc" id="L140">      .where(new SourceId&lt;&gt;()).equalTo(1)</span>
+<span class="fc" id="L141">      .with(new LongIdWithEdgeToTupleJoin())</span>
+<span class="fc" id="L142">      .join(indexToVertexIdMap)</span>
+<span class="fc" id="L143">      .where(1).equalTo(1)</span>
+<span class="fc" id="L144">      .with(new ReplaceTargetWithLongIdJoin())</span>
+<span class="fc" id="L145">      .join(indexToEdgeIdMap)</span>
+<span class="fc" id="L146">      .where(2).equalTo(1)</span>
+<span class="fc" id="L147">      .with(new LongIdTupleToGellyEdgeWithLongValueJoin());</span>
+
+<span class="fc" id="L149">    return Graph.fromDataSet(vertices, edges, graph.getConfig().getExecutionEnvironment());</span>
+  }
+
+  @Override
+  public LogicalGraph executeInGelly(Graph&lt;Long, VCIVertexValue, Long&gt; gellyGraph)
+    throws Exception {
+
+<span class="fc" id="L156">    Long vertexCount = gellyGraph.numberOfVertices();</span>
+
+    //--------------------------------------------------------------------------
+    // pre compute
+    //--------------------------------------------------------------------------
+
+    // define start vertices
+<span class="fc" id="L163">    Set&lt;Long&gt; randomStartIndices = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">    while (randomStartIndices.size() &lt; numberOfStartVertices) {</span>
+<span class="fc" id="L165">      long randomLongInBounds = (long) (Math.random() * (vertexCount - 1L));</span>
+<span class="fc" id="L166">      randomStartIndices.add(randomLongInBounds);</span>
+<span class="fc" id="L167">    }</span>
+<span class="fc" id="L168">    DataSet&lt;Long&gt; startIndices = currentGraph.getConfig().getExecutionEnvironment()</span>
+<span class="fc" id="L169">      .fromCollection(randomStartIndices);</span>
+
+    // define how many vertices to visit
+<span class="fc" id="L172">    long verticesToVisit = (long) Math.ceil((double) vertexCount * percentageToVisit);</span>
+
+    // set compute parameters
+<span class="fc" id="L175">    VertexCentricConfiguration parameters = new VertexCentricConfiguration();</span>
+<span class="fc" id="L176">    parameters.addBroadcastSet(VCIComputeFunction.START_INDICES_BROADCAST_SET, startIndices);</span>
+<span class="fc" id="L177">    parameters.addBroadcastSet(VCIComputeFunction.VERTEX_INDICES_BROADCAST_SET,</span>
+<span class="fc" id="L178">      indexToVertexIdMap.map(new Value0Of2&lt;&gt;()));</span>
+<span class="fc" id="L179">    parameters.registerAggregator(VCIComputeFunction.VISITED_VERTICES_AGGREGATOR_NAME,</span>
+      new LongSumAggregator());
+
+    // run gelly
+<span class="fc" id="L183">    Graph&lt;Long, VCIVertexValue, Long&gt; resultGraph = gellyGraph.runVertexCentricIteration(</span>
+      new VCIComputeFunction(jumpProbability, verticesToVisit),
+        null, maxIterations, parameters);
+
+    //--------------------------------------------------------------------------
+    // post compute
+    //--------------------------------------------------------------------------
+
+<span class="fc" id="L191">    DataSet&lt;GradoopId&gt; visitedGellyEdgeIds = resultGraph.getVertices()</span>
+<span class="fc" id="L192">      .flatMap(new GetVisitedGellyEdgeLongIdsFlatMap())</span>
+<span class="fc" id="L193">      .join(indexToEdgeIdMap)</span>
+<span class="fc" id="L194">      .where(&quot;*&quot;).equalTo(0)</span>
+<span class="fc" id="L195">      .with(new VisitedGellyEdgesWithLongIdToGradoopIdJoin());</span>
+
+    // compute new visited edges
+<span class="fc" id="L198">    DataSet&lt;org.gradoop.common.model.impl.pojo.Edge&gt; visitedEdges = currentGraph.getEdges()</span>
+<span class="fc" id="L199">      .leftOuterJoin(visitedGellyEdgeIds)</span>
+<span class="fc" id="L200">      .where(new Id&lt;&gt;()).equalTo(&quot;*&quot;)</span>
+<span class="fc" id="L201">      .with(new EPGMEdgeWithGellyEdgeIdJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));</span>
+
+<span class="fc" id="L203">    DataSet&lt;GradoopId&gt; visitedSourceTargetIds = visitedEdges</span>
+<span class="fc" id="L204">      .flatMap(new GetVisitedSourceTargetIdsFlatMap(SamplingConstants.PROPERTY_KEY_SAMPLED))</span>
+<span class="fc" id="L205">      .distinct();</span>
+
+    // compute new visited vertices
+<span class="fc" id="L208">    DataSet&lt;org.gradoop.common.model.impl.pojo.Vertex&gt; visitedVertices = resultGraph.getVertices()</span>
+<span class="fc" id="L209">      .join(indexToVertexIdMap)</span>
+<span class="fc" id="L210">      .where(0).equalTo(0)</span>
+<span class="fc" id="L211">      .with(new GellyVertexWithLongIdToGradoopIdJoin())</span>
+<span class="fc" id="L212">      .join(currentGraph.getVertices())</span>
+<span class="fc" id="L213">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L214">      .with(new GellyVertexWithEPGMVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));</span>
+
+<span class="fc" id="L216">    visitedVertices = visitedVertices.leftOuterJoin(visitedSourceTargetIds)</span>
+<span class="fc" id="L217">      .where(new Id&lt;&gt;()).equalTo(&quot;*&quot;)</span>
+<span class="fc" id="L218">      .with(new VertexWithVisitedSourceTargetIdJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));</span>
+
+    // return graph
+<span class="fc" id="L221">    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(</span>
+<span class="fc" id="L222">      currentGraph.getGraphHead(), visitedVertices, visitedEdges);</span>
+  }
+
+  @Override
+  public String getName() {
+<span class="nc" id="L227">    return KRandomJumpGellyVCI.class.getName();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

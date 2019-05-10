@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Selection.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.selection</a> &gt; <span class="el_source">Selection.java</span></div><h1>Selection.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.selection;
+
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.model.impl.operators.selection.functions.FilterTransactions;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Filter logical graphs from a graph collection based on their associated graph
+ * head.
+ */
+public class Selection extends SelectionBase {
+
+  /**
+   * User-defined predicate function
+   */
+  private final FilterFunction&lt;GraphHead&gt; predicate;
+
+  /**
+   * Creates a new Selection operator.
+   *
+   * @param predicate user-defined predicate function
+   */
+<span class="fc" id="L43">  public Selection(FilterFunction&lt;GraphHead&gt; predicate) {</span>
+<span class="fc" id="L44">    this.predicate = checkNotNull(predicate, &quot;Predicate function was null&quot;);</span>
+<span class="fc" id="L45">  }</span>
+
+  @Override
+  public GraphCollection execute(GraphCollection collection) {
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">    return collection.isTransactionalLayout() ?</span>
+<span class="pc" id="L50">      executeForTxLayout(collection) :</span>
+<span class="fc" id="L51">      executeForGVELayout(collection);</span>
+  }
+
+  /**
+   * Executes the operator for collections based on
+   * {@link org.gradoop.flink.model.impl.layouts.gve.GVELayout}
+   *
+   * @param collection graph collection
+   * @return result graph collection
+   */
+  private GraphCollection executeForGVELayout(GraphCollection collection) {
+<span class="fc" id="L62">    DataSet&lt;GraphHead&gt; graphHeads = collection.getGraphHeads()</span>
+<span class="fc" id="L63">      .filter(predicate);</span>
+<span class="fc" id="L64">    return selectVerticesAndEdges(collection, graphHeads);</span>
+  }
+
+  /**
+   * Executes the operator for collections based on
+   * {@link org.gradoop.flink.model.impl.layouts.transactional.TxCollectionLayout}
+   *
+   * @param collection graph collection
+   * @return result graph collection
+   */
+  private GraphCollection executeForTxLayout(GraphCollection collection) {
+<span class="nc" id="L75">    DataSet&lt;GraphTransaction&gt; filteredTransactions = collection.getGraphTransactions()</span>
+<span class="nc" id="L76">      .filter(new FilterTransactions(predicate));</span>
+
+<span class="nc" id="L78">    return collection.getConfig().getGraphCollectionFactory()</span>
+<span class="nc" id="L79">      .fromTransactions(filteredTransactions);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Not.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Accumulo</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.impl.accumulo.predicate.filter.calculate</a> &gt; <span class="el_source">Not.java</span></div><h1>Not.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.impl.accumulo.predicate.filter.calculate;
+
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
+
+/**
+ * Negative logic filter
+ *
+ * @param &lt;T&gt; input type
+ */
+public final class Not&lt;T extends EPGMElement&gt; implements AccumuloElementFilter&lt;T&gt; {
+
+  /**
+   * The predicate to negate
+   */
+  private final AccumuloElementFilter&lt;T&gt; predicate;
+
+  /**
+   * Create a new negated predicate
+   *
+   * @param predicate predicate
+   */
+<span class="fc" id="L38">  private Not(AccumuloElementFilter&lt;T&gt; predicate) {</span>
+<span class="fc" id="L39">    this.predicate = predicate;</span>
+<span class="fc" id="L40">  }</span>
+
+  /**
+   * Create a negative formula
+   *
+   * @param predicate negative predicate
+   * @param &lt;T&gt; input type
+   * @return negative filter instance
+   */
+  public static &lt;T extends EPGMElement&gt; Not&lt;T&gt; of(AccumuloElementFilter&lt;T&gt; predicate) {
+<span class="fc" id="L50">    return new Not&lt;&gt;(predicate);</span>
+  }
+
+  @Override
+  public boolean test(T t) {
+<span class="nc bnc" id="L55" title="All 2 branches missed.">    return !predicate.test(t);</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L60">    return &quot;NOT &quot; + predicate;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

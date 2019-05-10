@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseTableInputFormat.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop HBase</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.impl.hbase.io.inputformats</a> &gt; <span class="el_source">BaseTableInputFormat.java</span></div><h1>BaseTableInputFormat.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.impl.hbase.io.inputformats;
+
+import org.apache.flink.addons.hbase.TableInputFormat;
+import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.filter.FilterList;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.storage.common.predicate.query.ElementQuery;
+import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
+
+import javax.annotation.Nonnull;
+
+/**
+ * Base class for common functionality of HBase input formats
+ *
+ * @param &lt;E&gt; type of EPGM element
+ */
+<span class="fc" id="L34">abstract class BaseTableInputFormat&lt;E extends EPGMElement&gt; extends TableInputFormat&lt;Tuple1&lt;E&gt;&gt; {</span>
+
+  /**
+   * Attach a HBase filter represented by the given query to the given scan instance.
+   *
+   * @param query the query that represents a filter
+   * @param scan the HBase scan instance on which the filter will be applied
+   * @param isSpreadingByteUsed indicates whether a spreading byte is used as row key prefix or not
+   */
+  void attachFilter(
+    @Nonnull ElementQuery&lt;HBaseElementFilter&lt;E&gt;&gt; query,
+    @Nonnull Scan scan,
+    boolean isSpreadingByteUsed) {
+
+<span class="fc" id="L48">    FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);</span>
+
+<span class="pc bpc" id="L50" title="1 of 4 branches missed.">    if (query.getQueryRanges() != null &amp;&amp; !query.getQueryRanges().isEmpty()) {</span>
+<span class="fc" id="L51">      conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges(),</span>
+        isSpreadingByteUsed));
+    }
+
+<span class="fc bfc" id="L55" title="All 2 branches covered.">    if (query.getFilterPredicate() != null) {</span>
+<span class="fc" id="L56">      conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter(false));</span>
+    }
+
+    // if there are filters inside the root list, add it to the Scan object
+<span class="fc bfc" id="L60" title="All 2 branches covered.">    if (!conjunctFilters.getFilters().isEmpty()) {</span>
+<span class="fc" id="L61">      scan.setFilter(conjunctFilters);</span>
+    }
+<span class="fc" id="L63">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

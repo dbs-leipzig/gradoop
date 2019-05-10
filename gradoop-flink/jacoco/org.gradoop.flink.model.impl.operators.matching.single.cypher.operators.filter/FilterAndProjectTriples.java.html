@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FilterAndProjectTriples.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter</a> &gt; <span class="el_source">FilterAndProjectTriples.java</span></div><h1>FilterAndProjectTriples.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions.FilterAndProjectTriple;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Triple;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Filters a set of {@link Triple} objects based on a specified predicate. Additionally, the
+ * operator projects all property values to the output {@link Embedding} that are specified in the
+ * given {@code projectionPropertyKeys}.
+ *
+ * Triple -&gt; Embedding( [PropertyEntry(SourceVertexId)], [PropertyEntry(EdgeId)], PropertyEntry
+ * (TargetVertexId)])
+ *
+ * Example:
+ *
+ * Given a Triple
+ * (
+ *   p1: SourceVertex(0, &quot;Person&quot;, {name:&quot;Alice&quot;, age:23, location: &quot;Sweden&quot;}),
+ *   e1: Edge(1, &quot;knows&quot;, {}),
+ *   p2: TargetVertex(2, &quot;Person&quot;, {name:&quot;Bob&quot;, age:23})
+ * ),
+ * a predicate &quot;p1.name = &quot;Alice&quot; AND p1.age &lt;= p2.age&quot; and
+ * projection property keys {p1: [name, location], e1: [], p2: [name, location] the operator creates
+ * an {@link Embedding}:
+ *
+ * ([IdEntry(0),IdEntry(1),IdEntry(2)],[PropertyEntry(&quot;Alice&quot;),PropertyEntry(&quot;Sweden&quot;),
+ * PropertyEntry(&quot;Bob&quot;),PropertyEntry(NULL)])
+ */
+public class FilterAndProjectTriples implements PhysicalOperator {
+  /**
+   * Input vertices
+   */
+  private final DataSet&lt;Triple&gt; input;
+  /**
+   * Variable assigned to the source vertex
+   */
+  private final String sourceVariable;
+  /**
+   * Variable assigned to the edge
+   */
+  private final String edgeVariable;
+  /**
+   * Variable assigned to the target vertex
+   */
+  private final String targetVariable;
+  /**
+   * Predicates in conjunctive normal form
+   */
+  private final CNF predicates;
+  /**
+   * Property keys used for projection
+   */
+  private final Map&lt;String, List&lt;String&gt;&gt; projectionPropertyKeys;
+  /**
+   * Match Strategy used for Vertices
+   */
+  private final MatchStrategy vertexMatchStrategy;
+
+  /**
+   * Operator name used for Flink operator description
+   */
+  private String name;
+
+  /**
+   * New vertex filter operator
+   *
+   * @param input Candidate vertices
+   * @param sourceVariable Variable assigned to the vertex
+   * @param edgeVariable Variable assigned to the vertex
+   * @param targetVariable Variable assigned to the vertex
+   * @param predicates Predicates used to filter vertices
+   * @param projectionPropertyKeys Property keys used for projection
+   * @param vertexMatchStrategy Vertex match strategy
+   */
+  public FilterAndProjectTriples(DataSet&lt;Triple&gt; input, String sourceVariable, String edgeVariable,
+    String targetVariable, CNF predicates, Map&lt;String, List&lt;String&gt;&gt; projectionPropertyKeys,
+<span class="fc" id="L100">    MatchStrategy vertexMatchStrategy) {</span>
+<span class="fc" id="L101">    this.input = input;</span>
+<span class="fc" id="L102">    this.sourceVariable = sourceVariable;</span>
+<span class="fc" id="L103">    this.edgeVariable = edgeVariable;</span>
+<span class="fc" id="L104">    this.targetVariable = targetVariable;</span>
+<span class="fc" id="L105">    this.predicates = predicates;</span>
+<span class="fc" id="L106">    this.projectionPropertyKeys = projectionPropertyKeys;</span>
+<span class="fc" id="L107">    this.vertexMatchStrategy = vertexMatchStrategy;</span>
+<span class="fc" id="L108">    this.setName(&quot;FilterAndProjectTriples&quot;);</span>
+<span class="fc" id="L109">  }</span>
+
+  @Override
+  public DataSet&lt;Embedding&gt; evaluate() {
+<span class="fc" id="L113">    return input.flatMap(</span>
+      new FilterAndProjectTriple(
+        sourceVariable,
+        edgeVariable,
+        targetVariable,
+        predicates,
+        projectionPropertyKeys,
+        vertexMatchStrategy
+      )
+<span class="fc" id="L122">    ).name(getName());</span>
+  }
+
+  @Override
+  public void setName(String newName) {
+<span class="fc" id="L127">    this.name = newName;</span>
+<span class="fc" id="L128">  }</span>
+
+  @Override
+  public String getName() {
+<span class="fc" id="L132">    return this.name;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

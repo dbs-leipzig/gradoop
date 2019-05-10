@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CSVMetaDataParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.csv.metadata</a> &gt; <span class="el_source">CSVMetaDataParser.java</span></div><h1>CSVMetaDataParser.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.csv.metadata;
+
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.metadata.MetaData;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
+import org.gradoop.common.model.impl.properties.Property;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
+import org.gradoop.flink.io.impl.csv.functions.StringEscaper;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+/**
+ * Responsible for creating a {@link MetaData} instance from its string representation.
+ */
+<span class="nc" id="L40">public class CSVMetaDataParser {</span>
+  /**
+   * Used to map a simple type string to its corresponding parsing function.
+   */
+<span class="fc" id="L44">  private static final Map&lt;String, Function&lt;String, Object&gt;&gt; SIMPLE_TYPE_PARSER_MAP =</span>
+<span class="fc" id="L45">    getSimpleTypeParserMap();</span>
+
+  /**
+   * Creates the type - parser function mapping of static property SIMPLE_TYPE_PARSER_MAP
+   *
+   * @return a HashMap containing the mapping of a simple type string to its corresponding
+   * parsing function.
+   */
+  private static Map&lt;String, Function&lt;String, Object&gt;&gt; getSimpleTypeParserMap() {
+<span class="fc" id="L54">    Map&lt;String, Function&lt;String, Object&gt;&gt; map = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L55">    map.put(MetaData.TypeString.SHORT.getTypeString(), Short::parseShort);</span>
+<span class="fc" id="L56">    map.put(MetaData.TypeString.INTEGER.getTypeString(), Integer::parseInt);</span>
+<span class="fc" id="L57">    map.put(MetaData.TypeString.LONG.getTypeString(), Long::parseLong);</span>
+<span class="fc" id="L58">    map.put(MetaData.TypeString.FLOAT.getTypeString(), Float::parseFloat);</span>
+<span class="fc" id="L59">    map.put(MetaData.TypeString.DOUBLE.getTypeString(), Double::parseDouble);</span>
+<span class="fc" id="L60">    map.put(MetaData.TypeString.BOOLEAN.getTypeString(), Boolean::parseBoolean);</span>
+<span class="fc" id="L61">    map.put(MetaData.TypeString.STRING.getTypeString(), StringEscaper::unescape);</span>
+<span class="fc" id="L62">    map.put(MetaData.TypeString.BIGDECIMAL.getTypeString(), BigDecimal::new);</span>
+<span class="fc" id="L63">    map.put(MetaData.TypeString.GRADOOPID.getTypeString(), GradoopId::fromString);</span>
+<span class="fc" id="L64">    map.put(MetaData.TypeString.LOCALDATE.getTypeString(), LocalDate::parse);</span>
+<span class="fc" id="L65">    map.put(MetaData.TypeString.LOCALTIME.getTypeString(), LocalTime::parse);</span>
+<span class="fc" id="L66">    map.put(MetaData.TypeString.LOCALDATETIME.getTypeString(), LocalDateTime::parse);</span>
+<span class="fc" id="L67">    map.put(MetaData.TypeString.NULL.getTypeString(), CSVMetaDataParser::parseNullProperty);</span>
+<span class="fc" id="L68">    return Collections.unmodifiableMap(map);</span>
+  }
+
+  /**
+   * Returns the property meta data string for the specified property. The string consists of the
+   * property key and the property value type, e.g. &quot;foo:int&quot;.
+   *
+   * @param property property
+   * @return property meta data
+   */
+  public static String getPropertyMetaData(Property property) {
+<span class="fc" id="L79">    return String.format(&quot;%s%s%s&quot;,</span>
+<span class="fc" id="L80">      StringEscaper.escape(property.getKey(), CSVConstants.ESCAPED_CHARACTERS),</span>
+      MetaData.PROPERTY_TOKEN_DELIMITER,
+<span class="fc" id="L82">      MetaData.getTypeString(property.getValue())); // no need to escape</span>
+  }
+
+  /**
+   * Creates a parsing function for the given property type.
+   *
+   * @param propertyType string specifying the property type
+   * @return parsing function for the specific type
+   */
+  static Function&lt;String, Object&gt; getPropertyValueParser(String propertyType) {
+<span class="fc" id="L92">    String[] typeTokens = StringEscaper.split(</span>
+<span class="fc" id="L93">      propertyType.toLowerCase(), PropertyMetaData.PROPERTY_TOKEN_DELIMITER);</span>
+<span class="fc" id="L94">    String mainType = typeTokens[0];</span>
+
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    if (mainType.equals(MetaData.TypeString.LIST.getTypeString())) {</span>
+<span class="fc" id="L97">      return getListValueParser(typeTokens);</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">    } else if (mainType.equals(MetaData.TypeString.SET.getTypeString())) {</span>
+<span class="fc" id="L99">      return getSetValueParser(typeTokens);</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">    } else if (mainType.equals(MetaData.TypeString.MAP.getTypeString())) {</span>
+<span class="fc" id="L101">      return getMapValueParser(typeTokens);</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">    } else if (SIMPLE_TYPE_PARSER_MAP.containsKey(mainType)) {</span>
+<span class="fc" id="L103">      return SIMPLE_TYPE_PARSER_MAP.get(mainType);</span>
+    } else {
+<span class="nc" id="L105">      throw new TypeNotPresentException(mainType, null);</span>
+    }
+  }
+
+  /**
+   * Creates a parsing function for list property type.
+   *
+   * @param listTypeTokens string tokens of the list type and its items type, e.g.
+   *                       [&quot;list&quot;, &quot;string&quot;]
+   * @return parsing function
+   */
+  private static Function&lt;String, Object&gt; getListValueParser(String[] listTypeTokens) {
+    // It's a list with one additional data type (type of list items).
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">    if (listTypeTokens.length != 2) {</span>
+<span class="nc" id="L119">      throw new IllegalArgumentException(&quot;Item type of List type is missing&quot;);</span>
+    }
+<span class="fc" id="L121">    final String itemType = listTypeTokens[1];</span>
+    // check the validity of the list item type
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">    if (!SIMPLE_TYPE_PARSER_MAP.containsKey(itemType)) {</span>
+<span class="nc" id="L124">      throw new TypeNotPresentException(itemType, null);</span>
+    }
+
+<span class="fc" id="L127">    return s -&gt; parseListProperty(s, SIMPLE_TYPE_PARSER_MAP.get(itemType));</span>
+  }
+
+  /**
+   * Creates a parsing function for map property type.
+   *
+   * @param mapTypeTokens string tokens of the map type and its key type and value type, e.g.
+   *                      [&quot;map&quot;, &quot;string&quot;, &quot;double&quot;]
+   * @return parsing function
+   */
+  private static Function&lt;String, Object&gt; getMapValueParser(String[] mapTypeTokens) {
+    // It's a map with two additional data types (key type + value type).
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">    if (mapTypeTokens.length != 3) {</span>
+<span class="nc" id="L140">      throw new IllegalArgumentException(&quot;Key type or value type of Map type is missing&quot;);</span>
+    }
+
+<span class="fc" id="L143">    final String keyType = mapTypeTokens[1];</span>
+    // check the validity of the map key type
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">    if (!SIMPLE_TYPE_PARSER_MAP.containsKey(keyType)) {</span>
+<span class="nc" id="L146">      throw new TypeNotPresentException(keyType, null);</span>
+    }
+
+<span class="fc" id="L149">    final String valueType = mapTypeTokens[2];</span>
+    // check the validity of the map value type
+<span class="pc bpc" id="L151" title="1 of 2 branches missed.">    if (!SIMPLE_TYPE_PARSER_MAP.containsKey(valueType)) {</span>
+<span class="nc" id="L152">      throw new TypeNotPresentException(valueType, null);</span>
+    }
+
+<span class="fc" id="L155">    return s -&gt; parseMapProperty(</span>
+      s,
+<span class="fc" id="L157">      SIMPLE_TYPE_PARSER_MAP.get(keyType),</span>
+<span class="fc" id="L158">      SIMPLE_TYPE_PARSER_MAP.get(valueType)</span>
+    );
+  }
+
+  /**
+   * Creates a parsing function for set property type.
+   *
+   * @param setTypeTokens string tokens of the set type and its item type, e.g. [&quot;set&quot;, &quot;string&quot;]
+   * @return parsing function
+   */
+  private static Function&lt;String, Object&gt; getSetValueParser(String[] setTypeTokens) {
+    // It's a set with one additional data type (type of set items).
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">    if (setTypeTokens.length != 2) {</span>
+<span class="nc" id="L171">      throw new IllegalArgumentException(&quot;Item type of Set type is missing&quot;);</span>
+    }
+<span class="fc" id="L173">    final String itemType = setTypeTokens[1];</span>
+    // check the validity of the set item type
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">    if (!SIMPLE_TYPE_PARSER_MAP.containsKey(itemType)) {</span>
+<span class="nc" id="L176">      throw new TypeNotPresentException(itemType, null);</span>
+    }
+
+<span class="fc" id="L179">    return s -&gt; parseSetProperty(s, SIMPLE_TYPE_PARSER_MAP.get(itemType));</span>
+  }
+
+  /**
+   * Parse function to translate string representation of a List to a list of PropertyValues
+   *
+   * @param s          the string to parse as list, e.g. &quot;[myString1,myString2]&quot;
+   * @param itemParser the function to parse the list items
+   * @return the list represented by the argument
+   */
+  private static Object parseListProperty(String s, Function&lt;String, Object&gt; itemParser) {
+<span class="fc" id="L190">    s = s.substring(1, s.length() - 1);</span>
+<span class="fc" id="L191">    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))</span>
+<span class="fc" id="L192">      .map(itemParser)</span>
+<span class="fc" id="L193">      .map(PropertyValue::create)</span>
+<span class="fc" id="L194">      .collect(Collectors.toList());</span>
+  }
+
+  /**
+   * Parse function to translate string representation of a Map to a Map with
+   * key and value of type PropertyValue.
+   *
+   * @param s           the string to parse as map, e.g. &quot;{myString1=myValue1,myString2=myValue2}&quot;
+   * @param keyParser   the function to parse the keys
+   * @param valueParser the function to parse the values
+   * @return the map represented by the argument
+   */
+  private static Object parseMapProperty(String s, Function&lt;String, Object&gt; keyParser,
+    Function&lt;String, Object&gt; valueParser) {
+<span class="fc" id="L208">    s = s.substring(1, s.length() - 1);</span>
+<span class="fc" id="L209">    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))</span>
+<span class="fc" id="L210">      .map(st -&gt; StringEscaper.split(st, CSVConstants.MAP_SEPARATOR))</span>
+<span class="fc" id="L211">      .map(strings -&gt; new Object[]{keyParser.apply(strings[0]), valueParser.apply(strings[1])})</span>
+<span class="fc" id="L212">      .collect(Collectors.toMap(e -&gt; PropertyValue.create(e[0]), e -&gt; PropertyValue.create(e[1])));</span>
+  }
+
+  /**
+   * Parse function to translate string representation of a Set to a set of PropertyValues.
+   *
+   * @param s          the string to parse as set, e.g. &quot;[myString1,myString2]&quot;
+   * @param itemParser the function to parse the set items
+   * @return the set represented by the argument
+   */
+  private static Object parseSetProperty(String s, Function&lt;String, Object&gt; itemParser) {
+<span class="fc" id="L223">    s = s.substring(1, s.length() - 1);</span>
+<span class="fc" id="L224">    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))</span>
+<span class="fc" id="L225">      .map(itemParser)</span>
+<span class="fc" id="L226">      .map(PropertyValue::create)</span>
+<span class="fc" id="L227">      .collect(Collectors.toSet());</span>
+  }
+
+  /**
+   * Parse function to create null from the null string representation.
+   *
+   * @param nullString The string representing null.
+   * @return Returns null
+   * @throws IllegalArgumentException The string that is passed has to represent null.
+   */
+  private static Object parseNullProperty(String nullString) throws IllegalArgumentException {
+<span class="pc bpc" id="L238" title="2 of 4 branches missed.">    if (nullString != null &amp;&amp; nullString.equalsIgnoreCase(</span>
+<span class="fc" id="L239">      MetaData.TypeString.NULL.getTypeString())) {</span>
+<span class="fc" id="L240">      return null;</span>
+    } else {
+<span class="nc" id="L242">      throw new IllegalArgumentException(&quot;Only null represents a null string.&quot;);</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

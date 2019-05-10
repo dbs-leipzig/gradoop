@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DFSCodeComparator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.dimspan.comparison</a> &gt; <span class="el_source">DFSCodeComparator.java</span></div><h1>DFSCodeComparator.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.dimspan.comparison;
+
+import org.gradoop.flink.algorithms.fsm.dimspan.model.DFSCodeUtils;
+
+import java.io.Serializable;
+import java.util.Comparator;
+
+/**
+ * Comparator for DFS codes based on gSpan lexicographical order.
+ * See &lt;a href=&quot;https://www.cs.ucsb.edu/~xyan/software/gSpan.htm&quot;&gt;gSpan&lt;/a&gt;
+ */
+<span class="fc" id="L27">public class DFSCodeComparator implements Comparator&lt;int[]&gt;, Serializable {</span>
+
+  /**
+   * util methods to interpret int-array encoded patterns
+   */
+<span class="fc" id="L32">  private final DFSCodeUtils dfsCodeUtils = new DFSCodeUtils();</span>
+
+  @Override
+  public int compare(int[] a, int[] b) {
+    int comparison;
+
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">    boolean thisIsRoot = a.length == 0;</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">    boolean thatIsRoot = b.length == 0;</span>
+
+    // root is always smaller
+<span class="pc bpc" id="L42" title="3 of 4 branches missed.">    if (thisIsRoot &amp;&amp; ! thatIsRoot) {</span>
+<span class="nc" id="L43">      comparison = -1;</span>
+
+<span class="pc bpc" id="L45" title="3 of 4 branches missed.">    } else if (thatIsRoot &amp;&amp; !thisIsRoot) {</span>
+<span class="nc" id="L46">      comparison = 1;</span>
+
+      // none is root
+    } else {
+<span class="fc" id="L50">      comparison = 0;</span>
+
+<span class="fc" id="L52">      int thisSize = dfsCodeUtils.getEdgeCount(a);</span>
+<span class="fc" id="L53">      int thatSize = dfsCodeUtils.getEdgeCount(b);</span>
+
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">      boolean sameSize = thisSize == thatSize;</span>
+
+<span class="pc bpc" id="L57" title="3 of 4 branches missed.">      int minSize  = sameSize || thisSize &lt; thatSize ? thisSize : thatSize;</span>
+
+      // compare extensions
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">      for (int edgeTime = 0; edgeTime &lt; minSize; edgeTime++) {</span>
+
+<span class="fc" id="L62">        int thisFromTime = dfsCodeUtils.getFromId(a, edgeTime);</span>
+<span class="fc" id="L63">        int thatFromTime = dfsCodeUtils.getFromId(b, edgeTime);</span>
+
+<span class="fc" id="L65">        int thisToTime = dfsCodeUtils.getToId(a, edgeTime);</span>
+<span class="fc" id="L66">        int thatToTime = dfsCodeUtils.getToId(b, edgeTime);</span>
+
+        // no difference is times
+<span class="fc bfc" id="L69" title="All 4 branches covered.">        if (thisFromTime == thatFromTime &amp;&amp; thisToTime == thatToTime) {</span>
+
+          // compare from Labels
+<span class="fc" id="L72">          int thisFromLabel = dfsCodeUtils.getFromLabel(a, edgeTime);</span>
+<span class="fc" id="L73">          int thatFromLabel = dfsCodeUtils.getFromLabel(b, edgeTime);</span>
+
+<span class="fc" id="L75">          comparison = thisFromLabel - thatFromLabel;</span>
+
+<span class="fc bfc" id="L77" title="All 2 branches covered.">          if (comparison == 0) {</span>
+
+            // compare direction
+<span class="fc" id="L80">            boolean thisIsOutgoing = dfsCodeUtils.isOutgoing(a, edgeTime);</span>
+<span class="fc" id="L81">            boolean thatIsOutgoing = dfsCodeUtils.isOutgoing(b, edgeTime);</span>
+
+<span class="fc bfc" id="L83" title="All 4 branches covered.">            if (thisIsOutgoing &amp;&amp; !thatIsOutgoing) {</span>
+<span class="fc" id="L84">              comparison = -1;</span>
+<span class="pc bpc" id="L85" title="1 of 4 branches missed.">            } else if (thatIsOutgoing &amp;&amp; !thisIsOutgoing) {</span>
+<span class="fc" id="L86">              comparison = 1;</span>
+            } else {
+
+              // compare edge Labels
+<span class="fc" id="L90">              int thisEdgeLabel = dfsCodeUtils.getEdgeLabel(a, edgeTime);</span>
+<span class="fc" id="L91">              int thatEdgeLabel = dfsCodeUtils.getEdgeLabel(b, edgeTime);</span>
+
+<span class="fc" id="L93">              comparison = thisEdgeLabel - thatEdgeLabel;</span>
+
+<span class="fc bfc" id="L95" title="All 2 branches covered.">              if (comparison == 0) {</span>
+
+                // compare to Labels
+<span class="fc" id="L98">                int thisToLabel = dfsCodeUtils.getToLabel(a, edgeTime);</span>
+<span class="fc" id="L99">                int thatToLabel = dfsCodeUtils.getToLabel(b, edgeTime);</span>
+
+<span class="fc" id="L101">                comparison = thisToLabel - thatToLabel;</span>
+              }
+            }
+          }
+
+          // time differences
+<span class="fc" id="L107">        } else {</span>
+
+          // compare backtracking
+<span class="fc bfc" id="L110" title="All 2 branches covered.">          boolean thisIsBackwards = thisToTime &lt;= thisFromTime;</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">          boolean thatIsBackwards = thatToTime &lt;= thatFromTime;</span>
+
+<span class="pc bpc" id="L113" title="1 of 4 branches missed.">          if (thisIsBackwards &amp;&amp; !thatIsBackwards) {</span>
+<span class="fc" id="L114">            comparison = -1;</span>
+<span class="pc bpc" id="L115" title="1 of 4 branches missed.">          } else if (thatIsBackwards &amp;&amp; !thisIsBackwards) {</span>
+<span class="fc" id="L116">            comparison = 1;</span>
+          } else {
+
+            // both forwards
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">            if (thatIsBackwards) {</span>
+
+              // back to earlier vertex is smaller
+<span class="nc" id="L123">              comparison = thisToTime - thatToTime;</span>
+
+              // both backwards
+            } else {
+
+              // forwards from later vertex is smaller
+<span class="fc" id="L129">              comparison = thatFromTime - thisFromTime;</span>
+            }
+          }
+        }
+
+        // stop iteration as soon as one extension differs
+<span class="fc bfc" id="L135" title="All 2 branches covered.">        if (comparison != 0) {</span>
+<span class="fc" id="L136">          break;</span>
+        }
+      }
+
+      // one is parent of other
+<span class="pc bpc" id="L141" title="3 of 4 branches missed.">      if (comparison == 0 &amp;&amp; !sameSize) {</span>
+
+        // this is child, cause it has further traversals
+<span class="nc bnc" id="L144" title="All 2 branches missed.">        if (thisSize &gt; thatSize) {</span>
+<span class="nc" id="L145">          comparison = 1;</span>
+
+          // that is child, cause it has further traversals
+        } else {
+<span class="nc" id="L149">          comparison = -1;</span>
+
+        }
+      }
+    }
+
+<span class="fc" id="L155">    return comparison;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

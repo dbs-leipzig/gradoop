@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CanonicalAdjacencyMatrixBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.tostring</a> &gt; <span class="el_source">CanonicalAdjacencyMatrixBuilder.java</span></div><h1>CanonicalAdjacencyMatrixBuilder.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.tostring;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryGraphCollectionToValueOperator;
+import org.gradoop.flink.model.impl.functions.epgm.LabelCombiner;
+import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
+import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
+import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.AdjacencyMatrix;
+import org.gradoop.flink.model.impl.operators.tostring.functions.ConcatGraphHeadStrings;
+import org.gradoop.flink.model.impl.operators.tostring.functions.IncomingAdjacencyList;
+import org.gradoop.flink.model.impl.operators.tostring.functions.MultiEdgeStringCombiner;
+import org.gradoop.flink.model.impl.operators.tostring.functions.OutgoingAdjacencyList;
+import org.gradoop.flink.model.impl.operators.tostring.functions.SourceStringUpdater;
+import org.gradoop.flink.model.impl.operators.tostring.functions.SwitchSourceTargetIds;
+import org.gradoop.flink.model.impl.operators.tostring.functions.TargetStringUpdater;
+import org.gradoop.flink.model.impl.operators.tostring.functions.UndirectedAdjacencyList;
+import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
+import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
+import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
+
+/**
+ * Operator deriving a string representation from a graph collection.
+ * The representation follows the concept of a canonical adjacency matrix.
+ */
+public class CanonicalAdjacencyMatrixBuilder implements
+  UnaryGraphCollectionToValueOperator&lt;String&gt; {
+
+  /**
+   * function describing string representation of graph heads
+   */
+  private final GraphHeadToString&lt;GraphHead&gt; graphHeadToString;
+  /**
+   * function describing string representation of vertices
+   */
+  private final VertexToString&lt;Vertex&gt; vertexToString;
+  /**
+   * function describing string representation of edges
+   */
+  private final EdgeToString&lt;Edge&gt; egeLabelingFunction;
+  /**
+   * sets mode for either directed or undirected graph
+   */
+  private final boolean directed;
+
+  /**
+   * constructor
+   * @param graphHeadToString representation of graph heads
+   * @param vertexToString representation of vertices
+   * @param edgeLabelingFunction representation of edges
+   * @param directed sets mode for either directed or undirected graph
+   */
+  public CanonicalAdjacencyMatrixBuilder(
+    GraphHeadToString&lt;GraphHead&gt; graphHeadToString,
+    VertexToString&lt;Vertex&gt; vertexToString,
+    EdgeToString&lt;Edge&gt; edgeLabelingFunction,
+    boolean directed
+<span class="fc" id="L78">  ) {</span>
+<span class="fc" id="L79">    this.graphHeadToString = graphHeadToString;</span>
+<span class="fc" id="L80">    this.vertexToString = vertexToString;</span>
+<span class="fc" id="L81">    this.egeLabelingFunction = edgeLabelingFunction;</span>
+<span class="fc" id="L82">    this.directed = directed;</span>
+<span class="fc" id="L83">  }</span>
+
+  @Override
+  public DataSet&lt;String&gt; execute(GraphCollection collection) {
+
+    // 1-10.
+<span class="fc" id="L89">    DataSet&lt;GraphHeadString&gt; graphHeadLabels = getGraphHeadStrings(collection);</span>
+
+    // 11. add empty head to prevent empty result for empty collection
+
+<span class="fc" id="L93">    graphHeadLabels = graphHeadLabels</span>
+<span class="fc" id="L94">      .union(collection</span>
+<span class="fc" id="L95">        .getConfig()</span>
+<span class="fc" id="L96">        .getExecutionEnvironment()</span>
+<span class="fc" id="L97">        .fromElements(new GraphHeadString(GradoopId.get(), &quot;&quot;)));</span>
+
+    // 12. label collection
+
+<span class="fc" id="L101">    return graphHeadLabels</span>
+<span class="fc" id="L102">      .reduceGroup(new ConcatGraphHeadStrings());</span>
+  }
+
+  /**
+   * Created a dataset of (graph id, canonical label) pairs.
+   *
+   * @param collection input collection
+   * @return (graph id, canonical label) pairs
+   */
+  public DataSet&lt;GraphHeadString&gt; getGraphHeadStrings(GraphCollection collection) {
+    // 1. label graph heads
+<span class="fc" id="L113">    DataSet&lt;GraphHeadString&gt; graphHeadLabels = collection.getGraphHeads()</span>
+<span class="fc" id="L114">      .map(graphHeadToString);</span>
+
+    // 2. label vertices
+<span class="fc" id="L117">    DataSet&lt;VertexString&gt; vertexLabels = collection.getVertices()</span>
+<span class="fc" id="L118">      .flatMap(vertexToString);</span>
+
+    // 3. label edges
+<span class="fc" id="L121">    DataSet&lt;EdgeString&gt; edgeLabels = collection.getEdges()</span>
+<span class="fc" id="L122">      .flatMap(egeLabelingFunction);</span>
+
+<span class="fc bfc" id="L124" title="All 2 branches covered.">    if (directed) {</span>
+      // 4. combine labels of parallel edges
+<span class="fc" id="L126">      edgeLabels = edgeLabels</span>
+<span class="fc" id="L127">        .groupBy(0, 1, 2)</span>
+<span class="fc" id="L128">        .reduceGroup(new MultiEdgeStringCombiner());</span>
+
+      // 5. extend edge labels by vertex labels
+
+<span class="fc" id="L132">      edgeLabels = edgeLabels</span>
+<span class="fc" id="L133">        .join(vertexLabels)</span>
+<span class="fc" id="L134">        .where(0, 1).equalTo(0, 1) // graphId,sourceId = graphId,vertexId</span>
+<span class="fc" id="L135">        .with(new SourceStringUpdater())</span>
+<span class="fc" id="L136">        .join(vertexLabels)</span>
+<span class="fc" id="L137">        .where(0, 2).equalTo(0, 1) // graphId,targetId = graphId,vertexId</span>
+<span class="fc" id="L138">        .with(new TargetStringUpdater());</span>
+
+      // 6. extend vertex labels by outgoing vertex+edge labels
+
+<span class="fc" id="L142">      DataSet&lt;VertexString&gt; outgoingAdjacencyListLabels =</span>
+<span class="fc" id="L143">        edgeLabels.groupBy(0, 1) // graphId, sourceId</span>
+<span class="fc" id="L144">          .reduceGroup(new OutgoingAdjacencyList());</span>
+
+      // 7. extend vertex labels by outgoing vertex+edge labels
+
+<span class="fc" id="L148">      DataSet&lt;VertexString&gt; incomingAdjacencyListLabels =</span>
+<span class="fc" id="L149">        edgeLabels.groupBy(0, 2) // graphId, targetId</span>
+<span class="fc" id="L150">          .reduceGroup(new IncomingAdjacencyList());</span>
+
+      // 8. combine vertex labels
+
+<span class="fc" id="L154">      vertexLabels = vertexLabels</span>
+<span class="fc" id="L155">        .leftOuterJoin(outgoingAdjacencyListLabels)</span>
+<span class="fc" id="L156">        .where(0, 1).equalTo(0, 1)</span>
+<span class="fc" id="L157">        .with(new LabelCombiner&lt;VertexString&gt;())</span>
+<span class="fc" id="L158">        .leftOuterJoin(incomingAdjacencyListLabels)</span>
+<span class="fc" id="L159">        .where(0, 1).equalTo(0, 1)</span>
+<span class="fc" id="L160">        .with(new LabelCombiner&lt;VertexString&gt;());</span>
+<span class="fc" id="L161">    } else {</span>
+    // undirected graph
+
+      // 4. union edges with flipped edges and combine labels of parallel edges
+
+<span class="fc" id="L166">      edgeLabels = edgeLabels</span>
+<span class="fc" id="L167">        .union(edgeLabels</span>
+<span class="fc" id="L168">          .map(new SwitchSourceTargetIds()))</span>
+<span class="fc" id="L169">        .groupBy(0, 1, 2)</span>
+<span class="fc" id="L170">        .reduceGroup(new MultiEdgeStringCombiner());</span>
+
+      // 5. extend edge labels by vertex labels
+
+<span class="fc" id="L174">      edgeLabels = edgeLabels</span>
+<span class="fc" id="L175">        .join(vertexLabels)</span>
+<span class="fc" id="L176">        .where(0, 2).equalTo(0, 1) // graphId,targetId = graphId,vertexId</span>
+<span class="fc" id="L177">        .with(new TargetStringUpdater());</span>
+
+      // 6/7. extend vertex labels by vertex+edge labels
+
+<span class="fc" id="L181">      DataSet&lt;VertexString&gt; adjacencyListLabels =</span>
+<span class="fc" id="L182">        edgeLabels.groupBy(0, 1) // graphId, sourceId</span>
+<span class="fc" id="L183">          .reduceGroup(new UndirectedAdjacencyList());</span>
+
+      // 8. combine vertex labels
+
+<span class="fc" id="L187">      vertexLabels = vertexLabels</span>
+<span class="fc" id="L188">        .leftOuterJoin(adjacencyListLabels)</span>
+<span class="fc" id="L189">        .where(0, 1).equalTo(0, 1)</span>
+<span class="fc" id="L190">        .with(new LabelCombiner&lt;VertexString&gt;());</span>
+    }
+
+    // 9. create adjacency matrix labels
+
+<span class="fc" id="L195">    DataSet&lt;GraphHeadString&gt; adjacencyMatrixLabels = vertexLabels</span>
+<span class="fc" id="L196">      .groupBy(0)</span>
+<span class="fc" id="L197">      .reduceGroup(new AdjacencyMatrix());</span>
+
+    // 10. combine graph labels
+
+<span class="fc" id="L201">    graphHeadLabels = graphHeadLabels</span>
+<span class="fc" id="L202">      .leftOuterJoin(adjacencyMatrixLabels)</span>
+<span class="fc" id="L203">      .where(0).equalTo(0)</span>
+<span class="fc" id="L204">      .with(new LabelCombiner&lt;GraphHeadString&gt;());</span>
+<span class="fc" id="L205">    return graphHeadLabels;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

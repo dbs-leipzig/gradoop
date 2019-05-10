@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DateTimeSerializer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.properties</a> &gt; <span class="el_source">DateTimeSerializer.java</span></div><h1>DateTimeSerializer.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.properties;
+
+import org.apache.hadoop.hbase.util.Bytes;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+import static org.apache.hadoop.hbase.util.Bytes.SIZEOF_INT;
+
+/**
+ * Serializer for Java 8 {@code LocalDate, LocalTime, LocalDateTime}.
+ */
+<span class="nc" id="L29">public class DateTimeSerializer {</span>
+
+  /**
+   * byte-array length for {@code LocalDate} value
+   */
+  public static final int SIZEOF_DATE = 3 * SIZEOF_INT;
+  /**
+   * byte-array length for {@code LocalTime} value
+   */
+  public static final int SIZEOF_TIME = 4 * SIZEOF_INT;
+
+  /**
+   * byte-array length for {@code LocalDateTime} value
+   */
+  public static final int SIZEOF_DATETIME = 7 * SIZEOF_INT;
+
+  /**
+   * Serializes a {@code LocalDate} value.
+   *
+   * @param date {@code LocalDate} value
+   *
+   * @return serialized value
+   */
+  public static byte[] serializeDate(LocalDate date) {
+<span class="fc" id="L53">    int year = date.getYear();</span>
+<span class="fc" id="L54">    int month = date.getMonth().getValue();</span>
+<span class="fc" id="L55">    int day = date.getDayOfMonth();</span>
+
+<span class="fc" id="L57">    return serialize(new int[] {year, month, day});</span>
+  }
+
+  /**
+   * Serializes a {@code LocalTime} value.
+   *
+   * @param time {@code LocalTime} value
+   *
+   * @return serialized value
+   */
+  public static byte[] serializeTime(LocalTime time) {
+<span class="fc" id="L68">    int hour = time.getHour();</span>
+<span class="fc" id="L69">    int minute = time.getMinute();</span>
+<span class="fc" id="L70">    int second = time.getSecond();</span>
+<span class="fc" id="L71">    int nano = time.getNano();</span>
+
+<span class="fc" id="L73">    return serialize(new int[] {hour, minute, second, nano});</span>
+  }
+
+  /**
+   * Serializes a {@code LocalDateTime} value.
+   *
+   * @param dateTime {@code LocalDateTime} value
+   *
+   * @return serialized value
+   */
+  public static byte[] serializeDateTime(LocalDateTime dateTime) {
+<span class="fc" id="L84">    int year = dateTime.getYear();</span>
+<span class="fc" id="L85">    int month = dateTime.getMonth().getValue();</span>
+<span class="fc" id="L86">    int day = dateTime.getDayOfMonth();</span>
+<span class="fc" id="L87">    int hour = dateTime.getHour();</span>
+<span class="fc" id="L88">    int minute = dateTime.getMinute();</span>
+<span class="fc" id="L89">    int second = dateTime.getSecond();</span>
+<span class="fc" id="L90">    int nano = dateTime.getNano();</span>
+
+<span class="fc" id="L92">    return serialize(new int[] {year, month, day, hour, minute, second, nano});</span>
+  }
+
+  /**
+   * Generalization of serialization methods.
+   *
+   * @param ints int array representation of {@code LocalDate, LocalTime, LocalDateTime}
+   *
+   * @return serialized value
+   */
+  private static byte[] serialize(int[] ints) {
+<span class="fc" id="L103">    byte[] bytes = new byte[ints.length * SIZEOF_INT];</span>
+
+<span class="fc bfc" id="L105" title="All 2 branches covered.">    for (int i = 0; i &lt; ints.length; i++) {</span>
+<span class="fc" id="L106">      int offset = i * SIZEOF_INT;</span>
+<span class="fc" id="L107">      Bytes.putInt(bytes, offset, ints[i]);</span>
+    }
+
+<span class="fc" id="L110">    return bytes;</span>
+  }
+
+  /**
+   * Deserializes a {@code LocalDate} value.
+   *
+   * @param bytes serialized value
+   *
+   * @return {@code LocalDate} value
+   */
+  public static LocalDate deserializeDate(byte[] bytes) {
+<span class="fc" id="L121">    int year = Bytes.toInt(bytes, 0, SIZEOF_INT);</span>
+<span class="fc" id="L122">    int month = Bytes.toInt(bytes, SIZEOF_INT, SIZEOF_INT);</span>
+<span class="fc" id="L123">    int day = Bytes.toInt(bytes, 2 * SIZEOF_INT, SIZEOF_INT);</span>
+
+<span class="fc" id="L125">    return LocalDate.of(year, month, day);</span>
+  }
+
+  /**
+   * Deserializes a {@code LocalTime} value.
+   *
+   * @param bytes serialized value
+   *
+   * @return {@code LocalTime} value
+   */
+  public static LocalTime deserializeTime(byte[] bytes) {
+<span class="fc" id="L136">    int hour = Bytes.toInt(bytes, 0, SIZEOF_INT);</span>
+<span class="fc" id="L137">    int minute = Bytes.toInt(bytes, SIZEOF_INT, SIZEOF_INT);</span>
+<span class="fc" id="L138">    int second = Bytes.toInt(bytes, 2 * SIZEOF_INT, SIZEOF_INT);</span>
+<span class="fc" id="L139">    int nano = Bytes.toInt(bytes, 3 * SIZEOF_INT, SIZEOF_INT);</span>
+
+<span class="fc" id="L141">    return LocalTime.of(hour, minute, second, nano);</span>
+  }
+
+  /**
+   * Deserializes a {@code LocalDateTime} value.
+   *
+   * @param bytes serialized value
+   *
+   * @return {@code LocalDateTime} value
+   */
+  public static LocalDateTime deserializeDateTime(byte[] bytes) {
+<span class="fc" id="L152">    int year = Bytes.toInt(bytes, 0, SIZEOF_INT);</span>
+<span class="fc" id="L153">    int month = Bytes.toInt(bytes, SIZEOF_INT, SIZEOF_INT);</span>
+<span class="fc" id="L154">    int day = Bytes.toInt(bytes, 2 * SIZEOF_INT, SIZEOF_INT);</span>
+<span class="fc" id="L155">    int hour = Bytes.toInt(bytes, 3 * SIZEOF_INT, SIZEOF_INT);</span>
+<span class="fc" id="L156">    int minute = Bytes.toInt(bytes, 4 * SIZEOF_INT, SIZEOF_INT);</span>
+<span class="fc" id="L157">    int second = Bytes.toInt(bytes, 5 * SIZEOF_INT, SIZEOF_INT);</span>
+<span class="fc" id="L158">    int nano = Bytes.toInt(bytes, 6 * SIZEOF_INT, SIZEOF_INT);</span>
+
+<span class="fc" id="L160">    return LocalDateTime.of(year, month, day, hour, minute, second, nano);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropertyValueStrategyFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.properties.strategies</a> &gt; <span class="el_source">PropertyValueStrategyFactory.java</span></div><h1>PropertyValueStrategyFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.properties.strategies;
+
+import org.gradoop.common.exceptions.UnsupportedTypeException;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Factory class responsible for instantiating strategy classes that manage every kind of access to
+ * the current {@link PropertyValue} value.
+ */
+public class PropertyValueStrategyFactory {
+
+  /**
+   * {@link PropertyValueStrategyFactory} instance
+   */
+<span class="fc" id="L43">  private static PropertyValueStrategyFactory INSTANCE = new PropertyValueStrategyFactory();</span>
+  /**
+   * Map which links a data type to a strategy class
+   */
+  private final Map&lt;Class, PropertyValueStrategy&gt; classStrategyMap;
+  /**
+   * Array which links a type byte (as index) to a strategy class
+   */
+  private final PropertyValueStrategy[] byteStrategyMap;
+  /**
+   * Strategy for {@code null}-value properties
+   */
+  private final NullStrategy nullStrategy;
+
+  /**
+   * Constructs an {@link PropertyValueStrategyFactory} with type - strategy mappings as defined in
+   * {@code initClassStrategyMap}.
+   * Only one instance of this class is needed.
+   */
+<span class="fc" id="L62">  private PropertyValueStrategyFactory() {</span>
+<span class="fc" id="L63">    nullStrategy = new NullStrategy();</span>
+<span class="fc" id="L64">    classStrategyMap = initClassStrategyMap();</span>
+<span class="fc" id="L65">    byteStrategyMap = initByteStrategyMap();</span>
+<span class="fc" id="L66">  }</span>
+
+  /**
+   * Returns value which is represented by the the provided byte array. Assumes that the value is
+   * serialized according to the {@link PropertyValue} standard.
+   *
+   * @param bytes byte array of raw bytes.
+   * @return Object which is the result of the deserialization.
+   */
+  public static Object fromRawBytes(byte[] bytes) {
+<span class="fc" id="L76">    PropertyValueStrategy strategy = INSTANCE.byteStrategyMap[bytes[0]];</span>
+    try {
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">      return strategy == null ? null : strategy.get(bytes);</span>
+<span class="nc" id="L79">    } catch (IOException e) {</span>
+<span class="nc" id="L80">      throw new RuntimeException(&quot;Error while deserializing object.&quot;, e);</span>
+    }
+  }
+
+  /**
+   * Compares two values.
+   * If {@code other} is not comparable to {@code value}, the used {@link PropertyValueStrategy}
+   * will throw an {@code IllegalArgumentException}.
+   *
+   * @param value first value.
+   * @param other second value.
+   * @return a negative integer, zero, or a positive integer as {@code value} is less than, equal
+   * to, or greater than {@code other}.
+   */
+  public static int compare(Object value, Object other) {
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (value == null) {</span>
+<span class="fc" id="L96">      return INSTANCE.nullStrategy.compare(null, other);</span>
+    } else {
+<span class="fc" id="L98">      PropertyValueStrategy strategy = get(value.getClass());</span>
+<span class="fc" id="L99">      return strategy.compare(value, other);</span>
+    }
+  }
+
+  /**
+   * Get byte array representation of the provided object. The object is serialized according to the
+   * {@link PropertyValue} standard.
+   * If the given type is not supported, an {@code UnsupportedTypeException} will be thrown.
+   *
+   * @param value to be serialized.
+   * @return byte array representation of the provided object.
+   */
+  public static byte[] getRawBytes(Object value) {
+<span class="fc bfc" id="L112" title="All 2 branches covered.">    if (value != null) {</span>
+      try {
+<span class="fc" id="L114">        return get(value.getClass()).getRawBytes(value);</span>
+<span class="nc" id="L115">      } catch (IOException e) {</span>
+<span class="nc" id="L116">        throw new RuntimeException(&quot;Error while serializing object.&quot;, e);</span>
+      }
+    }
+<span class="fc" id="L119">    return new byte[] {PropertyValue.TYPE_NULL};</span>
+  }
+
+  /**
+   * Returns strategy mapping to the provided byte value.
+   *
+   * @param value representing a data type.
+   * @return strategy class.
+   * @throws UnsupportedTypeException when there is no matching strategy for a given type byte.
+   */
+  public static PropertyValueStrategy get(byte value) throws UnsupportedTypeException {
+<span class="fc" id="L130">    PropertyValueStrategy strategy = INSTANCE.byteStrategyMap[value];</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">    if (strategy == null) {</span>
+<span class="nc" id="L132">      throw new UnsupportedTypeException(&quot;No strategy for type byte &quot; + value);</span>
+    }
+
+<span class="fc" id="L135">    return strategy;</span>
+  }
+
+  /**
+   * Get a strategy which corresponds the provided class. If there is no mapping for the provided
+   * class in the class-strategy map, or the value of the parameter is {@code null}, an instance of
+   * {@link NullStrategy} is returned.
+   *
+   * @param clazz some class
+   * @return strategy class which is able to handle the provided type.
+   * @throws UnsupportedTypeException when there is no matching strategy for the given class.
+   */
+  public static PropertyValueStrategy get(Class clazz) throws UnsupportedTypeException {
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">    if (clazz == null) {</span>
+<span class="nc" id="L149">      return INSTANCE.nullStrategy;</span>
+    }
+
+<span class="fc" id="L152">    PropertyValueStrategy strategy = INSTANCE.classStrategyMap.get(clazz);</span>
+    // class could be some implementation of List/Map/Set that we don't register in the class-
+    // strategy map, so we need to check for that.
+<span class="fc bfc" id="L155" title="All 2 branches covered.">    if (strategy == null) {</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">      if (Map.class.isAssignableFrom(clazz)) {</span>
+<span class="fc" id="L157">        strategy = INSTANCE.classStrategyMap.get(Map.class);</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">      } else if (Set.class.isAssignableFrom(clazz)) {</span>
+<span class="fc" id="L159">        strategy = INSTANCE.classStrategyMap.get(Set.class);</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">      } else if (List.class.isAssignableFrom(clazz)) {</span>
+<span class="fc" id="L161">        strategy = INSTANCE.classStrategyMap.get(List.class);</span>
+      }
+    }
+<span class="fc bfc" id="L164" title="All 2 branches covered.">    if (strategy == null) {</span>
+<span class="fc" id="L165">      throw new UnsupportedTypeException(&quot;No strategy for class &quot; + clazz);</span>
+    }
+
+<span class="fc" id="L168">    return strategy;</span>
+  }
+
+  /**
+   * Get strategy by object.
+   *
+   * @param value some object.
+   * @return strategy that handles operations on the provided object type. If value is {@code null},
+   * {@link NullStrategy} is returned.
+   * @throws UnsupportedTypeException when there is no matching strategy for a given object.
+   */
+  public static PropertyValueStrategy get(Object value) throws UnsupportedTypeException {
+<span class="fc bfc" id="L180" title="All 2 branches covered.">    if (value != null) {</span>
+<span class="fc" id="L181">      PropertyValueStrategy strategy = get(value.getClass());</span>
+<span class="pc bpc" id="L182" title="1 of 2 branches missed.">      if (strategy == null) {</span>
+<span class="nc" id="L183">        throw new UnsupportedTypeException(&quot;No strategy for class &quot; + value.getClass());</span>
+      }
+<span class="fc" id="L185">      return get(value.getClass());</span>
+    }
+<span class="fc" id="L187">    return INSTANCE.nullStrategy;</span>
+  }
+
+  /**
+   * Initializes class-strategy mapping.
+   *
+   * @return Map of supported class-strategy associations.
+   */
+  private Map&lt;Class, PropertyValueStrategy&gt; initClassStrategyMap() {
+<span class="fc" id="L196">    Map&lt;Class, PropertyValueStrategy&gt; classMapping = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L197">    classMapping.put(Boolean.class, new BooleanStrategy());</span>
+<span class="fc" id="L198">    classMapping.put(Set.class, new SetStrategy());</span>
+<span class="fc" id="L199">    classMapping.put(Integer.class, new IntegerStrategy());</span>
+<span class="fc" id="L200">    classMapping.put(Long.class, new LongStrategy());</span>
+<span class="fc" id="L201">    classMapping.put(Float.class, new FloatStrategy());</span>
+<span class="fc" id="L202">    classMapping.put(Double.class, new DoubleStrategy());</span>
+<span class="fc" id="L203">    classMapping.put(Short.class, new ShortStrategy());</span>
+<span class="fc" id="L204">    classMapping.put(BigDecimal.class, new BigDecimalStrategy());</span>
+<span class="fc" id="L205">    classMapping.put(LocalDate.class, new DateStrategy());</span>
+<span class="fc" id="L206">    classMapping.put(LocalTime.class, new TimeStrategy());</span>
+<span class="fc" id="L207">    classMapping.put(LocalDateTime.class, new DateTimeStrategy());</span>
+<span class="fc" id="L208">    classMapping.put(GradoopId.class, new GradoopIdStrategy());</span>
+<span class="fc" id="L209">    classMapping.put(String.class, new StringStrategy());</span>
+<span class="fc" id="L210">    classMapping.put(List.class, new ListStrategy());</span>
+<span class="fc" id="L211">    classMapping.put(Map.class, new MapStrategy());</span>
+
+<span class="fc" id="L213">    return Collections.unmodifiableMap(classMapping);</span>
+  }
+
+  /**
+   * Initializes byte-strategy mapping.
+   *
+   * @return Array containing PropertyValueStrategies with their respective type byte as index.
+   */
+  private PropertyValueStrategy[] initByteStrategyMap() {
+<span class="fc" id="L222">    PropertyValueStrategy[] byteMapping = new PropertyValueStrategy[classStrategyMap.size() + 1];</span>
+<span class="fc bfc" id="L223" title="All 2 branches covered.">    for (PropertyValueStrategy strategy : classStrategyMap.values()) {</span>
+<span class="fc" id="L224">      byteMapping[strategy.getRawType()] = strategy;</span>
+<span class="fc" id="L225">    }</span>
+<span class="fc" id="L226">    byteMapping[nullStrategy.getRawType()] = nullStrategy;</span>
+
+<span class="fc" id="L228">    return byteMapping;</span>
+
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

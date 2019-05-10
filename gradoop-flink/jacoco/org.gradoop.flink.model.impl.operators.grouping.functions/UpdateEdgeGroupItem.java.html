@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UpdateEdgeGroupItem.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.grouping.functions</a> &gt; <span class="el_source">UpdateEdgeGroupItem.java</span></div><h1>UpdateEdgeGroupItem.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.grouping.functions;
+
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
+
+/**
+ * Takes a projected edge and an (vertex-id, group-representative) tuple
+ * and replaces the edge-target-id with the group-representative.
+ */
+public class UpdateEdgeGroupItem
+  implements JoinFunction&lt;EdgeGroupItem, VertexWithSuperVertex, EdgeGroupItem&gt; {
+  /**
+   * Field in {@link EdgeGroupItem} which is overridden by the group representative id.
+   */
+  private final int field;
+  /**
+   * Creates new join function.
+   *
+   * @param field field that is overridden by the group representative
+   */
+<span class="fc" id="L37">  public UpdateEdgeGroupItem(int field) {</span>
+<span class="fc" id="L38">    this.field = field;</span>
+<span class="fc" id="L39">  }</span>
+
+  @Override
+  public EdgeGroupItem join(EdgeGroupItem edge, VertexWithSuperVertex idTuple) throws Exception {
+<span class="fc" id="L43">    edge.setField(idTuple.getSuperVertexId(), field);</span>
+<span class="fc" id="L44">    return edge;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

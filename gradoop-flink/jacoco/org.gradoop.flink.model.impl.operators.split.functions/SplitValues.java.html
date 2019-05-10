@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SplitValues.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.split.functions</a> &gt; <span class="el_source">SplitValues.java</span></div><h1>SplitValues.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.split.functions;
+
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.functions.Function;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Maps the vertices to pairs, where each pair contains the vertex id and one
+ * split value. The split values are determined using a user defined function.
+ *
+ * @param &lt;V&gt; EPGM vertex type
+ */
+@FunctionAnnotation.ForwardedFields(&quot;id-&gt;f0&quot;)
+@FunctionAnnotation.ReadFields(&quot;properties&quot;)
+public class SplitValues&lt;V extends Vertex&gt;
+  implements FlatMapFunction&lt;V, Tuple2&lt;GradoopId, PropertyValue&gt;&gt; {
+  /**
+   * Self defined Function
+   */
+  private Function&lt;V, List&lt;PropertyValue&gt;&gt; function;
+
+  /**
+   * Constructor
+   *
+   * @param function user-defined function to determine split values
+   */
+<span class="fc" id="L51">  public SplitValues(Function&lt;V, List&lt;PropertyValue&gt;&gt; function) {</span>
+<span class="fc" id="L52">    this.function = checkNotNull(function);</span>
+<span class="fc" id="L53">  }</span>
+
+  @Override
+  public void flatMap(V vertex,
+    Collector&lt;Tuple2&lt;GradoopId, PropertyValue&gt;&gt; collector) throws Exception {
+<span class="fc" id="L58">    List&lt;PropertyValue&gt; splitValues = function.apply(vertex);</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">    for (PropertyValue value : splitValues) {</span>
+<span class="fc" id="L60">      collector.collect(new Tuple2&lt;&gt;(vertex.getId(), value));</span>
+<span class="fc" id="L61">    }</span>
+<span class="fc" id="L62">  }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

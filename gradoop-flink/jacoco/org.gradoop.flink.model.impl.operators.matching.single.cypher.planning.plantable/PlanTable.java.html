@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PlanTable.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable</a> &gt; <span class="el_source">PlanTable.java</span></div><h1>PlanTable.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable;
+
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
+
+/**
+ * A data structure to manage multiple query plans. Each {@link QueryPlan} is represented by a
+ * {@link PlanTableEntry}.
+ */
+public class PlanTable implements Iterable&lt;PlanTableEntry&gt; {
+  /**
+   * Entries of this plan table
+   */
+  private List&lt;PlanTableEntry&gt; planTableEntries;
+
+  /**
+   * Creates a new plan table
+   */
+<span class="fc" id="L40">  public PlanTable() {</span>
+<span class="fc" id="L41">    planTableEntries = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L42">  }</span>
+
+  /**
+   * Adds a {@link PlanTableEntry} to the plan table.
+   *
+   * @param planTableEntry entry
+   */
+  public void add(PlanTableEntry planTableEntry) {
+<span class="fc" id="L50">    planTableEntries.add(planTableEntry);</span>
+<span class="fc" id="L51">  }</span>
+
+  /**
+   * Returns the entry at the specified position.
+   *
+   * @param index position in the plan table
+   * @return entry at specified position
+   */
+  public PlanTableEntry get(int index) {
+<span class="fc" id="L60">    return planTableEntries.get(index);</span>
+  }
+
+  /**
+   * Removes all entries from the table whose query plans are covered by the query plan wrapped by
+   * the specified entry.
+   *
+   * @param planTableEntry entry
+   */
+  public void removeCoveredBy(PlanTableEntry planTableEntry) {
+<span class="fc" id="L70">    planTableEntries = planTableEntries.stream()</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">      .filter(e -&gt; !planTableEntry.getProcessedVariables().containsAll(e.getProcessedVariables()))</span>
+<span class="fc" id="L72">      .collect(Collectors.toList());</span>
+<span class="fc" id="L73">  }</span>
+
+  /**
+   * Returns the entry that represents the query plan with the minimum among all plans stored in
+   * this table.
+   *
+   * @return query plan with minimum cost
+   */
+  public PlanTableEntry min() {
+<span class="fc" id="L82">    return planTableEntries.stream()</span>
+<span class="fc" id="L83">      .sorted(Comparator.comparingLong(PlanTableEntry::getEstimatedCardinality))</span>
+<span class="fc" id="L84">      .findFirst()</span>
+<span class="fc" id="L85">      .orElseThrow(NoSuchElementException::new);</span>
+  }
+
+  /**
+   * Returns the number of entries in the table.
+   *
+   * @return number of entries
+   */
+  public int size() {
+<span class="fc" id="L94">    return planTableEntries.size();</span>
+  }
+
+  @Override
+  public Iterator&lt;PlanTableEntry&gt; iterator() {
+<span class="fc" id="L99">    return planTableEntries.iterator();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

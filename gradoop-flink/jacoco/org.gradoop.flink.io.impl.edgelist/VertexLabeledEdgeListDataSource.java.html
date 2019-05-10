@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VertexLabeledEdgeListDataSource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.edgelist</a> &gt; <span class="el_source">VertexLabeledEdgeListDataSource.java</span></div><h1>VertexLabeledEdgeListDataSource.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.edgelist;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple4;
+import org.apache.flink.api.java.utils.DataSetUtils;
+import org.gradoop.flink.io.impl.edgelist.functions.CreateImportEdge;
+import org.gradoop.flink.io.impl.edgelist.functions.CreateLabeledImportVertex;
+import org.gradoop.flink.io.impl.graph.GraphDataSource;
+import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
+import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.IOException;
+
+/**
+ * Data source to create a {@link LogicalGraph} from an edge list. Vertices are annotated with a
+ * string label/value, e.g.
+ *
+ * 0 EN 1 ZH
+ * 2 DE 0 EN
+ *
+ * The example line denotes an edge between two vertices:
+ * First edge:
+ * source: with id = 0 and vertex value &quot;EN&quot; and
+ * target: with id = 1 and vertex value &quot;ZH&quot;.
+ *
+ * Second edge:
+ * source: with id = 2 and vertex value &quot;DE&quot; and
+ * target: with id = 0 and vertex value &quot;EN&quot;.
+ *
+ * This data source implementation will create a logical graph based on the specified edge list. The
+ * resulting vertices will have a user-defined property that stores the label/value. The type of
+ * that value will be string.
+ */
+public class VertexLabeledEdgeListDataSource extends EdgeListDataSource {
+  /**
+   * property key which should be used for storing the property information
+   */
+  private String propertyKey;
+
+  /**
+   * Creates a new data source. Paths can be local (file://) or HDFS (hdfs://).
+   *
+   * @param edgeListPath    Path to edge list file
+   * @param tokenSeparator  Separator token
+   * @param propertyKey     Property key for storing the vertex value
+   * @param config          Gradoop Flink configuration
+   */
+  public VertexLabeledEdgeListDataSource(String edgeListPath, String tokenSeparator,
+    String propertyKey,
+    GradoopFlinkConfig config) {
+<span class="fc" id="L72">    super(edgeListPath, tokenSeparator, config);</span>
+<span class="fc" id="L73">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L74">  }</span>
+
+
+  @Override
+  public LogicalGraph getLogicalGraph() throws IOException {
+<span class="fc" id="L79">    return getGraphCollection().reduce(new ReduceCombination());</span>
+  }
+
+  @Override
+  public GraphCollection getGraphCollection() throws IOException {
+
+<span class="fc" id="L85">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
+
+    //--------------------------------------------------------------------------
+    // generate tuple that contains all information
+    //--------------------------------------------------------------------------
+
+<span class="fc" id="L91">    DataSet&lt;Tuple4&lt;Long, String, Long, String&gt;&gt; lineTuples = env</span>
+<span class="fc" id="L92">      .readCsvFile(getEdgeListPath())</span>
+<span class="fc" id="L93">      .fieldDelimiter(getTokenSeparator())</span>
+<span class="fc" id="L94">      .types(Long.class, String.class, Long.class, String.class);</span>
+
+    //--------------------------------------------------------------------------
+    // generate vertices
+    //--------------------------------------------------------------------------
+
+<span class="fc" id="L100">    DataSet&lt;ImportVertex&lt;Long&gt;&gt; importVertices = lineTuples</span>
+<span class="fc" id="L101">      .&lt;Tuple2&lt;Long, String&gt;&gt;project(0, 1)</span>
+<span class="fc" id="L102">      .union(lineTuples.&lt;Tuple2&lt;Long, String&gt;&gt;project(2, 3))</span>
+<span class="fc" id="L103">      .distinct(0)</span>
+<span class="fc" id="L104">      .map(new CreateLabeledImportVertex&lt;&gt;(propertyKey));</span>
+
+    //--------------------------------------------------------------------------
+    // generate edges
+    //--------------------------------------------------------------------------
+
+<span class="fc" id="L110">    DataSet&lt;ImportEdge&lt;Long&gt;&gt; importEdges = DataSetUtils</span>
+<span class="fc" id="L111">      .zipWithUniqueId(lineTuples.&lt;Tuple2&lt;Long, Long&gt;&gt;project(0, 2))</span>
+<span class="fc" id="L112">      .map(new CreateImportEdge&lt;&gt;());</span>
+
+    //--------------------------------------------------------------------------
+    // create graph data source
+    //--------------------------------------------------------------------------
+
+<span class="fc" id="L118">    return new GraphDataSource&lt;&gt;(importVertices, importEdges, getConfig())</span>
+<span class="fc" id="L119">      .getGraphCollection();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

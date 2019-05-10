@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropertyValueList.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.properties</a> &gt; <span class="el_source">PropertyValueList.java</span></div><h1>PropertyValueList.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.properties;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataInputViewStreamWrapper;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
+import org.apache.flink.types.Value;
+import org.apache.hadoop.hbase.util.Bytes;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+
+/**
+ * Represents a list of property values.
+ */
+public class PropertyValueList
+  implements Iterable&lt;PropertyValue&gt;, Serializable, Value, Comparable&lt;PropertyValueList&gt; {
+
+  /**
+   * Class version for serialization.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Property values are stored in their byte representation.
+   */
+  private byte[] bytes;
+
+  /**
+   * Default constructor (used for (de-)serialization.
+   */
+<span class="fc" id="L55">  public PropertyValueList() {</span>
+<span class="fc" id="L56">  }</span>
+
+  /**
+   * Creates a value list from the given bytes.
+   *
+   * @param bytes byte representation
+   */
+<span class="fc" id="L63">  private PropertyValueList(byte[] bytes) {</span>
+<span class="fc" id="L64">    this.bytes = bytes;</span>
+<span class="fc" id="L65">  }</span>
+
+  /**
+   * Creates a new property value list containing no elements.
+   *
+   * @return empty property value list
+   */
+  public static PropertyValueList createEmptyList() {
+<span class="nc" id="L73">    return new PropertyValueList(new byte[0]);</span>
+  }
+
+  /**
+   * Creates a Property value list from a collection of property values.
+   *
+   * @param propertyValues property values
+   * @return property value list containing the given properties
+   * @throws IOException on failure
+   */
+  public static PropertyValueList fromPropertyValues(
+    Collection&lt;PropertyValue&gt; propertyValues) throws IOException {
+
+<span class="fc" id="L86">    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();</span>
+<span class="fc" id="L87">    DataOutputStream outputStream = new DataOutputStream(byteStream);</span>
+<span class="fc" id="L88">    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);</span>
+
+<span class="fc bfc" id="L90" title="All 2 branches covered.">    for (PropertyValue propertyValue : propertyValues) {</span>
+<span class="fc" id="L91">      propertyValue.write(outputView);</span>
+<span class="fc" id="L92">    }</span>
+
+<span class="fc" id="L94">    outputStream.flush();</span>
+<span class="fc" id="L95">    return new PropertyValueList(byteStream.toByteArray());</span>
+  }
+
+  @Override
+  public boolean equals(Object o) {
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L101">      return true;</span>
+    }
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">    if (!(o instanceof PropertyValueList)) {</span>
+<span class="nc" id="L104">      return false;</span>
+    }
+<span class="fc" id="L106">    PropertyValueList that = (PropertyValueList) o;</span>
+<span class="fc" id="L107">    return Arrays.equals(bytes, that.bytes);</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="fc" id="L112">    return Arrays.hashCode(bytes);</span>
+  }
+
+  @Override
+  public Iterator&lt;PropertyValue&gt; iterator() {
+<span class="fc" id="L117">    return new PropertyValueListIterator(bytes);</span>
+  }
+
+  @Override
+  public void write(DataOutputView dataOutput) throws IOException {
+<span class="fc" id="L122">    dataOutput.writeShort(bytes.length);</span>
+<span class="fc" id="L123">    dataOutput.write(bytes);</span>
+<span class="fc" id="L124">  }</span>
+
+  @Override
+  public void read(DataInputView dataInput) throws IOException {
+<span class="fc" id="L128">    bytes = new byte[dataInput.readShort()];</span>
+<span class="fc" id="L129">    dataInput.readFully(bytes);</span>
+<span class="fc" id="L130">  }</span>
+
+  @Override
+  public int compareTo(PropertyValueList o) {
+<span class="fc" id="L134">    return Bytes.compareTo(bytes, o.bytes);</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L139">    return StringUtils.join(iterator(), ',');</span>
+  }
+
+  /**
+   * Used to iterate over the stored values.
+   */
+  private static class PropertyValueListIterator implements Iterator&lt;PropertyValue&gt; {
+
+    /**
+     * Used to wrap the byte array of PropertyValueList
+     */
+    private final ByteArrayInputStream byteStream;
+
+    /**
+     * Wraps the {@code byteStream} and is used to access the {@code read}
+     * method of PropertyValue.
+     */
+    private final DataInputStream inputStream;
+
+    /**
+     * Creates new iterator
+     *
+     * @param rawBytes property value list byte representation
+     */
+<span class="fc" id="L163">    PropertyValueListIterator(byte[] rawBytes) {</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">      if (rawBytes == null) {</span>
+<span class="fc" id="L165">        rawBytes = new byte[0];</span>
+      }
+<span class="fc" id="L167">      byteStream = new ByteArrayInputStream(rawBytes);</span>
+<span class="fc" id="L168">      inputStream = new DataInputStream(byteStream);</span>
+<span class="fc" id="L169">    }</span>
+
+    @Override
+    public boolean hasNext() {
+      boolean hasNext;
+<span class="fc bfc" id="L174" title="All 2 branches covered.">      if (byteStream.available() &gt; 0) {</span>
+<span class="fc" id="L175">        hasNext = true;</span>
+      } else {
+        // close the stream if no more data is available
+        try {
+<span class="fc" id="L179">          inputStream.close();</span>
+<span class="nc" id="L180">        } catch (IOException e) {</span>
+<span class="nc" id="L181">          e.printStackTrace();</span>
+<span class="fc" id="L182">        }</span>
+<span class="fc" id="L183">        hasNext = false;</span>
+      }
+<span class="fc" id="L185">      return hasNext;</span>
+    }
+
+    @Override
+    public PropertyValue next() {
+<span class="fc" id="L190">      PropertyValue nextValue = new PropertyValue();</span>
+      try {
+<span class="fc" id="L192">        DataInputView inputView = new DataInputViewStreamWrapper(inputStream);</span>
+<span class="fc" id="L193">        nextValue.read(inputView);</span>
+<span class="nc" id="L194">      } catch (IOException e) {</span>
+<span class="nc" id="L195">        e.printStackTrace();</span>
+<span class="fc" id="L196">      }</span>
+<span class="fc" id="L197">      return nextValue;</span>
+    }
+
+    @Override
+    public void remove() {
+<span class="nc" id="L202">    }</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

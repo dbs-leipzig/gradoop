@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CanonicalLabeler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization</a> &gt; <span class="el_source">CanonicalLabeler.java</span></div><h1>CanonicalLabeler.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.apache.commons.lang.StringUtils;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.Embedding;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Creates a canonical label for a given graph embedding that represents its
+ * adjacency matrix.
+ */
+public class CanonicalLabeler implements Serializable {
+
+  /**
+   * separator among adjacency lists
+   */
+  private static final char NEW_LIST = '|';
+  /**
+   * separator among vertex label and adjacency list entries
+   */
+  private static final char LIST_START = ':';
+  /**
+   * separator among adjacency list entries
+   */
+  private static final char NEW_ENTRY = ',';
+  /**
+   * edge separator indicating an outgoing edge
+   */
+  private static final char OUTGOING_EDGE = '&gt;';
+  /**
+   * edge separator indicating an incoming edge
+   */
+  private static final char INCOMING_EDGE = '&lt;';
+  /**
+   * edge separator indicating an undirected edge
+   */
+  private static final char UNDIRECTED_EDGE = '-';
+
+  /**
+   * true, if the label should represent directed graphs,
+   * false, otherwise
+   */
+  private final boolean directed;
+
+  /**
+   * Constructor.
+   *
+   * @param directed true for directed mode
+   */
+<span class="fc" id="L73">  public CanonicalLabeler(boolean directed) {</span>
+<span class="fc" id="L74">    this.directed = directed;</span>
+<span class="fc" id="L75">  }</span>
+
+  /**
+   * Creates a canonical subgraph graph label
+   *
+   * @param embedding subgraph
+   *
+   * @return canonical label
+   */
+  public String label(Embedding embedding) {
+
+<span class="fc" id="L86">    Map&lt;Integer, String&gt; vertices = embedding.getVertices();</span>
+<span class="fc" id="L87">    Map&lt;Integer, FSMEdge&gt; edges = embedding.getEdges();</span>
+
+<span class="fc" id="L89">    Map&lt;Integer, Map&lt;Integer, Set&lt;Integer&gt;&gt;&gt; adjacencyMatrix =</span>
+<span class="fc" id="L90">      createAdjacencyMatrix(vertices, edges);</span>
+
+<span class="fc" id="L92">    List&lt;String&gt; adjacencyListLabels =</span>
+<span class="fc" id="L93">      Lists.newArrayListWithCapacity(vertices.size());</span>
+
+    // for each vertex
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    for (Map.Entry&lt;Integer, String&gt; vertex : vertices.entrySet()) {</span>
+
+<span class="fc" id="L98">      int vertexId = vertex.getKey();</span>
+<span class="fc" id="L99">      String adjacencyListLabel = vertex.getValue() + LIST_START;</span>
+
+<span class="fc" id="L101">      Map&lt;Integer, Set&lt;Integer&gt;&gt; adjacencyList = adjacencyMatrix.get(vertexId);</span>
+
+<span class="fc" id="L103">      List&lt;String&gt; entryLabels =</span>
+<span class="fc" id="L104">        Lists.newArrayListWithCapacity(adjacencyList.size());</span>
+
+      // for each adjacent vertex
+<span class="fc bfc" id="L107" title="All 2 branches covered.">      for (Map.Entry&lt;Integer, Set&lt;Integer&gt;&gt; entry : adjacencyList.entrySet()) {</span>
+
+<span class="fc" id="L109">        int adjacentVertexId = entry.getKey();</span>
+<span class="fc" id="L110">        String entryLabel = vertices.get(adjacentVertexId);</span>
+
+        // for each edge
+<span class="fc" id="L113">        Set&lt;Integer&gt; incidentEdgeIds = entry.getValue();</span>
+
+<span class="fc bfc" id="L115" title="All 2 branches covered.">        if (incidentEdgeIds.size() == 1) {</span>
+<span class="fc" id="L116">          FSMEdge incidentEdge = edges.get(incidentEdgeIds.iterator().next());</span>
+
+<span class="fc" id="L118">          entryLabel += format(incidentEdge, vertexId);</span>
+
+<span class="fc" id="L120">        } else {</span>
+
+<span class="fc" id="L122">          List&lt;String&gt; incidentEdges =</span>
+<span class="fc" id="L123">            Lists.newArrayListWithExpectedSize(incidentEdgeIds.size());</span>
+
+<span class="fc bfc" id="L125" title="All 2 branches covered.">          for (int incidentEdgeId : incidentEdgeIds) {</span>
+<span class="fc" id="L126">            incidentEdges.add(format(edges.get(incidentEdgeId), vertexId));</span>
+<span class="fc" id="L127">          }</span>
+
+<span class="fc" id="L129">          Collections.sort(incidentEdges);</span>
+<span class="fc" id="L130">          entryLabel += StringUtils.join(incidentEdges, &quot;&quot;);</span>
+        }
+
+<span class="fc" id="L133">        entryLabels.add(entryLabel);</span>
+<span class="fc" id="L134">      }</span>
+
+<span class="fc" id="L136">      Collections.sort(entryLabels);</span>
+<span class="fc" id="L137">      adjacencyListLabel += StringUtils.join(entryLabels, NEW_ENTRY);</span>
+<span class="fc" id="L138">      adjacencyListLabels.add(adjacencyListLabel);</span>
+<span class="fc" id="L139">    }</span>
+
+<span class="fc" id="L141">    Collections.sort(adjacencyListLabels);</span>
+<span class="fc" id="L142">    return StringUtils.join(adjacencyListLabels, NEW_LIST);</span>
+  }
+
+  /**
+   * Creates an adjacency matrix.
+   *
+   * @param vertices vertices
+   * @param edges edges
+   * @return adjacency matrix
+   */
+  private Map&lt;Integer, Map&lt;Integer, Set&lt;Integer&gt;&gt;&gt; createAdjacencyMatrix(
+    Map&lt;Integer, String&gt; vertices, Map&lt;Integer, FSMEdge&gt; edges) {
+
+<span class="fc" id="L155">    Map&lt;Integer, Map&lt;Integer, Set&lt;Integer&gt;&gt;&gt; adjacencyMatrix =</span>
+<span class="fc" id="L156">      Maps.newHashMapWithExpectedSize(vertices.size());</span>
+
+<span class="fc bfc" id="L158" title="All 2 branches covered.">    for (Map.Entry&lt;Integer, FSMEdge&gt; edgeEntry : edges.entrySet()) {</span>
+
+<span class="fc" id="L160">      int edgeId = edgeEntry.getKey();</span>
+<span class="fc" id="L161">      FSMEdge edge = edgeEntry.getValue();</span>
+
+<span class="fc" id="L163">      int sourceId = edge.getSourceId();</span>
+<span class="fc" id="L164">      int targetId = edge.getTargetId();</span>
+
+<span class="fc" id="L166">      addAdjacencyMatrixEntry(adjacencyMatrix, sourceId, edgeId, targetId);</span>
+
+<span class="fc bfc" id="L168" title="All 2 branches covered.">      if (sourceId != targetId) {</span>
+<span class="fc" id="L169">        addAdjacencyMatrixEntry(adjacencyMatrix, targetId, edgeId, sourceId);</span>
+      }
+<span class="fc" id="L171">    }</span>
+
+<span class="fc" id="L173">    return adjacencyMatrix;</span>
+  }
+
+  /**
+   * Adds an entry to an adjacency matrix.
+   *
+   * @param adjacencyMatrix adjacency matrix
+   * @param vertexId id of the vertex the entry should be added to
+   * @param incidentEdgeId incident edge id
+   * @param adjacentVertexId adjacent vertex id
+   */
+  private void addAdjacencyMatrixEntry(
+    Map&lt;Integer, Map&lt;Integer, Set&lt;Integer&gt;&gt;&gt; adjacencyMatrix,
+    int vertexId, int incidentEdgeId, int adjacentVertexId) {
+
+    // create entry for target to source
+<span class="fc" id="L189">    Map&lt;Integer, Set&lt;Integer&gt;&gt; adjacencyList = adjacencyMatrix.get(vertexId);</span>
+
+    // first visit of this vertex
+<span class="fc bfc" id="L192" title="All 2 branches covered.">    if (adjacencyList == null) {</span>
+
+      // create target map
+<span class="fc" id="L195">      adjacencyList = Maps.newHashMap();</span>
+<span class="fc" id="L196">      adjacencyMatrix.put(vertexId, adjacencyList);</span>
+    }
+
+<span class="fc" id="L199">    Set&lt;Integer&gt; incidentEdgeIds = adjacencyList.get(adjacentVertexId);</span>
+
+    // first edge connecting to other vertex
+<span class="fc bfc" id="L202" title="All 2 branches covered.">    if (incidentEdgeIds == null) {</span>
+<span class="fc" id="L203">      adjacencyList.put(adjacentVertexId, Sets.newHashSet(incidentEdgeId));</span>
+    } else {
+<span class="fc" id="L205">      incidentEdgeIds.add(incidentEdgeId);</span>
+    }
+<span class="fc" id="L207">  }</span>
+
+  /**
+   * Formats an edge in an adjacency list entry.
+   *
+   * @param edge edge
+   * @param adjacencyListVertexId vertex id of the related adjacency list
+   *
+   * @return string representation
+   */
+  private String format(FSMEdge edge, int adjacencyListVertexId) {
+
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">    char edgeChar = directed ?</span>
+<span class="pc bfc" id="L220" title="All 2 branches covered.">      (edge.getSourceId() == adjacencyListVertexId ?</span>
+        OUTGOING_EDGE : INCOMING_EDGE
+      ) :
+      UNDIRECTED_EDGE;
+
+<span class="fc" id="L225">    return edgeChar + edge.getLabel();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BooleanStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.properties.strategies</a> &gt; <span class="el_source">BooleanStrategy.java</span></div><h1>BooleanStrategy.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.properties.strategies;
+
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.hadoop.hbase.util.Bytes;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.io.IOException;
+
+/**
+ * Strategy class for handling {@code PropertyValue} operations with a value of the type
+ * {@code Boolean}.
+ */
+<span class="fc" id="L28">public class BooleanStrategy extends AbstractFixSizedPropertyValueStrategy&lt;Boolean&gt; {</span>
+
+  @Override
+  public Boolean read(DataInputView inputView, byte typeByte) throws IOException {
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">    return inputView.readByte() == -1;</span>
+  }
+
+  @Override
+  public int compare(Boolean value, Object other) {
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">    if (other.getClass() == Boolean.class) {</span>
+<span class="fc" id="L38">      return Boolean.compare(value, (boolean) other);</span>
+    }
+<span class="nc" id="L40">    throw new IllegalArgumentException(String.format(</span>
+<span class="nc" id="L41">      &quot;Incompatible types: %s, %s&quot;, value.getClass(), other.getClass()));</span>
+  }
+
+  @Override
+  public boolean is(Object value) {
+<span class="fc" id="L46">    return value instanceof Boolean;</span>
+  }
+
+  @Override
+  public Class&lt;Boolean&gt; getType() {
+<span class="fc" id="L51">    return Boolean.class;</span>
+  }
+
+  @Override
+  public Boolean get(byte[] bytes) {
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">    return bytes[1] == -1;</span>
+  }
+
+  @Override
+  public byte getRawType() {
+<span class="fc" id="L61">    return PropertyValue.TYPE_BOOLEAN;</span>
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * Warning: Please note that if {@code null} is passed as an argument, it is going to be evaluated
+   * as if it was false.
+   */
+  @Override
+  public byte[] getRawBytes(Boolean value) {
+<span class="fc" id="L72">    byte[] rawBytes = new byte[PropertyValue.OFFSET + Bytes.SIZEOF_BOOLEAN];</span>
+<span class="fc" id="L73">    rawBytes[0] = getRawType();</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">    Bytes.putByte(rawBytes, PropertyValue.OFFSET, (byte) (value ? -1 : 0));</span>
+<span class="fc" id="L75">    return rawBytes;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

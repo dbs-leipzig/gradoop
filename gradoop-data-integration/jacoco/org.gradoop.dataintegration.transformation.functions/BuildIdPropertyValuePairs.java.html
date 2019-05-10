@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BuildIdPropertyValuePairs.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation.functions</a> &gt; <span class="el_source">BuildIdPropertyValuePairs.java</span></div><h1>BuildIdPropertyValuePairs.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation.functions;
+
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.util.Objects;
+
+/**
+ * A simple {@link FlatMapFunction} that prepares element data for further processing.
+ * Since not all elements necessarily have the property a flat map is used.
+ *
+ * @param &lt;E&gt; The element type.
+ */
+public class BuildIdPropertyValuePairs&lt;E extends EPGMElement&gt;
+  implements FlatMapFunction&lt;E, Tuple2&lt;GradoopId, PropertyValue&gt;&gt; {
+
+  /**
+   * The label of elements from which to propagate the property.
+   */
+  private final String label;
+
+  /**
+   * The property key of the property to propagate.
+   */
+  private final String propertyKey;
+
+  /**
+   * Reduce object instantiations.
+   */
+  private final Tuple2&lt;GradoopId, PropertyValue&gt; reuse;
+
+  /**
+   * The constructor of the {@link FlatMapFunction} to create {@link GradoopId} /
+   * {@link PropertyValue} pairs.
+   *
+   * @param label       The label of the elements to propagate from.
+   * @param propertyKey The property key of the property to propagate.
+   */
+<span class="fc" id="L58">  public BuildIdPropertyValuePairs(String label, String propertyKey) {</span>
+<span class="fc" id="L59">    this.label = Objects.requireNonNull(label);</span>
+<span class="fc" id="L60">    this.propertyKey = Objects.requireNonNull(propertyKey);</span>
+<span class="fc" id="L61">    this.reuse = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L62">  }</span>
+
+  @Override
+  public void flatMap(E element, Collector&lt;Tuple2&lt;GradoopId, PropertyValue&gt;&gt; out) {
+<span class="fc bfc" id="L66" title="All 4 branches covered.">    if (!label.equals(element.getLabel()) || !element.hasProperty(propertyKey)) {</span>
+<span class="fc" id="L67">      return;</span>
+    }
+<span class="fc" id="L69">    reuse.f0 = element.getId();</span>
+<span class="fc" id="L70">    reuse.f1 = element.getPropertyValue(propertyKey);</span>
+<span class="fc" id="L71">    out.collect(reuse);</span>
+<span class="fc" id="L72">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

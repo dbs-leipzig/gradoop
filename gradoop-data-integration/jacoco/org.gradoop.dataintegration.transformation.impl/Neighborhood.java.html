@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Neighborhood.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation.impl</a> &gt; <span class="el_source">Neighborhood.java</span></div><h1>Neighborhood.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation.impl;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.dataintegration.transformation.functions.CreateNeighborList;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * This class contains everything related to the neighborhood of vertices.
+ * A vertex pojo, edge direction and a method to calculate the neighborhood of all vertices.
+ */
+<span class="nc" id="L34">public class Neighborhood {</span>
+
+  /**
+   * This methods returns a {@link DataSet} containing a tuple where the first part is a vertex
+   * and the second one a list of all neighbors of this vertex. The vertices are derived from the
+   * centralVertices DataSet while the List elements are taken from the graph.
+   *
+   * @param graph A Graph the operation is executed on.
+   * @param centralVertices The vertices the neighborhood should be calculated for.
+   * @param edgeDirection The relevant direction for neighbors.
+   * @return A Dataset of tuples containing vertices and their neighborhood.
+   * @throws NullPointerException if any of the parameters is null.
+   */
+  public static DataSet&lt;Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; getPerVertex(LogicalGraph graph,
+                 DataSet&lt;Vertex&gt; centralVertices, EdgeDirection edgeDirection) {
+<span class="fc" id="L49">    Objects.requireNonNull(graph);</span>
+<span class="fc" id="L50">    Objects.requireNonNull(centralVertices);</span>
+<span class="fc" id="L51">    Objects.requireNonNull(edgeDirection);</span>
+<span class="fc" id="L52">    DataSet&lt;Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; incoming = null;</span>
+<span class="fc" id="L53">    DataSet&lt;Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; outgoing = null;</span>
+
+    // get incoming
+<span class="fc bfc" id="L56" title="All 2 branches covered.">    if (edgeDirection.equals(EdgeDirection.INCOMING) ||</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">      edgeDirection.equals(EdgeDirection.UNDIRECTED)) {</span>
+<span class="fc" id="L58">      incoming = graph.getEdges()</span>
+<span class="fc" id="L59">        .coGroup(centralVertices)</span>
+<span class="fc" id="L60">        .where(new TargetId&lt;&gt;())</span>
+<span class="fc" id="L61">        .equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L62">        .with(new CreateNeighborList(edgeDirection));</span>
+    }
+
+    // get outgoing
+<span class="fc bfc" id="L66" title="All 2 branches covered.">    if (edgeDirection.equals(EdgeDirection.OUTGOING) ||</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">      edgeDirection.equals(EdgeDirection.UNDIRECTED)) {</span>
+<span class="fc" id="L68">      outgoing = graph.getEdges()</span>
+<span class="fc" id="L69">        .coGroup(centralVertices)</span>
+<span class="fc" id="L70">        .where(new SourceId&lt;&gt;())</span>
+<span class="fc" id="L71">        .equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L72">        .with(new CreateNeighborList(edgeDirection));</span>
+    }
+
+<span class="fc bfc" id="L75" title="All 2 branches covered.">    if (edgeDirection.equals(EdgeDirection.UNDIRECTED)) {</span>
+<span class="fc" id="L76">      return incoming.union(outgoing);</span>
+    }
+<span class="fc bfc" id="L78" title="All 2 branches covered.">    return edgeDirection.equals(EdgeDirection.INCOMING) ? incoming : outgoing;</span>
+  }
+
+  /**
+   * A simple ENUM which contains possible edge directions viewed from the central vertex.
+   */
+<span class="fc" id="L84">  public enum EdgeDirection {</span>
+    /**
+     * Can be used for edges starting from the neighbor to the central vertex.
+     */
+<span class="fc" id="L88">    INCOMING,</span>
+
+    /**
+     * Can be used for edges starting from the central vertex to the neighbor.
+     */
+<span class="fc" id="L93">    OUTGOING,</span>
+
+    /**
+     * Can be used if the edge direction should be ignored an INCOMING and OUTGOING edges should be
+     * taken into account for the calculation.
+     */
+<span class="fc" id="L99">    UNDIRECTED</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

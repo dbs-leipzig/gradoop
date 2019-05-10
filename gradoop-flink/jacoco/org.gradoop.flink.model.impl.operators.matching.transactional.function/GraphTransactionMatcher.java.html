@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GraphTransactionMatcher.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.transactional.function</a> &gt; <span class="el_source">GraphTransactionMatcher.java</span></div><h1>GraphTransactionMatcher.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.transactional.function;
+
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
+import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.transactional.tuples.GraphWithCandidates;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import static org.gradoop.common.util.GradoopConstants.DEFAULT_EDGE_LABEL;
+import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
+
+/**
+ * Matches the elements of GraphTransactions against a query string. Returns
+ * GraphsWithCandidates, which can be input for HasEmbeddings or FindEmbeddings.
+ */
+public class GraphTransactionMatcher
+  extends RichMapFunction&lt;GraphTransaction, GraphWithCandidates&gt; {
+
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
+  /**
+   * Query handler
+   */
+  private transient QueryHandler handler;
+  /**
+   * Query string
+   */
+  private String query;
+
+  /**
+   * Constructor
+   * @param query query string
+   */
+<span class="nc" id="L61">  public GraphTransactionMatcher(String query) {</span>
+<span class="nc" id="L62">    this.query = query;</span>
+<span class="nc" id="L63">  }</span>
+
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="nc" id="L68">    handler = new QueryHandler(this.query);</span>
+<span class="nc" id="L69">  }</span>
+
+  @Override
+  public GraphWithCandidates map(GraphTransaction graphTransaction) {
+
+<span class="nc" id="L74">    GraphWithCandidates graph = new GraphWithCandidates(</span>
+<span class="nc" id="L75">      graphTransaction.getGraphHead().getId());</span>
+
+<span class="nc" id="L77">    Set&lt;Vertex&gt; vertices = graphTransaction.getVertices();</span>
+<span class="nc" id="L78">    List&lt;IdWithCandidates&lt;GradoopId&gt;&gt; vertexCandidates</span>
+<span class="nc" id="L79">      = new ArrayList&lt;&gt;(vertices.size());</span>
+
+<span class="nc bnc" id="L81" title="All 2 branches missed.">    for (Vertex vertex : vertices) {</span>
+<span class="nc" id="L82">      IdWithCandidates&lt;GradoopId&gt; candidates = new IdWithCandidates&lt;&gt;();</span>
+<span class="nc" id="L83">      candidates.setId(vertex.getId());</span>
+<span class="nc" id="L84">      candidates.setCandidates(</span>
+<span class="nc" id="L85">        getCandidates(handler.getVertexCount(), ElementMatcher.getMatches(</span>
+            vertex,
+<span class="nc" id="L87">            handler.getVertices(),</span>
+            DEFAULT_VERTEX_LABEL
+          )
+        )
+      );
+<span class="nc" id="L92">      vertexCandidates.add(candidates);</span>
+<span class="nc" id="L93">    }</span>
+
+<span class="nc" id="L95">    Set&lt;Edge&gt; edges = graphTransaction.getEdges();</span>
+<span class="nc" id="L96">    List&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; edgeCandidates =</span>
+<span class="nc" id="L97">    new ArrayList&lt;&gt;(edges.size());</span>
+
+<span class="nc bnc" id="L99" title="All 2 branches missed.">    for (Edge edge : edges) {</span>
+<span class="nc" id="L100">      TripleWithCandidates&lt;GradoopId&gt; candidates = new TripleWithCandidates&lt;&gt;();</span>
+<span class="nc" id="L101">      candidates.setEdgeId(edge.getId());</span>
+<span class="nc" id="L102">      candidates.setSourceId(edge.getSourceId());</span>
+<span class="nc" id="L103">      candidates.setTargetId(edge.getTargetId());</span>
+<span class="nc" id="L104">      candidates.setCandidates(</span>
+<span class="nc" id="L105">        getCandidates(handler.getEdgeCount(), ElementMatcher.getMatches(</span>
+            edge,
+<span class="nc" id="L107">            handler.getEdges(),</span>
+            DEFAULT_EDGE_LABEL
+          )
+        )
+      );
+<span class="nc" id="L112">      edgeCandidates.add(candidates);</span>
+<span class="nc" id="L113">    }</span>
+
+<span class="nc" id="L115">    graph.setVertexCandidates(vertexCandidates);</span>
+<span class="nc" id="L116">    graph.setEdgeCandidates(edgeCandidates);</span>
+<span class="nc" id="L117">    return graph;</span>
+  }
+
+  /**
+   * Returns a bit vector representing the matches for the given entity.
+   *
+   * @param candidateCount  size of the bit vector
+   * @param matches         matches for the given entity
+   * @return bit vector representing matches
+   */
+  private boolean[] getCandidates(int candidateCount, List&lt;Long&gt; matches) {
+<span class="nc" id="L128">    boolean[] candidates = new boolean[candidateCount];</span>
+
+<span class="nc bnc" id="L130" title="All 2 branches missed.">    for (Long candidate : matches) {</span>
+<span class="nc" id="L131">      candidates[candidate.intValue()] = true;</span>
+<span class="nc" id="L132">    }</span>
+<span class="nc" id="L133">    return candidates;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

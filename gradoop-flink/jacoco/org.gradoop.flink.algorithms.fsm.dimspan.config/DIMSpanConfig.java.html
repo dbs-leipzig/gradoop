@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DIMSpanConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.dimspan.config</a> &gt; <span class="el_source">DIMSpanConfig.java</span></div><h1>DIMSpanConfig.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.dimspan.config;
+
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * Frequent subgraph mining configuration.
+ */
+public class DIMSpanConfig implements Serializable {
+
+  /**
+   * support threshold for subgraphs to be considered to be frequenct
+   */
+<span class="fc" id="L32">  private float minSupport = 1.0f;</span>
+
+  /**
+   * Direction mode (true=directed; false=undirected)
+   */
+<span class="fc" id="L37">  private boolean directed = true;</span>
+
+  /**
+   * Dictionary type used for dictionary coding.
+   */
+<span class="fc" id="L42">  private DictionaryType dictionaryType = DictionaryType.INVERSE_PROPORTIONAL;</span>
+
+  /**
+   * Flag to enable embedding compression (true=enabled).
+   */
+<span class="fc" id="L47">  private boolean embeddingCompressionEnabled = true;</span>
+
+  /**
+   * Flag to enable graph compression (true=enabled).
+   */
+<span class="fc" id="L52">  private boolean graphCompressionEnabled = true;</span>
+
+  /**
+   * Flag to set dataflow position of pattern compression.
+   */
+<span class="fc" id="L57">  private DataflowStep patternCompressionInStep = DataflowStep.MAP;</span>
+
+  /**
+   * Flag to set dataflow position of pattern validation.
+   */
+<span class="fc" id="L62">  private DataflowStep patternVerificationInStep = DataflowStep.COMBINE;</span>
+
+  /**
+   * Flag to enable branch constraint in pattern growth (true=enabled).
+   */
+<span class="fc" id="L67">  private boolean branchConstraintEnabled = true;</span>
+
+  /**
+   * valued constructor
+   * @param minSupport minimum relative support of a subgraph
+   * @param directed direction mode
+   */
+<span class="fc" id="L74">  public DIMSpanConfig(float minSupport, boolean directed) {</span>
+<span class="fc" id="L75">    this.minSupport = minSupport;</span>
+<span class="fc" id="L76">    this.directed = directed;</span>
+<span class="fc" id="L77">  }</span>
+
+  @Override
+  public String toString() {
+<span class="nc" id="L81">    List&lt;String&gt; parameters = Lists.newArrayList();</span>
+
+<span class="nc" id="L83">    parameters.add(&quot;s_min : &quot; + String.valueOf(minSupport));</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">    parameters.add((directed ? &quot;directed&quot; : &quot;undirected&quot;) + &quot; mode&quot;);</span>
+<span class="nc" id="L85">    parameters.add(&quot;dictionary type : &quot; + dictionaryType.toString());</span>
+
+<span class="nc" id="L87">    parameters.add(getParameterEnabled(&quot;branch constraint&quot;, branchConstraintEnabled));</span>
+<span class="nc" id="L88">    parameters.add(getParameterEnabled(&quot;graph compression&quot;, graphCompressionEnabled));</span>
+<span class="nc" id="L89">    parameters.add(</span>
+<span class="nc" id="L90">      getParameterEnabled(&quot;embedding compression&quot;, embeddingCompressionEnabled));</span>
+<span class="nc" id="L91">    parameters.add(&quot;pattern compression @ &quot; + patternCompressionInStep.toString());</span>
+<span class="nc" id="L92">    parameters.add(&quot;pattern validation @ &quot; + patternVerificationInStep.toString());</span>
+
+<span class="nc" id="L94">    return StringUtils.join(parameters, &quot;|&quot;);</span>
+  }
+
+  /**
+   * Convenience method for string formatting of enum parameters.
+   *
+   * @param parameter parameter name
+   * @param enabled parameter value
+   *
+   * @return string representation of the parameter and its value
+   */
+  private String getParameterEnabled(String parameter, boolean enabled) {
+<span class="nc bnc" id="L106" title="All 2 branches missed.">    return parameter + &quot; &quot; + (enabled ? &quot;enabled&quot; : &quot;disabled&quot;);</span>
+  }
+
+  public float getMinSupport() {
+<span class="fc" id="L110">    return minSupport;</span>
+  }
+
+  public void setMinSupport(float minSupport) {
+<span class="nc" id="L114">    this.minSupport = minSupport;</span>
+<span class="nc" id="L115">  }</span>
+
+  public boolean isDirected() {
+<span class="fc" id="L118">    return directed;</span>
+  }
+
+  public void setDirected(boolean directed) {
+<span class="nc" id="L122">    this.directed = directed;</span>
+<span class="nc" id="L123">  }</span>
+
+  public DictionaryType getDictionaryType() {
+<span class="fc" id="L126">    return dictionaryType;</span>
+  }
+
+  public void setDictionaryType(DictionaryType dictionaryType) {
+<span class="nc" id="L130">    this.dictionaryType = dictionaryType;</span>
+<span class="nc" id="L131">  }</span>
+
+  public boolean isEmbeddingCompressionEnabled() {
+<span class="fc" id="L134">    return embeddingCompressionEnabled;</span>
+  }
+
+  public void setEmbeddingCompressionEnabled(boolean embeddingCompressionEnabled) {
+<span class="nc" id="L138">    this.embeddingCompressionEnabled = embeddingCompressionEnabled;</span>
+<span class="nc" id="L139">  }</span>
+
+  public boolean isGraphCompressionEnabled() {
+<span class="fc" id="L142">    return graphCompressionEnabled;</span>
+  }
+
+  public void setGraphCompressionEnabled(boolean graphCompressionEnabled) {
+<span class="nc" id="L146">    this.graphCompressionEnabled = graphCompressionEnabled;</span>
+<span class="nc" id="L147">  }</span>
+
+  public void setPatternCompressionInStep(DataflowStep patternCompressionInStep) {
+<span class="nc" id="L150">    this.patternCompressionInStep = patternCompressionInStep;</span>
+<span class="nc" id="L151">  }</span>
+
+  public DataflowStep getPatternCompressionInStep() {
+<span class="fc" id="L154">    return patternCompressionInStep;</span>
+  }
+
+  public DataflowStep getPatternVerificationInStep() {
+<span class="fc" id="L158">    return patternVerificationInStep;</span>
+  }
+
+  public void setPatternVerificationInStep(DataflowStep patternVerificationInStep) {
+<span class="nc" id="L162">    this.patternVerificationInStep = patternVerificationInStep;</span>
+<span class="nc" id="L163">  }</span>
+
+  public void setBranchConstraintEnabled(boolean branchConstraintEnabled) {
+<span class="nc" id="L166">    this.branchConstraintEnabled = branchConstraintEnabled;</span>
+<span class="nc" id="L167">  }</span>
+
+  public boolean isBranchConstraintEnabled() {
+<span class="fc" id="L170">    return branchConstraintEnabled;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

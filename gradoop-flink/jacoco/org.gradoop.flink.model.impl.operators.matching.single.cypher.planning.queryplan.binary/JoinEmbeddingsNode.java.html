@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JoinEmbeddingsNode.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary</a> &gt; <span class="el_source">JoinEmbeddingsNode.java</span></div><h1>JoinEmbeddingsNode.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary;
+
+import org.apache.flink.api.common.operators.base.JoinOperatorBase;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.JoinEmbeddings;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Binary node that wraps a {@link JoinEmbeddings} operator.
+ */
+public class JoinEmbeddingsNode extends BinaryNode implements JoinNode {
+  /**
+   * Query variables on which left and right child are joined
+   */
+  private final List&lt;String&gt; joinVariables;
+  /**
+   * Morphism type for vertices
+   */
+  private final MatchStrategy vertexStrategy;
+  /**
+   * Morphism type for edges
+   */
+  private final MatchStrategy edgeStrategy;
+  /**
+   * Join hint for Flink optimizer
+   */
+  private final JoinOperatorBase.JoinHint joinHint;
+
+  /**
+   * Creates  a new node.
+   *
+   * @param leftChild left input plan node
+   * @param rightChild right right input plan node
+   * @param joinVariables query variables to join the inputs on
+   * @param vertexStrategy morphism setting for vertices
+   * @param edgeStrategy morphism setting for edges
+   */
+  public JoinEmbeddingsNode(PlanNode leftChild, PlanNode rightChild,
+    List&lt;String&gt; joinVariables,
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy) {
+<span class="fc" id="L65">    this(leftChild, rightChild, joinVariables, vertexStrategy, edgeStrategy,</span>
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+<span class="fc" id="L67">  }</span>
+
+  /**
+   * Creates a new node.
+   *
+   * @param leftChild left input plan node
+   * @param rightChild right input plan node
+   * @param joinVariables query variables to join the inputs on
+   * @param vertexStrategy morphism setting for vertices
+   * @param edgeStrategy morphism setting for edges
+   * @param joinHint Join hint for the Flink optimizer
+   */
+  public JoinEmbeddingsNode(PlanNode leftChild, PlanNode rightChild,
+    List&lt;String&gt; joinVariables,
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
+    JoinOperatorBase.JoinHint joinHint) {
+<span class="fc" id="L83">    super(leftChild, rightChild);</span>
+<span class="fc" id="L84">    this.joinVariables = joinVariables;</span>
+<span class="fc" id="L85">    this.vertexStrategy = vertexStrategy;</span>
+<span class="fc" id="L86">    this.edgeStrategy = edgeStrategy;</span>
+<span class="fc" id="L87">    this.joinHint = joinHint;</span>
+<span class="fc" id="L88">  }</span>
+
+  @Override
+  public DataSet&lt;Embedding&gt; execute() {
+<span class="fc" id="L92">    JoinEmbeddings op = new JoinEmbeddings(getLeftChild().execute(), getRightChild().execute(),</span>
+<span class="fc" id="L93">      getRightChild().getEmbeddingMetaData().getEntryCount(),</span>
+<span class="fc" id="L94">      getJoinColumnsLeft(), getJoinColumnsRight(),</span>
+<span class="fc" id="L95">      getDistinctVertexColumnsLeft(), getDistinctVertexColumnsRight(),</span>
+<span class="fc" id="L96">      getDistinctEdgeColumnsLeft(), getDistinctEdgeColumnsRight(),</span>
+      joinHint);
+<span class="fc" id="L98">    op.setName(toString());</span>
+<span class="fc" id="L99">    return op.evaluate();</span>
+  }
+
+  @Override
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
+<span class="fc" id="L104">    EmbeddingMetaData leftInputMetaData = getLeftChild().getEmbeddingMetaData();</span>
+<span class="fc" id="L105">    EmbeddingMetaData rightInputMetaData = getRightChild().getEmbeddingMetaData();</span>
+<span class="fc" id="L106">    EmbeddingMetaData embeddingMetaData = new EmbeddingMetaData(leftInputMetaData);</span>
+
+<span class="fc" id="L108">    int entryCount = leftInputMetaData.getEntryCount();</span>
+
+    // append the non-join entry mappings from the right to the left side
+<span class="fc bfc" id="L111" title="All 2 branches covered.">    for (String var : rightInputMetaData.getVariables()) {</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">      if (!joinVariables.contains(var)) {</span>
+<span class="fc" id="L113">        embeddingMetaData.setEntryColumn(var, rightInputMetaData.getEntryType(var), entryCount++);</span>
+      }
+      // copy the direction information from the right to the left side
+<span class="fc bfc" id="L116" title="All 2 branches covered.">      if (rightInputMetaData.getEntryType(var) == EmbeddingMetaData.EntryType.PATH) {</span>
+<span class="fc" id="L117">        embeddingMetaData.setDirection(var, rightInputMetaData.getDirection(var));</span>
+      }
+<span class="fc" id="L119">    }</span>
+
+    // append all property mappings from the right to the left side
+<span class="fc" id="L122">    int propertyCount = leftInputMetaData.getPropertyCount();</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">    for (String var : rightInputMetaData.getVariables()) {</span>
+<span class="fc bfc" id="L124" title="All 2 branches covered.">      for (String key : rightInputMetaData.getPropertyKeys(var)) {</span>
+<span class="fc" id="L125">        embeddingMetaData.setPropertyColumn(var, key, propertyCount++);</span>
+<span class="fc" id="L126">      }</span>
+<span class="fc" id="L127">    }</span>
+<span class="fc" id="L128">    return embeddingMetaData;</span>
+  }
+
+  /**
+   * Computes the join columns of the left embedding according to its associated meta data.
+   *
+   * @return join columns of the left embedding
+   */
+  private List&lt;Integer&gt; getJoinColumnsLeft() {
+<span class="fc" id="L137">    return joinVariables.stream()</span>
+<span class="fc" id="L138">      .map(var -&gt; getLeftChild().getEmbeddingMetaData().getEntryColumn(var))</span>
+<span class="fc" id="L139">      .collect(Collectors.toList());</span>
+  }
+
+  /**
+   * Computes the join columns of the right embedding according to its associated meta data.
+   *
+   * @return join columns of the right embedding
+   */
+  private List&lt;Integer&gt; getJoinColumnsRight() {
+<span class="fc" id="L148">    return joinVariables.stream()</span>
+<span class="fc" id="L149">      .map(var -&gt; getRightChild().getEmbeddingMetaData().getEntryColumn(var))</span>
+<span class="fc" id="L150">      .collect(Collectors.toList());</span>
+  }
+
+  /**
+   * According to the specified {@link JoinEmbeddingsNode#vertexStrategy}, the method returns
+   * the columns that need to contain distinct entries in the left embedding.
+   * This includes the join columns
+   *
+   * @return distinct vertex columns of the left embedding
+   */
+  private List&lt;Integer&gt; getDistinctVertexColumnsLeft() {
+<span class="fc" id="L161">    EmbeddingMetaData metaData = getLeftChild().getEmbeddingMetaData();</span>
+
+<span class="fc bfc" id="L163" title="All 2 branches covered.">    return vertexStrategy == MatchStrategy.ISOMORPHISM ?</span>
+<span class="fc" id="L164">      metaData.getVertexVariables().stream()</span>
+<span class="fc" id="L165">        .map(metaData::getEntryColumn)</span>
+<span class="fc" id="L166">        .collect(Collectors.toList()) : Collections.emptyList();</span>
+  }
+
+  /**
+   * According to the specified {@link JoinEmbeddingsNode#vertexStrategy}, the method returns
+   * the columns that need to contain distinct entries in the right embedding.
+   * This excludes the join columns
+   *
+   * @return distinct vertex columns of the right embedding
+   */
+  private List&lt;Integer&gt; getDistinctVertexColumnsRight() {
+<span class="fc" id="L177">    EmbeddingMetaData metaData = getRightChild().getEmbeddingMetaData();</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">    return vertexStrategy == MatchStrategy.ISOMORPHISM ?</span>
+<span class="fc" id="L179">      metaData.getVertexVariables().stream()</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">        .filter(var -&gt; !joinVariables.contains(var))</span>
+<span class="fc" id="L181">        .map(metaData::getEntryColumn)</span>
+<span class="fc" id="L182">        .collect(Collectors.toList()) : Collections.emptyList();</span>
+  }
+
+  /**
+   * According to the specified {@link JoinEmbeddingsNode#edgeStrategy}, the method returns
+   * the columns that need to contain distinct entries in the left embedding.
+   *
+   * @return distinct edge columns of the left embedding
+   */
+  private List&lt;Integer&gt; getDistinctEdgeColumnsLeft() {
+<span class="fc" id="L192">    return getDistinctEdgeColumns(getLeftChild().getEmbeddingMetaData());</span>
+  }
+
+  /**
+   * According to the specified {@link JoinEmbeddingsNode#edgeStrategy}, the method returns
+   * the columns that need to contain distinct entries in the right embedding.
+   *
+   * @return distinct edge columns of the right embedding
+   */
+  private List&lt;Integer&gt; getDistinctEdgeColumnsRight() {
+<span class="fc" id="L202">    return getDistinctEdgeColumns(getRightChild().getEmbeddingMetaData());</span>
+  }
+
+  /**
+   * According to the specified {@link JoinEmbeddingsNode#edgeStrategy} and the specified
+   * {@link EmbeddingMetaData}, the method returns the columns that need to contain distinct
+   * entries.
+   *
+   * @param metaData meta data for the embedding
+   * @return distinct edge columns
+   */
+  private List&lt;Integer&gt; getDistinctEdgeColumns(EmbeddingMetaData metaData) {
+<span class="fc bfc" id="L214" title="All 2 branches covered.">    return edgeStrategy == MatchStrategy.ISOMORPHISM ?</span>
+<span class="fc" id="L215">      metaData.getEdgeVariables().stream()</span>
+<span class="fc" id="L216">        .map(metaData::getEntryColumn)</span>
+<span class="fc" id="L217">        .collect(Collectors.toList()) : Collections.emptyList();</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="fc" id="L222">    return String.format(&quot;JoinEmbeddingsNode{&quot; +</span>
+      &quot;joinVariables=%s, &quot; +
+      &quot;vertexMorphismType=%s, &quot; +
+      &quot;edgeMorphismType=%s}&quot;,
+      joinVariables, vertexStrategy, edgeStrategy);
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

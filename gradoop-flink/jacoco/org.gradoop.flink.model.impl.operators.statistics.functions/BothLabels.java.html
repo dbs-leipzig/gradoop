@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BothLabels.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.statistics.functions</a> &gt; <span class="el_source">BothLabels.java</span></div><h1>BothLabels.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.statistics.functions;
+
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.flink.model.impl.tuples.IdWithLabel;
+
+/**
+ * (id,label1),(id,label2) -&gt; (label1,label2)
+ */
+@FunctionAnnotation.ForwardedFieldsFirst(&quot;f1-&gt;f0&quot;)
+@FunctionAnnotation.ForwardedFieldsSecond(&quot;f1&quot;)
+<span class="fc" id="L28">public class BothLabels implements JoinFunction&lt;IdWithLabel, IdWithLabel, Tuple2&lt;String, String&gt;&gt; {</span>
+  /**
+   * Reduce object instantiations
+   */
+<span class="fc" id="L32">  private final Tuple2&lt;String, String&gt; reuseTuple = new Tuple2&lt;&gt;();</span>
+
+  @Override
+  public Tuple2&lt;String, String&gt; join(IdWithLabel first, IdWithLabel second) throws Exception {
+<span class="fc" id="L36">    reuseTuple.f0 = first.getLabel();</span>
+<span class="fc" id="L37">    reuseTuple.f1 = second.getLabel();</span>
+<span class="fc" id="L38">    return reuseTuple;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

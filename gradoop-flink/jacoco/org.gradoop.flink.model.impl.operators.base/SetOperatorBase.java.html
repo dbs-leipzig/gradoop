@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SetOperatorBase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.base</a> &gt; <span class="el_source">SetOperatorBase.java</span></div><h1>SetOperatorBase.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.base;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.functions.graphcontainment
+  .PairVertexWithGraphs;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.operators.base.functions.LeftJoin0OfTuple2;
+import org.gradoop.flink.model.impl.operators.difference.Difference;
+import org.gradoop.flink.model.impl.operators.intersection.Intersection;
+import org.gradoop.flink.model.impl.operators.union.Union;
+import org.gradoop.common.model.impl.id.GradoopId;
+
+/**
+ * Base class for set operations that share common methods to build vertex,
+ * edge and data sets.
+ *
+ * @see Difference
+ * @see Intersection
+ * @see Union
+ */
+<span class="fc" id="L43">public abstract class SetOperatorBase extends</span>
+  BinaryCollectionToCollectionOperatorBase {
+
+  /**
+   * Computes new vertices based on the new subgraphs. For each vertex, each
+   * graph is collected in a flatMap function and then joined with the new
+   * subgraph dataset.
+   *
+   * @param newGraphHeads graph dataset of the resulting graph collection
+   * @return vertex set of the resulting graph collection
+   */
+  @Override
+  protected DataSet&lt;Vertex&gt; computeNewVertices(
+    DataSet&lt;GraphHead&gt; newGraphHeads) {
+
+<span class="fc" id="L58">    DataSet&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; verticesWithGraphs =</span>
+<span class="fc" id="L59">      firstCollection.getVertices().flatMap(new PairVertexWithGraphs&lt;&gt;());</span>
+
+<span class="fc" id="L61">    return verticesWithGraphs</span>
+<span class="fc" id="L62">      .join(newGraphHeads)</span>
+<span class="fc" id="L63">      .where(1)</span>
+<span class="fc" id="L64">      .equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L65">      .with(new LeftJoin0OfTuple2&lt;&gt;())</span>
+<span class="fc" id="L66">      .withForwardedFieldsFirst(&quot;f0-&gt;*&quot;)</span>
+<span class="fc" id="L67">      .distinct(new Id&lt;&gt;());</span>
+  }
+
+  /**
+   * Constructs new edges by joining the edges of the first graph with the new
+   * vertices.
+   *
+   * @param newVertices vertex set of the resulting graph collection
+   * @return edges set only connect vertices in {@code newVertices}
+   * @see Difference
+   * @see Intersection
+   */
+  @Override
+  protected DataSet&lt;Edge&gt; computeNewEdges(DataSet&lt;Vertex&gt; newVertices) {
+<span class="fc" id="L81">    return firstCollection.getEdges().join(newVertices)</span>
+<span class="fc" id="L82">      .where(new SourceId&lt;&gt;())</span>
+<span class="fc" id="L83">      .equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L84">      .with(new LeftSide&lt;&gt;())</span>
+<span class="fc" id="L85">      .join(newVertices)</span>
+<span class="fc" id="L86">      .where(new TargetId&lt;&gt;())</span>
+<span class="fc" id="L87">      .equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L88">      .with(new LeftSide&lt;&gt;())</span>
+<span class="fc" id="L89">      .distinct(new Id&lt;&gt;());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

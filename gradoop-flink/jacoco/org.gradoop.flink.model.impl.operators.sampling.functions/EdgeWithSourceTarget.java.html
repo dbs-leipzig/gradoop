@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EdgeWithSourceTarget.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.sampling.functions</a> &gt; <span class="el_source">EdgeWithSourceTarget.java</span></div><h1>EdgeWithSourceTarget.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.sampling.functions;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+
+/**
+ * Maps an Edge to Edge with its source and targets
+ */
+public class EdgeWithSourceTarget implements MapFunction&lt;Edge, Tuple3&lt;Edge, GradoopId, GradoopId&gt;&gt; {
+  /**
+   *  Reduce object instantiations
+   */
+  private Tuple3&lt;Edge, GradoopId, GradoopId&gt; reuse;
+
+  /**
+   * Constructor
+   */
+<span class="nc" id="L35">  public EdgeWithSourceTarget() {</span>
+<span class="nc" id="L36">    reuse = new Tuple3&lt;&gt;();</span>
+<span class="nc" id="L37">  }</span>
+
+  @Override
+  public Tuple3&lt;Edge, GradoopId, GradoopId&gt; map(Edge edge) throws Exception {
+<span class="nc" id="L41">    reuse.f0 = edge;</span>
+<span class="nc" id="L42">    reuse.f1 = edge.getSourceId();</span>
+<span class="nc" id="L43">    reuse.f2 = edge.getTargetId();</span>
+<span class="nc" id="L44">    return reuse;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

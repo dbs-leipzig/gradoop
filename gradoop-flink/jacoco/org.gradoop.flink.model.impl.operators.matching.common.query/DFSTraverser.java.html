@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DFSTraverser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.common.query</a> &gt; <span class="el_source">DFSTraverser.java</span></div><h1>DFSTraverser.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.common.query;
+
+import com.google.common.collect.Sets;
+import org.s1ck.gdl.model.Edge;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Set;
+
+/**
+ * Implementation of a {@link Traverser}, using a depth-first search.
+ */
+<span class="fc" id="L28">public class DFSTraverser implements RootedTraverser {</span>
+  /**
+   * Query handler to access the query graph.
+   */
+  private QueryHandler queryHandler;
+
+  @Override
+  public TraversalCode traverse() {
+<span class="fc" id="L36">    return traverse(queryHandler.getVertices().iterator().next().getId());</span>
+  }
+
+  @Override
+  public void setQueryHandler(QueryHandler queryHandler) {
+<span class="fc" id="L41">    this.queryHandler = queryHandler;</span>
+<span class="fc" id="L42">  }</span>
+
+  @Override
+  public QueryHandler getQueryHandler() {
+<span class="fc" id="L46">    return queryHandler;</span>
+  }
+
+  @Override
+  public TraversalCode traverse(long rootVertex) {
+<span class="fc" id="L51">    Set&lt;Long&gt; vertexVisited = Sets.newHashSetWithExpectedSize(</span>
+<span class="fc" id="L52">      queryHandler.getVertexCount());</span>
+<span class="fc" id="L53">    Set&lt;Long&gt; edgeVisited = Sets.newHashSetWithExpectedSize(</span>
+<span class="fc" id="L54">      queryHandler.getEdgeCount());</span>
+<span class="fc" id="L55">    TraversalCode traversalCode = new TraversalCode();</span>
+
+<span class="fc" id="L57">    long current = rootVertex;</span>
+
+<span class="fc" id="L59">    vertexVisited.add(current);</span>
+<span class="fc" id="L60">    Deque&lt;Edge&gt; edgeStack = new ArrayDeque&lt;&gt;();</span>
+<span class="fc" id="L61">    edgeStack.addAll(queryHandler.getEdgesByVertexId(current));</span>
+
+<span class="fc bfc" id="L63" title="All 2 branches covered.">    while (!edgeStack.isEmpty()) {</span>
+<span class="fc" id="L64">      Edge edge = edgeStack.removeLast();</span>
+<span class="fc" id="L65">      long via = edge.getId();</span>
+
+<span class="fc bfc" id="L67" title="All 2 branches covered.">      if (!edgeVisited.contains(via)) {</span>
+<span class="fc" id="L68">        long source = edge.getSourceVertexId();</span>
+<span class="fc" id="L69">        long target = edge.getTargetVertexId();</span>
+
+        // backtrack?
+<span class="fc bfc" id="L72" title="All 4 branches covered.">        if (current != source &amp;&amp; current != target) {</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">          current = vertexVisited.contains(source) ? source : target;</span>
+        }
+
+        // do step
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        boolean isOutgoing  = current == source;</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        long from           = isOutgoing ? source : target;</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        long to             = isOutgoing ? target : source;</span>
+
+<span class="fc" id="L81">        traversalCode.add(new Step(from, via, to, isOutgoing));</span>
+
+        // go deeper
+<span class="fc" id="L84">        boolean visitedFrom = vertexVisited.contains(from);</span>
+<span class="fc" id="L85">        boolean visitedTo   = vertexVisited.contains(to);</span>
+
+<span class="pc bpc" id="L87" title="1 of 4 branches missed.">        if (!visitedFrom || !visitedTo) {</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">          current = visitedFrom ? to : from;</span>
+<span class="fc" id="L89">          edgeStack.addAll(queryHandler.getEdgesByVertexId(current));</span>
+        }
+
+<span class="fc" id="L92">        vertexVisited.add(current);</span>
+<span class="fc" id="L93">        edgeVisited.add(via);</span>
+      }
+<span class="fc" id="L95">    }</span>
+
+<span class="fc" id="L97">    return traversalCode;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

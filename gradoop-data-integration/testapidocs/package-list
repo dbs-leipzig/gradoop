@@ -1,0 +1,6 @@
+org.gradoop.dataintegration.importer.impl.csv
+org.gradoop.dataintegration.importer.impl.json
+org.gradoop.dataintegration.importer.impl.json.functions
+org.gradoop.dataintegration.transformation
+org.gradoop.dataintegration.transformation.functions
+org.gradoop.dataintegration.transformation.impl

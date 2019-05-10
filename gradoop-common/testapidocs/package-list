@@ -1,0 +1,6 @@
+org.gradoop.common
+org.gradoop.common.model.impl.id
+org.gradoop.common.model.impl.metadata
+org.gradoop.common.model.impl.pojo
+org.gradoop.common.model.impl.properties
+org.gradoop.common.util

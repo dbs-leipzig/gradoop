@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RollUp.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.rollup</a> &gt; <span class="el_source">RollUp.java</span></div><h1>RollUp.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.rollup;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.flink.model.impl.functions.epgm.SetProperty;
+import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
+
+/**
+ * The rollUp operator generates all combinations of the supplied vertex or edge grouping keys
+ * according to the definition of the rollUp operation in SQL and uses them together with all
+ * opposed grouping keys for separate grouping operations. For example, specifying the grouping
+ * keys A, B and C leads to three differently grouped graphs {A,B,C},{A,B},{A} within the resulting
+ * graph collection. The grouping can be applied using the vertex or edge grouping keys depending on
+ * the implementations of the used sub class.
+ */
+public abstract class RollUp implements UnaryGraphToCollectionOperator {
+  /**
+   * Stores grouping keys for vertices.
+   */
+  protected final List&lt;String&gt; vertexGroupingKeys;
+
+  /**
+   * Stores aggregation functions for vertices.
+   */
+  protected final List&lt;AggregateFunction&gt; vertexAggregateFunctions;
+
+  /**
+   * Stores grouping keys for edges.
+   */
+  protected final List&lt;String&gt; edgeGroupingKeys;
+
+  /**
+   * Stores aggregation functions for edges.
+   */
+  protected final List&lt;AggregateFunction&gt; edgeAggregateFunctions;
+
+  /**
+   * Stores the strategy used for grouping.
+   */
+  protected GroupingStrategy strategy;
+
+  /**
+   * Creates a rollUp operator instance with {@link GroupingStrategy#GROUP_REDUCE} as grouping
+   * strategy. Use {@link RollUp#setGroupingStrategy(GroupingStrategy)} to define a different
+   * grouping strategy.
+   *
+   * @param vertexGroupingKeys        grouping keys to group vertices
+   * @param vertexAggregateFunctions  aggregate functions to apply on super vertices
+   * @param edgeGroupingKeys          grouping keys to group edges
+   * @param edgeAggregateFunctions    aggregate functions to apply on super edges
+   */
+  RollUp(
+    List&lt;String&gt; vertexGroupingKeys,
+    List&lt;AggregateFunction&gt; vertexAggregateFunctions,
+    List&lt;String&gt; edgeGroupingKeys,
+<span class="fc" id="L81">    List&lt;AggregateFunction&gt; edgeAggregateFunctions) {</span>
+<span class="fc" id="L82">    this.vertexGroupingKeys = vertexGroupingKeys;</span>
+<span class="fc" id="L83">    this.vertexAggregateFunctions = vertexAggregateFunctions;</span>
+<span class="fc" id="L84">    this.edgeGroupingKeys = edgeGroupingKeys;</span>
+<span class="fc" id="L85">    this.edgeAggregateFunctions = edgeAggregateFunctions;</span>
+<span class="fc" id="L86">    this.strategy = GroupingStrategy.GROUP_REDUCE;</span>
+<span class="fc" id="L87">  }</span>
+
+  /**
+   * Applies the rollUp operation on the given input graph.
+   *
+   * @param graph input graph
+   * @return graphCollection containing all differently grouped graphs
+   */
+  @Override
+  public GraphCollection execute(LogicalGraph graph) {
+<span class="fc" id="L97">    DataSet&lt;GraphHead&gt; graphHeads = null;</span>
+<span class="fc" id="L98">    DataSet&lt;Vertex&gt; vertices = null;</span>
+<span class="fc" id="L99">    DataSet&lt;Edge&gt; edges = null;</span>
+<span class="fc" id="L100">    List&lt;List&lt;String&gt;&gt; groupingKeyCombinations = getGroupingKeyCombinations();</span>
+
+    // for each permutation execute a grouping
+<span class="fc bfc" id="L103" title="All 2 branches covered.">    for (List&lt;String&gt; combination : groupingKeyCombinations) {</span>
+      // apply the grouping
+<span class="fc" id="L105">      LogicalGraph groupedGraph = applyGrouping(graph, combination);</span>
+
+      // add a property to the grouped graph's head to specify the used keys
+<span class="fc" id="L108">      PropertyValue groupingKeys = PropertyValue.create(String.join(&quot;,&quot;, combination));</span>
+<span class="fc" id="L109">      DataSet&lt;GraphHead&gt; newGraphHead =</span>
+<span class="fc" id="L110">        groupedGraph.getGraphHead().map(new SetProperty&lt;&gt;(getGraphPropertyKey(), groupingKeys));</span>
+
+<span class="pc bpc" id="L112" title="2 of 6 branches missed.">      if (graphHeads != null &amp;&amp; vertices != null &amp;&amp; edges != null) {</span>
+        // in later iterations union the datasets of the grouped elements with the existing ones
+<span class="fc" id="L114">        graphHeads = graphHeads.union(newGraphHead);</span>
+<span class="fc" id="L115">        vertices = vertices.union(groupedGraph.getVertices());</span>
+<span class="fc" id="L116">        edges = edges.union(groupedGraph.getEdges());</span>
+      } else {
+        // in the first iteration, fill the datasets
+<span class="fc" id="L119">        graphHeads = newGraphHead;</span>
+<span class="fc" id="L120">        vertices = groupedGraph.getVertices();</span>
+<span class="fc" id="L121">        edges = groupedGraph.getEdges();</span>
+      }
+<span class="fc" id="L123">    }</span>
+
+    // We initialized the DataSets with null, so it may be possible that they're still null here,
+    // so we should check and return an empty collection in this case.
+    // But the overhead of creating an empty collection should only be done, if at least one of the
+    // DataSets is null.
+    GraphCollection collection;
+<span class="pc bpc" id="L130" title="3 of 6 branches missed.">    if (graphHeads != null &amp;&amp; vertices != null &amp;&amp; edges != null) {</span>
+<span class="fc" id="L131">      collection = graph.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L132">        .fromDataSets(graphHeads, vertices, edges);</span>
+    } else {
+<span class="nc" id="L134">      collection = graph.getConfig().getGraphCollectionFactory().createEmptyCollection();</span>
+    }
+
+<span class="fc" id="L137">    return collection;</span>
+  }
+
+  /**
+   * Creates all combinations of the supplied grouping keys.
+   *
+   * @param groupingKeys list of all grouping keys to be combined
+   * @return list containing all combinations of grouping keys
+   */
+  List&lt;List&lt;String&gt;&gt; createGroupingKeyCombinations(List&lt;String&gt; groupingKeys) {
+<span class="fc" id="L147">    List&lt;List&lt;String&gt;&gt; combinations = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L148">    int elements = groupingKeys.size();</span>
+
+<span class="fc bfc" id="L150" title="All 2 branches covered.">    while (elements &gt; 0) {</span>
+<span class="fc" id="L151">      combinations.add(new ArrayList&lt;&gt;(groupingKeys.subList(0, elements)));</span>
+<span class="fc" id="L152">      elements--;</span>
+    }
+
+<span class="fc" id="L155">    return combinations;</span>
+  }
+
+  /**
+   * Set the grouping strategy that will be used for each grouping.
+   * {@link GroupingStrategy#GROUP_REDUCE} is used as default.
+   *
+   * @param strategy the strategy to use
+   */
+  public void setGroupingStrategy(GroupingStrategy strategy) {
+<span class="nc" id="L165">    this.strategy = strategy;</span>
+<span class="nc" id="L166">  }</span>
+
+  /**
+   * Get the property key that is added to each graph head of the grouped graphs inside the
+   * resulting collection to specify which property keys are used to group the graph.
+   *
+   * @return the property key as string
+   */
+  abstract String getGraphPropertyKey();
+
+  /**
+   * Apply the groupBy-operator to the given logical graph and use the given grouping keys as vertex
+   * or edge grouping keys (depends on the child class).
+   *
+   * @param graph the graph the group-By operator is applied on
+   * @param groupingKeys the vertex or edge grouping keys to use
+   * @return the grouped graph
+   */
+  abstract LogicalGraph applyGrouping(LogicalGraph graph, List&lt;String&gt; groupingKeys);
+
+  /**
+   * Returns all vertex or edge grouping key combinations as list. Internally the
+   * {@link RollUp#createGroupingKeyCombinations(List)} function is used to create the combinations.
+   * The child class decides, whether the vertex or edge keys are used.
+   *
+   * @return a list of all vertex or edge grouping key combinations used for rollup grouping
+   */
+  abstract List&lt;List&lt;String&gt;&gt; getGroupingKeyCombinations();
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ValidateNeighborhood.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions</a> &gt; <span class="el_source">ValidateNeighborhood.java</span></div><h1>ValidateNeighborhood.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions;
+
+import com.google.common.collect.Sets;
+import org.apache.flink.api.common.functions.RichFlatMapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples
+  .IdPair;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Deletion;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
+
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.util.MessageType;
+import org.s1ck.gdl.model.Edge;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Validates the neighborhood of a {@link FatVertex} according to the query.
+ *
+ * For each query vertex candidate, the flatMap function checks if the vertex
+ * has the corresponding incident incoming and outgoing edges. If this is not
+ * the case, the vertex sends delete messages to all of its neighbors.
+ *
+ * fatVertex -&gt; [deletion]
+ *
+ * f0-&gt;f1: vertexId -&gt; senderId
+ */
+@FunctionAnnotation.ForwardedFields(&quot;f0-&gt;f1&quot;)
+public class ValidateNeighborhood
+  extends RichFlatMapFunction&lt;FatVertex, Deletion&gt; {
+
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
+
+  /**
+   * GDL query
+   */
+  private final String query;
+
+  /**
+   * Query handler
+   */
+  private transient QueryHandler queryHandler;
+
+  /**
+   * Reduce instantiations
+   */
+  private final Deletion reuseDeletion;
+
+  /**
+   * Constructor
+   *
+   * @param query GDL query
+   */
+<span class="fc" id="L78">  public ValidateNeighborhood(String query) {</span>
+<span class="fc" id="L79">    this.query          = query;</span>
+<span class="fc" id="L80">    this.reuseDeletion  = new Deletion();</span>
+<span class="fc" id="L81">  }</span>
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="fc" id="L85">    super.open(parameters);</span>
+<span class="fc" id="L86">    queryHandler = new QueryHandler(query);</span>
+<span class="fc" id="L87">  }</span>
+
+  @Override
+  public void flatMap(FatVertex fatVertex, Collector&lt;Deletion&gt; collector) throws
+    Exception {
+
+<span class="fc" id="L93">    List&lt;Long&gt; deletions = Lists</span>
+<span class="fc" id="L94">      .newArrayListWithCapacity(fatVertex.getCandidates().size());</span>
+<span class="fc" id="L95">    Set&lt;Long&gt; outgoingEdgeCandidates = getOutgoingEdgeCandidates(fatVertex);</span>
+
+<span class="fc bfc" id="L97" title="All 2 branches covered.">    for (Long vQ : fatVertex.getCandidates()) {</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">      if (!isValidCandidate(vQ, fatVertex, outgoingEdgeCandidates)) {</span>
+<span class="fc" id="L99">        deletions.add(vQ);</span>
+      }
+<span class="fc" id="L101">    }</span>
+
+<span class="fc bfc" id="L103" title="All 2 branches covered.">    if (!deletions.isEmpty()) {</span>
+<span class="fc" id="L104">      sendDeletions(deletions, fatVertex, collector);</span>
+    }
+<span class="fc" id="L106">  }</span>
+
+  /**
+   * Validates if the given query vertex candidate is a valid candidate for the
+   * vertex.
+   *
+   * @param vQ vertex candidate
+   * @param fatVertex vertex
+   * @param outgoingEdgeCandidates outgoing edge candidates
+   * @return true, if {@code fatVertex} is a valid embedding for {@code vQ}
+   */
+  private boolean isValidCandidate(Long vQ, FatVertex fatVertex,
+    Set&lt;Long&gt; outgoingEdgeCandidates) {
+<span class="fc" id="L119">    boolean isValidChild = isValidChild(vQ, fatVertex);</span>
+
+<span class="fc" id="L121">    boolean isValidParent = true;</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">    if (isValidChild) {</span>
+<span class="fc" id="L123">      isValidParent = isValidParent(vQ, outgoingEdgeCandidates);</span>
+    }
+<span class="fc bfc" id="L125" title="All 4 branches covered.">    return isValidChild &amp;&amp; isValidParent;</span>
+  }
+
+  /**
+   * Validate incoming edge candidates relating to the given vertex candidate.
+   *
+   * @param vQ vertex candidate
+   * @param fatVertex vertex
+   * @return true, if {@code fatVertex} is a valid child for {@code vQ}
+   */
+  private boolean isValidChild(Long vQ, FatVertex fatVertex) {
+<span class="fc" id="L136">    boolean isValidChild = true;</span>
+<span class="fc" id="L137">    Collection&lt;Edge&gt; inE = queryHandler.getEdgesByTargetVertexId(vQ);</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">    if (inE != null) {</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">      for (Edge eQIn : inE) {</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">        if (fatVertex.getIncomingCandidateCounts()[(int) eQIn.getId()] == 0) {</span>
+<span class="fc" id="L141">          isValidChild = false;</span>
+<span class="fc" id="L142">          break;</span>
+        }
+<span class="fc" id="L144">      }</span>
+    }
+<span class="fc" id="L146">    return isValidChild;</span>
+  }
+
+  /**
+   * Validate outgoing edge candidates relating to the given vertex candidate.
+   *
+   * @param vQ vertex candidate
+   * @param outgoingEdgeCandidates outgoing edge candidates
+   * @return true, if {@code fatVertex} is a valid parent for {@code vQ}
+   */
+  private boolean isValidParent(Long vQ, Set&lt;Long&gt; outgoingEdgeCandidates) {
+<span class="fc" id="L157">    boolean isValidParent = true;</span>
+<span class="fc" id="L158">    Collection&lt;Edge&gt; outE = queryHandler.getEdgesBySourceVertexId(vQ);</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">    if (outE != null) {</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">      for (Edge eQOut : outE) {</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">        if (!outgoingEdgeCandidates.contains(eQOut.getId())) {</span>
+<span class="fc" id="L162">          isValidParent = false;</span>
+<span class="fc" id="L163">          break;</span>
+        }
+<span class="fc" id="L165">      }</span>
+    }
+<span class="fc" id="L167">    return isValidParent;</span>
+  }
+
+  /**
+   * Sends delete messages to the vertex' neighborhood including itself.
+   *
+   * @param deletions vertex candidates that need to be deleted
+   * @param fatVertex current vertex
+   * @param collector message collector
+   */
+  private void sendDeletions(List&lt;Long&gt; deletions, FatVertex fatVertex,
+    Collector&lt;Deletion&gt; collector) {
+<span class="fc" id="L179">    reuseDeletion.setSenderId(fatVertex.getVertexId());</span>
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">    boolean toBeRemoved = deletions.size() == fatVertex.getCandidates().size();</span>
+<span class="fc bfc" id="L181" title="All 2 branches covered.">    for (Long deletion : deletions) {</span>
+<span class="fc" id="L182">      reuseDeletion.setDeletion(deletion);</span>
+<span class="fc" id="L183">      sendToSelf(fatVertex, collector);</span>
+<span class="fc" id="L184">      sendToParents(fatVertex, collector, toBeRemoved);</span>
+<span class="fc" id="L185">      sendToChildren(fatVertex, collector, toBeRemoved);</span>
+<span class="fc" id="L186">    }</span>
+<span class="fc" id="L187">  }</span>
+
+  /**
+   * Sends delete message to itself.
+   *
+   * @param fatVertex fat vertex
+   * @param collector message collector
+   */
+  private void sendToSelf(FatVertex fatVertex, Collector&lt;Deletion&gt; collector) {
+<span class="fc" id="L196">    reuseDeletion.setMessageType(MessageType.FROM_SELF);</span>
+<span class="fc" id="L197">    reuseDeletion.setRecipientId(fatVertex.getVertexId());</span>
+<span class="fc" id="L198">    collector.collect(reuseDeletion);</span>
+<span class="fc" id="L199">  }</span>
+
+  /**
+   * Sends delete messages to all parents.
+   *
+   * @param fatVertex   fat vertex
+   * @param collector   message collector
+   * @param toBeRemoved true, if {@code fatVertex} will be removed
+   */
+  private void sendToParents(FatVertex fatVertex, Collector&lt;Deletion&gt; collector,
+    boolean toBeRemoved) {
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">    reuseDeletion.setMessageType(toBeRemoved ?</span>
+      MessageType.FROM_CHILD_REMOVE : MessageType.FROM_CHILD);
+
+<span class="fc bfc" id="L213" title="All 2 branches covered.">    for (GradoopId gradoopId : fatVertex.getParentIds()) {</span>
+<span class="fc" id="L214">      reuseDeletion.setRecipientId(gradoopId);</span>
+<span class="fc" id="L215">      collector.collect(reuseDeletion);</span>
+<span class="fc" id="L216">    }</span>
+<span class="fc" id="L217">  }</span>
+
+  /**
+   * Sends delete messages to all children.
+   *
+   * @param fatVertex   fat vertex
+   * @param collector   message collector
+   * @param toBeRemoved true, if {@code fatVertex} will be removed
+   */
+  private void sendToChildren(FatVertex fatVertex,
+    Collector&lt;Deletion&gt; collector, boolean toBeRemoved) {
+<span class="pc bpc" id="L228" title="1 of 2 branches missed.">    reuseDeletion.setMessageType(toBeRemoved ?</span>
+      MessageType.FROM_PARENT_REMOVE : MessageType.FROM_PARENT);
+<span class="fc bfc" id="L230" title="All 2 branches covered.">    for (IdPair idPair : fatVertex.getEdgeCandidates().keySet()) {</span>
+<span class="fc" id="L231">      reuseDeletion.setRecipientId(idPair.getTargetId());</span>
+<span class="fc" id="L232">      collector.collect(reuseDeletion);</span>
+<span class="fc" id="L233">    }</span>
+<span class="fc" id="L234">  }</span>
+
+  /**
+   * Returns all outgoing edge candidates for the given vertex.
+   *
+   * @param fatVertex fat vertex
+   * @return all outgoing edge candidates of {@code fatVertex}
+   */
+  private Set&lt;Long&gt; getOutgoingEdgeCandidates(FatVertex fatVertex) {
+<span class="fc" id="L243">    Set&lt;Long&gt; outgoingEdgeCandidates = Sets.newHashSet();</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">    for (boolean[] candidates : fatVertex.getEdgeCandidates().values()) {</span>
+<span class="fc bfc" id="L245" title="All 2 branches covered.">      for (int i = 0; i &lt; candidates.length; i++) {</span>
+<span class="fc bfc" id="L246" title="All 2 branches covered.">        if (candidates[i]) {</span>
+<span class="fc" id="L247">          outgoingEdgeCandidates.add((long) i);</span>
+        }
+      }
+<span class="fc" id="L250">    }</span>
+<span class="fc" id="L251">    return outgoingEdgeCandidates;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

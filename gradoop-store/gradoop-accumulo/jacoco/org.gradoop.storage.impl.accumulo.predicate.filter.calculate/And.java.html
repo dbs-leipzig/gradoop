@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>And.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Accumulo</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.impl.accumulo.predicate.filter.calculate</a> &gt; <span class="el_source">And.java</span></div><h1>And.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.impl.accumulo.predicate.filter.calculate;
+
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringJoiner;
+
+/**
+ * Conjunctive predicate filter
+ *
+ * @param &lt;T&gt; element type
+ */
+public final class And&lt;T extends EPGMElement&gt; implements AccumuloElementFilter&lt;T&gt; {
+
+  /**
+   * Predicate list
+   */
+<span class="fc" id="L36">  private final List&lt;AccumuloElementFilter&lt;T&gt;&gt; predicates = new ArrayList&lt;&gt;();</span>
+
+  /**
+   * Create a new conjunctive principles
+   *
+   * @param predicates predicates
+   */
+<span class="fc" id="L43">  private And(List&lt;AccumuloElementFilter&lt;T&gt;&gt; predicates) {</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">    if (predicates.size() &lt; 2) {</span>
+<span class="nc" id="L45">      throw new IllegalArgumentException(String.format(&quot;predicates len(=%d) &lt; 2&quot;,</span>
+<span class="nc" id="L46">        predicates.size()));</span>
+    }
+<span class="fc" id="L48">    this.predicates.addAll(predicates);</span>
+<span class="fc" id="L49">  }</span>
+
+  /**
+   * Create a conjunctive formula
+   *
+   * @param predicates filter predicate
+   * @param &lt;T&gt; input type
+   * @return Conjunctive filter instance
+   */
+  @SafeVarargs
+  public static &lt;T extends EPGMElement&gt; And&lt;T&gt; create(AccumuloElementFilter&lt;T&gt;... predicates) {
+<span class="fc" id="L60">    List&lt;AccumuloElementFilter&lt;T&gt;&gt; formula = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L61">    Collections.addAll(formula, predicates);</span>
+<span class="fc" id="L62">    return new And&lt;&gt;(formula);</span>
+  }
+
+  @Override
+  public boolean test(T t) {
+<span class="nc bnc" id="L67" title="All 2 branches missed.">    for (AccumuloElementFilter&lt;T&gt; predicate : predicates) {</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">      if (!predicate.test(t)) {</span>
+<span class="nc" id="L69">        return false;</span>
+      }
+<span class="nc" id="L71">    }</span>
+<span class="nc" id="L72">    return true;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="fc" id="L77">    StringJoiner joiner = new StringJoiner(&quot; AND &quot;);</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">    for (AccumuloElementFilter&lt;T&gt; predicate : predicates) {</span>
+<span class="fc" id="L79">      joiner.add(&quot;(&quot; + predicate.toString() + &quot;)&quot;);</span>
+<span class="fc" id="L80">    }</span>
+<span class="fc" id="L81">    return joiner.toString();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

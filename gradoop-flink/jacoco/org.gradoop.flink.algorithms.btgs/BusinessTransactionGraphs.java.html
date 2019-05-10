@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BusinessTransactionGraphs.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.btgs</a> &gt; <span class="el_source">BusinessTransactionGraphs.java</span></div><h1>BusinessTransactionGraphs.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.btgs;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.graph.Graph;
+import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.algorithms.btgs.functions.BtgMessenger;
+import org.gradoop.flink.algorithms.btgs.functions.BtgUpdater;
+import org.gradoop.flink.algorithms.btgs.functions.CollectGradoopIds;
+import org.gradoop.flink.algorithms.btgs.functions.ComponentToNewBtgId;
+import org.gradoop.flink.algorithms.btgs.functions.MasterData;
+import org.gradoop.flink.algorithms.btgs.functions.NewBtgGraphHead;
+import org.gradoop.flink.algorithms.btgs.functions.SetBtgId;
+import org.gradoop.flink.algorithms.btgs.functions.SetBtgIds;
+import org.gradoop.flink.algorithms.btgs.functions.TargetIdBtgId;
+import org.gradoop.flink.algorithms.btgs.functions.TransactionalData;
+import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithGradoopId;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.flink.model.impl.functions.epgm.ExpandGradoopIds;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.ToGellyEdgeWithNullValue;
+import org.gradoop.flink.model.impl.functions.tuple.SwitchPair;
+import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+
+/**
+ * Part of the BIIIG approach.
+ * EPGMVertex-centric implementation to isolate business transaction graphs.
+ */
+<span class="fc" id="L53">public class BusinessTransactionGraphs implements</span>
+  UnaryGraphToCollectionOperator {
+
+  /**
+   * reserved property key referring to master or transactional data
+   */
+  public static final String SUPERTYPE_KEY = &quot;superType&quot;;
+  /**
+   * reserved property value to mark master data
+   */
+  public static final String SUPERCLASS_VALUE_MASTER = &quot;M&quot;;
+  /**
+   * reserved property value to mark transactional data
+   */
+  public static final String SUPERCLASS_VALUE_TRANSACTIONAL = &quot;T&quot;;
+  /**
+   * reserved label to mark business transaction graphs
+   */
+  public static final String BTG_LABEL = &quot;BusinessTransactionGraph&quot;;
+  /**
+   * reserved property key referring to the source identifier of vertices
+   */
+  public static final String SOURCEID_KEY = &quot;sid&quot;;
+
+  @Override
+  public GraphCollection execute(LogicalGraph iig) {
+
+<span class="fc" id="L80">    DataSet&lt;Vertex&gt; masterVertices = iig.getVertices()</span>
+<span class="fc" id="L81">      .filter(new MasterData&lt;&gt;());</span>
+
+<span class="fc" id="L83">    LogicalGraph transGraph = iig</span>
+<span class="fc" id="L84">      .vertexInducedSubgraph(new TransactionalData&lt;&gt;());</span>
+
+<span class="fc" id="L86">    DataSet&lt;Vertex&gt; transVertices = transGraph</span>
+<span class="fc" id="L87">      .getVertices();</span>
+
+<span class="fc" id="L89">    DataSet&lt;org.apache.flink.graph.Edge&lt;GradoopId, NullValue&gt;&gt; transEdges =</span>
+<span class="fc" id="L90">      transGraph.getEdges().map(new ToGellyEdgeWithNullValue());</span>
+
+<span class="fc" id="L92">    Graph&lt;GradoopId, GradoopId, NullValue&gt; gellyTransGraph = Graph.fromDataSet(</span>
+<span class="fc" id="L93">      transVertices.map(new VertexToGellyVertexWithGradoopId()),</span>
+      transEdges,
+<span class="fc" id="L95">      iig.getConfig().getExecutionEnvironment()</span>
+    );
+
+<span class="fc" id="L98">    gellyTransGraph = gellyTransGraph</span>
+<span class="fc" id="L99">      .getUndirected()</span>
+<span class="fc" id="L100">      .runScatterGatherIteration(new BtgMessenger(), new BtgUpdater(), 100);</span>
+
+
+<span class="fc" id="L103">    DataSet&lt;Tuple2&lt;GradoopId, GradoopIdSet&gt;&gt; btgVerticesMap = gellyTransGraph</span>
+<span class="fc" id="L104">      .getVerticesAsTuple2()</span>
+<span class="fc" id="L105">      .map(new SwitchPair&lt;&gt;())</span>
+<span class="fc" id="L106">      .groupBy(0)</span>
+<span class="fc" id="L107">      .reduceGroup(new CollectGradoopIds())</span>
+<span class="fc" id="L108">      .map(new ComponentToNewBtgId());</span>
+
+<span class="fc" id="L110">    DataSet&lt;Tuple2&lt;GradoopId, GradoopId&gt;&gt; vertexBtgMap = btgVerticesMap</span>
+<span class="fc" id="L111">      .flatMap(new ExpandGradoopIds&lt;&gt;())</span>
+<span class="fc" id="L112">      .map(new SwitchPair&lt;&gt;());</span>
+
+<span class="fc" id="L114">    DataSet&lt;GraphHead&gt; graphHeads = btgVerticesMap</span>
+<span class="fc" id="L115">      .map(new Value0Of2&lt;&gt;())</span>
+<span class="fc" id="L116">      .map(new NewBtgGraphHead&lt;&gt;(iig.getConfig().getGraphHeadFactory()));</span>
+
+    // filter and update edges
+<span class="fc" id="L119">    DataSet&lt;Edge&gt; btgEdges = iig.getEdges()</span>
+<span class="fc" id="L120">      .join(vertexBtgMap)</span>
+<span class="fc" id="L121">      .where(new SourceId&lt;&gt;()).equalTo(0)</span>
+<span class="fc" id="L122">      .with(new SetBtgId&lt;&gt;());</span>
+
+    // update transactional vertices
+<span class="fc" id="L125">    transVertices = transVertices</span>
+<span class="fc" id="L126">      .join(vertexBtgMap)</span>
+<span class="fc" id="L127">      .where(new Id&lt;&gt;()).equalTo(0)</span>
+<span class="fc" id="L128">      .with(new SetBtgId&lt;&gt;());</span>
+
+    // create master data BTG map
+<span class="fc" id="L131">    vertexBtgMap = btgEdges</span>
+<span class="fc" id="L132">      .map(new TargetIdBtgId&lt;&gt;())</span>
+<span class="fc" id="L133">      .join(masterVertices)</span>
+<span class="fc" id="L134">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L135">      .with(new LeftSide&lt;&gt;())</span>
+<span class="fc" id="L136">      .distinct();</span>
+
+<span class="fc" id="L138">    DataSet&lt;Tuple2&lt;GradoopId, GradoopIdSet&gt;&gt; vertexBtgsMap = vertexBtgMap</span>
+<span class="fc" id="L139">      .groupBy(0)</span>
+      //.combineGroup(new CollectGradoopIds())
+<span class="fc" id="L141">      .reduceGroup(new CollectGradoopIds());</span>
+
+<span class="fc" id="L143">    masterVertices = masterVertices.join(vertexBtgsMap)</span>
+<span class="fc" id="L144">      .where(new Id&lt;&gt;()).equalTo(0)</span>
+<span class="fc" id="L145">      .with(new SetBtgIds&lt;&gt;());</span>
+
+<span class="fc" id="L147">    return iig.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L148">      .fromDataSets(graphHeads, transVertices.union(masterVertices), btgEdges);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

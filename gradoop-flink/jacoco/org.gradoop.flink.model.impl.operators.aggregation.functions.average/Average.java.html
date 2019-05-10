@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Average.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.aggregation.functions.average</a> &gt; <span class="el_source">Average.java</span></div><h1>Average.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.aggregation.functions.average;
+
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.PropertyValueUtils;
+import org.gradoop.flink.model.api.functions.AggregateFunction;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Base interface for aggregate functions determining the average of some value.&lt;br&gt;
+ * This aggregate function uses a list of two property values for aggregation internally.
+ * The list will contain two values:
+ * &lt;ol start=0&gt;
+ *   &lt;li&gt;The sum of all values considered by the average.&lt;/li&gt;
+ *   &lt;li&gt;The number of values added to the sum.&lt;/li&gt;
+ * &lt;/ol&gt;
+ * A post-processing step is necessary after the aggregation, to get the final average value.
+ * The final value will be a {@code double} value or {@link PropertyValue#NULL_VALUE null},
+ * if there were no elements aggregated (i.e. if the property was not set on any element).&lt;p&gt;
+ * &lt;b&gt;Hint: &lt;/b&gt; Implementations of this interface have to make sure to use a property value
+ * with the correct format, as described above.
+ */
+public interface Average extends AggregateFunction {
+
+  /**
+   * The default value used internally in this aggregation.
+   * Implementations of {@link #getIncrement(EPGMElement)} should return this value when the
+   * element is ignored, i.e. when it does not have the attribute aggregated by this function.
+   */
+<span class="fc" id="L48">  PropertyValue IGNORED_VALUE = PropertyValue.create(</span>
+<span class="fc" id="L49">    Arrays.asList(PropertyValue.create(0L), PropertyValue.create(0L)));</span>
+
+  /**
+   * The aggregation logic for calculating the average.
+   * This function requires property values to have a certain format, see {@link Average}.
+   *
+   * @param aggregate previously aggregated value
+   * @param increment value that is added to the aggregate
+   * @return The new aggregate value.
+   */
+  @Override
+  default PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment) {
+<span class="fc" id="L61">    List&lt;PropertyValue&gt; aggregateValue = aggregate.getList();</span>
+<span class="fc" id="L62">    List&lt;PropertyValue&gt; incrementValue = increment.getList();</span>
+<span class="fc" id="L63">    PropertyValue sum = PropertyValueUtils.Numeric.add(aggregateValue.get(0),</span>
+<span class="fc" id="L64">      incrementValue.get(0));</span>
+<span class="fc" id="L65">    PropertyValue count = PropertyValueUtils.Numeric.add(aggregateValue.get(1),</span>
+<span class="fc" id="L66">      incrementValue.get(1));</span>
+<span class="fc" id="L67">    aggregateValue.set(0, sum);</span>
+<span class="fc" id="L68">    aggregateValue.set(1, count);</span>
+<span class="fc" id="L69">    aggregate.setList(aggregateValue);</span>
+<span class="fc" id="L70">    return aggregate;</span>
+  }
+
+  /**
+   * Calculate the average from the internally used aggregate value.
+   *
+   * @param result The result of the aggregation step.
+   * @return The average value (or null, if there were no elements to get the average of).
+   * @throws IllegalArgumentException if the previous result had an invalid format.
+   */
+  @Override
+  default PropertyValue postAggregate(PropertyValue result) {
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">    if (!Objects.requireNonNull(result).isList()) {</span>
+<span class="nc" id="L83">      throw new IllegalArgumentException(&quot;The aggregate value is expected to be a List.&quot;);</span>
+    }
+<span class="fc" id="L85">    List&lt;PropertyValue&gt; value = result.getList();</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">    if (value.size() != 2) {</span>
+<span class="nc" id="L87">      throw new IllegalArgumentException(&quot;The aggregate value list is expected to have size 2.&quot;);</span>
+    }
+<span class="pc bpc" id="L89" title="2 of 4 branches missed.">    if (!value.get(0).isNumber() || !value.get(1).isLong()) {</span>
+<span class="nc" id="L90">      throw new IllegalArgumentException(&quot;The aggregate value list contains unsupported types.&quot;);</span>
+    }
+    // Convert the two list values to a double.
+    // The first was some unknown number type, the second a long.
+<span class="fc" id="L94">    double sum = ((Number) value.get(0).getObject()).doubleValue();</span>
+<span class="fc" id="L95">    long count = value.get(1).getLong();</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">    if (count &lt; 0) {</span>
+<span class="nc" id="L97">      throw new IllegalArgumentException(&quot;Invalid number of elements &quot; + count +</span>
+        &quot;, expected value greater than zero.&quot;);
+<span class="fc bfc" id="L99" title="All 2 branches covered.">    } else if (count == 0) {</span>
+<span class="fc" id="L100">      return PropertyValue.NULL_VALUE;</span>
+    } else {
+<span class="fc" id="L102">      result.setDouble(sum / count);</span>
+<span class="fc" id="L103">      return result;</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

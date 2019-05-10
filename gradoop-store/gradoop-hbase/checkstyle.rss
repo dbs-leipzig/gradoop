@@ -1,0 +1,992 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<rss version="0.91">
+  <channel>
+    <title>Gradoop HBase - Checkstyle report</title>
+    <link>http://www.gradoop.org/gradoop-store/gradoop-hbase</link>
+    <description>Gradoop HBase - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2014 - 2019 - 2019 University of Leipzig</copyright>
+    <item>
+      <title>File: 67,
+             Errors: 0,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html</link>
+      <description>
+        <p>Click <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.config.package-info.java">org/gradoop/storage/config/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.constants.package-info.java">org/gradoop/storage/impl/hbase/constants/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropLargerThan.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBasePropLargerThan.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.package-info.java">org/gradoop/storage/impl/hbase/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.HBaseEPGMStoreTest.java">org/gradoop/storage/impl/hbase/HBaseEPGMStoreTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.inputformats.VertexTableInputFormat.java">org/gradoop/storage/impl/hbase/io/inputformats/VertexTableInputFormat.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter.java">org/gradoop/storage/impl/hbase/predicate/filter/api/HBaseElementFilter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.handler.HBaseEdgeHandler.java">org/gradoop/storage/impl/hbase/handler/HBaseEdgeHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropRegTest.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBasePropRegTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.HBaseDataSinkSourceTest.java">org/gradoop/storage/impl/hbase/io/HBaseDataSinkSourceTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.HBaseSpreadingByteGraphStoreTest.java">org/gradoop/storage/impl/hbase/HBaseSpreadingByteGraphStoreTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.inputformats.BaseTableInputFormat.java">org/gradoop/storage/impl/hbase/io/inputformats/BaseTableInputFormat.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.api.package-info.java">org/gradoop/storage/impl/hbase/predicate/filter/api/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.handler.package-info.java">org/gradoop/storage/impl/hbase/handler/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.HBaseDefaultGraphStoreTest.java">org/gradoop/storage/impl/hbase/HBaseDefaultGraphStoreTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.handler.HBaseGraphHeadHandler.java">org/gradoop/storage/impl/hbase/handler/HBaseGraphHeadHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.HBaseBase.java">org/gradoop/storage/impl/hbase/io/HBaseBase.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.iterator.HBaseEdgeIterator.java">org/gradoop/storage/impl/hbase/iterator/HBaseEdgeIterator.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.HBaseSplitRegionGraphStoreTest.java">org/gradoop/storage/impl/hbase/HBaseSplitRegionGraphStoreTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropEqualsTest.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBasePropEqualsTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.java">org/gradoop/storage/impl/hbase/GradoopHBaseTestBase.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.iterator.HBaseGraphIterator.java">org/gradoop/storage/impl/hbase/iterator/HBaseGraphIterator.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.iterator.HBaseVertexIterator.java">org/gradoop/storage/impl/hbase/iterator/HBaseVertexIterator.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropReg.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBasePropReg.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.handler.HBaseGraphElementHandler.java">org/gradoop/storage/impl/hbase/handler/HBaseGraphElementHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.functions.BuildEdgeMutation.java">org/gradoop/storage/impl/hbase/io/functions/BuildEdgeMutation.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.calculate.Not.java">org/gradoop/storage/impl/hbase/predicate/filter/calculate/Not.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.api.GraphElementHandler.java">org/gradoop/storage/impl/hbase/api/GraphElementHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBaseLabelIn.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBaseLabelIn.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.utils.RegionSplitter.java">org/gradoop/storage/utils/RegionSplitter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.functions.BuildGraphHeadMutation.java">org/gradoop/storage/impl/hbase/io/functions/BuildGraphHeadMutation.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropEquals.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBasePropEquals.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropLargerThanTest.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBasePropLargerThanTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory.java">org/gradoop/storage/impl/hbase/factory/HBaseEPGMStoreFactory.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.config.GradoopHBaseConfig.java">org/gradoop/storage/config/GradoopHBaseConfig.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.calculate.package-info.java">org/gradoop/storage/impl/hbase/predicate/filter/calculate/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.package-info.java">org/gradoop/storage/impl/hbase/io/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.package-info.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBaseLabelReg.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBaseLabelReg.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.HBaseTestSuite.java">org/gradoop/storage/impl/hbase/HBaseTestSuite.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.handler.HBaseElementHandler.java">org/gradoop/storage/impl/hbase/handler/HBaseElementHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.HBaseEPGMStore.java">org/gradoop/storage/impl/hbase/HBaseEPGMStore.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.handler.HBaseVertexHandler.java">org/gradoop/storage/impl/hbase/handler/HBaseVertexHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils.java">org/gradoop/storage/impl/hbase/predicate/filter/HBaseFilterUtils.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBaseLabelInTest.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBaseLabelInTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.functions.package-info.java">org/gradoop/storage/impl/hbase/io/functions/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.api.VertexHandler.java">org/gradoop/storage/impl/hbase/api/VertexHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.inputformats.package-info.java">org/gradoop/storage/impl/hbase/io/inputformats/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.constants.HBaseConstants.java">org/gradoop/storage/impl/hbase/constants/HBaseConstants.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.factory.package-info.java">org/gradoop/storage/impl/hbase/factory/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.inputformats.GraphHeadTableInputFormat.java">org/gradoop/storage/impl/hbase/io/inputformats/GraphHeadTableInputFormat.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.api.GraphHeadHandler.java">org/gradoop/storage/impl/hbase/api/GraphHeadHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.functions.BuildVertexMutation.java">org/gradoop/storage/impl/hbase/io/functions/BuildVertexMutation.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.HBaseDataSink.java">org/gradoop/storage/impl/hbase/io/HBaseDataSink.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.api.EdgeHandler.java">org/gradoop/storage/impl/hbase/api/EdgeHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.HBaseDataSource.java">org/gradoop/storage/impl/hbase/io/HBaseDataSource.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.utils.package-info.java">org/gradoop/storage/utils/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.package-info.java">org/gradoop/storage/impl/hbase/predicate/filter/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.utils.RowKeyDistributor.java">org/gradoop/storage/utils/RowKeyDistributor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.utils.HBaseFilters.java">org/gradoop/storage/utils/HBaseFilters.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.iterator.package-info.java">org/gradoop/storage/impl/hbase/iterator/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.calculate.Or.java">org/gradoop/storage/impl/hbase/predicate/filter/calculate/Or.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.api.package-info.java">org/gradoop/storage/impl/hbase/api/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBaseLabelRegTest.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBaseLabelRegTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.calculate.And.java">org/gradoop/storage/impl/hbase/predicate/filter/calculate/And.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.api.ElementHandler.java">org/gradoop/storage/impl/hbase/api/ElementHandler.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.io.inputformats.EdgeTableInputFormat.java">org/gradoop/storage/impl/hbase/io/inputformats/EdgeTableInputFormat.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

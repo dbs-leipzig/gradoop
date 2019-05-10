@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmbeddingFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos</a> &gt; <span class="el_source">EmbeddingFactory.java</span></div><h1>EmbeddingFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos;
+
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.util.List;
+
+/**
+ * Utility class to convert an EPGM element ({@link Vertex} and {@link Edge} into an
+ * {@link Embedding}.
+ */
+<span class="nc" id="L29">public class EmbeddingFactory {</span>
+
+  /**
+   * Converts a {@link Vertex} into an {@link Embedding}.
+   *
+   * The resulting embedding has one entry containing the vertex id and one entry for each property
+   * value associated with the specified property keys (ordered by list order). Note that missing
+   * property values are represented by a {@link PropertyValue#NULL_VALUE}.
+   *
+   * @param vertex vertex to create embedding from
+   * @param propertyKeys properties that will be stored in the embedding
+   * @return Embedding
+   */
+  public static Embedding fromVertex(Vertex vertex, List&lt;String&gt; propertyKeys) {
+<span class="fc" id="L43">    Embedding embedding = new Embedding();</span>
+<span class="fc" id="L44">    embedding.add(vertex.getId(), project(vertex, propertyKeys));</span>
+
+<span class="fc" id="L46">    return embedding;</span>
+  }
+
+  /**
+   * Converts an {@link Edge} into an {@link Embedding}.
+   *
+   * The resulting embedding has three entries containing the source vertex id, the edge id and the
+   * target vertex id. Furthermore, the embedding has one entry for each property value associated
+   * with the specified property keys (ordered by list order). Note that missing property values are
+   * represented by a {@link PropertyValue#NULL_VALUE}.
+   *
+   * @param edge edge to create embedding from
+   * @param propertyKeys properties that will be stored in the embedding
+   * @param isLoop indicates if the edges is a loop
+   * @return Embedding
+   */
+  public static Embedding fromEdge(Edge edge, List&lt;String&gt; propertyKeys, boolean isLoop) {
+<span class="fc" id="L63">    Embedding embedding = new Embedding();</span>
+
+<span class="fc bfc" id="L65" title="All 2 branches covered.">    if (isLoop) {</span>
+<span class="fc" id="L66">      embedding.addAll(edge.getSourceId(), edge.getId());</span>
+    } else {
+<span class="fc" id="L68">      embedding.addAll(edge.getSourceId(), edge.getId(), edge.getTargetId());</span>
+    }
+
+<span class="fc" id="L71">    embedding.addPropertyValues(project(edge, propertyKeys));</span>
+
+<span class="fc" id="L73">    return embedding;</span>
+  }
+
+  /**
+   * Converts an {@link Triple} into an {@link Embedding}.
+   *
+   * The resulting embedding has two or three entries containing the source vertex id, the edge id
+   * and the target vertex id. Furthermore, the embedding has one entry for each property value
+   * associated with the specified property keys (ordered by source properties, edge properties,
+   * target properties in list order). Note that missing property values are represented
+   * by a {@link PropertyValue#NULL_VALUE}.
+   *
+   * @param triple triple to create embedding from
+   * @param sourcePropertyKeys source properties that will be stored in the embedding
+   * @param edgePropertyKeys edge properties that will be stored in the embedding
+   * @param targetPropertyKeys target properties that will be stored in the embedding
+   * @param sourceVertexVariable variable of the source vertex
+   * @param targetVertexVariable variable of the target vertex
+   * @return Embedding
+   */
+  public static Embedding fromTriple(Triple triple, List&lt;String&gt; sourcePropertyKeys, List&lt;String&gt;
+    edgePropertyKeys, List&lt;String&gt; targetPropertyKeys, String sourceVertexVariable,
+    String targetVertexVariable) {
+
+<span class="fc" id="L97">    Embedding embedding = new Embedding();</span>
+<span class="fc" id="L98">    embedding.add(</span>
+<span class="fc" id="L99">      triple.getSourceVertex().getId(),</span>
+<span class="fc" id="L100">      project(triple.getSourceVertex(), sourcePropertyKeys)</span>
+    );
+
+<span class="fc" id="L103">    embedding.add(</span>
+<span class="fc" id="L104">      triple.getEdge().getId(),</span>
+<span class="fc" id="L105">      project(triple.getEdge(), edgePropertyKeys)</span>
+    );
+
+<span class="fc bfc" id="L108" title="All 2 branches covered.">    if (sourceVertexVariable.equals(targetVertexVariable)) {</span>
+<span class="fc" id="L109">      return embedding;</span>
+    }
+
+<span class="fc" id="L112">    embedding.add(</span>
+<span class="fc" id="L113">      triple.getTargetVertex().getId(),</span>
+<span class="fc" id="L114">      project(triple.getTargetVertex(), targetPropertyKeys)</span>
+    );
+
+<span class="fc" id="L117">    return embedding;</span>
+  }
+
+  /**
+   * Projects the elements properties into a list of property values. Only those properties
+   * specified by their key will be kept. Properties that are specified but not present at the
+   * element will be adopted as {@link PropertyValue#NULL_VALUE}.
+   *
+   * @param element element of which the properties will be projected
+   * @param propertyKeys properties that will be projected from the specified element
+   * @return projected property values
+   */
+  private static PropertyValue[] project(GraphElement element, List&lt;String&gt; propertyKeys) {
+<span class="fc" id="L130">    PropertyValue[] propertyValues = new PropertyValue[propertyKeys.size()];</span>
+<span class="fc" id="L131">    int i = 0;</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">    for (String propertyKey : propertyKeys) {</span>
+<span class="fc bfc" id="L133" title="All 2 branches covered.">      if (propertyKey.equals(&quot;__label__&quot;)) {</span>
+<span class="fc" id="L134">        propertyValues[i++] = PropertyValue.create(element.getLabel());</span>
+      } else {
+<span class="fc bfc" id="L136" title="All 2 branches covered.">        propertyValues[i++] = element.hasProperty(propertyKey) ?</span>
+<span class="fc" id="L137">          element.getPropertyValue(propertyKey) : PropertyValue.NULL_VALUE;</span>
+      }
+<span class="fc" id="L139">    }</span>
+<span class="fc" id="L140">    return propertyValues;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

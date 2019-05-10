@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TripleForLoopTraverser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser</a> &gt; <span class="el_source">TripleForLoopTraverser.java</span></div><h1>TripleForLoopTraverser.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser;
+
+import org.apache.flink.api.common.operators.base.JoinOperatorBase;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.debug.PrintTripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.common.functions.TripleHasCandidate;
+import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
+import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintEmbeddingWithTiePoint;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.UpdateVertexEdgeMapping;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
+
+import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
+
+/**
+ * Extracts {@link Embedding}s iteratively from a given graph by traversing the
+ * graph according to a given {@link TraversalCode}.
+ *
+ * For the iteration the traverser uses a basic for loop.
+ *
+ * @param &lt;K&gt; key type
+ */
+public class TripleForLoopTraverser&lt;K&gt; extends TripleTraverser&lt;K&gt; {
+
+  /**
+   * Creates a new distributed traverser.
+   *
+   * @param traversalCode describes the graph traversal
+   * @param vertexCount   number of query vertices
+   * @param edgeCount     number of query edges
+   * @param keyClazz      key type for embedding initialization
+   */
+  public TripleForLoopTraverser(TraversalCode traversalCode,
+    int vertexCount, int edgeCount, Class&lt;K&gt; keyClazz) {
+<span class="nc" id="L56">    this(traversalCode, MatchStrategy.ISOMORPHISM,</span>
+      vertexCount, edgeCount, keyClazz,
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES, null, null);
+<span class="nc" id="L59">  }</span>
+
+  /**
+   * Creates a new distributed traverser.
+   *
+   * @param traversalCode        describes the graph traversal
+   * @param matchStrategy        matching strategy for vertices and edges
+   * @param vertexCount          number of query vertices
+   * @param edgeCount            number of query edges
+   * @param keyClazz             key type for embedding initialization
+   * @param edgeStepJoinStrategy Join strategy for edge extension
+   * @param vertexMapping        used for debug
+   * @param edgeMapping          used for debug
+   */
+  public TripleForLoopTraverser(TraversalCode traversalCode, MatchStrategy matchStrategy,
+    int vertexCount, int edgeCount, Class&lt;K&gt; keyClazz,
+    JoinOperatorBase.JoinHint edgeStepJoinStrategy,
+    DataSet&lt;Tuple2&lt;K, PropertyValue&gt;&gt; vertexMapping,
+    DataSet&lt;Tuple2&lt;K, PropertyValue&gt;&gt; edgeMapping) {
+<span class="fc" id="L78">    super(traversalCode, matchStrategy, vertexCount, edgeCount, keyClazz, edgeStepJoinStrategy,</span>
+      vertexMapping, edgeMapping);
+<span class="fc" id="L80">  }</span>
+
+  @Override
+  public DataSet&lt;Tuple1&lt;Embedding&lt;K&gt;&gt;&gt; traverse(DataSet&lt;TripleWithCandidates&lt;K&gt;&gt; triples) {
+<span class="fc" id="L84">    return iterate(triples, buildInitialEmbeddings(triples)).project(1);</span>
+  }
+
+  @Override
+  boolean isIterative() {
+<span class="fc" id="L89">    return false;</span>
+  }
+
+  /**
+   * Explores the graph iteratively using the provided traversal code.
+   *
+   * @param triples    triple candidates
+   * @param embeddings initial embeddings
+   * @return final embeddings
+   */
+  private DataSet&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; iterate(
+    DataSet&lt;TripleWithCandidates&lt;K&gt;&gt; triples,
+    DataSet&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; embeddings) {
+
+<span class="fc" id="L103">    TraversalCode traversalCode = getTraversalCode();</span>
+
+<span class="fc bfc" id="L105" title="All 2 branches covered.">    for (int i = 1; i &lt; traversalCode.getSteps().size(); i++) {</span>
+<span class="fc" id="L106">      Step step = traversalCode.getStep(i);</span>
+
+<span class="fc" id="L108">      embeddings = log(embeddings,</span>
+        new PrintEmbeddingWithTiePoint&lt;&gt;(i, &quot;pre-join-embeddings&quot;),
+<span class="fc" id="L110">        getVertexMapping(), getEdgeMapping());</span>
+
+<span class="fc" id="L112">      DataSet&lt;TripleWithCandidates&lt;K&gt;&gt; filteredTriples = triples</span>
+<span class="fc" id="L113">        .filter(new TripleHasCandidate&lt;&gt;((int) step.getVia()));</span>
+
+<span class="fc" id="L115">      filteredTriples = log(filteredTriples,</span>
+        new PrintTripleWithCandidates&lt;&gt;(i, &quot;pre-join-triples&quot;),
+<span class="fc" id="L117">        getVertexMapping(), getEdgeMapping());</span>
+
+<span class="fc" id="L119">      embeddings = embeddings</span>
+<span class="fc" id="L120">        .join(filteredTriples, getEdgeStepJoinStrategy())</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        .where(0).equalTo(step.isOutgoing() ? 1 : 2)</span>
+<span class="fc" id="L122">        .with(new UpdateVertexEdgeMapping&lt;&gt;(traversalCode, i, getMatchStrategy()));</span>
+    }
+
+<span class="fc" id="L125">    return log(embeddings,</span>
+<span class="fc" id="L126">      new PrintEmbeddingWithTiePoint&lt;&gt;(isIterative(), &quot;final-embeddings&quot;),</span>
+<span class="fc" id="L127">      getVertexMapping(), getEdgeMapping());</span>
+  }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

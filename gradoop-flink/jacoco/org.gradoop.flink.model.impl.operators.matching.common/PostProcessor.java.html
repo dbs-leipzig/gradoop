@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PostProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.common</a> &gt; <span class="el_source">PostProcessor.java</span></div><h1>PostProcessor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.common;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.EdgeFromIds;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.MergedGraphIds;
+import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
+import org.gradoop.flink.model.impl.functions.utils.Cast;
+import org.gradoop.flink.model.impl.functions.utils.IsInstance;
+import org.gradoop.flink.model.impl.functions.utils.RightSide;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.functions.EdgeTriple;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+/**
+ * Provides methods for post-processing query results.
+ */
+<span class="nc" id="L45">public class PostProcessor {</span>
+
+  /**
+   * Extracts a {@link GraphCollection} from a set of {@link Element}.
+   *
+   * @param elements  EPGM elements
+   * @param config    Gradoop Flink config
+   * @return Graph collection
+   */
+  public static GraphCollection extractGraphCollection(
+    DataSet&lt;Element&gt; elements, GradoopFlinkConfig config) {
+<span class="nc" id="L56">    return extractGraphCollection(elements, config, true);</span>
+  }
+
+  /**
+   * Extracts a {@link GraphCollection} from a set of {@link Element}.
+   *
+   * @param elements  EPGM elements
+   * @param config        Gradoop Flink config
+   * @param mayOverlap    elements may be contained in multiple graphs
+   * @return Graph collection
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  public static GraphCollection extractGraphCollection(
+    DataSet&lt;Element&gt; elements, GradoopFlinkConfig config, boolean mayOverlap) {
+
+<span class="fc" id="L71">    Class&lt;GraphHead&gt; graphHeadType = config.getGraphHeadFactory().getType();</span>
+<span class="fc" id="L72">    Class&lt;Vertex&gt; vertexType = config.getVertexFactory().getType();</span>
+<span class="fc" id="L73">    Class&lt;Edge&gt; edgeType = config.getEdgeFactory().getType();</span>
+<span class="fc" id="L74">    return config.getGraphCollectionFactory().fromDataSets(</span>
+<span class="fc" id="L75">      extractGraphHeads(elements, graphHeadType),</span>
+<span class="fc" id="L76">      extractVertices(elements, vertexType, mayOverlap),</span>
+<span class="fc" id="L77">      extractEdges(elements, edgeType, mayOverlap)</span>
+    );
+  }
+
+  /**
+   * Extracts a {@link GraphCollection} from a set of {@link Element} and
+   * attaches the original data from the input {@link LogicalGraph}.
+   *
+   * @param elements      EPGM elements
+   * @param inputGraph    original input graph
+   * @param mayOverlap    true, if elements may be contained in multiple graphs
+   * @return Graph collection
+   */
+  public static GraphCollection extractGraphCollectionWithData(
+    DataSet&lt;Element&gt; elements, LogicalGraph inputGraph, boolean mayOverlap) {
+
+<span class="fc" id="L93">    GradoopFlinkConfig config = inputGraph.getConfig();</span>
+
+    // get result collection without data
+<span class="fc" id="L96">    GraphCollection collection = extractGraphCollection(elements, config, mayOverlap);</span>
+
+    // attach data by joining first and merging the graph head ids
+<span class="fc" id="L99">    DataSet&lt;Vertex&gt; newVertices = inputGraph.getVertices()</span>
+<span class="fc" id="L100">      .rightOuterJoin(collection.getVertices())</span>
+<span class="fc" id="L101">      .where(new Id&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L102">      .with(new MergedGraphIds&lt;&gt;())</span>
+<span class="fc" id="L103">      .withForwardedFieldsFirst(&quot;id;label;properties;&quot;);</span>
+
+
+<span class="fc" id="L106">    DataSet&lt;Edge&gt; newEdges = inputGraph.getEdges()</span>
+<span class="fc" id="L107">      .rightOuterJoin(collection.getEdges())</span>
+<span class="fc" id="L108">      .where(new Id&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L109">      .with(new MergedGraphIds&lt;&gt;())</span>
+<span class="fc" id="L110">      .withForwardedFieldsFirst(&quot;id;label;properties&quot;);</span>
+
+<span class="fc" id="L112">    return config.getGraphCollectionFactory().fromDataSets(</span>
+<span class="fc" id="L113">      collection.getGraphHeads(), newVertices, newEdges);</span>
+  }
+  /**
+   * Extracts vertex ids from the given pattern matching result.
+   *
+   * @param result pattern matching result
+   * @return dataset with (vertexId) tuples
+   */
+  public static DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; extractVertexIds(
+    DataSet&lt;FatVertex&gt; result) {
+<span class="fc" id="L123">    return result.project(0);</span>
+  }
+
+  /**
+   * Extracts edge-source-target id triples from the given pattern matching
+   * result.
+   *
+   * @param result pattern matching result
+   * @return dataset with (edgeId, sourceId, targetId) tuples
+   */
+  public static DataSet&lt;Tuple3&lt;GradoopId, GradoopId, GradoopId&gt;&gt; extractEdgeIds(
+    DataSet&lt;FatVertex&gt; result) {
+<span class="fc" id="L135">    return result.flatMap(new EdgeTriple());</span>
+  }
+
+  /**
+   * Filters and casts EPGM graph heads from a given set of {@link Element}
+   *
+   * @param elements      EPGM elements
+   * @param graphHeadType graph head type
+   * @return EPGM graph heads
+   */
+  public static DataSet&lt;GraphHead&gt; extractGraphHeads(DataSet&lt;Element&gt; elements,
+    Class&lt;GraphHead&gt; graphHeadType) {
+<span class="fc" id="L147">    return elements</span>
+<span class="fc" id="L148">      .filter(new IsInstance&lt;&gt;(graphHeadType))</span>
+<span class="fc" id="L149">      .map(new Cast&lt;&gt;(graphHeadType))</span>
+<span class="fc" id="L150">      .returns(TypeExtractor.createTypeInfo(graphHeadType));</span>
+  }
+
+  /**
+   * Initializes EPGM vertices from the given pattern matching result.
+   *
+   * @param result        pattern matching result
+   * @param epgmVertexFactory EPGM vertex factory
+   * @return EPGM vertices
+   */
+  public static DataSet&lt;Vertex&gt; extractVertices(DataSet&lt;FatVertex&gt; result,
+                                                EPGMVertexFactory&lt;Vertex&gt; epgmVertexFactory) {
+<span class="fc" id="L162">    return extractVertexIds(result).map(new VertexFromId(epgmVertexFactory));</span>
+  }
+
+  /**
+   * Filters and casts EPGM vertices from a given set of {@link Element}
+   *
+   * @param elements  EPGM elements
+   * @param vertexType    vertex type
+   * @param mayOverlap    vertices may be contained in multiple graphs
+   * @return EPGM vertices
+   */
+  public static DataSet&lt;Vertex&gt; extractVertices(DataSet&lt;Element&gt; elements,
+    Class&lt;Vertex&gt; vertexType, boolean mayOverlap) {
+<span class="fc" id="L175">    DataSet&lt;Vertex&gt; result = elements</span>
+<span class="fc" id="L176">      .filter(new IsInstance&lt;&gt;(vertexType))</span>
+<span class="fc" id="L177">      .map(new Cast&lt;&gt;(vertexType))</span>
+<span class="fc" id="L178">      .returns(TypeExtractor.createTypeInfo(vertexType));</span>
+<span class="pc bpc" id="L179" title="1 of 2 branches missed.">    return mayOverlap ? result</span>
+<span class="fc" id="L180">      .groupBy(new Id&lt;&gt;())</span>
+<span class="fc" id="L181">      .combineGroup(new MergedGraphIds&lt;&gt;())</span>
+<span class="fc" id="L182">      .groupBy(new Id&lt;&gt;())</span>
+<span class="pc" id="L183">      .reduceGroup(new MergedGraphIds&lt;&gt;()) : result;</span>
+  }
+
+  /**
+   * Initializes EPGM edges from the given pattern matching result.
+   *
+   * @param result      pattern matching result
+   * @param epgmEdgeFactory EPGM edge factory
+   * @return EPGM edges
+   */
+  public static DataSet&lt;Edge&gt; extractEdges(DataSet&lt;FatVertex&gt; result,
+    EPGMEdgeFactory&lt;Edge&gt; epgmEdgeFactory) {
+<span class="fc" id="L195">    return extractEdgeIds(result).map(new EdgeFromIds(epgmEdgeFactory));</span>
+  }
+
+  /**
+   * Filters and casts EPGM edges from a given set of {@link Element}
+   *
+   * @param elements      EPGM elements
+   * @param edgeType      edge type
+   * @param mayOverlap    edges may be contained in multiple graphs
+   * @return EPGM edges
+   */
+  public static DataSet&lt;Edge&gt; extractEdges(DataSet&lt;Element&gt; elements,
+    Class&lt;Edge&gt; edgeType, boolean mayOverlap) {
+<span class="fc" id="L208">    DataSet&lt;Edge&gt; result = elements</span>
+<span class="fc" id="L209">      .filter(new IsInstance&lt;&gt;(edgeType))</span>
+<span class="fc" id="L210">      .map(new Cast&lt;&gt;(edgeType))</span>
+<span class="fc" id="L211">      .returns(TypeExtractor.createTypeInfo(edgeType));</span>
+
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">    return mayOverlap ? result</span>
+<span class="fc" id="L214">      .groupBy(new Id&lt;&gt;())</span>
+<span class="fc" id="L215">      .combineGroup(new MergedGraphIds&lt;&gt;()).groupBy(new Id&lt;&gt;())</span>
+<span class="pc" id="L216">      .reduceGroup(new MergedGraphIds&lt;&gt;()) : result;</span>
+  }
+
+  /**
+   * Initializes EPGM vertices including their original data from the given
+   * pattern matching result.
+   *
+   * @param result        pattern matching result
+   * @param inputVertices original data graph vertices
+   * @return EPGM vertices including data
+   */
+  public static DataSet&lt;Vertex&gt; extractVerticesWithData(
+    DataSet&lt;FatVertex&gt; result, DataSet&lt;Vertex&gt; inputVertices) {
+<span class="fc" id="L229">    return extractVertexIds(result)</span>
+<span class="fc" id="L230">      .join(inputVertices)</span>
+<span class="fc" id="L231">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L232">      .with(new RightSide&lt;&gt;());</span>
+  }
+
+  /**
+   * Initializes EPGM edges including their original data from the given pattern
+   * matching result.
+   *
+   * @param result      pattern matching result
+   * @param inputEdges  original data graph edges
+   * @return EPGM edges including data
+   */
+  public static DataSet&lt;Edge&gt; extractEdgesWithData(DataSet&lt;FatVertex&gt; result,
+    DataSet&lt;Edge&gt; inputEdges) {
+<span class="fc" id="L245">    return extractEdgeIds(result)</span>
+<span class="fc" id="L246">      .join(inputEdges)</span>
+<span class="fc" id="L247">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L248">      .with(new RightSide&lt;&gt;());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

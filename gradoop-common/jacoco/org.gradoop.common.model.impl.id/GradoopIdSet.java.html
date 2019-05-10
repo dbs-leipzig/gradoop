@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GradoopIdSet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.id</a> &gt; <span class="el_source">GradoopIdSet.java</span></div><h1>GradoopIdSet.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.id;
+
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.types.Value;
+
+import java.io.IOException;
+import java.util.AbstractSet;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+/**
+ * Represents a set of {@link GradoopId} instances, ignoring any duplicates.
+ *
+ * Note that by implementing {@link java.util.List} Flink uses the Kryo serializer for
+ * (de-)serializing the list.
+ *
+ * @see GradoopId
+ */
+public class GradoopIdSet extends AbstractSet&lt;GradoopId&gt; implements Value {
+  /**
+   * Contains the set of gradoop ids.
+   */
+  private Set&lt;GradoopId&gt; ids;
+
+  /**
+   * Required default constructor for instantiation by serialization logic.
+   */
+<span class="fc" id="L47">  public GradoopIdSet() {</span>
+<span class="fc" id="L48">    this.ids = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L49">  }</span>
+
+  /**
+   * Initializes the set with the given byte array.
+   *
+   * @param bytes bytes representing multiple gradoop ids
+   */
+<span class="nc" id="L56">  private GradoopIdSet(byte[] bytes) {</span>
+<span class="nc" id="L57">    this.ids = readIds(bytes);</span>
+<span class="nc" id="L58">  }</span>
+
+  /**
+   * Initializes the set with the given ids.
+   *
+   * @param ids a collection of {@link GradoopId}s
+   */
+<span class="fc" id="L65">  private GradoopIdSet(Collection&lt;GradoopId&gt; ids) {</span>
+<span class="fc" id="L66">    this.ids = new HashSet&lt;&gt;(ids);</span>
+<span class="fc" id="L67">  }</span>
+
+  /**
+   * Since we will need to do operations on individual ids we need
+   * to reconstruct the {@link GradoopId} instances.
+   * @param bytes serialized sequence of {@link GradoopId}s
+   * @return a set representation
+   */
+  private Set&lt;GradoopId&gt; readIds(byte[] bytes) {
+<span class="fc" id="L76">    ids = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">    for (int i = 0; i &lt; bytes.length / GradoopId.ID_SIZE; i++) {</span>
+<span class="fc" id="L78">      byte[] idBytes = new byte[GradoopId.ID_SIZE];</span>
+<span class="fc" id="L79">      System.arraycopy(bytes, i * GradoopId.ID_SIZE, idBytes, 0, GradoopId.ID_SIZE);</span>
+<span class="fc" id="L80">      ids.add(GradoopId.fromByteArray(idBytes));</span>
+    }
+<span class="fc" id="L82">    return ids;</span>
+  }
+
+  /**
+   * Serialize all ids into a byte array.
+   * @param ids sequence of {@link GradoopId}s
+   * @return a binary representation
+   */
+  private byte[] writeIds(Set&lt;GradoopId&gt; ids) {
+<span class="fc" id="L91">    byte[] bytes = new byte[ids.size() * GradoopId.ID_SIZE];</span>
+
+<span class="fc" id="L93">    int i = 0;</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">    for (GradoopId id : ids) {</span>
+<span class="fc" id="L95">      System.arraycopy(id.toByteArray(), 0, bytes, i * GradoopId.ID_SIZE, GradoopId.ID_SIZE);</span>
+<span class="fc" id="L96">      i++;</span>
+<span class="fc" id="L97">    }</span>
+<span class="fc" id="L98">    return bytes;</span>
+  }
+
+  /**
+   * Creates a new instance from multiple GradoopIDs.
+   *
+   * @param ids array of gradoop ids
+   * @return gradoop id set
+   */
+  public static GradoopIdSet fromExisting(GradoopId... ids) {
+<span class="fc" id="L108">    return fromExisting(Arrays.asList(ids));</span>
+  }
+
+  /**
+   * Creates a new instance from multiple GradoopIDs.
+   *
+   * @param ids given ids
+   * @return gradoop id set
+   */
+  public static GradoopIdSet fromExisting(Collection&lt;GradoopId&gt; ids) {
+<span class="fc" id="L118">    return new GradoopIdSet(ids);</span>
+  }
+
+  /**
+   * Creates a new instance from multiple GradoopIDs represented as byte array.
+   *
+   * @param bytes byte array representing multiple gradoop ids
+   * @return gradoop id set
+   */
+  public static GradoopIdSet fromByteArray(byte[] bytes) {
+<span class="nc" id="L128">    return new GradoopIdSet(bytes);</span>
+  }
+
+  /**
+   * Adds the given gradoop id to the set.
+   *
+   * @param id the id to add
+   */
+  @Override
+  public boolean add(GradoopId id) {
+<span class="fc" id="L138">    return this.ids.add(id);</span>
+  }
+
+  /**
+   * Adds the given gradoop ids to the set.
+   *
+   * @param ids the ids to add
+   */
+  public void addAll(GradoopIdSet ids) {
+<span class="fc" id="L147">    this.ids.addAll(ids.ids);</span>
+<span class="fc" id="L148">  }</span>
+
+  /**
+   * Adds the given gradoop ids to the set.
+   *
+   * @param ids the ids to add
+   */
+  @Override
+  public boolean addAll(Collection&lt;? extends GradoopId&gt; ids) {
+<span class="fc" id="L157">    return this.ids.addAll(ids);</span>
+  }
+
+  /**
+   * Checks if the given id is contained in the set.
+   *
+   * @param identifier the id to look for
+   * @return true, iff the given id is in the set
+   */
+  @Override
+  public boolean contains(Object identifier) {
+<span class="fc" id="L168">    return this.ids.contains(identifier);</span>
+  }
+
+  /**
+   * Checks if the specified ids are contained in the set.
+   *
+   * @param other the ids to look for
+   * @return true, iff all specified ids are contained in the set
+   */
+  public boolean containsAll(GradoopIdSet other) {
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">    if (other.size() &gt; this.size()) {</span>
+<span class="nc" id="L179">      return false;</span>
+    }
+<span class="fc bfc" id="L181" title="All 2 branches covered.">    for (GradoopId id : other) {</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">      if (!this.contains(id)) {</span>
+<span class="fc" id="L183">        return false;</span>
+      }
+<span class="fc" id="L185">    }</span>
+<span class="fc" id="L186">    return true;</span>
+  }
+
+  /**
+   * Checks if the specified ids are contained in the set.
+   *
+   * @param other the ids to look for
+   * @return true, iff all specified ids are contained in the set
+   */
+  @Override
+  public boolean containsAll(Collection&lt;?&gt; other) {
+<span class="pc bpc" id="L197" title="2 of 4 branches missed.">    if (other instanceof Set &amp;&amp; other.size() &gt; this.size()) {</span>
+<span class="nc" id="L198">      return false;</span>
+    }
+<span class="fc bfc" id="L200" title="All 2 branches covered.">    for (Object id : other) {</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">      if (!this.contains(id)) {</span>
+<span class="fc" id="L202">        return false;</span>
+      }
+<span class="fc" id="L204">    }</span>
+<span class="fc" id="L205">    return true;</span>
+  }
+
+  /**
+   * Checks if any of the specified ids is contained in the set.
+   *
+   * @param other the ids to look for
+   * @return true, iff any of the specified ids is contained in the set
+   */
+  public boolean containsAny(GradoopIdSet other) {
+    // Algorithm: the sizes of both lists might be vastly different
+    // to prevent the case of iterating multiple times over large collections
+    // we make sure to always iterate over the smaller one
+<span class="fc" id="L218">    Set&lt;GradoopId&gt; iterate = this.ids;</span>
+<span class="fc" id="L219">    Set&lt;GradoopId&gt; contains = other.ids;</span>
+<span class="fc" id="L220">    int thisSize = this.size();</span>
+<span class="fc" id="L221">    int otherSize = other.size();</span>
+<span class="fc bfc" id="L222" title="All 2 branches covered.">    if (thisSize &gt; otherSize) {</span>
+<span class="fc" id="L223">      iterate = other.ids;</span>
+<span class="fc" id="L224">      contains = this.ids;</span>
+    }
+
+<span class="fc bfc" id="L227" title="All 2 branches covered.">    for (GradoopId id : iterate) {</span>
+<span class="fc bfc" id="L228" title="All 2 branches covered.">      if (contains.contains(id)) {</span>
+<span class="fc" id="L229">        return true;</span>
+      }
+<span class="fc" id="L231">    }</span>
+<span class="fc" id="L232">    return false;</span>
+  }
+
+  /**
+   * Checks if any of the specified ids is contained in the set.
+   *
+   * @param other the ids to look for
+   * @return true, iff any of the specified ids is contained in the set
+   */
+  public boolean containsAny(Set&lt;GradoopId&gt; other) {
+<span class="fc" id="L242">    Set&lt;GradoopId&gt; iterate = this.ids;</span>
+<span class="fc" id="L243">    Set&lt;GradoopId&gt; contains = other;</span>
+<span class="fc" id="L244">    int thisSize = this.size();</span>
+<span class="fc" id="L245">    int otherSize = other.size();</span>
+<span class="fc bfc" id="L246" title="All 2 branches covered.">    if (thisSize &gt; otherSize) {</span>
+<span class="fc" id="L247">      iterate = other;</span>
+<span class="fc" id="L248">      contains = this.ids;</span>
+    }
+
+<span class="fc bfc" id="L251" title="All 2 branches covered.">    for (GradoopId id : iterate) {</span>
+<span class="fc bfc" id="L252" title="All 2 branches covered.">      if (contains.contains(id)) {</span>
+<span class="fc" id="L253">        return true;</span>
+      }
+<span class="fc" id="L255">    }</span>
+<span class="fc" id="L256">    return false;</span>
+  }
+
+  /**
+   * Checks if the set is empty.
+   *
+   * @return true, iff the set contains no elements
+   */
+  public boolean isEmpty() {
+<span class="fc" id="L265">    return ids.isEmpty();</span>
+  }
+
+  @Override
+  public Iterator&lt;GradoopId&gt; iterator() {
+<span class="fc" id="L270">    return ids.iterator();</span>
+  }
+
+  /**
+   * Clears the set.
+   */
+  public void clear() {
+<span class="fc" id="L277">    ids.clear();</span>
+<span class="fc" id="L278">  }</span>
+
+  /**
+   * Returns the number of contained gradoop ids
+   *
+   * @return number of elements in the set
+   */
+  public int size() {
+<span class="fc" id="L286">    return ids.size();</span>
+  }
+
+  /**
+   * Returns the byte representation of that set.
+   *
+   * @return byte array representation
+   */
+  public byte[] toByteArray() {
+<span class="nc" id="L295">    return writeIds(ids);</span>
+  }
+
+  @Override
+  public void write(DataOutputView out) throws IOException {
+<span class="pc bpc" id="L300" title="1 of 2 branches missed.">    if (isEmpty()) {</span>
+<span class="nc" id="L301">      out.writeInt(0);</span>
+    } else {
+<span class="fc" id="L303">      out.writeInt(size());</span>
+<span class="fc" id="L304">      out.write(writeIds(ids));</span>
+    }
+<span class="fc" id="L306">  }</span>
+
+  @Override
+  public void read(DataInputView in) throws IOException {
+<span class="fc" id="L310">    int n = in.readInt();</span>
+<span class="fc" id="L311">    byte[] bytes = new byte[n * GradoopId.ID_SIZE];</span>
+<span class="fc" id="L312">    in.readFully(bytes);</span>
+<span class="fc" id="L313">    this.ids = readIds(bytes);</span>
+<span class="fc" id="L314">  }</span>
+
+  @Override
+  public boolean equals(Object o) {
+<span class="fc bfc" id="L318" title="All 2 branches covered.">    boolean equal = this == o;</span>
+
+<span class="pc bpc" id="L320" title="1 of 4 branches missed.">    if (!equal &amp;&amp; o instanceof GradoopIdSet) {</span>
+<span class="fc" id="L321">      GradoopIdSet that = (GradoopIdSet) o;</span>
+      // same number of ids
+<span class="fc bfc" id="L323" title="All 2 branches covered.">      equal = this.size() == that.size();</span>
+
+<span class="fc bfc" id="L325" title="All 2 branches covered.">      if (equal) {</span>
+        // same ids
+<span class="fc" id="L327">        equal = this.ids.equals(that.ids);</span>
+      }
+    }
+
+<span class="fc" id="L331">    return equal;</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="fc" id="L336">    return ids.hashCode();</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc bnc" id="L341" title="All 2 branches missed.">    if (isEmpty()) {</span>
+<span class="nc" id="L342">      return &quot;[]&quot;;</span>
+    }
+
+<span class="nc" id="L345">    Iterator&lt;GradoopId&gt; it = iterator();</span>
+<span class="nc" id="L346">    StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L347">    sb.append('[');</span>
+
+    for (;;) {
+<span class="nc" id="L350">      GradoopId id = it.next();</span>
+<span class="nc" id="L351">      sb.append(id);</span>
+<span class="nc bnc" id="L352" title="All 2 branches missed.">      if (!it.hasNext()) {</span>
+<span class="nc" id="L353">        return sb.append(']').toString();</span>
+      }
+<span class="nc" id="L355">      sb.append(',').append(' ');</span>
+<span class="nc" id="L356">    }</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

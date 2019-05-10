@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GrowFrequentPatterns.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.dimspan.functions.mining</a> &gt; <span class="el_source">GrowFrequentPatterns.java</span></div><h1>GrowFrequentPatterns.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.dimspan.functions.mining;
+
+import com.google.common.collect.Lists;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
+import org.gradoop.flink.algorithms.fsm.dimspan.comparison.DFSCodeComparator;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DataflowStep;
+import org.gradoop.flink.algorithms.fsm.dimspan.gspan.GSpanLogic;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.Simple16Compressor;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbeddingsMap;
+import org.gradoop.flink.model.impl.tuples.WithCount;
+
+import java.util.List;
+
+/**
+ * (graph, k-edge pattern -&gt; embeddings) =&gt; (graph, k+1-edge pattern -&gt; embeddings)
+ */
+public class GrowFrequentPatterns
+  extends RichMapFunction&lt;GraphWithPatternEmbeddingsMap, GraphWithPatternEmbeddingsMap&gt; {
+
+  /**
+   * compressed k-edge frequent patterns for fast embedding map lookup
+   */
+  private List&lt;int[]&gt; compressedFrequentPatterns;
+
+  /**
+   * uncompressed k-edge frequent patterns for pattern growth
+   */
+  private List&lt;int[]&gt; frequentPatterns;
+
+  /**
+   * patterns with frequency for collector
+   */
+  private List&lt;WithCount&lt;int[]&gt;&gt; patternFrequencies;
+
+  /**
+   * list of rightmost paths, index relates to frequent patterns
+   */
+  private List&lt;int[]&gt; rightmostPaths;
+
+  /**
+   * pattern growth logic (directed or undirected mode)
+   */
+  private final GSpanLogic gSpan;
+
+  /**
+   * flag to enable graph compression (true=enabled)
+   */
+  private final boolean compressGraphs;
+
+  /**
+   * flag to enable pattern compression (true=enabled)
+   */
+  private final boolean compressPatterns;
+
+  /**
+   * flag to enable pattern decompression (true=enabled)
+   */
+  private final boolean uncompressFrequentPatterns;
+
+  /**
+   * flag to enable embedding compression (true=enabled)
+   */
+  private final boolean compressEmbeddings;
+
+  /**
+   * flag to enable pattern verification before counting (true=enabled)
+   */
+  private final boolean validatePatterns;
+
+  /**
+   * Constructor.
+   *
+   * @param gSpan pattern growth logic
+   * @param fsmConfig FSM Configuration
+   */
+<span class="fc" id="L95">  public GrowFrequentPatterns(GSpanLogic gSpan, DIMSpanConfig fsmConfig) {</span>
+
+    // set pattern growth logic for directed or undirected mode
+<span class="fc" id="L98">    this.gSpan = gSpan;</span>
+
+    // cache compression flags
+<span class="fc" id="L101">    compressGraphs = fsmConfig.isGraphCompressionEnabled();</span>
+<span class="fc" id="L102">    compressEmbeddings = fsmConfig.isEmbeddingCompressionEnabled();</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">    compressPatterns = fsmConfig.getPatternCompressionInStep() == DataflowStep.MAP;</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">    uncompressFrequentPatterns = fsmConfig.getPatternCompressionInStep() != DataflowStep.WITHOUT;</span>
+
+    // cache validation flag
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">    validatePatterns = fsmConfig.getPatternVerificationInStep() == DataflowStep.MAP;</span>
+<span class="fc" id="L108">  }</span>
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="fc" id="L112">    super.open(parameters);</span>
+
+    // broadcast reception
+
+<span class="fc" id="L116">    patternFrequencies =</span>
+<span class="fc" id="L117">      getRuntimeContext().getBroadcastVariable(DIMSpanConstants.FREQUENT_PATTERNS);</span>
+
+<span class="fc" id="L119">    int patternCount = patternFrequencies.size();</span>
+
+<span class="fc" id="L121">    this.frequentPatterns = Lists.newArrayListWithExpectedSize(patternCount);</span>
+
+<span class="fc bfc" id="L123" title="All 2 branches covered.">    for (WithCount&lt;int[]&gt; patternWithCount : patternFrequencies) {</span>
+<span class="fc" id="L124">      int[] pattern = patternWithCount.getObject();</span>
+
+      // uncompress
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">      if (uncompressFrequentPatterns) {</span>
+<span class="fc" id="L128">        pattern = Simple16Compressor.uncompress(pattern);</span>
+      }
+<span class="fc" id="L130">      frequentPatterns.add(pattern);</span>
+<span class="fc" id="L131">    }</span>
+
+    // sort
+<span class="fc" id="L134">    frequentPatterns.sort(new DFSCodeComparator());</span>
+
+    // calculate rightmost paths
+<span class="fc" id="L137">    this.rightmostPaths = Lists.newArrayListWithExpectedSize(patternCount);</span>
+<span class="fc" id="L138">    this.compressedFrequentPatterns = Lists.newArrayListWithExpectedSize(patternCount);</span>
+
+<span class="fc bfc" id="L140" title="All 2 branches covered.">    for (int[] pattern : frequentPatterns) {</span>
+<span class="fc" id="L141">      rightmostPaths.add(gSpan.getRightmostPathTimes(pattern));</span>
+
+      // TODO: directly store compressed patterns at reception
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">      compressedFrequentPatterns</span>
+<span class="pc" id="L145">        .add(compressPatterns ? Simple16Compressor.compress(pattern) : pattern);</span>
+<span class="fc" id="L146">    }</span>
+<span class="fc" id="L147">  }</span>
+
+  @Override
+  public GraphWithPatternEmbeddingsMap map(GraphWithPatternEmbeddingsMap pair) throws Exception {
+
+    // union k-1 edge frequent patterns with k-edge ones
+<span class="fc bfc" id="L153" title="All 2 branches covered.">    if (pair.isFrequentPatternCollector()) {</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">      for (WithCount&lt;int[]&gt; patternWithFrequency : patternFrequencies) {</span>
+<span class="fc" id="L155">        pair.getMap().collect(patternWithFrequency);</span>
+<span class="fc" id="L156">      }</span>
+    } else {
+<span class="fc" id="L158">      int[] graph = pair.getGraph();</span>
+
+      // uncompress graph
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">      if (compressGraphs) {</span>
+<span class="fc" id="L162">        graph = Simple16Compressor.uncompress(graph);</span>
+      }
+
+      // execute pattern growth for all supported frequent patterns
+<span class="fc" id="L166">      PatternEmbeddingsMap childMap = gSpan.growPatterns(graph, pair.getMap(),</span>
+        frequentPatterns, rightmostPaths, compressEmbeddings, compressedFrequentPatterns);
+
+      // drop non-minimal patterns if configured to be executed here
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">      if (validatePatterns) {</span>
+<span class="nc" id="L171">        PatternEmbeddingsMap validatedMap = PatternEmbeddingsMap.getEmptyOne();</span>
+
+<span class="nc bnc" id="L173" title="All 2 branches missed.">        for (int i = 0; i &lt; childMap.getPatternCount(); i++) {</span>
+<span class="nc" id="L174">          int[] pattern = childMap.getPattern(i);</span>
+
+<span class="nc bnc" id="L176" title="All 2 branches missed.">          if (gSpan.isMinimal(pattern)) {</span>
+<span class="nc" id="L177">            int[] embeddingData = childMap.getValues()[i];</span>
+<span class="nc" id="L178">            validatedMap.put(pattern, embeddingData);</span>
+          }
+        }
+
+<span class="nc" id="L182">        childMap = validatedMap;</span>
+      }
+
+      // update pattern-embedding map
+<span class="fc" id="L186">      pair.setPatternEmbeddings(childMap);</span>
+
+      // compress patterns and embedding, if configured
+      // NOTE: graphs will remain compressed
+<span class="pc bpc" id="L190" title="1 of 2 branches missed.">      if (compressPatterns) {</span>
+<span class="fc" id="L191">        Simple16Compressor.compressPatterns(pair.getMap());</span>
+      }
+
+<span class="pc bpc" id="L194" title="1 of 2 branches missed.">      if (compressEmbeddings) {</span>
+<span class="fc" id="L195">        Simple16Compressor.compressEmbeddings(pair.getMap());</span>
+      }
+    }
+
+<span class="fc" id="L199">    return pair;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

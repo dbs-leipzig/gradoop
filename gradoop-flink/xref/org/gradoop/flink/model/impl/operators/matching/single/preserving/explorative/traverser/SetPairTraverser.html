@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+<title>SetPairTraverser xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../../../../../../../../stylesheet.css" />
+</head>
+<body>
+<div id="overview"><a href="../../../../../../../../../../../../apidocs/org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/traverser/SetPairTraverser.html">View Javadoc</a></div><pre>
+
+<a name="1" href="#1">1</a>   <em class="jxr_comment">/*</em>
+<a name="2" href="#2">2</a>   <em class="jxr_comment"> * Copyright © 2014 - 2019 Leipzig University (Database Research Group)</em>
+<a name="3" href="#3">3</a>   <em class="jxr_comment"> *</em>
+<a name="4" href="#4">4</a>   <em class="jxr_comment"> * Licensed under the Apache License, Version 2.0 (the "License");</em>
+<a name="5" href="#5">5</a>   <em class="jxr_comment"> * you may not use this file except in compliance with the License.</em>
+<a name="6" href="#6">6</a>   <em class="jxr_comment"> * You may obtain a copy of the License at</em>
+<a name="7" href="#7">7</a>   <em class="jxr_comment"> *</em>
+<a name="8" href="#8">8</a>   <em class="jxr_comment"> *     <a href="http://www.apache.org/licenses/LICENSE-2.0" target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.0</a></em>
+<a name="9" href="#9">9</a>   <em class="jxr_comment"> *</em>
+<a name="10" href="#10">10</a>  <em class="jxr_comment"> * Unless required by applicable law or agreed to in writing, software</em>
+<a name="11" href="#11">11</a>  <em class="jxr_comment"> * distributed under the License is distributed on an "AS IS" BASIS,</em>
+<a name="12" href="#12">12</a>  <em class="jxr_comment"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</em>
+<a name="13" href="#13">13</a>  <em class="jxr_comment"> * See the License for the specific language governing permissions and</em>
+<a name="14" href="#14">14</a>  <em class="jxr_comment"> * limitations under the License.</em>
+<a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
+<a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser;
+<a name="17" href="#17">17</a>  
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.operators.base.JoinOperatorBase;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.operators.JoinOperator;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple1;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.functions.ElementHasCandidate;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.Step;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
+<a name="32" href="#32">32</a>  
+<a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintEdgeStep;
+<a name="34" href="#34">34</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintEmbeddingWithTiePoint;
+<a name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.debug.PrintVertexStep;
+<a name="36" href="#36">36</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.BuildEdgeStep;
+<a name="37" href="#37">37</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.BuildEmbeddingFromVertex;
+<a name="38" href="#38">38</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.BuildVertexStep;
+<a name="39" href="#39">39</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.EdgeHasCandidate;
+<a name="40" href="#40">40</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.UpdateEdgeMapping;
+<a name="41" href="#41">41</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.UpdateVertexMapping;
+<a name="42" href="#42">42</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions.VertexHasCandidate;
+<a name="43" href="#43">43</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EdgeStep;
+<a name="44" href="#44">44</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
+<a name="45" href="#45">45</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.VertexStep;
+<a name="46" href="#46">46</a>  
+<a name="47" href="#47">47</a>  <strong class="jxr_keyword">import</strong> java.util.Objects;
+<a name="48" href="#48">48</a>  
+<a name="49" href="#49">49</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
+<a name="50" href="#50">50</a>  
+<a name="51" href="#51">51</a>  <em class="jxr_javadoccomment">/**</em>
+<a name="52" href="#52">52</a>  <em class="jxr_javadoccomment"> * Traverses a graph represented by two DataSets (vertices and edges).</em>
+<a name="53" href="#53">53</a>  <em class="jxr_javadoccomment"> *</em>
+<a name="54" href="#54">54</a>  <em class="jxr_javadoccomment"> * @param &lt;K&gt; key type</em>
+<a name="55" href="#55">55</a>  <em class="jxr_javadoccomment"> */</em>
+<a name="56" href="#56">56</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">class</strong> SetPairTraverser&lt;K&gt; <strong class="jxr_keyword">extends</strong> DistributedTraverser&lt;K&gt; {
+<a name="57" href="#57">57</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * Join strategy used for the join between embeddings and edges</em>
+<a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="60" href="#60">60</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> JoinOperatorBase.JoinHint edgeStepJoinStrategy;
+<a name="61" href="#61">61</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="62" href="#62">62</a>  <em class="jxr_javadoccomment">   * Join strategy used for the join between embeddings and vertices</em>
+<a name="63" href="#63">63</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="64" href="#64">64</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> JoinOperatorBase.JoinHint vertexStepJoinStrategy;
+<a name="65" href="#65">65</a>  
+<a name="66" href="#66">66</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="67" href="#67">67</a>  <em class="jxr_javadoccomment">   * Creates a new distributed traverser.</em>
+<a name="68" href="#68">68</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="69" href="#69">69</a>  <em class="jxr_javadoccomment">   * @param traversalCode          describes the graph traversal</em>
+<a name="70" href="#70">70</a>  <em class="jxr_javadoccomment">   * @param matchStrategy          matching strategy for vertices and edges</em>
+<a name="71" href="#71">71</a>  <em class="jxr_javadoccomment">   * @param vertexCount            number of query vertices</em>
+<a name="72" href="#72">72</a>  <em class="jxr_javadoccomment">   * @param edgeCount              number of query edges</em>
+<a name="73" href="#73">73</a>  <em class="jxr_javadoccomment">   * @param keyClazz               key type for embedding initialization</em>
+<a name="74" href="#74">74</a>  <em class="jxr_javadoccomment">   * @param edgeStepJoinStrategy   Join strategy for edge extension</em>
+<a name="75" href="#75">75</a>  <em class="jxr_javadoccomment">   * @param vertexStepJoinStrategy Join strategy for vertex extension</em>
+<a name="76" href="#76">76</a>  <em class="jxr_javadoccomment">   * @param vertexMapping          used for debug</em>
+<a name="77" href="#77">77</a>  <em class="jxr_javadoccomment">   * @param edgeMapping            used for debug</em>
+<a name="78" href="#78">78</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="79" href="#79">79</a>    <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/traverser/SetPairTraverser.html">SetPairTraverser</a>(<a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/TraversalCode.html">TraversalCode</a> traversalCode, <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/MatchStrategy.html">MatchStrategy</a> matchStrategy, <strong class="jxr_keyword">int</strong> vertexCount,
+<a name="80" href="#80">80</a>      <strong class="jxr_keyword">int</strong> edgeCount, Class&lt;K&gt; keyClazz, JoinOperatorBase.JoinHint edgeStepJoinStrategy,
+<a name="81" href="#81">81</a>      JoinOperatorBase.JoinHint vertexStepJoinStrategy,
+<a name="82" href="#82">82</a>      DataSet&lt;Tuple2&lt;K, PropertyValue&gt;&gt; vertexMapping,
+<a name="83" href="#83">83</a>      DataSet&lt;Tuple2&lt;K, PropertyValue&gt;&gt; edgeMapping) {
+<a name="84" href="#84">84</a>      <strong class="jxr_keyword">super</strong>(traversalCode, matchStrategy, vertexCount, edgeCount, keyClazz,
+<a name="85" href="#85">85</a>        vertexMapping, edgeMapping);
+<a name="86" href="#86">86</a>  
+<a name="87" href="#87">87</a>      Objects.requireNonNull(edgeStepJoinStrategy);
+<a name="88" href="#88">88</a>      Objects.requireNonNull(vertexStepJoinStrategy);
+<a name="89" href="#89">89</a>  
+<a name="90" href="#90">90</a>      <strong class="jxr_keyword">this</strong>.edgeStepJoinStrategy = edgeStepJoinStrategy;
+<a name="91" href="#91">91</a>      <strong class="jxr_keyword">this</strong>.vertexStepJoinStrategy = vertexStepJoinStrategy;
+<a name="92" href="#92">92</a>    }
+<a name="93" href="#93">93</a>  
+<a name="94" href="#94">94</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="95" href="#95">95</a>  <em class="jxr_javadoccomment">   * Traverses the graph, thereby extracting embeddings of a given pattern.</em>
+<a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="97" href="#97">97</a>  <em class="jxr_javadoccomment">   * @param vertices  vertices including their query candidates</em>
+<a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">   * @param edges     edges including their query candidates</em>
+<a name="99" href="#99">99</a>  <em class="jxr_javadoccomment">   * @return embeddings contained in the graph</em>
+<a name="100" href="#100">100</a> <em class="jxr_javadoccomment">   */</em>
+<a name="101" href="#101">101</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> DataSet&lt;Tuple1&lt;Embedding&lt;K&gt;&gt;&gt; traverse(
+<a name="102" href="#102">102</a>     DataSet&lt;IdWithCandidates&lt;K&gt;&gt; vertices,
+<a name="103" href="#103">103</a>     DataSet&lt;TripleWithCandidates&lt;K&gt;&gt; edges);
+<a name="104" href="#104">104</a> 
+<a name="105" href="#105">105</a>   <strong class="jxr_keyword">private</strong> JoinOperatorBase.JoinHint getEdgeStepJoinStrategy() {
+<a name="106" href="#106">106</a>     <strong class="jxr_keyword">return</strong> edgeStepJoinStrategy;
+<a name="107" href="#107">107</a>   }
+<a name="108" href="#108">108</a> 
+<a name="109" href="#109">109</a>   <strong class="jxr_keyword">private</strong> JoinOperatorBase.JoinHint getVertexStepJoinStrategy() {
+<a name="110" href="#110">110</a>     <strong class="jxr_keyword">return</strong> vertexStepJoinStrategy;
+<a name="111" href="#111">111</a>   }
+<a name="112" href="#112">112</a> 
+<a name="113" href="#113">113</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="114" href="#114">114</a> <em class="jxr_javadoccomment">   * Builds the initial embeddings from the given vertices.</em>
+<a name="115" href="#115">115</a> <em class="jxr_javadoccomment">   *</em>
+<a name="116" href="#116">116</a> <em class="jxr_javadoccomment">   * @param vertices vertices and their query candidates</em>
+<a name="117" href="#117">117</a> <em class="jxr_javadoccomment">   * @return initial embeddings</em>
+<a name="118" href="#118">118</a> <em class="jxr_javadoccomment">   */</em>
+<a name="119" href="#119">119</a>   DataSet&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; buildInitialEmbeddings(DataSet&lt;IdWithCandidates&lt;K&gt;&gt; vertices) {
+<a name="120" href="#120">120</a> 
+<a name="121" href="#121">121</a>     <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/Step.html">Step</a> initialStep = getTraversalCode().getStep(0);
+<a name="122" href="#122">122</a> 
+<a name="123" href="#123">123</a>     DataSet&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; initialEmbeddings = vertices
+<a name="124" href="#124">124</a>       .filter(<strong class="jxr_keyword">new</strong> ElementHasCandidate&lt;&gt;((<strong class="jxr_keyword">int</strong>) initialStep.getFrom()))
+<a name="125" href="#125">125</a>       .map(<strong class="jxr_keyword">new</strong> BuildEmbeddingFromVertex&lt;&gt;(getKeyClazz(), initialStep,
+<a name="126" href="#126">126</a>         getVertexCount(), getEdgeCount()));
+<a name="127" href="#127">127</a> 
+<a name="128" href="#128">128</a>     <strong class="jxr_keyword">return</strong> log(initialEmbeddings,
+<a name="129" href="#129">129</a>       <strong class="jxr_keyword">new</strong> PrintEmbeddingWithTiePoint&lt;&gt;(), getVertexMapping(), getEdgeMapping());
+<a name="130" href="#130">130</a>   }
+<a name="131" href="#131">131</a> 
+<a name="132" href="#132">132</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="133" href="#133">133</a> <em class="jxr_javadoccomment">   * Extends the given embeddings with valid edges and returns the updated</em>
+<a name="134" href="#134">134</a> <em class="jxr_javadoccomment">   * embeddings.</em>
+<a name="135" href="#135">135</a> <em class="jxr_javadoccomment">   *</em>
+<a name="136" href="#136">136</a> <em class="jxr_javadoccomment">   * @param edges             edges including their candidates</em>
+<a name="137" href="#137">137</a> <em class="jxr_javadoccomment">   * @param embeddings        embeddings</em>
+<a name="138" href="#138">138</a> <em class="jxr_javadoccomment">   * @param superstep         current iteration</em>
+<a name="139" href="#139">139</a> <em class="jxr_javadoccomment">   * @param traverserStrategy iteration strategy</em>
+<a name="140" href="#140">140</a> <em class="jxr_javadoccomment">   * @param forwardedFields   forwarded fields for edge step creation</em>
+<a name="141" href="#141">141</a> <em class="jxr_javadoccomment">   * @return updated embeddings</em>
+<a name="142" href="#142">142</a> <em class="jxr_javadoccomment">   */</em>
+<a name="143" href="#143">143</a>   DataSet&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; traverseEdges(
+<a name="144" href="#144">144</a>     DataSet&lt;TripleWithCandidates&lt;K&gt;&gt; edges,
+<a name="145" href="#145">145</a>     DataSet&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; embeddings,
+<a name="146" href="#146">146</a>     DataSet&lt;Integer&gt; superstep,
+<a name="147" href="#147">147</a>     <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/traverser/TraverserStrategy.html">TraverserStrategy</a> traverserStrategy,
+<a name="148" href="#148">148</a>     String[] forwardedFields) {
+<a name="149" href="#149">149</a> 
+<a name="150" href="#150">150</a>     DataSet&lt;EdgeStep&lt;K&gt;&gt; edgeSteps = edges
+<a name="151" href="#151">151</a>       .filter(<strong class="jxr_keyword">new</strong> EdgeHasCandidate&lt;&gt;(getTraversalCode()))
+<a name="152" href="#152">152</a>       .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP)
+<a name="153" href="#153">153</a>       .map(<strong class="jxr_keyword">new</strong> BuildEdgeStep&lt;&gt;(getTraversalCode()))
+<a name="154" href="#154">154</a>       .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP)
+<a name="155" href="#155">155</a>       .withForwardedFields(forwardedFields);
+<a name="156" href="#156">156</a> 
+<a name="157" href="#157">157</a>     edgeSteps = log(edgeSteps,
+<a name="158" href="#158">158</a>       <strong class="jxr_keyword">new</strong> PrintEdgeStep&lt;&gt;(isIterative(), <span class="jxr_string">"post-filter-map-edge"</span>),
+<a name="159" href="#159">159</a>       getVertexMapping(), getEdgeMapping());
+<a name="160" href="#160">160</a> 
+<a name="161" href="#161">161</a>     JoinOperator&lt;EmbeddingWithTiePoint&lt;K&gt;, EdgeStep&lt;K&gt;,
+<a name="162" href="#162">162</a>       EmbeddingWithTiePoint&lt;K&gt;&gt; join = embeddings
+<a name="163" href="#163">163</a>       .join(edgeSteps, getEdgeStepJoinStrategy())
+<a name="164" href="#164">164</a>       .where(0).equalTo(1) <em class="jxr_comment">// tiePointId == sourceId/targetId tie point</em>
+<a name="165" href="#165">165</a>       .with(<strong class="jxr_keyword">new</strong> UpdateEdgeMapping&lt;&gt;(getTraversalCode(), getMatchStrategy(), traverserStrategy));
+<a name="166" href="#166">166</a> 
+<a name="167" href="#167">167</a>     <strong class="jxr_keyword">if</strong> (traverserStrategy == TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION) {
+<a name="168" href="#168">168</a>       embeddings = join.withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP);
+<a name="169" href="#169">169</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="170" href="#170">170</a>       embeddings = join;
+<a name="171" href="#171">171</a>     }
+<a name="172" href="#172">172</a> 
+<a name="173" href="#173">173</a>     <strong class="jxr_keyword">return</strong> log(embeddings,
+<a name="174" href="#174">174</a>       <strong class="jxr_keyword">new</strong> PrintEmbeddingWithTiePoint&lt;&gt;(isIterative(), <span class="jxr_string">"post-edge-update"</span>),
+<a name="175" href="#175">175</a>       getVertexMapping(), getEdgeMapping());
+<a name="176" href="#176">176</a>   }
+<a name="177" href="#177">177</a> 
+<a name="178" href="#178">178</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="179" href="#179">179</a> <em class="jxr_javadoccomment">   * Extends the given embeddings with valid vertices and returns the updated</em>
+<a name="180" href="#180">180</a> <em class="jxr_javadoccomment">   * embeddings.</em>
+<a name="181" href="#181">181</a> <em class="jxr_javadoccomment">   *</em>
+<a name="182" href="#182">182</a> <em class="jxr_javadoccomment">   * @param vertices          vertices including their candidates</em>
+<a name="183" href="#183">183</a> <em class="jxr_javadoccomment">   * @param embeddings        embeddings</em>
+<a name="184" href="#184">184</a> <em class="jxr_javadoccomment">   * @param superstep         current super step</em>
+<a name="185" href="#185">185</a> <em class="jxr_javadoccomment">   * @param traverserStrategy iteration strategy</em>
+<a name="186" href="#186">186</a> <em class="jxr_javadoccomment">   * @return updated embeddings</em>
+<a name="187" href="#187">187</a> <em class="jxr_javadoccomment">   */</em>
+<a name="188" href="#188">188</a>   DataSet&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; traverseVertices(
+<a name="189" href="#189">189</a>     DataSet&lt;IdWithCandidates&lt;K&gt;&gt; vertices,
+<a name="190" href="#190">190</a>     DataSet&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; embeddings,
+<a name="191" href="#191">191</a>     DataSet&lt;Integer&gt; superstep,
+<a name="192" href="#192">192</a>     <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/preserving/explorative/traverser/TraverserStrategy.html">TraverserStrategy</a> traverserStrategy) {
+<a name="193" href="#193">193</a> 
+<a name="194" href="#194">194</a>     DataSet&lt;VertexStep&lt;K&gt;&gt; vertexSteps = vertices
+<a name="195" href="#195">195</a>       .filter(<strong class="jxr_keyword">new</strong> VertexHasCandidate&lt;&gt;(getTraversalCode()))
+<a name="196" href="#196">196</a>       .withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP)
+<a name="197" href="#197">197</a>       .map(<strong class="jxr_keyword">new</strong> BuildVertexStep&lt;&gt;());
+<a name="198" href="#198">198</a> 
+<a name="199" href="#199">199</a>     vertexSteps = log(vertexSteps,
+<a name="200" href="#200">200</a>       <strong class="jxr_keyword">new</strong> PrintVertexStep&lt;&gt;(isIterative(), <span class="jxr_string">"post-filter-project-vertex"</span>),
+<a name="201" href="#201">201</a>       getVertexMapping(), getEdgeMapping());
+<a name="202" href="#202">202</a> 
+<a name="203" href="#203">203</a>     JoinOperator&lt;EmbeddingWithTiePoint&lt;K&gt;, VertexStep&lt;K&gt;,
+<a name="204" href="#204">204</a>       EmbeddingWithTiePoint&lt;K&gt;&gt; join = embeddings
+<a name="205" href="#205">205</a>       .join(vertexSteps, getVertexStepJoinStrategy())
+<a name="206" href="#206">206</a>       .where(0).equalTo(0) <em class="jxr_comment">// tiePointId == vertexId</em>
+<a name="207" href="#207">207</a>       .with(<strong class="jxr_keyword">new</strong> UpdateVertexMapping&lt;&gt;(getTraversalCode(), getMatchStrategy(), traverserStrategy));
+<a name="208" href="#208">208</a> 
+<a name="209" href="#209">209</a>     <strong class="jxr_keyword">if</strong> (traverserStrategy == TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION) {
+<a name="210" href="#210">210</a>       embeddings = join.withBroadcastSet(superstep, ExplorativePatternMatching.BC_SUPERSTEP);
+<a name="211" href="#211">211</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="212" href="#212">212</a>       embeddings = join;
+<a name="213" href="#213">213</a>     }
+<a name="214" href="#214">214</a> 
+<a name="215" href="#215">215</a>     embeddings = log(embeddings,
+<a name="216" href="#216">216</a>       <strong class="jxr_keyword">new</strong> PrintEmbeddingWithTiePoint&lt;&gt;(isIterative(), <span class="jxr_string">"post-vertex-update"</span>),
+<a name="217" href="#217">217</a>       getVertexMapping(), getEdgeMapping());
+<a name="218" href="#218">218</a>     <strong class="jxr_keyword">return</strong> embeddings;
+<a name="219" href="#219">219</a>   }
+<a name="220" href="#220">220</a> }
+</pre>
+<hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
+</html>

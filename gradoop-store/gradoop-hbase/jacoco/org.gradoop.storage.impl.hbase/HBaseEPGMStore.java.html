@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HBaseEPGMStore.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop HBase</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.impl.hbase</a> &gt; <span class="el_source">HBaseEPGMStore.java</span></div><h1>HBaseEPGMStore.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.impl.hbase;
+
+import com.google.common.base.Preconditions;
+import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.filter.FilterList;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.storage.common.api.EPGMConfigProvider;
+import org.gradoop.storage.common.api.EPGMGraphInput;
+import org.gradoop.storage.common.api.EPGMGraphPredictableOutput;
+import org.gradoop.storage.common.iterator.ClosableIterator;
+import org.gradoop.storage.common.predicate.query.ElementQuery;
+import org.gradoop.storage.config.GradoopHBaseConfig;
+import org.gradoop.storage.impl.hbase.api.EdgeHandler;
+import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
+import org.gradoop.storage.impl.hbase.api.VertexHandler;
+import org.gradoop.storage.impl.hbase.iterator.HBaseEdgeIterator;
+import org.gradoop.storage.impl.hbase.iterator.HBaseGraphIterator;
+import org.gradoop.storage.impl.hbase.iterator.HBaseVertexIterator;
+import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
+import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Default HBase graph store that handles reading and writing vertices and
+ * graphs from and to HBase.
+ *
+ * @see EPGMGraphPredictableOutput
+ */
+public class HBaseEPGMStore implements
+  EPGMConfigProvider&lt;GradoopHBaseConfig&gt;,
+  EPGMGraphInput,
+  EPGMGraphPredictableOutput&lt;
+    HBaseElementFilter&lt;GraphHead&gt;,
+    HBaseElementFilter&lt;Vertex&gt;,
+    HBaseElementFilter&lt;Edge&gt;&gt; {
+
+  /**
+   * Gradoop configuration.
+   */
+  private final GradoopHBaseConfig config;
+  /**
+   * HBase table for storing graphs.
+   */
+  private final Table graphHeadTable;
+  /**
+   * HBase table for storing vertex data.
+   */
+  private final Table vertexTable;
+  /**
+   * HBase table for storing edge data.
+   */
+  private final Table edgeTable;
+  /**
+   * HBase admin instance
+   */
+  private final Admin admin;
+  /**
+   * Auto flush flag, default false
+   */
+  private volatile boolean autoFlush;
+
+  /**
+   * Creates a HBaseEPGMStore based on the given parameters. All parameters
+   * are mandatory and must not be {@code null}.
+   *
+   * @param graphHeadTable HBase table to store graph data
+   * @param vertexTable HBase table to store vertex data
+   * @param edgeTable HBase table to store edge data
+   * @param config Gradoop Configuration
+   * @param admin HBase admin instance
+   */
+  public HBaseEPGMStore(
+    final Table graphHeadTable,
+    final Table vertexTable,
+    final Table edgeTable,
+    final GradoopHBaseConfig config,
+    final Admin admin
+<span class="fc" id="L110">  ) {</span>
+<span class="fc" id="L111">    this.graphHeadTable = Preconditions.checkNotNull(graphHeadTable);</span>
+<span class="fc" id="L112">    this.vertexTable = Preconditions.checkNotNull(vertexTable);</span>
+<span class="fc" id="L113">    this.edgeTable = Preconditions.checkNotNull(edgeTable);</span>
+<span class="fc" id="L114">    this.config = Preconditions.checkNotNull(config);</span>
+<span class="fc" id="L115">    this.admin = Preconditions.checkNotNull(admin);</span>
+<span class="fc" id="L116">  }</span>
+
+  @Override
+  public GradoopHBaseConfig getConfig() {
+<span class="fc" id="L120">    return config;</span>
+  }
+
+  @Override
+  public String getVertexTableName() {
+<span class="fc" id="L125">    return vertexTable.getName().getNameAsString();</span>
+  }
+
+  @Override
+  public String getEdgeTableName() {
+<span class="fc" id="L130">    return edgeTable.getName().getNameAsString();</span>
+  }
+
+  @Override
+  public String getGraphHeadName() {
+<span class="fc" id="L135">    return graphHeadTable.getName().getNameAsString();</span>
+  }
+
+  @Override
+  public void writeGraphHead(@Nonnull final EPGMGraphHead graphHead) throws IOException {
+<span class="fc" id="L140">    GraphHeadHandler graphHeadHandler = config.getGraphHeadHandler();</span>
+    // graph id
+<span class="fc" id="L142">    Put put = new Put(graphHeadHandler.getRowKey(graphHead.getId()));</span>
+    // write graph to Put
+<span class="fc" id="L144">    put = graphHeadHandler.writeGraphHead(put, graphHead);</span>
+    // write to table
+<span class="fc" id="L146">    graphHeadTable.put(put);</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">    if (autoFlush) {</span>
+<span class="nc" id="L148">      admin.flush(graphHeadTable.getName());</span>
+    }
+<span class="fc" id="L150">  }</span>
+
+  @Override
+  public void writeVertex(@Nonnull final EPGMVertex vertexData) throws IOException {
+<span class="fc" id="L154">    VertexHandler vertexHandler = config.getVertexHandler();</span>
+    // vertex id
+<span class="fc" id="L156">    Put put = new Put(vertexHandler.getRowKey(vertexData.getId()));</span>
+    // write vertex data to Put
+<span class="fc" id="L158">    put = vertexHandler.writeVertex(put, vertexData);</span>
+    // write to table
+<span class="fc" id="L160">    vertexTable.put(put);</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">    if (autoFlush) {</span>
+<span class="nc" id="L162">      admin.flush(vertexTable.getName());</span>
+    }
+<span class="fc" id="L164">  }</span>
+
+  @Override
+  public void writeEdge(@Nonnull final EPGMEdge edgeData) throws IOException {
+    // write to table
+<span class="fc" id="L169">    EdgeHandler edgeHandler = config.getEdgeHandler();</span>
+    // edge id
+<span class="fc" id="L171">    Put put = new Put(edgeHandler.getRowKey(edgeData.getId()));</span>
+    // write edge data to Put
+<span class="fc" id="L173">    put = edgeHandler.writeEdge(put, edgeData);</span>
+<span class="fc" id="L174">    edgeTable.put(put);</span>
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">    if (autoFlush) {</span>
+<span class="nc" id="L176">      admin.flush(edgeTable.getName());</span>
+    }
+<span class="fc" id="L178">  }</span>
+
+  @Override
+  public GraphHead readGraph(@Nonnull final GradoopId graphId) throws IOException {
+<span class="fc" id="L182">    GraphHead graphData = null;</span>
+<span class="fc" id="L183">    GraphHeadHandler graphHeadHandler = config.getGraphHeadHandler();</span>
+<span class="fc" id="L184">    List&lt;Get&gt; getList = new ArrayList&lt;&gt;();</span>
+
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">    if (graphHeadHandler.isSpreadingByteUsed()) {</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">      for (byte[] rowKey : graphHeadHandler.getPossibleRowKeys(graphId)) {</span>
+<span class="nc" id="L188">        getList.add(new Get(rowKey));</span>
+<span class="nc" id="L189">      }</span>
+    } else {
+<span class="fc" id="L191">      getList.add(new Get(graphId.toByteArray()));</span>
+    }
+<span class="fc" id="L193">    final Result[] results = graphHeadTable.get(getList);</span>
+<span class="pc bpc" id="L194" title="1 of 2 branches missed.">    for (Result res : results) {</span>
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">      if (!res.isEmpty()) {</span>
+<span class="fc" id="L196">        graphData = graphHeadHandler.readGraphHead(res);</span>
+<span class="fc" id="L197">        break;</span>
+      }
+    }
+<span class="fc" id="L200">    return graphData;</span>
+  }
+
+  @Override
+  public Vertex readVertex(@Nonnull final GradoopId vertexId) throws IOException {
+<span class="fc" id="L205">    Vertex vertexData = null;</span>
+<span class="fc" id="L206">    VertexHandler vertexHandler = config.getVertexHandler();</span>
+<span class="fc" id="L207">    List&lt;Get&gt; getList = new ArrayList&lt;&gt;();</span>
+
+<span class="pc bpc" id="L209" title="1 of 2 branches missed.">    if (vertexHandler.isSpreadingByteUsed()) {</span>
+<span class="nc bnc" id="L210" title="All 2 branches missed.">      for (byte[] rowKey : vertexHandler.getPossibleRowKeys(vertexId)) {</span>
+<span class="nc" id="L211">        getList.add(new Get(rowKey));</span>
+<span class="nc" id="L212">      }</span>
+    } else {
+<span class="fc" id="L214">      getList.add(new Get(vertexHandler.getRowKey(vertexId)));</span>
+    }
+
+<span class="fc" id="L217">    final Result[] results = vertexTable.get(getList);</span>
+<span class="pc bpc" id="L218" title="1 of 2 branches missed.">    for (Result res : results) {</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">      if (!res.isEmpty()) {</span>
+<span class="fc" id="L220">        vertexData = vertexHandler.readVertex(res);</span>
+<span class="fc" id="L221">        break;</span>
+      }
+    }
+
+<span class="fc" id="L225">    return vertexData;</span>
+  }
+
+  @Override
+  public Edge readEdge(@Nonnull final GradoopId edgeId) throws IOException {
+<span class="fc" id="L230">    Edge edgeData = null;</span>
+<span class="fc" id="L231">    EdgeHandler edgeHandler = config.getEdgeHandler();</span>
+<span class="fc" id="L232">    List&lt;Get&gt; getList = new ArrayList&lt;&gt;();</span>
+
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">    if (edgeHandler.isSpreadingByteUsed()) {</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">      for (byte[] rowKey : edgeHandler.getPossibleRowKeys(edgeId)) {</span>
+<span class="nc" id="L236">        getList.add(new Get(rowKey));</span>
+<span class="nc" id="L237">      }</span>
+    } else {
+<span class="fc" id="L239">      getList.add(new Get(edgeHandler.getRowKey(edgeId)));</span>
+    }
+
+<span class="fc" id="L242">    final Result[] results = edgeTable.get(getList);</span>
+<span class="pc bpc" id="L243" title="1 of 2 branches missed.">    for (Result res : results) {</span>
+<span class="pc bpc" id="L244" title="1 of 2 branches missed.">      if (!res.isEmpty()) {</span>
+<span class="fc" id="L245">        edgeData = edgeHandler.readEdge(res);</span>
+<span class="fc" id="L246">        break;</span>
+      }
+    }
+
+<span class="fc" id="L250">    return edgeData;</span>
+  }
+
+  @Nonnull
+  @Override
+  public ClosableIterator&lt;GraphHead&gt; getGraphSpace(
+    @Nullable ElementQuery&lt;HBaseElementFilter&lt;GraphHead&gt;&gt; query,
+    int cacheSize
+  ) throws IOException {
+<span class="fc" id="L259">    Scan scan = new Scan();</span>
+<span class="fc" id="L260">    scan.setCaching(cacheSize);</span>
+<span class="fc" id="L261">    scan.setMaxVersions(1);</span>
+
+<span class="fc bfc" id="L263" title="All 2 branches covered.">    if (query != null) {</span>
+<span class="fc" id="L264">      attachFilter(query, scan, config.getGraphHeadHandler().isSpreadingByteUsed());</span>
+    }
+
+<span class="fc" id="L267">    return new HBaseGraphIterator(graphHeadTable.getScanner(scan), config.getGraphHeadHandler());</span>
+  }
+
+  @Nonnull
+  @Override
+  public ClosableIterator&lt;Vertex&gt; getVertexSpace(
+    @Nullable ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; query,
+    int cacheSize
+  ) throws IOException {
+<span class="fc" id="L276">    Scan scan = new Scan();</span>
+<span class="fc" id="L277">    scan.setCaching(cacheSize);</span>
+<span class="fc" id="L278">    scan.setMaxVersions(1);</span>
+
+<span class="fc bfc" id="L280" title="All 2 branches covered.">    if (query != null) {</span>
+<span class="fc" id="L281">      attachFilter(query, scan, config.getVertexHandler().isSpreadingByteUsed());</span>
+    }
+
+<span class="fc" id="L284">    return new HBaseVertexIterator(vertexTable.getScanner(scan), config.getVertexHandler());</span>
+  }
+
+  @Nonnull
+  @Override
+  public ClosableIterator&lt;Edge&gt; getEdgeSpace(
+    @Nullable ElementQuery&lt;HBaseElementFilter&lt;Edge&gt;&gt; query,
+    int cacheSize
+  ) throws IOException {
+<span class="fc" id="L293">    Scan scan = new Scan();</span>
+<span class="fc" id="L294">    scan.setCaching(cacheSize);</span>
+<span class="fc" id="L295">    scan.setMaxVersions(1);</span>
+
+<span class="fc bfc" id="L297" title="All 2 branches covered.">    if (query != null) {</span>
+<span class="fc" id="L298">      attachFilter(query, scan, config.getEdgeHandler().isSpreadingByteUsed());</span>
+    }
+
+<span class="fc" id="L301">    return new HBaseEdgeIterator(edgeTable.getScanner(scan), config.getEdgeHandler());</span>
+  }
+
+  @Override
+  public void setAutoFlush(boolean autoFlush) {
+<span class="fc" id="L306">    this.autoFlush = autoFlush;</span>
+<span class="fc" id="L307">  }</span>
+
+  @Override
+  public void flush() throws IOException {
+<span class="fc" id="L311">    admin.flush(vertexTable.getName());</span>
+<span class="fc" id="L312">    admin.flush(edgeTable.getName());</span>
+<span class="fc" id="L313">    admin.flush(graphHeadTable.getName());</span>
+<span class="fc" id="L314">  }</span>
+
+  @Override
+  public void close() throws IOException {
+<span class="fc" id="L318">    vertexTable.close();</span>
+<span class="fc" id="L319">    edgeTable.close();</span>
+<span class="fc" id="L320">    graphHeadTable.close();</span>
+<span class="fc" id="L321">  }</span>
+
+  /**
+   * First disable, then drop all three tables.
+   *
+   * @throws IOException on error
+   */
+  public void dropTables() throws IOException {
+<span class="fc" id="L329">    admin.disableTable(vertexTable.getName());</span>
+<span class="fc" id="L330">    admin.disableTable(edgeTable.getName());</span>
+<span class="fc" id="L331">    admin.disableTable(graphHeadTable.getName());</span>
+
+<span class="fc" id="L333">    admin.deleteTable(vertexTable.getName());</span>
+<span class="fc" id="L334">    admin.deleteTable(edgeTable.getName());</span>
+<span class="fc" id="L335">    admin.deleteTable(graphHeadTable.getName());</span>
+<span class="fc" id="L336">  }</span>
+
+  /**
+   * First disable, then truncate all tables handled by this store instance, i.e. delete all rows.
+   *
+   * @throws IOException when truncating any table fails.
+   */
+  public void truncateTables() throws IOException {
+<span class="fc" id="L344">    admin.disableTable(graphHeadTable.getName());</span>
+<span class="fc" id="L345">    admin.disableTable(vertexTable.getName());</span>
+<span class="fc" id="L346">    admin.disableTable(edgeTable.getName());</span>
+
+<span class="fc" id="L348">    admin.truncateTable(getConfig().getGraphTableName(), true);</span>
+<span class="fc" id="L349">    admin.truncateTable(getConfig().getVertexTableName(), true);</span>
+<span class="fc" id="L350">    admin.truncateTable(getConfig().getEdgeTableName(), true);</span>
+<span class="fc" id="L351">  }</span>
+
+  /**
+   * Attach a HBase filter represented by the given query to the given scan instance.
+   *
+   * @param query the query that represents a filter
+   * @param scan the HBase scan instance on which the filter will be applied
+   * @param isSpreadingByteUsed indicates whether a spreading byte is used as row key prefix or not
+   * @param &lt;T&gt; the type of the EPGM element
+   */
+  private &lt;T extends EPGMElement&gt; void attachFilter(
+    @Nonnull ElementQuery&lt;HBaseElementFilter&lt;T&gt;&gt; query,
+    @Nonnull Scan scan,
+    boolean isSpreadingByteUsed) {
+
+<span class="fc" id="L366">    FilterList conjunctFilters = new FilterList(FilterList.Operator.MUST_PASS_ALL);</span>
+
+<span class="pc bpc" id="L368" title="1 of 4 branches missed.">    if (query.getQueryRanges() != null &amp;&amp; !query.getQueryRanges().isEmpty()) {</span>
+<span class="fc" id="L369">      conjunctFilters.addFilter(HBaseFilterUtils.getIdFilter(query.getQueryRanges(),</span>
+        isSpreadingByteUsed));
+    }
+
+<span class="fc bfc" id="L373" title="All 2 branches covered.">    if (query.getFilterPredicate() != null) {</span>
+<span class="fc" id="L374">      conjunctFilters.addFilter(query.getFilterPredicate().toHBaseFilter(false));</span>
+    }
+
+    // if there are filters inside the root list, add it to the Scan object
+<span class="fc bfc" id="L378" title="All 2 branches covered.">    if (!conjunctFilters.getFilters().isEmpty()) {</span>
+<span class="fc" id="L379">      scan.setFilter(conjunctFilters);</span>
+    }
+<span class="fc" id="L381">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

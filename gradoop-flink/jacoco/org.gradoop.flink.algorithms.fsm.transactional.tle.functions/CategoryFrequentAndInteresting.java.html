@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CategoryFrequentAndInteresting.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.transactional.tle.functions</a> &gt; <span class="el_source">CategoryFrequentAndInteresting.java</span></div><h1>CategoryFrequentAndInteresting.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.apache.flink.api.common.functions.RichGroupReduceFunction;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.interestingness.Interestingness;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CCSSubgraph;
+
+import java.util.Collection;
+import java.util.Map;
+
+/**
+ * Evaluates subgraphs of different categories with regard to category
+ * frequency and global interestingness.
+ */
+public class CategoryFrequentAndInteresting
+  extends RichGroupReduceFunction&lt;CCSSubgraph, CCSSubgraph&gt; {
+
+  /**
+   * Interestingness measure
+   */
+  private final Interestingness interestingness;
+
+  /**
+   * minimum frequency per category
+   */
+  private Map&lt;String, Long&gt; categoryMinFrequencies;
+
+  /**
+   * graph count per category
+   */
+  private Map&lt;String, Long&gt; categoryCounts;
+
+  /**
+   * Constructor.
+   *
+   * @param minInterestingness interestingness threshold
+   */
+<span class="nc" id="L58">  public CategoryFrequentAndInteresting(float minInterestingness) {</span>
+<span class="nc" id="L59">    this.interestingness = new Interestingness(minInterestingness);</span>
+<span class="nc" id="L60">  }</span>
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="nc" id="L64">    super.open(parameters);</span>
+
+<span class="nc" id="L66">    this.categoryMinFrequencies = getRuntimeContext()</span>
+<span class="nc" id="L67">      .&lt;Map&lt;String, Long&gt;&gt;getBroadcastVariable(DIMSpanConstants.MIN_FREQUENCY).get(0);</span>
+
+<span class="nc" id="L69">    this.categoryCounts = getRuntimeContext()</span>
+<span class="nc" id="L70">      .&lt;Map&lt;String, Long&gt;&gt;getBroadcastVariable(TFSMConstants.GRAPH_COUNT).get(0);</span>
+<span class="nc" id="L71">  }</span>
+
+  @Override
+  public void reduce(
+    Iterable&lt;CCSSubgraph&gt; values, Collector&lt;CCSSubgraph&gt; out) throws Exception {
+
+<span class="nc" id="L77">    Collection&lt;CCSSubgraph&gt; subgraphs = Lists.newArrayList();</span>
+
+<span class="nc" id="L79">    boolean onceFrequent = false;</span>
+
+<span class="nc" id="L81">    Map&lt;String, Float&gt; categorySupports = Maps.newHashMap();</span>
+
+<span class="nc" id="L83">    float avgSupport = 0.0f;</span>
+
+<span class="nc bnc" id="L85" title="All 2 branches missed.">    for (CCSSubgraph subgraph : values) {</span>
+<span class="nc" id="L86">      subgraphs.add(subgraph);</span>
+
+<span class="nc" id="L88">      String category = subgraph.getCategory();</span>
+<span class="nc" id="L89">      long categoryFrequency = subgraph.getCount();</span>
+
+<span class="nc" id="L91">      float categorySupport =</span>
+<span class="nc" id="L92">        (float) categoryFrequency / categoryCounts.get(category);</span>
+
+<span class="nc" id="L94">      avgSupport += categorySupport;</span>
+
+<span class="nc" id="L96">      categorySupports.put(category, categorySupport);</span>
+
+<span class="nc bnc" id="L98" title="All 4 branches missed.">      if (categoryFrequency &gt;= categoryMinFrequencies.get(category) &amp;&amp;</span>
+        !onceFrequent) {
+<span class="nc" id="L100">        onceFrequent = true;</span>
+      }
+<span class="nc" id="L102">    }</span>
+
+<span class="nc bnc" id="L104" title="All 2 branches missed.">    if (onceFrequent) {</span>
+<span class="nc" id="L105">      avgSupport /= categoryMinFrequencies.size();</span>
+
+<span class="nc bnc" id="L107" title="All 2 branches missed.">      for (CCSSubgraph subgraph : subgraphs) {</span>
+<span class="nc" id="L108">        float categorySupport = categorySupports.get(subgraph.getCategory());</span>
+
+<span class="nc" id="L110">        subgraph.setInteresting(</span>
+<span class="nc" id="L111">          interestingness.isInteresting(categorySupport, avgSupport));</span>
+
+<span class="nc" id="L113">        out.collect(subgraph);</span>
+<span class="nc" id="L114">      }</span>
+    }
+<span class="nc" id="L116">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

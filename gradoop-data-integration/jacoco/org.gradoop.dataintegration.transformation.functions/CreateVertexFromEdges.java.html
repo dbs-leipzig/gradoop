@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreateVertexFromEdges.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation.functions</a> &gt; <span class="el_source">CreateVertexFromEdges.java</span></div><h1>CreateVertexFromEdges.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation.functions;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.impl.id.GradoopId;
+
+import java.util.Objects;
+
+/**
+ * A {@link MapFunction} that creates a new vertex based on the given edge. Furthermore it
+ * returns the source and target id of the edge for later use.
+ *
+ * @param &lt;V&gt; The vertex type.
+ * @param &lt;E&gt; The edge type.
+ */
+public class CreateVertexFromEdges&lt;V extends EPGMVertex, E extends EPGMEdge&gt;
+  implements MapFunction&lt;E, Tuple3&lt;V, GradoopId, GradoopId&gt;&gt;,
+  ResultTypeQueryable&lt;Tuple3&lt;V, GradoopId, GradoopId&gt;&gt; {
+
+  /**
+   * The factory vertices are created with.
+   */
+  private final EPGMVertexFactory&lt;V&gt; factory;
+
+  /**
+   * Reduce object instantiations.
+   */
+  private final Tuple3&lt;V, GradoopId, GradoopId&gt; reuse;
+
+  /**
+   * The constructor of the MapFunction.
+   *
+   * @param newVertexLabel The label of the newly created vertex.
+   * @param factory        The factory for creating new vertices.
+   */
+<span class="fc" id="L57">  public CreateVertexFromEdges(String newVertexLabel, EPGMVertexFactory&lt;V&gt; factory) {</span>
+<span class="fc" id="L58">    this.factory = Objects.requireNonNull(factory);</span>
+<span class="fc" id="L59">    this.reuse = new Tuple3&lt;&gt;(factory.createVertex(newVertexLabel), null, null);</span>
+<span class="fc" id="L60">  }</span>
+
+  @Override
+  public Tuple3&lt;V, GradoopId, GradoopId&gt; map(E e) {
+<span class="fc" id="L64">    reuse.f0.setId(GradoopId.get());</span>
+<span class="fc" id="L65">    reuse.f0.setProperties(e.getProperties());</span>
+<span class="fc" id="L66">    reuse.f1 = e.getSourceId();</span>
+<span class="fc" id="L67">    reuse.f2 = e.getTargetId();</span>
+<span class="fc" id="L68">    return reuse;</span>
+  }
+
+  @Override
+  public TypeInformation&lt;Tuple3&lt;V, GradoopId, GradoopId&gt;&gt; getProducedType() {
+<span class="fc" id="L73">    final TypeInformation&lt;GradoopId&gt; idType = TypeInformation.of(GradoopId.class);</span>
+<span class="fc" id="L74">    return new TupleTypeInfo&lt;&gt;(TypeInformation.of(factory.getType()), idType, idType);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

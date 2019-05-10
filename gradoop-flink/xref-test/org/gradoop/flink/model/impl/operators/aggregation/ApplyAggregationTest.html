@@ -1,0 +1,623 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+<title>ApplyAggregationTest xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../../../../stylesheet.css" />
+</head>
+<body>
+<pre>
+
+<a name="1" href="#1">1</a>   <em class="jxr_comment">/*</em>
+<a name="2" href="#2">2</a>   <em class="jxr_comment"> * Copyright © 2014 - 2019 Leipzig University (Database Research Group)</em>
+<a name="3" href="#3">3</a>   <em class="jxr_comment"> *</em>
+<a name="4" href="#4">4</a>   <em class="jxr_comment"> * Licensed under the Apache License, Version 2.0 (the "License");</em>
+<a name="5" href="#5">5</a>   <em class="jxr_comment"> * you may not use this file except in compliance with the License.</em>
+<a name="6" href="#6">6</a>   <em class="jxr_comment"> * You may obtain a copy of the License at</em>
+<a name="7" href="#7">7</a>   <em class="jxr_comment"> *</em>
+<a name="8" href="#8">8</a>   <em class="jxr_comment"> *     <a href="http://www.apache.org/licenses/LICENSE-2.0" target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.0</a></em>
+<a name="9" href="#9">9</a>   <em class="jxr_comment"> *</em>
+<a name="10" href="#10">10</a>  <em class="jxr_comment"> * Unless required by applicable law or agreed to in writing, software</em>
+<a name="11" href="#11">11</a>  <em class="jxr_comment"> * distributed under the License is distributed on an "AS IS" BASIS,</em>
+<a name="12" href="#12">12</a>  <em class="jxr_comment"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</em>
+<a name="13" href="#13">13</a>  <em class="jxr_comment"> * See the License for the specific language governing permissions and</em>
+<a name="14" href="#14">14</a>  <em class="jxr_comment"> * limitations under the License.</em>
+<a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
+<a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.aggregation;
+<a name="17" href="#17">17</a>  
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.runtime.client.JobExecutionException;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.exceptions.UnsupportedTypeException;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasEdgeLabel;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasLabel;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasVertexLabel;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxEdgeProperty;
+<a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxProperty;
+<a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
+<a name="34" href="#34">34</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinEdgeProperty;
+<a name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinProperty;
+<a name="36" href="#36">36</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
+<a name="37" href="#37">37</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumEdgeProperty;
+<a name="38" href="#38">38</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumProperty;
+<a name="39" href="#39">39</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
+<a name="40" href="#40">40</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.FlinkAsciiGraphLoader;
+<a name="41" href="#41">41</a>  <strong class="jxr_keyword">import</strong> org.junit.Assert;
+<a name="42" href="#42">42</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="43" href="#43">43</a>  
+<a name="44" href="#44">44</a>  <strong class="jxr_keyword">import</strong> java.util.List;
+<a name="45" href="#45">45</a>  
+<a name="46" href="#46">46</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertEquals;
+<a name="47" href="#47">47</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertFalse;
+<a name="48" href="#48">48</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertTrue;
+<a name="49" href="#49">49</a>  
+<a name="50" href="#50">50</a>  <em class="jxr_javadoccomment">/**</em>
+<a name="51" href="#51">51</a>  <em class="jxr_javadoccomment"> * Test class for aggregation on graph collections.</em>
+<a name="52" href="#52">52</a>  <em class="jxr_javadoccomment"> */</em>
+<a name="53" href="#53">53</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/ApplyAggregationTest.html">ApplyAggregationTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/AggregationTest.html">AggregationTest</a> {
+<a name="54" href="#54">54</a>  
+<a name="55" href="#55">55</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="56" href="#56">56</a>  <em class="jxr_javadoccomment">   * Test MinProperty, MinVertexProperty and MinEdgeProperty with a graph collection.</em>
+<a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * @throws Exception if the execution fails.</em>
+<a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="60" href="#60">60</a>    @Test
+<a name="61" href="#61">61</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionMin() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="62" href="#62">62</a>      FlinkAsciiGraphLoader loader = getLoaderFromString(
+<a name="63" href="#63">63</a>        <span class="jxr_string">"g0["</span> +
+<a name="64" href="#64">64</a>          <span class="jxr_string">"(va {p : 0.5})"</span> +
+<a name="65" href="#65">65</a>          <span class="jxr_string">"(vb {p : 0.3})"</span> +
+<a name="66" href="#66">66</a>          <span class="jxr_string">"(vc {p : 0.1})"</span> +
+<a name="67" href="#67">67</a>          <span class="jxr_string">"(va)-[ea {p : 2L}]-&gt;(vb)"</span> +
+<a name="68" href="#68">68</a>          <span class="jxr_string">"(vb)-[eb]-&gt;(vc)"</span> +
+<a name="69" href="#69">69</a>          <span class="jxr_string">"]"</span> +
+<a name="70" href="#70">70</a>          <span class="jxr_string">"g1["</span> +
+<a name="71" href="#71">71</a>          <span class="jxr_string">"(va)-[ea]-&gt;(vb)"</span> +
+<a name="72" href="#72">72</a>          <span class="jxr_string">"]"</span> +
+<a name="73" href="#73">73</a>          <span class="jxr_string">"g2[]"</span>);
+<a name="74" href="#74">74</a>  
+<a name="75" href="#75">75</a>      GraphCollection inputCollection = loader
+<a name="76" href="#76">76</a>        .getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g2"</span>);
+<a name="77" href="#77">77</a>  
+<a name="78" href="#78">78</a>      MinVertexProperty minVertexProperty =
+<a name="79" href="#79">79</a>        <strong class="jxr_keyword">new</strong> MinVertexProperty(PROPERTY, VERTEX_AGGREGATE_PROPERTY);
+<a name="80" href="#80">80</a>      MinEdgeProperty minEdgeProperty = <strong class="jxr_keyword">new</strong> MinEdgeProperty(PROPERTY, EDGE_AGGREGATE_PROPERTY);
+<a name="81" href="#81">81</a>      MinProperty minProperty = <strong class="jxr_keyword">new</strong> MinProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY);
+<a name="82" href="#82">82</a>  
+<a name="83" href="#83">83</a>      GraphCollection outputCollection = inputCollection
+<a name="84" href="#84">84</a>        .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(minVertexProperty))
+<a name="85" href="#85">85</a>        .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(minEdgeProperty))
+<a name="86" href="#86">86</a>        .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(minProperty));
+<a name="87" href="#87">87</a>  
+<a name="88" href="#88">88</a>      GradoopId g0Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>).getId();
+<a name="89" href="#89">89</a>      GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
+<a name="90" href="#90">90</a>      GradoopId g2Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g2"</span>).getId();
+<a name="91" href="#91">91</a>  
+<a name="92" href="#92">92</a>      <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+<a name="93" href="#93">93</a>        assertTrue(<span class="jxr_string">"edge minimum not set"</span>, graphHead.hasProperty
+<a name="94" href="#94">94</a>          (minEdgeProperty.getAggregatePropertyKey()));
+<a name="95" href="#95">95</a>        assertTrue(<span class="jxr_string">"vertex minimum not set"</span>, graphHead.hasProperty
+<a name="96" href="#96">96</a>          (minVertexProperty.getAggregatePropertyKey()));
+<a name="97" href="#97">97</a>        assertTrue(<span class="jxr_string">"element minimum not set"</span>, graphHead.hasProperty
+<a name="98" href="#98">98</a>          (minProperty.getAggregatePropertyKey()));
+<a name="99" href="#99">99</a>  
+<a name="100" href="#100">100</a>       PropertyValue edgeAggregate =
+<a name="101" href="#101">101</a>         graphHead.getPropertyValue(minEdgeProperty.getAggregatePropertyKey());
+<a name="102" href="#102">102</a>       PropertyValue vertexAggregate =
+<a name="103" href="#103">103</a>         graphHead.getPropertyValue(minVertexProperty.getAggregatePropertyKey());
+<a name="104" href="#104">104</a>       PropertyValue elementAggregate =
+<a name="105" href="#105">105</a>         graphHead.getPropertyValue(minProperty.getAggregatePropertyKey());
+<a name="106" href="#106">106</a> 
+<a name="107" href="#107">107</a>       <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g0Id)) {
+<a name="108" href="#108">108</a>         assertEquals(2, edgeAggregate.getLong());
+<a name="109" href="#109">109</a>         assertEquals(0.1f, vertexAggregate.getFloat(), 0.00001);
+<a name="110" href="#110">110</a>         assertEquals(0.1f, elementAggregate.getFloat(), 0.00001);
+<a name="111" href="#111">111</a>       } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g1Id)) {
+<a name="112" href="#112">112</a>         assertEquals(2, edgeAggregate.getLong());
+<a name="113" href="#113">113</a>         assertEquals(0.3f, vertexAggregate.getFloat(), 0.00001);
+<a name="114" href="#114">114</a>         assertEquals(0.3f, elementAggregate.getFloat(), 0.00001);
+<a name="115" href="#115">115</a>       } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g2Id)) {
+<a name="116" href="#116">116</a>         assertEquals(PropertyValue.NULL_VALUE, edgeAggregate);
+<a name="117" href="#117">117</a>         assertEquals(PropertyValue.NULL_VALUE, vertexAggregate);
+<a name="118" href="#118">118</a>         assertEquals(PropertyValue.NULL_VALUE, elementAggregate);
+<a name="119" href="#119">119</a>       } <strong class="jxr_keyword">else</strong> {
+<a name="120" href="#120">120</a>         Assert.fail(<span class="jxr_string">"unexpected graph head: "</span> + graphHead);
+<a name="121" href="#121">121</a>       }
+<a name="122" href="#122">122</a>     }
+<a name="123" href="#123">123</a>   }
+<a name="124" href="#124">124</a> 
+<a name="125" href="#125">125</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="126" href="#126">126</a> <em class="jxr_javadoccomment">   * Test MaxProperty, MaxVertexProperty and MaxEdgeProperty with a graph collection.</em>
+<a name="127" href="#127">127</a> <em class="jxr_javadoccomment">   *</em>
+<a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   * @throws Exception if the execution fails.</em>
+<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   */</em>
+<a name="130" href="#130">130</a>   @Test
+<a name="131" href="#131">131</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionMax() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="132" href="#132">132</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(
+<a name="133" href="#133">133</a>       <span class="jxr_string">"g0["</span> +
+<a name="134" href="#134">134</a>         <span class="jxr_string">"(va {p : 0.5f})"</span> +
+<a name="135" href="#135">135</a>         <span class="jxr_string">"(vb {p : 0.3f})"</span> +
+<a name="136" href="#136">136</a>         <span class="jxr_string">"(vc {p : 0.1f})"</span> +
+<a name="137" href="#137">137</a>         <span class="jxr_string">"(va)-[ea {p : 2L}]-&gt;(vb)"</span> +
+<a name="138" href="#138">138</a>         <span class="jxr_string">"(vb)-[eb]-&gt;(vc)"</span> +
+<a name="139" href="#139">139</a>         <span class="jxr_string">"]"</span> +
+<a name="140" href="#140">140</a>         <span class="jxr_string">"g1["</span> +
+<a name="141" href="#141">141</a>         <span class="jxr_string">"(va)-[ea]-&gt;(vb)"</span> +
+<a name="142" href="#142">142</a>         <span class="jxr_string">"]"</span> +
+<a name="143" href="#143">143</a>         <span class="jxr_string">"g2[]"</span>);
+<a name="144" href="#144">144</a> 
+<a name="145" href="#145">145</a>     GraphCollection inputCollection = loader
+<a name="146" href="#146">146</a>       .getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g2"</span>);
+<a name="147" href="#147">147</a> 
+<a name="148" href="#148">148</a>     MaxVertexProperty maxVertexProperty =
+<a name="149" href="#149">149</a>       <strong class="jxr_keyword">new</strong> MaxVertexProperty(PROPERTY, VERTEX_AGGREGATE_PROPERTY);
+<a name="150" href="#150">150</a>     MaxEdgeProperty maxEdgeProperty = <strong class="jxr_keyword">new</strong> MaxEdgeProperty(PROPERTY, EDGE_AGGREGATE_PROPERTY);
+<a name="151" href="#151">151</a>     MaxProperty maxProperty = <strong class="jxr_keyword">new</strong> MaxProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY);
+<a name="152" href="#152">152</a> 
+<a name="153" href="#153">153</a>     GraphCollection outputCollection = inputCollection
+<a name="154" href="#154">154</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxVertexProperty))
+<a name="155" href="#155">155</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxEdgeProperty))
+<a name="156" href="#156">156</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxProperty));
+<a name="157" href="#157">157</a> 
+<a name="158" href="#158">158</a>     GradoopId g0Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>).getId();
+<a name="159" href="#159">159</a>     GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
+<a name="160" href="#160">160</a>     GradoopId g2Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g2"</span>).getId();
+<a name="161" href="#161">161</a> 
+<a name="162" href="#162">162</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+<a name="163" href="#163">163</a>       assertTrue(<span class="jxr_string">"edge maximum not set"</span>,
+<a name="164" href="#164">164</a>         graphHead.hasProperty(maxEdgeProperty.getAggregatePropertyKey()));
+<a name="165" href="#165">165</a>       assertTrue(<span class="jxr_string">"vertex maximum not set"</span>,
+<a name="166" href="#166">166</a>         graphHead.hasProperty(maxVertexProperty.getAggregatePropertyKey()));
+<a name="167" href="#167">167</a>       assertTrue(<span class="jxr_string">"element maximum not set"</span>,
+<a name="168" href="#168">168</a>         graphHead.hasProperty(maxVertexProperty.getAggregatePropertyKey()));
+<a name="169" href="#169">169</a> 
+<a name="170" href="#170">170</a>       PropertyValue edgeAggregate =
+<a name="171" href="#171">171</a>         graphHead.getPropertyValue(maxEdgeProperty.getAggregatePropertyKey());
+<a name="172" href="#172">172</a>       PropertyValue vertexAggregate =
+<a name="173" href="#173">173</a>         graphHead.getPropertyValue(maxVertexProperty.getAggregatePropertyKey());
+<a name="174" href="#174">174</a>       PropertyValue elementAggregate =
+<a name="175" href="#175">175</a>         graphHead.getPropertyValue(maxProperty.getAggregatePropertyKey());
+<a name="176" href="#176">176</a> 
+<a name="177" href="#177">177</a>       <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g0Id)) {
+<a name="178" href="#178">178</a>         assertEquals(2L, edgeAggregate.getLong());
+<a name="179" href="#179">179</a>         assertEquals(0.5f, vertexAggregate.getFloat(), 0.00001);
+<a name="180" href="#180">180</a>         assertEquals(2L, elementAggregate.getLong());
+<a name="181" href="#181">181</a>       } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g1Id)) {
+<a name="182" href="#182">182</a>         assertEquals(2L, edgeAggregate.getLong());
+<a name="183" href="#183">183</a>         assertEquals(0.5f, vertexAggregate.getFloat(), 0.00001);
+<a name="184" href="#184">184</a>         assertEquals(2L, elementAggregate.getLong());
+<a name="185" href="#185">185</a>       } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g2Id)) {
+<a name="186" href="#186">186</a>         assertEquals(PropertyValue.NULL_VALUE, edgeAggregate);
+<a name="187" href="#187">187</a>         assertEquals(PropertyValue.NULL_VALUE, vertexAggregate);
+<a name="188" href="#188">188</a>         assertEquals(PropertyValue.NULL_VALUE, elementAggregate);
+<a name="189" href="#189">189</a>       }  <strong class="jxr_keyword">else</strong> {
+<a name="190" href="#190">190</a>         Assert.fail(<span class="jxr_string">"unexpected graph head: "</span> + graphHead);
+<a name="191" href="#191">191</a>       }
+<a name="192" href="#192">192</a>     }
+<a name="193" href="#193">193</a>   }
+<a name="194" href="#194">194</a> 
+<a name="195" href="#195">195</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="196" href="#196">196</a> <em class="jxr_javadoccomment">   * Test SumProperty, SumVertexProperty and SumEdgeProperty with a graph collection.</em>
+<a name="197" href="#197">197</a> <em class="jxr_javadoccomment">   *</em>
+<a name="198" href="#198">198</a> <em class="jxr_javadoccomment">   * @throws Exception if the execution fails.</em>
+<a name="199" href="#199">199</a> <em class="jxr_javadoccomment">   */</em>
+<a name="200" href="#200">200</a>   @Test
+<a name="201" href="#201">201</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionSum() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="202" href="#202">202</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(
+<a name="203" href="#203">203</a>       <span class="jxr_string">"g0["</span> +
+<a name="204" href="#204">204</a>         <span class="jxr_string">"(va {p : 0.5})"</span> +
+<a name="205" href="#205">205</a>         <span class="jxr_string">"(vb {p : 0.3})"</span> +
+<a name="206" href="#206">206</a>         <span class="jxr_string">"(vc {p : 0.1})"</span> +
+<a name="207" href="#207">207</a>         <span class="jxr_string">"(va)-[ea {p : 2L}]-&gt;(vb)"</span> +
+<a name="208" href="#208">208</a>         <span class="jxr_string">"(vb)-[eb]-&gt;(vc)"</span> +
+<a name="209" href="#209">209</a>         <span class="jxr_string">"]"</span> +
+<a name="210" href="#210">210</a>         <span class="jxr_string">"g1["</span> +
+<a name="211" href="#211">211</a>         <span class="jxr_string">"(va)-[ea]-&gt;(vb)"</span> +
+<a name="212" href="#212">212</a>         <span class="jxr_string">"]"</span> +
+<a name="213" href="#213">213</a>         <span class="jxr_string">"g2[]"</span>);
+<a name="214" href="#214">214</a> 
+<a name="215" href="#215">215</a>     GraphCollection inputCollection = loader
+<a name="216" href="#216">216</a>       .getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g2"</span>);
+<a name="217" href="#217">217</a> 
+<a name="218" href="#218">218</a>     SumVertexProperty sumVertexProperty =
+<a name="219" href="#219">219</a>       <strong class="jxr_keyword">new</strong> SumVertexProperty(PROPERTY, VERTEX_AGGREGATE_PROPERTY);
+<a name="220" href="#220">220</a>     SumEdgeProperty sumEdgeProperty = <strong class="jxr_keyword">new</strong> SumEdgeProperty(PROPERTY, EDGE_AGGREGATE_PROPERTY);
+<a name="221" href="#221">221</a>     SumProperty sumProperty = <strong class="jxr_keyword">new</strong> SumProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY);
+<a name="222" href="#222">222</a> 
+<a name="223" href="#223">223</a>     GraphCollection outputCollection = inputCollection
+<a name="224" href="#224">224</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumVertexProperty))
+<a name="225" href="#225">225</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumEdgeProperty))
+<a name="226" href="#226">226</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumProperty));
+<a name="227" href="#227">227</a> 
+<a name="228" href="#228">228</a>     GradoopId g0Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>).getId();
+<a name="229" href="#229">229</a>     GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
+<a name="230" href="#230">230</a>     GradoopId g2Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g2"</span>).getId();
+<a name="231" href="#231">231</a> 
+<a name="232" href="#232">232</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+<a name="233" href="#233">233</a>       assertTrue(<span class="jxr_string">"vertex sum not set"</span>, graphHead.hasProperty(
+<a name="234" href="#234">234</a>         sumVertexProperty.getAggregatePropertyKey()));
+<a name="235" href="#235">235</a>       assertTrue(<span class="jxr_string">"edge sum not set"</span>, graphHead.hasProperty(
+<a name="236" href="#236">236</a>         sumEdgeProperty.getAggregatePropertyKey()));
+<a name="237" href="#237">237</a>       assertTrue(<span class="jxr_string">"element sum not set"</span>, graphHead.hasProperty(
+<a name="238" href="#238">238</a>         sumProperty.getAggregatePropertyKey()));
+<a name="239" href="#239">239</a> 
+<a name="240" href="#240">240</a>       PropertyValue vertexAggregate =
+<a name="241" href="#241">241</a>         graphHead.getPropertyValue(sumVertexProperty.getAggregatePropertyKey());
+<a name="242" href="#242">242</a>       PropertyValue edgeAggregate =
+<a name="243" href="#243">243</a>         graphHead.getPropertyValue(sumEdgeProperty.getAggregatePropertyKey());
+<a name="244" href="#244">244</a>       PropertyValue elementAggregate =
+<a name="245" href="#245">245</a>         graphHead.getPropertyValue(sumProperty.getAggregatePropertyKey());
+<a name="246" href="#246">246</a> 
+<a name="247" href="#247">247</a>       <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g0Id)) {
+<a name="248" href="#248">248</a>         assertEquals(2, edgeAggregate.getLong());
+<a name="249" href="#249">249</a>         assertEquals(0.9f, vertexAggregate.getFloat(), 0.00001);
+<a name="250" href="#250">250</a>         assertEquals(2.9f, elementAggregate.getFloat(), 0.00001);
+<a name="251" href="#251">251</a>       } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g1Id)) {
+<a name="252" href="#252">252</a>         assertEquals(2, edgeAggregate.getLong());
+<a name="253" href="#253">253</a>         assertEquals(0.8f, vertexAggregate.getFloat(), 0.00001);
+<a name="254" href="#254">254</a>         assertEquals(2.8f, elementAggregate.getFloat(), 0.00001);
+<a name="255" href="#255">255</a>       } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g2Id)) {
+<a name="256" href="#256">256</a>         assertEquals(PropertyValue.NULL_VALUE, edgeAggregate);
+<a name="257" href="#257">257</a>         assertEquals(PropertyValue.NULL_VALUE, vertexAggregate);
+<a name="258" href="#258">258</a>         assertEquals(PropertyValue.NULL_VALUE, elementAggregate);
+<a name="259" href="#259">259</a>       }  <strong class="jxr_keyword">else</strong> {
+<a name="260" href="#260">260</a>         Assert.fail(<span class="jxr_string">"unexpected graph head: "</span> + graphHead);
+<a name="261" href="#261">261</a>       }
+<a name="262" href="#262">262</a>     }
+<a name="263" href="#263">263</a>   }
+<a name="264" href="#264">264</a> 
+<a name="265" href="#265">265</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="266" href="#266">266</a> <em class="jxr_javadoccomment">   * Test SumProperty, SumVertexProperty and SumEdgeProperty with a graph collection</em>
+<a name="267" href="#267">267</a> <em class="jxr_javadoccomment">   * and mixed type property values.</em>
+<a name="268" href="#268">268</a> <em class="jxr_javadoccomment">   *</em>
+<a name="269" href="#269">269</a> <em class="jxr_javadoccomment">   * @throws Exception if the execution fails.</em>
+<a name="270" href="#270">270</a> <em class="jxr_javadoccomment">   */</em>
+<a name="271" href="#271">271</a>   @Test
+<a name="272" href="#272">272</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testWithMixedTypePropertyValues() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="273" href="#273">273</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(
+<a name="274" href="#274">274</a>       <span class="jxr_string">"g0["</span> +
+<a name="275" href="#275">275</a>         <span class="jxr_string">"(va {p : 0.5})"</span> +
+<a name="276" href="#276">276</a>         <span class="jxr_string">"(vc {p : 1})"</span> +
+<a name="277" href="#277">277</a>         <span class="jxr_string">"(va)-[ea {p : 2L}]-&gt;(vb)"</span> +
+<a name="278" href="#278">278</a>         <span class="jxr_string">"(vb)-[eb {p : 2.0F}]-&gt;(vc)"</span> +
+<a name="279" href="#279">279</a>         <span class="jxr_string">"]"</span> +
+<a name="280" href="#280">280</a>         <span class="jxr_string">"g1["</span> +
+<a name="281" href="#281">281</a>         <span class="jxr_string">"(va)-[ea]-&gt;(vb)"</span> +
+<a name="282" href="#282">282</a>         <span class="jxr_string">"]"</span> +
+<a name="283" href="#283">283</a>         <span class="jxr_string">"g2[]"</span>);
+<a name="284" href="#284">284</a> 
+<a name="285" href="#285">285</a>     GraphCollection inputCollection = loader
+<a name="286" href="#286">286</a>       .getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g2"</span>);
+<a name="287" href="#287">287</a> 
+<a name="288" href="#288">288</a>     SumVertexProperty sumVertexProperty =
+<a name="289" href="#289">289</a>       <strong class="jxr_keyword">new</strong> SumVertexProperty(PROPERTY, VERTEX_AGGREGATE_PROPERTY);
+<a name="290" href="#290">290</a>     SumEdgeProperty sumEdgeProperty = <strong class="jxr_keyword">new</strong> SumEdgeProperty(PROPERTY, EDGE_AGGREGATE_PROPERTY);
+<a name="291" href="#291">291</a>     SumProperty sumProperty = <strong class="jxr_keyword">new</strong> SumProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY);
+<a name="292" href="#292">292</a> 
+<a name="293" href="#293">293</a>     GraphCollection outputCollection = inputCollection
+<a name="294" href="#294">294</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumVertexProperty))
+<a name="295" href="#295">295</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumEdgeProperty))
+<a name="296" href="#296">296</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumProperty));
+<a name="297" href="#297">297</a> 
+<a name="298" href="#298">298</a>     GradoopId g0Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>).getId();
+<a name="299" href="#299">299</a>     GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
+<a name="300" href="#300">300</a>     GradoopId g2Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g2"</span>).getId();
+<a name="301" href="#301">301</a> 
+<a name="302" href="#302">302</a>     List&lt;GraphHead&gt; graphHeads = outputCollection.getGraphHeads().collect();
+<a name="303" href="#303">303</a> 
+<a name="304" href="#304">304</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : graphHeads) {
+<a name="305" href="#305">305</a>       assertTrue(<span class="jxr_string">"edge sum not set"</span>, graphHead.hasProperty(
+<a name="306" href="#306">306</a>         sumEdgeProperty.getAggregatePropertyKey()));
+<a name="307" href="#307">307</a>       assertTrue(<span class="jxr_string">"vertex sum not set"</span>, graphHead.hasProperty(
+<a name="308" href="#308">308</a>         sumVertexProperty.getAggregatePropertyKey()));
+<a name="309" href="#309">309</a>       assertTrue(<span class="jxr_string">"element sum not set"</span>, graphHead.hasProperty(
+<a name="310" href="#310">310</a>         sumProperty.getAggregatePropertyKey()));
+<a name="311" href="#311">311</a> 
+<a name="312" href="#312">312</a>       PropertyValue vertexAggregate =
+<a name="313" href="#313">313</a>         graphHead.getPropertyValue(sumVertexProperty.getAggregatePropertyKey());
+<a name="314" href="#314">314</a>       PropertyValue edgeAggregate =
+<a name="315" href="#315">315</a>         graphHead.getPropertyValue(sumEdgeProperty.getAggregatePropertyKey());
+<a name="316" href="#316">316</a>       PropertyValue elementAggregate =
+<a name="317" href="#317">317</a>         graphHead.getPropertyValue(sumProperty.getAggregatePropertyKey());
+<a name="318" href="#318">318</a> 
+<a name="319" href="#319">319</a>       <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g0Id)) {
+<a name="320" href="#320">320</a>         assertEquals(1.5f, vertexAggregate.getFloat(), 0.00001);
+<a name="321" href="#321">321</a>         assertEquals(4.0f, edgeAggregate.getFloat(), 0.00001);
+<a name="322" href="#322">322</a>         assertEquals(5.5f, elementAggregate.getFloat(), 0.00001);
+<a name="323" href="#323">323</a>       } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g1Id)) {
+<a name="324" href="#324">324</a>         assertEquals(0.5f, vertexAggregate.getFloat(), 0.00001);
+<a name="325" href="#325">325</a>         assertEquals(2L, edgeAggregate.getLong());
+<a name="326" href="#326">326</a>         assertEquals(2.5f, elementAggregate.getFloat(), 0.00001);
+<a name="327" href="#327">327</a>       } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g2Id)) {
+<a name="328" href="#328">328</a>         assertEquals(PropertyValue.NULL_VALUE, vertexAggregate);
+<a name="329" href="#329">329</a>         assertEquals(PropertyValue.NULL_VALUE, edgeAggregate);
+<a name="330" href="#330">330</a>         assertEquals(PropertyValue.NULL_VALUE, elementAggregate);
+<a name="331" href="#331">331</a>       }
+<a name="332" href="#332">332</a>     }
+<a name="333" href="#333">333</a>   }
+<a name="334" href="#334">334</a> 
+<a name="335" href="#335">335</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="336" href="#336">336</a> <em class="jxr_javadoccomment">   * Test SumProperty, SumVertexProperty and SumEdgeProperty with a graph collection</em>
+<a name="337" href="#337">337</a> <em class="jxr_javadoccomment">   * and unsupported property types.</em>
+<a name="338" href="#338">338</a> <em class="jxr_javadoccomment">   */</em>
+<a name="339" href="#339">339</a>   @Test
+<a name="340" href="#340">340</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionUnsupportedPropertyValueType() {
+<a name="341" href="#341">341</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(
+<a name="342" href="#342">342</a>       <span class="jxr_string">"g[({p : 0})-[{p : 0.0}]-&gt;({p : true})-[{p : \&quot;\&quot;}]-&gt;({})]"</span>);
+<a name="343" href="#343">343</a> 
+<a name="344" href="#344">344</a>     GraphCollection collection = loader.getGraphCollectionByVariables(<span class="jxr_string">"g"</span>);
+<a name="345" href="#345">345</a> 
+<a name="346" href="#346">346</a>     <strong class="jxr_keyword">try</strong> {
+<a name="347" href="#347">347</a>       collection
+<a name="348" href="#348">348</a>         .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(<strong class="jxr_keyword">new</strong> SumVertexProperty(PROPERTY, VERTEX_AGGREGATE_PROPERTY)))
+<a name="349" href="#349">349</a>         .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(<strong class="jxr_keyword">new</strong> SumEdgeProperty(PROPERTY, EDGE_AGGREGATE_PROPERTY)))
+<a name="350" href="#350">350</a>         .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(<strong class="jxr_keyword">new</strong> SumProperty(PROPERTY, ELEMENT_AGGREGATE_PROPERTY)))
+<a name="351" href="#351">351</a>         .getGraphHeads().print();
+<a name="352" href="#352">352</a>     } <strong class="jxr_keyword">catch</strong> (Exception e) {
+<a name="353" href="#353">353</a>       assertTrue(
+<a name="354" href="#354">354</a>         e instanceof JobExecutionException &amp;&amp;
+<a name="355" href="#355">355</a>           e.getCause() instanceof UnsupportedTypeException);
+<a name="356" href="#356">356</a>     }
+<a name="357" href="#357">357</a>   }
+<a name="358" href="#358">358</a> 
+<a name="359" href="#359">359</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="360" href="#360">360</a> <em class="jxr_javadoccomment">   * Test Count, VertexCount and EdgeCount with a graph collection.</em>
+<a name="361" href="#361">361</a> <em class="jxr_javadoccomment">   *</em>
+<a name="362" href="#362">362</a> <em class="jxr_javadoccomment">   * @throws Exception if the execution fails.</em>
+<a name="363" href="#363">363</a> <em class="jxr_javadoccomment">   */</em>
+<a name="364" href="#364">364</a>   @Test
+<a name="365" href="#365">365</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionCount() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="366" href="#366">366</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(
+<a name="367" href="#367">367</a>       <span class="jxr_string">"g0[()--&gt;()&lt;--()]"</span> +
+<a name="368" href="#368">368</a>         <span class="jxr_string">"g1[()--&gt;()--&gt;()--&gt;()]"</span> +
+<a name="369" href="#369">369</a>         <span class="jxr_string">"g2[()--&gt;()]"</span> +
+<a name="370" href="#370">370</a>         <span class="jxr_string">"g3[]"</span>);
+<a name="371" href="#371">371</a> 
+<a name="372" href="#372">372</a>     GraphCollection inputCollection = loader
+<a name="373" href="#373">373</a>       .getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g2"</span>, <span class="jxr_string">"g3"</span>);
+<a name="374" href="#374">374</a> 
+<a name="375" href="#375">375</a>     VertexCount vertexCount = <strong class="jxr_keyword">new</strong> VertexCount();
+<a name="376" href="#376">376</a>     EdgeCount edgeCount = <strong class="jxr_keyword">new</strong> EdgeCount();
+<a name="377" href="#377">377</a>     Count count = <strong class="jxr_keyword">new</strong> Count();
+<a name="378" href="#378">378</a> 
+<a name="379" href="#379">379</a>     GraphCollection outputCollection = inputCollection
+<a name="380" href="#380">380</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(vertexCount))
+<a name="381" href="#381">381</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(edgeCount))
+<a name="382" href="#382">382</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(count));
+<a name="383" href="#383">383</a> 
+<a name="384" href="#384">384</a>     GradoopId g0Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>).getId();
+<a name="385" href="#385">385</a>     GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
+<a name="386" href="#386">386</a>     GradoopId g2Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g2"</span>).getId();
+<a name="387" href="#387">387</a>     GradoopId g3Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g3"</span>).getId();
+<a name="388" href="#388">388</a> 
+<a name="389" href="#389">389</a>     <strong class="jxr_keyword">int</strong> graphHeadCount = 0;
+<a name="390" href="#390">390</a> 
+<a name="391" href="#391">391</a>     List&lt;GraphHead&gt; graphHeads = outputCollection.getGraphHeads().collect();
+<a name="392" href="#392">392</a> 
+<a name="393" href="#393">393</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : graphHeads) {
+<a name="394" href="#394">394</a>       graphHeadCount++;
+<a name="395" href="#395">395</a>       assertTrue(<span class="jxr_string">"vertex count not set"</span>, graphHead.hasProperty(
+<a name="396" href="#396">396</a>         vertexCount.getAggregatePropertyKey()));
+<a name="397" href="#397">397</a>       assertTrue(<span class="jxr_string">"edge count not set"</span>, graphHead.hasProperty(
+<a name="398" href="#398">398</a>         edgeCount.getAggregatePropertyKey()));
+<a name="399" href="#399">399</a>       assertTrue(<span class="jxr_string">"element count not set"</span>, graphHead.hasProperty(
+<a name="400" href="#400">400</a>         count.getAggregatePropertyKey()));
+<a name="401" href="#401">401</a> 
+<a name="402" href="#402">402</a>       <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g0Id)) {
+<a name="403" href="#403">403</a>         assertCounts(graphHead, 3, 2);
+<a name="404" href="#404">404</a>       } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g1Id)) {
+<a name="405" href="#405">405</a>         assertCounts(graphHead, 4, 3);
+<a name="406" href="#406">406</a>       } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (graphHead.getId().equals(g2Id)) {
+<a name="407" href="#407">407</a>         assertCounts(graphHead, 2, 1);
+<a name="408" href="#408">408</a>       } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (graphHead
+<a name="409" href="#409">409</a>         .getId().equals(g3Id)) {
+<a name="410" href="#410">410</a>         assertCounts(graphHead, 0, 0);
+<a name="411" href="#411">411</a>       } <strong class="jxr_keyword">else</strong> {
+<a name="412" href="#412">412</a>         Assert.fail(<span class="jxr_string">"unexpected graph head: "</span> + graphHead);
+<a name="413" href="#413">413</a>       }
+<a name="414" href="#414">414</a>     }
+<a name="415" href="#415">415</a> 
+<a name="416" href="#416">416</a>     assertTrue(<span class="jxr_string">"wrong number of output graph heads"</span>, graphHeadCount == 4);
+<a name="417" href="#417">417</a>   }
+<a name="418" href="#418">418</a> 
+<a name="419" href="#419">419</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="420" href="#420">420</a> <em class="jxr_javadoccomment">   * Test HasLabel, HasVertexLabel and HasEdgeLabel with a graph collection and result true.</em>
+<a name="421" href="#421">421</a> <em class="jxr_javadoccomment">   *</em>
+<a name="422" href="#422">422</a> <em class="jxr_javadoccomment">   * @throws Exception if the execution or IO fails.</em>
+<a name="423" href="#423">423</a> <em class="jxr_javadoccomment">   */</em>
+<a name="424" href="#424">424</a>   @Test
+<a name="425" href="#425">425</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionHasLabelTrue() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="426" href="#426">426</a>     GraphCollection collection = getSocialNetworkLoader()
+<a name="427" href="#427">427</a>       .getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g2"</span>, <span class="jxr_string">"g3"</span>);
+<a name="428" href="#428">428</a> 
+<a name="429" href="#429">429</a>     HasVertexLabel hasPerson = <strong class="jxr_keyword">new</strong> HasVertexLabel(<span class="jxr_string">"Person"</span>);
+<a name="430" href="#430">430</a>     HasEdgeLabel hasKnows = <strong class="jxr_keyword">new</strong> HasEdgeLabel(<span class="jxr_string">"knows"</span>);
+<a name="431" href="#431">431</a>     HasLabel hasKnowsElement = <strong class="jxr_keyword">new</strong> HasLabel(<span class="jxr_string">"knows"</span>);
+<a name="432" href="#432">432</a> 
+<a name="433" href="#433">433</a>     collection = collection
+<a name="434" href="#434">434</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasKnows))
+<a name="435" href="#435">435</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasKnowsElement))
+<a name="436" href="#436">436</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasPerson));
+<a name="437" href="#437">437</a> 
+<a name="438" href="#438">438</a>     List&lt;GraphHead&gt; graphHeads = collection.getGraphHeads().collect();
+<a name="439" href="#439">439</a> 
+<a name="440" href="#440">440</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : graphHeads) {
+<a name="441" href="#441">441</a>       <em class="jxr_comment">// check vertex label</em>
+<a name="442" href="#442">442</a>       assertTrue(<span class="jxr_string">"Property hasVertexLabel_Person not set"</span>,
+<a name="443" href="#443">443</a>         graphHead.hasProperty(hasPerson.getAggregatePropertyKey()));
+<a name="444" href="#444">444</a>       assertTrue(<span class="jxr_string">"Property hasVertexLabel_Person is false, should be true"</span>,
+<a name="445" href="#445">445</a>         graphHead.getPropertyValue(hasPerson.getAggregatePropertyKey()).getBoolean());
+<a name="446" href="#446">446</a>       <em class="jxr_comment">// check edge label</em>
+<a name="447" href="#447">447</a>       assertTrue(<span class="jxr_string">"Property hasEdgeLabel_knows not set"</span>,
+<a name="448" href="#448">448</a>         graphHead.hasProperty(hasKnows.getAggregatePropertyKey()));
+<a name="449" href="#449">449</a>       assertTrue(<span class="jxr_string">"Property hasEdgeLabel_knows is false, should be true"</span>,
+<a name="450" href="#450">450</a>         graphHead.getPropertyValue(hasKnows.getAggregatePropertyKey()).getBoolean());
+<a name="451" href="#451">451</a>       <em class="jxr_comment">// check element label</em>
+<a name="452" href="#452">452</a>       assertTrue(<span class="jxr_string">"Property hasLabel_knows not set"</span>,
+<a name="453" href="#453">453</a>         graphHead.hasProperty(hasKnowsElement.getAggregatePropertyKey()));
+<a name="454" href="#454">454</a>       assertTrue(<span class="jxr_string">"Property hasLabel_knows is false, should be true"</span>,
+<a name="455" href="#455">455</a>         graphHead.getPropertyValue(hasKnowsElement.getAggregatePropertyKey()).getBoolean());
+<a name="456" href="#456">456</a>     }
+<a name="457" href="#457">457</a>   }
+<a name="458" href="#458">458</a> 
+<a name="459" href="#459">459</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="460" href="#460">460</a> <em class="jxr_javadoccomment">   * Test HasLabel, HasVertexLabel and HasEdgeLabel with a graph collection and result false.</em>
+<a name="461" href="#461">461</a> <em class="jxr_javadoccomment">   *</em>
+<a name="462" href="#462">462</a> <em class="jxr_javadoccomment">   * @throws Exception if the execution or IO fails.</em>
+<a name="463" href="#463">463</a> <em class="jxr_javadoccomment">   */</em>
+<a name="464" href="#464">464</a>   @Test
+<a name="465" href="#465">465</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionHasLabelFalse() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="466" href="#466">466</a>     GraphCollection collection = getSocialNetworkLoader()
+<a name="467" href="#467">467</a>       .getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g2"</span>, <span class="jxr_string">"g3"</span>);
+<a name="468" href="#468">468</a> 
+<a name="469" href="#469">469</a>     HasVertexLabel hasSomeLabel = <strong class="jxr_keyword">new</strong> HasVertexLabel(<span class="jxr_string">"someLabel"</span>);
+<a name="470" href="#470">470</a>     HasEdgeLabel hasOtherLabel = <strong class="jxr_keyword">new</strong> HasEdgeLabel(<span class="jxr_string">"otherLabel"</span>);
+<a name="471" href="#471">471</a>     HasLabel hasThirdLabel = <strong class="jxr_keyword">new</strong> HasLabel(<span class="jxr_string">"thirdLabel"</span>);
+<a name="472" href="#472">472</a> 
+<a name="473" href="#473">473</a>     collection = collection
+<a name="474" href="#474">474</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasSomeLabel))
+<a name="475" href="#475">475</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasOtherLabel))
+<a name="476" href="#476">476</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasThirdLabel));
+<a name="477" href="#477">477</a> 
+<a name="478" href="#478">478</a>     List&lt;GraphHead&gt; graphHeads = collection.getGraphHeads().collect();
+<a name="479" href="#479">479</a> 
+<a name="480" href="#480">480</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : graphHeads) {
+<a name="481" href="#481">481</a>       <em class="jxr_comment">// check edge label</em>
+<a name="482" href="#482">482</a>       assertTrue(<span class="jxr_string">"Property hasEdgeLabel_otherLabel not set"</span>,
+<a name="483" href="#483">483</a>         graphHead.hasProperty(hasOtherLabel.getAggregatePropertyKey()));
+<a name="484" href="#484">484</a>       assertFalse(<span class="jxr_string">"Property hasEdgeLabel_otherLabel is true, should be false"</span>,
+<a name="485" href="#485">485</a>         graphHead.getPropertyValue(hasOtherLabel.getAggregatePropertyKey()).getBoolean());
+<a name="486" href="#486">486</a>       <em class="jxr_comment">// check vertex label</em>
+<a name="487" href="#487">487</a>       assertTrue(<span class="jxr_string">"Property hasVertexLabel_someLabel not set"</span>,
+<a name="488" href="#488">488</a>         graphHead.hasProperty(hasSomeLabel.getAggregatePropertyKey()));
+<a name="489" href="#489">489</a>       assertFalse(<span class="jxr_string">"Property hasVertexLabel_someLabel is true, should be false"</span>,
+<a name="490" href="#490">490</a>         graphHead.getPropertyValue(hasSomeLabel.getAggregatePropertyKey()).getBoolean());
+<a name="491" href="#491">491</a>       <em class="jxr_comment">// check element label</em>
+<a name="492" href="#492">492</a>       assertTrue(<span class="jxr_string">"Property hasLabel_thirdLabel not set"</span>,
+<a name="493" href="#493">493</a>         graphHead.hasProperty(hasThirdLabel.getAggregatePropertyKey()));
+<a name="494" href="#494">494</a>       assertFalse(<span class="jxr_string">"Property hasLabel_thirdLabel is true, should be false"</span>,
+<a name="495" href="#495">495</a>         graphHead.getPropertyValue(hasThirdLabel.getAggregatePropertyKey()).getBoolean());
+<a name="496" href="#496">496</a>     }
+<a name="497" href="#497">497</a>   }
+<a name="498" href="#498">498</a> 
+<a name="499" href="#499">499</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="500" href="#500">500</a> <em class="jxr_javadoccomment">   * Test using multiple vertex aggregation functions on a graph collection</em>
+<a name="501" href="#501">501</a> <em class="jxr_javadoccomment">   *</em>
+<a name="502" href="#502">502</a> <em class="jxr_javadoccomment">   * @throws Exception if the execution or IO fails.</em>
+<a name="503" href="#503">503</a> <em class="jxr_javadoccomment">   */</em>
+<a name="504" href="#504">504</a>   @Test
+<a name="505" href="#505">505</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionWithMultipleVertexAggregationFunctions() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="506" href="#506">506</a>     GraphCollection collection = getSocialNetworkLoader()
+<a name="507" href="#507">507</a>       .getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g2"</span>, <span class="jxr_string">"g3"</span>);
+<a name="508" href="#508">508</a> 
+<a name="509" href="#509">509</a>     SumVertexProperty sumVertexProperty = <strong class="jxr_keyword">new</strong> SumVertexProperty(<span class="jxr_string">"age"</span>);
+<a name="510" href="#510">510</a>     MaxVertexProperty maxVertexProperty = <strong class="jxr_keyword">new</strong> MaxVertexProperty(<span class="jxr_string">"age"</span>);
+<a name="511" href="#511">511</a> 
+<a name="512" href="#512">512</a>     GraphCollection expected = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumVertexProperty))
+<a name="513" href="#513">513</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxVertexProperty));
+<a name="514" href="#514">514</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumVertexProperty,
+<a name="515" href="#515">515</a>       maxVertexProperty));
+<a name="516" href="#516">516</a> 
+<a name="517" href="#517">517</a>     collectAndAssertTrue(expected.equalsByGraphData(output));
+<a name="518" href="#518">518</a>   }
+<a name="519" href="#519">519</a> 
+<a name="520" href="#520">520</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="521" href="#521">521</a> <em class="jxr_javadoccomment">   * Test using multiple edge aggregation functions on a graph collection</em>
+<a name="522" href="#522">522</a> <em class="jxr_javadoccomment">   *</em>
+<a name="523" href="#523">523</a> <em class="jxr_javadoccomment">   * @throws Exception if the execution or IO fails.</em>
+<a name="524" href="#524">524</a> <em class="jxr_javadoccomment">   */</em>
+<a name="525" href="#525">525</a>   @Test
+<a name="526" href="#526">526</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionWithMultipleEdgeAggregationFunctions() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="527" href="#527">527</a>     GraphCollection collection = getSocialNetworkLoader()
+<a name="528" href="#528">528</a>       .getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g2"</span>, <span class="jxr_string">"g3"</span>);
+<a name="529" href="#529">529</a> 
+<a name="530" href="#530">530</a>     SumEdgeProperty sumEdgeProperty = <strong class="jxr_keyword">new</strong> SumEdgeProperty(<span class="jxr_string">"since"</span>);
+<a name="531" href="#531">531</a>     MaxEdgeProperty maxEdgeProperty = <strong class="jxr_keyword">new</strong> MaxEdgeProperty(<span class="jxr_string">"since"</span>);
+<a name="532" href="#532">532</a> 
+<a name="533" href="#533">533</a>     GraphCollection expected = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumEdgeProperty))
+<a name="534" href="#534">534</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxEdgeProperty));
+<a name="535" href="#535">535</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumEdgeProperty,
+<a name="536" href="#536">536</a>       maxEdgeProperty));
+<a name="537" href="#537">537</a> 
+<a name="538" href="#538">538</a>     collectAndAssertTrue(expected.equalsByGraphData(output));
+<a name="539" href="#539">539</a>   }
+<a name="540" href="#540">540</a> 
+<a name="541" href="#541">541</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="542" href="#542">542</a> <em class="jxr_javadoccomment">   * Test using multiple element aggregation functions on a graph collection</em>
+<a name="543" href="#543">543</a> <em class="jxr_javadoccomment">   *</em>
+<a name="544" href="#544">544</a> <em class="jxr_javadoccomment">   * @throws Exception if the execution or IO fails.</em>
+<a name="545" href="#545">545</a> <em class="jxr_javadoccomment">   */</em>
+<a name="546" href="#546">546</a>   @Test
+<a name="547" href="#547">547</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionWithMultipleElementAggregationFunctions() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="548" href="#548">548</a>     GraphCollection collection = getSocialNetworkLoader()
+<a name="549" href="#549">549</a>       .getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g2"</span>, <span class="jxr_string">"g3"</span>);
+<a name="550" href="#550">550</a> 
+<a name="551" href="#551">551</a>     SumProperty sumProperty = <strong class="jxr_keyword">new</strong> SumProperty(<span class="jxr_string">"since"</span>);
+<a name="552" href="#552">552</a>     MaxProperty maxProperty = <strong class="jxr_keyword">new</strong> MaxProperty(<span class="jxr_string">"since"</span>);
+<a name="553" href="#553">553</a> 
+<a name="554" href="#554">554</a>     GraphCollection expected = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumProperty))
+<a name="555" href="#555">555</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxProperty));
+<a name="556" href="#556">556</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(sumProperty, maxProperty));
+<a name="557" href="#557">557</a> 
+<a name="558" href="#558">558</a>     collectAndAssertTrue(expected.equalsByGraphData(output));
+<a name="559" href="#559">559</a>   }
+<a name="560" href="#560">560</a> 
+<a name="561" href="#561">561</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="562" href="#562">562</a> <em class="jxr_javadoccomment">   * Test using multiple vertex and edge aggregation functions on a graph collection</em>
+<a name="563" href="#563">563</a> <em class="jxr_javadoccomment">   *</em>
+<a name="564" href="#564">564</a> <em class="jxr_javadoccomment">   * @throws Exception if the execution or IO fails.</em>
+<a name="565" href="#565">565</a> <em class="jxr_javadoccomment">   */</em>
+<a name="566" href="#566">566</a>   @Test
+<a name="567" href="#567">567</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionWithMultipleDifferentAggregationFunctions() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="568" href="#568">568</a>     GraphCollection collection = getSocialNetworkLoader()
+<a name="569" href="#569">569</a>       .getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g2"</span>, <span class="jxr_string">"g3"</span>);
+<a name="570" href="#570">570</a> 
+<a name="571" href="#571">571</a>     VertexCount vertexCount = <strong class="jxr_keyword">new</strong> VertexCount();
+<a name="572" href="#572">572</a>     EdgeCount edgeCount = <strong class="jxr_keyword">new</strong> EdgeCount();
+<a name="573" href="#573">573</a>     Count count = <strong class="jxr_keyword">new</strong> Count();
+<a name="574" href="#574">574</a>     MaxEdgeProperty maxEdgeProperty = <strong class="jxr_keyword">new</strong> MaxEdgeProperty(<span class="jxr_string">"since"</span>);
+<a name="575" href="#575">575</a> 
+<a name="576" href="#576">576</a>     GraphCollection expected = collection
+<a name="577" href="#577">577</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(vertexCount))
+<a name="578" href="#578">578</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(edgeCount))
+<a name="579" href="#579">579</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(count))
+<a name="580" href="#580">580</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(maxEdgeProperty));
+<a name="581" href="#581">581</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(vertexCount, edgeCount, count,
+<a name="582" href="#582">582</a>       maxEdgeProperty));
+<a name="583" href="#583">583</a> 
+<a name="584" href="#584">584</a>     collectAndAssertTrue(expected.equalsByGraphData(output));
+<a name="585" href="#585">585</a>   }
+<a name="586" href="#586">586</a> 
+<a name="587" href="#587">587</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="588" href="#588">588</a> <em class="jxr_javadoccomment">   * Test using multiple aggregation functions on an empty graph collection</em>
+<a name="589" href="#589">589</a> <em class="jxr_javadoccomment">   *</em>
+<a name="590" href="#590">590</a> <em class="jxr_javadoccomment">   * @throws Exception if the execution or IO fails.</em>
+<a name="591" href="#591">591</a> <em class="jxr_javadoccomment">   */</em>
+<a name="592" href="#592">592</a>   @Test
+<a name="593" href="#593">593</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testEmptyCollectionWithMultipleAggregationFunctions() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="594" href="#594">594</a>     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+<a name="595" href="#595">595</a>     GraphCollection collection = loader.getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>)
+<a name="596" href="#596">596</a>       .difference(loader.getGraphCollectionByVariables(<span class="jxr_string">"g1"</span>));
+<a name="597" href="#597">597</a> 
+<a name="598" href="#598">598</a>     VertexCount vertexCount = <strong class="jxr_keyword">new</strong> VertexCount();
+<a name="599" href="#599">599</a>     EdgeCount edgeCount = <strong class="jxr_keyword">new</strong> EdgeCount();
+<a name="600" href="#600">600</a>     Count count = <strong class="jxr_keyword">new</strong> Count();
+<a name="601" href="#601">601</a> 
+<a name="602" href="#602">602</a>     GraphCollection expected = collection
+<a name="603" href="#603">603</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(vertexCount))
+<a name="604" href="#604">604</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(edgeCount))
+<a name="605" href="#605">605</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(count));
+<a name="606" href="#606">606</a>     GraphCollection output = collection.apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(vertexCount, edgeCount, count));
+<a name="607" href="#607">607</a> 
+<a name="608" href="#608">608</a>     collectAndAssertTrue(expected.equalsByGraphData(output));
+<a name="609" href="#609">609</a>   }
+<a name="610" href="#610">610</a> }
+</pre>
+<hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
+</html>

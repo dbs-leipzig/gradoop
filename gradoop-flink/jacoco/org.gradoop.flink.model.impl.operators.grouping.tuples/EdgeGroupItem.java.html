@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EdgeGroupItem.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.grouping.tuples</a> &gt; <span class="el_source">EdgeGroupItem.java</span></div><h1>EdgeGroupItem.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.grouping.tuples;
+
+import org.apache.flink.api.java.tuple.Tuple6;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValueList;
+
+/**
+ * Edge representation used for grouping edges to super edges.
+ *
+ * &lt;pre&gt;
+ * f0: source vertex id
+ * f1: target vertex id
+ * f2: edge group label
+ * f3: edge group property values
+ * f4: edge group aggregate values
+ * f5: edge label group
+ * &lt;/pre&gt;
+ */
+<span class="fc" id="L34">public class EdgeGroupItem</span>
+  extends Tuple6&lt;GradoopId, GradoopId, String, PropertyValueList, PropertyValueList, LabelGroup&gt;
+  implements GroupItem {
+
+  public GradoopId getSourceId() {
+<span class="fc" id="L39">    return f0;</span>
+  }
+
+  public void setSourceId(GradoopId sourceVertexId) {
+<span class="fc" id="L43">    f0 = sourceVertexId;</span>
+<span class="fc" id="L44">  }</span>
+
+  public GradoopId getTargetId() {
+<span class="fc" id="L47">    return f1;</span>
+  }
+
+  public void setTargetId(GradoopId targetVertexId) {
+<span class="fc" id="L51">    f1 = targetVertexId;</span>
+<span class="fc" id="L52">  }</span>
+
+  public String getGroupLabel() {
+<span class="fc" id="L55">    return f2;</span>
+  }
+
+  public void setGroupLabel(String groupLabel) {
+<span class="fc" id="L59">    f2 = groupLabel;</span>
+<span class="fc" id="L60">  }</span>
+
+  public PropertyValueList getGroupingValues() {
+<span class="fc" id="L63">    return f3;</span>
+  }
+
+  public void setGroupingValues(PropertyValueList groupPropertyValues) {
+<span class="fc" id="L67">    f3 = groupPropertyValues;</span>
+<span class="fc" id="L68">  }</span>
+
+  public PropertyValueList getAggregateValues() {
+<span class="fc" id="L71">    return f4;</span>
+  }
+
+  public void setAggregateValues(PropertyValueList value) {
+<span class="fc" id="L75">    this.f4 = value;</span>
+<span class="fc" id="L76">  }</span>
+
+  public LabelGroup getLabelGroup() {
+<span class="fc" id="L79">    return f5;</span>
+  }
+
+  public void setLabelGroup(LabelGroup edgeLabelGroup) {
+<span class="fc" id="L83">    f5 = edgeLabelGroup;</span>
+<span class="fc" id="L84">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

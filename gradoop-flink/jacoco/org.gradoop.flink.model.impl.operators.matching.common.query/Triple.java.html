@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Triple.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.common.query</a> &gt; <span class="el_source">Triple.java</span></div><h1>Triple.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.common.query;
+
+import org.s1ck.gdl.model.Edge;
+import org.s1ck.gdl.model.Vertex;
+
+/**
+ * A triple representation of a query edge.
+ */
+public class Triple {
+  /**
+   * The source vertex of that triple.
+   */
+  private final Vertex sourceVertex;
+  /**
+   * The edge of that triple.
+   */
+  private final Edge edge;
+  /**
+   * The target vertex of that triple.
+   */
+  private final Vertex targetVertex;
+
+  /**
+   * Creates a new triple using the specified query elements.
+   *
+   * @param sourceVertex source vertex
+   * @param edge edge
+   * @param targetVertex target vertex
+   */
+<span class="fc" id="L45">  public Triple(Vertex sourceVertex, Edge edge, Vertex targetVertex) {</span>
+<span class="fc" id="L46">    this.sourceVertex = sourceVertex;</span>
+<span class="fc" id="L47">    this.edge = edge;</span>
+<span class="fc" id="L48">    this.targetVertex = targetVertex;</span>
+<span class="fc" id="L49">  }</span>
+
+  public Vertex getSourceVertex() {
+<span class="fc" id="L52">    return sourceVertex;</span>
+  }
+
+  public Edge getEdge() {
+<span class="fc" id="L56">    return edge;</span>
+  }
+
+  public Vertex getTargetVertex() {
+<span class="fc" id="L60">    return targetVertex;</span>
+  }
+
+  @Override
+  public boolean equals(Object o) {
+<span class="fc bfc" id="L65" title="All 2 branches covered.">    if (this == o) {</span>
+<span class="fc" id="L66">      return true;</span>
+    }
+<span class="pc bpc" id="L68" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L69">      return false;</span>
+    }
+
+<span class="fc" id="L72">    Triple triple = (Triple) o;</span>
+
+<span class="pc bpc" id="L74" title="3 of 4 branches missed.">    return edge != null ? edge.equals(triple.edge) : triple.edge == null;</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">    return edge != null ? edge.hashCode() : 0;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L84">    return &quot;Triple{&quot; + &quot;sourceVertex=&quot; + sourceVertex + &quot;, edge=&quot; + edge + &quot;, targetVertex=&quot; +</span>
+      targetVertex + '}';
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

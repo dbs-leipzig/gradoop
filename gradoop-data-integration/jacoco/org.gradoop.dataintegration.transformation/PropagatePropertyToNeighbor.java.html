@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropagatePropertyToNeighbor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation</a> &gt; <span class="el_source">PropagatePropertyToNeighbor.java</span></div><h1>PropagatePropertyToNeighbor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.dataintegration.transformation.functions.AccumulatePropagatedValues;
+import org.gradoop.dataintegration.transformation.functions.BuildIdPropertyValuePairs;
+import org.gradoop.dataintegration.transformation.functions.BuildTargetVertexIdPropertyValuePairs;
+import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+
+import java.util.Objects;
+import java.util.Set;
+
+/**
+ * A property of a vertex is propagated to its neighbors and aggregated in a Property List.
+ */
+public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
+
+  /**
+   * The label of the vertex the property to propagate is part of.
+   */
+  private final String vertexLabel;
+
+  /**
+   * The property key of the property to propagate.
+   */
+  private final String propertyKey;
+
+  /**
+   * The property key where the PropertyValue list should be stored at the target vertices.
+   */
+  private final String targetVertexPropertyKey;
+
+  /**
+   * Only edges with the inserted labels are used. If all labels are sufficient use {@code null}.
+   */
+  private final Set&lt;String&gt; propagatingEdgeLabels;
+
+  /**
+   * Only vertices with the inserted labels will store the propagated values.
+   * If all vertices should do it use {@code null}.
+   */
+  private final Set&lt;String&gt; targetVertexLabels;
+
+  /**
+   * The constructor for the propagate property transformation. Additionally it is possible to
+   * define which edge labels can be used for propagation and / or which vertices could be target
+   * of the Properties.
+   * &lt;p&gt;
+   * Using this constructor, properties will be propagated along all edges and to all
+   * target vertices. {@link #PropagatePropertyToNeighbor(String, String, String, Set, Set)}
+   * can be used when properties should only be propagated along certain edges (selected by their
+   * label) and / or to certain vertices (selected by their label). Using this constructor is
+   * equivalent to {@code PropagatePropertyToNeighbor(vertexLabel, propertyKey,
+   * targetVertexPropertyKey, null, null)}.
+   *
+   * @param vertexLabel             The label of the vertex the property to propagate is part of.
+   * @param propertyKey             The property key of the property to propagate.
+   * @param targetVertexPropertyKey The property key where the PropertyValue list should be stored
+   *                                at the target vertices.
+   */
+  public PropagatePropertyToNeighbor(String vertexLabel, String propertyKey,
+    String targetVertexPropertyKey) {
+<span class="fc" id="L83">    this(vertexLabel, propertyKey, targetVertexPropertyKey, null, null);</span>
+<span class="fc" id="L84">  }</span>
+
+  /**
+   * The constructor for the propagate property transformation. Additionally it is possible to
+   * define which edge labels can be used for propagation and / or which vertices could be target
+   * of the Properties.
+   *
+   * @param vertexLabel             The label of the vertex the property to propagate is part of.
+   * @param propertyKey             The property key of the property to propagate.
+   * @param targetVertexPropertyKey The property key where the PropertyValue list should be stored
+   *                                at the target vertices.
+   * @param propagatingEdges        Only edges with the inserted labels are used. If all labels
+   *                                are sufficient use {@code null}.
+   * @param targetVertexLabels      Only vertices with the inserted labels will store the
+   *                                propagated values. If all vertices should, use {@code null}.
+   */
+  public PropagatePropertyToNeighbor(String vertexLabel, String propertyKey,
+                                     String targetVertexPropertyKey, Set&lt;String&gt; propagatingEdges,
+<span class="fc" id="L102">                                     Set&lt;String&gt; targetVertexLabels) {</span>
+<span class="fc" id="L103">    this.vertexLabel = Objects.requireNonNull(vertexLabel);</span>
+<span class="fc" id="L104">    this.propertyKey = Objects.requireNonNull(propertyKey);</span>
+<span class="fc" id="L105">    this.targetVertexPropertyKey = Objects.requireNonNull(targetVertexPropertyKey);</span>
+<span class="fc" id="L106">    this.propagatingEdgeLabels = propagatingEdges;</span>
+<span class="fc" id="L107">    this.targetVertexLabels = targetVertexLabels;</span>
+<span class="fc" id="L108">  }</span>
+
+  @Override
+  public LogicalGraph execute(LogicalGraph graph) {
+    // prepare the edge set, EdgeFilter if propagating edges are given
+<span class="fc" id="L113">    DataSet&lt;Edge&gt; propagateAlong = graph.getEdges();</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">    if (propagatingEdgeLabels != null) {</span>
+<span class="fc" id="L115">      propagateAlong = propagateAlong.filter(new LabelIsIn&lt;&gt;(propagatingEdgeLabels));</span>
+    }
+
+<span class="fc" id="L118">    DataSet&lt;Vertex&gt; newVertices = graph.getVertices()</span>
+      // Extract properties to propagate
+<span class="fc" id="L120">      .flatMap(new BuildIdPropertyValuePairs&lt;&gt;(vertexLabel, propertyKey))</span>
+      // Propagate along edges.
+<span class="fc" id="L122">      .join(propagateAlong)</span>
+<span class="fc" id="L123">      .where(0).equalTo(new SourceId&lt;&gt;())</span>
+<span class="fc" id="L124">      .with(new BuildTargetVertexIdPropertyValuePairs&lt;&gt;())</span>
+      // Update target vertices.
+<span class="fc" id="L126">      .coGroup(graph.getVertices())</span>
+<span class="fc" id="L127">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L128">      .with(new AccumulatePropagatedValues&lt;&gt;(targetVertexPropertyKey, targetVertexLabels));</span>
+
+<span class="fc" id="L130">    return graph.getFactory().fromDataSets(newVertices, graph.getEdges());</span>
+  }
+
+  @Override
+  public String getName() {
+<span class="nc" id="L135">    return PropagatePropertyToNeighbor.class.getName();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

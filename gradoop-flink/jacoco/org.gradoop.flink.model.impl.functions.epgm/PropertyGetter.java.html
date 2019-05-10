@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropertyGetter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.functions.epgm</a> &gt; <span class="el_source">PropertyGetter.java</span></div><h1>PropertyGetter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.functions.epgm;
+
+import com.google.common.collect.Lists;
+import org.gradoop.flink.model.api.functions.Function;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Extracts a list of {@link PropertyValue} instances from a given entity using
+ * a list of property keys. The order of the property keys determines the order
+ * of the values in the result. If the EPGM element does not have a property,
+ * the property value will be {@code PropertyValue.NULL_VALUE}.
+ *
+ * @param &lt;EL&gt; EPGM element
+ */
+public class PropertyGetter&lt;EL extends Element&gt;
+  implements Function&lt;EL, List&lt;PropertyValue&gt;&gt; {
+
+  /**
+   * Property keys to retrieve property values
+   */
+  private final List&lt;String&gt; propertyKeys;
+
+  /**
+   * Constructor
+   *
+   * @param propertyKeys property keys to retrieve values for
+   */
+<span class="fc" id="L48">  public PropertyGetter(List&lt;String&gt; propertyKeys) {</span>
+<span class="fc" id="L49">    this.propertyKeys = checkNotNull(propertyKeys);</span>
+<span class="fc" id="L50">  }</span>
+
+  @Override
+  public List&lt;PropertyValue&gt; apply(EL entity) {
+<span class="fc" id="L54">    List&lt;PropertyValue&gt; propertyValueList =</span>
+<span class="fc" id="L55">      Lists.newArrayListWithCapacity(propertyKeys.size());</span>
+
+<span class="fc bfc" id="L57" title="All 2 branches covered.">    for (String propertyKey : propertyKeys) {</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">      if (entity.hasProperty(propertyKey)) {</span>
+<span class="fc" id="L59">        propertyValueList.add(entity.getPropertyValue(propertyKey));</span>
+      } else {
+<span class="nc" id="L61">        propertyValueList.add(PropertyValue.NULL_VALUE);</span>
+      }
+<span class="fc" id="L63">    }</span>
+<span class="fc" id="L64">    return propertyValueList;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JSONBase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.deprecated.json</a> &gt; <span class="el_source">JSONBase.java</span></div><h1>JSONBase.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.deprecated.json;
+
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+/**
+ * Base class for file based I/O formats.
+ */
+abstract class JSONBase {
+  /**
+   * Default file name for storing graph heads
+   */
+  static final String DEFAULT_GRAPHS_FILE = &quot;/graphs.json&quot;;
+  /**
+   * Default file name for storing vertices
+   */
+  static final String DEFAULT_VERTEX_FILE = &quot;/vertices.json&quot;;
+  /**
+   * Default file name for storing edges
+   */
+  static final String DEFAULT_EDGE_FILE = &quot;/edges.json&quot;;
+  /**
+   * Gradoop Flink configuration
+   */
+  private final GradoopFlinkConfig config;
+  /**
+   * File to write graph heads to
+   */
+  private final String graphHeadPath;
+  /**
+   * File to write vertices to
+   */
+  private final String vertexPath;
+  /**
+   * File to write edges to
+   */
+  private final String edgePath;
+
+  /**
+   * Creates a new data source/sink. Paths can be local (file://) or HDFS
+   * (hdfs://).
+   *
+   * @param vertexPath    vertex data file
+   * @param edgePath      edge data file
+   * @param graphHeadPath graph data file
+   * @param config        Gradoop Flink configuration
+   */
+  JSONBase(String graphHeadPath, String vertexPath,
+<span class="fc" id="L63">    String edgePath, GradoopFlinkConfig config) {</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">    if (config == null) {</span>
+<span class="nc" id="L65">      throw new IllegalArgumentException(&quot;config must not be null&quot;);</span>
+    }
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">    if (vertexPath == null) {</span>
+<span class="nc" id="L68">      throw new IllegalArgumentException(&quot;vertex file must not be null&quot;);</span>
+    }
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">    if (edgePath == null) {</span>
+<span class="nc" id="L71">      throw new IllegalArgumentException(&quot;edge file must not be null&quot;);</span>
+    }
+<span class="fc" id="L73">    this.graphHeadPath = graphHeadPath;</span>
+<span class="fc" id="L74">    this.vertexPath = vertexPath;</span>
+<span class="fc" id="L75">    this.edgePath = edgePath;</span>
+<span class="fc" id="L76">    this.config = config;</span>
+<span class="fc" id="L77">  }</span>
+
+  public GradoopFlinkConfig getConfig() {
+<span class="fc" id="L80">    return config;</span>
+  }
+
+  public String getGraphHeadPath() {
+<span class="fc" id="L84">    return graphHeadPath;</span>
+  }
+
+  public String getVertexPath() {
+<span class="fc" id="L88">    return vertexPath;</span>
+  }
+
+  public String getEdgePath() {
+<span class="fc" id="L92">    return edgePath;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

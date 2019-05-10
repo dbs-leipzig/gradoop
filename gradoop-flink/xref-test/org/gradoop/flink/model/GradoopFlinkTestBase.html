@@ -1,0 +1,260 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+<title>GradoopFlinkTestBase xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../stylesheet.css" />
+</head>
+<body>
+<pre>
+
+<a name="1" href="#1">1</a>   <em class="jxr_comment">/*</em>
+<a name="2" href="#2">2</a>   <em class="jxr_comment"> * Copyright © 2014 - 2019 Leipzig University (Database Research Group)</em>
+<a name="3" href="#3">3</a>   <em class="jxr_comment"> *</em>
+<a name="4" href="#4">4</a>   <em class="jxr_comment"> * Licensed under the Apache License, Version 2.0 (the "License");</em>
+<a name="5" href="#5">5</a>   <em class="jxr_comment"> * you may not use this file except in compliance with the License.</em>
+<a name="6" href="#6">6</a>   <em class="jxr_comment"> * You may obtain a copy of the License at</em>
+<a name="7" href="#7">7</a>   <em class="jxr_comment"> *</em>
+<a name="8" href="#8">8</a>   <em class="jxr_comment"> *     <a href="http://www.apache.org/licenses/LICENSE-2.0" target="alexandria_uri">http://www.apache.org/licenses/LICENSE-2.0</a></em>
+<a name="9" href="#9">9</a>   <em class="jxr_comment"> *</em>
+<a name="10" href="#10">10</a>  <em class="jxr_comment"> * Unless required by applicable law or agreed to in writing, software</em>
+<a name="11" href="#11">11</a>  <em class="jxr_comment"> * distributed under the License is distributed on an "AS IS" BASIS,</em>
+<a name="12" href="#12">12</a>  <em class="jxr_comment"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</em>
+<a name="13" href="#13">13</a>  <em class="jxr_comment"> * See the License for the specific language governing permissions and</em>
+<a name="14" href="#14">14</a>  <em class="jxr_comment"> * limitations under the License.</em>
+<a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
+<a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model;
+<a name="17" href="#17">17</a>  
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.ExecutionEnvironment;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.configuration.Configuration;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.runtime.minicluster.LocalFlinkMiniCluster;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.test.util.TestEnvironment;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.GradoopTestUtils;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMElement;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.bool.False;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
+<a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
+<a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.FlinkAsciiGraphLoader;
+<a name="34" href="#34">34</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.GradoopFlinkConfig;
+<a name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> org.junit.AfterClass;
+<a name="36" href="#36">36</a>  <strong class="jxr_keyword">import</strong> org.junit.Assert;
+<a name="37" href="#37">37</a>  <strong class="jxr_keyword">import</strong> org.junit.BeforeClass;
+<a name="38" href="#38">38</a>  
+<a name="39" href="#39">39</a>  <strong class="jxr_keyword">import</strong> java.io.File;
+<a name="40" href="#40">40</a>  <strong class="jxr_keyword">import</strong> java.io.IOException;
+<a name="41" href="#41">41</a>  <strong class="jxr_keyword">import</strong> java.io.InputStream;
+<a name="42" href="#42">42</a>  <strong class="jxr_keyword">import</strong> java.io.UnsupportedEncodingException;
+<a name="43" href="#43">43</a>  <strong class="jxr_keyword">import</strong> java.net.URLDecoder;
+<a name="44" href="#44">44</a>  <strong class="jxr_keyword">import</strong> java.nio.charset.StandardCharsets;
+<a name="45" href="#45">45</a>  <strong class="jxr_keyword">import</strong> java.nio.file.Files;
+<a name="46" href="#46">46</a>  <strong class="jxr_keyword">import</strong> java.nio.file.Path;
+<a name="47" href="#47">47</a>  
+<a name="48" href="#48">48</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertFalse;
+<a name="49" href="#49">49</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertTrue;
+<a name="50" href="#50">50</a>  
+<a name="51" href="#51">51</a>  <em class="jxr_javadoccomment">/**</em>
+<a name="52" href="#52">52</a>  <em class="jxr_javadoccomment"> * Base class for Flink-based unit tests with the same cluster.</em>
+<a name="53" href="#53">53</a>  <em class="jxr_javadoccomment"> */</em>
+<a name="54" href="#54">54</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
+<a name="55" href="#55">55</a>  
+<a name="56" href="#56">56</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> DEFAULT_PARALLELISM = 4;
+<a name="57" href="#57">57</a>  
+<a name="58" href="#58">58</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">long</strong> TASKMANAGER_MEMORY_SIZE_MB = 512;
+<a name="59" href="#59">59</a>  
+<a name="60" href="#60">60</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> LocalFlinkMiniCluster CLUSTER = <strong class="jxr_keyword">null</strong>;
+<a name="61" href="#61">61</a>  
+<a name="62" href="#62">62</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="63" href="#63">63</a>  <em class="jxr_javadoccomment">   * Flink Execution Environment</em>
+<a name="64" href="#64">64</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="65" href="#65">65</a>    <strong class="jxr_keyword">private</strong> ExecutionEnvironment env;
+<a name="66" href="#66">66</a>  
+<a name="67" href="#67">67</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="68" href="#68">68</a>  <em class="jxr_javadoccomment">   * Gradoop Flink configuration</em>
+<a name="69" href="#69">69</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="70" href="#70">70</a>    <strong class="jxr_keyword">private</strong> GradoopFlinkConfig config;
+<a name="71" href="#71">71</a>  
+<a name="72" href="#72">72</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="73" href="#73">73</a>  <em class="jxr_javadoccomment">   * The factory to create a logical graph layout.</em>
+<a name="74" href="#74">74</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="75" href="#75">75</a>    <strong class="jxr_keyword">private</strong> LogicalGraphLayoutFactory&lt;GraphHead, Vertex, Edge&gt; graphLayoutFactory;
+<a name="76" href="#76">76</a>  
+<a name="77" href="#77">77</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="78" href="#78">78</a>  <em class="jxr_javadoccomment">   * The factory to create a graph collection layout.</em>
+<a name="79" href="#79">79</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="80" href="#80">80</a>    <strong class="jxr_keyword">private</strong> GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; collectionLayoutFactory;
+<a name="81" href="#81">81</a>  
+<a name="82" href="#82">82</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="83" href="#83">83</a>  <em class="jxr_javadoccomment">   * Creates a new instance of {@link GradoopFlinkTestBase}.</em>
+<a name="84" href="#84">84</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="85" href="#85">85</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a>() {
+<a name="86" href="#86">86</a>      TestEnvironment testEnv = <strong class="jxr_keyword">new</strong> TestEnvironment(CLUSTER, DEFAULT_PARALLELISM, false);
+<a name="87" href="#87">87</a>      <em class="jxr_comment">// makes ExecutionEnvironment.getExecutionEnvironment() return this instance</em>
+<a name="88" href="#88">88</a>      testEnv.setAsContext();
+<a name="89" href="#89">89</a>      <strong class="jxr_keyword">this</strong>.env = testEnv;
+<a name="90" href="#90">90</a>      <strong class="jxr_keyword">this</strong>.graphLayoutFactory = <strong class="jxr_keyword">new</strong> GVEGraphLayoutFactory();
+<a name="91" href="#91">91</a>      <strong class="jxr_keyword">this</strong>.collectionLayoutFactory = <strong class="jxr_keyword">new</strong> GVECollectionLayoutFactory();
+<a name="92" href="#92">92</a>    }
+<a name="93" href="#93">93</a>  
+<a name="94" href="#94">94</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="95" href="#95">95</a>  <em class="jxr_javadoccomment">   * Returns the execution environment for the tests</em>
+<a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="97" href="#97">97</a>  <em class="jxr_javadoccomment">   * @return Flink execution environment</em>
+<a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="99" href="#99">99</a>    <strong class="jxr_keyword">protected</strong> ExecutionEnvironment getExecutionEnvironment() {
+<a name="100" href="#100">100</a>     <strong class="jxr_keyword">return</strong> env;
+<a name="101" href="#101">101</a>   }
+<a name="102" href="#102">102</a> 
+<a name="103" href="#103">103</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="104" href="#104">104</a> <em class="jxr_javadoccomment">   * Returns the configuration for the test</em>
+<a name="105" href="#105">105</a> <em class="jxr_javadoccomment">   *</em>
+<a name="106" href="#106">106</a> <em class="jxr_javadoccomment">   * @return Gradoop Flink configuration</em>
+<a name="107" href="#107">107</a> <em class="jxr_javadoccomment">   */</em>
+<a name="108" href="#108">108</a>   <strong class="jxr_keyword">protected</strong> GradoopFlinkConfig getConfig() {
+<a name="109" href="#109">109</a>     <strong class="jxr_keyword">if</strong> (config == <strong class="jxr_keyword">null</strong>) {
+<a name="110" href="#110">110</a>       setConfig(GradoopFlinkConfig.createConfig(getExecutionEnvironment(),
+<a name="111" href="#111">111</a>         graphLayoutFactory,
+<a name="112" href="#112">112</a>         collectionLayoutFactory));
+<a name="113" href="#113">113</a>     }
+<a name="114" href="#114">114</a>     <strong class="jxr_keyword">return</strong> config;
+<a name="115" href="#115">115</a>   }
+<a name="116" href="#116">116</a> 
+<a name="117" href="#117">117</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="118" href="#118">118</a> <em class="jxr_javadoccomment">   * Sets the default configuration for the test</em>
+<a name="119" href="#119">119</a> <em class="jxr_javadoccomment">   */</em>
+<a name="120" href="#120">120</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> setConfig(GradoopFlinkConfig config) {
+<a name="121" href="#121">121</a>     <strong class="jxr_keyword">this</strong>.config = config;
+<a name="122" href="#122">122</a>   }
+<a name="123" href="#123">123</a> 
+<a name="124" href="#124">124</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> setCollectionLayoutFactory(
+<a name="125" href="#125">125</a>     GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; collectionLayoutFactory) {
+<a name="126" href="#126">126</a>     <strong class="jxr_keyword">this</strong>.collectionLayoutFactory = collectionLayoutFactory;
+<a name="127" href="#127">127</a>   }
+<a name="128" href="#128">128</a> 
+<a name="129" href="#129">129</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
+<a name="130" href="#130">130</a>   <em class="jxr_comment">// Cluster related</em>
+<a name="131" href="#131">131</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
+<a name="132" href="#132">132</a> 
+<a name="133" href="#133">133</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="134" href="#134">134</a> <em class="jxr_javadoccomment">   * Custom test cluster start routine,</em>
+<a name="135" href="#135">135</a> <em class="jxr_javadoccomment">   * workaround to set TASK_MANAGER_MEMORY_SIZE.</em>
+<a name="136" href="#136">136</a> <em class="jxr_javadoccomment">   *</em>
+<a name="137" href="#137">137</a> <em class="jxr_javadoccomment">   * TODO: remove, when future issue is fixed</em>
+<a name="138" href="#138">138</a> <em class="jxr_javadoccomment">   * {@see <a href="http://mail-archives.apache.org/mod_mbox/flink-dev/201511.mbox/%3CCAC27z=PmPMeaiNkrkoxNFzoR26BOOMaVMghkh1KLJFW4oxmUmw@mail.gmail.com%3E" target="alexandria_uri">http://mail-archives.apache.org/mod_mbox/flink-dev/201511.mbox/%3CCAC27z=PmPMeaiNkrkoxNFzoR26BOOMaVMghkh1KLJFW4oxmUmw@mail.gmail.com%3E</a>}</em>
+<a name="139" href="#139">139</a> <em class="jxr_javadoccomment">   *</em>
+<a name="140" href="#140">140</a> <em class="jxr_javadoccomment">   * @throws Exception on failure</em>
+<a name="141" href="#141">141</a> <em class="jxr_javadoccomment">   */</em>
+<a name="142" href="#142">142</a>   @BeforeClass
+<a name="143" href="#143">143</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> setupFlink() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="144" href="#144">144</a>     File logDir = File.createTempFile(<span class="jxr_string">"TestBaseUtils-logdir"</span>, <strong class="jxr_keyword">null</strong>);
+<a name="145" href="#145">145</a>     Assert.assertTrue(<span class="jxr_string">"Unable to delete temp file"</span>, logDir.delete());
+<a name="146" href="#146">146</a>     Assert.assertTrue(<span class="jxr_string">"Unable to create temp directory"</span>, logDir.mkdir());
+<a name="147" href="#147">147</a> 
+<a name="148" href="#148">148</a>     Files.createFile((<strong class="jxr_keyword">new</strong> File(logDir, <span class="jxr_string">"jobmanager.out"</span>)).toPath());
+<a name="149" href="#149">149</a>     Path logFile =  Files
+<a name="150" href="#150">150</a>       .createFile((<strong class="jxr_keyword">new</strong> File(logDir, <span class="jxr_string">"jobmanager.log"</span>)).toPath());
+<a name="151" href="#151">151</a> 
+<a name="152" href="#152">152</a>     Configuration config = <strong class="jxr_keyword">new</strong> Configuration();
+<a name="153" href="#153">153</a> 
+<a name="154" href="#154">154</a>     config.setInteger(<span class="jxr_string">"local.number-taskmanager"</span>, 1);
+<a name="155" href="#155">155</a>     config.setInteger(<span class="jxr_string">"taskmanager.numberOfTaskSlots"</span>, DEFAULT_PARALLELISM);
+<a name="156" href="#156">156</a>     config.setBoolean(<span class="jxr_string">"local.start-webserver"</span>, false);
+<a name="157" href="#157">157</a>     config.setLong(<span class="jxr_string">"taskmanager.memory.size"</span>, TASKMANAGER_MEMORY_SIZE_MB);
+<a name="158" href="#158">158</a>     config.setBoolean(<span class="jxr_string">"fs.overwrite-files"</span>, <strong class="jxr_keyword">true</strong>);
+<a name="159" href="#159">159</a>     config.setString(<span class="jxr_string">"akka.ask.timeout"</span>, <span class="jxr_string">"1000s"</span>);
+<a name="160" href="#160">160</a>     config.setString(<span class="jxr_string">"akka.startup-timeout"</span>, <span class="jxr_string">"60 s"</span>);
+<a name="161" href="#161">161</a>     config.setInteger(<span class="jxr_string">"jobmanager.web.port"</span>, 8081);
+<a name="162" href="#162">162</a>     config.setString(<span class="jxr_string">"jobmanager.web.log.path"</span>, logFile.toString());
+<a name="163" href="#163">163</a>     CLUSTER = <strong class="jxr_keyword">new</strong> LocalFlinkMiniCluster(config, <strong class="jxr_keyword">true</strong>);
+<a name="164" href="#164">164</a>     CLUSTER.start();
+<a name="165" href="#165">165</a>   }
+<a name="166" href="#166">166</a> 
+<a name="167" href="#167">167</a>   @AfterClass
+<a name="168" href="#168">168</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> tearDownFlink() {
+<a name="169" href="#169">169</a>     CLUSTER.stop();
+<a name="170" href="#170">170</a>   }
+<a name="171" href="#171">171</a> 
+<a name="172" href="#172">172</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
+<a name="173" href="#173">173</a>   <em class="jxr_comment">// Data generation</em>
+<a name="174" href="#174">174</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
+<a name="175" href="#175">175</a> 
+<a name="176" href="#176">176</a>   <strong class="jxr_keyword">protected</strong> FlinkAsciiGraphLoader getLoaderFromString(String asciiString) {
+<a name="177" href="#177">177</a>     FlinkAsciiGraphLoader loader = getNewLoader();
+<a name="178" href="#178">178</a>     loader.initDatabaseFromString(asciiString);
+<a name="179" href="#179">179</a>     <strong class="jxr_keyword">return</strong> loader;
+<a name="180" href="#180">180</a>   }
+<a name="181" href="#181">181</a> 
+<a name="182" href="#182">182</a>   <strong class="jxr_keyword">protected</strong> FlinkAsciiGraphLoader getLoaderFromFile(String fileName) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="183" href="#183">183</a>     FlinkAsciiGraphLoader loader = getNewLoader();
+<a name="184" href="#184">184</a> 
+<a name="185" href="#185">185</a>     loader.initDatabaseFromFile(fileName);
+<a name="186" href="#186">186</a>     <strong class="jxr_keyword">return</strong> loader;
+<a name="187" href="#187">187</a>   }
+<a name="188" href="#188">188</a> 
+<a name="189" href="#189">189</a>   <strong class="jxr_keyword">protected</strong> FlinkAsciiGraphLoader getLoaderFromStream(InputStream inputStream) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="190" href="#190">190</a>     FlinkAsciiGraphLoader loader = getNewLoader();
+<a name="191" href="#191">191</a> 
+<a name="192" href="#192">192</a>     loader.initDatabaseFromStream(inputStream);
+<a name="193" href="#193">193</a>     <strong class="jxr_keyword">return</strong> loader;
+<a name="194" href="#194">194</a>   }
+<a name="195" href="#195">195</a> 
+<a name="196" href="#196">196</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="197" href="#197">197</a> <em class="jxr_javadoccomment">   * Creates a social network as a basis for tests.</em>
+<a name="198" href="#198">198</a> <em class="jxr_javadoccomment">   * &lt;p/&gt;</em>
+<a name="199" href="#199">199</a> <em class="jxr_javadoccomment">   * An image of the network can be found in</em>
+<a name="200" href="#200">200</a> <em class="jxr_javadoccomment">   * gradoop/dev-support/social-network.pdf</em>
+<a name="201" href="#201">201</a> <em class="jxr_javadoccomment">   *</em>
+<a name="202" href="#202">202</a> <em class="jxr_javadoccomment">   * @return graph store containing a simple social network for tests.</em>
+<a name="203" href="#203">203</a> <em class="jxr_javadoccomment">   */</em>
+<a name="204" href="#204">204</a>   <strong class="jxr_keyword">protected</strong> FlinkAsciiGraphLoader getSocialNetworkLoader() <strong class="jxr_keyword">throws</strong> IOException {
+<a name="205" href="#205">205</a>     InputStream inputStream = getClass()
+<a name="206" href="#206">206</a>       .getResourceAsStream(GradoopTestUtils.SOCIAL_NETWORK_GDL_FILE);
+<a name="207" href="#207">207</a>     <strong class="jxr_keyword">return</strong> getLoaderFromStream(inputStream);
+<a name="208" href="#208">208</a>   }
+<a name="209" href="#209">209</a> 
+<a name="210" href="#210">210</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="211" href="#211">211</a> <em class="jxr_javadoccomment">   * Returns an uninitialized loader with the test config.</em>
+<a name="212" href="#212">212</a> <em class="jxr_javadoccomment">   *</em>
+<a name="213" href="#213">213</a> <em class="jxr_javadoccomment">   * @return uninitialized Flink Ascii graph loader</em>
+<a name="214" href="#214">214</a> <em class="jxr_javadoccomment">   */</em>
+<a name="215" href="#215">215</a>   <strong class="jxr_keyword">private</strong> FlinkAsciiGraphLoader getNewLoader() {
+<a name="216" href="#216">216</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> FlinkAsciiGraphLoader(getConfig());
+<a name="217" href="#217">217</a>   }
+<a name="218" href="#218">218</a> 
+<a name="219" href="#219">219</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
+<a name="220" href="#220">220</a>   <em class="jxr_comment">// Test helper</em>
+<a name="221" href="#221">221</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
+<a name="222" href="#222">222</a> 
+<a name="223" href="#223">223</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> collectAndAssertTrue(DataSet&lt;Boolean&gt; result) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="224" href="#224">224</a>     assertTrue(<span class="jxr_string">"expected true"</span>, result.collect().get(0));
+<a name="225" href="#225">225</a>   }
+<a name="226" href="#226">226</a> 
+<a name="227" href="#227">227</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> collectAndAssertFalse(DataSet&lt;Boolean&gt; result) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="228" href="#228">228</a>     assertFalse(<span class="jxr_string">"expected false"</span>, result.collect().get(0));
+<a name="229" href="#229">229</a>   }
+<a name="230" href="#230">230</a> 
+<a name="231" href="#231">231</a>   <strong class="jxr_keyword">protected</strong> &lt;T <strong class="jxr_keyword">extends</strong> EPGMElement&gt; DataSet&lt;T&gt; getEmptyDataSet(T dummy) {
+<a name="232" href="#232">232</a>     <strong class="jxr_keyword">return</strong> getExecutionEnvironment()
+<a name="233" href="#233">233</a>       .fromElements(dummy)
+<a name="234" href="#234">234</a>       .filter(<strong class="jxr_keyword">new</strong> False&lt;&gt;());
+<a name="235" href="#235">235</a>   }
+<a name="236" href="#236">236</a> 
+<a name="237" href="#237">237</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="238" href="#238">238</a> <em class="jxr_javadoccomment">   * Returns the encoded file path to a resource.</em>
+<a name="239" href="#239">239</a> <em class="jxr_javadoccomment">   *</em>
+<a name="240" href="#240">240</a> <em class="jxr_javadoccomment">   * @param  relPath the relative path to the resource</em>
+<a name="241" href="#241">241</a> <em class="jxr_javadoccomment">   * @return encoded file path</em>
+<a name="242" href="#242">242</a> <em class="jxr_javadoccomment">   */</em>
+<a name="243" href="#243">243</a>   <strong class="jxr_keyword">protected</strong> String getFilePath(String relPath) <strong class="jxr_keyword">throws</strong> UnsupportedEncodingException {
+<a name="244" href="#244">244</a>     <strong class="jxr_keyword">return</strong> URLDecoder.decode(
+<a name="245" href="#245">245</a>       getClass().getResource(relPath).getFile(), StandardCharsets.UTF_8.name());
+<a name="246" href="#246">246</a>   }
+<a name="247" href="#247">247</a> }
+</pre>
+<hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
+</html>

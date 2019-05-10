@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TransactionalFSMBase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.transactional.tle</a> &gt; <span class="el_source">TransactionalFSMBase.java</span></div><h1>TransactionalFSMBase.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.transactional.tle;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.DropPropertiesAndGraphContainment;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.EdgeLabels;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.FilterEdgesByLabel;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.FilterVerticesByLabel;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.NotEmpty;
+import org.gradoop.flink.algorithms.fsm.transactional.common.functions.VertexLabels;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinFrequency;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.impl.functions.tuple.ValueOfWithCount;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.model.impl.operators.count.Count;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+/**
+ * Superclass of frequent subgraph implementations in the graph transaction setting.
+ */
+public abstract class TransactionalFSMBase implements UnaryCollectionToCollectionOperator {
+
+  /**
+   * FSM configuration
+   */
+  protected final FSMConfig fsmConfig;
+
+  /**
+   * search space size
+   */
+  protected DataSet&lt;Long&gt; graphCount;
+
+  /**
+   * minimum frequency for patterns to be considered to be frequent
+   */
+  protected DataSet&lt;Long&gt; minFrequency;
+
+  /**
+   * Gradoop configuration
+   */
+  protected GradoopFlinkConfig config;
+
+  /**
+   * Constructor.
+   *
+   * @param fsmConfig FSM configuration
+   */
+<span class="fc" id="L67">  public TransactionalFSMBase(FSMConfig fsmConfig) {</span>
+<span class="fc" id="L68">    this.fsmConfig = fsmConfig;</span>
+<span class="fc" id="L69">  }</span>
+
+  @Override
+  public GraphCollection execute(GraphCollection collection)  {
+<span class="fc" id="L73">    config = collection.getConfig();</span>
+
+<span class="fc" id="L75">    DataSet&lt;GraphTransaction&gt; input = collection</span>
+<span class="fc" id="L76">      .getGraphTransactions();</span>
+
+<span class="fc" id="L78">    DataSet&lt;GraphTransaction&gt; output = execute(input);</span>
+
+<span class="fc" id="L80">    return config.getGraphCollectionFactory()</span>
+<span class="fc" id="L81">      .fromTransactions(output);</span>
+  }
+
+  /**
+   * Executes the algorithm for a dataset of graphs in transactional representation.
+   *
+   * @param transactions dataset of graphs
+   *
+   * @return frequent patterns as dataset of graphs
+   */
+  protected abstract DataSet&lt;GraphTransaction&gt; execute(DataSet&lt;GraphTransaction&gt; transactions);
+
+  /**
+   * Triggers the label-frequency base preprocessing
+   *
+   * @param transactions input
+   * @return preprocessed input
+   */
+  protected DataSet&lt;GraphTransaction&gt; preProcess(DataSet&lt;GraphTransaction&gt; transactions) {
+<span class="fc" id="L100">    transactions = transactions</span>
+<span class="fc" id="L101">      .map(new DropPropertiesAndGraphContainment());</span>
+
+<span class="fc" id="L103">    this.graphCount = Count</span>
+<span class="fc" id="L104">      .count(transactions);</span>
+
+<span class="fc" id="L106">    this.minFrequency = graphCount</span>
+<span class="fc" id="L107">      .map(new MinFrequency(fsmConfig));</span>
+
+<span class="fc" id="L109">    DataSet&lt;String&gt; frequentVertexLabels = transactions</span>
+<span class="fc" id="L110">      .flatMap(new VertexLabels())</span>
+<span class="fc" id="L111">      .groupBy(0)</span>
+<span class="fc" id="L112">      .sum(1)</span>
+<span class="fc" id="L113">      .filter(new Frequent&lt;&gt;())</span>
+<span class="fc" id="L114">      .withBroadcastSet(minFrequency, DIMSpanConstants.MIN_FREQUENCY)</span>
+<span class="fc" id="L115">      .map(new ValueOfWithCount&lt;&gt;());</span>
+
+<span class="fc" id="L117">    transactions = transactions</span>
+<span class="fc" id="L118">      .map(new FilterVerticesByLabel())</span>
+<span class="fc" id="L119">      .withBroadcastSet(frequentVertexLabels, TFSMConstants.FREQUENT_VERTEX_LABELS);</span>
+
+<span class="fc" id="L121">    DataSet&lt;String&gt; frequentEdgeLabels = transactions</span>
+<span class="fc" id="L122">      .flatMap(new EdgeLabels())</span>
+<span class="fc" id="L123">      .groupBy(0)</span>
+<span class="fc" id="L124">      .sum(1)</span>
+<span class="fc" id="L125">      .filter(new Frequent&lt;&gt;())</span>
+<span class="fc" id="L126">      .withBroadcastSet(minFrequency, DIMSpanConstants.MIN_FREQUENCY)</span>
+<span class="fc" id="L127">      .map(new ValueOfWithCount&lt;&gt;());</span>
+
+<span class="fc" id="L129">    transactions = transactions</span>
+<span class="fc" id="L130">      .map(new FilterEdgesByLabel())</span>
+<span class="fc" id="L131">      .withBroadcastSet(frequentEdgeLabels, TFSMConstants.FREQUENT_EDGE_LABELS);</span>
+
+<span class="fc" id="L133">    transactions = transactions</span>
+<span class="fc" id="L134">      .filter(new NotEmpty());</span>
+
+<span class="fc" id="L136">    return transactions;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

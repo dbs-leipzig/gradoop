@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RepresentationConverters.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.representation.transactional</a> &gt; <span class="el_source">RepresentationConverters.java</span></div><h1>RepresentationConverters.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.representation.transactional;
+
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
+import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
+
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Util to convert among different graph representations.
+ */
+<span class="nc" id="L38">public class RepresentationConverters {</span>
+
+  /**
+   * transaction =&gt; adjacency list
+   *
+   * @param transaction (g,V,E)
+   *
+   * @param edgeDataFactory edge data factory
+   * @param vertexDataFactory vertex data factory
+   *
+   * @param &lt;ED&gt; edge data
+   * @param &lt;VD&gt; vertex data
+   *
+   * @return adjacency list
+   * @throws Exception on failure
+   */
+  public static &lt;ED, VD&gt; AdjacencyList&lt;GradoopId, String, ED, VD&gt; getAdjacencyList(
+    GraphTransaction transaction,
+    MapFunction&lt;Edge, ED&gt; edgeDataFactory,
+    MapFunction&lt;Vertex, VD&gt; vertexDataFactory
+  ) throws Exception {
+
+<span class="fc" id="L60">    Set&lt;Vertex&gt; vertices = transaction.getVertices();</span>
+<span class="fc" id="L61">    Set&lt;Edge&gt; edges = transaction.getEdges();</span>
+
+<span class="fc" id="L63">    int vertexCount = vertices.size();</span>
+
+<span class="fc" id="L65">    Map&lt;GradoopId, String&gt; labels =</span>
+<span class="fc" id="L66">      Maps.newHashMapWithExpectedSize(1 + vertexCount + edges.size());</span>
+
+    Map&lt;GradoopId, Properties&gt; properties =
+<span class="fc" id="L69">      Maps.newHashMap();</span>
+
+<span class="fc" id="L71">    Map&lt;GradoopId, AdjacencyListRow&lt;ED, VD&gt;&gt; outgoingRows =</span>
+<span class="fc" id="L72">      Maps.newHashMapWithExpectedSize(vertexCount);</span>
+
+<span class="fc" id="L74">    Map&lt;GradoopId, AdjacencyListRow&lt;ED, VD&gt;&gt; incomingRows =</span>
+<span class="fc" id="L75">      Maps.newHashMapWithExpectedSize(vertexCount);</span>
+
+<span class="fc" id="L77">    Map&lt;GradoopId, Vertex&gt; vertexIndex = Maps.newHashMapWithExpectedSize(vertexCount);</span>
+
+    // VERTICES
+<span class="fc bfc" id="L80" title="All 2 branches covered.">    for (Vertex vertex : vertices) {</span>
+<span class="fc" id="L81">      addLabelsAndProperties(vertex, labels, properties);</span>
+<span class="fc" id="L82">      vertexIndex.put(vertex.getId(), vertex);</span>
+<span class="fc" id="L83">    }</span>
+
+    // EDGES
+
+<span class="fc bfc" id="L87" title="All 2 branches covered.">    for (Edge edge : edges) {</span>
+<span class="fc" id="L88">      addLabelsAndProperties(edge, labels, properties);</span>
+
+<span class="fc" id="L90">      Vertex source = vertexIndex.get(edge.getSourceId());</span>
+<span class="fc" id="L91">      AdjacencyListRow&lt;ED, VD&gt; outgoingRow =</span>
+<span class="fc" id="L92">        outgoingRows.computeIfAbsent(source.getId(), k -&gt; new AdjacencyListRow&lt;&gt;());</span>
+
+<span class="fc" id="L94">      VD sourceData = vertexDataFactory.map(source);</span>
+
+<span class="fc" id="L96">      Vertex target = vertexIndex.get(edge.getTargetId());</span>
+<span class="fc" id="L97">      AdjacencyListRow&lt;ED, VD&gt; incomingRow =</span>
+<span class="fc" id="L98">        incomingRows.computeIfAbsent(target.getId(), k -&gt; new AdjacencyListRow&lt;&gt;());</span>
+<span class="fc" id="L99">      VD targetData = vertexDataFactory.map(target);</span>
+
+<span class="fc" id="L101">      ED edgeData = edgeDataFactory.map(edge);</span>
+
+<span class="fc" id="L103">      outgoingRow.getCells().add(new AdjacencyListCell&lt;&gt;(edgeData, targetData));</span>
+<span class="fc" id="L104">      incomingRow.getCells().add(new AdjacencyListCell&lt;&gt;(edgeData, sourceData));</span>
+<span class="fc" id="L105">    }</span>
+
+<span class="fc" id="L107">    return new AdjacencyList&lt;&gt;(</span>
+<span class="fc" id="L108">      transaction.getGraphHead(), labels, properties, outgoingRows, incomingRows);</span>
+  }
+
+  /**
+   * Adds label and properties of an EPGM element to id-label and id-properties maps.
+   *
+   * @param element EPGM element
+   * @param labels id-label map
+   * @param properties id-properties map
+   */
+  private static void addLabelsAndProperties(
+    EPGMElement element,
+    Map&lt;GradoopId, String&gt; labels,
+    Map&lt;GradoopId, Properties&gt; properties
+  ) {
+<span class="fc" id="L123">    labels.put(element.getId(), element.getLabel());</span>
+
+<span class="fc" id="L125">    Properties propertyList = element.getProperties();</span>
+<span class="fc bfc" id="L126" title="All 4 branches covered.">    if (propertyList != null &amp;&amp; !propertyList.isEmpty()) {</span>
+<span class="fc" id="L127">      properties.put(element.getId(), propertyList);</span>
+    }
+<span class="fc" id="L129">  }</span>
+
+  /**
+   * adjacency list =&gt; transaction
+   *
+   * @param adjacencyList adjacency list
+   * @return transaction
+   */
+  public static GraphTransaction getGraphTransaction(AdjacencyList&lt;GradoopId, String, GradoopId,
+    GradoopId&gt; adjacencyList) {
+
+    // GRAPH HEAD
+<span class="fc" id="L141">    GraphHead graphHead = adjacencyList.getGraphHead();</span>
+
+<span class="fc" id="L143">    GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());</span>
+
+<span class="fc" id="L145">    Set&lt;Vertex&gt; vertices = Sets.newHashSet();</span>
+<span class="fc" id="L146">    Set&lt;Edge&gt; edges = Sets.newHashSet();</span>
+
+    // VERTICES
+    for (Map.Entry&lt;GradoopId, AdjacencyListRow&lt;GradoopId, GradoopId&gt;&gt; entry :
+<span class="fc bfc" id="L150" title="All 2 branches covered.">      adjacencyList.getOutgoingRows().entrySet()) {</span>
+
+<span class="fc" id="L152">      GradoopId sourceId = entry.getKey();</span>
+<span class="fc" id="L153">      Properties properties = adjacencyList.getProperties(sourceId);</span>
+<span class="fc" id="L154">      String label = adjacencyList.getLabel(sourceId);</span>
+<span class="fc" id="L155">      vertices.add(new Vertex(sourceId, label, properties, graphIds));</span>
+
+      // EDGES
+<span class="fc bfc" id="L158" title="All 2 branches covered.">      for (AdjacencyListCell&lt;GradoopId, GradoopId&gt; cell : entry.getValue().getCells()) {</span>
+<span class="fc" id="L159">        GradoopId edgeId = cell.getEdgeData();</span>
+<span class="fc" id="L160">        label = adjacencyList.getLabel(edgeId);</span>
+<span class="fc" id="L161">        properties = adjacencyList.getProperties(edgeId);</span>
+<span class="fc" id="L162">        GradoopId targetId = cell.getVertexData();</span>
+
+<span class="fc" id="L164">        edges.add(new Edge(edgeId, label, sourceId, targetId, properties, graphIds));</span>
+<span class="fc" id="L165">      }</span>
+<span class="fc" id="L166">    }</span>
+
+<span class="fc" id="L168">    return new GraphTransaction(graphHead, vertices, edges);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExpandEmbeddingsNode.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary</a> &gt; <span class="el_source">ExpandEmbeddingsNode.java</span></div><h1>ExpandEmbeddingsNode.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.binary;
+
+import org.apache.flink.api.common.operators.base.JoinOperatorBase;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand
+  .ExpandEmbeddings;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.expand.ExpandEmbeddingsBulk;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.BinaryNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.JoinNode;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.PlanNode;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Binary node that wraps an {@link ExpandEmbeddingsBulk} operator.
+ */
+public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
+  /**
+   * Column to expand the embedding from.
+   */
+  private final int expandColumn;
+  /**
+   * Query variable of the first vertex in the path
+   */
+  private final String startVariable;
+  /**
+   * Query variable of the variable length path
+   */
+  private final String pathVariable;
+  /**
+   * Query variable of the last vertex in the path
+   */
+  private final String endVariable;
+  /**
+   * Minimum number of path expansion steps
+   */
+  private final int lowerBound;
+  /**
+   * Maximum number of path expansion steps
+   */
+  private final int upperBound;
+  /**
+   * Column that contains the final vertex of the expansion
+   */
+  private final int closingColumn;
+  /**
+   * Direction in which to expand the embedding
+   */
+  private final ExpandDirection expandDirection;
+  /**
+   * Morphism type for vertices
+   */
+  private final MatchStrategy vertexStrategy;
+  /**
+   * Morphism type for edges
+   */
+  private final MatchStrategy edgeStrategy;
+
+  /**
+   * Creates a new node.
+   *
+   * @param leftChild left child representing the embeddings to expand
+   * @param rightChild right child representing the edges to expand with
+   * @param startVariable vertex variable on which to start the expansion
+   * @param pathVariable variable representing the path
+   * @param endVariable vertex variable on which to end the expansion
+   * @param lowerBound minimum number of expansions
+   * @param upperBound maximum number of expansions
+   * @param expandDirection edge direction in the expansion
+   * @param vertexStrategy morphism strategy for vertices
+   * @param edgeStrategy morphism strategy for edges
+   */
+  public ExpandEmbeddingsNode(PlanNode leftChild, PlanNode rightChild,
+    String startVariable, String pathVariable, String endVariable,
+    int lowerBound, int upperBound, ExpandDirection expandDirection,
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy) {
+<span class="fc" id="L99">    super(leftChild, rightChild);</span>
+<span class="fc" id="L100">    this.pathVariable = pathVariable;</span>
+<span class="fc" id="L101">    this.startVariable = startVariable;</span>
+<span class="fc" id="L102">    this.endVariable = endVariable;</span>
+<span class="fc" id="L103">    this.lowerBound = lowerBound;</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">    this.upperBound = upperBound == 0 ? Integer.MAX_VALUE : upperBound;</span>
+<span class="fc" id="L105">    this.expandDirection = expandDirection;</span>
+<span class="fc" id="L106">    this.vertexStrategy = vertexStrategy;</span>
+<span class="fc" id="L107">    this.edgeStrategy = edgeStrategy;</span>
+<span class="fc" id="L108">    this.expandColumn = leftChild.getEmbeddingMetaData().getEntryColumn(startVariable);</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">    this.closingColumn = leftChild.getEmbeddingMetaData().containsEntryColumn(endVariable) ?</span>
+<span class="fc" id="L110">      leftChild.getEmbeddingMetaData().getEntryColumn(endVariable) : -1;</span>
+<span class="fc" id="L111">  }</span>
+
+  @Override
+  public DataSet&lt;Embedding&gt; execute() {
+<span class="fc" id="L115">    ExpandEmbeddings op = new ExpandEmbeddingsBulk(</span>
+<span class="fc" id="L116">      getLeftChild().execute(), getRightChild().execute(),</span>
+      expandColumn, lowerBound, upperBound, expandDirection,
+<span class="fc" id="L118">      getDistinctVertexColumns(getLeftChild().getEmbeddingMetaData()),</span>
+<span class="fc" id="L119">      getDistinctEdgeColumns(getLeftChild().getEmbeddingMetaData()),</span>
+      closingColumn, JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+<span class="fc" id="L121">    op.setName(toString());</span>
+<span class="fc" id="L122">    return op.evaluate();</span>
+  }
+
+  @Override
+  protected EmbeddingMetaData computeEmbeddingMetaData() {
+<span class="fc" id="L127">    EmbeddingMetaData inputMetaData = getLeftChild().getEmbeddingMetaData();</span>
+<span class="fc" id="L128">    EmbeddingMetaData metaData = new EmbeddingMetaData(inputMetaData);</span>
+
+<span class="fc" id="L130">    metaData.setEntryColumn(pathVariable, EmbeddingMetaData.EntryType.PATH,</span>
+<span class="fc" id="L131">      inputMetaData.getEntryCount());</span>
+
+<span class="fc" id="L133">    metaData.setDirection(pathVariable, expandDirection);</span>
+
+<span class="fc bfc" id="L135" title="All 2 branches covered.">    if (!inputMetaData.containsEntryColumn(endVariable)) {</span>
+<span class="fc" id="L136">      metaData.setEntryColumn(endVariable, EmbeddingMetaData.EntryType.VERTEX,</span>
+<span class="fc" id="L137">        inputMetaData.getEntryCount() + 1);</span>
+    }
+<span class="fc" id="L139">    return metaData;</span>
+  }
+
+  /**
+   * According to the specified {@link JoinEmbeddingsNode#vertexStrategy} and the specified
+   * {@link EmbeddingMetaData}, the method returns the columns that need to contain distinct
+   * entries.
+   *
+   * @param metaData meta data for the embedding
+   * @return distinct vertex columns
+   */
+  private List&lt;Integer&gt; getDistinctVertexColumns(EmbeddingMetaData metaData) {
+<span class="fc bfc" id="L151" title="All 2 branches covered.">    return this.vertexStrategy == MatchStrategy.ISOMORPHISM ? metaData.getVertexVariables().stream()</span>
+<span class="fc" id="L152">      .map(metaData::getEntryColumn)</span>
+<span class="fc" id="L153">      .collect(Collectors.toList()) : Collections.emptyList();</span>
+  }
+
+  /**
+   * According to the specified {@link JoinEmbeddingsNode#edgeStrategy} and the specified
+   * {@link EmbeddingMetaData}, the method returns the columns that need to contain distinct
+   * entries.
+   *
+   * @param metaData meta data for the embedding
+   * @return distinct edge columns
+   */
+  private List&lt;Integer&gt; getDistinctEdgeColumns(EmbeddingMetaData metaData) {
+<span class="fc bfc" id="L165" title="All 2 branches covered.">    return edgeStrategy == MatchStrategy.ISOMORPHISM ?</span>
+<span class="fc" id="L166">      metaData.getEdgeVariables().stream()</span>
+<span class="fc" id="L167">        .map(metaData::getEntryColumn)</span>
+<span class="fc" id="L168">        .collect(Collectors.toList()) : Collections.emptyList();</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="fc" id="L173">    return String.format(&quot;ExpandEmbeddingsNode={&quot; +</span>
+        &quot;startVariable='%s', &quot; +
+        &quot;pathVariable='%s', &quot; +
+        &quot;endVariable='%s', &quot; +
+        &quot;lowerBound=%d, &quot; +
+        &quot;upperBound=%d, &quot; +
+        &quot;expandDirection=%s, &quot; +
+        &quot;vertexMorphismType=%s, &quot; +
+        &quot;edgeMorphismType=%s}&quot;,
+<span class="fc" id="L182">      startVariable, pathVariable, endVariable, lowerBound, upperBound, expandDirection,</span>
+      vertexStrategy, edgeStrategy);
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

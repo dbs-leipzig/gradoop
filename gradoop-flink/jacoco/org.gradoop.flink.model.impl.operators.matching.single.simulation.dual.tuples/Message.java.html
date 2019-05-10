@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Message.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples</a> &gt; <span class="el_source">Message.java</span></div><h1>Message.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples;
+
+import org.apache.flink.api.java.tuple.Tuple4;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.util.MessageType;
+
+import java.util.List;
+
+/**
+ * Bundles a set of {@link Deletion} messages into a single message to update
+ * the vertex state accordingly.
+ *
+ * f0: recipient vertex id
+ * f1: sender vertex ids
+ * f2: candidate deletions
+ * f3: message types
+ */
+<span class="fc" id="L33">public class Message extends</span>
+  Tuple4&lt;GradoopId, List&lt;GradoopId&gt;, List&lt;Long&gt;, List&lt;MessageType&gt;&gt; {
+
+  public GradoopId getRecipientId() {
+<span class="nc" id="L37">    return f0;</span>
+  }
+
+  public void setRecipientId(GradoopId recipientId) {
+<span class="fc" id="L41">    f0 = recipientId;</span>
+<span class="fc" id="L42">  }</span>
+
+  public List&lt;GradoopId&gt; getSenderIds() {
+<span class="fc" id="L45">    return f1;</span>
+  }
+
+  public void setSenderIds(List&lt;GradoopId&gt; senderIds) {
+<span class="fc" id="L49">    f1 = senderIds;</span>
+<span class="fc" id="L50">  }</span>
+
+  public List&lt;Long&gt; getDeletions() {
+<span class="fc" id="L53">    return f2;</span>
+  }
+
+  public void setDeletions(List&lt;Long&gt; deletions) {
+<span class="fc" id="L57">    f2 = deletions;</span>
+<span class="fc" id="L58">  }</span>
+
+  public List&lt;MessageType&gt; getMessageTypes() {
+<span class="fc" id="L61">    return f3;</span>
+  }
+
+  public void setMessageTypes(List&lt;MessageType&gt; messageTypes) {
+<span class="fc" id="L65">    f3 = messageTypes;</span>
+<span class="fc" id="L66">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

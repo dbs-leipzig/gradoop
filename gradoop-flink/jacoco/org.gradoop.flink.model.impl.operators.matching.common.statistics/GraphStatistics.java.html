@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GraphStatistics.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.common.statistics</a> &gt; <span class="el_source">GraphStatistics.java</span></div><h1>GraphStatistics.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.common.statistics;
+
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+
+import java.util.Collections;
+import java.util.Map;
+
+/**
+ * Represents several statistics related to a {@link LogicalGraph}.
+ */
+public class GraphStatistics {
+  /**
+   * Number of vertices
+   */
+  private long vertexCount;
+  /**
+   * Number of edges
+   */
+  private long edgeCount;
+  /**
+   * Frequency distribution for vertex labels
+   */
+  private Map&lt;String, Long&gt; vertexCountByLabel;
+  /**
+   * Frequency distribution for edge labels
+   */
+  private Map&lt;String, Long&gt; edgeCountByLabel;
+  /**
+   * Number of edges with a specific source vertex label and edge label.
+   */
+  private Map&lt;String, Map&lt;String, Long&gt;&gt; edgeCountBySourceVertexAndEdgeLabel;
+  /**
+   * Number of edges with a specific target vertex label and edge label.
+   */
+  private Map&lt;String, Map&lt;String, Long&gt;&gt; edgeCountByTargetVertexAndEdgeLabel;
+  /**
+   * Number of distinct source vertices, i.e. the number of distinct vertices that have at least
+   * one outgoing edge.
+   */
+  private long distinctSourceVertexCount;
+  /**
+   * Number of distinct target vertices, i.e. the number of distinct vertices that have at least
+   * one incoming edge.
+   */
+  private long distinctTargetVertexCount;
+  /**
+   * Number of distinct source vertices by edge label, i.e. the number of distinct vertices that
+   * have at least one outgoing edge with the specified label.
+   */
+  private Map&lt;String, Long&gt; distinctSourceVertexCountByEdgeLabel;
+  /**
+   * Number of distinct target vertices by edge label, i.e. the number of distinct vertices that
+   * have at least one incoming edge with the specified label.
+   */
+  private Map&lt;String, Long&gt; distinctTargetVertexCountByEdgeLabel;
+  /**
+   * Number of distinct edge property values of a given label - property name pair
+   */
+  private Map&lt;String, Map&lt;String, Long&gt;&gt; distinctEdgePropertiesByLabel;
+  /**
+   * Number of distinct vertex property values of a given label - property name pair
+   */
+  private Map&lt;String, Map&lt;String, Long&gt;&gt; distinctVertexPropertiesByLabel;
+  /**
+   * Number of distinct edge property values for property names
+   */
+  private Map&lt;String, Long&gt; distinctEdgeProperties;
+  /**
+   * Number of distinct vertex property values for property names
+   */
+  private Map&lt;String, Long&gt; distinctVertexProperties;
+
+  /**
+   * Constructor using basic statistics.
+   *
+   * @param vertexCount total number of vertices
+   * @param edgeCount total number of edges
+   * @param distinctSourceVertexCount number of distinct source vertices
+   * @param distinctTargetVertexCount number of distinct target vertices
+   */
+  public GraphStatistics(long vertexCount, long edgeCount,
+    long distinctSourceVertexCount, long distinctTargetVertexCount) {
+<span class="fc" id="L98">    this(vertexCount,</span>
+      edgeCount,
+<span class="fc" id="L100">      Collections.emptyMap(),</span>
+<span class="fc" id="L101">      Collections.emptyMap(),</span>
+<span class="fc" id="L102">      Collections.emptyMap(),</span>
+<span class="fc" id="L103">      Collections.emptyMap(),</span>
+      distinctSourceVertexCount,
+      distinctTargetVertexCount,
+<span class="fc" id="L106">      Collections.emptyMap(),</span>
+<span class="fc" id="L107">      Collections.emptyMap(),</span>
+<span class="fc" id="L108">      Collections.emptyMap(),</span>
+<span class="fc" id="L109">      Collections.emptyMap(),</span>
+<span class="fc" id="L110">      Collections.emptyMap(),</span>
+<span class="fc" id="L111">      Collections.emptyMap());</span>
+<span class="fc" id="L112">  }</span>
+
+  /**
+   * Constructor.
+   *
+   * @param vertexCount number of vertices
+   * @param edgeCount number of edges
+   * @param vertexCountByLabel number of vertices by label
+   * @param edgeCountByLabel number of edges by label
+   * @param edgeCountBySourceVertexAndEdgeLabel number of edges by source vertex and edge label
+   * @param edgeCountByTargetVertexAndEdgeLabel number of edges by target vertex and edge label
+   * @param distinctSourceVertexCount number of distinct source vertices
+   * @param distinctTargetVertexCount number of distinct target vertices
+   * @param distinctSourceVertexCountByEdgeLabel number of distinct source vertices by edge label
+   * @param distinctTargetVertexCountByEdgeLabel number of distinct target vertices by edge label
+   * @param distinctEdgePropertiesByLabel (label,property) -&gt; distinct values
+   * @param distinctVertexPropertiesByLabel (label,property) -&gt; distinct values
+   * @param distinctEdgeProperties (edge property) -&gt; distinct values
+   * @param distinctVertexProperties (vertex property) -&gt; distinct values
+   */
+  GraphStatistics(long vertexCount, long edgeCount, Map&lt;String, Long&gt; vertexCountByLabel,
+    Map&lt;String, Long&gt; edgeCountByLabel,
+    Map&lt;String, Map&lt;String, Long&gt;&gt; edgeCountBySourceVertexAndEdgeLabel,
+    Map&lt;String, Map&lt;String, Long&gt;&gt; edgeCountByTargetVertexAndEdgeLabel,
+    long distinctSourceVertexCount, long distinctTargetVertexCount,
+    Map&lt;String, Long&gt; distinctSourceVertexCountByEdgeLabel,
+    Map&lt;String, Long&gt; distinctTargetVertexCountByEdgeLabel,
+    Map&lt;String, Map&lt;String, Long&gt;&gt; distinctEdgePropertiesByLabel,
+    Map&lt;String, Map&lt;String, Long&gt;&gt; distinctVertexPropertiesByLabel,
+    Map&lt;String, Long&gt; distinctEdgeProperties,
+<span class="fc" id="L142">    Map&lt;String, Long&gt; distinctVertexProperties) {</span>
+<span class="fc" id="L143">    this.vertexCount = vertexCount;</span>
+<span class="fc" id="L144">    this.edgeCount = edgeCount;</span>
+<span class="fc" id="L145">    this.vertexCountByLabel = vertexCountByLabel;</span>
+<span class="fc" id="L146">    this.edgeCountByLabel = edgeCountByLabel;</span>
+<span class="fc" id="L147">    this.edgeCountBySourceVertexAndEdgeLabel = edgeCountBySourceVertexAndEdgeLabel;</span>
+<span class="fc" id="L148">    this.edgeCountByTargetVertexAndEdgeLabel = edgeCountByTargetVertexAndEdgeLabel;</span>
+<span class="fc" id="L149">    this.distinctSourceVertexCount = distinctSourceVertexCount;</span>
+<span class="fc" id="L150">    this.distinctTargetVertexCount = distinctTargetVertexCount;</span>
+<span class="fc" id="L151">    this.distinctSourceVertexCountByEdgeLabel = distinctSourceVertexCountByEdgeLabel;</span>
+<span class="fc" id="L152">    this.distinctTargetVertexCountByEdgeLabel = distinctTargetVertexCountByEdgeLabel;</span>
+<span class="fc" id="L153">    this.distinctEdgePropertiesByLabel = distinctEdgePropertiesByLabel;</span>
+<span class="fc" id="L154">    this.distinctVertexPropertiesByLabel = distinctVertexPropertiesByLabel;</span>
+<span class="fc" id="L155">    this.distinctEdgeProperties = distinctEdgeProperties;</span>
+<span class="fc" id="L156">    this.distinctVertexProperties = distinctVertexProperties;</span>
+<span class="fc" id="L157">  }</span>
+
+  /**
+   * Returns the number of vertices in the graph.
+   *
+   * @return vertex count
+   */
+  public long getVertexCount() {
+<span class="fc" id="L165">    return vertexCount;</span>
+  }
+
+  /**
+   * Returns the number of edges in the graph
+   *
+   * @return edge count
+   */
+  public long getEdgeCount() {
+<span class="fc" id="L174">    return edgeCount;</span>
+  }
+
+  /**
+   * Returns the number of vertices with the specified label.
+   *
+   * @param vertexLabel vertex label
+   * @return number of vertices with the given label
+   */
+  public long getVertexCount(String vertexLabel) {
+<span class="fc" id="L184">    return vertexCountByLabel.getOrDefault(vertexLabel, 0L);</span>
+  }
+
+  /**
+   * Returns the number of edges with the specified label.
+   *
+   * @param edgeLabel edge label
+   * @return number of edges with the given label
+   */
+  public long getEdgeCount(String edgeLabel) {
+<span class="fc" id="L194">    return edgeCountByLabel.getOrDefault(edgeLabel, 0L);</span>
+  }
+
+  /**
+   * Returns the number of edges with a specified source vertex label and edge label.
+   *
+   * @param vertexLabel source vertex label
+   * @param edgeLabel edge label
+   * @return number of edges with the specified labels
+   */
+  public long getEdgeCountBySource(String vertexLabel, String edgeLabel) {
+<span class="fc bfc" id="L205" title="All 2 branches covered.">    return (edgeCountBySourceVertexAndEdgeLabel.containsKey(vertexLabel)) ?</span>
+<span class="fc" id="L206">      edgeCountBySourceVertexAndEdgeLabel.get(vertexLabel).getOrDefault(edgeLabel, 0L) :</span>
+      0L;
+  }
+
+  /**
+   * Returns the number of edges with a specified target vertex label and edge label.
+   *
+   * @param vertexLabel target vertex label
+   * @param edgeLabel edge label
+   * @return number of edges with the specified labels
+   */
+  public long getEdgeCountByTarget(String vertexLabel, String edgeLabel) {
+<span class="fc bfc" id="L218" title="All 2 branches covered.">    return (edgeCountByTargetVertexAndEdgeLabel.containsKey(vertexLabel)) ?</span>
+<span class="fc" id="L219">      edgeCountByTargetVertexAndEdgeLabel.get(vertexLabel).getOrDefault(edgeLabel, 0L) :</span>
+      0L;
+  }
+
+  /**
+   * Returns the number of distinct source vertices.
+   *
+   * @return number of distinct source vertices
+   */
+  public long getDistinctSourceVertexCount() {
+<span class="fc" id="L229">    return distinctSourceVertexCount;</span>
+  }
+
+  /**
+   * Returns the number of distinct target vertices.
+   *
+   * @return number of distinct target vertices
+   */
+  public long getDistinctTargetVertexCount() {
+<span class="fc" id="L238">    return distinctTargetVertexCount;</span>
+  }
+
+  /**
+   * Returns the number of distinct source vertices incident to an edge with the specified label.
+   *
+   * @param edgeLabel edge label
+   * @return number of distinct source vertices incident to the labeled edge
+   */
+  public long getDistinctSourceVertexCount(String edgeLabel) {
+<span class="fc" id="L248">    return distinctSourceVertexCountByEdgeLabel.getOrDefault(edgeLabel, 0L);</span>
+  }
+
+  /**
+   * Returns the number of distinct target vertices incident to an edge with the specified label.
+   *
+   * @param edgeLabel edge label
+   * @return number of distinct target vertices incident to the labeled edge
+   */
+  public long getDistinctTargetVertexCount(String edgeLabel) {
+<span class="fc" id="L258">    return distinctTargetVertexCountByEdgeLabel.getOrDefault(edgeLabel, 0L);</span>
+  }
+
+  /**
+   * Returns the number of distinct vertex property values for given property name
+   * Eg (name) -&gt; 20
+   *
+   * @param propertyName property name
+   * @return number of distinct property values for label property name pair
+   */
+  public long getDistinctVertexProperties(String propertyName) {
+<span class="fc" id="L269">    return distinctVertexProperties.getOrDefault(propertyName, 0L);</span>
+  }
+
+  /**
+   * Returns the number of distinct edge property values for given property name
+   * Eg (name) -&gt; 20
+   *
+   * @param propertyName property name
+   * @return number of distinct property values for label property name pair
+   */
+  public long getDistinctEdgeProperties(String propertyName) {
+<span class="fc" id="L280">    return distinctEdgeProperties.getOrDefault(propertyName, 0L);</span>
+  }
+
+  /**
+   * Returns the number of distinct property values for given vertex label property name pair
+   * Eg (Person, name) -&gt; 20
+   *
+   * @param vertexLabel vertex label
+   * @param propertyName property name
+   * @return number of distinct property values for label property name pair
+   */
+  public long getDistinctVertexProperties(String vertexLabel, String propertyName) {
+<span class="fc bfc" id="L292" title="All 2 branches covered.">    return distinctVertexPropertiesByLabel.containsKey(vertexLabel) ?</span>
+<span class="fc" id="L293">      distinctVertexPropertiesByLabel.get(vertexLabel).getOrDefault(propertyName, 0L) : 0;</span>
+  }
+
+  /**
+   * Returns the number of distinct property values for given edge label property name pair
+   * Eg (Person, name) -&gt; 20
+   *
+   * @param edgeLabel edge label
+   * @param propertyName property name
+   * @return number of distinct property values for label property name pair
+   */
+  public long getDistinctEdgeProperties(String edgeLabel, String propertyName) {
+<span class="fc bfc" id="L305" title="All 2 branches covered.">    return distinctEdgePropertiesByLabel.containsKey(edgeLabel) ?</span>
+<span class="fc" id="L306">      distinctEdgePropertiesByLabel.get(edgeLabel).getOrDefault(propertyName, 0L) : 0;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L311">    final StringBuilder sb = new StringBuilder(&quot;GraphStatistics{&quot;);</span>
+<span class="nc" id="L312">    sb.append(String.format(&quot;%n vertexCount=&quot;))</span>
+<span class="nc" id="L313">      .append(vertexCount);</span>
+<span class="nc" id="L314">    sb.append(String.format(&quot;,%n edgeCount=&quot;))</span>
+<span class="nc" id="L315">      .append(edgeCount);</span>
+<span class="nc" id="L316">    sb.append(String.format(&quot;,%n vertexCountByLabel=&quot;))</span>
+<span class="nc" id="L317">      .append(vertexCountByLabel);</span>
+<span class="nc" id="L318">    sb.append(String.format(&quot;,%n edgeCountByLabel=&quot;))</span>
+<span class="nc" id="L319">      .append(edgeCountByLabel);</span>
+<span class="nc" id="L320">    sb.append(String.format(&quot;,%n edgeCountByTargetVertexAndEdgeLabel=&quot;))</span>
+<span class="nc" id="L321">      .append(edgeCountByTargetVertexAndEdgeLabel);</span>
+<span class="nc" id="L322">    sb.append(String.format(&quot;,%n edgeCountBySourceVertexAndEdgeLabel=&quot;))</span>
+<span class="nc" id="L323">      .append(edgeCountBySourceVertexAndEdgeLabel);</span>
+<span class="nc" id="L324">    sb.append(String.format(&quot;,%n distinctSourceVertexCount=&quot;))</span>
+<span class="nc" id="L325">      .append(distinctSourceVertexCount);</span>
+<span class="nc" id="L326">    sb.append(String.format(&quot;,%n distinctTargetVertexCount=&quot;))</span>
+<span class="nc" id="L327">      .append(distinctTargetVertexCount);</span>
+<span class="nc" id="L328">    sb.append(String.format(&quot;,%n distinctSourceVertexCountByEdgeLabel=&quot;))</span>
+<span class="nc" id="L329">      .append(distinctSourceVertexCountByEdgeLabel);</span>
+<span class="nc" id="L330">    sb.append(String.format(&quot;,%n distinctTargetVertexCountByEdgeLabel=&quot;))</span>
+<span class="nc" id="L331">      .append(distinctTargetVertexCountByEdgeLabel);</span>
+<span class="nc" id="L332">    sb.append(String.format(&quot;,%n distinctVertexProperties=&quot;))</span>
+<span class="nc" id="L333">      .append(distinctVertexProperties);</span>
+<span class="nc" id="L334">    sb.append(String.format(&quot;,%n distinctEdgeProperties=&quot;))</span>
+<span class="nc" id="L335">      .append(distinctEdgeProperties);</span>
+<span class="nc" id="L336">    sb.append(String.format(&quot;,%n distinctVertexPropertiesByLabel=&quot;))</span>
+<span class="nc" id="L337">      .append(distinctVertexPropertiesByLabel);</span>
+<span class="nc" id="L338">    sb.append(String.format(&quot;,%n distinctEdgePropertiesByLabel=&quot;))</span>
+<span class="nc" id="L339">      .append(distinctEdgePropertiesByLabel);</span>
+
+<span class="nc" id="L341">    sb.append(String.format(&quot;%n}&quot;));</span>
+<span class="nc" id="L342">    return sb.toString();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

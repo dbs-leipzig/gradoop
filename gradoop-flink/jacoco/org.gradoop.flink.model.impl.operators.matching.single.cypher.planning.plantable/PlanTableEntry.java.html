@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PlanTableEntry.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable</a> &gt; <span class="el_source">PlanTableEntry.java</span></div><h1>PlanTableEntry.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.plantable;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.estimation.QueryPlanEstimator;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.QueryPlan;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * Represents a query plan and additional meta data. Plan table entries are managed in a
+ * {@link PlanTable}.
+ */
+public class PlanTableEntry {
+  /**
+   * Type of the element a plan entry represents.
+   */
+<span class="fc" id="L35">  public enum Type {</span>
+    /**
+     * A single vertex
+     */
+<span class="fc" id="L39">    VERTEX,</span>
+    /**
+     * A single edge
+     */
+<span class="fc" id="L43">    EDGE,</span>
+    /**
+     * A variable length path
+     */
+<span class="fc" id="L47">    PATH,</span>
+    /**
+     * A graph contains joined vertices, edges, paths or graphs.
+     */
+<span class="fc" id="L51">    GRAPH</span>
+  }
+
+  /**
+   * The type of this entry
+   */
+  private final Type type;
+  /**
+   * The variables that are already processed by the query plan.
+   */
+  private final Set&lt;String&gt; processedVars;
+  /**
+   * Remaining predicates
+   */
+  private final CNF predicates;
+  /**
+   * The estimator containing the query plan.
+   */
+  private QueryPlanEstimator estimator;
+  /**
+   * Estimated cardinality of the query result as computed by the estimator.
+   */
+<span class="fc" id="L73">  private long estimatedCardinality = -1;</span>
+
+  /**
+   * Creates a new plan table entry.
+   *
+   * @param type the partial match type this entry represents
+   * @param processedVars processed query variables
+   * @param predicates predicates not covered by this plan
+   * @param estimator cardinality estimator
+   */
+  public PlanTableEntry(Type type, Set&lt;String&gt; processedVars, CNF predicates,
+<span class="fc" id="L84">    QueryPlanEstimator estimator) {</span>
+<span class="fc" id="L85">    this.type = type;</span>
+<span class="fc" id="L86">    this.processedVars = processedVars;</span>
+<span class="fc" id="L87">    this.predicates = predicates;</span>
+<span class="fc" id="L88">    this.estimator = estimator;</span>
+<span class="fc" id="L89">  }</span>
+
+  /**
+   * Returns the type of this plan table entry.
+   *
+   * @return plan table entry type
+   */
+  public Type getType() {
+<span class="fc" id="L97">    return type;</span>
+  }
+
+  /**
+   * Returns the remaining predicates not covered by this plan entry.
+   *
+   * @return remaining predicates
+   */
+  public CNF getPredicates() {
+<span class="fc" id="L106">    return predicates;</span>
+  }
+
+  /**
+   * Returns the query variables covered by this plan table entry
+   *
+   * @return covered variables
+   */
+  public Set&lt;String&gt; getAllVariables() {
+<span class="fc" id="L115">    return new HashSet&lt;&gt;(estimator.getQueryPlan().getRoot().getEmbeddingMetaData()</span>
+<span class="fc" id="L116">      .getVariables());</span>
+  }
+
+  /**
+   * Returns the query variables that are evaluable in a filter operator.
+   *
+   * @return query variables with assigned properties
+   */
+  public Set&lt;String&gt; getAttributedVariables() {
+<span class="fc" id="L125">    return new HashSet&lt;&gt;(estimator.getQueryPlan().getRoot().getEmbeddingMetaData()</span>
+<span class="fc" id="L126">      .getVariablesWithProperties());</span>
+  }
+
+  /**
+   * Returns the query variables that have been processed by this plan entry.
+   *
+   * @return processed vars
+   */
+  public Set&lt;String&gt; getProcessedVariables() {
+<span class="fc" id="L135">    return processedVars;</span>
+  }
+
+  /**
+   * Returns all (variable,key) pairs attached to the query plan.
+   *
+   * @return (variable,key) pairs attached to the current plan
+   */
+  public Set&lt;Pair&lt;String, String&gt;&gt; getPropertyPairs() {
+<span class="fc" id="L144">    return getAttributedVariables().stream()</span>
+<span class="fc" id="L145">      .flatMap(var -&gt; getQueryPlan().getRoot().getEmbeddingMetaData().getPropertyKeys(var).stream()</span>
+<span class="fc" id="L146">        .map(key -&gt; Pair.of(var, key)))</span>
+<span class="fc" id="L147">      .collect(Collectors.toSet());</span>
+  }
+
+  /**
+   * Returns all (variable,key) pairs needed for further query processing.
+   *
+   * @return (variable,key) pairs needed for further processing
+   */
+  public Set&lt;Pair&lt;String, String&gt;&gt; getProjectionPairs() {
+<span class="fc" id="L156">    return predicates.getVariables().stream()</span>
+<span class="fc" id="L157">      .flatMap(var -&gt; predicates.getPropertyKeys(var).stream().map(key -&gt; Pair.of(var, key)))</span>
+<span class="fc" id="L158">      .collect(Collectors.toSet());</span>
+  }
+
+  /**
+   * Returns the estimated cardinality of the query plan represented by this entry.
+   *
+   * @return estimated cardinality
+   */
+  public long getEstimatedCardinality() {
+<span class="fc bfc" id="L167" title="All 2 branches covered.">    if (estimatedCardinality == -1) {</span>
+<span class="fc" id="L168">      estimatedCardinality = estimator.getCardinality();</span>
+    }
+<span class="fc" id="L170">    return estimatedCardinality;</span>
+  }
+
+  public QueryPlan getQueryPlan() {
+<span class="fc" id="L174">    return estimator.getQueryPlan();</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L179">    return String.format(&quot;PlanTableEntry | type: %s | all-vars: %s | &quot; +</span>
+        &quot;proc-vars: %s | attr-vars: %s | est-card: %d | prediates: %s | Plan :%n%s&quot;,
+<span class="nc" id="L181">      type, getAllVariables(), getProcessedVariables(), getAttributedVariables(),</span>
+<span class="nc" id="L182">      estimatedCardinality, predicates, estimator.getQueryPlan());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

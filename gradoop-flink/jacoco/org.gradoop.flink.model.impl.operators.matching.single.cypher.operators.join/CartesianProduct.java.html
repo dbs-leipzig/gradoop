@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CartesianProduct.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join</a> &gt; <span class="el_source">CartesianProduct.java</span></div><h1>CartesianProduct.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join;
+
+import com.google.common.collect.Lists;
+import org.apache.flink.api.common.operators.base.CrossOperatorBase;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.MergeEmbeddings;
+
+import java.util.List;
+
+/**
+ * This operator builds the cartesian product of two disjunct embeddings and combines them into a
+ * single embedding.
+ *
+ * The result is always a new embedding with the following constraints.
+ *
+ * &lt;ul&gt;
+ * &lt;li&gt;new entries of the right embedding are always appended to the left embedding&lt;/li&gt;
+ * &lt;li&gt;all properties from the right side are appended to the proeprties of the left side
+ * &lt;/ul&gt;
+ */
+public class CartesianProduct implements PhysicalOperator {
+
+  /**
+   * Left side embeddings
+   */
+  private final DataSet&lt;Embedding&gt; left;
+  /**
+   * Right side embeddings
+   */
+  private final DataSet&lt;Embedding&gt; right;
+  /**
+   * Number of columns in the right embedding.
+   */
+  private final int rightColumns;
+  /**
+   * Columns that represent vertices in the left embedding which need to be distinct
+   */
+  private final List&lt;Integer&gt; distinctVertexColumnsLeft;
+  /**
+   * Columns that represent vertices in the right embedding which need to be distinct
+   */
+  private final List&lt;Integer&gt; distinctVertexColumnsRight;
+  /**
+   * Columns that represent edges in the left embedding which need to be distinct
+   */
+  private final List&lt;Integer&gt; distinctEdgeColumnsLeft;
+  /**
+   * Columns that represent edges in the right embedding which need to be distinct
+   */
+  private final List&lt;Integer&gt; distinctEdgeColumnsRight;
+  /**
+   * Flink cross Hint
+   */
+  private final CrossOperatorBase.CrossHint crossHint;
+  /**
+   * Operator name used for Flink operator naming
+   */
+  private String name;
+
+  /**
+   * New value join operator
+   *
+   * @param left left hand side data set
+   * @param right right hand side data set
+   * @param rightColumns size of the right embedding
+   * @param distinctVertexColumnsLeft distinct vertex columns of the left embedding
+   * @param distinctVertexColumnsRight distinct vertex columns of the right embedding
+   * @param distinctEdgeColumnsLeft distinct edge columns of the left embedding
+   * @param distinctEdgeColumnsRight distinct edge columns of the right embedding
+   * @param crossHint cross hint
+   */
+  public CartesianProduct(
+    DataSet&lt;Embedding&gt; left,
+    DataSet&lt;Embedding&gt; right,
+    int rightColumns,
+    List&lt;Integer&gt; distinctVertexColumnsLeft,
+    List&lt;Integer&gt; distinctVertexColumnsRight,
+    List&lt;Integer&gt; distinctEdgeColumnsLeft,
+    List&lt;Integer&gt; distinctEdgeColumnsRight,
+<span class="fc" id="L97">    CrossOperatorBase.CrossHint crossHint) {</span>
+
+<span class="fc" id="L99">    this.left = left;</span>
+<span class="fc" id="L100">    this.right = right;</span>
+<span class="fc" id="L101">    this.rightColumns = rightColumns;</span>
+<span class="fc" id="L102">    this.distinctVertexColumnsLeft = distinctVertexColumnsLeft;</span>
+<span class="fc" id="L103">    this.distinctVertexColumnsRight = distinctVertexColumnsRight;</span>
+<span class="fc" id="L104">    this.distinctEdgeColumnsLeft = distinctEdgeColumnsLeft;</span>
+<span class="fc" id="L105">    this.distinctEdgeColumnsRight = distinctEdgeColumnsRight;</span>
+<span class="fc" id="L106">    this.crossHint = crossHint;</span>
+<span class="fc" id="L107">    this.setName(&quot;CartesianProduct&quot;);</span>
+<span class="fc" id="L108">  }</span>
+
+  @Override
+  public DataSet&lt;Embedding&gt; evaluate() {
+<span class="fc" id="L112">    return left.cross(right)</span>
+<span class="fc" id="L113">      .flatMap(new MergeEmbeddings(</span>
+<span class="fc" id="L114">        rightColumns, Lists.newArrayListWithCapacity(0),</span>
+        distinctVertexColumnsLeft,
+        distinctVertexColumnsRight,
+        distinctEdgeColumnsLeft,
+        distinctEdgeColumnsRight
+      ))
+<span class="fc" id="L120">      .name(getName());</span>
+  }
+
+  @Override
+  public void setName(String newName) {
+<span class="fc" id="L125">    this.name = newName;</span>
+<span class="fc" id="L126">  }</span>
+
+  @Override
+  public String getName() {
+<span class="fc" id="L130">    return this.name;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

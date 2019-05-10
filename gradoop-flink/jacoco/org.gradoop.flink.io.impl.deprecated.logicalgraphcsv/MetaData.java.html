@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MetaData.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.deprecated.logicalgraphcsv</a> &gt; <span class="el_source">MetaData.java</span></div><h1>MetaData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;
+
+import org.apache.flink.api.common.typeinfo.TypeHint;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.gradoop.flink.io.api.metadata.MetaDataSource;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+/**
+ * Describes the data stored in the vertex and edge CSV files.
+ */
+public class MetaData {
+  /**
+   * Mapping between an entity tuple(type, label) to their associated property meta data.
+   */
+  private Map&lt;Tuple2&lt;String, String&gt;, List&lt;PropertyMetaData&gt;&gt; metaData;
+
+  /**
+   * Constructor
+   *
+   * @param metaData contains entity tuple(type, label) and its property strings
+   */
+<span class="fc" id="L54">  MetaData(Map&lt;Tuple2&lt;String, String&gt;, List&lt;PropertyMetaData&gt;&gt; metaData) {</span>
+<span class="fc" id="L55">    this.metaData = metaData;</span>
+<span class="fc" id="L56">  }</span>
+
+  /**
+   * Reads the meta data from a specified file. Each line is split into a
+   * (element prefix, label, metadata) tuple
+   * and put into a dataset. The latter can be used to broadcast the metadata to the mappers.
+   *
+   * @param path path to metadata csv file
+   * @param config gradoop configuration
+   * @return (element prefix (g,v,e), label, metadata) tuple dataset
+   */
+  public static DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; fromFile(String path, GradoopFlinkConfig
+    config) {
+<span class="fc" id="L69">    return config.getExecutionEnvironment()</span>
+<span class="fc" id="L70">      .readTextFile(path)</span>
+<span class="fc" id="L71">      .map(line -&gt; {</span>
+<span class="fc" id="L72">        String[] tokens = line.split(CSVConstants.TOKEN_DELIMITER, 3);</span>
+<span class="fc" id="L73">        return Tuple3.of(tokens[0], tokens[1], tokens[2]);</span>
+      })
+<span class="fc" id="L75">      .returns(new TypeHint&lt;Tuple3&lt;String, String, String&gt;&gt;() { });</span>
+  }
+
+  /**
+   * Reads the meta data from a specified csv file. The file can be either located in a local file
+   * system or in HDFS.
+   *
+   * @param path path to metadata csv file
+   * @param hdfsConfig file system configuration
+   * @return meta data
+   * @throws IOException on failure
+   */
+  public static MetaData fromFile(String path, Configuration hdfsConfig) throws IOException {
+<span class="fc" id="L88">    FileSystem fs = FileSystem.get(hdfsConfig);</span>
+<span class="fc" id="L89">    Path file = new Path(path);</span>
+<span class="fc" id="L90">    Charset charset = Charset.forName(&quot;UTF-8&quot;);</span>
+
+<span class="fc" id="L92">    try (BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(file), charset))) {</span>
+<span class="fc" id="L93">      return MetaDataParser.create(br.lines()</span>
+<span class="fc" id="L94">        .map(line -&gt; line.split(CSVConstants.TOKEN_DELIMITER, 3))</span>
+<span class="fc" id="L95">        .map(tokens -&gt; Tuple3.of(tokens[0], tokens[1], tokens[2]))</span>
+<span class="fc" id="L96">        .collect(Collectors.toList()));</span>
+    }
+  }
+
+  /**
+   * Returns the vertex labels available in the meta data.
+   *
+   * @return vertex labels
+   */
+  public Set&lt;String&gt; getVertexLabels() {
+<span class="fc" id="L106">    return metaData.keySet().stream()</span>
+<span class="fc" id="L107">      .filter(key -&gt; key.f0.equals(MetaDataSource.VERTEX_TYPE))</span>
+<span class="fc" id="L108">      .map(key -&gt; key.f1)</span>
+<span class="fc" id="L109">      .collect(Collectors.toSet());</span>
+  }
+
+  /**
+   * Returns the edge labels available in the meta data.
+   *
+   * @return edge labels
+   */
+  public Set&lt;String&gt; getEdgeLabels() {
+<span class="fc" id="L118">    return metaData.keySet().stream()</span>
+<span class="fc" id="L119">      .filter(key -&gt; key.f0.equals(MetaDataSource.EDGE_TYPE))</span>
+<span class="fc" id="L120">      .map(key -&gt; key.f1)</span>
+<span class="fc" id="L121">      .collect(Collectors.toSet());</span>
+  }
+
+  /**
+   * Returns the property meta data associated with the specified label and type.
+   *
+   * @param type element type
+   * @param label element label
+   * @return property meta data for the element
+   */
+  public List&lt;PropertyMetaData&gt; getPropertyMetaData(String type, String label) {
+<span class="fc" id="L132">    return metaData.getOrDefault(new Tuple2&lt;&gt;(type, label), new ArrayList&lt;&gt;());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

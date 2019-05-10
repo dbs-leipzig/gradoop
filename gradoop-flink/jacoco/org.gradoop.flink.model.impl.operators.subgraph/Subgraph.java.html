@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Subgraph.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.subgraph</a> &gt; <span class="el_source">Subgraph.java</span></div><h1>Subgraph.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.subgraph;
+
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
+import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
+import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.functions.utils.RightSide;
+
+import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.BOTH;
+import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.BOTH_VERIFIED;
+import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.VERTEX_INDUCED;
+import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.EDGE_INDUCED;
+import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.EDGE_INDUCED_PROJECT_FIRST;
+
+/**
+ * Extracts a subgraph from a logical graph using the given filter functions.
+ *
+ * The operator is able to:
+ * 1) extract vertex-induced subgraph
+ * 2) extract edge-induced subgraph via join + union strategy
+ * 2) extract edge-induced subgraph via project + union + join strategy
+ * 3) extract subgraph based on vertex and edge filter function
+ * 4) extract subgraph based on vertex and edge filter function without verification (no joins)
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the logical graph instance
+ */
+public class Subgraph&lt;
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph&lt;G, V, E, LG&gt;&gt; implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
+
+  /**
+   * Used to filter vertices from the logical graph.
+   */
+  private final FilterFunction&lt;V&gt; vertexFilterFunction;
+
+  /**
+   * Used to filter edges from the logical graph.
+   */
+  private final FilterFunction&lt;E&gt; edgeFilterFunction;
+
+  /**
+   * Execution strategy for the operator.
+   */
+  private final Strategy strategy;
+
+  /**
+   * Available execution strategies.
+   */
+<span class="fc" id="L82">  public enum Strategy {</span>
+    /**
+     * Applies both filter functions on the input vertex and edge data set.
+     */
+<span class="fc" id="L86">    BOTH,</span>
+    /**
+     * Applies both filter functions on the input vertex and edge data set. In addition, this
+     * strategy verifies the consistency of the output graph by triplifying it projecting the
+     * vertices and edges.
+     */
+<span class="fc" id="L92">    BOTH_VERIFIED,</span>
+    /**
+     * Only applies the vertex filter function and adds the incident edges connecting those
+     * vertices via a join.
+     */
+<span class="fc" id="L97">    VERTEX_INDUCED,</span>
+    /**
+     * Only applies the edge filter function and computes the resulting vertices via:
+     * (E |&gt;&lt;| V ON e.source = v.id) U (E |&gt;&lt;| V on e.target = v.id)
+     */
+<span class="fc" id="L102">    EDGE_INDUCED,</span>
+    /**
+     * Only applies the edge filter function and computes the resulting vertices via:
+     * DISTINCT((π_source(E) U π_target(E))) |&gt;&lt;| V
+     */
+<span class="fc" id="L107">    EDGE_INDUCED_PROJECT_FIRST</span>
+  }
+
+  /**
+   * Creates a new sub graph operator instance.
+   *
+   * If both parameters are not {@code null}, the operator returns the subgraph
+   * defined by filtered vertices and edges.
+   *
+   * If the {@code edgeFilterFunction} is {@code null}, the operator returns the
+   * vertex-induced subgraph.
+   *
+   * If the {@code vertexFilterFunction} is {@code null}, the operator returns
+   * the edge-induced subgraph.
+   *
+   * @param vertexFilterFunction  vertex filter function
+   * @param edgeFilterFunction    edge filter function
+   * @param strategy              sets the execution strategy for the operator
+   */
+  public Subgraph(FilterFunction&lt;V&gt; vertexFilterFunction,
+<span class="fc" id="L127">    FilterFunction&lt;E&gt; edgeFilterFunction, Strategy strategy) {</span>
+
+<span class="pc bpc" id="L129" title="3 of 8 branches missed.">    if ((strategy == BOTH || strategy == BOTH_VERIFIED) &amp;&amp;</span>
+      vertexFilterFunction == null &amp;&amp; edgeFilterFunction == null) {
+<span class="nc" id="L131">      throw new IllegalArgumentException(&quot;No filter functions was given.&quot;);</span>
+    }
+
+<span class="pc bpc" id="L134" title="1 of 4 branches missed.">    if (strategy == VERTEX_INDUCED &amp;&amp; vertexFilterFunction == null) {</span>
+<span class="nc" id="L135">      throw new IllegalArgumentException(&quot;No vertex filter functions was given.&quot;);</span>
+    }
+
+<span class="pc bpc" id="L138" title="1 of 6 branches missed.">    if ((strategy == EDGE_INDUCED || strategy == EDGE_INDUCED_PROJECT_FIRST) &amp;&amp;</span>
+      edgeFilterFunction == null) {
+<span class="nc" id="L140">      throw new IllegalArgumentException(&quot;No vertex edge functions was given.&quot;);</span>
+    }
+
+<span class="fc" id="L143">    this.strategy = strategy;</span>
+
+<span class="fc" id="L145">    this.vertexFilterFunction = vertexFilterFunction;</span>
+<span class="fc" id="L146">    this.edgeFilterFunction = edgeFilterFunction;</span>
+<span class="fc" id="L147">  }</span>
+
+  @Override
+  public LG execute(LG superGraph) {
+
+    LG result;
+<span class="pc bpc" id="L153" title="1 of 6 branches missed.">    switch (strategy) {</span>
+    case BOTH:
+<span class="fc" id="L155">      result = subgraph(superGraph);</span>
+<span class="fc" id="L156">      break;</span>
+    case BOTH_VERIFIED:
+<span class="fc" id="L158">      result = verify(subgraph(superGraph));</span>
+<span class="fc" id="L159">      break;</span>
+    case VERTEX_INDUCED:
+<span class="fc" id="L161">      result = vertexInducedSubgraph(superGraph);</span>
+<span class="fc" id="L162">      break;</span>
+    case EDGE_INDUCED:
+<span class="fc" id="L164">      result = edgeInducedSubgraph(superGraph);</span>
+<span class="fc" id="L165">      break;</span>
+    case EDGE_INDUCED_PROJECT_FIRST:
+<span class="fc" id="L167">      result = edgeInducedSubgraphProjectFirst(superGraph);</span>
+<span class="fc" id="L168">      break;</span>
+    default:
+<span class="nc" id="L170">      throw new IllegalArgumentException(&quot;Strategy &quot; + strategy + &quot; is not supported&quot;);</span>
+    }
+
+<span class="fc" id="L173">    return result;</span>
+  }
+
+  /**
+   * Returns the subgraph of the given supergraph that is induced by the
+   * vertices that fulfil the given filter function.
+   *
+   * @param superGraph supergraph
+   * @return vertex-induced subgraph
+   */
+  private LG vertexInducedSubgraph(LG superGraph) {
+<span class="fc" id="L184">    DataSet&lt;V&gt; filteredVertices = superGraph.getVertices().filter(vertexFilterFunction);</span>
+
+<span class="fc" id="L186">    DataSet&lt;E&gt; newEdges = superGraph.getEdges()</span>
+<span class="fc" id="L187">      .join(filteredVertices)</span>
+<span class="fc" id="L188">      .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L189">      .with(new LeftSide&lt;&gt;())</span>
+<span class="fc" id="L190">      .join(filteredVertices)</span>
+<span class="fc" id="L191">      .where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L192">      .with(new LeftSide&lt;&gt;());</span>
+
+<span class="fc" id="L194">    return superGraph.getFactory().fromDataSets(filteredVertices, newEdges);</span>
+  }
+
+  /**
+   * Returns the subgraph of the given supergraph that is induced by the
+   * edges that fulfil the given filter function.
+   *
+   * @param superGraph supergraph
+   * @return edge-induced subgraph
+   */
+  private LG edgeInducedSubgraph(LG superGraph) {
+<span class="fc" id="L205">    DataSet&lt;E&gt; filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);</span>
+
+<span class="fc" id="L207">    DataSet&lt;V&gt; filteredVertices = filteredEdges</span>
+<span class="fc" id="L208">      .join(superGraph.getVertices())</span>
+<span class="fc" id="L209">      .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L210">      .with(new RightSide&lt;&gt;())</span>
+<span class="fc" id="L211">      .union(filteredEdges</span>
+<span class="fc" id="L212">        .join(superGraph.getVertices())</span>
+<span class="fc" id="L213">        .where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L214">        .with(new RightSide&lt;&gt;()))</span>
+<span class="fc" id="L215">      .distinct(new Id&lt;&gt;());</span>
+
+<span class="fc" id="L217">    return superGraph.getFactory().fromDataSets(filteredVertices, filteredEdges);</span>
+  }
+
+  /**
+   * Returns the subgraph of the given supergraph that is induced by the
+   * edges that fulfil the given filter function.
+   *
+   * @param superGraph supergraph
+   * @return edge-induced subgraph
+   */
+  private LG edgeInducedSubgraphProjectFirst(LG superGraph) {
+<span class="fc" id="L228">    DataSet&lt;E&gt; filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);</span>
+
+<span class="fc" id="L230">    DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; vertexIdentifiers = filteredEdges</span>
+<span class="fc" id="L231">      .map(new SourceId&lt;&gt;())</span>
+<span class="fc" id="L232">      .map(new ObjectTo1&lt;&gt;())</span>
+<span class="fc" id="L233">      .union(filteredEdges</span>
+<span class="fc" id="L234">        .map(new TargetId&lt;&gt;())</span>
+<span class="fc" id="L235">        .map(new ObjectTo1&lt;&gt;()))</span>
+<span class="fc" id="L236">      .distinct();</span>
+
+<span class="fc" id="L238">    DataSet&lt;V&gt; filteredVertices = vertexIdentifiers</span>
+<span class="fc" id="L239">      .join(superGraph.getVertices())</span>
+<span class="fc" id="L240">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L241">      .with(new RightSide&lt;&gt;());</span>
+
+<span class="fc" id="L243">    return superGraph.getFactory().fromDataSets(filteredVertices, filteredEdges);</span>
+  }
+
+  /**
+   * Returns the subgraph of the given supergraph that is defined by the
+   * vertices that fulfil the vertex filter function and edges that fulfill
+   * the edge filter function.
+   *
+   * Note, that the operator does not verify the consistency of the resulting
+   * graph.
+   *
+   * @param superGraph supergraph
+   * @return subgraph
+   */
+  private LG subgraph(LG superGraph) {
+<span class="fc" id="L258">    return superGraph.getFactory().fromDataSets(</span>
+<span class="fc" id="L259">      superGraph.getVertices().filter(vertexFilterFunction),</span>
+<span class="fc" id="L260">      superGraph.getEdges().filter(edgeFilterFunction));</span>
+  }
+
+  /**
+   * Verifies that the given graph is consistent, contains only edges that connect to vertices
+   * within the subgraph.
+   *
+   * @param subgraph supergraph
+   * @return verified subgraph
+   */
+  private LG verify(LG subgraph) {
+
+<span class="fc" id="L272">    DataSet&lt;Tuple2&lt;Tuple2&lt;E, V&gt;, V&gt;&gt; verifiedTriples = subgraph.getEdges()</span>
+<span class="fc" id="L273">      .join(subgraph.getVertices())</span>
+<span class="fc" id="L274">      .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L275">      .join(subgraph.getVertices())</span>
+<span class="fc" id="L276">      .where(&quot;0.targetId&quot;).equalTo(new Id&lt;&gt;());</span>
+
+<span class="fc" id="L278">    DataSet&lt;E&gt; verifiedEdges = verifiedTriples</span>
+<span class="fc" id="L279">      .map(new Value0Of2&lt;&gt;())</span>
+<span class="fc" id="L280">      .map(new Value0Of2&lt;&gt;());</span>
+
+<span class="fc" id="L282">    DataSet&lt;V&gt; verifiedVertices = verifiedTriples</span>
+<span class="fc" id="L283">      .map(new Value0Of2&lt;&gt;())</span>
+<span class="fc" id="L284">      .map(new Value1Of2&lt;&gt;())</span>
+<span class="fc" id="L285">      .union(verifiedTriples.map(new Value1Of2&lt;&gt;()))</span>
+<span class="fc" id="L286">      .distinct(new Id&lt;&gt;());</span>
+
+<span class="fc" id="L288">    return subgraph.getFactory().fromDataSets(verifiedVertices, verifiedEdges);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

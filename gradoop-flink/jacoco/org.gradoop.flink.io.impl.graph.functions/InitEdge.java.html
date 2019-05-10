@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InitEdge.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.graph.functions</a> &gt; <span class="el_source">InitEdge.java</span></div><h1>InitEdge.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.graph.functions;
+
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
+
+/**
+ * Initializes an EPGM edge from the given {@link ImportEdge}.
+ *
+ * @param &lt;K&gt; Import Edge/Vertex identifier type
+ */
+@FunctionAnnotation.ForwardedFieldsFirst(
+  &quot;f2-&gt;f0;&quot; +           // import target vertex id
+  &quot;f3-&gt;f1.label;&quot; +     // edge label
+  &quot;f4-&gt;f1.properties&quot;)  // edge properties
+@FunctionAnnotation.ForwardedFieldsSecond(
+  &quot;f1-&gt;f1.sourceId&quot;     // EPGM source vertex id
+)
+public class InitEdge&lt;K extends Comparable&lt;K&gt;&gt;
+  extends InitElement&lt;Edge, K&gt;
+  implements JoinFunction&lt;ImportEdge&lt;K&gt;, Tuple2&lt;K, GradoopId&gt;, Tuple2&lt;K, Edge&gt;&gt;,
+  ResultTypeQueryable&lt;Tuple2&lt;K, Edge&gt;&gt; {
+
+  /**
+   * Used to create new EPGM edge.
+   */
+  private final EPGMEdgeFactory&lt;Edge&gt; edgeFactory;
+
+  /**
+   * Reduce object instantiation.
+   */
+  private final Tuple2&lt;K, Edge&gt; reuseTuple;
+
+  /**
+   * Creates a new join function.
+   *
+   * @param epgmEdgeFactory         edge factory
+   * @param lineagePropertyKey  property key to store import identifier
+   *                            (can be {@code null})
+   * @param keyTypeInfo         type info for the import edge identifier
+   */
+  public InitEdge(EPGMEdgeFactory&lt;Edge&gt; epgmEdgeFactory, String lineagePropertyKey,
+    TypeInformation&lt;K&gt; keyTypeInfo) {
+<span class="fc" id="L67">    super(lineagePropertyKey, keyTypeInfo);</span>
+<span class="fc" id="L68">    this.edgeFactory        = epgmEdgeFactory;</span>
+<span class="fc" id="L69">    this.reuseTuple         = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L70">  }</span>
+
+  /**
+   * Outputs a pair of import target vertex id and new EPGM edge. The target
+   * vertex id is used for further joining the tuple with the import vertices.
+   *
+   * @param importEdge    import edge
+   * @param vertexIdPair  pair of import id and corresponding Gradoop vertex id
+   * @return pair of import target vertex id and EPGM edge
+   * @throws Exception on failure
+   */
+  @Override
+  public Tuple2&lt;K, Edge&gt; join(ImportEdge&lt;K&gt; importEdge,
+    Tuple2&lt;K, GradoopId&gt; vertexIdPair) throws Exception {
+<span class="fc" id="L84">    reuseTuple.f0 = importEdge.getTargetId();</span>
+
+<span class="fc" id="L86">    Edge edge = edgeFactory.createEdge(importEdge.getLabel(),</span>
+<span class="fc" id="L87">      vertexIdPair.f1, GradoopId.get(), importEdge.getProperties());</span>
+
+<span class="fc" id="L89">    reuseTuple.f1 = updateLineage(edge, importEdge.getId());</span>
+
+<span class="fc" id="L91">    return reuseTuple;</span>
+  }
+
+  @Override
+  public TypeInformation&lt;Tuple2&lt;K, Edge&gt;&gt; getProducedType() {
+<span class="fc" id="L96">    return new TupleTypeInfo&lt;&gt;(getKeyTypeInfo(),</span>
+<span class="fc" id="L97">      TypeExtractor.createTypeInfo(edgeFactory.getType()));</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

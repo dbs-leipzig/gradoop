@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropertyValueStrategyUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.properties.strategies</a> &gt; <span class="el_source">PropertyValueStrategyUtils.java</span></div><h1>PropertyValueStrategyUtils.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.properties.strategies;
+
+import org.gradoop.common.exceptions.UnsupportedTypeException;
+import java.math.BigDecimal;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Utility class which mainly handles comparing any values of the type {@code Numerical}.
+ */
+<span class="nc" id="L25">class PropertyValueStrategyUtils {</span>
+
+  /**
+   * Short type.
+   */
+  private static final int SHORT = 0;
+  /**
+   * Integer type.
+   */
+  private static final int INT = 1;
+  /**
+   * Long type.
+   */
+  private static final int LONG = 2;
+  /**
+   * Float type.
+   */
+  private static final int FLOAT = 3;
+  /**
+   * Double type.
+   */
+  private static final int DOUBLE = 4;
+  /**
+   * Big decimal type.
+   */
+  private static final int BIG_DECIMAL = 5;
+
+  /**
+   * Compares a numerical to an object. The object needs to be an instance of {@code Number}.
+   *
+   * @param aValue first value
+   * @param other second value
+   * @return a negative integer, zero, or a positive integer as aValue is less than, equal to, or
+   * greater than bValue.
+   * @throws IllegalArgumentException if other is not an instance of number.
+   */
+  static int compareNumerical(Number aValue, Object other) {
+<span class="fc bfc" id="L62" title="All 2 branches covered.">    if (!(other instanceof Number)) {</span>
+<span class="fc" id="L63">      throw new IllegalArgumentException(String.format(</span>
+<span class="fc" id="L64">        &quot;Incompatible types: %s, %s&quot;, aValue.getClass(), other.getClass()));</span>
+    }
+
+<span class="fc" id="L67">    Number bValue = (Number) other;</span>
+<span class="fc" id="L68">    int aType = getType(aValue);</span>
+<span class="fc" id="L69">    int bType = getType(bValue);</span>
+
+<span class="fc bfc" id="L71" title="All 2 branches covered.">    boolean sameType = aType == bType;</span>
+
+<span class="fc" id="L73">    int maxType = Math.max(aType, bType);</span>
+
+    int result;
+
+<span class="fc bfc" id="L77" title="All 2 branches covered.">    if (maxType == SHORT) {</span>
+<span class="fc" id="L78">      result = Short.compare(aValue.shortValue(), bValue.shortValue());</span>
+
+<span class="fc bfc" id="L80" title="All 2 branches covered.">    } else if (maxType == INT) {</span>
+      int a;
+      int b;
+
+<span class="fc bfc" id="L84" title="All 2 branches covered.">      if (sameType) {</span>
+<span class="fc" id="L85">        a = aValue.intValue();</span>
+<span class="fc" id="L86">        b = bValue.intValue();</span>
+      } else {
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        a = aType == INT ? aValue.intValue() : aValue.shortValue();</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        b = bType == INT ? bValue.intValue() : bValue.shortValue();</span>
+      }
+
+<span class="fc" id="L92">      result = Integer.compare(a, b);</span>
+
+<span class="fc bfc" id="L94" title="All 2 branches covered.">    } else if (maxType == FLOAT) {</span>
+      float a;
+      float b;
+
+<span class="fc bfc" id="L98" title="All 2 branches covered.">      if (sameType) {</span>
+<span class="fc" id="L99">        a = aValue.floatValue();</span>
+<span class="fc" id="L100">        b = bValue.floatValue();</span>
+      } else {
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        a = aType == FLOAT ? aValue.floatValue() : floatValue(aValue, aType);</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        b = bType == FLOAT ? bValue.floatValue() : floatValue(bValue, bType);</span>
+      }
+
+<span class="fc" id="L106">      result = Float.compare(a, b);</span>
+
+<span class="fc bfc" id="L108" title="All 2 branches covered.">    } else if (maxType == LONG) {</span>
+      long a;
+      long b;
+
+<span class="fc bfc" id="L112" title="All 2 branches covered.">      if (sameType) {</span>
+<span class="fc" id="L113">        a = aValue.longValue();</span>
+<span class="fc" id="L114">        b = bValue.longValue();</span>
+      } else {
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        a = aType == LONG ? aValue.longValue() : longValue(aValue, aType);</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">        b = bType == LONG ? bValue.longValue() : longValue(bValue, bType);</span>
+      }
+
+<span class="fc" id="L120">      result = Long.compare(a, b);</span>
+
+<span class="fc bfc" id="L122" title="All 2 branches covered.">    } else if (maxType == DOUBLE) {</span>
+      double a;
+      double b;
+
+<span class="fc bfc" id="L126" title="All 2 branches covered.">      if (sameType) {</span>
+<span class="fc" id="L127">        a = aValue.doubleValue();</span>
+<span class="fc" id="L128">        b = bValue.doubleValue();</span>
+      } else {
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        a = aType == DOUBLE ? aValue.doubleValue() : doubleValue(aValue, aType);</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        b = bType == DOUBLE ? bValue.doubleValue() : doubleValue(bValue, bType);</span>
+      }
+
+<span class="fc" id="L134">      result = Double.compare(a, b);</span>
+
+<span class="fc" id="L136">    } else {</span>
+      BigDecimal a;
+      BigDecimal b;
+
+<span class="fc bfc" id="L140" title="All 2 branches covered.">      if (sameType) {</span>
+<span class="fc" id="L141">        a = (BigDecimal) aValue;</span>
+<span class="fc" id="L142">        b = (BigDecimal) bValue;</span>
+      } else {
+<span class="fc bfc" id="L144" title="All 2 branches covered.">        a = aType == BIG_DECIMAL ? (BigDecimal) aValue :</span>
+<span class="fc" id="L145">        bigDecimalValue(aValue, aType);</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">        b = bType == BIG_DECIMAL ? (BigDecimal) bValue :</span>
+<span class="fc" id="L147">        bigDecimalValue(bValue, bType);</span>
+      }
+
+<span class="fc" id="L150">      result = a.compareTo(b);</span>
+    }
+
+<span class="fc" id="L153">    return result;</span>
+  }
+
+  /**
+   * Gets the number type of the provided object.
+   *
+   * @param value some number object.
+   * @return integer representation of the objects data type.
+   */
+  private static int getType(Number value) {
+<span class="fc" id="L163">    checkNotNull(value);</span>
+
+    int type;
+
+<span class="fc bfc" id="L167" title="All 2 branches covered.">    if (value instanceof Short) {</span>
+<span class="fc" id="L168">      type = SHORT;</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">    } else if (value instanceof Integer) {</span>
+<span class="fc" id="L170">      type = INT;</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">    } else if (value instanceof Long) {</span>
+<span class="fc" id="L172">      type = LONG;</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">    } else if (value instanceof Float) {</span>
+<span class="fc" id="L174">      type = FLOAT;</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">    } else if (value instanceof Double) {</span>
+<span class="fc" id="L176">      type = DOUBLE;</span>
+<span class="pc bpc" id="L177" title="1 of 2 branches missed.">    } else if (value instanceof BigDecimal) {</span>
+<span class="fc" id="L178">      type = BIG_DECIMAL;</span>
+    } else {
+<span class="nc" id="L180">      throw new UnsupportedTypeException(value.getClass());</span>
+    }
+
+<span class="fc" id="L183">    return type;</span>
+  }
+
+  /**
+   * Converts a value of a lower domain numerical type to BigDecimal.
+   *
+   * @param value value
+   * @param type  type
+   * @return converted value
+   */
+  private static BigDecimal bigDecimalValue(Number value, int type) {
+<span class="fc bfc" id="L194" title="All 5 branches covered.">    switch (type) {</span>
+    case SHORT:
+<span class="fc" id="L196">      return BigDecimal.valueOf(value.shortValue());</span>
+    case INT:
+<span class="fc" id="L198">      return BigDecimal.valueOf(value.intValue());</span>
+    case LONG:
+<span class="fc" id="L200">      return BigDecimal.valueOf(value.longValue());</span>
+    case FLOAT:
+<span class="fc" id="L202">      return BigDecimal.valueOf(value.floatValue());</span>
+    default:
+<span class="fc" id="L204">      return BigDecimal.valueOf(value.doubleValue());</span>
+    }
+  }
+
+  /**
+   * Converts a value of a lower domain numerical type to Double.
+   *
+   * @param value value
+   * @param type  type
+   * @return converted value
+   */
+  private static double doubleValue(Number value, int type) {
+<span class="fc bfc" id="L216" title="All 4 branches covered.">    switch (type) {</span>
+    case SHORT:
+<span class="fc" id="L218">      return value.shortValue();</span>
+    case INT:
+<span class="fc" id="L220">      return value.intValue();</span>
+    case LONG:
+<span class="fc" id="L222">      return value.longValue();</span>
+    default:
+<span class="fc" id="L224">      return value.floatValue();</span>
+    }
+  }
+
+  /**
+   * Converts a value of a lower domain numerical type to Long.
+   *
+   * @param value value
+   * @param type  type
+   * @return converted value
+   */
+  private static long longValue(Number value, int type) {
+<span class="fc bfc" id="L236" title="All 2 branches covered.">    if (type == SHORT) {</span>
+<span class="fc" id="L237">      return value.shortValue();</span>
+    }
+<span class="fc" id="L239">    return value.intValue();</span>
+  }
+
+  /**
+   * Converts a value of a lower domain numerical type to Float.
+   *
+   * @param value value
+   * @param type  type
+   * @return converted value
+   */
+  private static float floatValue(Number value, int type) {
+<span class="fc bfc" id="L250" title="All 3 branches covered.">    switch (type) {</span>
+    case SHORT:
+<span class="fc" id="L252">      return value.shortValue();</span>
+    case INT:
+<span class="fc" id="L254">      return value.intValue();</span>
+    default:
+<span class="fc" id="L256">      return value.longValue();</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

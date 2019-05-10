@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UpdateVertexEdgeMapping.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions</a> &gt; <span class="el_source">UpdateVertexEdgeMapping.java</span></div><h1>UpdateVertexEdgeMapping.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions;
+
+import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
+import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
+
+/**
+ * Extends an embedding with an edge and its source and target vertices if possible.
+ *
+ * @param &lt;K&gt; key type
+ */
+public class UpdateVertexEdgeMapping&lt;K&gt;
+  extends UpdateMapping&lt;K&gt;
+  implements
+  FlatJoinFunction&lt;EmbeddingWithTiePoint&lt;K&gt;, TripleWithCandidates&lt;K&gt;, EmbeddingWithTiePoint&lt;K&gt;&gt; {
+  /**
+   * Query candidate for the source vertex
+   */
+  private final int sourceCandidate;
+  /**
+   * Query candidate for the edge
+   */
+  private final int edgeCandidate;
+  /**
+   * Query candidate for the target vertex
+   */
+  private final int targetCandidate;
+  /**
+   * From field of the next traversal step (if there is one)
+   */
+  private int nextFrom;
+
+  /**
+   * Constructor
+   *
+   * @param traversalCode traversal code for the current query
+   * @param currentStepId step if of the current traversal step
+   * @param matchStrategy strategy for morphism testing
+   */
+  public UpdateVertexEdgeMapping(TraversalCode traversalCode, int currentStepId,
+    MatchStrategy matchStrategy) {
+<span class="fc" id="L61">    super(traversalCode, matchStrategy);</span>
+
+<span class="fc" id="L63">    setCurrentStepId(currentStepId);</span>
+<span class="fc" id="L64">    initializeVisited();</span>
+
+<span class="fc" id="L66">    Step currentStep = getCurrentStep();</span>
+<span class="fc" id="L67">    boolean isOutgoing = currentStep.isOutgoing();</span>
+<span class="fc" id="L68">    this.edgeCandidate = (int) currentStep.getVia();</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">    this.sourceCandidate = isOutgoing ? (int) currentStep.getFrom() : (int) currentStep.getTo();</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">    this.targetCandidate = isOutgoing ? (int) currentStep.getTo() : (int) currentStep.getFrom();</span>
+
+<span class="fc" id="L72">    this.nextFrom = getNextFrom();</span>
+<span class="fc" id="L73">  }</span>
+
+  @Override
+  public void join(EmbeddingWithTiePoint&lt;K&gt; embedding, TripleWithCandidates&lt;K&gt; t,
+    Collector&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; out) throws Exception {
+
+<span class="fc" id="L79">    K edgeId = t.getEdgeId();</span>
+<span class="fc" id="L80">    K[] edgeMapping = embedding.getEmbedding().getEdgeMapping();</span>
+
+<span class="fc bfc" id="L82" title="All 2 branches covered.">    if (isValidEdge(edgeId, edgeMapping, edgeCandidate)) {</span>
+      // check vertices
+<span class="fc" id="L84">      K[] vertexMapping = embedding.getEmbedding().getVertexMapping();</span>
+
+<span class="fc bfc" id="L86" title="All 2 branches covered.">      if (isValidVertex(t.getSourceId(), vertexMapping, sourceCandidate) &amp;&amp;</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        isValidVertex(t.getTargetId(), vertexMapping, targetCandidate)) {</span>
+<span class="fc" id="L88">        edgeMapping[edgeCandidate] = edgeId;</span>
+<span class="fc" id="L89">        vertexMapping[sourceCandidate] = t.getSourceId();</span>
+<span class="fc" id="L90">        vertexMapping[targetCandidate] = t.getTargetId();</span>
+
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (hasMoreSteps()) {</span>
+<span class="fc" id="L93">          embedding.setTiePointId(vertexMapping[nextFrom]);</span>
+        }
+<span class="fc" id="L95">        out.collect(embedding);</span>
+      }
+    }
+<span class="fc" id="L98">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

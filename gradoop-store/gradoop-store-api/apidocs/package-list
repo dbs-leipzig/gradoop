@@ -1,0 +1,7 @@
+org.gradoop.storage.common.api
+org.gradoop.storage.common.config
+org.gradoop.storage.common.io
+org.gradoop.storage.common.iterator
+org.gradoop.storage.common.predicate.filter.api
+org.gradoop.storage.common.predicate.filter.impl
+org.gradoop.storage.common.predicate.query

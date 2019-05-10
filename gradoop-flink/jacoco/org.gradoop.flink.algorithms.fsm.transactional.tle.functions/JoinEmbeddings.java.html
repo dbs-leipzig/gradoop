@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JoinEmbeddings.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.transactional.tle.functions</a> &gt; <span class="el_source">JoinEmbeddings.java</span></div><h1>JoinEmbeddings.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.canonicalization.CanonicalLabeler;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.Embedding;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMGraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.SubgraphEmbeddings;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+/**
+ * Superclass of classes joining subgraph embeddings.
+ *
+ * @param &lt;G&gt; graph type
+ * @param &lt;SE&gt; subgraph type
+ */
+public class JoinEmbeddings&lt;G extends FSMGraph, SE extends SubgraphEmbeddings&gt;
+  implements FlatJoinFunction&lt;SE, G, SE&gt;, FlatMapFunction&lt;SE, SE&gt; {
+
+  /**
+   * Labeler used to generate canonical labels.
+   */
+  private final CanonicalLabeler canonicalLabeler;
+
+  /**
+   * Constructor.
+   *
+   * @param fsmConfig FSM configuration.
+   */
+<span class="fc" id="L56">  public JoinEmbeddings(FSMConfig fsmConfig) {</span>
+<span class="fc" id="L57">    this.canonicalLabeler = new CanonicalLabeler(fsmConfig.isDirected());</span>
+<span class="fc" id="L58">  }</span>
+
+  @Override
+  public void join(SE embeddings, G graph, Collector&lt;SE&gt; out) throws
+    Exception {
+
+<span class="nc" id="L64">    Set&lt;TreeSet&lt;Integer&gt;&gt; edgeSets = Sets.newHashSet();</span>
+<span class="nc" id="L65">    Map&lt;String, List&lt;Embedding&gt;&gt; subgraphEmbeddings = Maps.newHashMap();</span>
+
+<span class="nc bnc" id="L67" title="All 2 branches missed.">    for (Embedding parent : embeddings.getEmbeddings()) {</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">      for (Map.Entry&lt;Integer, FSMEdge&gt; entry : graph.getEdges().entrySet()) {</span>
+
+<span class="nc" id="L70">        int edgeId = entry.getKey();</span>
+
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (! parent.getEdges().containsKey(edgeId)) {</span>
+<span class="nc" id="L73">          FSMEdge edge = entry.getValue();</span>
+
+<span class="nc" id="L75">          int sourceId = edge.getSourceId();</span>
+<span class="nc" id="L76">          boolean containsSourceId =</span>
+<span class="nc" id="L77">            parent.getVertices().containsKey(sourceId);</span>
+
+<span class="nc" id="L79">          int targetId = edge.getTargetId();</span>
+<span class="nc" id="L80">          boolean containsTargetId =</span>
+<span class="nc" id="L81">            parent.getVertices().containsKey(targetId);</span>
+
+<span class="nc bnc" id="L83" title="All 4 branches missed.">          if (containsSourceId ||  containsTargetId) {</span>
+<span class="nc" id="L84">            TreeSet&lt;Integer&gt; edgeSet = Sets.newTreeSet(parent.getEdgeIds());</span>
+<span class="nc" id="L85">            edgeSet.add(edgeId);</span>
+
+<span class="nc bnc" id="L87" title="All 2 branches missed.">            if (! edgeSets.contains(edgeSet)) {</span>
+<span class="nc" id="L88">              edgeSets.add(edgeSet);</span>
+
+<span class="nc" id="L90">              Embedding child = parent.deepCopy();</span>
+<span class="nc" id="L91">              child.getEdges().put(edgeId, edge);</span>
+
+<span class="nc bnc" id="L93" title="All 2 branches missed.">              if (! containsSourceId) {</span>
+<span class="nc" id="L94">                child.getVertices()</span>
+<span class="nc" id="L95">                  .put(sourceId, graph.getVertices().get(sourceId));</span>
+              }
+<span class="nc bnc" id="L97" title="All 2 branches missed.">              if (! containsTargetId) {</span>
+<span class="nc" id="L98">                child.getVertices()</span>
+<span class="nc" id="L99">                  .put(targetId, graph.getVertices().get(targetId));</span>
+              }
+
+<span class="nc" id="L102">              String canonicalLabel = canonicalLabeler.label(child);</span>
+
+<span class="nc" id="L104">              List&lt;Embedding&gt; siblings =</span>
+<span class="nc" id="L105">                subgraphEmbeddings.get(canonicalLabel);</span>
+
+<span class="nc bnc" id="L107" title="All 2 branches missed.">              if (siblings == null) {</span>
+<span class="nc" id="L108">                siblings = Lists.newArrayList(child);</span>
+<span class="nc" id="L109">                subgraphEmbeddings.put(canonicalLabel, siblings);</span>
+              } else {
+<span class="nc" id="L111">                siblings.add(child);</span>
+              }
+            }
+          }
+        }
+<span class="nc" id="L116">      }</span>
+<span class="nc" id="L117">    }</span>
+
+<span class="nc" id="L119">    collect(embeddings, out, subgraphEmbeddings);</span>
+<span class="nc" id="L120">  }</span>
+
+  @Override
+  public void flatMap(SE embeddings, Collector&lt;SE&gt; collector) throws Exception {
+
+    Map&lt;String, List&lt;Embedding&gt;&gt; subgraphEmbeddings;
+
+<span class="fc bfc" id="L127" title="All 2 branches covered.">    if (embeddings.getSize() == 1) {</span>
+<span class="fc" id="L128">      subgraphEmbeddings = joinOnVertex(embeddings);</span>
+    } else {
+<span class="fc" id="L130">      subgraphEmbeddings = joinOnEdgeOverlap(embeddings);</span>
+    }
+
+<span class="fc" id="L133">    collect(embeddings, collector, subgraphEmbeddings);</span>
+<span class="fc" id="L134">  }</span>
+
+  /**
+   * Cross-joins k-edge (k&gt;1) embeddings on k-1-edge overlap.
+   *
+   * @param embeddings k-edge embeddings
+   * @return Map of k+1-edge subgraphs and embeddings
+   */
+  private Map&lt;String, List&lt;Embedding&gt;&gt; joinOnEdgeOverlap(SE embeddings) {
+    Map&lt;String, List&lt;Embedding&gt;&gt; subgraphEmbeddings;
+<span class="fc" id="L144">    subgraphEmbeddings = Maps.newHashMap();</span>
+<span class="fc" id="L145">    List&lt;Embedding&gt; parents = embeddings.getEmbeddings();</span>
+
+<span class="fc" id="L147">    Set&lt;TreeSet&lt;Integer&gt;&gt; edgeSets = Sets.newHashSet();</span>
+
+    // index parents
+
+<span class="fc" id="L151">    Map&lt;TreeSet&lt;Integer&gt;, List&lt;Integer&gt;&gt; subsetParents =  Maps.newHashMap();</span>
+
+<span class="fc" id="L153">    int parentIndex = 0;</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">    for (Embedding parent : parents) {</span>
+
+<span class="fc bfc" id="L156" title="All 2 branches covered.">      for (Integer edgeId : parent.getEdgeIds()) {</span>
+<span class="fc" id="L157">        TreeSet&lt;Integer&gt; subset = Sets.newTreeSet(parent.getEdgeIds());</span>
+<span class="fc" id="L158">        subset.remove(edgeId);</span>
+
+<span class="fc" id="L160">        Collection&lt;Integer&gt; siblings = subsetParents.get(subset);</span>
+
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        if (siblings == null) {</span>
+<span class="fc" id="L163">          subsetParents.put(subset, Lists.newArrayList(parentIndex));</span>
+        } else {
+<span class="fc" id="L165">          siblings.add(parentIndex);</span>
+        }
+<span class="fc" id="L167">      }</span>
+
+<span class="fc" id="L169">      parentIndex++;</span>
+<span class="fc" id="L170">    }</span>
+
+    // join overlapping parents
+
+<span class="fc bfc" id="L174" title="All 2 branches covered.">    for (List&lt;Integer&gt; overlappingParents : subsetParents.values()) {</span>
+<span class="fc" id="L175">      int size = overlappingParents.size();</span>
+
+<span class="fc bfc" id="L177" title="All 2 branches covered.">      if (size &gt; 1) {</span>
+
+<span class="fc bfc" id="L179" title="All 2 branches covered.">        for (int i = 0; i &lt; size - 1; i++) {</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">          for (int j = i + 1; j &lt; size; j++) {</span>
+
+<span class="fc" id="L182">            Embedding left = parents.get(overlappingParents.get(i));</span>
+<span class="fc" id="L183">            Embedding right = parents.get(overlappingParents.get(j));</span>
+
+<span class="fc" id="L185">            TreeSet&lt;Integer&gt; edgeSet = Sets.newTreeSet(left.getEdgeIds());</span>
+<span class="fc" id="L186">            edgeSet.addAll(right.getEdgeIds());</span>
+
+<span class="fc bfc" id="L188" title="All 2 branches covered.">            if (!edgeSets.contains(edgeSet)) {</span>
+<span class="fc" id="L189">              edgeSets.add(edgeSet);</span>
+
+<span class="fc" id="L191">              Embedding child = left.deepCopy();</span>
+<span class="fc" id="L192">              child.getVertices().putAll(right.getVertices());</span>
+<span class="fc" id="L193">              child.getEdges().putAll(right.getEdges());</span>
+
+<span class="fc" id="L195">              String canonicalLabel = canonicalLabeler.label(child);</span>
+
+<span class="fc" id="L197">              List&lt;Embedding&gt; siblings =</span>
+<span class="fc" id="L198">                subgraphEmbeddings.get(canonicalLabel);</span>
+
+<span class="fc bfc" id="L200" title="All 2 branches covered.">              if (siblings == null) {</span>
+<span class="fc" id="L201">                siblings = Lists.newArrayList(child);</span>
+<span class="fc" id="L202">                subgraphEmbeddings.put(canonicalLabel, siblings);</span>
+              } else {
+<span class="fc" id="L204">                siblings.add(child);</span>
+              }
+            }
+          }
+        }
+      }
+<span class="fc" id="L210">    }</span>
+<span class="fc" id="L211">    return subgraphEmbeddings;</span>
+  }
+
+  /**
+   * Cross-joins 1-edge embeddings on source and target vertices.
+   *
+   * @param embeddings 1-edge embeddings
+   * @return Map of 2-edge subgraphs and embeddings
+   */
+  private Map&lt;String, List&lt;Embedding&gt;&gt; joinOnVertex(SE embeddings) {
+    Map&lt;String, List&lt;Embedding&gt;&gt; subgraphEmbeddings;
+<span class="fc" id="L222">    subgraphEmbeddings = Maps.newHashMap();</span>
+<span class="fc" id="L223">    List&lt;Embedding&gt; parents = embeddings.getEmbeddings();</span>
+
+<span class="fc" id="L225">    int size = parents.size();</span>
+
+<span class="fc bfc" id="L227" title="All 2 branches covered.">    for (int i = 0; i &lt; size - 1; i++) {</span>
+<span class="fc bfc" id="L228" title="All 2 branches covered.">      for (int j = i + 1; j &lt; size; j++) {</span>
+
+<span class="fc" id="L230">        Embedding left = parents.get(i);</span>
+<span class="fc" id="L231">        Embedding right = parents.get(j);</span>
+
+<span class="fc" id="L233">        FSMEdge leftEdge = left.getEdges().values().iterator().next();</span>
+<span class="fc" id="L234">        FSMEdge rightEdge = right.getEdges().values().iterator().next();</span>
+
+<span class="fc bfc" id="L236" title="All 2 branches covered.">        if (leftEdge.getSourceId() == rightEdge.getSourceId() ||</span>
+<span class="fc bfc" id="L237" title="All 2 branches covered.">          leftEdge.getSourceId() == rightEdge.getTargetId() ||</span>
+<span class="fc bfc" id="L238" title="All 2 branches covered.">          leftEdge.getTargetId() == rightEdge.getSourceId() ||</span>
+<span class="fc bfc" id="L239" title="All 2 branches covered.">          leftEdge.getTargetId() == rightEdge.getTargetId()) {</span>
+
+<span class="fc" id="L241">          Embedding child = left.deepCopy();</span>
+<span class="fc" id="L242">          child.getVertices().putAll(right.getVertices());</span>
+<span class="fc" id="L243">          child.getEdges().putAll(right.getEdges());</span>
+
+<span class="fc" id="L245">          String canonicalLabel = canonicalLabeler.label(child);</span>
+
+<span class="fc" id="L247">          List&lt;Embedding&gt; siblings =</span>
+<span class="fc" id="L248">            subgraphEmbeddings.get(canonicalLabel);</span>
+
+<span class="fc bfc" id="L250" title="All 2 branches covered.">          if (siblings == null) {</span>
+<span class="fc" id="L251">            siblings = Lists.newArrayList(child);</span>
+<span class="fc" id="L252">            subgraphEmbeddings.put(canonicalLabel, siblings);</span>
+          } else {
+<span class="fc" id="L254">            siblings.add(child);</span>
+          }
+        }
+      }
+    }
+<span class="fc" id="L259">    return subgraphEmbeddings;</span>
+  }
+
+  /**
+   * Triggers output of subgraphs and embeddings.
+   *
+   * @param reuseTuple reuse tuple to avoid instantiations
+   * @param out Flink output collector
+   * @param subgraphEmbeddings subgraphs and embeddings.
+   */
+  private void collect(SE reuseTuple, Collector&lt;SE&gt; out,
+    Map&lt;String, List&lt;Embedding&gt;&gt; subgraphEmbeddings) {
+
+<span class="fc" id="L272">    reuseTuple.setSize(reuseTuple.getSize() + 1);</span>
+
+    for (Map.Entry&lt;String, List&lt;Embedding&gt;&gt; entry :
+<span class="fc bfc" id="L275" title="All 2 branches covered.">      subgraphEmbeddings.entrySet()) {</span>
+
+<span class="fc" id="L277">      reuseTuple.setCanonicalLabel(entry.getKey());</span>
+<span class="fc" id="L278">      reuseTuple.setEmbeddings(entry.getValue());</span>
+
+<span class="fc" id="L280">      out.collect(reuseTuple);</span>
+<span class="fc" id="L281">    }</span>
+<span class="fc" id="L282">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

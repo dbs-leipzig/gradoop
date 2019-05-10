@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElementLabelEncoder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.tlf.functions</a> &gt; <span class="el_source">ElementLabelEncoder.java</span></div><h1>ElementLabelEncoder.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.tlf.functions;
+
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
+import org.gradoop.flink.io.impl.tlf.TLFConstants;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Map function which sets the simple label from either the vertex labels or
+ * the edge labels or both.
+ */
+public class ElementLabelEncoder extends
+  RichMapFunction&lt;GraphTransaction, GraphTransaction&gt; {
+
+  /**
+   * True if the vertices of the transaction as labels set by a dictionary.
+   */
+  private boolean hasVertexDictionary;
+  /**
+   * True if the edges of the transaction as labels set by a dictionary.
+   */
+  private boolean hasEdgeDictionary;
+  /**
+   * Map containing the vertex dictionary.
+   */
+  private Map&lt;String, Integer&gt; vertexDictionary;
+  /**
+   * Map containing the edge dictionary.
+   */
+  private Map&lt;String, Integer&gt; edgeDictionary;
+
+  /**
+   * Creates a new map function which sets the simple label from either the
+   * vertex labels or the edge labels or both.
+   * Changes labels from:
+   *    'dictionarylabel'
+   * to:
+   *    'simpleLabel' (Integer)
+   *
+   * @param hasVertexDictionary set to true if vertex labels are set by a
+   *                            dictionary
+   * @param hasEdgeDictionary set to true if edge labels are set by a dictionary
+   */
+  public ElementLabelEncoder(
+<span class="fc" id="L65">    boolean hasVertexDictionary, boolean hasEdgeDictionary) {</span>
+<span class="fc" id="L66">    this.hasVertexDictionary = hasVertexDictionary;</span>
+<span class="fc" id="L67">    this.hasEdgeDictionary = hasEdgeDictionary;</span>
+<span class="fc" id="L68">  }</span>
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="fc" id="L72">    super.open(parameters);</span>
+    //load the dictionaries if set
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">    if (hasVertexDictionary) {</span>
+<span class="fc" id="L75">      vertexDictionary = getRuntimeContext()</span>
+<span class="fc" id="L76">        .&lt;HashMap&lt;String, Integer&gt;&gt;getBroadcastVariable(</span>
+<span class="fc" id="L77">          TLFConstants.VERTEX_DICTIONARY).get(0);</span>
+    }
+<span class="fc bfc" id="L79" title="All 2 branches covered.">    if (hasEdgeDictionary) {</span>
+<span class="fc" id="L80">      edgeDictionary = getRuntimeContext()</span>
+<span class="fc" id="L81">        .&lt;HashMap&lt;String, Integer&gt;&gt;getBroadcastVariable(</span>
+<span class="fc" id="L82">          TLFConstants.EDGE_DICTIONARY).get(0);</span>
+    }
+<span class="fc" id="L84">  }</span>
+
+  /**
+   * Removes the dictionary labels and sets the simple labels (integer).
+   *
+   * @param graphTransaction graph transaction with label format:
+   *                         'dictionarylabel'
+   * @return graph transaction with label format: 'simpleLabel' (Integer)
+   * @throws Exception on failure
+   */
+  @Override
+  public GraphTransaction map(GraphTransaction graphTransaction)
+      throws Exception {
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">    if (vertexDictionary != null) {</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">      for (Vertex vertex : graphTransaction.getVertices()) {</span>
+<span class="fc" id="L99">        vertex.setLabel(vertexDictionary.get(vertex.getLabel()).toString());</span>
+<span class="fc" id="L100">      }</span>
+    }
+<span class="fc bfc" id="L102" title="All 2 branches covered.">    if (edgeDictionary != null) {</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">      for (Edge edge : graphTransaction.getEdges()) {</span>
+<span class="fc" id="L104">        edge.setLabel(edgeDictionary.get(edge.getLabel()).toString());</span>
+<span class="fc" id="L105">      }</span>
+    }
+<span class="fc" id="L107">    return graphTransaction;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

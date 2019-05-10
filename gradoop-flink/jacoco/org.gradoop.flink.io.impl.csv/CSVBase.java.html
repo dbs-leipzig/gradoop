@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CSVBase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.csv</a> &gt; <span class="el_source">CSVBase.java</span></div><h1>CSVBase.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.csv;
+
+import org.gradoop.flink.io.impl.csv.functions.StringEscaper;
+import org.gradoop.flink.io.impl.csv.indexed.functions.MultipleFileOutputFormat;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.File;
+import java.util.Objects;
+
+/**
+ * Base class for CSV data source and data sink.
+ */
+public abstract class CSVBase {
+  /**
+   * Broadcast set identifier for meta data.
+   */
+  public static final String BC_METADATA = &quot;metadata&quot;;
+  /**
+   * File ending for CSV files.
+   */
+  private static final String CSV_FILE_SUFFIX = &quot;.csv&quot;;
+  /**
+   * Path for indexed vertices
+   */
+  private static final String VERTEX_PATH = &quot;vertices&quot;;
+  /**
+   * CSV file for vertices.
+   */
+  private static final String VERTEX_FILE = &quot;vertices&quot; + CSV_FILE_SUFFIX;
+  /**
+   * Path for indexed graph heads.
+   */
+  private static final String GRAPH_HEAD_PATH = &quot;graphs&quot;;
+  /**
+   * CSV file containing the graph heads.
+   */
+  private static final String GRAPH_HEAD_FILE = &quot;graphs&quot; + CSV_FILE_SUFFIX;
+  /**
+   * Path for indexed edges
+   */
+  private static final String EDGE_PATH = &quot;edges&quot;;
+  /**
+   * CSV file for edges.
+   */
+  private static final String EDGE_FILE = &quot;edges&quot; + CSV_FILE_SUFFIX;
+  /**
+   * CSV file for meta data.
+   */
+  private static final String METADATA_FILE = &quot;metadata&quot; + CSV_FILE_SUFFIX;
+  /**
+   * Root directory containing the CSV and metadata files.
+   */
+  private final String csvRoot;
+  /**
+   * Gradoop Flink configuration
+   */
+  private final GradoopFlinkConfig config;
+
+  /**
+   * Constructor.
+   *
+   * @param csvPath directory to the CSV files
+   * @param config  Gradoop Flink configuration
+   */
+<span class="fc" id="L80">  protected CSVBase(String csvPath, GradoopFlinkConfig config) {</span>
+<span class="fc" id="L81">    Objects.requireNonNull(csvPath);</span>
+<span class="fc" id="L82">    Objects.requireNonNull(config);</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">    this.csvRoot = csvPath.endsWith(File.separator) ? csvPath : csvPath + File.separator;</span>
+<span class="fc" id="L84">    this.config = config;</span>
+<span class="fc" id="L85">  }</span>
+
+  /**
+   * Returns the path to the graph head directory.
+   *
+   * @return graph head path
+   */
+  protected String getGraphHeadPath() {
+<span class="fc" id="L93">    return csvRoot + GRAPH_HEAD_PATH;</span>
+  }
+
+  /**
+   * Returns the path to the vertex directory.
+   *
+   * @return vertex path
+   */
+  protected String getVertexPath() {
+<span class="fc" id="L102">    return csvRoot + VERTEX_PATH;</span>
+  }
+
+  /**
+   * Returns the path to the edge directory.
+   *
+   * @return edge path
+   */
+  protected String getEdgePath() {
+<span class="fc" id="L111">    return csvRoot + EDGE_PATH;</span>
+  }
+
+  /**
+   * Returns the path to the graph head file.
+   *
+   * @return graph head file path
+   */
+  protected String getGraphHeadCSVPath() {
+<span class="fc" id="L120">    return csvRoot + GRAPH_HEAD_FILE;</span>
+  }
+
+  /**
+   * Returns the path to the vertex file.
+   *
+   * @return vertex file path
+   */
+  protected String getVertexCSVPath() {
+<span class="fc" id="L129">    return csvRoot + VERTEX_FILE;</span>
+  }
+
+  /**
+   * Returns the path to the edge file.
+   *
+   * @return edge file path
+   */
+  protected String getEdgeCSVPath() {
+<span class="fc" id="L138">    return csvRoot + EDGE_FILE;</span>
+  }
+
+  /**
+   * Returns the path to the graph head file containing only graph heads with the specified label.
+   *
+   * @param label graph head label
+   * @return path to csv file
+   */
+  protected String getGraphHeadCSVPath(String label) {
+<span class="fc" id="L148">    return getElementCSVPath(label, getGraphHeadPath());</span>
+  }
+
+  /**
+   * Returns the path to the vertex file containing only vertices with the specified label.
+   *
+   * @param label vertex label
+   * @return path to csv file
+   */
+  protected String getVertexCSVPath(String label) {
+<span class="fc" id="L158">    return getElementCSVPath(label, getVertexPath());</span>
+  }
+
+  /**
+   * Returns the path to the edge file containing only edges with the specified label.
+   *
+   * @param label edge label
+   * @return path to csv file
+   */
+  protected String getEdgeCSVPath(String label) {
+<span class="fc" id="L168">    return getElementCSVPath(label, getEdgePath());</span>
+  }
+
+  /**
+   * Returns the path to the element file containing only elements with the specified label.
+   *
+   * @param label       element label
+   * @param elementPath path of the element (e.g. &quot;edge&quot;)
+   * @return path to csv file
+   */
+  private String getElementCSVPath(String label, String elementPath) {
+<span class="fc" id="L179">    Objects.requireNonNull(label);</span>
+<span class="fc bfc" id="L180" title="All 2 branches covered.">    if (label.isEmpty()) {</span>
+<span class="fc" id="L181">      label = CSVConstants.DEFAULT_DIRECTORY;</span>
+    } else {
+<span class="fc" id="L183">      label = MultipleFileOutputFormat</span>
+<span class="fc" id="L184">        .cleanFilename(StringEscaper.escape(label, CSVConstants.ESCAPED_CHARACTERS));</span>
+    }
+<span class="fc" id="L186">    return elementPath +</span>
+      CSVConstants.DIRECTORY_SEPARATOR +
+      label +
+      CSVConstants.DIRECTORY_SEPARATOR +
+      CSVConstants.SIMPLE_FILE;
+  }
+
+  protected String getMetaDataPath() {
+<span class="fc" id="L194">    return csvRoot + METADATA_FILE;</span>
+  }
+
+  protected GradoopFlinkConfig getConfig() {
+<span class="fc" id="L198">    return config;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

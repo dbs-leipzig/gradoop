@@ -1,0 +1,5 @@
+org.gradoop.storage.impl.accumulo
+org.gradoop.storage.impl.accumulo.basic
+org.gradoop.storage.impl.accumulo.io
+org.gradoop.storage.impl.accumulo.io.source
+org.gradoop.storage.impl.accumulo.predicate

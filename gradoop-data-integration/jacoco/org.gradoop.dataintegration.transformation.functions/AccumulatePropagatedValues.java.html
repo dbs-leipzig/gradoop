@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccumulatePropagatedValues.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation.functions</a> &gt; <span class="el_source">AccumulatePropagatedValues.java</span></div><h1>AccumulatePropagatedValues.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation.functions;
+
+import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+/**
+ * This {@link CoGroupFunction} accumulates all properties that might be send to a vertex and
+ * stores them in a {@link PropertyValue} list.
+ *
+ * @param &lt;V&gt; The vertex type.
+ */
+public class AccumulatePropagatedValues&lt;V extends EPGMVertex&gt;
+  implements CoGroupFunction&lt;Tuple2&lt;GradoopId, PropertyValue&gt;, V, V&gt; {
+
+  /**
+   * The property key where the PropertyValue list should be stored at the target vertices.
+   */
+  private final String targetVertexPropertyKey;
+
+  /**
+   * Labels of vertices where the propagated property should be set.
+   */
+  private final Set&lt;String&gt; targetVertexLabels;
+
+  /**
+   * The constructor of the co group function for accumulation of collected property values.
+   *
+   * @param targetVertexPropertyKey The property key where the PropertyValue list should be
+   *                                stored at the target vertices.
+   * @param targetVertexLabels      The set of labels of elements where the property should be
+   *                                set. (Use {@code null} for all vertices.)
+   */
+  public AccumulatePropagatedValues(String targetVertexPropertyKey,
+<span class="fc" id="L59">    Set&lt;String&gt; targetVertexLabels) {</span>
+<span class="fc" id="L60">    this.targetVertexPropertyKey = Objects.requireNonNull(targetVertexPropertyKey);</span>
+<span class="fc" id="L61">    this.targetVertexLabels = targetVertexLabels;</span>
+<span class="fc" id="L62">  }</span>
+
+  @Override
+  public void coGroup(Iterable&lt;Tuple2&lt;GradoopId, PropertyValue&gt;&gt; propertyValues,
+                      Iterable&lt;V&gt; elements, Collector&lt;V&gt; out) {
+    // should only contain one vertex, based on the uniqueness of gradoop ids
+<span class="fc" id="L68">    Iterator&lt;V&gt; iterator = elements.iterator();</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">    if (!iterator.hasNext()) {</span>
+<span class="nc" id="L70">      return;</span>
+    }
+<span class="fc" id="L72">    V targetVertex = iterator.next();</span>
+    // If the vertex is not whitelisted by the targetVertexLabels list,
+    // forward it without modification.
+<span class="fc bfc" id="L75" title="All 4 branches covered.">    if (targetVertexLabels != null &amp;&amp; !targetVertexLabels.contains(targetVertex.getLabel())) {</span>
+<span class="fc" id="L76">      out.collect(targetVertex);</span>
+<span class="fc" id="L77">      return;</span>
+    }
+
+    // collect values of neighbors
+<span class="fc" id="L81">    List&lt;PropertyValue&gt; values = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L82">    propertyValues.forEach(t -&gt; values.add(t.f1));</span>
+
+    // Add to vertex if and only if at least one property was propagated.
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    if (!values.isEmpty()) {</span>
+<span class="fc" id="L86">      targetVertex.setProperty(targetVertexPropertyKey, PropertyValue.create(values));</span>
+    }
+
+<span class="fc" id="L89">    out.collect(targetVertex);</span>
+<span class="fc" id="L90">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

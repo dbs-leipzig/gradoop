@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UniqueIdWithOffset.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.cypher.capf.query.functions</a> &gt; <span class="el_source">UniqueIdWithOffset.java</span></div><h1>UniqueIdWithOffset.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.cypher.capf.query.functions;
+
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.common.functions.RuntimeContext;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.configuration.Configuration;
+
+import java.util.List;
+
+/**
+ * Zip each element in the dataset with a unique Long id. Its possible to set an offset via a
+ * broadcast set.
+ *
+ * @param &lt;E&gt; the type of elements in the dataset
+ */
+
+<span class="fc" id="L32">public class UniqueIdWithOffset&lt;E&gt; extends RichMapFunction&lt;E, Tuple2&lt;Long, E&gt;&gt; {</span>
+
+  /**
+   * The parallelism this MapFunction is run at.
+   */
+  private Long parallelism;
+
+  /**
+   * A counter to make sure each id is only given once.
+   */
+  private Long idCounter;
+
+  /**
+   * Reduce object instantiations
+   */
+<span class="fc" id="L47">  private Tuple2&lt;Long, E&gt; returnTuple = new Tuple2&lt;&gt;();</span>
+
+  @Override
+  public void open(Configuration parameters) {
+
+<span class="fc" id="L52">    idCounter = 0L;</span>
+
+<span class="fc" id="L54">    RuntimeContext ctx = getRuntimeContext();</span>
+    // if an offset has been set, add it to the idCounter
+<span class="fc bfc" id="L56" title="All 2 branches covered.">    if (ctx.hasBroadcastVariable(&quot;offset&quot;)) {</span>
+<span class="fc" id="L57">      List&lt;Long&gt; offset = ctx.getBroadcastVariable(&quot;offset&quot;);</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">      if (offset.size() &gt; 0) {</span>
+<span class="fc" id="L59">        idCounter += offset.get(0);</span>
+      }
+    }
+<span class="fc" id="L62">    parallelism = (long) ctx.getNumberOfParallelSubtasks();</span>
+<span class="fc" id="L63">    idCounter += (long) ctx.getIndexOfThisSubtask();</span>
+<span class="fc" id="L64">  }</span>
+
+  @Override
+  public Tuple2&lt;Long, E&gt; map(E e) throws Exception {
+<span class="fc" id="L68">    returnTuple.f0 = idCounter;</span>
+<span class="fc" id="L69">    returnTuple.f1 = e;</span>
+<span class="fc" id="L70">    idCounter += parallelism;</span>
+<span class="fc" id="L71">    return returnTuple;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

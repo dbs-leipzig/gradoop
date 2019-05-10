@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BuildVertexGroupItem.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.grouping.functions</a> &gt; <span class="el_source">BuildVertexGroupItem.java</span></div><h1>BuildVertexGroupItem.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.grouping.functions;
+
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
+
+import java.util.List;
+
+/**
+ * Creates a minimal representation of vertex data to be used for label specific grouping.
+ *
+ * The output of that mapper is {@link VertexGroupItem} that contains the vertex id,
+ * vertex label, vertex group properties and vertex aggregate properties.
+ */
+@FunctionAnnotation.ForwardedFields(&quot;id-&gt;f0&quot;)
+@FunctionAnnotation.ReadFields(&quot;label;properties&quot;)
+public class BuildVertexGroupItem
+  extends BuildGroupItemBase
+  implements FlatMapFunction&lt;Vertex, VertexGroupItem&gt; {
+
+  /**
+   * Reduce object instantiations.
+   */
+  private final VertexGroupItem reuseVertexGroupItem;
+
+  /**
+   * Creates map function
+   *
+   * @param useLabel true, if label shall be considered
+   * @param vertexLabelGroups stores grouping properties for vertex labels
+   */
+  public BuildVertexGroupItem(boolean useLabel, List&lt;LabelGroup&gt; vertexLabelGroups) {
+<span class="fc" id="L52">    super(useLabel, vertexLabelGroups);</span>
+
+<span class="fc" id="L54">    this.reuseVertexGroupItem = new VertexGroupItem();</span>
+<span class="fc" id="L55">    this.reuseVertexGroupItem.setSuperVertexId(GradoopId.NULL_VALUE);</span>
+<span class="fc" id="L56">    this.reuseVertexGroupItem.setSuperVertex(false);</span>
+<span class="fc" id="L57">  }</span>
+
+  @Override
+  public void flatMap(Vertex vertex, Collector&lt;VertexGroupItem&gt; collector) throws Exception {
+<span class="fc" id="L61">    boolean usedVertexLabelGroup = false;</span>
+
+<span class="fc" id="L63">    reuseVertexGroupItem.setVertexId(vertex.getId());</span>
+
+    // check if vertex shall be grouped by a special set of keys
+<span class="fc bfc" id="L66" title="All 2 branches covered.">    for (LabelGroup vertexLabelGroup : getLabelGroups()) {</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">      if (vertexLabelGroup.getGroupingLabel().equals(vertex.getLabel())) {</span>
+<span class="fc" id="L68">        usedVertexLabelGroup = true;</span>
+<span class="fc" id="L69">        setGroupItem(reuseVertexGroupItem, vertex, vertexLabelGroup);</span>
+<span class="fc" id="L70">        collector.collect(reuseVertexGroupItem);</span>
+      }
+<span class="fc" id="L72">    }</span>
+    // standard grouping case
+<span class="fc bfc" id="L74" title="All 2 branches covered.">    if (!usedVertexLabelGroup) {</span>
+<span class="fc" id="L75">      setGroupItem(reuseVertexGroupItem, vertex, getDefaultLabelGroup());</span>
+<span class="fc" id="L76">      collector.collect(reuseVertexGroupItem);</span>
+    }
+<span class="fc" id="L78">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

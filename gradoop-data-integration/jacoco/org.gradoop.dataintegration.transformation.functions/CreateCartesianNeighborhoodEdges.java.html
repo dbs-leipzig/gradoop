@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreateCartesianNeighborhoodEdges.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation.functions</a> &gt; <span class="el_source">CreateCartesianNeighborhoodEdges.java</span></div><h1>CreateCartesianNeighborhoodEdges.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation.functions;
+
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
+
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * This {@link FlatMapFunction} creates all edges between neighbor vertices.
+ *
+ * @param &lt;V&gt; The vertex type.
+ * @param &lt;E&gt; The edge type.
+ * @see org.gradoop.dataintegration.transformation.ConnectNeighbors
+ */
+@FunctionAnnotation.ReadFields({&quot;f1&quot;})
+public class CreateCartesianNeighborhoodEdges&lt;V extends EPGMVertex, E extends EPGMEdge&gt;
+  implements FlatMapFunction&lt;Tuple2&lt;V, List&lt;NeighborhoodVertex&gt;&gt;, E&gt;, ResultTypeQueryable&lt;E&gt; {
+
+  /**
+   * The type of the edges created by the factory.
+   */
+  private final Class&lt;E&gt; edgeType;
+
+  /**
+   * Reduce object instantiations.
+   */
+  private E reuseEdge;
+
+  /**
+   * The constructor to calculate the edges in the neighborhood.
+   *
+   * @param factory      The factory the edges are created with.
+   * @param newEdgeLabel The label of the created edge between the neighbors.
+   */
+<span class="fc" id="L60">  public CreateCartesianNeighborhoodEdges(EPGMEdgeFactory&lt;E&gt; factory, String newEdgeLabel) {</span>
+<span class="fc" id="L61">    this.edgeType = Objects.requireNonNull(factory).getType();</span>
+<span class="fc" id="L62">    this.reuseEdge = factory.createEdge(Objects.requireNonNull(newEdgeLabel),</span>
+      GradoopId.NULL_VALUE, GradoopId.NULL_VALUE);
+<span class="fc" id="L64">  }</span>
+
+  @Override
+  public void flatMap(Tuple2&lt;V, List&lt;NeighborhoodVertex&gt;&gt; value, Collector&lt;E&gt; out) {
+<span class="fc" id="L68">    final List&lt;NeighborhoodVertex&gt; neighbors = value.f1;</span>
+
+    // To &quot;simulate&quot; bidirectional edges we have to create an edge for each direction.
+<span class="fc bfc" id="L71" title="All 2 branches covered.">    for (NeighborhoodVertex source : neighbors) {</span>
+      // The source id is the same for the inner loop, we can keep it.
+<span class="fc" id="L73">      reuseEdge.setSourceId(source.getNeighborId());</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">      for (NeighborhoodVertex target : neighbors) {</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if (source == target) {</span>
+<span class="fc" id="L76">          continue;</span>
+        }
+<span class="fc" id="L78">        reuseEdge.setId(GradoopId.get());</span>
+<span class="fc" id="L79">        reuseEdge.setTargetId(target.getNeighborId());</span>
+<span class="fc" id="L80">        out.collect(reuseEdge);</span>
+<span class="fc" id="L81">      }</span>
+<span class="fc" id="L82">    }</span>
+<span class="fc" id="L83">  }</span>
+
+  @Override
+  public TypeInformation&lt;E&gt; getProducedType() {
+<span class="fc" id="L87">    return TypeInformation.of(edgeType);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

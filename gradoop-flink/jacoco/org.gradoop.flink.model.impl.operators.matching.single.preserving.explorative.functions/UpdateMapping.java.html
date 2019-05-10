@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UpdateMapping.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions</a> &gt; <span class="el_source">UpdateMapping.java</span></div><h1>UpdateMapping.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions;
+
+import org.apache.flink.api.common.functions.AbstractRichFunction;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
+import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.Embedding;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Base class for updating vertex and edge mappings in an {@link Embedding}.
+ *
+ * @param &lt;K&gt; key type
+ */
+abstract class UpdateMapping&lt;K&gt; extends AbstractRichFunction {
+  /**
+   * Traversal code representing the graph query
+   */
+  private final TraversalCode traversalCode;
+  /**
+   * Match strategy for morphism checks
+   */
+  private final MatchStrategy matchStrategy;
+  /**
+   * Total number of steps in the traversal
+   */
+  private final int stepCount;
+  /**
+   * Id of the current step
+   */
+  private int currentStepId;
+  /**
+   * Flag to signal if there is a preceding step in the traversal
+   */
+  private boolean hasMoreSteps;
+  /**
+   * Represents a list of all edge candidates visited in previous traversal steps
+   */
+  private int[] previousEdgeCandidates;
+  /**
+   * Represents a set of all vertex candidates visited in previous traversal steps
+   */
+  private int[] previousVertexCandidates;
+
+  /**
+   * Constructor
+   *
+   * @param traversalCode traversal code representing the graph query
+   * @param matchStrategy morphism strategy
+   */
+<span class="fc" id="L68">  UpdateMapping(TraversalCode traversalCode, MatchStrategy matchStrategy) {</span>
+<span class="fc" id="L69">    this.traversalCode = traversalCode;</span>
+<span class="fc" id="L70">    this.matchStrategy = matchStrategy;</span>
+<span class="fc" id="L71">    this.stepCount = traversalCode.getSteps().size();</span>
+<span class="fc" id="L72">  }</span>
+
+  /**
+   * Check if the given id has been visited before.
+   *
+   * @param mapping current mapping
+   * @param id      id to check
+   * @param fields  fields to check
+   * @return true, if id was visited before
+   */
+  private boolean seenBefore(K[] mapping, K id, int[] fields) {
+<span class="fc" id="L83">    boolean result = false;</span>
+
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    for (int field : fields) {</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">      if (mapping[field].equals(id)) {</span>
+<span class="fc" id="L87">        result = true;</span>
+<span class="fc" id="L88">        break;</span>
+      }
+    }
+<span class="fc" id="L91">    return result;</span>
+  }
+
+  /**
+   * If the given {@link MatchStrategy} requires it, this method initializes the collections
+   * of previously visited edges and vertices according to the traversal code.
+   */
+  void initializeVisited() {
+<span class="fc bfc" id="L99" title="All 2 branches covered.">    if (getMatchStrategy() == MatchStrategy.ISOMORPHISM) {</span>
+      // get previous edge candidates
+<span class="fc" id="L101">      previousEdgeCandidates = new int[currentStepId];</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">      for (int i = 0; i &lt; currentStepId; i++) {</span>
+<span class="fc" id="L103">        previousEdgeCandidates[i] = (int) getTraversalCode().getStep(i).getVia();</span>
+      }
+
+      // get previous vertex candidates (limited by two times the number steps (edges))
+<span class="fc" id="L107">      Set&lt;Integer&gt; visitedVertices = new HashSet&lt;&gt;(stepCount * 2);</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">      for (int i = 0; i &lt; currentStepId; i++) {</span>
+<span class="fc" id="L109">        Step s = getTraversalCode().getStep(i);</span>
+<span class="fc" id="L110">        visitedVertices.add((int) s.getFrom());</span>
+<span class="fc" id="L111">        visitedVertices.add((int) s.getTo());</span>
+      }
+      // add from field of current step
+<span class="fc" id="L114">      visitedVertices.add((int) getCurrentStep().getFrom());</span>
+      // initialize array from unique vertex ids
+<span class="fc" id="L116">      previousVertexCandidates = new int[visitedVertices.size()];</span>
+<span class="fc" id="L117">      int i = 0;</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">      for (Integer visitedVertex : visitedVertices) {</span>
+<span class="fc" id="L119">        previousVertexCandidates[i++] = visitedVertex;</span>
+<span class="fc" id="L120">      }</span>
+    }
+<span class="fc" id="L122">  }</span>
+
+  TraversalCode getTraversalCode() {
+<span class="fc" id="L125">    return traversalCode;</span>
+  }
+
+  MatchStrategy getMatchStrategy() {
+<span class="fc" id="L129">    return matchStrategy;</span>
+  }
+
+  /**
+   * Sets the current step to the specified value. The current step needs to be provided
+   * by the inheriting classes.
+   *
+   * @param currentStepId current step
+   */
+  void setCurrentStepId(int currentStepId) {
+<span class="fc" id="L139">    this.currentStepId = currentStepId;</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">    this.hasMoreSteps = currentStepId &lt; stepCount - 1;</span>
+<span class="fc" id="L141">  }</span>
+
+  Step getCurrentStep() {
+<span class="fc" id="L144">    return this.traversalCode.getStep(currentStepId);</span>
+  }
+
+  /**
+   * Check if there are more traversal steps left.
+   *
+   * @return true, if there are more steps
+   */
+  boolean hasMoreSteps() {
+<span class="fc" id="L153">    return hasMoreSteps;</span>
+  }
+
+  /**
+   * Returns the from-candidate of the next traversal step or {@code -1} if it is the last
+   * step.
+   *
+   * @return from candidate of next step or -1 if there is none
+   */
+  int getNextFrom() {
+<span class="fc bfc" id="L163" title="All 2 branches covered.">    return hasMoreSteps() ? (int) getTraversalCode()</span>
+<span class="fc" id="L164">      .getStep(currentStepId + 1)</span>
+<span class="fc" id="L165">      .getFrom() : -1;</span>
+  }
+
+  /**
+   * Checks if the given vertex is a valid candidate for the specified mapping index.
+   *
+   * @param vertexId vertex id to check for validity
+   * @param vertexMapping current vertex mapping
+   * @param candidateIndex position in the mapping to check validity for
+   * @return true, iff the specified vertex is a valid candidate for the specified candidateIndex
+   */
+  boolean isValidVertex(K vertexId, K[] vertexMapping, int candidateIndex) {
+<span class="fc bfc" id="L177" title="All 2 branches covered.">    boolean isMapped = vertexMapping[candidateIndex] != null;</span>
+<span class="fc bfc" id="L178" title="All 2 branches covered.">    boolean seen = matchStrategy == MatchStrategy.ISOMORPHISM &amp;&amp;</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">      seenBefore(vertexMapping, vertexId, previousVertexCandidates);</span>
+<span class="fc bfc" id="L180" title="All 8 branches covered.">    return (!isMapped &amp;&amp; !seen) || (isMapped &amp;&amp; vertexMapping[candidateIndex].equals(vertexId));</span>
+  }
+
+  /**
+   * Checks of the given edge is a valid candidate for the specified mapping index.
+   *
+   * @param edgeId edge id to check for validity
+   * @param edgeMapping current edge mapping
+   * @param candidateIndex position in the mapping to check validity for
+   * @return true, iff the specified edge is a valid candidate for the specified candidateIndex
+   */
+  boolean isValidEdge(K edgeId, K[] edgeMapping, int candidateIndex) {
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">    boolean isMapped = edgeMapping[candidateIndex] != null;</span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">    boolean seen = getMatchStrategy() == MatchStrategy.ISOMORPHISM &amp;&amp;</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">      seenBefore(edgeMapping, edgeId, previousEdgeCandidates);</span>
+<span class="pc bpc" id="L195" title="1 of 4 branches missed.">    return !isMapped &amp;&amp; !seen;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

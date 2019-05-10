@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GSpanLogicBase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.dimspan.gspan</a> &gt; <span class="el_source">GSpanLogicBase.java</span></div><h1>GSpanLogicBase.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.dimspan.gspan;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.gradoop.flink.algorithms.fsm.dimspan.comparison.DFSCodeComparator;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.DFSCodeUtils;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.SearchGraphUtils;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.SortedSearchGraphUtils;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.UnsortedSearchGraphUtils;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.PatternEmbeddingsMap;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Superclass of gSpan pattern growth and verification functionality.
+ */
+public abstract class GSpanLogicBase implements GSpanLogic, Serializable {
+
+  /**
+   * Comparator used to verify minimum DFS codes.
+   */
+<span class="fc" id="L39">  private final DFSCodeComparator comparator = new DFSCodeComparator();</span>
+
+  /**
+   * graph utils (provides methods to interpret int-array encoded graphs)
+   */
+  private final SearchGraphUtils graphUtils;
+
+  /**
+   * flag to enable branch constraint in pattern-growth (true=enabled)
+   */
+  private final boolean branchConstraintEnabled;
+
+  /**
+   * util methods to interpret and manipulate int-array encoded DFS codes
+   */
+<span class="fc" id="L54">  private final DFSCodeUtils dfsCodeUtils = new DFSCodeUtils();</span>
+
+  /**
+   * Constructor
+   * @param fsmConfig FSM configuration
+   */
+<span class="fc" id="L60">  protected GSpanLogicBase(DIMSpanConfig fsmConfig) {</span>
+    // set graph utils depending on the branch constraint configuration
+<span class="fc" id="L62">    branchConstraintEnabled = fsmConfig.isBranchConstraintEnabled();</span>
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">    graphUtils = branchConstraintEnabled ?</span>
+      new SortedSearchGraphUtils(fsmConfig) :
+      new UnsortedSearchGraphUtils();
+<span class="fc" id="L66">  }</span>
+
+  // SINGLE EDGE PATTERNS
+
+  @Override
+  public PatternEmbeddingsMap getSingleEdgePatternEmbeddings(int[] graph) {
+<span class="fc" id="L72">    PatternEmbeddingsMap patternEmbeddings = PatternEmbeddingsMap.getEmptyOne();</span>
+
+    // create a 1-edge DFS code for every edge as well as all embeddings
+<span class="fc bfc" id="L75" title="All 2 branches covered.">    for (int edgeId = 0; edgeId &lt; graphUtils.getEdgeCount(graph); edgeId++) {</span>
+
+<span class="fc" id="L77">      int fromId = graphUtils.getFromId(graph, edgeId);</span>
+<span class="fc" id="L78">      int fromLabel = graphUtils.getFromLabel(graph, edgeId);</span>
+<span class="fc" id="L79">      int toId = graphUtils.getToId(graph, edgeId);</span>
+<span class="fc" id="L80">      int toLabel = graphUtils.getToLabel(graph, edgeId);</span>
+
+<span class="fc bfc" id="L82" title="All 2 branches covered.">      boolean loop = fromId == toId;</span>
+
+<span class="fc bfc" id="L84" title="All 2 branches covered.">      int[] vertexIds = loop ? new int[] {fromId} : new int[] {fromId, toId};</span>
+<span class="fc" id="L85">      int[] edgeIds = new int[] {edgeId};</span>
+<span class="fc" id="L86">      int edgeLabel = graphUtils.getEdgeLabel(graph, edgeId);</span>
+<span class="fc" id="L87">      int fromTime = 0;</span>
+<span class="fc bfc" id="L88" title="All 2 branches covered.">      int toTime = loop ? 0 : 1;</span>
+<span class="fc" id="L89">      boolean outgoing = getSingleEdgePatternIsOutgoing(graph, edgeId, loop);</span>
+
+<span class="fc" id="L91">      int[] pattern = graphUtils</span>
+<span class="fc" id="L92">        .multiplex(fromTime, fromLabel, outgoing, edgeLabel, toTime, toLabel);</span>
+
+<span class="fc" id="L94">      storeSingleEdgePatternEmbeddings(</span>
+        patternEmbeddings, pattern, vertexIds, edgeIds, fromLabel, toLabel, loop);
+    }
+
+<span class="fc" id="L98">    return patternEmbeddings;</span>
+  }
+
+  /**
+   * Add a pattern and create an embedding. Add both to the pattern-embedding map.
+   *
+   * @param patternEmbeddings pattern-embedding map
+   * @param pattern current pattern
+   * @param vertexIds embedding vertex ids
+   * @param edgeIds embedding edge id
+   * @param fromLabel minimal vertex label
+   * @param toLabel maximal vertex label
+   * @param loop true, if sourceId = targetId
+   */
+  protected abstract void storeSingleEdgePatternEmbeddings(PatternEmbeddingsMap patternEmbeddings,
+    int[] pattern, int[] vertexIds, int[] edgeIds, int fromLabel, int toLabel, boolean loop);
+
+  /**
+   * Check if an edge is outgoing.
+   *
+   * @param graph graph
+   * @param edgeId edge id
+   * @param loop true, if sourceId = targetId
+   *
+   * @return true, if directed
+   */
+  protected abstract boolean getSingleEdgePatternIsOutgoing(int[] graph, int edgeId, boolean loop);
+
+  // PATTERN GROWTH
+
+  @Override
+  public int[] getRightmostPathTimes(int[] pattern) {
+
+    int[] rightmostPathTimes;
+
+    // 1-edge pattern
+<span class="fc bfc" id="L134" title="All 2 branches covered.">    if (graphUtils.getEdgeCount(pattern) == 1) {</span>
+      // loop
+<span class="fc bfc" id="L136" title="All 2 branches covered.">      if (graphUtils.getFromId(pattern, 0) == graphUtils.getToId(pattern, 0)) {</span>
+<span class="fc" id="L137">        rightmostPathTimes = new int[] {0};</span>
+      } else {
+<span class="fc" id="L139">        rightmostPathTimes = new int[] {1, 0};</span>
+      }
+    } else {
+<span class="fc" id="L142">      rightmostPathTimes = new int[0];</span>
+
+<span class="fc bfc" id="L144" title="All 2 branches covered.">      for (int edgeTime = graphUtils.getEdgeCount(pattern) - 1; edgeTime &gt;= 0; edgeTime--) {</span>
+<span class="fc" id="L145">        int fromTime = graphUtils.getFromId(pattern, edgeTime);</span>
+<span class="fc" id="L146">        int toTime = graphUtils.getToId(pattern, edgeTime);</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">        boolean firstStep = rightmostPathTimes.length == 0;</span>
+
+        // forwards
+<span class="fc bfc" id="L150" title="All 2 branches covered.">        if (toTime &gt; fromTime) {</span>
+
+          // first step, add both times
+<span class="fc bfc" id="L153" title="All 2 branches covered.">          if (firstStep) {</span>
+<span class="fc" id="L154">            rightmostPathTimes = ArrayUtils.add(rightmostPathTimes, toTime);</span>
+<span class="fc" id="L155">            rightmostPathTimes = ArrayUtils.add(rightmostPathTimes, fromTime);</span>
+
+            // add from time
+<span class="fc bfc" id="L158" title="All 2 branches covered.">          } else if (ArrayUtils.indexOf(rightmostPathTimes, toTime) &gt;= 0) {</span>
+<span class="fc" id="L159">            rightmostPathTimes = ArrayUtils.add(rightmostPathTimes, fromTime);</span>
+          }
+
+          // first step and loop
+<span class="pc bpc" id="L163" title="1 of 4 branches missed.">        } else if (firstStep &amp;&amp; fromTime == toTime) {</span>
+<span class="nc" id="L164">          rightmostPathTimes = ArrayUtils.add(rightmostPathTimes, 0);</span>
+        }
+      }
+    }
+
+<span class="fc" id="L169">    return rightmostPathTimes;</span>
+  }
+
+  @Override
+  public PatternEmbeddingsMap growPatterns(int[] graph, PatternEmbeddingsMap parentMap,
+    List&lt;int[]&gt; frequentPatterns, List&lt;int[]&gt; rightmostPaths, boolean uncompressEmbeddings,
+    List&lt;int[]&gt; compressedPatterns) {
+
+<span class="fc" id="L177">    PatternEmbeddingsMap childMap = PatternEmbeddingsMap.getEmptyOne();</span>
+
+<span class="fc" id="L179">    int minEdgeId = 0;</span>
+<span class="fc" id="L180">    int[] minExtension = new int[] {0, 0, 0, 0, 0, 0};</span>
+
+<span class="fc bfc" id="L182" title="All 2 branches covered.">    for (int frequentPatternIndex = 0; frequentPatternIndex &lt; frequentPatterns.size();</span>
+<span class="fc" id="L183">         frequentPatternIndex++) {</span>
+
+<span class="fc" id="L185">      int[] compressedPattern = compressedPatterns.get(frequentPatternIndex);</span>
+<span class="fc" id="L186">      int parentPatternIndex = parentMap.getIndex(compressedPattern);</span>
+
+      // if frequent pattern is supported
+<span class="fc bfc" id="L189" title="All 2 branches covered.">      if (parentPatternIndex &gt;= 0) {</span>
+<span class="fc" id="L190">        int[] parentPattern = frequentPatterns.get(frequentPatternIndex);</span>
+
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">        if (branchConstraintEnabled) {</span>
+<span class="fc" id="L193">          int[] firstExtension = dfsCodeUtils.getBranch(parentPattern);</span>
+
+<span class="fc bfc" id="L195" title="All 2 branches covered.">          if (!Objects.deepEquals(minExtension, firstExtension)) {</span>
+<span class="fc" id="L196">            minEdgeId = graphUtils</span>
+<span class="fc" id="L197">              .getFirstGeqEdgeId(graph, firstExtension, minEdgeId);</span>
+
+<span class="pc bpc" id="L199" title="1 of 2 branches missed.">            if (minEdgeId &lt; 0) {</span>
+<span class="nc" id="L200">              break;</span>
+            }
+
+<span class="fc" id="L203">            minExtension = firstExtension;</span>
+          }
+        }
+
+<span class="fc" id="L207">        int[] rightmostPath = rightmostPaths.get(frequentPatternIndex);</span>
+
+        // for each embedding
+<span class="fc" id="L210">        int[][] parentEmbeddings =</span>
+<span class="fc" id="L211">          parentMap.getEmbeddings(parentPatternIndex, uncompressEmbeddings);</span>
+
+<span class="fc" id="L213">        PatternEmbeddingsMap currentParentMap =</span>
+<span class="fc" id="L214">          growPattern(graph, minEdgeId, parentPattern, parentEmbeddings, rightmostPath);</span>
+
+        // add partial result to output
+<span class="fc" id="L217">        childMap.append(currentParentMap);</span>
+      }
+    }
+
+<span class="fc" id="L221">    return childMap;</span>
+  }
+
+  /**
+   * Grows children of a single supported frequent patterns in a graph (checks time constraint).
+   *
+   * @param graph graph
+   * @param minEdgeId minimal edge id satisfying the branch constraint
+   * @param parentPattern pattern to grow
+   * @param parentEmbeddings all embeddings of the parent pattern
+   * @param rightmostPath rightmost path of the parent pattern
+   *
+   * @return map of child patterns and embeddings
+   */
+  private PatternEmbeddingsMap growPattern(int[] graph,
+    int minEdgeId, int[] parentPattern, int[][] parentEmbeddings, int[] rightmostPath) {
+
+    // init partial map for current parent for fast insertion
+<span class="fc" id="L239">    PatternEmbeddingsMap currentChildMap = PatternEmbeddingsMap.getEmptyOne();</span>
+
+<span class="fc bfc" id="L241" title="All 2 branches covered.">    for (int m = 0; m &lt; parentEmbeddings.length / 2; m++) {</span>
+
+<span class="fc" id="L243">      int[] parentVertexIds = parentEmbeddings[2 * m];</span>
+<span class="fc" id="L244">      int[] parentEdgeIds = parentEmbeddings[2 * m + 1];</span>
+
+<span class="fc" id="L246">      int forwardsTime = graphUtils.getVertexCount(parentPattern);</span>
+<span class="fc" id="L247">      int rightmostTime = rightmostPath[0];</span>
+
+      // FOR EACH EDGE
+<span class="fc bfc" id="L250" title="All 2 branches covered.">      for (int edgeId = minEdgeId; edgeId &lt; graphUtils.getEdgeCount(graph); edgeId++) {</span>
+
+        // if not contained in parent embedding
+<span class="fc bfc" id="L253" title="All 2 branches covered.">        if (!ArrayUtils.contains(parentEdgeIds, edgeId)) {</span>
+
+          // determine times of incident vertices in parent embedding
+<span class="fc" id="L256">          int edgeFromId = graphUtils.getFromId(graph, edgeId);</span>
+<span class="fc" id="L257">          int fromTime = ArrayUtils.indexOf(parentVertexIds, edgeFromId);</span>
+
+<span class="fc" id="L259">          int edgeToId = graphUtils.getToId(graph, edgeId);</span>
+<span class="fc" id="L260">          int toTime = ArrayUtils.indexOf(parentVertexIds, edgeToId);</span>
+
+          // CHECK FOR BACKWARDS GROWTH OPTIONS
+
+          // grow backwards from from
+<span class="fc bfc" id="L265" title="All 4 branches covered.">          if (fromTime == rightmostTime &amp;&amp; toTime &gt;= 0) {</span>
+
+<span class="fc" id="L267">            int[] childPattern = dfsCodeUtils.addExtension(parentPattern,</span>
+              fromTime,
+<span class="fc" id="L269">              graphUtils.getFromLabel(graph, edgeId),</span>
+<span class="fc" id="L270">              getExtensionIsOutgoing(graph, edgeId, true),</span>
+<span class="fc" id="L271">              graphUtils.getEdgeLabel(graph, edgeId),</span>
+              toTime,
+<span class="fc" id="L273">              graphUtils.getToLabel(graph, edgeId)</span>
+            );
+
+<span class="fc" id="L276">            int[] childVertexIds = parentVertexIds.clone();</span>
+<span class="fc" id="L277">            int[] childEdgeIds = ArrayUtils.add(parentEdgeIds, edgeId);</span>
+<span class="fc" id="L278">            currentChildMap.put(childPattern, childVertexIds, childEdgeIds);</span>
+
+            // grow backwards from to
+<span class="fc bfc" id="L281" title="All 4 branches covered.">          } else if (toTime == rightmostTime &amp;&amp; fromTime &gt;= 0) {</span>
+
+<span class="fc" id="L283">            int[] childPattern = dfsCodeUtils.addExtension(parentPattern,</span>
+              toTime,
+<span class="fc" id="L285">              graphUtils.getToLabel(graph, edgeId),</span>
+<span class="fc" id="L286">              getExtensionIsOutgoing(graph, edgeId, false),</span>
+<span class="fc" id="L287">              graphUtils.getEdgeLabel(graph, edgeId),</span>
+              fromTime,
+<span class="fc" id="L289">              graphUtils.getFromLabel(graph, edgeId)</span>
+            );
+
+<span class="fc" id="L292">            int[] childVertexIds = parentVertexIds.clone();</span>
+<span class="fc" id="L293">            int[] childEdgeIds = ArrayUtils.add(parentEdgeIds, edgeId);</span>
+<span class="fc" id="L294">            currentChildMap.put(childPattern, childVertexIds, childEdgeIds);</span>
+
+            // CHECK FOR FORWARDS GROWTH OPTIONS
+<span class="fc" id="L297">          } else {</span>
+
+            // for each time on rightmost path (starting from rightmost vertex time)
+<span class="fc bfc" id="L300" title="All 2 branches covered.">            for (int rightmostPathTime : rightmostPath) {</span>
+
+              // grow forwards from from
+<span class="fc bfc" id="L303" title="All 4 branches covered.">              if (fromTime == rightmostPathTime &amp;&amp; toTime &lt; 0) {</span>
+
+<span class="fc" id="L305">                int[] childPattern = dfsCodeUtils.addExtension(parentPattern,</span>
+                  fromTime,
+<span class="fc" id="L307">                  graphUtils.getFromLabel(graph, edgeId),</span>
+<span class="fc" id="L308">                  getExtensionIsOutgoing(graph, edgeId, true),</span>
+<span class="fc" id="L309">                  graphUtils.getEdgeLabel(graph, edgeId),</span>
+                  forwardsTime,
+<span class="fc" id="L311">                  graphUtils.getToLabel(graph, edgeId)</span>
+                );
+
+<span class="fc" id="L314">                int[] childVertexIds = ArrayUtils.add(parentVertexIds, edgeToId);</span>
+<span class="fc" id="L315">                int[] childEdgeIds = ArrayUtils.add(parentEdgeIds, edgeId);</span>
+<span class="fc" id="L316">                currentChildMap.put(childPattern, childVertexIds, childEdgeIds);</span>
+<span class="fc" id="L317">                break;</span>
+
+                // forwards from to
+<span class="fc bfc" id="L320" title="All 4 branches covered.">              } else if (toTime == rightmostPathTime &amp;&amp; fromTime &lt; 0) {</span>
+
+<span class="fc" id="L322">                int[] childPattern = dfsCodeUtils.addExtension(parentPattern,</span>
+                  toTime,
+<span class="fc" id="L324">                  graphUtils.getToLabel(graph, edgeId),</span>
+<span class="fc" id="L325">                  getExtensionIsOutgoing(graph, edgeId, false),</span>
+<span class="fc" id="L326">                  graphUtils.getEdgeLabel(graph, edgeId),</span>
+                  forwardsTime,
+<span class="fc" id="L328">                  graphUtils.getFromLabel(graph, edgeId)</span>
+                );
+
+<span class="fc" id="L331">                int[] childVertexIds = ArrayUtils.add(parentVertexIds, edgeFromId);</span>
+<span class="fc" id="L332">                int[] childEdgeIds = ArrayUtils.add(parentEdgeIds, edgeId);</span>
+<span class="fc" id="L333">                currentChildMap.put(childPattern, childVertexIds, childEdgeIds);</span>
+<span class="fc" id="L334">                break;</span>
+
+              }
+            }
+          }
+        }
+      }
+    }
+<span class="fc" id="L342">    return currentChildMap;</span>
+  }
+
+  /**
+   * Check, if an extension is in in or against direction.
+   *
+   * @param graph graph
+   * @param edgeId extension's edge id
+   * @param fromFrom true, if extension is made from the edge's from id.
+   *                 (edges are already 1-edge DFS codes and thus have a FROM instead of SOURCE id)
+   *
+   * @return true, if extension is in the edge's direction
+   */
+  protected abstract boolean getExtensionIsOutgoing(int[] graph, int edgeId, boolean fromFrom);
+
+  // VERIFICATION
+
+  @Override
+  public boolean isMinimal(int[] pattern) {
+
+<span class="fc" id="L362">    boolean minimal = true;</span>
+
+    // turn pattern into graph
+<span class="fc" id="L365">    int[] graph = getGraph(pattern);</span>
+
+    // init map of 1-edge DFS codes and embeddings
+<span class="fc" id="L368">    PatternEmbeddingsMap subEmbeddingsMap = getSingleEdgePatternEmbeddings(graph);</span>
+
+    // extend the ONE current k-edge minimal DFS code unit k=|E|
+<span class="fc bfc" id="L371" title="All 2 branches covered.">    for (int k = 0; k &lt; graphUtils.getEdgeCount(graph); k++) {</span>
+<span class="fc" id="L372">      int minPatternIndex = 0;</span>
+<span class="fc" id="L373">      int[] minPattern = subEmbeddingsMap.getPattern(minPatternIndex);</span>
+
+      // find minimum among all k-edge DFS codes
+<span class="fc bfc" id="L376" title="All 2 branches covered.">      for (int patIndex = 1; patIndex &lt; subEmbeddingsMap.getPatternCount(); patIndex++) {</span>
+<span class="fc" id="L377">        int[] subPattern = subEmbeddingsMap.getPattern(patIndex);</span>
+
+<span class="fc bfc" id="L379" title="All 2 branches covered.">        if (comparator.compare(subPattern, minPattern) &lt; 0) {</span>
+<span class="fc" id="L380">          minPattern = subPattern;</span>
+<span class="fc" id="L381">          minPatternIndex = patIndex;</span>
+        }
+      }
+
+      // check if input pattern is still child of current minimum
+<span class="fc" id="L386">      minimal = dfsCodeUtils.isChildOf(minPattern, pattern);</span>
+
+      // brake  as soon as not minimal
+<span class="fc bfc" id="L389" title="All 2 branches covered.">      if (!minimal) {</span>
+<span class="fc" id="L390">        break;</span>
+
+        // or grow the chosen minimum otherwise
+      } else {
+<span class="fc" id="L394">        subEmbeddingsMap = growPattern(</span>
+          graph,
+          0,
+          minPattern,
+<span class="fc" id="L398">          subEmbeddingsMap.getEmbeddings(minPatternIndex, false),</span>
+<span class="fc" id="L399">          getRightmostPathTimes(minPattern)</span>
+        );
+      }
+    }
+
+<span class="fc" id="L404">    return minimal;</span>
+  }
+
+  /**
+   * Turns a pattern into a graph transaction in adjacency list model.
+   *
+   * @param pattern pattern
+   *
+   * @return adjacency list
+   */
+  @Override
+  public int[] getGraph(int[] pattern) {
+
+<span class="fc" id="L417">    int[] graph = new int[0];</span>
+
+<span class="fc bfc" id="L419" title="All 2 branches covered.">    for (int edgeTime = 0; edgeTime &lt; graphUtils.getEdgeCount(pattern); edgeTime++) {</span>
+
+      int sourceId;
+      int sourceLabel;
+<span class="fc" id="L423">      int edgeLabel = graphUtils.getEdgeLabel(pattern, edgeTime);</span>
+      int targetId;
+      int targetLabel;
+
+<span class="fc bfc" id="L427" title="All 2 branches covered.">      if (graphUtils.isOutgoing(pattern, edgeTime)) {</span>
+<span class="fc" id="L428">        sourceId = graphUtils.getFromId(pattern, edgeTime);</span>
+<span class="fc" id="L429">        sourceLabel = graphUtils.getFromLabel(pattern, edgeTime);</span>
+<span class="fc" id="L430">        targetId = graphUtils.getToId(pattern, edgeTime);</span>
+<span class="fc" id="L431">        targetLabel = graphUtils.getToLabel(pattern, edgeTime);</span>
+      } else {
+<span class="fc" id="L433">        sourceId = graphUtils.getToId(pattern, edgeTime);</span>
+<span class="fc" id="L434">        sourceLabel = graphUtils.getToLabel(pattern, edgeTime);</span>
+<span class="fc" id="L435">        targetId = graphUtils.getFromId(pattern, edgeTime);</span>
+<span class="fc" id="L436">        targetLabel = graphUtils.getFromLabel(pattern, edgeTime);</span>
+      }
+
+<span class="fc" id="L439">      graph = graphUtils</span>
+<span class="fc" id="L440">        .addEdge(graph, sourceId, sourceLabel, edgeLabel, targetId, targetLabel);</span>
+    }
+
+<span class="fc" id="L443">    return graph;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

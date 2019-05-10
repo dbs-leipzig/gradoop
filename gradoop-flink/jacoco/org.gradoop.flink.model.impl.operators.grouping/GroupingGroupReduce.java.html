@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GroupingGroupReduce.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.grouping</a> &gt; <span class="el_source">GroupingGroupReduce.java</span></div><h1>GroupingGroupReduce.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.grouping;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertex;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWithSuperVertex;
+import org.gradoop.flink.model.impl.operators.grouping.functions.FilterRegularVertices;
+import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVertices;
+import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceVertexGroupItems;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
+
+import java.util.List;
+
+/**
+ * Grouping implementation that uses group + groupReduce for building super
+ * vertices and updating the original vertices.
+ *
+ * Algorithmic idea:
+ *
+ * 1) Map vertices to a minimal representation, i.e. {@link VertexGroupItem}.
+ * 2) Group vertices on label and/or property.
+ * 3) Create a super vertex id for each group and collect a non-candidate
+ *    {@link VertexGroupItem} for each group element and one additional
+ *    super vertex tuple that holds the group aggregate.
+ * 4) Filter output of 3)
+ *    a) non-candidate tuples are mapped to {@link VertexWithSuperVertex}
+ *    b) super vertex tuples are used to build final super vertices
+ * 5) Map edges to a minimal representation, i.e. {@link EdgeGroupItem}
+ * 6) Join edges with output of 4a) and replace source/target id with super
+ *    vertex id.
+ * 7) Updated edges are grouped by source and target id and optionally by label
+ *    and/or edge property.
+ * 8) Group combine on the workers and compute aggregate.
+ * 9) Group reduce globally and create final super edges.
+ */
+public class GroupingGroupReduce extends Grouping {
+  /**
+   * Creates grouping operator instance.
+   *
+   * @param useVertexLabels   group on vertex label true/false
+   * @param useEdgeLabels     group on edge label true/false
+   * @param vertexLabelGroups stores grouping properties for vertex labels
+   * @param edgeLabelGroups   stores grouping properties for edge labels
+   */
+  GroupingGroupReduce(
+    boolean useVertexLabels,
+    boolean useEdgeLabels,
+    List&lt;LabelGroup&gt; vertexLabelGroups,
+    List&lt;LabelGroup&gt; edgeLabelGroups) {
+<span class="fc" id="L71">    super(</span>
+      useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);
+<span class="fc" id="L73">  }</span>
+
+  @Override
+  protected LogicalGraph groupInternal(LogicalGraph graph) {
+
+<span class="fc" id="L78">    DataSet&lt;VertexGroupItem&gt; verticesForGrouping = graph.getVertices()</span>
+      // map vertex to vertex group item
+<span class="fc" id="L80">      .flatMap(new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups()));</span>
+
+    // group vertices by label / properties / both
+<span class="fc" id="L83">    DataSet&lt;VertexGroupItem&gt; vertexGroupItems = groupVertices(verticesForGrouping)</span>
+      // apply aggregate function
+<span class="fc" id="L85">      .reduceGroup(new ReduceVertexGroupItems(useVertexLabels()));</span>
+
+<span class="fc" id="L87">    DataSet&lt;Vertex&gt; superVertices = vertexGroupItems</span>
+      // filter group representative tuples
+<span class="fc" id="L89">      .filter(new FilterSuperVertices())</span>
+      // build super vertices
+<span class="fc" id="L91">      .map(new BuildSuperVertex(useVertexLabels(), config.getVertexFactory()));</span>
+
+<span class="fc" id="L93">    DataSet&lt;VertexWithSuperVertex&gt; vertexToRepresentativeMap = vertexGroupItems</span>
+      // filter group element tuples
+<span class="fc" id="L95">      .filter(new FilterRegularVertices())</span>
+      // build vertex to group representative tuple
+<span class="fc" id="L97">      .map(new BuildVertexWithSuperVertex());</span>
+
+    // build super edges
+<span class="fc" id="L100">    DataSet&lt;Edge&gt; superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);</span>
+
+<span class="fc" id="L102">    return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

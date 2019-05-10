@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CAPFQueryResult.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.cypher.capf.result</a> &gt; <span class="el_source">CAPFQueryResult.java</span></div><h1>CAPFQueryResult.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.cypher.capf.result;
+
+import org.apache.calcite.plan.RelOptRule;
+import org.apache.calcite.tools.RuleSets;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.table.api.Table;
+import org.apache.flink.table.calcite.CalciteConfig;
+import org.apache.flink.table.calcite.CalciteConfigBuilder;
+import org.apache.flink.types.Row;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AddGradoopIdToRow;
+import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AddNewGraphs;
+import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AggregateGraphs;
+import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.CreateGraphHeadWithProperties;
+import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.PropertyDecoder;
+import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.SplitRow;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.opencypher.flink.api.CAPFSession;
+import org.opencypher.flink.impl.CAPFRecords;
+import org.opencypher.okapi.api.graph.CypherResult;
+import org.opencypher.okapi.ir.api.expr.Expr;
+import org.opencypher.okapi.ir.api.expr.Var;
+import scala.collection.Iterator;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Wrapper containing the results of a CAPF query.
+ */
+public class CAPFQueryResult {
+
+  /**
+   * Logical optimizer rules to be removed for better optimizer performance.
+   *
+   * {@code ProjectMergeRule:force_mode} would result in long optimization times.
+   */
+<span class="fc" id="L62">  private static final List&lt;String&gt; DISABLED_RULES =</span>
+<span class="fc" id="L63">    Collections.singletonList(&quot;ProjectMergeRule:force_mode&quot;);</span>
+
+  /**
+   * The wrapped CAPFRecords.
+   */
+  private CAPFRecords records;
+
+  /**
+   * Flag, set true iff the CAPFResult contains graph entities and can be transformed into a graph.
+   */
+  private boolean isGraph;
+
+  /**
+   * The CAPFSession that was used to create the result.
+   */
+  private CAPFSession session;
+
+  /**
+   * Mapping between the long ids and the original vertices.
+   */
+  private DataSet&lt;Tuple2&lt;Long, Vertex&gt;&gt; verticesWithIds;
+
+  /**
+   * Mapping between the long ids and the original edges.
+   */
+  private DataSet&lt;Tuple2&lt;Long, Edge&gt;&gt; edgesWithIds;
+
+  /**
+   * The GradoopFlinkConfig.
+   */
+  private GradoopFlinkConfig config;
+
+  /**
+   * Constructor;
+   *
+   * @param result          result of CAPF query
+   * @param verticesWithIds map between long id and original vertex
+   * @param edgesWithIds    map between long id and original edge
+   * @param config          the gradoop config
+   */
+  public CAPFQueryResult(
+    CypherResult result,
+    DataSet&lt;Tuple2&lt;Long, Vertex&gt;&gt; verticesWithIds,
+    DataSet&lt;Tuple2&lt;Long, Edge&gt;&gt; edgesWithIds,
+<span class="fc" id="L107">    GradoopFlinkConfig config) {</span>
+<span class="fc" id="L108">    this.records = (CAPFRecords) result.records();</span>
+<span class="fc" id="L109">    this.verticesWithIds = verticesWithIds;</span>
+<span class="fc" id="L110">    this.edgesWithIds = edgesWithIds;</span>
+<span class="fc" id="L111">    this.config = config;</span>
+
+<span class="fc" id="L113">    this.session = ((CAPFRecords) result.records()).capf();</span>
+<span class="fc bfc" id="L114" title="All 2 branches covered.">    this.isGraph = !records.header().entityVars().isEmpty();</span>
+<span class="fc" id="L115">  }</span>
+
+
+  /**
+   * Returns true iff the result contained entities that can be returned as graph collection.
+   *
+   * @return true iff results contain graphs
+   */
+  public boolean containsGraphs() {
+<span class="fc" id="L124">    return isGraph;</span>
+  }
+
+  /**
+   * Get the graphs contained in the CAPF query result.
+   * Returns null if the result contains no graphs.
+   *
+   * @return graphs contained in CAPF query iff there are any, else null
+   */
+  public GraphCollection getGraphs() {
+
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">    if (!isGraph) {</span>
+<span class="nc" id="L136">      return null;</span>
+    }
+
+<span class="fc" id="L139">    Set&lt;Var&gt; nodeVars = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L140">    Set&lt;Var&gt; relVars = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L141">    Set&lt;Var&gt; otherVars = new HashSet&lt;&gt;();</span>
+
+<span class="fc" id="L143">    Iterator&lt;Var&gt; varIt = records.header().vars().iterator();</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">    while (varIt.hasNext()) {</span>
+<span class="fc" id="L145">      otherVars.add(varIt.next());</span>
+    }
+
+<span class="fc" id="L148">    Iterator&lt;Var&gt; nodeVarIt = records.header().nodeEntities().iterator();</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">    while (nodeVarIt.hasNext()) {</span>
+<span class="fc" id="L150">      Var nodeVar = nodeVarIt.next();</span>
+<span class="fc" id="L151">      nodeVars.add(nodeVar);</span>
+<span class="fc" id="L152">      otherVars.remove(nodeVar);</span>
+<span class="fc" id="L153">    }</span>
+
+<span class="fc" id="L155">    Iterator&lt;Var&gt; relVarIt = records.header().relationshipEntities().iterator();</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">    while (relVarIt.hasNext()) {</span>
+<span class="fc" id="L157">      Var relVar = relVarIt.next();</span>
+<span class="fc" id="L158">      relVars.add(relVar);</span>
+<span class="fc" id="L159">      otherVars.remove(relVar);</span>
+<span class="fc" id="L160">    }</span>
+
+<span class="fc" id="L162">    StringBuilder entityFieldsBuilder = new StringBuilder();</span>
+<span class="fc bfc" id="L163" title="All 2 branches covered.">    for (Var var : nodeVars) {</span>
+<span class="fc" id="L164">      entityFieldsBuilder.append(records.header().column((Expr) var)).append(&quot;,&quot;);</span>
+<span class="fc" id="L165">    }</span>
+
+<span class="fc bfc" id="L167" title="All 2 branches covered.">    for (Var var : relVars) {</span>
+<span class="fc" id="L168">      entityFieldsBuilder.append(records.header().column((Expr) var)).append(&quot;,&quot;);</span>
+<span class="fc" id="L169">    }</span>
+
+<span class="fc" id="L171">    StringBuilder otherFieldsBuilder = new StringBuilder();</span>
+<span class="fc" id="L172">    List&lt;String&gt; otherVarNames = new ArrayList&lt;&gt;();</span>
+
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">    for (Var var : otherVars) {</span>
+<span class="nc" id="L175">      otherVarNames.add(var.name());</span>
+<span class="nc" id="L176">      otherFieldsBuilder.append(</span>
+<span class="nc" id="L177">        records.header().getColumn((Expr) var).get()).append(&quot;, &quot;);</span>
+<span class="nc" id="L178">    }</span>
+
+<span class="fc" id="L180">    String fieldString = entityFieldsBuilder.toString() + otherFieldsBuilder.toString();</span>
+<span class="pc bpc" id="L181" title="1 of 2 branches missed.">    if (fieldString.length() &gt; 0) {</span>
+<span class="fc" id="L182">      fieldString = fieldString.substring(0, fieldString.length() - 1);</span>
+    }
+
+<span class="fc" id="L185">    TypeInformation&lt;Row&gt; rowTypeInfo = TypeInformation.of(Row.class);</span>
+
+    // Workaround for usable optimizer times
+<span class="fc" id="L188">    removeSlowOptimizationRule();</span>
+
+    // entities, others, id
+<span class="fc" id="L191">    org.apache.flink.api.scala.DataSet&lt;Row&gt; scalarowsWithNewIds = session.tableEnv()</span>
+<span class="fc" id="L192">      .toDataSet(records.table().table().select(fieldString), rowTypeInfo);</span>
+
+<span class="fc" id="L194">    DataSet&lt;Row&gt; rowsWithNewIds = scalarowsWithNewIds.javaSet()</span>
+<span class="fc" id="L195">      .map(new AddGradoopIdToRow());</span>
+
+<span class="fc" id="L197">    int entityFieldsCount = nodeVars.size() + relVars.size();</span>
+<span class="fc" id="L198">    int otherFieldsCount = otherVars.size();</span>
+
+<span class="fc" id="L200">    DataSet&lt;GraphHead&gt; graphHeads = rowsWithNewIds</span>
+<span class="fc" id="L201">      .map(new CreateGraphHeadWithProperties(</span>
+        entityFieldsCount,
+        entityFieldsCount + otherFieldsCount,
+<span class="fc" id="L204">        config.getGraphHeadFactory(),</span>
+        otherVarNames)
+      );
+
+<span class="fc" id="L208">    DataSet&lt;Tuple2&lt;Long, GradoopIdSet&gt;&gt; rowsWithGraphIdSets = rowsWithNewIds</span>
+<span class="fc" id="L209">      .flatMap(new SplitRow(0, entityFieldsCount))</span>
+<span class="fc" id="L210">      .groupBy(0)</span>
+<span class="fc" id="L211">      .reduceGroup(new AggregateGraphs&lt;&gt;());</span>
+
+<span class="fc" id="L213">    DataSet&lt;Vertex&gt; vertices =</span>
+      rowsWithGraphIdSets
+<span class="fc" id="L215">        .join(verticesWithIds)</span>
+<span class="fc" id="L216">        .where(0)</span>
+<span class="fc" id="L217">        .equalTo(0)</span>
+<span class="fc" id="L218">        .with(new AddNewGraphs&lt;&gt;());</span>
+
+<span class="fc" id="L220">    DataSet&lt;Edge&gt; edges =</span>
+      rowsWithGraphIdSets
+<span class="fc" id="L222">        .join(edgesWithIds)</span>
+<span class="fc" id="L223">        .where(0)</span>
+<span class="fc" id="L224">        .equalTo(0)</span>
+<span class="fc" id="L225">        .with(new AddNewGraphs&lt;&gt;());</span>
+
+<span class="fc" id="L227">    vertices = vertices.map(new PropertyDecoder&lt;&gt;());</span>
+<span class="fc" id="L228">    edges = edges.map(new PropertyDecoder&lt;&gt;());</span>
+
+<span class="fc" id="L230">    return config.getGraphCollectionFactory().fromDataSets(graphHeads, vertices, edges);</span>
+  }
+
+  /**
+   * Workaround to remove slow logical optimization rules listed in
+   * {@link CAPFQueryResult#DISABLED_RULES}.
+   *
+   * This method accesses protected scala flink functions. See Issue #1221
+   * (https://github.com/dbs-leipzig/gradoop/issues/1221).
+   */
+  private void removeSlowOptimizationRule() {
+<span class="fc" id="L241">    List&lt;RelOptRule&gt; ruleList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">    for (RelOptRule rule : session.tableEnv().getLogicalOptRuleSet()) {</span>
+<span class="pc bpc" id="L243" title="1 of 2 branches missed.">      if (!DISABLED_RULES.contains(rule.toString())) {</span>
+<span class="fc" id="L244">        ruleList.add(rule);</span>
+      }
+<span class="fc" id="L246">    }</span>
+<span class="fc" id="L247">    CalciteConfigBuilder builder = new CalciteConfigBuilder()</span>
+<span class="fc" id="L248">      .replaceLogicalOptRuleSet(RuleSets.ofList(ruleList));</span>
+
+    // rebuild old calcite config
+<span class="fc" id="L251">    CalciteConfig calciteConfig = session.tableEnv().config().getCalciteConfig();</span>
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">    if (calciteConfig.replacesDecoRuleSet()) {</span>
+<span class="nc" id="L253">      builder.replaceDecoRuleSet(calciteConfig.getDecoRuleSet().get());</span>
+    }
+<span class="pc bpc" id="L255" title="1 of 2 branches missed.">    if (calciteConfig.replacesNormRuleSet()) {</span>
+<span class="nc" id="L256">      builder.replaceNormRuleSet(calciteConfig.getNormRuleSet().get());</span>
+    }
+<span class="pc bpc" id="L258" title="1 of 2 branches missed.">    if (calciteConfig.replacesPhysicalOptRuleSet()) {</span>
+<span class="nc" id="L259">      builder.replacePhysicalOptRuleSet(calciteConfig.getPhysicalOptRuleSet().get());</span>
+    }
+<span class="pc bpc" id="L261" title="1 of 2 branches missed.">    if (calciteConfig.replacesSqlOperatorTable()) {</span>
+<span class="nc" id="L262">      builder.replaceSqlOperatorTable(calciteConfig.getSqlOperatorTable().get());</span>
+    }
+<span class="pc bpc" id="L264" title="1 of 2 branches missed.">    if (calciteConfig.getSqlParserConfig().isDefined()) {</span>
+<span class="nc" id="L265">      builder.replaceSqlParserConfig(calciteConfig.getSqlParserConfig().get());</span>
+    }
+<span class="pc bpc" id="L267" title="1 of 2 branches missed.">    if (calciteConfig.getSqlToRelConverterConfig().isDefined()) {</span>
+<span class="nc" id="L268">      builder.replaceSqlToRelConverterConfig(calciteConfig.getSqlToRelConverterConfig().get());</span>
+    }
+
+<span class="fc" id="L271">    session.tableEnv().config().setCalciteConfig(builder.build());</span>
+<span class="fc" id="L272">  }</span>
+
+  /**
+   * Get the flink table from the CAPF query result.
+   *
+   * @return flink table containing the CAPF query result
+   */
+  public Table getTable() {
+<span class="fc" id="L280">    return records.table().table();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

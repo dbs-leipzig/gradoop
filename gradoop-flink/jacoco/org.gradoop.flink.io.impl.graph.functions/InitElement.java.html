@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InitElement.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.graph.functions</a> &gt; <span class="el_source">InitElement.java</span></div><h1>InitElement.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.graph.functions;
+
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.gradoop.common.model.impl.pojo.Element;
+
+import java.io.Serializable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Abstract base class for initializing EPGM elements from import elements.
+ *
+ * @param &lt;EL&gt; EPGM element type
+ * @param &lt;K&gt;  Import Edge/Vertex identifier type
+ */
+public abstract class InitElement
+  &lt;EL extends Element, K extends Comparable&lt;K&gt;&gt; implements Serializable {
+
+  /**
+   * Decides if lineage info (original identifier) shall be stored
+   */
+  private final boolean keepLineage;
+
+  /**
+   * Used to store the lineage information at the resulting EPGM element
+   */
+  private final String lineagePropertyKey;
+
+  /**
+   * Type information for the import element identifier
+   */
+  private final TypeInformation&lt;K&gt; keyTypeInfo;
+
+  /**
+   * Constructor.
+   *
+   * If the given property key is {@code null}, no lineage info will be stored.
+   *
+   * @param lineagePropertyKey  property key to store lineage info at EPGM
+   *                            element (can be {@code null})
+   * @param keyTypeInfo         type info for import element identifier
+   */
+  public InitElement(String lineagePropertyKey,
+<span class="fc" id="L59">    TypeInformation&lt;K&gt; keyTypeInfo) {</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">    this.keepLineage        = lineagePropertyKey != null;</span>
+<span class="fc" id="L61">    this.lineagePropertyKey = lineagePropertyKey;</span>
+<span class="fc" id="L62">    this.keyTypeInfo        = checkNotNull(keyTypeInfo, &quot;key type was null&quot;);</span>
+<span class="fc" id="L63">  }</span>
+
+  /**
+   * Updates the lineage info of the given EPGM element if necessary.
+   *
+   * @param element   EPGM element
+   * @param importKey import element identifier
+   * @return updated EPGM element
+   */
+  protected EL updateLineage(EL element, K importKey) {
+<span class="fc bfc" id="L73" title="All 2 branches covered.">    if (keepLineage) {</span>
+<span class="fc" id="L74">      element.setProperty(lineagePropertyKey, importKey);</span>
+    }
+<span class="fc" id="L76">    return element;</span>
+  }
+
+  /**
+   * Returns type information for the import element identifier.
+   *
+   * @return import element identifier type info
+   */
+  protected TypeInformation&lt;K&gt; getKeyTypeInfo() {
+<span class="fc" id="L85">    return keyTypeInfo;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

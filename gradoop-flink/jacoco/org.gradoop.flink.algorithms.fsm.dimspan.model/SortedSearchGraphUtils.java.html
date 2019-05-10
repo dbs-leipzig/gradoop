@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SortedSearchGraphUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.dimspan.model</a> &gt; <span class="el_source">SortedSearchGraphUtils.java</span></div><h1>SortedSearchGraphUtils.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.dimspan.model;
+
+import org.gradoop.flink.algorithms.fsm.dimspan.comparison.DFSBranchComparator;
+import org.gradoop.flink.algorithms.fsm.dimspan.comparison.DirectedDFSBranchComparator;
+import org.gradoop.flink.algorithms.fsm.dimspan.comparison.UndirectedDFSBranchComparator;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
+
+/**
+ * Util methods to interpret and manipulate sorted int-array encoded graphs
+ */
+public class SortedSearchGraphUtils extends SearchGraphUtilsBase {
+
+  /**
+   * Comparator used to search for first edge greater than or equal to a branch DFS code.
+   */
+  private final DFSBranchComparator comparator;
+
+  /**
+   * Constructor.
+   *
+   * @param fsmConfig FSM configuration
+   */
+<span class="fc" id="L38">  public SortedSearchGraphUtils(DIMSpanConfig fsmConfig) {</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">    this.comparator = fsmConfig.isDirected() ?</span>
+      new DirectedDFSBranchComparator() :
+      new UndirectedDFSBranchComparator();
+<span class="fc" id="L42">  }</span>
+
+  @Override
+  public int getFirstGeqEdgeId(int[] graphMux, int[] searchMux, int searchFromEdgeId) {
+
+<span class="fc" id="L47">    int firstGeqEdgeId = -1;</span>
+
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">    for (int edgeId = searchFromEdgeId; edgeId &lt; getEdgeCount(graphMux); edgeId++) {</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">      if (comparator.compare(searchMux, getEdge(graphMux, edgeId)) &gt;= 0) {</span>
+<span class="fc" id="L51">        firstGeqEdgeId = edgeId;</span>
+<span class="fc" id="L52">        break;</span>
+      }
+    }
+
+<span class="fc" id="L56">    return firstGeqEdgeId;</span>
+  }
+
+  /**
+   * Returns the multiplex of a single edge.
+   *
+   * @param graphMux multiplex of all edges
+   * @param edgeId edge id
+   * @return multiplex of edge with given id
+   */
+  private int[] getEdge(int[] graphMux, int edgeId) {
+<span class="fc" id="L67">    int[] edgeMux = new int[EDGE_LENGTH];</span>
+
+<span class="fc" id="L69">    edgeMux[FROM_ID] = getFromId(graphMux, edgeId);</span>
+<span class="fc" id="L70">    edgeMux[TO_ID] = getToId(graphMux, edgeId);</span>
+<span class="fc" id="L71">    edgeMux[FROM_LABEL] = getFromLabel(graphMux, edgeId);</span>
+<span class="fc" id="L72">    edgeMux[TO_LABEL] = getToLabel(graphMux, edgeId);</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">    edgeMux[DIRECTION] = isOutgoing(graphMux, edgeId) ? OUTGOING : INCOMING;</span>
+<span class="fc" id="L74">    edgeMux[EDGE_LABEL] = getEdgeLabel(graphMux, edgeId);</span>
+
+<span class="fc" id="L76">    return edgeMux;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

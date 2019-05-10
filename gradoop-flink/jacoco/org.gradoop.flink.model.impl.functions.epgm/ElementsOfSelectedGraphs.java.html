@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElementsOfSelectedGraphs.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.functions.epgm</a> &gt; <span class="el_source">ElementsOfSelectedGraphs.java</span></div><h1>ElementsOfSelectedGraphs.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.functions.epgm;
+
+import org.apache.flink.api.common.functions.RichFlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.GraphElement;
+
+/**
+ * graphIds (BC)
+ * element =&gt; (graphId, element),..
+ *
+ * \forall (graphId, element) : graphId \in graphIds
+ *
+ * @param &lt;EL&gt; graph element type
+ */
+public class ElementsOfSelectedGraphs&lt;EL extends GraphElement&gt; extends
+  RichFlatMapFunction&lt;EL, Tuple2&lt;GradoopId, EL&gt;&gt; {
+
+  /**
+   * constant string for &quot;graph ids&quot;
+   */
+  public static final String GRAPH_IDS = &quot;graphIds&quot;;
+
+  /**
+   * graph ids
+   */
+  protected GradoopIdSet graphIds;
+
+  /**
+   * reuse tuple
+   */
+  private Tuple2&lt;GradoopId, EL&gt; reuse;
+
+  /**
+   * constructor
+   */
+<span class="fc" id="L55">  public ElementsOfSelectedGraphs() {</span>
+<span class="fc" id="L56">    reuse = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L57">  }</span>
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="fc" id="L61">    super.open(parameters);</span>
+
+<span class="fc" id="L63">    graphIds = GradoopIdSet.fromExisting(getRuntimeContext().getBroadcastVariable(GRAPH_IDS));</span>
+<span class="fc" id="L64">  }</span>
+
+  @Override
+  public void flatMap(EL el, Collector
+    &lt;Tuple2&lt;GradoopId, EL&gt;&gt; collector) throws Exception {
+<span class="fc bfc" id="L69" title="All 2 branches covered.">    for (GradoopId graphId : el.getGraphIds()) {</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">      if (graphIds.contains(graphId)) {</span>
+<span class="fc" id="L71">        reuse.f0 = graphId;</span>
+<span class="fc" id="L72">        reuse.f1 = el;</span>
+<span class="fc" id="L73">        collector.collect(reuse);</span>
+      }
+<span class="fc" id="L75">    }</span>
+<span class="fc" id="L76">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

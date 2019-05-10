@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>And.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.functions.bool</a> &gt; <span class="el_source">And.java</span></div><h1>And.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.functions.bool;
+
+import org.apache.flink.api.common.functions.CrossFunction;
+import org.apache.flink.api.common.functions.ReduceFunction;
+import org.apache.flink.api.java.DataSet;
+
+/**
+ * Logical &quot;AND&quot; as Flink function.
+ */
+<span class="nc" id="L25">public class And implements CrossFunction&lt;Boolean, Boolean, Boolean&gt;,</span>
+  ReduceFunction&lt;Boolean&gt; {
+
+  @Override
+  public Boolean cross(Boolean a, Boolean b) throws Exception {
+<span class="nc bnc" id="L30" title="All 4 branches missed.">    return a &amp;&amp; b;</span>
+  }
+
+  @Override
+  public Boolean reduce(Boolean a, Boolean b) throws Exception {
+<span class="nc bnc" id="L35" title="All 4 branches missed.">    return a &amp;&amp; b;</span>
+  }
+
+  /**
+   * Performs a logical conjunction on the union of both input data sets.
+   *
+   * @param a boolean vector a
+   * @param b boolean vector b
+   * @return 1-element dataset containing the result of the conjunction
+   */
+  public static DataSet&lt;Boolean&gt; union(DataSet&lt;Boolean&gt; a, DataSet&lt;Boolean&gt; b) {
+<span class="nc" id="L46">    return a.union(b).reduce(new And());</span>
+  }
+
+  /**
+   * Performs a pair-wise logical conjunction on the cross of both input data
+   * sets.
+   *
+   * @param a boolean vector a
+   * @param b boolean vector b
+   * @return dataset containing the result of the pair-wise conjunction
+   */
+  public static DataSet&lt;Boolean&gt; cross(DataSet&lt;Boolean&gt; a, DataSet&lt;Boolean&gt; b) {
+<span class="nc" id="L58">    return a.cross(b).with(new And());</span>
+  }
+
+  /**
+   * Performs a logical conjunction on a data set of boolean values.
+   *
+   * @param d boolean set
+   * @return conjunction
+   */
+  public static DataSet&lt;Boolean&gt; reduce(DataSet&lt;Boolean&gt; d) {
+<span class="nc" id="L68">    return d.reduce(new And());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

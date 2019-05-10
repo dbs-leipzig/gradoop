@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TLFRecordReader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.tlf.inputformats</a> &gt; <span class="el_source">TLFRecordReader.java</span></div><h1>TLFRecordReader.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.tlf.inputformats;
+
+import org.apache.commons.io.Charsets;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.DataOutputBuffer;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.gradoop.flink.io.impl.tlf.TLFConstants;
+
+import java.io.IOException;
+
+/**
+ * TLFRecordReader class to read through a given TLF document to
+ * output graph blocks as records which are specified by the start tag and
+ * end tag.
+ */
+public class TLFRecordReader extends RecordReader&lt;LongWritable, Text&gt; {
+
+  /**
+   * The start position of the split.
+   */
+  private final long start;
+
+  /**
+   * The end position of the split.
+   */
+  private final long end;
+
+  /**
+   * Input stream which reads the data from the split file.
+   */
+  private final FSDataInputStream fsin;
+
+  /**
+   * Output buffer which writes only needed content.
+   */
+<span class="fc" id="L59">  private final DataOutputBuffer buffer = new DataOutputBuffer();</span>
+
+  /**
+   * The current key.
+   */
+  private LongWritable currentKey;
+
+  /**
+   * The current value.
+   */
+  private Text currentValue;
+
+  /**
+   * The length of the buffer data to be set to the value.
+   */
+  private int valueLength;
+
+  /**
+   * Constructor for the reader which handles TLF splits and
+   * initializes the file input stream.
+   *
+   * @param split the split of the file containing all TLF content
+   * @param conf the configuration of the task attempt context
+   * @throws IOException on failure
+   */
+  public TLFRecordReader(FileSplit split, Configuration conf) throws
+<span class="fc" id="L85">    IOException {</span>
+    // open the file and seek to the start of the split
+<span class="fc" id="L87">    start = split.getStart();</span>
+<span class="fc" id="L88">    end = start + split.getLength();</span>
+<span class="fc" id="L89">    Path file = split.getPath();</span>
+<span class="fc" id="L90">    FileSystem fs = file.getFileSystem(conf);</span>
+<span class="fc" id="L91">    fsin = fs.open(split.getPath());</span>
+<span class="fc" id="L92">    fsin.seek(start);</span>
+<span class="fc" id="L93">  }</span>
+
+  /**
+   * Reads the next key/value pair from the input for processing.
+   *
+   * @param key the new key
+   * @param value the new value
+   * @return true if a key/value pair was found
+   * @throws IOException on failure
+   */
+  private boolean next(LongWritable key, Text value) throws IOException {
+<span class="fc bfc" id="L104" title="All 2 branches covered.">    if (fsin.getPos() &lt; end &amp;&amp;</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">      readUntilMatch(TLFConstants.START_TAG.getBytes(Charsets.UTF_8), false)) {</span>
+      try {
+<span class="fc" id="L107">        buffer.write(TLFConstants.START_TAG.getBytes(Charsets.UTF_8));</span>
+<span class="pc bpc" id="L108" title="1 of 2 branches missed.">        if (readUntilMatch(TLFConstants.END_TAG.getBytes(Charsets.UTF_8), true)) {</span>
+<span class="fc" id="L109">          key.set(fsin.getPos());</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">          if (fsin.getPos() != end) {</span>
+            //- end tag because it is the new start tag and shall not be added
+<span class="fc" id="L112">            valueLength = buffer.getLength() - TLFConstants.END_TAG.getBytes(Charsets.UTF_8).length;</span>
+          } else {
+            // in this case there is no new start tag
+<span class="fc" id="L115">            valueLength = buffer.getLength();</span>
+          }
+          //- end tag because it is the new start tag and shall not be added
+<span class="fc" id="L118">          value.set(buffer.getData(), 0, valueLength);</span>
+          //set the buffer to position before end tag of old graph which is
+          // start tag of the new one
+<span class="fc" id="L121">          fsin.seek(fsin.getPos() - TLFConstants.END_TAG.getBytes(Charsets.UTF_8).length);</span>
+<span class="fc" id="L122">          return true;</span>
+        }
+      } finally {
+<span class="fc" id="L125">        buffer.reset();</span>
+      }
+    }
+<span class="fc" id="L128">    return false;</span>
+  }
+
+  /**
+   * Reads the split and searches for matches with given 'match byte array'.
+   *
+   * @param match the match byte to be found
+   * @param withinBlock specifies if match is within the graph block
+   * @return true if match was found or the end of file was reached, so
+   * that the current block can be closed
+   * @throws IOException on failure
+   */
+  private boolean readUntilMatch(byte[] match, boolean withinBlock) throws
+    IOException {
+<span class="fc" id="L142">    int i = 0;</span>
+    while (true) {
+<span class="fc" id="L144">      int b = fsin.read();</span>
+      // end of file:
+<span class="fc bfc" id="L146" title="All 2 branches covered.">      if (b == -1) {</span>
+<span class="fc" id="L147">        return true;</span>
+      }
+      // save to buffer:
+<span class="fc bfc" id="L150" title="All 2 branches covered.">      if (withinBlock) {</span>
+<span class="fc" id="L151">        buffer.write(b);</span>
+      }
+      // check if we are matching:
+<span class="fc bfc" id="L154" title="All 2 branches covered.">      if (b == match[i]) {</span>
+<span class="fc" id="L155">        i++;</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">        if (i &gt;= match.length) {</span>
+<span class="fc" id="L157">          return true;</span>
+        }
+      } else {
+<span class="fc" id="L160">        i = 0;</span>
+      }
+      // see if we have passed the stop point:
+<span class="fc bfc" id="L163" title="All 6 branches covered.">      if (!withinBlock &amp;&amp; i == 0 &amp;&amp; fsin.getPos() &gt;= end) {</span>
+<span class="fc" id="L164">        return false;</span>
+      }
+<span class="fc" id="L166">    }</span>
+  }
+
+  /**
+   * Closes open buffers
+   *
+   * @throws IOException on failure
+   */
+  @Override
+  public void close() throws IOException {
+<span class="fc" id="L176">    fsin.close();</span>
+<span class="fc" id="L177">    buffer.close();</span>
+<span class="fc" id="L178">  }</span>
+
+  /**
+   * Returns the current process of input streaming.
+   *
+   * @return percentage of the completion
+   * @throws IOException on failure
+   */
+  @Override
+  public float getProgress() throws IOException {
+<span class="nc" id="L188">    return (fsin.getPos() - start) / (float) (end - start);</span>
+  }
+
+  /**
+   * Returns the current key.
+   *
+   * @return the current key.
+   * @throws IOException on failure
+   * @throws InterruptedException if interrupted
+   */
+  @Override
+  public LongWritable getCurrentKey() throws IOException,
+    InterruptedException {
+<span class="fc" id="L201">    return currentKey;</span>
+  }
+
+  /**
+   * Returns the current value.
+   *
+   * @return the current value
+   * @throws IOException on failure
+   * @throws InterruptedException if interrupted
+   */
+  @Override
+  public Text getCurrentValue() throws IOException, InterruptedException {
+<span class="fc" id="L213">    return currentValue;</span>
+  }
+
+  /**
+   * Called once for initialization.
+   *
+   * @param split the split of the file containing all TLF content
+   * @param context current task attempt context
+   * @throws IOException on failure
+   * @throws InterruptedException if interrupted
+   */
+  @Override
+  public void initialize(InputSplit split, TaskAttemptContext context)
+      throws IOException, InterruptedException {
+<span class="fc" id="L227">  }</span>
+
+  /**
+   * Reads the next kex/value pair from the input for processing.
+   *
+   * @return true if a key/value pair was found
+   * @throws IOException on failure
+   * @throws InterruptedException if interrupted
+   */
+  @Override
+  public boolean nextKeyValue() throws IOException, InterruptedException {
+<span class="fc" id="L238">    currentKey = new LongWritable();</span>
+<span class="fc" id="L239">    currentValue = new Text();</span>
+<span class="fc" id="L240">    return next(currentKey, currentValue);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

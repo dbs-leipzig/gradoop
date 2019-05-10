@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TraversalCode.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.representation.transactional.traversalcode</a> &gt; <span class="el_source">TraversalCode.java</span></div><h1>TraversalCode.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.representation.transactional.traversalcode;
+
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * Represents a graph by the log of a depth first search.
+ *
+ * @param &lt;C&gt; vertex and edge value type
+ */
+public class TraversalCode&lt;C extends Comparable&lt;C&gt;&gt; implements Serializable, Comparable&lt;TraversalCode&lt;C&gt;&gt; {
+
+  /**
+   * Included edges.
+   */
+  private final List&lt;Traversal&lt;C&gt;&gt; traversals;
+
+  /**
+   * Default constructor.
+   */
+<span class="nc" id="L40">  public TraversalCode() {</span>
+<span class="nc" id="L41">    this.traversals = Lists.newArrayList();</span>
+<span class="nc" id="L42">  }</span>
+
+  /**
+   * Constructor.
+   *
+   * @param traversal initial traversals
+   */
+<span class="nc" id="L49">  public TraversalCode(Traversal&lt;C&gt; traversal) {</span>
+<span class="nc" id="L50">    this.traversals = Lists.newArrayListWithExpectedSize(1);</span>
+<span class="nc" id="L51">    this.traversals.add(traversal);</span>
+<span class="nc" id="L52">  }</span>
+
+  /**
+   * Constructor.
+   *
+   * @param parent parent DFS-code
+   */
+<span class="nc" id="L59">  public TraversalCode(TraversalCode&lt;C&gt; parent) {</span>
+<span class="nc" id="L60">    this.traversals = Lists.newArrayList(parent.getTraversals());</span>
+<span class="nc" id="L61">  }</span>
+
+  public List&lt;Traversal&lt;C&gt;&gt; getTraversals() {
+<span class="nc" id="L64">    return traversals;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L69">    return StringUtils.join(traversals, ',');</span>
+  }
+
+  @Override
+  public boolean equals(Object o) {
+<span class="nc bnc" id="L74" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L75">      return true;</span>
+    }
+<span class="nc bnc" id="L77" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L78">      return false;</span>
+    }
+
+<span class="nc" id="L81">    TraversalCode code = (TraversalCode) o;</span>
+
+<span class="nc" id="L83">    return traversals.equals(code.traversals);</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L88">    return traversals.hashCode();</span>
+  }
+
+  @Override
+  public int compareTo(TraversalCode&lt;C&gt; that) {
+
+    int comparison;
+
+<span class="nc" id="L96">    boolean thisIsRoot = this.getTraversals().isEmpty();</span>
+<span class="nc" id="L97">    boolean thatIsRoot = that.getTraversals().isEmpty();</span>
+
+<span class="nc bnc" id="L99" title="All 4 branches missed.">    if (thisIsRoot &amp;&amp; ! thatIsRoot) {</span>
+<span class="nc" id="L100">      comparison = -1;</span>
+
+<span class="nc bnc" id="L102" title="All 4 branches missed.">    } else if (thatIsRoot &amp;&amp; !thisIsRoot) {</span>
+<span class="nc" id="L103">      comparison = 1;</span>
+
+    } else {
+<span class="nc" id="L106">      comparison = 0;</span>
+
+<span class="nc" id="L108">      Iterator&lt;Traversal&lt;C&gt;&gt; thisIterator = this.getTraversals().iterator();</span>
+<span class="nc" id="L109">      Iterator&lt;Traversal&lt;C&gt;&gt; thatIterator = that.getTraversals().iterator();</span>
+
+      // if two DFS-Codes share initial traversals,
+      // the first different traversal will decide about comparison
+<span class="nc bnc" id="L113" title="All 6 branches missed.">      while (comparison == 0 &amp;&amp; thisIterator.hasNext() &amp;&amp; thatIterator.hasNext()) {</span>
+<span class="nc" id="L114">        comparison = thisIterator.next().compareTo(thatIterator.next());</span>
+      }
+
+      // DFS-Codes are equal or one is parent of other
+<span class="nc bnc" id="L118" title="All 2 branches missed.">      if (comparison == 0) {</span>
+
+        // this is child, cause it has further traversals
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        if (thisIterator.hasNext()) {</span>
+<span class="nc" id="L122">          comparison = 1;</span>
+
+          // that is child, cause it has further traversals
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        } else if (thatIterator.hasNext()) {</span>
+<span class="nc" id="L126">          comparison = -1;</span>
+
+        }
+      }
+    }
+
+<span class="nc" id="L132">    return comparison;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

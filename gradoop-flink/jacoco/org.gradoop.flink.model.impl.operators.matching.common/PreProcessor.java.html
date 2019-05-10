@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PreProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.common</a> &gt; <span class="el_source">PreProcessor.java</span></div><h1>PreProcessor.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.common;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.matching.common.functions.BuildIdWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.common.functions.BuildTripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingEdges;
+import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingPairs;
+import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingTriples;
+import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingVertices;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
+import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithSourceEdgeCandidates;
+
+/**
+ * Provides methods for filtering vertices, edges, pairs (vertex + edge) and
+ * triples based on a given query.
+ */
+<span class="nc" id="L35">public class PreProcessor {</span>
+
+  /**
+   * Filters vertices based on the given GDL query. The resulting dataset only
+   * contains vertex ids and their candidates that match at least one vertex in
+   * the query graph.
+   *
+   * @param graph data graph
+   * @param query query graph
+   * @return dataset with matching vertex ids and their candidates
+   */
+  public static DataSet&lt;IdWithCandidates&lt;GradoopId&gt;&gt; filterVertices(
+    LogicalGraph graph, final String query) {
+<span class="fc" id="L48">    return graph.getVertices()</span>
+<span class="fc" id="L49">      .filter(new MatchingVertices&lt;&gt;(query))</span>
+<span class="fc" id="L50">      .map(new BuildIdWithCandidates&lt;&gt;(query));</span>
+  }
+
+  /**
+   * Filters edges based on the given GDL query. The resulting dataset only
+   * contains edges that match at least one edge in the query graph.
+   *
+   * @param graph data graph
+   * @param query query graph
+   * @return dataset with matching edge triples and their candidates
+   */
+  public static DataSet&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; filterEdges(
+    LogicalGraph graph, final String query) {
+<span class="fc" id="L63">    return graph.getEdges()</span>
+<span class="fc" id="L64">      .filter(new MatchingEdges&lt;&gt;(query))</span>
+<span class="fc" id="L65">      .map(new BuildTripleWithCandidates&lt;&gt;(query));</span>
+  }
+
+  /**
+   * Filters vertex-edge pairs based on the given GDL query. The resulting
+   * dataset only contains vertex-edge pairs that match at least one vertex-edge
+   * pair in the query graph.
+   *
+   * @param g     data graph
+   * @param query query graph
+   * @return dataset with matching vertex-edge pairs
+   */
+  public static DataSet&lt;TripleWithSourceEdgeCandidates&lt;GradoopId&gt;&gt; filterPairs(
+    LogicalGraph g, final String query) {
+<span class="nc" id="L79">    return filterPairs(g, query, filterVertices(g, query));</span>
+  }
+
+  /**
+   * Filters vertex-edge pairs based on the given GDL query. The resulting
+   * dataset only contains vertex-edge pairs that match at least one vertex-edge
+   * pair in the query graph and their corresponding candidates
+   *
+   * @param graph             data graph
+   * @param query             query graph
+   * @param filteredVertices  used for the edge join
+
+   * @return dataset with matching vertex-edge pairs and their candidates
+   */
+  public static DataSet&lt;TripleWithSourceEdgeCandidates&lt;GradoopId&gt;&gt; filterPairs(
+    LogicalGraph graph, final String query,
+    DataSet&lt;IdWithCandidates&lt;GradoopId&gt;&gt; filteredVertices) {
+<span class="fc" id="L96">    return filteredVertices</span>
+<span class="fc" id="L97">      .join(filterEdges(graph, query))</span>
+<span class="fc" id="L98">      .where(0).equalTo(1)</span>
+<span class="fc" id="L99">      .with(new MatchingPairs(query));</span>
+  }
+
+  /**
+   * Filters vertex-edge-vertex pairs based on the given GDL query. The
+   * resulting dataset only contains triples that match at least one triple in
+   * the query graph.
+   *
+   * @param graph data graph
+   * @param query query graph
+   * @return dataset with matching triples
+   */
+  public static DataSet&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; filterTriplets(
+    LogicalGraph graph, final String query) {
+<span class="fc" id="L113">    return filterTriplets(graph, query, filterVertices(graph, query));</span>
+  }
+
+  /**
+   * Filters vertex-edge-vertex pairs based on the given GDL query. The
+   * resulting dataset only contains triples that match at least one triple in
+   * the query graph.
+   *
+   * @param graph             data graph
+   * @param query             query graph
+   * @param filteredVertices  used for the edge join
+   * @return dataset with matching triples and their candidates
+   */
+  public static DataSet&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; filterTriplets(
+    LogicalGraph graph, final String query,
+    DataSet&lt;IdWithCandidates&lt;GradoopId&gt;&gt; filteredVertices) {
+<span class="fc" id="L129">    return filterPairs(graph, query, filteredVertices)</span>
+<span class="fc" id="L130">      .join(filteredVertices)</span>
+<span class="fc" id="L131">      .where(3).equalTo(0)</span>
+<span class="fc" id="L132">      .with(new MatchingTriples(query));</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

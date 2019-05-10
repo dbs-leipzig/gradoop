@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LPUpdateFunction.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.gelly.labelpropagation.functions</a> &gt; <span class="el_source">LPUpdateFunction.java</span></div><h1>LPUpdateFunction.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.gelly.labelpropagation.functions;
+
+import org.apache.flink.graph.Vertex;
+import org.apache.flink.graph.spargel.GatherFunction;
+import org.apache.flink.graph.spargel.MessageIterator;
+import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Updates the value of a vertex by picking the most frequent value out of
+ * all incoming values.
+ */
+<span class="fc" id="L32">public class LPUpdateFunction</span>
+  extends GatherFunction&lt;GradoopId, PropertyValue, PropertyValue&gt; {
+  /**
+   * Updates the vertex value if it has changed.
+   *
+   * @param vertex  vertex to be updated
+   * @param msg     message
+   */
+  @Override
+  public void updateVertex(Vertex&lt;GradoopId, PropertyValue&gt; vertex,
+    MessageIterator&lt;PropertyValue&gt; msg) {
+<span class="fc" id="L43">    PropertyValue value = getNewValue(vertex,</span>
+<span class="fc" id="L44">      Lists.newArrayList(msg.iterator()));</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">    if (!vertex.getValue().equals(value)) {</span>
+<span class="fc" id="L46">      setNewVertexValue(value);</span>
+    }
+<span class="fc" id="L48">  }</span>
+
+  /**
+   * Returns the new value based on all incoming messages. Depending on the
+   * number of messages sent to the vertex, the method returns:
+   * &lt;p/&gt;
+   * 0 messages:   The current value
+   * &lt;p/&gt;
+   * 1 message:    The minimum of the message and the current vertex value
+   * &lt;p/&gt;
+   * &gt;1 messages:  The most frequent of all message values
+   * &lt;p/&gt;
+   * &gt;1 messages, same frequency: The minimum of the most frequent labels
+   *
+   * @param vertex      the current vertex
+   * @param allMessages all received messages
+   * @return most frequent value below all messages
+   */
+  private PropertyValue getNewValue(Vertex&lt;GradoopId, PropertyValue&gt; vertex,
+    List&lt;PropertyValue&gt; allMessages) {
+
+<span class="fc" id="L69">    Collections.sort(allMessages);</span>
+    PropertyValue newValue;
+<span class="fc" id="L71">    int currentCounter = 1;</span>
+<span class="fc" id="L72">    PropertyValue currentValue = allMessages.get(0);</span>
+<span class="fc" id="L73">    int maxCounter = 1;</span>
+<span class="fc" id="L74">    PropertyValue maxValue = PropertyValue.NULL_VALUE;</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">    for (int i = 1; i &lt; allMessages.size(); i++) {</span>
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">      if (currentValue == allMessages.get(i)) {</span>
+<span class="nc" id="L77">        currentCounter++;</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (maxCounter &lt; currentCounter) {</span>
+<span class="nc" id="L79">          maxCounter = currentCounter;</span>
+<span class="nc" id="L80">          maxValue = currentValue;</span>
+        }
+      } else {
+<span class="fc" id="L83">        currentCounter = 1;</span>
+<span class="fc" id="L84">        currentValue = allMessages.get(i);</span>
+      }
+    }
+    // if each label has a frequency of one
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">    if (maxCounter == 1) {</span>
+      // to avoid an oscillating state of the calculation we will just use
+      // the smaller value
+<span class="fc" id="L91">      newValue = getMinimum(vertex.getValue(), allMessages.get(0));</span>
+    } else {
+<span class="nc" id="L93">      newValue = maxValue;</span>
+    }
+<span class="fc" id="L95">    return newValue;</span>
+  }
+
+  /**
+   * Compares two PropertyValues and returns the smaller one
+   *
+   * @param v1 PropertyValue 1
+   * @param v2 PropertyValue 2
+   * @return returns the smaller PropertyValue
+   */
+  private PropertyValue getMinimum(PropertyValue v1, PropertyValue v2) {
+    PropertyValue newValue;
+<span class="fc" id="L107">    int compare = v1.compareTo(v2);</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">    if (compare &lt;= 0) {</span>
+<span class="fc" id="L109">      newValue = v1;</span>
+    } else {
+<span class="fc" id="L111">      newValue = v2;</span>
+    }
+<span class="fc" id="L113">    return newValue;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

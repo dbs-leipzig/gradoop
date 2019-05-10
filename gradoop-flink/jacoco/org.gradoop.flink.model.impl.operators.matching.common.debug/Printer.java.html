@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Printer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.common.debug</a> &gt; <span class="el_source">Printer.java</span></div><h1>Printer.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.common.debug;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.configuration.Configuration;
+import org.apache.log4j.Logger;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Base class for printing debug output using vertex and edge mappings. Both
+ * map an internal id to a readable numeric id.
+ *
+ * @param &lt;IN&gt; input type
+ * @param &lt;K&gt; key type
+ */
+@FunctionAnnotation.ForwardedFields(&quot;*&quot;)
+public abstract class Printer&lt;IN, K&gt; extends RichMapFunction&lt;IN, IN&gt; {
+  /**
+   * Broadcast set name for vertex mapping
+   */
+  public static final String VERTEX_MAPPING = &quot;vertexMapping&quot;;
+  /**
+   * Broadcast set name for edge mapping
+   */
+  public static final String EDGE_MAPPING = &quot;edgeMapping&quot;;
+  /**
+   * Logger
+   */
+<span class="fc" id="L51">  private static final Logger LOG = Logger.getLogger(Printer.class);</span>
+  /**
+   * Mapping gradoopId -&gt; propertyValue
+   *
+   * The value is used to represent the vertex with the corresponding id.
+   */
+  protected Map&lt;K, PropertyValue&gt; vertexMap;
+  /**
+   * Mapping gradoopId -&gt; propertyValue
+   *
+   * The value is used to represent the edge with the corresponding id.
+   */
+  protected Map&lt;K, PropertyValue&gt; edgeMap;
+  /**
+   * String is put in front of debug output.
+   */
+  protected final String prefix;
+  /**
+   * Used to differ between iterative and non-iterative runtime context.
+   */
+  protected final boolean isIterative;
+  /**
+   * Number to display if not in iterative context but iteration is set.
+   */
+  private final int iterationNumber;
+  /**
+   * Constructor
+   */
+  public Printer() {
+<span class="fc" id="L80">    this(false, &quot;&quot;);</span>
+<span class="fc" id="L81">  }</span>
+
+  /**
+   * Constructor
+   *
+   * Automatically determines the current iteration when instantiated in Flink iteration.
+   *
+   * @param isIterative true, if called in a Flink iterative context (i.e. bulk/delta iteration)
+   * @param prefix      prefix for output
+   */
+<span class="fc" id="L91">  public Printer(boolean isIterative, String prefix) {</span>
+<span class="fc" id="L92">    this.isIterative     = isIterative;</span>
+<span class="fc" id="L93">    this.iterationNumber = 0;</span>
+<span class="fc" id="L94">    this.prefix          = prefix;</span>
+<span class="fc" id="L95">  }</span>
+
+  /**
+   * Constructor
+   *
+   * Requires the manual definition of the current iteration. This is necessary when called
+   * outside a Flink iteration, but in an iterative context (e.g. a Java loop).
+   *
+   * @param iterationNumber current iteration
+   * @param prefix          prefix for debug string
+   */
+<span class="fc" id="L106">  public Printer(int iterationNumber, String prefix) {</span>
+<span class="fc" id="L107">    this.isIterative     = false;</span>
+<span class="fc" id="L108">    this.iterationNumber = iterationNumber;</span>
+<span class="fc" id="L109">    this.prefix          = prefix;</span>
+<span class="fc" id="L110">  }</span>
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="nc" id="L114">    super.open(parameters);</span>
+<span class="nc" id="L115">    List&lt;Tuple2&lt;K, PropertyValue&gt;&gt; vertexMapping = getRuntimeContext()</span>
+<span class="nc" id="L116">      .getBroadcastVariable(VERTEX_MAPPING);</span>
+<span class="nc" id="L117">    vertexMap = initMapping(vertexMapping);</span>
+<span class="nc" id="L118">    List&lt;Tuple2&lt;K, PropertyValue&gt;&gt; edgeMapping = getRuntimeContext()</span>
+<span class="nc" id="L119">      .getBroadcastVariable(EDGE_MAPPING);</span>
+<span class="nc" id="L120">    edgeMap = initMapping(edgeMapping);</span>
+<span class="nc" id="L121">  }</span>
+
+  @Override
+  public IN map(IN in) throws Exception {
+<span class="nc" id="L125">    getLogger().debug(String.format(&quot;%s%s&quot;, getHeader(), getDebugString(in)));</span>
+<span class="nc" id="L126">    return in;</span>
+  }
+
+  /**
+   * Returns the debug string representation of the concrete Object.
+   *
+   * @param in input object
+   * @return debug string representation for input object
+   */
+  protected abstract String getDebugString(IN in);
+
+  /**
+   * Returns the logger for the concrete subclass.
+   *
+   * @return logger
+   */
+  protected abstract Logger getLogger();
+
+  /**
+   * Builds the header for debug string which contains the prefix and the
+   * superstep number (0 if non-iterative).
+   *
+   * @return debug header
+   */
+  private String getHeader() {
+<span class="nc bnc" id="L151" title="All 2 branches missed.">    return String.format(&quot;[%d][%s]: &quot;,</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">      isIterative ? getIterationRuntimeContext().getSuperstepNumber() : iterationNumber,</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">      prefix != null &amp;&amp; !prefix.isEmpty() ? prefix : &quot; &quot;);</span>
+  }
+
+  /**
+   * Used to initialize vertex and edge mapping.
+   *
+   * @param tuples broadcast set tuples
+   * @return mapping
+   */
+  private Map&lt;K, PropertyValue&gt; initMapping(
+    List&lt;Tuple2&lt;K, PropertyValue&gt;&gt; tuples) {
+<span class="nc" id="L164">    Map&lt;K, PropertyValue&gt; map = Maps.newHashMap();</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">    for (Tuple2&lt;K, PropertyValue&gt; tuple : tuples) {</span>
+<span class="nc" id="L166">      map.put(tuple.f0, tuple.f1);</span>
+<span class="nc" id="L167">    }</span>
+<span class="nc" id="L168">    return map;</span>
+  }
+
+  /**
+   * Converts a list of ids into a list of corresponding property values.
+   *
+   * @param ids       gradoop ids
+   * @param isVertex  true - use vertex mapping, false - use edge mapping
+   * @return list of property values
+   */
+  protected List&lt;PropertyValue&gt; convertList(List&lt;K&gt; ids, boolean isVertex) {
+<span class="nc" id="L179">    List&lt;PropertyValue&gt; result = Lists.newArrayListWithCapacity(ids.size());</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">    for (K gradoopId : ids) {</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">      result.add(isVertex ? vertexMap.get(gradoopId) : edgeMap.get(gradoopId));</span>
+<span class="nc" id="L182">    }</span>
+<span class="nc" id="L183">    return result;</span>
+  }
+
+  /**
+   * Checks if log level is debug and the mappings are initialized.
+   *
+   * @param vertexMapping mapping between vertex id and debug property value
+   * @param edgeMapping   mapping between edge id and debug property value
+   * @param &lt;K&gt;           key type
+   * @return true, iff logging is enabled
+   */
+  private static &lt;K&gt; boolean isDebugEnabled(
+    DataSet&lt;Tuple2&lt;K, PropertyValue&gt;&gt; vertexMapping,
+    DataSet&lt;Tuple2&lt;K, PropertyValue&gt;&gt; edgeMapping) {
+<span class="pc bpc" id="L197" title="5 of 6 branches missed.">    return LOG.isDebugEnabled() &amp;&amp; vertexMapping != null &amp;&amp; edgeMapping != null;</span>
+  }
+
+  /**
+   * Prints out logging information if logging is enabled and mapping information is available.
+   *
+   * @param dataSet       dataset to be logged
+   * @param printer       prints each dataset row (or a subset of it)
+   * @param vertexMapping mapping between vertex id and debug property value
+   * @param edgeMapping   mapping between edge id and debug property value
+   * @param &lt;T&gt;           dataset type
+   * @param &lt;K&gt;           key type
+   * @return unmodified dataset
+   */
+  public static &lt;T, K&gt; DataSet&lt;T&gt; log(DataSet&lt;T&gt; dataSet, Printer&lt;T, K&gt; printer,
+    DataSet&lt;Tuple2&lt;K, PropertyValue&gt;&gt; vertexMapping,
+    DataSet&lt;Tuple2&lt;K, PropertyValue&gt;&gt; edgeMapping) {
+<span class="pc bpc" id="L214" title="1 of 2 branches missed.">    if (isDebugEnabled(vertexMapping, edgeMapping)) {</span>
+<span class="nc" id="L215">      return dataSet</span>
+<span class="nc" id="L216">        .map(printer)</span>
+<span class="nc" id="L217">        .withBroadcastSet(vertexMapping, Printer.VERTEX_MAPPING)</span>
+<span class="nc" id="L218">        .withBroadcastSet(edgeMapping, Printer.EDGE_MAPPING);</span>
+    } else {
+<span class="fc" id="L220">      return dataSet;</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

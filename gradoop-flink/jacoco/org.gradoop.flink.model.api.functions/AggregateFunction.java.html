@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AggregateFunction.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.api.functions</a> &gt; <span class="el_source">AggregateFunction.java</span></div><h1>AggregateFunction.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.api.functions;
+
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
+
+import java.io.Serializable;
+
+/**
+ * Describes an aggregate function as input for the {@link Aggregation} operator.
+ */
+public interface AggregateFunction extends Serializable {
+
+  /**
+   * Describes the aggregation logic.
+   *
+   * @param aggregate previously aggregated value
+   * @param increment value that is added to the aggregate
+   *
+   * @return new aggregate
+   */
+  PropertyValue aggregate(PropertyValue aggregate, PropertyValue increment);
+
+  /**
+   * Returns the property key used to store the aggregate value.
+   *
+   * @return aggregate property key
+   */
+  String getAggregatePropertyKey();
+
+  /**
+   * Describes the increment of an element that should be added to the aggregate.
+   *
+   * @param element element used to get the increment
+   * @return increment, may be NULL, which is handled in the operator
+   */
+  PropertyValue getIncrement(EPGMElement element);
+
+  /**
+   * Returns whether this function aggregates vertices.
+   *
+   * @return true, if it aggregates vertices
+   */
+  default boolean isVertexAggregation() {
+<span class="fc" id="L60">    return true;</span>
+  }
+  /**
+   * Returns whether this function aggregates edges.
+   *
+   * @return true, if it aggregates edges
+   */
+  default boolean isEdgeAggregation() {
+<span class="fc" id="L68">    return true;</span>
+  }
+
+  /**
+   * Compute the final result after the aggregation step was completed. This method may be
+   * implemented if the aggregate function uses some internal aggregate value not equal to the
+   * result.&lt;br&gt;
+   * The default implementation of this method does nothing, it returns the result unchanged.&lt;br&gt;
+   * This method will not be called when the aggregate value is {@code null}.
+   *
+   * @param result The result of the aggregation step.
+   * @return The final result, computed from the previous result in a post-processing step.
+   */
+  default PropertyValue postAggregate(PropertyValue result) {
+<span class="fc" id="L82">    return result;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

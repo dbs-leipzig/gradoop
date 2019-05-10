@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VertexFusion.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.fusion</a> &gt; <span class="el_source">VertexFusion.java</span></div><h1>VertexFusion.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.fusion;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.IdNotInBroadcast;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
+import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
+import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.operators.fusion.functions.CoGroupAssociateOldVerticesWithNewIds;
+import org.gradoop.flink.model.impl.operators.fusion.functions.CoGroupGraphHeadToVertex;
+import org.gradoop.flink.model.impl.operators.fusion.functions.FlatJoinSourceEdgeReference;
+import org.gradoop.flink.model.impl.operators.fusion.functions.LeftElementId;
+import org.gradoop.flink.model.impl.operators.fusion.functions.MapFunctionAddGraphElementToGraph2;
+import org.gradoop.flink.model.impl.operators.fusion.functions.MapGraphHeadForNewGraph;
+import org.gradoop.flink.model.impl.operators.fusion.functions.MapVertexToPairWithGraphId;
+import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTuplesWithNullId;
+
+
+/**
+ * Fusion is a binary operator taking two graphs: a search graph (first parameter) and a
+ * pattern graph (second parameter) [This means that this is not a symmetric operator
+ * (F(a,b) != F(b,a))]. The general idea of this operator is that everything that appears
+ * in the pattern graph is fused into a single vertex into the search graph. A new logical graph
+ * is returned.
+ *
+ * 1) If any search graph is empty, an empty result will always be returned
+ * 2) If a pattern graph is empty, then the search graph will always be returned
+ * 3) The vertices of the pattern graph appearing in the first parameter are replaced by a
+ *    new vertex. The old edges of the search graph are updated in the final result so that
+ *    each vertex, either pointing to a to-be-fused vertex or starting from a to-be-fused vertex,
+ *    are respectively updated as either pointing or starting from the fused vertex.
+ * 4) Pattern graph's edges are also taken into account: any edge between to-be-fused vertices
+ *    appearing in the search graph that are not expressed in the pattern graph are
+ *    rendered as hooks over the fused vertex
+ */
+<span class="fc" id="L61">public class VertexFusion implements BinaryGraphToGraphOperator {</span>
+
+  /**
+   * Fusing the already-combined sources
+   *
+   * @param searchGraph            Logical Graph defining the data lake
+   * @param graphPatterns Collection of elements representing which vertices will be merged into
+   *                      a vertex
+   * @return              A single merged graph
+   */
+  @Override
+  public LogicalGraph execute(LogicalGraph searchGraph, LogicalGraph graphPatterns) {
+<span class="fc" id="L73">    return execute(searchGraph,</span>
+<span class="fc" id="L74">        graphPatterns.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L75">        .fromDataSets(</span>
+<span class="fc" id="L76">            graphPatterns.getGraphHead(),</span>
+<span class="fc" id="L77">            graphPatterns.getVertices(),</span>
+<span class="fc" id="L78">            graphPatterns.getEdges()));</span>
+  }
+
+
+  /**
+   * Fusing the already-combined sources
+   *
+   * @param searchGraph            Logical Graph defining the data lake
+   * @param graphPatterns Collection of elements representing which vertices will be merged into
+   *                      a vertex
+   * @return              A single merged graph
+   */
+  public LogicalGraph execute(LogicalGraph searchGraph, GraphCollection graphPatterns) {
+
+    // Missing in the theoric definition: creating a new header
+<span class="fc" id="L93">    GradoopId newGraphid = GradoopId.get();</span>
+
+<span class="fc" id="L95">    DataSet&lt;GraphHead&gt; gh = searchGraph.getGraphHead()</span>
+<span class="fc" id="L96">      .map(new MapGraphHeadForNewGraph(newGraphid));</span>
+
+<span class="fc" id="L98">    DataSet&lt;GradoopId&gt; patternVertexIds = graphPatterns.getVertices()</span>
+<span class="fc" id="L99">            .map(new Id&lt;&gt;());</span>
+<span class="fc" id="L100">    DataSet&lt;GradoopId&gt; patternEdgeIds = graphPatterns.getEdges()</span>
+<span class="fc" id="L101">            .map(new Id&lt;&gt;());</span>
+
+    // PHASE 1: Induced Subgraphs
+    // Associate each vertex to its graph id
+<span class="fc" id="L105">    DataSet&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; patternVerticesWithGraphIDs =</span>
+<span class="fc" id="L106">        graphPatterns.getVertices()</span>
+<span class="fc" id="L107">        .coGroup(searchGraph.getVertices())</span>
+<span class="fc" id="L108">        .where(new Id&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L109">        .with(new LeftSide&lt;&gt;())</span>
+<span class="fc" id="L110">        .flatMap(new MapVertexToPairWithGraphId());</span>
+
+    // Associate each gid in hypervertices.H to the merged vertices
+<span class="fc" id="L113">    DataSet&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; mergedVertices =</span>
+<span class="fc" id="L114">        graphPatterns.getGraphHeads()</span>
+<span class="fc" id="L115">        .map(new CoGroupGraphHeadToVertex());</span>
+
+    // PHASE 2: Recreating the vertices
+<span class="fc" id="L118">    DataSet&lt;Vertex&gt; vi = searchGraph.getVertices()</span>
+<span class="fc" id="L119">      .filter(new IdNotInBroadcast&lt;&gt;())</span>
+<span class="fc" id="L120">      .withBroadcastSet(patternVertexIds, IdNotInBroadcast.IDS);</span>
+
+<span class="fc" id="L122">    DataSet&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; idJoin = patternVerticesWithGraphIDs</span>
+<span class="fc" id="L123">      .coGroup(mergedVertices)</span>
+<span class="fc" id="L124">      .where(new Value1Of2&lt;&gt;()).equalTo(new Value1Of2&lt;&gt;())</span>
+<span class="fc" id="L125">      .with(new CoGroupAssociateOldVerticesWithNewIds())</span>
+<span class="fc" id="L126">      .union(vi.map(new MapVerticesAsTuplesWithNullId()));</span>
+
+<span class="fc" id="L128">    DataSet&lt;Vertex&gt; vToRet = mergedVertices</span>
+<span class="fc" id="L129">      .coGroup(patternVerticesWithGraphIDs)</span>
+<span class="fc" id="L130">      .where(new Value1Of2&lt;&gt;()).equalTo(new Value1Of2&lt;&gt;())</span>
+<span class="fc" id="L131">      .with(new LeftSide&lt;&gt;())</span>
+<span class="fc" id="L132">      .map(new Value0Of2&lt;&gt;())</span>
+<span class="fc" id="L133">      .union(vi)</span>
+<span class="fc" id="L134">      .map(new MapFunctionAddGraphElementToGraph2&lt;&gt;(newGraphid));</span>
+
+    // PHASE 3: Recreating the edges
+<span class="fc" id="L137">    DataSet&lt;Edge&gt; edges = searchGraph.getEdges()</span>
+<span class="fc" id="L138">      .filter(new IdNotInBroadcast&lt;&gt;())</span>
+<span class="fc" id="L139">      .withBroadcastSet(patternEdgeIds, IdNotInBroadcast.IDS)</span>
+<span class="fc" id="L140">      .leftOuterJoin(idJoin)</span>
+<span class="fc" id="L141">      .where(new SourceId&lt;&gt;()).equalTo(new LeftElementId&lt;&gt;())</span>
+<span class="fc" id="L142">      .with(new FlatJoinSourceEdgeReference(true))</span>
+<span class="fc" id="L143">      .leftOuterJoin(idJoin)</span>
+<span class="fc" id="L144">      .where(new TargetId&lt;&gt;()).equalTo(new LeftElementId&lt;&gt;())</span>
+<span class="fc" id="L145">      .with(new FlatJoinSourceEdgeReference(false))</span>
+<span class="fc" id="L146">      .groupBy(new Id&lt;&gt;())</span>
+<span class="fc" id="L147">      .reduceGroup(new AddNewIdToDuplicatedEdge())</span>
+<span class="fc" id="L148">      .map(new MapFunctionAddGraphElementToGraph2&lt;&gt;(newGraphid));</span>
+
+<span class="fc" id="L150">    return searchGraph.getConfig().getLogicalGraphFactory().fromDataSets(gh, vToRet, edges);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

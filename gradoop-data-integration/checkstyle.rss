@@ -1,0 +1,866 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<rss version="0.91">
+  <channel>
+    <title>Gradoop Data Integration - Checkstyle report</title>
+    <link>http://www.gradoop.org/gradoop-data-integration</link>
+    <description>Gradoop Data Integration - Checkstyle report</description>
+    <language>en-us</language>
+    <copyright>&#169;2014 - 2019 - 2019 University of Leipzig</copyright>
+    <item>
+      <title>File: 58,
+             Errors: 0,
+             Warnings: 0,
+             Infos: 0
+      </title>
+            <link>http://www.gradoop.org/gradoop-data-integration/checkstyle.html</link>
+      <description>
+        <p>Click <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html">here</a> for the full Checkstyle report.</p>
+
+        <table summary="Files" boder="1">
+          <thead>
+            <tr>
+              <th>Files</th>
+              <th style="width:30px;"><abbr title="Info">I</abbr></th>
+              <th style="width:30px;"><abbr title="Warning">W</abbr></th>
+              <th style="width:30px;"><abbr title="Error">E</abbr></th>
+            </tr>
+          </thead>
+          <tbody>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.json.functions.MinimalJsonToVertex.java">org/gradoop/dataintegration/importer/impl/json/functions/MinimalJsonToVertex.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.CreateCartesianNeighborhoodEdgesTest.java">org/gradoop/dataintegration/transformation/functions/CreateCartesianNeighborhoodEdgesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.BuildIdPropertyValuePairsTest.java">org/gradoop/dataintegration/transformation/functions/BuildIdPropertyValuePairsTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.CreateCartesianNeighborhoodEdges.java">org/gradoop/dataintegration/transformation/functions/CreateCartesianNeighborhoodEdges.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.package-info.java">org/gradoop/dataintegration/transformation/impl/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.VertexToEdge.java">org/gradoop/dataintegration/transformation/VertexToEdge.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.csv.MinimalCSVImporter.java">org/gradoop/dataintegration/importer/impl/csv/MinimalCSVImporter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.functions.DivideBy.java">org/gradoop/dataintegration/transformation/impl/functions/DivideBy.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.BuildTargetVertexIdPropertyValuePairsTest.java">org/gradoop/dataintegration/transformation/functions/BuildTargetVertexIdPropertyValuePairsTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.functions.CreateNewVertex.java">org/gradoop/dataintegration/transformation/impl/functions/CreateNewVertex.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.csv.functions.CsvRowToProperties.java">org/gradoop/dataintegration/importer/impl/csv/functions/CsvRowToProperties.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.Neighborhood.java">org/gradoop/dataintegration/transformation/impl/Neighborhood.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.AccumulatePropagatedValues.java">org/gradoop/dataintegration/transformation/functions/AccumulatePropagatedValues.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.CreateNeighborList.java">org/gradoop/dataintegration/transformation/functions/CreateNeighborList.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.EdgeToVertex.java">org/gradoop/dataintegration/transformation/EdgeToVertex.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.functions.CreateNewVertexWithEqualityCondense.java">org/gradoop/dataintegration/transformation/impl/functions/CreateNewVertexWithEqualityCondense.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.BasePropertyTransformationFunction.java">org/gradoop/dataintegration/transformation/impl/BasePropertyTransformationFunction.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.ConnectNeighborsTest.java">org/gradoop/dataintegration/transformation/ConnectNeighborsTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.config.EdgeDirection.java">org/gradoop/dataintegration/transformation/impl/config/EdgeDirection.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.BuildIdPropertyValuePairs.java">org/gradoop/dataintegration/transformation/functions/BuildIdPropertyValuePairs.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.PropagatePropertyToNeighborTest.java">org/gradoop/dataintegration/transformation/PropagatePropertyToNeighborTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.InvertEdges.java">org/gradoop/dataintegration/transformation/impl/InvertEdges.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.CreateEdgesFromTripleTest.java">org/gradoop/dataintegration/transformation/functions/CreateEdgesFromTripleTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.package-info.java">org/gradoop/dataintegration/transformation/functions/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.PropagatePropertyToNeighbor.java">org/gradoop/dataintegration/transformation/PropagatePropertyToNeighbor.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.NeighborhoodTest.java">org/gradoop/dataintegration/transformation/functions/NeighborhoodTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.EdgesFromLocalTransitiveClosure.java">org/gradoop/dataintegration/transformation/functions/EdgesFromLocalTransitiveClosure.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.csv.functions.PropertiesToVertex.java">org/gradoop/dataintegration/importer/impl/csv/functions/PropertiesToVertex.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.package-info.java">org/gradoop/dataintegration/transformation/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.AccumulatePropagatedValuesTest.java">org/gradoop/dataintegration/transformation/functions/AccumulatePropagatedValuesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.BuildTargetVertexIdPropertyValuePairs.java">org/gradoop/dataintegration/transformation/functions/BuildTargetVertexIdPropertyValuePairs.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.csv.functions.package-info.java">org/gradoop/dataintegration/importer/impl/csv/functions/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.csv.MinimalCSVImporterTest.java">org/gradoop/dataintegration/importer/impl/csv/MinimalCSVImporterTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.json.MinimalJSONImporter.java">org/gradoop/dataintegration/importer/impl/json/MinimalJSONImporter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.api.package-info.java">org/gradoop/dataintegration/transformation/api/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.PropertyTransformation.java">org/gradoop/dataintegration/transformation/impl/PropertyTransformation.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.json.functions.package-info.java">org/gradoop/dataintegration/importer/impl/json/functions/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.csv.package-info.java">org/gradoop/dataintegration/importer/impl/csv/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.PropertyTransformationTest.java">org/gradoop/dataintegration/transformation/impl/PropertyTransformationTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.ExtractPropertyFromVertex.java">org/gradoop/dataintegration/transformation/impl/ExtractPropertyFromVertex.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.ConnectNeighbors.java">org/gradoop/dataintegration/transformation/ConnectNeighbors.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.config.package-info.java">org/gradoop/dataintegration/transformation/impl/config/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.CreateVertexFromEdgesTest.java">org/gradoop/dataintegration/transformation/functions/CreateVertexFromEdgesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.package-info.java">org/gradoop/dataintegration/importer/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.ExtractPropertyFromVertexTest.java">org/gradoop/dataintegration/transformation/impl/ExtractPropertyFromVertexTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.functions.ExtractPropertyWithOriginId.java">org/gradoop/dataintegration/transformation/impl/functions/ExtractPropertyWithOriginId.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.json.MinimalJSONImporterTest.java">org/gradoop/dataintegration/importer/impl/json/MinimalJSONImporterTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.CreateEdgesFromTriple.java">org/gradoop/dataintegration/transformation/functions/CreateEdgesFromTriple.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.functions.package-info.java">org/gradoop/dataintegration/transformation/impl/functions/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.json.package-info.java">org/gradoop/dataintegration/importer/impl/json/package-info.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.functions.CreateVertexFromEdges.java">org/gradoop/dataintegration/transformation/functions/CreateVertexFromEdges.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.EdgeToVertexTest.java">org/gradoop/dataintegration/transformation/EdgeToVertexTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.importer.impl.json.functions.MinimalJsonToVertexTest.java">org/gradoop/dataintegration/importer/impl/json/functions/MinimalJsonToVertexTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction.java">org/gradoop/dataintegration/transformation/api/PropertyTransformationFunction.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.VertexToEdgeTest.java">org/gradoop/dataintegration/transformation/VertexToEdgeTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.functions.CreateNewEdges.java">org/gradoop/dataintegration/transformation/impl/functions/CreateNewEdges.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex.java">org/gradoop/dataintegration/transformation/impl/NeighborhoodVertex.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-data-integration/checkstyle.html#org.gradoop.dataintegration.transformation.impl.InvertEdgesTest.java">org/gradoop/dataintegration/transformation/impl/InvertEdgesTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                      </tbody>
+        </table>
+        
+      </description>
+    </item>
+  </channel>
+</rss>
+

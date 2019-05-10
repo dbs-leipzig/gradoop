@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UpdateVertexMapping.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions</a> &gt; <span class="el_source">UpdateVertexMapping.java</span></div><h1>UpdateVertexMapping.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.functions;
+
+import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.query.TraversalCode;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.ExplorativePatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.EmbeddingWithTiePoint;
+import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.tuples.VertexStep;
+
+/**
+ * Extends an embedding with a vertex if possible.
+ *
+ * Read fields first:
+ *
+ * f1.f0: vertex mappings
+ *
+ * Read fields second:
+ *
+ * f0: vertex id
+ *
+ * Forwarded fields first:
+ *
+ * f0.f1: edge mappings
+ *
+ * @param &lt;K&gt; key type
+ */
+@FunctionAnnotation.ReadFieldsFirst(&quot;f1.f0&quot;)
+@FunctionAnnotation.ReadFieldsSecond(&quot;f0&quot;)
+public class UpdateVertexMapping&lt;K&gt;
+  extends UpdateMapping&lt;K&gt;
+  implements FlatJoinFunction&lt;EmbeddingWithTiePoint&lt;K&gt;, VertexStep&lt;K&gt;, EmbeddingWithTiePoint&lt;K&gt;&gt; {
+  /**
+   * Iteration strategy
+   */
+  private final TraverserStrategy traverserStrategy;
+  /**
+   * From field of the next step in the traversal (if not last)
+   */
+  private int nextFrom;
+  /**
+   * Index to check in the vertex mapping
+   */
+  private int vertexCandidate;
+  /**
+   * Constructor
+   *
+   * @param tc traversal code for the current exploration
+   * @param matchStrategy select if subgraph isomorphism or homomorphism is used
+   * @param traverserStrategy iteration strategy
+   */
+  public UpdateVertexMapping(TraversalCode tc, MatchStrategy matchStrategy,
+    TraverserStrategy traverserStrategy) {
+<span class="fc" id="L72">    super(tc, matchStrategy);</span>
+<span class="fc" id="L73">    this.traverserStrategy = traverserStrategy;</span>
+<span class="fc" id="L74">  }</span>
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="fc" id="L78">    super.open(parameters);</span>
+
+<span class="fc bfc" id="L80" title="All 2 branches covered.">    if (traverserStrategy == TraverserStrategy.SET_PAIR_BULK_ITERATION) {</span>
+<span class="fc" id="L81">      setCurrentStepId(getIterationRuntimeContext().getSuperstepNumber() - 1);</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">    } else if (traverserStrategy == TraverserStrategy.SET_PAIR_FOR_LOOP_ITERATION) {</span>
+<span class="fc" id="L83">      setCurrentStepId((int) getRuntimeContext().getBroadcastVariable(</span>
+<span class="fc" id="L84">        ExplorativePatternMatching.BC_SUPERSTEP).get(0) - 1);</span>
+    }
+<span class="fc" id="L86">    initializeVisited();</span>
+
+<span class="fc" id="L88">    this.vertexCandidate = (int) getCurrentStep().getTo();</span>
+<span class="fc" id="L89">    this.nextFrom = getNextFrom();</span>
+<span class="fc" id="L90">  }</span>
+
+  @Override
+  public void join(EmbeddingWithTiePoint&lt;K&gt; embedding, VertexStep&lt;K&gt; vertexStep,
+    Collector&lt;EmbeddingWithTiePoint&lt;K&gt;&gt; collector) throws Exception {
+
+<span class="fc" id="L96">    K vertexId = vertexStep.getVertexId();</span>
+<span class="fc" id="L97">    K[] vertexMapping = embedding.getEmbedding().getVertexMapping();</span>
+
+<span class="fc bfc" id="L99" title="All 2 branches covered.">    if (isValidVertex(vertexId, vertexMapping, vertexCandidate)) {</span>
+
+<span class="fc" id="L101">      vertexMapping[vertexCandidate] = vertexId;</span>
+<span class="fc" id="L102">      embedding.getEmbedding().setVertexMapping(vertexMapping);</span>
+
+<span class="fc bfc" id="L104" title="All 2 branches covered.">      if (hasMoreSteps()) {</span>
+<span class="fc" id="L105">        embedding.setTiePointId(vertexMapping[nextFrom]);</span>
+      }
+<span class="fc" id="L107">      collector.collect(embedding);</span>
+    }
+<span class="fc" id="L109">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

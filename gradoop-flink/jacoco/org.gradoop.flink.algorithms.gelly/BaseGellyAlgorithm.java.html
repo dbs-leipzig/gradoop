@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseGellyAlgorithm.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.gelly</a> &gt; <span class="el_source">BaseGellyAlgorithm.java</span></div><h1>BaseGellyAlgorithm.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.gelly;
+
+import org.apache.flink.graph.Graph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
+
+/**
+ * Base class for Algorithms executed in Flink Gelly.
+ *
+ * @param &lt;K&gt;   Key type of output gelly graph.
+ * @param &lt;VV&gt;  Value type of output gelly vertex.
+ * @param &lt;EV&gt;  Value type of output gelly edge.
+ * @param &lt;O&gt;   Output type.
+ */
+<span class="fc" id="L30">public abstract class BaseGellyAlgorithm&lt;K, VV, EV, O&gt; implements UnaryGraphToValueOperator&lt;O&gt; {</span>
+
+  @Override
+  public O execute(LogicalGraph graph) {
+    try {
+<span class="fc" id="L35">      return executeInGelly(transformToGelly(graph));</span>
+<span class="nc" id="L36">    } catch (Exception e) {</span>
+<span class="nc" id="L37">      throw new RuntimeException(e);</span>
+    }
+  }
+
+  /**
+   * Default transformation from class K to a Gelly Graph.
+   *
+   * @param graph Gradoop Graph.
+   * @return Gelly Graph.
+   */
+  public abstract Graph&lt;K, VV, EV&gt; transformToGelly(LogicalGraph graph);
+
+  /**
+   * Perform some operation in Gelly and transform the Gelly graph back to a dedicated value.
+   *
+   * @param graph The Gelly graph.
+   * @return output format.
+   * @throws Exception on failure
+   */
+  public abstract O executeInGelly(Graph&lt;K, VV, EV&gt; graph) throws Exception;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

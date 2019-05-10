@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LabelPropagation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.gelly.labelpropagation</a> &gt; <span class="el_source">LabelPropagation.java</span></div><h1>LabelPropagation.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.gelly.labelpropagation;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.graph.Graph;
+import org.apache.flink.types.NullValue;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
+import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
+import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithPropertyValue;
+import org.gradoop.flink.algorithms.gelly.labelpropagation.functions.LPVertexJoin;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Wraps {@link LabelPropagation} into the EPGM model.
+ *
+ * During vertex centric iteration (Label Propagation Algorithm):
+ *
+ * In each super step each vertex will adopt the value sent by the majority of
+ * their neighbors or the smallest one if there is just one neighbor. If
+ * multiple labels occur with the same frequency, the minimum of them will be
+ * selected as new label. If a vertex changes its value in a super step, the new
+ * value will be propagated to the neighbours.
+ *
+ * The computation will terminate if no new values are assigned.
+ */
+public abstract class LabelPropagation extends GradoopGellyAlgorithm&lt;PropertyValue, NullValue&gt; {
+
+  /**
+   * Counter to define maximum number of iterations for the algorithm
+   */
+  private final int maxIterations;
+
+  /**
+   * Property key to access the label value which will be propagated
+   */
+  private final String propertyKey;
+
+  /**
+   * Constructor
+   *
+   * @param maxIterations Counter to define maximal iteration for the algorithm
+   * @param propertyKey   Property key to access the label value
+   */
+  protected LabelPropagation(int maxIterations, String propertyKey) {
+<span class="fc" id="L65">    super(new VertexToGellyVertexWithPropertyValue(propertyKey),</span>
+            new EdgeToGellyEdgeWithNullValue());
+<span class="fc" id="L67">    this.maxIterations = maxIterations;</span>
+<span class="fc" id="L68">    this.propertyKey = checkNotNull(propertyKey);</span>
+<span class="fc" id="L69">  }</span>
+
+  @Override
+  public LogicalGraph executeInGelly(Graph&lt;GradoopId, PropertyValue, NullValue&gt; graph) {
+<span class="fc" id="L73">    DataSet&lt;Vertex&gt; labeledVertices = executeInternal(graph)</span>
+<span class="fc" id="L74">      .join(currentGraph.getVertices())</span>
+<span class="fc" id="L75">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L76">      .with(new LPVertexJoin(propertyKey));</span>
+
+    // return labeled graph
+<span class="fc" id="L79">    return currentGraph.getConfig().getLogicalGraphFactory()</span>
+<span class="fc" id="L80">      .fromDataSets(labeledVertices, currentGraph.getEdges());</span>
+  }
+
+  /**
+   * Executes the label propagation and returns the updated vertex dataset.
+   *
+   * @param gellyGraph gelly graph with initialized vertices
+   * @return updated vertex set
+   */
+  protected abstract DataSet&lt;org.apache.flink.graph.Vertex&lt;GradoopId, PropertyValue&gt;&gt;
+  executeInternal(Graph&lt;GradoopId, PropertyValue, NullValue&gt; gellyGraph);
+
+  /**
+   * Returns the maximum number of iterations the algorithm is executed.
+   *
+   * @return maximum number of iterations
+   */
+  protected int getMaxIterations() {
+<span class="fc" id="L98">    return maxIterations;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MinimalJsonToVertex.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.importer.impl.json.functions</a> &gt; <span class="el_source">MinimalJsonToVertex.java</span></div><h1>MinimalJsonToVertex.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.importer.impl.json.functions;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Reads vertex data from a json document. The document contains at least
+ * the vertex id, an embedded data document and an embedded meta document.
+ * The data document contains all key-value pairs stored at the vertex, the
+ * meta document contains the vertex label and an optional list of graph
+ * identifiers the vertex is contained in.
+ * &lt;p&gt;
+ * Example:
+ * &lt;p&gt;
+ * &lt;pre&gt;{@code {
+ * &quot;id&quot;:0,
+ * &quot;name&quot;:&quot;Alice&quot;,&quot;gender&quot;:&quot;female&quot;,&quot;age&quot;:42
+ * }}&lt;/pre&gt;
+ */
+public class MinimalJsonToVertex implements MapFunction&lt;String, Vertex&gt; {
+
+  /**
+   * The default label used for the newly created vertices.
+   */
+  public static final String JSON_VERTEX_LABEL = &quot;JsonRowVertex&quot;;
+
+  /**
+   * Reduce object instantiations.
+   */
+  private final Vertex reuse;
+
+  /**
+   * Creates a new instance of this JSON string to vertex converting function.
+   *
+   * @param vertexFactory The vertex factory used to create new vertices.
+   */
+<span class="fc" id="L62">  public MinimalJsonToVertex(EPGMVertexFactory&lt;Vertex&gt; vertexFactory) {</span>
+<span class="fc" id="L63">    this.reuse = Objects.requireNonNull(vertexFactory).createVertex(JSON_VERTEX_LABEL);</span>
+<span class="fc" id="L64">    this.reuse.setProperties(Properties.create());</span>
+<span class="fc" id="L65">  }</span>
+
+  /**
+   * Constructs a vertex from a given JSON string representation.
+   *
+   * @param jsonString The String representation of a JSON object.
+   * @return A new vertex from the JSON object.
+   * @throws Exception on failure
+   */
+  @Override
+  public Vertex map(String jsonString) throws Exception {
+<span class="fc" id="L76">    JSONObject jsonVertex = new JSONObject(jsonString);</span>
+
+<span class="fc" id="L78">    Properties properties = reuse.getProperties();</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">    if (properties == null) {</span>
+<span class="nc" id="L80">      properties = Properties.create();</span>
+<span class="nc" id="L81">      reuse.setProperties(properties);</span>
+    }
+<span class="fc" id="L83">    properties.clear();</span>
+
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    for (Iterator it = jsonVertex.keys(); it.hasNext();) {</span>
+<span class="fc" id="L86">      String key = (String) it.next();</span>
+
+<span class="fc" id="L88">      PropertyValue propertyValue = getPropertyValue(jsonVertex, key);</span>
+<span class="fc" id="L89">      properties.set(key, propertyValue);</span>
+<span class="fc" id="L90">    }</span>
+<span class="fc" id="L91">    return reuse;</span>
+  }
+
+  /**
+   * Convert a value of a JSON object to a {@link PropertyValue}.
+   *
+   * @param jsonObject The JSON object.
+   * @param key        The key associated with the value to convert into a property value.
+   * @return The converted value.
+   */
+  private PropertyValue getPropertyValue(JSONObject jsonObject, String key) {
+<span class="fc" id="L102">    PropertyValue propertyValue = new PropertyValue();</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">    if (jsonObject.optJSONArray(key) != null) {</span>
+<span class="fc" id="L104">      JSONArray array = jsonObject.optJSONArray(key);</span>
+      // is it list or object?
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">      boolean listOrObject = array.optJSONObject(0) != null;</span>
+
+<span class="fc" id="L108">      List&lt;PropertyValue&gt; propertyList = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L110" title="All 2 branches covered.">      for (int i = 0; i &lt; array.length(); i++) {</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">        String stringValue = listOrObject ? array.optJSONObject(i).toString() : array.optString(i);</span>
+
+<span class="fc" id="L113">        PropertyValue listElement = PropertyValue.create(stringValue);</span>
+<span class="fc" id="L114">        propertyList.add(listElement);</span>
+<span class="fc" id="L115">        propertyValue.setList(propertyList);</span>
+      }
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">    } else if (jsonObject.optString(key) != null) {</span>
+<span class="fc" id="L118">      String text = jsonObject.optString(key);</span>
+<span class="fc" id="L119">      propertyValue.setString(text);</span>
+<span class="fc" id="L120">    } else {</span>
+<span class="nc" id="L121">      propertyValue.setObject(null);</span>
+    }
+<span class="fc" id="L123">    return propertyValue;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

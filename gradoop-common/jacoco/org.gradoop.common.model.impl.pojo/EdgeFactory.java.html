@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EdgeFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.pojo</a> &gt; <span class="el_source">EdgeFactory.java</span></div><h1>EdgeFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.pojo;
+
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.util.GradoopConstants;
+
+import java.io.Serializable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * Factory for creating edge POJOs.
+ */
+<span class="fc" id="L31">public class EdgeFactory implements EPGMEdgeFactory&lt;Edge&gt;, Serializable {</span>
+
+  /**
+   * serial version uid
+   */
+  private static final long serialVersionUID = 42L;
+
+  @Override
+  public Edge createEdge(GradoopId sourceVertexId,
+    GradoopId targetVertexId) {
+<span class="nc" id="L41">    return initEdge(GradoopId.get(), sourceVertexId, targetVertexId);</span>
+  }
+
+  @Override
+  public Edge initEdge(final GradoopId id, final GradoopId sourceVertexId,
+    final GradoopId targetVertexId) {
+<span class="fc" id="L47">    return initEdge(id, GradoopConstants.DEFAULT_EDGE_LABEL, sourceVertexId,</span>
+      targetVertexId);
+  }
+
+  @Override
+  public Edge createEdge(String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId) {
+<span class="nc" id="L54">    return initEdge(GradoopId.get(), label, sourceVertexId, targetVertexId);</span>
+  }
+
+  @Override
+  public Edge initEdge(final GradoopId id, final String label,
+    final GradoopId sourceVertexId, final GradoopId targetVertexId) {
+<span class="fc" id="L60">    return initEdge(id, label, sourceVertexId, targetVertexId, null, null);</span>
+  }
+
+  @Override
+  public Edge createEdge(String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId, Properties properties) {
+<span class="nc" id="L66">    return initEdge(GradoopId.get(),</span>
+      label, sourceVertexId, targetVertexId, properties);
+  }
+
+  @Override
+  public Edge initEdge(
+    GradoopId id,
+    String label,
+    GradoopId sourceVertexId,
+    GradoopId targetVertexId,
+    Properties properties) {
+
+<span class="nc" id="L78">    return</span>
+<span class="nc" id="L79">      initEdge(id, label, sourceVertexId, targetVertexId, properties, null);</span>
+  }
+
+  @Override
+  public Edge createEdge(String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId, GradoopIdSet graphIds) {
+<span class="nc" id="L85">    return initEdge(GradoopId.get(),</span>
+      label, sourceVertexId, targetVertexId, graphIds);
+  }
+
+  @Override
+  public Edge initEdge(final GradoopId id, final String label,
+    final GradoopId sourceVertexId, final GradoopId targetVertexId,
+    GradoopIdSet graphs) {
+<span class="nc" id="L93">    return initEdge(id, label, sourceVertexId, targetVertexId, null, graphs);</span>
+  }
+
+  @Override
+  public Edge createEdge(String label, GradoopId sourceVertexId,
+    GradoopId targetVertexId, Properties properties,
+    GradoopIdSet graphIds) {
+<span class="fc" id="L100">    return initEdge(GradoopId.get(),</span>
+      label, sourceVertexId, targetVertexId, properties, graphIds);
+  }
+
+  @Override
+  public Edge initEdge(final GradoopId id, final String label,
+    final GradoopId sourceVertexId, final GradoopId targetVertexId,
+    final Properties properties, GradoopIdSet graphIds) {
+<span class="fc" id="L108">    checkNotNull(id, &quot;Identifier was null&quot;);</span>
+<span class="fc" id="L109">    checkNotNull(label, &quot;Label was null&quot;);</span>
+<span class="fc" id="L110">    checkNotNull(sourceVertexId, &quot;Source vertex id was null&quot;);</span>
+<span class="fc" id="L111">    checkNotNull(targetVertexId, &quot;Target vertex id was null&quot;);</span>
+<span class="fc" id="L112">    return new Edge(id, label, sourceVertexId, targetVertexId,</span>
+      properties, graphIds);
+  }
+
+  @Override
+  public Class&lt;Edge&gt; getType() {
+<span class="nc" id="L118">    return Edge.class;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

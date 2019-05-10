@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TLFFileFormat.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.tlf.functions</a> &gt; <span class="el_source">TLFFileFormat.java</span></div><h1>TLFFileFormat.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.tlf.functions;
+
+import com.google.common.collect.Maps;
+import org.apache.flink.api.java.io.TextOutputFormat;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.flink.io.impl.tlf.TLFConstants;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Converts a GraphTransaction to the following format:
+ * &lt;p&gt;
+ *   t # 0
+ *   v 0 vertexLabel0
+ *   v 1 vertexLabel1
+ *   e 0 1 edgeLabel
+ * &lt;/p&gt;
+ */
+<span class="fc" id="L38">public class TLFFileFormat</span>
+  implements TextOutputFormat.TextFormatter&lt;GraphTransaction&gt; {
+
+  /**
+   * Global counter for the graph id used for each single graph transaction.
+   */
+<span class="fc" id="L44">  private long graphId = 0;</span>
+
+  /**
+   * Stores a long representation for each gradoop id.
+   */
+  private Map&lt;GradoopId, Long&gt; vertexIdMap;
+
+  /**
+   * Creates a TLF string representation of a given graph transaction, which
+   * has the following format:
+   * &lt;p&gt;
+   * t # 0
+   * v 0 label
+   * v 1 label
+   * v 2 label
+   * e 0 1 edgeLabel
+   * e 1 2 edgeLabel
+   * e 2 1 edgeLabel
+   * &lt;/p&gt;
+   *
+   * @param graphTransaction graph transaction
+   * @return TLF string representation
+   */
+  @Override
+  public String format(GraphTransaction graphTransaction) {
+<span class="fc" id="L69">    StringBuilder builder = new StringBuilder();</span>
+
+<span class="fc" id="L71">    vertexIdMap = Maps</span>
+<span class="fc" id="L72">      .newHashMapWithExpectedSize(graphTransaction.getVertices().size());</span>
+
+    // GRAPH HEAD
+<span class="fc" id="L75">    writeGraphHead(builder, graphId);</span>
+<span class="fc" id="L76">    graphId++;</span>
+
+    // VERTICES
+<span class="fc" id="L79">    writeVertices(builder, graphTransaction.getVertices());</span>
+
+    // EDGES
+<span class="fc" id="L82">    writeEdges(builder, graphTransaction.getEdges());</span>
+
+<span class="fc" id="L84">    return builder.toString().trim();</span>
+  }
+
+  /**
+   * Converts the graph head into the following format and adds this to the
+   * StringBuilder:
+   * &lt;p&gt;
+   * t # 0
+   * &lt;/p&gt;
+   *
+   * @param builder StringBuilder to build the whole string representation
+   * @param graphId current graph id
+   * @return builder with appended graph head representation
+   */
+  private StringBuilder writeGraphHead(StringBuilder builder, long graphId) {
+<span class="fc" id="L99">    return builder.append(String.format(&quot;%s %s %s%n&quot;,</span>
+<span class="fc" id="L100">      TLFConstants.GRAPH_SYMBOL, TLFConstants.NEW_GRAPH_TAG, graphId));</span>
+  }
+
+  /**
+   * Converts the vertices into the following format and adds this to the
+   * StringBuilder:
+   * &lt;p&gt;
+   * v 0 vertexLabel
+   * v 1 vertexLabel
+   * v 2 vertexLabel
+   * &lt;/p&gt;
+   *
+   * @param builder StringBuilder to build the whole string representation
+   * @param vertices set of vertices
+   * @return builder with appended vertex representations
+   */
+  private StringBuilder writeVertices(StringBuilder builder,
+    Set&lt;Vertex&gt; vertices) {
+<span class="fc" id="L118">    long vertexId = 0;</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">    for (Vertex vertex : vertices) {</span>
+<span class="fc" id="L120">      vertexIdMap.put(vertex.getId(), vertexId);</span>
+<span class="fc" id="L121">      builder.append(String.format(&quot;%s %s %s%n&quot;,</span>
+        TLFConstants.VERTEX_SYMBOL,
+<span class="fc" id="L123">        vertexId,</span>
+<span class="fc" id="L124">        vertex.getLabel()));</span>
+<span class="fc" id="L125">      vertexId++;</span>
+<span class="fc" id="L126">    }</span>
+<span class="fc" id="L127">    return builder;</span>
+  }
+
+  /**
+   * Converts the edges into the following format and adds this to the
+   * StringBuilder:
+   * &lt;p&gt;
+   * e 0 1 edgeLabel
+   * e 1 2 edgeLabel
+   * e 2 1 edgeLabel
+   * &lt;/p&gt;
+   *
+   * @param builder StringBuilder to build the whole string representation
+   * @param edges set of edges
+   * @return builder with appended edge representations
+   */
+  private StringBuilder writeEdges(StringBuilder builder, Set&lt;Edge&gt; edges) {
+<span class="fc bfc" id="L144" title="All 2 branches covered.">    for (Edge edge : edges) {</span>
+<span class="fc" id="L145">      Long sourceId = vertexIdMap.get(edge.getSourceId());</span>
+<span class="fc" id="L146">      Long targetId = vertexIdMap.get(edge.getTargetId());</span>
+
+<span class="fc" id="L148">      builder.append(String.format(&quot;%s %s %s %s%n&quot;,</span>
+        TLFConstants.EDGE_SYMBOL,
+        sourceId,
+        targetId,
+<span class="fc" id="L152">        edge.getLabel()));</span>
+<span class="fc" id="L153">    }</span>
+<span class="fc" id="L154">    return builder;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

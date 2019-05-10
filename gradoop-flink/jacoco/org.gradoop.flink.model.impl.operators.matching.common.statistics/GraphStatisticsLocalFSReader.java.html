@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GraphStatisticsLocalFSReader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.common.statistics</a> &gt; <span class="el_source">GraphStatisticsLocalFSReader.java</span></div><h1>GraphStatisticsLocalFSReader.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.common.statistics;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
+
+/**
+ * Reads {@link GraphStatistics} from dedicated files in the local file system.
+ */
+<span class="nc" id="L29">public class GraphStatisticsLocalFSReader extends GraphStatisticsReader {</span>
+  /**
+   * Reads statistics from files contains in the specified directory and creates a
+   * {@link GraphStatistics} object from them.
+   *
+   * The method expects all files to be present and formatted according to the docs.
+   *
+   * @param inputPath path to directory containing statistics files
+   * @return graph statistics
+   * @throws IOException if an I/O error occurs opening the files
+   */
+  public static GraphStatistics read(String inputPath) throws IOException {
+
+<span class="fc" id="L42">    Path statisticsDir = Paths.get(new File(inputPath).getAbsolutePath());</span>
+<span class="fc" id="L43">    Charset charset = Charset.forName(&quot;UTF-8&quot;);</span>
+
+<span class="fc" id="L45">    Path p = statisticsDir.resolve(Paths.get(GraphStatisticsReader.FILE_VERTEX_COUNT));</span>
+<span class="fc" id="L46">    long vertexCount = readSingleValue(Files.lines(p, charset));</span>
+
+<span class="fc" id="L48">    p = statisticsDir.resolve(Paths.get(GraphStatisticsReader.FILE_EDGE_COUNT));</span>
+<span class="fc" id="L49">    long edgeCount = readSingleValue(Files.lines(p, charset));</span>
+
+<span class="fc" id="L51">    p = statisticsDir.resolve(Paths.get(GraphStatisticsReader.FILE_VERTEX_COUNT_BY_LABEL));</span>
+<span class="fc" id="L52">    Map&lt;String, Long&gt; vertexCountByLabel = readKeyValueMap(Files.lines(p, charset));</span>
+
+<span class="fc" id="L54">    p = statisticsDir.resolve(Paths.get(GraphStatisticsReader.FILE_EDGE_COUNT_BY_LABEL));</span>
+<span class="fc" id="L55">    Map&lt;String, Long&gt; edgeCountByLabel = readKeyValueMap(Files.lines(p, charset));</span>
+
+<span class="fc" id="L57">    p = statisticsDir</span>
+<span class="fc" id="L58">      .resolve(Paths.get(GraphStatisticsReader.FILE_EDGE_COUNT_BY_SOURCE_VERTEX_AND_EDGE_LABEL));</span>
+<span class="fc" id="L59">    Map&lt;String, Map&lt;String, Long&gt;&gt; edgeCountBySourceVertexAndEdgeLabel =</span>
+<span class="fc" id="L60">      readNestedKeyValueMap(Files.lines(p, charset));</span>
+
+<span class="fc" id="L62">    p = statisticsDir</span>
+<span class="fc" id="L63">      .resolve(Paths.get(GraphStatisticsReader.FILE_EDGE_COUNT_BY_TARGET_VERTEX_AND_EDGE_LABEL));</span>
+<span class="fc" id="L64">    Map&lt;String, Map&lt;String, Long&gt;&gt; edgeCountByTargetVertexAndEdgeLabel =</span>
+<span class="fc" id="L65">      readNestedKeyValueMap(Files.lines(p, charset));</span>
+
+<span class="fc" id="L67">    p = statisticsDir.resolve(Paths.get(GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT));</span>
+<span class="fc" id="L68">    long distinctSourceVertexCount = readSingleValue(Files.lines(p, charset));</span>
+
+<span class="fc" id="L70">    p = statisticsDir.resolve(Paths.get(GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT));</span>
+<span class="fc" id="L71">    long distinctTargetVertexCount = readSingleValue(Files.lines(p, charset));</span>
+
+<span class="fc" id="L73">    p = statisticsDir</span>
+<span class="fc" id="L74">      .resolve(Paths.get(GraphStatisticsReader.FILE_DISTINCT_SOURCE_VERTEX_COUNT_BY_EDGE_LABEL));</span>
+<span class="fc" id="L75">    Map&lt;String, Long&gt; distSourceVertexCountByEdgeLabel = readKeyValueMap(Files.lines(p, charset));</span>
+
+<span class="fc" id="L77">    p = statisticsDir</span>
+<span class="fc" id="L78">      .resolve(Paths.get(GraphStatisticsReader.FILE_DISTINCT_TARGET_VERTEX_COUNT_BY_EDGE_LABEL));</span>
+<span class="fc" id="L79">    Map&lt;String, Long&gt; distTargetVertexCountByEdgeLabel = readKeyValueMap(Files.lines(p, charset));</span>
+
+<span class="fc" id="L81">    p = statisticsDir.resolve(Paths.get(</span>
+        GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES_BY_LABEL));
+<span class="fc" id="L83">    Map&lt;String, Map&lt;String, Long&gt;&gt; distinctPropertyValuesByEdgeLabelAndPropertyName =</span>
+<span class="fc" id="L84">      readNestedKeyValueMap(Files.lines(p, charset));</span>
+
+<span class="fc" id="L86">    p = statisticsDir.resolve(Paths.get(</span>
+      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES_BY_LABEL));
+<span class="fc" id="L88">    Map&lt;String, Map&lt;String, Long&gt;&gt; distinctPropertyValuesByVertexLabelAndPropertyName =</span>
+<span class="fc" id="L89">      readNestedKeyValueMap(Files.lines(p, charset));</span>
+
+<span class="fc" id="L91">    p = statisticsDir.resolve(Paths.get(</span>
+      GraphStatisticsReader.FILE_DISTINCT_EDGE_PROPERTIES));
+<span class="fc" id="L93">    Map&lt;String, Long&gt; distinctEdgePropertyValuesByPropertyName =</span>
+<span class="fc" id="L94">      readKeyValueMap(Files.lines(p, charset));</span>
+
+<span class="fc" id="L96">    p = statisticsDir.resolve(Paths.get(</span>
+      GraphStatisticsReader.FILE_DISTINCT_VERTEX_PROPERTIES));
+<span class="fc" id="L98">    Map&lt;String, Long&gt; distinctVertexPropertyValuesByPropertyName =</span>
+<span class="fc" id="L99">      readKeyValueMap(Files.lines(p, charset));</span>
+
+<span class="fc" id="L101">    return new GraphStatistics(vertexCount, edgeCount, vertexCountByLabel, edgeCountByLabel,</span>
+      edgeCountBySourceVertexAndEdgeLabel, edgeCountByTargetVertexAndEdgeLabel,
+      distinctSourceVertexCount, distinctTargetVertexCount,
+      distSourceVertexCountByEdgeLabel, distTargetVertexCountByEdgeLabel,
+      distinctPropertyValuesByEdgeLabelAndPropertyName,
+      distinctPropertyValuesByVertexLabelAndPropertyName,
+      distinctEdgePropertyValuesByPropertyName,
+      distinctVertexPropertyValuesByPropertyName);
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MergeEmbeddings.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions</a> &gt; <span class="el_source">MergeEmbeddings.java</span></div><h1>MergeEmbeddings.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.JoinEmbeddings;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.ToIntFunction;
+import java.util.stream.IntStream;
+
+/**
+ * Given two input embeddings, the function merges them according to the given parameters and
+ * constraints.
+ *
+ * The constraints for merging are defined at {@link JoinEmbeddings}.
+ */
+public class MergeEmbeddings implements
+  FlatJoinFunction&lt;Embedding, Embedding, Embedding&gt;,
+  FlatMapFunction&lt;Tuple2&lt;Embedding, Embedding&gt;, Embedding&gt; {
+
+  /**
+   * Reduce object instantiations.
+   */
+  protected final Embedding reuseEmbedding;
+  /**
+   * Non-Join columns from the right side.
+   */
+  private final int[] nonJoinColumnsRight;
+  /**
+   * Number of join columns of the right side.
+   */
+  private final int joinColumnsRightSize;
+  /**
+   * Vertex columns of the left embedding that need to have distinct id values.
+   */
+  private final int[] distinctVertexColumnsLeft;
+  /**
+   * Vertex columns of the right embedding that need to have distinct id values.
+   */
+  private final int[] distinctVertexColumnsRight;
+  /**
+   * Edge columns of the left embedding that need to have distinct id values.
+   */
+  private final int[] distinctEdgeColumnsLeft;
+  /**
+   * Edge columns of the right embedding that need to have distinct id values.
+   */
+  private final int[] distinctEdgeColumnsRight;
+  /**
+   * Flag, if vertex distinctiveness needs to be checked.
+   */
+  private final boolean checkDistinctVertices;
+  /**
+   * Flag, if vertex distinctiveness needs to be checked.
+   */
+  private final boolean checkDistinctEdges;
+
+  /**
+   * Creates a new UDF instance.
+   *
+   * @param rightColumns number of columns in the right embedding
+   * @param joinColumnsRight join columns of the right side
+   * @param distinctVertexColumnsLeft distinct vertex columns of the left embedding
+   * @param distinctVertexColumnsRight distinct vertex columns of the right embedding
+   * @param distinctEdgeColumnsLeft distinct edge columns of the left embedding
+   * @param distinctEdgeColumnsRight distinct edge columns of the right embedding
+   */
+  public MergeEmbeddings(int rightColumns,
+    List&lt;Integer&gt; joinColumnsRight,
+    List&lt;Integer&gt; distinctVertexColumnsLeft,
+    List&lt;Integer&gt; distinctVertexColumnsRight,
+    List&lt;Integer&gt; distinctEdgeColumnsLeft,
+<span class="fc" id="L95">    List&lt;Integer&gt; distinctEdgeColumnsRight) {</span>
+
+<span class="fc" id="L97">    this.nonJoinColumnsRight = IntStream.range(0, rightColumns)</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">      .filter(col -&gt; !joinColumnsRight.contains(col))</span>
+<span class="fc" id="L99">      .toArray();</span>
+<span class="fc" id="L100">    this.joinColumnsRightSize = joinColumnsRight.size();</span>
+
+<span class="fc" id="L102">    ToIntFunction&lt;Integer&gt; f = i -&gt; i;</span>
+<span class="fc" id="L103">    this.distinctVertexColumnsLeft = distinctVertexColumnsLeft.stream().mapToInt(f).toArray();</span>
+<span class="fc" id="L104">    this.distinctVertexColumnsRight = distinctVertexColumnsRight.stream().mapToInt(f).toArray();</span>
+<span class="fc" id="L105">    this.distinctEdgeColumnsLeft = distinctEdgeColumnsLeft.stream().mapToInt(f).toArray();</span>
+<span class="fc" id="L106">    this.distinctEdgeColumnsRight = distinctEdgeColumnsRight.stream().mapToInt(f).toArray();</span>
+
+<span class="fc bfc" id="L108" title="All 2 branches covered.">    this.checkDistinctVertices = distinctVertexColumnsLeft.size() &gt; 0 ||</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">      distinctVertexColumnsRight.size() &gt; 0;</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">    this.checkDistinctEdges = distinctEdgeColumnsLeft.size() &gt; 0 ||</span>
+<span class="fc bfc" id="L111" title="All 2 branches covered.">      distinctEdgeColumnsRight.size() &gt; 0;</span>
+<span class="fc" id="L112">    this.reuseEmbedding = new Embedding();</span>
+<span class="fc" id="L113">  }</span>
+
+  @Override
+  public void join(Embedding left, Embedding right, Collector&lt;Embedding&gt; out) throws Exception {
+<span class="fc bfc" id="L117" title="All 2 branches covered.">    if (isValid(left, right)) {</span>
+<span class="fc" id="L118">      buildEmbedding(left, right);</span>
+<span class="fc" id="L119">      out.collect(reuseEmbedding);</span>
+    }
+<span class="fc" id="L121">  }</span>
+
+  @Override
+  public void flatMap(Tuple2&lt;Embedding, Embedding&gt; value, Collector&lt;Embedding&gt; out)
+      throws Exception {
+<span class="fc" id="L126">    join(value.f0, value.f1, out);</span>
+<span class="fc" id="L127">  }</span>
+
+  /**
+   * Checks if the merged embedding would hold under morphism setting
+   * @param left left embedding
+   * @param right right embedding
+   * @return true if the morphism condition holds
+   */
+  protected boolean isValid(Embedding left, Embedding right) {
+<span class="fc" id="L136">    boolean collect = false;</span>
+
+    // Vertex-Homomorphism + Edge-Homomorphism
+<span class="fc bfc" id="L139" title="All 4 branches covered.">    if (!checkDistinctVertices &amp;&amp; !checkDistinctEdges) {</span>
+<span class="fc" id="L140">      collect = true;</span>
+      // Vertex-Homomorphism + Edge-Isomorphism
+<span class="fc bfc" id="L142" title="All 2 branches covered.">    } else if (!checkDistinctVertices) {</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">      if (isDistinct(distinctEdgeColumnsLeft, distinctEdgeColumnsRight, left, right)) {</span>
+<span class="fc" id="L144">        collect = true;</span>
+      }
+      // Vertex-Isomorphism + Edge-Isomorphism
+    } else {
+<span class="fc bfc" id="L148" title="All 2 branches covered.">      if (isDistinct(distinctVertexColumnsLeft, distinctVertexColumnsRight, left, right) &amp;&amp;</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        isDistinct(distinctEdgeColumnsLeft, distinctEdgeColumnsRight, left, right)) {</span>
+<span class="fc" id="L150">        collect = true;</span>
+      }
+    }
+
+<span class="fc" id="L154">    return collect;</span>
+  }
+
+  /**
+   * Merges left and right embeddings into {@link MergeEmbeddings#reuseEmbedding}
+   * @param left left embedding
+   * @param right right embedding
+   */
+  protected void buildEmbedding(Embedding left, Embedding right) {
+<span class="fc" id="L163">    reuseEmbedding.setIdData(mergeIdData(left, right));</span>
+<span class="fc" id="L164">    reuseEmbedding.setPropertyData(mergePropertyData(left, right));</span>
+<span class="fc" id="L165">    reuseEmbedding.setIdListData(mergeIdListData(left, right));</span>
+<span class="fc" id="L166">  }</span>
+
+  /**
+   * Checks if both given embeddings contain distinct id values at all specified columns.
+   *
+   * @param columnsLeft left columns to include in check for uniqueness
+   * @param columnsRight right columns to include in check for uniqueness
+   * @param left left embedding
+   * @param right right embedding
+   * @return true, if both embeddings contain unique id values for all specified columns
+   */
+  private boolean isDistinct(int[] columnsLeft, int[] columnsRight,
+    Embedding left, Embedding right) {
+
+<span class="fc" id="L180">    Set&lt;GradoopId&gt; ids = new HashSet&lt;&gt;(left.size() + right.size());</span>
+<span class="fc bfc" id="L181" title="All 4 branches covered.">    return isDistinct(ids, columnsLeft, left) &amp;&amp; isDistinct(ids, columnsRight, right);</span>
+  }
+
+  /**
+   * Checks if the specified embeddings contains distinct ids at the specified columns.
+   *
+   * @param ids used to track uniqueness
+   * @param columns columns to check for uniqueness
+   * @param embedding embedding to check
+   * @return true, if the embedding contains distinct Ids at the specified columns
+   */
+  private boolean isDistinct(Set&lt;GradoopId&gt; ids, int[] columns, Embedding embedding) {
+<span class="fc" id="L193">    boolean isDistinct = true;</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">    for (int column : columns) {</span>
+<span class="fc" id="L195">      isDistinct = ids.addAll(embedding.getIdAsList(column));</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">      if (!isDistinct) {</span>
+<span class="fc" id="L197">        break;</span>
+      }
+    }
+<span class="fc" id="L200">    return isDistinct;</span>
+  }
+
+  /**
+   * Merges the idData columns of left and right
+   * All entries of left are kept as well as all right entries which aren't join columns
+   *
+   * @param left the left hand side embedding
+   * @param right the right hand side embedding
+   * @return the merged data represented as byte array
+   */
+  private byte[] mergeIdData(Embedding left, Embedding right) {
+<span class="fc" id="L212">    byte[] newIdData = new byte[</span>
+<span class="fc" id="L213">      left.getIdData().length +</span>
+<span class="fc" id="L214">      right.getIdData().length -</span>
+      (joinColumnsRightSize * (Embedding.ID_ENTRY_SIZE))
+    ];
+
+<span class="fc" id="L218">    int offset = left.getIdData().length;</span>
+<span class="fc" id="L219">    System.arraycopy(left.getIdData(), 0, newIdData, 0, offset);</span>
+
+<span class="fc bfc" id="L221" title="All 2 branches covered.">    for (int i : nonJoinColumnsRight) {</span>
+<span class="fc" id="L222">      System.arraycopy(right.getRawIdEntry(i), 0, newIdData, offset, Embedding.ID_ENTRY_SIZE);</span>
+<span class="fc" id="L223">      offset += Embedding.ID_ENTRY_SIZE;</span>
+    }
+
+<span class="fc" id="L226">    return newIdData;</span>
+  }
+
+  /**
+   * Merges the propertyData columns of the left and right embeddings
+   * All entries from both sides are kept.
+   *
+   * @param left the left hand side embedding
+   * @param right the right hand side embedding
+   * @return the merged data represented as byte array
+   */
+  private byte[] mergePropertyData(Embedding left, Embedding right) {
+<span class="fc" id="L238">    return ArrayUtils.addAll(left.getPropertyData(), right.getPropertyData());</span>
+  }
+
+  /**
+   * Merges the idListData columns of the left and right embeddings
+   * All entries from both sides are kept.
+   *
+   * @param left the left hand side embedding
+   * @param right the right hand side embedding
+   * @return the merged data represented as byte array
+   */
+  private byte[] mergeIdListData(Embedding left, Embedding right) {
+<span class="fc" id="L250">    return ArrayUtils.addAll(left.getIdListData(), right.getIdListData());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

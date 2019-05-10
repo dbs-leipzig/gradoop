@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JoinEmbeddings.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join</a> &gt; <span class="el_source">JoinEmbeddings.java</span></div><h1>JoinEmbeddings.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join;
+
+import org.apache.flink.api.common.operators.base.JoinOperatorBase;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.ExtractJoinColumns;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.join.functions.MergeEmbeddings;
+
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Joins two embeddings at given columns and checks for vertex/edge isomorphism/homomorphism.
+ *
+ * The result is always a new embedding with the following constraints.
+ *
+ * &lt;ul&gt;
+ * &lt;li&gt;new entries of the right embedding are always appended to the left embedding&lt;/li&gt;
+ * &lt;li&gt;duplicate fields are removed, i.e., the join columns are stored once in the result&lt;/li&gt;
+ * &lt;li&gt;all properties from the right side are appended to the proeprties of the left side,
+ *     &lt;em&gt;no&lt;/em&gt; deduplication is performed&lt;/li&gt;
+ * &lt;/ul&gt;
+ */
+public class JoinEmbeddings implements PhysicalOperator {
+
+  /**
+   * Left side embeddings
+   */
+  private final DataSet&lt;Embedding&gt; left;
+  /**
+   * Right side embeddings
+   */
+  private final DataSet&lt;Embedding&gt; right;
+  /**
+   * Number of columns in the right embedding.
+   */
+  private final int rightColumns;
+  /**
+   * Left side join columns
+   */
+  private final List&lt;Integer&gt; leftJoinColumns;
+  /**
+   * Right side join columns
+   */
+  private final List&lt;Integer&gt; rightJoinColumns;
+  /**
+   * Columns that represent vertices in the left embedding which need to be distinct
+   */
+  private final List&lt;Integer&gt; distinctVertexColumnsLeft;
+  /**
+   * Columns that represent vertices in the right embedding which need to be distinct
+   */
+  private final List&lt;Integer&gt; distinctVertexColumnsRight;
+  /**
+   * Columns that represent edges in the left embedding which need to be distinct
+   */
+  private final List&lt;Integer&gt; distinctEdgeColumnsLeft;
+  /**
+   * Columns that represent edges in the right embedding which need to be distinct
+   */
+  private final List&lt;Integer&gt; distinctEdgeColumnsRight;
+  /**
+   * Flink join Hint
+   */
+  private final JoinOperatorBase.JoinHint joinHint;
+
+  /**
+   * Operator name
+   */
+  private String name;
+
+  /**
+   * Instantiates a new join operator.
+   *
+   * @param left embeddings of the left side of the join
+   * @param right embeddings of the right side of the join
+   * @param rightColumns number of columns in the right side of the join
+   * @param leftJoinColumn join column left side
+   * @param rightJoinColumn join column right side
+   */
+  public JoinEmbeddings(DataSet&lt;Embedding&gt; left, DataSet&lt;Embedding&gt; right,
+    int rightColumns,
+    int leftJoinColumn, int rightJoinColumn) {
+<span class="fc" id="L100">    this(left, right, rightColumns,</span>
+<span class="fc" id="L101">      Collections.singletonList(leftJoinColumn), Collections.singletonList(rightJoinColumn));</span>
+<span class="fc" id="L102">  }</span>
+
+  /**
+   * Instantiates a new join operator.
+   *
+   * @param left embeddings of the left side of the join
+   * @param right embeddings of the right side of the join
+   * @param rightColumns number of columns in the right side of the join
+   * @param leftJoinColumns specifies the join columns of the left side
+   * @param rightJoinColumns specifies the join columns of the right side
+   */
+  public JoinEmbeddings(DataSet&lt;Embedding&gt; left, DataSet&lt;Embedding&gt; right,
+    int rightColumns,
+    List&lt;Integer&gt; leftJoinColumns, List&lt;Integer&gt; rightJoinColumns) {
+<span class="fc" id="L116">    this(left, right, rightColumns,</span>
+      leftJoinColumns, rightJoinColumns,
+<span class="fc" id="L118">      Collections.emptyList(), Collections.emptyList(),</span>
+<span class="fc" id="L119">      Collections.emptyList(), Collections.emptyList());</span>
+<span class="fc" id="L120">  }</span>
+
+  /**
+   * Instantiates a new join operator.
+   *
+   * @param left embeddings of the left side of the join
+   * @param right embeddings of the right side of the join
+   * @param rightColumns number of columns in the right side of the join
+   * @param leftJoinColumns specifies the join columns of the left side
+   * @param rightJoinColumns specifies the join columns of the right side
+   * @param distinctVertexColumnsLeft distinct vertex columns of the left embedding
+   * @param distinctVertexColumnsRight distinct vertex columns of the right embedding
+   * @param distinctEdgeColumnsLeft distinct edge columns of the left embedding
+   * @param distinctEdgeColumnsRight distinct edge columns of the right embedding
+   */
+  public JoinEmbeddings(DataSet&lt;Embedding&gt; left, DataSet&lt;Embedding&gt; right,
+    int rightColumns,
+    List&lt;Integer&gt; leftJoinColumns, List&lt;Integer&gt; rightJoinColumns,
+    List&lt;Integer&gt; distinctVertexColumnsLeft, List&lt;Integer&gt; distinctVertexColumnsRight,
+    List&lt;Integer&gt; distinctEdgeColumnsLeft, List&lt;Integer&gt; distinctEdgeColumnsRight) {
+<span class="fc" id="L140">    this(left, right, rightColumns,</span>
+      leftJoinColumns, rightJoinColumns,
+      distinctVertexColumnsLeft, distinctVertexColumnsRight,
+      distinctEdgeColumnsLeft, distinctEdgeColumnsRight,
+      JoinOperatorBase.JoinHint.OPTIMIZER_CHOOSES);
+<span class="fc" id="L145">  }</span>
+
+  /**
+   * Instantiates a new join operator.
+   *
+   * @param left embeddings of the left side of the join
+   * @param right embeddings of the right side of the join
+   * @param rightColumns number of columns in the right side of the join
+   * @param leftJoinColumns specifies the join columns of the left side
+   * @param rightJoinColumns specifies the join columns of the right side
+   * @param distinctVertexColumnsLeft distinct vertex columns of the left embedding
+   * @param distinctVertexColumnsRight distinct vertex columns of the right embedding
+   * @param distinctEdgeColumnsLeft distinct edge columns of the left embedding
+   * @param distinctEdgeColumnsRight distinct edge columns of the right embedding
+   * @param joinHint join strategy
+   */
+  public JoinEmbeddings(DataSet&lt;Embedding&gt; left, DataSet&lt;Embedding&gt; right,
+    int rightColumns,
+    List&lt;Integer&gt; leftJoinColumns, List&lt;Integer&gt; rightJoinColumns,
+    List&lt;Integer&gt; distinctVertexColumnsLeft, List&lt;Integer&gt; distinctVertexColumnsRight,
+    List&lt;Integer&gt; distinctEdgeColumnsLeft, List&lt;Integer&gt; distinctEdgeColumnsRight,
+<span class="fc" id="L166">    JoinOperatorBase.JoinHint joinHint) {</span>
+<span class="fc" id="L167">    this.left                       = left;</span>
+<span class="fc" id="L168">    this.right                      = right;</span>
+<span class="fc" id="L169">    this.rightColumns               = rightColumns;</span>
+<span class="fc" id="L170">    this.leftJoinColumns            = leftJoinColumns;</span>
+<span class="fc" id="L171">    this.rightJoinColumns           = rightJoinColumns;</span>
+<span class="fc" id="L172">    this.distinctVertexColumnsLeft  = distinctVertexColumnsLeft;</span>
+<span class="fc" id="L173">    this.distinctVertexColumnsRight = distinctVertexColumnsRight;</span>
+<span class="fc" id="L174">    this.distinctEdgeColumnsLeft    = distinctEdgeColumnsLeft;</span>
+<span class="fc" id="L175">    this.distinctEdgeColumnsRight   = distinctEdgeColumnsRight;</span>
+<span class="fc" id="L176">    this.joinHint                   = joinHint;</span>
+<span class="fc" id="L177">    this.setName(&quot;JoinEmbeddings&quot;);</span>
+<span class="fc" id="L178">  }</span>
+
+  @Override
+  public DataSet&lt;Embedding&gt; evaluate() {
+<span class="fc" id="L182">    return left.join(right, joinHint)</span>
+<span class="fc" id="L183">      .where(new ExtractJoinColumns(leftJoinColumns))</span>
+<span class="fc" id="L184">      .equalTo(new ExtractJoinColumns(rightJoinColumns))</span>
+<span class="fc" id="L185">      .with(new MergeEmbeddings(rightColumns, rightJoinColumns,</span>
+        distinctVertexColumnsLeft, distinctVertexColumnsRight,
+        distinctEdgeColumnsLeft, distinctEdgeColumnsRight))
+<span class="fc" id="L188">      .name(getName());</span>
+  }
+
+  @Override
+  public void setName(String newName) {
+<span class="fc" id="L193">    this.name = newName;</span>
+<span class="fc" id="L194">  }</span>
+
+  @Override
+  public String getName() {
+<span class="fc" id="L198">    return this.name;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

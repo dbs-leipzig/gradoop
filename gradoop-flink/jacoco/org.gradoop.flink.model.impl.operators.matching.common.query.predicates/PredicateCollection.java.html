@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PredicateCollection.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.common.query.predicates</a> &gt; <span class="el_source">PredicateCollection.java</span></div><h1>PredicateCollection.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
+
+import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import static java.util.stream.Collectors.joining;
+
+/**
+ * represents a collection of predicates which are connected via a certain operator
+ *
+ * @param &lt;P&gt; the stored predicate type
+ */
+<span class="fc" id="L34">public abstract class PredicateCollection&lt;P&gt; implements Iterable&lt;P&gt;, Serializable {</span>
+  /**
+   * Holds the predicate collection
+   */
+  protected List&lt;P&gt; predicates;
+
+  /**
+   * Returns the stored predicates
+   *
+   * @return predicates
+   */
+  public List&lt;P&gt; getPredicates() {
+<span class="fc" id="L46">    return this.predicates;</span>
+  }
+
+  /**
+   * Sets the predicates to the given list
+   *
+   * @param predicates new predicates
+   */
+  public void setPredicates(List&lt;P&gt; predicates) {
+<span class="nc" id="L55">    this.predicates = predicates;</span>
+<span class="nc" id="L56">  }</span>
+
+  /**
+   * Add a single predicate to the collection
+   *
+   * @param predicate the predicate to be added
+   */
+  public void addPredicate(P predicate) {
+<span class="fc" id="L64">    this.predicates.add(predicate);</span>
+<span class="fc" id="L65">  }</span>
+
+  /**
+   * Add a list of predicates
+   *
+   * @param predicateList the predicaes to be added
+   */
+  public void addPredicates(List&lt;P&gt; predicateList) {
+<span class="fc" id="L73">    this.predicates.addAll(predicateList);</span>
+<span class="fc" id="L74">  }</span>
+
+  /**
+   * Returns the number of predicates contained in this predicate collection.
+   *
+   * @return number of predicates
+   */
+  public int size() {
+<span class="fc" id="L82">    return predicates.size();</span>
+  }
+
+  /**
+   * Evaluates the predicate collection with respect to the given Embedding
+   *
+   * @param embedding the embedding record holding the data
+   * @param metaData the embedding meta data
+   * @return evaluation result
+   */
+  public abstract boolean evaluate(Embedding embedding, EmbeddingMetaData metaData);
+
+  /**
+   * Evaluates the predicate collection with respect to the given GraphElement
+   *
+   * @param element GraphElement under which the predicate will be evaluated
+   * @return evaluation result
+   */
+  public abstract boolean evaluate(GraphElement element);
+
+  /**
+   * Retrieves a set of all variables included in the predicate collection
+   * @return set of variables
+   */
+  public abstract Set&lt;String&gt; getVariables();
+
+  /**
+   * Retrieves a set of all property keys referenced by the predicate for a given variable
+   * @param variable the variable
+   * @return set of referenced properties
+   */
+  public abstract Set&lt;String&gt; getPropertyKeys(String variable);
+
+  /**
+   * Stores the name of the operator predicates are connected with
+   *
+   * @return operator name
+   */
+  public abstract String operatorName();
+
+  @Override
+  public Iterator&lt;P&gt; iterator() {
+<span class="nc" id="L124">    return predicates.iterator();</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="fc" id="L129">    return &quot;(&quot; + predicates.stream()</span>
+<span class="fc" id="L130">            .map(P::toString)</span>
+<span class="fc" id="L131">            .collect(joining(&quot; &quot; + operatorName() + &quot; &quot;)) + &quot;)&quot;;</span>
+  }
+
+  @Override
+  public boolean equals(Object o) {
+<span class="fc bfc" id="L136" title="All 2 branches covered.">    if (this == o) {</span>
+<span class="fc" id="L137">      return true;</span>
+    }
+<span class="pc bpc" id="L139" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L140">      return false;</span>
+    }
+
+<span class="fc" id="L143">    PredicateCollection predicateCollection = (PredicateCollection) o;</span>
+
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">    return predicates != null ?</span>
+<span class="pc bnc" id="L146" title="All 2 branches missed.">      predicates.equals(predicateCollection.predicates) : predicateCollection.predicates == null;</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc bnc" id="L151" title="All 2 branches missed.">    return predicates != null ? predicates.hashCode() : 0;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

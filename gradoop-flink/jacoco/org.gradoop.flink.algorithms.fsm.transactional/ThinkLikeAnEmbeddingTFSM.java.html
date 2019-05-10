@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ThinkLikeAnEmbeddingTFSM.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.transactional</a> &gt; <span class="el_source">ThinkLikeAnEmbeddingTFSM.java</span></div><h1>ThinkLikeAnEmbeddingTFSM.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.transactional;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.ThinkLikeAnEmbeddingFSMBase;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinEdgeCount;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.IsResult;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.TFSMSingleEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.TFSMSubgraphDecoder;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.TFSMSubgraphOnly;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.ToTFSMGraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.TFSMWrapInSubgraphEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.TFSMGraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.TFSMSubgraphEmbeddings;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+
+/**
+ * abstract superclass of different implementations of the gSpan frequent
+ * subgraph mining algorithm as Gradoop operator
+ */
+public class ThinkLikeAnEmbeddingTFSM
+  extends ThinkLikeAnEmbeddingFSMBase&lt;TFSMGraph, TFSMSubgraph, TFSMSubgraphEmbeddings&gt; {
+
+  /**
+   * constructor
+   * @param fsmConfig frequent subgraph mining configuration
+   *
+   */
+  public ThinkLikeAnEmbeddingTFSM(FSMConfig fsmConfig) {
+<span class="fc" id="L49">    super(fsmConfig);</span>
+<span class="fc" id="L50">  }</span>
+
+  /**
+   * Core mining method.
+   *
+   * @param transactions search space
+   *
+   * @return frequent subgraphs
+   */
+  public DataSet&lt;GraphTransaction&gt; execute(DataSet&lt;GraphTransaction&gt; transactions) {
+
+<span class="fc" id="L61">    transactions = preProcess(transactions);</span>
+
+<span class="fc" id="L63">    DataSet&lt;TFSMGraph&gt; graphs = transactions</span>
+<span class="fc" id="L64">      .map(new ToTFSMGraph());</span>
+
+<span class="fc" id="L66">    DataSet&lt;TFSMSubgraphEmbeddings&gt; embeddings = graphs</span>
+<span class="fc" id="L67">      .flatMap(new TFSMSingleEdgeEmbeddings(fsmConfig));</span>
+
+    // ITERATION HEAD
+<span class="fc" id="L70">    IterativeDataSet&lt;TFSMSubgraphEmbeddings&gt; iterative = embeddings</span>
+<span class="fc" id="L71">      .iterate(fsmConfig.getMaxEdgeCount());</span>
+
+    // ITERATION BODY
+
+    // get frequent subgraphs
+<span class="fc" id="L76">    DataSet&lt;TFSMSubgraphEmbeddings&gt; parentEmbeddings = iterative</span>
+<span class="fc" id="L77">      .filter(new IsResult&lt;&gt;(false));</span>
+
+<span class="fc" id="L79">    DataSet&lt;TFSMSubgraph&gt; frequentSubgraphs =</span>
+<span class="fc" id="L80">      getFrequentSubgraphs(parentEmbeddings);</span>
+
+<span class="fc" id="L82">    parentEmbeddings =</span>
+<span class="fc" id="L83">      filterByFrequentSubgraphs(parentEmbeddings, frequentSubgraphs);</span>
+
+<span class="fc" id="L85">    DataSet&lt;TFSMSubgraphEmbeddings&gt; childEmbeddings =</span>
+<span class="fc" id="L86">      growEmbeddingsOfFrequentSubgraphs(parentEmbeddings, frequentSubgraphs);</span>
+
+<span class="fc" id="L88">    DataSet&lt;TFSMSubgraphEmbeddings&gt; resultIncrement = frequentSubgraphs</span>
+<span class="fc" id="L89">      .map(new TFSMWrapInSubgraphEmbeddings());</span>
+
+<span class="fc" id="L91">    DataSet&lt;TFSMSubgraphEmbeddings&gt; resultAndEmbeddings = iterative</span>
+<span class="fc" id="L92">      .filter(new IsResult&lt;&gt;(true))</span>
+<span class="fc" id="L93">      .union(resultIncrement)</span>
+<span class="fc" id="L94">      .union(childEmbeddings);</span>
+
+    // ITERATION FOOTER
+
+<span class="fc" id="L98">    DataSet&lt;TFSMSubgraph&gt;  allFrequentSubgraphs = iterative</span>
+<span class="fc" id="L99">      .closeWith(resultAndEmbeddings, childEmbeddings)</span>
+<span class="fc" id="L100">      .filter(new IsResult&lt;&gt;(true))</span>
+<span class="fc" id="L101">      .map(new TFSMSubgraphOnly());</span>
+
+
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">    if (fsmConfig.getMinEdgeCount() &gt; 1) {</span>
+<span class="nc" id="L105">      allFrequentSubgraphs = allFrequentSubgraphs</span>
+<span class="nc" id="L106">        .filter(new MinEdgeCount&lt;&gt;(fsmConfig));</span>
+    }
+
+<span class="fc" id="L109">    return allFrequentSubgraphs.map(new TFSMSubgraphDecoder(config));</span>
+  }
+
+  /**
+   * Determines frequent subgraphs in a set of embeddings.
+   *
+   * @param embeddings set of embeddings
+   * @return frequent subgraphs
+   */
+  private DataSet&lt;TFSMSubgraph&gt; getFrequentSubgraphs(
+    DataSet&lt;TFSMSubgraphEmbeddings&gt; embeddings) {
+<span class="fc" id="L120">    return embeddings</span>
+<span class="fc" id="L121">        .map(new TFSMSubgraphOnly())</span>
+<span class="fc" id="L122">        .groupBy(0)</span>
+<span class="fc" id="L123">        .sum(1)</span>
+<span class="fc" id="L124">        .filter(new Frequent&lt;&gt;())</span>
+<span class="fc" id="L125">        .withBroadcastSet(minFrequency, DIMSpanConstants.MIN_FREQUENCY);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

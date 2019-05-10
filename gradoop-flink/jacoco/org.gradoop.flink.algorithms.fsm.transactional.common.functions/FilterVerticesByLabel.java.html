@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FilterVerticesByLabel.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.transactional.common.functions</a> &gt; <span class="el_source">FilterVerticesByLabel.java</span></div><h1>FilterVerticesByLabel.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.transactional.common.functions;
+
+import com.google.common.collect.Sets;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
+
+/**
+ * Drops vertices with infrequent labels and their incident edges.
+ */
+<span class="fc" id="L33">public class FilterVerticesByLabel extends RichMapFunction&lt;GraphTransaction, GraphTransaction&gt; {</span>
+
+  /**
+   * frequent vertex labels
+   */
+  private Collection&lt;String&gt; frequentVertexLabels;
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="fc" id="L42">    super.open(parameters);</span>
+
+<span class="fc" id="L44">    Collection&lt;String&gt; broadcast = getRuntimeContext()</span>
+<span class="fc" id="L45">      .getBroadcastVariable(TFSMConstants.FREQUENT_VERTEX_LABELS);</span>
+
+<span class="fc" id="L47">    this.frequentVertexLabels = Sets.newHashSet(broadcast);</span>
+<span class="fc" id="L48">  }</span>
+
+  @Override
+  public GraphTransaction map(GraphTransaction transaction) throws Exception {
+
+<span class="fc" id="L53">    Set&lt;GradoopId&gt; keptVertexIds = Sets.newHashSet();</span>
+
+    // drop vertices with infrequent labels
+
+<span class="fc" id="L57">    Iterator&lt;Vertex&gt; vertexIterator = transaction.getVertices().iterator();</span>
+
+<span class="fc bfc" id="L59" title="All 2 branches covered.">    while (vertexIterator.hasNext()) {</span>
+<span class="fc" id="L60">      Vertex next = vertexIterator.next();</span>
+
+<span class="fc bfc" id="L62" title="All 2 branches covered.">      if (frequentVertexLabels.contains(next.getLabel())) {</span>
+<span class="fc" id="L63">        keptVertexIds.add(next.getId());</span>
+      } else {
+<span class="fc" id="L65">        vertexIterator.remove();</span>
+      }
+<span class="fc" id="L67">    }</span>
+
+    // drop inconsistent edges
+
+<span class="fc" id="L71">    transaction.getEdges().removeIf(next -&gt;</span>
+<span class="fc bfc" id="L72" title="All 4 branches covered.">      !keptVertexIds.contains(next.getSourceId()) || !keptVertexIds.contains(next.getTargetId()));</span>
+
+<span class="fc" id="L74">    return transaction;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

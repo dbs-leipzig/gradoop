@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreateGraphHeadWithProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.cypher.capf.result.functions</a> &gt; <span class="el_source">CreateGraphHeadWithProperties.java</span></div><h1>CreateGraphHeadWithProperties.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.cypher.capf.result.functions;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.types.Row;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.properties.Properties;
+
+import java.util.List;
+
+/**
+ * Create a graph head from a row while automatically setting properties. The fields between start
+ * and end are expected to be the properties in order of the property names, the last field of the
+ * row is expected to be a {@link GradoopId}.
+ */
+public class CreateGraphHeadWithProperties implements MapFunction&lt;Row, GraphHead&gt; {
+
+  /**
+   * The start index of fields that will be set as properties of the graph heads.
+   */
+  private int start;
+
+  /**
+   * The end index of fields that will be set as properties of the graph heads.
+   */
+  private int end;
+
+  /**
+   * The factory used to create the graph heads.
+   */
+  private GraphHeadFactory headFactory;
+
+  /**
+   * List containing names for the properties to be set.
+   */
+  private List&lt;String&gt; propertyNames;
+
+  /**
+   * Constructor.
+   *
+   * @param start         start index of property fields
+   * @param end           end index of property fields
+   * @param headFactory   graph head factory
+   * @param propertyNames names of the properties to be set
+   */
+  public CreateGraphHeadWithProperties(
+    int start,
+    int end,
+    GraphHeadFactory headFactory,
+<span class="fc" id="L66">    List&lt;String&gt; propertyNames) {</span>
+
+<span class="fc" id="L68">    this.start = start;</span>
+<span class="fc" id="L69">    this.end = end;</span>
+<span class="fc" id="L70">    this.headFactory = headFactory;</span>
+<span class="fc" id="L71">    this.propertyNames = propertyNames;</span>
+<span class="fc" id="L72">  }</span>
+
+  @Override
+  public GraphHead map(Row row) {
+
+<span class="fc" id="L77">    GraphHead head = headFactory.initGraphHead((GradoopId) row.getField(row.getArity() - 1));</span>
+<span class="fc" id="L78">    Properties props = new Properties();</span>
+
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">    for (int i = start; i &lt; end; i++) {</span>
+<span class="nc" id="L81">      props.set(propertyNames.get(i), row.getField(i));</span>
+    }
+
+<span class="fc" id="L84">    head.setProperties(props);</span>
+
+<span class="fc" id="L86">    return head;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GradoopAccumuloConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Accumulo</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.config</a> &gt; <span class="el_source">GradoopAccumuloConfig.java</span></div><h1>GradoopAccumuloConfig.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.config;
+
+import org.apache.accumulo.core.security.Authorizations;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.storage.common.config.GradoopStoreConfig;
+import org.gradoop.storage.impl.accumulo.constants.AccumuloDefault;
+import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
+import org.gradoop.storage.impl.accumulo.handler.AccumuloEdgeHandler;
+import org.gradoop.storage.impl.accumulo.handler.AccumuloGraphHandler;
+import org.gradoop.storage.impl.accumulo.handler.AccumuloVertexHandler;
+
+import java.util.Properties;
+
+/**
+ * Gradoop Accumulo configuration define
+ */
+public class GradoopAccumuloConfig implements GradoopStoreConfig {
+
+  /**
+   * accumulo user for accumulo connector, default &quot;root&quot;
+   */
+  public static final String ACCUMULO_USER = &quot;accumulo.user&quot;;
+
+  /**
+   * accumulo password for accumulo connector, default empty
+   */
+  public static final String ACCUMULO_PASSWD = &quot;accumulo.password&quot;;
+
+  /**
+   * accumulo instance name, default &quot;gradoop&quot;
+   */
+  public static final String ACCUMULO_INSTANCE = &quot;accumulo.instance&quot;;
+
+  /**
+   * accumulo authorizations, default {@link Authorizations#EMPTY}
+   */
+  public static final String ACCUMULO_AUTHORIZATIONS = &quot;accumulo.authorizations&quot;;
+
+  /**
+   * accumulo table prefix, you can define namespace and store prefix here
+   */
+  public static final String ACCUMULO_TABLE_PREFIX = &quot;accumulo.table.prefix&quot;;
+
+  /**
+   * gradoop accumulo iterator priority, default 0xf
+   */
+  public static final String GRADOOP_ITERATOR_PRIORITY = &quot;gradoop.iterator.priority&quot;;
+
+  /**
+   * gradoop batch scanner threads, default 10
+   */
+  public static final String GRADOOP_BATCH_SCANNER_THREADS = &quot;gradoop.batch.scanner.threads&quot;;
+
+  /**
+   * zookeeper hosts, default &quot;localhost:2181&quot;
+   */
+  public static final String ZOOKEEPER_HOSTS = &quot;zookeeper.hosts&quot;;
+
+  /**
+   * Definition for serialize version control
+   */
+  private static final int serialVersionUID = 23;
+
+  /**
+   * accumulo properties
+   */
+<span class="fc" id="L84">  private final Properties accumuloProperties = new Properties();</span>
+
+  /**
+   * row handler for EPGM GraphHead
+   */
+  private final AccumuloGraphHandler graphHandler;
+
+  /**
+   * row handler for EPGM Vertex
+   */
+  private final AccumuloVertexHandler vertexHandler;
+
+  /**
+   * row handler for EPGM Edge
+   */
+  private final AccumuloEdgeHandler edgeHandler;
+
+  /**
+   * Creates a new Configuration.
+   *
+   * @param graphHandler                graph head handler
+   * @param vertexHandler               vertex handler
+   * @param edgeHandler                 edge handler
+   */
+  private GradoopAccumuloConfig(
+    AccumuloGraphHandler graphHandler,
+    AccumuloVertexHandler vertexHandler,
+    AccumuloEdgeHandler edgeHandler
+<span class="fc" id="L112">  ) {</span>
+<span class="fc" id="L113">    this.graphHandler = graphHandler;</span>
+<span class="fc" id="L114">    this.vertexHandler = vertexHandler;</span>
+<span class="fc" id="L115">    this.edgeHandler = edgeHandler;</span>
+<span class="fc" id="L116">  }</span>
+
+  /**
+   * Creates a default Configuration using POJO handlers for vertices, edges
+   * and graph heads and default table names.
+   *
+   * @return Default Gradoop Accumulo configuration.
+   */
+  public static GradoopAccumuloConfig getDefaultConfig() {
+<span class="fc" id="L125">    GraphHeadFactory graphHeadFactory = new GraphHeadFactory();</span>
+<span class="fc" id="L126">    EdgeFactory edgeFactory = new EdgeFactory();</span>
+<span class="fc" id="L127">    VertexFactory vertexFactory = new VertexFactory();</span>
+<span class="fc" id="L128">    return new GradoopAccumuloConfig(</span>
+      new AccumuloGraphHandler(graphHeadFactory),
+      new AccumuloVertexHandler(vertexFactory),
+      new AccumuloEdgeHandler(edgeFactory));
+  }
+
+  /**
+   * property setter
+   *
+   * @param key property key
+   * @param value property value
+   * @return configure itself
+   */
+  public GradoopAccumuloConfig set(String key, Object value) {
+<span class="fc" id="L142">    accumuloProperties.put(key, value);</span>
+<span class="fc" id="L143">    return this;</span>
+  }
+
+  /**
+   * integer value by key
+   *
+   * @param key property key
+   * @param defValue default value
+   * @param &lt;T&gt; value template
+   * @return integer value
+   */
+  public &lt;T&gt; T get(String key, T defValue) {
+<span class="fc" id="L155">    Object value = accumuloProperties.get(key);</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">    if (value == null) {</span>
+<span class="fc" id="L157">      return defValue;</span>
+    } else {
+      //noinspection unchecked
+<span class="fc" id="L160">      return (T) value;</span>
+    }
+  }
+
+  /**
+   * Get accumulo properties
+   *
+   * @return accumulo properties
+   */
+  public Properties getAccumuloProperties() {
+<span class="fc" id="L170">    return accumuloProperties;</span>
+  }
+
+  /**
+   * Get graph handler
+   *
+   * @return graph handler
+   */
+  public AccumuloGraphHandler getGraphHandler() {
+<span class="fc" id="L179">    return graphHandler;</span>
+  }
+
+  /**
+   * Get vertex handler
+   *
+   * @return vertex handler
+   */
+  public AccumuloVertexHandler getVertexHandler() {
+<span class="fc" id="L188">    return vertexHandler;</span>
+  }
+
+  /**
+   * Get edge handler
+   *
+   * @return edge handler
+   */
+  public AccumuloEdgeHandler getEdgeHandler() {
+<span class="fc" id="L197">    return edgeHandler;</span>
+  }
+
+  /**
+   * Get edge table name
+   *
+   * @return edge table name
+   */
+  public String getEdgeTable() {
+<span class="fc" id="L206">    return get(ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX) + AccumuloTables.EDGE;</span>
+  }
+
+  /**
+   * Get vertex table name
+   *
+   * @return vertex table name
+   */
+  public String getVertexTable() {
+<span class="fc" id="L215">    return get(ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX) + AccumuloTables.VERTEX;</span>
+  }
+
+  /**
+   * Get graph head table name
+   *
+   * @return graph head table name
+   */
+  public String getGraphHeadTable() {
+<span class="fc" id="L224">    return get(ACCUMULO_TABLE_PREFIX, AccumuloDefault.TABLE_PREFIX) + AccumuloTables.GRAPH;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L229">    return accumuloProperties.toString();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

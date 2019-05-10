@@ -1,0 +1,3 @@
+org.gradoop.storage.impl.hbase
+org.gradoop.storage.impl.hbase.io
+org.gradoop.storage.impl.hbase.predicate.filter.impl

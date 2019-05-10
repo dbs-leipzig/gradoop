@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CAPFQuery.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.cypher.capf.query</a> &gt; <span class="el_source">CAPFQuery.java</span></div><h1>CAPFQuery.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.cypher.capf.query;
+
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple5;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
+import org.apache.flink.table.api.Table;
+import org.apache.flink.types.Row;
+import org.gradoop.common.model.impl.metadata.MetaData;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
+import org.gradoop.flink.model.api.operators.Operator;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.count.Count;
+import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.EdgeLabelFilter;
+import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.EdgeToTuple;
+import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.IdOfF1;
+import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.PropertyEncoder;
+import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.ReplaceSourceId;
+import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.ReplaceTargetId;
+import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.TupleToRow;
+import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.UniqueIdWithOffset;
+import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.VertexLabelFilter;
+import org.gradoop.flink.model.impl.operators.cypher.capf.query.functions.VertexToRow;
+import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
+import org.opencypher.flink.api.CAPFSession;
+import org.opencypher.flink.api.CAPFSession$;
+import org.opencypher.flink.api.io.CAPFNodeTable;
+import org.opencypher.flink.api.io.CAPFRelationshipTable;
+import org.opencypher.flink.impl.table.FlinkCypherTable;
+import org.opencypher.okapi.api.graph.PropertyGraph;
+import org.opencypher.okapi.api.io.conversion.NodeMapping;
+import org.opencypher.okapi.api.io.conversion.RelationshipMapping;
+import org.opencypher.okapi.relational.api.io.EntityTable;
+import scala.collection.JavaConversions;
+import scala.collection.mutable.Seq;
+import scala.reflect.ClassTag$;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.EDGE_ID;
+import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.END_NODE;
+import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.NODE_ID;
+import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.OFFSET;
+import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.PROPERTY_PREFIX;
+import static org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQueryConstants.START_NODE;
+
+
+/**
+ * Execute a cypher query on a LogicalGraph via the CAPF (Cypher for Apache Flink)
+ * API.
+ */
+public class CAPFQuery implements Operator {
+
+  /**
+   * The query string.
+   */
+  private String query;
+
+  /**
+   * MetaData object
+   */
+  private MetaData metaData;
+
+  /**
+   * The CAPF session the query will be executed in.
+   */
+  private CAPFSession session;
+
+  /**
+   * The number of vertices by label, ordered alphabetically.
+   */
+  private DataSet&lt;Long&gt; vertexCount;
+
+  /**
+   * Mapping between the long ids and the original vertices.
+   */
+  private DataSet&lt;Tuple2&lt;Long, Vertex&gt;&gt; verticesWithIds;
+
+  /**
+   * Mapping between the long ids and the original edges.
+   */
+  private DataSet&lt;Tuple2&lt;Long, Edge&gt;&gt; edgesWithIds;
+
+  /**
+   * Constructor
+   *
+   * @param query the query string
+   * @param env   the execution environment
+   */
+<span class="fc" id="L112">  public CAPFQuery(String query, ExecutionEnvironment env) {</span>
+
+<span class="fc" id="L114">    this.query = query;</span>
+
+<span class="fc" id="L116">    this.vertexCount = null;</span>
+<span class="fc" id="L117">    this.session = CAPFSession$.MODULE$.create(</span>
+      new org.apache.flink.api.scala.ExecutionEnvironment(env)
+    );
+<span class="fc" id="L120">  }</span>
+
+  /**
+   * Constructor
+   *
+   * @param query    the query string
+   * @param metaData metaData object
+   * @param env      the execution environment
+   */
+  public CAPFQuery(
+<span class="fc" id="L130">    String query, MetaData metaData, ExecutionEnvironment env) {</span>
+<span class="fc" id="L131">    this.query = query;</span>
+<span class="fc" id="L132">    this.metaData = metaData;</span>
+<span class="fc" id="L133">    this.vertexCount = null;</span>
+<span class="fc" id="L134">    this.session = CAPFSession$.MODULE$.create(</span>
+      new org.apache.flink.api.scala.ExecutionEnvironment(env));
+<span class="fc" id="L136">  }</span>
+
+  /**
+   * Execute a cypher query on a given graph via the CAPF API.
+   *
+   * @param graph the graph that the query shall be executed on
+   * @return the result of the query, either a graph collection or a flink table
+   * @throws Exception if the execution or IO fails.
+   */
+  public CAPFQueryResult execute(LogicalGraph graph) throws Exception {
+
+<span class="fc bfc" id="L147" title="All 2 branches covered.">    if (metaData == null) {</span>
+<span class="fc" id="L148">      graph = transformGraphProperties(graph);</span>
+<span class="fc" id="L149">      metaData = new CSVMetaDataSource()</span>
+<span class="fc" id="L150">        .fromTuples(new CSVMetaDataSource().tuplesFromGraph(graph).collect());</span>
+    }
+    // create flink tables of nodes as required by CAPF
+<span class="fc" id="L153">    List&lt;CAPFNodeTable&gt; nodeTables = createNodeTables(graph);</span>
+
+    // create flink tables of relationships as required by CAPF
+<span class="fc" id="L156">    List&lt;CAPFRelationshipTable&gt; relTables = createRelationshipTables(graph);</span>
+
+    // if there are no nodes, no edges can exit either, so we can terminate early
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">    if (nodeTables.size() &gt; 0) {</span>
+<span class="fc" id="L160">      List&lt;EntityTable&lt;FlinkCypherTable.FlinkTable&gt;&gt; tables = new ArrayList&lt;&gt;(</span>
+<span class="fc" id="L161">        nodeTables.subList(1, nodeTables.size()));</span>
+<span class="fc" id="L162">      tables.addAll(relTables);</span>
+
+<span class="fc" id="L164">      Seq&lt;EntityTable&lt;FlinkCypherTable.FlinkTable&gt;&gt; tableSeq =</span>
+<span class="fc" id="L165">        JavaConversions.asScalaBuffer(tables);</span>
+
+<span class="fc" id="L167">      PropertyGraph g = session.readFrom(nodeTables.get(0), tableSeq);</span>
+
+      // construct a CAPFQueryResult from the CAPFResult returned by CAPF
+<span class="fc" id="L170">      return new CAPFQueryResult(</span>
+<span class="fc" id="L171">        g.cypher(</span>
+          query,
+<span class="fc" id="L173">          g.cypher$default$2(),</span>
+<span class="fc" id="L174">          g.cypher$default$3(),</span>
+<span class="fc" id="L175">          g.cypher$default$4()</span>
+        ),
+        verticesWithIds,
+        edgesWithIds,
+<span class="fc" id="L179">        graph.getConfig()</span>
+      );
+    }
+
+<span class="nc" id="L183">    return null;</span>
+  }
+
+  /**
+   * Transform vertex and edge properties with types not yet supported by CAPF into string
+   * representations.
+   *
+   * @param graph the graph
+   * @return a graph with transformed vertex and edge properties
+   */
+  private LogicalGraph transformGraphProperties(LogicalGraph graph) {
+<span class="fc" id="L194">    DataSet&lt;Vertex&gt; transformedVertices = graph.getVertices()</span>
+<span class="fc" id="L195">      .map(new PropertyEncoder&lt;&gt;());</span>
+<span class="fc" id="L196">    DataSet&lt;Edge&gt; transformedEdges = graph.getEdges()</span>
+<span class="fc" id="L197">      .map(new PropertyEncoder&lt;&gt;());</span>
+
+<span class="fc" id="L199">    return graph.getFactory().fromDataSets(transformedVertices, transformedEdges);</span>
+  }
+
+  /**
+   * Method to transform a DataSet of vertices into the flink table format
+   * required by CAPF: Unique long ids for each vertex, one table per
+   * vertex label and each property in a unique row field.
+   *
+   * @param graph the graph whose vertices should be transformed into CAPF tables
+   * @return a list of node tables, one table per vertex label
+   */
+  private List&lt;CAPFNodeTable&gt; createNodeTables(LogicalGraph graph) {
+<span class="fc" id="L211">    List&lt;CAPFNodeTable&gt; nodeTables = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L213">    verticesWithIds = graph.getVertices().map(new UniqueIdWithOffset&lt;&gt;());</span>
+<span class="fc" id="L214">    vertexCount = Count.count(graph.getVertices());</span>
+
+    // construct a table for each vertex label
+<span class="fc bfc" id="L217" title="All 2 branches covered.">    for (String label : metaData.getVertexLabels()) {</span>
+<span class="fc" id="L218">      List&lt;PropertyMetaData&gt; propertyTypes = metaData.getVertexPropertyMetaData(label);</span>
+
+      // list of all row field types
+<span class="fc" id="L221">      TypeInformation&lt;?&gt;[] types = new TypeInformation&lt;?&gt;[propertyTypes.size() + 1];</span>
+<span class="fc" id="L222">      List&lt;String&gt; propKeys = new ArrayList&lt;&gt;(propertyTypes.size());</span>
+
+      // first field is long id
+<span class="fc" id="L225">      types[0] = TypeInformation.of(Long.class);</span>
+
+<span class="fc bfc" id="L227" title="All 2 branches covered.">      for (int i = 0; i &lt; propertyTypes.size(); i++) {</span>
+<span class="fc" id="L228">        PropertyMetaData pmd = propertyTypes.get(i);</span>
+<span class="fc" id="L229">        propKeys.add(pmd.getKey());</span>
+<span class="fc" id="L230">        types[i + 1] = TypeInformation.of(MetaData.getClassFromTypeString(pmd.getTypeString()));</span>
+      }
+
+<span class="fc" id="L233">      RowTypeInfo info = new RowTypeInfo(types);</span>
+
+      // zip all vertices of one label with a globally unique id
+<span class="fc" id="L236">      DataSet&lt;Tuple2&lt;Long, Vertex&gt;&gt; verticesByLabelWithIds =</span>
+<span class="fc" id="L237">        verticesWithIds.filter(new VertexLabelFilter(label));</span>
+
+      // map vertices to row and wrap in scala DataSet
+<span class="fc" id="L240">      org.apache.flink.api.scala.DataSet&lt;Row&gt; scalaRowDataSet =</span>
+        new org.apache.flink.api.scala.DataSet&lt;&gt;(
+<span class="fc" id="L242">          verticesByLabelWithIds.map(new VertexToRow(propKeys)).returns(info),</span>
+<span class="fc" id="L243">          ClassTag$.MODULE$.apply(Row.class)</span>
+        );
+
+      // build table schema string, naming each field in the table
+<span class="fc" id="L247">      StringBuilder schemaStringBuilder = new StringBuilder(NODE_ID);</span>
+<span class="fc" id="L248">      NodeMapping nodeMapping = NodeMapping.withSourceIdKey(NODE_ID)</span>
+<span class="fc" id="L249">        .withImpliedLabel(label);</span>
+
+<span class="fc bfc" id="L251" title="All 2 branches covered.">      for (String propKey : propKeys) {</span>
+<span class="fc" id="L252">        schemaStringBuilder.append(&quot;, &quot;).append(PROPERTY_PREFIX).append(propKey);</span>
+
+<span class="fc" id="L254">        nodeMapping = nodeMapping.withPropertyKey(propKey, PROPERTY_PREFIX + propKey);</span>
+<span class="fc" id="L255">      }</span>
+
+<span class="fc" id="L257">      String schemaString = schemaStringBuilder.toString();</span>
+
+      // create table, add to node table list
+<span class="fc" id="L260">      Table vertexTable = session.tableEnv()</span>
+<span class="fc" id="L261">        .fromDataSet(scalaRowDataSet).as(schemaString);</span>
+
+<span class="fc" id="L263">      nodeTables.add(CAPFNodeTable.fromMapping(nodeMapping, vertexTable));</span>
+<span class="fc" id="L264">    }</span>
+
+<span class="fc" id="L266">    return nodeTables;</span>
+  }
+
+  /**
+   * Method to transform a DataSet of edges into the flink table format
+   * required by CAPF: Unique long ids for each edge, source and target are long ids,
+   * one table per edge label and each property in a unique row field.
+   *
+   * @param graph the graph whose edges should be transformed into CAPF tables
+   * @return a list of edge tables, one table per edge label
+   */
+  private List&lt;CAPFRelationshipTable&gt; createRelationshipTables(LogicalGraph graph) {
+<span class="fc" id="L278">    List&lt;CAPFRelationshipTable&gt; relTables = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L280">    edgesWithIds = graph.getEdges().map(new UniqueIdWithOffset&lt;&gt;())</span>
+<span class="fc" id="L281">      .withBroadcastSet(vertexCount, OFFSET);</span>
+
+    // replace source and target with long ids
+<span class="fc" id="L284">    DataSet&lt;Tuple5&lt;Long, Long, Long, String, Properties&gt;&gt; edgeTuples = edgesWithIds</span>
+<span class="fc" id="L285">      .map(new EdgeToTuple())</span>
+<span class="fc" id="L286">      .join(verticesWithIds)</span>
+<span class="fc" id="L287">      .where(1).equalTo(new IdOfF1&lt;&gt;()).with(new ReplaceSourceId())</span>
+<span class="fc" id="L288">      .join(verticesWithIds)</span>
+<span class="fc" id="L289">      .where(2).equalTo(new IdOfF1&lt;&gt;()).with(new ReplaceTargetId());</span>
+
+    // construct a table for each edge label
+<span class="fc bfc" id="L292" title="All 2 branches covered.">    for (String label : metaData.getEdgeLabels()) {</span>
+<span class="fc" id="L293">      List&lt;PropertyMetaData&gt; propertyTypes = metaData.getEdgePropertyMetaData(label);</span>
+
+      // list of all row field types
+<span class="fc" id="L296">      TypeInformation&lt;?&gt;[] types = new TypeInformation&lt;?&gt;[propertyTypes.size() + 3];</span>
+<span class="fc" id="L297">      List&lt;String&gt; propKeys = new ArrayList&lt;&gt;(propertyTypes.size());</span>
+
+      // first fields are id, source id and target id
+<span class="fc" id="L300">      types[0] = TypeInformation.of(Long.class); // id</span>
+<span class="fc" id="L301">      types[1] = TypeInformation.of(Long.class); // source</span>
+<span class="fc" id="L302">      types[2] = TypeInformation.of(Long.class); // target</span>
+
+      // other fields are properties
+<span class="fc bfc" id="L305" title="All 2 branches covered.">      for (int i = 0; i &lt; propertyTypes.size(); i++) {</span>
+<span class="fc" id="L306">        PropertyMetaData pmd = propertyTypes.get(i);</span>
+<span class="fc" id="L307">        propKeys.add(pmd.getKey());</span>
+<span class="fc" id="L308">        types[i + 3] = TypeInformation.of(MetaData.getClassFromTypeString(pmd.getTypeString()));</span>
+      }
+
+<span class="fc" id="L311">      RowTypeInfo info = new RowTypeInfo(types);</span>
+
+      // zip all edges of one label with a globally unique id
+<span class="fc" id="L314">      DataSet&lt;Tuple5&lt;Long, Long, Long, String, Properties&gt;&gt; edgesByLabel = edgeTuples</span>
+<span class="fc" id="L315">        .filter(new EdgeLabelFilter(label));</span>
+
+      // map vertices to row and wrap in scala DataSet
+<span class="fc" id="L318">      org.apache.flink.api.scala.DataSet&lt;Row&gt; scalaRowDataSet =</span>
+        new org.apache.flink.api.scala.DataSet&lt;&gt;(
+<span class="fc" id="L320">          edgesByLabel.map(new TupleToRow(propKeys)).returns(info),</span>
+<span class="fc" id="L321">          ClassTag$.MODULE$.apply(Row.class)</span>
+        );
+
+      // build table schema string, naming each field in the table
+<span class="fc" id="L325">      StringBuilder schemaStringBuilder = new StringBuilder();</span>
+<span class="fc" id="L326">      schemaStringBuilder</span>
+<span class="fc" id="L327">        .append(EDGE_ID).append(&quot;, &quot;)</span>
+<span class="fc" id="L328">        .append(START_NODE).append(&quot;, &quot;)</span>
+<span class="fc" id="L329">        .append(END_NODE);</span>
+
+<span class="fc" id="L331">      RelationshipMapping relMapping = RelationshipMapping.withSourceIdKey(EDGE_ID)</span>
+<span class="fc" id="L332">        .withSourceStartNodeKey(START_NODE)</span>
+<span class="fc" id="L333">        .withSourceEndNodeKey(END_NODE)</span>
+<span class="fc" id="L334">        .withRelType(label);</span>
+
+<span class="fc bfc" id="L336" title="All 2 branches covered.">      for (String propKey : propKeys) {</span>
+<span class="fc" id="L337">        schemaStringBuilder.append(&quot;, &quot;).append(PROPERTY_PREFIX).append(propKey);</span>
+<span class="fc" id="L338">        relMapping = relMapping.withPropertyKey(propKey, PROPERTY_PREFIX + propKey);</span>
+<span class="fc" id="L339">      }</span>
+
+<span class="fc" id="L341">      String schemaString = schemaStringBuilder.toString();</span>
+
+      // create table, add to relationship table list
+<span class="fc" id="L344">      Table edgeTable = session.tableEnv()</span>
+<span class="fc" id="L345">        .fromDataSet(scalaRowDataSet).as(schemaString);</span>
+
+<span class="fc" id="L347">      relTables.add(CAPFRelationshipTable.fromMapping(relMapping, edgeTable));</span>
+<span class="fc" id="L348">    }</span>
+
+<span class="fc" id="L350">    return relTables;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

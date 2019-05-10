@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StatisticWriter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.statistics.writer</a> &gt; <span class="el_source">StatisticWriter.java</span></div><h1>StatisticWriter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.statistics.writer;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.core.fs.FileSystem.WriteMode;
+import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsReader;
+
+/**
+ * Class to write the statistic of a graph in a file.
+ */
+<span class="nc" id="L26">public class StatisticWriter {</span>
+
+  /**
+   * Write the statistic for a given logical graph in a CSV file.
+   * @param tuples tuples the tuples to write (one row per tuple, tuple fields separated by
+   * GraphStatisticsReader.TOKEN_SEPARATOR).
+   * @param filePath the path for the CSV file
+   * @param &lt;T&gt; the tuple containing statistics
+   */
+  public static &lt;T extends Tuple&gt; void writeCSV(final DataSet&lt;T&gt; tuples, final String filePath) {
+<span class="fc" id="L36">    writeCSV(tuples, filePath, false);</span>
+<span class="fc" id="L37">  }</span>
+
+  /**
+   * Writes tuples as CSV file in a filepath.
+   * @param tuples the tuples to write (one row per tuple, tuple fields separated by
+   * GraphStatisticsReader.TOKEN_SEPARATOR).
+   * @param filePath the path to write the tuples in.
+   * @param overWrite should the target file be overwritten if it already exists?
+   * @param &lt;T&gt; the tuple containing statistics
+   */
+  public static &lt;T extends Tuple&gt; void writeCSV(
+      final DataSet&lt;T&gt; tuples, final String filePath, final boolean overWrite) {
+<span class="fc" id="L49">    tuples.writeAsCsv(</span>
+        filePath,
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">        System.lineSeparator(),</span>
+        GraphStatisticsReader.TOKEN_SEPARATOR,
+        overWrite ? WriteMode.OVERWRITE : WriteMode.NO_OVERWRITE)
+<span class="fc" id="L54">       .setParallelism(1);</span>
+<span class="fc" id="L55">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

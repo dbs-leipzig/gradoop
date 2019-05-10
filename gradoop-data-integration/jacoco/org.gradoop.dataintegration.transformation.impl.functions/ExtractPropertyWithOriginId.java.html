@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExtractPropertyWithOriginId.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation.impl.functions</a> &gt; <span class="el_source">ExtractPropertyWithOriginId.java</span></div><h1>ExtractPropertyWithOriginId.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation.impl.functions;
+
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+/**
+ * This {@link FlatMapFunction} extracts a {@link PropertyValue} and the origin Id of a vertex into
+ * a Tuple.
+ */
+public class ExtractPropertyWithOriginId implements FlatMapFunction&lt;Vertex, Tuple2&lt;PropertyValue, GradoopId&gt;&gt; {
+
+  /**
+   * The property key of the property value.
+   */
+  private final String originalPropertyName;
+
+  /**
+   * Reduce object instantiation.
+   */
+  private final Tuple2&lt;PropertyValue, GradoopId&gt; reuseTuple;
+
+  /**
+   * The constructor for extracting property value and its origin id.
+   *
+   * @param originalPropertyName The property key of the property value.
+   */
+<span class="fc" id="L46">  public ExtractPropertyWithOriginId(String originalPropertyName) {</span>
+<span class="fc" id="L47">    this.originalPropertyName = originalPropertyName;</span>
+<span class="fc" id="L48">    this.reuseTuple = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L49">  }</span>
+
+  @Override
+  public void flatMap(Vertex vertex, Collector&lt;Tuple2&lt;PropertyValue, GradoopId&gt;&gt; out) {
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">    if (vertex.getProperties() != null &amp;&amp;</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">      vertex.getProperties().containsKey(originalPropertyName)) {</span>
+<span class="fc" id="L55">      PropertyValue pv = vertex.getPropertyValue(originalPropertyName);</span>
+<span class="fc" id="L56">      reuseTuple.f1 = vertex.getId();</span>
+
+<span class="fc bfc" id="L58" title="All 2 branches covered.">      if (pv.isList()) {</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        for (PropertyValue value : pv.getList()) {</span>
+<span class="fc" id="L60">          reuseTuple.f0 = value;</span>
+<span class="fc" id="L61">          out.collect(reuseTuple);</span>
+<span class="fc" id="L62">        }</span>
+      } else {
+<span class="fc" id="L64">        reuseTuple.f0 = pv;</span>
+<span class="fc" id="L65">        out.collect(reuseTuple);</span>
+      }
+    }
+<span class="fc" id="L68">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FSMEdge.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.transactional.tle.pojos</a> &gt; <span class="el_source">FSMEdge.java</span></div><h1>FSMEdge.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.transactional.tle.pojos;
+
+/**
+ * Represents an edge within Subgraph embeddings.
+ */
+public class FSMEdge {
+
+  /**
+   * source vertex id
+   */
+  private final int sourceId;
+  /**
+   * edge label
+   */
+  private final String label;
+  /**
+   * target vertex id
+   */
+  private final int targetId;
+
+  /**
+   * Constructor.
+   *
+   * @param sourceId source vertex id
+   * @param label edge label
+   * @param targetId target vertex id
+   */
+<span class="fc" id="L43">  public FSMEdge(int sourceId, String label, int targetId) {</span>
+<span class="fc" id="L44">    this.sourceId = sourceId;</span>
+<span class="fc" id="L45">    this.label = label;</span>
+<span class="fc" id="L46">    this.targetId = targetId;</span>
+<span class="fc" id="L47">  }</span>
+
+  public int getSourceId() {
+<span class="fc" id="L50">    return sourceId;</span>
+  }
+
+  public int getTargetId() {
+<span class="fc" id="L54">    return targetId;</span>
+  }
+
+  public String getLabel() {
+<span class="fc" id="L58">    return label;</span>
+  }
+
+  @Override
+  public boolean equals(Object o) {
+<span class="nc bnc" id="L63" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L64">      return true;</span>
+    }
+<span class="nc bnc" id="L66" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L67">      return false;</span>
+    }
+
+<span class="nc" id="L70">    FSMEdge that = (FSMEdge) o;</span>
+
+<span class="nc bnc" id="L72" title="All 2 branches missed.">    if (sourceId != that.sourceId) {</span>
+<span class="nc" id="L73">      return false;</span>
+    }
+<span class="nc bnc" id="L75" title="All 2 branches missed.">    if (targetId != that.targetId) {</span>
+<span class="nc" id="L76">      return false;</span>
+    }
+<span class="nc" id="L78">    return label.equals(that.label);</span>
+
+  }
+
+  @Override
+  public int hashCode() {
+<span class="nc" id="L84">    int result = sourceId;</span>
+<span class="nc" id="L85">    result = 31 * result + label.hashCode();</span>
+<span class="nc" id="L86">    result = 31 * result + targetId;</span>
+<span class="nc" id="L87">    return result;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L92">    return sourceId + &quot;-&quot; + label + &quot;-&gt;&quot; + targetId;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

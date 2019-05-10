@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IndexedGVELayout.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.layouts.gve.indexed</a> &gt; <span class="el_source">IndexedGVELayout.java</span></div><h1>IndexedGVELayout.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.layouts.gve.indexed;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
+import org.gradoop.flink.model.impl.layouts.gve.GVELayout;
+
+import java.util.Map;
+
+/**
+ * Like {@link GVELayout}, this layout separated between graph head, vertex and edge layouts. In
+ * addition, the datasets are separated by labels and accesses by known labels are much more
+ * efficient as they avoid duplicating rows during program execution.
+ */
+public class IndexedGVELayout extends GVELayout implements
+  LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt;, GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; {
+  /**
+   * Mapping from graph label to graph heads with that label.
+   */
+  private final Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads;
+  /**
+   * Mapping from vertex label to vertices with that label.
+   */
+  private final Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices;
+  /**
+   * Mapping from edge label to edges with that label.
+   */
+  private final Map&lt;String, DataSet&lt;Edge&gt;&gt; edges;
+
+  /**
+   * Creates a new Indexed GVE Layout.
+   *
+   * @param graphHeads mapping from label to graph heads
+   * @param vertices mapping from label to vertices
+   * @param edges mapping from label to edges
+   */
+  IndexedGVELayout(Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads,
+    Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
+    Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
+<span class="fc" id="L58">    super(</span>
+<span class="fc" id="L59">      graphHeads.values().stream().reduce(DataSet::union)</span>
+<span class="pc" id="L60">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during graph head union&quot;)),</span>
+<span class="fc" id="L61">      vertices.values().stream().reduce(DataSet::union)</span>
+<span class="pc" id="L62">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during vertex union&quot;)),</span>
+<span class="fc" id="L63">      edges.values().stream().reduce(DataSet::union)</span>
+<span class="pc" id="L64">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during edge union&quot;))</span>
+    );
+<span class="fc" id="L66">    this.graphHeads = graphHeads;</span>
+<span class="fc" id="L67">    this.vertices = vertices;</span>
+<span class="fc" id="L68">    this.edges = edges;</span>
+<span class="fc" id="L69">  }</span>
+
+  @Override
+  public boolean isIndexedGVELayout() {
+<span class="fc" id="L73">    return true;</span>
+  }
+
+  @Override
+  public DataSet&lt;GraphHead&gt; getGraphHeadsByLabel(String label) {
+<span class="fc" id="L78">    return graphHeads.get(label);</span>
+  }
+
+  @Override
+  public DataSet&lt;Vertex&gt; getVerticesByLabel(String label) {
+<span class="fc" id="L83">    return vertices.get(label);</span>
+  }
+
+  @Override
+  public DataSet&lt;Edge&gt; getEdgesByLabel(String label) {
+<span class="fc" id="L88">    return edges.get(label);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CSVLineToElement.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.deprecated.logicalgraphcsv</a> &gt; <span class="el_source">CSVLineToElement.java</span></div><h1>CSVLineToElement.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;
+
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.flink.io.impl.csv.CSVConstants;
+import org.gradoop.flink.io.impl.csv.CSVDataSource;
+
+import java.util.List;
+import java.util.regex.Pattern;
+
+/**
+ * Base class for reading an {@link Element} from CSV. Handles the {@link MetaData} which is
+ * required to parse the property values.
+ *
+ * @param &lt;E&gt; EPGM element type
+ */
+abstract class CSVLineToElement&lt;E extends Element&gt; extends RichMapFunction&lt;String, E&gt; {
+  /**
+   * Stores the properties for the {@link Element} to be parsed.
+   */
+  private final Properties properties;
+  /**
+   * Needed for splitting the input.
+   */
+<span class="fc" id="L43">  private final String valueDelimiter = Pattern.quote(CSVConstants.VALUE_DELIMITER);</span>
+  /**
+   * Meta data that provides parsers for a specific {@link Element}.
+   */
+  private MetaData metaData;
+
+  /**
+   * Constructor
+   */
+<span class="fc" id="L52">  CSVLineToElement() {</span>
+<span class="fc" id="L53">    this.properties = Properties.create();</span>
+<span class="fc" id="L54">  }</span>
+
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="fc" id="L59">    super.open(parameters);</span>
+<span class="fc" id="L60">    this.metaData = MetaDataParser.create(getRuntimeContext()</span>
+<span class="fc" id="L61">      .getBroadcastVariable(CSVDataSource.BC_METADATA));</span>
+<span class="fc" id="L62">  }</span>
+
+  /**
+   * Parses the given property values according to the meta data associated with the specified
+   * label.
+   *
+   * @param type element type
+   * @param label element label
+   * @param propertyValueString string representation of elements' property values
+   * @return parsed properties
+   */
+  Properties parseProperties(String type, String label, String propertyValueString) {
+<span class="fc" id="L74">    String[] propertyValues = propertyValueString.split(valueDelimiter);</span>
+<span class="fc" id="L75">    List&lt;PropertyMetaData&gt; metaDataList = metaData.getPropertyMetaData(type, label);</span>
+<span class="fc" id="L76">    properties.clear();</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">    for (int i = 0; i &lt; propertyValues.length; i++) {</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">      if (propertyValues[i].length() &gt; 0) {</span>
+<span class="fc" id="L79">        properties.set(metaDataList.get(i).getKey(),</span>
+<span class="fc" id="L80">          metaDataList.get(i).getValueParser().apply(propertyValues[i]));</span>
+      }
+    }
+<span class="fc" id="L83">    return properties;</span>
+  }
+
+  /**
+   * Splits the specified string.
+   *
+   * Note: Using {@link Pattern#split(CharSequence)} leads to a significant performance loss.
+   *
+   * @param s string
+   * @param limit resulting array length
+   * @return tokens
+   */
+  protected String[] split(String s, int limit) {
+<span class="fc" id="L96">    return s.split(CSVConstants.TOKEN_DELIMITER, limit);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

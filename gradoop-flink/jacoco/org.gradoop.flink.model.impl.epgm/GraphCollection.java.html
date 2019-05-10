@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GraphCollection.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.epgm</a> &gt; <span class="el_source">GraphCollection.java</span></div><h1>GraphCollection.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.epgm;
+
+import org.apache.commons.lang.NotImplementedException;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.util.Order;
+import org.gradoop.flink.io.api.DataSink;
+import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.GraphCollectionOperators;
+import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
+import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
+import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
+import org.gradoop.flink.model.impl.functions.bool.Not;
+import org.gradoop.flink.model.impl.functions.bool.Or;
+import org.gradoop.flink.model.impl.functions.bool.True;
+import org.gradoop.flink.model.impl.functions.epgm.BySameId;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
+import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.model.impl.operators.difference.Difference;
+import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
+import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
+import org.gradoop.flink.model.impl.operators.distinction.DistinctByIsomorphism;
+import org.gradoop.flink.model.impl.operators.distinction.GroupByIsomorphism;
+import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
+import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds;
+import org.gradoop.flink.model.impl.operators.intersection.Intersection;
+import org.gradoop.flink.model.impl.operators.intersection.IntersectionBroadcast;
+import org.gradoop.flink.model.impl.operators.limit.Limit;
+import org.gradoop.flink.model.impl.operators.matching.transactional.TransactionalPatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
+import org.gradoop.flink.model.impl.operators.selection.Selection;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
+import org.gradoop.flink.model.impl.operators.union.Union;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.IOException;
+import java.util.Objects;
+
+/**
+ * A graph collection graph is one of the base concepts of the Extended Property Graph Model. From
+ * a model perspective, the collection represents a set of logical graphs. From a data perspective
+ * this is reflected by providing three concepts:
+ *
+ * - a set of graph heads assigned to the graphs in that collection
+ * - a set of vertices which is the union of all vertex sets of the represented graphs
+ * - a set of edges which is the union of all edge sets of the represented graphs
+ *
+ * Furthermore, a graph collection provides operations that are performed on the underlying data.
+ * These operations result in either another graph collection or in a {@link LogicalGraph}.
+ *
+ * A graph collection is wrapping a {@link GraphCollectionLayout} which defines, how the collection
+ * is represented in Apache Flink. Note that the GraphCollection also implements that interface and
+ * just forward the calls to the layout. This is just for convenience and API synchronicity.
+ */
+public class GraphCollection implements
+  BaseGraphCollection&lt;GraphHead, Vertex, Edge, GraphCollection&gt;, GraphCollectionOperators {
+  /**
+   * Layout for that graph collection
+   */
+  private final GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; layout;
+  /**
+   * Configuration
+   */
+  private final GradoopFlinkConfig config;
+
+  /**
+   * Creates a graph collection from the given arguments.
+   *
+   * @param layout the graph collection layout
+   * @param config the Gradoop Flink configuration
+   */
+  GraphCollection(GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; layout,
+<span class="fc" id="L105">    GradoopFlinkConfig config) {</span>
+<span class="fc" id="L106">    this.layout = Objects.requireNonNull(layout);</span>
+<span class="fc" id="L107">    this.config = Objects.requireNonNull(config);</span>
+<span class="fc" id="L108">  }</span>
+
+  //----------------------------------------------------------------------------
+  // Data methods
+  //----------------------------------------------------------------------------
+
+  @Override
+  public boolean isGVELayout() {
+<span class="nc" id="L116">    return layout.isGVELayout();</span>
+  }
+
+  @Override
+  public boolean isIndexedGVELayout() {
+<span class="nc" id="L121">    return layout.isIndexedGVELayout();</span>
+  }
+
+  @Override
+  public boolean isTransactionalLayout() {
+<span class="fc" id="L126">    return layout.isTransactionalLayout();</span>
+  }
+
+  @Override
+  public DataSet&lt;Vertex&gt; getVertices() {
+<span class="fc" id="L131">    return layout.getVertices();</span>
+  }
+
+  @Override
+  public DataSet&lt;Vertex&gt; getVerticesByLabel(String label) {
+<span class="nc" id="L136">    return layout.getVerticesByLabel(label);</span>
+  }
+
+  @Override
+  public DataSet&lt;Edge&gt; getEdges() {
+<span class="fc" id="L141">    return layout.getEdges();</span>
+  }
+
+  @Override
+  public DataSet&lt;Edge&gt; getEdgesByLabel(String label) {
+<span class="nc" id="L146">    return layout.getEdgesByLabel(label);</span>
+  }
+
+  @Override
+  public DataSet&lt;GraphHead&gt; getGraphHeads() {
+<span class="fc" id="L151">    return layout.getGraphHeads();</span>
+  }
+
+  @Override
+  public DataSet&lt;GraphHead&gt; getGraphHeadsByLabel(String label) {
+<span class="nc" id="L156">    return layout.getGraphHeadsByLabel(label);</span>
+  }
+
+  @Override
+  public DataSet&lt;GraphTransaction&gt; getGraphTransactions() {
+<span class="fc" id="L161">    return layout.getGraphTransactions();</span>
+  }
+
+  //----------------------------------------------------------------------------
+  // Logical Graph / Graph Head Getters
+  //----------------------------------------------------------------------------
+
+  @Override
+  public LogicalGraph getGraph(final GradoopId graphID) {
+    // filter vertices and edges based on given graph id
+<span class="fc" id="L171">    DataSet&lt;GraphHead&gt; graphHead = getGraphHeads()</span>
+<span class="fc" id="L172">      .filter(new BySameId&lt;&gt;(graphID));</span>
+<span class="fc" id="L173">    DataSet&lt;Vertex&gt; vertices = getVertices()</span>
+<span class="fc" id="L174">      .filter(new InGraph&lt;&gt;(graphID));</span>
+<span class="fc" id="L175">    DataSet&lt;Edge&gt; edges = getEdges()</span>
+<span class="fc" id="L176">      .filter(new InGraph&lt;&gt;(graphID));</span>
+
+<span class="fc" id="L178">    return new LogicalGraph(</span>
+<span class="fc" id="L179">      config.getLogicalGraphFactory().fromDataSets(graphHead, vertices, edges),</span>
+<span class="fc" id="L180">      getConfig());</span>
+  }
+
+  @Override
+  public GraphCollection getGraphs(final GradoopId... identifiers) {
+
+<span class="nc" id="L186">    GradoopIdSet graphIds = new GradoopIdSet();</span>
+
+<span class="nc bnc" id="L188" title="All 2 branches missed.">    for (GradoopId id : identifiers) {</span>
+<span class="nc" id="L189">      graphIds.add(id);</span>
+    }
+
+<span class="nc" id="L192">    return getGraphs(graphIds);</span>
+  }
+
+  @Override
+  public GraphCollection getGraphs(final GradoopIdSet identifiers) {
+
+<span class="fc" id="L198">    DataSet&lt;GraphHead&gt; newGraphHeads = this.getGraphHeads()</span>
+<span class="fc" id="L199">      .filter(new FilterFunction&lt;GraphHead&gt;() {</span>
+        @Override
+        public boolean filter(GraphHead graphHead) {
+<span class="fc" id="L202">          return identifiers.contains(graphHead.getId());</span>
+        }
+      });
+
+    // build new vertex set
+<span class="fc" id="L207">    DataSet&lt;Vertex&gt; vertices = getVertices()</span>
+<span class="fc" id="L208">      .filter(new InAnyGraph&lt;&gt;(identifiers));</span>
+
+    // build new edge set
+<span class="fc" id="L211">    DataSet&lt;Edge&gt; edges = getEdges()</span>
+<span class="fc" id="L212">      .filter(new InAnyGraph&lt;&gt;(identifiers));</span>
+
+<span class="fc" id="L214">    return new GraphCollection(getFactory().fromDataSets(newGraphHeads, vertices, edges),</span>
+<span class="fc" id="L215">      getConfig());</span>
+  }
+
+  //----------------------------------------------------------------------------
+  // Unary Operators
+  //----------------------------------------------------------------------------
+
+  @Override
+  public GraphCollection select(final FilterFunction&lt;GraphHead&gt; predicate) {
+<span class="fc" id="L224">    return callForCollection(new Selection(predicate));</span>
+  }
+
+  @Override
+  public GraphCollection sortBy(String propertyKey, Order order) {
+<span class="nc" id="L229">    throw new NotImplementedException();</span>
+  }
+
+  @Override
+  public GraphCollection limit(int n) {
+<span class="fc" id="L234">    return callForCollection(new Limit(n));</span>
+  }
+
+  @Override
+  public GraphCollection match(
+    String pattern,
+    PatternMatchingAlgorithm algorithm,
+    boolean returnEmbeddings) {
+<span class="fc" id="L242">    return new TransactionalPatternMatching(</span>
+      pattern,
+      algorithm,
+<span class="fc" id="L245">      returnEmbeddings).execute(this);</span>
+  }
+
+  //----------------------------------------------------------------------------
+  // Binary Operators
+  //----------------------------------------------------------------------------
+
+  @Override
+  public GraphCollection union(GraphCollection otherCollection) {
+<span class="fc" id="L254">    return callForCollection(new Union(), otherCollection);</span>
+  }
+
+  @Override
+  public GraphCollection intersect(GraphCollection otherCollection) {
+<span class="fc" id="L259">    return callForCollection(new Intersection(), otherCollection);</span>
+  }
+
+  @Override
+  public GraphCollection intersectWithSmallResult(
+    GraphCollection otherCollection) {
+<span class="fc" id="L265">    return callForCollection(new IntersectionBroadcast(),</span>
+      otherCollection);
+  }
+
+  @Override
+  public GraphCollection difference(GraphCollection otherCollection) {
+<span class="fc" id="L271">    return callForCollection(new Difference(), otherCollection);</span>
+  }
+
+  @Override
+  public GraphCollection differenceWithSmallResult(
+    GraphCollection otherCollection) {
+<span class="fc" id="L277">    return callForCollection(new DifferenceBroadcast(),</span>
+      otherCollection);
+  }
+
+  @Override
+  public DataSet&lt;Boolean&gt; equalsByGraphIds(GraphCollection other) {
+<span class="fc" id="L283">    return new CollectionEqualityByGraphIds().execute(this, other);</span>
+  }
+
+  @Override
+  public DataSet&lt;Boolean&gt; equalsByGraphElementIds(GraphCollection other) {
+<span class="fc" id="L288">    return new CollectionEquality(</span>
+      new GraphHeadToEmptyString(),
+      new VertexToIdString(),
+<span class="fc" id="L291">      new EdgeToIdString(), true).execute(this, other);</span>
+  }
+
+  @Override
+  public DataSet&lt;Boolean&gt; equalsByGraphElementData(GraphCollection other) {
+<span class="fc" id="L296">    return new CollectionEquality(</span>
+      new GraphHeadToEmptyString(),
+      new VertexToDataString(),
+<span class="fc" id="L299">      new EdgeToDataString(), true).execute(this, other);</span>
+  }
+
+  @Override
+  public DataSet&lt;Boolean&gt; equalsByGraphData(GraphCollection other) {
+<span class="fc" id="L304">    return new CollectionEquality(</span>
+      new GraphHeadToDataString(),
+      new VertexToDataString(),
+<span class="fc" id="L307">      new EdgeToDataString(), true).execute(this, other);</span>
+  }
+
+  //----------------------------------------------------------------------------
+  // Auxiliary Operators
+  //----------------------------------------------------------------------------
+
+  @Override
+  public GraphCollection callForCollection(
+    UnaryCollectionToCollectionOperator op) {
+<span class="fc" id="L317">    return op.execute(this);</span>
+  }
+
+  @Override
+  public GraphCollection callForCollection(
+    BinaryCollectionToCollectionOperator op,
+    GraphCollection otherCollection) {
+<span class="fc" id="L324">    return op.execute(this, otherCollection);</span>
+  }
+
+  @Override
+  public LogicalGraph callForGraph(UnaryCollectionToGraphOperator op) {
+<span class="fc" id="L329">    return op.execute(this);</span>
+  }
+
+  @Override
+  public GraphCollection apply(ApplicableUnaryGraphToGraphOperator op) {
+<span class="fc" id="L334">    return callForCollection(op);</span>
+  }
+
+  @Override
+  public LogicalGraph reduce(ReducibleBinaryGraphToGraphOperator op) {
+<span class="fc" id="L339">    return callForGraph(op);</span>
+  }
+
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
+
+  @Override
+  public GradoopFlinkConfig getConfig() {
+<span class="fc" id="L348">    return config;</span>
+  }
+
+  @Override
+  public BaseGraphCollectionFactory&lt;GraphHead, Vertex, Edge, GraphCollection&gt; getFactory() {
+<span class="fc" id="L353">    return config.getGraphCollectionFactory();</span>
+  }
+
+  @Override
+  public DataSet&lt;Boolean&gt; isEmpty() {
+<span class="fc" id="L358">    return getGraphHeads()</span>
+<span class="fc" id="L359">      .map(new True&lt;&gt;())</span>
+<span class="fc" id="L360">      .distinct()</span>
+<span class="fc" id="L361">      .union(getConfig().getExecutionEnvironment().fromElements(false))</span>
+<span class="fc" id="L362">      .reduce(new Or())</span>
+<span class="fc" id="L363">      .map(new Not());</span>
+  }
+
+  @Override
+  public GraphCollection distinctById() {
+<span class="fc" id="L368">    return callForCollection(new DistinctById());</span>
+  }
+
+  @Override
+  public GraphCollection distinctByIsomorphism() {
+<span class="fc" id="L373">    return callForCollection(new DistinctByIsomorphism());</span>
+  }
+
+  @Override
+  public GraphCollection groupByIsomorphism(GraphHeadReduceFunction func) {
+<span class="fc" id="L378">    return callForCollection(new GroupByIsomorphism(func));</span>
+  }
+
+  @Override
+  public void writeTo(DataSink dataSink) throws IOException {
+<span class="fc" id="L383">    dataSink.write(this);</span>
+<span class="fc" id="L384">  }</span>
+
+  @Override
+  public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
+<span class="nc" id="L388">    dataSink.write(this, overWrite);</span>
+<span class="nc" id="L389">  }</span>
+
+  /**
+   * Prints this graph collection to the console.
+   *
+   * @throws Exception forwarded DataSet print() Exception.
+   */
+  public void print() throws Exception {
+<span class="nc" id="L397">    GDLConsoleOutput.print(this);</span>
+<span class="nc" id="L398">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

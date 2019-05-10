@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DIMSpan.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.dimspan</a> &gt; <span class="el_source">DIMSpan.java</span></div><h1>DIMSpan.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.dimspan;
+
+import org.apache.flink.api.common.functions.GroupCombineFunction;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.aggregation.AggregationFunction;
+import org.apache.flink.api.java.aggregation.SumAggregationFunction;
+import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.gradoop.flink.algorithms.fsm.dimspan.comparison.AlphabeticalLabelComparator;
+import org.gradoop.flink.algorithms.fsm.dimspan.comparison.InverseProportionalLabelComparator;
+import org.gradoop.flink.algorithms.fsm.dimspan.comparison.LabelComparator;
+import org.gradoop.flink.algorithms.fsm.dimspan.comparison.ProportionalLabelComparator;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DataflowStep;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DictionaryType;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion.DFSCodeToEPGMGraphTransaction;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.CreateCollector;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.ExpandFrequentPatterns;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.Frequent;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.GrowFrequentPatterns;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.InitSingleEdgePatternEmbeddingsMap;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.IsFrequentPatternCollector;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.NotObsolete;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.ReportSupportedPatterns;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.VerifyPattern;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.mining.CompressPattern;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.AggregateMultipleFunctions;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.CreateDictionary;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.EncodeAndPruneEdges;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.EncodeAndPruneVertices;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.MinFrequency;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.NotEmpty;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.ReportEdgeLabels;
+import org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing.ReportVertexLabels;
+import org.gradoop.flink.algorithms.fsm.dimspan.gspan.DirectedGSpanLogic;
+import org.gradoop.flink.algorithms.fsm.dimspan.gspan.GSpanLogic;
+import org.gradoop.flink.algorithms.fsm.dimspan.gspan.UndirectedGSpanLogic;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.GraphWithPatternEmbeddingsMap;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphIntString;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphStringString;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+import org.gradoop.flink.model.impl.operators.count.Count;
+import org.gradoop.flink.model.impl.tuples.WithCount;
+
+/**
+ * abstract superclass of different implementations of the gSpan frequent
+ * subgraph mining algorithm as Gradoop operator
+ */
+public class DIMSpan {
+
+  /**
+   * Maximum number of iterations if set of k-edge frequent patterns is not running empty before.
+   */
+  private static final int MAX_ITERATIONS = 100;
+
+  /**
+   * FSM configuration
+   */
+  protected final DIMSpanConfig fsmConfig;
+
+  /**
+   * input graph collection cardinality
+   */
+  protected DataSet&lt;Long&gt; graphCount;
+
+  /**
+   * minimum frequency for patterns to be considered to be frequent
+   */
+  protected DataSet&lt;Long&gt; minFrequency;
+
+  /**
+   * Pattern growth and verification logic derived from gSpan.
+   * See &lt;a href=&quot;https://www.cs.ucsb.edu/~xyan/software/gSpan.htm&quot;&gt;gSpan&lt;/a&gt;
+   */
+  protected final GSpanLogic gSpan;
+
+  /**
+   * Vertex label dictionary for dictionary coding.
+   */
+  private DataSet&lt;String[]&gt; vertexDictionary;
+
+  /**
+   * Edge label dictionary for dictionary coding.
+   */
+  private DataSet&lt;String[]&gt; edgeDictionary;
+
+  /**
+   * Label comparator used for dictionary coding.
+   */
+  private final LabelComparator comparator;
+
+  /**
+   * Constructor.
+   *
+   * @param fsmConfig FSM configuration
+   */
+<span class="fc" id="L112">  public DIMSpan(DIMSpanConfig fsmConfig) {</span>
+<span class="fc" id="L113">    this.fsmConfig = fsmConfig;</span>
+
+    // set gSpan implementation depending on direction mode
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">    gSpan = fsmConfig.isDirected() ?</span>
+      new DirectedGSpanLogic(fsmConfig) :
+      new UndirectedGSpanLogic(fsmConfig);
+
+    // set comparator based on dictionary type
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">    if (fsmConfig.getDictionaryType() == DictionaryType.PROPORTIONAL) {</span>
+<span class="nc" id="L122">      comparator =  new ProportionalLabelComparator();</span>
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">    } else if (fsmConfig.getDictionaryType() == DictionaryType.INVERSE_PROPORTIONAL) {</span>
+<span class="fc" id="L124">      comparator =  new InverseProportionalLabelComparator();</span>
+    } else {
+<span class="nc" id="L126">      comparator = new AlphabeticalLabelComparator();</span>
+    }
+<span class="fc" id="L128">  }</span>
+
+  /**
+   * Executes the DIMSpan algorithm.
+   * Orchestration of preprocessing, mining and postprocessing.
+   *
+   * @param input input graph collection
+   * @return frequent patterns
+   */
+  public DataSet&lt;GraphTransaction&gt; execute(DataSet&lt;LabeledGraphStringString&gt; input) {
+
+<span class="fc" id="L139">    DataSet&lt;int[]&gt; encodedInput = preProcess(input);</span>
+<span class="fc" id="L140">    DataSet&lt;WithCount&lt;int[]&gt;&gt; encodedOutput = mine(encodedInput);</span>
+
+<span class="fc" id="L142">    return postProcess(encodedOutput);</span>
+  }
+
+  /**
+   * Triggers the label-frequency base preprocessing
+   *
+   * @param graphs input
+   * @return preprocessed input
+   */
+  private DataSet&lt;int[]&gt; preProcess(DataSet&lt;LabeledGraphStringString&gt; graphs) {
+
+    // Determine cardinality of input graph collection
+<span class="fc" id="L154">    this.graphCount = Count</span>
+<span class="fc" id="L155">      .count(graphs);</span>
+
+    // Calculate minimum frequency
+<span class="fc" id="L158">    this.minFrequency = graphCount</span>
+<span class="fc" id="L159">      .map(new MinFrequency(fsmConfig));</span>
+
+    // Execute vertex label pruning and dictionary coding
+<span class="fc" id="L162">    DataSet&lt;LabeledGraphIntString&gt; graphsWithEncodedVertices = encodeVertices(graphs);</span>
+
+    // Execute edge label pruning and dictionary coding
+<span class="fc" id="L165">    DataSet&lt;int[]&gt; encodedGraphs = encodeEdges(graphsWithEncodedVertices);</span>
+
+    // return all non-obsolete encoded graphs
+<span class="fc" id="L168">    return encodedGraphs</span>
+<span class="fc" id="L169">      .filter(new NotEmpty());</span>
+  }
+
+  /**
+   * Triggers the iterative mining process.
+   *
+   * @param graphs preprocessed input graph collection
+   * @return frequent patterns
+   */
+  protected DataSet&lt;WithCount&lt;int[]&gt;&gt; mine(DataSet&lt;int[]&gt; graphs) {
+
+<span class="fc" id="L180">    DataSet&lt;GraphWithPatternEmbeddingsMap&gt; searchSpace = graphs</span>
+<span class="fc" id="L181">      .map(new InitSingleEdgePatternEmbeddingsMap(gSpan, fsmConfig));</span>
+
+    // Workaround to support multiple data sinks: create pseudo-graph (collector),
+    // which embedding map will be used to union all k-edge frequent patterns
+<span class="fc" id="L185">    DataSet&lt;GraphWithPatternEmbeddingsMap&gt; collector = graphs</span>
+<span class="fc" id="L186">      .getExecutionEnvironment()</span>
+<span class="fc" id="L187">      .fromElements(true)</span>
+<span class="fc" id="L188">      .map(new CreateCollector());</span>
+
+<span class="fc" id="L190">    searchSpace = searchSpace.union(collector);</span>
+
+    // ITERATION HEAD
+
+<span class="fc" id="L194">    IterativeDataSet&lt;GraphWithPatternEmbeddingsMap&gt; iterative = searchSpace</span>
+<span class="fc" id="L195">      .iterate(MAX_ITERATIONS);</span>
+
+    // ITERATION BODY
+
+<span class="fc" id="L199">    DataSet&lt;WithCount&lt;int[]&gt;&gt; reports = iterative</span>
+<span class="fc" id="L200">      .flatMap(new ReportSupportedPatterns());</span>
+
+<span class="fc" id="L202">    DataSet&lt;WithCount&lt;int[]&gt;&gt; frequentPatterns = getFrequentPatterns(reports);</span>
+
+<span class="fc" id="L204">    DataSet&lt;GraphWithPatternEmbeddingsMap&gt; grownEmbeddings = iterative</span>
+<span class="fc" id="L205">      .map(new GrowFrequentPatterns(gSpan, fsmConfig))</span>
+<span class="fc" id="L206">      .withBroadcastSet(frequentPatterns, DIMSpanConstants.FREQUENT_PATTERNS)</span>
+<span class="fc" id="L207">      .filter(new NotObsolete());</span>
+
+    // ITERATION FOOTER
+
+<span class="fc" id="L211">    return iterative</span>
+<span class="fc" id="L212">      .closeWith(grownEmbeddings, frequentPatterns)</span>
+      // keep only collector and expand embedding map keys
+<span class="fc" id="L214">      .filter(new IsFrequentPatternCollector())</span>
+<span class="fc" id="L215">      .flatMap(new ExpandFrequentPatterns());</span>
+  }
+
+  /**
+   * Triggers the postprocessing.
+   *
+   * @param encodedOutput frequent patterns represented by multiplexed int-arrays
+   * @return Gradoop graph transactions
+   */
+  private DataSet&lt;GraphTransaction&gt; postProcess(DataSet&lt;WithCount&lt;int[]&gt;&gt; encodedOutput) {
+<span class="fc" id="L225">    return encodedOutput</span>
+<span class="fc" id="L226">      .map(new DFSCodeToEPGMGraphTransaction(fsmConfig))</span>
+<span class="fc" id="L227">      .withBroadcastSet(vertexDictionary, DIMSpanConstants.VERTEX_DICTIONARY)</span>
+<span class="fc" id="L228">      .withBroadcastSet(edgeDictionary, DIMSpanConstants.EDGE_DICTIONARY)</span>
+<span class="fc" id="L229">      .withBroadcastSet(graphCount, DIMSpanConstants.GRAPH_COUNT);</span>
+  }
+
+  /**
+   * Executes pruning and dictionary coding of vertex labels.
+   *
+   * @param graphs graphs with string-labels
+   * @return graphs with dictionary-encoded vertex labels
+   */
+  private DataSet&lt;LabeledGraphIntString&gt; encodeVertices(DataSet&lt;LabeledGraphStringString&gt; graphs) {
+
+    // LABEL PRUNING
+
+<span class="fc" id="L242">    DataSet&lt;WithCount&lt;String&gt;&gt; vertexLabels = graphs</span>
+<span class="fc" id="L243">      .flatMap(new ReportVertexLabels());</span>
+
+<span class="fc" id="L245">    vertexLabels = getFrequentLabels(vertexLabels);</span>
+
+    // DICTIONARY ENCODING
+
+<span class="fc" id="L249">    vertexDictionary = vertexLabels</span>
+<span class="fc" id="L250">      .reduceGroup(new CreateDictionary(comparator));</span>
+
+<span class="fc" id="L252">    return graphs</span>
+<span class="fc" id="L253">      .map(new EncodeAndPruneVertices())</span>
+<span class="fc" id="L254">      .withBroadcastSet(vertexDictionary, DIMSpanConstants.VERTEX_DICTIONARY);</span>
+  }
+
+  /**
+   * Executes pruning and dictionary coding of edge labels.
+   *
+   * @param graphs graphs with dictionary-encoded vertex labels
+   * @return graphs with dictionary-encoded vertex and edge labels
+   */
+  private DataSet&lt;int[]&gt; encodeEdges(DataSet&lt;LabeledGraphIntString&gt; graphs) {
+
+<span class="fc" id="L265">    DataSet&lt;WithCount&lt;String&gt;&gt; edgeLabels = graphs</span>
+<span class="fc" id="L266">      .flatMap(new ReportEdgeLabels());</span>
+
+<span class="fc" id="L268">    edgeLabels = getFrequentLabels(edgeLabels);</span>
+
+<span class="fc" id="L270">    edgeDictionary = edgeLabels</span>
+<span class="fc" id="L271">      .reduceGroup(new CreateDictionary(comparator));</span>
+
+<span class="fc" id="L273">    return graphs</span>
+<span class="fc" id="L274">      .map(new EncodeAndPruneEdges(fsmConfig))</span>
+<span class="fc" id="L275">      .withBroadcastSet(edgeDictionary, DIMSpanConstants.EDGE_DICTIONARY);</span>
+  }
+
+  /**
+   * Determines frequent labels.
+   *
+   * @param labels dataset of labels
+   *
+   * @return dataset of frequent labels
+   */
+  private DataSet&lt;WithCount&lt;String&gt;&gt; getFrequentLabels(DataSet&lt;WithCount&lt;String&gt;&gt; labels) {
+    // enabled
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">    if (fsmConfig.getDictionaryType() != DictionaryType.RANDOM) {</span>
+
+<span class="fc" id="L289">      labels = labels</span>
+<span class="fc" id="L290">        .groupBy(0)</span>
+<span class="fc" id="L291">        .sum(1)</span>
+<span class="fc" id="L292">        .filter(new Frequent&lt;&gt;())</span>
+<span class="fc" id="L293">        .withBroadcastSet(minFrequency, DIMSpanConstants.MIN_FREQUENCY);</span>
+
+      // disabled
+    } else {
+<span class="nc" id="L297">      labels = labels</span>
+<span class="nc" id="L298">        .distinct();</span>
+    }
+
+<span class="fc" id="L301">    return labels;</span>
+  }
+
+  /**
+   * Identifies valid frequent patterns from a dataset of reported patterns.
+   *
+   * @param patterns reported patterns
+   * @return valid frequent patterns
+   */
+  private DataSet&lt;WithCount&lt;int[]&gt;&gt; getFrequentPatterns(DataSet&lt;WithCount&lt;int[]&gt;&gt; patterns) {
+    // COMBINE
+
+<span class="fc" id="L313">    patterns = patterns</span>
+<span class="fc" id="L314">      .groupBy(0)</span>
+<span class="fc" id="L315">      .combineGroup(sumPartition());</span>
+
+<span class="pc bpc" id="L317" title="1 of 2 branches missed.">    if (fsmConfig.getPatternVerificationInStep() == DataflowStep.COMBINE) {</span>
+<span class="fc" id="L318">      patterns = patterns</span>
+<span class="fc" id="L319">        .filter(new VerifyPattern(gSpan, fsmConfig));</span>
+    }
+
+<span class="pc bpc" id="L322" title="1 of 2 branches missed.">    if (fsmConfig.getPatternCompressionInStep() == DataflowStep.COMBINE) {</span>
+<span class="nc" id="L323">      patterns = patterns</span>
+<span class="nc" id="L324">        .map(new CompressPattern());</span>
+    }
+
+    // REDUCE
+
+<span class="fc" id="L329">    patterns = patterns</span>
+<span class="fc" id="L330">      .groupBy(0)</span>
+<span class="fc" id="L331">      .sum(1);</span>
+
+    // FILTER
+
+<span class="fc" id="L335">    patterns = patterns</span>
+<span class="fc" id="L336">      .filter(new Frequent&lt;&gt;())</span>
+<span class="fc" id="L337">      .withBroadcastSet(minFrequency, DIMSpanConstants.MIN_FREQUENCY);</span>
+
+<span class="pc bpc" id="L339" title="1 of 2 branches missed.">    if (fsmConfig.getPatternVerificationInStep() == DataflowStep.FILTER) {</span>
+<span class="nc" id="L340">      patterns = patterns</span>
+<span class="nc" id="L341">        .filter(new VerifyPattern(gSpan, fsmConfig));</span>
+    }
+
+<span class="pc bpc" id="L344" title="1 of 2 branches missed.">    if (fsmConfig.getPatternCompressionInStep() == DataflowStep.FILTER) {</span>
+<span class="nc" id="L345">      patterns = patterns</span>
+<span class="nc" id="L346">        .map(new CompressPattern());</span>
+    }
+
+<span class="fc" id="L349">    return patterns;</span>
+  }
+
+  /**
+   * Creates a Flink sum aggregate function that can be applied in group combine operations.
+   *
+   * @return sum group combine function
+   */
+  private GroupCombineFunction&lt;WithCount&lt;int[]&gt;, WithCount&lt;int[]&gt;&gt; sumPartition() {
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+<span class="fc" id="L360">    AggregationFunction&lt;Long&gt;[] sum = new AggregationFunction[] {</span>
+      new SumAggregationFunction.SumAggregationFunctionFactory()
+<span class="fc" id="L362">        .createAggregationFunction(Long.class)</span>
+    };
+
+<span class="fc" id="L365">    int[] fields = { 1 };</span>
+
+<span class="fc" id="L367">    return new AggregateMultipleFunctions(sum, fields);</span>
+  }
+
+  public String getName() {
+<span class="nc" id="L371">    return this.getClass().getSimpleName();</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

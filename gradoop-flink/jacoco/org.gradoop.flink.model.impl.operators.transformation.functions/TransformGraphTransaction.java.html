@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TransformGraphTransaction.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.transformation.functions</a> &gt; <span class="el_source">TransformGraphTransaction.java</span></div><h1>TransformGraphTransaction.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.transformation.functions;
+
+import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.util.GradoopConstants;
+import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+
+import java.util.stream.Collectors;
+
+/**
+ * Transformation map function for graph transactions.
+ */
+public class TransformGraphTransaction implements MapFunction&lt;GraphTransaction, GraphTransaction&gt; {
+
+  /**
+   * Factory to init modified graph head.
+   */
+  private final EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory;
+  /**
+   * Graph head modification function
+   */
+  private final TransformationFunction&lt;GraphHead&gt; graphHeadTransFunc;
+
+  /**
+   * Factory to init modified vertex.
+   */
+  private final EPGMVertexFactory&lt;Vertex&gt; vertexFactory;
+
+  /**
+   * Vertex modification function
+   */
+  private final TransformationFunction&lt;Vertex&gt; vertexTransFunc;
+
+  /**
+   * Factory to init modified edge.
+   */
+  private final EPGMEdgeFactory&lt;Edge&gt; edgeFactory;
+  /**
+   * Edge modification function
+   */
+  private final TransformationFunction&lt;Edge&gt; edgeTransFunc;
+
+  /**
+   * Constructor
+   *
+   * @param graphHeadFactory graph head factory
+   * @param graphHeadTransFunc graph head transformation function
+   * @param vertexFactory vertex factory
+   * @param vertexTransFunc vertex transformation function
+   * @param edgeFactory edge factory
+   * @param edgeTransFunc edge transformation function
+   */
+  public TransformGraphTransaction(EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory,
+    TransformationFunction&lt;GraphHead&gt; graphHeadTransFunc, EPGMVertexFactory&lt;Vertex&gt; vertexFactory,
+    TransformationFunction&lt;Vertex&gt; vertexTransFunc, EPGMEdgeFactory&lt;Edge&gt; edgeFactory,
+<span class="fc" id="L77">    TransformationFunction&lt;Edge&gt; edgeTransFunc) {</span>
+<span class="fc" id="L78">    this.graphHeadFactory = graphHeadFactory;</span>
+<span class="fc" id="L79">    this.graphHeadTransFunc = graphHeadTransFunc;</span>
+<span class="fc" id="L80">    this.vertexFactory = vertexFactory;</span>
+<span class="fc" id="L81">    this.vertexTransFunc = vertexTransFunc;</span>
+<span class="fc" id="L82">    this.edgeFactory = edgeFactory;</span>
+<span class="fc" id="L83">    this.edgeTransFunc = edgeTransFunc;</span>
+<span class="fc" id="L84">  }</span>
+
+  @Override
+  public GraphTransaction map(GraphTransaction transaction) throws Exception {
+<span class="fc bfc" id="L88" title="All 2 branches covered.">    if (graphHeadTransFunc != null) {</span>
+<span class="fc" id="L89">      transaction.setGraphHead(graphHeadTransFunc.apply(</span>
+<span class="fc" id="L90">        transaction.getGraphHead(),</span>
+<span class="fc" id="L91">        graphHeadFactory.initGraphHead(</span>
+<span class="fc" id="L92">          transaction.getGraphHead().getId(), GradoopConstants.DEFAULT_GRAPH_LABEL)));</span>
+    }
+
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (vertexTransFunc != null) {</span>
+<span class="fc" id="L96">      transaction.setVertices(transaction.getVertices().stream()</span>
+<span class="fc" id="L97">        .map(vertex -&gt; vertexTransFunc.apply(</span>
+          vertex,
+<span class="fc" id="L99">          vertexFactory.initVertex(</span>
+<span class="fc" id="L100">            vertex.getId(), GradoopConstants.DEFAULT_VERTEX_LABEL, vertex.getGraphIds())))</span>
+<span class="fc" id="L101">        .collect(Collectors.toSet()));</span>
+    }
+
+<span class="fc bfc" id="L104" title="All 2 branches covered.">    if (edgeTransFunc != null) {</span>
+<span class="fc" id="L105">      transaction.setEdges(transaction.getEdges().stream()</span>
+<span class="fc" id="L106">        .map(edge -&gt; edgeTransFunc.apply(</span>
+          edge,
+<span class="fc" id="L108">          edgeFactory.initEdge(</span>
+<span class="fc" id="L109">            edge.getId(), GradoopConstants.DEFAULT_EDGE_LABEL,</span>
+<span class="fc" id="L110">            edge.getSourceId(), edge.getTargetId(), edge.getGraphIds())))</span>
+<span class="fc" id="L111">        .collect(Collectors.toSet()));</span>
+    }
+<span class="fc" id="L113">    return transaction;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

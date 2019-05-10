@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CsvRowToProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.importer.impl.csv.functions</a> &gt; <span class="el_source">CsvRowToProperties.java</span></div><h1>CsvRowToProperties.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.importer.impl.csv.functions;
+
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Map the values of a token separated row of a file to the properties of a EPGM element.
+ * Each property value will be mapped to the property name the user set via parameter.
+ */
+public class CsvRowToProperties implements FlatMapFunction&lt;String, Properties&gt; {
+
+  /**
+   * Token separator for the csv file.
+   */
+  private String tokenSeparator;
+
+  /**
+   * The name of the properties
+   */
+  private List&lt;String&gt; propertyNames;
+
+  /**
+   * True, if the user want to check if each row of the file is equals to the header row
+   */
+  private boolean checkReoccurringHeader;
+
+  /**
+   * Reduce object instantiations
+   */
+  private Properties reuseProperties;
+
+  /**
+   * Create a new RowToVertexMapper
+   *
+   * @param tokenDelimiter in the file is used
+   * @param propertyNames list of the property names
+   * @param checkReoccurringHeader should the row checked for a occurring of the column names?
+   */
+  public CsvRowToProperties(String tokenDelimiter, List&lt;String&gt; propertyNames,
+<span class="fc" id="L61">    boolean checkReoccurringHeader) {</span>
+<span class="fc" id="L62">    this.tokenSeparator = Objects.requireNonNull(tokenDelimiter);</span>
+<span class="fc" id="L63">    this.propertyNames = Objects.requireNonNull(propertyNames);</span>
+<span class="fc" id="L64">    this.checkReoccurringHeader = checkReoccurringHeader;</span>
+<span class="fc" id="L65">    this.reuseProperties = new Properties();</span>
+<span class="fc" id="L66">  }</span>
+
+  @Override
+  public void flatMap(String line, Collector&lt;Properties&gt; out) {
+    // Check if the line is an empty line
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">    if (line.isEmpty()) {</span>
+<span class="nc" id="L72">      return;</span>
+    }
+
+<span class="fc" id="L75">    String[] propertyValues = line.split(tokenSeparator);</span>
+
+    // If the line to read is equals to the header and the checkReoccurringHeader flag is set to
+    // TRUE, we do not import this line.
+<span class="fc bfc" id="L79" title="All 4 branches covered.">    if (checkReoccurringHeader &amp;&amp; propertyNames.containsAll(Arrays.asList(propertyValues))) {</span>
+<span class="fc" id="L80">      return;</span>
+    }
+
+    // clear the properties
+<span class="fc" id="L84">    reuseProperties.clear();</span>
+
+<span class="fc bfc" id="L86" title="All 2 branches covered.">    for (int i = 0; i &lt; propertyValues.length; i++) {</span>
+      // if a value is empty, do not add a property
+<span class="fc bfc" id="L88" title="All 2 branches covered.">      if (!propertyValues[i].isEmpty()) {</span>
+<span class="fc" id="L89">        reuseProperties.set(propertyNames.get(i), PropertyValue.create(propertyValues[i]));</span>
+      }
+    }
+<span class="fc" id="L92">    out.collect(reuseProperties);</span>
+<span class="fc" id="L93">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,809 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropertyValue.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.properties</a> &gt; <span class="el_source">PropertyValue.java</span></div><h1>PropertyValue.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.properties;
+
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.types.Value;
+import org.gradoop.common.exceptions.UnsupportedTypeException;
+import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.strategies.PropertyValueStrategyFactory;
+import org.gradoop.common.util.GradoopConstants;
+import java.io.IOException;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+/**
+ * Represents a single property value in the EPGM.
+ *
+ * A property value wraps a value that implements a supported data type.
+ */
+public class PropertyValue implements Value, Serializable, Comparable&lt;PropertyValue&gt; {
+
+  /**
+   * Represents a property value that is {@code null}.
+   */
+<span class="fc" id="L48">  public static final PropertyValue NULL_VALUE = PropertyValue.create(null);</span>
+  /**
+   * {@code &lt;property-type&gt;} for empty property value (i.e. {@code null})
+   */
+  public static final transient byte TYPE_NULL         = 0x00;
+  /**
+   * {@code &lt;property-type&gt;} for {@link java.lang.Boolean}
+   */
+  public static final transient byte TYPE_BOOLEAN      = 0x01;
+  /**
+   * {@code &lt;property-type&gt;} for {@link java.lang.Integer}
+   */
+  public static final transient byte TYPE_INTEGER      = 0x02;
+  /**
+   * {@code &lt;property-type&gt;} for {@link java.lang.Long}
+   */
+  public static final transient byte TYPE_LONG         = 0x03;
+  /**
+   * {@code &lt;property-type&gt;} for {@link java.lang.Float}
+   */
+  public static final transient byte TYPE_FLOAT        = 0x04;
+  /**
+   * {@code &lt;property-type&gt;} for {@link java.lang.Double}
+   */
+  public static final transient byte TYPE_DOUBLE       = 0x05;
+  /**
+   * {@code &lt;property-type&gt;} for {@link java.lang.String}
+   */
+  public static final transient byte TYPE_STRING       = 0x06;
+  /**
+   * {@code &lt;property-type&gt;} for {@link BigDecimal}
+   */
+  public static final transient byte TYPE_BIG_DECIMAL  = 0x07;
+  /**
+   * {@code &lt;property-type&gt;} for {@link org.gradoop.common.model.impl.id.GradoopId}
+   */
+  public static final transient byte TYPE_GRADOOP_ID   = 0x08;
+  /**
+   * {@code &lt;property-type&gt;} for {@link java.util.HashMap}
+   */
+  public static final transient byte TYPE_MAP          = 0x09;
+  /**
+   * {@code &lt;property-type&gt;} for {@link java.util.List}
+   */
+  public static final transient byte TYPE_LIST         = 0x0a;
+  /**
+   * {@code &lt;property-type&gt;} for {@link LocalDate}
+   */
+  public static final transient byte TYPE_DATE         = 0x0b;
+  /**
+   * {@code &lt;property-type&gt;} for {@link LocalTime}
+   */
+  public static final transient byte TYPE_TIME         = 0x0c;
+  /**
+   * {@code &lt;property-type&gt;} for {@link LocalDateTime}
+   */
+  public static final transient byte TYPE_DATETIME     = 0x0d;
+  /**
+   * {@code &lt;property-type&gt;} for {@link java.lang.Short}
+   */
+  public static final transient byte TYPE_SHORT        = 0x0e;
+  /**
+   * {@code &lt;property-type&gt;} for {@link java.util.Set}
+   */
+  public static final transient byte TYPE_SET          = 0x0f;
+  /**
+   * Value offset in byte
+   */
+  public static final transient byte OFFSET            = 0x01;
+
+  /**
+   * Bit flag indicating a &quot;large&quot; property. The length of the byte representation will be stored
+   * as an {@code int} instead.
+   *
+   * @see #write(DataOutputView)
+   */
+  public static final transient byte FLAG_LARGE = (byte) 0x80;
+
+  /**
+   * If the length of the byte representation is larger than this value, the length will be
+   * stored as an {@code int} instead of a {@code short}.
+   *
+   * @see #write(DataOutputView)
+   */
+  public static final transient int LARGE_PROPERTY_THRESHOLD = Short.MAX_VALUE;
+
+  /**
+   * Class version for serialization.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Stores the object representation of the value
+   */
+  private Object value;
+
+  /**
+   * Default constructor.
+   */
+<span class="fc" id="L147">  public PropertyValue() { }</span>
+
+  /**
+   * Creates a new property value from the given value.
+   *
+   * If the given object type is not supported, an
+   * {@link UnsupportedTypeException} will be thrown.
+   *
+   * @param value value with supported type
+   */
+<span class="fc" id="L157">  private PropertyValue(Object value) {</span>
+<span class="fc" id="L158">    setObject(value);</span>
+<span class="fc" id="L159">  }</span>
+
+  /**
+   * Creates a new property value from the given byte array.
+   *
+   * @param bytes byte array
+   */
+<span class="fc" id="L166">  private PropertyValue(byte[] bytes) {</span>
+<span class="fc" id="L167">    setBytes(bytes);</span>
+<span class="fc" id="L168">  }</span>
+
+  /**
+   * Creates a new Property Value from the given object.
+   *
+   * If the given object type is not supported, an
+   * {@link UnsupportedTypeException} will be thrown.
+   *
+   * @param value value with supported type
+   * @return property value
+   */
+  public static PropertyValue create(Object value) {
+<span class="fc" id="L180">    return new PropertyValue(value);</span>
+  }
+
+  /**
+   * Create a {@link PropertyValue} that wraps a byte array.
+   *
+   * @param rawBytes array to wrap
+   * @return new instance of {@link PropertyValue}
+   */
+  public static PropertyValue fromRawBytes(byte[] rawBytes) {
+<span class="fc" id="L190">    return new PropertyValue(rawBytes);</span>
+  }
+
+  /**
+   * Creates a deep copy of the property value.
+   *
+   * @return property value
+   */
+  public PropertyValue copy() {
+<span class="fc" id="L199">    return new PropertyValue(getRawBytes());</span>
+  }
+
+  //----------------------------------------------------------------------------
+  // Type checking
+  //----------------------------------------------------------------------------
+
+  /**
+   * Check if the property value type is an instance of a certain class.
+   *
+   * @param clazz class to check against
+   * @return true if the attribute {@code value} is an object of the provided class, false
+   * otherwise
+   */
+  public boolean is(Class clazz) {
+<span class="fc" id="L214">    return PropertyValueStrategyFactory.get(clazz).is(value);</span>
+  }
+
+  /**
+   * True, if the value represents {@code null}.
+   *
+   * @return true, if {@code null} value
+   */
+  public boolean isNull() {
+<span class="fc bfc" id="L223" title="All 2 branches covered.">    return getRawBytes()[0] == PropertyValue.TYPE_NULL;</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@code boolean}.
+   *
+   * @return true, if {@code boolean} value
+   */
+  public boolean isBoolean() {
+<span class="fc" id="L232">    return is(Boolean.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@code short}.
+   *
+   * @return true, if {@code short} value
+   */
+  public boolean isShort() {
+<span class="fc" id="L241">    return is(Short.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@code int}.
+   *
+   * @return true, if {@code int} value
+   */
+  public boolean isInt() {
+<span class="fc" id="L250">    return is(Integer.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@code long}.
+   *
+   * @return true, if {@code long} value
+   */
+  public boolean isLong() {
+<span class="fc" id="L259">    return is(Long.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@code float}.
+   *
+   * @return true, if {@code float} value
+   */
+  public boolean isFloat() {
+<span class="fc" id="L268">    return is(Float.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@code double}.
+   *
+   * @return true, if {@code double} value
+   */
+  public boolean isDouble() {
+<span class="fc" id="L277">    return is(Double.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link String}.
+   *
+   * @return true, if {@link String} value
+   */
+  public boolean isString() {
+<span class="fc" id="L286">    return is(String.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link BigDecimal}.
+   *
+   * @return true, if {@link BigDecimal} value
+   * @see BigDecimal
+   */
+  public boolean isBigDecimal() {
+<span class="fc" id="L296">    return is(BigDecimal.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link GradoopId}.
+   *
+   * @return true, if {@link GradoopId} value
+   */
+  public boolean isGradoopId() {
+<span class="fc" id="L305">    return is(GradoopId.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link Map}.
+   *
+   * @return true, if {@link Map} value
+   */
+  public boolean isMap() {
+<span class="fc" id="L314">    return is(Map.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link List}.
+   *
+   * @return true, if {@link List} value
+   */
+  public boolean isList() {
+<span class="fc" id="L323">    return is(List.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link LocalDate}.
+   *
+   * @return true, if {@link LocalDate} value
+   */
+  public boolean isDate() {
+<span class="fc" id="L332">    return is(LocalDate.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link LocalTime}.
+   *
+   * @return true, if {@link LocalTime} value
+   */
+  public boolean isTime() {
+<span class="fc" id="L341">    return is(LocalTime.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link LocalDateTime}.
+   *
+   * @return true, if {@link LocalDateTime} value
+   */
+  public boolean isDateTime() {
+<span class="fc" id="L350">    return is(LocalDateTime.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is of type {@link Set}.
+   *
+   * @return true, if {@link Set} value
+   */
+  public boolean isSet() {
+<span class="fc" id="L359">    return is(Set.class);</span>
+  }
+
+  /**
+   * True, if the wrapped value is a subtype of {@link Number}.
+   *
+   * @return true, if {@link Number} value
+   */
+  public boolean isNumber() {
+<span class="fc bfc" id="L368" title="All 4 branches covered.">    return !isNull() &amp;&amp; Number.class.isAssignableFrom(getType());</span>
+  }
+
+  //----------------------------------------------------------------------------
+  // Getter
+  //----------------------------------------------------------------------------
+
+  /**
+   * Returns the value as the specified type. If it is already of the same type as requested, we
+   * just return the value. If not, an {@link UnsupportedOperationException} is thrown.
+   *
+   * @param clazz the requested value type
+   * @param &lt;T&gt; PropertyValue supported type
+   * @return value
+   * @throws UnsupportedOperationException when trying to get the wrong type
+   */
+  @SuppressWarnings(&quot;unchecked&quot;)
+  public &lt;T&gt; T get(Class&lt;T&gt; clazz) throws UnsupportedOperationException {
+<span class="fc" id="L386">    PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(clazz);</span>
+<span class="pc bpc" id="L387" title="1 of 2 branches missed.">    if (strategy.is(value)) {</span>
+<span class="fc" id="L388">      return (T) value;</span>
+    }
+<span class="nc" id="L390">    throw new UnsupportedOperationException(&quot;Value '&quot; + value + &quot;' of type &quot; +</span>
+<span class="nc" id="L391">      value.getClass().getSimpleName() + &quot;, cannot be accessed as &quot; + clazz.getSimpleName());</span>
+  }
+
+  /**
+   * Returns the wrapped value as object.
+   *
+   * @return value or {@code null} if the value is empty
+   */
+  public Object getObject() {
+<span class="fc" id="L400">    Object obj = null;</span>
+<span class="fc bfc" id="L401" title="All 2 branches covered.">    if (value != null) {</span>
+<span class="fc" id="L402">      obj = get(value.getClass());</span>
+    }
+<span class="fc" id="L404">    return obj;</span>
+  }
+
+  /**
+   * Returns the wrapped value as {@code boolean}.
+   *
+   * @return {@code boolean} value
+   */
+  public boolean getBoolean() {
+<span class="fc" id="L413">    return get(Boolean.class);</span>
+  }
+
+  /**
+   * Returns the wrapped value as {@code short}.
+   *
+   * @return {@code short} value
+   */
+  public short getShort() {
+<span class="fc" id="L422">    return get(Short.class);</span>
+  }
+
+  /**
+   * Returns the wrapped value as {@code int}.
+   *
+   * @return {@code int} value
+   */
+  public int getInt() {
+<span class="fc" id="L431">    return get(Integer.class);</span>
+  }
+
+  /**
+   * Returns the wrapped value as {@code long}.
+   *
+   * @return {@code long} value
+   */
+  public long getLong() {
+<span class="fc" id="L440">    return get(Long.class);</span>
+  }
+
+  /**
+   * Returns the wrapped value as {@code float}.
+   *
+   * @return {@code float} value
+   */
+  public float getFloat() {
+<span class="fc" id="L449">    return get(Float.class);</span>
+  }
+
+  /**
+   * Returns the wrapped value as {@code double}.
+   *
+   * @return {@code double} value
+   */
+  public double getDouble() {
+<span class="fc" id="L458">    return get(Double.class);</span>
+  }
+
+  /**
+   * Returns the wrapped value as {@link String}.
+   *
+   * @return {@link String} value
+   */
+  public String getString() {
+<span class="fc" id="L467">    return get(String.class);</span>
+  }
+
+  /**
+   * Returns the wrapped value as {@link BigDecimal}.
+   *
+   * @return {@link BigDecimal} value
+   * @see BigDecimal
+   */
+  public BigDecimal getBigDecimal() {
+<span class="fc" id="L477">    return get(BigDecimal.class);</span>
+  }
+
+  /**
+   * Returns the wrapped value as {@link GradoopId}.
+   *
+   * @return {@link GradoopId} value
+   */
+  public GradoopId getGradoopId() {
+<span class="fc" id="L486">    return get(GradoopId.class);</span>
+  }
+
+  /**
+   * Returns the wrapped Map as {@code Map&lt;PropertyValue, PropertyValue&gt;}.
+   *
+   * @return {@code Map&lt;PropertyValue, PropertyValue&gt;} value
+   */
+  public Map&lt;PropertyValue, PropertyValue&gt; getMap() {
+<span class="fc" id="L495">    return get(Map.class);</span>
+  }
+
+  /**
+   * Returns the wrapped List as {@code List&lt;PropertyValue&gt;}.
+   *
+   * @return {@code List&lt;PropertyValue&gt;} value
+   */
+  public List&lt;PropertyValue&gt; getList() {
+<span class="fc" id="L504">    return get(List.class);</span>
+  }
+
+  /**
+   * Returns the wrapped List as {@link LocalDate}.
+   *
+   * @return {@link LocalDate} value
+   */
+  public LocalDate getDate() {
+<span class="fc" id="L513">    return get(LocalDate.class);</span>
+  }
+
+  /**
+   * Returns the wrapped List as {@link LocalTime}.
+   *
+   * @return {@link LocalTime} value
+   */
+  public LocalTime getTime() {
+<span class="fc" id="L522">    return get(LocalTime.class);</span>
+  }
+
+  /**
+   * Returns the wrapped List as {@link LocalDateTime}.
+   *
+   * @return {@link LocalDateTime} value
+   */
+  public LocalDateTime getDateTime() {
+<span class="fc" id="L531">    return get(LocalDateTime.class);</span>
+  }
+
+  /**
+   * Returns the wrapped Set as {@code Set&lt;PropertyValue&gt;}.
+   *
+   * @return {@code Set&lt;PropertyValue&gt;} value
+   */
+  public Set&lt;PropertyValue&gt; getSet() {
+<span class="fc" id="L540">    return get(Set.class);</span>
+  }
+
+  //----------------------------------------------------------------------------
+  // Setter
+  //----------------------------------------------------------------------------
+
+  /**
+   * Sets the given value as internal value if it has a supported type.
+   *
+   * @param value value
+   * @throws UnsupportedTypeException if the type of the Object is not supported
+   */
+  public void setObject(Object value) {
+<span class="fc bfc" id="L554" title="All 4 branches covered.">    if (value != null &amp;&amp; !PropertyValueStrategyFactory.get(value.getClass()).is(value)) {</span>
+<span class="fc" id="L555">      throw new UnsupportedTypeException(value.getClass());</span>
+    }
+<span class="fc" id="L557">    this.value = value;</span>
+<span class="fc" id="L558">  }</span>
+
+  /**
+   * Sets the wrapped value as {@code boolean} value.
+   *
+   * @param booleanValue value
+   */
+  public void setBoolean(boolean booleanValue) {
+<span class="fc" id="L566">    setObject(booleanValue);</span>
+<span class="fc" id="L567">  }</span>
+
+  /**
+   * Sets the wrapped value as {@code short} value.
+   *
+   * @param shortValue value
+   */
+  public void setShort(short shortValue) {
+<span class="fc" id="L575">    setObject(shortValue);</span>
+<span class="fc" id="L576">  }</span>
+
+  /**
+   * Sets the wrapped value as {@code int} value.
+   *
+   * @param intValue intValue
+   */
+  public void setInt(int intValue) {
+<span class="fc" id="L584">    setObject(intValue);</span>
+<span class="fc" id="L585">  }</span>
+
+  /**
+   * Sets the wrapped value as {@code long} value.
+   *
+   * @param longValue value
+   */
+  public void setLong(long longValue) {
+<span class="fc" id="L593">    setObject(longValue);</span>
+<span class="fc" id="L594">  }</span>
+
+  /**
+   * Sets the wrapped value as {@code float} value.
+   *
+   * @param floatValue value
+   */
+  public void setFloat(float floatValue) {
+<span class="fc" id="L602">    setObject(floatValue);</span>
+<span class="fc" id="L603">  }</span>
+
+  /**
+   * Sets the wrapped value as {@code double} value.
+   *
+   * @param doubleValue value
+   */
+  public void setDouble(double doubleValue) {
+<span class="fc" id="L611">    setObject(doubleValue);</span>
+<span class="fc" id="L612">  }</span>
+
+  /**
+   * Sets the wrapped value as {@link String} value.
+   *
+   * @param stringValue value
+   */
+  public void setString(String stringValue) {
+<span class="fc" id="L620">    setObject(stringValue);</span>
+<span class="fc" id="L621">  }</span>
+
+  /**
+   * Sets the wrapped value as {@link BigDecimal} value.
+   *
+   * @param bigDecimalValue value
+   */
+  public void setBigDecimal(BigDecimal bigDecimalValue) {
+<span class="fc" id="L629">    setObject(bigDecimalValue);</span>
+<span class="fc" id="L630">  }</span>
+
+  /**
+   * Sets the wrapped value as {@link GradoopId} value.
+   *
+   * @param gradoopIdValue value
+   */
+  public void setGradoopId(GradoopId gradoopIdValue) {
+<span class="fc" id="L638">    setObject(gradoopIdValue);</span>
+<span class="fc" id="L639">  }</span>
+
+  /**
+   * Sets the wrapped value as {@link Map} value.
+   *
+   * @param map value
+   */
+  public void setMap(Map&lt;PropertyValue, PropertyValue&gt; map) {
+<span class="fc" id="L647">    setObject(map);</span>
+<span class="fc" id="L648">  }</span>
+
+  /**
+   * Sets the wrapped value as {@link List} value.
+   *
+   * @param list value
+   */
+  public void setList(List&lt;PropertyValue&gt; list) {
+<span class="fc" id="L656">    setObject(list);</span>
+<span class="fc" id="L657">  }</span>
+
+  /**
+   * Sets the wrapped value as {@link LocalDate} value.
+   *
+   * @param date value
+   */
+  public void setDate(LocalDate date) {
+<span class="fc" id="L665">    setObject(date);</span>
+<span class="fc" id="L666">  }</span>
+
+  /**
+   * Sets the wrapped value as {@link LocalTime} value.
+   *
+   * @param time value
+   */
+  public void setTime(LocalTime time) {
+<span class="fc" id="L674">    setObject(time);</span>
+<span class="fc" id="L675">  }</span>
+
+  /**
+   * Sets the wrapped value as {@code LocalDateTime} value.
+   *
+   * @param dateTime value
+   */
+  public void setDateTime(LocalDateTime dateTime) {
+<span class="fc" id="L683">    setObject(dateTime);</span>
+<span class="fc" id="L684">  }</span>
+
+  /**
+   * Sets the wrapped value as {@code Set} value.
+   *
+   * @param set value
+   */
+  public void setSet(Set&lt;PropertyValue&gt; set) {
+<span class="fc" id="L692">    setObject(set);</span>
+<span class="fc" id="L693">  }</span>
+
+  //----------------------------------------------------------------------------
+  // Util
+  //----------------------------------------------------------------------------
+
+  /**
+   * Get the data type as class object according to the first position of the rawBytes[] array.
+   *
+   * @return Class object
+   */
+  public Class&lt;?&gt; getType() {
+<span class="fc" id="L705">    Class&lt;?&gt; clazz = null;</span>
+<span class="fc bfc" id="L706" title="All 2 branches covered.">    if (value != null) {</span>
+<span class="fc" id="L707">      clazz = PropertyValueStrategyFactory.get(value.getClass()).getType();</span>
+    }
+
+<span class="fc" id="L710">    return clazz;</span>
+  }
+
+  public int getByteSize() {
+<span class="nc" id="L714">    return getRawBytes().length;</span>
+  }
+
+  public byte[] getRawBytes() {
+<span class="fc" id="L718">    return PropertyValueStrategyFactory.getRawBytes(value);</span>
+  }
+
+  /**
+   * Set internal byte representation.
+   *
+   * @param bytes array
+   */
+  public void setBytes(byte[] bytes) {
+<span class="fc" id="L727">    value = PropertyValueStrategyFactory.fromRawBytes(bytes);</span>
+<span class="fc" id="L728">  }</span>
+
+  @Override
+  public boolean equals(Object object) {
+<span class="fc bfc" id="L732" title="All 4 branches covered.">    return object instanceof PropertyValue &amp;&amp; Objects.equals(value, ((PropertyValue) object).value);</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="fc" id="L737">    return Arrays.hashCode(PropertyValueStrategyFactory.getRawBytes(value));</span>
+  }
+
+  @Override
+  public int compareTo(PropertyValue other) {
+<span class="fc" id="L742">    return PropertyValueStrategyFactory.compare(value, other.value);</span>
+  }
+
+  /**
+   * Returns the byte size of the properties internal representation.
+   *
+   * @return byte size
+   */
+  public int byteSize() {
+<span class="fc" id="L751">    byte[] rawBytes = PropertyValueStrategyFactory.getRawBytes(value);</span>
+<span class="fc" id="L752">    return rawBytes.length;</span>
+  }
+
+  /**
+   * Byte representation:
+   *
+   * byte 1       : type info
+   *
+   * for dynamic length types (e.g. String and BigDecimal)
+   * byte 2       : length (short)
+   * byte 3       : length (short)
+   * byte 4 - end : value bytes
+   *
+   * If the size of the internal byte representation if larger than
+   * {@link #LARGE_PROPERTY_THRESHOLD} (i.e. if a {@code short} is too small to store the length),
+   * then the {@link #FLAG_LARGE} bit will be set in the first byte and the byte representation
+   * will be:
+   * byte 2       ; length (int)
+   * byte 3       : length (int)
+   * byte 4       : length (int)
+   * byte 5       : length (int)
+   * byte 6 - end : value bytes
+   *
+   * for fixed length types (e.g. int, long, float, ...)
+   * byte 2 - end : value bytes
+   *
+   * @param outputView data output to write data to
+   * @throws IOException if write to output view fails.
+   */
+  @Override
+  public void write(DataOutputView outputView) throws IOException {
+<span class="fc" id="L783">    PropertyValueStrategyFactory.get(value).write(value, outputView);</span>
+<span class="fc" id="L784">  }</span>
+
+  @Override
+  public void read(DataInputView inputView) throws IOException {
+    // type
+<span class="fc" id="L789">    byte typeByte = inputView.readByte();</span>
+    // Apply bitmask to get the actual type.
+<span class="fc" id="L791">    byte type = (byte) (~PropertyValue.FLAG_LARGE &amp; typeByte);</span>
+
+<span class="fc" id="L793">    PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(type);</span>
+
+<span class="pc bpc" id="L795" title="1 of 2 branches missed.">    if (strategy == null) {</span>
+<span class="nc" id="L796">      throw new UnsupportedTypeException(&quot;No strategy for type byte from input view found&quot;);</span>
+    } else {
+<span class="fc" id="L798">      value = strategy.read(inputView, typeByte);</span>
+    }
+<span class="fc" id="L800">  }</span>
+
+  @Override
+  public String toString() {
+<span class="nc bnc" id="L804" title="All 2 branches missed.">    return getObject() != null ?</span>
+<span class="nc" id="L805">      getObject().toString() :</span>
+      GradoopConstants.NULL_STRING;
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

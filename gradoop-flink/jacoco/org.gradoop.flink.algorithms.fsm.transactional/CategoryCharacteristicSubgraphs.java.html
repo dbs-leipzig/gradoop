@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CategoryCharacteristicSubgraphs.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.transactional</a> &gt; <span class="el_source">CategoryCharacteristicSubgraphs.java</span></div><h1>CategoryCharacteristicSubgraphs.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.transactional;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.FilterOperator;
+import org.apache.flink.api.java.operators.IterativeDataSet;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
+import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CCSSingleEdgeEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CCSSubgraphDecoder;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CCSSubgraphOnly;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CCSWrapInSubgraphEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CategoryEdgeLabels;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CategoryFrequent;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CategoryFrequentAndInteresting;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CategoryGraphCounts;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CategoryMinFrequencies;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CategoryVertexLabels;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.CategoryWithCount;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.IsCharacteristic;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.LabelOnly;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.ToCCSGraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.CCSGraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CCSSubgraph;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.tuples.CCSSubgraphEmbeddings;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.ThinkLikeAnEmbeddingFSMBase;
+import org.gradoop.flink.algorithms.fsm.transactional.common.FSMConfig;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.MinEdgeCount;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.WithoutInfrequentEdgeLabels;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.WithoutInfrequentVertexLabels;
+import org.gradoop.flink.algorithms.fsm.transactional.tle.functions.IsResult;
+import org.gradoop.flink.model.impl.functions.utils.First;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+
+import java.util.Map;
+
+/**
+ * abstract superclass of different implementations of the gSpan frequent
+ * subgraph mining algorithm as Gradoop operator
+ */
+public class CategoryCharacteristicSubgraphs
+  extends ThinkLikeAnEmbeddingFSMBase&lt;CCSGraph, CCSSubgraph, CCSSubgraphEmbeddings&gt; {
+
+  /**
+   * Property key to store a category association.
+   */
+  public static final String CATEGORY_KEY = &quot;_category&quot;;
+
+  /**
+   * minimum frequency for subgraphs to be considered to be frequent
+   */
+  private DataSet&lt;Map&lt;String, Long&gt;&gt; categoryCounts;
+
+  /**
+   * minimum frequency for subgraphs to be considered to be frequent
+   */
+  private DataSet&lt;Map&lt;String, Long&gt;&gt; categoryMinFrequencies;
+
+  /**
+   * interstingness threshold
+   */
+  private final float minInterestingness;
+
+  /**
+   * constructor
+   * @param fsmConfig frequent subgraph mining configuration
+   * @param minInterestingness minInterestingness threshold
+   *
+   */
+  public CategoryCharacteristicSubgraphs(
+    FSMConfig fsmConfig, float minInterestingness) {
+<span class="nc" id="L86">    super(fsmConfig);</span>
+<span class="nc" id="L87">    this.minInterestingness = minInterestingness;</span>
+<span class="nc" id="L88">  }</span>
+
+  /**
+   * Executes the algorithm based on transactional representation.
+   *
+   * @param transactions search space
+   * @return category characteristic subgraphs
+   */
+  public DataSet&lt;GraphTransaction&gt; execute(DataSet&lt;GraphTransaction&gt; transactions) {
+
+<span class="nc" id="L98">    DataSet&lt;CCSGraph&gt;  graphs = transactions</span>
+<span class="nc" id="L99">      .map(new ToCCSGraph());</span>
+
+<span class="nc" id="L101">    setCategoryCounts(graphs);</span>
+
+<span class="nc" id="L103">    setMinFrequencies();</span>
+
+<span class="nc bnc" id="L105" title="All 2 branches missed.">    if (fsmConfig.isPreprocessingEnabled()) {</span>
+<span class="nc" id="L106">      graphs = preProcessCategories(graphs);</span>
+    }
+
+<span class="nc" id="L109">    DataSet&lt;CCSSubgraphEmbeddings&gt; embeddings = graphs</span>
+<span class="nc" id="L110">      .flatMap(new CCSSingleEdgeEmbeddings(fsmConfig));</span>
+
+    // ITERATION HEAD
+<span class="nc" id="L113">    IterativeDataSet&lt;CCSSubgraphEmbeddings&gt; iterative = embeddings</span>
+<span class="nc" id="L114">      .iterate(fsmConfig.getMaxEdgeCount());</span>
+
+    // ITERATION BODY
+
+    // get frequent subgraphs
+<span class="nc" id="L119">    DataSet&lt;CCSSubgraphEmbeddings&gt; parentEmbeddings = iterative</span>
+<span class="nc" id="L120">      .filter(new IsResult&lt;&gt;(false));</span>
+
+<span class="nc" id="L122">    DataSet&lt;CCSSubgraph&gt; categoryFrequentSubgraphs =</span>
+<span class="nc" id="L123">      getCategoryFrequentSubgraphs(parentEmbeddings);</span>
+
+<span class="nc" id="L125">    DataSet&lt;CCSSubgraph&gt; frequentSubgraphs = categoryFrequentSubgraphs</span>
+<span class="nc" id="L126">      .groupBy(0)</span>
+<span class="nc" id="L127">      .reduceGroup(new First&lt;&gt;());</span>
+
+<span class="nc" id="L129">    parentEmbeddings =</span>
+<span class="nc" id="L130">      filterByFrequentSubgraphs(parentEmbeddings, frequentSubgraphs);</span>
+
+<span class="nc" id="L132">    DataSet&lt;CCSSubgraphEmbeddings&gt; childEmbeddings =</span>
+<span class="nc" id="L133">      growEmbeddingsOfFrequentSubgraphs(parentEmbeddings, frequentSubgraphs</span>
+      );
+
+<span class="nc" id="L136">    DataSet&lt;CCSSubgraphEmbeddings&gt; resultIncrement =</span>
+<span class="nc" id="L137">      getCharacteristicSubgraphs(categoryFrequentSubgraphs)</span>
+<span class="nc" id="L138">        .map(new CCSWrapInSubgraphEmbeddings());</span>
+
+<span class="nc" id="L140">    DataSet&lt;CCSSubgraphEmbeddings&gt; resultAndEmbeddings = iterative</span>
+<span class="nc" id="L141">      .filter(new IsResult&lt;&gt;(true))</span>
+<span class="nc" id="L142">      .union(resultIncrement)</span>
+<span class="nc" id="L143">      .union(childEmbeddings);</span>
+
+    // ITERATION FOOTER
+
+<span class="nc" id="L147">    DataSet&lt;CCSSubgraph&gt; characteristicSubgraphs = iterative</span>
+<span class="nc" id="L148">      .closeWith(resultAndEmbeddings, childEmbeddings)</span>
+<span class="nc" id="L149">      .filter(new IsResult&lt;&gt;(true))</span>
+<span class="nc" id="L150">      .map(new CCSSubgraphOnly());</span>
+
+<span class="nc bnc" id="L152" title="All 2 branches missed.">    if (fsmConfig.getMinEdgeCount() &gt; 1) {</span>
+<span class="nc" id="L153">      characteristicSubgraphs = characteristicSubgraphs</span>
+<span class="nc" id="L154">        .filter(new MinEdgeCount&lt;&gt;(fsmConfig));</span>
+    }
+
+<span class="nc" id="L157">    return characteristicSubgraphs</span>
+<span class="nc" id="L158">      .map(new CCSSubgraphDecoder(config));</span>
+  }
+
+  /**
+   * Determines the graph count for each category.
+   *
+   * @param graphs search space
+   */
+  private void setCategoryCounts(DataSet&lt;CCSGraph&gt; graphs) {
+<span class="nc" id="L167">    categoryCounts = graphs</span>
+<span class="nc" id="L168">      .map(new CategoryWithCount())</span>
+<span class="nc" id="L169">      .groupBy(0)</span>
+<span class="nc" id="L170">      .sum(1)</span>
+<span class="nc" id="L171">      .reduceGroup(new CategoryGraphCounts());</span>
+<span class="nc" id="L172">  }</span>
+
+  /**
+   * Determines the min frequency per category based on category graph count
+   * and support threshold.
+   **/
+  private void setMinFrequencies() {
+<span class="nc" id="L179">    categoryMinFrequencies = categoryCounts</span>
+<span class="nc" id="L180">      .map(new CategoryMinFrequencies(fsmConfig));</span>
+<span class="nc" id="L181">  }</span>
+
+  /**
+   * Removes vertices and edges showing labels that are infrequent in all
+   * categories.
+   *
+   * @param graphs graph collection
+   * @return processed graph collection
+   */
+  private DataSet&lt;CCSGraph&gt; preProcessCategories(DataSet&lt;CCSGraph&gt; graphs) {
+<span class="nc" id="L191">    DataSet&lt;String&gt; frequentVertexLabels = graphs</span>
+<span class="nc" id="L192">      .flatMap(new CategoryVertexLabels())</span>
+<span class="nc" id="L193">      .groupBy(0, 1)</span>
+<span class="nc" id="L194">      .sum(2)</span>
+<span class="nc" id="L195">      .filter(new CategoryFrequent())</span>
+<span class="nc" id="L196">      .withBroadcastSet(categoryMinFrequencies, DIMSpanConstants.MIN_FREQUENCY)</span>
+<span class="nc" id="L197">      .map(new LabelOnly())</span>
+<span class="nc" id="L198">      .distinct();</span>
+
+<span class="nc" id="L200">    graphs = graphs</span>
+<span class="nc" id="L201">      .map(new WithoutInfrequentVertexLabels&lt;CCSGraph&gt;())</span>
+<span class="nc" id="L202">      .withBroadcastSet(</span>
+        frequentVertexLabels, TFSMConstants.FREQUENT_VERTEX_LABELS);
+
+<span class="nc" id="L205">    DataSet&lt;String&gt; frequentEdgeLabels = graphs</span>
+<span class="nc" id="L206">      .flatMap(new CategoryEdgeLabels())</span>
+<span class="nc" id="L207">      .groupBy(0, 1)</span>
+<span class="nc" id="L208">      .sum(2)</span>
+<span class="nc" id="L209">      .filter(new CategoryFrequent())</span>
+<span class="nc" id="L210">      .withBroadcastSet(categoryMinFrequencies, DIMSpanConstants.MIN_FREQUENCY)</span>
+<span class="nc" id="L211">      .map(new LabelOnly())</span>
+<span class="nc" id="L212">      .distinct();</span>
+
+<span class="nc" id="L214">    graphs = graphs</span>
+<span class="nc" id="L215">      .map(new WithoutInfrequentEdgeLabels&lt;CCSGraph&gt;())</span>
+<span class="nc" id="L216">      .withBroadcastSet(frequentEdgeLabels, TFSMConstants.FREQUENT_EDGE_LABELS);</span>
+
+<span class="nc" id="L218">    return graphs;</span>
+  }
+
+  /**
+   * Returns characteristic from category frequent subgraphs.
+   *
+   * @param frequentSubgraphs subgraphs, frequent in at least one category
+   * @return characteristic subgraphs
+   */
+  private FilterOperator&lt;CCSSubgraph&gt; getCharacteristicSubgraphs(
+    DataSet&lt;CCSSubgraph&gt; frequentSubgraphs) {
+<span class="nc" id="L229">    return frequentSubgraphs</span>
+<span class="nc" id="L230">      .filter(new IsCharacteristic());</span>
+  }
+
+  /**
+   * Determines frequent subgraphs in a set of embeddings.
+   *
+   * @param embeddings set of embeddings
+   * @return frequent subgraphs
+   */
+  private DataSet&lt;CCSSubgraph&gt; getCategoryFrequentSubgraphs(
+    DataSet&lt;CCSSubgraphEmbeddings&gt; embeddings) {
+<span class="nc" id="L241">    return embeddings</span>
+<span class="nc" id="L242">      .map(new CCSSubgraphOnly())</span>
+<span class="nc" id="L243">      .groupBy(0, 3)</span>
+<span class="nc" id="L244">      .sum(1)</span>
+<span class="nc" id="L245">      .groupBy(0)</span>
+<span class="nc" id="L246">      .reduceGroup(new CategoryFrequentAndInteresting(minInterestingness))</span>
+<span class="nc" id="L247">      .withBroadcastSet(categoryCounts, TFSMConstants.GRAPH_COUNT)</span>
+<span class="nc" id="L248">      .withBroadcastSet(categoryMinFrequencies, DIMSpanConstants.MIN_FREQUENCY);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

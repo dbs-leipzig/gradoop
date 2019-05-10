@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TripleWithSourceEdgeCandidates.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.common.tuples</a> &gt; <span class="el_source">TripleWithSourceEdgeCandidates.java</span></div><h1>TripleWithSourceEdgeCandidates.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.common.tuples;
+
+import org.apache.flink.api.java.tuple.Tuple5;
+
+/**
+ * Represents a triple with source and edge candidates.
+ *
+ * f0: edge id
+ * f1: source vertex id
+ * f2: source vertex candidates
+ * f3: target vertex id
+ * f4: edge candidates
+ *
+ * @param &lt;K&gt; key type
+ */
+<span class="fc" id="L31">public class TripleWithSourceEdgeCandidates&lt;K&gt; extends Tuple5&lt;K, K, boolean[], K, boolean[]&gt; {</span>
+
+  public K getEdgeId() {
+<span class="fc" id="L34">    return f0;</span>
+  }
+
+  public void setEdgeId(K edgeId) {
+<span class="fc" id="L38">    f0 = edgeId;</span>
+<span class="fc" id="L39">  }</span>
+
+  public K getSourceId() {
+<span class="fc" id="L42">    return f1;</span>
+  }
+
+  public void setSourceId(K sourceId) {
+<span class="fc" id="L46">    f1 = sourceId;</span>
+<span class="fc" id="L47">  }</span>
+
+  public boolean[] getSourceCandidates() {
+<span class="fc" id="L50">    return f2;</span>
+  }
+
+  public void setSourceCandidates(boolean[] sourceCandidates) {
+<span class="fc" id="L54">    f2 = sourceCandidates;</span>
+<span class="fc" id="L55">  }</span>
+
+  public K getTargetId() {
+<span class="nc" id="L58">    return f3;</span>
+  }
+
+  public void setTargetId(K targetId) {
+<span class="fc" id="L62">    f3 = targetId;</span>
+<span class="fc" id="L63">  }</span>
+
+  public boolean[] getEdgeCandidates() {
+<span class="fc" id="L66">    return f4;</span>
+  }
+
+  public void setEdgeCandidates(boolean[] edgeCandidates) {
+<span class="fc" id="L70">    f4 = edgeCandidates;</span>
+<span class="fc" id="L71">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

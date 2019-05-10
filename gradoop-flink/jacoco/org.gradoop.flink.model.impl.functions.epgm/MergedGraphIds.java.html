@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MergedGraphIds.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.functions.epgm</a> &gt; <span class="el_source">MergedGraphIds.java</span></div><h1>MergedGraphIds.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.functions.epgm;
+
+import org.apache.flink.api.common.functions.GroupCombineFunction;
+import org.apache.flink.api.common.functions.GroupReduceFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+
+import java.util.Iterator;
+
+/**
+ * Creates a single graph element which is contained in all graphs that the
+ * input elements are contained in.
+ *
+ * GraphElement* -&gt; GraphElement
+ *
+ * @param &lt;GE&gt; EPGM graph element type
+ */
+<span class="fc" id="L35">public class MergedGraphIds&lt;GE extends GraphElement&gt;</span>
+  implements GroupCombineFunction&lt;GE, GE&gt;, GroupReduceFunction&lt;GE, GE&gt;,
+  JoinFunction&lt;GE, GE, GE&gt; {
+
+
+  @Override
+  public void combine(Iterable&lt;GE&gt; values, Collector&lt;GE&gt; out) throws Exception {
+<span class="fc" id="L42">    reduce(values, out);</span>
+<span class="fc" id="L43">  }</span>
+
+  @Override
+  public void reduce(Iterable&lt;GE&gt; values, Collector&lt;GE&gt; out) throws Exception {
+<span class="fc" id="L47">    Iterator&lt;GE&gt; iterator = values.iterator();</span>
+<span class="fc" id="L48">    GE result = iterator.next();</span>
+<span class="fc" id="L49">    GradoopIdSet graphIds = result.getGraphIds();</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
+<span class="fc" id="L51">      graphIds.addAll(iterator.next().getGraphIds());</span>
+    }
+<span class="fc" id="L53">    out.collect(result);</span>
+<span class="fc" id="L54">  }</span>
+
+  @Override
+  public GE join(GE first, GE second) throws Exception {
+<span class="fc bfc" id="L58" title="All 2 branches covered.">    if (first == null) {</span>
+<span class="fc" id="L59">      return second;</span>
+    }
+<span class="fc" id="L61">    first.getGraphIds().addAll(second.getGraphIds());</span>
+<span class="fc" id="L62">    return first;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

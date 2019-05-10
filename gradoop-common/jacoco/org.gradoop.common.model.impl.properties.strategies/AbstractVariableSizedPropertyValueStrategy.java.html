@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractVariableSizedPropertyValueStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.properties.strategies</a> &gt; <span class="el_source">AbstractVariableSizedPropertyValueStrategy.java</span></div><h1>AbstractVariableSizedPropertyValueStrategy.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.properties.strategies;
+
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataInputViewStreamWrapper;
+import org.apache.flink.core.memory.DataOutputView;
+import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+
+/**
+ * Abstract class that provides generic methods for {@code PropertyValueStrategy} classes that
+ * handle data types with a variable size.
+ *
+ * @param &lt;T&gt; Type with a variable length.
+ */
+<span class="fc" id="L34">public abstract class AbstractVariableSizedPropertyValueStrategy&lt;T&gt; implements PropertyValueStrategy&lt;T&gt; {</span>
+
+  @Override
+  public void write(T value, DataOutputView outputView) throws IOException {
+<span class="fc" id="L38">    byte[] rawBytes = getRawBytes(value);</span>
+<span class="fc" id="L39">    byte type = rawBytes[0];</span>
+
+<span class="fc bfc" id="L41" title="All 2 branches covered.">    if (rawBytes.length &gt; PropertyValue.LARGE_PROPERTY_THRESHOLD) {</span>
+<span class="fc" id="L42">      type |= PropertyValue.FLAG_LARGE;</span>
+    }
+<span class="fc" id="L44">    outputView.writeByte(type);</span>
+
+    // Write length as an int if the &quot;large&quot; flag is set.
+<span class="fc bfc" id="L47" title="All 2 branches covered.">    if ((type &amp; PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {</span>
+<span class="fc" id="L48">      outputView.writeInt(rawBytes.length - PropertyValue.OFFSET);</span>
+    } else {
+<span class="fc" id="L50">      outputView.writeShort(rawBytes.length - PropertyValue.OFFSET);</span>
+    }
+
+<span class="fc" id="L53">    outputView.write(rawBytes, PropertyValue.OFFSET, rawBytes.length - PropertyValue.OFFSET);</span>
+<span class="fc" id="L54">  }</span>
+
+  /**
+   * Reads data of variable size from a data input view. The size of the data is determined by the
+   * type byte and {@see org.gradoop.common.model.impl.properties.PropertyValue#FLAG_LARGE}.
+   *
+   * @param inputView Data input view to read from
+   * @param typeByte Byte indicating the type of the serialized data
+   * @return The serialized data in the data input view
+   * @throws IOException when reading a byte goes wrong
+   */
+  byte[] readVariableSizedData(DataInputView inputView, byte typeByte) throws IOException {
+    int length;
+    // read length
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    if ((typeByte &amp; PropertyValue.FLAG_LARGE) == PropertyValue.FLAG_LARGE) {</span>
+<span class="fc" id="L69">      length = inputView.readInt();</span>
+    } else {
+<span class="fc" id="L71">      length = inputView.readShort();</span>
+    }
+    // init new array
+<span class="fc" id="L74">    byte[] rawBytes = new byte[length];</span>
+
+<span class="fc bfc" id="L76" title="All 2 branches covered.">    for (int i = 0; i &lt; rawBytes.length; i++) {</span>
+<span class="fc" id="L77">      rawBytes[i] = inputView.readByte();</span>
+    }
+
+<span class="fc" id="L80">    return rawBytes;</span>
+  }
+
+  /**
+   * Creates an instance of {@link DataInputViewStreamWrapper} from a byte array.
+   *
+   * @param bytes input byte array
+   * @return A DataInputViewStreamWrapper
+   */
+  DataInputViewStreamWrapper createInputView(byte[] bytes) {
+<span class="fc" id="L90">    ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);</span>
+<span class="fc" id="L91">    DataInputStream inputStream = new DataInputStream(byteStream);</span>
+<span class="fc" id="L92">    return new DataInputViewStreamWrapper(inputStream);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

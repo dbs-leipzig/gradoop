@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GVEGraphLayoutFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.layouts.gve</a> &gt; <span class="el_source">GVEGraphLayoutFactory.java</span></div><h1>GVEGraphLayoutFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.layouts.gve;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+/**
+ * Responsible for creating a {@link GVELayout} from given data.
+ */
+<span class="fc" id="L38">public class GVEGraphLayoutFactory extends GVEBaseFactory</span>
+  implements LogicalGraphLayoutFactory&lt;GraphHead, Vertex, Edge&gt; {
+
+  @Override
+  public GVELayout fromDataSets(DataSet&lt;Vertex&gt; vertices) {
+<span class="fc" id="L43">    return fromDataSets(vertices,</span>
+<span class="fc" id="L44">      createEdgeDataSet(Lists.newArrayListWithCapacity(0)));</span>
+  }
+
+  @Override
+  public GVELayout fromDataSets(DataSet&lt;Vertex&gt; vertices, DataSet&lt;Edge&gt; edges) {
+<span class="fc" id="L49">    Objects.requireNonNull(vertices, &quot;Vertex DataSet was null&quot;);</span>
+<span class="fc" id="L50">    Objects.requireNonNull(edges, &quot;Edge DataSet was null&quot;);</span>
+<span class="fc" id="L51">    GraphHead graphHead = getConfig()</span>
+<span class="fc" id="L52">      .getGraphHeadFactory()</span>
+<span class="fc" id="L53">      .createGraphHead();</span>
+
+<span class="fc" id="L55">    DataSet&lt;GraphHead&gt; graphHeadSet = getConfig().getExecutionEnvironment()</span>
+<span class="fc" id="L56">      .fromElements(graphHead);</span>
+
+    // update vertices and edges with new graph head id
+<span class="fc" id="L59">    vertices = vertices</span>
+<span class="fc" id="L60">      .map(new AddToGraph&lt;&gt;(graphHead))</span>
+<span class="fc" id="L61">      .withForwardedFields(&quot;id;label;properties&quot;);</span>
+<span class="fc" id="L62">    edges = edges</span>
+<span class="fc" id="L63">      .map(new AddToGraph&lt;&gt;(graphHead))</span>
+<span class="fc" id="L64">      .withForwardedFields(&quot;id;sourceId;targetId;label;properties&quot;);</span>
+
+<span class="fc" id="L66">    return new GVELayout(graphHeadSet, vertices, edges);</span>
+  }
+
+  @Override
+  public LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromDataSets(DataSet&lt;GraphHead&gt; graphHead,
+    DataSet&lt;Vertex&gt; vertices, DataSet&lt;Edge&gt; edges) {
+<span class="fc" id="L72">    return create(graphHead, vertices, edges);</span>
+  }
+
+  @Override
+  public LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromIndexedDataSets(
+    Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
+    Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
+<span class="fc" id="L79">    GraphHead graphHead = getConfig()</span>
+<span class="fc" id="L80">      .getGraphHeadFactory()</span>
+<span class="fc" id="L81">      .createGraphHead();</span>
+
+<span class="fc" id="L83">    DataSet&lt;GraphHead&gt; graphHeadSet = getConfig().getExecutionEnvironment()</span>
+<span class="fc" id="L84">      .fromElements(graphHead);</span>
+
+<span class="fc" id="L86">    Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads = Maps.newHashMap();</span>
+<span class="fc" id="L87">    graphHeads.put(graphHead.getLabel(), graphHeadSet);</span>
+
+    // update vertices and edges with new graph head id
+<span class="fc" id="L90">    vertices = vertices.entrySet().stream()</span>
+<span class="fc" id="L91">      .collect(Collectors.toMap(</span>
+<span class="fc" id="L92">        Map.Entry::getKey, e -&gt; e.getValue().map(new AddToGraph&lt;&gt;(graphHead))</span>
+<span class="fc" id="L93">          .withForwardedFields(&quot;id;label;properties&quot;)));</span>
+
+<span class="fc" id="L95">    edges = edges.entrySet().stream()</span>
+<span class="fc" id="L96">      .collect(Collectors.toMap(</span>
+<span class="fc" id="L97">        Map.Entry::getKey, e -&gt; e.getValue().map(new AddToGraph&lt;&gt;(graphHead))</span>
+<span class="fc" id="L98">          .withForwardedFields(&quot;id;sourceId;targetId;label;properties&quot;)));</span>
+
+<span class="fc" id="L100">    return create(graphHeads, vertices, edges);</span>
+  }
+
+  @Override
+  public LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromIndexedDataSets(
+    Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads,
+    Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
+    Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
+<span class="fc" id="L108">    return create(graphHeads, vertices, edges);</span>
+  }
+
+  @Override
+  public LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromCollections(GraphHead graphHead,
+    Collection&lt;Vertex&gt; vertices,
+    Collection&lt;Edge&gt; edges) {
+
+<span class="fc" id="L116">    Objects.requireNonNull(vertices, &quot;Vertex collection was null&quot;);</span>
+
+    List&lt;GraphHead&gt; graphHeads;
+<span class="fc bfc" id="L119" title="All 2 branches covered.">    if (graphHead == null) {</span>
+<span class="fc" id="L120">      graphHeads = Lists.newArrayListWithCapacity(0);</span>
+    } else {
+<span class="fc" id="L122">      graphHeads = Lists.newArrayList(graphHead);</span>
+    }
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">    if (edges == null) {</span>
+<span class="nc" id="L125">      edges = Lists.newArrayListWithCapacity(0);</span>
+    }
+
+<span class="fc" id="L128">    return fromDataSets(</span>
+<span class="fc" id="L129">      createGraphHeadDataSet(graphHeads),</span>
+<span class="fc" id="L130">      createVertexDataSet(vertices),</span>
+<span class="fc" id="L131">      createEdgeDataSet(edges));</span>
+  }
+
+  @Override
+  public LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromCollections(Collection&lt;Vertex&gt; vertices,
+    Collection&lt;Edge&gt; edges) {
+<span class="fc" id="L137">    Objects.requireNonNull(vertices, &quot;Vertex collection was null&quot;);</span>
+<span class="fc" id="L138">    Objects.requireNonNull(edges, &quot;Edge collection was null&quot;);</span>
+<span class="fc" id="L139">    return fromDataSets(createVertexDataSet(vertices), createEdgeDataSet(edges));</span>
+  }
+
+  @Override
+  public LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; createEmptyGraph() {
+<span class="fc" id="L144">    Collection&lt;Vertex&gt; vertices = new ArrayList&lt;&gt;(0);</span>
+<span class="fc" id="L145">    Collection&lt;Edge&gt; edges = new ArrayList&lt;&gt;(0);</span>
+<span class="fc" id="L146">    return fromCollections(null, vertices, edges);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>QueryPlan.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan</a> &gt; <span class="el_source">QueryPlan.java</span></div><h1>QueryPlan.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+
+/**
+ * Represents an executable Cypher query plan.
+ */
+public class QueryPlan {
+  /**
+   * Used for indentation when creating a string representation of the plan
+   */
+  private static final String PAD_STRING = &quot;|.&quot;;
+  /**
+   * Root entry point for the query plan.
+   */
+  private final PlanNode root;
+
+  /**
+   * Creates a new query plan
+   *
+   * @param root root node of the query plan
+   */
+<span class="fc" id="L40">  public QueryPlan(PlanNode root) {</span>
+<span class="fc" id="L41">    this.root = root;</span>
+<span class="fc" id="L42">  }</span>
+
+  /**
+   * Returns the root node of the query plan
+   *
+   * @return root node of the query plan
+   */
+  public PlanNode getRoot() {
+<span class="fc" id="L50">    return root;</span>
+  }
+
+  /**
+   * Executes the query plan and produces the resulting embeddings.
+   *
+   * @return embeddings representing the query result
+   */
+  public DataSet&lt;Embedding&gt; execute() {
+<span class="fc" id="L59">    return root.execute();</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L64">    StringBuilder sb = new StringBuilder();</span>
+<span class="nc" id="L65">    printPlanNode(root, 0, sb);</span>
+<span class="nc" id="L66">    return sb.toString();</span>
+  }
+
+  /**
+   * Recursively prints the sub tree of the given node in pre-order.
+   *
+   * @param node root plan node
+   * @param level level of the whole query tree
+   * @param sb string builder to append
+   */
+  private void printPlanNode(PlanNode node, int level, StringBuilder sb) {
+<span class="nc" id="L77">    sb.append(String.format(&quot;%s|-%s%n&quot;, StringUtils.leftPad(&quot;&quot;, level * 2, PAD_STRING), node));</span>
+<span class="nc" id="L78">    level++;</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">    if (node instanceof UnaryNode) {</span>
+<span class="nc" id="L80">      printPlanNode(((UnaryNode) node).getChildNode(), level, sb);</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">    } else if (node instanceof BinaryNode) {</span>
+<span class="nc" id="L82">      printPlanNode(((BinaryNode) node).getLeftChild(), level, sb);</span>
+<span class="nc" id="L83">      printPlanNode(((BinaryNode) node).getRightChild(), level, sb);</span>
+    }
+<span class="nc" id="L85">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

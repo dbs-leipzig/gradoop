@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MetaDataSource.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.api.metadata</a> &gt; <span class="el_source">MetaDataSource.java</span></div><h1>MetaDataSource.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.api.metadata;
+
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.apache.hadoop.conf.Configuration;
+import org.gradoop.common.model.impl.metadata.MetaData;
+import org.gradoop.common.model.impl.metadata.PropertyMetaData;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.flink.io.api.metadata.functions.ElementToPropertyMetaData;
+import org.gradoop.flink.io.api.metadata.functions.ReducePropertyMetaData;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Base interface for factories that create metadata objects from tuples and files (distributed
+ * or locally).
+ *
+ * @param &lt;M&gt; meta data type
+ */
+public interface MetaDataSource&lt;M extends MetaData&gt; {
+  /**
+   * Used to tag a graph head entity.
+   */
+  String GRAPH_TYPE = &quot;g&quot;;
+  /**
+   * Used to tag a vertex entity.
+   */
+  String VERTEX_TYPE = &quot;v&quot;;
+  /**
+   * Used to tag an edge entity.
+   */
+  String EDGE_TYPE = &quot;e&quot;;
+
+  /**
+   * Creates the meta data for the given graph.
+   *
+   * @param graph logical graph
+   * @return meta data information
+   */
+  default DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; tuplesFromGraph(LogicalGraph graph) {
+<span class="fc" id="L63">    return tuplesFromElements(graph.getVertices())</span>
+<span class="fc" id="L64">      .union(tuplesFromElements(graph.getEdges()));</span>
+  }
+
+  /**
+   * Creates the meta data for the given graph collection.
+   *
+   * @param graphs graph collection
+   * @return meta data information
+   */
+  default DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; tuplesFromCollection(GraphCollection graphs) {
+<span class="fc" id="L74">    return tuplesFromElements(graphs.getVertices())</span>
+<span class="fc" id="L75">      .union(tuplesFromElements(graphs.getEdges()))</span>
+<span class="fc" id="L76">      .union(tuplesFromElements(graphs.getGraphHeads()));</span>
+  }
+
+  /**
+   * Creates the meta data for the specified data set of EPGM elements.
+   *
+   * @param elements EPGM elements
+   * @param &lt;E&gt;      EPGM element type
+   * @return meta data information
+   */
+  static &lt;E extends Element&gt; DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; tuplesFromElements(
+    DataSet&lt;E&gt; elements) {
+<span class="fc" id="L88">    return elements</span>
+<span class="fc" id="L89">      .map(new ElementToPropertyMetaData&lt;&gt;())</span>
+<span class="fc" id="L90">      .groupBy(0, 1)</span>
+<span class="fc" id="L91">      .reduce(new ReducePropertyMetaData())</span>
+<span class="fc" id="L92">      .map(tuple -&gt; Tuple3.of(</span>
+        tuple.f0,
+        tuple.f1,
+<span class="fc" id="L95">        tuple.f2.stream().sorted().collect(</span>
+<span class="fc" id="L96">          Collectors.joining(PropertyMetaData.PROPERTY_DELIMITER))))</span>
+<span class="fc" id="L97">      .returns(new TupleTypeInfo&lt;&gt;(</span>
+        BasicTypeInfo.STRING_TYPE_INFO,
+        BasicTypeInfo.STRING_TYPE_INFO,
+        BasicTypeInfo.STRING_TYPE_INFO))
+<span class="fc" id="L101">      .withForwardedFields(&quot;f0&quot;, &quot;f1&quot;);</span>
+  }
+
+  /**
+   * Creates a {@link MetaData} object from the specified lines. The specified tuple is already
+   * separated into the label and the metadata.
+   *
+   * @param metaDataStrings (element prefix (g,v,e), label, meta data) tuples
+   * @return Meta Data object
+   */
+  M fromTuples(List&lt;Tuple3&lt;String, String, String&gt;&gt; metaDataStrings);
+
+  /**
+   * Reads the meta data from a specified file. Each line is split into a
+   * (element prefix, label, metadata) tuple
+   * and put into a dataset. The latter can be used to broadcast the metadata to the mappers.
+   *
+   * @param path   path to metadata csv file
+   * @param config gradoop configuration
+   * @return (element prefix ( g, v, e), label, metadata) tuple dataset
+   */
+  DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; readDistributed(String path, GradoopFlinkConfig config);
+
+  /**
+   * Reads the meta data from a specified csv file. The file can be either located in a local file
+   * system or in HDFS.
+   *
+   * @param path       path to metadata csv file
+   * @param hdfsConfig file system configuration
+   * @return meta data
+   * @throws IOException on failure
+   */
+  M readLocal(String path, Configuration hdfsConfig) throws IOException;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

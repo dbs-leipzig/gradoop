@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LogicalGraphFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.epgm</a> &gt; <span class="el_source">LogicalGraphFactory.java</span></div><h1>LogicalGraphFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.epgm;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * Responsible for creating instances of {@link LogicalGraph} based on a specific
+ * {@link org.gradoop.flink.model.api.layouts.LogicalGraphLayout}.
+ */
+public class LogicalGraphFactory
+  implements BaseGraphFactory&lt;GraphHead, Vertex, Edge, LogicalGraph&gt; {
+  /**
+   * Creates the layout from given data.
+   */
+  private LogicalGraphLayoutFactory&lt;GraphHead, Vertex, Edge&gt; layoutFactory;
+  /**
+   * The Gradoop Flink configuration.
+   */
+  private final GradoopFlinkConfig config;
+
+  /**
+   * Creates a new factory.
+   *
+   * @param config the Gradoop Flink configuration
+   */
+<span class="fc" id="L53">  public LogicalGraphFactory(GradoopFlinkConfig config) {</span>
+<span class="fc" id="L54">    this.config = config;</span>
+<span class="fc" id="L55">  }</span>
+
+  @Override
+  public void setLayoutFactory(LogicalGraphLayoutFactory&lt;GraphHead, Vertex, Edge&gt; layoutFactory) {
+<span class="fc" id="L59">    Objects.requireNonNull(layoutFactory);</span>
+<span class="fc" id="L60">    this.layoutFactory = layoutFactory;</span>
+<span class="fc" id="L61">    this.layoutFactory.setGradoopFlinkConfig(config);</span>
+<span class="fc" id="L62">  }</span>
+
+  /**
+   * {@inheritDoc}
+   *
+   * The factory is passed from {@link GradoopFlinkConfig} at the moment.
+   */
+  @Override
+  public EPGMGraphHeadFactory&lt;GraphHead&gt; getGraphHeadFactory() {
+<span class="fc" id="L71">    return config.getGraphHeadFactory();</span>
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * The factory is passed from {@link GradoopFlinkConfig} at the moment.
+   */
+  @Override
+  public EPGMVertexFactory&lt;Vertex&gt; getVertexFactory() {
+<span class="fc" id="L81">    return config.getVertexFactory();</span>
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * The factory is passed from {@link GradoopFlinkConfig} at the moment.
+   */
+  @Override
+  public EPGMEdgeFactory&lt;Edge&gt; getEdgeFactory() {
+<span class="fc" id="L91">    return config.getEdgeFactory();</span>
+  }
+
+  @Override
+  public LogicalGraph fromDataSets(DataSet&lt;Vertex&gt; vertices) {
+<span class="fc" id="L96">    return new LogicalGraph(layoutFactory.fromDataSets(vertices), config);</span>
+  }
+
+  @Override
+  public LogicalGraph fromDataSets(DataSet&lt;Vertex&gt; vertices, DataSet&lt;Edge&gt; edges) {
+<span class="fc" id="L101">    return new LogicalGraph(layoutFactory.fromDataSets(vertices, edges), config);</span>
+  }
+
+  @Override
+  public LogicalGraph fromDataSets(DataSet&lt;GraphHead&gt; graphHead, DataSet&lt;Vertex&gt; vertices,
+    DataSet&lt;Edge&gt; edges) {
+<span class="fc" id="L107">    return new LogicalGraph(layoutFactory.fromDataSets(graphHead, vertices, edges), config);</span>
+  }
+
+  @Override
+  public LogicalGraph fromIndexedDataSets(Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
+    Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
+<span class="fc" id="L113">    return new LogicalGraph(layoutFactory.fromIndexedDataSets(vertices, edges), config);</span>
+  }
+
+  @Override
+  public LogicalGraph fromIndexedDataSets(Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHead,
+    Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
+<span class="nc" id="L119">    return new LogicalGraph(layoutFactory.fromIndexedDataSets(graphHead, vertices, edges), config);</span>
+  }
+
+  @Override
+  public LogicalGraph fromCollections(GraphHead graphHead, Collection&lt;Vertex&gt; vertices,
+    Collection&lt;Edge&gt; edges) {
+<span class="fc" id="L125">    return new LogicalGraph(layoutFactory.fromCollections(graphHead, vertices, edges), config);</span>
+  }
+
+  @Override
+  public LogicalGraph fromCollections(Collection&lt;Vertex&gt; vertices, Collection&lt;Edge&gt; edges) {
+<span class="fc" id="L130">    return new LogicalGraph(layoutFactory.fromCollections(vertices, edges), config);</span>
+  }
+
+  @Override
+  public LogicalGraph createEmptyGraph() {
+<span class="nc" id="L135">    return new LogicalGraph(layoutFactory.createEmptyGraph(), config);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

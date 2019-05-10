@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MinimalCSVImporter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.importer.impl.csv</a> &gt; <span class="el_source">MinimalCSVImporter.java</span></div><h1>MinimalCSVImporter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.importer.impl.csv;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.dataintegration.importer.impl.csv.functions.CsvRowToProperties;
+import org.gradoop.dataintegration.importer.impl.csv.functions.PropertiesToVertex;
+import org.gradoop.flink.io.api.DataSource;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Read a csv file and import each row as a vertex in EPGM representation.
+ */
+public class MinimalCSVImporter implements DataSource {
+
+  /**
+   * Token delimiter of the CSV file.
+   */
+  private String tokenSeparator;
+
+  /**
+   * Path to the csv file.
+   */
+  private String path;
+
+  /**
+   * The charset used in the csv file, e.g., &quot;UTF-8&quot;.
+   */
+  private String charset;
+
+  /**
+   * The property names for all columns in the file. If {@code null}, the first line will be
+   * interpreted as header row.
+   */
+  private List&lt;String&gt; columnNames;
+
+  /**
+   * Flag to specify if each row of the file should be checked for reoccurring of the column
+   * property names.
+   */
+  private boolean checkReoccurringHeader;
+
+  /**
+   * Gradoop Flink configuration.
+   */
+  private GradoopFlinkConfig config;
+
+  /**
+   * Create a new MinimalCSVImporter instance by the given parameters.
+   *
+   * @param path the path to the csv file
+   * @param tokenSeparator the token delimiter of the csv file
+   * @param config GradoopFlinkConfig configuration
+   * @param columnNames property identifiers for each column
+   * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
+   *                               the column property names
+   */
+  public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config,
+                            List&lt;String&gt; columnNames, boolean checkReoccurringHeader) {
+<span class="fc" id="L87">    this(path, tokenSeparator, config, checkReoccurringHeader);</span>
+<span class="fc" id="L88">    this.columnNames = Objects.requireNonNull(columnNames);</span>
+<span class="fc" id="L89">  }</span>
+
+  /**
+   * Create a new MinimalCSVImporter instance by the given parameters.
+   * Use the UTF-8 charset as default. The first line of the file will be set as the property
+   * names for each column.
+   *
+   * @param path the path to the csv file
+   * @param tokenSeparator the token delimiter of the csv file
+   * @param config GradoopFlinkConfig configuration
+   * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
+   *                               the column property names.
+   */
+  public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config,
+                            boolean checkReoccurringHeader) {
+<span class="fc" id="L104">    this(path, tokenSeparator, config, &quot;UTF-8&quot;, checkReoccurringHeader);</span>
+<span class="fc" id="L105">  }</span>
+
+  /**
+   * Create a new MinimalCSVImporter with a user set charset. The first line of the file
+   * will set as the property names for each column.
+   *
+   * @param path the path to the csv file
+   * @param tokenSeparator the token delimiter of the csv file
+   * @param config GradoopFlinkConfig configuration
+   * @param charset the charset used in the csv file
+   * @param checkReoccurringHeader if each row of the file should be checked for reoccurring of
+   *                               the column property names.
+   */
+  public MinimalCSVImporter(String path, String tokenSeparator, GradoopFlinkConfig config,
+<span class="fc" id="L119">                            String charset, boolean checkReoccurringHeader) {</span>
+<span class="fc" id="L120">    this.path = Objects.requireNonNull(path);</span>
+<span class="fc" id="L121">    this.tokenSeparator = Objects.requireNonNull(tokenSeparator);</span>
+<span class="fc" id="L122">    this.config = Objects.requireNonNull(config);</span>
+<span class="fc" id="L123">    this.charset = Objects.requireNonNull(charset);</span>
+<span class="fc" id="L124">    this.checkReoccurringHeader = checkReoccurringHeader;</span>
+<span class="fc" id="L125">  }</span>
+
+  /**
+   * Import each row of the file as a vertex and create a logical graph from it.
+   * If no column property names are set, read the first line of the file as header and set this
+   * values as column names.
+   *
+   * @return a logical graph with a vertex per csv line and no edges
+   * @throws IOException on failure
+   */
+  @Override
+  public LogicalGraph getLogicalGraph() throws IOException {
+    DataSet&lt;Vertex&gt; vertices;
+
+<span class="fc bfc" id="L139" title="All 2 branches covered.">    if (columnNames == null) {</span>
+<span class="fc" id="L140">      vertices = readCSVFile(readHeaderRow(), checkReoccurringHeader);</span>
+    } else {
+<span class="fc" id="L142">      vertices = readCSVFile(columnNames, checkReoccurringHeader);</span>
+    }
+
+<span class="fc" id="L145">    return config.getLogicalGraphFactory().fromDataSets(vertices);</span>
+  }
+
+  @Override
+  public GraphCollection getGraphCollection() throws IOException {
+<span class="fc" id="L150">    return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());</span>
+  }
+
+  /**
+   * Reads the csv file specified by {@link MinimalCSVImporter#path} and converts each valid line
+   * to a {@link Vertex}.
+   *
+   * @param propertyNames list of the property identifier names
+   * @param checkReoccurringHeader set to true if each row of the file should be checked for
+   *                               reoccurring of the column property names
+   * @return a {@link DataSet} of all vertices from one specific file
+   */
+  private DataSet&lt;Vertex&gt; readCSVFile(List&lt;String&gt; propertyNames, boolean checkReoccurringHeader) {
+<span class="fc" id="L163">    return config.getExecutionEnvironment()</span>
+<span class="fc" id="L164">      .readTextFile(path)</span>
+<span class="fc" id="L165">      .flatMap(new CsvRowToProperties(tokenSeparator, propertyNames, checkReoccurringHeader))</span>
+<span class="fc" id="L166">      .map(new PropertiesToVertex&lt;&gt;(config.getVertexFactory()))</span>
+<span class="fc" id="L167">      .returns(config.getVertexFactory().getType());</span>
+  }
+
+  /**
+   * Reads the fist row of a csv file and creates a list including all column entries that
+   * will be used as property names.
+   *
+   * @return the property names
+   * @throws IOException if an error occurred while open the stream
+   */
+  private List&lt;String&gt; readHeaderRow() throws IOException {
+<span class="fc" id="L178">    Path filePath = new Path(path);</span>
+<span class="fc" id="L179">    try (FileSystem fs = FileSystem.get(filePath.toUri(), new Configuration())) {</span>
+<span class="fc" id="L180">      FSDataInputStream inputStream = fs.open(filePath);</span>
+<span class="fc" id="L181">      BufferedReader lineReader = new BufferedReader(new InputStreamReader(inputStream, charset));</span>
+<span class="fc" id="L182">      String headerLine = lineReader.readLine();</span>
+<span class="fc" id="L183">      lineReader.close();</span>
+<span class="fc bfc" id="L184" title="All 4 branches covered.">      if (headerLine == null || headerLine.isEmpty()) {</span>
+<span class="fc" id="L185">        throw new IOException(&quot;The csv file '&quot; + path + &quot;' does not contain any rows.&quot;);</span>
+      }
+<span class="fc" id="L187">      return Arrays.asList(headerLine.split(tokenSeparator));</span>
+<span class="fc" id="L188">    } catch (IOException ioe) {</span>
+<span class="fc" id="L189">      throw new IOException(&quot;Error while opening a stream to '&quot; + path + &quot;'.&quot;, ioe);</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

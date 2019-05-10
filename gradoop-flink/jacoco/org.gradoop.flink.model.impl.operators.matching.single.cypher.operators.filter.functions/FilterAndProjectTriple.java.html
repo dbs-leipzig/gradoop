@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FilterAndProjectTriple.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions</a> &gt; <span class="el_source">FilterAndProjectTriple.java</span></div><h1>FilterAndProjectTriple.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions;
+
+import org.apache.flink.api.common.functions.RichFlatMapFunction;
+import org.apache.flink.util.Collector;
+import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
+import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Triple;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Applies a given predicate on a {@link Triple} and projects specified property values to the
+ * output embedding.
+ */
+public class FilterAndProjectTriple extends RichFlatMapFunction&lt;Triple, Embedding&gt; {
+  /**
+   * Predicates used for filtering
+   */
+  private final CNF predicates;
+  /**
+   * variable of the source vertex
+   */
+  private final String sourceVariable;
+  /**
+   * variable of the target vertex
+   */
+  private final String targetVariable;
+  /**
+   * Property keys used for value projection of the source vertex
+   */
+  private final List&lt;String&gt; sourceProjectionPropertyKeys;
+  /**
+   * Property keys used for value projection of the edge
+   */
+  private final List&lt;String&gt; edgeProjectionPropertyKeys;
+  /**
+   * Property keys used for value projection of the target vertex
+   */
+  private final List&lt;String&gt; targetProjectionPropertyKeys;
+  /**
+   * Meta data describing the vertex embedding used for filtering
+   */
+  private final EmbeddingMetaData filterMetaData;
+  /**
+   * Source vertex propertyKeys of the embedding used for filtering
+   */
+  private final List&lt;String&gt; sourceFilterPropertyKeys;
+  /**
+   * Edge propertyKeys of the embedding used for filtering
+   */
+  private final List&lt;String&gt; edgeFilterPropertyKeys;
+  /**
+   * Target vertex propertyKeys of the embedding used for filtering
+   */
+  private final List&lt;String&gt; targetFilterPropertyKeys;
+
+  /**
+   * True if vertex and target variable are the same
+   */
+  private final boolean isLoop;
+
+  /**
+   * Set to true if vertex matching strategy is isomorphism
+   */
+  private final boolean isVertexIso;
+
+  /**
+   * New FilterAndProjectTriples
+   * @param sourceVariable the source variable
+   * @param edgeVariable edge variabe
+   * @param targetVariable target variable
+   * @param predicates filter predicates
+   * @param projectionPropertyKeys property keys used for projection
+   * @param vertexMatchStrategy vertex match strategy
+   */
+  public FilterAndProjectTriple(String sourceVariable, String edgeVariable, String targetVariable,
+    CNF predicates, Map&lt;String, List&lt;String&gt;&gt; projectionPropertyKeys,
+<span class="fc" id="L98">    MatchStrategy vertexMatchStrategy) {</span>
+
+<span class="fc" id="L100">    this.predicates = predicates;</span>
+<span class="fc" id="L101">    this.sourceVariable = sourceVariable;</span>
+<span class="fc" id="L102">    this.targetVariable = targetVariable;</span>
+
+<span class="fc" id="L104">    this.sourceProjectionPropertyKeys =</span>
+<span class="fc" id="L105">      projectionPropertyKeys.getOrDefault(sourceVariable, new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L106">    this.edgeProjectionPropertyKeys =</span>
+<span class="fc" id="L107">      projectionPropertyKeys.getOrDefault(edgeVariable, new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L108">    this.targetProjectionPropertyKeys =</span>
+<span class="fc" id="L109">      projectionPropertyKeys.getOrDefault(targetVariable, new ArrayList&lt;&gt;());</span>
+
+<span class="fc" id="L111">    this.isLoop = sourceVariable.equals(targetVariable);</span>
+<span class="fc" id="L112">    this.isVertexIso = vertexMatchStrategy.equals(MatchStrategy.ISOMORPHISM);</span>
+
+<span class="fc" id="L114">    filterMetaData = createFilterMetaData(predicates, sourceVariable, edgeVariable, targetVariable);</span>
+<span class="fc" id="L115">    sourceFilterPropertyKeys = filterMetaData.getPropertyKeys(sourceVariable);</span>
+<span class="fc" id="L116">    edgeFilterPropertyKeys = filterMetaData.getPropertyKeys(edgeVariable);</span>
+<span class="fc" id="L117">    targetFilterPropertyKeys = filterMetaData.getPropertyKeys(targetVariable);</span>
+
+<span class="fc" id="L119">  }</span>
+
+  @Override
+  public void flatMap(Triple triple, Collector&lt;Embedding&gt; out) throws Exception {
+<span class="fc" id="L123">    boolean isValid = true;</span>
+
+<span class="fc bfc" id="L125" title="All 2 branches covered.">    if (isLoop) {</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">      if (!(triple.getSourceId().equals(triple.getTargetId()))) {</span>
+<span class="fc" id="L127">        isValid = false;</span>
+      }
+<span class="fc bfc" id="L129" title="All 4 branches covered.">    } else if (isVertexIso &amp;&amp; triple.getSourceId().equals(triple.getTargetId())) {</span>
+<span class="fc" id="L130">      isValid = false;</span>
+    }
+
+<span class="fc bfc" id="L133" title="All 4 branches covered.">    if (isValid &amp;&amp; filter(triple)) {</span>
+<span class="fc" id="L134">      out.collect(</span>
+<span class="fc" id="L135">        EmbeddingFactory.fromTriple(</span>
+          triple,
+          sourceProjectionPropertyKeys, edgeProjectionPropertyKeys, targetProjectionPropertyKeys,
+          sourceVariable, targetVariable
+        )
+      );
+    }
+<span class="fc" id="L142">  }</span>
+
+  /**
+   * Checks if the the triple holds for the predicate
+   * @param triple triple to be filtered
+   * @return True if the triple holds for the predicate
+   */
+  private boolean filter(Triple triple) {
+<span class="fc" id="L150">    return predicates.evaluate(</span>
+<span class="fc" id="L151">      EmbeddingFactory.fromTriple(triple,</span>
+        sourceFilterPropertyKeys,  edgeFilterPropertyKeys, targetFilterPropertyKeys,
+        sourceVariable, targetVariable
+      ),
+      filterMetaData
+    );
+  }
+
+  /**
+   * Creates the {@code EmbeddingMetaData} of the embedding used for filtering
+   * @param predicates filter predicates
+   * @param sourceVariable source variable
+   * @param edgeVariable edge variable
+   * @param targetVariable target variable
+   * @return filter embedding meta data
+   */
+  private static EmbeddingMetaData createFilterMetaData(CNF predicates, String sourceVariable,
+    String edgeVariable, String targetVariable) {
+
+<span class="fc" id="L170">    EmbeddingMetaData metaData = new EmbeddingMetaData();</span>
+<span class="fc" id="L171">    metaData.setEntryColumn(sourceVariable, EmbeddingMetaData.EntryType.VERTEX, 0);</span>
+<span class="fc" id="L172">    metaData.setEntryColumn(edgeVariable, EmbeddingMetaData.EntryType.EDGE, 1);</span>
+<span class="fc" id="L173">    metaData.setEntryColumn(targetVariable, EmbeddingMetaData.EntryType.VERTEX, 2);</span>
+
+<span class="fc" id="L175">    int i = 0;</span>
+<span class="fc bfc" id="L176" title="All 2 branches covered.">    for (String variable : new String[] {sourceVariable, edgeVariable, targetVariable}) {</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">      for (String propertyKey : predicates.getPropertyKeys(variable)) {</span>
+<span class="fc" id="L178">        metaData.setPropertyColumn(variable, propertyKey, i++);</span>
+<span class="fc" id="L179">      }</span>
+    }
+
+<span class="fc" id="L182">    return metaData;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

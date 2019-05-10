@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GradoopId.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.id</a> &gt; <span class="el_source">GradoopId.java</span></div><h1>GradoopId.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.id;
+
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataOutputView;
+import org.apache.flink.core.memory.MemorySegment;
+import org.apache.flink.types.CopyableValue;
+import org.apache.flink.types.NormalizableKey;
+import org.gradoop.common.model.api.entities.EPGMIdentifiable;
+
+import java.io.IOException;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
+import java.security.SecureRandom;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * Primary key for an EPGM element.
+ * &lt;p&gt;
+ * This implementation reuses much of the code of BSON's ObjectId
+ * (org.bson.types.ObjectId) to guarantee uniqueness. Much of the code is copied directly or
+ * has only small changes.
+ *
+ * @see EPGMIdentifiable
+ * &lt;p&gt;
+ * references to: org.bson.types.ObjectId
+ */
+public class GradoopId implements NormalizableKey&lt;GradoopId&gt;, CopyableValue&lt;GradoopId&gt; {
+
+  /**
+   * Number of bytes to represent an id internally.
+   */
+  public static final int ID_SIZE = 12;
+
+  /**
+   * Represents a null id.
+   */
+<span class="fc" id="L57">  public static final GradoopId NULL_VALUE =</span>
+    new GradoopId(0, 0, (short) 0, 0);
+
+  /**
+   * Integer containing a unique identifier of the machine
+   */
+  private static final int MACHINE_IDENTIFIER;
+
+  /**
+   * Short containing a unique identifier of the process
+   */
+  private static final short PROCESS_IDENTIFIER;
+
+  /**
+   * Integer containing a counter that is increased whenever a new id is created
+   */
+<span class="fc" id="L73">  private static final AtomicInteger NEXT_COUNTER = new AtomicInteger(new SecureRandom().nextInt());</span>
+
+  /**
+   * Bit mask used to extract the lowest three bytes of four
+   */
+  private static final int LOW_ORDER_THREE_BYTES = 0x00ffffff;
+
+  /**
+   * Bit mask used to extract the highest byte of four
+   */
+  private static final int HIGH_ORDER_ONE_BYTE = 0xff000000;
+
+  /**
+   * Required for {@link GradoopId#toString()}
+   */
+<span class="fc" id="L88">  private static final char[] HEX_CHARS = new char[] {</span>
+    '0', '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+  /**
+   * Internal byte representation
+   */
+  private byte[] bytes;
+
+  static {
+<span class="fc" id="L98">    MACHINE_IDENTIFIER = createMachineIdentifier();</span>
+<span class="fc" id="L99">    PROCESS_IDENTIFIER = createProcessIdentifier();</span>
+<span class="fc" id="L100">  }</span>
+
+  /**
+   * Required default constructor for instantiation by serialization logic.
+   */
+<span class="nc" id="L105">  public GradoopId() {</span>
+<span class="nc" id="L106">    bytes = new byte[ID_SIZE];</span>
+<span class="nc" id="L107">  }</span>
+
+  /**
+   * Creates a GradoopId from a given byte representation
+   *
+   * @param bytes the GradoopId represented by the byte array
+   */
+<span class="fc" id="L114">  private GradoopId(byte[] bytes) {</span>
+<span class="fc" id="L115">    this.bytes = bytes;</span>
+<span class="fc" id="L116">  }</span>
+
+  /**
+   * Creates a GradoopId using the given time, machine identifier, process identifier, and counter.
+   * &lt;p&gt;
+   * Note: Implementation taken from org.bson.types.ObjectId
+   *
+   * @param timestamp         the time in seconds
+   * @param machineIdentifier the machine identifier
+   * @param processIdentifier the process identifier
+   * @param counter           the counter
+   * @throws IllegalArgumentException if the high order byte of machineIdentifier
+   *                                  or counter is not zero
+   */
+  public GradoopId(final int timestamp, final int machineIdentifier,
+    final short processIdentifier, final int counter) {
+<span class="fc" id="L132">    this(timestamp, machineIdentifier, processIdentifier, counter, true);</span>
+<span class="fc" id="L133">  }</span>
+
+
+  /**
+   * Creates a GradoopId using the given time, machine identifier, process identifier, and counter.
+   * &lt;p&gt;
+   * Note: Implementation taken from org.bson.types.ObjectId
+   *
+   * @param timestamp         the time in seconds
+   * @param machineIdentifier the machine identifier
+   * @param processIdentifier the process identifier
+   * @param counter           the counter
+   * @param checkCounter      if the constructor should test if the counter is between 0 and
+   *                          16777215
+   */
+  private GradoopId(final int timestamp, final int machineIdentifier, final short processIdentifier,
+<span class="fc" id="L149">    final int counter, final boolean checkCounter) {</span>
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">    if ((machineIdentifier &amp; HIGH_ORDER_ONE_BYTE) != 0) {</span>
+<span class="nc" id="L151">      throw new IllegalArgumentException(&quot;The machine identifier must be between 0&quot; +</span>
+        &quot; and 16777215 (it must fit in three bytes).&quot;);
+    }
+<span class="pc bpc" id="L154" title="1 of 4 branches missed.">    if (checkCounter &amp;&amp; ((counter &amp; HIGH_ORDER_ONE_BYTE) != 0)) {</span>
+<span class="nc" id="L155">      throw new IllegalArgumentException(&quot;The counter must be between 0&quot; +</span>
+        &quot; and 16777215 (it must fit in three bytes).&quot;);
+    }
+
+<span class="fc" id="L159">    ByteBuffer buffer = ByteBuffer.allocate(12);</span>
+
+<span class="fc" id="L161">    buffer.put((byte) (timestamp &gt;&gt; 24));</span>
+<span class="fc" id="L162">    buffer.put((byte) (timestamp &gt;&gt; 16));</span>
+<span class="fc" id="L163">    buffer.put((byte) (timestamp &gt;&gt; 8));</span>
+<span class="fc" id="L164">    buffer.put((byte) timestamp);</span>
+
+<span class="fc" id="L166">    buffer.put((byte) (machineIdentifier &gt;&gt; 16));</span>
+<span class="fc" id="L167">    buffer.put((byte) (machineIdentifier &gt;&gt; 8));</span>
+<span class="fc" id="L168">    buffer.put((byte) machineIdentifier);</span>
+
+<span class="fc" id="L170">    buffer.put((byte) (processIdentifier &gt;&gt; 8));</span>
+<span class="fc" id="L171">    buffer.put((byte) processIdentifier);</span>
+
+<span class="fc" id="L173">    buffer.put((byte) (counter &gt;&gt; 16));</span>
+<span class="fc" id="L174">    buffer.put((byte) (counter &gt;&gt; 8));</span>
+<span class="fc" id="L175">    buffer.put((byte) counter);</span>
+
+<span class="fc" id="L177">    this.bytes = buffer.array();</span>
+<span class="fc" id="L178">  }</span>
+
+  /**
+   * Creates the machine identifier from the network interface.
+   * &lt;p&gt;
+   * Note: Implementation taken from org.bson.types.ObjectId
+   *
+   * @return a short representing the process
+   */
+  private static int createMachineIdentifier() {
+    int machinePiece;
+    try {
+<span class="fc" id="L190">      StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L191">      Enumeration&lt;NetworkInterface&gt; e = NetworkInterface.getNetworkInterfaces();</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">      while (e.hasMoreElements()) {</span>
+<span class="fc" id="L193">        NetworkInterface ni = e.nextElement();</span>
+<span class="fc" id="L194">        sb.append(ni.toString());</span>
+<span class="fc" id="L195">        byte[] mac = ni.getHardwareAddress();</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">        if (mac != null) {</span>
+<span class="fc" id="L197">          ByteBuffer bb = ByteBuffer.wrap(mac);</span>
+          try {
+<span class="fc" id="L199">            sb.append(bb.getChar());</span>
+<span class="fc" id="L200">            sb.append(bb.getChar());</span>
+<span class="fc" id="L201">            sb.append(bb.getChar());</span>
+<span class="nc" id="L202">          } catch (BufferUnderflowException shortHardwareAddressException) {</span>
+            // mac with less than 6 bytes. continue
+<span class="fc" id="L204">          }</span>
+        }
+<span class="fc" id="L206">      }</span>
+<span class="fc" id="L207">      machinePiece = sb.toString().hashCode();</span>
+<span class="nc" id="L208">    } catch (SocketException t) {</span>
+<span class="nc" id="L209">      machinePiece = new SecureRandom().nextInt();</span>
+<span class="fc" id="L210">    }</span>
+<span class="fc" id="L211">    machinePiece = machinePiece &amp; LOW_ORDER_THREE_BYTES;</span>
+<span class="fc" id="L212">    return machinePiece;</span>
+  }
+
+  /**
+   * Creates the process identifier.  This does not have to be unique per class loader because
+   * NEXT_COUNTER will provide the uniqueness.
+   * &lt;p&gt;
+   * Note: Implementation taken from org.bson.types.ObjectId
+   *
+   * @return a short representing the process
+   */
+  private static short createProcessIdentifier() {
+    short processId;
+<span class="fc" id="L225">    String processName = java.lang.management.ManagementFactory.getRuntimeMXBean().getName();</span>
+<span class="pc bpc" id="L226" title="1 of 2 branches missed.">    if (processName.contains(&quot;@&quot;)) {</span>
+<span class="fc" id="L227">      processId = (short) Integer.parseInt(processName.substring(0, processName.indexOf('@')));</span>
+    } else {
+      processId = (short) java.lang.management.ManagementFactory
+<span class="nc" id="L230">        .getRuntimeMXBean().getName().hashCode();</span>
+    }
+
+<span class="fc" id="L233">    return processId;</span>
+  }
+
+  /**
+   * Returns a new GradoopId
+   *
+   * @return new GradoopId
+   */
+  public static GradoopId get() {
+<span class="fc" id="L242">    return new GradoopId(dateToTimestampSeconds(new Date()), MACHINE_IDENTIFIER,</span>
+<span class="fc" id="L243">      PROCESS_IDENTIFIER, NEXT_COUNTER.getAndIncrement(), false);</span>
+  }
+
+  /**
+   * Converts a date into the seconds since unix epoch.
+   *
+   * @param time a time
+   * @return int representing the seconds between unix epoch and the given time
+   */
+  private static int dateToTimestampSeconds(final Date time) {
+<span class="fc" id="L253">    return (int) (time.getTime() / 1000);</span>
+  }
+
+  /**
+   * Returns the Gradoop ID represented by a specified hexadecimal string.
+   * &lt;p&gt;
+   * Note: Implementation taken from org.bson.types.ObjectId
+   *
+   * @param string hexadecimal GradoopId representation
+   * @return GradoopId
+   */
+  public static GradoopId fromString(String string) {
+<span class="pc bpc" id="L265" title="1 of 2 branches missed.">    if (!GradoopId.isValid(string)) {</span>
+<span class="nc" id="L266">      throw new IllegalArgumentException(</span>
+        &quot;invalid hexadecimal representation of a GradoopId: [&quot; + string + &quot;]&quot;);
+    }
+
+<span class="fc" id="L270">    byte[] b = new byte[12];</span>
+<span class="fc bfc" id="L271" title="All 2 branches covered.">    for (int i = 0; i &lt; b.length; i++) {</span>
+<span class="fc" id="L272">      b[i] = (byte) Integer.parseInt(string.substring(i * 2, i * 2 + 2), 16);</span>
+    }
+<span class="fc" id="L274">    return new GradoopId(b);</span>
+  }
+
+  /**
+   * Checks if a string can be transformed into a GradoopId.
+   * &lt;p&gt;
+   * Note: Implementation taken from org.bson.types.ObjectId
+   *
+   * @param hexString a potential GradoopId as a String.
+   * @return whether the string could be an object id
+   * @throws IllegalArgumentException if hexString is null
+   */
+  public static boolean isValid(final String hexString) {
+<span class="pc bpc" id="L287" title="1 of 2 branches missed.">    if (hexString == null) {</span>
+<span class="nc" id="L288">      throw new IllegalArgumentException();</span>
+    }
+
+<span class="fc" id="L291">    int len = hexString.length();</span>
+<span class="pc bpc" id="L292" title="1 of 2 branches missed.">    if (len != 24) {</span>
+<span class="nc" id="L293">      return false;</span>
+    }
+
+<span class="fc bfc" id="L296" title="All 2 branches covered.">    for (int i = 0; i &lt; len; i++) {</span>
+<span class="fc" id="L297">      char c = hexString.charAt(i);</span>
+<span class="pc bpc" id="L298" title="1 of 4 branches missed.">      if (c &gt;= '0' &amp;&amp; c &lt;= '9') {</span>
+<span class="fc" id="L299">        continue;</span>
+      }
+<span class="pc bpc" id="L301" title="2 of 4 branches missed.">      if (c &gt;= 'a' &amp;&amp; c &lt;= 'f') {</span>
+<span class="fc" id="L302">        continue;</span>
+      }
+<span class="nc bnc" id="L304" title="All 4 branches missed.">      if (c &gt;= 'A' &amp;&amp; c &lt;= 'F') {</span>
+<span class="nc" id="L305">        continue;</span>
+      }
+
+<span class="nc" id="L308">      return false;</span>
+    }
+
+<span class="fc" id="L311">    return true;</span>
+  }
+
+  /**
+   * Returns the Gradoop ID represented by a byte array
+   *
+   * @param bytes byte representation
+   * @return Gradoop ID
+   */
+  public static GradoopId fromByteArray(byte[] bytes) {
+<span class="fc" id="L321">    return new GradoopId(bytes);</span>
+  }
+
+  /**
+   * Returns byte representation of a GradoopId
+   *
+   * @return Byte representation
+   */
+  @SuppressWarnings(value = &quot;EI_EXPOSE_REP&quot;, justification = &quot;never mutated&quot;)
+  public byte[] toByteArray() {
+<span class="fc" id="L331">    return bytes;</span>
+  }
+
+  /**
+   * Checks if the specified object is equal to the current id.
+   *
+   * @param o the object to be compared
+   * @return true, iff the specified id is equal to this id
+   */
+  @Override
+  public boolean equals(Object o) {
+<span class="fc bfc" id="L342" title="All 2 branches covered.">    if (this == o) {</span>
+<span class="fc" id="L343">      return true;</span>
+    }
+<span class="pc bpc" id="L345" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L346">      return false;</span>
+    }
+
+<span class="fc" id="L349">    byte[] firstBytes = this.bytes;</span>
+<span class="fc" id="L350">    byte[] secondBytes = ((GradoopId) o).bytes;</span>
+<span class="fc bfc" id="L351" title="All 2 branches covered.">    for (int i = 0; i &lt; GradoopId.ID_SIZE; i++) {</span>
+<span class="fc bfc" id="L352" title="All 2 branches covered.">      if (firstBytes[i] != secondBytes[i]) {</span>
+<span class="fc" id="L353">        return false;</span>
+      }
+    }
+<span class="fc" id="L356">    return true;</span>
+  }
+
+  /**
+   * Returns the hash code of this GradoopId.
+   * &lt;p&gt;
+   * Note: Implementation taken from org.bson.types.ObjectId
+   *
+   * @return hash code
+   */
+  @Override
+  public int hashCode() {
+<span class="fc" id="L368">    int result = getTimeStamp();</span>
+<span class="fc" id="L369">    result = 31 * result + getMachineIdentifier();</span>
+<span class="fc" id="L370">    result = 31 * result + (int) getProcessIdentifier();</span>
+<span class="fc" id="L371">    result = 31 * result + getCounter();</span>
+<span class="fc" id="L372">    return result;</span>
+  }
+
+  /**
+   * Performs a byte-wise comparison of this and the specified GradoopId.
+   *
+   * @param other the object to be compared.
+   * @return a negative integer, zero, or a positive integer as this object
+   * is less than, equal to, or greater than the specified object.
+   */
+  @Override
+  public int compareTo(GradoopId other) {
+
+<span class="fc bfc" id="L385" title="All 2 branches covered.">    for (int i = 0; i &lt; GradoopId.ID_SIZE; i++) {</span>
+<span class="fc bfc" id="L386" title="All 2 branches covered.">      if (this.bytes[i] != other.bytes[i]) {</span>
+<span class="fc bfc" id="L387" title="All 2 branches covered.">        return ((this.bytes[i] &amp; 0xff) &lt; (other.bytes[i] &amp; 0xff)) ? -1 : 1;</span>
+      }
+    }
+<span class="fc" id="L390">    return 0;</span>
+  }
+
+  /**
+   * Returns hex string representation of a GradoopId.
+   * &lt;p&gt;
+   * Note: Implementation taken from org.bson.types.ObjectId
+   *
+   * @return GradoopId string representation.
+   */
+  @Override
+  public String toString() {
+<span class="fc" id="L402">    char[] chars = new char[24];</span>
+<span class="fc" id="L403">    int i = 0;</span>
+<span class="fc bfc" id="L404" title="All 2 branches covered.">    for (byte b : bytes) {</span>
+<span class="fc" id="L405">      chars[i++] = HEX_CHARS[b &gt;&gt; 4 &amp; 0xF];</span>
+<span class="fc" id="L406">      chars[i++] = HEX_CHARS[b &amp; 0xF];</span>
+    }
+<span class="fc" id="L408">    return String.valueOf(chars);</span>
+  }
+
+  //------------------------------------------------------------------------------------------------
+  // methods inherited from NormalizableKey
+  //------------------------------------------------------------------------------------------------
+
+  @Override
+  public int getMaxNormalizedKeyLen() {
+<span class="nc" id="L417">    return ID_SIZE;</span>
+  }
+
+  @Override
+  public void copyNormalizedKey(MemorySegment target, int offset, int len) {
+<span class="nc" id="L422">    target.put(offset, bytes, 0, len);</span>
+<span class="nc" id="L423">  }</span>
+
+  @Override
+  public void write(DataOutputView out) throws IOException {
+<span class="nc" id="L427">    out.write(bytes);</span>
+<span class="nc" id="L428">  }</span>
+
+  @Override
+  public void read(DataInputView in) throws IOException {
+<span class="nc" id="L432">    in.readFully(bytes);</span>
+<span class="nc" id="L433">  }</span>
+
+  //------------------------------------------------------------------------------------------------
+  // methods inherited from CopyableValue
+  //------------------------------------------------------------------------------------------------
+
+  @Override
+  public int getBinaryLength() {
+<span class="nc" id="L441">    return ID_SIZE;</span>
+  }
+
+  @Override
+  public void copyTo(GradoopId target) {
+<span class="nc" id="L446">    target.bytes = this.bytes;</span>
+<span class="nc" id="L447">  }</span>
+
+  @Override
+  public GradoopId copy() {
+<span class="nc" id="L451">    return new GradoopId(this.bytes);</span>
+  }
+
+  @Override
+  public void copy(DataInputView source, DataOutputView target) throws IOException {
+<span class="nc" id="L456">    target.write(source, ID_SIZE);</span>
+<span class="nc" id="L457">  }</span>
+
+  //------------------------------------------------------------------------------------------------
+  // private little helpers
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Returns the timestamp component of the id.
+   *
+   * @return the timestamp
+   */
+  private int getTimeStamp() {
+<span class="fc" id="L469">    return makeInt(bytes[0], bytes[1], bytes[2], bytes[3]);</span>
+  }
+
+  /**
+   * Returns the machine identifier component of the id.
+   *
+   * @return the machine identifier
+   */
+  private int getMachineIdentifier() {
+<span class="fc" id="L478">    return makeInt((byte) 0, bytes[4], bytes[5], bytes[6]);</span>
+  }
+
+  /**
+   * Returns the process identifier component of the id.
+   *
+   * @return the process identifier
+   */
+  private short getProcessIdentifier() {
+<span class="fc" id="L487">    return (short) makeInt((byte) 0, (byte) 0, bytes[7], bytes[8]);</span>
+  }
+
+  /**
+   * Returns the counter component of the id.
+   *
+   * @return the counter
+   */
+  private int getCounter() {
+<span class="fc" id="L496">    return makeInt((byte) 0, bytes[9], bytes[10], bytes[11]);</span>
+  }
+
+
+  //------------------------------------------------------------------------------------------------
+  // static helper functions
+  //------------------------------------------------------------------------------------------------
+
+  /**
+   * Compares the given GradoopIds and returns the smaller one. It both are equal, the first
+   * argument is returned.
+   *
+   * @param first  first GradoopId
+   * @param second second GradoopId
+   * @return smaller GradoopId or first if equal
+   */
+  public static GradoopId min(GradoopId first, GradoopId second) {
+<span class="fc" id="L513">    int comparison = first.compareTo(second);</span>
+<span class="pc bpc" id="L514" title="2 of 4 branches missed.">    return comparison == 0 ? first : (comparison &lt; 0 ? first : second);</span>
+  }
+
+  /**
+   * Returns a primitive int represented by the given 4 bytes.
+   *
+   * @param b3 byte 3
+   * @param b2 byte 2
+   * @param b1 byte 1
+   * @param b0 byte 0
+   * @return int value
+   */
+  private static int makeInt(final byte b3, final byte b2, final byte b1, final byte b0) {
+<span class="fc" id="L527">    return (b3 &lt;&lt; 24) | ((b2 &amp; 0xff) &lt;&lt; 16) | ((b1 &amp; 0xff) &lt;&lt; 8) | ((b0 &amp; 0xff));</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ListStrategy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.properties.strategies</a> &gt; <span class="el_source">ListStrategy.java</span></div><h1>ListStrategy.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.properties.strategies;
+
+import org.apache.flink.core.memory.DataInputView;
+import org.apache.flink.core.memory.DataInputViewStreamWrapper;
+import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Strategy class for handling {@code PropertyValue} operations with a value of the type
+ * {@code List}.
+ */
+<span class="fc" id="L34">public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy&lt;List&lt;PropertyValue&gt;&gt; {</span>
+
+  @Override
+  public List&lt;PropertyValue&gt; read(DataInputView inputView, byte typeByte) throws IOException {
+<span class="fc" id="L38">    byte[] rawBytes = readVariableSizedData(inputView, typeByte);</span>
+
+    PropertyValue item;
+<span class="fc" id="L41">    List&lt;PropertyValue&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L42">    DataInputViewStreamWrapper internalInputView = createInputView(rawBytes);</span>
+
+    try {
+<span class="fc bfc" id="L45" title="All 2 branches covered.">      while (internalInputView.available() &gt; 0) {</span>
+<span class="fc" id="L46">        item = new PropertyValue();</span>
+<span class="fc" id="L47">        item.read(internalInputView);</span>
+
+<span class="fc" id="L49">        list.add(item);</span>
+      }
+<span class="nc" id="L51">    } catch (IOException e) {</span>
+<span class="nc" id="L52">      throw new IOException(&quot;Error reading PropertyValue with ListStrategy.&quot;, e);</span>
+<span class="fc" id="L53">    }</span>
+
+<span class="fc" id="L55">    return list;</span>
+  }
+
+  @Override
+  public int compare(List value, Object other) {
+<span class="fc" id="L60">    throw new UnsupportedOperationException(&quot;Method compare() is not supported for List.&quot;);</span>
+  }
+
+  @Override
+  public boolean is(Object value) {
+<span class="fc bfc" id="L65" title="All 2 branches covered.">    if (!(value instanceof List)) {</span>
+<span class="fc" id="L66">      return false;</span>
+    }
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    for (Object item : (List) value) {</span>
+      // List is not a valid property value if it contains any object
+      // that is not a property value itself.
+<span class="fc bfc" id="L71" title="All 2 branches covered.">      if (!(item instanceof PropertyValue)) {</span>
+<span class="fc" id="L72">        return false;</span>
+      }
+<span class="fc" id="L74">    }</span>
+
+<span class="fc" id="L76">    return true;</span>
+  }
+
+  @Override
+  public Class&lt;List&lt;PropertyValue&gt;&gt; getType() {
+<span class="fc" id="L81">    return (Class) List.class;</span>
+  }
+
+  /**
+   * {@inheritDoc}
+   * @throws IOException if converting the byte array to a List fails.
+   */
+  @Override
+  public List&lt;PropertyValue&gt; get(byte[] bytes) throws IOException {
+    PropertyValue item;
+<span class="fc" id="L91">    List&lt;PropertyValue&gt; list = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L93">    try (ByteArrayInputStream byteStream = new ByteArrayInputStream(bytes);</span>
+<span class="fc" id="L94">        DataInputStream inputStream = new DataInputStream(byteStream);</span>
+<span class="fc" id="L95">        DataInputViewStreamWrapper inputView = new DataInputViewStreamWrapper(inputStream)) {</span>
+
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">      if (inputView.skipBytes(PropertyValue.OFFSET) != PropertyValue.OFFSET) {</span>
+<span class="nc" id="L98">        throw new IOException(&quot;Malformed entry in PropertyValue List.&quot;);</span>
+      }
+<span class="fc bfc" id="L100" title="All 2 branches covered.">      while (inputView.available() &gt; 0) {</span>
+<span class="fc" id="L101">        item = new PropertyValue();</span>
+<span class="fc" id="L102">        item.read(inputView);</span>
+
+<span class="fc" id="L104">        list.add(item);</span>
+      }
+<span class="nc" id="L106">    } catch (IOException e) {</span>
+<span class="nc" id="L107">      throw new IOException(&quot;Error reading PropertyValue with ListStrategy.&quot;, e);</span>
+<span class="fc" id="L108">    }</span>
+
+<span class="fc" id="L110">    return list;</span>
+  }
+
+  @Override
+  public byte getRawType() {
+<span class="fc" id="L115">    return PropertyValue.TYPE_LIST;</span>
+  }
+
+  /**
+   * {@inheritDoc}
+   * @throws IOException if converting the value to a byte array fails.
+   */
+  @Override
+  public byte[] getRawBytes(List&lt;PropertyValue&gt; value) throws IOException {
+<span class="fc" id="L124">    int size = value.stream().mapToInt(PropertyValue::byteSize).sum() +</span>
+      PropertyValue.OFFSET;
+
+<span class="fc" id="L127">    try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);</span>
+<span class="fc" id="L128">        DataOutputStream outputStream = new DataOutputStream(byteStream);</span>
+<span class="fc" id="L129">        DataOutputViewStreamWrapper outputView = new DataOutputViewStreamWrapper(outputStream)) {</span>
+
+<span class="fc" id="L131">      outputStream.write(getRawType());</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">      for (PropertyValue entry : value) {</span>
+<span class="fc" id="L133">        entry.write(outputView);</span>
+<span class="fc" id="L134">      }</span>
+
+<span class="fc" id="L136">      return byteStream.toByteArray();</span>
+<span class="nc" id="L137">    } catch (IOException e) {</span>
+<span class="nc" id="L138">      throw new IOException(&quot;Error writing PropertyValue with ListStrategy.&quot;, e);</span>
+    }
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

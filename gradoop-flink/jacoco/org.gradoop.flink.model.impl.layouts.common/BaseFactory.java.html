@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BaseFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.layouts.common</a> &gt; <span class="el_source">BaseFactory.java</span></div><h1>BaseFactory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.layouts.common;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.flink.model.api.layouts.BaseLayoutFactory;
+import org.gradoop.flink.model.impl.functions.bool.False;
+import org.gradoop.flink.util.GradoopFlinkConfig;
+
+import java.util.Collection;
+import java.util.Objects;
+
+/**
+ * Base class for graph layout factories.
+ */
+<span class="fc" id="L34">public abstract class BaseFactory implements BaseLayoutFactory {</span>
+
+  /**
+   * Gradoop Flink config
+   */
+  private GradoopFlinkConfig config;
+
+  @Override
+  public void setGradoopFlinkConfig(GradoopFlinkConfig config) {
+<span class="fc" id="L43">    Objects.requireNonNull(config);</span>
+<span class="fc" id="L44">    this.config = config;</span>
+<span class="fc" id="L45">  }</span>
+
+  protected GradoopFlinkConfig getConfig() {
+<span class="fc" id="L48">    return config;</span>
+  }
+
+  /**
+   * Creates a graph head dataset from a given collection.
+   * Encapsulates the workaround for dataset creation from an empty collection.
+   *
+   * @param graphHeads  graph heads
+   * @return graph head dataset
+   */
+  protected DataSet&lt;GraphHead&gt; createGraphHeadDataSet(Collection&lt;GraphHead&gt; graphHeads) {
+
+<span class="fc" id="L60">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
+
+    DataSet&lt;GraphHead&gt; graphHeadSet;
+<span class="fc bfc" id="L63" title="All 2 branches covered.">    if (graphHeads.isEmpty()) {</span>
+<span class="fc" id="L64">      graphHeadSet = env</span>
+<span class="fc" id="L65">        .fromElements(getConfig().getGraphHeadFactory().createGraphHead())</span>
+<span class="fc" id="L66">        .filter(new False&lt;&gt;());</span>
+    } else {
+<span class="fc" id="L68">      graphHeadSet =  env.fromCollection(graphHeads);</span>
+    }
+<span class="fc" id="L70">    return graphHeadSet;</span>
+  }
+
+  /**
+   * Creates a vertex dataset from a given collection.
+   * Encapsulates the workaround for dataset creation from an empty collection.
+   *
+   * @param vertices  vertex collection
+   * @return vertex dataset
+   */
+  protected DataSet&lt;Vertex&gt; createVertexDataSet(Collection&lt;Vertex&gt; vertices) {
+
+<span class="fc" id="L82">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
+
+    DataSet&lt;Vertex&gt; vertexSet;
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    if (vertices.isEmpty()) {</span>
+<span class="fc" id="L86">      vertexSet = env</span>
+<span class="fc" id="L87">        .fromElements(getConfig().getVertexFactory().createVertex())</span>
+<span class="fc" id="L88">        .filter(new False&lt;&gt;());</span>
+    } else {
+<span class="fc" id="L90">      vertexSet = env.fromCollection(vertices);</span>
+    }
+<span class="fc" id="L92">    return vertexSet;</span>
+  }
+
+  /**
+   * Creates an edge dataset from a given collection.
+   * Encapsulates the workaround for dataset creation from an empty collection.
+   *
+   * @param edges edge collection
+   * @return edge dataset
+   */
+  protected DataSet&lt;Edge&gt; createEdgeDataSet(Collection&lt;Edge&gt; edges) {
+<span class="fc" id="L103">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
+
+    DataSet&lt;Edge&gt; edgeSet;
+<span class="fc bfc" id="L106" title="All 2 branches covered.">    if (edges.isEmpty()) {</span>
+<span class="fc" id="L107">      GradoopId dummyId = GradoopId.get();</span>
+<span class="fc" id="L108">      edgeSet = env</span>
+<span class="fc" id="L109">        .fromElements(getConfig().getEdgeFactory().createEdge(dummyId, dummyId))</span>
+<span class="fc" id="L110">        .filter(new False&lt;&gt;());</span>
+<span class="fc" id="L111">    } else {</span>
+<span class="fc" id="L112">      edgeSet = env.fromCollection(edges);</span>
+    }
+<span class="fc" id="L114">    return edgeSet;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

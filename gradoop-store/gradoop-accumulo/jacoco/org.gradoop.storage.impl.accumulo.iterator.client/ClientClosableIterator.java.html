@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClientClosableIterator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Accumulo</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.storage.impl.accumulo.iterator.client</a> &gt; <span class="el_source">ClientClosableIterator.java</span></div><h1>ClientClosableIterator.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.storage.impl.accumulo.iterator.client;
+
+import org.apache.accumulo.core.client.BatchScanner;
+import org.apache.accumulo.core.data.Key;
+import org.apache.accumulo.core.data.Value;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.storage.common.api.EPGMGraphOutput;
+import org.gradoop.storage.common.api.EPGMGraphPredictableOutput;
+import org.gradoop.storage.common.iterator.ClosableIterator;
+import org.gradoop.storage.impl.accumulo.handler.AccumuloRowHandler;
+import org.gradoop.storage.impl.accumulo.iterator.tserver.BaseElementIterator;
+
+import javax.annotation.Nonnull;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Accumulo client closable iterator.
+ * This Iterator will be created in client runtime, when executing a store output query. A client
+ * closable iterator will transform accumulo result entry into required EPGM element type. The
+ * query result will always be fetch block by block for better performance. And the
+ * block size for result is called cache size.
+ *
+ * @param &lt;R&gt; EPGM Element type for reading result
+ * @param &lt;E&gt; EPGM Element type for reading source (remote definition)
+ * @see EPGMGraphOutput
+ * @see EPGMGraphPredictableOutput
+ */
+public class ClientClosableIterator&lt;R extends Element, E extends EPGMElement&gt;
+  implements ClosableIterator&lt;R&gt; {
+
+  /**
+   * accumulo batch scanner instance
+   */
+  private final BatchScanner scanner;
+
+  /**
+   * scanner iterator
+   */
+  private final Iterator&lt;Map.Entry&lt;Key, Value&gt;&gt; inner;
+
+  /**
+   * row decoder
+   */
+  private final BaseElementIterator&lt;E&gt; codec;
+
+  /**
+   * max record cache size
+   */
+  private final int cacheSize;
+
+  /**
+   * accumulo row handler
+   */
+  private final AccumuloRowHandler&lt;R, E&gt; handler;
+
+  /**
+   * element cache size
+   */
+<span class="fc" id="L79">  private List&lt;E&gt; cache = new ArrayList&lt;&gt;();</span>
+
+  /**
+   * cache closable iterator constructor
+   *
+   * @param scanner accumulo batch scanner
+   * @param codec iterator decoder
+   * @param handler result element row handler
+   * @param cacheSize result cache size
+   */
+  public ClientClosableIterator(
+    @Nonnull BatchScanner scanner,
+    @Nonnull BaseElementIterator&lt;E&gt; codec,
+    @Nonnull AccumuloRowHandler&lt;R, E&gt; handler,
+    int cacheSize
+<span class="fc" id="L94">  ) {</span>
+<span class="fc" id="L95">    this.codec = codec;</span>
+<span class="fc" id="L96">    this.scanner = scanner;</span>
+<span class="fc" id="L97">    this.cacheSize = cacheSize;</span>
+<span class="fc" id="L98">    this.handler = handler;</span>
+<span class="fc" id="L99">    this.inner = scanner.iterator();</span>
+<span class="fc" id="L100">  }</span>
+
+  @Override
+  public void close() {
+<span class="fc" id="L104">    scanner.close();</span>
+<span class="fc" id="L105">  }</span>
+
+  @Override
+  public boolean hasNext() {
+<span class="fc bfc" id="L109" title="All 2 branches covered.">    if (!cache.isEmpty()) {</span>
+      //cache is not empty
+<span class="fc" id="L111">      return true;</span>
+
+<span class="fc bfc" id="L113" title="All 2 branches covered.">    } else if (inner.hasNext()) {</span>
+      //cache is empty, read elements to cache
+<span class="pc bpc" id="L115" title="1 of 4 branches missed.">      while (inner.hasNext() &amp;&amp; cache.size() &lt; cacheSize) {</span>
+<span class="fc" id="L116">        E next = null;</span>
+        try {
+<span class="fc" id="L118">          next = codec.fromRow(inner.next());</span>
+<span class="nc" id="L119">        } catch (IOException e) {</span>
+<span class="nc" id="L120">          e.printStackTrace();</span>
+<span class="fc" id="L121">        }</span>
+<span class="fc" id="L122">        cache.add(next);</span>
+<span class="fc" id="L123">      }</span>
+<span class="fc" id="L124">      return hasNext();</span>
+
+    } else {
+      //cache is empty and iterator has no element any more
+<span class="fc" id="L128">      return false;</span>
+
+    }
+  }
+
+  @Override
+  public R next() {
+<span class="fc" id="L135">    E row = cache.remove(0);</span>
+<span class="fc" id="L136">    return handler.readRow(row);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

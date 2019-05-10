@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Split.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.split</a> &gt; <span class="el_source">Split.java</span></div><h1>Split.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.split;
+
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.tuple.Tuple1;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.functions.Function;
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.epgm.InitGraphHead;
+import org.gradoop.flink.model.impl.functions.epgm.PairTupleWithNewId;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
+import org.gradoop.flink.model.impl.operators.split.functions.AddNewGraphsToEdge;
+import org.gradoop.flink.model.impl.operators.split.functions.AddNewGraphsToVertex;
+import org.gradoop.flink.model.impl.operators.split.functions.JoinEdgeTupleWithSourceGraphs;
+import org.gradoop.flink.model.impl.operators.split.functions.JoinEdgeTupleWithTargetGraphs;
+import org.gradoop.flink.model.impl.operators.split.functions.JoinVertexIdWithGraphIds;
+import org.gradoop.flink.model.impl.operators.split.functions.MultipleGraphIdsGroupReducer;
+import org.gradoop.flink.model.impl.operators.split.functions.SplitValues;
+
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * Splits a LogicalGraph into a GraphCollection based on user-defined property
+ * values. The operator supports overlapping logical graphs, where a vertex
+ * can be in more than one logical graph. Edges, where source and target vertex
+ * have no graphs in common, are removed from the resulting collection.
+ */
+public class Split implements UnaryGraphToCollectionOperator, Serializable {
+
+  /**
+   * User-defined function for value extraction
+   */
+  private final Function&lt;Vertex, List&lt;PropertyValue&gt;&gt; function;
+
+  /**
+   * Constructor
+   *
+   * @param function user-defined function
+   */
+<span class="fc" id="L66">  public Split(Function&lt;Vertex, List&lt;PropertyValue&gt;&gt; function) {</span>
+<span class="fc" id="L67">    this.function = function;</span>
+<span class="fc" id="L68">  }</span>
+
+  @Override
+  public GraphCollection execute(LogicalGraph graph) {
+
+    //--------------------------------------------------------------------------
+    // compute vertices
+    //--------------------------------------------------------------------------
+
+    // build tuples of vertex and split value, which will determine in which
+    // new graph the vertices lie
+<span class="fc" id="L79">    DataSet&lt;Tuple2&lt;GradoopId, PropertyValue&gt;&gt; vertexIdWithSplitValues =</span>
+<span class="fc" id="L80">      graph.getVertices()</span>
+<span class="fc" id="L81">        .flatMap(new SplitValues&lt;&gt;(function));</span>
+
+    // extract the split properties into a dataset
+<span class="fc" id="L84">    DataSet&lt;Tuple1&lt;PropertyValue&gt;&gt; distinctSplitValues = vertexIdWithSplitValues</span>
+<span class="fc" id="L85">      .map(new Project2To1&lt;&gt;())</span>
+<span class="fc" id="L86">      .distinct();</span>
+
+    // generate one new unique GraphId per distinct split property
+<span class="fc" id="L89">    DataSet&lt;Tuple2&lt;PropertyValue, GradoopId&gt;&gt; splitValuesWithGraphIds =</span>
+      distinctSplitValues
+<span class="fc" id="L91">        .map(new PairTupleWithNewId&lt;&gt;());</span>
+
+    // build a dataset of the vertex ids and the new associated graph ids
+<span class="fc" id="L94">    DataSet&lt;Tuple2&lt;GradoopId, GradoopIdSet&gt;&gt; vertexIdWithGraphIds =</span>
+      vertexIdWithSplitValues
+<span class="fc" id="L96">        .join(splitValuesWithGraphIds)</span>
+<span class="fc" id="L97">        .where(1).equalTo(0)</span>
+<span class="fc" id="L98">        .with(new JoinVertexIdWithGraphIds())</span>
+<span class="fc" id="L99">        .groupBy(0)</span>
+<span class="fc" id="L100">        .reduceGroup(new MultipleGraphIdsGroupReducer());</span>
+
+    // add new graph ids to the initial vertex set
+<span class="fc" id="L103">    DataSet&lt;Vertex&gt; vertices = graph.getVertices()</span>
+<span class="fc" id="L104">      .join(vertexIdWithGraphIds)</span>
+<span class="fc" id="L105">      .where(new Id&lt;&gt;()).equalTo(0)</span>
+<span class="fc" id="L106">      .with(new AddNewGraphsToVertex&lt;&gt;());</span>
+
+    //--------------------------------------------------------------------------
+    // compute new graphs
+    //--------------------------------------------------------------------------
+
+    // extract graph ids into a dataset
+<span class="fc" id="L113">    DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; newGraphIds = splitValuesWithGraphIds</span>
+<span class="fc" id="L114">      .map(new Project2To1&lt;&gt;());</span>
+
+    // add new graph id's to the initial graph set
+<span class="fc" id="L117">    DataSet&lt;GraphHead&gt; newGraphs = newGraphIds</span>
+<span class="fc" id="L118">      .map(new InitGraphHead(graph.getConfig().getGraphHeadFactory()));</span>
+
+    //--------------------------------------------------------------------------
+    // compute edges
+    //--------------------------------------------------------------------------
+
+    // replace source and target id by the graph list the corresponding vertex
+<span class="fc" id="L125">    DataSet&lt;Tuple3&lt;Edge, GradoopIdSet, GradoopIdSet&gt;&gt; edgeGraphIdsGraphIds =</span>
+<span class="fc" id="L126">      graph.getEdges()</span>
+<span class="fc" id="L127">        .join(vertexIdWithGraphIds)</span>
+<span class="fc" id="L128">        .where(new SourceId&lt;&gt;()).equalTo(0)</span>
+<span class="fc" id="L129">        .with(new JoinEdgeTupleWithSourceGraphs&lt;&gt;())</span>
+<span class="fc" id="L130">        .join(vertexIdWithGraphIds)</span>
+<span class="fc" id="L131">        .where(&quot;f0.targetId&quot;).equalTo(0)</span>
+<span class="fc" id="L132">        .with(new JoinEdgeTupleWithTargetGraphs&lt;&gt;());</span>
+
+    // add new graph ids to the edges iff source and target are contained in the
+    // same graph
+<span class="fc" id="L136">    DataSet&lt;Edge&gt; edges = edgeGraphIdsGraphIds</span>
+<span class="fc" id="L137">      .flatMap(new AddNewGraphsToEdge&lt;&gt;());</span>
+
+    //--------------------------------------------------------------------------
+    // return new graph collection
+    //--------------------------------------------------------------------------
+
+<span class="fc" id="L143">    return graph.getConfig().getGraphCollectionFactory()</span>
+<span class="fc" id="L144">      .fromDataSets(newGraphs, vertices, edges);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

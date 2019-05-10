@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EncodeAndPruneEdges.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing</a> &gt; <span class="el_source">EncodeAndPruneEdges.java</span></div><h1>EncodeAndPruneEdges.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.algorithms.fsm.dimspan.functions.preprocessing;
+
+import com.google.common.collect.Maps;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.configuration.Configuration;
+import org.gradoop.flink.algorithms.fsm.dimspan.comparison.DFSBranchComparator;
+import org.gradoop.flink.algorithms.fsm.dimspan.comparison.DirectedDFSBranchComparator;
+import org.gradoop.flink.algorithms.fsm.dimspan.comparison.UndirectedDFSBranchComparator;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
+import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.GraphUtils;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.SearchGraphUtils;
+import org.gradoop.flink.algorithms.fsm.dimspan.model.UnsortedSearchGraphUtils;
+import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphIntString;
+
+import java.util.Arrays;
+import java.util.Map;
+
+/**
+ * Encodes edge labels to integers.
+ * Drops edges with infrequent labels and isolated vertices.
+ */
+public class EncodeAndPruneEdges extends RichMapFunction&lt;LabeledGraphIntString, int[]&gt; {
+
+  /**
+   * edge label dictionary
+   */
+<span class="fc" id="L44">  private Map&lt;String, Integer&gt; edgeDictionary = Maps.newHashMap();</span>
+
+  /**
+   * flag to enable graph sorting (true=enabled)
+   */
+  private final boolean sortGraph;
+
+  /**
+   * comparator used for graph sorting
+   */
+  private final DFSBranchComparator branchComparator;
+
+  /**
+   * util methods to interpret and manipulate int-array encoded graphs
+   */
+<span class="fc" id="L59">  private final SearchGraphUtils graphUtils = new UnsortedSearchGraphUtils();</span>
+
+  /**
+   * Constructor
+   *
+   * @param fsmConfig FSM configuration
+   */
+<span class="fc" id="L66">  public EncodeAndPruneEdges(DIMSpanConfig fsmConfig) {</span>
+<span class="fc" id="L67">    sortGraph = fsmConfig.isBranchConstraintEnabled();</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">    branchComparator = fsmConfig.isDirected() ?</span>
+      new DirectedDFSBranchComparator() :
+      new UndirectedDFSBranchComparator();
+<span class="fc" id="L71">  }</span>
+
+  @Override
+  public void open(Configuration parameters) throws Exception {
+<span class="fc" id="L75">    super.open(parameters);</span>
+
+    // create inverse dictionary at broadcast reception
+<span class="fc" id="L78">    String[] broadcast = getRuntimeContext()</span>
+<span class="fc" id="L79">      .&lt;String[]&gt;getBroadcastVariable(DIMSpanConstants.EDGE_DICTIONARY).get(0);</span>
+
+<span class="fc bfc" id="L81" title="All 2 branches covered.">    for (int i = 0; i &lt; broadcast.length; i++) {</span>
+<span class="fc" id="L82">      edgeDictionary.put(broadcast[i], i);</span>
+    }
+<span class="fc" id="L84">  }</span>
+
+  @Override
+  public int[] map(LabeledGraphIntString inGraph) throws Exception {
+<span class="fc" id="L88">    int[][] dfsCodes = new int[0][];</span>
+
+    // prune edges and convert to 1-edge minimum DFS codes;
+    // isolated vertices will be automatically removed as source and target information is stored
+    // attached to edges
+<span class="fc bfc" id="L93" title="All 2 branches covered.">    for (int edgeId = 0; edgeId &lt; inGraph.size(); edgeId++) {</span>
+<span class="fc" id="L94">      Integer edgeLabel = edgeDictionary.get(inGraph.getEdgeLabel(edgeId));</span>
+
+<span class="fc bfc" id="L96" title="All 2 branches covered.">      if (edgeLabel != null) {</span>
+<span class="fc" id="L97">        int sourceId = inGraph.getSourceId(edgeId);</span>
+<span class="fc" id="L98">        int sourceLabel = inGraph.getSourceLabel(edgeId);</span>
+<span class="fc" id="L99">        int targetId = inGraph.getTargetId(edgeId);</span>
+<span class="fc" id="L100">        int targetLabel = inGraph.getTargetLabel(edgeId);</span>
+
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        int[] dfsCode = sourceLabel &lt;= targetLabel ?</span>
+<span class="fc" id="L103">          graphUtils.multiplex(</span>
+<span class="fc" id="L104">            sourceId, sourceLabel, true, edgeLabel, targetId, targetLabel) :</span>
+<span class="fc" id="L105">          graphUtils.multiplex(</span>
+<span class="fc" id="L106">            targetId, targetLabel, false, edgeLabel, sourceId, sourceLabel);</span>
+
+<span class="fc" id="L108">        dfsCodes = ArrayUtils.add(dfsCodes, dfsCode);</span>
+      }
+    }
+
+    // optionally sort 1-edge DFS codes
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">    if (sortGraph) {</span>
+<span class="fc" id="L114">      Arrays.sort(dfsCodes, branchComparator);</span>
+    }
+
+    // multiplex 1-edge DFS codes
+<span class="fc" id="L118">    int[] outGraph = new int[dfsCodes.length * GraphUtils.EDGE_LENGTH];</span>
+
+<span class="fc" id="L120">    int i = 0;</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">    for (int[] dfsCode : dfsCodes) {</span>
+<span class="fc" id="L122">      System.arraycopy(dfsCode, 0, outGraph, i * 6, GraphUtils.EDGE_LENGTH);</span>
+<span class="fc" id="L123">      i++;</span>
+    }
+
+<span class="fc" id="L126">    return outGraph;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

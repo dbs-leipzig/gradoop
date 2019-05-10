@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MultipleFileOutputFormat.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.csv.indexed.functions</a> &gt; <span class="el_source">MultipleFileOutputFormat.java</span></div><h1>MultipleFileOutputFormat.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.csv.indexed.functions;
+
+import org.apache.flink.api.common.io.CleanupWhenUnsuccessful;
+import org.apache.flink.api.common.io.InitializeOnMaster;
+import org.apache.flink.api.common.io.OutputFormat;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.core.fs.FileSystem;
+import org.apache.flink.core.fs.Path;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * The abstract base class for all output formats using multiple files.
+ * This format will (for each record to write) determine a subdirectory, create a
+ * new OutputFormat for that directory and write the record using the newly created format.
+ * Those formats will be created as soon as the first record is to be written to that directory
+ * and they will not be initialized automatically.
+ * &lt;br&gt;
+ * &lt;i&gt;Warning:&lt;/i&gt; The {@link #configure(Configuration)}, {@link #open(int, int)},
+ * {@link #close()} and {@link #initializeGlobal(int)} methods will not invoke the respective
+ * methods of the new output formats, their parameters will just be stored as
+ * {@link #configuration}, {@link #taskNumber}, {@link #numTasks}, {@link #parallelism}
+ * respectively. Make sure to configure each output format in
+ * {@link #createFormatForDirectory(Path)}.
+ *
+ * @param &lt;IT&gt; The type of the records to write.
+ */
+public abstract class MultipleFileOutputFormat&lt;IT&gt;
+  implements OutputFormat&lt;IT&gt;, CleanupWhenUnsuccessful, InitializeOnMaster {
+
+  /**
+   * The configuration set with {@link #configure(Configuration)}.
+   */
+  protected Configuration configuration;
+
+  /**
+   * The write mode of this format.
+   */
+  protected FileSystem.WriteMode writeMode;
+
+  /**
+   * The number of this write task.
+   */
+  protected int taskNumber;
+
+  /**
+   * The number of tasks used by the sink.
+   */
+  protected int numTasks;
+
+  /**
+   * The parallelism of this format.
+   */
+  protected int parallelism;
+
+  /**
+   * The root output directory.
+   */
+  protected Path rootOutputPath;
+
+  /**
+   * Stores {@link OutputFormat}s used internally for each subdirectory determined by
+   * {@link #getDirectoryForRecord(Object)}.
+   */
+  private Map&lt;String, OutputFormat&lt;IT&gt;&gt; formatsPerSubdirectory;
+
+  /**
+   * Creates a new output format with multiple output files.
+   *
+   * @param rootPath The root directory where all files will be stored.
+   */
+<span class="fc" id="L89">  MultipleFileOutputFormat(Path rootPath) {</span>
+<span class="fc" id="L90">    this.rootOutputPath = rootPath;</span>
+<span class="fc" id="L91">    formatsPerSubdirectory = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L92">  }</span>
+
+  @Override
+  public void close() throws IOException {
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    for (OutputFormat&lt;IT&gt; outputFormat : formatsPerSubdirectory.values()) {</span>
+<span class="fc" id="L97">      outputFormat.close();</span>
+<span class="fc" id="L98">    }</span>
+<span class="fc" id="L99">    formatsPerSubdirectory.clear();</span>
+<span class="fc" id="L100">  }</span>
+
+  @Override
+  public void configure(Configuration parameters) {
+<span class="fc" id="L104">    this.configuration = parameters;</span>
+<span class="fc" id="L105">  }</span>
+
+  @Override
+  public void initializeGlobal(int parallelism) throws IOException {
+<span class="fc" id="L109">    this.parallelism = parallelism;</span>
+
+    // Prepare root output directory
+<span class="fc" id="L112">    final FileSystem fs = rootOutputPath.getFileSystem();</span>
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">    if (fs.isDistributedFS()) {</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">      if (!fs.initOutPathDistFS(rootOutputPath, writeMode, true)) {</span>
+<span class="nc" id="L115">        throw new IOException(&quot;Failed to initialize output root directory: &quot; + rootOutputPath);</span>
+      }
+    } else {
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">      if (writeMode == FileSystem.WriteMode.OVERWRITE) {</span>
+        try {
+<span class="fc" id="L120">          fs.delete(rootOutputPath, true);</span>
+<span class="nc" id="L121">        } catch (IOException e) {</span>
+<span class="nc" id="L122">          throw new IOException(&quot;Could not remove existing output root directory: &quot; +</span>
+            rootOutputPath, e);
+<span class="fc" id="L124">        }</span>
+      }
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">      if (!fs.initOutPathLocalFS(rootOutputPath, writeMode, true)) {</span>
+<span class="nc" id="L127">        throw new IOException(&quot;Failed to initialize output root directory: &quot; + rootOutputPath);</span>
+      }
+    }
+<span class="fc" id="L130">  }</span>
+
+  @Override
+  public void open(int taskNumber, int numTasks) {
+<span class="fc" id="L134">    this.taskNumber = taskNumber;</span>
+<span class="fc" id="L135">    this.numTasks = numTasks;</span>
+<span class="fc" id="L136">  }</span>
+
+  /**
+   * Set the write mode of this format.
+   *
+   * @param writeMode The new write mode.
+   */
+  public void setWriteMode(FileSystem.WriteMode writeMode) {
+<span class="fc" id="L144">    this.writeMode = writeMode;</span>
+<span class="fc" id="L145">  }</span>
+
+  @Override
+  public void tryCleanupOnError() throws Exception {
+<span class="nc bnc" id="L149" title="All 2 branches missed.">    for (OutputFormat&lt;IT&gt; outputFormat : formatsPerSubdirectory.values()) {</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">      if (outputFormat instanceof CleanupWhenUnsuccessful) {</span>
+<span class="nc" id="L151">        ((CleanupWhenUnsuccessful) outputFormat).tryCleanupOnError();</span>
+      }
+<span class="nc" id="L153">    }</span>
+<span class="nc" id="L154">    rootOutputPath.getFileSystem().delete(rootOutputPath, false);</span>
+<span class="nc" id="L155">  }</span>
+
+
+  @Override
+  public void writeRecord(IT record) throws IOException {
+<span class="fc" id="L160">    String subDirectory = getDirectoryForRecord(record);</span>
+    OutputFormat&lt;IT&gt; format;
+<span class="fc bfc" id="L162" title="All 2 branches covered.">    if (formatsPerSubdirectory.containsKey(subDirectory)) {</span>
+<span class="fc" id="L163">      format = formatsPerSubdirectory.get(subDirectory);</span>
+    } else {
+<span class="fc" id="L165">      format = createFormatForDirectory(new Path(rootOutputPath, subDirectory));</span>
+<span class="fc" id="L166">      format.open(taskNumber, numTasks);</span>
+<span class="fc" id="L167">      formatsPerSubdirectory.put(subDirectory, format);</span>
+    }
+<span class="fc" id="L169">    format.writeRecord(record);</span>
+<span class="fc" id="L170">  }</span>
+
+  /**
+   * Create or load an {@link OutputFormat} to use for a specific directory.
+   * The directory should be a subdirectory of the root directory of this output format.
+   *
+   * @param directory The (sub-)directory where the output format operates.
+   * @return The output format used to write in that directory.
+   * @throws IOException when the initialization of the new format fails.
+   */
+  protected abstract OutputFormat&lt;IT&gt; createFormatForDirectory(Path directory) throws IOException;
+
+  /**
+   * Get the appropriate subdirectory for a record.
+   * This is expected to return a relative path from the root directory.
+   *
+   * @param record The record to write.
+   * @return The output directory to store the record in.
+   */
+  protected abstract String getDirectoryForRecord(IT record);
+
+  /**
+   * Replace illegal filename characters ({@code &lt;, &gt;, :, &quot;, /, \, |, ?, *}) with {@code '_'}
+   * and change the string to lower case.
+   *
+   * @param filename filename to be cleaned
+   * @return cleaned filename
+   */
+  public static String cleanFilename(String filename) {
+<span class="fc" id="L199">    return filename.replaceAll(&quot;[&lt;&gt;:\&quot;/\\\\|?*]&quot;, &quot;_&quot;).toLowerCase();</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

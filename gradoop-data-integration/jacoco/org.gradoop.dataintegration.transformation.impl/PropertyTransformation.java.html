@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PropertyTransformation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Data Integration</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.dataintegration.transformation.impl</a> &gt; <span class="el_source">PropertyTransformation.java</span></div><h1>PropertyTransformation.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.dataintegration.transformation.impl;
+
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.impl.operators.transformation.Transformation;
+
+/**
+ * Creates a graph with the same structure but a specified property of an element is transformed
+ * by the declared function. The transformed value can be stored under a new key. If the
+ * original key shall be reused the old value can be stored under the key 'key__x' where 'x' is a
+ * version number. This number increases on every continuous transformation.
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the logical graph instance
+ */
+public class PropertyTransformation&lt;
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph&lt;G, V, E, LG&gt;&gt; implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
+
+  /**
+   * Label of the element whose property shall be transformed.
+   */
+  private String label;
+  /**
+   * Property key.
+   */
+  private String propertyKey;
+  /**
+   * Transformation function which shall be applied to a property of a graph head.
+   */
+  private PropertyTransformationFunction graphHeadTransformationFunction;
+  /**
+   * Transformation function which shall be applied to a property of a vertex.
+   */
+  private PropertyTransformationFunction vertexTransformationFunction;
+  /**
+   * Transformation function which shall be applied to a property of an edge.
+   */
+  private PropertyTransformationFunction edgeTransformationFunction;
+  /**
+   * New property key.
+   */
+  private String newPropertyKey;
+  /**
+   * True, if the history of a property key shall be kept.
+   */
+  private boolean keepHistory;
+
+  /**
+   * Valued constructor.
+   *
+   * @param propertyKey                      property key
+   * @param graphHeadTransformationFunction  transformation function which shall be applied to a
+   *                                         property of a graph head
+   * @param vertexTransformationFunction     transformation function which shall be applied to a
+   *                                         property of a vertex
+   * @param edgeTransformationFunction       transformation function which shall be applied to a
+   *                                         property of an edge
+   * @param label                            label of the element whose property shall be
+   *                                         transformed (optional)
+   * @param newPropertyKey                   new property key (optional)
+   * @param keepHistory                      flag to enable versioning (false by default)
+   */
+  public PropertyTransformation(String propertyKey,
+      PropertyTransformationFunction graphHeadTransformationFunction,
+      PropertyTransformationFunction vertexTransformationFunction,
+      PropertyTransformationFunction edgeTransformationFunction, String label,
+<span class="fc" id="L91">      String newPropertyKey, boolean keepHistory) {</span>
+<span class="pc bpc" id="L92" title="1 of 6 branches missed.">    if (graphHeadTransformationFunction == null &amp;&amp; vertexTransformationFunction == null &amp;&amp;</span>
+        edgeTransformationFunction == null) {
+<span class="nc" id="L94">      throw new IllegalArgumentException(&quot;Provide at least one transformation function.&quot;);</span>
+    }
+
+<span class="fc" id="L97">    this.label = label;</span>
+<span class="fc" id="L98">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L99">    this.graphHeadTransformationFunction = graphHeadTransformationFunction;</span>
+<span class="fc" id="L100">    this.vertexTransformationFunction = vertexTransformationFunction;</span>
+<span class="fc" id="L101">    this.edgeTransformationFunction = edgeTransformationFunction;</span>
+<span class="fc" id="L102">    this.newPropertyKey = newPropertyKey;</span>
+<span class="fc" id="L103">    this.keepHistory = keepHistory;</span>
+<span class="fc" id="L104">  }</span>
+
+  /**
+   * Creates a new property transformation operator instance.
+   *
+   * @param propertyKey                      property key
+   * @param graphHeadTransformationFunction  transformation function which shall be applied to a
+   *                                         property of a graph head
+   * @param vertexTransformationFunction     transformation function which shall be applied to a
+   *                                         property of a vertex
+   * @param edgeTransformationFunction       transformation function which shall be applied to a
+   *                                         property of an edge
+   */
+  public PropertyTransformation(String propertyKey,
+      PropertyTransformationFunction graphHeadTransformationFunction,
+      PropertyTransformationFunction vertexTransformationFunction,
+      PropertyTransformationFunction edgeTransformationFunction) {
+<span class="fc" id="L121">    this(propertyKey, graphHeadTransformationFunction, vertexTransformationFunction,</span>
+         edgeTransformationFunction, null, null, false);
+<span class="fc" id="L123">  }</span>
+
+  /**
+   * Applies the property transformation functions on the given input graph.
+   *
+   * @param graph input graph
+   * @return transformed logical graph
+   */
+  @Override
+  public LG execute(LG graph) {
+<span class="fc bfc" id="L133" title="All 6 branches covered.">    return new Transformation&lt;G, V, E, LG&gt;(</span>
+        graphHeadTransformationFunction == null ? null : new BasePropertyTransformationFunction&lt;&gt;(
+            propertyKey, graphHeadTransformationFunction, label, newPropertyKey, keepHistory),
+        vertexTransformationFunction == null ? null : new BasePropertyTransformationFunction&lt;&gt;(
+            propertyKey, vertexTransformationFunction, label, newPropertyKey, keepHistory),
+        edgeTransformationFunction == null ? null : new BasePropertyTransformationFunction&lt;&gt;(
+            propertyKey, edgeTransformationFunction, label, newPropertyKey, keepHistory))
+<span class="fc" id="L140">      .execute(graph);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
