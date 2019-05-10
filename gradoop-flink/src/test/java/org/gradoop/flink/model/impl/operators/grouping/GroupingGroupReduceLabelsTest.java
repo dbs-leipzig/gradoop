@@ -29,134 +29,366 @@ import static org.junit.Assert.assertTrue;
 
 public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
 
-  // TODO test that vertices with multiple properties are cloned correctly
-  // TODO create testcase: user is not using label specific grouping => keepVertices
-  // should do nothing
+  // TODO create testcase: 1:1 conversion to supervertex: test that vertices with single/multiple
+  //  properties are cloned correctly
+  // TODO create testcase: user is not using label specific grouping => keepVertices should do
+  //  nothing
+  // TODO create testcase: 1:1 conversion to supervertex => no outgoing edges/ single outgoing
+  //  edge / multiple outgoing edges ... same for incoming edges?
 
-  private static final String EXPECTED_FORUMS_NO_LABEL_GROUPING = "g1:graph[" +
-    // all vertices
-    "(f1 {title: \"Graph Processing\", count : 1L})" +
-    "(f2 {title: \"Graph Databases\", count : 1L})" + "(ps:Person {count: 6L})" +
-    "(ts:Tag {count: 3L})" +
-    // all edges
-    "(f1)-[:hasMember]->(ps)" + "(f1)-[:hasModerator]->(ps)" + "(f2)-[:hasMember]->(ps)" +
-    "(f2)-[:hasModerator]->(ps)" + "(ps)-[:knows]->(ps)" + "(ps)-[:hasInterest]->(ts)" +
-    "(f1)-[:hasTag]->(ts)" + "(f2)-[:hasTag]->(ts)" + "]";
-
-  private static final String EXPECTED_FORUMS_AND_TAG_GRAPHS_NO_LABEL_GROUPING =
-    "g1:graph[" + "(f1:noLabel_0 {title: \"Graph Processing\", count : 1L})" +
-      "(f2:noLabel_1 {title: \"Graph Databases\", count : 1L})" + "(tg:noLabel_2 {name: " +
-      "\"Graphs\", count :" + " 1L})" + "(ps:Person {count: 6L})" + "(ts:Tag {count: 2L})" +
-      "(f1)-[:hasMember]->(ps)" + "(f1)-[:hasModerator]->(ps)" + "(f2)-[:hasMember]->(ps)" +
-      "(f2)-[:hasModerator]->(ps)" + "(ps)-[:knows]->(ps)" + "(ps)-[:hasInterest]->(ts)" +
-      "(f1)-[:hasTag]->(tg)" + "(f2)-[:hasTag]->(tg)" + "(f1)-[:hasTag]->(ts)" +
-      "(f2)-[:hasTag]->(ts)" + "]";
-
-
-  protected static void convertDotToPNG(String dotFile, String pngFile) throws IOException {
+  private static void convertDotToPNG(String dotFile, String pngFile) throws IOException {
     ProcessBuilder pb = new ProcessBuilder("dot", "-Tpng", dotFile);
     File output = new File(pngFile);
     pb.redirectOutput(ProcessBuilder.Redirect.appendTo(output));
     pb.start();
-
-
   }
 
   @Test
   public void testKeepVerticesFlag() {
-    Grouping grouping = new Grouping.GroupingBuilder().setStrategy(GroupingStrategy.GROUP_REDUCE)
-      .setKeepVertices(true).build();
+    Grouping grouping = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setKeepVertices(true)
+      .build();
 
     assertTrue(grouping.isKeepingVertices());
   }
 
+  private final String DEFAULT_PREFIX = "default_";
+
+  /**
+   * Groups a graph by label and a property.
+   * The graph contains a single vertex that has no label, but a matching property.
+   * This vertex should not be converted 1:1.
+   */
   @Test
-  public void testGroupingWithoutLabel() throws Exception {
+  public void groupByLabelAndPropertySingleNoLabelHasProperty() throws Exception {
+    String asciiInput = "input[" +
+      "(v0:Blue {a : 3})" +
+      "(v1:Blue {b : 2})" +
+      "(v2 {b : 5, c: 1.2})" + // goal: checks that v2 won't be converted 1:1 to a
+      // supervertice, because of its matching property
+      "(v3 {c : 4.1})" +
+      "(v4:Red  {b : 2})" +
+      "(v0)-->(v2)" +
+      "(v1)-->(v2)" +
+      "(v2)-->(v3)" +
+      "(v2)-->(v4)" +
+      "]";
 
-    System.out.println(
-      "operators/GroupingGroupReduceLabelsTest.java, working directory:" + new File("out/").getAbsolutePath());
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
 
-    LogicalGraph expectedGraph =
-      getExpectedGraph(EXPECTED_FORUMS_AND_TAG_GRAPHS_NO_LABEL_GROUPING, true);
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00:Blue {b: NULL, count:1L})" +
+        "(v01:Blue {b : 2, count:1L})" +
+        "(v02 {b : 5, count:1L})" +
+        "(v03 {b: NULL, count: 1L, c: 4.1})" + // v3 was converted 1:1
+        "(v04:Red {b: 2, count: 1L})" +
+        "(v00)-->(v02)" +
+        "(v01)-->(v02)" +
+        "(v02)-->(v03)" +
+        "(v02)-->(v04)" +
+        "]");
 
-    // Actual Graph
-    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
-    String dotPath = "out/groupingTest.dot";
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setKeepVertices(true)
+      .useVertexLabel(true)
+      .addVertexGroupingKey("b")
+      .addVertexAggregateFunction(new Count())
+      .build()
+      .execute(input);
 
-    boolean deleted = new File(dotPath + ".png").delete();
-    System.out.println("deleted old file? " + deleted);
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
-    DOTDataSink sink = new DOTDataSink(dotPath, true);
+    writeGraphPNG(output, DEFAULT_PREFIX, "groupByLabelAndPropertySingleNoLabelHasProperty");
 
-    LogicalGraph logicalGraph = loader.getLogicalGraph();
+    writeGraphPNG(expected, "", "expectedGroupByLabelAndPropertySingleNoLabelHasProperty");
 
-    logicalGraph = logicalGraph.transformVertices((vertex, cpy) -> {
-//|| (vertex.getLabel().equals("Tag") &&
-//        vertex.getPropertyValue("name").getString().equals("Graphs"))
-      if (vertex.getLabel().equals("Forum") || (vertex.getLabel().equals("Tag") &&
-        vertex.getPropertyValue("name").getString().equals("Graphs"))) {
-        vertex.setLabel("");
-      }
-      return vertex;
-    });
-
-    logicalGraph = new Grouping.GroupingBuilder().setStrategy(GroupingStrategy.GROUP_REDUCE)
-      .setKeepVertices(true).useVertexLabel(true).useEdgeLabel(true)
-      .addVertexAggregateFunction(new Count()).build().execute(logicalGraph);
-
-    sink.write(logicalGraph, true);
-
-    logicalGraph.print();
-
-    // No data sinks have been created yet. A program needs at least one sink that consumes data.
-    //env.execute();
-
-    convertDotToPNG(dotPath, dotPath + ".png");
-
-
-    System.out.println("finish");
-
-    /*Optional<Boolean> reduce = logicalGraph.equalsByElementData(expectedGraph).collect().stream()
-      .reduce(Boolean::logicalAnd);
-
-    System.out.println("expected equals actual? " + reduce);*/
-
-    collectAndAssertTrue(logicalGraph.equalsByElementData(expectedGraph));
-
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
 
-  private LogicalGraph getExpectedGraph(String asciiGraph, boolean write) {
+  /**
+   * Groups a graph by label and a property.
+   * The graph contains multiple vertices that have no label, but a matching property.
+   * These vertices should not be converted 1:1.
+   */
+  @Test
+  public void groupByLabelAndPropertyMultipleNoLabelHasProperty() throws Exception {
+    String asciiInput = "input[" +
+      "(v0:Blue {a : 3})" +
+      "(v1:Blue {b : 2})" +
+      "(v2 {b : 5, c: 1.2})" + // v2 and v3 will form a group
+      "(v3 {b : 5})" +
+      "(v4:Red  {b : 2})" +
+      "(v0)-->(v2)" +
+      "(v1)-->(v2)" +
+      "(v2)-->(v3)" +
+      "(v2)-->(v4)" +
+      "]";
 
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
 
-    // Expected Graph read and write
-    FlinkAsciiGraphLoader expectedGraphLoader = new FlinkAsciiGraphLoader(getConfig());
-    expectedGraphLoader.initDatabaseFromString(asciiGraph);
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00:Blue {b: NULL, count:1L})" +
+        "(v01:Blue {b : 2, count:1L})" +
+        "(v02 {b : 5, count:2L})" +
+        "(v04:Red {b: 2, count: 1L})" +
+        "(v00)-->(v02)" +
+        "(v01)-->(v02)" +
+        "(v02)-->(v02)" +
+        "(v02)-->(v04)" +
+        "]");
 
-    LogicalGraph expectedGraph = expectedGraphLoader.getLogicalGraphByVariable("g1");
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
-    if (write) {
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setKeepVertices(true)
+      .useVertexLabel(true)
+      .addVertexGroupingKey("b")
+      .addVertexAggregateFunction(new Count())
+      .build()
+      .execute(input);
 
-      final String expectedGraphPath = "out/expected.dot";
-      new File(expectedGraphPath).delete();
-      new File(expectedGraphPath+".png").delete();
-      DOTDataSink dotDataSink = new DOTDataSink(expectedGraphPath, true);
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
-      try {
-        dotDataSink.write(expectedGraph, false);
-        expectedGraph.print();
-        convertDotToPNG(expectedGraphPath, expectedGraphPath + ".png");
+    writeGraphPNG(output, DEFAULT_PREFIX, "groupByLabelAndPropertyMultipleNoLabelHasProperty");
 
-        System.out.println("successful write");
-      } catch (IOException e) {
-        System.err.println("writing expected graph failed");
-        e.printStackTrace();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
+    writeGraphPNG(expected, "", "expectedGroupByLabelAndPropertyMultipleNoLabelHasProperty");
 
-    System.out.println("returning expected graph" + expectedGraph);
-    return expectedGraph;
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  /**
+   * Groups a graph by label and a property.
+   * The graph contains a single vertex that has no label and no matching property.
+   * The vertex should be converted 1:1.
+   */
+  @Test
+  public void groupByLabelAndPropertySingleNoLabelNoProperty() throws Exception {
+    String asciiInput = "input[" +
+      "(v0:Blue {a : 3})" +
+      "(v1:Blue {b : 2})" +
+      "(v2 {c : 4.1})" + // property that does not match -> convert 1:1
+      "(v3:Red  {b : 2})" +
+      "(v0)-->(v2)" +
+      "(v1)-->(v2)" +
+      "(v2)-->(v3)" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00:Blue {b: NULL, count:1L})" +
+        "(v01:Blue {b : 2, count:1L})" +
+        "(v02 {c : 4.1, count:1L})" + // was converted 1:1
+        "(v03:Red {b: 2, count: 1L})" +
+        "(v00)-->(v02)" +
+        "(v01)-->(v02)" +
+        "(v02)-->(v03)" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setKeepVertices(true)
+      .useVertexLabel(true)
+      .addVertexGroupingKey("b")
+      .addVertexAggregateFunction(new Count())
+      .build()
+      .execute(input);
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+
+    writeGraphPNG(output, DEFAULT_PREFIX, "groupByLabelAndPropertySingleNoLabelNoProperty");
+
+    writeGraphPNG(expected, "", "expectedGroupByLabelAndPropertySingleNoLabelNoProperty");
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  /**
+   * Groups a graph by label and a property.
+   * The graph contains multiple vertices that have no label and no matching property.
+   * These vertices should be converted 1:1.
+   */
+  @Test
+  public void groupByLabelAndPropertyMultipleNoLabelNoProperty() throws Exception {
+    String asciiInput = "input[" +
+      "(v0:Blue {a : 3})" +
+      "(v1:Blue {b : 2})" +
+      "(v2 {c : 4.1})" + // property that does not match -> convert 1:1
+      "(v21 {d: 'a'})" + // property that does not match -> convert 1:1
+      "(v3:Red  {b : 2})" +
+      "(v0)-->(v2)" +
+      "(v1)-->(v2)" +
+      "(v2)-->(v3)" +
+      "(v3)-->(v21)" +
+      "(v2)-->(v21)" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00:Blue {b: NULL, count:1L})" +
+        "(v01:Blue {b : 2, count:1L})" +
+        "(v02 {c : 4.1, count:1L})" + // was converted 1:1
+        "(v021 {d : 'a', count:1L})" + // was converted 1:1
+        "(v03:Red {b: 2, count: 1L})" +
+        "(v00)-->(v02)" +
+        "(v01)-->(v02)" +
+        "(v02)-->(v03)" +
+        "(v03)-->(v021)" +
+        "(v02)-->(v021)" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setKeepVertices(true)
+      .useVertexLabel(true)
+      .addVertexGroupingKey("b")
+      .addVertexAggregateFunction(new Count())
+      .build()
+      .execute(input);
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+
+    writeGraphPNG(output, DEFAULT_PREFIX, "groupByLabelAndPropertyMultipleNoLabelNoProperty");
+
+    writeGraphPNG(expected, "", "expectedGroupByLabelAndPropertyMultipleNoLabelNoProperty");
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  /**
+   * Groups a graph by label.
+   * The graph contains a single vertex without a label.
+   * The vertex should be converted 1:1.
+   */
+  @Test
+  public void groupByLabelSingleNoLabel() throws Exception {
+    String asciiInput = "input[" +
+      "(v0:Blue {})" +
+      "(v1:Blue {})" +
+      "(v2 {c : 4.1})" + // no label -> convert 1:1
+      "(v3:Red {})" +
+      "(v0)-->(v2)" +
+      "(v1)-->(v2)" +
+      "(v2)-->(v3)" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00:Blue {count:2L})" +
+        "(v02 {c : 4.1, count:1L})" + // was converted 1:1, and property c was saved
+        "(v03:Red {count: 1L})" +
+        "(v00)-->(v02)" +
+        "(v02)-->(v03)" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setKeepVertices(true)
+      .useVertexLabel(true)
+      .addVertexAggregateFunction(new Count())
+      .build()
+      .execute(input);
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+
+    writeGraphPNG(output, DEFAULT_PREFIX, "groupByLabelAndPropertySingleNoLabel");
+
+    writeGraphPNG(expected, "", "expectedGroupByLabelAndPropertySingleNoLabel");
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  /**
+   * Groups a graph by label.
+   * The graph contains multiple vertices without labels, they should be converted 1:1.
+   */
+  @Test
+  public void groupByLabelMultipleNoLabel() throws Exception {
+
+    String asciiInput = "input[" +
+      "(v0:Blue {})" +
+      "(v1:Blue {})" +
+      "(v2 {c : 4.1})" + // no label -> convert 1:1
+      "(v3:Red {})" +
+      "(v4 {d: 'a'})" + // no label -> convert 1:1
+      "(v0)-->(v2)" +
+      "(v1)-->(v2)" +
+      "(v2)-->(v3)" +
+      "(v3)-->(v4)" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00:Blue {count:2L})" +
+        "(v02 {c : 4.1, count:1L})" +
+        "(v03:Red {count: 1L})" +
+        "(v04 {d: 'a', count: 1L})" +
+        "(v00)-->(v02)" +
+        "(v02)-->(v03)" +
+        "(v03)-->(v04)" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setKeepVertices(true)
+      .useVertexLabel(true)
+      .addVertexAggregateFunction(new Count())
+      .build()
+      .execute(input);
+
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+
+    writeGraphPNG(output, DEFAULT_PREFIX, "groupByLabelAndPropertyMultipleNoLabel");
+
+    writeGraphPNG(expected, "", "expectedGroupByLabelAndPropertyMultipleNoLabel");
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  private void writeGraphPNG(LogicalGraph graph, String filePrefix, String dotFilename) throws
+    Exception {
+
+    String dir = "out/";
+    String suffix = ".dot";
+    String dotPath = dir + filePrefix + dotFilename + suffix;
+    String pngPath = dotPath + ".png";
+    DOTDataSink sink = new DOTDataSink(dotPath, true);
+
+    sink.write(graph, true);
+
+    graph.print();
+
+    File file = new File(pngPath);
+    System.out.println(file + " was deleted: " + file.delete());
+
+    convertDotToPNG(dotPath, pngPath);
   }
 }
