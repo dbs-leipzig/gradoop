@@ -29,12 +29,12 @@ import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
  * <p>
  *   digraph 0
  *   {
- *   gradoopId1 [label="person",name="Bob",age="20",...];
- *   gradoopId2 [label="person",name="Alice",age="20",...];
+ *   gradoopId1 [label=<<table>...</table>>];
+ *   gradoopId2 [label=<<table>...</table>>];
  *   gradoopID3;
  *   gradoopID4;
- *   gradoopId1->gradoopId2 [label="knows",since="2003",...];
- *   gradoopId2->gradoopId1 [label="knows",since="2003",...];
+ *   gradoopId1->gradoopId2 [label=<<table>...</table>>];
+ *   gradoopId2->gradoopId1 [label=<<table>...</table>>];
  *   gradoopId3->gradoopId4;
  *   }
  * </p>
@@ -50,9 +50,10 @@ public class DotFileFormatHtml extends AbstractDotFileFormat {
    * Constructor
    *
    * @param printGraphHead true, iff graph head data shall be attached to the output
+   * @param color the color for header background and properties text
    */
   public DotFileFormatHtml(Boolean printGraphHead, String color) {
-    this.printGraphHead = printGraphHead;
+    setPrintGraphHead(printGraphHead);
     this.color = color;
   }
 

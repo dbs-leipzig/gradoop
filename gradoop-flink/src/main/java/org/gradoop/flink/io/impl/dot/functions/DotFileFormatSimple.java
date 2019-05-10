@@ -22,6 +22,21 @@ import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
+/**
+ * Converts a GraphTransaction to the following .dot format:
+ * <p>
+ *   digraph 0
+ *   {
+ *   gradoopId1 [label="person",name="Bob",age="20",...];
+ *   gradoopId2 [label="person",name="Alice",age="20",...];
+ *   gradoopID3;
+ *   gradoopID4;
+ *   gradoopId1->gradoopId2 [label="knows",since="2003",...];
+ *   gradoopId2->gradoopId1 [label="knows",since="2003",...];
+ *   gradoopId3->gradoopId4;
+ *   }
+ * </p>
+ */
 public class DotFileFormatSimple extends AbstractDotFileFormat {
 
   /**
@@ -30,7 +45,7 @@ public class DotFileFormatSimple extends AbstractDotFileFormat {
    * @param printGraphHead true, iff graph head data shall be attached to the output
    */
   public DotFileFormatSimple(Boolean printGraphHead) {
-    this.printGraphHead = printGraphHead;
+    setPrintGraphHead(printGraphHead);
   }
 
   /**
@@ -55,10 +70,15 @@ public class DotFileFormatSimple extends AbstractDotFileFormat {
     }
   }
 
+  /**
+   * @inheritDoc
+   *
+   * @param builder StringBuilder
+   * @param element EPGMElement
+   */
   void writeLabel(StringBuilder builder, EPGMElement element) {
-    String label = StringUtils.isEmpty(element.getLabel())
-      ? element.getId().toString()
-      : element.getLabel();
+    String label = StringUtils.isEmpty(element.getLabel()) ? element.getId().toString() :
+      element.getLabel();
     Properties properties = element.getProperties();
 
     if (properties != null && properties.size() > 0) {

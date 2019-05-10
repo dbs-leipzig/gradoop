@@ -22,20 +22,26 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
-abstract class AbstractDotFileFormat implements TextOutputFormat.TextFormatter<GraphTransaction> {
+/**
+ * Base class for implementing a dot formatting.
+ */
+public abstract class AbstractDotFileFormat
+  implements TextOutputFormat.TextFormatter<GraphTransaction> {
+
+  /**
+   * .DOT vertex identifier prefix
+   */
+  static final String VERTEX_ID_PREFIX = "v";
 
   /**
    * id that needs to be update upon changes to this class' structure.
    */
   private static final long serialVersionUID = 1L;
-  /**
-   * .DOT vertex identifier prefix
-   */
-  static final String VERTEX_ID_PREFIX = "v";
+
   /**
    * flag to print graph head information to dot
    */
-  boolean printGraphHead;
+  private boolean printGraphHead;
 
 
 
@@ -90,6 +96,15 @@ abstract class AbstractDotFileFormat implements TextOutputFormat.TextFormatter<G
     builder.append(";\n");
   }
 
+  /**
+   * Adds vertex information to the specified builder.
+   *
+   * vertexId [label="label", property1="value1", ...];
+   *
+   * @param transaction graph transaction
+   * @param builder string builder to append
+   * @param suffix id suffix specific for the current {@link GraphTransaction}
+   */
   abstract void writeVertices(GraphTransaction transaction, StringBuilder builder, String suffix);
 
   /**
@@ -118,5 +133,15 @@ abstract class AbstractDotFileFormat implements TextOutputFormat.TextFormatter<G
     }
   }
 
+  /**
+   * Writes the specified label and properties.
+   *
+   * @param builder string builder to append
+   * @param element graph element with id, label and properties
+   */
   abstract void writeLabel(StringBuilder builder, EPGMElement element);
+
+  void setPrintGraphHead(boolean printGraphHead) {
+    this.printGraphHead = printGraphHead;
+  }
 }

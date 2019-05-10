@@ -36,7 +36,7 @@ public class DotFileFormatSimpleTest extends GradoopFlinkTestBase {
   private GraphTransaction transaction;
 
   @Before
-  public void initGraphTransactionMock() throws Exception{
+  public void initGraphTransactionMock() {
     GraphHead graphHead = new GraphHead();
     graphHead.setId(GradoopId.fromString("aaaaaaaaaaaaaaaaaaaaaaaa"));
     graphHead.setLabel("graph");
@@ -83,12 +83,12 @@ public class DotFileFormatSimpleTest extends GradoopFlinkTestBase {
     edges.add(edge2);
     edges.add(edge3);
 
-    GraphTransaction transaction = mock(GraphTransaction.class);
-    when(transaction.getGraphHead()).thenReturn(graphHead);
-    when(transaction.getVertices()).thenReturn(vertices);
-    when(transaction.getEdges()).thenReturn(edges);
+    GraphTransaction transactionMock = mock(GraphTransaction.class);
+    when(transactionMock.getGraphHead()).thenReturn(graphHead);
+    when(transactionMock.getVertices()).thenReturn(vertices);
+    when(transactionMock.getEdges()).thenReturn(edges);
 
-    this.transaction = transaction;
+    this.transaction = transactionMock;
   }
 
   @Test
@@ -105,6 +105,6 @@ public class DotFileFormatSimpleTest extends GradoopFlinkTestBase {
       "vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa->vddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaa [label=\"knows\"];\n" +
       "}\n";
 
-      assertEquals(expected, dotFileFormat.format(transaction));
+    assertEquals(expected, dotFileFormat.format(transaction));
   }
 }
