@@ -18,6 +18,8 @@ package org.gradoop.common.model.impl.properties.strategies;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
+
 import java.io.IOException;
 
 /**
@@ -60,7 +62,7 @@ public class ShortStrategy extends AbstractFixSizedPropertyValueStrategy<Short> 
 
   @Override
   public byte getRawType() {
-    return PropertyValue.TYPE_SHORT;
+    return Type.SHORT.getTypeByte();
   }
 
   @Override

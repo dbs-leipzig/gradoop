@@ -19,6 +19,8 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -112,7 +114,7 @@ public class ListStrategy extends AbstractVariableSizedPropertyValueStrategy<Lis
 
   @Override
   public byte getRawType() {
-    return PropertyValue.TYPE_LIST;
+    return Type.LIST.getTypeByte();
   }
 
   /**

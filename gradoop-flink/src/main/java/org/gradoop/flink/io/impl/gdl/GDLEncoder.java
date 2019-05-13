@@ -144,8 +144,8 @@ public class GDLEncoder {
         boolean containedInGraph = v.getGraphIds().contains(gh.getId());
         boolean firstOccurrence = !usedVertexIds.contains(v.getId());
 
-        if (containedInGraph && firstOccurrence) {
-          String vertexString = vertexToGDLString(v, idToVertexName);
+        if (containedInGraph) {
+          String vertexString = vertexToGDLString(v, idToVertexName, firstOccurrence);
           usedVertexIds.add(v.getId());
           verticesString.append(vertexString).append(System.lineSeparator());
         }
@@ -163,7 +163,8 @@ public class GDLEncoder {
       result
         .append(graphHeadToGDLString(gh, idToGraphHeadName))
         .append(GRAPH_ELEMENTS_DEFINITION_START).append(System.lineSeparator())
-        .append(verticesString).append(System.lineSeparator())
+        .append(verticesString)
+        .append(edgesString.length() > 0 ? System.lineSeparator() : "")
         .append(edgesString)
         .append(GRAPH_ELEMENTS_DEFINITION_END)
         .append(System.lineSeparator()).append(System.lineSeparator());
@@ -237,48 +238,56 @@ public class GDLEncoder {
    * Returns the gdl formatted vertex including the properties and the label on first occurrence
    * or otherwise just the variable name.
    *
-   * @param v The vertex that should be formatted.
+   * @param vertex The vertex that should be formatted.
    * @param idToVertexName Maps GradoopId of a vertex to a string that represents the gdl
    *                       variable name
+   * @param firstOccurrence Is it the first occurrence of the vertex in all graphs?
    * @return A GDL formatted vertex string.
    */
-  private String vertexToGDLString(Vertex v, Map<GradoopId, String> idToVertexName)  {
-    return String.format("(%s:%s %s)",
-      idToVertexName.get(v.getId()),
-      v.getLabel(),
-      propertiesToGDLString(v.getProperties()));
+  private String vertexToGDLString(
+    Vertex vertex,
+    Map<GradoopId, String> idToVertexName,
+    boolean firstOccurrence) {
+    if (firstOccurrence) {
+      return String.format("(%s:%s %s)",
+        idToVertexName.get(vertex.getId()),
+        vertex.getLabel(),
+        propertiesToGDLString(vertex.getProperties()));
+    } else {
+      return String.format("(%s)", idToVertexName.get(vertex.getId()));
+    }
   }
 
   /**
    * Returns the GDL formatted edge, including the properties and the label on first occurrence
    * or otherwise just the variable name.
    *
-   * @param e The edge to be formatted.
+   * @param edge The edge to be formatted.
    * @param idToVertexName Maps GradoopId of a vertex to a string that represents the GDL
    *                       variable name
    * @param idToEdgeName Maps GradoopId of an edge to a string that represents the GDL variable
    *                     name.
-   * @param firstOccurrence Is it the first occurrence of the vertex in all graphs?
+   * @param firstOccurrence Is it the first occurrence of the edge in all graphs?
    * @return A GDL formatted edge string.
    */
   private String edgeToGDLString(
-    Edge e,
+    Edge edge,
     Map<GradoopId, String> idToVertexName,
     Map<GradoopId, String> idToEdgeName,
     boolean firstOccurrence) {
     String result;
     if (firstOccurrence) {
       result =  String.format("(%s)-[%s:%s%s]->(%s)",
-        idToVertexName.get(e.getSourceId()),
-        idToEdgeName.get(e.getId()),
-        e.getLabel(),
-        propertiesToGDLString(e.getProperties()),
-        idToVertexName.get(e.getTargetId()));
+        idToVertexName.get(edge.getSourceId()),
+        idToEdgeName.get(edge.getId()),
+        edge.getLabel(),
+        propertiesToGDLString(edge.getProperties()),
+        idToVertexName.get(edge.getTargetId()));
     } else {
       result = String.format("(%s)-[%s]->(%s)",
-        idToVertexName.get(e.getSourceId()),
-        idToEdgeName.get(e.getId()),
-        idToVertexName.get(e.getTargetId()));
+        idToVertexName.get(edge.getSourceId()),
+        idToEdgeName.get(edge.getId()),
+        idToVertexName.get(edge.getTargetId()));
     }
     return result;
   }

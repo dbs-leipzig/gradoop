@@ -20,6 +20,7 @@ import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.functions.StringEscaper;
 
@@ -52,19 +53,19 @@ public class CSVMetaDataParser {
    */
   private static Map<String, Function<String, Object>> getSimpleTypeParserMap() {
     Map<String, Function<String, Object>> map = new HashMap<>();
-    map.put(MetaData.TypeString.SHORT.getTypeString(), Short::parseShort);
-    map.put(MetaData.TypeString.INTEGER.getTypeString(), Integer::parseInt);
-    map.put(MetaData.TypeString.LONG.getTypeString(), Long::parseLong);
-    map.put(MetaData.TypeString.FLOAT.getTypeString(), Float::parseFloat);
-    map.put(MetaData.TypeString.DOUBLE.getTypeString(), Double::parseDouble);
-    map.put(MetaData.TypeString.BOOLEAN.getTypeString(), Boolean::parseBoolean);
-    map.put(MetaData.TypeString.STRING.getTypeString(), StringEscaper::unescape);
-    map.put(MetaData.TypeString.BIGDECIMAL.getTypeString(), BigDecimal::new);
-    map.put(MetaData.TypeString.GRADOOPID.getTypeString(), GradoopId::fromString);
-    map.put(MetaData.TypeString.LOCALDATE.getTypeString(), LocalDate::parse);
-    map.put(MetaData.TypeString.LOCALTIME.getTypeString(), LocalTime::parse);
-    map.put(MetaData.TypeString.LOCALDATETIME.getTypeString(), LocalDateTime::parse);
-    map.put(MetaData.TypeString.NULL.getTypeString(), CSVMetaDataParser::parseNullProperty);
+    map.put(Type.SHORT.toString(), Short::parseShort);
+    map.put(Type.INTEGER.toString(), Integer::parseInt);
+    map.put(Type.LONG.toString(), Long::parseLong);
+    map.put(Type.FLOAT.toString(), Float::parseFloat);
+    map.put(Type.DOUBLE.toString(), Double::parseDouble);
+    map.put(Type.BOOLEAN.toString(), Boolean::parseBoolean);
+    map.put(Type.STRING.toString(), StringEscaper::unescape);
+    map.put(Type.BIG_DECIMAL.toString(), BigDecimal::new);
+    map.put(Type.GRADOOP_ID.toString(), GradoopId::fromString);
+    map.put(Type.DATE.toString(), LocalDate::parse);
+    map.put(Type.TIME.toString(), LocalTime::parse);
+    map.put(Type.DATE_TIME.toString(), LocalDateTime::parse);
+    map.put(Type.NULL.toString(), CSVMetaDataParser::parseNullProperty);
     return Collections.unmodifiableMap(map);
   }
 
@@ -93,11 +94,11 @@ public class CSVMetaDataParser {
       propertyType.toLowerCase(), PropertyMetaData.PROPERTY_TOKEN_DELIMITER);
     String mainType = typeTokens[0];
 
-    if (mainType.equals(MetaData.TypeString.LIST.getTypeString())) {
+    if (mainType.equals(Type.LIST.toString())) {
       return getListValueParser(typeTokens);
-    } else if (mainType.equals(MetaData.TypeString.SET.getTypeString())) {
+    } else if (mainType.equals(Type.SET.toString())) {
       return getSetValueParser(typeTokens);
-    } else if (mainType.equals(MetaData.TypeString.MAP.getTypeString())) {
+    } else if (mainType.equals(Type.MAP.toString())) {
       return getMapValueParser(typeTokens);
     } else if (SIMPLE_TYPE_PARSER_MAP.containsKey(mainType)) {
       return SIMPLE_TYPE_PARSER_MAP.get(mainType);
@@ -236,7 +237,7 @@ public class CSVMetaDataParser {
    */
   private static Object parseNullProperty(String nullString) throws IllegalArgumentException {
     if (nullString != null && nullString.equalsIgnoreCase(
-      MetaData.TypeString.NULL.getTypeString())) {
+      Type.NULL.toString())) {
       return null;
     } else {
       throw new IllegalArgumentException("Only null represents a null string.");

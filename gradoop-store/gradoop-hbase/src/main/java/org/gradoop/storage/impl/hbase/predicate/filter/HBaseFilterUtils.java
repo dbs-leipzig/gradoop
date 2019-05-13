@@ -19,16 +19,17 @@ import org.apache.hadoop.hbase.filter.BinaryComparator;
 import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
+import org.apache.hadoop.hbase.filter.FuzzyRowFilter;
 import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
-import org.apache.hadoop.hbase.filter.FuzzyRowFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.util.Pair;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
+import org.gradoop.common.model.impl.properties.Type;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -37,8 +38,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_META;
-import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_VALUE;
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_TYPE;
+import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.CF_PROPERTY_VALUE;
 import static org.gradoop.storage.impl.hbase.constants.HBaseConstants.COL_LABEL;
 
 /**
@@ -218,7 +219,7 @@ public class HBaseFilterUtils {
       CF_PROPERTY_TYPE_BYTES,
       Bytes.toBytesBinary(key),
       compareOp,
-      new byte[] {PropertyValue.TYPE_STRING});
+      new byte[] {Type.STRING.getTypeByte()});
 
     // Define that the entire row will be skipped if the column is not found
     typeFilter.setFilterIfMissing(true);
