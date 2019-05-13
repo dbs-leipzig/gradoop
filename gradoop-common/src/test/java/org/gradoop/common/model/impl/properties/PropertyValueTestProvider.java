@@ -54,6 +54,7 @@ public class PropertyValueTestProvider {
   @DataProvider
   private Object[][] supportedTypeProvider() {
     return new Object[][] {
+      {NULL_VAL_0},
       {BOOL_VAL_1},
       {INT_VAL_2},
       {LONG_VAL_3},
@@ -236,7 +237,8 @@ public class PropertyValueTestProvider {
       {create(DATE_VAL_b), PropertyValue.TYPE_DATE},
       {create(TIME_VAL_c), PropertyValue.TYPE_TIME},
       {create(DATETIME_VAL_d), PropertyValue.TYPE_DATETIME},
-      {create(SHORT_VAL_e), PropertyValue.TYPE_SHORT}
+      {create(SHORT_VAL_e), PropertyValue.TYPE_SHORT},
+      {create(SET_VAL_f), PropertyValue.TYPE_SET}
     };
   }
 }

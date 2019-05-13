@@ -37,51 +37,47 @@ import static org.testng.AssertJUnit.*;
 public class PropertyValueTest {
 
   /**
-   * Tests if conversion to {@link BigDecimal} fails if incompatible type is given.
+   * Tests if any type conversion of the kind PropertyValue.getType == A to B with
+   * PropertyValue.getB raises an {@link UnsupportedOperationException}.
    */
   @Test(expectedExceptions = UnsupportedOperationException.class,
-    dataProvider = "nonNumericalPropertyValueProvider",
+    dataProvider = "propertyValueProvider",
     dataProviderClass = PropertyValueTestProvider.class)
-  public void testUnsupportedBigDecimalConversionThrowsException(PropertyValue actual) {
-    actual.getBigDecimal();
-  }
-
-  @Test
-  public void testCreateWithNull() {
-    PropertyValue p = create(null);
-    assertTrue(p.isNull());
-    assertNull(p.getObject());
+  public void testIfTypeConversionThrowsException(PropertyValue actual) {
+    if (actual.getType() != BigDecimal.class) {
+      actual.getBigDecimal();
+    } else {
+      actual.getDate();
+    }
   }
 
   /**
    * Tests if {@link PropertyValue#create(Object)} works with supported types.
    */
   @Test(dataProvider = "supportedTypeProvider", dataProviderClass = PropertyValueTestProvider.class)
-  public void testCreate(Object supportedValue) {
-    PropertyValue p = create(supportedValue);
-    assertTrue(p.is(supportedValue.getClass()));
-    assertEquals(supportedValue, p.get(supportedValue.getClass()));
-  }
+  public void testCreate(Object supportedType) {
+    PropertyValue p = create(supportedType);
 
-  /**
-   * Test copying the property value
-   */
-  @Test
-  public void testCopyBoolean() {
-    PropertyValue p = create(BOOL_VAL_1);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
+    if (supportedType != null) {
+      assertTrue(p.is(supportedType.getClass()));
+      assertEquals(supportedType, p.get(supportedType.getClass()));
+    } else {
+      assertTrue(p.isNull());
+      assertNull(p.getObject());
+    }
   }
 
   /**
    * Tests if {@link PropertyValue#copy()} works for every supported type.
    */
-  @Test(dataProvider = "propertyValueProvider", dataProviderClass = PropertyValueTestProvider.class)
-  public void testCopy(PropertyValue value) {
+  @Test(dataProvider = "testIsProvider", dataProviderClass = PropertyValueTestProvider.class)
+  public void testCopy(PropertyValue value, Object supportedType) {
     PropertyValue copy = value.copy();
     assertEquals(value, copy);
     assertNotSame(value, copy);
+    if (value instanceof List || value instanceof Map || value instanceof Set) {
+      assertNotSame(supportedType, copy.getObject());
+    }
   }
 
   /**
@@ -89,24 +85,16 @@ public class PropertyValueTest {
    * X -> p.setObject(X) -> p.getObject() -> X | where X equals X
    */
   @Test(dataProvider = "supportedTypeProvider", dataProviderClass = PropertyValueTestProvider.class)
-  public void testSetAndGetObject(Object supportedObject) {
+  public void testSetAndGetObject(Object supportedType) {
     PropertyValue value = new PropertyValue();
 
-    value.setObject(supportedObject);
-    assertTrue(value.is(supportedObject.getClass()));
-    assertEquals(supportedObject, value.getObject());
-    // null
-    value.setObject(null);
-    assertTrue(value.isNull());
-    assertNull(value.getObject());
-  }
-
-  @Test
-  public void testSetAndGetObjectWithNull() {
-    PropertyValue value = new PropertyValue();
-    value.setObject(null);
-    assertTrue(value.isNull());
-    assertNull(value.getObject());
+    value.setObject(supportedType);
+    if (supportedType != null) {
+      assertTrue(value.is(supportedType.getClass()));
+    } else {
+      assertTrue(value.isNull());
+    }
+    assertEquals(supportedType, value.getObject());
   }
 
   /**
@@ -863,12 +851,14 @@ public class PropertyValueTest {
    * Tests {@link PropertyValue#getType()}.
    */
   @Test(dataProvider = "supportedTypeProvider", dataProviderClass = PropertyValueTestProvider.class)
-  public void testGetType(Object supportedProperty) {
-    PropertyValue value = create(supportedProperty);
-    if (supportedProperty instanceof List || supportedProperty instanceof Map || supportedProperty instanceof Set) {
-      assertEquals(supportedProperty.getClass().getInterfaces()[0], value.getType());
+  public void testGetType(Object supportedType) {
+    PropertyValue value = create(supportedType);
+    if (supportedType instanceof List || supportedType instanceof Map || supportedType instanceof Set) {
+      assertEquals(supportedType.getClass().getInterfaces()[0], value.getType());
+    } else if (supportedType != null) {
+      assertEquals(supportedType.getClass(), value.getType());
     } else {
-      assertEquals(supportedProperty.getClass(), value.getType());
+      assertNull(value.getType());
     }
   }
 

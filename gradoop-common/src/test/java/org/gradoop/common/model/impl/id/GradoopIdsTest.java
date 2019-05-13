@@ -42,19 +42,18 @@ public class GradoopIdsTest {
 
     GradoopIdSet ids = new GradoopIdSet();
 
-    assertThat(ids.size(), is(0));
     assertEquals(0, ids.size());
 
     ids.add(id1);
-    assertThat(ids.size(), is(1));
+    assertEquals(1, ids.size());
     assertTrue(ids.contains(id1));
     // must not change
     ids.add(id1);
-    assertThat(ids.size(), is(1));
+    assertEquals(1, ids.size());
     assertTrue(ids.contains(id1));
     // must change
     ids.add(id2);
-    assertThat(ids.size(), is(2));
+    assertEquals(2, ids.size());
     assertTrue(ids.contains(id1));
     assertTrue(ids.contains(id2));
   }

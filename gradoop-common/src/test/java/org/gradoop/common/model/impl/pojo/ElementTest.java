@@ -18,6 +18,7 @@ package org.gradoop.common.model.impl.pojo;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.testng.annotations.Test;
+
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.testng.AssertJUnit.*;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;

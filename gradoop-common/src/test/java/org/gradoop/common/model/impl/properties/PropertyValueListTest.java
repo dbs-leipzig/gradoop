@@ -44,7 +44,7 @@ public class PropertyValueListTest {
     assertNotEquals(p3, p1);
 
     assertEquals(p2.hashCode(), p1.hashCode());
-    assertFalse(p1.hashCode() == p3.hashCode());
+    assertNotEquals(p1.hashCode(), p3.hashCode());
   }
 
   @Test
