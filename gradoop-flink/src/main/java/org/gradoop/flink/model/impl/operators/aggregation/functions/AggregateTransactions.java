@@ -33,6 +33,10 @@ import java.util.stream.Collectors;
 public class AggregateTransactions implements MapFunction<GraphTransaction, GraphTransaction> {
 
   /**
+   * Set of all aggregate functions.
+   */
+  private final Set<AggregateFunction> aggregateFunctions;
+  /**
    * Set of aggregate vertex functions.
    */
   private final Set<AggregateFunction> vertexAggregateFunctions;
@@ -52,6 +56,7 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
    */
   public AggregateTransactions(Set<AggregateFunction> aggregateFunctions) {
     // initialization logic to avoid instanceOf checking during execution
+    this.aggregateFunctions = aggregateFunctions;
 
     vertexAggregateFunctions = aggregateFunctions.stream()
       .filter(AggregateFunction::isVertexAggregation)
@@ -74,6 +79,10 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
     aggregate = aggregateVertices(aggregate, graphTransaction);
     aggregate = aggregateEdges(aggregate, graphTransaction);
 
+    for (AggregateFunction function : aggregateFunctions) {
+      aggregate.computeIfPresent(function.getAggregatePropertyKey(),
+        (k, v) -> function.postAggregate(v));
+    }
     aggregateDefaultValues.forEach(aggregate::putIfAbsent);
 
     aggregate.forEach(graphTransaction.getGraphHead()::setProperty);

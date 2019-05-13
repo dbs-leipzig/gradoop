@@ -20,7 +20,9 @@ import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.SumPlusOne;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasEdgeLabel;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasLabel;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.containment.HasVertexLabel;
@@ -591,5 +593,49 @@ public class AggregationTest extends GradoopFlinkTestBase {
     LogicalGraph output = graph.aggregate(vertexCount, minEdgeProperty, count);
 
     collectAndAssertTrue(expected.equalsByData(output));
+  }
+
+  /**
+   * Test the aggregation with a post-processing step on a logical graph.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testAggregationWithPostAggregateForGraph() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input [" +
+      "(i1 {a: 1L}) (i2 {a: 2L}) (i3 {a: -1L}) (i4 {a: 3L})" +
+      "] expected {sum_a: 5L, sum_a_plusone: 6L} [" +
+      "(i1)(i2)(i3)(i4)" +
+      "]");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+    LogicalGraph result = input.aggregate(new SumVertexProperty("a", "sum_a"),
+      new SumPlusOne("a", "sum_a_plusone"));
+    collectAndAssertTrue(expected.equalsByData(result));
+  }
+
+  /**
+   * Test the aggregation with a post-processing step on a graph collection.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testAggregationWithPostAggregateForGraphCollection() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input1 [" +
+      "(i1 {a: 1L}) (i2 {a: 2L})" +
+      "] input2 [" +
+      "(i3 {a: -1L}) (i4 {a: 3L})" +
+      "] input3 [] expected1 {sum_a: 3L, sum_a_plusone: 4L} [" +
+      "(i1)(i2)" +
+      "] expected2 {sum_a: 2L, sum_a_plusone: 3L} [" +
+      "(i3)(i4)" +
+      "] expected3 {sum_a: NULL, sum_a_plusone: NULL} []");
+    GraphCollection input = loader.getGraphCollectionByVariables("input1", "input2", "input3");
+    GraphCollection expected = loader.getGraphCollectionByVariables("expected1", "expected2",
+      "expected3");
+    GraphCollection result = input.apply(new ApplyAggregation(
+      new SumVertexProperty("a", "sum_a"),
+      new SumPlusOne("a", "sum_a_plusone")));
+    collectAndAssertTrue(expected.equalsByGraphData(result));
   }
 }
