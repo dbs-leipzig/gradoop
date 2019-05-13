@@ -20,7 +20,9 @@ import org.gradoop.common.GradoopTestUtils;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.gradoop.common.GradoopTestUtils.writeAndReadFields;
 import static org.testng.AssertJUnit.*;
@@ -126,5 +128,13 @@ public class PropertyValueListTest {
 
     List<PropertyValue> expected = Lists.newArrayList(p);
     assertEquals(0, expected.size());
+  }
+
+  @Test(expectedExceptions = NoSuchElementException.class)
+  public void testNextOnEmptyIteratorRaisesException() {
+    PropertyValueList propertyValueList = PropertyValueList.createEmptyList();
+
+    Iterator<PropertyValue> iterator =  propertyValueList.iterator();
+    iterator.next();
   }
 }

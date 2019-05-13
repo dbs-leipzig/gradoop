@@ -19,6 +19,8 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -90,7 +92,7 @@ public class MapStrategy
 
   @Override
   public byte getRawType() {
-    return PropertyValue.TYPE_MAP;
+    return Type.MAP.getTypeByte();
   }
 
   /**
@@ -107,7 +109,7 @@ public class MapStrategy
         DataOutputStream outputStream = new DataOutputStream(byteStream);
         DataOutputViewStreamWrapper outputView = new DataOutputViewStreamWrapper(outputStream)) {
 
-      outputStream.write(PropertyValue.TYPE_MAP);
+      outputStream.write(Type.MAP.getTypeByte());
       for (Map.Entry<PropertyValue, PropertyValue> entry : value.entrySet()) {
         entry.getKey().write(outputView);
         entry.getValue().write(outputView);
