@@ -968,7 +968,7 @@ public class PropertyValueUtilsTest {
     /**
      * Test static function {@link PropertyValueUtils.Bytes#getRawBytesWithoutType(PropertyValue)}
      */
-    @Test(dataProviderClass = PropertyValueTestProvider.class, dataProvider = "propertiesProvider")
+    @Test(dataProviderClass = PropertyValueTestProvider.class, dataProvider = "propertyValueProvider")
     public void testGetRawBytesWithoutType(PropertyValue propertyValue) {
       assertArrayEquals(Arrays.copyOfRange(propertyValue.getRawBytes(), 1, propertyValue.getRawBytes().length),
         PropertyValueUtils.Bytes.getRawBytesWithoutType(propertyValue));
