@@ -16,32 +16,21 @@
 package org.gradoop.flink.model.impl.operators.subgraph.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * For each edge, collect two tuple 2 containing its source or target id in the
- * first field and all the graphs this edge is contained in in its second field.
+ * Flat map function mapping edges to sourceIds and targetIds
  *
- * @param <E> epgm edge type
+ * @param <E> edge type
  */
-
-@FunctionAnnotation.ReadFields("sourceId;targetId")
-@FunctionAnnotation.ForwardedFields("graphIds->f1")
-public class SourceTargetIdGraphsTuple<E extends Edge>
-  implements FlatMapFunction<E, Tuple2<GradoopId, GradoopIdSet>> {
+public class EdgeToSourceAndTargetId<E extends EPGMEdge>
+  implements FlatMapFunction<E, GradoopId> {
 
   @Override
-  public void flatMap(
-    E e,
-    Collector<Tuple2<GradoopId, GradoopIdSet>> collector) throws
-    Exception {
-
-    collector.collect(new Tuple2<>(e.getSourceId(), e.getGraphIds()));
-    collector.collect(new Tuple2<>(e.getTargetId(), e.getGraphIds()));
+  public void flatMap(E edge, Collector<GradoopId> collector) throws Exception {
+    collector.collect(edge.getSourceId());
+    collector.collect(edge.getTargetId());
   }
 }

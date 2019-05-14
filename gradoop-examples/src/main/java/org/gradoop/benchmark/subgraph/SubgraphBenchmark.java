@@ -132,7 +132,7 @@ public class SubgraphBenchmark extends AbstractRunner implements ProgramDescript
     // compute subgraph -> verify results (join) vs no verify (filter)
     if (VERIFICATION) {
       graph = graph.subgraph(new ByLabel<>(VERTEX_LABEL), new ByLabel<>(EDGE_LABEL),
-        Subgraph.Strategy.BOTH_VERIFIED);
+        Subgraph.Strategy.BOTH).verify();
     } else {
       graph = graph.subgraph(new ByLabel<>(VERTEX_LABEL), new ByLabel<>(EDGE_LABEL),
         Subgraph.Strategy.BOTH);

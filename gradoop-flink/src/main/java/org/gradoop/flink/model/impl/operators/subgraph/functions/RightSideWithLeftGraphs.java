@@ -17,26 +17,21 @@ package org.gradoop.flink.model.impl.operators.subgraph.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.api.entities.EPGMGraphElement;
 
 /**
- * Add all gradoop ids in the second field of the first tuple to the element.
- * id:el{id1} join (id, {id2, id3}) -> id:el{id1, id2, id3}
- * @param <EL> epgm graph element type
+ * left, right => right (retain graphIds contained in left)
+ *
+ * @param <L> left type
+ * @param <R> right type
  */
-@FunctionAnnotation.ReadFieldsFirst("f1")
-@FunctionAnnotation.ForwardedFieldsSecond("id;label;properties")
-public class AddGraphsToElements<EL extends GraphElement>
-  implements JoinFunction<Tuple2<GradoopId, GradoopIdSet>, EL, EL> {
-
+@FunctionAnnotation.NonForwardedFieldsSecond("graphIds")
+@FunctionAnnotation.ReadFieldsFirst("graphIds")
+public class RightSideWithLeftGraphs<L extends EPGMGraphElement, R extends EPGMGraphElement>
+  implements JoinFunction<L, R, R> {
   @Override
-  public EL join(
-    Tuple2<GradoopId, GradoopIdSet> left,
-    EL right) {
-    right.getGraphIds().addAll(left.f1);
+  public R join(L left, R right) throws Exception {
+    right.getGraphIds().retainAll(left.getGraphIds());
     return right;
   }
 }

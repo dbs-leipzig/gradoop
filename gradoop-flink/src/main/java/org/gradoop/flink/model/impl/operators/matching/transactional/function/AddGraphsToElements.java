@@ -13,34 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.subgraph.functions;
+package org.gradoop.flink.model.impl.operators.matching.transactional.function;
 
-import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * Creates a tuple containing the id of the element and the id of one graph for
- * each graph the element is contained in.
- * (id:el{id1, id2}) => (id, id1),(id, id2)
+ * Add all gradoop ids in the second field of the first tuple to the element.
+ * id:el{id1} join (id, {id2, id3}) -> id:el{id1, id2, id3}
  * @param <EL> epgm graph element type
  */
-
-@FunctionAnnotation.ReadFields("graphIds")
-@FunctionAnnotation.ForwardedFields("id->f0")
-public class ElementIdGraphIdTuple<EL extends GraphElement>
-  implements FlatMapFunction<EL, Tuple2<GradoopId, GradoopId>> {
+@FunctionAnnotation.ReadFieldsFirst("f1")
+@FunctionAnnotation.ForwardedFieldsSecond("id;label;properties")
+public class AddGraphsToElements<EL extends GraphElement>
+  implements JoinFunction<Tuple2<GradoopId, GradoopIdSet>, EL, EL> {
 
   @Override
-  public void flatMap(
-    EL element,
-    Collector<Tuple2<GradoopId, GradoopId>> collector) throws Exception {
-
-    for (GradoopId graph : element.getGraphIds()) {
-      collector.collect(new Tuple2<>(element.getId(), graph));
-    }
+  public EL join(
+    Tuple2<GradoopId, GradoopIdSet> left,
+    EL right) {
+    right.getGraphIds().addAll(left.f1);
+    return right;
   }
 }
