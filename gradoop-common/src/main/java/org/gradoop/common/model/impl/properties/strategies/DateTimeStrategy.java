@@ -19,6 +19,8 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.DateTimeSerializer;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -70,7 +72,7 @@ public class DateTimeStrategy extends AbstractFixSizedPropertyValueStrategy<Loca
 
   @Override
   public byte getRawType() {
-    return PropertyValue.TYPE_DATETIME;
+    return Type.DATE_TIME.getTypeByte();
   }
 
   @Override

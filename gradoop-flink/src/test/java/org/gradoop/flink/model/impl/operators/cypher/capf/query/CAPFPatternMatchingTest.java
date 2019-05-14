@@ -23,6 +23,7 @@ import org.apache.flink.table.sinks.BatchTableSink;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
+import org.gradoop.common.model.impl.properties.Type;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -66,7 +67,7 @@ public class CAPFPatternMatchingTest extends GradoopFlinkTestBase {
     Map<String, List<PropertyMetaData>> edgePropertyMap = new HashMap<>();
 
     List<PropertyMetaData> propertyList = new ArrayList<>();
-    propertyList.add(new PropertyMetaData("id", MetaData.TypeString.INTEGER.getTypeString(),
+    propertyList.add(new PropertyMetaData("id", Type.INTEGER.toString(),
       null));
 
     vertexPropertyMap.put("A", propertyList);

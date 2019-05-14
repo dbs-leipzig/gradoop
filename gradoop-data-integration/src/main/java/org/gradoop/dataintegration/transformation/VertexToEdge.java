@@ -24,6 +24,8 @@ import org.gradoop.dataintegration.transformation.impl.Neighborhood;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraphBroadcast;
 import org.gradoop.flink.model.impl.operators.neighborhood.keyselector.IdInTuple;
 
 import java.util.List;
@@ -85,9 +87,12 @@ public class VertexToEdge implements UnaryGraphToGraphOperator {
       .where(new IdInTuple<>(0))
       .equalTo(new IdInTuple<>(0))
       .with(new EdgesFromLocalTransitiveClosure<>(newEdgeLabel,
-        graph.getFactory().getEdgeFactory()));
+        graph.getFactory().getEdgeFactory()))
+      .map(new AddToGraphBroadcast<>())
+      .withBroadcastSet(graph.getGraphHead().map(new Id<>()), AddToGraphBroadcast.GRAPH_ID);
 
-    return graph.getFactory().fromDataSets(graph.getVertices(), graph.getEdges().union(newEdges));
+    return graph.getFactory()
+      .fromDataSets(graph.getGraphHead(), graph.getVertices(), graph.getEdges().union(newEdges));
   }
 
   @Override

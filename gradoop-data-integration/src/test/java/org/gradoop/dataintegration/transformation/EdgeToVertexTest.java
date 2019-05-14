@@ -31,12 +31,12 @@ public class EdgeToVertexTest extends GradoopFlinkTestBase {
   /**
    * The loader with the graphs used in the tests.
    */
-  private final FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
+  private final FlinkAsciiGraphLoader loader = getLoaderFromString("input:test[" +
     "(a:VertexA)-[e:edgeToTransform {testProp: 1, testProp2: \"\"}]->(b:VertexB)" +
     "(a)-[e2:edgeToTransform]->(b)" +
     "(a)-[en:anotherEdge]->(b)" +
     "]" +
-    "expected [" +
+    "expected:test [" +
     "(a)-[e]->(b)" +
     "(a)-[e2]->(b)" +
     "(a)-[en]->(b)" +
@@ -56,7 +56,7 @@ public class EdgeToVertexTest extends GradoopFlinkTestBase {
     LogicalGraph result = loader.getLogicalGraphByVariable("input").callForGraph(operator);
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
-    collectAndAssertTrue(result.equalsByElementData(expected));
+    collectAndAssertTrue(result.equalsByData(expected));
   }
 
   /**
@@ -72,7 +72,7 @@ public class EdgeToVertexTest extends GradoopFlinkTestBase {
     LogicalGraph result = loader.getLogicalGraphByVariable("input").callForGraph(operator);
     LogicalGraph expected = loader.getLogicalGraphByVariable("input");
 
-    collectAndAssertTrue(result.equalsByElementData(expected));
+    collectAndAssertTrue(result.equalsByData(expected));
   }
 
   /**
