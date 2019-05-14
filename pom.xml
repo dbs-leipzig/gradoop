@@ -186,7 +186,7 @@
         <plugin.maven-gpg.version>1.6</plugin.maven-gpg.version>
         <plugin.maven-nexus-staging.version>1.6.7</plugin.maven-nexus-staging.version>
         <plugin.maven-site.version>3.7.1</plugin.maven-site.version>
-        <plugin.maven-scm-publish.version>1.1</plugin.maven-scm-publish.version>
+        <plugin.maven-scm-publish.version>3.0.0</plugin.maven-scm-publish.version>
         <plugin.maven-jacoco.version>0.8.1</plugin.maven-jacoco.version>
 
         <maven.site.url>http://localhost/gradoop/site</maven.site.url>
@@ -328,6 +328,16 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-site-plugin</artifactId>
+                        <configuration>
+                            <skipDeploy>false</skipDeploy>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.maven.wagon</groupId>
+                                <artifactId>wagon-ssh</artifactId>
+                                <version>3.0.0</version>
+                            </dependency>
+                        </dependencies>
                     </plugin>
                     <plugin>
                         <artifactId>maven-scm-publish-plugin</artifactId>
