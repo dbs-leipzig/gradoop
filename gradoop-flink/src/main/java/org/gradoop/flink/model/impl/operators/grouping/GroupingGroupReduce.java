@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -108,15 +109,25 @@ public class GroupingGroupReduce extends Grouping {
       // build super vertices
       .map(new BuildSuperVertex(useVertexLabels(), config.getVertexFactory()));
 
-    if (optionalConvertedVertices.isPresent()) {
-      superVertices = superVertices.union(optionalConvertedVertices.get());
-    }
-
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap = vertexGroupItems
       // filter group element tuples
       .filter(new FilterRegularVertices())
       // build vertex to group representative tuple
       .map(new BuildVertexWithSuperVertex());
+
+
+    if (optionalConvertedVertices.isPresent()) {
+
+      DataSet<Vertex> convertedVertices = optionalConvertedVertices.get();
+
+      superVertices = superVertices.union(convertedVertices);
+
+      DataSet<VertexWithSuperVertex> optionalRepresentatives =
+        convertedVertices.map(new VertexSuperVertexIdentity());
+
+      vertexToRepresentativeMap = vertexToRepresentativeMap.union(optionalRepresentatives);
+
+    }
 
     // build super edges
     DataSet<Edge> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
@@ -166,4 +177,23 @@ public class GroupingGroupReduce extends Grouping {
   }
 
 
+  private class VertexSuperVertexIdentity implements MapFunction<Vertex, VertexWithSuperVertex> {
+
+    /**
+     * Avoid object instantiation.
+     */
+    private final VertexWithSuperVertex reuseTuple;
+
+    private VertexSuperVertexIdentity() {
+      reuseTuple = new VertexWithSuperVertex();
+    }
+
+    @Override
+    public VertexWithSuperVertex map(Vertex value) throws Exception {
+      reuseTuple.setVertexId(value.getId());
+      reuseTuple.setSuperVertexId((value.getId()));
+      return reuseTuple;
+    }
+
+  }
 }
