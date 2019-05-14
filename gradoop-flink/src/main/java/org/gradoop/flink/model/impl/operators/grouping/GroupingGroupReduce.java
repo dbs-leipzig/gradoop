@@ -34,6 +34,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Grouping implementation that uses group + groupReduce for building super
@@ -86,15 +87,10 @@ public class GroupingGroupReduce extends Grouping {
 
     DataSet<Vertex> vertices = graph.getVertices();
 
-    // TODO use optional instead of null
-    DataSet<Vertex> directlyConvertedVertices = null;
+    Optional<DataSet<Vertex>> optionalConvertedVertices =
+      isKeepingVertices() ? Optional.of(getVerticesToKeep(vertices)) : Optional.empty();
 
-    if (isKeepingVertices()) {
-
-      // split set of vertices
-      // vertices are kept, iff their label is empty and when they don't have any property that is
-      // grouped by
-      directlyConvertedVertices = getVerticesToKeep(vertices);
+    if (optionalConvertedVertices.isPresent()) {
       vertices = getVerticesToGroup(vertices);
     }
 
@@ -112,10 +108,8 @@ public class GroupingGroupReduce extends Grouping {
       // build super vertices
       .map(new BuildSuperVertex(useVertexLabels(), config.getVertexFactory()));
 
-    // DataSet<Vertex> joinedDataSet = superVertices.join(directlyConvertedVertices);
-
-    if (isKeepingVertices()) {
-      //TODO superVertices = superVertices.union(directlyConvertedVertices);
+    if (optionalConvertedVertices.isPresent()) {
+      superVertices = superVertices.union(optionalConvertedVertices.get());
     }
 
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap = vertexGroupItems
@@ -135,6 +129,8 @@ public class GroupingGroupReduce extends Grouping {
     return vertices.filter(new Not<>(verticesToKeepFilter));
   }
 
+  // vertices are kept, iff their label is empty and when they don't have any property that is
+  // grouped by
   private DataSet<Vertex> getVerticesToKeep(DataSet<Vertex> vertices) {
     return vertices.filter(verticesToKeepFilter);
   }
