@@ -40,26 +40,26 @@ import java.util.List;
 /**
  * Grouping implementation that uses group + groupCombine + groupReduce for
  * building super vertices and updating the original vertices.
- *
+ * <p>
  * Algorithmic idea:
- *
+ * <p>
  * 1) Map vertices to a minimal representation, i.e. {@link VertexGroupItem}.
  * 2) Group vertices on label and/or property
  * 3) Use groupCombine to process the grouped partitions. Creates a super vertex
- *    tuple for each group partition, including the local aggregates.
- *    Update each vertex tuple with their super vertex id and forward them.
+ * tuple for each group partition, including the local aggregates.
+ * Update each vertex tuple with their super vertex id and forward them.
  * 4) Filter output of 3)
- *    a) super vertex tuples are filtered, grouped and merged via groupReduce to
- *       create a final super vertex representing the group. An additional
- *       mapping from the final super vertex id to the super vertex ids of the
- *       original partitions is also created.
- *    b) non-candidate tuples are mapped to {@link VertexWithSuperVertex} using
- *       the broadcasted mapping output of 4a)
+ * a) super vertex tuples are filtered, grouped and merged via groupReduce to
+ * create a final super vertex representing the group. An additional
+ * mapping from the final super vertex id to the super vertex ids of the
+ * original partitions is also created.
+ * b) non-candidate tuples are mapped to {@link VertexWithSuperVertex} using
+ * the broadcasted mapping output of 4a)
  * 5) Map edges to a minimal representation, i.e. {@link EdgeGroupItem}
  * 6) Join edges with output of 4b) and replace source/target id with super
- *    vertex id.
+ * vertex id.
  * 7) Updated edges are grouped by source and target id and optionally by label
- *    and/or edge property.
+ * and/or edge property.
  * 8) Group combine on the workers and compute aggregate.
  * 9) Group reduce globally and create final super edges.
  */
@@ -68,26 +68,29 @@ public class GroupingGroupCombine extends Grouping {
   /**
    * Creates grouping operator instance.
    *
-   * @param useVertexLabels   group on vertex label true/false
-   * @param useEdgeLabels     group on edge label true/false
-   * @param vertexLabelGroups stores grouping properties for vertex labels
-   * @param edgeLabelGroups   stores grouping properties for edge labels
-   * @param keepVertices      keep vertices without labels (when grouping by label)
+   * @param useVertexLabels         group on vertex label true/false
+   * @param useEdgeLabels           group on edge label true/false
+   * @param vertexLabelGroups       stores grouping properties for vertex labels
+   * @param edgeLabelGroups         stores grouping properties for edge labels
+   * @param keepVertices            keep vertices without labels (when grouping by label)
+   * @param defaultVertexLabelGroup
    */
   GroupingGroupCombine(
     boolean useVertexLabels,
     boolean useEdgeLabels,
     List<LabelGroup> vertexLabelGroups,
     List<LabelGroup> edgeLabelGroups,
-    boolean keepVertices) {
-    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups, keepVertices);
+    boolean keepVertices,
+    LabelGroup defaultVertexLabelGroup) {
+    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups, keepVertices,
+      defaultVertexLabelGroup);
   }
 
   @Override
   protected LogicalGraph groupInternal(LogicalGraph graph) {
     // map vertex to vertex group item
-    DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
-      .flatMap(new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups(), true));
+    DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices().flatMap(
+      new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups(), isKeepingVertices()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> combinedVertexGroupItems = groupVertices(verticesForGrouping)

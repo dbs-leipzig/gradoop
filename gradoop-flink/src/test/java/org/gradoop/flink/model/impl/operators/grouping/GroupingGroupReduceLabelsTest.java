@@ -35,6 +35,8 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
   //  nothing
   // TODO create testcase: 1:1 conversion to supervertex => no outgoing edges/ single outgoing
   //  edge / multiple outgoing edges ... same for incoming edges?
+  // TODO create testcase: labelspecific Grouping (e.g graph with A,B,C,D Vertices,Group by A,B
+  //  => C,D will get smashed together, but should be converted 1:1 with set flag
 
   private static void convertDotToPNG(String dotFile, String pngFile) throws IOException {
     ProcessBuilder pb = new ProcessBuilder("dot", "-Tpng", dotFile);
@@ -67,7 +69,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
       "(v1:Blue {b : 2})" +
       "(v2 {b : 5, c: 1.2})" + // goal: checks that v2 won't be converted 1:1 to a
       // supervertice, because of its matching property
-      "(v3 {c : 4.1})" +
+      "(v3 {c : 4.1})" + // v3 will be converted, no label and no matching property
       "(v4:Red  {b : 2})" +
       "(v0)-->(v2)" +
       "(v1)-->(v2)" +
@@ -81,7 +83,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
       "expected[" +
         "(v00:Blue {b: NULL, count:1L})" +
         "(v01:Blue {b : 2, count:1L})" +
-        "(v02 {b : 5, count:1L})" +
+        "(v02 {b : 5, count:1L})" + // v2 builds a group
         "(v03 {b: NULL, count: 1L, c: 4.1})" + // v3 was converted 1:1
         "(v04:Red {b: 2, count: 1L})" +
         "(v00)-->(v02)" +
@@ -103,8 +105,10 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
 
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
+    System.out.println("output:");
     writeGraphPNG(output, DEFAULT_PREFIX, "groupByLabelAndPropertySingleNoLabelHasProperty");
 
+    System.out.println("expected:");
     writeGraphPNG(expected, "", "expectedGroupByLabelAndPropertySingleNoLabelHasProperty");
 
     collectAndAssertTrue(

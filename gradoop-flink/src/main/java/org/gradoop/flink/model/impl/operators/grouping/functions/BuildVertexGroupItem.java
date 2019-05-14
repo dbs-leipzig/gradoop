@@ -108,7 +108,7 @@ public class BuildVertexGroupItem extends BuildGroupItemBase implements
     reuseVertexGroupItem.setVertexId(vertex.getId());
     reuseVertexGroupItem.setTemporaryLabel(false);
 
-    if (keepVertices && vertex.getLabel().isEmpty()) {
+   /* if (keepVertices && vertex.getLabel().isEmpty()) {
 
       // TODO need to set new, unique label somehow
       // causes creation of a new, individual group for this vertex
@@ -127,15 +127,15 @@ public class BuildVertexGroupItem extends BuildGroupItemBase implements
       vertex.getPropertyKeys().forEach(key -> aggregators.add(new LastElement(key)));
 
       LabelGroup labelGroup = new LabelGroup(defaultLabelGroup.getGroupingLabel(),
-        vertex.getLabel()/* <-- is only used in setGroupItem, if useLabels is not set */,
-        propertyKeys, aggregators);
+        vertex.getLabel()/* <-- is only used in setGroupItem, if useLabels is not set *///,
+   /*     propertyKeys, aggregators);
 
       setGroupItem(reuseVertexGroupItem, vertex, labelGroup);
       reuseVertexGroupItem.setTemporaryLabel(true);
 
       collector.collect(reuseVertexGroupItem);
       return;
-    }
+    }*/
 
     // check if vertex shall be grouped by a special set of keys
     for (LabelGroup vertexLabelGroup : getLabelGroups()) {

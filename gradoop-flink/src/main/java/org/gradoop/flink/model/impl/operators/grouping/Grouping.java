@@ -77,7 +77,7 @@ import java.util.Objects;
 public abstract class Grouping implements UnaryGraphToGraphOperator {
   /**
    * Used as property key to declare a label based grouping.
-   *
+   * <p>
    * See {@link LogicalGraph#groupBy(List, List, List, List, GroupingStrategy)}
    */
   public static final String LABEL_SYMBOL = ":label";
@@ -112,6 +112,11 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   private final List<LabelGroup> edgeLabelGroups;
 
   /**
+   * Default vertex label group.
+   */
+  private final LabelGroup defaultVertexLabelGroup;
+
+  /**
    * True, iff vertices without labels will be converted to individual groups/ supervertices.
    * False, iff vertices without labels will be collapsed into a single group/ supervertice.
    */
@@ -128,12 +133,13 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    *                          grouping by labels)
    */
   Grouping(boolean useVertexLabels, boolean useEdgeLabels, List<LabelGroup> vertexLabelGroups,
-    List<LabelGroup> edgeLabelGroups, boolean keepVertices) {
+    List<LabelGroup> edgeLabelGroups, boolean keepVertices, LabelGroup defaultVertexLabelGroup) {
     this.useVertexLabels = useVertexLabels;
     this.useEdgeLabels = useEdgeLabels;
     this.vertexLabelGroups = vertexLabelGroups;
     this.edgeLabelGroups = edgeLabelGroups;
     this.keepVertices = keepVertices;
+    this.defaultVertexLabelGroup = defaultVertexLabelGroup;
   }
 
   @Override
@@ -197,6 +203,14 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    */
   protected boolean isKeepingVertices() {
     return keepVertices;
+  }
+
+  /**
+   * TODO doc
+   * @return
+   */
+  protected LabelGroup getDefaultVertexLabelGroup() {
+    return defaultVertexLabelGroup;
   }
 
   /**
@@ -301,6 +315,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * @return grouped output graph
    */
   protected abstract LogicalGraph groupInternal(LogicalGraph graph);
+
 
   /**
    * Used for building a grouping operator instance.
@@ -700,11 +715,11 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       case GROUP_REDUCE:
         groupingOperator =
           new GroupingGroupReduce(useVertexLabel, useEdgeLabel, vertexLabelGroups,
-            edgeLabelGroups, keepVertices);
+            edgeLabelGroups, keepVertices, defaultVertexLabelGroup);
         break;
       case GROUP_COMBINE:
         groupingOperator = new GroupingGroupCombine(useVertexLabel, useEdgeLabel, vertexLabelGroups,
-          edgeLabelGroups, keepVertices);
+          edgeLabelGroups, keepVertices, defaultVertexLabelGroup);
         break;
       default:
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);
