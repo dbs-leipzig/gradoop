@@ -16,44 +16,47 @@
 package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 /**
  * Computes the overlap graph from two logical graphs.
  */
-public class Overlap implements BinaryGraphToGraphOperator {
+public class Overlap<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG>> implements BinaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge
-   * sets of two input graphs. Vertex and edge equality is based on their
-   * respective identifiers.
+   * sets of two input graphs. Vertex and edge equality is based on their respective identifiers.
    *
    * @param firstGraph  first input graph
    * @param secondGraph second input graph
    * @return graph with overlapping elements from both input graphs
    */
   @Override
-  public LogicalGraph execute(
-    LogicalGraph firstGraph, LogicalGraph secondGraph) {
+  public LG execute(LG firstGraph, LG secondGraph) {
 
-    DataSet<Vertex> newVertices = firstGraph.getVertices()
+    DataSet<V> newVertices = firstGraph.getVertices()
       .join(secondGraph.getVertices())
       .where(new Id<>())
       .equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    DataSet<Edge> newEdges = firstGraph.getEdges()
+    DataSet<E> newEdges = firstGraph.getEdges()
       .join(secondGraph.getEdges())
       .where(new Id<>())
       .equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices, newEdges);
+    return firstGraph.getFactory().fromDataSets(newVertices, newEdges);
   }
 
 

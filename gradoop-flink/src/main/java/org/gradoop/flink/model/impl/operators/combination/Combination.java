@@ -16,39 +16,42 @@
 package org.gradoop.flink.model.impl.operators.combination;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
  * Computes the combined graph from two logical graphs.
  */
-public class Combination implements BinaryGraphToGraphOperator {
+public class Combination<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG>> implements BinaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Creates a new logical graph by union the vertex and edge sets of two
-   * input graphs. Vertex and edge equality is based on their respective
-   * identifiers.
+   * input graphs. Vertex and edge equality is based on their respective identifiers.
    *
    * @param firstGraph  first input graph
    * @param secondGraph second input graph
    * @return combined graph
    */
   @Override
-  public LogicalGraph execute(LogicalGraph firstGraph,
-    LogicalGraph secondGraph) {
+  public LG execute(LG firstGraph, LG secondGraph) {
 
-    DataSet<Vertex> newVertexSet = firstGraph.getVertices()
+    DataSet<V> newVertexSet = firstGraph.getVertices()
       .union(secondGraph.getVertices())
-      .distinct(new Id<Vertex>());
+      .distinct(new Id<>());
 
-    DataSet<Edge> newEdgeSet = firstGraph.getEdges()
+    DataSet<E> newEdgeSet = firstGraph.getEdges()
       .union(secondGraph.getEdges())
-      .distinct(new Id<Edge>());
+      .distinct(new Id<>());
 
-    return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertexSet, newEdgeSet);
+    return firstGraph.getFactory().fromDataSets(newVertexSet, newEdgeSet);
   }
 
 }

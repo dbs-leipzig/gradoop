@@ -33,14 +33,12 @@
 package org.gradoop.flink.model.impl.operators.exclusion;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.SourceId;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.LeftWhenRightIsNull;
 
 /**
@@ -49,28 +47,21 @@ import org.gradoop.flink.model.impl.functions.utils.LeftWhenRightIsNull;
  * the second graph. The graph head of the first graph is retained. Vertex and edge equality
  * is based on their respective identifiers.
  */
-public class Exclusion implements BinaryGraphToGraphOperator {
+public class Exclusion<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG>> implements BinaryBaseGraphToBaseGraphOperator<LG> {
 
   @Override
-  public LogicalGraph execute(
-    LogicalGraph firstGraph, LogicalGraph secondGraph) {
-    DataSet<Vertex> newVertexSet = firstGraph.getVertices()
+  public LG execute(LG firstGraph, LG secondGraph) {
+    DataSet<V> newVertexSet = firstGraph.getVertices()
       .leftOuterJoin(secondGraph.getVertices())
       .where(new Id<>())
       .equalTo(new Id<>())
       .with(new LeftWhenRightIsNull<>());
 
-    DataSet<Edge> newEdgeSet = firstGraph.getEdges()
-      .join(newVertexSet)
-      .where(new SourceId<>())
-      .equalTo(new Id<>())
-      .with(new LeftSide<>())
-      .join(newVertexSet)
-      .where(new TargetId<>())
-      .equalTo(new Id<>())
-      .with(new LeftSide<>());
-
     return firstGraph.getFactory()
-      .fromDataSets(firstGraph.getGraphHead(), newVertexSet, newEdgeSet);
+      .fromDataSets(firstGraph.getGraphHead(), newVertexSet, firstGraph.getEdges()).verify();
   }
 }

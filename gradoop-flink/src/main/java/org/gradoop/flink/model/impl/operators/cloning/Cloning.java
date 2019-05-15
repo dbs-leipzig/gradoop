@@ -35,8 +35,12 @@ import org.gradoop.flink.model.impl.operators.cloning.functions.ElementGraphUpda
 import org.gradoop.flink.model.impl.operators.cloning.functions.Value0Of2ToId;
 
 /**
- * Creates a copy of the logical graph with new ids for the graph head,
- * vertices and edges.
+ * Creates a copy of the logical graph with new ids for the graph head, vertices and edges.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> the type of the logical graph
  */
 public class Cloning<
   G extends EPGMGraphHead,
