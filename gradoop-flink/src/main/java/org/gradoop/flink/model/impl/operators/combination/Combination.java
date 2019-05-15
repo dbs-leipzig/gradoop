@@ -25,6 +25,11 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
  * Computes the combined graph from two logical graphs.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> the type of the logical graph
  */
 public class Combination<
   G extends EPGMGraphHead,

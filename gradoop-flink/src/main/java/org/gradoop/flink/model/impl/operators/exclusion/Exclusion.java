@@ -46,6 +46,11 @@ import org.gradoop.flink.model.impl.functions.utils.LeftWhenRightIsNull;
  * Reduces the first input graph to contain only vertices and edges that don't exist in
  * the second graph. The graph head of the first graph is retained. Vertex and edge equality
  * is based on their respective identifiers.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> the type of the logical graph
  */
 public class Exclusion<
   G extends EPGMGraphHead,

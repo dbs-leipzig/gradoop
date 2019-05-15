@@ -26,6 +26,11 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 /**
  * Computes the overlap graph from two logical graphs.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> the type of the logical graph
  */
 public class Overlap<
   G extends EPGMGraphHead,
