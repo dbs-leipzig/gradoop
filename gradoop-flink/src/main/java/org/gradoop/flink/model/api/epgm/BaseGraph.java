@@ -47,4 +47,9 @@ public interface BaseGraph<
    * @return a factory that can be used to create a {@link LG} instance
    */
   BaseGraphFactory<G, V, E, LG> getFactory();
+
+  //----------------------------------------------------------------------------
+  // Unary Operators
+  //----------------------------------------------------------------------------
+
 }

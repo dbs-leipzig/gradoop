@@ -221,7 +221,7 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
 
   @Override
   public LogicalGraph copy() {
-    return callForGraph(new Cloning());
+    return callForGraph(new Cloning<>());
   }
 
   @Override
