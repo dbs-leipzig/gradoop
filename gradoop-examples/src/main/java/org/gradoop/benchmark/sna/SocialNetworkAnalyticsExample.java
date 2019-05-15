@@ -27,13 +27,13 @@ import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVDataSink;
 import org.gradoop.flink.io.impl.csv.indexed.IndexedCSVDataSource;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
 import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatisticsHDFSReader;
-import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.File;
@@ -136,12 +136,12 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
     }
 
     // group on vertex and edge labels + count grouped edges
-    LogicalGraph groupedGraph  = new Grouping.GroupingBuilder()
+    LogicalGraph groupedGraph  = graph.callForGraph(new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_COMBINE)
       .addVertexGroupingKey("name")
       .useEdgeLabel(true).useVertexLabel(true)
       .addEdgeAggregateFunction(new Count())
-      .build().execute(graph);
+      .build());
 
     // filter all edges below a fixed threshold
     groupedGraph = groupedGraph.edgeInducedSubgraph(new CountFilter());
