@@ -71,8 +71,6 @@ public class GDLQueryExample {
       "WHERE u1.name = \"Alice\"");
 
     // print the matches
-    matches.getGraphHeads().print();
-    matches.getVertices().print();
-    matches.getEdges().print();
+    matches.print();
   }
 }

@@ -75,8 +75,6 @@ public class GellyCommunitiesExample {
     graph = graph.callForGraph(new GellyLabelPropagation(5, communityKey));
 
     // print results
-    graph.getGraphHead().print();
-    graph.getVertices().print();
-    graph.getEdges().print();
+    graph.print();
   }
 }

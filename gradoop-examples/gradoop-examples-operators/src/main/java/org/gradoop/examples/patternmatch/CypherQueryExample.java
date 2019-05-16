@@ -58,8 +58,6 @@ public class CypherQueryExample {
       "RETURN *").getGraphs();
 
     // print found matches
-    matches.getGraphHeads().print();
-    matches.getVertices().print();
-    matches.getEdges().print();
+    matches.print();
   }
 }

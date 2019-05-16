@@ -68,24 +68,18 @@ public class QuickstartExample {
     LogicalGraph graph1 = loader.getLogicalGraphByVariable("g1");
 
     System.out.println("INPUT_GRAPH_1");
-    graph1.getGraphHead().print();
-    graph1.getVertices().print();
-    graph1.getEdges().print();
+    graph1.print();
 
     LogicalGraph graph2 = loader.getLogicalGraphByVariable("g2");
 
     System.out.println("INPUT_GRAPH_2");
-    graph2.getGraphHead().print();
-    graph2.getVertices().print();
-    graph2.getEdges().print();
+    graph2.print();
 
     // execute overlap
     LogicalGraph overlap = graph2.overlap(graph1);
 
     System.out.println("OVERLAP_GRAPH");
-    overlap.getGraphHead().print();
-    overlap.getVertices().print();
-    overlap.getEdges().print();
+    overlap.print();
 
     // execute combine
     LogicalGraph workGraph = graph1.combine(graph2)
@@ -94,17 +88,13 @@ public class QuickstartExample {
         e -> e.getLabel().equals("worksAt"));
 
     System.out.println("COMBINED_GRAPH with SUBGRAPH");
-    workGraph.getGraphHead().print();
-    workGraph.getVertices().print();
-    workGraph.getEdges().print();
+    workGraph.print();
 
     // execute WCC
     GraphCollection workspaces = new WeaklyConnectedComponentsAsCollection(5).execute(workGraph);
 
     System.out.println("CONNECTED_COMPONENTS_GRAPH");
-    workspaces.getGraphHeads().print();
-    workspaces.getVertices().print();
-    workspaces.getEdges().print();
+    workspaces.print();
   }
 
 }

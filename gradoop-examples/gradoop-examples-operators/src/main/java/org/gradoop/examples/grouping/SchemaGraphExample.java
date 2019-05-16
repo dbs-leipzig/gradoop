@@ -69,10 +69,6 @@ public class SchemaGraphExample {
     LogicalGraph schema = graph.groupBy(singletonList(LABEL_SYMBOL), singletonList(LABEL_SYMBOL));
 
     // print results
-//    schema.getGraphHead().print();
-//    schema.getVertices().print();
-//    schema.getEdges().print();
-
     schema.print();
   }
 }

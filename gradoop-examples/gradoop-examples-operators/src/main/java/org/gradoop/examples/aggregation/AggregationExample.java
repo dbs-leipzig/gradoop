@@ -97,8 +97,6 @@ public class AggregationExample {
       .transformGraphHead(new AddPropertyMeanAgeToGraphHead());
 
     // print graph, which now contains the newly aggregated properties in the graph head
-    result.getGraphHead().print();
-    result.getVertices().print();
-    result.getEdges().print();
+    result.print();
   }
 }
