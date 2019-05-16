@@ -60,6 +60,7 @@
                                     <include>org.apache.hbase:hbase-common</include>
                                     <include>com.github.s1ck:gdl</include>
                                     <include>org.antlr:antlr4-runtime</include>
+                                    <include>me.lemire.integercompression:*</include>
                                     <!-- capf example dependencies -->
                                     <include>org.opencypher:*</include>
                                     <include>org.apache.flink:flink-table_2.11</include>
