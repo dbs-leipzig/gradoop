@@ -20,9 +20,12 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 
 import java.util.Objects;
@@ -155,6 +158,28 @@ public interface BaseGraphOperators<
    * @return logical graph with additional properties storing the aggregates
    */
   LG aggregate(AggregateFunction... aggregateFunctions);
+
+  /**
+   * Sets the aggregation result of the given function as property for each vertex. All edges where
+   * the vertex is relevant get joined first and then grouped. The relevant edges are specified
+   * using the direction which may direct to the vertex, or from the vertex or both.
+   *
+   * @param function      aggregate function
+   * @param edgeDirection incoming, outgoing edges or both
+   * @return logical graph where vertices store aggregated information about connected edges
+   */
+  LG reduceOnEdges(EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
+
+  /**
+   * Sets the aggregation result of the given function as property for each vertex. All vertices
+   * of relevant edges get joined first and then grouped by the vertex. The relevant edges are
+   * specified using the direction which may direct to the vertex, or from the vertex or both.
+   *
+   * @param function      aggregate function
+   * @param edgeDirection incoming, outgoing edges or both
+   * @return logical graph where vertices store aggregated information about connected vertices
+   */
+  LG reduceOnNeighbors(VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
 
   /**
    * Verifies this graph, removing dangling edges, i.e. edges pointing to or from

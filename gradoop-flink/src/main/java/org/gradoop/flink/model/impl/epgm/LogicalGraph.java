@@ -27,8 +27,6 @@ import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.epgm.LogicalGraphOperators;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
@@ -46,9 +44,6 @@ import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
-import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
-import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
-import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.rollup.EdgeRollUp;
 import org.gradoop.flink.model.impl.operators.rollup.VertexRollUp;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
@@ -248,18 +243,6 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
       edgeAggregateFunctions.forEach(builder::addEdgeAggregateFunction);
     }
     return callForGraph(builder.build());
-  }
-
-  @Override
-  public LogicalGraph reduceOnEdges(
-    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
-    return callForGraph(new ReduceEdgeNeighborhood(function, edgeDirection));
-  }
-
-  @Override
-  public LogicalGraph reduceOnNeighbors(
-    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
-    return callForGraph(new ReduceVertexNeighborhood(function, edgeDirection));
   }
 
   @Override

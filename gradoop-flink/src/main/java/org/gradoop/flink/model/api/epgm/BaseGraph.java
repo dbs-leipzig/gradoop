@@ -20,12 +20,17 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
+import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
+import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
+import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
+import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
@@ -125,6 +130,18 @@ public interface BaseGraph<
   @Override
   default LG aggregate(AggregateFunction... aggregateFunctions) {
     return callForGraph(new Aggregation<>(aggregateFunctions));
+  }
+
+  @Override
+  default LG reduceOnEdges(
+    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
+    return callForGraph(new ReduceEdgeNeighborhood<>(function, edgeDirection));
+  }
+
+  @Override
+  default LG reduceOnNeighbors(
+    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
+    return callForGraph(new ReduceVertexNeighborhood<>(function, edgeDirection));
   }
 
   @Override
