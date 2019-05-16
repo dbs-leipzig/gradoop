@@ -49,7 +49,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
   public void testKeepVerticesFlag() {
     Grouping grouping = new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
-      .setKeepVertices(true)
+      .setRetainVerticesWithoutGroups(true)
       .build();
 
     assertTrue(grouping.isKeepingVertices());
@@ -96,7 +96,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
-      .setKeepVertices(true)
+      .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
@@ -152,7 +152,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
-      .setKeepVertices(true)
+      .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
@@ -192,7 +192,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
       "expected[" +
         "(v00:Blue {b: NULL, count:1L})" +
         "(v01:Blue {b : 2, count:1L})" +
-        "(v02 {c : 4.1, count:1L})" + // was converted 1:1
+        "(v02 {b: NULL, c : 4.1, count:1L})" + // was converted 1:1
         "(v03:Red {b: 2, count: 1L})" +
         "(v00)-->(v02)" +
         "(v01)-->(v02)" +
@@ -203,7 +203,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
-      .setKeepVertices(true)
+      .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
@@ -246,8 +246,8 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
       "expected[" +
         "(v00:Blue {b: NULL, count:1L})" +
         "(v01:Blue {b : 2, count:1L})" +
-        "(v02 {c : 4.1, count:1L})" + // was converted 1:1
-        "(v021 {d : 'a', count:1L})" + // was converted 1:1
+        "(v02 {b: NULL, c : 4.1, count:1L})" + // was converted 1:1
+        "(v021 {b: NULL, d : 'a', count:1L})" + // was converted 1:1
         "(v03:Red {b: 2, count: 1L})" +
         "(v00)-->(v02)" +
         "(v01)-->(v02)" +
@@ -260,7 +260,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
-      .setKeepVertices(true)
+      .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
@@ -309,7 +309,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
-      .setKeepVertices(true)
+      .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexAggregateFunction(new Count())
       .build()
@@ -361,7 +361,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
-      .setKeepVertices(true)
+      .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexAggregateFunction(new Count())
       .build()

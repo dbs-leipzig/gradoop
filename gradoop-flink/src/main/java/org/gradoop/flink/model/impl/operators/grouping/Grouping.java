@@ -117,28 +117,30 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   private final LabelGroup defaultVertexLabelGroup;
 
   /**
-   * True, iff vertices without labels will be converted to individual groups/ supervertices.
-   * False, iff vertices without labels will be collapsed into a single group/ supervertice.
+   * True: vertices without labels or matching properties will be converted to individual groups/
+   * supervertices.
+   * False: vertices without labels or matching properties will be collapsed into a single group/
+   * supervertice.
    */
-  private final boolean keepVertices;
+  private final boolean retainVerticesWithoutGroups;
 
   /**
    * Creates grouping operator instance.
    *
-   * @param useVertexLabels   group on vertex label true/false
-   * @param useEdgeLabels     group on edge label true/false
-   * @param vertexLabelGroups stores grouping properties for vertex labels
-   * @param edgeLabelGroups   stores grouping properties for edge labels
-   * @param keepVertices      convert vertices without labels to supervertices (only applies when
+   * @param useVertexLabels                   group on vertex label true/false
+   * @param useEdgeLabels                     group on edge label true/false
+   * @param vertexLabelGroups                 stores grouping properties for vertex labels
+   * @param edgeLabelGroups                   stores grouping properties for edge labels
+   * @param retainVerticesWithoutGroups      convert vertices without labels to supervertices (only applies when
    *                          grouping by labels)
    */
   Grouping(boolean useVertexLabels, boolean useEdgeLabels, List<LabelGroup> vertexLabelGroups,
-    List<LabelGroup> edgeLabelGroups, boolean keepVertices, LabelGroup defaultVertexLabelGroup) {
+    List<LabelGroup> edgeLabelGroups, boolean retainVerticesWithoutGroups, LabelGroup defaultVertexLabelGroup) {
     this.useVertexLabels = useVertexLabels;
     this.useEdgeLabels = useEdgeLabels;
     this.vertexLabelGroups = vertexLabelGroups;
     this.edgeLabelGroups = edgeLabelGroups;
-    this.keepVertices = keepVertices;
+    this.retainVerticesWithoutGroups = retainVerticesWithoutGroups;
     this.defaultVertexLabelGroup = defaultVertexLabelGroup;
   }
 
@@ -202,7 +204,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * @return true, iff vertices will be converted
    */
   protected boolean isKeepingVertices() {
-    return keepVertices;
+    return retainVerticesWithoutGroups;
   }
 
   /**
@@ -369,7 +371,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * True, iff vertices without labels will be converted to individual groups/ supervertices.
      * False, iff vertices without labels will be collapsed into a single group/ supervertice.
      */
-    private boolean keepVertices;
+    private boolean retainVerticesWithoutGroups;
 
     /**
      * Creates a new grouping builder
@@ -404,14 +406,14 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
 
     /**
      * This flag only applies when grouping by labels.
-     * If keepVertices is true, vertices without labels are converted as is to supervertices.
+     * If retainVerticesWithoutGroups is true, vertices without labels are converted as is to supervertices.
      * Otherwise all vertices without labels are collapsed into a single supervertice/ group.
      *
-     * @param keepVertices true: Vertices without labels are not reduced to a single super vertex
+     * @param retainVerticesWithoutGroups true: Vertices without labels are not reduced to a single super vertex
      * @return this builder
      */
-    public GroupingBuilder setKeepVertices(boolean keepVertices) {
-      this.keepVertices = keepVertices;
+    public GroupingBuilder setRetainVerticesWithoutGroups(boolean retainVerticesWithoutGroups) {
+      this.retainVerticesWithoutGroups = retainVerticesWithoutGroups;
       return this;
     }
 
@@ -715,11 +717,11 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       case GROUP_REDUCE:
         groupingOperator =
           new GroupingGroupReduce(useVertexLabel, useEdgeLabel, vertexLabelGroups,
-            edgeLabelGroups, keepVertices, defaultVertexLabelGroup);
+            edgeLabelGroups, retainVerticesWithoutGroups, defaultVertexLabelGroup);
         break;
       case GROUP_COMBINE:
         groupingOperator = new GroupingGroupCombine(useVertexLabel, useEdgeLabel, vertexLabelGroups,
-          edgeLabelGroups, keepVertices, defaultVertexLabelGroup);
+          edgeLabelGroups, retainVerticesWithoutGroups, defaultVertexLabelGroup);
         break;
       default:
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);

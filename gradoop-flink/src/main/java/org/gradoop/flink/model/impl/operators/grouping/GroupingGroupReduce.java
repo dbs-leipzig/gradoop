@@ -20,6 +20,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.filters.And;
 import org.gradoop.flink.model.impl.functions.filters.Not;
@@ -61,24 +62,31 @@ import java.util.Optional;
  */
 public class GroupingGroupReduce extends Grouping {
 
+  /**
+   * vertices are kept, iff their label is empty and when they don't have any property that is
+   * grouped by
+   */
   private final FilterFunction<Vertex>
-    verticesToKeepFilter = new And<>(new EmptyLabelFilter(),
+    verticesWithoutGroupFilter = new And<>(new EmptyLabelFilter(),
     new Not<>(new HasLabelingGroupPropertyFilter(getDefaultVertexLabelGroup())));
 
   /**
    * Creates grouping operator instance.
    *
-   * @param useVertexLabels         group on vertex label true/false
-   * @param useEdgeLabels           group on edge label true/false
-   * @param vertexLabelGroups       stores grouping properties for vertex labels
-   * @param edgeLabelGroups         stores grouping properties for edge labels
-   * @param keepVertices            keep vertices without labels (when grouping by label)
-   * @param defaultVertexLabelGroup default vertex label group
+   * @param useVertexLabels             group on vertex label true/false
+   * @param useEdgeLabels               group on edge label true/false
+   * @param vertexLabelGroups           stores grouping properties for vertex labels
+   * @param edgeLabelGroups             stores grouping properties for edge labels
+   * @param retainVerticesWithoutGroups convert vertices that are not member of a group as is to
+   *                                    supervertices
+   * @param defaultVertexLabelGroup     default vertex label group
    */
   GroupingGroupReduce(boolean useVertexLabels, boolean useEdgeLabels,
-    List<LabelGroup> vertexLabelGroups, List<LabelGroup> edgeLabelGroups, boolean keepVertices,
+    List<LabelGroup> vertexLabelGroups, List<LabelGroup> edgeLabelGroups,
+    boolean retainVerticesWithoutGroups,
     LabelGroup defaultVertexLabelGroup) {
-    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups, keepVertices,
+    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups,
+      retainVerticesWithoutGroups,
       defaultVertexLabelGroup);
 
   }
@@ -89,7 +97,7 @@ public class GroupingGroupReduce extends Grouping {
     DataSet<Vertex> vertices = graph.getVertices();
 
     Optional<DataSet<Vertex>> optionalConvertedVertices =
-      isKeepingVertices() ? Optional.of(getVerticesToKeep(vertices)) : Optional.empty();
+      isKeepingVertices() ? Optional.of(getVerticesWithoutGroup(vertices)) : Optional.empty();
 
     if (optionalConvertedVertices.isPresent()) {
       vertices = getVerticesToGroup(vertices);
@@ -120,6 +128,16 @@ public class GroupingGroupReduce extends Grouping {
 
       DataSet<Vertex> convertedVertices = optionalConvertedVertices.get();
 
+      // --- TODO property and aggregate step necessary?
+      // Add all properties that were grouped by as null values to converted vertices
+      convertedVertices =
+        convertedVertices.map(new AddPropertiesAsNullValues(getDefaultVertexLabelGroup()));
+
+      // Execute aggregation functions once for each converted vertex
+      convertedVertices =
+        convertedVertices.map(new AddSingleAggregationResult(getDefaultVertexLabelGroup()));
+      // ---
+
       superVertices = superVertices.union(convertedVertices);
 
       DataSet<VertexWithSuperVertex> optionalRepresentatives =
@@ -137,13 +155,12 @@ public class GroupingGroupReduce extends Grouping {
 
   //TODO extract super function
   private DataSet<Vertex> getVerticesToGroup(DataSet<Vertex> vertices) {
-    return vertices.filter(new Not<>(verticesToKeepFilter));
+    return vertices.filter(new Not<>(verticesWithoutGroupFilter));
   }
 
-  // vertices are kept, iff their label is empty and when they don't have any property that is
-  // grouped by
-  private DataSet<Vertex> getVerticesToKeep(DataSet<Vertex> vertices) {
-    return vertices.filter(verticesToKeepFilter);
+
+  private DataSet<Vertex> getVerticesWithoutGroup(DataSet<Vertex> vertices) {
+    return vertices.filter(verticesWithoutGroupFilter);
   }
 
   /**
@@ -158,7 +175,7 @@ public class GroupingGroupReduce extends Grouping {
   }
 
   /**
-   * Returns true, if a vertice has properties of a labelGroup.
+   * Returns true, if a vertice has property keys of a labelGroup.
    */
   private static class HasLabelingGroupPropertyFilter implements FilterFunction<Vertex> {
 
@@ -177,6 +194,10 @@ public class GroupingGroupReduce extends Grouping {
   }
 
 
+  /**
+   * Creates a {@link VertexWithSuperVertex} with both components referencing the same
+   * vertex that is mapped on.
+   */
   private class VertexSuperVertexIdentity implements MapFunction<Vertex, VertexWithSuperVertex> {
 
     /**
@@ -195,5 +216,50 @@ public class GroupingGroupReduce extends Grouping {
       return reuseTuple;
     }
 
+  }
+
+  /**
+   * Adds all properties of a {@link LabelGroup} to a vertex, initialized with
+   * PropertyValue.NULL_VALUE.
+   */
+  private class AddPropertiesAsNullValues implements MapFunction<Vertex, Vertex> {
+
+    private final LabelGroup labelGroup;
+
+    public AddPropertiesAsNullValues(LabelGroup labelGroup) {
+      this.labelGroup = labelGroup;
+    }
+
+    @Override
+    public Vertex map(Vertex value) throws Exception {
+
+      labelGroup.getPropertyKeys()
+        .forEach(key -> value.setProperty(key, PropertyValue.NULL_VALUE));
+
+      return value;
+    }
+  }
+
+  /**
+   * Executes each aggregation function in a labelGroup once and adds the result as a property to
+   * a vertex.
+   */
+  private class AddSingleAggregationResult implements MapFunction<Vertex, Vertex> {
+
+    private final LabelGroup labelGroup;
+
+    public AddSingleAggregationResult(LabelGroup labelGroup) {
+
+      this.labelGroup = labelGroup;
+    }
+
+    @Override
+    public Vertex map(Vertex value) throws Exception {
+
+      labelGroup.getAggregateFunctions()
+        .forEach(fun -> value.setProperty(fun.getAggregatePropertyKey(), fun.getIncrement(value)));
+
+      return value;
+    }
   }
 }
