@@ -56,17 +56,11 @@
                                     <!-- libs that are not provided by flink binary -->
                                     <include>org.apache.flink:flink-gelly_2.11</include>
                                     <include>org.apache.flink:flink-java</include>
-                                    <!-- property value bytes class -->
-                                    <include>org.apache.hbase:hbase-common</include>
                                     <!-- others -->
-                                    <!--<include>org.neo4j:*</include>-->
+                                    <include>org.apache.hbase:hbase-common</include>
                                     <include>com.github.s1ck:gdl</include>
-                                    <!--<include>org.codehaus.jettison:jettison</include>-->
-                                    <!--<include>com.google.guava:guava</include>-->
                                     <include>org.antlr:antlr4-runtime</include>
-                                    <!--<include>me.lemire.integercompression:*</include>-->
-                                    <!--<include>commons-cli:*</include>-->
-                                    <!-- CAPF Example Dependencies -->
+                                    <!-- capf example dependencies -->
                                     <include>org.opencypher:*</include>
                                     <include>org.apache.flink:flink-table_2.11</include>
                                     <include>org.parboiled:parboiled-scala_2.11</include>
