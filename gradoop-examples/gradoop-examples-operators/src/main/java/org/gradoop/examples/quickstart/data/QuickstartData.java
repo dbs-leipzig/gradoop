@@ -1,7 +1,17 @@
 package org.gradoop.examples.quickstart.data;
 
+/**
+ * Class to provide the graph data for the QuickstartExample
+ */
 public class QuickstartData {
 
+  /**
+   * Example Graph for QuickstartExample
+   *
+   * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Getting-started">
+   * Gradoop Quickstart Example</a>
+   * @return example graph
+   */
   public static String getGraphGDLString() {
 
     return "" +

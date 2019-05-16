@@ -17,10 +17,7 @@ package org.gradoop.examples.communities;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.common.SocialNetworkGraph;
-import org.gradoop.examples.patternmatch.GDLPatternMatchExample;
 import org.gradoop.flink.algorithms.gelly.labelpropagation.GellyLabelPropagation;
-import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -78,6 +75,8 @@ public class GellyCommunitiesExample {
     graph = graph.callForGraph(new GellyLabelPropagation(5, communityKey));
 
     // print results
-    graph.print();
+    graph.getGraphHead().print();
+    graph.getVertices().print();
+    graph.getEdges().print();
   }
 }

@@ -30,15 +30,27 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Simple Gradoop Example that walks through the process of loading data, doing a simple graph
- * transformation and storing the results
+ * A self contained quickstart example on how to use a composition of gradoop operators.
  * */
 public class QuickstartExample {
 
   /**
-   * run the example
+   * Runs the program on the example data graph.
+   *
+   * The example provides an overview over the possible usage of gradoop operators in general.
+   * Documentation for all available operators as well as their detailed description can be
+   * found in the projects wiki.
+   *
+   * Using a prepared graph (see link below), the program will:
+   * 1. create the graph based on the given gdl string
+   * 2. show input graphs
+   * 3. calculate and show the overlap
+   * 4. calculate and show the combination result (combined with subgraph operator)
+   * 5. calculate and show the WCC result
    *
    * @param args no args used
+   * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Getting-started">
+   * Gradoop Quickstart Example</a>
    * @throws Exception on failure
    */
   public static void main(String[] args) throws Exception {
@@ -52,18 +64,28 @@ public class QuickstartExample {
     loader.initDatabaseFromString(
       URLDecoder.decode(QuickstartData.getGraphGDLString(), StandardCharsets.UTF_8.name()));
 
-    GraphCollection inputGraphs = loader.getGraphCollectionByVariables("g1", "g2");
+    // show input
+    LogicalGraph graph1 = loader.getLogicalGraphByVariable("g1");
 
-    System.out.println("INPUT_GRAPH:");
-    inputGraphs.print();
+    System.out.println("INPUT_GRAPH_1");
+    graph1.getGraphHead().print();
+    graph1.getVertices().print();
+    graph1.getEdges().print();
+
+    LogicalGraph graph2 = loader.getLogicalGraphByVariable("g2");
+
+    System.out.println("INPUT_GRAPH_2");
+    graph2.getGraphHead().print();
+    graph2.getVertices().print();
+    graph2.getEdges().print();
 
     // execute overlap
-    LogicalGraph graph1 = loader.getLogicalGraphByVariable("g1");
-    LogicalGraph graph2 = loader.getLogicalGraphByVariable("g2");
     LogicalGraph overlap = graph2.overlap(graph1);
 
     System.out.println("OVERLAP_GRAPH");
-    overlap.print();
+    overlap.getGraphHead().print();
+    overlap.getVertices().print();
+    overlap.getEdges().print();
 
     // execute combine
     LogicalGraph workGraph = graph1.combine(graph2)
@@ -72,13 +94,17 @@ public class QuickstartExample {
         e -> e.getLabel().equals("worksAt"));
 
     System.out.println("COMBINED_GRAPH with SUBGRAPH");
-    workGraph.print();
+    workGraph.getGraphHead().print();
+    workGraph.getVertices().print();
+    workGraph.getEdges().print();
 
-    // Weakly Connected Components Algorithm
+    // execute WCC
     GraphCollection workspaces = new WeaklyConnectedComponentsAsCollection(5).execute(workGraph);
 
     System.out.println("CONNECTED_COMPONENTS_GRAPH");
-    workspaces.print();
+    workspaces.getGraphHeads().print();
+    workspaces.getVertices().print();
+    workspaces.getEdges().print();
   }
 
 }

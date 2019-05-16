@@ -17,9 +17,6 @@ package org.gradoop.examples.grouping;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.common.SocialNetworkGraph;
-import org.gradoop.examples.patternmatch.GDLPatternMatchExample;
-import org.gradoop.flink.io.api.DataSource;
-import org.gradoop.flink.io.impl.csv.CSVDataSource;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -31,16 +28,26 @@ import static java.util.Collections.singletonList;
 import static org.gradoop.flink.model.impl.operators.grouping.Grouping.LABEL_SYMBOL;
 
 /**
- * Demo program that uses graph grouping to extract the schema from a (possibly large) property
- * (logical) graph. The resulting summary graph is written to console.
+ * A self contained example on how to use the grouping operator on Gradoop's LogicalGraph class.
+ *
+ * The example used the graph in dev-support/social-network.pdf
  */
 public class SchemaGraphExample {
 
   /**
-   * Loads the graph from the specified input path, computes its schema via grouping and writes
-   * the result as DOT into the output path and converts it into an PNG image.
+   * Runs the program on the example data graph
+   *
+   * The example provides an overview over the usage of the grouping() method.
+   * Documentation of possible settings for the grouping operator can be found in the projects wiki.
+   *
+   * Using the social network graph {@link SocialNetworkGraph}, the program will:
+   * 1. load the graph from the given gdl string
+   * 2. group the graph based on vertex and edge labels
+   * 3. print the resulting schema graph
    *
    * @param args arguments
+   * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Unary-Logical-Graph-Operators">
+   * Gradoop Wiki</a>
    * @throws Exception if something goes wrong
    */
   public static void main(String[] args) throws Exception {
@@ -62,6 +69,10 @@ public class SchemaGraphExample {
     LogicalGraph schema = graph.groupBy(singletonList(LABEL_SYMBOL), singletonList(LABEL_SYMBOL));
 
     // print results
+//    schema.getGraphHead().print();
+//    schema.getVertices().print();
+//    schema.getEdges().print();
+
     schema.print();
   }
 }
