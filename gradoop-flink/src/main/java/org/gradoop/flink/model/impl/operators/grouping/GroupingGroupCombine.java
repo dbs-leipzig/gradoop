@@ -90,7 +90,7 @@ public class GroupingGroupCombine extends Grouping {
   protected LogicalGraph groupInternal(LogicalGraph graph) {
     // map vertex to vertex group item
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices().flatMap(
-      new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups(), isKeepingVertices()));
+      new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups(), isRetainingVerticesWithoutGroups()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> combinedVertexGroupItems = groupVertices(verticesForGrouping)

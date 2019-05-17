@@ -127,15 +127,17 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   /**
    * Creates grouping operator instance.
    *
-   * @param useVertexLabels                   group on vertex label true/false
-   * @param useEdgeLabels                     group on edge label true/false
-   * @param vertexLabelGroups                 stores grouping properties for vertex labels
-   * @param edgeLabelGroups                   stores grouping properties for edge labels
-   * @param retainVerticesWithoutGroups      convert vertices without labels to supervertices (only applies when
-   *                          grouping by labels)
+   * @param useVertexLabels             group on vertex label true/false
+   * @param useEdgeLabels               group on edge label true/false
+   * @param vertexLabelGroups           stores grouping properties for vertex labels
+   * @param edgeLabelGroups             stores grouping properties for edge labels
+   * @param retainVerticesWithoutGroups convert vertices without labels to supervertices (only
+   *                                    applies when
+   *                                    grouping by labels)
    */
   Grouping(boolean useVertexLabels, boolean useEdgeLabels, List<LabelGroup> vertexLabelGroups,
-    List<LabelGroup> edgeLabelGroups, boolean retainVerticesWithoutGroups, LabelGroup defaultVertexLabelGroup) {
+    List<LabelGroup> edgeLabelGroups, boolean retainVerticesWithoutGroups,
+    LabelGroup defaultVertexLabelGroup) {
     this.useVertexLabels = useVertexLabels;
     this.useEdgeLabels = useEdgeLabels;
     this.vertexLabelGroups = vertexLabelGroups;
@@ -203,12 +205,13 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    *
    * @return true, iff vertices will be converted
    */
-  protected boolean isKeepingVertices() {
+  protected boolean isRetainingVerticesWithoutGroups() {
     return retainVerticesWithoutGroups;
   }
 
   /**
    * TODO doc
+   *
    * @return
    */
   protected LabelGroup getDefaultVertexLabelGroup() {
@@ -406,10 +409,12 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
 
     /**
      * This flag only applies when grouping by labels.
-     * If retainVerticesWithoutGroups is true, vertices without labels are converted as is to supervertices.
+     * If retainVerticesWithoutGroups is true, vertices without labels are converted as is to
+     * supervertices.
      * Otherwise all vertices without labels are collapsed into a single supervertice/ group.
      *
-     * @param retainVerticesWithoutGroups true: Vertices without labels are not reduced to a single super vertex
+     * @param retainVerticesWithoutGroups true: Vertices without labels are not reduced to a
+     *                                    single super vertex
      * @return this builder
      */
     public GroupingBuilder setRetainVerticesWithoutGroups(boolean retainVerticesWithoutGroups) {
@@ -697,6 +702,11 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
         throw new IllegalArgumentException(
           "Provide vertex key(s) and/or use vertex labels for grouping.");
       }
+
+/*      if (retainVerticesWithoutGroups && !useVertexLabel) {
+        throw new UnsupportedOperationException("retainVerticesWithoutGroups can only be used in " +
+          "conjunction with useVertexLabel");
+      }*/
 
       // adding the global aggregators to the associated label groups
       for (LabelGroup vertexLabelGroup : vertexLabelGroups) {

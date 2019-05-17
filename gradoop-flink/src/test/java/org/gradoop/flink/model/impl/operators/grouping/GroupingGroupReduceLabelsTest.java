@@ -24,20 +24,25 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 
 import static org.junit.Assert.assertTrue;
 
 public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
 
-  // TODO create testcase: 1:1 conversion to supervertex: test that vertices with single/multiple
-  //  properties are cloned correctly
-  // TODO create testcase: user is not using label specific grouping => keepVertices should do
-  //  nothing
-  // TODO create testcase: 1:1 conversion to supervertex => no outgoing edges/ single outgoing
-  //  edge / multiple outgoing edges ... same for incoming edges?
+
   // TODO create testcase: labelspecific Grouping (e.g graph with A,B,C,D Vertices,Group by A,B
   //  => C,D will get smashed together, but should be converted 1:1 with set flag
+  // TODO label specific grouping: addVertexGroupingKey functionality. (adds a property key to
+  //  the vertex grouping keys for vertices which do not have a specific label group)
 
+  // TODO test that group by property is added
+  // TODO test that aggregate function is called correctly
+
+  // TODO testcase: group by props a and b, vertex has only a => vertex should be in no
+  //  group!
+
+  // TODO testcase: can vertex be in multiple labelgroups?
   private static void convertDotToPNG(String dotFile, String pngFile) throws IOException {
     ProcessBuilder pb = new ProcessBuilder("dot", "-Tpng", dotFile);
     File output = new File(pngFile);
@@ -46,16 +51,108 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
   }
 
   @Test
-  public void testKeepVerticesFlag() {
+  public void testRetainVerticesFlag() {
     Grouping grouping = new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .useVertexLabel(true)
       .setRetainVerticesWithoutGroups(true)
       .build();
 
-    assertTrue(grouping.isKeepingVertices());
+    assertTrue(grouping.isRetainingVerticesWithoutGroups());
+
+  }
+
+  /**
+   * Verify that retainVerticesWithoutGroups flag can only be used in conjunction with
+   * useVertexLabel.
+   */
+  @Test(expected = UnsupportedOperationException.class)
+  public void testIllegalRetainVerticesFlagState() {
+    new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .build();
   }
 
   private final String DEFAULT_PREFIX = "default_";
+
+  @Test
+  public void testConversionNoProperties() throws Exception {
+    String asciiInput = "input[" +
+      "(v0 {})" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00 {})" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .useVertexLabel(true)
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testConversionSingleProperty() throws Exception {
+    String asciiInput = "input[" +
+      "(v0 {a: 3})" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00 {a: 3})" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .useVertexLabel(true)
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testConversionMultipleProperties() throws Exception {
+    String asciiInput = "input[" +
+      "(v0 {a: 3, b:'c'})" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00 {a: 3, b:'c'})" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .useVertexLabel(true)
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
 
   /**
    * Groups a graph by label and a property.
@@ -228,6 +325,8 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
   @Test
   public void groupByLabelAndPropertyMultipleNoLabelNoProperty() throws Exception {
     String asciiInput = "input[" +
+      //TODO v0 auch 1:1 konvertieren, da v0 kein b hat => also nicht komplett zur Gruppe zugehörig
+      // TODO was ist standardverhalten hier?
       "(v0:Blue {a : 3})" +
       "(v1:Blue {b : 2})" +
       "(v2 {c : 4.1})" + // property that does not match -> convert 1:1
@@ -376,6 +475,329 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
+
+  // TODO create testcase: labelspecific Grouping (e.g graph with A,B,C,D Vertices,Group by A,B
+  //  => C,D will get smashed together, but should be converted 1:1 with set flag
+
+  /**
+   * Tests function {@link GroupingGroupReduce#groupInternal(LogicalGraph)}
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testLabelSpecificGroupingNoCandidatesMatch() throws Exception {
+
+    String asciiInput = "input[" +
+      "(v0:A {a: 1, foo: true})" +
+      "(v1:B {b: 2, foo: true})" +
+      "(v2:C {c : 3})" + // C and D build their own groups because of useVertexLabel !!!false ->C,
+      // D: not label A or B -> convert 1:1. <= is useVertexLabel(false) case!
+      "(v3:D {d: 4})" +
+      "(v0)-->(v2)" +
+      "(v1)-->(v2)" +
+      "(v2)-->(v3)" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00:SuperA {a: 1})" +
+        "(v01:SuperB {b: 2})" +
+        "(v02:C {})" +
+        "(v03:D {})" +
+        "(v00)-->(v02)" +
+        "(v01)-->(v02)" +
+        "(v02)-->(v03)" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .useVertexLabel(true) // TODO testcase: useVertexLabel(false) => Both would be assigned to
+      // the same group without retain vertices flag
+      .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
+      .addVertexLabelGroup("B", "SuperB", Collections.singletonList("b"))
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+
+  }
+
+  @Test
+  public void testLabelSpecificGroupingMultipleCandidatesMatches() throws Exception {
+
+    String asciiInput = "input[" +
+      "(v0:A {a: 1, foo: true})" +
+      "(v1:B {b: 2, foo: true})" +
+      "(v2:C {c : 3})" + // useVertexLabel = false => C and D are not member of a group =>
+      // convert 1:!
+      "(v3:D {d: 4})" +
+      "(v0)-->(v2)" +
+      "(v1)-->(v2)" +
+      "(v2)-->(v3)" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00:SuperA {a: 1})" +
+        "(v01:SuperB {b: 2})" +
+        "(v02:C {c : 3})" +
+        "(v03:D {d : 4})" +
+        "(v00)-->(v02)" +
+        "(v01)-->(v02)" +
+        "(v02)-->(v03)" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .useVertexLabel(false)
+      .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
+      .addVertexLabelGroup("B", "SuperB", Collections.singletonList("b"))
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+
+  @Test
+  public void testGraphNoVertices() throws Exception {
+
+    String asciiInput = "input[" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .useVertexLabel(true)
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testGraphContainsOnlyVertices() throws Exception {
+
+    String asciiInput = "input[" +
+      "(v0:Blue {})" +
+      "(v1:Blue {})" +
+      "(v2 {c : 4.1})" + // no label -> convert 1:1
+      "(v3:Red {})" +
+      "(v4 {d: 'a'})" + // no label -> convert 1:1
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00:Blue {count:2L})" +
+        "(v02 {c : 4.1, count:1L})" +
+        "(v03:Red {count: 1L})" +
+        "(v04 {d: 'a', count: 1L})" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .useVertexLabel(true)
+      .addVertexAggregateFunction(new Count())
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testGraphOnlyVerticesToGroup() throws Exception {
+
+    String asciiInput = "input[" +
+      "(v0:Blue {})" +
+      "(v1:Blue {})" +
+      "(v2:Red {})" +
+      "(v0)-->(v1)" +
+      "(v1)-->(v2)" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00:Blue {count:2L})" +
+        "(v02:Red {count: 1L})" +
+        "(v00)-->(v00)" +
+        "(v00)-->(v02)" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .useVertexLabel(true)
+      .addVertexAggregateFunction(new Count())
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testGraphOnlyVerticesToRetain() throws Exception {
+
+    String asciiInput = "input[" +
+      "(v0 {a:1})" +
+      "(v1 {b:2})" +
+      "(v2 {})" +
+      "(v0)-->(v1)" +
+      "(v1)-->(v2)" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    loader.appendToDatabaseFromString(
+      "expected[" +
+        "(v00 {a:1, count:1L})" +
+        "(v01 {b:2, count:1L})" +
+        "(v02 {count: 1L})" +
+        "(v00)-->(v01)" +
+        "(v01)-->(v02)" +
+        "]");
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .useVertexLabel(true)
+      .addVertexAggregateFunction(new Count())
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
+  }
+
+  @Test
+  public void testConversionSingleOutgoingEdge() throws Exception {
+    String asciiInput = "input[" +
+      "(v0 {a: 'b'})" +
+      "(v1:Blue {})" +
+      "(v0)-->(v1)" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .useVertexLabel(true)
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("input")));
+  }
+
+  @Test
+  public void testConversionMulitpleOutgoingEdges() throws Exception {
+    String asciiInput = "input[" +
+      "(v0 {a: 'b'})" +
+      "(v1:Blue {})" +
+      "(v2:Red {})" +
+      "(v0)-->(v1)" +
+      "(v0)-->(v2)" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .useVertexLabel(true)
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("input")));
+  }
+
+  @Test
+  public void testConversionSingleIncomingEdge() throws Exception {
+    String asciiInput = "input[" +
+      "(v0 {a: 'b'})" +
+      "(v1:Blue {})" +
+      "(v1)-->(v0)" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .useVertexLabel(true)
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("input")));
+  }
+
+  @Test
+  public void testConversionMultipleIncomingEdges() throws Exception {
+    String asciiInput = "input[" +
+      "(v0 {a: 'b'})" +
+      "(v1:Blue {})" +
+      "(v2:Red {})" +
+      "(v1)-->(v0)" +
+      "(v2)-->(v0)" +
+      "]";
+
+    FlinkAsciiGraphLoader loader = getLoaderFromString(asciiInput);
+
+    final LogicalGraph input = loader.getLogicalGraphByVariable("input");
+
+    LogicalGraph output = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setRetainVerticesWithoutGroups(true)
+      .useVertexLabel(true)
+      .build()
+      .execute(input);
+
+    collectAndAssertTrue(
+      output.equalsByElementData(loader.getLogicalGraphByVariable("input")));
+  }
+
 
   private void writeGraphPNG(LogicalGraph graph, String filePrefix, String dotFilename) throws
     Exception {
