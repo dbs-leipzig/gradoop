@@ -95,7 +95,6 @@ public class DOTDataSink implements DataSink {
     FileSystem.WriteMode writeMode =
       overwrite ? FileSystem.WriteMode.OVERWRITE : FileSystem.WriteMode.NO_OVERWRITE;
 
-//    DotFileFormatHtml dotFileFormat = new DotFileFormatHtml(graphInformation, "#AAAAAA");
     AbstractDotFileFormat dotFileFormat = format.getDotFileFormat(graphInformation);
     GraphvizWriter graphvizWriter = new GraphvizWriter(new Path(path));
     graphvizWriter.setWriteMode(writeMode);
@@ -117,16 +116,6 @@ public class DOTDataSink implements DataSink {
      * Default class version for serialization.
      */
     private static final long serialVersionUID = 1;
-
-    /**
-     * see super constructor.
-     *
-     * @param outputPath graphviz dot file name
-     * @param charset    encoding
-     */
-    GraphvizWriter(Path outputPath, String charset) {
-      super(outputPath, charset);
-    }
 
     /**
      * see super constructor.
