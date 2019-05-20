@@ -27,6 +27,7 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Writes an EPGM representation into one DOT file. The format
@@ -53,25 +54,24 @@ public class DOTDataSink implements DataSink {
   /**
    * Creates a new data sink. Path can be local (file://) or HDFS (hdfs://).
    *
-   * @param path              dot data file
-   * @param graphInformation  flag to print graph head information
+   * @param path             dot data file
+   * @param graphInformation flag to print graph head information
    */
   public DOTDataSink(String path, boolean graphInformation) {
-    this.path = path;
-    this.graphInformation = graphInformation;
-    this.format = DotFormat.HTML;
+    this(path, graphInformation, DotFormat.HTML);
   }
 
   /**
    * Creates a new data sink that uses the specified dot format for output.
-   * @param path              dot data file
-   * @param graphInformation  flag to print graph head information
-   * @param format            output format
+   *
+   * @param path             dot data file
+   * @param graphInformation flag to print graph head information
+   * @param format           output format
    */
   public DOTDataSink(String path, boolean graphInformation, DotFormat format) {
-    this.path = path;
+    this.path = Objects.requireNonNull(path);
     this.graphInformation = graphInformation;
-    this.format = format;
+    this.format = Objects.requireNonNull(format);
   }
 
   @Override
@@ -93,7 +93,7 @@ public class DOTDataSink implements DataSink {
   @Override
   public void write(GraphCollection graphCollection, boolean overwrite) throws IOException {
     FileSystem.WriteMode writeMode =
-      overwrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
+      overwrite ? FileSystem.WriteMode.OVERWRITE : FileSystem.WriteMode.NO_OVERWRITE;
 
 //    DotFileFormatHtml dotFileFormat = new DotFileFormatHtml(graphInformation, "#AAAAAA");
     AbstractDotFileFormat dotFileFormat = format.getDotFileFormat(graphInformation);
@@ -122,7 +122,7 @@ public class DOTDataSink implements DataSink {
      * see super constructor.
      *
      * @param outputPath graphviz dot file name
-     * @param charset encoding
+     * @param charset    encoding
      */
     GraphvizWriter(Path outputPath, String charset) {
       super(outputPath, charset);
@@ -154,9 +154,13 @@ public class DOTDataSink implements DataSink {
    * Enumeration of supported dot formats.
    */
   public enum DotFormat {
-    /** Format that uses HTML tables to display element data. */
+    /**
+     * Format that uses HTML tables to display element data.
+     */
     HTML,
-    /** Format that uses plain dot formatting. */
+    /**
+     * Format that uses plain dot formatting.
+     */
     SIMPLE;
 
     /**
@@ -166,11 +170,16 @@ public class DOTDataSink implements DataSink {
      * @return a subclass of AbstractDotFileFormat
      */
     public AbstractDotFileFormat getDotFileFormat(boolean printGraphHeadInformation) {
-      if (this == DotFormat.SIMPLE) {
+
+      String htmlColorGrey = "AAAAAAA";
+
+      switch (this) {
+      case SIMPLE:
         return new DotFileFormatSimple(printGraphHeadInformation);
+      case HTML:
+      default:
+        return new DotFileFormatHtml(printGraphHeadInformation, htmlColorGrey);
       }
-      String textColor = "AAAAAAA";
-      return new DotFileFormatHtml(printGraphHeadInformation, textColor);
     }
   }
 }

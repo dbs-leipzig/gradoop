@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 
 /**
  * Converts a GraphTransaction to the following .dot format:
- * <p>
+ * <p>{@code
  *   digraph 0
  *   {
  *   gradoopId1 [label="person",name="Bob",age="20",...];
@@ -35,6 +35,7 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
  *   gradoopId2->gradoopId1 [label="knows",since="2003",...];
  *   gradoopId3->gradoopId4;
  *   }
+ *   }
  * </p>
  */
 public class DotFileFormatSimple extends AbstractDotFileFormat {
@@ -44,19 +45,20 @@ public class DotFileFormatSimple extends AbstractDotFileFormat {
    *
    * @param printGraphHead true, iff graph head data shall be attached to the output
    */
-  public DotFileFormatSimple(Boolean printGraphHead) {
+  public DotFileFormatSimple(boolean printGraphHead) {
     setPrintGraphHead(printGraphHead);
   }
 
   /**
    * Adds vertex information to the specified builder.
    *
-   * vertexId [label="label", property1="value1", ...];
+   * {@code vertexId [label="label", property1="value1", ...];}
    *
    * @param transaction graph transaction
    * @param builder string builder to append
    * @param suffix id suffix specific for the current {@link GraphTransaction}
    */
+  @Override
   void writeVertices(GraphTransaction transaction, StringBuilder builder, String suffix) {
     for (Vertex vertex: transaction.getVertices()) {
       builder.append(VERTEX_ID_PREFIX)
@@ -70,12 +72,7 @@ public class DotFileFormatSimple extends AbstractDotFileFormat {
     }
   }
 
-  /**
-   * @inheritDoc
-   *
-   * @param builder StringBuilder
-   * @param element EPGMElement
-   */
+  @Override
   void writeLabel(StringBuilder builder, EPGMElement element) {
     String label = StringUtils.isEmpty(element.getLabel()) ? element.getId().toString() :
       element.getLabel();

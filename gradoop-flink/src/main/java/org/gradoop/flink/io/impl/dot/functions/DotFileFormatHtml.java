@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.io.impl.dot.functions;
 
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -26,7 +27,7 @@ import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
 
 /**
  * Converts a GraphTransaction to the following .dot format:
- * <p>
+ * <p>{@code
  *   digraph 0
  *   {
  *   gradoopId1 [label=<<table>...</table>>];
@@ -36,6 +37,7 @@ import static org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
  *   gradoopId1->gradoopId2 [label=<<table>...</table>>];
  *   gradoopId2->gradoopId1 [label=<<table>...</table>>];
  *   gradoopId3->gradoopId4;
+ *   }
  *   }
  * </p>
  */
@@ -52,20 +54,21 @@ public class DotFileFormatHtml extends AbstractDotFileFormat {
    * @param printGraphHead true, iff graph head data shall be attached to the output
    * @param color the color for header background and properties text
    */
-  public DotFileFormatHtml(Boolean printGraphHead, String color) {
+  public DotFileFormatHtml(boolean printGraphHead, String color) {
     setPrintGraphHead(printGraphHead);
-    this.color = color;
+    this.color = Preconditions.checkNotNull(color, "Color was null");
   }
 
   /**
    * Adds vertex information to the specified builder.
    *
-   * vertexId [label="label", property1="value1", ...];
+   * {@code vertexId [label="label", property1="value1", ...];}
    *
    * @param transaction graph transaction
    * @param builder string builder to append
    * @param suffix id suffix specific for the current {@link GraphTransaction}
    */
+  @Override
   void writeVertices(GraphTransaction transaction, StringBuilder builder, String suffix) {
     for (Vertex vertex: transaction.getVertices()) {
       // writes for each vertex:
@@ -86,11 +89,12 @@ public class DotFileFormatHtml extends AbstractDotFileFormat {
   /**
    * Writes the specified label and properties as DOT HTML label string (table)
    *
-   * output: label=<<table>...</table>>
+   * output: {@code label=<<table>...</table>>}
    *
    * @param builder string builder to append
    * @param elem graph element with id, label and properties
    */
+  @Override
   void writeLabel(StringBuilder builder, EPGMElement elem) {
     String label = elem.getLabel();
     String id = elem.getId().toString();
