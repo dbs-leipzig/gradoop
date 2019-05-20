@@ -100,9 +100,9 @@ public class DotFileFormatSimpleTest extends GradoopFlinkTestBase {
 
     String expected = "subgraph cluster_gaaaaaaaaaaaaaaaaaaaaaaaa{\n" +
       "label=\"graph\";\n" +
-      "vddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaa [ label=\"Person\",name=\"Anna\",age=\"27\"];\n" +
-      "vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa [ label=\"Person\",name=\"Tom\",age=\"25\"];\n" +
-      "vccccccccccccccccccccccccaaaaaaaaaaaaaaaaaaaaaaaa [ label=\"Forum\",lan=\"EN\"];\n" +
+      "vddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaa [label=\"Person\",name=\"Anna\",age=\"27\"];\n" +
+      "vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa [label=\"Person\",name=\"Tom\",age=\"25\"];\n" +
+      "vccccccccccccccccccccccccaaaaaaaaaaaaaaaaaaaaaaaa [label=\"Forum\",lan=\"EN\"];\n" +
       "vddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaa->vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa [label=\"knows\"];\n" +
       "vccccccccccccccccccccccccaaaaaaaaaaaaaaaaaaaaaaaa->vddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaa [label=\"hasModerator\"];\n" +
       "vbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaa->vddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaa [label=\"knows\"];\n" +

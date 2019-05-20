@@ -64,7 +64,7 @@ public class DotFileFormatSimple extends AbstractDotFileFormat {
       builder.append(VERTEX_ID_PREFIX)
         .append(vertex.getId())
         .append(suffix)
-        .append(" [ ");
+        .append(" [");
 
       writeLabel(builder, vertex);
 

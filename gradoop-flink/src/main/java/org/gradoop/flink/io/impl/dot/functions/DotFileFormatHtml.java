@@ -76,7 +76,7 @@ public class DotFileFormatHtml extends AbstractDotFileFormat {
       builder.append(VERTEX_ID_PREFIX)
         .append(vertex.getId())
         .append(suffix)
-        .append(" [ shape=Mrecord, ");
+        .append(" [shape=Mrecord, ");
 
       writeLabel(builder, vertex);
 
