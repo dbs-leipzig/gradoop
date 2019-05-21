@@ -16,13 +16,11 @@
 package org.gradoop.examples.aggregation;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.examples.aggregation.functions.AddPropertyMeanAgeToGraphHead;
 import org.gradoop.examples.aggregation.functions.AggregateListOfNames;
 import org.gradoop.examples.common.SocialNetworkGraph;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.average.AverageVertexProperty;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
@@ -30,39 +28,45 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
 /**
- * A self contained example on how to use the aggregate operator on Gradoop's LogicalGraph class.
+ * A self contained example on how to use the aggregate operator on Gradoop's {@link LogicalGraph}
+ * class.
  *
- * The example uses the graph in dev-support/social-network.pdf
+ * The example uses the graph in {@code dev-support/social-network.pdf}
  */
 public class AggregationExample {
 
   /**
-   * Property key 'birthday'
+   * Property key {@code birthday}
    */
   private static final String PROPERTY_KEY_BIRTHDAY = "birthday";
+
   /**
-   * Property key 'person'
+   * Property key {@code mean_age}
+   */
+  private static final String PROPERTY_KEY_MEAN_AGE = "mean_age";
+
+  /**
+   * Property key {@code Person}
    */
   private static final String LABEL_PERSON = "Person";
 
   /**
    * Runs the program on the example data graph.
    *
-   * The example provides an overview over the usage of the aggregate() method.
+   * The example provides an overview over the usage of the {@code aggregate()} method.
    * It both showcases the application of aggregation functions that are already provided by
    * Gradoop, as well as the definition of custom ones.
    * Documentation for all available aggregation functions as well as a detailed description of the
    * aggregate method can be found in the projects wiki.
    *
-   * Using the social network graph {@link SocialNetworkGraph}, the program will:
-   * 1. extract a subgraph only containing vertices which are labeled "person"
-   * 2. concatenate the values of the vertex property "name" of each vertex in the subgraph
-   * 3. count the amount of vertices in the subgraph (aka the amount of persons)
-   * 4. sum up the values of the vertex property "birthday"
-   * 5. add the property "meanAge" to the graph head using a graph head transformation
-   * 6. print results
+   * Using the social network graph in the resources directory, the program will:
+   * <ol>
+   *   <li>extract a subgraph only containing vertices which are labeled "person"</li>
+   *   <li>concatenate the values of the vertex property "name" of each vertex in the subgraph</li>
+   *   <li>calculate the mean value of the "birthday" property</li>
+   * </ol>
    *
-   * @param args arguments
+   * @param args Command line arguments (unused).
    *
    * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Unary-Logical-Graph-Operators">
    * Gradoop Wiki</a>
@@ -89,12 +93,8 @@ public class AggregationExample {
       // apply custom VertexAggregateFunction
       .aggregate(
         new AggregateListOfNames(),
-        // aggregate sum of vertices in order to obtain total amount of persons
-        new VertexCount(),
-        // sum up values of the vertex property "birthday"
-        new SumVertexProperty(PROPERTY_KEY_BIRTHDAY))
-      // add computed property "meanAge" to the graph head
-      .transformGraphHead(new AddPropertyMeanAgeToGraphHead());
+        // Calculate the average of the vertex property "birthday"
+        new AverageVertexProperty(PROPERTY_KEY_BIRTHDAY, PROPERTY_KEY_MEAN_AGE));
 
     // print graph, which now contains the newly aggregated properties in the graph head
     result.print();
