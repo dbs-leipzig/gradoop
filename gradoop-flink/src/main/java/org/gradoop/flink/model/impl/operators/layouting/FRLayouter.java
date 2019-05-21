@@ -1,20 +1,16 @@
 package org.gradoop.flink.model.impl.operators.layouting;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.functions.RichJoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.aggregation.Aggregations;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.operators.IterativeDataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-
-import java.util.Random;
+import org.gradoop.flink.model.impl.operators.layouting.functions.*;
 
 /** Layouts a graph using the Fruchtermann-Reingold algorithm
  *
@@ -27,10 +23,10 @@ public class FRLayouter extends LayoutingAlgorithm {
     protected int height;
     protected int cellResolution;
 
-    protected enum NeighborType {UP, DOWN, LEFT, RIGHT, UPRIGHT, DOWNRIGHT, UPLEFT, DOWNLEFT, SELF}
+    public enum NeighborType {UP, DOWN, LEFT, RIGHT, UPRIGHT, DOWNRIGHT, UPLEFT, DOWNLEFT, SELF}
 
     ;
-    protected static final String CELLID_PROPERTY = "cellid";
+    public static final String CELLID_PROPERTY = "cellid";
 
     /** Create new Instance of FRLayouter
      *
@@ -91,27 +87,7 @@ public class FRLayouter extends LayoutingAlgorithm {
      * @return The input vertices with x and y coordinated chaned according to the given force and current iteration number.
      */
     protected DataSet<Vertex> applyForces(DataSet<Vertex> vertices, DataSet<Tuple3<GradoopId, Double, Double>> forces, int iterations) {
-        final int width = this.width;
-        final int height = this.height;
-        final int maxIterations = iterations;
-        final double k = this.k;
-        return vertices.join(forces).where("id").equalTo(0).with(new RichJoinFunction<Vertex, Tuple3<GradoopId, Double, Double>, Vertex>() {
-            public Vertex join(Vertex first, Tuple3<GradoopId, Double, Double> second) throws Exception {
-                int iteration = getIterationRuntimeContext().getSuperstepNumber();
-                double temp = k / 2.0;
-                double speedLimit = -(temp / maxIterations) * iteration + temp + (k / 10.0);
-
-                Vector movement = Vector.fromForceTuple(second);
-                movement = movement.clamped(speedLimit);
-
-                Vector position = Vector.fromVertexPosition(first);
-                position = position.add(movement);
-                position = position.confined(0, width - 1, 0, height - 1);
-
-                position.setVertexPosition(first);
-                return first;
-            }
-        });
+        return vertices.join(forces).where("id").equalTo(0).with(new FRForceApplicator(width,height,k,iterations));
     }
 
     /** Calculates the repusive forces between the given vertices.
@@ -120,100 +96,22 @@ public class FRLayouter extends LayoutingAlgorithm {
      * @return Dataset of applied forces. May (and will) contain multiple forces for each vertex.
      */
     protected DataSet<Tuple3<GradoopId, Double, Double>> repulsionForces(DataSet<Vertex> vertices) {
-        vertices = vertices.map(getIdMapperFunction());
+        vertices = vertices.map(new FRCellIdMapper(cellResolution,width,height));
 
-        DataSet<Tuple3<GradoopId, Double, Double>> self = vertices.join(vertices).where(getCellIdSelector(NeighborType.SELF)).equalTo(getCellIdSelector(NeighborType.SELF)).with(getRepulsionJoinFunction());
-        DataSet<Tuple3<GradoopId, Double, Double>> up = vertices.join(vertices).where(getCellIdSelector(NeighborType.UP)).equalTo(getCellIdSelector(NeighborType.SELF)).with(getRepulsionJoinFunction());
-        DataSet<Tuple3<GradoopId, Double, Double>> down = vertices.join(vertices).where(getCellIdSelector(NeighborType.DOWN)).equalTo(getCellIdSelector(NeighborType.SELF)).with(getRepulsionJoinFunction());
-        DataSet<Tuple3<GradoopId, Double, Double>> left = vertices.join(vertices).where(getCellIdSelector(NeighborType.LEFT)).equalTo(getCellIdSelector(NeighborType.SELF)).with(getRepulsionJoinFunction());
-        DataSet<Tuple3<GradoopId, Double, Double>> right = vertices.join(vertices).where(getCellIdSelector(NeighborType.RIGHT)).equalTo(getCellIdSelector(NeighborType.SELF)).with(getRepulsionJoinFunction());
-        DataSet<Tuple3<GradoopId, Double, Double>> uright = vertices.join(vertices).where(getCellIdSelector(NeighborType.UPRIGHT)).equalTo(getCellIdSelector(NeighborType.SELF)).with(getRepulsionJoinFunction());
-        DataSet<Tuple3<GradoopId, Double, Double>> uleft = vertices.join(vertices).where(getCellIdSelector(NeighborType.UPLEFT)).equalTo(getCellIdSelector(NeighborType.SELF)).with(getRepulsionJoinFunction());
-        DataSet<Tuple3<GradoopId, Double, Double>> dright = vertices.join(vertices).where(getCellIdSelector(NeighborType.DOWNRIGHT)).equalTo(getCellIdSelector(NeighborType.SELF)).with(getRepulsionJoinFunction());
-        DataSet<Tuple3<GradoopId, Double, Double>> dleft = vertices.join(vertices).where(getCellIdSelector(NeighborType.DOWNLEFT)).equalTo(getCellIdSelector(NeighborType.SELF)).with(getRepulsionJoinFunction());
+        KeySelector<Vertex, Integer> selfselector = new FRCellIdSelector(cellResolution,NeighborType.SELF);
+        JoinFunction<Vertex, Vertex, Tuple3<GradoopId, Double, Double>> repulsionFunction = new FRRepulsionFunction(k);
+
+        DataSet<Tuple3<GradoopId, Double, Double>> self = vertices.join(vertices).where(new FRCellIdSelector(cellResolution,NeighborType.SELF)).equalTo(selfselector).with(repulsionFunction);
+        DataSet<Tuple3<GradoopId, Double, Double>> up = vertices.join(vertices).where(new FRCellIdSelector(cellResolution,NeighborType.UP)).equalTo(selfselector).with(repulsionFunction);
+        DataSet<Tuple3<GradoopId, Double, Double>> down = vertices.join(vertices).where(new FRCellIdSelector(cellResolution,NeighborType.DOWN)).equalTo(selfselector).with(repulsionFunction);
+        DataSet<Tuple3<GradoopId, Double, Double>> left = vertices.join(vertices).where(new FRCellIdSelector(cellResolution,NeighborType.LEFT)).equalTo(selfselector).with(repulsionFunction);
+        DataSet<Tuple3<GradoopId, Double, Double>> right = vertices.join(vertices).where(new FRCellIdSelector(cellResolution,NeighborType.RIGHT)).equalTo(selfselector).with(repulsionFunction);
+        DataSet<Tuple3<GradoopId, Double, Double>> uright = vertices.join(vertices).where(new FRCellIdSelector(cellResolution,NeighborType.UPRIGHT)).equalTo(selfselector).with(repulsionFunction);
+        DataSet<Tuple3<GradoopId, Double, Double>> uleft = vertices.join(vertices).where(new FRCellIdSelector(cellResolution,NeighborType.UPLEFT)).equalTo(selfselector).with(repulsionFunction);
+        DataSet<Tuple3<GradoopId, Double, Double>> dright = vertices.join(vertices).where(new FRCellIdSelector(cellResolution,NeighborType.DOWNRIGHT)).equalTo(selfselector).with(repulsionFunction);
+        DataSet<Tuple3<GradoopId, Double, Double>> dleft = vertices.join(vertices).where(new FRCellIdSelector(cellResolution,NeighborType.DOWNLEFT)).equalTo(selfselector).with(repulsionFunction);
 
         return self.union(up).union(down).union(left).union(right).union(uright).union(uleft).union(dright).union(dleft);
-    }
-
-    /** Returns a map-function that sssigns a cellid to each input-vertex, depending on its position in the layouting-space.
-     *  The cellid is stored as a property.
-     */
-    protected MapFunction<Vertex, Vertex> getIdMapperFunction() {
-        final int cells = cellResolution;
-
-        return new MapFunction<Vertex, Vertex>() {
-            public Vertex map(Vertex value) {
-                Vector pos = Vector.fromVertexPosition(value);
-                int xcell = ((int) pos.x) / cells;
-                int ycell = ((int) pos.y) / cells;
-                int cellid = ycell * cells + xcell;
-                value.setProperty(CELLID_PROPERTY, cellid);
-                return value;
-            }
-        };
-    }
-
-    /** Returns a KeySelector that extracts the cellid of a Vertex.
-     *
-     * @param neighborType Selects which id to return. The 'real' one or the id of a specific neighbor.
-     * @return
-     */
-    protected KeySelector<Vertex, Integer> getCellIdSelector(NeighborType neighborType) {
-        final int cells = this.cellResolution;
-        final NeighborType type = neighborType;
-
-        return new KeySelector<Vertex, Integer>() {
-            public Integer getKey(Vertex value) {
-                int cellid = value.getPropertyValue(CELLID_PROPERTY).getInt();
-                int xcell = cellid % cells;
-                int ycell = cellid / cells;
-                if (type == NeighborType.RIGHT || type == NeighborType.UPRIGHT || type == NeighborType.DOWNRIGHT) {
-                    xcell++;
-                }
-                if (type == NeighborType.LEFT || type == NeighborType.DOWNLEFT || type == NeighborType.UPLEFT) {
-                    xcell--;
-                }
-                if (type == NeighborType.UP || type == NeighborType.UPLEFT || type == NeighborType.UPRIGHT) {
-                    ycell--;
-                }
-                if (type == NeighborType.DOWN || type == NeighborType.DOWNLEFT || type == NeighborType.DOWNRIGHT) {
-                    ycell++;
-                }
-
-                if (xcell >= cells || ycell >= cells || xcell < 0 || ycell < 0) {
-                    return -1;
-                }
-                return ycell * cells + xcell;
-            }
-        };
-    }
-
-    /** Returns a JoinFunction that computes the repulsion-forces between two given vertices.
-     */
-    protected JoinFunction<Vertex, Vertex, Tuple3<GradoopId, Double, Double>> getRepulsionJoinFunction() {
-        final double k = this.k;
-        final Random rng = new Random();
-        return new JoinFunction<Vertex, Vertex, Tuple3<GradoopId, Double, Double>>() {
-            public Tuple3<GradoopId, Double, Double> join(Vertex first, Vertex second) {
-                Vector pos1 = Vector.fromVertexPosition(first);
-                Vector pos2 = Vector.fromVertexPosition(second);
-                double distance = pos1.distance(pos2);
-                Vector direction = pos2.sub(pos1);
-
-                if (first.getId().equals(second.getId())) {
-                    return new Tuple3<GradoopId, Double, Double>(first.getId(), 0.0, 0.0);
-                }
-                if (distance == 0) {
-                    distance = 0.1;
-                    direction.x = rng.nextInt();
-                    direction.y = rng.nextInt();
-                }
-
-                Vector force = direction.normalized().mul(-Math.pow(k, 2) / distance);
-
-                return new Tuple3<GradoopId, Double, Double>(first.getId(), force.x, force.y);
-            }
-        };
     }
 
     /** Compute the attractive-forces between all vertices connected by edges.
@@ -224,17 +122,7 @@ public class FRLayouter extends LayoutingAlgorithm {
      */
     protected DataSet<Tuple3<GradoopId, Double, Double>> attractionForces(DataSet<Vertex> vertices, DataSet<Edge> edges) {
         final double k = this.k;
-        return edges.join(vertices).where("sourceId").equalTo("id").join(vertices).where("f0.targetId").equalTo("id").with(new JoinFunction<Tuple2<Edge, Vertex>, Vertex, Tuple3<GradoopId, Double, Double>>() {
-            public Tuple3<GradoopId, Double, Double> join(Tuple2<Edge, Vertex> first, Vertex second) throws Exception {
-                Vector pos1 = Vector.fromVertexPosition(first.f1);
-                Vector pos2 = Vector.fromVertexPosition(second);
-                double distance = pos1.distance(pos2);
-
-                Vector force = pos2.sub(pos1).normalized().mul(Math.pow(distance, 2) / k);
-
-                return new Tuple3<GradoopId, Double, Double>(first.f1.getId(), force.x, force.y);
-            }
-        });
+        return edges.join(vertices).where("sourceId").equalTo("id").join(vertices).where("f0.targetId").equalTo("id").with(new FRAttractionFunction(k));
     }
 
 }

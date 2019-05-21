@@ -1,5 +1,6 @@
 package org.gradoop.flink.model.impl.operators.layouting;
 
+import org.gradoop.flink.model.impl.operators.layouting.util.Vector;
 import org.junit.Assert;
 import org.junit.Test;
 
