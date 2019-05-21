@@ -15,26 +15,10 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
-import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
-import org.gradoop.flink.model.impl.operators.cloning.Cloning;
-import org.gradoop.flink.model.impl.operators.combination.Combination;
-import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
-import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
-import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
-import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
-import org.gradoop.flink.model.impl.operators.overlap.Overlap;
-import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
-import org.gradoop.flink.model.impl.operators.transformation.Transformation;
-import org.gradoop.flink.model.impl.operators.verify.Verify;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Objects;
@@ -66,106 +50,4 @@ public interface BaseGraph<
    * @return a factory that can be used to create a {@link LG} instance
    */
   BaseGraphFactory<G, V, E, LG> getFactory();
-
-  //----------------------------------------------------------------------------
-  // Unary Operators
-  //----------------------------------------------------------------------------
-
-  @Override
-  default LG copy() {
-    return callForGraph(new Cloning<>());
-  }
-
-  @Override
-  default LG transform(
-    TransformationFunction<G> graphHeadTransformationFunction,
-    TransformationFunction<V> vertexTransformationFunction,
-    TransformationFunction<E> edgeTransformationFunction) {
-    return callForGraph(new Transformation<>(
-      graphHeadTransformationFunction,
-      vertexTransformationFunction,
-      edgeTransformationFunction));
-  }
-
-  @Override
-  default LG transformGraphHead(
-    TransformationFunction<G> graphHeadTransformationFunction) {
-    return transform(graphHeadTransformationFunction, null, null);
-  }
-
-  @Override
-  default LG transformVertices(
-    TransformationFunction<V> vertexTransformationFunction) {
-    return transform(null, vertexTransformationFunction, null);
-  }
-
-  @Override
-  default LG transformEdges(
-    TransformationFunction<E> edgeTransformationFunction) {
-    return transform(null, null, edgeTransformationFunction);
-  }
-
-  @Override
-  default LG vertexInducedSubgraph(
-    FilterFunction<V> vertexFilterFunction) {
-    Objects.requireNonNull(vertexFilterFunction);
-    return callForGraph(
-      new Subgraph<>(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
-  }
-
-  @Override
-  default LG edgeInducedSubgraph(
-    FilterFunction<E> edgeFilterFunction) {
-    Objects.requireNonNull(edgeFilterFunction);
-    return callForGraph(new Subgraph<>(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));
-  }
-
-  @Override
-  default LG subgraph(
-    FilterFunction<V> vertexFilterFunction,
-    FilterFunction<E> edgeFilterFunction, Subgraph.Strategy strategy) {
-    return callForGraph(new Subgraph<>(vertexFilterFunction, edgeFilterFunction, strategy));
-  }
-
-  @Override
-  default LG aggregate(AggregateFunction... aggregateFunctions) {
-    return callForGraph(new Aggregation<>(aggregateFunctions));
-  }
-
-  @Override
-  default LG reduceOnEdges(
-    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
-    return callForGraph(new ReduceEdgeNeighborhood<>(function, edgeDirection));
-  }
-
-  @Override
-  default LG reduceOnNeighbors(
-    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection) {
-    return callForGraph(new ReduceVertexNeighborhood<>(function, edgeDirection));
-  }
-
-  @Override
-  default LG verify() {
-    return callForGraph(new Verify<>());
-  }
-
-  //----------------------------------------------------------------------------
-  // Binary Operators
-  //----------------------------------------------------------------------------
-
-  @Override
-  default LG combine(LG otherGraph) {
-    return callForGraph(new Combination<>(), otherGraph);
-  }
-
-  @Override
-  default LG overlap(LG otherGraph) {
-    return callForGraph(new Overlap<>(), otherGraph);
-  }
-
-  @Override
-  default LG exclude(LG otherGraph) {
-    return callForGraph(new Exclusion<>(), otherGraph);
-  }
-
 }

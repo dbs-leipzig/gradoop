@@ -25,8 +25,17 @@ import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
+import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
+import org.gradoop.flink.model.impl.operators.cloning.Cloning;
+import org.gradoop.flink.model.impl.operators.combination.Combination;
+import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
+import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
+import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
+import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
+import org.gradoop.flink.model.impl.operators.transformation.Transformation;
+import org.gradoop.flink.model.impl.operators.verify.Verify;
 
 import java.util.Objects;
 
@@ -55,7 +64,9 @@ public interface BaseGraphOperators<
    *
    * @return projected logical graph
    */
-  LG copy();
+  default LG copy() {
+    return callForGraph(new Cloning<>());
+  }
 
   /**
    * Transforms the elements of the logical graph using the given transformation functions.
@@ -66,10 +77,15 @@ public interface BaseGraphOperators<
    * @param edgeTransformationFunction      edge transformation function
    * @return transformed logical graph
    */
-  LG transform(
+  default LG transform(
     TransformationFunction<G> graphHeadTransformationFunction,
     TransformationFunction<V> vertexTransformationFunction,
-    TransformationFunction<E> edgeTransformationFunction);
+    TransformationFunction<E> edgeTransformationFunction) {
+    return callForGraph(new Transformation<>(
+      graphHeadTransformationFunction,
+      vertexTransformationFunction,
+      edgeTransformationFunction));
+  }
 
   /**
    * Transforms the graph head of the logical graph using the given
@@ -78,8 +94,9 @@ public interface BaseGraphOperators<
    * @param graphHeadTransformationFunction graph head transformation function
    * @return transformed logical graph
    */
-  LG transformGraphHead(
-    TransformationFunction<G> graphHeadTransformationFunction);
+  default LG transformGraphHead(TransformationFunction<G> graphHeadTransformationFunction) {
+    return transform(graphHeadTransformationFunction, null, null);
+  }
 
   /**
    * Transforms the vertices of the logical graph using the given transformation
@@ -88,7 +105,9 @@ public interface BaseGraphOperators<
    * @param vertexTransformationFunction vertex transformation function
    * @return transformed logical graph
    */
-  LG transformVertices(TransformationFunction<V> vertexTransformationFunction);
+  default LG transformVertices(TransformationFunction<V> vertexTransformationFunction) {
+    return transform(null, vertexTransformationFunction, null);
+  }
 
   /**
    * Transforms the edges of the logical graph using the given transformation function.
@@ -97,7 +116,9 @@ public interface BaseGraphOperators<
    * @param edgeTransformationFunction edge transformation function
    * @return transformed logical graph
    */
-  LG transformEdges(TransformationFunction<E> edgeTransformationFunction);
+  default LG transformEdges(TransformationFunction<E> edgeTransformationFunction) {
+    return transform(null, null, edgeTransformationFunction);
+  }
 
   /**
    * Returns the subgraph that is induced by the vertices which fulfill the given filter function.
@@ -105,7 +126,11 @@ public interface BaseGraphOperators<
    * @param vertexFilterFunction vertex filter function
    * @return vertex-induced subgraph as a new logical graph
    */
-  LG vertexInducedSubgraph(FilterFunction<V> vertexFilterFunction);
+  default LG vertexInducedSubgraph(FilterFunction<V> vertexFilterFunction) {
+    Objects.requireNonNull(vertexFilterFunction);
+    return callForGraph(
+      new Subgraph<>(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
+  }
 
   /**
    * Returns the subgraph that is induced by the edges which fulfill the given filter function.
@@ -113,7 +138,10 @@ public interface BaseGraphOperators<
    * @param edgeFilterFunction edge filter function
    * @return edge-induced subgraph as a new logical graph
    */
-  LG edgeInducedSubgraph(FilterFunction<E> edgeFilterFunction);
+  default LG edgeInducedSubgraph(FilterFunction<E> edgeFilterFunction) {
+    Objects.requireNonNull(edgeFilterFunction);
+    return callForGraph(new Subgraph<>(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));
+  }
 
   /**
    * Returns a subgraph of the logical graph which contains only those vertices
@@ -147,8 +175,10 @@ public interface BaseGraphOperators<
    * @return logical graph which fulfils the given predicates and is a subgraph
    * of that graph
    */
-  LG subgraph(FilterFunction<V> vertexFilterFunction,
-              FilterFunction<E> edgeFilterFunction, Subgraph.Strategy strategy);
+  default LG subgraph(FilterFunction<V> vertexFilterFunction,
+                      FilterFunction<E> edgeFilterFunction, Subgraph.Strategy strategy) {
+    return callForGraph(new Subgraph<>(vertexFilterFunction, edgeFilterFunction, strategy));
+  }
 
   /**
    * Applies the given aggregate functions to the logical graph and stores the
@@ -157,7 +187,9 @@ public interface BaseGraphOperators<
    * @param aggregateFunctions computes aggregates on the logical graph
    * @return logical graph with additional properties storing the aggregates
    */
-  LG aggregate(AggregateFunction... aggregateFunctions);
+  default LG aggregate(AggregateFunction... aggregateFunctions) {
+    return callForGraph(new Aggregation<>(aggregateFunctions));
+  }
 
   /**
    * Sets the aggregation result of the given function as property for each vertex. All edges where
@@ -168,7 +200,10 @@ public interface BaseGraphOperators<
    * @param edgeDirection incoming, outgoing edges or both
    * @return logical graph where vertices store aggregated information about connected edges
    */
-  LG reduceOnEdges(EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
+  default LG reduceOnEdges(EdgeAggregateFunction function,
+                           Neighborhood.EdgeDirection edgeDirection) {
+    return callForGraph(new ReduceEdgeNeighborhood<>(function, edgeDirection));
+  }
 
   /**
    * Sets the aggregation result of the given function as property for each vertex. All vertices
@@ -179,7 +214,10 @@ public interface BaseGraphOperators<
    * @param edgeDirection incoming, outgoing edges or both
    * @return logical graph where vertices store aggregated information about connected vertices
    */
-  LG reduceOnNeighbors(VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
+  default LG reduceOnNeighbors(VertexAggregateFunction function,
+                               Neighborhood.EdgeDirection edgeDirection) {
+    return callForGraph(new ReduceVertexNeighborhood<>(function, edgeDirection));
+  }
 
   /**
    * Verifies this graph, removing dangling edges, i.e. edges pointing to or from
@@ -189,7 +227,9 @@ public interface BaseGraphOperators<
    *
    * @return this graph with all dangling edges removed.
    */
-  LG verify();
+  default LG verify() {
+    return callForGraph(new Verify<>());
+  }
 
   //----------------------------------------------------------------------------
   // Binary Operators
@@ -202,7 +242,9 @@ public interface BaseGraphOperators<
    * @param otherGraph logical graph to combine this graph with
    * @return logical graph containing all vertices and edges of the input graphs
    */
-  LG combine(LG otherGraph);
+  default LG combine(LG otherGraph) {
+    return callForGraph(new Combination<>(), otherGraph);
+  }
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge sets of this graph
@@ -212,7 +254,9 @@ public interface BaseGraphOperators<
    * @return logical graph that contains all vertices and edges that exist in
    * both input graphs
    */
-  LG overlap(LG otherGraph);
+  default LG overlap(LG otherGraph) {
+    return callForGraph(new Overlap<>(), otherGraph);
+  }
 
   /**
    * Creates a new logical graph containing only vertices and edges that
@@ -222,7 +266,9 @@ public interface BaseGraphOperators<
    * @param otherGraph logical graph to exclude from that graph
    * @return logical that contains only vertices and edges that are not in the other graph
    */
-  LG exclude(LG otherGraph);
+  default LG exclude(LG otherGraph) {
+    return callForGraph(new Exclusion<>(), otherGraph);
+  }
 
   //----------------------------------------------------------------------------
   // Auxiliary Operators
