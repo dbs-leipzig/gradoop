@@ -229,7 +229,6 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
    *
    * @throws IOException on failure
    */
-  @SuppressWarnings("Duplicates")
   @Test
   public void propertyTypeTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore();
@@ -393,7 +392,6 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
     validateEPGMGraphElements(originalVertex, loadedVertex);
   }
 
-  @SuppressWarnings("Duplicates")
   private void validateEdge(HBaseEPGMStore graphStore, Edge originalEdge) throws IOException {
 
     EPGMEdge loadedEdge = graphStore.readEdge(originalEdge.getId());

@@ -64,7 +64,6 @@ public class PostProcessor {
    * @param mayOverlap    elements may be contained in multiple graphs
    * @return Graph collection
    */
-  @SuppressWarnings("unchecked")
   public static GraphCollection extractGraphCollection(
     DataSet<Element> elements, GradoopFlinkConfig config, boolean mayOverlap) {
 
