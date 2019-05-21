@@ -193,10 +193,9 @@ public class GroupingGroupReduce extends Grouping {
 
         if (groupingByLabels) {
 
-          // a vertex is member of the default group if
-          // if its label is not empty or
-          //   if the vertex exhibits all grouped by properties
-
+          // if the vertex's label is empty,
+          // a) and the group by properties are empty => vertex is not member of the group
+          // b) and group by properties are not empty => vertex can be member of the group
           if (vertex.getLabel().isEmpty()) {
             return !group.getPropertyKeys().isEmpty() && hasVertexAllPropertiesOfGroup.apply(group,
               vertex);
