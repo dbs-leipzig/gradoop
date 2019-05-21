@@ -23,6 +23,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.s1ck.gdl.model.comparables.Literal;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -85,8 +86,7 @@ public class LiteralComparable extends QueryComparable {
 
     LiteralComparable that = (LiteralComparable) o;
 
-    return literal != null ? literal.equals(that.literal) : that.literal == null;
-
+    return Objects.equals(literal, that.literal);
   }
 
   @Override

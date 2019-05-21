@@ -22,6 +22,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.stream.Collectors.joining;
@@ -142,8 +143,7 @@ public abstract class PredicateCollection<P> implements Iterable<P>, Serializabl
 
     PredicateCollection predicateCollection = (PredicateCollection) o;
 
-    return predicates != null ?
-      predicates.equals(predicateCollection.predicates) : predicateCollection.predicates == null;
+    return Objects.equals(predicates, predicateCollection.predicates);
   }
 
   @Override

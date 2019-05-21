@@ -16,7 +16,6 @@
 package org.gradoop.storage.impl.hbase;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Queues;
 import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.api.entities.EPGMEdge;
@@ -37,6 +36,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 import static org.gradoop.common.GradoopTestUtils.*;
@@ -210,7 +210,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
     EPGMVertexFactory<Vertex> vertexFactory = new VertexFactory();
 
     // Queue is not supported by
-    final Queue<String> value = Queues.newPriorityQueue();
+    final Queue<String> value = new PriorityQueue<>();
 
     GradoopId vertexID = GradoopId.get();
     final String label = "A";

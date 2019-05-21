@@ -69,7 +69,7 @@ public class PropertyTransformationTest extends GradoopFlinkTestBase {
   /**
    * Simple property transformation that divides a value by 1000.
    */
-  protected static PropertyTransformationFunction DIVISION = new DivideBy(1000L);
+  protected static final PropertyTransformationFunction DIVISION = new DivideBy(1000L);
   /**
    * Executes a property transformation on graphHeads, vertices and edges and checks if the result
    * is correct.

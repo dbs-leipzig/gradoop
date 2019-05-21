@@ -136,7 +136,6 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
         inVertices.add(vertex);
       }
     }
-    Set<GraphElement> inEdges = new HashSet<>();
     for (Edge edge : edges2) {
       if (!edges0.contains(edge)) {
         inVertices.add(edge);
@@ -146,7 +145,7 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
     Set<GraphElement> outVertices = new HashSet<>();
     inVertices.addAll(outVertices);
     Set<GraphElement> outEdges = new HashSet<>();
-    inEdges.addAll(resEdges);
+    Set<GraphElement> inEdges = new HashSet<>(resEdges);
 
     checkElementMatches(inVertices, outVertices);
     checkElementMatches(inEdges, outEdges);

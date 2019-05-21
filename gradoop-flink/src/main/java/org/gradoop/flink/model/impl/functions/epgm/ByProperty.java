@@ -70,9 +70,7 @@ public class ByProperty<E extends EPGMElement> implements CombinableFilter<E> {
   public boolean filter(E e) throws Exception {
     if (e.hasProperty(key)) {
       if (value != null) {
-        if (e.getPropertyValue(key).equals(value)) {
-          return true;
-        }
+        return e.getPropertyValue(key).equals(value);
       } else {
         return true;
       }
