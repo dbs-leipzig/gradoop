@@ -177,13 +177,12 @@ public class GroupingGroupReduce extends Grouping {
   private FilterFunction<Vertex> getIsVertexMemberOfLabelGroupFilter(LabelGroup group) {
 
     // Returns true, if a vertex exhibits all properties of a labelGroup.
-    // If labelGroup's properties are empty, returns false.
+    // Also returns true, if grouped by properties are empty
     BiFunction<LabelGroup, Vertex, Boolean> hasVertexAllPropertiesOfGroup =
       (BiFunction<LabelGroup, Vertex, Boolean> & Serializable) (labelGroup, vertex) ->
-        !group.getPropertyKeys().isEmpty() &&
-          group.getPropertyKeys()
-            .parallelStream()
-            .allMatch(vertex::hasProperty);
+        group.getPropertyKeys()
+          .parallelStream()
+          .allMatch(vertex::hasProperty);
 
     boolean groupingByLabels = useVertexLabels();
 
@@ -195,16 +194,25 @@ public class GroupingGroupReduce extends Grouping {
         if (groupingByLabels) {
 
           // a vertex is member of the default group if
-          //   its label is not empty (only when grouping by labels) or
-          //   if its label is empty and the vertex exhibits all grouped by properties
-          return !vertex.getLabel().isEmpty() || hasVertexAllPropertiesOfGroup.apply(group, vertex);
+          // if its label is not empty or
+          //   if the vertex exhibits all grouped by properties
+
+          if (vertex.getLabel().isEmpty()) {
+            return !group.getPropertyKeys().isEmpty() && hasVertexAllPropertiesOfGroup.apply(group,
+              vertex);
+          } else {
+            return hasVertexAllPropertiesOfGroup.apply(group,
+              vertex);
+          }
 
         } else {
 
-          // if we are not grouping by labels, we only need to check if the vertex has all
+          // if we are not grouping by labels, we need to check if the vertex has all
           // properties grouped by
-          return hasVertexAllPropertiesOfGroup.apply(group, vertex);
+          // if there is no grouped by property, no vertex should be part of the group
 
+          return !group.getPropertyKeys().isEmpty() && hasVertexAllPropertiesOfGroup.apply(group,
+            vertex);
         }
       };
     }
