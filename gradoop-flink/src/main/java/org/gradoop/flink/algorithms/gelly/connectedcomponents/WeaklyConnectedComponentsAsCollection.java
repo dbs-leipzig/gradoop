@@ -15,10 +15,9 @@
  */
 package org.gradoop.flink.algorithms.gelly.connectedcomponents;
 
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 
 /**
  * Computes the weakly connected components of a graph. Uses the gradoop wrapper

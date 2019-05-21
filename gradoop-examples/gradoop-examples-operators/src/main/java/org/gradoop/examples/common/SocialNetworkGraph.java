@@ -45,5 +45,8 @@ public class SocialNetworkGraph {
 
   }
 
+  /**
+   * Private Constructor
+   */
   private SocialNetworkGraph () { }
 }
