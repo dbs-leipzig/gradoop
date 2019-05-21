@@ -21,8 +21,6 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.util.Objects;
-
 /**
  * Default interface of a EPGM logical graph instance.
  *
@@ -37,6 +35,7 @@ public interface BaseGraph<
   E extends EPGMEdge,
   LG extends BaseGraph<G, V, E, LG>>
   extends LogicalGraphLayout<G, V, E>, BaseGraphOperators<G, V, E, LG> {
+
   /**
    * Returns the Gradoop Flink configuration.
    *

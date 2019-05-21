@@ -124,7 +124,7 @@ public interface BaseGraphOperators<
    * Returns the subgraph that is induced by the vertices which fulfill the given filter function.
    *
    * @param vertexFilterFunction vertex filter function
-   * @return vertex-induced subgraph as a new logical graph
+   * @return vertex-induced subgraph
    */
   default LG vertexInducedSubgraph(FilterFunction<V> vertexFilterFunction) {
     Objects.requireNonNull(vertexFilterFunction);
@@ -136,7 +136,7 @@ public interface BaseGraphOperators<
    * Returns the subgraph that is induced by the edges which fulfill the given filter function.
    *
    * @param edgeFilterFunction edge filter function
-   * @return edge-induced subgraph as a new logical graph
+   * @return edge-induced subgraph
    */
   default LG edgeInducedSubgraph(FilterFunction<E> edgeFilterFunction) {
     Objects.requireNonNull(edgeFilterFunction);
@@ -145,15 +145,14 @@ public interface BaseGraphOperators<
 
   /**
    * Returns a subgraph of the logical graph which contains only those vertices
-   * and edges that fulfil the given vertex and edge filter function respectively.
+   * and edges that fulfil the given vertex and edge filter functions respectively.
    * <p>
-   * Note, that the operator does not verify the consistency of the resulting
-   * graph. Use {#toGellyGraph().subgraph()} for that behaviour.
+   * Note, that the operator does not verify the consistency of the resulting graph.
+   * Use {@link #verify()} for that behaviour.
    *
    * @param vertexFilterFunction vertex filter function
    * @param edgeFilterFunction   edge filter function
-   * @return logical graph which fulfils the given predicates and is a subgraph
-   * of that graph
+   * @return logical graph which fulfils the given predicates and is a subgraph of that graph
    */
   default LG subgraph(FilterFunction<V> vertexFilterFunction,
                       FilterFunction<E> edgeFilterFunction) {
@@ -164,16 +163,15 @@ public interface BaseGraphOperators<
 
   /**
    * Returns a subgraph of the logical graph which contains only those vertices
-   * and edges that fulfil the given vertex and edge filter function respectively.
+   * and edges that fulfil the given vertex and edge filter functions respectively.
    * <p>
-   * Note, that the operator does not verify the consistency of the resulting
-   * graph. Use {#toGellyGraph().subgraph()} for that behaviour.
+   * Note, that the operator does not verify the consistency of the resulting graph.
+   * Use {@link #verify()} for that behaviour.
    *
    * @param vertexFilterFunction vertex filter function
    * @param edgeFilterFunction   edge filter function
    * @param strategy             execution strategy for the operator
-   * @return logical graph which fulfils the given predicates and is a subgraph
-   * of that graph
+   * @return logical graph which fulfils the given predicates and is a subgraph of that graph
    */
   default LG subgraph(FilterFunction<V> vertexFilterFunction,
                       FilterFunction<E> edgeFilterFunction, Subgraph.Strategy strategy) {
@@ -251,17 +249,16 @@ public interface BaseGraphOperators<
    * and the given graph. Vertex and edge equality is based on their identifiers.
    *
    * @param otherGraph logical graph to compute overlap with
-   * @return logical graph that contains all vertices and edges that exist in
-   * both input graphs
+   * @return logical graph that contains all vertices and edges that exist in both input graphs
    */
   default LG overlap(LG otherGraph) {
     return callForGraph(new Overlap<>(), otherGraph);
   }
 
   /**
-   * Creates a new logical graph containing only vertices and edges that
-   * exist in that graph but not in the other graph. Vertex and edge equality
-   * is based on their identifiers.
+   * Creates a new logical graph containing only vertices and edges that exist in that graph
+   * but not in the other graph. Vertex and edge equality is based on their identifiers.
+   * The graph head of this graph is retained.
    *
    * @param otherGraph logical graph to exclude from that graph
    * @return logical that contains only vertices and edges that are not in the other graph
