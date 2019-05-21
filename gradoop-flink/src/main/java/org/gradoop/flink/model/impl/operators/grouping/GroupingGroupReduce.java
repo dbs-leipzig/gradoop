@@ -20,9 +20,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.filters.And;
 import org.gradoop.flink.model.impl.functions.filters.Not;
 import org.gradoop.flink.model.impl.functions.filters.Or;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertex;
@@ -36,8 +34,10 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -64,65 +64,7 @@ import java.util.stream.Collectors;
  */
 public class GroupingGroupReduce extends Grouping {
 
-  /**
-   * vertices are kept, if their label is empty and when they don't have any property that is
-   * grouped by
-   * or
-   * if using label specific grouping and they don't belong to any group
-   * TODO basically retain, if a vertex is not a member of any group (be it defaultLabelGroup or
-   *  sth else)
-   */
-  /**
-   * A vertex is not a member of the default labeling group, if its label is empty, and if it
-   * does not have any property that is grouped by
-   */
-  private final FilterFunction<Vertex>
-    verticesNotInDefaultGroupFilter = new And<>(new EmptyLabelFilter(),
-    new Not<>(new HasLabelingGroupPropertyFilter(getDefaultVertexLabelGroup())));
-
-  private final FilterFunction<Vertex> verticesNotInAnyGroupFilter;
-
-  private FilterFunction<Vertex> getIsVertexMemberOfSpecificGroupFilter(LabelGroup group) {
-
-    // v is not member of default group, if its label is empty
-    // v is not a member of the default group, if:
-    // - (group by label && label is not empty) && has no property of def.group.
-    // Default case:
-    boolean groupingByLabels = useVertexLabels();
-    if (group.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP)) {
-      return (FilterFunction<Vertex>) vertex -> {
-
-        if (groupingByLabels) {
-
-          // if useVertexLabels, a vertex is not member of the default group
-          // if its label is empty and it does not have any properties that are grouped by
-          // if it has a label, it is always member of a group
-
-          return !(vertex.getLabel().isEmpty() && group.getPropertyKeys()
-            .parallelStream()
-            .noneMatch(vertex::hasProperty));
-
-        } else {
-
-          // if we are not grouping by labels, we only need to check if the vertex has any
-          // grouped by property
-
-          return group.getPropertyKeys()
-            .parallelStream()
-            .anyMatch(vertex::hasProperty);
-
-        }
-      };
-    }
-
-    // Label specific grouping case:
-    // a vertex is a member of a label specific group, if the labels match and if the vertex has
-    // all of the required properties
-    return (FilterFunction<Vertex>) vertex -> vertex.getLabel().equals(group.getGroupingLabel()) &&
-      group.getPropertyKeys()
-        .parallelStream()
-        .allMatch(vertex::hasProperty);
-  }
+  private final FilterFunction<Vertex> vertexIsInNoGroupFilter;
 
   /**
    * Creates grouping operator instance.
@@ -145,11 +87,11 @@ public class GroupingGroupReduce extends Grouping {
 
     FilterFunction[] isVertexInLabelGroupFunctions = getVertexLabelGroups()
       .parallelStream()
-      .map(this::getIsVertexMemberOfSpecificGroupFilter)
+      .map(this::getIsVertexMemberOfLabelGroupFilter)
       .collect(Collectors.toList())
       .toArray(new FilterFunction[getVertexLabelGroups().size()]);
 
-    verticesNotInAnyGroupFilter = new Not<>(new Or<Vertex>(isVertexInLabelGroupFunctions));
+    vertexIsInNoGroupFilter = new Not<>(new Or<Vertex>(isVertexInLabelGroupFunctions));
 
   }
 
@@ -186,22 +128,9 @@ public class GroupingGroupReduce extends Grouping {
       // build vertex to group representative tuple
       .map(new BuildVertexWithSuperVertex());
 
-
     if (optionalConvertedVertices.isPresent()) {
 
       DataSet<Vertex> convertedVertices = optionalConvertedVertices.get();
-
-      // --- TODO property and aggregate step necessary?
-      // TODO delete
-      // Add all properties that were grouped by as null values to converted vertices
-      convertedVertices =
-        convertedVertices.map(new AddPropertiesAsNullValues(getDefaultVertexLabelGroup()));
-
-      // TODO delete, aggregation nur auf Gruppierten knoten
-      // Execute aggregation functions once for each converted vertex
-      convertedVertices =
-        convertedVertices.map(new AddSingleAggregationResult(getDefaultVertexLabelGroup()));
-      // ---
 
       superVertices = superVertices.union(convertedVertices);
 
@@ -218,45 +147,74 @@ public class GroupingGroupReduce extends Grouping {
     return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
   }
 
-  //TODO extract super function
+  /**
+   * Returns a list that contains all vertices that belong to a {@link LabelGroup}.
+   *
+   * @param vertices to check
+   * @return filtered vertices
+   */
   private DataSet<Vertex> getVerticesToGroup(DataSet<Vertex> vertices) {
-    return vertices.filter(new Not<>(verticesNotInAnyGroupFilter));
+    return vertices.filter(new Not<>(vertexIsInNoGroupFilter));
   }
 
+  /**
+   * Returns a list that contains all vertices that don't belong to a {@link LabelGroup}.
+   *
+   * @param vertices to check
+   * @return filtered vertices
+   */
   private DataSet<Vertex> getVerticesWithoutGroup(DataSet<Vertex> vertices) {
-    return vertices.filter(verticesNotInAnyGroupFilter);
+    return vertices.filter(vertexIsInNoGroupFilter);
   }
 
   /**
-   * Returns true, if a vertex's label is empty.
+   * Returns a {@link FilterFunction<Vertex>} that checks if a vertex is member of a
+   * {@link LabelGroup}.
+   *
+   * @param group to check
+   * @return function
    */
-  private static class EmptyLabelFilter implements FilterFunction<Vertex> {
+  private FilterFunction<Vertex> getIsVertexMemberOfLabelGroupFilter(LabelGroup group) {
 
-    @Override
-    public boolean filter(Vertex value) throws Exception {
-      return value.getLabel().isEmpty();
+    // Returns true, if a vertex exhibits all properties of a labelGroup.
+    // If labelGroup's properties are empty, returns false.
+    BiFunction<LabelGroup, Vertex, Boolean> hasVertexAllPropertiesOfGroup =
+      (BiFunction<LabelGroup, Vertex, Boolean> & Serializable) (labelGroup, vertex) ->
+        !group.getPropertyKeys().isEmpty() &&
+          group.getPropertyKeys()
+            .parallelStream()
+            .allMatch(vertex::hasProperty);
+
+    boolean groupingByLabels = useVertexLabels();
+
+    // Default case (parameter group is not label specific)
+    if (group.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP)) {
+
+      return (FilterFunction<Vertex>) vertex -> {
+
+        if (groupingByLabels) {
+
+          // a vertex is member of the default group if
+          //   its label is not empty (only when grouping by labels) or
+          //   if its label is empty and the vertex exhibits all grouped by properties
+          return !vertex.getLabel().isEmpty() || hasVertexAllPropertiesOfGroup.apply(group, vertex);
+
+        } else {
+
+          // if we are not grouping by labels, we only need to check if the vertex has all
+          // properties grouped by
+          return hasVertexAllPropertiesOfGroup.apply(group, vertex);
+
+        }
+      };
     }
+
+    // Label specific grouping case:
+    // a vertex is a member of a label specific group, if the labels match and if the vertex has
+    // all of the required properties
+    return (FilterFunction<Vertex>) vertex -> vertex.getLabel().equals(group.getGroupingLabel()) &&
+      hasVertexAllPropertiesOfGroup.apply(group, vertex);
   }
-
-  /**
-   * Returns true, if a vertex has property keys of a labelGroup.
-   */
-  private static class HasLabelingGroupPropertyFilter implements FilterFunction<Vertex> {
-
-    private final LabelGroup labelGroup;
-
-    public HasLabelingGroupPropertyFilter(LabelGroup labelGroup) {
-      this.labelGroup = labelGroup;
-    }
-
-    @Override
-    public boolean filter(Vertex value) throws Exception {
-      return labelGroup.getPropertyKeys()
-        .parallelStream()
-        .anyMatch(value::hasProperty);
-    }
-  }
-
 
   /**
    * Creates a {@link VertexWithSuperVertex} with both components referencing the same
@@ -282,48 +240,4 @@ public class GroupingGroupReduce extends Grouping {
 
   }
 
-  /**
-   * Adds all properties of a {@link LabelGroup} to a vertex, initialized with
-   * PropertyValue.NULL_VALUE.
-   */
-  private class AddPropertiesAsNullValues implements MapFunction<Vertex, Vertex> {
-
-    private final LabelGroup labelGroup;
-
-    public AddPropertiesAsNullValues(LabelGroup labelGroup) {
-      this.labelGroup = labelGroup;
-    }
-
-    @Override
-    public Vertex map(Vertex value) throws Exception {
-
-      labelGroup.getPropertyKeys()
-        .forEach(key -> value.setProperty(key, PropertyValue.NULL_VALUE));
-
-      return value;
-    }
-  }
-
-  /**
-   * Executes each aggregation function in a labelGroup once and adds the result as a property to
-   * a vertex.
-   */
-  private class AddSingleAggregationResult implements MapFunction<Vertex, Vertex> {
-
-    private final LabelGroup labelGroup;
-
-    public AddSingleAggregationResult(LabelGroup labelGroup) {
-
-      this.labelGroup = labelGroup;
-    }
-
-    @Override
-    public Vertex map(Vertex value) throws Exception {
-
-      labelGroup.getAggregateFunctions()
-        .forEach(fun -> value.setProperty(fun.getAggregatePropertyKey(), fun.getIncrement(value)));
-
-      return value;
-    }
-  }
 }

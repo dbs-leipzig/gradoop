@@ -31,18 +31,15 @@ import static org.junit.Assert.assertTrue;
 public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
 
 
-  // TODO create testcase: labelspecific Grouping (e.g graph with A,B,C,D Vertices,Group by A,B
-  //  => C,D will get smashed together, but should be converted 1:1 with set flag
   // TODO label specific grouping: addVertexGroupingKey functionality. (adds a property key to
   //  the vertex grouping keys for vertices which do not have a specific label group)
-
-  // TODO test that group by property is added
-  // TODO test that aggregate function is called correctly
 
   // TODO testcase: group by props a and b, vertex has only a => vertex should be in no
   //  group!
 
   // TODO testcase: can vertex be in multiple labelgroups?
+
+  // TODO testcase:
   private static void convertDotToPNG(String dotFile, String pngFile) throws IOException {
     ProcessBuilder pb = new ProcessBuilder("dot", "-Tpng", dotFile);
     File output = new File(pngFile);
@@ -60,18 +57,6 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
 
     assertTrue(grouping.isRetainingVerticesWithoutGroups());
 
-  }
-
-  /**
-   * Verify that retainVerticesWithoutGroups flag can only be used in conjunction with
-   * useVertexLabel.
-   */
-  @Test(expected = UnsupportedOperationException.class)
-  public void testIllegalRetainVerticesFlagState() {
-    new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
-      .setRetainVerticesWithoutGroups(true)
-      .build();
   }
 
   private final String DEFAULT_PREFIX = "default_";
@@ -181,7 +166,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
         "(v00:Blue {b: NULL, count:1L})" +
         "(v01:Blue {b : 2, count:1L})" +
         "(v02 {b : 5, count:1L})" + // v2 builds a group
-        "(v03 {b: NULL, count: 1L, c: 4.1})" + // v3 was converted 1:1
+        "(v03 {c: 4.1})" + // v3 was converted 1:1
         "(v04:Red {b: 2, count: 1L})" +
         "(v00)-->(v02)" +
         "(v01)-->(v02)" +
@@ -211,6 +196,26 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
+
+  /**
+   * Groups a graph by label and two properties.
+   * The graph contains a single vertices without a label and one matching property,
+   */
+  @Test
+  public void groupByLabelAndPropertiesSingleNoLabelOneProperty() {
+
+  }
+
+  /**
+   *
+   */
+  @Test
+  public void groupByLabelAndPropertiesSingleNoLabelMatchingProperties() {
+
+  }
+
+//  @Test
+//  public void groupByLabelAndPropertiesSingleLabel
 
   /**
    * Groups a graph by label and a property.
@@ -289,7 +294,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
       "expected[" +
         "(v00:Blue {b: NULL, count:1L})" +
         "(v01:Blue {b : 2, count:1L})" +
-        "(v02 {b: NULL, c : 4.1, count:1L})" + // was converted 1:1
+        "(v02 {c : 4.1})" + // was converted 1:1
         "(v03:Red {b: 2, count: 1L})" +
         "(v00)-->(v02)" +
         "(v01)-->(v02)" +
@@ -345,8 +350,8 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
       "expected[" +
         "(v00:Blue {b: NULL, count:1L})" +
         "(v01:Blue {b : 2, count:1L})" +
-        "(v02 {b: NULL, c : 4.1, count:1L})" + // was converted 1:1
-        "(v021 {b: NULL, d : 'a', count:1L})" + // was converted 1:1
+        "(v02 {c : 4.1})" + // was converted 1:1
+        "(v021 {d : 'a'})" + // was converted 1:1
         "(v03:Red {b: 2, count: 1L})" +
         "(v00)-->(v02)" +
         "(v01)-->(v02)" +
@@ -398,7 +403,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString(
       "expected[" +
         "(v00:Blue {count:2L})" +
-        "(v02 {c : 4.1, count:1L})" + // was converted 1:1, and property c was saved
+        "(v02 {c : 4.1})" + // was converted 1:1
         "(v03:Red {count: 1L})" +
         "(v00)-->(v02)" +
         "(v02)-->(v03)" +
@@ -448,9 +453,9 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString(
       "expected[" +
         "(v00:Blue {count:2L})" +
-        "(v02 {c : 4.1, count:1L})" +
+        "(v02 {c : 4.1})" +
         "(v03:Red {count: 1L})" +
-        "(v04 {d: 'a', count: 1L})" +
+        "(v04 {d: 'a'})" +
         "(v00)-->(v02)" +
         "(v02)-->(v03)" +
         "(v03)-->(v04)" +
@@ -476,11 +481,10 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
 
-  // TODO create testcase: labelspecific Grouping (e.g graph with A,B,C,D Vertices,Group by A,B
-  //  => C,D will get smashed together, but should be converted 1:1 with set flag
-
   /**
    * Tests function {@link GroupingGroupReduce#groupInternal(LogicalGraph)}
+   * <p>
+   * No vertex will be converted 1:1.
    *
    * @throws Exception
    */
@@ -490,8 +494,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     String asciiInput = "input[" +
       "(v0:A {a: 1, foo: true})" +
       "(v1:B {b: 2, foo: true})" +
-      "(v2:C {c : 3})" + // C and D build their own groups because of useVertexLabel !!!false ->C,
-      // D: not label A or B -> convert 1:1. <= is useVertexLabel(false) case!
+      "(v2:C {c : 3})" + // C and D build their own groups because of useVertexLabel
       "(v3:D {d: 4})" +
       "(v0)-->(v2)" +
       "(v1)-->(v2)" +
@@ -516,8 +519,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
       .setRetainVerticesWithoutGroups(true)
-      .useVertexLabel(true) // TODO testcase: useVertexLabel(false) => Both would be assigned to
-      // the same group without retain vertices flag
+      .useVertexLabel(true)
       .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
       .addVertexLabelGroup("B", "SuperB", Collections.singletonList("b"))
       .build()
@@ -535,8 +537,9 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
       "(v0:A {a: 1, foo: true})" +
       "(v1:B {b: 2, foo: true})" +
       "(v2:C {c : 3})" + // useVertexLabel = false => C and D are not member of a group =>
-      // convert 1:!
-      "(v3:D {d: 4})" +
+      // convert 1:1
+      "(v3:D {d: 4})" + // TODO are C and D members of DefaultLabelGroup here? => no, only after
+      // addVertexGroupingKey()
       "(v0)-->(v2)" +
       "(v1)-->(v2)" +
       "(v2)-->(v3)" +
@@ -612,9 +615,9 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString(
       "expected[" +
         "(v00:Blue {count:2L})" +
-        "(v02 {c : 4.1, count:1L})" +
+        "(v02 {c : 4.1})" +
         "(v03:Red {count: 1L})" +
-        "(v04 {d: 'a', count: 1L})" +
+        "(v04 {d: 'a'})" +
         "]");
 
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
@@ -681,9 +684,9 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
 
     loader.appendToDatabaseFromString(
       "expected[" +
-        "(v00 {a:1, count:1L})" +
-        "(v01 {b:2, count:1L})" +
-        "(v02 {count: 1L})" +
+        "(v00 {a:1})" +
+        "(v01 {b:2})" +
+        "(v02 {})" +
         "(v00)-->(v01)" +
         "(v01)-->(v02)" +
         "]");
