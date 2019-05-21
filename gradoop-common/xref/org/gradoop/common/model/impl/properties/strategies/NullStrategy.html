@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.core.memory.DataInputView;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.core.memory.DataOutputView;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.strategies.PropertyValueStrategy;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Type;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> java.io.IOException;
 <a name="24" href="#24">24</a>  
@@ -72,12 +72,12 @@
 <a name="62" href="#62">62</a>  
 <a name="63" href="#63">63</a>    @Override
 <a name="64" href="#64">64</a>    <strong class="jxr_keyword">public</strong> byte getRawType() {
-<a name="65" href="#65">65</a>      <strong class="jxr_keyword">return</strong> PropertyValue.TYPE_NULL;
+<a name="65" href="#65">65</a>      <strong class="jxr_keyword">return</strong> Type.NULL.getTypeByte();
 <a name="66" href="#66">66</a>    }
 <a name="67" href="#67">67</a>  
 <a name="68" href="#68">68</a>    @Override
 <a name="69" href="#69">69</a>    <strong class="jxr_keyword">public</strong> byte[] getRawBytes(Object value) {
-<a name="70" href="#70">70</a>      <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong>;
+<a name="70" href="#70">70</a>      <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> byte[] {getRawType()};
 <a name="71" href="#71">71</a>    }
 <a name="72" href="#72">72</a>  }
 </pre>

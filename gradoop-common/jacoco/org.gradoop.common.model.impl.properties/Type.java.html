@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Type.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.properties</a> &gt; <span class="el_source">Type.java</span></div><h1>Type.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.properties;
+
+/**
+ * Representations of types that are supported by
+ * {@link org.gradoop.common.model.impl.properties.PropertyValue}
+ */
+<span class="fc" id="L22">public enum Type {</span>
+  /** Null type */
+<span class="fc" id="L24">  NULL(0x00, &quot;null&quot;),</span>
+  /** Boolean type */
+<span class="fc" id="L26">  BOOLEAN(0x01, &quot;boolean&quot;),</span>
+  /** Integer type */
+<span class="fc" id="L28">  INTEGER(0x02, &quot;int&quot;),</span>
+  /** Long type */
+<span class="fc" id="L30">  LONG(0x03, &quot;long&quot;),</span>
+  /** Float type */
+<span class="fc" id="L32">  FLOAT(0x04, &quot;float&quot;),</span>
+  /** Double type */
+<span class="fc" id="L34">  DOUBLE(0x05, &quot;double&quot;),</span>
+  /** String type */
+<span class="fc" id="L36">  STRING(0x06, &quot;string&quot;),</span>
+  /** BigDecimal type */
+<span class="fc" id="L38">  BIG_DECIMAL(0x07, &quot;bigdecimal&quot;),</span>
+  /** GradoopId type */
+<span class="fc" id="L40">  GRADOOP_ID(0x08, &quot;gradoopid&quot;),</span>
+  /** Map type */
+<span class="fc" id="L42">  MAP(0x09, &quot;map&quot;),</span>
+  /** List type */
+<span class="fc" id="L44">  LIST(0x0a, &quot;list&quot;),</span>
+  /** Date type */
+<span class="fc" id="L46">  DATE(0x0b, &quot;localdate&quot;),</span>
+  /** Time type */
+<span class="fc" id="L48">  TIME(0x0c, &quot;localtime&quot;),</span>
+  /** DateTime type */
+<span class="fc" id="L50">  DATE_TIME(0x0d, &quot;localdatetime&quot;),</span>
+  /** Short type */
+<span class="fc" id="L52">  SHORT(0x0e, &quot;short&quot;),</span>
+  /** Set type */
+<span class="fc" id="L54">  SET(0x0f, &quot;set&quot;);</span>
+
+  /**
+   * Byte representation
+   */
+  private final byte typeByte;
+  /**
+   * String representation
+   */
+  private final String typeString;
+
+  /**
+   * Constructs an enum type that represents a supported type.
+   *
+   * @param typeByte byte representation as int, is casted to byte
+   * @param typeString string representation
+   */
+<span class="fc" id="L71">  Type(int typeByte, String typeString) {</span>
+<span class="fc" id="L72">    this.typeByte = (byte) typeByte;</span>
+<span class="fc" id="L73">    this.typeString = typeString;</span>
+<span class="fc" id="L74">  }</span>
+
+  /**
+   * Returns the byte representation.
+   *
+   * @return type byte
+   */
+  public byte getTypeByte() {
+<span class="fc" id="L82">    return typeByte;</span>
+  }
+
+  /**
+   * Returns the string representation.
+   *
+   * @return type string
+   */
+  @Override
+  public String toString() {
+<span class="fc" id="L92">    return typeString;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

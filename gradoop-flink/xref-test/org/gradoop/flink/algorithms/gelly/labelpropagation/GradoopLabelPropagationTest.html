@@ -33,7 +33,7 @@
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/labelpropagation/GradoopLabelPropagationTest.html">GradoopLabelPropagationTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
 <a name="24" href="#24">24</a>    @Test
 <a name="25" href="#25">25</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testByElementData() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="26" href="#26">26</a>      String graph = <span class="jxr_string">"input["</span> +
+<a name="26" href="#26">26</a>      String graph = <span class="jxr_string">"input:test["</span> +
 <a name="27" href="#27">27</a>        <span class="jxr_string">"/* first community */"</span> +
 <a name="28" href="#28">28</a>        <span class="jxr_string">"(v0 {id:0, value:\&quot;A\&quot;})"</span> +
 <a name="29" href="#29">29</a>        <span class="jxr_string">"(v1 {id:1, value:\&quot;A\&quot;})"</span> +
@@ -60,7 +60,7 @@
 <a name="50" href="#50">50</a>        <span class="jxr_string">"(v6)-[e14]-&gt;(v4)"</span> +
 <a name="51" href="#51">51</a>        <span class="jxr_string">"(v6)-[e15]-&gt;(v5)"</span> +
 <a name="52" href="#52">52</a>        <span class="jxr_string">"]"</span> +
-<a name="53" href="#53">53</a>        <span class="jxr_string">"result["</span> +
+<a name="53" href="#53">53</a>        <span class="jxr_string">"result:test["</span> +
 <a name="54" href="#54">54</a>        <span class="jxr_string">"(v7 {id:0, value:\&quot;A\&quot;})"</span> +
 <a name="55" href="#55">55</a>        <span class="jxr_string">"(v8 {id:1, value:\&quot;A\&quot;})"</span> +
 <a name="56" href="#56">56</a>        <span class="jxr_string">"(v9 {id:2, value:\&quot;A\&quot;})"</span> +
@@ -91,7 +91,7 @@
 <a name="81" href="#81">81</a>      LogicalGraph outputGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>)
 <a name="82" href="#82">82</a>        .callForGraph(<strong class="jxr_keyword">new</strong> GradoopLabelPropagation(10, <span class="jxr_string">"value"</span>));
 <a name="83" href="#83">83</a>  
-<a name="84" href="#84">84</a>      collectAndAssertTrue(outputGraph.equalsByElementData(
+<a name="84" href="#84">84</a>      collectAndAssertTrue(outputGraph.equalsByData(
 <a name="85" href="#85">85</a>        loader.getLogicalGraphByVariable(<span class="jxr_string">"result"</span>)));
 <a name="86" href="#86">86</a>    }
 <a name="87" href="#87">87</a>  

@@ -18,56 +18,58 @@ package org.gradoop.common.model.impl.properties.strategies;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
+
 import java.io.IOException;
 
 /**
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code String}.
  */
-<span class="fc" id="L27">public class StringStrategy extends AbstractVariableSizedPropertyValueStrategy&lt;String&gt; {</span>
+<span class="fc" id="L29">public class StringStrategy extends AbstractVariableSizedPropertyValueStrategy&lt;String&gt; {</span>
 
   @Override
   public String read(DataInputView inputView, byte typeByte) throws IOException {
-<span class="fc" id="L31">    byte[] rawBytes = readVariableSizedData(inputView, typeByte);</span>
-<span class="fc" id="L32">    return Bytes.toString(rawBytes);</span>
+<span class="fc" id="L33">    byte[] rawBytes = readVariableSizedData(inputView, typeByte);</span>
+<span class="fc" id="L34">    return Bytes.toString(rawBytes);</span>
   }
 
   @Override
   public int compare(String value, Object other) {
-<span class="pc bpc" id="L37" title="1 of 2 branches missed.">    if (other instanceof String) {</span>
-<span class="fc" id="L38">      return value.compareTo((String) other);</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">    if (other instanceof String) {</span>
+<span class="fc" id="L40">      return value.compareTo((String) other);</span>
     }
-<span class="nc" id="L40">    throw new IllegalArgumentException(String.format(</span>
-<span class="nc" id="L41">      &quot;Incompatible types: %s, %s&quot;, value.getClass(), other.getClass()));</span>
+<span class="nc" id="L42">    throw new IllegalArgumentException(String.format(</span>
+<span class="nc" id="L43">      &quot;Incompatible types: %s, %s&quot;, value.getClass(), other.getClass()));</span>
   }
 
   @Override
   public boolean is(Object value) {
-<span class="fc" id="L46">    return value instanceof String;</span>
+<span class="fc" id="L48">    return value instanceof String;</span>
   }
 
   @Override
   public Class&lt;String&gt; getType() {
-<span class="fc" id="L51">    return String.class;</span>
+<span class="fc" id="L53">    return String.class;</span>
   }
 
   @Override
   public String get(byte[] bytes) {
-<span class="fc" id="L56">    return Bytes.toString(bytes, PropertyValue.OFFSET, bytes.length - PropertyValue.OFFSET);</span>
+<span class="fc" id="L58">    return Bytes.toString(bytes, PropertyValue.OFFSET, bytes.length - PropertyValue.OFFSET);</span>
   }
 
   @Override
   public byte getRawType() {
-<span class="fc" id="L61">    return PropertyValue.TYPE_STRING;</span>
+<span class="fc" id="L63">    return Type.STRING.getTypeByte();</span>
   }
 
   @Override
   public byte[] getRawBytes(String value) {
-<span class="fc" id="L66">    byte[] valueBytes = Bytes.toBytes(value);</span>
-<span class="fc" id="L67">    byte[] rawBytes = new byte[PropertyValue.OFFSET + valueBytes.length];</span>
-<span class="fc" id="L68">    rawBytes[0] = getRawType();</span>
-<span class="fc" id="L69">    Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);</span>
-<span class="fc" id="L70">    return rawBytes;</span>
+<span class="fc" id="L68">    byte[] valueBytes = Bytes.toBytes(value);</span>
+<span class="fc" id="L69">    byte[] rawBytes = new byte[PropertyValue.OFFSET + valueBytes.length];</span>
+<span class="fc" id="L70">    rawBytes[0] = getRawType();</span>
+<span class="fc" id="L71">    Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);</span>
+<span class="fc" id="L72">    return rawBytes;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

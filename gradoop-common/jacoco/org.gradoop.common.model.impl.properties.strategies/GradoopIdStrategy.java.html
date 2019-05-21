@@ -19,6 +19,8 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
+
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -26,59 +28,59 @@ import java.util.Arrays;
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code GradoopIdStrategy}.
  */
-<span class="fc" id="L29">public class GradoopIdStrategy extends AbstractFixSizedPropertyValueStrategy&lt;GradoopId&gt; {</span>
+<span class="fc" id="L31">public class GradoopIdStrategy extends AbstractFixSizedPropertyValueStrategy&lt;GradoopId&gt; {</span>
 
   @Override
   public GradoopId read(DataInputView inputView, byte typeByte) throws IOException {
-<span class="fc" id="L33">    int length = GradoopId.ID_SIZE;</span>
-<span class="fc" id="L34">    byte[] rawBytes = new byte[length];</span>
+<span class="fc" id="L35">    int length = GradoopId.ID_SIZE;</span>
+<span class="fc" id="L36">    byte[] rawBytes = new byte[length];</span>
 
-<span class="fc bfc" id="L36" title="All 2 branches covered.">    for (int i = 0; i &lt; rawBytes.length; i++) {</span>
-<span class="fc" id="L37">      rawBytes[i] = inputView.readByte();</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">    for (int i = 0; i &lt; rawBytes.length; i++) {</span>
+<span class="fc" id="L39">      rawBytes[i] = inputView.readByte();</span>
     }
 
-<span class="fc" id="L40">    return GradoopId.fromByteArray(rawBytes);</span>
+<span class="fc" id="L42">    return GradoopId.fromByteArray(rawBytes);</span>
   }
 
   @Override
   public int compare(GradoopId value, Object other) {
-<span class="pc bpc" id="L45" title="1 of 2 branches missed.">    if (other instanceof GradoopId) {</span>
-<span class="fc" id="L46">      return value.compareTo((GradoopId) other);</span>
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">    if (other instanceof GradoopId) {</span>
+<span class="fc" id="L48">      return value.compareTo((GradoopId) other);</span>
     }
-<span class="nc" id="L48">    throw new IllegalArgumentException(String.format(</span>
-<span class="nc" id="L49">      &quot;Incompatible types: %s, %s&quot;, value.getClass(), other.getClass()));</span>
+<span class="nc" id="L50">    throw new IllegalArgumentException(String.format(</span>
+<span class="nc" id="L51">      &quot;Incompatible types: %s, %s&quot;, value.getClass(), other.getClass()));</span>
   }
 
   @Override
   public boolean is(Object value) {
-<span class="fc" id="L54">    return value instanceof GradoopId;</span>
+<span class="fc" id="L56">    return value instanceof GradoopId;</span>
   }
 
   @Override
   public Class&lt;GradoopId&gt; getType() {
-<span class="fc" id="L59">    return GradoopId.class;</span>
+<span class="fc" id="L61">    return GradoopId.class;</span>
   }
 
   @Override
   public GradoopId get(byte[] bytes) {
-<span class="fc" id="L64">    return GradoopId.fromByteArray(</span>
-<span class="fc" id="L65">      Arrays.copyOfRange(</span>
+<span class="fc" id="L66">    return GradoopId.fromByteArray(</span>
+<span class="fc" id="L67">      Arrays.copyOfRange(</span>
         bytes, PropertyValue.OFFSET, GradoopId.ID_SIZE + PropertyValue.OFFSET
       ));
   }
 
   @Override
   public byte getRawType() {
-<span class="fc" id="L72">    return PropertyValue.TYPE_GRADOOP_ID;</span>
+<span class="fc" id="L74">    return Type.GRADOOP_ID.getTypeByte();</span>
   }
 
   @Override
   public byte[] getRawBytes(GradoopId value) {
-<span class="fc" id="L77">    byte[] valueBytes = value.toByteArray();</span>
-<span class="fc" id="L78">    byte[] rawBytes = new byte[PropertyValue.OFFSET + GradoopId.ID_SIZE];</span>
-<span class="fc" id="L79">    rawBytes[0] = getRawType();</span>
-<span class="fc" id="L80">    Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);</span>
-<span class="fc" id="L81">    return rawBytes;</span>
+<span class="fc" id="L79">    byte[] valueBytes = value.toByteArray();</span>
+<span class="fc" id="L80">    byte[] rawBytes = new byte[PropertyValue.OFFSET + GradoopId.ID_SIZE];</span>
+<span class="fc" id="L81">    rawBytes[0] = getRawType();</span>
+<span class="fc" id="L82">    Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);</span>
+<span class="fc" id="L83">    return rawBytes;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

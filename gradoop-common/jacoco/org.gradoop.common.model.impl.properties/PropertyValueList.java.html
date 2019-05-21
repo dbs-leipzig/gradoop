@@ -32,6 +32,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Represents a list of property values.
@@ -52,17 +53,17 @@ public class PropertyValueList
   /**
    * Default constructor (used for (de-)serialization.
    */
-<span class="fc" id="L55">  public PropertyValueList() {</span>
-<span class="fc" id="L56">  }</span>
+<span class="fc" id="L56">  public PropertyValueList() {</span>
+<span class="fc" id="L57">  }</span>
 
   /**
    * Creates a value list from the given bytes.
    *
    * @param bytes byte representation
    */
-<span class="fc" id="L63">  private PropertyValueList(byte[] bytes) {</span>
-<span class="fc" id="L64">    this.bytes = bytes;</span>
-<span class="fc" id="L65">  }</span>
+<span class="fc" id="L64">  private PropertyValueList(byte[] bytes) {</span>
+<span class="fc" id="L65">    this.bytes = bytes;</span>
+<span class="fc" id="L66">  }</span>
 
   /**
    * Creates a new property value list containing no elements.
@@ -70,7 +71,7 @@ public class PropertyValueList
    * @return empty property value list
    */
   public static PropertyValueList createEmptyList() {
-<span class="nc" id="L73">    return new PropertyValueList(new byte[0]);</span>
+<span class="fc" id="L74">    return new PropertyValueList(new byte[0]);</span>
   }
 
   /**
@@ -83,60 +84,60 @@ public class PropertyValueList
   public static PropertyValueList fromPropertyValues(
     Collection&lt;PropertyValue&gt; propertyValues) throws IOException {
 
-<span class="fc" id="L86">    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();</span>
-<span class="fc" id="L87">    DataOutputStream outputStream = new DataOutputStream(byteStream);</span>
-<span class="fc" id="L88">    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);</span>
+<span class="fc" id="L87">    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();</span>
+<span class="fc" id="L88">    DataOutputStream outputStream = new DataOutputStream(byteStream);</span>
+<span class="fc" id="L89">    DataOutputView outputView = new DataOutputViewStreamWrapper(outputStream);</span>
 
-<span class="fc bfc" id="L90" title="All 2 branches covered.">    for (PropertyValue propertyValue : propertyValues) {</span>
-<span class="fc" id="L91">      propertyValue.write(outputView);</span>
-<span class="fc" id="L92">    }</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">    for (PropertyValue propertyValue : propertyValues) {</span>
+<span class="fc" id="L92">      propertyValue.write(outputView);</span>
+<span class="fc" id="L93">    }</span>
 
-<span class="fc" id="L94">    outputStream.flush();</span>
-<span class="fc" id="L95">    return new PropertyValueList(byteStream.toByteArray());</span>
+<span class="fc" id="L95">    outputStream.flush();</span>
+<span class="fc" id="L96">    return new PropertyValueList(byteStream.toByteArray());</span>
   }
 
   @Override
   public boolean equals(Object o) {
-<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    if (this == o) {</span>
-<span class="nc" id="L101">      return true;</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L102">      return true;</span>
     }
-<span class="pc bpc" id="L103" title="1 of 2 branches missed.">    if (!(o instanceof PropertyValueList)) {</span>
-<span class="nc" id="L104">      return false;</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">    if (!(o instanceof PropertyValueList)) {</span>
+<span class="nc" id="L105">      return false;</span>
     }
-<span class="fc" id="L106">    PropertyValueList that = (PropertyValueList) o;</span>
-<span class="fc" id="L107">    return Arrays.equals(bytes, that.bytes);</span>
+<span class="fc" id="L107">    PropertyValueList that = (PropertyValueList) o;</span>
+<span class="fc" id="L108">    return Arrays.equals(bytes, that.bytes);</span>
   }
 
   @Override
   public int hashCode() {
-<span class="fc" id="L112">    return Arrays.hashCode(bytes);</span>
+<span class="fc" id="L113">    return Arrays.hashCode(bytes);</span>
   }
 
   @Override
   public Iterator&lt;PropertyValue&gt; iterator() {
-<span class="fc" id="L117">    return new PropertyValueListIterator(bytes);</span>
+<span class="fc" id="L118">    return new PropertyValueListIterator(bytes);</span>
   }
 
   @Override
   public void write(DataOutputView dataOutput) throws IOException {
-<span class="fc" id="L122">    dataOutput.writeShort(bytes.length);</span>
-<span class="fc" id="L123">    dataOutput.write(bytes);</span>
-<span class="fc" id="L124">  }</span>
+<span class="fc" id="L123">    dataOutput.writeShort(bytes.length);</span>
+<span class="fc" id="L124">    dataOutput.write(bytes);</span>
+<span class="fc" id="L125">  }</span>
 
   @Override
   public void read(DataInputView dataInput) throws IOException {
-<span class="fc" id="L128">    bytes = new byte[dataInput.readShort()];</span>
-<span class="fc" id="L129">    dataInput.readFully(bytes);</span>
-<span class="fc" id="L130">  }</span>
+<span class="fc" id="L129">    bytes = new byte[dataInput.readShort()];</span>
+<span class="fc" id="L130">    dataInput.readFully(bytes);</span>
+<span class="fc" id="L131">  }</span>
 
   @Override
   public int compareTo(PropertyValueList o) {
-<span class="fc" id="L134">    return Bytes.compareTo(bytes, o.bytes);</span>
+<span class="fc" id="L135">    return Bytes.compareTo(bytes, o.bytes);</span>
   }
 
   @Override
   public String toString() {
-<span class="nc" id="L139">    return StringUtils.join(iterator(), ',');</span>
+<span class="nc" id="L140">    return StringUtils.join(iterator(), ',');</span>
   }
 
   /**
@@ -160,46 +161,46 @@ public class PropertyValueList
      *
      * @param rawBytes property value list byte representation
      */
-<span class="fc" id="L163">    PropertyValueListIterator(byte[] rawBytes) {</span>
-<span class="fc bfc" id="L164" title="All 2 branches covered.">      if (rawBytes == null) {</span>
-<span class="fc" id="L165">        rawBytes = new byte[0];</span>
+<span class="fc" id="L164">    PropertyValueListIterator(byte[] rawBytes) {</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">      if (rawBytes == null) {</span>
+<span class="fc" id="L166">        rawBytes = new byte[0];</span>
       }
-<span class="fc" id="L167">      byteStream = new ByteArrayInputStream(rawBytes);</span>
-<span class="fc" id="L168">      inputStream = new DataInputStream(byteStream);</span>
-<span class="fc" id="L169">    }</span>
+<span class="fc" id="L168">      byteStream = new ByteArrayInputStream(rawBytes);</span>
+<span class="fc" id="L169">      inputStream = new DataInputStream(byteStream);</span>
+<span class="fc" id="L170">    }</span>
 
     @Override
     public boolean hasNext() {
       boolean hasNext;
-<span class="fc bfc" id="L174" title="All 2 branches covered.">      if (byteStream.available() &gt; 0) {</span>
-<span class="fc" id="L175">        hasNext = true;</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">      if (byteStream.available() &gt; 0) {</span>
+<span class="fc" id="L176">        hasNext = true;</span>
       } else {
         // close the stream if no more data is available
         try {
-<span class="fc" id="L179">          inputStream.close();</span>
-<span class="nc" id="L180">        } catch (IOException e) {</span>
-<span class="nc" id="L181">          e.printStackTrace();</span>
-<span class="fc" id="L182">        }</span>
-<span class="fc" id="L183">        hasNext = false;</span>
+<span class="fc" id="L180">          inputStream.close();</span>
+<span class="nc" id="L181">        } catch (IOException e) {</span>
+<span class="nc" id="L182">          e.printStackTrace();</span>
+<span class="fc" id="L183">        }</span>
+<span class="fc" id="L184">        hasNext = false;</span>
       }
-<span class="fc" id="L185">      return hasNext;</span>
+<span class="fc" id="L186">      return hasNext;</span>
     }
 
     @Override
-    public PropertyValue next() {
-<span class="fc" id="L190">      PropertyValue nextValue = new PropertyValue();</span>
+    public PropertyValue next() throws NoSuchElementException {
+<span class="fc" id="L191">      PropertyValue nextValue = new PropertyValue();</span>
       try {
-<span class="fc" id="L192">        DataInputView inputView = new DataInputViewStreamWrapper(inputStream);</span>
-<span class="fc" id="L193">        nextValue.read(inputView);</span>
-<span class="nc" id="L194">      } catch (IOException e) {</span>
-<span class="nc" id="L195">        e.printStackTrace();</span>
-<span class="fc" id="L196">      }</span>
-<span class="fc" id="L197">      return nextValue;</span>
+<span class="fc" id="L193">        DataInputView inputView = new DataInputViewStreamWrapper(inputStream);</span>
+<span class="fc" id="L194">        nextValue.read(inputView);</span>
+<span class="fc" id="L195">      } catch (IOException e) {</span>
+<span class="fc" id="L196">        throw new NoSuchElementException(&quot;Error while reading from input stream.&quot;);</span>
+<span class="fc" id="L197">      }</span>
+<span class="fc" id="L198">      return nextValue;</span>
     }
 
     @Override
     public void remove() {
-<span class="nc" id="L202">    }</span>
+<span class="nc" id="L203">    }</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

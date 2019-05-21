@@ -21,12 +21,12 @@ Gradoop HBase,org.gradoop.storage.impl.hbase.factory,HBaseEPGMStoreFactory,8,186
 Gradoop HBase,org.gradoop.storage.impl.hbase.io,HBaseBase,0,19,0,0,0,7,0,4,0,4
 Gradoop HBase,org.gradoop.storage.impl.hbase.io,HBaseDataSink,5,121,0,2,2,33,1,8,1,7
 Gradoop HBase,org.gradoop.storage.impl.hbase.io,HBaseDataSource,1,186,1,5,0,33,1,10,0,8
+Gradoop HBase,org.gradoop.storage.impl.hbase.predicate.filter,HBaseFilterUtils,10,319,3,27,2,80,4,20,1,8
 Gradoop HBase,org.gradoop.storage.impl.hbase.constants,HBaseConstants,3,0,0,0,1,0,1,0,1,0
-Gradoop HBase,org.gradoop.storage.impl.hbase.predicate.filter,HBaseFilterUtils,10,318,3,27,2,79,4,20,1,8
 Gradoop HBase,org.gradoop.storage.config,GradoopHBaseConfig,3,158,3,3,0,36,3,12,0,12
 Gradoop HBase,org.gradoop.storage.impl.hbase.iterator,HBaseEdgeIterator,0,37,0,2,0,12,0,5,0,4
-Gradoop HBase,org.gradoop.storage.impl.hbase.iterator,HBaseGraphIterator,0,37,0,2,0,12,0,5,0,4
 Gradoop HBase,org.gradoop.storage.impl.hbase.iterator,HBaseVertexIterator,0,37,0,2,0,12,0,5,0,4
+Gradoop HBase,org.gradoop.storage.impl.hbase.iterator,HBaseGraphIterator,0,37,0,2,0,12,0,5,0,4
 Gradoop HBase,org.gradoop.storage.impl.hbase.io.functions,BuildVertexMutation,0,44,0,0,0,12,0,3,0,3
 Gradoop HBase,org.gradoop.storage.impl.hbase.io.functions,BuildGraphHeadMutation,0,44,0,0,0,12,0,3,0,3
 Gradoop HBase,org.gradoop.storage.impl.hbase.io.functions,BuildEdgeMutation,0,44,0,0,0,12,0,3,0,3

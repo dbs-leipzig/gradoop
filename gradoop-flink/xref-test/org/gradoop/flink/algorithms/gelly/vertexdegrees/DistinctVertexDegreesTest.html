@@ -36,7 +36,7 @@
 <a name="26" href="#26">26</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testByElementData() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="27" href="#27">27</a>  
 <a name="28" href="#28">28</a>      String graph =
-<a name="29" href="#29">29</a>        <span class="jxr_string">"input["</span> +
+<a name="29" href="#29">29</a>        <span class="jxr_string">"input:test["</span> +
 <a name="30" href="#30">30</a>          <span class="jxr_string">"(v0 {id:0})"</span> +
 <a name="31" href="#31">31</a>          <span class="jxr_string">"(v1 {id:1})"</span> +
 <a name="32" href="#32">32</a>          <span class="jxr_string">"(v2 {id:2})"</span> +
@@ -47,7 +47,7 @@
 <a name="37" href="#37">37</a>          <span class="jxr_string">"(v2)-[e3]-&gt;(v1)"</span> +
 <a name="38" href="#38">38</a>          <span class="jxr_string">"(v3)-[e4]-&gt;(v2)"</span> +
 <a name="39" href="#39">39</a>          <span class="jxr_string">"]"</span> +
-<a name="40" href="#40">40</a>          <span class="jxr_string">"result["</span> +
+<a name="40" href="#40">40</a>          <span class="jxr_string">"result:test["</span> +
 <a name="41" href="#41">41</a>          <span class="jxr_string">"(v4 {id:0, degree:2L, inDegree:0L, outDegree:2L})"</span> +
 <a name="42" href="#42">42</a>          <span class="jxr_string">"(v5 {id:1, degree:2L, inDegree:2L, outDegree:0L})"</span> +
 <a name="43" href="#43">43</a>          <span class="jxr_string">"(v6 {id:2, degree:3L, inDegree:2L, outDegree:2L})"</span> +
@@ -65,7 +65,7 @@
 <a name="55" href="#55">55</a>        input.callForGraph(<strong class="jxr_keyword">new</strong> DistinctVertexDegrees(<span class="jxr_string">"degree"</span>, <span class="jxr_string">"inDegree"</span>, <span class="jxr_string">"outDegree"</span>, false));
 <a name="56" href="#56">56</a>      LogicalGraph expect = loader.getLogicalGraphByVariable(<span class="jxr_string">"result"</span>);
 <a name="57" href="#57">57</a>  
-<a name="58" href="#58">58</a>      collectAndAssertTrue(outputGraph.equalsByElementData(expect));
+<a name="58" href="#58">58</a>      collectAndAssertTrue(outputGraph.equalsByData(expect));
 <a name="59" href="#59">59</a>    }
 <a name="60" href="#60">60</a>  }
 </pre>

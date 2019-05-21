@@ -121,7 +121,7 @@
 <a name="111" href="#111">111</a>       .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/hits/functions/HITSToAttributes.html">HITSToAttributes</a>(authorityPropertyKey, hubPropertyKey));
 <a name="112" href="#112">112</a> 
 <a name="113" href="#113">113</a>     <strong class="jxr_keyword">return</strong> currentGraph.getConfig().getLogicalGraphFactory()
-<a name="114" href="#114">114</a>       .fromDataSets(newVertices, currentGraph.getEdges());
+<a name="114" href="#114">114</a>       .fromDataSets(currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());
 <a name="115" href="#115">115</a>   }
 <a name="116" href="#116">116</a> 
 <a name="117" href="#117">117</a> }

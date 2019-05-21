@@ -106,8 +106,8 @@
 <a name="96" href="#96">96</a>        .where(0).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
 <a name="97" href="#97">97</a>        .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/vertexdegrees/functions/DistinctVertexDegreesToAttribute.html">DistinctVertexDegreesToAttribute</a>(propertyKey, propertyKeyIn, propertyKeyOut));
 <a name="98" href="#98">98</a>  
-<a name="99" href="#99">99</a>      <strong class="jxr_keyword">return</strong> currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices,
-<a name="100" href="#100">100</a>       currentGraph.getEdges());
+<a name="99" href="#99">99</a>      <strong class="jxr_keyword">return</strong> currentGraph.getFactory()
+<a name="100" href="#100">100</a>       .fromDataSets(currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());
 <a name="101" href="#101">101</a>   }
 <a name="102" href="#102">102</a> }
 </pre>

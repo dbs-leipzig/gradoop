@@ -18,7 +18,7 @@ package org.gradoop.common.model.impl.properties.strategies;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
-import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 
 import java.io.IOException;
 
@@ -62,12 +62,12 @@ import java.io.IOException;
 
   @Override
   public byte getRawType() {
-<span class="fc" id="L65">    return PropertyValue.TYPE_NULL;</span>
+<span class="fc" id="L65">    return Type.NULL.getTypeByte();</span>
   }
 
   @Override
   public byte[] getRawBytes(Object value) {
-<span class="nc" id="L70">    return null;</span>
+<span class="nc" id="L70">    return new byte[] {getRawType()};</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

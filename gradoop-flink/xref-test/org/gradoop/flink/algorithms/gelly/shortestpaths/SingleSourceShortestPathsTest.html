@@ -34,9 +34,9 @@
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/shortestpaths/SingleSourceShortestPathsTest.html">SingleSourceShortestPathsTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
 <a name="26" href="#26">26</a>    @Test
-<a name="27" href="#27">27</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testByElementData() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="27" href="#27">27</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testByData() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="28" href="#28">28</a>  
-<a name="29" href="#29">29</a>      String graphsDouble = <span class="jxr_string">"input["</span> +
+<a name="29" href="#29">29</a>      String graphsDouble = <span class="jxr_string">"input:test["</span> +
 <a name="30" href="#30">30</a>        <span class="jxr_string">"(v0 {id:0, vertexValue:0.0d})"</span> +
 <a name="31" href="#31">31</a>        <span class="jxr_string">"(v1 {id:1, vertexValue:NULL})"</span> +
 <a name="32" href="#32">32</a>        <span class="jxr_string">"(v2 {id:2, vertexValue:NULL})"</span> +
@@ -50,7 +50,7 @@
 <a name="40" href="#40">40</a>        <span class="jxr_string">"(v2)-[e5 {edgeValue:5.0d}]-&gt;(v4)"</span> +
 <a name="41" href="#41">41</a>        <span class="jxr_string">"(v3)-[e6 {edgeValue:1.0d}]-&gt;(v4)"</span> +
 <a name="42" href="#42">42</a>        <span class="jxr_string">"]"</span> +
-<a name="43" href="#43">43</a>        <span class="jxr_string">"result["</span> +
+<a name="43" href="#43">43</a>        <span class="jxr_string">"result:test["</span> +
 <a name="44" href="#44">44</a>        <span class="jxr_string">"(v5 {id:0, vertexValue:0.0d})"</span> +
 <a name="45" href="#45">45</a>        <span class="jxr_string">"(v6 {id:1, vertexValue:2.0d})"</span> +
 <a name="46" href="#46">46</a>        <span class="jxr_string">"(v7 {id:2, vertexValue:5.0d})"</span> +
@@ -65,7 +65,7 @@
 <a name="55" href="#55">55</a>        <span class="jxr_string">"(v8)-[e13 {edgeValue:1.0d}]-&gt;(v9)"</span> +
 <a name="56" href="#56">56</a>        <span class="jxr_string">"]"</span>;
 <a name="57" href="#57">57</a>  
-<a name="58" href="#58">58</a>      String graphs = <span class="jxr_string">"input["</span> +
+<a name="58" href="#58">58</a>      String graphs = <span class="jxr_string">"input:test["</span> +
 <a name="59" href="#59">59</a>          <span class="jxr_string">"(v0 {id:0, vertexValue:0.0})"</span> +
 <a name="60" href="#60">60</a>          <span class="jxr_string">"(v1 {id:1, vertexValue:NULL})"</span> +
 <a name="61" href="#61">61</a>          <span class="jxr_string">"(v2 {id:2, vertexValue:NULL})"</span> +
@@ -79,7 +79,7 @@
 <a name="69" href="#69">69</a>          <span class="jxr_string">"(v2)-[e5 {edgeValue:5.0}]-&gt;(v4)"</span> +
 <a name="70" href="#70">70</a>          <span class="jxr_string">"(v3)-[e6 {edgeValue:1.0}]-&gt;(v4)"</span> +
 <a name="71" href="#71">71</a>          <span class="jxr_string">"]"</span> +
-<a name="72" href="#72">72</a>          <span class="jxr_string">"result["</span> +
+<a name="72" href="#72">72</a>          <span class="jxr_string">"result:test["</span> +
 <a name="73" href="#73">73</a>          <span class="jxr_string">"(v5 {id:0, vertexValue:0.0d})"</span> +
 <a name="74" href="#74">74</a>          <span class="jxr_string">"(v6 {id:1, vertexValue:2.0d})"</span> +
 <a name="75" href="#75">75</a>          <span class="jxr_string">"(v7 {id:2, vertexValue:5.0d})"</span> +
@@ -104,7 +104,7 @@
 <a name="94" href="#94">94</a>        <span class="jxr_string">"edgeValue"</span>, 10, <span class="jxr_string">"vertexValue"</span>));
 <a name="95" href="#95">95</a>      LogicalGraph expectDouble = loaderDouble.getLogicalGraphByVariable(<span class="jxr_string">"result"</span>);
 <a name="96" href="#96">96</a>  
-<a name="97" href="#97">97</a>      collectAndAssertTrue(outputGraphDouble.equalsByElementData(expectDouble));
+<a name="97" href="#97">97</a>      collectAndAssertTrue(outputGraphDouble.equalsByData(expectDouble));
 <a name="98" href="#98">98</a>  
 <a name="99" href="#99">99</a>    <em class="jxr_comment">//test a graph with float values as input</em>
 <a name="100" href="#100">100</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(graphs);
@@ -116,7 +116,7 @@
 <a name="106" href="#106">106</a>       <span class="jxr_string">"edgeValue"</span>, 10, <span class="jxr_string">"vertexValue"</span>));
 <a name="107" href="#107">107</a>     LogicalGraph expect = loader.getLogicalGraphByVariable(<span class="jxr_string">"result"</span>);
 <a name="108" href="#108">108</a> 
-<a name="109" href="#109">109</a>     collectAndAssertTrue(outputGraph.equalsByElementData(expect));
+<a name="109" href="#109">109</a>     collectAndAssertTrue(outputGraph.equalsByData(expect));
 <a name="110" href="#110">110</a>   }
 <a name="111" href="#111">111</a> }
 </pre>

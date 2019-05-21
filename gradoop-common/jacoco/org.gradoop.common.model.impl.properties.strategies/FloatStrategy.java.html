@@ -18,57 +18,59 @@ package org.gradoop.common.model.impl.properties.strategies;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
+
 import java.io.IOException;
 
 /**
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code Float}.
  */
-<span class="fc" id="L27">public class FloatStrategy extends AbstractFixSizedPropertyValueStrategy&lt;Float&gt; {</span>
+<span class="fc" id="L29">public class FloatStrategy extends AbstractFixSizedPropertyValueStrategy&lt;Float&gt; {</span>
 
   @Override
   public Float read(DataInputView inputView, byte typeByte) throws IOException {
-<span class="fc" id="L31">    int length = Bytes.SIZEOF_FLOAT;</span>
-<span class="fc" id="L32">    byte[] rawBytes = new byte[length];</span>
+<span class="fc" id="L33">    int length = Bytes.SIZEOF_FLOAT;</span>
+<span class="fc" id="L34">    byte[] rawBytes = new byte[length];</span>
 
-<span class="fc bfc" id="L34" title="All 2 branches covered.">    for (int i  = 0; i &lt; rawBytes.length; i++) {</span>
-<span class="fc" id="L35">      rawBytes[i] = inputView.readByte();</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">    for (int i  = 0; i &lt; rawBytes.length; i++) {</span>
+<span class="fc" id="L37">      rawBytes[i] = inputView.readByte();</span>
     }
 
-<span class="fc" id="L38">    return Bytes.toFloat(rawBytes);</span>
+<span class="fc" id="L40">    return Bytes.toFloat(rawBytes);</span>
   }
 
   @Override
   public int compare(Float value, Object other) {
-<span class="fc" id="L43">    return PropertyValueStrategyUtils.compareNumerical(value, other);</span>
+<span class="fc" id="L45">    return PropertyValueStrategyUtils.compareNumerical(value, other);</span>
   }
 
   @Override
   public boolean is(Object value) {
-<span class="fc" id="L48">    return value instanceof Float;</span>
+<span class="fc" id="L50">    return value instanceof Float;</span>
   }
 
   @Override
   public Class&lt;Float&gt; getType() {
-<span class="fc" id="L53">    return Float.class;</span>
+<span class="fc" id="L55">    return Float.class;</span>
   }
 
   @Override
   public Float get(byte[] bytes) {
-<span class="fc" id="L58">    return Bytes.toFloat(bytes, PropertyValue.OFFSET);</span>
+<span class="fc" id="L60">    return Bytes.toFloat(bytes, PropertyValue.OFFSET);</span>
   }
 
   @Override
   public byte getRawType() {
-<span class="fc" id="L63">    return PropertyValue.TYPE_FLOAT;</span>
+<span class="fc" id="L65">    return Type.FLOAT.getTypeByte();</span>
   }
 
   @Override
   public byte[] getRawBytes(Float value) {
-<span class="fc" id="L68">    byte[] rawBytes = new byte[PropertyValue.OFFSET + Bytes.SIZEOF_FLOAT];</span>
-<span class="fc" id="L69">    rawBytes[0] = getRawType();</span>
-<span class="fc" id="L70">    Bytes.putFloat(rawBytes, PropertyValue.OFFSET, value);</span>
-<span class="fc" id="L71">    return rawBytes;</span>
+<span class="fc" id="L70">    byte[] rawBytes = new byte[PropertyValue.OFFSET + Bytes.SIZEOF_FLOAT];</span>
+<span class="fc" id="L71">    rawBytes[0] = getRawType();</span>
+<span class="fc" id="L72">    Bytes.putFloat(rawBytes, PropertyValue.OFFSET, value);</span>
+<span class="fc" id="L73">    return rawBytes;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

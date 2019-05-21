@@ -19,6 +19,8 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -29,42 +31,42 @@ import java.util.Map;
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code Map}.
  */
-<span class="fc" id="L32">public class MapStrategy</span>
+<span class="fc" id="L34">public class MapStrategy</span>
   extends AbstractVariableSizedPropertyValueStrategy&lt;Map&lt;PropertyValue, PropertyValue&gt;&gt; {
 
   @Override
   public Map&lt;PropertyValue, PropertyValue&gt; read(DataInputView inputView, byte typeByte)
       throws IOException {
-<span class="fc" id="L38">    byte[] rawBytes = readVariableSizedData(inputView, typeByte);</span>
-<span class="fc" id="L39">    DataInputViewStreamWrapper internalInputView = createInputView(rawBytes);</span>
-<span class="fc" id="L40">    return createMap(internalInputView);</span>
+<span class="fc" id="L40">    byte[] rawBytes = readVariableSizedData(inputView, typeByte);</span>
+<span class="fc" id="L41">    DataInputViewStreamWrapper internalInputView = createInputView(rawBytes);</span>
+<span class="fc" id="L42">    return createMap(internalInputView);</span>
   }
 
   @Override
   public int compare(Map value, Object other) {
-<span class="fc" id="L45">    throw new UnsupportedOperationException(&quot;Method compare() is not supported for Map.&quot;);</span>
+<span class="fc" id="L47">    throw new UnsupportedOperationException(&quot;Method compare() is not supported for Map.&quot;);</span>
   }
 
   @Override
   public boolean is(Object value) {
-<span class="fc bfc" id="L50" title="All 2 branches covered.">    if (!(value instanceof Map)) {</span>
-<span class="fc" id="L51">      return false;</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">    if (!(value instanceof Map)) {</span>
+<span class="fc" id="L53">      return false;</span>
     }
-<span class="fc bfc" id="L53" title="All 2 branches covered.">    for (Map.Entry&lt;?, ?&gt; entry : ((Map&lt;?, ?&gt;) value).entrySet()) {</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">    for (Map.Entry&lt;?, ?&gt; entry : ((Map&lt;?, ?&gt;) value).entrySet()) {</span>
       // Map is not a valid property value if it contains any object
       // that is not a property value itself.
-<span class="fc bfc" id="L56" title="All 2 branches covered.">      if (!(entry.getKey() instanceof PropertyValue) ||</span>
-<span class="pc bpc" id="L57" title="1 of 2 branches missed.">        !(entry.getValue() instanceof PropertyValue)) {</span>
-<span class="fc" id="L58">        return false;</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">      if (!(entry.getKey() instanceof PropertyValue) ||</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">        !(entry.getValue() instanceof PropertyValue)) {</span>
+<span class="fc" id="L60">        return false;</span>
       }
-<span class="fc" id="L60">    }</span>
+<span class="fc" id="L62">    }</span>
 
-<span class="fc" id="L62">    return true;</span>
+<span class="fc" id="L64">    return true;</span>
   }
 
   @Override
   public Class&lt;Map&lt;PropertyValue, PropertyValue&gt;&gt; getType() {
-<span class="fc" id="L67">    return (Class) Map.class;</span>
+<span class="fc" id="L69">    return (Class) Map.class;</span>
   }
 
   /**
@@ -73,24 +75,24 @@ import java.util.Map;
    */
   @Override
   public Map&lt;PropertyValue, PropertyValue&gt; get(byte[] bytes) throws IOException {
-<span class="fc" id="L76">    DataInputViewStreamWrapper inputView = createInputView(bytes);</span>
+<span class="fc" id="L78">    DataInputViewStreamWrapper inputView = createInputView(bytes);</span>
     Map&lt;PropertyValue, PropertyValue&gt; map;
 
     try {
-<span class="pc bpc" id="L80" title="1 of 2 branches missed.">      if (inputView.skipBytes(PropertyValue.OFFSET) != PropertyValue.OFFSET) {</span>
-<span class="nc" id="L81">        throw new IOException(&quot;Malformed entry in PropertyValue Map.&quot;);</span>
+<span class="pc bpc" id="L82" title="1 of 2 branches missed.">      if (inputView.skipBytes(PropertyValue.OFFSET) != PropertyValue.OFFSET) {</span>
+<span class="nc" id="L83">        throw new IOException(&quot;Malformed entry in PropertyValue Map.&quot;);</span>
       }
-<span class="fc" id="L83">      map = createMap(inputView);</span>
-<span class="nc" id="L84">    } catch (IOException e) {</span>
-<span class="nc" id="L85">      throw new IOException(&quot;Error while processing DataInputViewStreamWrapper.&quot;);</span>
-<span class="fc" id="L86">    }</span>
+<span class="fc" id="L85">      map = createMap(inputView);</span>
+<span class="nc" id="L86">    } catch (IOException e) {</span>
+<span class="nc" id="L87">      throw new IOException(&quot;Error while processing DataInputViewStreamWrapper.&quot;);</span>
+<span class="fc" id="L88">    }</span>
 
-<span class="fc" id="L88">    return map;</span>
+<span class="fc" id="L90">    return map;</span>
   }
 
   @Override
   public byte getRawType() {
-<span class="fc" id="L93">    return PropertyValue.TYPE_MAP;</span>
+<span class="fc" id="L95">    return Type.MAP.getTypeByte();</span>
   }
 
   /**
@@ -99,23 +101,23 @@ import java.util.Map;
    */
   @Override
   public byte[] getRawBytes(Map&lt;PropertyValue, PropertyValue&gt; value) throws IOException {
-<span class="fc" id="L102">    int size = value.keySet().stream().mapToInt(PropertyValue::byteSize).sum() +</span>
-<span class="fc" id="L103">        value.values().stream().mapToInt(PropertyValue::byteSize).sum() +</span>
+<span class="fc" id="L104">    int size = value.keySet().stream().mapToInt(PropertyValue::byteSize).sum() +</span>
+<span class="fc" id="L105">        value.values().stream().mapToInt(PropertyValue::byteSize).sum() +</span>
         PropertyValue.OFFSET;
 
-<span class="fc" id="L106">    try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);</span>
-<span class="fc" id="L107">        DataOutputStream outputStream = new DataOutputStream(byteStream);</span>
-<span class="fc" id="L108">        DataOutputViewStreamWrapper outputView = new DataOutputViewStreamWrapper(outputStream)) {</span>
+<span class="fc" id="L108">    try (ByteArrayOutputStream byteStream = new ByteArrayOutputStream(size);</span>
+<span class="fc" id="L109">        DataOutputStream outputStream = new DataOutputStream(byteStream);</span>
+<span class="fc" id="L110">        DataOutputViewStreamWrapper outputView = new DataOutputViewStreamWrapper(outputStream)) {</span>
 
-<span class="fc" id="L110">      outputStream.write(PropertyValue.TYPE_MAP);</span>
-<span class="fc bfc" id="L111" title="All 2 branches covered.">      for (Map.Entry&lt;PropertyValue, PropertyValue&gt; entry : value.entrySet()) {</span>
-<span class="fc" id="L112">        entry.getKey().write(outputView);</span>
-<span class="fc" id="L113">        entry.getValue().write(outputView);</span>
-<span class="fc" id="L114">      }</span>
+<span class="fc" id="L112">      outputStream.write(Type.MAP.getTypeByte());</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">      for (Map.Entry&lt;PropertyValue, PropertyValue&gt; entry : value.entrySet()) {</span>
+<span class="fc" id="L114">        entry.getKey().write(outputView);</span>
+<span class="fc" id="L115">        entry.getValue().write(outputView);</span>
+<span class="fc" id="L116">      }</span>
 
-<span class="fc" id="L116">      return byteStream.toByteArray();</span>
-<span class="nc" id="L117">    } catch (IOException e) {</span>
-<span class="nc" id="L118">      throw new IOException(&quot;Error writing PropertyValue with MapStrategy.&quot;, e);</span>
+<span class="fc" id="L118">      return byteStream.toByteArray();</span>
+<span class="nc" id="L119">    } catch (IOException e) {</span>
+<span class="nc" id="L120">      throw new IOException(&quot;Error writing PropertyValue with MapStrategy.&quot;, e);</span>
     }
   }
 
@@ -130,22 +132,22 @@ import java.util.Map;
     PropertyValue key;
     PropertyValue value;
 
-<span class="fc" id="L133">    Map&lt;PropertyValue, PropertyValue&gt; map = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L135">    Map&lt;PropertyValue, PropertyValue&gt; map = new HashMap&lt;&gt;();</span>
 
     try {
-<span class="fc bfc" id="L136" title="All 2 branches covered.">      while (inputView.available() &gt; 0) {</span>
-<span class="fc" id="L137">        key = new PropertyValue();</span>
-<span class="fc" id="L138">        key.read(inputView);</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">      while (inputView.available() &gt; 0) {</span>
+<span class="fc" id="L139">        key = new PropertyValue();</span>
+<span class="fc" id="L140">        key.read(inputView);</span>
 
-<span class="fc" id="L140">        value = new PropertyValue();</span>
-<span class="fc" id="L141">        value.read(inputView);</span>
+<span class="fc" id="L142">        value = new PropertyValue();</span>
+<span class="fc" id="L143">        value.read(inputView);</span>
 
-<span class="fc" id="L143">        map.put(key, value);</span>
+<span class="fc" id="L145">        map.put(key, value);</span>
       }
-<span class="nc" id="L145">    } catch (IOException e) {</span>
-<span class="nc" id="L146">      throw new IOException(&quot;Error reading PropertyValue with MapStrategy.&quot;, e);</span>
-<span class="fc" id="L147">    }</span>
-<span class="fc" id="L148">    return map;</span>
+<span class="nc" id="L147">    } catch (IOException e) {</span>
+<span class="nc" id="L148">      throw new IOException(&quot;Error reading PropertyValue with MapStrategy.&quot;, e);</span>
+<span class="fc" id="L149">    }</span>
+<span class="fc" id="L150">    return map;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

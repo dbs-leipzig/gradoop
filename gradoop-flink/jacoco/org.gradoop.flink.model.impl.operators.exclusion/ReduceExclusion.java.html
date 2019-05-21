@@ -18,18 +18,21 @@ package org.gradoop.flink.model.impl.operators.exclusion;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.ByDifferentId;
+import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphsBroadcast;
 
 /**
  * Computes the exclusion graph from a collection of logical graphs.
+ * Reduces the starting graph to contain only vertices and edges that are not contained in any
+ * other graph that is part of the given collection.
+ * The graph head of the starting graph is retained.
  */
 public class ReduceExclusion implements ReducibleBinaryGraphToGraphOperator {
 
@@ -45,35 +48,28 @@ public class ReduceExclusion implements ReducibleBinaryGraphToGraphOperator {
    *
    * @param startId graph id from which other graphs will be exluded from
    */
-<span class="fc" id="L48">  public ReduceExclusion(GradoopId startId) {</span>
-<span class="fc" id="L49">    this.startId = startId;</span>
-<span class="fc" id="L50">  }</span>
+<span class="fc" id="L51">  public ReduceExclusion(GradoopId startId) {</span>
+<span class="fc" id="L52">    this.startId = startId;</span>
+<span class="fc" id="L53">  }</span>
 
-  /**
-   * Creates a new logical graph that contains only vertices and edges that
-   * are contained in the starting graph but not in any other graph that is part
-   * of the given collection.
-   *
-   * @param collection input collection
-   * @return excluded graph
-   */
   @Override
   public LogicalGraph execute(GraphCollection collection) {
-<span class="fc" id="L62">    DataSet&lt;GradoopId&gt; excludedGraphIds = collection.getGraphHeads()</span>
-<span class="fc" id="L63">      .filter(new ByDifferentId&lt;GraphHead&gt;(startId))</span>
-<span class="fc" id="L64">      .map(new Id&lt;GraphHead&gt;());</span>
+<span class="fc" id="L57">    DataSet&lt;GradoopId&gt; excludedGraphIds = collection.getGraphHeads()</span>
+<span class="fc" id="L58">      .filter(new ByDifferentId&lt;&gt;(startId))</span>
+<span class="fc" id="L59">      .map(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L66">    DataSet&lt;Vertex&gt; vertices = collection.getVertices()</span>
-<span class="fc" id="L67">      .filter(new InGraph&lt;Vertex&gt;(startId))</span>
-<span class="fc" id="L68">      .filter(new NotInGraphsBroadcast&lt;Vertex&gt;())</span>
+<span class="fc" id="L61">    DataSet&lt;Vertex&gt; vertices = collection.getVertices()</span>
+<span class="fc" id="L62">      .filter(new InGraph&lt;&gt;(startId))</span>
+<span class="fc" id="L63">      .filter(new NotInGraphsBroadcast&lt;&gt;())</span>
+<span class="fc" id="L64">      .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);</span>
+
+<span class="fc" id="L66">    DataSet&lt;Edge&gt; edges = collection.getEdges()</span>
+<span class="fc" id="L67">      .filter(new InGraph&lt;&gt;(startId))</span>
+<span class="fc" id="L68">      .filter(new NotInGraphsBroadcast&lt;&gt;())</span>
 <span class="fc" id="L69">      .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);</span>
 
-<span class="fc" id="L71">    DataSet&lt;Edge&gt; edges = collection.getEdges()</span>
-<span class="fc" id="L72">      .filter(new InGraph&lt;Edge&gt;(startId))</span>
-<span class="fc" id="L73">      .filter(new NotInGraphsBroadcast&lt;Edge&gt;())</span>
-<span class="fc" id="L74">      .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);</span>
-
-<span class="fc" id="L76">    return collection.getConfig().getLogicalGraphFactory().fromDataSets(vertices, edges);</span>
+<span class="fc" id="L71">    return collection.getConfig().getLogicalGraphFactory()</span>
+<span class="fc" id="L72">      .fromDataSets(collection.getGraphHeads().filter(new BySameId&lt;&gt;(startId)), vertices, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

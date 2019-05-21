@@ -16,14 +16,9 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.algorithms.gelly.pagerank.PageRank;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.SourceId;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxVertexProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinVertexProperty;
@@ -89,13 +84,13 @@ public class PageRankSampling extends SamplingAlgorithm {
    *                                in case all vertices got the same PageRank-score.
    */
   public PageRankSampling(double dampeningFactor, int maxIteration, double threshold,
-<span class="fc" id="L92">    boolean sampleGreaterThanThreshold, boolean keepVerticesIfSameScore) {</span>
-<span class="fc" id="L93">    this.dampeningFactor = dampeningFactor;</span>
-<span class="fc" id="L94">    this.threshold = threshold;</span>
-<span class="fc" id="L95">    this.maxIteration = maxIteration;</span>
-<span class="fc" id="L96">    this.sampleGreaterThanThreshold = sampleGreaterThanThreshold;</span>
-<span class="fc" id="L97">    this.keepVerticesIfSameScore = keepVerticesIfSameScore;</span>
-<span class="fc" id="L98">  }</span>
+<span class="fc" id="L87">    boolean sampleGreaterThanThreshold, boolean keepVerticesIfSameScore) {</span>
+<span class="fc" id="L88">    this.dampeningFactor = dampeningFactor;</span>
+<span class="fc" id="L89">    this.threshold = threshold;</span>
+<span class="fc" id="L90">    this.maxIteration = maxIteration;</span>
+<span class="fc" id="L91">    this.sampleGreaterThanThreshold = sampleGreaterThanThreshold;</span>
+<span class="fc" id="L92">    this.keepVerticesIfSameScore = keepVerticesIfSameScore;</span>
+<span class="fc" id="L93">  }</span>
 
   /**
    * {@inheritDoc}
@@ -113,38 +108,28 @@ public class PageRankSampling extends SamplingAlgorithm {
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
-<span class="fc" id="L116">    LogicalGraph pageRankGraph = new PageRank(</span>
+<span class="fc" id="L111">    LogicalGraph pageRankGraph = new PageRank(</span>
       SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY,
       dampeningFactor,
       maxIteration,
-<span class="fc" id="L120">      true).execute(graph);</span>
+<span class="fc" id="L115">      true).execute(graph);</span>
 
-<span class="fc" id="L122">    graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(</span>
-<span class="fc" id="L123">      graph.getGraphHead(), pageRankGraph.getVertices(), pageRankGraph.getEdges());</span>
+<span class="fc" id="L117">    graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(</span>
+<span class="fc" id="L118">      graph.getGraphHead(), pageRankGraph.getVertices(), pageRankGraph.getEdges());</span>
 
-<span class="fc" id="L125">    graph = graph</span>
-<span class="fc" id="L126">      .aggregate(new MinVertexProperty(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),</span>
+<span class="fc" id="L120">    graph = graph</span>
+<span class="fc" id="L121">      .aggregate(new MinVertexProperty(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),</span>
         new MaxVertexProperty(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
         new SumVertexProperty(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
         new VertexCount());
 
-<span class="fc" id="L131">    DataSet&lt;Vertex&gt; scaledVertices = graph.getVertices()</span>
-<span class="fc" id="L132">      .crossWithTiny(graph.getGraphHead().first(1))</span>
-<span class="fc" id="L133">      .with(new AddPageRankScoresToVertexCrossFunction())</span>
-<span class="fc" id="L134">      .filter(new PageRankResultVertexFilter(</span>
+<span class="fc" id="L126">    DataSet&lt;Vertex&gt; scaledVertices = graph.getVertices()</span>
+<span class="fc" id="L127">      .crossWithTiny(graph.getGraphHead().first(1))</span>
+<span class="fc" id="L128">      .with(new AddPageRankScoresToVertexCrossFunction())</span>
+<span class="fc" id="L129">      .filter(new PageRankResultVertexFilter(</span>
         threshold, sampleGreaterThanThreshold, keepVerticesIfSameScore));
 
-<span class="fc" id="L137">    DataSet&lt;Edge&gt; newEdges = graph.getEdges()</span>
-<span class="fc" id="L138">      .join(scaledVertices)</span>
-<span class="fc" id="L139">      .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L140">      .with(new LeftSide&lt;&gt;())</span>
-<span class="fc" id="L141">      .join(scaledVertices)</span>
-<span class="fc" id="L142">      .where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L143">      .with(new LeftSide&lt;&gt;());</span>
-
-<span class="fc" id="L145">    graph = graph.getFactory().fromDataSets(scaledVertices, newEdges);</span>
-
-<span class="fc" id="L147">    return graph;</span>
+<span class="fc" id="L132">    return graph.getFactory().fromDataSets(scaledVertices, graph.getEdges()).verify();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -43,7 +43,7 @@ import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 <span class="fc" id="L43">    vertex.setProperty(SamplingConstants.SUM_PAGE_RANK_SCORE_PROPERTY_KEY, sum);</span>
 <span class="fc" id="L44">    vertex.setProperty(&quot;vertexCount&quot;, graphHead.getPropertyValue(&quot;vertexCount&quot;));</span>
 
-<span class="pc bpc" id="L46" title="1 of 2 branches missed.">    if (min != max) {</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">    if (min != max) {</span>
 <span class="fc" id="L47">      double score = vertex.getPropertyValue(</span>
 <span class="fc" id="L48">        SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();</span>
 <span class="fc" id="L49">      vertex.setProperty(</span>

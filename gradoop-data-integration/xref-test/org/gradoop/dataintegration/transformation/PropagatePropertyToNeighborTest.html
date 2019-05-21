@@ -57,139 +57,140 @@
 <a name="47" href="#47">47</a>  <em class="jxr_javadoccomment">   * The loader with the graphs used in this test.</em>
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="49" href="#49">49</a>    <strong class="jxr_keyword">private</strong> FlinkAsciiGraphLoader loader = getLoaderFromString(
-<a name="50" href="#50">50</a>      <span class="jxr_string">"input1["</span> + <span class="jxr_string">"(s1:Source {p1: 1, p2: 1.1d})-[e1:edge1]-&gt;(t:Target {t: 0})"</span> +
+<a name="50" href="#50">50</a>      <span class="jxr_string">"input1:test["</span> + <span class="jxr_string">"(s1:Source {p1: 1, p2: 1.1d})-[e1:edge1]-&gt;(t:Target {t: 0})"</span> +
 <a name="51" href="#51">51</a>        <span class="jxr_string">"(s2:Source {p1: \&quot;\&quot;})-[e2:edge2]-&gt;(t)"</span> +
 <a name="52" href="#52">52</a>        <span class="jxr_string">"(s1)-[e12:edge1]-&gt;(t2:Target2 {t: 0})"</span> +
 <a name="53" href="#53">53</a>        <span class="jxr_string">"(s2)-[e22:edge2]-&gt;(t2)"</span> +
-<a name="54" href="#54">54</a>        <span class="jxr_string">"] input2 ["</span> +
-<a name="55" href="#55">55</a>        <span class="jxr_string">"(v:Vertex {t: 1})--&gt;(v)"</span> +
-<a name="56" href="#56">56</a>        <span class="jxr_string">"]"</span>);
-<a name="57" href="#57">57</a>  
-<a name="58" href="#58">58</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   * Test the operator propagating a property to two vertices.</em>
-<a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="61" href="#61">61</a>  <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails.</em>
-<a name="62" href="#62">62</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="63" href="#63">63</a>    @Test
-<a name="64" href="#64">64</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPropagateDirected() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="65" href="#65">65</a>      LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input1"</span>);
-<a name="66" href="#66">66</a>      UnaryGraphToGraphOperator <strong class="jxr_keyword">operator</strong> = <strong class="jxr_keyword">new</strong> PropagatePropertyToNeighbor(<span class="jxr_string">"Source"</span>, <span class="jxr_string">"p1"</span>, <span class="jxr_string">"t"</span>);
-<a name="67" href="#67">67</a>      <em class="jxr_comment">// We have to update the vertices manually because the ascii loader does not support lists.</em>
-<a name="68" href="#68">68</a>      LogicalGraph expected = input.transformVertices((v, c) -&gt; {
-<a name="69" href="#69">69</a>        <strong class="jxr_keyword">if</strong> (!v.getLabel().equals(<span class="jxr_string">"Target"</span>) &amp;&amp; !v.getLabel().equals(<span class="jxr_string">"Target2"</span>)) {
-<a name="70" href="#70">70</a>          <strong class="jxr_keyword">return</strong> v;
-<a name="71" href="#71">71</a>        }
-<a name="72" href="#72">72</a>        v.setProperty(<span class="jxr_string">"t"</span>, Arrays.asList(PropertyValue.create(1L), PropertyValue.create(<span class="jxr_string">""</span>)));
-<a name="73" href="#73">73</a>        <strong class="jxr_keyword">return</strong> v;
-<a name="74" href="#74">74</a>      }).callForGraph(<strong class="jxr_keyword">new</strong> PropertyTransformation&lt;&gt;(<span class="jxr_string">"t"</span>, pv -&gt; pv,
-<a name="75" href="#75">75</a>        PropagatePropertyToNeighborTest::orderListProperty, pv -&gt; pv));
-<a name="76" href="#76">76</a>      LogicalGraph result = input.callForGraph(<strong class="jxr_keyword">operator</strong>)
-<a name="77" href="#77">77</a>        .callForGraph(<strong class="jxr_keyword">new</strong> PropertyTransformation&lt;&gt;(<span class="jxr_string">"t"</span>, pv -&gt; pv,
-<a name="78" href="#78">78</a>        PropagatePropertyToNeighborTest::orderListProperty, pv -&gt; pv));
-<a name="79" href="#79">79</a>      collectAndAssertTrue(expected.equalsByElementData(result));
-<a name="80" href="#80">80</a>    }
-<a name="81" href="#81">81</a>  
-<a name="82" href="#82">82</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="83" href="#83">83</a>  <em class="jxr_javadoccomment">   * Test the operator propagating along only certain edge labels.</em>
-<a name="84" href="#84">84</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="85" href="#85">85</a>  <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails.</em>
-<a name="86" href="#86">86</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="87" href="#87">87</a>    @Test
-<a name="88" href="#88">88</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPropagateAlongCertainEdges() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="89" href="#89">89</a>      LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input1"</span>);
-<a name="90" href="#90">90</a>      UnaryGraphToGraphOperator <strong class="jxr_keyword">operator</strong> = <strong class="jxr_keyword">new</strong> PropagatePropertyToNeighbor(<span class="jxr_string">"Source"</span>, <span class="jxr_string">"p1"</span>, <span class="jxr_string">"t"</span>,
-<a name="91" href="#91">91</a>        Collections.singleton(<span class="jxr_string">"edge1"</span>), <strong class="jxr_keyword">null</strong>);
-<a name="92" href="#92">92</a>      LogicalGraph expected = input.transformVertices((v, c) -&gt; {
-<a name="93" href="#93">93</a>        <strong class="jxr_keyword">if</strong> (!v.getLabel().equals(<span class="jxr_string">"Target"</span>) &amp;&amp; !v.getLabel().equals(<span class="jxr_string">"Target2"</span>)) {
-<a name="94" href="#94">94</a>          <strong class="jxr_keyword">return</strong> v;
-<a name="95" href="#95">95</a>        }
-<a name="96" href="#96">96</a>        v.setProperty(<span class="jxr_string">"t"</span>, Collections.singletonList(PropertyValue.create(1L)));
-<a name="97" href="#97">97</a>        <strong class="jxr_keyword">return</strong> v;
-<a name="98" href="#98">98</a>      });
-<a name="99" href="#99">99</a>      LogicalGraph result = input.callForGraph(<strong class="jxr_keyword">operator</strong>);
-<a name="100" href="#100">100</a>     collectAndAssertTrue(expected.equalsByElementData(result));
-<a name="101" href="#101">101</a>   }
-<a name="102" href="#102">102</a> 
-<a name="103" href="#103">103</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="104" href="#104">104</a> <em class="jxr_javadoccomment">   * Test the operator propagating only to vertices with a certain label.</em>
-<a name="105" href="#105">105</a> <em class="jxr_javadoccomment">   *</em>
-<a name="106" href="#106">106</a> <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails.</em>
-<a name="107" href="#107">107</a> <em class="jxr_javadoccomment">   */</em>
-<a name="108" href="#108">108</a>   @Test
-<a name="109" href="#109">109</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPropagateToCertainVertices() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="110" href="#110">110</a>     LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input1"</span>);
-<a name="111" href="#111">111</a>     UnaryGraphToGraphOperator <strong class="jxr_keyword">operator</strong> = <strong class="jxr_keyword">new</strong> PropagatePropertyToNeighbor(<span class="jxr_string">"Source"</span>, <span class="jxr_string">"p1"</span>, <span class="jxr_string">"t"</span>,
-<a name="112" href="#112">112</a>       <strong class="jxr_keyword">null</strong>, Collections.singleton(<span class="jxr_string">"Target"</span>));
-<a name="113" href="#113">113</a>     LogicalGraph expected = input.transformVertices((v, c) -&gt; {
-<a name="114" href="#114">114</a>       <strong class="jxr_keyword">if</strong> (!v.getLabel().equals(<span class="jxr_string">"Target"</span>)) {
-<a name="115" href="#115">115</a>         <strong class="jxr_keyword">return</strong> v;
-<a name="116" href="#116">116</a>       }
-<a name="117" href="#117">117</a>       v.setProperty(<span class="jxr_string">"t"</span>, Arrays.asList(PropertyValue.create(1L), PropertyValue.create(<span class="jxr_string">""</span>)));
-<a name="118" href="#118">118</a>       <strong class="jxr_keyword">return</strong> v;
-<a name="119" href="#119">119</a>     }).callForGraph(<strong class="jxr_keyword">new</strong> PropertyTransformation&lt;&gt;(<span class="jxr_string">"t"</span>, pv -&gt; pv,
-<a name="120" href="#120">120</a>       PropagatePropertyToNeighborTest::orderListProperty, pv -&gt; pv));
-<a name="121" href="#121">121</a>     LogicalGraph result = input.callForGraph(<strong class="jxr_keyword">operator</strong>)
-<a name="122" href="#122">122</a>       .callForGraph(<strong class="jxr_keyword">new</strong> PropertyTransformation&lt;&gt;(<span class="jxr_string">"t"</span>, pv -&gt; pv,
-<a name="123" href="#123">123</a>       PropagatePropertyToNeighborTest::orderListProperty, pv -&gt; pv));
-<a name="124" href="#124">124</a>     collectAndAssertTrue(expected.equalsByElementData(result));
-<a name="125" href="#125">125</a>   }
-<a name="126" href="#126">126</a> 
-<a name="127" href="#127">127</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   * Test the operator propagating only to vertices with a certain label and only along edges of</em>
-<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   * a certain label.</em>
-<a name="130" href="#130">130</a> <em class="jxr_javadoccomment">   *</em>
-<a name="131" href="#131">131</a> <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails.</em>
-<a name="132" href="#132">132</a> <em class="jxr_javadoccomment">   */</em>
-<a name="133" href="#133">133</a>   @Test
-<a name="134" href="#134">134</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPropagateToCertainVerticesAlongCertainEdges() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="135" href="#135">135</a>     LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input1"</span>);
-<a name="136" href="#136">136</a>     UnaryGraphToGraphOperator <strong class="jxr_keyword">operator</strong> = <strong class="jxr_keyword">new</strong> PropagatePropertyToNeighbor(<span class="jxr_string">"Source"</span>, <span class="jxr_string">"p1"</span>, <span class="jxr_string">"t"</span>,
-<a name="137" href="#137">137</a>       Collections.singleton(<span class="jxr_string">"edge1"</span>), Collections.singleton(<span class="jxr_string">"Target"</span>));
-<a name="138" href="#138">138</a>     LogicalGraph expected = input.transformVertices((v, c) -&gt; {
-<a name="139" href="#139">139</a>       <strong class="jxr_keyword">if</strong> (!v.getLabel().equals(<span class="jxr_string">"Target"</span>)) {
-<a name="140" href="#140">140</a>         <strong class="jxr_keyword">return</strong> v;
-<a name="141" href="#141">141</a>       }
-<a name="142" href="#142">142</a>       v.setProperty(<span class="jxr_string">"t"</span>, Collections.singletonList(PropertyValue.create(1L)));
-<a name="143" href="#143">143</a>       <strong class="jxr_keyword">return</strong> v;
-<a name="144" href="#144">144</a>     });
-<a name="145" href="#145">145</a>     LogicalGraph result = input.callForGraph(<strong class="jxr_keyword">operator</strong>);
-<a name="146" href="#146">146</a>     collectAndAssertTrue(expected.equalsByElementData(result));
-<a name="147" href="#147">147</a>   }
-<a name="148" href="#148">148</a> 
-<a name="149" href="#149">149</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="150" href="#150">150</a> <em class="jxr_javadoccomment">   * Test if the operator works correctly for loops.</em>
-<a name="151" href="#151">151</a> <em class="jxr_javadoccomment">   * This will also check if using the same property key for reading and writing values works.</em>
-<a name="152" href="#152">152</a> <em class="jxr_javadoccomment">   *</em>
-<a name="153" href="#153">153</a> <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails.</em>
-<a name="154" href="#154">154</a> <em class="jxr_javadoccomment">   */</em>
-<a name="155" href="#155">155</a>   @Test
-<a name="156" href="#156">156</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPropagateInLoops() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="157" href="#157">157</a>     LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input2"</span>);
-<a name="158" href="#158">158</a>     UnaryGraphToGraphOperator <strong class="jxr_keyword">operator</strong> = <strong class="jxr_keyword">new</strong> PropagatePropertyToNeighbor(<span class="jxr_string">"Vertex"</span>, <span class="jxr_string">"t"</span>, <span class="jxr_string">"t"</span>);
-<a name="159" href="#159">159</a>     LogicalGraph expected = input.transformVertices((v, c) -&gt; {
-<a name="160" href="#160">160</a>       v.setProperty(<span class="jxr_string">"t"</span>, Collections.singletonList(PropertyValue.create(1L)));
-<a name="161" href="#161">161</a>       <strong class="jxr_keyword">return</strong> v;
-<a name="162" href="#162">162</a>     });
-<a name="163" href="#163">163</a>     LogicalGraph result = input.callForGraph(<strong class="jxr_keyword">operator</strong>);
-<a name="164" href="#164">164</a>     collectAndAssertTrue(expected.equalsByElementData(result));
-<a name="165" href="#165">165</a>   }
-<a name="166" href="#166">166</a> 
-<a name="167" href="#167">167</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="168" href="#168">168</a> <em class="jxr_javadoccomment">   * Order a list-type property. This is used to make sure that two lists are equal except</em>
-<a name="169" href="#169">169</a> <em class="jxr_javadoccomment">   * for the order of their elements.</em>
-<a name="170" href="#170">170</a> <em class="jxr_javadoccomment">   *</em>
-<a name="171" href="#171">171</a> <em class="jxr_javadoccomment">   * @param list The property.</em>
-<a name="172" href="#172">172</a> <em class="jxr_javadoccomment">   * @return The ordered property.</em>
-<a name="173" href="#173">173</a> <em class="jxr_javadoccomment">   */</em>
-<a name="174" href="#174">174</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> PropertyValue orderListProperty(PropertyValue list) {
-<a name="175" href="#175">175</a>     <strong class="jxr_keyword">if</strong> (!list.isList()) {
-<a name="176" href="#176">176</a>       <strong class="jxr_keyword">return</strong> list;
-<a name="177" href="#177">177</a>     }
-<a name="178" href="#178">178</a>     List&lt;PropertyValue&gt; theList = list.getList();
-<a name="179" href="#179">179</a>     theList.sort(byTypeFirst);
-<a name="180" href="#180">180</a>     <strong class="jxr_keyword">return</strong> PropertyValue.create(theList);
-<a name="181" href="#181">181</a>   }
-<a name="182" href="#182">182</a> }
+<a name="54" href="#54">54</a>        <span class="jxr_string">"]"</span> +
+<a name="55" href="#55">55</a>        <span class="jxr_string">"input2:test ["</span> +
+<a name="56" href="#56">56</a>        <span class="jxr_string">"(v:Vertex {t: 1})--&gt;(v)"</span> +
+<a name="57" href="#57">57</a>        <span class="jxr_string">"]"</span>);
+<a name="58" href="#58">58</a>  
+<a name="59" href="#59">59</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   * Test the operator propagating a property to two vertices.</em>
+<a name="61" href="#61">61</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="62" href="#62">62</a>  <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails.</em>
+<a name="63" href="#63">63</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="64" href="#64">64</a>    @Test
+<a name="65" href="#65">65</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPropagateDirected() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="66" href="#66">66</a>      LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input1"</span>);
+<a name="67" href="#67">67</a>      UnaryGraphToGraphOperator <strong class="jxr_keyword">operator</strong> = <strong class="jxr_keyword">new</strong> PropagatePropertyToNeighbor(<span class="jxr_string">"Source"</span>, <span class="jxr_string">"p1"</span>, <span class="jxr_string">"t"</span>);
+<a name="68" href="#68">68</a>      <em class="jxr_comment">// We have to update the vertices manually because the ascii loader does not support lists.</em>
+<a name="69" href="#69">69</a>      LogicalGraph expected = input.transformVertices((v, c) -&gt; {
+<a name="70" href="#70">70</a>        <strong class="jxr_keyword">if</strong> (!v.getLabel().equals(<span class="jxr_string">"Target"</span>) &amp;&amp; !v.getLabel().equals(<span class="jxr_string">"Target2"</span>)) {
+<a name="71" href="#71">71</a>          <strong class="jxr_keyword">return</strong> v;
+<a name="72" href="#72">72</a>        }
+<a name="73" href="#73">73</a>        v.setProperty(<span class="jxr_string">"t"</span>, Arrays.asList(PropertyValue.create(1L), PropertyValue.create(<span class="jxr_string">""</span>)));
+<a name="74" href="#74">74</a>        <strong class="jxr_keyword">return</strong> v;
+<a name="75" href="#75">75</a>      }).callForGraph(<strong class="jxr_keyword">new</strong> PropertyTransformation&lt;&gt;(<span class="jxr_string">"t"</span>, pv -&gt; pv,
+<a name="76" href="#76">76</a>        PropagatePropertyToNeighborTest::orderListProperty, pv -&gt; pv));
+<a name="77" href="#77">77</a>      LogicalGraph result = input.callForGraph(<strong class="jxr_keyword">operator</strong>)
+<a name="78" href="#78">78</a>        .callForGraph(<strong class="jxr_keyword">new</strong> PropertyTransformation&lt;&gt;(<span class="jxr_string">"t"</span>, pv -&gt; pv,
+<a name="79" href="#79">79</a>        PropagatePropertyToNeighborTest::orderListProperty, pv -&gt; pv));
+<a name="80" href="#80">80</a>      collectAndAssertTrue(expected.equalsByData(result));
+<a name="81" href="#81">81</a>    }
+<a name="82" href="#82">82</a>  
+<a name="83" href="#83">83</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="84" href="#84">84</a>  <em class="jxr_javadoccomment">   * Test the operator propagating along only certain edge labels.</em>
+<a name="85" href="#85">85</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="86" href="#86">86</a>  <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails.</em>
+<a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="88" href="#88">88</a>    @Test
+<a name="89" href="#89">89</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPropagateAlongCertainEdges() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="90" href="#90">90</a>      LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input1"</span>);
+<a name="91" href="#91">91</a>      UnaryGraphToGraphOperator <strong class="jxr_keyword">operator</strong> = <strong class="jxr_keyword">new</strong> PropagatePropertyToNeighbor(<span class="jxr_string">"Source"</span>, <span class="jxr_string">"p1"</span>, <span class="jxr_string">"t"</span>,
+<a name="92" href="#92">92</a>        Collections.singleton(<span class="jxr_string">"edge1"</span>), <strong class="jxr_keyword">null</strong>);
+<a name="93" href="#93">93</a>      LogicalGraph expected = input.transformVertices((v, c) -&gt; {
+<a name="94" href="#94">94</a>        <strong class="jxr_keyword">if</strong> (!v.getLabel().equals(<span class="jxr_string">"Target"</span>) &amp;&amp; !v.getLabel().equals(<span class="jxr_string">"Target2"</span>)) {
+<a name="95" href="#95">95</a>          <strong class="jxr_keyword">return</strong> v;
+<a name="96" href="#96">96</a>        }
+<a name="97" href="#97">97</a>        v.setProperty(<span class="jxr_string">"t"</span>, Collections.singletonList(PropertyValue.create(1L)));
+<a name="98" href="#98">98</a>        <strong class="jxr_keyword">return</strong> v;
+<a name="99" href="#99">99</a>      });
+<a name="100" href="#100">100</a>     LogicalGraph result = input.callForGraph(<strong class="jxr_keyword">operator</strong>);
+<a name="101" href="#101">101</a>     collectAndAssertTrue(expected.equalsByData(result));
+<a name="102" href="#102">102</a>   }
+<a name="103" href="#103">103</a> 
+<a name="104" href="#104">104</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="105" href="#105">105</a> <em class="jxr_javadoccomment">   * Test the operator propagating only to vertices with a certain label.</em>
+<a name="106" href="#106">106</a> <em class="jxr_javadoccomment">   *</em>
+<a name="107" href="#107">107</a> <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails.</em>
+<a name="108" href="#108">108</a> <em class="jxr_javadoccomment">   */</em>
+<a name="109" href="#109">109</a>   @Test
+<a name="110" href="#110">110</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPropagateToCertainVertices() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="111" href="#111">111</a>     LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input1"</span>);
+<a name="112" href="#112">112</a>     UnaryGraphToGraphOperator <strong class="jxr_keyword">operator</strong> = <strong class="jxr_keyword">new</strong> PropagatePropertyToNeighbor(<span class="jxr_string">"Source"</span>, <span class="jxr_string">"p1"</span>, <span class="jxr_string">"t"</span>,
+<a name="113" href="#113">113</a>       <strong class="jxr_keyword">null</strong>, Collections.singleton(<span class="jxr_string">"Target"</span>));
+<a name="114" href="#114">114</a>     LogicalGraph expected = input.transformVertices((v, c) -&gt; {
+<a name="115" href="#115">115</a>       <strong class="jxr_keyword">if</strong> (!v.getLabel().equals(<span class="jxr_string">"Target"</span>)) {
+<a name="116" href="#116">116</a>         <strong class="jxr_keyword">return</strong> v;
+<a name="117" href="#117">117</a>       }
+<a name="118" href="#118">118</a>       v.setProperty(<span class="jxr_string">"t"</span>, Arrays.asList(PropertyValue.create(1L), PropertyValue.create(<span class="jxr_string">""</span>)));
+<a name="119" href="#119">119</a>       <strong class="jxr_keyword">return</strong> v;
+<a name="120" href="#120">120</a>     }).callForGraph(<strong class="jxr_keyword">new</strong> PropertyTransformation&lt;&gt;(<span class="jxr_string">"t"</span>, pv -&gt; pv,
+<a name="121" href="#121">121</a>       PropagatePropertyToNeighborTest::orderListProperty, pv -&gt; pv));
+<a name="122" href="#122">122</a>     LogicalGraph result = input.callForGraph(<strong class="jxr_keyword">operator</strong>)
+<a name="123" href="#123">123</a>       .callForGraph(<strong class="jxr_keyword">new</strong> PropertyTransformation&lt;&gt;(<span class="jxr_string">"t"</span>, pv -&gt; pv,
+<a name="124" href="#124">124</a>       PropagatePropertyToNeighborTest::orderListProperty, pv -&gt; pv));
+<a name="125" href="#125">125</a>     collectAndAssertTrue(expected.equalsByData(result));
+<a name="126" href="#126">126</a>   }
+<a name="127" href="#127">127</a> 
+<a name="128" href="#128">128</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   * Test the operator propagating only to vertices with a certain label and only along edges of</em>
+<a name="130" href="#130">130</a> <em class="jxr_javadoccomment">   * a certain label.</em>
+<a name="131" href="#131">131</a> <em class="jxr_javadoccomment">   *</em>
+<a name="132" href="#132">132</a> <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails.</em>
+<a name="133" href="#133">133</a> <em class="jxr_javadoccomment">   */</em>
+<a name="134" href="#134">134</a>   @Test
+<a name="135" href="#135">135</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPropagateToCertainVerticesAlongCertainEdges() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="136" href="#136">136</a>     LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input1"</span>);
+<a name="137" href="#137">137</a>     UnaryGraphToGraphOperator <strong class="jxr_keyword">operator</strong> = <strong class="jxr_keyword">new</strong> PropagatePropertyToNeighbor(<span class="jxr_string">"Source"</span>, <span class="jxr_string">"p1"</span>, <span class="jxr_string">"t"</span>,
+<a name="138" href="#138">138</a>       Collections.singleton(<span class="jxr_string">"edge1"</span>), Collections.singleton(<span class="jxr_string">"Target"</span>));
+<a name="139" href="#139">139</a>     LogicalGraph expected = input.transformVertices((v, c) -&gt; {
+<a name="140" href="#140">140</a>       <strong class="jxr_keyword">if</strong> (!v.getLabel().equals(<span class="jxr_string">"Target"</span>)) {
+<a name="141" href="#141">141</a>         <strong class="jxr_keyword">return</strong> v;
+<a name="142" href="#142">142</a>       }
+<a name="143" href="#143">143</a>       v.setProperty(<span class="jxr_string">"t"</span>, Collections.singletonList(PropertyValue.create(1L)));
+<a name="144" href="#144">144</a>       <strong class="jxr_keyword">return</strong> v;
+<a name="145" href="#145">145</a>     });
+<a name="146" href="#146">146</a>     LogicalGraph result = input.callForGraph(<strong class="jxr_keyword">operator</strong>);
+<a name="147" href="#147">147</a>     collectAndAssertTrue(expected.equalsByData(result));
+<a name="148" href="#148">148</a>   }
+<a name="149" href="#149">149</a> 
+<a name="150" href="#150">150</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="151" href="#151">151</a> <em class="jxr_javadoccomment">   * Test if the operator works correctly for loops.</em>
+<a name="152" href="#152">152</a> <em class="jxr_javadoccomment">   * This will also check if using the same property key for reading and writing values works.</em>
+<a name="153" href="#153">153</a> <em class="jxr_javadoccomment">   *</em>
+<a name="154" href="#154">154</a> <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails.</em>
+<a name="155" href="#155">155</a> <em class="jxr_javadoccomment">   */</em>
+<a name="156" href="#156">156</a>   @Test
+<a name="157" href="#157">157</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testPropagateInLoops() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="158" href="#158">158</a>     LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input2"</span>);
+<a name="159" href="#159">159</a>     UnaryGraphToGraphOperator <strong class="jxr_keyword">operator</strong> = <strong class="jxr_keyword">new</strong> PropagatePropertyToNeighbor(<span class="jxr_string">"Vertex"</span>, <span class="jxr_string">"t"</span>, <span class="jxr_string">"t"</span>);
+<a name="160" href="#160">160</a>     LogicalGraph expected = input.transformVertices((v, c) -&gt; {
+<a name="161" href="#161">161</a>       v.setProperty(<span class="jxr_string">"t"</span>, Collections.singletonList(PropertyValue.create(1L)));
+<a name="162" href="#162">162</a>       <strong class="jxr_keyword">return</strong> v;
+<a name="163" href="#163">163</a>     });
+<a name="164" href="#164">164</a>     LogicalGraph result = input.callForGraph(<strong class="jxr_keyword">operator</strong>);
+<a name="165" href="#165">165</a>     collectAndAssertTrue(expected.equalsByData(result));
+<a name="166" href="#166">166</a>   }
+<a name="167" href="#167">167</a> 
+<a name="168" href="#168">168</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="169" href="#169">169</a> <em class="jxr_javadoccomment">   * Order a list-type property. This is used to make sure that two lists are equal except</em>
+<a name="170" href="#170">170</a> <em class="jxr_javadoccomment">   * for the order of their elements.</em>
+<a name="171" href="#171">171</a> <em class="jxr_javadoccomment">   *</em>
+<a name="172" href="#172">172</a> <em class="jxr_javadoccomment">   * @param list The property.</em>
+<a name="173" href="#173">173</a> <em class="jxr_javadoccomment">   * @return The ordered property.</em>
+<a name="174" href="#174">174</a> <em class="jxr_javadoccomment">   */</em>
+<a name="175" href="#175">175</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> PropertyValue orderListProperty(PropertyValue list) {
+<a name="176" href="#176">176</a>     <strong class="jxr_keyword">if</strong> (!list.isList()) {
+<a name="177" href="#177">177</a>       <strong class="jxr_keyword">return</strong> list;
+<a name="178" href="#178">178</a>     }
+<a name="179" href="#179">179</a>     List&lt;PropertyValue&gt; theList = list.getList();
+<a name="180" href="#180">180</a>     theList.sort(byTypeFirst);
+<a name="181" href="#181">181</a>     <strong class="jxr_keyword">return</strong> PropertyValue.create(theList);
+<a name="182" href="#182">182</a>   }
+<a name="183" href="#183">183</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

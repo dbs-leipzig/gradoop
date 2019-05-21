@@ -18,6 +18,7 @@ package org.gradoop.common.model.impl.properties.strategies;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -26,51 +27,51 @@ import java.math.BigDecimal;
  * Strategy class for handling {@link PropertyValue} operations with a value of the type
  * {@link BigDecimal}.
  */
-<span class="fc" id="L29">public class BigDecimalStrategy extends AbstractVariableSizedPropertyValueStrategy&lt;BigDecimal&gt; {</span>
+<span class="fc" id="L30">public class BigDecimalStrategy extends AbstractVariableSizedPropertyValueStrategy&lt;BigDecimal&gt; {</span>
 
   @Override
   public BigDecimal read(DataInputView inputView, byte typeByte) throws IOException {
-<span class="fc" id="L33">    byte[] rawBytes = readVariableSizedData(inputView, typeByte);</span>
-<span class="fc" id="L34">    return Bytes.toBigDecimal(rawBytes);</span>
+<span class="fc" id="L34">    byte[] rawBytes = readVariableSizedData(inputView, typeByte);</span>
+<span class="fc" id="L35">    return Bytes.toBigDecimal(rawBytes);</span>
   }
 
   @Override
   public int compare(BigDecimal value, Object other) {
-<span class="pc bpc" id="L39" title="1 of 2 branches missed.">    if (other instanceof Number) {</span>
-<span class="fc" id="L40">      Number num = (Number) other;</span>
-<span class="fc" id="L41">      return PropertyValueStrategyUtils.compareNumerical(value, num);</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">    if (other instanceof Number) {</span>
+<span class="fc" id="L41">      Number num = (Number) other;</span>
+<span class="fc" id="L42">      return PropertyValueStrategyUtils.compareNumerical(value, num);</span>
     }
-<span class="nc" id="L43">    throw new IllegalArgumentException(String.format(</span>
-<span class="nc" id="L44">      &quot;Incompatible types: %s, %s&quot;, value.getClass(), other.getClass()));</span>
+<span class="nc" id="L44">    throw new IllegalArgumentException(String.format(</span>
+<span class="nc" id="L45">      &quot;Incompatible types: %s, %s&quot;, value.getClass(), other.getClass()));</span>
   }
 
   @Override
   public boolean is(Object value) {
-<span class="fc" id="L49">    return value instanceof BigDecimal;</span>
+<span class="fc" id="L50">    return value instanceof BigDecimal;</span>
   }
 
   @Override
   public Class&lt;BigDecimal&gt; getType() {
-<span class="fc" id="L54">    return BigDecimal.class;</span>
+<span class="fc" id="L55">    return BigDecimal.class;</span>
   }
 
   @Override
   public BigDecimal get(byte[] bytes) {
-<span class="fc" id="L59">    return Bytes.toBigDecimal(bytes, PropertyValue.OFFSET, bytes.length - PropertyValue.OFFSET);</span>
+<span class="fc" id="L60">    return Bytes.toBigDecimal(bytes, PropertyValue.OFFSET, bytes.length - PropertyValue.OFFSET);</span>
   }
 
   @Override
   public byte getRawType() {
-<span class="fc" id="L64">    return PropertyValue.TYPE_BIG_DECIMAL;</span>
+<span class="fc" id="L65">    return Type.BIG_DECIMAL.getTypeByte();</span>
   }
 
   @Override
   public byte[] getRawBytes(BigDecimal value) {
-<span class="fc" id="L69">    byte[] valueBytes = Bytes.toBytes(value);</span>
-<span class="fc" id="L70">    byte[] rawBytes = new byte[PropertyValue.OFFSET + valueBytes.length];</span>
-<span class="fc" id="L71">    rawBytes[0] = getRawType();</span>
-<span class="fc" id="L72">    Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);</span>
-<span class="fc" id="L73">    return rawBytes;</span>
+<span class="fc" id="L70">    byte[] valueBytes = Bytes.toBytes(value);</span>
+<span class="fc" id="L71">    byte[] rawBytes = new byte[PropertyValue.OFFSET + valueBytes.length];</span>
+<span class="fc" id="L72">    rawBytes[0] = getRawType();</span>
+<span class="fc" id="L73">    Bytes.putBytes(rawBytes, PropertyValue.OFFSET, valueBytes, 0, valueBytes.length);</span>
+<span class="fc" id="L74">    return rawBytes;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

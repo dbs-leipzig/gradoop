@@ -16,9 +16,10 @@
 package org.gradoop.common.model.impl.properties.strategies;
 
 import org.gradoop.common.exceptions.UnsupportedTypeException;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.api.strategies.PropertyValueStrategy;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -40,7 +41,7 @@ public class PropertyValueStrategyFactory {
   /**
    * {@link PropertyValueStrategyFactory} instance
    */
-<span class="fc" id="L43">  private static PropertyValueStrategyFactory INSTANCE = new PropertyValueStrategyFactory();</span>
+<span class="fc" id="L44">  private static PropertyValueStrategyFactory INSTANCE = new PropertyValueStrategyFactory();</span>
   /**
    * Map which links a data type to a strategy class
    */
@@ -59,11 +60,11 @@ public class PropertyValueStrategyFactory {
    * {@code initClassStrategyMap}.
    * Only one instance of this class is needed.
    */
-<span class="fc" id="L62">  private PropertyValueStrategyFactory() {</span>
-<span class="fc" id="L63">    nullStrategy = new NullStrategy();</span>
-<span class="fc" id="L64">    classStrategyMap = initClassStrategyMap();</span>
-<span class="fc" id="L65">    byteStrategyMap = initByteStrategyMap();</span>
-<span class="fc" id="L66">  }</span>
+<span class="fc" id="L63">  private PropertyValueStrategyFactory() {</span>
+<span class="fc" id="L64">    nullStrategy = new NullStrategy();</span>
+<span class="fc" id="L65">    classStrategyMap = initClassStrategyMap();</span>
+<span class="fc" id="L66">    byteStrategyMap = initByteStrategyMap();</span>
+<span class="fc" id="L67">  }</span>
 
   /**
    * Returns value which is represented by the the provided byte array. Assumes that the value is
@@ -73,11 +74,11 @@ public class PropertyValueStrategyFactory {
    * @return Object which is the result of the deserialization.
    */
   public static Object fromRawBytes(byte[] bytes) {
-<span class="fc" id="L76">    PropertyValueStrategy strategy = INSTANCE.byteStrategyMap[bytes[0]];</span>
+<span class="fc" id="L77">    PropertyValueStrategy strategy = INSTANCE.byteStrategyMap[bytes[0]];</span>
     try {
-<span class="pc bpc" id="L78" title="1 of 2 branches missed.">      return strategy == null ? null : strategy.get(bytes);</span>
-<span class="nc" id="L79">    } catch (IOException e) {</span>
-<span class="nc" id="L80">      throw new RuntimeException(&quot;Error while deserializing object.&quot;, e);</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">      return strategy == null ? null : strategy.get(bytes);</span>
+<span class="nc" id="L80">    } catch (IOException e) {</span>
+<span class="nc" id="L81">      throw new RuntimeException(&quot;Error while deserializing object.&quot;, e);</span>
     }
   }
 
@@ -92,11 +93,11 @@ public class PropertyValueStrategyFactory {
    * to, or greater than {@code other}.
    */
   public static int compare(Object value, Object other) {
-<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (value == null) {</span>
-<span class="fc" id="L96">      return INSTANCE.nullStrategy.compare(null, other);</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    if (value == null) {</span>
+<span class="fc" id="L97">      return INSTANCE.nullStrategy.compare(null, other);</span>
     } else {
-<span class="fc" id="L98">      PropertyValueStrategy strategy = get(value.getClass());</span>
-<span class="fc" id="L99">      return strategy.compare(value, other);</span>
+<span class="fc" id="L99">      PropertyValueStrategy strategy = get(value.getClass());</span>
+<span class="fc" id="L100">      return strategy.compare(value, other);</span>
     }
   }
 
@@ -109,14 +110,14 @@ public class PropertyValueStrategyFactory {
    * @return byte array representation of the provided object.
    */
   public static byte[] getRawBytes(Object value) {
-<span class="fc bfc" id="L112" title="All 2 branches covered.">    if (value != null) {</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">    if (value != null) {</span>
       try {
-<span class="fc" id="L114">        return get(value.getClass()).getRawBytes(value);</span>
-<span class="nc" id="L115">      } catch (IOException e) {</span>
-<span class="nc" id="L116">        throw new RuntimeException(&quot;Error while serializing object.&quot;, e);</span>
+<span class="fc" id="L115">        return get(value.getClass()).getRawBytes(value);</span>
+<span class="nc" id="L116">      } catch (IOException e) {</span>
+<span class="nc" id="L117">        throw new RuntimeException(&quot;Error while serializing object.&quot;, e);</span>
       }
     }
-<span class="fc" id="L119">    return new byte[] {PropertyValue.TYPE_NULL};</span>
+<span class="fc" id="L120">    return new byte[] {Type.NULL.getTypeByte()};</span>
   }
 
   /**
@@ -127,12 +128,12 @@ public class PropertyValueStrategyFactory {
    * @throws UnsupportedTypeException when there is no matching strategy for a given type byte.
    */
   public static PropertyValueStrategy get(byte value) throws UnsupportedTypeException {
-<span class="fc" id="L130">    PropertyValueStrategy strategy = INSTANCE.byteStrategyMap[value];</span>
-<span class="pc bpc" id="L131" title="1 of 2 branches missed.">    if (strategy == null) {</span>
-<span class="nc" id="L132">      throw new UnsupportedTypeException(&quot;No strategy for type byte &quot; + value);</span>
+<span class="fc" id="L131">    PropertyValueStrategy strategy = INSTANCE.byteStrategyMap[value];</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">    if (strategy == null) {</span>
+<span class="nc" id="L133">      throw new UnsupportedTypeException(&quot;No strategy for type byte &quot; + value);</span>
     }
 
-<span class="fc" id="L135">    return strategy;</span>
+<span class="fc" id="L136">    return strategy;</span>
   }
 
   /**
@@ -145,27 +146,27 @@ public class PropertyValueStrategyFactory {
    * @throws UnsupportedTypeException when there is no matching strategy for the given class.
    */
   public static PropertyValueStrategy get(Class clazz) throws UnsupportedTypeException {
-<span class="pc bpc" id="L148" title="1 of 2 branches missed.">    if (clazz == null) {</span>
-<span class="nc" id="L149">      return INSTANCE.nullStrategy;</span>
+<span class="pc bpc" id="L149" title="1 of 2 branches missed.">    if (clazz == null) {</span>
+<span class="nc" id="L150">      return INSTANCE.nullStrategy;</span>
     }
 
-<span class="fc" id="L152">    PropertyValueStrategy strategy = INSTANCE.classStrategyMap.get(clazz);</span>
+<span class="fc" id="L153">    PropertyValueStrategy strategy = INSTANCE.classStrategyMap.get(clazz);</span>
     // class could be some implementation of List/Map/Set that we don't register in the class-
     // strategy map, so we need to check for that.
-<span class="fc bfc" id="L155" title="All 2 branches covered.">    if (strategy == null) {</span>
-<span class="fc bfc" id="L156" title="All 2 branches covered.">      if (Map.class.isAssignableFrom(clazz)) {</span>
-<span class="fc" id="L157">        strategy = INSTANCE.classStrategyMap.get(Map.class);</span>
-<span class="fc bfc" id="L158" title="All 2 branches covered.">      } else if (Set.class.isAssignableFrom(clazz)) {</span>
-<span class="fc" id="L159">        strategy = INSTANCE.classStrategyMap.get(Set.class);</span>
-<span class="fc bfc" id="L160" title="All 2 branches covered.">      } else if (List.class.isAssignableFrom(clazz)) {</span>
-<span class="fc" id="L161">        strategy = INSTANCE.classStrategyMap.get(List.class);</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">    if (strategy == null) {</span>
+<span class="fc bfc" id="L157" title="All 2 branches covered.">      if (Map.class.isAssignableFrom(clazz)) {</span>
+<span class="fc" id="L158">        strategy = INSTANCE.classStrategyMap.get(Map.class);</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">      } else if (Set.class.isAssignableFrom(clazz)) {</span>
+<span class="fc" id="L160">        strategy = INSTANCE.classStrategyMap.get(Set.class);</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">      } else if (List.class.isAssignableFrom(clazz)) {</span>
+<span class="fc" id="L162">        strategy = INSTANCE.classStrategyMap.get(List.class);</span>
       }
     }
-<span class="fc bfc" id="L164" title="All 2 branches covered.">    if (strategy == null) {</span>
-<span class="fc" id="L165">      throw new UnsupportedTypeException(&quot;No strategy for class &quot; + clazz);</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">    if (strategy == null) {</span>
+<span class="fc" id="L166">      throw new UnsupportedTypeException(&quot;No strategy for class &quot; + clazz);</span>
     }
 
-<span class="fc" id="L168">    return strategy;</span>
+<span class="fc" id="L169">    return strategy;</span>
   }
 
   /**
@@ -177,14 +178,14 @@ public class PropertyValueStrategyFactory {
    * @throws UnsupportedTypeException when there is no matching strategy for a given object.
    */
   public static PropertyValueStrategy get(Object value) throws UnsupportedTypeException {
-<span class="fc bfc" id="L180" title="All 2 branches covered.">    if (value != null) {</span>
-<span class="fc" id="L181">      PropertyValueStrategy strategy = get(value.getClass());</span>
-<span class="pc bpc" id="L182" title="1 of 2 branches missed.">      if (strategy == null) {</span>
-<span class="nc" id="L183">        throw new UnsupportedTypeException(&quot;No strategy for class &quot; + value.getClass());</span>
+<span class="fc bfc" id="L181" title="All 2 branches covered.">    if (value != null) {</span>
+<span class="fc" id="L182">      PropertyValueStrategy strategy = get(value.getClass());</span>
+<span class="pc bpc" id="L183" title="1 of 2 branches missed.">      if (strategy == null) {</span>
+<span class="nc" id="L184">        throw new UnsupportedTypeException(&quot;No strategy for class &quot; + value.getClass());</span>
       }
-<span class="fc" id="L185">      return get(value.getClass());</span>
+<span class="fc" id="L186">      return get(value.getClass());</span>
     }
-<span class="fc" id="L187">    return INSTANCE.nullStrategy;</span>
+<span class="fc" id="L188">    return INSTANCE.nullStrategy;</span>
   }
 
   /**
@@ -193,24 +194,24 @@ public class PropertyValueStrategyFactory {
    * @return Map of supported class-strategy associations.
    */
   private Map&lt;Class, PropertyValueStrategy&gt; initClassStrategyMap() {
-<span class="fc" id="L196">    Map&lt;Class, PropertyValueStrategy&gt; classMapping = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L197">    classMapping.put(Boolean.class, new BooleanStrategy());</span>
-<span class="fc" id="L198">    classMapping.put(Set.class, new SetStrategy());</span>
-<span class="fc" id="L199">    classMapping.put(Integer.class, new IntegerStrategy());</span>
-<span class="fc" id="L200">    classMapping.put(Long.class, new LongStrategy());</span>
-<span class="fc" id="L201">    classMapping.put(Float.class, new FloatStrategy());</span>
-<span class="fc" id="L202">    classMapping.put(Double.class, new DoubleStrategy());</span>
-<span class="fc" id="L203">    classMapping.put(Short.class, new ShortStrategy());</span>
-<span class="fc" id="L204">    classMapping.put(BigDecimal.class, new BigDecimalStrategy());</span>
-<span class="fc" id="L205">    classMapping.put(LocalDate.class, new DateStrategy());</span>
-<span class="fc" id="L206">    classMapping.put(LocalTime.class, new TimeStrategy());</span>
-<span class="fc" id="L207">    classMapping.put(LocalDateTime.class, new DateTimeStrategy());</span>
-<span class="fc" id="L208">    classMapping.put(GradoopId.class, new GradoopIdStrategy());</span>
-<span class="fc" id="L209">    classMapping.put(String.class, new StringStrategy());</span>
-<span class="fc" id="L210">    classMapping.put(List.class, new ListStrategy());</span>
-<span class="fc" id="L211">    classMapping.put(Map.class, new MapStrategy());</span>
+<span class="fc" id="L197">    Map&lt;Class, PropertyValueStrategy&gt; classMapping = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L198">    classMapping.put(Boolean.class, new BooleanStrategy());</span>
+<span class="fc" id="L199">    classMapping.put(Set.class, new SetStrategy());</span>
+<span class="fc" id="L200">    classMapping.put(Integer.class, new IntegerStrategy());</span>
+<span class="fc" id="L201">    classMapping.put(Long.class, new LongStrategy());</span>
+<span class="fc" id="L202">    classMapping.put(Float.class, new FloatStrategy());</span>
+<span class="fc" id="L203">    classMapping.put(Double.class, new DoubleStrategy());</span>
+<span class="fc" id="L204">    classMapping.put(Short.class, new ShortStrategy());</span>
+<span class="fc" id="L205">    classMapping.put(BigDecimal.class, new BigDecimalStrategy());</span>
+<span class="fc" id="L206">    classMapping.put(LocalDate.class, new DateStrategy());</span>
+<span class="fc" id="L207">    classMapping.put(LocalTime.class, new TimeStrategy());</span>
+<span class="fc" id="L208">    classMapping.put(LocalDateTime.class, new DateTimeStrategy());</span>
+<span class="fc" id="L209">    classMapping.put(GradoopId.class, new GradoopIdStrategy());</span>
+<span class="fc" id="L210">    classMapping.put(String.class, new StringStrategy());</span>
+<span class="fc" id="L211">    classMapping.put(List.class, new ListStrategy());</span>
+<span class="fc" id="L212">    classMapping.put(Map.class, new MapStrategy());</span>
 
-<span class="fc" id="L213">    return Collections.unmodifiableMap(classMapping);</span>
+<span class="fc" id="L214">    return Collections.unmodifiableMap(classMapping);</span>
   }
 
   /**
@@ -219,13 +220,13 @@ public class PropertyValueStrategyFactory {
    * @return Array containing PropertyValueStrategies with their respective type byte as index.
    */
   private PropertyValueStrategy[] initByteStrategyMap() {
-<span class="fc" id="L222">    PropertyValueStrategy[] byteMapping = new PropertyValueStrategy[classStrategyMap.size() + 1];</span>
-<span class="fc bfc" id="L223" title="All 2 branches covered.">    for (PropertyValueStrategy strategy : classStrategyMap.values()) {</span>
-<span class="fc" id="L224">      byteMapping[strategy.getRawType()] = strategy;</span>
-<span class="fc" id="L225">    }</span>
-<span class="fc" id="L226">    byteMapping[nullStrategy.getRawType()] = nullStrategy;</span>
+<span class="fc" id="L223">    PropertyValueStrategy[] byteMapping = new PropertyValueStrategy[classStrategyMap.size() + 1];</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">    for (PropertyValueStrategy strategy : classStrategyMap.values()) {</span>
+<span class="fc" id="L225">      byteMapping[strategy.getRawType()] = strategy;</span>
+<span class="fc" id="L226">    }</span>
+<span class="fc" id="L227">    byteMapping[nullStrategy.getRawType()] = nullStrategy;</span>
 
-<span class="fc" id="L228">    return byteMapping;</span>
+<span class="fc" id="L229">    return byteMapping;</span>
 
   }
 }

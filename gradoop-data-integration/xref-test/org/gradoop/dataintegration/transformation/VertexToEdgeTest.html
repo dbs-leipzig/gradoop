@@ -42,14 +42,14 @@
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="33" href="#33">33</a>    @Test
 <a name="34" href="#34">34</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testWithEdgeCreation() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="35" href="#35">35</a>      FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"input["</span> +
+<a name="35" href="#35">35</a>      FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"input:test["</span> +
 <a name="36" href="#36">36</a>        <span class="jxr_string">"(v0:Blue {a : 3})"</span> +
 <a name="37" href="#37">37</a>        <span class="jxr_string">"(v1:Green {a : 2})"</span> +
 <a name="38" href="#38">38</a>        <span class="jxr_string">"(v2:Blue {a : 4})"</span> +
 <a name="39" href="#39">39</a>        <span class="jxr_string">"(v0)-[{b : 2}]-&gt;(v1)"</span> +
 <a name="40" href="#40">40</a>        <span class="jxr_string">"(v1)-[{b : 4}]-&gt;(v2)"</span> +
 <a name="41" href="#41">41</a>        <span class="jxr_string">"]"</span> +
-<a name="42" href="#42">42</a>        <span class="jxr_string">"expected["</span> +
+<a name="42" href="#42">42</a>        <span class="jxr_string">"expected:test["</span> +
 <a name="43" href="#43">43</a>        <span class="jxr_string">"(v00:Blue {a : 3})"</span> +
 <a name="44" href="#44">44</a>        <span class="jxr_string">"(v01:Green {a : 2})"</span> +
 <a name="45" href="#45">45</a>        <span class="jxr_string">"(v02:Blue {a : 4})"</span> +
@@ -64,7 +64,7 @@
 <a name="54" href="#54">54</a>      VertexToEdge transformation = <strong class="jxr_keyword">new</strong> VertexToEdge(<span class="jxr_string">"Green"</span>, <span class="jxr_string">"foo"</span>);
 <a name="55" href="#55">55</a>      LogicalGraph transformed = input.callForGraph(transformation);
 <a name="56" href="#56">56</a>  
-<a name="57" href="#57">57</a>      collectAndAssertTrue(transformed.equalsByElementData(expected));
+<a name="57" href="#57">57</a>      collectAndAssertTrue(transformed.equalsByData(expected));
 <a name="58" href="#58">58</a>    }
 <a name="59" href="#59">59</a>  }
 </pre>

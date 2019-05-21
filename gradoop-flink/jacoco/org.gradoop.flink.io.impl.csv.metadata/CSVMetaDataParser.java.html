@@ -20,6 +20,7 @@ import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.functions.StringEscaper;
 
@@ -37,12 +38,12 @@ import java.util.stream.Collectors;
 /**
  * Responsible for creating a {@link MetaData} instance from its string representation.
  */
-<span class="nc" id="L40">public class CSVMetaDataParser {</span>
+<span class="nc" id="L41">public class CSVMetaDataParser {</span>
   /**
    * Used to map a simple type string to its corresponding parsing function.
    */
-<span class="fc" id="L44">  private static final Map&lt;String, Function&lt;String, Object&gt;&gt; SIMPLE_TYPE_PARSER_MAP =</span>
-<span class="fc" id="L45">    getSimpleTypeParserMap();</span>
+<span class="fc" id="L45">  private static final Map&lt;String, Function&lt;String, Object&gt;&gt; SIMPLE_TYPE_PARSER_MAP =</span>
+<span class="fc" id="L46">    getSimpleTypeParserMap();</span>
 
   /**
    * Creates the type - parser function mapping of static property SIMPLE_TYPE_PARSER_MAP
@@ -51,21 +52,21 @@ import java.util.stream.Collectors;
    * parsing function.
    */
   private static Map&lt;String, Function&lt;String, Object&gt;&gt; getSimpleTypeParserMap() {
-<span class="fc" id="L54">    Map&lt;String, Function&lt;String, Object&gt;&gt; map = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L55">    map.put(MetaData.TypeString.SHORT.getTypeString(), Short::parseShort);</span>
-<span class="fc" id="L56">    map.put(MetaData.TypeString.INTEGER.getTypeString(), Integer::parseInt);</span>
-<span class="fc" id="L57">    map.put(MetaData.TypeString.LONG.getTypeString(), Long::parseLong);</span>
-<span class="fc" id="L58">    map.put(MetaData.TypeString.FLOAT.getTypeString(), Float::parseFloat);</span>
-<span class="fc" id="L59">    map.put(MetaData.TypeString.DOUBLE.getTypeString(), Double::parseDouble);</span>
-<span class="fc" id="L60">    map.put(MetaData.TypeString.BOOLEAN.getTypeString(), Boolean::parseBoolean);</span>
-<span class="fc" id="L61">    map.put(MetaData.TypeString.STRING.getTypeString(), StringEscaper::unescape);</span>
-<span class="fc" id="L62">    map.put(MetaData.TypeString.BIGDECIMAL.getTypeString(), BigDecimal::new);</span>
-<span class="fc" id="L63">    map.put(MetaData.TypeString.GRADOOPID.getTypeString(), GradoopId::fromString);</span>
-<span class="fc" id="L64">    map.put(MetaData.TypeString.LOCALDATE.getTypeString(), LocalDate::parse);</span>
-<span class="fc" id="L65">    map.put(MetaData.TypeString.LOCALTIME.getTypeString(), LocalTime::parse);</span>
-<span class="fc" id="L66">    map.put(MetaData.TypeString.LOCALDATETIME.getTypeString(), LocalDateTime::parse);</span>
-<span class="fc" id="L67">    map.put(MetaData.TypeString.NULL.getTypeString(), CSVMetaDataParser::parseNullProperty);</span>
-<span class="fc" id="L68">    return Collections.unmodifiableMap(map);</span>
+<span class="fc" id="L55">    Map&lt;String, Function&lt;String, Object&gt;&gt; map = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L56">    map.put(Type.SHORT.toString(), Short::parseShort);</span>
+<span class="fc" id="L57">    map.put(Type.INTEGER.toString(), Integer::parseInt);</span>
+<span class="fc" id="L58">    map.put(Type.LONG.toString(), Long::parseLong);</span>
+<span class="fc" id="L59">    map.put(Type.FLOAT.toString(), Float::parseFloat);</span>
+<span class="fc" id="L60">    map.put(Type.DOUBLE.toString(), Double::parseDouble);</span>
+<span class="fc" id="L61">    map.put(Type.BOOLEAN.toString(), Boolean::parseBoolean);</span>
+<span class="fc" id="L62">    map.put(Type.STRING.toString(), StringEscaper::unescape);</span>
+<span class="fc" id="L63">    map.put(Type.BIG_DECIMAL.toString(), BigDecimal::new);</span>
+<span class="fc" id="L64">    map.put(Type.GRADOOP_ID.toString(), GradoopId::fromString);</span>
+<span class="fc" id="L65">    map.put(Type.DATE.toString(), LocalDate::parse);</span>
+<span class="fc" id="L66">    map.put(Type.TIME.toString(), LocalTime::parse);</span>
+<span class="fc" id="L67">    map.put(Type.DATE_TIME.toString(), LocalDateTime::parse);</span>
+<span class="fc" id="L68">    map.put(Type.NULL.toString(), CSVMetaDataParser::parseNullProperty);</span>
+<span class="fc" id="L69">    return Collections.unmodifiableMap(map);</span>
   }
 
   /**
@@ -76,10 +77,10 @@ import java.util.stream.Collectors;
    * @return property meta data
    */
   public static String getPropertyMetaData(Property property) {
-<span class="fc" id="L79">    return String.format(&quot;%s%s%s&quot;,</span>
-<span class="fc" id="L80">      StringEscaper.escape(property.getKey(), CSVConstants.ESCAPED_CHARACTERS),</span>
+<span class="fc" id="L80">    return String.format(&quot;%s%s%s&quot;,</span>
+<span class="fc" id="L81">      StringEscaper.escape(property.getKey(), CSVConstants.ESCAPED_CHARACTERS),</span>
       MetaData.PROPERTY_TOKEN_DELIMITER,
-<span class="fc" id="L82">      MetaData.getTypeString(property.getValue())); // no need to escape</span>
+<span class="fc" id="L83">      MetaData.getTypeString(property.getValue())); // no need to escape</span>
   }
 
   /**
@@ -89,20 +90,20 @@ import java.util.stream.Collectors;
    * @return parsing function for the specific type
    */
   static Function&lt;String, Object&gt; getPropertyValueParser(String propertyType) {
-<span class="fc" id="L92">    String[] typeTokens = StringEscaper.split(</span>
-<span class="fc" id="L93">      propertyType.toLowerCase(), PropertyMetaData.PROPERTY_TOKEN_DELIMITER);</span>
-<span class="fc" id="L94">    String mainType = typeTokens[0];</span>
+<span class="fc" id="L93">    String[] typeTokens = StringEscaper.split(</span>
+<span class="fc" id="L94">      propertyType.toLowerCase(), PropertyMetaData.PROPERTY_TOKEN_DELIMITER);</span>
+<span class="fc" id="L95">    String mainType = typeTokens[0];</span>
 
-<span class="fc bfc" id="L96" title="All 2 branches covered.">    if (mainType.equals(MetaData.TypeString.LIST.getTypeString())) {</span>
-<span class="fc" id="L97">      return getListValueParser(typeTokens);</span>
-<span class="fc bfc" id="L98" title="All 2 branches covered.">    } else if (mainType.equals(MetaData.TypeString.SET.getTypeString())) {</span>
-<span class="fc" id="L99">      return getSetValueParser(typeTokens);</span>
-<span class="fc bfc" id="L100" title="All 2 branches covered.">    } else if (mainType.equals(MetaData.TypeString.MAP.getTypeString())) {</span>
-<span class="fc" id="L101">      return getMapValueParser(typeTokens);</span>
-<span class="pc bpc" id="L102" title="1 of 2 branches missed.">    } else if (SIMPLE_TYPE_PARSER_MAP.containsKey(mainType)) {</span>
-<span class="fc" id="L103">      return SIMPLE_TYPE_PARSER_MAP.get(mainType);</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">    if (mainType.equals(Type.LIST.toString())) {</span>
+<span class="fc" id="L98">      return getListValueParser(typeTokens);</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">    } else if (mainType.equals(Type.SET.toString())) {</span>
+<span class="fc" id="L100">      return getSetValueParser(typeTokens);</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">    } else if (mainType.equals(Type.MAP.toString())) {</span>
+<span class="fc" id="L102">      return getMapValueParser(typeTokens);</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">    } else if (SIMPLE_TYPE_PARSER_MAP.containsKey(mainType)) {</span>
+<span class="fc" id="L104">      return SIMPLE_TYPE_PARSER_MAP.get(mainType);</span>
     } else {
-<span class="nc" id="L105">      throw new TypeNotPresentException(mainType, null);</span>
+<span class="nc" id="L106">      throw new TypeNotPresentException(mainType, null);</span>
     }
   }
 
@@ -115,16 +116,16 @@ import java.util.stream.Collectors;
    */
   private static Function&lt;String, Object&gt; getListValueParser(String[] listTypeTokens) {
     // It's a list with one additional data type (type of list items).
-<span class="pc bpc" id="L118" title="1 of 2 branches missed.">    if (listTypeTokens.length != 2) {</span>
-<span class="nc" id="L119">      throw new IllegalArgumentException(&quot;Item type of List type is missing&quot;);</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">    if (listTypeTokens.length != 2) {</span>
+<span class="nc" id="L120">      throw new IllegalArgumentException(&quot;Item type of List type is missing&quot;);</span>
     }
-<span class="fc" id="L121">    final String itemType = listTypeTokens[1];</span>
+<span class="fc" id="L122">    final String itemType = listTypeTokens[1];</span>
     // check the validity of the list item type
-<span class="pc bpc" id="L123" title="1 of 2 branches missed.">    if (!SIMPLE_TYPE_PARSER_MAP.containsKey(itemType)) {</span>
-<span class="nc" id="L124">      throw new TypeNotPresentException(itemType, null);</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">    if (!SIMPLE_TYPE_PARSER_MAP.containsKey(itemType)) {</span>
+<span class="nc" id="L125">      throw new TypeNotPresentException(itemType, null);</span>
     }
 
-<span class="fc" id="L127">    return s -&gt; parseListProperty(s, SIMPLE_TYPE_PARSER_MAP.get(itemType));</span>
+<span class="fc" id="L128">    return s -&gt; parseListProperty(s, SIMPLE_TYPE_PARSER_MAP.get(itemType));</span>
   }
 
   /**
@@ -136,26 +137,26 @@ import java.util.stream.Collectors;
    */
   private static Function&lt;String, Object&gt; getMapValueParser(String[] mapTypeTokens) {
     // It's a map with two additional data types (key type + value type).
-<span class="pc bpc" id="L139" title="1 of 2 branches missed.">    if (mapTypeTokens.length != 3) {</span>
-<span class="nc" id="L140">      throw new IllegalArgumentException(&quot;Key type or value type of Map type is missing&quot;);</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">    if (mapTypeTokens.length != 3) {</span>
+<span class="nc" id="L141">      throw new IllegalArgumentException(&quot;Key type or value type of Map type is missing&quot;);</span>
     }
 
-<span class="fc" id="L143">    final String keyType = mapTypeTokens[1];</span>
+<span class="fc" id="L144">    final String keyType = mapTypeTokens[1];</span>
     // check the validity of the map key type
-<span class="pc bpc" id="L145" title="1 of 2 branches missed.">    if (!SIMPLE_TYPE_PARSER_MAP.containsKey(keyType)) {</span>
-<span class="nc" id="L146">      throw new TypeNotPresentException(keyType, null);</span>
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">    if (!SIMPLE_TYPE_PARSER_MAP.containsKey(keyType)) {</span>
+<span class="nc" id="L147">      throw new TypeNotPresentException(keyType, null);</span>
     }
 
-<span class="fc" id="L149">    final String valueType = mapTypeTokens[2];</span>
+<span class="fc" id="L150">    final String valueType = mapTypeTokens[2];</span>
     // check the validity of the map value type
-<span class="pc bpc" id="L151" title="1 of 2 branches missed.">    if (!SIMPLE_TYPE_PARSER_MAP.containsKey(valueType)) {</span>
-<span class="nc" id="L152">      throw new TypeNotPresentException(valueType, null);</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">    if (!SIMPLE_TYPE_PARSER_MAP.containsKey(valueType)) {</span>
+<span class="nc" id="L153">      throw new TypeNotPresentException(valueType, null);</span>
     }
 
-<span class="fc" id="L155">    return s -&gt; parseMapProperty(</span>
+<span class="fc" id="L156">    return s -&gt; parseMapProperty(</span>
       s,
-<span class="fc" id="L157">      SIMPLE_TYPE_PARSER_MAP.get(keyType),</span>
-<span class="fc" id="L158">      SIMPLE_TYPE_PARSER_MAP.get(valueType)</span>
+<span class="fc" id="L158">      SIMPLE_TYPE_PARSER_MAP.get(keyType),</span>
+<span class="fc" id="L159">      SIMPLE_TYPE_PARSER_MAP.get(valueType)</span>
     );
   }
 
@@ -167,16 +168,16 @@ import java.util.stream.Collectors;
    */
   private static Function&lt;String, Object&gt; getSetValueParser(String[] setTypeTokens) {
     // It's a set with one additional data type (type of set items).
-<span class="pc bpc" id="L170" title="1 of 2 branches missed.">    if (setTypeTokens.length != 2) {</span>
-<span class="nc" id="L171">      throw new IllegalArgumentException(&quot;Item type of Set type is missing&quot;);</span>
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">    if (setTypeTokens.length != 2) {</span>
+<span class="nc" id="L172">      throw new IllegalArgumentException(&quot;Item type of Set type is missing&quot;);</span>
     }
-<span class="fc" id="L173">    final String itemType = setTypeTokens[1];</span>
+<span class="fc" id="L174">    final String itemType = setTypeTokens[1];</span>
     // check the validity of the set item type
-<span class="pc bpc" id="L175" title="1 of 2 branches missed.">    if (!SIMPLE_TYPE_PARSER_MAP.containsKey(itemType)) {</span>
-<span class="nc" id="L176">      throw new TypeNotPresentException(itemType, null);</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">    if (!SIMPLE_TYPE_PARSER_MAP.containsKey(itemType)) {</span>
+<span class="nc" id="L177">      throw new TypeNotPresentException(itemType, null);</span>
     }
 
-<span class="fc" id="L179">    return s -&gt; parseSetProperty(s, SIMPLE_TYPE_PARSER_MAP.get(itemType));</span>
+<span class="fc" id="L180">    return s -&gt; parseSetProperty(s, SIMPLE_TYPE_PARSER_MAP.get(itemType));</span>
   }
 
   /**
@@ -187,11 +188,11 @@ import java.util.stream.Collectors;
    * @return the list represented by the argument
    */
   private static Object parseListProperty(String s, Function&lt;String, Object&gt; itemParser) {
-<span class="fc" id="L190">    s = s.substring(1, s.length() - 1);</span>
-<span class="fc" id="L191">    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))</span>
-<span class="fc" id="L192">      .map(itemParser)</span>
-<span class="fc" id="L193">      .map(PropertyValue::create)</span>
-<span class="fc" id="L194">      .collect(Collectors.toList());</span>
+<span class="fc" id="L191">    s = s.substring(1, s.length() - 1);</span>
+<span class="fc" id="L192">    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))</span>
+<span class="fc" id="L193">      .map(itemParser)</span>
+<span class="fc" id="L194">      .map(PropertyValue::create)</span>
+<span class="fc" id="L195">      .collect(Collectors.toList());</span>
   }
 
   /**
@@ -205,11 +206,11 @@ import java.util.stream.Collectors;
    */
   private static Object parseMapProperty(String s, Function&lt;String, Object&gt; keyParser,
     Function&lt;String, Object&gt; valueParser) {
-<span class="fc" id="L208">    s = s.substring(1, s.length() - 1);</span>
-<span class="fc" id="L209">    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))</span>
-<span class="fc" id="L210">      .map(st -&gt; StringEscaper.split(st, CSVConstants.MAP_SEPARATOR))</span>
-<span class="fc" id="L211">      .map(strings -&gt; new Object[]{keyParser.apply(strings[0]), valueParser.apply(strings[1])})</span>
-<span class="fc" id="L212">      .collect(Collectors.toMap(e -&gt; PropertyValue.create(e[0]), e -&gt; PropertyValue.create(e[1])));</span>
+<span class="fc" id="L209">    s = s.substring(1, s.length() - 1);</span>
+<span class="fc" id="L210">    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))</span>
+<span class="fc" id="L211">      .map(st -&gt; StringEscaper.split(st, CSVConstants.MAP_SEPARATOR))</span>
+<span class="fc" id="L212">      .map(strings -&gt; new Object[]{keyParser.apply(strings[0]), valueParser.apply(strings[1])})</span>
+<span class="fc" id="L213">      .collect(Collectors.toMap(e -&gt; PropertyValue.create(e[0]), e -&gt; PropertyValue.create(e[1])));</span>
   }
 
   /**
@@ -220,11 +221,11 @@ import java.util.stream.Collectors;
    * @return the set represented by the argument
    */
   private static Object parseSetProperty(String s, Function&lt;String, Object&gt; itemParser) {
-<span class="fc" id="L223">    s = s.substring(1, s.length() - 1);</span>
-<span class="fc" id="L224">    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))</span>
-<span class="fc" id="L225">      .map(itemParser)</span>
-<span class="fc" id="L226">      .map(PropertyValue::create)</span>
-<span class="fc" id="L227">      .collect(Collectors.toSet());</span>
+<span class="fc" id="L224">    s = s.substring(1, s.length() - 1);</span>
+<span class="fc" id="L225">    return Arrays.stream(StringEscaper.split(s, CSVConstants.LIST_DELIMITER))</span>
+<span class="fc" id="L226">      .map(itemParser)</span>
+<span class="fc" id="L227">      .map(PropertyValue::create)</span>
+<span class="fc" id="L228">      .collect(Collectors.toSet());</span>
   }
 
   /**
@@ -235,11 +236,11 @@ import java.util.stream.Collectors;
    * @throws IllegalArgumentException The string that is passed has to represent null.
    */
   private static Object parseNullProperty(String nullString) throws IllegalArgumentException {
-<span class="pc bpc" id="L238" title="2 of 4 branches missed.">    if (nullString != null &amp;&amp; nullString.equalsIgnoreCase(</span>
-<span class="fc" id="L239">      MetaData.TypeString.NULL.getTypeString())) {</span>
-<span class="fc" id="L240">      return null;</span>
+<span class="pc bpc" id="L239" title="2 of 4 branches missed.">    if (nullString != null &amp;&amp; nullString.equalsIgnoreCase(</span>
+<span class="fc" id="L240">      Type.NULL.toString())) {</span>
+<span class="fc" id="L241">      return null;</span>
     } else {
-<span class="nc" id="L242">      throw new IllegalArgumentException(&quot;Only null represents a null string.&quot;);</span>
+<span class="nc" id="L243">      throw new IllegalArgumentException(&quot;Only null represents a null string.&quot;);</span>
     }
   }
 }

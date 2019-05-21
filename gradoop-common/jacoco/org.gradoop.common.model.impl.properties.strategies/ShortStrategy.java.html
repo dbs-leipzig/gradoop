@@ -18,57 +18,59 @@ package org.gradoop.common.model.impl.properties.strategies;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
+
 import java.io.IOException;
 
 /**
  * Strategy class for handling {@code PropertyValue} operations with a value of the type
  * {@code Short}.
  */
-<span class="fc" id="L27">public class ShortStrategy extends AbstractFixSizedPropertyValueStrategy&lt;Short&gt; {</span>
+<span class="fc" id="L29">public class ShortStrategy extends AbstractFixSizedPropertyValueStrategy&lt;Short&gt; {</span>
 
   @Override
   public Short read(DataInputView inputView, byte typeByte) throws IOException {
-<span class="fc" id="L31">    int length = Bytes.SIZEOF_SHORT;</span>
-<span class="fc" id="L32">    byte[] rawBytes = new byte[length];</span>
+<span class="fc" id="L33">    int length = Bytes.SIZEOF_SHORT;</span>
+<span class="fc" id="L34">    byte[] rawBytes = new byte[length];</span>
 
-<span class="fc bfc" id="L34" title="All 2 branches covered.">    for (int i  = 0; i &lt; rawBytes.length; i++) {</span>
-<span class="fc" id="L35">      rawBytes[i] = inputView.readByte();</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">    for (int i  = 0; i &lt; rawBytes.length; i++) {</span>
+<span class="fc" id="L37">      rawBytes[i] = inputView.readByte();</span>
     }
 
-<span class="fc" id="L38">    return Bytes.toShort(rawBytes);</span>
+<span class="fc" id="L40">    return Bytes.toShort(rawBytes);</span>
   }
 
   @Override
   public int compare(Short value, Object other) {
-<span class="fc" id="L43">    return PropertyValueStrategyUtils.compareNumerical(value, other);</span>
+<span class="fc" id="L45">    return PropertyValueStrategyUtils.compareNumerical(value, other);</span>
   }
 
   @Override
   public boolean is(Object value) {
-<span class="fc" id="L48">    return value instanceof Short;</span>
+<span class="fc" id="L50">    return value instanceof Short;</span>
   }
 
   @Override
   public Class&lt;Short&gt; getType() {
-<span class="fc" id="L53">    return Short.class;</span>
+<span class="fc" id="L55">    return Short.class;</span>
   }
 
   @Override
   public Short get(byte[] bytes) {
-<span class="fc" id="L58">    return Bytes.toShort(bytes, PropertyValue.OFFSET);</span>
+<span class="fc" id="L60">    return Bytes.toShort(bytes, PropertyValue.OFFSET);</span>
   }
 
   @Override
   public byte getRawType() {
-<span class="fc" id="L63">    return PropertyValue.TYPE_SHORT;</span>
+<span class="fc" id="L65">    return Type.SHORT.getTypeByte();</span>
   }
 
   @Override
   public byte[] getRawBytes(Short value) {
-<span class="fc" id="L68">    byte[] rawBytes = new byte[PropertyValue.OFFSET + Bytes.SIZEOF_SHORT];</span>
-<span class="fc" id="L69">    rawBytes[0] = getRawType();</span>
-<span class="fc" id="L70">    Bytes.putShort(rawBytes, PropertyValue.OFFSET, value);</span>
-<span class="fc" id="L71">    return rawBytes;</span>
+<span class="fc" id="L70">    byte[] rawBytes = new byte[PropertyValue.OFFSET + Bytes.SIZEOF_SHORT];</span>
+<span class="fc" id="L71">    rawBytes[0] = getRawType();</span>
+<span class="fc" id="L72">    Bytes.putShort(rawBytes, PropertyValue.OFFSET, value);</span>
+<span class="fc" id="L73">    return rawBytes;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

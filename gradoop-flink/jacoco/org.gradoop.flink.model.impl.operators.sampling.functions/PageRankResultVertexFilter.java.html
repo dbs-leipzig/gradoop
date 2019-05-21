@@ -59,7 +59,7 @@ public class PageRankResultVertexFilter implements FilterFunction&lt;Vertex&gt; 
 
   @Override
   public boolean filter(Vertex v) throws Exception {
-<span class="pc bpc" id="L62" title="1 of 2 branches missed.">    if (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">    if (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {</span>
 <span class="fc" id="L63">      double pr = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)</span>
 <span class="fc" id="L64">        .getDouble();</span>
 <span class="fc bfc" id="L65" title="All 2 branches covered.">      if (sampleGreaterThanThreshold) {</span>
@@ -68,7 +68,7 @@ public class PageRankResultVertexFilter implements FilterFunction&lt;Vertex&gt; 
 <span class="fc bfc" id="L68" title="All 2 branches covered.">        return pr &lt;= threshold;</span>
       }
     } else {
-<span class="nc" id="L71">      return keepVerticesIfSameScore;</span>
+<span class="fc" id="L71">      return keepVerticesIfSameScore;</span>
     }
   }
 }

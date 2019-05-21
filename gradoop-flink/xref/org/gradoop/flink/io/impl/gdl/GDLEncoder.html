@@ -154,8 +154,8 @@
 <a name="144" href="#144">144</a>         <strong class="jxr_keyword">boolean</strong> containedInGraph = v.getGraphIds().contains(gh.getId());
 <a name="145" href="#145">145</a>         <strong class="jxr_keyword">boolean</strong> firstOccurrence = !usedVertexIds.contains(v.getId());
 <a name="146" href="#146">146</a> 
-<a name="147" href="#147">147</a>         <strong class="jxr_keyword">if</strong> (containedInGraph &amp;&amp; firstOccurrence) {
-<a name="148" href="#148">148</a>           String vertexString = vertexToGDLString(v, idToVertexName);
+<a name="147" href="#147">147</a>         <strong class="jxr_keyword">if</strong> (containedInGraph) {
+<a name="148" href="#148">148</a>           String vertexString = vertexToGDLString(v, idToVertexName, firstOccurrence);
 <a name="149" href="#149">149</a>           usedVertexIds.add(v.getId());
 <a name="150" href="#150">150</a>           verticesString.append(vertexString).append(System.lineSeparator());
 <a name="151" href="#151">151</a>         }
@@ -173,172 +173,181 @@
 <a name="163" href="#163">163</a>       result
 <a name="164" href="#164">164</a>         .append(graphHeadToGDLString(gh, idToGraphHeadName))
 <a name="165" href="#165">165</a>         .append(GRAPH_ELEMENTS_DEFINITION_START).append(System.lineSeparator())
-<a name="166" href="#166">166</a>         .append(verticesString).append(System.lineSeparator())
-<a name="167" href="#167">167</a>         .append(edgesString)
-<a name="168" href="#168">168</a>         .append(GRAPH_ELEMENTS_DEFINITION_END)
-<a name="169" href="#169">169</a>         .append(System.lineSeparator()).append(System.lineSeparator());
-<a name="170" href="#170">170</a>     }
-<a name="171" href="#171">171</a>     <strong class="jxr_keyword">return</strong> result.toString();
-<a name="172" href="#172">172</a>   }
-<a name="173" href="#173">173</a> 
-<a name="174" href="#174">174</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="175" href="#175">175</a> <em class="jxr_javadoccomment">   * Returns a mapping between the graph heads gradoop ids and the GDL variable names.</em>
-<a name="176" href="#176">176</a> <em class="jxr_javadoccomment">   *</em>
-<a name="177" href="#177">177</a> <em class="jxr_javadoccomment">   * @param graphHeads The graph heads.</em>
-<a name="178" href="#178">178</a> <em class="jxr_javadoccomment">   * @return Mapping between graph head and GDL variable name.</em>
-<a name="179" href="#179">179</a> <em class="jxr_javadoccomment">   */</em>
-<a name="180" href="#180">180</a>   <strong class="jxr_keyword">private</strong> Map&lt;GradoopId, String&gt; getGraphHeadNameMapping(List&lt;GraphHead&gt; graphHeads) {
-<a name="181" href="#181">181</a>     Map&lt;GradoopId, String&gt; idToGraphHeadName = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;(graphHeads.size());
-<a name="182" href="#182">182</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; graphHeads.size(); i++) {
-<a name="183" href="#183">183</a>       GraphHead g = graphHeads.get(i);
-<a name="184" href="#184">184</a>       String gName = String.format(<span class="jxr_string">"%s%s"</span>, GRAPH_VARIABLE_PREFIX, i);
-<a name="185" href="#185">185</a>       idToGraphHeadName.put(g.getId(), gName);
-<a name="186" href="#186">186</a>     }
-<a name="187" href="#187">187</a>     <strong class="jxr_keyword">return</strong> idToGraphHeadName;
-<a name="188" href="#188">188</a>   }
-<a name="189" href="#189">189</a> 
-<a name="190" href="#190">190</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="191" href="#191">191</a> <em class="jxr_javadoccomment">   * Returns a mapping between the vertex GradoopID and the GDL variable name.</em>
-<a name="192" href="#192">192</a> <em class="jxr_javadoccomment">   *</em>
-<a name="193" href="#193">193</a> <em class="jxr_javadoccomment">   * @param vertices The graph vertices.</em>
-<a name="194" href="#194">194</a> <em class="jxr_javadoccomment">   * @return Mapping between vertex and GDL variable name.</em>
-<a name="195" href="#195">195</a> <em class="jxr_javadoccomment">   */</em>
-<a name="196" href="#196">196</a>   <strong class="jxr_keyword">private</strong> Map&lt;GradoopId, String&gt; getVertexNameMapping(List&lt;Vertex&gt; vertices) {
-<a name="197" href="#197">197</a>     Map&lt;GradoopId, String&gt; idToVertexName = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;(vertices.size());
-<a name="198" href="#198">198</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; vertices.size(); i++) {
-<a name="199" href="#199">199</a>       Vertex v = vertices.get(i);
-<a name="200" href="#200">200</a>       String vName = String.format(<span class="jxr_string">"%s_%s_%s"</span>, VERTEX_VARIABLE_PREFIX, v.getLabel(), i);
-<a name="201" href="#201">201</a>       idToVertexName.put(v.getId(), vName);
-<a name="202" href="#202">202</a>     }
-<a name="203" href="#203">203</a>     <strong class="jxr_keyword">return</strong> idToVertexName;
-<a name="204" href="#204">204</a>   }
-<a name="205" href="#205">205</a> 
-<a name="206" href="#206">206</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="207" href="#207">207</a> <em class="jxr_javadoccomment">   * Returns a mapping between the edge GradoopId and the GDL variable name.</em>
-<a name="208" href="#208">208</a> <em class="jxr_javadoccomment">   *</em>
-<a name="209" href="#209">209</a> <em class="jxr_javadoccomment">   * @param edges The graph edges.</em>
-<a name="210" href="#210">210</a> <em class="jxr_javadoccomment">   * @return Mapping between edge and GDL variable name.</em>
-<a name="211" href="#211">211</a> <em class="jxr_javadoccomment">   */</em>
-<a name="212" href="#212">212</a>   <strong class="jxr_keyword">private</strong> Map&lt;GradoopId, String&gt; getEdgeNameMapping(List&lt;Edge&gt; edges) {
-<a name="213" href="#213">213</a>     Map&lt;GradoopId, String&gt; idToEdgeName = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;(edges.size());
-<a name="214" href="#214">214</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; edges.size(); i++) {
-<a name="215" href="#215">215</a>       Edge e = edges.get(i);
-<a name="216" href="#216">216</a>       String eName = String.format(<span class="jxr_string">"%s_%s_%s"</span>, EDGE_VARIABLE_PREFIX, e.getLabel(), i);
-<a name="217" href="#217">217</a>       idToEdgeName.put(e.getId(), eName);
-<a name="218" href="#218">218</a>     }
-<a name="219" href="#219">219</a>     <strong class="jxr_keyword">return</strong> idToEdgeName;
-<a name="220" href="#220">220</a>   }
-<a name="221" href="#221">221</a> 
-<a name="222" href="#222">222</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="223" href="#223">223</a> <em class="jxr_javadoccomment">   * Returns a GDL formatted graph head string.</em>
-<a name="224" href="#224">224</a> <em class="jxr_javadoccomment">   *</em>
-<a name="225" href="#225">225</a> <em class="jxr_javadoccomment">   * @param g graph head</em>
-<a name="226" href="#226">226</a> <em class="jxr_javadoccomment">   * @param idToGraphHeadName mapping from graph head id to its GDL variable name</em>
-<a name="227" href="#227">227</a> <em class="jxr_javadoccomment">   * @return GDL formatted string</em>
-<a name="228" href="#228">228</a> <em class="jxr_javadoccomment">   */</em>
-<a name="229" href="#229">229</a>   <strong class="jxr_keyword">private</strong> String graphHeadToGDLString(GraphHead g, Map&lt;GradoopId, String&gt; idToGraphHeadName) {
-<a name="230" href="#230">230</a>     <strong class="jxr_keyword">return</strong> String.format(<span class="jxr_string">"%s:%s %s"</span>,
-<a name="231" href="#231">231</a>       idToGraphHeadName.get(g.getId()),
-<a name="232" href="#232">232</a>       g.getLabel(),
-<a name="233" href="#233">233</a>       propertiesToGDLString(g.getProperties()));
-<a name="234" href="#234">234</a>   }
-<a name="235" href="#235">235</a> 
-<a name="236" href="#236">236</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="237" href="#237">237</a> <em class="jxr_javadoccomment">   * Returns the gdl formatted vertex including the properties and the label on first occurrence</em>
-<a name="238" href="#238">238</a> <em class="jxr_javadoccomment">   * or otherwise just the variable name.</em>
-<a name="239" href="#239">239</a> <em class="jxr_javadoccomment">   *</em>
-<a name="240" href="#240">240</a> <em class="jxr_javadoccomment">   * @param v The vertex that should be formatted.</em>
-<a name="241" href="#241">241</a> <em class="jxr_javadoccomment">   * @param idToVertexName Maps GradoopId of a vertex to a string that represents the gdl</em>
-<a name="242" href="#242">242</a> <em class="jxr_javadoccomment">   *                       variable name</em>
-<a name="243" href="#243">243</a> <em class="jxr_javadoccomment">   * @return A GDL formatted vertex string.</em>
-<a name="244" href="#244">244</a> <em class="jxr_javadoccomment">   */</em>
-<a name="245" href="#245">245</a>   <strong class="jxr_keyword">private</strong> String vertexToGDLString(Vertex v, Map&lt;GradoopId, String&gt; idToVertexName)  {
-<a name="246" href="#246">246</a>     <strong class="jxr_keyword">return</strong> String.format(<span class="jxr_string">"(%s:%s %s)"</span>,
-<a name="247" href="#247">247</a>       idToVertexName.get(v.getId()),
-<a name="248" href="#248">248</a>       v.getLabel(),
-<a name="249" href="#249">249</a>       propertiesToGDLString(v.getProperties()));
-<a name="250" href="#250">250</a>   }
-<a name="251" href="#251">251</a> 
-<a name="252" href="#252">252</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="253" href="#253">253</a> <em class="jxr_javadoccomment">   * Returns the GDL formatted edge, including the properties and the label on first occurrence</em>
-<a name="254" href="#254">254</a> <em class="jxr_javadoccomment">   * or otherwise just the variable name.</em>
-<a name="255" href="#255">255</a> <em class="jxr_javadoccomment">   *</em>
-<a name="256" href="#256">256</a> <em class="jxr_javadoccomment">   * @param e The edge to be formatted.</em>
-<a name="257" href="#257">257</a> <em class="jxr_javadoccomment">   * @param idToVertexName Maps GradoopId of a vertex to a string that represents the GDL</em>
-<a name="258" href="#258">258</a> <em class="jxr_javadoccomment">   *                       variable name</em>
-<a name="259" href="#259">259</a> <em class="jxr_javadoccomment">   * @param idToEdgeName Maps GradoopId of an edge to a string that represents the GDL variable</em>
-<a name="260" href="#260">260</a> <em class="jxr_javadoccomment">   *                     name.</em>
-<a name="261" href="#261">261</a> <em class="jxr_javadoccomment">   * @param firstOccurrence Is it the first occurrence of the vertex in all graphs?</em>
-<a name="262" href="#262">262</a> <em class="jxr_javadoccomment">   * @return A GDL formatted edge string.</em>
-<a name="263" href="#263">263</a> <em class="jxr_javadoccomment">   */</em>
-<a name="264" href="#264">264</a>   <strong class="jxr_keyword">private</strong> String edgeToGDLString(
-<a name="265" href="#265">265</a>     Edge e,
-<a name="266" href="#266">266</a>     Map&lt;GradoopId, String&gt; idToVertexName,
-<a name="267" href="#267">267</a>     Map&lt;GradoopId, String&gt; idToEdgeName,
-<a name="268" href="#268">268</a>     <strong class="jxr_keyword">boolean</strong> firstOccurrence) {
-<a name="269" href="#269">269</a>     String result;
-<a name="270" href="#270">270</a>     <strong class="jxr_keyword">if</strong> (firstOccurrence) {
-<a name="271" href="#271">271</a>       result =  String.format(<span class="jxr_string">"(%s)-[%s:%s%s]-&gt;(%s)"</span>,
-<a name="272" href="#272">272</a>         idToVertexName.get(e.getSourceId()),
-<a name="273" href="#273">273</a>         idToEdgeName.get(e.getId()),
-<a name="274" href="#274">274</a>         e.getLabel(),
-<a name="275" href="#275">275</a>         propertiesToGDLString(e.getProperties()),
-<a name="276" href="#276">276</a>         idToVertexName.get(e.getTargetId()));
-<a name="277" href="#277">277</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="278" href="#278">278</a>       result = String.format(<span class="jxr_string">"(%s)-[%s]-&gt;(%s)"</span>,
-<a name="279" href="#279">279</a>         idToVertexName.get(e.getSourceId()),
-<a name="280" href="#280">280</a>         idToEdgeName.get(e.getId()),
-<a name="281" href="#281">281</a>         idToVertexName.get(e.getTargetId()));
-<a name="282" href="#282">282</a>     }
-<a name="283" href="#283">283</a>     <strong class="jxr_keyword">return</strong> result;
-<a name="284" href="#284">284</a>   }
-<a name="285" href="#285">285</a> 
-<a name="286" href="#286">286</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="287" href="#287">287</a> <em class="jxr_javadoccomment">   * Returns the properties as a GDL formatted String.</em>
-<a name="288" href="#288">288</a> <em class="jxr_javadoccomment">   *</em>
-<a name="289" href="#289">289</a> <em class="jxr_javadoccomment">   * @param properties The properties to be formatted.</em>
-<a name="290" href="#290">290</a> <em class="jxr_javadoccomment">   * @return A GDL formatted string that represents the properties.</em>
-<a name="291" href="#291">291</a> <em class="jxr_javadoccomment">   */</em>
-<a name="292" href="#292">292</a>   <strong class="jxr_keyword">private</strong> String propertiesToGDLString(Properties properties) {
-<a name="293" href="#293">293</a>     <strong class="jxr_keyword">if</strong> (properties == <strong class="jxr_keyword">null</strong> || properties.isEmpty()) {
-<a name="294" href="#294">294</a>       <strong class="jxr_keyword">return</strong> <span class="jxr_string">""</span>;
-<a name="295" href="#295">295</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="296" href="#296">296</a>       <strong class="jxr_keyword">return</strong> properties.toList().stream()
-<a name="297" href="#297">297</a>         .map(<strong class="jxr_keyword">this</strong>::propertyToGDLString)
-<a name="298" href="#298">298</a>         .collect(Collectors.joining(PROPERTIES_SEPARATOR, PROPERTIES_PREFIX, PROPERTIES_SUFFIX));
-<a name="299" href="#299">299</a>     }
-<a name="300" href="#300">300</a>   }
-<a name="301" href="#301">301</a> 
-<a name="302" href="#302">302</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="303" href="#303">303</a> <em class="jxr_javadoccomment">   * Returns this property as a GDL formatted String.</em>
-<a name="304" href="#304">304</a> <em class="jxr_javadoccomment">   *</em>
-<a name="305" href="#305">305</a> <em class="jxr_javadoccomment">   * @param property The property.</em>
-<a name="306" href="#306">306</a> <em class="jxr_javadoccomment">   * @return A GDL formatted string that represents the property.</em>
-<a name="307" href="#307">307</a> <em class="jxr_javadoccomment">   */</em>
-<a name="308" href="#308">308</a>   <strong class="jxr_keyword">private</strong> String propertyToGDLString(Property property) {
-<a name="309" href="#309">309</a>     StringBuilder result = <strong class="jxr_keyword">new</strong> StringBuilder()
-<a name="310" href="#310">310</a>       .append(property.getKey())
-<a name="311" href="#311">311</a>       .append(KEY_VALUE_SEPARATOR);
-<a name="312" href="#312">312</a> 
-<a name="313" href="#313">313</a>     PropertyValue value = property.getValue();
-<a name="314" href="#314">314</a> 
-<a name="315" href="#315">315</a>     <strong class="jxr_keyword">if</strong> (value.isString()) {
-<a name="316" href="#316">316</a>       result.append(STRING_PREFIX).append(value.toString()).append(STRING_SUFFIX);
-<a name="317" href="#317">317</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (value.isNull()) {
-<a name="318" href="#318">318</a>       result.append(NULL_STRING);
-<a name="319" href="#319">319</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (value.isDouble()) {
-<a name="320" href="#320">320</a>       result.append(value.toString()).append(DOUBLE_SUFFIX);
-<a name="321" href="#321">321</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (value.isFloat()) {
-<a name="322" href="#322">322</a>       result.append(value.toString()).append(FLOAT_SUFFIX);
-<a name="323" href="#323">323</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (value.isLong()) {
-<a name="324" href="#324">324</a>       result.append(value.toString()).append(LONG_SUFFIX);
-<a name="325" href="#325">325</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="326" href="#326">326</a>       result.append(value.toString());
-<a name="327" href="#327">327</a>     }
-<a name="328" href="#328">328</a> 
-<a name="329" href="#329">329</a>     <strong class="jxr_keyword">return</strong> result.toString();
-<a name="330" href="#330">330</a>   }
-<a name="331" href="#331">331</a> }
+<a name="166" href="#166">166</a>         .append(verticesString)
+<a name="167" href="#167">167</a>         .append(edgesString.length() &gt; 0 ? System.lineSeparator() : <span class="jxr_string">""</span>)
+<a name="168" href="#168">168</a>         .append(edgesString)
+<a name="169" href="#169">169</a>         .append(GRAPH_ELEMENTS_DEFINITION_END)
+<a name="170" href="#170">170</a>         .append(System.lineSeparator()).append(System.lineSeparator());
+<a name="171" href="#171">171</a>     }
+<a name="172" href="#172">172</a>     <strong class="jxr_keyword">return</strong> result.toString();
+<a name="173" href="#173">173</a>   }
+<a name="174" href="#174">174</a> 
+<a name="175" href="#175">175</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="176" href="#176">176</a> <em class="jxr_javadoccomment">   * Returns a mapping between the graph heads gradoop ids and the GDL variable names.</em>
+<a name="177" href="#177">177</a> <em class="jxr_javadoccomment">   *</em>
+<a name="178" href="#178">178</a> <em class="jxr_javadoccomment">   * @param graphHeads The graph heads.</em>
+<a name="179" href="#179">179</a> <em class="jxr_javadoccomment">   * @return Mapping between graph head and GDL variable name.</em>
+<a name="180" href="#180">180</a> <em class="jxr_javadoccomment">   */</em>
+<a name="181" href="#181">181</a>   <strong class="jxr_keyword">private</strong> Map&lt;GradoopId, String&gt; getGraphHeadNameMapping(List&lt;GraphHead&gt; graphHeads) {
+<a name="182" href="#182">182</a>     Map&lt;GradoopId, String&gt; idToGraphHeadName = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;(graphHeads.size());
+<a name="183" href="#183">183</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; graphHeads.size(); i++) {
+<a name="184" href="#184">184</a>       GraphHead g = graphHeads.get(i);
+<a name="185" href="#185">185</a>       String gName = String.format(<span class="jxr_string">"%s%s"</span>, GRAPH_VARIABLE_PREFIX, i);
+<a name="186" href="#186">186</a>       idToGraphHeadName.put(g.getId(), gName);
+<a name="187" href="#187">187</a>     }
+<a name="188" href="#188">188</a>     <strong class="jxr_keyword">return</strong> idToGraphHeadName;
+<a name="189" href="#189">189</a>   }
+<a name="190" href="#190">190</a> 
+<a name="191" href="#191">191</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="192" href="#192">192</a> <em class="jxr_javadoccomment">   * Returns a mapping between the vertex GradoopID and the GDL variable name.</em>
+<a name="193" href="#193">193</a> <em class="jxr_javadoccomment">   *</em>
+<a name="194" href="#194">194</a> <em class="jxr_javadoccomment">   * @param vertices The graph vertices.</em>
+<a name="195" href="#195">195</a> <em class="jxr_javadoccomment">   * @return Mapping between vertex and GDL variable name.</em>
+<a name="196" href="#196">196</a> <em class="jxr_javadoccomment">   */</em>
+<a name="197" href="#197">197</a>   <strong class="jxr_keyword">private</strong> Map&lt;GradoopId, String&gt; getVertexNameMapping(List&lt;Vertex&gt; vertices) {
+<a name="198" href="#198">198</a>     Map&lt;GradoopId, String&gt; idToVertexName = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;(vertices.size());
+<a name="199" href="#199">199</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; vertices.size(); i++) {
+<a name="200" href="#200">200</a>       Vertex v = vertices.get(i);
+<a name="201" href="#201">201</a>       String vName = String.format(<span class="jxr_string">"%s_%s_%s"</span>, VERTEX_VARIABLE_PREFIX, v.getLabel(), i);
+<a name="202" href="#202">202</a>       idToVertexName.put(v.getId(), vName);
+<a name="203" href="#203">203</a>     }
+<a name="204" href="#204">204</a>     <strong class="jxr_keyword">return</strong> idToVertexName;
+<a name="205" href="#205">205</a>   }
+<a name="206" href="#206">206</a> 
+<a name="207" href="#207">207</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="208" href="#208">208</a> <em class="jxr_javadoccomment">   * Returns a mapping between the edge GradoopId and the GDL variable name.</em>
+<a name="209" href="#209">209</a> <em class="jxr_javadoccomment">   *</em>
+<a name="210" href="#210">210</a> <em class="jxr_javadoccomment">   * @param edges The graph edges.</em>
+<a name="211" href="#211">211</a> <em class="jxr_javadoccomment">   * @return Mapping between edge and GDL variable name.</em>
+<a name="212" href="#212">212</a> <em class="jxr_javadoccomment">   */</em>
+<a name="213" href="#213">213</a>   <strong class="jxr_keyword">private</strong> Map&lt;GradoopId, String&gt; getEdgeNameMapping(List&lt;Edge&gt; edges) {
+<a name="214" href="#214">214</a>     Map&lt;GradoopId, String&gt; idToEdgeName = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;(edges.size());
+<a name="215" href="#215">215</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; edges.size(); i++) {
+<a name="216" href="#216">216</a>       Edge e = edges.get(i);
+<a name="217" href="#217">217</a>       String eName = String.format(<span class="jxr_string">"%s_%s_%s"</span>, EDGE_VARIABLE_PREFIX, e.getLabel(), i);
+<a name="218" href="#218">218</a>       idToEdgeName.put(e.getId(), eName);
+<a name="219" href="#219">219</a>     }
+<a name="220" href="#220">220</a>     <strong class="jxr_keyword">return</strong> idToEdgeName;
+<a name="221" href="#221">221</a>   }
+<a name="222" href="#222">222</a> 
+<a name="223" href="#223">223</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="224" href="#224">224</a> <em class="jxr_javadoccomment">   * Returns a GDL formatted graph head string.</em>
+<a name="225" href="#225">225</a> <em class="jxr_javadoccomment">   *</em>
+<a name="226" href="#226">226</a> <em class="jxr_javadoccomment">   * @param g graph head</em>
+<a name="227" href="#227">227</a> <em class="jxr_javadoccomment">   * @param idToGraphHeadName mapping from graph head id to its GDL variable name</em>
+<a name="228" href="#228">228</a> <em class="jxr_javadoccomment">   * @return GDL formatted string</em>
+<a name="229" href="#229">229</a> <em class="jxr_javadoccomment">   */</em>
+<a name="230" href="#230">230</a>   <strong class="jxr_keyword">private</strong> String graphHeadToGDLString(GraphHead g, Map&lt;GradoopId, String&gt; idToGraphHeadName) {
+<a name="231" href="#231">231</a>     <strong class="jxr_keyword">return</strong> String.format(<span class="jxr_string">"%s:%s %s"</span>,
+<a name="232" href="#232">232</a>       idToGraphHeadName.get(g.getId()),
+<a name="233" href="#233">233</a>       g.getLabel(),
+<a name="234" href="#234">234</a>       propertiesToGDLString(g.getProperties()));
+<a name="235" href="#235">235</a>   }
+<a name="236" href="#236">236</a> 
+<a name="237" href="#237">237</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="238" href="#238">238</a> <em class="jxr_javadoccomment">   * Returns the gdl formatted vertex including the properties and the label on first occurrence</em>
+<a name="239" href="#239">239</a> <em class="jxr_javadoccomment">   * or otherwise just the variable name.</em>
+<a name="240" href="#240">240</a> <em class="jxr_javadoccomment">   *</em>
+<a name="241" href="#241">241</a> <em class="jxr_javadoccomment">   * @param vertex The vertex that should be formatted.</em>
+<a name="242" href="#242">242</a> <em class="jxr_javadoccomment">   * @param idToVertexName Maps GradoopId of a vertex to a string that represents the gdl</em>
+<a name="243" href="#243">243</a> <em class="jxr_javadoccomment">   *                       variable name</em>
+<a name="244" href="#244">244</a> <em class="jxr_javadoccomment">   * @param firstOccurrence Is it the first occurrence of the vertex in all graphs?</em>
+<a name="245" href="#245">245</a> <em class="jxr_javadoccomment">   * @return A GDL formatted vertex string.</em>
+<a name="246" href="#246">246</a> <em class="jxr_javadoccomment">   */</em>
+<a name="247" href="#247">247</a>   <strong class="jxr_keyword">private</strong> String vertexToGDLString(
+<a name="248" href="#248">248</a>     Vertex vertex,
+<a name="249" href="#249">249</a>     Map&lt;GradoopId, String&gt; idToVertexName,
+<a name="250" href="#250">250</a>     <strong class="jxr_keyword">boolean</strong> firstOccurrence) {
+<a name="251" href="#251">251</a>     <strong class="jxr_keyword">if</strong> (firstOccurrence) {
+<a name="252" href="#252">252</a>       <strong class="jxr_keyword">return</strong> String.format(<span class="jxr_string">"(%s:%s %s)"</span>,
+<a name="253" href="#253">253</a>         idToVertexName.get(vertex.getId()),
+<a name="254" href="#254">254</a>         vertex.getLabel(),
+<a name="255" href="#255">255</a>         propertiesToGDLString(vertex.getProperties()));
+<a name="256" href="#256">256</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="257" href="#257">257</a>       <strong class="jxr_keyword">return</strong> String.format(<span class="jxr_string">"(%s)"</span>, idToVertexName.get(vertex.getId()));
+<a name="258" href="#258">258</a>     }
+<a name="259" href="#259">259</a>   }
+<a name="260" href="#260">260</a> 
+<a name="261" href="#261">261</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="262" href="#262">262</a> <em class="jxr_javadoccomment">   * Returns the GDL formatted edge, including the properties and the label on first occurrence</em>
+<a name="263" href="#263">263</a> <em class="jxr_javadoccomment">   * or otherwise just the variable name.</em>
+<a name="264" href="#264">264</a> <em class="jxr_javadoccomment">   *</em>
+<a name="265" href="#265">265</a> <em class="jxr_javadoccomment">   * @param edge The edge to be formatted.</em>
+<a name="266" href="#266">266</a> <em class="jxr_javadoccomment">   * @param idToVertexName Maps GradoopId of a vertex to a string that represents the GDL</em>
+<a name="267" href="#267">267</a> <em class="jxr_javadoccomment">   *                       variable name</em>
+<a name="268" href="#268">268</a> <em class="jxr_javadoccomment">   * @param idToEdgeName Maps GradoopId of an edge to a string that represents the GDL variable</em>
+<a name="269" href="#269">269</a> <em class="jxr_javadoccomment">   *                     name.</em>
+<a name="270" href="#270">270</a> <em class="jxr_javadoccomment">   * @param firstOccurrence Is it the first occurrence of the edge in all graphs?</em>
+<a name="271" href="#271">271</a> <em class="jxr_javadoccomment">   * @return A GDL formatted edge string.</em>
+<a name="272" href="#272">272</a> <em class="jxr_javadoccomment">   */</em>
+<a name="273" href="#273">273</a>   <strong class="jxr_keyword">private</strong> String edgeToGDLString(
+<a name="274" href="#274">274</a>     Edge edge,
+<a name="275" href="#275">275</a>     Map&lt;GradoopId, String&gt; idToVertexName,
+<a name="276" href="#276">276</a>     Map&lt;GradoopId, String&gt; idToEdgeName,
+<a name="277" href="#277">277</a>     <strong class="jxr_keyword">boolean</strong> firstOccurrence) {
+<a name="278" href="#278">278</a>     String result;
+<a name="279" href="#279">279</a>     <strong class="jxr_keyword">if</strong> (firstOccurrence) {
+<a name="280" href="#280">280</a>       result =  String.format(<span class="jxr_string">"(%s)-[%s:%s%s]-&gt;(%s)"</span>,
+<a name="281" href="#281">281</a>         idToVertexName.get(edge.getSourceId()),
+<a name="282" href="#282">282</a>         idToEdgeName.get(edge.getId()),
+<a name="283" href="#283">283</a>         edge.getLabel(),
+<a name="284" href="#284">284</a>         propertiesToGDLString(edge.getProperties()),
+<a name="285" href="#285">285</a>         idToVertexName.get(edge.getTargetId()));
+<a name="286" href="#286">286</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="287" href="#287">287</a>       result = String.format(<span class="jxr_string">"(%s)-[%s]-&gt;(%s)"</span>,
+<a name="288" href="#288">288</a>         idToVertexName.get(edge.getSourceId()),
+<a name="289" href="#289">289</a>         idToEdgeName.get(edge.getId()),
+<a name="290" href="#290">290</a>         idToVertexName.get(edge.getTargetId()));
+<a name="291" href="#291">291</a>     }
+<a name="292" href="#292">292</a>     <strong class="jxr_keyword">return</strong> result;
+<a name="293" href="#293">293</a>   }
+<a name="294" href="#294">294</a> 
+<a name="295" href="#295">295</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="296" href="#296">296</a> <em class="jxr_javadoccomment">   * Returns the properties as a GDL formatted String.</em>
+<a name="297" href="#297">297</a> <em class="jxr_javadoccomment">   *</em>
+<a name="298" href="#298">298</a> <em class="jxr_javadoccomment">   * @param properties The properties to be formatted.</em>
+<a name="299" href="#299">299</a> <em class="jxr_javadoccomment">   * @return A GDL formatted string that represents the properties.</em>
+<a name="300" href="#300">300</a> <em class="jxr_javadoccomment">   */</em>
+<a name="301" href="#301">301</a>   <strong class="jxr_keyword">private</strong> String propertiesToGDLString(Properties properties) {
+<a name="302" href="#302">302</a>     <strong class="jxr_keyword">if</strong> (properties == <strong class="jxr_keyword">null</strong> || properties.isEmpty()) {
+<a name="303" href="#303">303</a>       <strong class="jxr_keyword">return</strong> <span class="jxr_string">""</span>;
+<a name="304" href="#304">304</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="305" href="#305">305</a>       <strong class="jxr_keyword">return</strong> properties.toList().stream()
+<a name="306" href="#306">306</a>         .map(<strong class="jxr_keyword">this</strong>::propertyToGDLString)
+<a name="307" href="#307">307</a>         .collect(Collectors.joining(PROPERTIES_SEPARATOR, PROPERTIES_PREFIX, PROPERTIES_SUFFIX));
+<a name="308" href="#308">308</a>     }
+<a name="309" href="#309">309</a>   }
+<a name="310" href="#310">310</a> 
+<a name="311" href="#311">311</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="312" href="#312">312</a> <em class="jxr_javadoccomment">   * Returns this property as a GDL formatted String.</em>
+<a name="313" href="#313">313</a> <em class="jxr_javadoccomment">   *</em>
+<a name="314" href="#314">314</a> <em class="jxr_javadoccomment">   * @param property The property.</em>
+<a name="315" href="#315">315</a> <em class="jxr_javadoccomment">   * @return A GDL formatted string that represents the property.</em>
+<a name="316" href="#316">316</a> <em class="jxr_javadoccomment">   */</em>
+<a name="317" href="#317">317</a>   <strong class="jxr_keyword">private</strong> String propertyToGDLString(Property property) {
+<a name="318" href="#318">318</a>     StringBuilder result = <strong class="jxr_keyword">new</strong> StringBuilder()
+<a name="319" href="#319">319</a>       .append(property.getKey())
+<a name="320" href="#320">320</a>       .append(KEY_VALUE_SEPARATOR);
+<a name="321" href="#321">321</a> 
+<a name="322" href="#322">322</a>     PropertyValue value = property.getValue();
+<a name="323" href="#323">323</a> 
+<a name="324" href="#324">324</a>     <strong class="jxr_keyword">if</strong> (value.isString()) {
+<a name="325" href="#325">325</a>       result.append(STRING_PREFIX).append(value.toString()).append(STRING_SUFFIX);
+<a name="326" href="#326">326</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (value.isNull()) {
+<a name="327" href="#327">327</a>       result.append(NULL_STRING);
+<a name="328" href="#328">328</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (value.isDouble()) {
+<a name="329" href="#329">329</a>       result.append(value.toString()).append(DOUBLE_SUFFIX);
+<a name="330" href="#330">330</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (value.isFloat()) {
+<a name="331" href="#331">331</a>       result.append(value.toString()).append(FLOAT_SUFFIX);
+<a name="332" href="#332">332</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (value.isLong()) {
+<a name="333" href="#333">333</a>       result.append(value.toString()).append(LONG_SUFFIX);
+<a name="334" href="#334">334</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="335" href="#335">335</a>       result.append(value.toString());
+<a name="336" href="#336">336</a>     }
+<a name="337" href="#337">337</a> 
+<a name="338" href="#338">338</a>     <strong class="jxr_keyword">return</strong> result.toString();
+<a name="339" href="#339">339</a>   }
+<a name="340" href="#340">340</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

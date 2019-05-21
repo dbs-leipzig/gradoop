@@ -33,273 +33,274 @@
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.types.Row;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.metadata.MetaData;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.metadata.PropertyMetaData;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
-<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.cypher.capf.TestData;
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
-<a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.FlinkAsciiGraphLoader;
-<a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
-<a name="34" href="#34">34</a>  <strong class="jxr_keyword">import</strong> org.junit.runner.RunWith;
-<a name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> org.junit.runners.Parameterized;
-<a name="36" href="#36">36</a>  
-<a name="37" href="#37">37</a>  <strong class="jxr_keyword">import</strong> java.util.*;
-<a name="38" href="#38">38</a>  
-<a name="39" href="#39">39</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> junit.framework.TestCase.fail;
-<a name="40" href="#40">40</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.flink.model.impl.operators.cypher.capf.TestData.*;
-<a name="41" href="#41">41</a>  
-<a name="42" href="#42">42</a>  @RunWith(Parameterized.<strong class="jxr_keyword">class</strong>)
-<a name="43" href="#43">43</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/CAPFPatternMatchingTest.html">CAPFPatternMatchingTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
-<a name="44" href="#44">44</a>  
-<a name="45" href="#45">45</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> String testName;
-<a name="46" href="#46">46</a>  
-<a name="47" href="#47">47</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> String dataGraph;
-<a name="48" href="#48">48</a>  
-<a name="49" href="#49">49</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> String queryGraph;
-<a name="50" href="#50">50</a>  
-<a name="51" href="#51">51</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> String[] expectedGraphVariables;
-<a name="52" href="#52">52</a>  
-<a name="53" href="#53">53</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> String expectedCollection;
-<a name="54" href="#54">54</a>  
-<a name="55" href="#55">55</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> MetaData metaData;
-<a name="56" href="#56">56</a>  
-<a name="57" href="#57">57</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/CAPFPatternMatchingTest.html">CAPFPatternMatchingTest</a>(String testName, String dataGraph, String queryGraph,
-<a name="58" href="#58">58</a>                                   String expectedGraphVariables, String expectedCollection) {
-<a name="59" href="#59">59</a>      <strong class="jxr_keyword">this</strong>.testName = testName;
-<a name="60" href="#60">60</a>      <strong class="jxr_keyword">this</strong>.dataGraph = dataGraph;
-<a name="61" href="#61">61</a>      <strong class="jxr_keyword">this</strong>.queryGraph = queryGraph;
-<a name="62" href="#62">62</a>      <strong class="jxr_keyword">this</strong>.expectedGraphVariables = expectedGraphVariables.split(<span class="jxr_string">","</span>);
-<a name="63" href="#63">63</a>      <strong class="jxr_keyword">this</strong>.expectedCollection = expectedCollection;
-<a name="64" href="#64">64</a>  
-<a name="65" href="#65">65</a>      Map&lt;String, List&lt;PropertyMetaData&gt;&gt; vertexPropertyMap = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
-<a name="66" href="#66">66</a>      Map&lt;String, List&lt;PropertyMetaData&gt;&gt; edgePropertyMap = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
-<a name="67" href="#67">67</a>  
-<a name="68" href="#68">68</a>      List&lt;PropertyMetaData&gt; propertyList = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
-<a name="69" href="#69">69</a>      propertyList.add(<strong class="jxr_keyword">new</strong> PropertyMetaData(<span class="jxr_string">"id"</span>, MetaData.TypeString.INTEGER.getTypeString(),
-<a name="70" href="#70">70</a>        <strong class="jxr_keyword">null</strong>));
-<a name="71" href="#71">71</a>  
-<a name="72" href="#72">72</a>      vertexPropertyMap.put(<span class="jxr_string">"A"</span>, propertyList);
-<a name="73" href="#73">73</a>      vertexPropertyMap.put(<span class="jxr_string">"B"</span>, propertyList);
-<a name="74" href="#74">74</a>      vertexPropertyMap.put(<span class="jxr_string">"C"</span>, propertyList);
-<a name="75" href="#75">75</a>      vertexPropertyMap.put(<span class="jxr_string">"D"</span>, propertyList);
-<a name="76" href="#76">76</a>  
-<a name="77" href="#77">77</a>      edgePropertyMap.put(<span class="jxr_string">"a"</span>, propertyList);
-<a name="78" href="#78">78</a>      edgePropertyMap.put(<span class="jxr_string">"b"</span>, propertyList);
-<a name="79" href="#79">79</a>      edgePropertyMap.put(<span class="jxr_string">"c"</span>, propertyList);
-<a name="80" href="#80">80</a>      edgePropertyMap.put(<span class="jxr_string">"d"</span>, propertyList);
-<a name="81" href="#81">81</a>  
-<a name="82" href="#82">82</a>      metaData = <strong class="jxr_keyword">new</strong> CSVMetaData(<strong class="jxr_keyword">new</strong> HashMap&lt;&gt;(), vertexPropertyMap, edgePropertyMap);
-<a name="83" href="#83">83</a>    }
-<a name="84" href="#84">84</a>  
-<a name="85" href="#85">85</a>    @Test
-<a name="86" href="#86">86</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGraphElementIdEquality() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="87" href="#87">87</a>      FlinkAsciiGraphLoader loader = getLoaderFromString(dataGraph);
-<a name="88" href="#88">88</a>  
-<a name="89" href="#89">89</a>      <em class="jxr_comment">// initialize with data graph</em>
-<a name="90" href="#90">90</a>      LogicalGraph db = loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
-<a name="91" href="#91">91</a>  
-<a name="92" href="#92">92</a>      <em class="jxr_comment">// append the expected result</em>
-<a name="93" href="#93">93</a>      loader.appendToDatabaseFromString(expectedCollection);
-<a name="94" href="#94">94</a>  
-<a name="95" href="#95">95</a>      <em class="jxr_comment">// execute and validate</em>
-<a name="96" href="#96">96</a>      CAPFQueryResult capfResult = db.cypher(queryGraph, metaData);
-<a name="97" href="#97">97</a>      <strong class="jxr_keyword">if</strong> (capfResult.containsGraphs()) {
-<a name="98" href="#98">98</a>        GraphCollection result = capfResult.getGraphs();
-<a name="99" href="#99">99</a>        GraphCollection expected = loader.getGraphCollectionByVariables(expectedGraphVariables);
-<a name="100" href="#100">100</a>       collectAndAssertTrue(result.equalsByGraphElementIds(expected));
-<a name="101" href="#101">101</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="102" href="#102">102</a>       fail(<span class="jxr_string">"Result did not contain any graphs!"</span>);
-<a name="103" href="#103">103</a>     }
-<a name="104" href="#104">104</a>   }
-<a name="105" href="#105">105</a> 
-<a name="106" href="#106">106</a>   @Test
-<a name="107" href="#107">107</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGraphElementEquality() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="108" href="#108">108</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(dataGraph);
-<a name="109" href="#109">109</a> 
-<a name="110" href="#110">110</a>     <em class="jxr_comment">// initialize with data graph</em>
-<a name="111" href="#111">111</a>     LogicalGraph db = loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
-<a name="112" href="#112">112</a> 
-<a name="113" href="#113">113</a>     <em class="jxr_comment">// append the expected result</em>
-<a name="114" href="#114">114</a>     loader.appendToDatabaseFromString(expectedCollection);
-<a name="115" href="#115">115</a> 
-<a name="116" href="#116">116</a>     <em class="jxr_comment">// execute and validate</em>
-<a name="117" href="#117">117</a>     CAPFQueryResult capfResult = db.cypher(queryGraph, metaData);
-<a name="118" href="#118">118</a>     <strong class="jxr_keyword">if</strong> (capfResult.containsGraphs()) {
-<a name="119" href="#119">119</a>       GraphCollection result = capfResult.getGraphs();
-<a name="120" href="#120">120</a>       GraphCollection expected = loader.getGraphCollectionByVariables(expectedGraphVariables);
-<a name="121" href="#121">121</a>       collectAndAssertTrue(result.equalsByGraphElementData(expected));
-<a name="122" href="#122">122</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="123" href="#123">123</a>       fail(<span class="jxr_string">"Result did not contain any graphs!"</span>);
-<a name="124" href="#124">124</a>     }
-<a name="125" href="#125">125</a>   }
-<a name="126" href="#126">126</a> 
-<a name="127" href="#127">127</a>   @Parameterized.Parameters(name = <span class="jxr_string">"{index}: {0}"</span>)
-<a name="128" href="#128">128</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Iterable&lt;String[]&gt; data() {
-<a name="129" href="#129">129</a>     <strong class="jxr_keyword">return</strong> Arrays.asList(
-<a name="130" href="#130">130</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="131" href="#131">131</a>         <span class="jxr_string">"Graph1_Chain0"</span>,
-<a name="132" href="#132">132</a>         GRAPH_1, CHAIN_PATTERN_0,
-<a name="133" href="#133">133</a>         <span class="jxr_string">"expected1,expected2,expected3"</span>,
-<a name="134" href="#134">134</a>         <span class="jxr_string">"expected1[(v1)-[e2]-&gt;(v6)]"</span> +
-<a name="135" href="#135">135</a>           <span class="jxr_string">"expected2[(v2)-[e3]-&gt;(v6)]"</span> +
-<a name="136" href="#136">136</a>           <span class="jxr_string">"expected3[(v5)-[e6]-&gt;(v4)]"</span>
-<a name="137" href="#137">137</a>       },
-<a name="138" href="#138">138</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="139" href="#139">139</a>         <span class="jxr_string">"Graph1_Chain2"</span>,
-<a name="140" href="#140">140</a>         GRAPH_1, CHAIN_PATTERN_2,
-<a name="141" href="#141">141</a>         <span class="jxr_string">"expected1,expected2,expected3"</span>,
-<a name="142" href="#142">142</a>         <span class="jxr_string">"expected1[(v1)]"</span> +
-<a name="143" href="#143">143</a>           <span class="jxr_string">"expected2[(v2)]"</span> +
-<a name="144" href="#144">144</a>           <span class="jxr_string">"expected3[(v5)]"</span>
-<a name="145" href="#145">145</a>       },
-<a name="146" href="#146">146</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="147" href="#147">147</a>         <span class="jxr_string">"Graph2_Chain3"</span>,
-<a name="148" href="#148">148</a>         GRAPH_2, CHAIN_PATTERN_3,
-<a name="149" href="#149">149</a>         <span class="jxr_string">"expected1"</span>,
-<a name="150" href="#150">150</a>         <span class="jxr_string">"expected1[(v9)-[e15]-&gt;(v9)]"</span>
-<a name="151" href="#151">151</a>       },
-<a name="152" href="#152">152</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="153" href="#153">153</a>         <span class="jxr_string">"Graph2_Loop0"</span>,
-<a name="154" href="#154">154</a>         GRAPH_2,
-<a name="155" href="#155">155</a>         LOOP_PATTERN_0,
-<a name="156" href="#156">156</a>         <span class="jxr_string">"expected1"</span>,
-<a name="157" href="#157">157</a>         <span class="jxr_string">"expected1[(v9)-[e15]-&gt;(v9)]"</span>
-<a name="158" href="#158">158</a>       },
-<a name="159" href="#159">159</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="160" href="#160">160</a>         <span class="jxr_string">"Graph1_Cycle2"</span>,
-<a name="161" href="#161">161</a>         GRAPH_1,
-<a name="162" href="#162">162</a>         CYCLE_PATTERN_2,
-<a name="163" href="#163">163</a>         <span class="jxr_string">"expected1"</span>,
-<a name="164" href="#164">164</a>         <span class="jxr_string">"expected1["</span> +
-<a name="165" href="#165">165</a>           <span class="jxr_string">"(v2)-[e3]-&gt;(v6)"</span> +
-<a name="166" href="#166">166</a>           <span class="jxr_string">"(v6)-[e7]-&gt;(v2)"</span> +
-<a name="167" href="#167">167</a>           <span class="jxr_string">"(v6)-[e9]-&gt;(v7)"</span> +
-<a name="168" href="#168">168</a>           <span class="jxr_string">"]"</span>
-<a name="169" href="#169">169</a>       },
-<a name="170" href="#170">170</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="171" href="#171">171</a>         <span class="jxr_string">"Graph1_Cycle4"</span>,
-<a name="172" href="#172">172</a>         GRAPH_1,
-<a name="173" href="#173">173</a>         CYCLE_PATTERN_4,
-<a name="174" href="#174">174</a>         <span class="jxr_string">"expected1,expected2"</span>,
-<a name="175" href="#175">175</a>         <span class="jxr_string">"expected1[(v1)-[e2]-&gt;(v6)-[e8]-&gt;(v5)-[e6]-&gt;(v4)-[e4]-&gt;(v1)]"</span> +
-<a name="176" href="#176">176</a>           <span class="jxr_string">"expected2[(v5)-[e6]-&gt;(v4)-[e4]-&gt;(v1)-[e2]-&gt;(v6)-[e8]-&gt;(v5)]"</span>
-<a name="177" href="#177">177</a>       },
-<a name="178" href="#178">178</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="179" href="#179">179</a>         <span class="jxr_string">"Graph2_Cycle5"</span>,
-<a name="180" href="#180">180</a>         GRAPH_2,
-<a name="181" href="#181">181</a>         CYCLE_PATTERN_5,
-<a name="182" href="#182">182</a>         <span class="jxr_string">"expected1,expected2"</span>,
-<a name="183" href="#183">183</a>         <span class="jxr_string">"expected1[(v0)-[e1]-&gt;(v4)&lt;-[e2]-(v0)]"</span> +
-<a name="184" href="#184">184</a>           <span class="jxr_string">"expected2[(v5)-[e9]-&gt;(v4)&lt;-[e10]-(v5)]"</span>
-<a name="185" href="#185">185</a>       },
-<a name="186" href="#186">186</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="187" href="#187">187</a>         <span class="jxr_string">"Graph4_Cycle6"</span>,
-<a name="188" href="#188">188</a>         GRAPH_4, CYCLE_PATTERN_6,
-<a name="189" href="#189">189</a>         <span class="jxr_string">"expected1,expected2"</span>,
-<a name="190" href="#190">190</a>         <span class="jxr_string">"expected1[(v1)-[e1]-&gt;(v2)&lt;-[e2]-(v1)]"</span> +
-<a name="191" href="#191">191</a>           <span class="jxr_string">"expected2[(v1)-[e2]-&gt;(v2)&lt;-[e1]-(v1)]"</span>
-<a name="192" href="#192">192</a>       },
-<a name="193" href="#193">193</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="194" href="#194">194</a>         <span class="jxr_string">"Graph4_Chain4"</span>,
-<a name="195" href="#195">195</a>         GRAPH_4, CHAIN_PATTERN_4,
-<a name="196" href="#196">196</a>         <span class="jxr_string">"expected1,expected2,expected3,expected4"</span>,
-<a name="197" href="#197">197</a>         <span class="jxr_string">"expected1[(v0)-[e0]-&gt;(v1)-[e1]-&gt;(v2)]"</span> +
-<a name="198" href="#198">198</a>           <span class="jxr_string">"expected2[(v0)-[e0]-&gt;(v1)-[e2]-&gt;(v2)]"</span> +
-<a name="199" href="#199">199</a>           <span class="jxr_string">"expected3[(v1)-[e1]-&gt;(v2)-[e3]-&gt;(v3)]"</span> +
-<a name="200" href="#200">200</a>           <span class="jxr_string">"expected4[(v1)-[e2]-&gt;(v2)-[e3]-&gt;(v3)]"</span>
-<a name="201" href="#201">201</a>       },
-<a name="202" href="#202">202</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="203" href="#203">203</a>         <span class="jxr_string">"Graph5_Chain6"</span>,
-<a name="204" href="#204">204</a>         GRAPH_5,
-<a name="205" href="#205">205</a>         CHAIN_PATTERN_6,
-<a name="206" href="#206">206</a>         <span class="jxr_string">"expected1"</span>,
-<a name="207" href="#207">207</a>         <span class="jxr_string">"expected1[ ]"</span>
-<a name="208" href="#208">208</a>       },
-<a name="209" href="#209">209</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="210" href="#210">210</a>         <span class="jxr_string">"Graph6_Chain7"</span>,
-<a name="211" href="#211">211</a>         GRAPH_5,
-<a name="212" href="#212">212</a>         CHAIN_PATTERN_7,
-<a name="213" href="#213">213</a>         <span class="jxr_string">"expected1"</span>,
-<a name="214" href="#214">214</a>         <span class="jxr_string">"expected1[ ]"</span>
-<a name="215" href="#215">215</a>       },
-<a name="216" href="#216">216</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="217" href="#217">217</a>         <span class="jxr_string">"Graph3_Unlabeled0"</span>,
-<a name="218" href="#218">218</a>         GRAPH_3,
-<a name="219" href="#219">219</a>         UNLABELED_PATTERN_0,
-<a name="220" href="#220">220</a>         <span class="jxr_string">"expected1,expected2,expected3,expected4"</span>,
-<a name="221" href="#221">221</a>         <span class="jxr_string">"expected1[(v0)]"</span> +
-<a name="222" href="#222">222</a>           <span class="jxr_string">"expected2[(v1)]"</span> +
-<a name="223" href="#223">223</a>           <span class="jxr_string">"expected3[(v2)]"</span> +
-<a name="224" href="#224">224</a>           <span class="jxr_string">"expected4[(v3)]"</span>
-<a name="225" href="#225">225</a>       },
-<a name="226" href="#226">226</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="227" href="#227">227</a>         <span class="jxr_string">"Graph3_Unlabeled1"</span>,
-<a name="228" href="#228">228</a>         GRAPH_3,
-<a name="229" href="#229">229</a>         UNLABELED_PATTERN_1,
-<a name="230" href="#230">230</a>         <span class="jxr_string">"expected1,expected2,expected3"</span>,
-<a name="231" href="#231">231</a>         <span class="jxr_string">"expected1[(v0),(v1)]"</span> +
-<a name="232" href="#232">232</a>           <span class="jxr_string">"expected2[(v1),(v2)]"</span> +
-<a name="233" href="#233">233</a>           <span class="jxr_string">"expected3[(v2),(v3)]"</span>
-<a name="234" href="#234">234</a>       },
-<a name="235" href="#235">235</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="236" href="#236">236</a>         <span class="jxr_string">"Graph1_Unlabeled2"</span>,
-<a name="237" href="#237">237</a>         GRAPH_1,
-<a name="238" href="#238">238</a>         UNLABELED_PATTERN_2,
-<a name="239" href="#239">239</a>         <span class="jxr_string">"expected1,expected2"</span>,
-<a name="240" href="#240">240</a>         <span class="jxr_string">"expected1[(v4)-[e5]-&gt;(v3)]"</span> +
-<a name="241" href="#241">241</a>           <span class="jxr_string">"expected2[(v6)-[e9]-&gt;(v7)]"</span>
-<a name="242" href="#242">242</a>       },
-<a name="243" href="#243">243</a>       <strong class="jxr_keyword">new</strong> String[] {
-<a name="244" href="#244">244</a>         <span class="jxr_string">"Graph1_Unlabeled3"</span>,
-<a name="245" href="#245">245</a>         GRAPH_1,
-<a name="246" href="#246">246</a>         UNLABELED_PATTERN_3,
-<a name="247" href="#247">247</a>         <span class="jxr_string">"expected1,expected2,expected3"</span>,
-<a name="248" href="#248">248</a>         <span class="jxr_string">"expected1[(v1),(v6)]"</span> +
-<a name="249" href="#249">249</a>           <span class="jxr_string">"expected2[(v5),(v4)]"</span> +
-<a name="250" href="#250">250</a>           <span class="jxr_string">"expected3[(v2),(v6)]"</span>
-<a name="251" href="#251">251</a>       }
-<a name="252" href="#252">252</a>     );
-<a name="253" href="#253">253</a>   }
-<a name="254" href="#254">254</a> 
-<a name="255" href="#255">255</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> printTable(Table table) {
-<a name="256" href="#256">256</a>     table.writeToSink(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/CAPFPatternMatchingTest.html">PrintTableSink</a>());
-<a name="257" href="#257">257</a>   }
-<a name="258" href="#258">258</a> 
-<a name="259" href="#259">259</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/CAPFPatternMatchingTest.html">PrintTableSink</a> implements BatchTableSink&lt;Row&gt; {
-<a name="260" href="#260">260</a> 
-<a name="261" href="#261">261</a>     <strong class="jxr_keyword">private</strong> String[] fieldNames;
-<a name="262" href="#262">262</a> 
-<a name="263" href="#263">263</a>     <strong class="jxr_keyword">private</strong> TypeInformation[] fieldTypes;
-<a name="264" href="#264">264</a> 
-<a name="265" href="#265">265</a>     <strong class="jxr_keyword">public</strong> TypeInformation&lt;Row&gt; getOutputType() {
-<a name="266" href="#266">266</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> RowTypeInfo(fieldTypes);
-<a name="267" href="#267">267</a>     }
-<a name="268" href="#268">268</a> 
-<a name="269" href="#269">269</a>     <strong class="jxr_keyword">public</strong> String[] getFieldNames() {
-<a name="270" href="#270">270</a>       <strong class="jxr_keyword">return</strong> fieldNames;
-<a name="271" href="#271">271</a>     }
-<a name="272" href="#272">272</a> 
-<a name="273" href="#273">273</a>     <strong class="jxr_keyword">public</strong> TypeInformation[] getFieldTypes() {
-<a name="274" href="#274">274</a>       <strong class="jxr_keyword">return</strong> fieldTypes;
-<a name="275" href="#275">275</a>     }
-<a name="276" href="#276">276</a> 
-<a name="277" href="#277">277</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/CAPFPatternMatchingTest.html">PrintTableSink</a> configure(String[] fieldNames, TypeInformation[] fieldTypes) {
-<a name="278" href="#278">278</a>       <strong class="jxr_keyword">this</strong>.fieldNames = fieldNames;
-<a name="279" href="#279">279</a>       <strong class="jxr_keyword">this</strong>.fieldTypes = fieldTypes;
-<a name="280" href="#280">280</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
-<a name="281" href="#281">281</a>     }
-<a name="282" href="#282">282</a> 
-<a name="283" href="#283">283</a>     @Override
-<a name="284" href="#284">284</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> emitDataSet(DataSet&lt;Row&gt; dataSet) {
-<a name="285" href="#285">285</a>       <strong class="jxr_keyword">try</strong> {
-<a name="286" href="#286">286</a>         dataSet.print();
-<a name="287" href="#287">287</a>       } <strong class="jxr_keyword">catch</strong> (Exception e) {
-<a name="288" href="#288">288</a>         e.printStackTrace();
-<a name="289" href="#289">289</a>       }
-<a name="290" href="#290">290</a>     }
-<a name="291" href="#291">291</a>   }
-<a name="292" href="#292">292</a> }
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Type;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.cypher.capf.TestData;
+<a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
+<a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.FlinkAsciiGraphLoader;
+<a name="34" href="#34">34</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> org.junit.runner.RunWith;
+<a name="36" href="#36">36</a>  <strong class="jxr_keyword">import</strong> org.junit.runners.Parameterized;
+<a name="37" href="#37">37</a>  
+<a name="38" href="#38">38</a>  <strong class="jxr_keyword">import</strong> java.util.*;
+<a name="39" href="#39">39</a>  
+<a name="40" href="#40">40</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> junit.framework.TestCase.fail;
+<a name="41" href="#41">41</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.flink.model.impl.operators.cypher.capf.TestData.*;
+<a name="42" href="#42">42</a>  
+<a name="43" href="#43">43</a>  @RunWith(Parameterized.<strong class="jxr_keyword">class</strong>)
+<a name="44" href="#44">44</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/CAPFPatternMatchingTest.html">CAPFPatternMatchingTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
+<a name="45" href="#45">45</a>  
+<a name="46" href="#46">46</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> String testName;
+<a name="47" href="#47">47</a>  
+<a name="48" href="#48">48</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> String dataGraph;
+<a name="49" href="#49">49</a>  
+<a name="50" href="#50">50</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> String queryGraph;
+<a name="51" href="#51">51</a>  
+<a name="52" href="#52">52</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> String[] expectedGraphVariables;
+<a name="53" href="#53">53</a>  
+<a name="54" href="#54">54</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> String expectedCollection;
+<a name="55" href="#55">55</a>  
+<a name="56" href="#56">56</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> MetaData metaData;
+<a name="57" href="#57">57</a>  
+<a name="58" href="#58">58</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/CAPFPatternMatchingTest.html">CAPFPatternMatchingTest</a>(String testName, String dataGraph, String queryGraph,
+<a name="59" href="#59">59</a>                                   String expectedGraphVariables, String expectedCollection) {
+<a name="60" href="#60">60</a>      <strong class="jxr_keyword">this</strong>.testName = testName;
+<a name="61" href="#61">61</a>      <strong class="jxr_keyword">this</strong>.dataGraph = dataGraph;
+<a name="62" href="#62">62</a>      <strong class="jxr_keyword">this</strong>.queryGraph = queryGraph;
+<a name="63" href="#63">63</a>      <strong class="jxr_keyword">this</strong>.expectedGraphVariables = expectedGraphVariables.split(<span class="jxr_string">","</span>);
+<a name="64" href="#64">64</a>      <strong class="jxr_keyword">this</strong>.expectedCollection = expectedCollection;
+<a name="65" href="#65">65</a>  
+<a name="66" href="#66">66</a>      Map&lt;String, List&lt;PropertyMetaData&gt;&gt; vertexPropertyMap = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
+<a name="67" href="#67">67</a>      Map&lt;String, List&lt;PropertyMetaData&gt;&gt; edgePropertyMap = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
+<a name="68" href="#68">68</a>  
+<a name="69" href="#69">69</a>      List&lt;PropertyMetaData&gt; propertyList = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="70" href="#70">70</a>      propertyList.add(<strong class="jxr_keyword">new</strong> PropertyMetaData(<span class="jxr_string">"id"</span>, Type.INTEGER.toString(),
+<a name="71" href="#71">71</a>        <strong class="jxr_keyword">null</strong>));
+<a name="72" href="#72">72</a>  
+<a name="73" href="#73">73</a>      vertexPropertyMap.put(<span class="jxr_string">"A"</span>, propertyList);
+<a name="74" href="#74">74</a>      vertexPropertyMap.put(<span class="jxr_string">"B"</span>, propertyList);
+<a name="75" href="#75">75</a>      vertexPropertyMap.put(<span class="jxr_string">"C"</span>, propertyList);
+<a name="76" href="#76">76</a>      vertexPropertyMap.put(<span class="jxr_string">"D"</span>, propertyList);
+<a name="77" href="#77">77</a>  
+<a name="78" href="#78">78</a>      edgePropertyMap.put(<span class="jxr_string">"a"</span>, propertyList);
+<a name="79" href="#79">79</a>      edgePropertyMap.put(<span class="jxr_string">"b"</span>, propertyList);
+<a name="80" href="#80">80</a>      edgePropertyMap.put(<span class="jxr_string">"c"</span>, propertyList);
+<a name="81" href="#81">81</a>      edgePropertyMap.put(<span class="jxr_string">"d"</span>, propertyList);
+<a name="82" href="#82">82</a>  
+<a name="83" href="#83">83</a>      metaData = <strong class="jxr_keyword">new</strong> CSVMetaData(<strong class="jxr_keyword">new</strong> HashMap&lt;&gt;(), vertexPropertyMap, edgePropertyMap);
+<a name="84" href="#84">84</a>    }
+<a name="85" href="#85">85</a>  
+<a name="86" href="#86">86</a>    @Test
+<a name="87" href="#87">87</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGraphElementIdEquality() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="88" href="#88">88</a>      FlinkAsciiGraphLoader loader = getLoaderFromString(dataGraph);
+<a name="89" href="#89">89</a>  
+<a name="90" href="#90">90</a>      <em class="jxr_comment">// initialize with data graph</em>
+<a name="91" href="#91">91</a>      LogicalGraph db = loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
+<a name="92" href="#92">92</a>  
+<a name="93" href="#93">93</a>      <em class="jxr_comment">// append the expected result</em>
+<a name="94" href="#94">94</a>      loader.appendToDatabaseFromString(expectedCollection);
+<a name="95" href="#95">95</a>  
+<a name="96" href="#96">96</a>      <em class="jxr_comment">// execute and validate</em>
+<a name="97" href="#97">97</a>      CAPFQueryResult capfResult = db.cypher(queryGraph, metaData);
+<a name="98" href="#98">98</a>      <strong class="jxr_keyword">if</strong> (capfResult.containsGraphs()) {
+<a name="99" href="#99">99</a>        GraphCollection result = capfResult.getGraphs();
+<a name="100" href="#100">100</a>       GraphCollection expected = loader.getGraphCollectionByVariables(expectedGraphVariables);
+<a name="101" href="#101">101</a>       collectAndAssertTrue(result.equalsByGraphElementIds(expected));
+<a name="102" href="#102">102</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="103" href="#103">103</a>       fail(<span class="jxr_string">"Result did not contain any graphs!"</span>);
+<a name="104" href="#104">104</a>     }
+<a name="105" href="#105">105</a>   }
+<a name="106" href="#106">106</a> 
+<a name="107" href="#107">107</a>   @Test
+<a name="108" href="#108">108</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGraphElementEquality() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="109" href="#109">109</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(dataGraph);
+<a name="110" href="#110">110</a> 
+<a name="111" href="#111">111</a>     <em class="jxr_comment">// initialize with data graph</em>
+<a name="112" href="#112">112</a>     LogicalGraph db = loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
+<a name="113" href="#113">113</a> 
+<a name="114" href="#114">114</a>     <em class="jxr_comment">// append the expected result</em>
+<a name="115" href="#115">115</a>     loader.appendToDatabaseFromString(expectedCollection);
+<a name="116" href="#116">116</a> 
+<a name="117" href="#117">117</a>     <em class="jxr_comment">// execute and validate</em>
+<a name="118" href="#118">118</a>     CAPFQueryResult capfResult = db.cypher(queryGraph, metaData);
+<a name="119" href="#119">119</a>     <strong class="jxr_keyword">if</strong> (capfResult.containsGraphs()) {
+<a name="120" href="#120">120</a>       GraphCollection result = capfResult.getGraphs();
+<a name="121" href="#121">121</a>       GraphCollection expected = loader.getGraphCollectionByVariables(expectedGraphVariables);
+<a name="122" href="#122">122</a>       collectAndAssertTrue(result.equalsByGraphElementData(expected));
+<a name="123" href="#123">123</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="124" href="#124">124</a>       fail(<span class="jxr_string">"Result did not contain any graphs!"</span>);
+<a name="125" href="#125">125</a>     }
+<a name="126" href="#126">126</a>   }
+<a name="127" href="#127">127</a> 
+<a name="128" href="#128">128</a>   @Parameterized.Parameters(name = <span class="jxr_string">"{index}: {0}"</span>)
+<a name="129" href="#129">129</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Iterable&lt;String[]&gt; data() {
+<a name="130" href="#130">130</a>     <strong class="jxr_keyword">return</strong> Arrays.asList(
+<a name="131" href="#131">131</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="132" href="#132">132</a>         <span class="jxr_string">"Graph1_Chain0"</span>,
+<a name="133" href="#133">133</a>         GRAPH_1, CHAIN_PATTERN_0,
+<a name="134" href="#134">134</a>         <span class="jxr_string">"expected1,expected2,expected3"</span>,
+<a name="135" href="#135">135</a>         <span class="jxr_string">"expected1[(v1)-[e2]-&gt;(v6)]"</span> +
+<a name="136" href="#136">136</a>           <span class="jxr_string">"expected2[(v2)-[e3]-&gt;(v6)]"</span> +
+<a name="137" href="#137">137</a>           <span class="jxr_string">"expected3[(v5)-[e6]-&gt;(v4)]"</span>
+<a name="138" href="#138">138</a>       },
+<a name="139" href="#139">139</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="140" href="#140">140</a>         <span class="jxr_string">"Graph1_Chain2"</span>,
+<a name="141" href="#141">141</a>         GRAPH_1, CHAIN_PATTERN_2,
+<a name="142" href="#142">142</a>         <span class="jxr_string">"expected1,expected2,expected3"</span>,
+<a name="143" href="#143">143</a>         <span class="jxr_string">"expected1[(v1)]"</span> +
+<a name="144" href="#144">144</a>           <span class="jxr_string">"expected2[(v2)]"</span> +
+<a name="145" href="#145">145</a>           <span class="jxr_string">"expected3[(v5)]"</span>
+<a name="146" href="#146">146</a>       },
+<a name="147" href="#147">147</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="148" href="#148">148</a>         <span class="jxr_string">"Graph2_Chain3"</span>,
+<a name="149" href="#149">149</a>         GRAPH_2, CHAIN_PATTERN_3,
+<a name="150" href="#150">150</a>         <span class="jxr_string">"expected1"</span>,
+<a name="151" href="#151">151</a>         <span class="jxr_string">"expected1[(v9)-[e15]-&gt;(v9)]"</span>
+<a name="152" href="#152">152</a>       },
+<a name="153" href="#153">153</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="154" href="#154">154</a>         <span class="jxr_string">"Graph2_Loop0"</span>,
+<a name="155" href="#155">155</a>         GRAPH_2,
+<a name="156" href="#156">156</a>         LOOP_PATTERN_0,
+<a name="157" href="#157">157</a>         <span class="jxr_string">"expected1"</span>,
+<a name="158" href="#158">158</a>         <span class="jxr_string">"expected1[(v9)-[e15]-&gt;(v9)]"</span>
+<a name="159" href="#159">159</a>       },
+<a name="160" href="#160">160</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="161" href="#161">161</a>         <span class="jxr_string">"Graph1_Cycle2"</span>,
+<a name="162" href="#162">162</a>         GRAPH_1,
+<a name="163" href="#163">163</a>         CYCLE_PATTERN_2,
+<a name="164" href="#164">164</a>         <span class="jxr_string">"expected1"</span>,
+<a name="165" href="#165">165</a>         <span class="jxr_string">"expected1["</span> +
+<a name="166" href="#166">166</a>           <span class="jxr_string">"(v2)-[e3]-&gt;(v6)"</span> +
+<a name="167" href="#167">167</a>           <span class="jxr_string">"(v6)-[e7]-&gt;(v2)"</span> +
+<a name="168" href="#168">168</a>           <span class="jxr_string">"(v6)-[e9]-&gt;(v7)"</span> +
+<a name="169" href="#169">169</a>           <span class="jxr_string">"]"</span>
+<a name="170" href="#170">170</a>       },
+<a name="171" href="#171">171</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="172" href="#172">172</a>         <span class="jxr_string">"Graph1_Cycle4"</span>,
+<a name="173" href="#173">173</a>         GRAPH_1,
+<a name="174" href="#174">174</a>         CYCLE_PATTERN_4,
+<a name="175" href="#175">175</a>         <span class="jxr_string">"expected1,expected2"</span>,
+<a name="176" href="#176">176</a>         <span class="jxr_string">"expected1[(v1)-[e2]-&gt;(v6)-[e8]-&gt;(v5)-[e6]-&gt;(v4)-[e4]-&gt;(v1)]"</span> +
+<a name="177" href="#177">177</a>           <span class="jxr_string">"expected2[(v5)-[e6]-&gt;(v4)-[e4]-&gt;(v1)-[e2]-&gt;(v6)-[e8]-&gt;(v5)]"</span>
+<a name="178" href="#178">178</a>       },
+<a name="179" href="#179">179</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="180" href="#180">180</a>         <span class="jxr_string">"Graph2_Cycle5"</span>,
+<a name="181" href="#181">181</a>         GRAPH_2,
+<a name="182" href="#182">182</a>         CYCLE_PATTERN_5,
+<a name="183" href="#183">183</a>         <span class="jxr_string">"expected1,expected2"</span>,
+<a name="184" href="#184">184</a>         <span class="jxr_string">"expected1[(v0)-[e1]-&gt;(v4)&lt;-[e2]-(v0)]"</span> +
+<a name="185" href="#185">185</a>           <span class="jxr_string">"expected2[(v5)-[e9]-&gt;(v4)&lt;-[e10]-(v5)]"</span>
+<a name="186" href="#186">186</a>       },
+<a name="187" href="#187">187</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="188" href="#188">188</a>         <span class="jxr_string">"Graph4_Cycle6"</span>,
+<a name="189" href="#189">189</a>         GRAPH_4, CYCLE_PATTERN_6,
+<a name="190" href="#190">190</a>         <span class="jxr_string">"expected1,expected2"</span>,
+<a name="191" href="#191">191</a>         <span class="jxr_string">"expected1[(v1)-[e1]-&gt;(v2)&lt;-[e2]-(v1)]"</span> +
+<a name="192" href="#192">192</a>           <span class="jxr_string">"expected2[(v1)-[e2]-&gt;(v2)&lt;-[e1]-(v1)]"</span>
+<a name="193" href="#193">193</a>       },
+<a name="194" href="#194">194</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="195" href="#195">195</a>         <span class="jxr_string">"Graph4_Chain4"</span>,
+<a name="196" href="#196">196</a>         GRAPH_4, CHAIN_PATTERN_4,
+<a name="197" href="#197">197</a>         <span class="jxr_string">"expected1,expected2,expected3,expected4"</span>,
+<a name="198" href="#198">198</a>         <span class="jxr_string">"expected1[(v0)-[e0]-&gt;(v1)-[e1]-&gt;(v2)]"</span> +
+<a name="199" href="#199">199</a>           <span class="jxr_string">"expected2[(v0)-[e0]-&gt;(v1)-[e2]-&gt;(v2)]"</span> +
+<a name="200" href="#200">200</a>           <span class="jxr_string">"expected3[(v1)-[e1]-&gt;(v2)-[e3]-&gt;(v3)]"</span> +
+<a name="201" href="#201">201</a>           <span class="jxr_string">"expected4[(v1)-[e2]-&gt;(v2)-[e3]-&gt;(v3)]"</span>
+<a name="202" href="#202">202</a>       },
+<a name="203" href="#203">203</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="204" href="#204">204</a>         <span class="jxr_string">"Graph5_Chain6"</span>,
+<a name="205" href="#205">205</a>         GRAPH_5,
+<a name="206" href="#206">206</a>         CHAIN_PATTERN_6,
+<a name="207" href="#207">207</a>         <span class="jxr_string">"expected1"</span>,
+<a name="208" href="#208">208</a>         <span class="jxr_string">"expected1[ ]"</span>
+<a name="209" href="#209">209</a>       },
+<a name="210" href="#210">210</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="211" href="#211">211</a>         <span class="jxr_string">"Graph6_Chain7"</span>,
+<a name="212" href="#212">212</a>         GRAPH_5,
+<a name="213" href="#213">213</a>         CHAIN_PATTERN_7,
+<a name="214" href="#214">214</a>         <span class="jxr_string">"expected1"</span>,
+<a name="215" href="#215">215</a>         <span class="jxr_string">"expected1[ ]"</span>
+<a name="216" href="#216">216</a>       },
+<a name="217" href="#217">217</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="218" href="#218">218</a>         <span class="jxr_string">"Graph3_Unlabeled0"</span>,
+<a name="219" href="#219">219</a>         GRAPH_3,
+<a name="220" href="#220">220</a>         UNLABELED_PATTERN_0,
+<a name="221" href="#221">221</a>         <span class="jxr_string">"expected1,expected2,expected3,expected4"</span>,
+<a name="222" href="#222">222</a>         <span class="jxr_string">"expected1[(v0)]"</span> +
+<a name="223" href="#223">223</a>           <span class="jxr_string">"expected2[(v1)]"</span> +
+<a name="224" href="#224">224</a>           <span class="jxr_string">"expected3[(v2)]"</span> +
+<a name="225" href="#225">225</a>           <span class="jxr_string">"expected4[(v3)]"</span>
+<a name="226" href="#226">226</a>       },
+<a name="227" href="#227">227</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="228" href="#228">228</a>         <span class="jxr_string">"Graph3_Unlabeled1"</span>,
+<a name="229" href="#229">229</a>         GRAPH_3,
+<a name="230" href="#230">230</a>         UNLABELED_PATTERN_1,
+<a name="231" href="#231">231</a>         <span class="jxr_string">"expected1,expected2,expected3"</span>,
+<a name="232" href="#232">232</a>         <span class="jxr_string">"expected1[(v0),(v1)]"</span> +
+<a name="233" href="#233">233</a>           <span class="jxr_string">"expected2[(v1),(v2)]"</span> +
+<a name="234" href="#234">234</a>           <span class="jxr_string">"expected3[(v2),(v3)]"</span>
+<a name="235" href="#235">235</a>       },
+<a name="236" href="#236">236</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="237" href="#237">237</a>         <span class="jxr_string">"Graph1_Unlabeled2"</span>,
+<a name="238" href="#238">238</a>         GRAPH_1,
+<a name="239" href="#239">239</a>         UNLABELED_PATTERN_2,
+<a name="240" href="#240">240</a>         <span class="jxr_string">"expected1,expected2"</span>,
+<a name="241" href="#241">241</a>         <span class="jxr_string">"expected1[(v4)-[e5]-&gt;(v3)]"</span> +
+<a name="242" href="#242">242</a>           <span class="jxr_string">"expected2[(v6)-[e9]-&gt;(v7)]"</span>
+<a name="243" href="#243">243</a>       },
+<a name="244" href="#244">244</a>       <strong class="jxr_keyword">new</strong> String[] {
+<a name="245" href="#245">245</a>         <span class="jxr_string">"Graph1_Unlabeled3"</span>,
+<a name="246" href="#246">246</a>         GRAPH_1,
+<a name="247" href="#247">247</a>         UNLABELED_PATTERN_3,
+<a name="248" href="#248">248</a>         <span class="jxr_string">"expected1,expected2,expected3"</span>,
+<a name="249" href="#249">249</a>         <span class="jxr_string">"expected1[(v1),(v6)]"</span> +
+<a name="250" href="#250">250</a>           <span class="jxr_string">"expected2[(v5),(v4)]"</span> +
+<a name="251" href="#251">251</a>           <span class="jxr_string">"expected3[(v2),(v6)]"</span>
+<a name="252" href="#252">252</a>       }
+<a name="253" href="#253">253</a>     );
+<a name="254" href="#254">254</a>   }
+<a name="255" href="#255">255</a> 
+<a name="256" href="#256">256</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> printTable(Table table) {
+<a name="257" href="#257">257</a>     table.writeToSink(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/CAPFPatternMatchingTest.html">PrintTableSink</a>());
+<a name="258" href="#258">258</a>   }
+<a name="259" href="#259">259</a> 
+<a name="260" href="#260">260</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/CAPFPatternMatchingTest.html">PrintTableSink</a> implements BatchTableSink&lt;Row&gt; {
+<a name="261" href="#261">261</a> 
+<a name="262" href="#262">262</a>     <strong class="jxr_keyword">private</strong> String[] fieldNames;
+<a name="263" href="#263">263</a> 
+<a name="264" href="#264">264</a>     <strong class="jxr_keyword">private</strong> TypeInformation[] fieldTypes;
+<a name="265" href="#265">265</a> 
+<a name="266" href="#266">266</a>     <strong class="jxr_keyword">public</strong> TypeInformation&lt;Row&gt; getOutputType() {
+<a name="267" href="#267">267</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> RowTypeInfo(fieldTypes);
+<a name="268" href="#268">268</a>     }
+<a name="269" href="#269">269</a> 
+<a name="270" href="#270">270</a>     <strong class="jxr_keyword">public</strong> String[] getFieldNames() {
+<a name="271" href="#271">271</a>       <strong class="jxr_keyword">return</strong> fieldNames;
+<a name="272" href="#272">272</a>     }
+<a name="273" href="#273">273</a> 
+<a name="274" href="#274">274</a>     <strong class="jxr_keyword">public</strong> TypeInformation[] getFieldTypes() {
+<a name="275" href="#275">275</a>       <strong class="jxr_keyword">return</strong> fieldTypes;
+<a name="276" href="#276">276</a>     }
+<a name="277" href="#277">277</a> 
+<a name="278" href="#278">278</a>     <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/CAPFPatternMatchingTest.html">PrintTableSink</a> configure(String[] fieldNames, TypeInformation[] fieldTypes) {
+<a name="279" href="#279">279</a>       <strong class="jxr_keyword">this</strong>.fieldNames = fieldNames;
+<a name="280" href="#280">280</a>       <strong class="jxr_keyword">this</strong>.fieldTypes = fieldTypes;
+<a name="281" href="#281">281</a>       <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
+<a name="282" href="#282">282</a>     }
+<a name="283" href="#283">283</a> 
+<a name="284" href="#284">284</a>     @Override
+<a name="285" href="#285">285</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> emitDataSet(DataSet&lt;Row&gt; dataSet) {
+<a name="286" href="#286">286</a>       <strong class="jxr_keyword">try</strong> {
+<a name="287" href="#287">287</a>         dataSet.print();
+<a name="288" href="#288">288</a>       } <strong class="jxr_keyword">catch</strong> (Exception e) {
+<a name="289" href="#289">289</a>         e.printStackTrace();
+<a name="290" href="#290">290</a>       }
+<a name="291" href="#291">291</a>     }
+<a name="292" href="#292">292</a>   }
+<a name="293" href="#293">293</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

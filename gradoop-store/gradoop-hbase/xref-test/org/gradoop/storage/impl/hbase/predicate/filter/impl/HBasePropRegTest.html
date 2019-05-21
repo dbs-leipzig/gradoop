@@ -31,7 +31,7 @@
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.util.Bytes;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Type;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
 <a name="26" href="#26">26</a>  
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> java.util.regex.Pattern;
@@ -69,7 +69,7 @@
 <a name="59" href="#59">59</a>        Bytes.toBytesBinary(CF_PROPERTY_TYPE),
 <a name="60" href="#60">60</a>        Bytes.toBytesBinary(key),
 <a name="61" href="#61">61</a>        CompareFilter.CompareOp.EQUAL,
-<a name="62" href="#62">62</a>        <strong class="jxr_keyword">new</strong> byte[] {PropertyValue.TYPE_STRING});
+<a name="62" href="#62">62</a>        <strong class="jxr_keyword">new</strong> byte[] {Type.STRING.getTypeByte()});
 <a name="63" href="#63">63</a>  
 <a name="64" href="#64">64</a>      <em class="jxr_comment">// Define that the entire row will be skipped if the column is not found</em>
 <a name="65" href="#65">65</a>      typeFilter.setFilterIfMissing(<strong class="jxr_keyword">true</strong>);

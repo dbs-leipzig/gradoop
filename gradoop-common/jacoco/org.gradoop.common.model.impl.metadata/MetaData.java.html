@@ -17,6 +17,7 @@ package org.gradoop.common.model.impl.metadata;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -40,7 +41,7 @@ public class MetaData {
   /**
    * Map between type strings and the corresponding classes.
    */
-<span class="fc" id="L43">  private static Map&lt;String, Class&lt;?&gt;&gt; TYPE_STRING_TO_CLASS_MAP = createStringToClassMap();</span>
+<span class="fc" id="L44">  private static Map&lt;String, Class&lt;?&gt;&gt; TYPE_STRING_TO_CLASS_MAP = createStringToClassMap();</span>
   /**
    * Mapping between a graph labels and their associated property meta data.
    */
@@ -63,11 +64,11 @@ public class MetaData {
    */
   protected MetaData(Map&lt;String, List&lt;PropertyMetaData&gt;&gt; graphMetaData,
     Map&lt;String, List&lt;PropertyMetaData&gt;&gt; vertexMetaData,
-<span class="fc" id="L66">    Map&lt;String, List&lt;PropertyMetaData&gt;&gt; edgeMetaData) {</span>
-<span class="fc" id="L67">    this.graphMetaData = graphMetaData;</span>
-<span class="fc" id="L68">    this.vertexMetaData = vertexMetaData;</span>
-<span class="fc" id="L69">    this.edgeMetaData = edgeMetaData;</span>
-<span class="fc" id="L70">  }</span>
+<span class="fc" id="L67">    Map&lt;String, List&lt;PropertyMetaData&gt;&gt; edgeMetaData) {</span>
+<span class="fc" id="L68">    this.graphMetaData = graphMetaData;</span>
+<span class="fc" id="L69">    this.vertexMetaData = vertexMetaData;</span>
+<span class="fc" id="L70">    this.edgeMetaData = edgeMetaData;</span>
+<span class="fc" id="L71">  }</span>
 
   /**
    * Get the class corresponding to a type string.
@@ -76,8 +77,8 @@ public class MetaData {
    * @return the corresponding class
    */
   public static Class&lt;?&gt; getClassFromTypeString(String typeString) {
-<span class="fc" id="L79">    String prunedTypeString = typeString.split(&quot;:&quot;)[0];</span>
-<span class="fc" id="L80">    return TYPE_STRING_TO_CLASS_MAP.get(prunedTypeString);</span>
+<span class="fc" id="L80">    String prunedTypeString = typeString.split(&quot;:&quot;)[0];</span>
+<span class="fc" id="L81">    return TYPE_STRING_TO_CLASS_MAP.get(prunedTypeString);</span>
   }
 
   /**
@@ -86,24 +87,24 @@ public class MetaData {
    * @return map between string types and corresponding classes
    */
   private static Map&lt;String, Class&lt;?&gt;&gt; createStringToClassMap() {
-<span class="fc" id="L89">    Map&lt;String, Class&lt;?&gt;&gt; stringClassMap = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L90">    stringClassMap.put(TypeString.NULL.getTypeString(), null);</span>
-<span class="fc" id="L91">    stringClassMap.put(TypeString.SHORT.getTypeString(), Short.class);</span>
-<span class="fc" id="L92">    stringClassMap.put(TypeString.INTEGER.getTypeString(), Integer.class);</span>
-<span class="fc" id="L93">    stringClassMap.put(TypeString.LONG.getTypeString(), Long.class);</span>
-<span class="fc" id="L94">    stringClassMap.put(TypeString.FLOAT.getTypeString(), Float.class);</span>
-<span class="fc" id="L95">    stringClassMap.put(TypeString.DOUBLE.getTypeString(), Double.class);</span>
-<span class="fc" id="L96">    stringClassMap.put(TypeString.BOOLEAN.getTypeString(), Boolean.class);</span>
-<span class="fc" id="L97">    stringClassMap.put(TypeString.STRING.getTypeString(), String.class);</span>
-<span class="fc" id="L98">    stringClassMap.put(TypeString.BIGDECIMAL.getTypeString(), BigDecimal.class);</span>
-<span class="fc" id="L99">    stringClassMap.put(TypeString.GRADOOPID.getTypeString(), GradoopId.class);</span>
-<span class="fc" id="L100">    stringClassMap.put(TypeString.MAP.getTypeString(), Map.class);</span>
-<span class="fc" id="L101">    stringClassMap.put(TypeString.LIST.getTypeString(), List.class);</span>
-<span class="fc" id="L102">    stringClassMap.put(TypeString.LOCALDATE.getTypeString(), LocalDate.class);</span>
-<span class="fc" id="L103">    stringClassMap.put(TypeString.LOCALTIME.getTypeString(), LocalTime.class);</span>
-<span class="fc" id="L104">    stringClassMap.put(TypeString.LOCALDATETIME.getTypeString(), LocalDateTime.class);</span>
-<span class="fc" id="L105">    stringClassMap.put(TypeString.SET.getTypeString(), Set.class);</span>
-<span class="fc" id="L106">    return Collections.unmodifiableMap(stringClassMap);</span>
+<span class="fc" id="L90">    Map&lt;String, Class&lt;?&gt;&gt; stringClassMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L91">    stringClassMap.put(Type.NULL.toString(), null);</span>
+<span class="fc" id="L92">    stringClassMap.put(Type.SHORT.toString(), Short.class);</span>
+<span class="fc" id="L93">    stringClassMap.put(Type.INTEGER.toString(), Integer.class);</span>
+<span class="fc" id="L94">    stringClassMap.put(Type.LONG.toString(), Long.class);</span>
+<span class="fc" id="L95">    stringClassMap.put(Type.FLOAT.toString(), Float.class);</span>
+<span class="fc" id="L96">    stringClassMap.put(Type.DOUBLE.toString(), Double.class);</span>
+<span class="fc" id="L97">    stringClassMap.put(Type.BOOLEAN.toString(), Boolean.class);</span>
+<span class="fc" id="L98">    stringClassMap.put(Type.STRING.toString(), String.class);</span>
+<span class="fc" id="L99">    stringClassMap.put(Type.BIG_DECIMAL.toString(), BigDecimal.class);</span>
+<span class="fc" id="L100">    stringClassMap.put(Type.GRADOOP_ID.toString(), GradoopId.class);</span>
+<span class="fc" id="L101">    stringClassMap.put(Type.MAP.toString(), Map.class);</span>
+<span class="fc" id="L102">    stringClassMap.put(Type.LIST.toString(), List.class);</span>
+<span class="fc" id="L103">    stringClassMap.put(Type.DATE.toString(), LocalDate.class);</span>
+<span class="fc" id="L104">    stringClassMap.put(Type.TIME.toString(), LocalTime.class);</span>
+<span class="fc" id="L105">    stringClassMap.put(Type.DATE_TIME.toString(), LocalDateTime.class);</span>
+<span class="fc" id="L106">    stringClassMap.put(Type.SET.toString(), Set.class);</span>
+<span class="fc" id="L107">    return Collections.unmodifiableMap(stringClassMap);</span>
   }
 
   /**
@@ -112,7 +113,7 @@ public class MetaData {
    * @return graph labels
    */
   public Set&lt;String&gt; getGraphLabels() {
-<span class="fc" id="L115">    return graphMetaData.keySet();</span>
+<span class="fc" id="L116">    return graphMetaData.keySet();</span>
   }
 
   /**
@@ -121,7 +122,7 @@ public class MetaData {
    * @return vertex labels
    */
   public Set&lt;String&gt; getVertexLabels() {
-<span class="fc" id="L124">    return vertexMetaData.keySet();</span>
+<span class="fc" id="L125">    return vertexMetaData.keySet();</span>
   }
 
   /**
@@ -130,7 +131,7 @@ public class MetaData {
    * @return edge labels
    */
   public Set&lt;String&gt; getEdgeLabels() {
-<span class="fc" id="L133">    return edgeMetaData.keySet();</span>
+<span class="fc" id="L134">    return edgeMetaData.keySet();</span>
   }
 
   /**
@@ -140,7 +141,7 @@ public class MetaData {
    * @return property meta data for the graph label
    */
   public List&lt;PropertyMetaData&gt; getGraphPropertyMetaData(String label) {
-<span class="fc" id="L143">    return graphMetaData.getOrDefault(label, new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L144">    return graphMetaData.getOrDefault(label, new ArrayList&lt;&gt;());</span>
   }
 
   /**
@@ -150,7 +151,7 @@ public class MetaData {
    * @return property meta data for the vertex label
    */
   public List&lt;PropertyMetaData&gt; getVertexPropertyMetaData(String label) {
-<span class="fc" id="L153">    return vertexMetaData.getOrDefault(label, new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L154">    return vertexMetaData.getOrDefault(label, new ArrayList&lt;&gt;());</span>
   }
 
   /**
@@ -160,7 +161,7 @@ public class MetaData {
    * @return property meta data for the edge label
    */
   public List&lt;PropertyMetaData&gt; getEdgePropertyMetaData(String label) {
-<span class="fc" id="L163">    return edgeMetaData.getOrDefault(label, new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L164">    return edgeMetaData.getOrDefault(label, new ArrayList&lt;&gt;());</span>
   }
 
 
@@ -171,144 +172,51 @@ public class MetaData {
    * @return property type string
    */
   public static String getTypeString(PropertyValue propertyValue) {
-<span class="fc bfc" id="L174" title="All 2 branches covered.">    if (propertyValue.isNull()) {</span>
-<span class="fc" id="L175">      return TypeString.NULL.getTypeString();</span>
-<span class="fc bfc" id="L176" title="All 2 branches covered.">    } else if (propertyValue.isShort()) {</span>
-<span class="fc" id="L177">      return TypeString.SHORT.getTypeString();</span>
-<span class="fc bfc" id="L178" title="All 2 branches covered.">    } else if (propertyValue.isInt()) {</span>
-<span class="fc" id="L179">      return TypeString.INTEGER.getTypeString();</span>
-<span class="fc bfc" id="L180" title="All 2 branches covered.">    } else if (propertyValue.isLong()) {</span>
-<span class="fc" id="L181">      return TypeString.LONG.getTypeString();</span>
-<span class="fc bfc" id="L182" title="All 2 branches covered.">    } else if (propertyValue.isFloat()) {</span>
-<span class="fc" id="L183">      return TypeString.FLOAT.getTypeString();</span>
-<span class="fc bfc" id="L184" title="All 2 branches covered.">    } else if (propertyValue.isDouble()) {</span>
-<span class="fc" id="L185">      return TypeString.DOUBLE.getTypeString();</span>
-<span class="fc bfc" id="L186" title="All 2 branches covered.">    } else if (propertyValue.isBoolean()) {</span>
-<span class="fc" id="L187">      return TypeString.BOOLEAN.getTypeString();</span>
-<span class="fc bfc" id="L188" title="All 2 branches covered.">    } else if (propertyValue.isString()) {</span>
-<span class="fc" id="L189">      return TypeString.STRING.getTypeString();</span>
-<span class="fc bfc" id="L190" title="All 2 branches covered.">    } else if (propertyValue.isBigDecimal()) {</span>
-<span class="fc" id="L191">      return TypeString.BIGDECIMAL.getTypeString();</span>
-<span class="fc bfc" id="L192" title="All 2 branches covered.">    } else if (propertyValue.isGradoopId()) {</span>
-<span class="fc" id="L193">      return TypeString.GRADOOPID.getTypeString();</span>
-<span class="fc bfc" id="L194" title="All 2 branches covered.">    } else if (propertyValue.isMap()) {</span>
+<span class="fc bfc" id="L175" title="All 2 branches covered.">    if (propertyValue.isNull()) {</span>
+<span class="fc" id="L176">      return Type.NULL.toString();</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">    } else if (propertyValue.isShort()) {</span>
+<span class="fc" id="L178">      return Type.SHORT.toString();</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">    } else if (propertyValue.isInt()) {</span>
+<span class="fc" id="L180">      return Type.INTEGER.toString();</span>
+<span class="fc bfc" id="L181" title="All 2 branches covered.">    } else if (propertyValue.isLong()) {</span>
+<span class="fc" id="L182">      return Type.LONG.toString();</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">    } else if (propertyValue.isFloat()) {</span>
+<span class="fc" id="L184">      return Type.FLOAT.toString();</span>
+<span class="fc bfc" id="L185" title="All 2 branches covered.">    } else if (propertyValue.isDouble()) {</span>
+<span class="fc" id="L186">      return Type.DOUBLE.toString();</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">    } else if (propertyValue.isBoolean()) {</span>
+<span class="fc" id="L188">      return Type.BOOLEAN.toString();</span>
+<span class="fc bfc" id="L189" title="All 2 branches covered.">    } else if (propertyValue.isString()) {</span>
+<span class="fc" id="L190">      return Type.STRING.toString();</span>
+<span class="fc bfc" id="L191" title="All 2 branches covered.">    } else if (propertyValue.isBigDecimal()) {</span>
+<span class="fc" id="L192">      return Type.BIG_DECIMAL.toString();</span>
+<span class="fc bfc" id="L193" title="All 2 branches covered.">    } else if (propertyValue.isGradoopId()) {</span>
+<span class="fc" id="L194">      return Type.GRADOOP_ID.toString();</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">    } else if (propertyValue.isMap()) {</span>
       // map type string is map:{keyType}:{valueType}
-<span class="fc" id="L196">      return TypeString.MAP.getTypeString() +</span>
+<span class="fc" id="L197">      return Type.MAP.toString() +</span>
         PROPERTY_TOKEN_DELIMITER +
-<span class="fc" id="L198">        getTypeString(propertyValue.getMap().keySet().iterator().next()) +</span>
+<span class="fc" id="L199">        getTypeString(propertyValue.getMap().keySet().iterator().next()) +</span>
         PROPERTY_TOKEN_DELIMITER +
-<span class="fc" id="L200">        getTypeString(propertyValue.getMap().values().iterator().next());</span>
-<span class="fc bfc" id="L201" title="All 2 branches covered.">    } else if (propertyValue.isList()) {</span>
+<span class="fc" id="L201">        getTypeString(propertyValue.getMap().values().iterator().next());</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">    } else if (propertyValue.isList()) {</span>
       // list type string is list:{itemType}
-<span class="fc" id="L203">      return TypeString.LIST.getTypeString() +</span>
+<span class="fc" id="L204">      return Type.LIST.toString() +</span>
         PROPERTY_TOKEN_DELIMITER +
-<span class="fc" id="L205">        getTypeString(propertyValue.getList().get(0));</span>
-<span class="fc bfc" id="L206" title="All 2 branches covered.">    } else if (propertyValue.isDate()) {</span>
-<span class="fc" id="L207">      return TypeString.LOCALDATE.getTypeString();</span>
-<span class="fc bfc" id="L208" title="All 2 branches covered.">    } else if (propertyValue.isTime()) {</span>
-<span class="fc" id="L209">      return TypeString.LOCALTIME.getTypeString();</span>
-<span class="fc bfc" id="L210" title="All 2 branches covered.">    } else if (propertyValue.isDateTime()) {</span>
-<span class="fc" id="L211">      return TypeString.LOCALDATETIME.getTypeString();</span>
-<span class="pc bpc" id="L212" title="1 of 2 branches missed.">    } else if (propertyValue.isSet()) {</span>
+<span class="fc" id="L206">        getTypeString(propertyValue.getList().get(0));</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">    } else if (propertyValue.isDate()) {</span>
+<span class="fc" id="L208">      return Type.DATE.toString();</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">    } else if (propertyValue.isTime()) {</span>
+<span class="fc" id="L210">      return Type.TIME.toString();</span>
+<span class="fc bfc" id="L211" title="All 2 branches covered.">    } else if (propertyValue.isDateTime()) {</span>
+<span class="fc" id="L212">      return Type.DATE_TIME.toString();</span>
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">    } else if (propertyValue.isSet()) {</span>
       // set type string is set:{itemType}
-<span class="fc" id="L214">      return TypeString.SET.getTypeString() +</span>
+<span class="fc" id="L215">      return Type.SET.toString() +</span>
         PROPERTY_TOKEN_DELIMITER +
-<span class="fc" id="L216">        getTypeString(propertyValue.getSet().iterator().next());</span>
+<span class="fc" id="L217">        getTypeString(propertyValue.getSet().iterator().next());</span>
     } else {
-<span class="nc" id="L218">      throw new IllegalArgumentException(&quot;Type &quot; + propertyValue.getType() + &quot; is not supported&quot;);</span>
-    }
-  }
-
-  /**
-   * Supported type strings for the CSV format.
-   */
-<span class="fc" id="L225">  public enum TypeString {</span>
-    /**
-     * Null type
-     */
-<span class="fc" id="L229">    NULL(&quot;null&quot;),</span>
-    /**
-     * Boolean type
-     */
-<span class="fc" id="L233">    BOOLEAN(&quot;boolean&quot;),</span>
-    /**
-     * Short type
-     */
-<span class="fc" id="L237">    SHORT(&quot;short&quot;),</span>
-    /**
-     * Integer type
-     */
-<span class="fc" id="L241">    INTEGER(&quot;int&quot;),</span>
-    /**
-     * Long type
-     */
-<span class="fc" id="L245">    LONG(&quot;long&quot;),</span>
-    /**
-     * Float type
-     */
-<span class="fc" id="L249">    FLOAT(&quot;float&quot;),</span>
-    /**
-     * Double type
-     */
-<span class="fc" id="L253">    DOUBLE(&quot;double&quot;),</span>
-    /**
-     * String type
-     */
-<span class="fc" id="L257">    STRING(&quot;string&quot;),</span>
-    /**
-     * BigDecimal type
-     */
-<span class="fc" id="L261">    BIGDECIMAL(&quot;bigdecimal&quot;),</span>
-    /**
-     * GradoopId type
-     */
-<span class="fc" id="L265">    GRADOOPID(&quot;gradoopid&quot;),</span>
-    /**
-     * Map type
-     */
-<span class="fc" id="L269">    MAP(&quot;map&quot;),</span>
-    /**
-     * List type
-     */
-<span class="fc" id="L273">    LIST(&quot;list&quot;),</span>
-    /**
-     * LocalDate type
-     */
-<span class="fc" id="L277">    LOCALDATE(&quot;localdate&quot;),</span>
-    /**
-     * LocalTime type
-     */
-<span class="fc" id="L281">    LOCALTIME(&quot;localtime&quot;),</span>
-    /**
-     * LocalDateTime type
-     */
-<span class="fc" id="L285">    LOCALDATETIME(&quot;localdatetime&quot;),</span>
-    /**
-     * Set type
-     */
-<span class="fc" id="L289">    SET(&quot;set&quot;);</span>
-
-    /**
-     * String representation
-     */
-    private String typeString;
-
-    /**
-     * Constructor
-     *
-     * @param typeString string representation
-     */
-<span class="fc" id="L301">    TypeString(String typeString) {</span>
-<span class="fc" id="L302">      this.typeString = typeString;</span>
-<span class="fc" id="L303">    }</span>
-
-    /**
-     * Returns the type string.
-     *
-     * @return type string
-     */
-    public String getTypeString() {
-<span class="fc" id="L311">      return typeString;</span>
+<span class="nc" id="L219">      throw new IllegalArgumentException(&quot;Type &quot; + propertyValue.getType() + &quot; is not supported&quot;);</span>
     }
   }
 }

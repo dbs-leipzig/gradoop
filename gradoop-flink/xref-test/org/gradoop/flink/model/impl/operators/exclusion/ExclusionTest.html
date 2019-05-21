@@ -38,54 +38,54 @@
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> java.util.HashSet;
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> java.util.Set;
 <a name="30" href="#30">30</a>  
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertTrue;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/exclusion/ExclusionTest.html">ExclusionTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/base/ReducibleBinaryOperatorsTestBase.html">ReducibleBinaryOperatorsTestBase</a> {
 <a name="32" href="#32">32</a>  
-<a name="33" href="#33">33</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/exclusion/ExclusionTest.html">ExclusionTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/base/ReducibleBinaryOperatorsTestBase.html">ReducibleBinaryOperatorsTestBase</a> {
-<a name="34" href="#34">34</a>  
-<a name="35" href="#35">35</a>    @Test
-<a name="36" href="#36">36</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testSameGraph() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="37" href="#37">37</a>      FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
-<a name="38" href="#38">38</a>  
-<a name="39" href="#39">39</a>      loader.appendToDatabaseFromString(<span class="jxr_string">"expected[]"</span>);
-<a name="40" href="#40">40</a>  
-<a name="41" href="#41">41</a>      LogicalGraph g0 = loader.getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>);
-<a name="42" href="#42">42</a>      LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>);
-<a name="43" href="#43">43</a>  
-<a name="44" href="#44">44</a>      assertTrue(<span class="jxr_string">"exclusion of same graph failed"</span>,
-<a name="45" href="#45">45</a>        expected.equalsByElementIds(g0.exclude(g0)).collect().get(0));
-<a name="46" href="#46">46</a>    }
-<a name="47" href="#47">47</a>  
-<a name="48" href="#48">48</a>    @Test
-<a name="49" href="#49">49</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testOverlappingGraphs() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="50" href="#50">50</a>      FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
-<a name="51" href="#51">51</a>  
-<a name="52" href="#52">52</a>      loader.appendToDatabaseFromString(<span class="jxr_string">""</span> +
-<a name="53" href="#53">53</a>        <span class="jxr_string">"expected1[(eve)]"</span> +
-<a name="54" href="#54">54</a>        <span class="jxr_string">"expected2[(carol)-[ckd]-&gt;(dave)-[dkc]-&gt;(carol)]"</span>);
+<a name="33" href="#33">33</a>    @Test
+<a name="34" href="#34">34</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testSameGraph() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="35" href="#35">35</a>      FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+<a name="36" href="#36">36</a>  
+<a name="37" href="#37">37</a>      loader.appendToDatabaseFromString(
+<a name="38" href="#38">38</a>        <span class="jxr_string">"expected:Community {interest:\&quot;Databases\&quot;, vertexCount:3}[]"</span>);
+<a name="39" href="#39">39</a>  
+<a name="40" href="#40">40</a>      LogicalGraph g0 = loader.getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>);
+<a name="41" href="#41">41</a>      LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>);
+<a name="42" href="#42">42</a>  
+<a name="43" href="#43">43</a>      collectAndAssertTrue(g0.exclude(g0).equalsByData(expected));
+<a name="44" href="#44">44</a>    }
+<a name="45" href="#45">45</a>  
+<a name="46" href="#46">46</a>    @Test
+<a name="47" href="#47">47</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testOverlappingGraphs() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="48" href="#48">48</a>      FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+<a name="49" href="#49">49</a>  
+<a name="50" href="#50">50</a>      loader.appendToDatabaseFromString(<span class="jxr_string">""</span> +
+<a name="51" href="#51">51</a>        <span class="jxr_string">"expected1:Community {interest:\&quot;Databases\&quot;, vertexCount:3}"</span> +
+<a name="52" href="#52">52</a>        <span class="jxr_string">"[(eve)]"</span> +
+<a name="53" href="#53">53</a>        <span class="jxr_string">"expected2:Community {interest : \&quot;Graphs\&quot;, vertexCount : 4}"</span> +
+<a name="54" href="#54">54</a>        <span class="jxr_string">"[(carol)-[ckd]-&gt;(dave)-[dkc]-&gt;(carol)]"</span>);
 <a name="55" href="#55">55</a>  
 <a name="56" href="#56">56</a>      LogicalGraph g0 = loader.getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>);
 <a name="57" href="#57">57</a>      LogicalGraph g2 = loader.getLogicalGraphByVariable(<span class="jxr_string">"g2"</span>);
 <a name="58" href="#58">58</a>      LogicalGraph expected1 = loader.getLogicalGraphByVariable(<span class="jxr_string">"expected1"</span>);
 <a name="59" href="#59">59</a>      LogicalGraph expected2 = loader.getLogicalGraphByVariable(<span class="jxr_string">"expected2"</span>);
 <a name="60" href="#60">60</a>  
-<a name="61" href="#61">61</a>      assertTrue(<span class="jxr_string">"excluding overlapping graphs failed"</span>,
-<a name="62" href="#62">62</a>        expected1.equalsByElementIds(g0.exclude(g2)).collect().get(0));
-<a name="63" href="#63">63</a>      assertTrue(<span class="jxr_string">"excluding switched overlapping graphs failed"</span>,
-<a name="64" href="#64">64</a>        expected2.equalsByElementIds(g2.exclude(g0)).collect().get(0));
-<a name="65" href="#65">65</a>    }
-<a name="66" href="#66">66</a>  
-<a name="67" href="#67">67</a>    @Test
-<a name="68" href="#68">68</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDerivedOverlappingGraphs() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="69" href="#69">69</a>      FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"g[(a {x: true, y: true}),(b {x:true, y: false})]"</span>);
+<a name="61" href="#61">61</a>      collectAndAssertTrue(g0.exclude(g2).equalsByData(expected1));
+<a name="62" href="#62">62</a>      collectAndAssertTrue(g2.exclude(g0).equalsByData(expected2));
+<a name="63" href="#63">63</a>  
+<a name="64" href="#64">64</a>    }
+<a name="65" href="#65">65</a>  
+<a name="66" href="#66">66</a>    @Test
+<a name="67" href="#67">67</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDerivedOverlappingGraphs() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="68" href="#68">68</a>      FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"g:test"</span> +
+<a name="69" href="#69">69</a>        <span class="jxr_string">"[(a {x: true, y: true}),(b {x:true, y: false})]"</span>);
 <a name="70" href="#70">70</a>  
 <a name="71" href="#71">71</a>      LogicalGraph baseGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"g"</span>);
 <a name="72" href="#72">72</a>      LogicalGraph derivedGraph1 = baseGraph.vertexInducedSubgraph(v -&gt; v.getPropertyValue(<span class="jxr_string">"x"</span>).getBoolean());
 <a name="73" href="#73">73</a>      LogicalGraph derivedGraph2 = baseGraph.vertexInducedSubgraph(v -&gt; !v.getPropertyValue(<span class="jxr_string">"y"</span>).getBoolean());
 <a name="74" href="#74">74</a>  
-<a name="75" href="#75">75</a>      loader.appendToDatabaseFromString(<span class="jxr_string">"expected[(a)]"</span>);
+<a name="75" href="#75">75</a>      loader.appendToDatabaseFromString(<span class="jxr_string">"expected:test[(a)]"</span>);
 <a name="76" href="#76">76</a>      LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>);
 <a name="77" href="#77">77</a>  
-<a name="78" href="#78">78</a>      collectAndAssertTrue(derivedGraph1.exclude(derivedGraph2).equalsByElementIds(expected));
+<a name="78" href="#78">78</a>      collectAndAssertTrue(derivedGraph1.exclude(derivedGraph2).equalsByData(expected));
 <a name="79" href="#79">79</a>    }
 <a name="80" href="#80">80</a>  
 <a name="81" href="#81">81</a>    @Test
@@ -95,89 +95,88 @@
 <a name="85" href="#85">85</a>      LogicalGraph g0 = loader.getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>);
 <a name="86" href="#86">86</a>      LogicalGraph g1 = loader.getLogicalGraphByVariable(<span class="jxr_string">"g1"</span>);
 <a name="87" href="#87">87</a>  
-<a name="88" href="#88">88</a>      assertTrue(<span class="jxr_string">"excluding non overlapping graphs failed"</span>,
-<a name="89" href="#89">89</a>        g0.equalsByElementIds(g0.exclude(g1)).collect().get(0));
-<a name="90" href="#90">90</a>      assertTrue(<span class="jxr_string">"excluding switched non overlapping graphs failed"</span>,
-<a name="91" href="#91">91</a>        g1.equalsByElementIds(g1.exclude(g0)).collect().get(0));
-<a name="92" href="#92">92</a>    }
-<a name="93" href="#93">93</a>  
-<a name="94" href="#94">94</a>    @Test
-<a name="95" href="#95">95</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDerivedNonOverlappingGraphs() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="96" href="#96">96</a>      FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"g[(a {x: true}),(b {x: false})]"</span>);
-<a name="97" href="#97">97</a>  
-<a name="98" href="#98">98</a>      LogicalGraph baseGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"g"</span>);
-<a name="99" href="#99">99</a>      LogicalGraph derivedGraph1 = baseGraph.vertexInducedSubgraph(v -&gt; v.getPropertyValue(<span class="jxr_string">"x"</span>).getBoolean());
-<a name="100" href="#100">100</a>     LogicalGraph derivedGraph2 = baseGraph.vertexInducedSubgraph(v -&gt; !v.getPropertyValue(<span class="jxr_string">"x"</span>).getBoolean());
-<a name="101" href="#101">101</a> 
-<a name="102" href="#102">102</a>     loader.appendToDatabaseFromString(<span class="jxr_string">"expected[(a)]"</span>);
-<a name="103" href="#103">103</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>);
-<a name="104" href="#104">104</a> 
-<a name="105" href="#105">105</a>     collectAndAssertTrue(derivedGraph1.exclude(derivedGraph2).equalsByElementIds(expected));
-<a name="106" href="#106">106</a>   }
-<a name="107" href="#107">107</a> 
-<a name="108" href="#108">108</a>   @Test
-<a name="109" href="#109">109</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGraphContainment() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="110" href="#110">110</a>     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
-<a name="111" href="#111">111</a> 
-<a name="112" href="#112">112</a>     LogicalGraph g0 = loader.getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>);
-<a name="113" href="#113">113</a>     LogicalGraph g2 = loader.getLogicalGraphByVariable(<span class="jxr_string">"g2"</span>);
-<a name="114" href="#114">114</a> 
-<a name="115" href="#115">115</a>     <em class="jxr_comment">// use collections as data sink</em>
-<a name="116" href="#116">116</a>     Collection&lt;Vertex&gt; vertices0 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="117" href="#117">117</a>     Collection&lt;Edge&gt; edges0 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="118" href="#118">118</a>     Collection&lt;Vertex&gt; vertices2 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="119" href="#119">119</a>     Collection&lt;Edge&gt; edges2 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="120" href="#120">120</a>     Collection&lt;Vertex&gt; resVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="121" href="#121">121</a>     Collection&lt;Edge&gt; resEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="122" href="#122">122</a> 
-<a name="123" href="#123">123</a>     LogicalGraph res = g2.exclude(g0);
-<a name="124" href="#124">124</a> 
-<a name="125" href="#125">125</a>     g0.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(vertices0));
-<a name="126" href="#126">126</a>     g0.getEdges().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(edges0));
-<a name="127" href="#127">127</a>     g2.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(vertices2));
-<a name="128" href="#128">128</a>     g2.getEdges().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(edges2));
-<a name="129" href="#129">129</a>     res.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(resVertices));
-<a name="130" href="#130">130</a>     res.getEdges().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(resEdges));
-<a name="131" href="#131">131</a> 
-<a name="132" href="#132">132</a>     getExecutionEnvironment().execute();
-<a name="133" href="#133">133</a> 
-<a name="134" href="#134">134</a>     Set&lt;GraphElement&gt; inVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="135" href="#135">135</a>     <strong class="jxr_keyword">for</strong> (Vertex vertex : vertices2) {
-<a name="136" href="#136">136</a>       <strong class="jxr_keyword">if</strong> (!vertices0.contains(vertex)) {
-<a name="137" href="#137">137</a>         inVertices.add(vertex);
-<a name="138" href="#138">138</a>       }
-<a name="139" href="#139">139</a>     }
-<a name="140" href="#140">140</a>     Set&lt;GraphElement&gt; inEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="141" href="#141">141</a>     <strong class="jxr_keyword">for</strong> (Edge edge : edges2) {
-<a name="142" href="#142">142</a>       <strong class="jxr_keyword">if</strong> (!edges0.contains(edge)) {
-<a name="143" href="#143">143</a>         inVertices.add(edge);
-<a name="144" href="#144">144</a>       }
-<a name="145" href="#145">145</a>     }
-<a name="146" href="#146">146</a> 
-<a name="147" href="#147">147</a>     Set&lt;GraphElement&gt; outVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="148" href="#148">148</a>     inVertices.addAll(outVertices);
-<a name="149" href="#149">149</a>     Set&lt;GraphElement&gt; outEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="150" href="#150">150</a>     inEdges.addAll(resEdges);
-<a name="151" href="#151">151</a> 
-<a name="152" href="#152">152</a>     checkElementMatches(inVertices, outVertices);
-<a name="153" href="#153">153</a>     checkElementMatches(inEdges, outEdges);
-<a name="154" href="#154">154</a>   }
-<a name="155" href="#155">155</a> 
-<a name="156" href="#156">156</a>   @Test
-<a name="157" href="#157">157</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testReduceCollection() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="158" href="#158">158</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">""</span> +
-<a name="159" href="#159">159</a>         <span class="jxr_string">"g1[(a)-[e1]-&gt;(b)]"</span> +
-<a name="160" href="#160">160</a>         <span class="jxr_string">"g2[(b)-[e2]-&gt;(c)]"</span> +
-<a name="161" href="#161">161</a>         <span class="jxr_string">"g3[(c)-[e3]-&gt;(d)]"</span> +
-<a name="162" href="#162">162</a>         <span class="jxr_string">"g4[(a)-[e4]-&gt;(b)]"</span> +
-<a name="163" href="#163">163</a>         <span class="jxr_string">"exp12[(a)]"</span> +
-<a name="164" href="#164">164</a>         <span class="jxr_string">"exp13[(a)-[e1]-&gt;(b)]"</span> +
-<a name="165" href="#165">165</a>         <span class="jxr_string">"exp14[]"</span>);
-<a name="166" href="#166">166</a> 
-<a name="167" href="#167">167</a>     checkExpectationsEqualResults(loader, <strong class="jxr_keyword">new</strong> ReduceExclusion(loader
-<a name="168" href="#168">168</a>       .getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId()));
-<a name="169" href="#169">169</a>   }
-<a name="170" href="#170">170</a> }
+<a name="88" href="#88">88</a>      collectAndAssertTrue(g0.exclude(g1).equalsByData(g0));
+<a name="89" href="#89">89</a>      collectAndAssertTrue(g1.exclude(g0).equalsByData(g1));
+<a name="90" href="#90">90</a>    }
+<a name="91" href="#91">91</a>  
+<a name="92" href="#92">92</a>    @Test
+<a name="93" href="#93">93</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testDerivedNonOverlappingGraphs() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="94" href="#94">94</a>      FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"g:test"</span> +
+<a name="95" href="#95">95</a>        <span class="jxr_string">"[(a {x: true}),(b {x: false})]"</span>);
+<a name="96" href="#96">96</a>  
+<a name="97" href="#97">97</a>      LogicalGraph baseGraph = loader.getLogicalGraphByVariable(<span class="jxr_string">"g"</span>);
+<a name="98" href="#98">98</a>      LogicalGraph derivedGraph1 = baseGraph.vertexInducedSubgraph(v -&gt; v.getPropertyValue(<span class="jxr_string">"x"</span>).getBoolean());
+<a name="99" href="#99">99</a>      LogicalGraph derivedGraph2 = baseGraph.vertexInducedSubgraph(v -&gt; !v.getPropertyValue(<span class="jxr_string">"x"</span>).getBoolean());
+<a name="100" href="#100">100</a> 
+<a name="101" href="#101">101</a>     loader.appendToDatabaseFromString(<span class="jxr_string">"expected:test[(a)]"</span>);
+<a name="102" href="#102">102</a>     LogicalGraph expected = loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>);
+<a name="103" href="#103">103</a> 
+<a name="104" href="#104">104</a>     collectAndAssertTrue(derivedGraph1.exclude(derivedGraph2).equalsByData(expected));
+<a name="105" href="#105">105</a>   }
+<a name="106" href="#106">106</a> 
+<a name="107" href="#107">107</a>   @Test
+<a name="108" href="#108">108</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testGraphContainment() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="109" href="#109">109</a>     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+<a name="110" href="#110">110</a> 
+<a name="111" href="#111">111</a>     LogicalGraph g0 = loader.getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>);
+<a name="112" href="#112">112</a>     LogicalGraph g2 = loader.getLogicalGraphByVariable(<span class="jxr_string">"g2"</span>);
+<a name="113" href="#113">113</a> 
+<a name="114" href="#114">114</a>     <em class="jxr_comment">// use collections as data sink</em>
+<a name="115" href="#115">115</a>     Collection&lt;Vertex&gt; vertices0 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="116" href="#116">116</a>     Collection&lt;Edge&gt; edges0 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="117" href="#117">117</a>     Collection&lt;Vertex&gt; vertices2 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="118" href="#118">118</a>     Collection&lt;Edge&gt; edges2 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="119" href="#119">119</a>     Collection&lt;Vertex&gt; resVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="120" href="#120">120</a>     Collection&lt;Edge&gt; resEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="121" href="#121">121</a> 
+<a name="122" href="#122">122</a>     LogicalGraph res = g2.exclude(g0);
+<a name="123" href="#123">123</a> 
+<a name="124" href="#124">124</a>     g0.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(vertices0));
+<a name="125" href="#125">125</a>     g0.getEdges().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(edges0));
+<a name="126" href="#126">126</a>     g2.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(vertices2));
+<a name="127" href="#127">127</a>     g2.getEdges().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(edges2));
+<a name="128" href="#128">128</a>     res.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(resVertices));
+<a name="129" href="#129">129</a>     res.getEdges().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(resEdges));
+<a name="130" href="#130">130</a> 
+<a name="131" href="#131">131</a>     getExecutionEnvironment().execute();
+<a name="132" href="#132">132</a> 
+<a name="133" href="#133">133</a>     Set&lt;GraphElement&gt; inVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="134" href="#134">134</a>     <strong class="jxr_keyword">for</strong> (Vertex vertex : vertices2) {
+<a name="135" href="#135">135</a>       <strong class="jxr_keyword">if</strong> (!vertices0.contains(vertex)) {
+<a name="136" href="#136">136</a>         inVertices.add(vertex);
+<a name="137" href="#137">137</a>       }
+<a name="138" href="#138">138</a>     }
+<a name="139" href="#139">139</a>     Set&lt;GraphElement&gt; inEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="140" href="#140">140</a>     <strong class="jxr_keyword">for</strong> (Edge edge : edges2) {
+<a name="141" href="#141">141</a>       <strong class="jxr_keyword">if</strong> (!edges0.contains(edge)) {
+<a name="142" href="#142">142</a>         inVertices.add(edge);
+<a name="143" href="#143">143</a>       }
+<a name="144" href="#144">144</a>     }
+<a name="145" href="#145">145</a> 
+<a name="146" href="#146">146</a>     Set&lt;GraphElement&gt; outVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="147" href="#147">147</a>     inVertices.addAll(outVertices);
+<a name="148" href="#148">148</a>     Set&lt;GraphElement&gt; outEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="149" href="#149">149</a>     inEdges.addAll(resEdges);
+<a name="150" href="#150">150</a> 
+<a name="151" href="#151">151</a>     checkElementMatches(inVertices, outVertices);
+<a name="152" href="#152">152</a>     checkElementMatches(inEdges, outEdges);
+<a name="153" href="#153">153</a>   }
+<a name="154" href="#154">154</a> 
+<a name="155" href="#155">155</a>   @Test
+<a name="156" href="#156">156</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testReduceCollection() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="157" href="#157">157</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">""</span> +
+<a name="158" href="#158">158</a>         <span class="jxr_string">"g1[(a)-[e1]-&gt;(b)]"</span> +
+<a name="159" href="#159">159</a>         <span class="jxr_string">"g2[(b)-[e2]-&gt;(c)]"</span> +
+<a name="160" href="#160">160</a>         <span class="jxr_string">"g3[(c)-[e3]-&gt;(d)]"</span> +
+<a name="161" href="#161">161</a>         <span class="jxr_string">"g4[(a)-[e4]-&gt;(b)]"</span> +
+<a name="162" href="#162">162</a>         <span class="jxr_string">"exp12[(a)]"</span> +
+<a name="163" href="#163">163</a>         <span class="jxr_string">"exp13[(a)-[e1]-&gt;(b)]"</span> +
+<a name="164" href="#164">164</a>         <span class="jxr_string">"exp14[]"</span>);
+<a name="165" href="#165">165</a> 
+<a name="166" href="#166">166</a>     checkExpectationsEqualResults(loader, <strong class="jxr_keyword">new</strong> ReduceExclusion(loader
+<a name="167" href="#167">167</a>       .getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId()));
+<a name="168" href="#168">168</a>   }
+<a name="169" href="#169">169</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

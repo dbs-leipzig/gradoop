@@ -96,8 +96,8 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm&lt;NullValue, N
 <span class="fc" id="L96">      .where(0).equalTo(new Id&lt;&gt;())</span>
 <span class="fc" id="L97">      .with(new DistinctVertexDegreesToAttribute(propertyKey, propertyKeyIn, propertyKeyOut));</span>
 
-<span class="fc" id="L99">    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices,</span>
-<span class="fc" id="L100">      currentGraph.getEdges());</span>
+<span class="fc" id="L99">    return currentGraph.getFactory()</span>
+<span class="fc" id="L100">      .fromDataSets(currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

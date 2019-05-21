@@ -354,7 +354,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.iterator.HBaseVertexIterator.java">org/gradoop/storage/impl/hbase/iterator/HBaseVertexIterator.java</a>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropReg.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBasePropReg.java</a>
                 </td>
                 <td>
                   0
@@ -368,7 +368,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropReg.java">org/gradoop/storage/impl/hbase/predicate/filter/impl/HBasePropReg.java</a>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.iterator.HBaseVertexIterator.java">org/gradoop/storage/impl/hbase/iterator/HBaseVertexIterator.java</a>
                 </td>
                 <td>
                   0
@@ -634,7 +634,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.handler.HBaseVertexHandler.java">org/gradoop/storage/impl/hbase/handler/HBaseVertexHandler.java</a>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils.java">org/gradoop/storage/impl/hbase/predicate/filter/HBaseFilterUtils.java</a>
                 </td>
                 <td>
                   0
@@ -648,7 +648,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils.java">org/gradoop/storage/impl/hbase/predicate/filter/HBaseFilterUtils.java</a>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-hbase/checkstyle.html#org.gradoop.storage.impl.hbase.handler.HBaseVertexHandler.java">org/gradoop/storage/impl/hbase/handler/HBaseVertexHandler.java</a>
                 </td>
                 <td>
                   0
