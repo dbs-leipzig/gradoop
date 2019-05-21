@@ -13,13 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Contains all implementations of the graph layouting operator.
+ */
 package org.gradoop.flink.model.impl.operators.layouting;
-
-public class RandomLayouterTest extends LayoutingAlgorithmTest {
-
-  @Override
-  public LayoutingAlgorithm getLayouter(int w, int h) {
-    return new RandomLayouter(0, w, 0, h);
-  }
-
-}

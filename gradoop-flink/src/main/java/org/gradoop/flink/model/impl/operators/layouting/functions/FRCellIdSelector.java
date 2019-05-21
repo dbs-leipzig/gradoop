@@ -1,46 +1,73 @@
+/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.gradoop.flink.model.impl.operators.layouting.functions;
 
 import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.layouting.FRLayouter;
 
-/** A KeySelector that extracts the cellid of a Vertex.
+/**
+ * A KeySelector that extracts the cellid of a Vertex.
  */
 public class FRCellIdSelector implements KeySelector<Vertex, Integer> {
-    int cellResolution;
-    FRLayouter.NeighborType type;
 
-    /** Returns a KeySelector that extracts the cellid of a Vertex.
-     *
-     * @param type Selects which id to return. The 'real' one or the id of a specific neighbor.
-     * @return
-     */
-    public FRCellIdSelector(int cellResolution, FRLayouter.NeighborType type) {
-        this.cellResolution = cellResolution;
-        this.type = type;
+  /** Type of neighbor to select if from */
+  public enum NeighborType { UP, DOWN, LEFT, RIGHT, UPRIGHT, DOWNRIGHT, UPLEFT, DOWNLEFT, SELF }
+
+  /** Numer of cells per axis */
+  private int cellResolution;
+  /** Type of neighbor to get cellid from */
+  private NeighborType type;
+
+  /**
+   * A KeySelector that extracts the cellid of a Vertex. (Or the cellid of one of it's neighbors)
+   *
+   * @param cellResolution Number of cells per axis
+   * @param type Selects which id to return. The 'real' one or the id of a specific neighbor.
+   */
+  public FRCellIdSelector(int cellResolution, NeighborType type) {
+    this.cellResolution = cellResolution;
+    this.type = type;
+  }
+
+  @Override
+  public Integer getKey(Vertex value) {
+    int cellid = value.getPropertyValue(FRLayouter.CELLID_PROPERTY).getInt();
+    int xcell = cellid % cellResolution;
+    int ycell = cellid / cellResolution;
+    if (type == NeighborType.RIGHT || type == NeighborType.UPRIGHT ||
+      type == NeighborType.DOWNRIGHT) {
+      xcell++;
+    }
+    if (type == NeighborType.LEFT || type == NeighborType.DOWNLEFT ||
+      type == NeighborType.UPLEFT) {
+      xcell--;
+    }
+    if (type == NeighborType.UP || type == NeighborType.UPLEFT ||
+      type == NeighborType.UPRIGHT) {
+      ycell--;
+    }
+    if (type == NeighborType.DOWN || type == NeighborType.DOWNLEFT ||
+      type == NeighborType.DOWNRIGHT) {
+      ycell++;
     }
 
-    @Override
-    public Integer getKey(Vertex value) {
-        int cellid = value.getPropertyValue(FRLayouter.CELLID_PROPERTY).getInt();
-        int xcell = cellid % cellResolution;
-        int ycell = cellid / cellResolution;
-        if (type == FRLayouter.NeighborType.RIGHT || type == FRLayouter.NeighborType.UPRIGHT || type == FRLayouter.NeighborType.DOWNRIGHT) {
-            xcell++;
-        }
-        if (type == FRLayouter.NeighborType.LEFT || type == FRLayouter.NeighborType.DOWNLEFT || type == FRLayouter.NeighborType.UPLEFT) {
-            xcell--;
-        }
-        if (type == FRLayouter.NeighborType.UP || type == FRLayouter.NeighborType.UPLEFT || type == FRLayouter.NeighborType.UPRIGHT) {
-            ycell--;
-        }
-        if (type == FRLayouter.NeighborType.DOWN || type == FRLayouter.NeighborType.DOWNLEFT || type == FRLayouter.NeighborType.DOWNRIGHT) {
-            ycell++;
-        }
-
-        if (xcell >= cellResolution || ycell >= cellResolution || xcell < 0 || ycell < 0) {
-            return -1;
-        }
-        return ycell * cellResolution + xcell;
+    if (xcell >= cellResolution || ycell >= cellResolution || xcell < 0 || ycell < 0) {
+      return -1;
     }
+    return ycell * cellResolution + xcell;
+  }
 }
