@@ -139,7 +139,7 @@
     <distributionManagement>
         <site>
             <id>site_gradoop</id>
-            <url>${maven.site.url}</url>
+            <url>https://dbs-leipzig.github.io/gradoop/</url>
         </site>
         <snapshotRepository>
             <id>release_artifacts_gradoop</id>
@@ -192,8 +192,6 @@
         <plugin.maven-site.version>3.7.1</plugin.maven-site.version>
         <plugin.maven-scm-publish.version>3.0.0</plugin.maven-scm-publish.version>
         <plugin.maven-jacoco.version>0.8.1</plugin.maven-jacoco.version>
-
-        <maven.site.url>http://localhost/gradoop/site</maven.site.url>
     </properties>
 
     <profiles>
@@ -324,9 +322,6 @@
         </profile>
         <profile>
             <id>javadoc</id>
-            <properties>
-                <maven.site.url>https://dbs-leipzig.github.io/gradoop/</maven.site.url>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
