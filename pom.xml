@@ -192,6 +192,7 @@
         <plugin.maven-site.version>3.7.1</plugin.maven-site.version>
         <plugin.maven-scm-publish.version>3.0.0</plugin.maven-scm-publish.version>
         <plugin.maven-jacoco.version>0.8.1</plugin.maven-jacoco.version>
+        <plugin.maven-wagon-ssh.version>3.0.0</plugin.maven-wagon-ssh.version>
     </properties>
 
     <profiles>
@@ -334,7 +335,7 @@
                             <dependency>
                                 <groupId>org.apache.maven.wagon</groupId>
                                 <artifactId>wagon-ssh</artifactId>
-                                <version>3.0.0</version>
+                                <version>${plugin.maven-wagon-ssh.version}</version>
                             </dependency>
                         </dependencies>
                     </plugin>
