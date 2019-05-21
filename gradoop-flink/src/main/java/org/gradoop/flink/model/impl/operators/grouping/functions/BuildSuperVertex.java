@@ -33,8 +33,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
  */
 @FunctionAnnotation.ForwardedFields("f1->id;f2->label")
 @FunctionAnnotation.ReadFields("f1;f2;f3;f4;f6")
-public class BuildSuperVertex<V extends EPGMVertex>
-  extends BuildBase
+public class BuildSuperVertex<V extends EPGMVertex> extends BuildBase
   implements MapFunction<VertexGroupItem, V>, ResultTypeQueryable<V> {
 
   /**
@@ -62,8 +61,7 @@ public class BuildSuperVertex<V extends EPGMVertex>
    * @throws Exception on failure
    */
   @Override
-  public V map(VertexGroupItem groupItem) throws
-    Exception {
+  public V map(VertexGroupItem groupItem) throws Exception {
     V supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());
 
     supVertex.setLabel(groupItem.getGroupLabel());

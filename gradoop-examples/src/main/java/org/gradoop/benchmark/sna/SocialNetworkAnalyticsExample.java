@@ -39,6 +39,8 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -136,12 +138,11 @@ public class SocialNetworkAnalyticsExample extends AbstractRunner implements Pro
     }
 
     // group on vertex and edge labels + count grouped edges
-    LogicalGraph groupedGraph  = graph.callForGraph(new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_COMBINE)
-      .addVertexGroupingKey("name")
-      .useEdgeLabel(true).useVertexLabel(true)
-      .addEdgeAggregateFunction(new Count())
-      .build());
+    LogicalGraph groupedGraph = graph.groupBy(Arrays.asList(Grouping.LABEL_SYMBOL, "name"),
+      Collections.emptyList(),
+      Collections.singletonList(Grouping.LABEL_SYMBOL),
+      Collections.singletonList(new Count()),
+      GroupingStrategy.GROUP_COMBINE);
 
     // filter all edges below a fixed threshold
     groupedGraph = groupedGraph.edgeInducedSubgraph(new CountFilter());

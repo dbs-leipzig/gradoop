@@ -35,8 +35,7 @@ import java.util.List;
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 @FunctionAnnotation.ReadFields("label;properties")
-public class BuildVertexGroupItem<V extends EPGMVertex>
-  extends BuildGroupItemBase
+public class BuildVertexGroupItem<V extends EPGMVertex> extends BuildGroupItemBase
   implements FlatMapFunction<V, VertexGroupItem> {
 
   /**
