@@ -148,9 +148,7 @@ public class HBaseEPGMStoreFactory {
     final String edgeTableName,
     final String graphTableName
   ) {
-    try {
-      Connection connection = ConnectionFactory.createConnection(config);
-
+    try (Connection connection = ConnectionFactory.createConnection(config)) {
       deleteTablesIfExists(
         connection.getAdmin(),
         TableName.valueOf(vertexTableName),
