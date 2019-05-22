@@ -73,8 +73,7 @@ public class SingleSourceShortestPaths extends GradoopGellyAlgorithm<NullValue, 
   }
 
   @Override
-  public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, Double> graph)
-    throws Exception {
+  public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, Double> graph) {
 
     DataSet<Vertex> newVertices = new org.apache.flink.graph.library.SingleSourceShortestPaths
       <GradoopId, NullValue>(srcVertexId, iterations)
@@ -83,7 +82,7 @@ public class SingleSourceShortestPaths extends GradoopGellyAlgorithm<NullValue, 
       .where(0)
       .equalTo(new Id<>())
       .with(new SingleSourceShortestPathsAttribute(propertyKeyVertex));
-    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices,
-      currentGraph.getEdges());
+    return currentGraph.getFactory()
+      .fromDataSets(currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());
   }
 }

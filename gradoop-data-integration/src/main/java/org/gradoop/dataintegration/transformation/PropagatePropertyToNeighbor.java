@@ -26,6 +26,7 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.LabelIsIn;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraphBroadcast;
 
 import java.util.Objects;
 import java.util.Set;
@@ -125,9 +126,11 @@ public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
       // Update target vertices.
       .coGroup(graph.getVertices())
       .where(0).equalTo(new Id<>())
-      .with(new AccumulatePropagatedValues<>(targetVertexPropertyKey, targetVertexLabels));
+      .with(new AccumulatePropagatedValues<>(targetVertexPropertyKey, targetVertexLabels))
+      .map(new AddToGraphBroadcast<>())
+      .withBroadcastSet(graph.getGraphHead().map(new Id<>()), AddToGraphBroadcast.GRAPH_ID);
 
-    return graph.getFactory().fromDataSets(newVertices, graph.getEdges());
+    return graph.getFactory().fromDataSets(graph.getGraphHead(), newVertices, graph.getEdges());
   }
 
   @Override

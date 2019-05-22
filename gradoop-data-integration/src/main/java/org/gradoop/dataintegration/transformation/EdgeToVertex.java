@@ -24,6 +24,8 @@ import org.gradoop.dataintegration.transformation.functions.CreateEdgesFromTripl
 import org.gradoop.dataintegration.transformation.functions.CreateVertexFromEdges;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraphBroadcast;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of3;
 
 import java.util.Objects;
@@ -88,15 +90,19 @@ public class EdgeToVertex implements UnaryGraphToGraphOperator {
 
     DataSet<Vertex> newVertices = newVerticesAndOriginIds
       .map(new Value0Of3<>())
+      .map(new AddToGraphBroadcast<>())
+      .withBroadcastSet(graph.getGraphHead().map(new Id<>()), AddToGraphBroadcast.GRAPH_ID)
       .union(graph.getVertices());
 
     // create edges to the newly created vertex
     DataSet<Edge> newEdges = newVerticesAndOriginIds
       .flatMap(new CreateEdgesFromTriple<>(graph.getFactory().getEdgeFactory(),
         edgeLabelSourceToNew, edgeLabelNewToTarget))
+      .map(new AddToGraphBroadcast<>())
+      .withBroadcastSet(graph.getGraphHead().map(new Id<>()), AddToGraphBroadcast.GRAPH_ID)
       .union(graph.getEdges());
 
-    return graph.getFactory().fromDataSets(newVertices, newEdges);
+    return graph.getFactory().fromDataSets(graph.getGraphHead(), newVertices, newEdges);
   }
 
   @Override

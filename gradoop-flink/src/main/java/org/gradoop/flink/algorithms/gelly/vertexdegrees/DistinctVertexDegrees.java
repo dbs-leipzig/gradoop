@@ -96,7 +96,7 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm<NullValue, Null
       .where(0).equalTo(new Id<>())
       .with(new DistinctVertexDegreesToAttribute(propertyKey, propertyKeyIn, propertyKeyOut));
 
-    return currentGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertices,
-      currentGraph.getEdges());
+    return currentGraph.getFactory()
+      .fromDataSets(currentGraph.getGraphHead(), newVertices, currentGraph.getEdges());
   }
 }
