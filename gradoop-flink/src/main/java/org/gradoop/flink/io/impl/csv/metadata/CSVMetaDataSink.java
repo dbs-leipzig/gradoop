@@ -50,8 +50,7 @@ public class CSVMetaDataSink implements MetaDataSink<CSVMetaData> {
     CSVMetaData metaData,
     Configuration hdfsConfig,
     boolean overwrite) throws IOException {
-    FSDataOutputStream outputStream = null;
-    try(org.apache.hadoop.fs.FileSystem fs = org.apache.hadoop.fs.FileSystem.get(hdfsConfig)) {
+    try (org.apache.hadoop.fs.FileSystem fs = org.apache.hadoop.fs.FileSystem.get(hdfsConfig)) {
       Path file = new Path(metaDataPath);
       if (fs.exists(file)) {
         if (!overwrite) {
@@ -60,38 +59,33 @@ public class CSVMetaDataSink implements MetaDataSink<CSVMetaData> {
           fs.delete(file, false);
         }
       }
-      outputStream = fs.create(file);
 
-      for (String graphLabel : metaData.getGraphLabels()) {
-        outputStream.writeBytes(constructMetaDataString(
-          MetaDataSource.GRAPH_TYPE,
-          graphLabel,
-          metaData.getGraphPropertyMetaData(graphLabel)));
-        outputStream.writeBytes(CSVConstants.ROW_DELIMITER);
-      }
+      try (FSDataOutputStream outputStream = fs.create(file)) {
+        for (String graphLabel : metaData.getGraphLabels()) {
+          outputStream.writeBytes(constructMetaDataString(
+            MetaDataSource.GRAPH_TYPE,
+            graphLabel,
+            metaData.getGraphPropertyMetaData(graphLabel)));
+          outputStream.writeBytes(CSVConstants.ROW_DELIMITER);
+        }
 
-      for (String vertexLabel : metaData.getVertexLabels()) {
-        outputStream.writeBytes(constructMetaDataString(
-          MetaDataSource.VERTEX_TYPE,
-          vertexLabel,
-          metaData.getVertexPropertyMetaData(vertexLabel)));
-        outputStream.writeBytes(CSVConstants.ROW_DELIMITER);
-      }
+        for (String vertexLabel : metaData.getVertexLabels()) {
+          outputStream.writeBytes(constructMetaDataString(
+            MetaDataSource.VERTEX_TYPE,
+            vertexLabel,
+            metaData.getVertexPropertyMetaData(vertexLabel)));
+          outputStream.writeBytes(CSVConstants.ROW_DELIMITER);
+        }
 
-      for (String edgeLabel : metaData.getEdgeLabels()) {
-        outputStream.writeBytes(constructMetaDataString(
-          MetaDataSource.EDGE_TYPE,
-          edgeLabel,
-          metaData.getEdgePropertyMetaData(edgeLabel)));
-        outputStream.writeBytes(CSVConstants.ROW_DELIMITER);
-      }
+        for (String edgeLabel : metaData.getEdgeLabels()) {
+          outputStream.writeBytes(constructMetaDataString(
+            MetaDataSource.EDGE_TYPE,
+            edgeLabel,
+            metaData.getEdgePropertyMetaData(edgeLabel)));
+          outputStream.writeBytes(CSVConstants.ROW_DELIMITER);
+        }
 
-      outputStream.flush();
-      outputStream.close();
-    } finally {
-      // cleanup
-      if (outputStream != null) {
-        outputStream.close();
+        outputStream.flush();
       }
     }
   }
