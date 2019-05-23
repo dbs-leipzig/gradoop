@@ -15,10 +15,9 @@
  */
 package org.gradoop.flink.algorithms.gelly.connectedcomponents;
 
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 
 /**
  * Computes the weakly connected components of a graph. Uses the gradoop wrapper
@@ -68,14 +67,9 @@ public class WeaklyConnectedComponentsAsCollection implements UnaryGraphToCollec
   @Override
   public GraphCollection execute(LogicalGraph graph) {
 
-    LogicalGraph graphWithWccIds = graph.callForGraph(new AnnotateWeaklyConnectedComponents(
-      propertyKey, maxIterations));
+    LogicalGraph graphWithWccIds = graph.callForGraph(
+      new AnnotateWeaklyConnectedComponents(propertyKey, maxIterations));
 
-    GraphCollection split = graphWithWccIds.splitBy(propertyKey);
-
-    return graph.getConfig().getGraphCollectionFactory().fromDataSets(
-      split.getGraphHeads(),
-      split.getVertices().map(new PropertyRemover<>(propertyKey)),
-      split.getEdges().map(new PropertyRemover<>(propertyKey)));
+    return graphWithWccIds.splitBy(propertyKey);
   }
 }

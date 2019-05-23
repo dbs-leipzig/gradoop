@@ -17,6 +17,9 @@
   <suppress checks="IllegalCatch"
             files="PrintTableSink"
             lines="90-100"/>
+  <suppress checks="LineLength"
+            files="SocialNetworkGraph.java"
+            lines="0-68"/>
 
   <!-- less restrictive checkstyle for tests -->
   <suppress checks="JavadocMethod"

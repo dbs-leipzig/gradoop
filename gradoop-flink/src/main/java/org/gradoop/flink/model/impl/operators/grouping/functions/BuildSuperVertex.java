@@ -73,7 +73,6 @@ public class BuildSuperVertex
     return supVertex;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<Vertex> getProducedType() {
     return TypeExtractor.createTypeInfo(vertexFactory.getType());
