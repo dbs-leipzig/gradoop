@@ -55,10 +55,6 @@ public class SetProperty<E extends Element> implements MapFunction<E, E> {
     this.propertyValue = propertyValue;
   }
 
-  /**
-   * @param element original element to be updated
-   * @return updated element
-   */
   @Override
   public E map(E element) throws Exception {
     element.setProperty(propertyKey, propertyValue);
