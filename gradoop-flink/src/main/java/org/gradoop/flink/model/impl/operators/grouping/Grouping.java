@@ -278,15 +278,15 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   /**
    * Build super edges by joining them with vertices and their super vertex.
    *
-   * @param graph input graph
+   * @param inputEdges input edges
    * @param vertexToRepresentativeMap dataset containing tuples of vertex id and super vertex id
    * @return super edges
    */
   protected DataSet<Edge> buildSuperEdges(
-    LogicalGraph graph,
+    DataSet<Edge> inputEdges,
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap) {
 
-    DataSet<EdgeGroupItem> edges = graph.getEdges()
+    DataSet<EdgeGroupItem> edges = inputEdges
       // build edge group items
       .flatMap(new BuildEdgeGroupItem(useEdgeLabels(), getEdgeLabelGroups()))
       // join edges with vertex-group-map on source-id == vertex-id

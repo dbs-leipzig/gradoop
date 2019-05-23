@@ -122,7 +122,7 @@ public class GroupingGroupCombine extends Grouping {
       .withBroadcastSet(mapping, BuildVertexWithSuperVertexBC.BC_MAPPING);
 
     // build super edges
-    DataSet<Edge> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
+    DataSet<Edge> superEdges = buildSuperEdges(graph.getEdges(), vertexToRepresentativeMap);
 
     return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
   }

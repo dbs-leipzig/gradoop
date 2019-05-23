@@ -15,12 +15,14 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
+import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.filters.Not;
 import org.gradoop.flink.model.impl.functions.filters.Or;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertex;
@@ -33,6 +35,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
+import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 
 import java.io.Serializable;
 import java.util.List;
@@ -64,6 +67,9 @@ import java.util.stream.Collectors;
  */
 public class GroupingGroupReduce extends Grouping {
 
+  /**
+   * Returns true, if a vertex is not a member of any labelGroup.
+   */
   private final FilterFunction<Vertex> vertexIsInNoGroupFilter;
 
   /**
@@ -100,11 +106,11 @@ public class GroupingGroupReduce extends Grouping {
 
     DataSet<Vertex> vertices = graph.getVertices();
 
-    Optional<DataSet<Vertex>> optionalConvertedVertices =
-      isRetainingVerticesWithoutGroups() ? Optional.of(getVerticesWithoutGroup(vertices)) :
+    Optional<LogicalGraph> optionalRetainedVerticesSubgraph =
+      isRetainingVerticesWithoutGroups() ? Optional.of(getRetainedVerticesSubgraph(graph)) :
         Optional.empty();
 
-    if (optionalConvertedVertices.isPresent()) {
+    if (optionalRetainedVerticesSubgraph.isPresent()) {
       vertices = getVerticesToGroup(vertices);
     }
 
@@ -128,43 +134,73 @@ public class GroupingGroupReduce extends Grouping {
       // build vertex to group representative tuple
       .map(new BuildVertexWithSuperVertex());
 
-    if (optionalConvertedVertices.isPresent()) {
 
-      DataSet<Vertex> convertedVertices = optionalConvertedVertices.get();
+    DataSet<Edge> edgesToGroup = graph.getEdges();
 
-      superVertices = superVertices.union(convertedVertices);
+    if (optionalRetainedVerticesSubgraph.isPresent()) {
+      LogicalGraph retainedVerticesSubgraph = optionalRetainedVerticesSubgraph.get();
 
-      DataSet<VertexWithSuperVertex> optionalRepresentatives =
-        convertedVertices.map(new VertexSuperVertexIdentity());
+      // To add support for grouped edges between retained vertices and supervertices,
+      // vertices are their group representatives themselves
 
-      vertexToRepresentativeMap = vertexToRepresentativeMap.union(optionalRepresentatives);
+      DataSet<VertexWithSuperVertex> verticesRepresentatives =
+        retainedVerticesSubgraph.getVertices()
+          .map(new VertexSuperVertexIdentity());
 
+      vertexToRepresentativeMap = vertexToRepresentativeMap.union(verticesRepresentatives);
+
+      // don't execute grouping on edges between retained vertices
+      // but execute on edges between retained vertices and grouped vertices
+      //   graph.getEdges() - retainedVerticesSubgraph.getEdges()
+
+      edgesToGroup = graph.getEdges()
+        .coGroup(retainedVerticesSubgraph.getEdges())
+        .where("sourceId", "targetId")
+        .equalTo("sourceId", "targetId")
+        .with((CoGroupFunction<Edge, Edge, Edge>) (first, second, out) -> {
+
+          // only collect edges that do not exist in retainedVerticesSubgraph
+          if (!second.iterator().hasNext()) {
+            first.forEach(out::collect);
+          }
+
+        })
+        .returns(Edge.class);
     }
 
     // build super edges
-    DataSet<Edge> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
+    DataSet<Edge> superEdges =
+      buildSuperEdges(edgesToGroup, vertexToRepresentativeMap);
 
-    return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
+    LogicalGraph groupedGraph =
+      config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
+
+    return optionalRetainedVerticesSubgraph.isPresent() ?
+      groupedGraph.combine(optionalRetainedVerticesSubgraph.get()) : groupedGraph;
   }
 
   /**
-   * Returns a list that contains all vertices that belong to a {@link LabelGroup}.
+   * Returns a subgraph that only includes vertices that are not member of any labelGroups.
+   * Also returns only edges between said vertices.
+   *
+   * @param graph to filter
+   * @return subgraph
+   */
+  private LogicalGraph getRetainedVerticesSubgraph(LogicalGraph graph) {
+    return graph
+      .subgraph(vertexIsInNoGroupFilter, new True<>(), Subgraph.Strategy.VERTEX_INDUCED)
+      .verify();
+  }
+
+  /**
+   * Returns a {@link DataSet<Vertex>} that contains all vertices that belong to a
+   * {@link LabelGroup}.
    *
    * @param vertices to check
    * @return filtered vertices
    */
   private DataSet<Vertex> getVerticesToGroup(DataSet<Vertex> vertices) {
     return vertices.filter(new Not<>(vertexIsInNoGroupFilter));
-  }
-
-  /**
-   * Returns a list that contains all vertices that don't belong to a {@link LabelGroup}.
-   *
-   * @param vertices to check
-   * @return filtered vertices
-   */
-  private DataSet<Vertex> getVerticesWithoutGroup(DataSet<Vertex> vertices) {
-    return vertices.filter(vertexIsInNoGroupFilter);
   }
 
   /**
