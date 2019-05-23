@@ -34,7 +34,7 @@ public class QuickstartData {
    */
   public static String getGraphGDLString() {
 
-    return "" +
+    return
       "g1:graph[" + SEPARATOR +
       "      (p1:Person {name: \"Bob\", age: 24})-[:friendsWith]->" + SEPARATOR +
       "      (p2:Person{name: \"Alice\", age: 30})-[:friendsWith]->(p1)" + SEPARATOR +

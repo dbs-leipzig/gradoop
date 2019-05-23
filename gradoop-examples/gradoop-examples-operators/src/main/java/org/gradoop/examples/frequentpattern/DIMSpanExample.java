@@ -22,9 +22,6 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 /**
  * A self contained example on how to use the transactional fsm operator.
  */
@@ -38,9 +35,11 @@ public class DIMSpanExample {
    * found in the projects wiki.
    *
    * Using the example graph {@link DIMSpanData}, the program will:
-   * 1. create the graph based on the given gdl string
-   * 2. compute all frequent patterns based on a given frequency (70%)
-   * 3. print the resulting graph collection
+   * <ol>
+   *   <li>create the graph based on the given gdl string</li>
+   *   <li>compute all frequent patterns based on a given frequency (70%)</li>
+   *   <li>print the resulting graph collection</li>
+   * </ol>
    *
    * @param args arguments (none required)
    * @throws Exception on failure
@@ -53,8 +52,7 @@ public class DIMSpanExample {
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(GradoopFlinkConfig.createConfig(env));
 
     // load data
-    loader.initDatabaseFromString(
-      URLDecoder.decode(DIMSpanData.getGraphGDLString(), StandardCharsets.UTF_8.name()));
+    loader.initDatabaseFromString(DIMSpanData.getGraphGDLString());
 
     GraphCollection input = loader.getGraphCollection();
 

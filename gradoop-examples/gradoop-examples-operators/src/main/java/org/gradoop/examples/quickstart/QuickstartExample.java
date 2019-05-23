@@ -23,9 +23,6 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 /**
  * A self contained quickstart example on how to use a composition of gradoop operators.
  * */
@@ -39,11 +36,13 @@ public class QuickstartExample {
    * found in the projects wiki.
    *
    * Using a prepared graph (see link below), the program will:
-   * 1. create the graph based on the given gdl string
-   * 2. show input graphs
-   * 3. calculate and show the overlap
-   * 4. calculate and show the combination result (combined with subgraph operator)
-   * 5. calculate and show the WCC result
+   * <ol>
+   *   <li>create the graph based on the given gdl string</li>
+   *   <li>show input graphs</li>
+   *   <li>calculate and show the overlap</li>
+   *   <li>calculate and show the combination result (combined with subgraph operator)</li>
+   *   <li>calculate and show the WCC result</li>
+   * </ol>
    *
    * @param args no args used
    * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Getting-started">
@@ -58,8 +57,7 @@ public class QuickstartExample {
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(GradoopFlinkConfig.createConfig(env));
 
     // load data
-    loader.initDatabaseFromString(
-      URLDecoder.decode(QuickstartData.getGraphGDLString(), StandardCharsets.UTF_8.name()));
+    loader.initDatabaseFromString(QuickstartData.getGraphGDLString());
 
     // show input
     LogicalGraph graph1 = loader.getLogicalGraphByVariable("g1");

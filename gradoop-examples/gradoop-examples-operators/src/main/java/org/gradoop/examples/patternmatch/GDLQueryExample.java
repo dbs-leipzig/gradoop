@@ -22,9 +22,6 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 /**
  * A self-contained example on how to use the query engine in Gradoop.
  *
@@ -40,9 +37,11 @@ public class GDLQueryExample {
    * Documentation and usage examples can be found in the projects wiki.
    *
    * Using the social network graph {@link SocialNetworkGraph}, the program will:
-   * 1. create the graph based on the given gdl string
-   * 2. run the query method with a user defined (GDL) query string.
-   * 3. print all found matches
+   * <ol>
+   *   <li>create the graph based on the given gdl string</li>
+   *   <li>run the query method with a user defined (GDL) query string</li>
+   *   <li>print all found matches</li>
+   * </ol>
    *
    * @param args arguments
    * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Unary-Logical-Graph-Operators">
@@ -57,8 +56,7 @@ public class GDLQueryExample {
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(GradoopFlinkConfig.createConfig(env));
 
     // load data
-    loader.initDatabaseFromString(
-      URLDecoder.decode(SocialNetworkGraph.getGraphGDLString(), StandardCharsets.UTF_8.name()));
+    loader.initDatabaseFromString(SocialNetworkGraph.getGraphGDLString());
 
     // load graph
     LogicalGraph socialNetwork = loader.getLogicalGraph();

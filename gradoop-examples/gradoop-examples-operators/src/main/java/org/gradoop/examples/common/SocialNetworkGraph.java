@@ -37,7 +37,7 @@ public class SocialNetworkGraph {
    */
   public static String getGraphGDLString() {
 
-    return "" +
+    return
       "db[" + SEPARATOR +
       "// vertex space" +
       "(databases:tag {name:\"Databases\"})" + SEPARATOR +

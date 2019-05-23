@@ -21,13 +21,18 @@ package org.gradoop.examples.frequentpattern.data;
 public class DIMSpanData {
 
   /**
+   * Private Constructor
+   */
+  private DIMSpanData() {}
+
+  /**
    * Provides an example graph collection used for DIMSpanExample
    *
    * @return example graph collection
    */
   public static String getGraphGDLString() {
 
-    return "" +
+    return
       "g1[" +
       "   (v1:A)-->(v2:B)" +
       "   (v1)-->(v3:C)" +

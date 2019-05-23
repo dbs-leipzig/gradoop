@@ -22,9 +22,6 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 /**
  * A self contained example on how to use the {@link GellyLabelPropagation} operator.
  *
@@ -39,10 +36,12 @@ public class GellyCommunitiesExample {
    * Documentation for all available gelly based operators can be found in the projects wiki.
    *
    * Using the social network graph {@link SocialNetworkGraph}, the program will:
-   * 1. create the logical graph from the social network gdl string
-   * 2. prepare the initial community id by using a transformation function on each vertex
-   * 3. calculate the communities using label propagation
-   * 4. print the results
+   * <ol>
+   *   <li>create the logical graph from the social network gdl string</li>
+   *   <li>prepare the initial community id by using a transformation function on each vertex</li>
+   *   <li>calculate the communities using label propagation</li>
+   *   <li>print the results</li>
+   * </ol>
    *
    * @param args arguments
    * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Unary-Logical-Graph-Operators">
@@ -58,8 +57,7 @@ public class GellyCommunitiesExample {
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(GradoopFlinkConfig.createConfig(env));
 
     // load data
-    loader.initDatabaseFromString(
-      URLDecoder.decode(SocialNetworkGraph.getGraphGDLString(), StandardCharsets.UTF_8.name()));
+    loader.initDatabaseFromString(SocialNetworkGraph.getGraphGDLString());
 
     // property key used for label propagation
     final String communityKey = "comm_id";

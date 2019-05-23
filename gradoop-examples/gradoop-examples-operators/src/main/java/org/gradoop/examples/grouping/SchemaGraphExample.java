@@ -21,9 +21,6 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 import static java.util.Collections.singletonList;
 import static org.gradoop.flink.model.impl.operators.grouping.Grouping.LABEL_SYMBOL;
 
@@ -42,9 +39,11 @@ public class SchemaGraphExample {
    * Documentation of possible settings for the grouping operator can be found in the projects wiki.
    *
    * Using the social network graph {@link SocialNetworkGraph}, the program will:
-   * 1. load the graph from the given gdl string
-   * 2. group the graph based on vertex and edge labels
-   * 3. print the resulting schema graph
+   * <ol>
+   *   <li>load the graph from the given gdl string</li>
+   *   <li>group the graph based on vertex and edge labels</li>
+   *   <li>print the resulting schema graph</li>
+   * </ol>
    *
    * @param args arguments
    * @see <a href="https://github.com/dbs-leipzig/gradoop/wiki/Unary-Logical-Graph-Operators">
@@ -60,8 +59,7 @@ public class SchemaGraphExample {
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(GradoopFlinkConfig.createConfig(env));
 
     // load data
-    loader.initDatabaseFromString(
-      URLDecoder.decode(SocialNetworkGraph.getGraphGDLString(), StandardCharsets.UTF_8.name()));
+    loader.initDatabaseFromString(SocialNetworkGraph.getGraphGDLString());
 
     // load the graph
     LogicalGraph graph = loader.getLogicalGraph();

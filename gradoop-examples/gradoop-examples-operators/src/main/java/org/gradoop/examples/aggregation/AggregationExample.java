@@ -24,9 +24,6 @@ import org.gradoop.flink.model.impl.operators.aggregation.functions.average.Aver
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 /**
  * A self contained example on how to use the aggregate operator on Gradoop's {@link LogicalGraph}
  * class.
@@ -80,8 +77,7 @@ public class AggregationExample {
     FlinkAsciiGraphLoader loader = new FlinkAsciiGraphLoader(GradoopFlinkConfig.createConfig(env));
 
     // load data
-    loader.initDatabaseFromString(
-      URLDecoder.decode(SocialNetworkGraph.getGraphGDLString(), StandardCharsets.UTF_8.name()));
+    loader.initDatabaseFromString(SocialNetworkGraph.getGraphGDLString());
 
     // get LogicalGraph representation of the social network graph
     LogicalGraph networkGraph = loader.getLogicalGraph();
