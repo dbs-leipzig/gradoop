@@ -1,18 +1,3 @@
-/*
- * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -26,8 +11,9 @@ import java.util.Collections;
 
 import static org.junit.Assert.assertTrue;
 
-//TODO create edge conversion properties and labels test
-public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
+public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBase {
+
+  protected abstract GroupingStrategy getStrategy();
 
   /**
    * Tests function {@link Grouping.GroupingBuilder#setRetainVerticesWithoutGroups(boolean)}.
@@ -36,7 +22,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
   @Test
   public void testRetainVerticesFlag() {
     Grouping grouping = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .useVertexLabel(true)
       .setRetainVerticesWithoutGroups(true)
       .build();
@@ -67,7 +53,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .build()
@@ -99,7 +85,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
@@ -132,7 +118,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .addVertexGroupingKey("c")
       .build()
@@ -169,7 +155,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
@@ -212,7 +198,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
@@ -251,7 +237,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
@@ -294,7 +280,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
@@ -331,7 +317,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
@@ -370,7 +356,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
@@ -413,7 +399,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
@@ -446,7 +432,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .build()
@@ -492,7 +478,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexAggregateFunction(new Count())
@@ -534,7 +520,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("c")
@@ -580,7 +566,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexAggregateFunction(new Count())
@@ -631,7 +617,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("a")
@@ -677,7 +663,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKeys(Arrays.asList("a", "b"))
@@ -728,7 +714,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(false)
       .addVertexGroupingKey("a")
@@ -773,7 +759,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(false)
       .addVertexGroupingKeys(Arrays.asList("a", "b"))
@@ -784,7 +770,6 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
-
 
   /**
    * Tests function {@link GroupingGroupReduce#groupInternal(LogicalGraph)}.
@@ -821,7 +806,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
@@ -883,7 +868,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(false)
       .addVertexLabelGroup("A", "A", Arrays.asList("a", "b"),
@@ -936,7 +921,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(false)
       .addVertexGroupingKey("f")
@@ -988,7 +973,7 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     final LogicalGraph input = loader.getLogicalGraphByVariable("input");
 
     LogicalGraph output = new Grouping.GroupingBuilder()
-      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(false)
       .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
@@ -999,6 +984,4 @@ public class GroupingGroupReduceLabelsTest extends GradoopFlinkTestBase {
     collectAndAssertTrue(
       output.equalsByElementData(loader.getLogicalGraphByVariable("expected")));
   }
-
-
 }
