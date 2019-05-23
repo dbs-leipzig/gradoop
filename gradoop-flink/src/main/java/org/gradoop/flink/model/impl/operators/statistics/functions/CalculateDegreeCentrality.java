@@ -24,11 +24,6 @@ import org.apache.flink.api.java.tuple.Tuple1;
  */
 public class CalculateDegreeCentrality implements CrossFunction<Tuple1<Long>, Long, Double> {
 
-  /**
-   * @param vertexDistanceSum sum of degree distances of the vertices
-   * @param vertexCount number of vertices
-   * @return degree centrality of graph
-   */
   @Override
   public Double cross(Tuple1<Long> vertexDistanceSum, Long vertexCount) {
     double sum = vertexDistanceSum.f0;

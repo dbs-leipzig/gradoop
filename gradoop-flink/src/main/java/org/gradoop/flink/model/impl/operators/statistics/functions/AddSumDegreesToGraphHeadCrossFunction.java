@@ -40,11 +40,6 @@ public class AddSumDegreesToGraphHeadCrossFunction
     this.propertyKey = propertyKey;
   }
 
-  /**
-   * @param gradoopIdWithCount The {@code WithCount}-Object containing the sum-value
-   * @param graphHead The graphHead the sum-value is written to
-   * @return The graphHead with the sum-value as property
-   */
   @Override
   public GraphHead cross(WithCount<GradoopId> gradoopIdWithCount, GraphHead graphHead) {
     graphHead.setProperty(propertyKey, gradoopIdWithCount.getCount());
