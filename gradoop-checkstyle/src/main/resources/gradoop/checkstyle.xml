@@ -23,7 +23,7 @@
 
     <!-- Checks for the correct license header in *.java files -->
     <module name="Header">
-        <property name="headerFile" value="${checkstyle.header.file}"/>
+        <property name="headerFile" value="/gradoop/LICENSE.txt"/>
         <property name="fileExtensions" value="java"/>
     </module>
 
