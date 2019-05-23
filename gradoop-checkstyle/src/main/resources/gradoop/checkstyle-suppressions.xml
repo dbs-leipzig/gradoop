@@ -20,9 +20,6 @@
   <suppress checks="LineLength"
             files="SocialNetworkGraph.java"
             lines="0-68"/>
-  <suppress checks="LineLength"
-            files="QuickstartData.java"
-            lines="0-61"/>
 
   <!-- less restrictive checkstyle for tests -->
   <suppress checks="JavadocMethod"

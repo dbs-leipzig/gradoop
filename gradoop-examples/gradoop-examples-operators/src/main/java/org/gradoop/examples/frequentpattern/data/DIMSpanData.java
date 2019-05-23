@@ -23,7 +23,7 @@ public class DIMSpanData {
   /**
    * Private Constructor
    */
-  private DIMSpanData() {}
+  private DIMSpanData() { }
 
   /**
    * Provides an example graph collection used for DIMSpanExample
