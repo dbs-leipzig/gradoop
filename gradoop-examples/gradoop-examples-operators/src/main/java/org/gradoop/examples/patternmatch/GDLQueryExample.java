@@ -17,7 +17,6 @@ package org.gradoop.examples.patternmatch;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.examples.common.SocialNetworkGraph;
-import org.gradoop.examples.quickstart.data.QuickstartData;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -36,8 +35,8 @@ public class GDLQueryExample {
   /**
    * Runs the program on the example data graph.
    *
-   * The example provides an overview over the usage of the query() method.
-   * It showcases who a user defined (GDL) query can be applied to a graph.
+   * The example provides an overview over the usage of the {@link LogicalGraph#query(String)}
+   * method. It showcases who a user defined (GDL) query can be applied to a graph.
    * Documentation and usage examples can be found in the projects wiki.
    *
    * Using the social network graph {@link SocialNetworkGraph}, the program will:

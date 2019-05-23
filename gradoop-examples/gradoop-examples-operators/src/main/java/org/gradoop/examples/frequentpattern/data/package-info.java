@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 /**
- *  Quickstart Gradoop Example that walks through the process of loading data and executing
- *  a set of operators.
+ * Examples data related to {@link org.gradoop.examples.frequentpattern.DIMSpanExample}
  */
-package org.gradoop.examples.quickstart;
+package org.gradoop.examples.frequentpattern.data;

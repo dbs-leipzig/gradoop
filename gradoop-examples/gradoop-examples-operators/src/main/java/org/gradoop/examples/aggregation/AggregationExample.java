@@ -61,7 +61,7 @@ public class AggregationExample {
    *
    * Using the social network graph in the resources directory, the program will:
    * <ol>
-   *   <li>extract a subgraph only containing vertices which are labeled "person"</li>
+   *   <li>extract a subgraph only containing vertices which are labeled "Person"</li>
    *   <li>concatenate the values of the vertex property "name" of each vertex in the subgraph</li>
    *   <li>calculate the mean value of the "birthday" property</li>
    * </ol>

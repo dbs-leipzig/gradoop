@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 /**
- *  Quickstart Gradoop Example that walks through the process of loading data and executing
- *  a set of operators.
+ * Example data related to {@link org.gradoop.examples.quickstart.QuickstartExample}
  */
-package org.gradoop.examples.quickstart;
+package org.gradoop.examples.quickstart.data;

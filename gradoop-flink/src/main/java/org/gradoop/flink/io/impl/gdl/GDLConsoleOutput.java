@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.io.impl.gdl;
 
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -22,6 +23,7 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,12 +51,16 @@ public class GDLConsoleOutput {
    * @throws Exception Forwarded from flink execute.
    */
   public static void print(GraphCollection graphCollection) throws Exception {
+    List<GraphHead> graphHeads = new ArrayList<>();
+    graphCollection.getGraphHeads().output(new LocalCollectionOutputFormat<>(graphHeads));
 
-    List<GraphHead> graphHeads = graphCollection.getGraphHeads().collect();
+    List<Vertex> vertices = new ArrayList<>();
+    graphCollection.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
 
-    List<Vertex> vertices = graphCollection.getVertices().collect();
+    List<Edge> edges = new ArrayList<>();
+    graphCollection.getEdges().output(new LocalCollectionOutputFormat<>(edges));
 
-    List<Edge> edges = graphCollection.getEdges().collect();
+    graphCollection.getConfig().getExecutionEnvironment().execute();
 
     GDLEncoder encoder = new GDLEncoder(graphHeads, vertices, edges);
     String graphString = encoder.getGDLString();

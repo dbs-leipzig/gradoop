@@ -16,7 +16,6 @@
 package org.gradoop.examples.frequentpattern;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.examples.common.SocialNetworkGraph;
 import org.gradoop.examples.frequentpattern.data.DIMSpanData;
 import org.gradoop.flink.algorithms.fsm.TransactionalFSM;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;

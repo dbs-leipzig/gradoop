@@ -28,7 +28,8 @@ import static java.util.Collections.singletonList;
 import static org.gradoop.flink.model.impl.operators.grouping.Grouping.LABEL_SYMBOL;
 
 /**
- * A self contained example on how to use the grouping operator on Gradoop's LogicalGraph class.
+ * A self contained example on how to use the grouping operator on Gradoop's {@link LogicalGraph}
+ * class.
  *
  * The example used the graph in dev-support/social-network.pdf
  */

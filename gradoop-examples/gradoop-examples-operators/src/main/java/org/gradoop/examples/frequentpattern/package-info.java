@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Examples related to the BIIIG approach.
+ * Examples related to the DIMSpan approach.
  */
 package org.gradoop.examples.frequentpattern;

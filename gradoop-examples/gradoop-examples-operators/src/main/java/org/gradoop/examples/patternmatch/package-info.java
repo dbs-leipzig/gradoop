@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 /**
- * Programs to run simulation algorithms on extended property graphs.
+ * Examples to show usage of query and cypher methods.
  */
 package org.gradoop.examples.patternmatch;

@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 /**
- *  Quickstart Gradoop Example that walks through the process of loading data and executing
- *  a set of operators.
+ * Example SNA Data
+ *
+ * {@code dev-support/social-network.pdf}
  */
-package org.gradoop.examples.quickstart;
+package org.gradoop.examples.common;

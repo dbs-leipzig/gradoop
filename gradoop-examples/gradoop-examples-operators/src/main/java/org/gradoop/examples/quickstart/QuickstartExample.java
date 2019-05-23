@@ -16,11 +16,8 @@
 package org.gradoop.examples.quickstart;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.examples.common.SocialNetworkGraph;
 import org.gradoop.examples.quickstart.data.QuickstartData;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.WeaklyConnectedComponentsAsCollection;
-import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.dot.DOTDataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
