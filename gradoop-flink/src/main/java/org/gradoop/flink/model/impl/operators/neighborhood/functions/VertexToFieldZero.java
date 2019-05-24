@@ -40,4 +40,3 @@ public class VertexToFieldZero<P, Q, V extends EPGMVertex>
     return reuseTuple;
   }
 }
-

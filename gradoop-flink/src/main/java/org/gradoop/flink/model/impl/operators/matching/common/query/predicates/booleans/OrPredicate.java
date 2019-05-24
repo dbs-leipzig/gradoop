@@ -19,6 +19,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.s1ck.gdl.model.predicates.booleans.Or;
 
+import java.util.Objects;
+
 /**
  * Wraps an {@link org.s1ck.gdl.model.predicates.booleans.Or} predicate
  */
@@ -71,7 +73,7 @@ public class OrPredicate extends QueryPredicate {
 
     OrPredicate orPredicateWrapper = (OrPredicate) o;
 
-    return or != null ? or.equals(orPredicateWrapper.or) : orPredicateWrapper.or == null;
+    return Objects.equals(or, orPredicateWrapper.or);
   }
 
   @Override

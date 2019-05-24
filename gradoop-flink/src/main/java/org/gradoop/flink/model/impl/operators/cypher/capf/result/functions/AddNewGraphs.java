@@ -35,9 +35,7 @@ public class AddNewGraphs<E extends GraphElement>
   implements JoinFunction<Tuple2<Long, GradoopIdSet>, Tuple2<Long, E>, E> {
 
   @Override
-  public E join(
-    Tuple2<Long, GradoopIdSet> idTuple,
-    Tuple2<Long, E> elementTuple) throws Exception {
+  public E join(Tuple2<Long, GradoopIdSet> idTuple, Tuple2<Long, E> elementTuple) {
 
     E element = elementTuple.f1;
     for (GradoopId id : idTuple.f1) {

@@ -37,63 +37,75 @@
 
     <developers>
         <developer>
-            <id>mjunghanns</id>
+            <id>s1ck</id>
             <name>Martin Junghanns</name>
             <email>junghanns@informatik.uni-leipzig.de</email>
-            <timezone>+1</timezone>
             <organization>University of Leipzig</organization>
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
         <developer>
-            <id>apetermann</id>
+            <id>p3et</id>
             <name>Andre Petermann</name>
             <email>petermann@informatik.uni-leipzig.de</email>
-            <timezone>+1</timezone>
             <organization>University of Leipzig</organization>
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
         <developer>
-            <id>kgomez</id>
-            <name>Kevin Gomez</name>
-            <email>gomez@informatik.uni-leipzig.de</email>
-            <timezone>+1</timezone>
-            <organization>University of Leipzig</organization>
-            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
-        </developer>
-        <developer>
-            <id>nteichmann</id>
-            <name>Niklas Teichmann</name>
-            <email>teichmann@studserv.uni-leipzig.de</email>
-            <timezone>+1</timezone>
-            <organization>University of Leipzig</organization>
-            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
-        </developer>
-        <developer>
-            <id>skemper</id>
-            <name>Stephan Kemper</name>
-            <email>mai12byw@studserv.uni-leipzig.de</email>
-            <timezone>+1</timezone>
-            <organization>University of Leipzig</organization>
-            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
-        </developer>
-        <developer>
-            <id>sdienst</id>
-            <name>Steffen Dienst</name>
-            <timezone>+1</timezone>
-            <organization>University of Leipzig</organization>
-        </developer>
-        <developer>
-            <id>crost</id>
+            <id>ChrizZz110</id>
             <name>Christopher Rost</name>
             <email>rost@informatik.uni-leipzig.de</email>
-            <timezone>+1</timezone>
             <organization>University of Leipzig</organization>
             <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
         </developer>
         <developer>
-            <id>mkricke</id>
+            <id>galpha</id>
+            <name>Kevin Gomez</name>
+            <email>gomez@informatik.uni-leipzig.de</email>
+            <organization>University of Leipzig</organization>
+            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
+        </developer>
+        <developer>
+            <id>niklasteichmann</id>
+            <name>Niklas Teichmann</name>
+            <organization>University of Leipzig</organization>
+            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
+        </developer>
+        <developer>
+            <id>Venom590</id>
+            <name>Stephan Kemper</name>
+            <organization>University of Leipzig</organization>
+            <organizationUrl>http://dbs.uni-leipzig.de/en</organizationUrl>
+        </developer>
+        <developer>
+            <id>smee</id>
+            <name>Steffen Dienst</name>
+            <organization>University of Leipzig</organization>
+        </developer>
+        <developer>
+            <id>merando</id>
             <name>Matthias Kricke</name>
-            <timezone>+1</timezone>
+            <organization>University of Leipzig</organization>
+        </developer>
+        <developer>
+            <id>timo95</id>
+            <name>Timo Adameit</name>
+            <organization>University of Leipzig</organization>
+        </developer>
+        <developer>
+            <id>p-f</id>
+            <name>Philip Fritzsche</name>
+            <organization>Institut für Angewandte Informatik e. V.</organization>
+            <email>fritzsche@infai.org</email>
+        </developer>
+        <developer>
+            <id>boggledekoog</id>
+            <name>Julian Götz</name>
+            <organization>Institut für Angewandte Informatik e. V.</organization>
+            <email>goetz@infai.org</email>
+        </developer>
+        <developer>
+            <id>Rascat</id>
+            <name>Lucas Schons</name>
             <organization>University of Leipzig</organization>
         </developer>
     </developers>
@@ -106,6 +118,16 @@
         </developerConnection>
     </scm>
 
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/dbs-leipzig/gradoop/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>Travis CI</system>
+        <url>https://travis-ci.org/dbs-leipzig/gradoop/</url>
+    </ciManagement>
+
     <repositories>
         <repository>
             <id>dbleipzig</id>
@@ -115,6 +137,10 @@
     </repositories>
 
     <distributionManagement>
+        <site>
+            <id>site_gradoop</id>
+            <url>https://dbs-leipzig.github.io/gradoop/</url>
+        </site>
         <snapshotRepository>
             <id>release_artifacts_gradoop</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -164,8 +190,9 @@
         <plugin.maven-gpg.version>1.6</plugin.maven-gpg.version>
         <plugin.maven-nexus-staging.version>1.6.7</plugin.maven-nexus-staging.version>
         <plugin.maven-site.version>3.7.1</plugin.maven-site.version>
-        <plugin.maven-scm-publish.version>1.1</plugin.maven-scm-publish.version>
+        <plugin.maven-scm-publish.version>3.0.0</plugin.maven-scm-publish.version>
         <plugin.maven-jacoco.version>0.8.1</plugin.maven-jacoco.version>
+        <plugin.maven-wagon-ssh.version>3.0.0</plugin.maven-wagon-ssh.version>
     </properties>
 
     <profiles>
@@ -300,39 +327,17 @@
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>${plugin.maven-javadoc.version}</version>
-                        <configuration>
-                            <quiet>true</quiet>
-                            <doclint>none</doclint>
-                            <detectOfflineLinks>false</detectOfflineLinks>
-                            <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
-                            <reportOutputDirectory>${project.build.directory}</reportOutputDirectory>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>javadoc</id>
-                                <goals>
-                                    <goal>javadoc</goal>
-                                </goals>
-                                <phase>site</phase>
-                            </execution>
-                            <execution>
-                                <id>aggregate</id>
-                                <goals>
-                                    <goal>aggregate</goal>
-                                </goals>
-                                <phase>site</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <artifactId>maven-site-plugin</artifactId>
-                        <version>${plugin.maven-site.version}</version>
                         <configuration>
-                            <skip>true</skip>
-                            <skipDeploy>true</skipDeploy>
+                            <skipDeploy>false</skipDeploy>
                         </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.apache.maven.wagon</groupId>
+                                <artifactId>wagon-ssh</artifactId>
+                                <version>${plugin.maven-wagon-ssh.version}</version>
+                            </dependency>
+                        </dependencies>
                     </plugin>
                     <plugin>
                         <artifactId>maven-scm-publish-plugin</artifactId>
@@ -342,8 +347,8 @@
                             <serverId>github</serverId>
                             <pubScmUrl>scm:git:https://github.com/dbs-leipzig/gradoop.git</pubScmUrl>
                             <scmBranch>gh-pages</scmBranch>
-                            <checkinComment>Updated JavaDocs via Maven</checkinComment>
-                            <content>${project.build.directory}/apidocs</content>
+                            <checkinComment>Updated Site via Maven</checkinComment>
+                            <content>${project.build.directory}/staging</content>
                             <siteOutputEncoding>UTF-8</siteOutputEncoding>
                             <tryUpdate>true</tryUpdate>
                         </configuration>
@@ -352,7 +357,7 @@
                                 <goals>
                                     <goal>publish-scm</goal>
                                 </goals>
-                                <phase>site</phase>
+                                <phase>site-deploy</phase>
                             </execution>
                         </executions>
                     </plugin>
@@ -517,10 +522,93 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>${plugin.maven-site.version}</version>
+                    <configuration>
+                        <skipDeploy>true</skipDeploy>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
 
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${plugin.maven-checkstyle.version}</version>
+                <configuration>
+                    <configLocation>gradoop/checkstyle.xml</configLocation>
+                    <headerLocation>gradoop/LICENSE.txt</headerLocation>
+                    <includeResources>false</includeResources>
+                    <includeTestResources>false</includeTestResources>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <suppressionsLocation>
+                        /gradoop/checkstyle-suppressions.xml
+                    </suppressionsLocation>
+                    <suppressionsFileExpression>
+                        checkstyle.suppressions.file
+                    </suppressionsFileExpression>
+                    <failsOnError>false</failsOnError>
+                    <consoleOutput>false</consoleOutput>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${plugin.maven-javadoc.version}</version>
+                <configuration>
+                    <doclint>none</doclint>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${plugin.maven-surefire.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${plugin.maven-jacoco.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>report</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <reports>
+                            <report>report-aggregate</report>
+                        </reports>
+                        <inherited>false</inherited>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${plugin.maven-spotbugs.version}</version>
+                <configuration>
+                    <xmlOutput>true</xmlOutput>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 
     <dependencyManagement>
         <dependencies>
