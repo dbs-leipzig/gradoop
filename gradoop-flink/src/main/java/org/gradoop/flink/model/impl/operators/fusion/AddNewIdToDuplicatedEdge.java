@@ -31,7 +31,7 @@ public class AddNewIdToDuplicatedEdge implements GroupReduceFunction<Edge, Edge>
    * @see org.apache.flink.api.common.functions.GroupReduceFunction#reduce(java.lang.Iterable, org.apache.flink.util.Collector)
    */
   @Override
-  public void reduce(Iterable<Edge> values, Collector<Edge> out) throws Exception {
+  public void reduce(Iterable<Edge> values, Collector<Edge> out) {
     boolean sawFirst = false;
     for (Edge edge: values) {
       if (sawFirst) {

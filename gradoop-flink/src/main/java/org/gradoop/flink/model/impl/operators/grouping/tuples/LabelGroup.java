@@ -19,7 +19,6 @@ import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -276,7 +275,7 @@ public class LabelGroup
     PropertyValue increment = null;
     if ((element instanceof EPGMVertex && aggregateFunction.isVertexAggregation()) ||
       (element instanceof EPGMEdge && aggregateFunction.isEdgeAggregation())) {
-      increment = aggregateFunction.getIncrement((Element) element);
+      increment = aggregateFunction.getIncrement(element);
     }
     return increment == null ? AggregateUtil.getDefaultAggregate(aggregateFunction) : increment;
   }

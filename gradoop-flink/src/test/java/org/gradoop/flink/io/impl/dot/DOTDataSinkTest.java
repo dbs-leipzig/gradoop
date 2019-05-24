@@ -19,6 +19,7 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -33,24 +34,28 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
   @Rule
   public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-  @Test
-  public void testWrite() throws Exception {
+  private String dotFilePath;
 
-    String gdlFile = getFilePath("/data/dot/input.gdl");
-
-    // load from gdl
-    FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlFile);
-
-    // load input graph
-    LogicalGraph inputGraph = loader.getLogicalGraphByVariable("input");
-
+  @Before
+  public void initDotFilePath() {
     // create temp directory
     String tmpDir = temporaryFolder.getRoot().toString();
 
-    final String dotFile = tmpDir + "/check.dot";
+    dotFilePath = tmpDir + "/check.dot";
+  }
+
+  /**
+   * Tests {@link DOTDataSink#write(LogicalGraph)} with instance that uses HTML tables.
+   *
+   * @throws Exception if something goes wrong.
+   */
+  @Test
+  public void testWriteWithHtmlFormat() throws Exception {
 
     // create data sink
-    DataSink dataSink = new DOTDataSink(dotFile, true);
+    DataSink dataSink = initDotDataSink(DOTDataSink.DotFormat.HTML);
+
+    LogicalGraph inputGraph = initInputGraph();
 
     // write graph
     dataSink.write(inputGraph);
@@ -58,42 +63,85 @@ public class DOTDataSinkTest extends GradoopFlinkTestBase {
     // execute
     getExecutionEnvironment().execute();
 
-    int graphLines = 0;
-    int lines = 0;
-    int subgraphLines = 0;
-    int vertexLines = 0;
-    int edgeLines = 0;
+    List<String> lines = readLinesFromEnv();
 
-    // read written file
-    List<String> dotLines = getExecutionEnvironment()
-      .readTextFile(dotFile)
+    checkWriteOutput(lines, DOTDataSink.DotFormat.HTML);
+  }
+
+  /**
+   * Tests {@link DOTDataSink#write(LogicalGraph)} method with instance that uses plain dot
+   * formatting.
+   *
+   * @throws Exception if something goes wrong.
+   */
+  @Test
+  public void testWriteWithSimpleFormat() throws Exception {
+    LogicalGraph inputGraph = initInputGraph();
+
+    DataSink dotDataSink = initDotDataSink(DOTDataSink.DotFormat.SIMPLE);
+
+    dotDataSink.write(inputGraph);
+
+    getExecutionEnvironment().execute();
+
+    List<String> lines = readLinesFromEnv();
+
+    checkWriteOutput(lines, DOTDataSink.DotFormat.SIMPLE);
+  }
+
+  private LogicalGraph initInputGraph() throws Exception {
+    String gdlFile = getFilePath("/data/dot/input.gdl");
+    // load from gdl
+    FlinkAsciiGraphLoader loader = getLoaderFromFile(gdlFile);
+    // load input graph
+    return loader.getLogicalGraphByVariable("input");
+  }
+
+  private DOTDataSink initDotDataSink(DOTDataSink.DotFormat format) {
+    return new DOTDataSink(dotFilePath, true, format);
+  }
+
+  private List<String> readLinesFromEnv() throws Exception {
+    return getExecutionEnvironment()
+      .readTextFile(dotFilePath)
       .setParallelism(1) // force reading lines in order
       .collect();
+  }
+
+  private void checkWriteOutput(List<String> lines, DOTDataSink.DotFormat format) {
+    int countGraphLines = 0;
+    int countLines = 0;
+    int countSubgraphLines = 0;
+    int countVertexLines = 0;
+    int countEdgeLines = 0;
 
     // count vertex and edge lines
-    for (String line : dotLines) {
+    for (String line : lines) {
 
-      if (line.contains("digraph") && lines == 0) {
-        graphLines++;
+      if (line.contains("digraph") && countLines == 0) {
+        countGraphLines++;
       } else  if (line.contains("->")) {
-        edgeLines++;
+        countEdgeLines++;
       } else if (line.startsWith("v")) {
-        vertexLines++;
+        countVertexLines++;
       } else if (line.startsWith("subgraph")) {
-        subgraphLines++;
+        countSubgraphLines++;
       }
-      int index = line.indexOf('&');
-      if (index != -1) {
-        assertTrue("HTML entity & should have been escaped", line.substring(index).startsWith("&amp;"));
+
+      if (format == DOTDataSink.DotFormat.HTML) {
+        int index = line.indexOf('&');
+        if (index != -1) {
+          assertTrue("HTML entity & should have been escaped", line.substring(index).startsWith("&amp;"));
+        }
       }
-      lines++;
+      countLines++;
     }
 
     // assert
-    assertEquals("Wrong prefix/missing 'digraph'", 1, graphLines);
-    assertEquals("Wrong number of subgraph lines", 1, subgraphLines);
-    assertEquals("Wrong number of graph lines", 1, graphLines);
-    assertEquals("Wrong number of edge lines", 4, edgeLines);
-    assertEquals("Wrong number of vertex lines", 3, vertexLines);
+    assertEquals("Wrong prefix/missing 'digraph'", 1, countGraphLines);
+    assertEquals("Wrong number of subgraph lines", 1, countSubgraphLines);
+    assertEquals("Wrong number of graph lines", 1, countGraphLines);
+    assertEquals("Wrong number of edge lines", 4, countEdgeLines);
+    assertEquals("Wrong number of vertex lines", 3, countVertexLines);
   }
 }

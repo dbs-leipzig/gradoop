@@ -61,7 +61,7 @@ public class QueryHandlerTest {
 
     Collection<Triple> triples = QUERY_HANDLER.getTriples();
     assertEquals(expected.size(), triples.size());
-    assertTrue(triples.stream().allMatch(expected::contains));
+    assertTrue(expected.containsAll(triples));
   }
 
   @Test

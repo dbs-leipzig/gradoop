@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
 public class AddCount<T> implements MapFunction<T, WithCount<T>> {
 
   @Override
-  public WithCount<T> map(T object) throws Exception {
+  public WithCount<T> map(T object) {
     return new WithCount<>(object);
   }
 }
