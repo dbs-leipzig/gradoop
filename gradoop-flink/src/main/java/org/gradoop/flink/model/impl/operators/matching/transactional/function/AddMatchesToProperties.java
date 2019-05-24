@@ -57,7 +57,7 @@ public class AddMatchesToProperties
   @Override
   public void coGroup(Iterable<GraphHead> heads,
     Iterable<Tuple2<GradoopId, Boolean>> matches,
-    Collector<GraphHead> collector) throws Exception {
+    Collector<GraphHead> collector) {
     GraphHead graphHead = heads.iterator().next();
     Iterator<Tuple2<GradoopId, Boolean>> it = matches.iterator();
     if (!it.hasNext()) {

@@ -24,6 +24,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.s1ck.gdl.model.comparables.PropertySelector;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -103,9 +104,7 @@ public class PropertySelectorComparable extends QueryComparable {
 
     PropertySelectorComparable that = (PropertySelectorComparable) o;
 
-    return propertySelector != null ?
-      propertySelector.equals(that.propertySelector) :
-      that.propertySelector == null;
+    return Objects.equals(propertySelector, that.propertySelector);
   }
 
   @Override
