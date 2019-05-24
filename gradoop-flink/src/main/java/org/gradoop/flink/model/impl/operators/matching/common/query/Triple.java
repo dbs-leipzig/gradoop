@@ -18,6 +18,8 @@ package org.gradoop.flink.model.impl.operators.matching.common.query;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Vertex;
 
+import java.util.Objects;
+
 /**
  * A triple representation of a query edge.
  */
@@ -71,7 +73,7 @@ public class Triple {
 
     Triple triple = (Triple) o;
 
-    return edge != null ? edge.equals(triple.edge) : triple.edge == null;
+    return Objects.equals(edge, triple.edge);
   }
 
   @Override

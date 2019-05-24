@@ -30,12 +30,12 @@ public class MinimalJSONImporterTest extends GradoopFlinkTestBase {
   /**
    * The path of the test JSON data.
    */
-  private String dirPath = MinimalJSONImporter.class.getResource("/json/testdata.json").getFile();
+  private final String dirPath = MinimalJSONImporter.class.getResource("/json/testdata.json").getFile();
 
   /**
    * The path of a single file of the test JSON data.
    */
-  private String filePath = MinimalJSONImporter.class.getResource("/json/testdata.json/2").getFile();
+  private final String filePath = MinimalJSONImporter.class.getResource("/json/testdata.json/2").getFile();
 
   /**
    * The loader used to load the expected graph.

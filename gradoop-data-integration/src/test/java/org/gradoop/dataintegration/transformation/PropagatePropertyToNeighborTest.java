@@ -39,7 +39,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
    * Whether this order makes any sense is not relevant for this test, it is just used to make sure
    * that two list-typed properties have the same order.
    */
-  private static Comparator<PropertyValue> byTypeFirst = Comparator
+  private static final Comparator<PropertyValue> byTypeFirst = Comparator
     .comparing((PropertyValue pv) -> pv.getType().getSimpleName())
     .thenComparing(Comparator.naturalOrder());
 
