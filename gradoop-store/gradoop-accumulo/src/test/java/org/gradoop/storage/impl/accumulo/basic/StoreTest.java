@@ -294,7 +294,6 @@ public class StoreTest extends AccumuloStoreTestBase {
   /**
    * Checks if property values are read correctly.
    */
-  @SuppressWarnings("Duplicates")
   @Test
   public void propertyTypeTest()
     throws AccumuloSecurityException, AccumuloException, IOException {
@@ -418,7 +417,6 @@ public class StoreTest extends AccumuloStoreTestBase {
     validateEPGMGraphElements(originalVertex, loadedVertex);
   }
 
-  @SuppressWarnings("Duplicates")
   private void validateEdge(
     AccumuloEPGMStore graphStore,
     Edge originalEdge

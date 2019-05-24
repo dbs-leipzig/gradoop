@@ -25,7 +25,6 @@ import static org.gradoop.common.GradoopTestUtils.*;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.AssertJUnit.*;
 
-@SuppressWarnings("Duplicates")
 public class PropertiesTest {
 
   @Test
