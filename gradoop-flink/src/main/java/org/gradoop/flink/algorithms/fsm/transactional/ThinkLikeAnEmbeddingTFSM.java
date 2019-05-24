@@ -41,9 +41,9 @@ public class ThinkLikeAnEmbeddingTFSM
   extends ThinkLikeAnEmbeddingFSMBase<TFSMGraph, TFSMSubgraph, TFSMSubgraphEmbeddings> {
 
   /**
-   * constructor
-   * @param fsmConfig frequent subgraph mining configuration
+   * Constructor
    *
+   * @param fsmConfig frequent subgraph mining configuration
    */
   public ThinkLikeAnEmbeddingTFSM(FSMConfig fsmConfig) {
     super(fsmConfig);

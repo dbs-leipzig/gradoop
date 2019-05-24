@@ -347,9 +347,7 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
     if (patternEdge.getSourceVertexId()
       .equals(patternEdge.getTargetVertexId())) {
       if (edgeCandidate.f0.equals(edgeCandidate.f1)) {
-        if (edgeCandidate.f2[(int) patternEdge.getId()]) {
-          return true;
-        }
+        return edgeCandidate.f2[(int) patternEdge.getId()];
       }
     }
     return false;
@@ -505,9 +503,7 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
     Tuple3<GradoopId, GradoopId, boolean[]> edge = edgeDict.get(edgeCandidate);
     if (edge.f2[(int) patternEdge.getId()]) {
       GradoopId possibleVertex = edge.f1;
-      if (possibleVertex.equals(target)) {
-        return true;
-      }
+      return possibleVertex.equals(target);
     }
     return false;
   }
@@ -525,9 +521,7 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
     Tuple3<GradoopId, GradoopId, boolean[]> edge = edgeDict.get(edgeCandidate);
     if (edge.f2[(int) patternEdge.getId()]) {
       GradoopId possibleVertex = edge.f0;
-      if (possibleVertex.equals(source)) {
-        return true;
-      }
+      return possibleVertex.equals(source);
     }
     return false;
   }

@@ -80,8 +80,7 @@ public class PlanTable implements Iterable<PlanTableEntry> {
    */
   public PlanTableEntry min() {
     return planTableEntries.stream()
-      .sorted(Comparator.comparingLong(PlanTableEntry::getEstimatedCardinality))
-      .findFirst()
+      .min(Comparator.comparingLong(PlanTableEntry::getEstimatedCardinality))
       .orElseThrow(NoSuchElementException::new);
   }
 

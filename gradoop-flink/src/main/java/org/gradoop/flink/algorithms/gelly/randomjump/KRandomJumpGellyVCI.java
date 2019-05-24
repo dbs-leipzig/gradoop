@@ -153,7 +153,7 @@ public class KRandomJumpGellyVCI
   public LogicalGraph executeInGelly(Graph<Long, VCIVertexValue, Long> gellyGraph)
     throws Exception {
 
-    Long vertexCount = gellyGraph.numberOfVertices();
+    long vertexCount = gellyGraph.numberOfVertices();
 
     //--------------------------------------------------------------------------
     // pre compute
