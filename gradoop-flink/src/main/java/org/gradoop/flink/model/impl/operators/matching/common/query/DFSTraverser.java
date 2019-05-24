@@ -57,8 +57,7 @@ public class DFSTraverser implements RootedTraverser {
     long current = rootVertex;
 
     vertexVisited.add(current);
-    Deque<Edge> edgeStack = new ArrayDeque<>();
-    edgeStack.addAll(queryHandler.getEdgesByVertexId(current));
+    Deque<Edge> edgeStack = new ArrayDeque<>(queryHandler.getEdgesByVertexId(current));
 
     while (!edgeStack.isEmpty()) {
       Edge edge = edgeStack.removeLast();

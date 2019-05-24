@@ -55,7 +55,7 @@ public class BuildEmbeddingFromVertex<K>
   }
 
   @Override
-  public EmbeddingWithTiePoint<K> map(IdWithCandidates<K> v) throws Exception {
+  public EmbeddingWithTiePoint<K> map(IdWithCandidates<K> v) {
     reuseEmbeddingWithTiePoint.setTiePointId(v.getId());
     // candidate is same for all vertices
     reuseEmbedding.getVertexMapping()[vertexCandidate] = v.getId();

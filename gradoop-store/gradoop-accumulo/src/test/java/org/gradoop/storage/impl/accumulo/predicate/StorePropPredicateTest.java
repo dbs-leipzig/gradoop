@@ -183,7 +183,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
           Query.elements()
             .fromAll()
             .where(AccumuloFilters
-              .<GraphHead>propLargerThan("vertexCount", 4, true)))
+              .propLargerThan("vertexCount", 4, true)))
         .readRemainsAndClose();
 
       GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);

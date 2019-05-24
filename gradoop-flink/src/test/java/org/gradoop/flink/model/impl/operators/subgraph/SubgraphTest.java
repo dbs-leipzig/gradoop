@@ -220,9 +220,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     FilterFunction<Edge> edgeFilterFunction = e -> {
       if (e.getLabel().equals("knows")) {
-        if (e.getPropertyValue("since").getInt() == 2016) {
-          return true;
-        }
+        return e.getPropertyValue("since").getInt() == 2016;
       }
       return false;
     };

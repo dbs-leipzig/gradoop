@@ -52,17 +52,17 @@ public class AbstractRichCombinedFilterFunctionTest
     /**
      * The key in the configuration.
      */
-    public static String KEY = "filterKey";
+    public static final String KEY = "filterKey";
 
     @Override
-    public void open(Configuration parameters) throws Exception {
+    public void open(Configuration parameters) {
       assertNotNull("Parameters not set", parameters);
       assertNotNull("RuntimeContext not set", getRuntimeContext());
       expectedValue = parameters.getInteger(KEY, -1);
     }
 
     @Override
-    public boolean filter(Integer value) throws Exception {
+    public boolean filter(Integer value) {
       assertNotNull("Context not set.", getRuntimeContext());
       return value == expectedValue;
     }

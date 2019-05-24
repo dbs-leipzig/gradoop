@@ -405,7 +405,7 @@ public class QueryHandler {
     Collection<Edge> predecessors =
       getEdgesByTargetVertexId(getEdgeById(edgeId).getSourceVertexId());
     return predecessors != null ?
-      Lists.newArrayList(predecessors) : Lists.<Edge>newArrayList();
+      Lists.newArrayList(predecessors) : Lists.newArrayList();
   }
 
   /**
@@ -419,7 +419,7 @@ public class QueryHandler {
     Collection<Edge> successors =
       getEdgesBySourceVertexId(getEdgeById(edgeId).getTargetVertexId());
     return successors != null ?
-      Lists.newArrayList(successors) : Lists.<Edge>newArrayList();
+      Lists.newArrayList(successors) : Lists.newArrayList();
   }
 
   /**

@@ -80,7 +80,7 @@ public class DIMSpanConfig implements Serializable {
   public String toString() {
     List<String> parameters = Lists.newArrayList();
 
-    parameters.add("s_min : " + String.valueOf(minSupport));
+    parameters.add("s_min : " + minSupport);
     parameters.add((directed ? "directed" : "undirected") + " mode");
     parameters.add("dictionary type : " + dictionaryType.toString());
 
