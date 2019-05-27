@@ -123,14 +123,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   private final List<LabelGroup> edgeLabelGroups;
 
   /**
-   * Default vertex label group.
-   */
-  private final LabelGroup defaultVertexLabelGroup;
-
-  /**
-   * True: vertices without labels or matching properties will be converted to individual groups/
-   * supervertices.
-   * False: vertices without labels or matching properties will be collapsed into a single group/
+   * True: vertices that are not member of any labelGroup are converted as is to supervertices.
+   * False: vertices that are not member of any labelGroup will be collapsed into a single group/
    * supervertice.
    */
   private final boolean retainVerticesWithoutGroups;
@@ -138,7 +132,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   /**
    * Returns true, if a vertex is not a member of any labelGroup.
    */
-  protected final FilterFunction<Vertex> vertexInNoGroupFilter;
+  private final FilterFunction<Vertex> vertexInNoGroupFilter;
 
   /**
    * Creates grouping operator instance.
@@ -152,14 +146,12 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    *                                    grouping by labels)
    */
   Grouping(boolean useVertexLabels, boolean useEdgeLabels, List<LabelGroup> vertexLabelGroups,
-    List<LabelGroup> edgeLabelGroups, boolean retainVerticesWithoutGroups,
-    LabelGroup defaultVertexLabelGroup) {
+    List<LabelGroup> edgeLabelGroups, boolean retainVerticesWithoutGroups) {
     this.useVertexLabels = useVertexLabels;
     this.useEdgeLabels = useEdgeLabels;
     this.vertexLabelGroups = vertexLabelGroups;
     this.edgeLabelGroups = edgeLabelGroups;
     this.retainVerticesWithoutGroups = retainVerticesWithoutGroups;
-    this.defaultVertexLabelGroup = defaultVertexLabelGroup;
 
     FilterFunction[] isVertexInLabelGroupFunctions = getVertexLabelGroups()
       .parallelStream()
@@ -345,8 +337,10 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    */
   private FilterFunction<Vertex> getIsVertexMemberOfLabelGroupFilter(LabelGroup group) {
 
-    // Returns true, if a vertex exhibits all properties of a labelGroup.
-    // Also returns true, if grouped by properties are empty
+    /*
+     * Returns true, if a vertex exhibits all properties of a labelGroup.
+     * Also returns true, if grouped by properties (propertyKeys) are empty.
+     */
     BiFunction<LabelGroup, Vertex, Boolean> hasVertexAllPropertiesOfGroup =
       (BiFunction<LabelGroup, Vertex, Boolean> & Serializable) (labelGroup, vertex) ->
         group.getPropertyKeys()
@@ -393,8 +387,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   }
 
   /**
-   * Returns a subgraph that only includes vertices that are not member of any labelGroups.
-   * Also returns only edges between said vertices.
+   * Returns a verified subgraph that only includes vertices that are not member of any labelGroups.
    *
    * @param graph to filter
    * @return subgraph
@@ -416,10 +409,20 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     return vertices.filter(new Not<>(vertexInNoGroupFilter));
   }
 
-  protected DataSet<Edge> subtractRetainedEdgesFromDefaultGraph(LogicalGraph graph,
+  /**
+   * Is used when {@link Grouping#retainVerticesWithoutGroups} is set.
+   * Edges between retained vertices are not grouped, but converted as they are.
+   * So set of edges to be grouped needs to be reduced accordingly.
+   * Computes: {@code graph.getEdges() - retainedVerticesSubgraph.getEdges()}
+   *
+   * @param graph to be grouped
+   * @param retainedVerticesSubgraph graph that contains all retained vertices
+   * @return reduced set of edges
+   */
+  DataSet<Edge> subtractRetainedEdgesFromDefaultGraph(LogicalGraph graph,
     LogicalGraph retainedVerticesSubgraph) {
-    DataSet<Edge> edgesToGroup;
-    edgesToGroup = graph.getEdges()
+
+    return graph.getEdges()
       .coGroup(retainedVerticesSubgraph.getEdges())
       .where("sourceId", "targetId")
       .equalTo("sourceId", "targetId")
@@ -432,10 +435,18 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
 
       })
       .returns(Edge.class);
-    return edgesToGroup;
   }
 
-  protected DataSet<VertexWithSuperVertex> updateVertexRepresentativesWithUngroupedVertices(
+  /**
+   * Is used when {@link Grouping#retainVerticesWithoutGroups} is set.
+   * To add support for grouped edges between retained vertices and supervertices,
+   * retained vertices are singleton groups and are their group representatives themself.
+   *
+   * @param vertexToRepresentativeMap vertex representative map to add to
+   * @param retainedVerticesSubgraph graph that contains only retained vertices
+   * @return updated vertexToRepresentativeMap
+   */
+  DataSet<VertexWithSuperVertex> updateVertexRepresentativesWithUngroupedVertices(
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap,
     LogicalGraph retainedVerticesSubgraph) {
     DataSet<VertexWithSuperVertex> verticesRepresentatives =
@@ -446,7 +457,15 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     return vertexToRepresentativeMap;
   }
 
-  protected LogicalGraph buildGroupedGraph(DataSet<Vertex> superVertices,
+  /**
+   * Builds a graph that contains all grouped vertices and edges.
+   *
+   * @param superVertices set of vertices
+   * @param vertexToRepresentativeMap set of representatives of vertices
+   * @param edgesToGroup edges to be grouped
+   * @return grouped graph
+   */
+  LogicalGraph buildGroupedGraph(DataSet<Vertex> superVertices,
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap, DataSet<Edge> edgesToGroup) {
     // build super edges
     DataSet<Edge> superEdges = buildSuperEdges(edgesToGroup, vertexToRepresentativeMap);
@@ -540,16 +559,14 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     }
 
     /**
-     * This flag only applies when grouping by labels.
-     * If retainVerticesWithoutGroups is true, vertices without labels are converted as is to
-     * supervertices.
-     * Otherwise all vertices without labels are collapsed into a single supervertice/ group.
+     * True: vertices that are not member of any labelGroup are converted as is to supervertices.
+     * False: vertices that are not member of any labelGroup will be collapsed into a single group/
+     * supervertice.
      *
-     * @param retainVerticesWithoutGroups true: Vertices without labels are not reduced to a
-     *                                    single super vertex
+     * @param retainVerticesWithoutGroups flag
      * @return this builder
      */
-    public GroupingBuilder setRetainVerticesWithoutGroups(boolean retainVerticesWithoutGroups) {
+    GroupingBuilder setRetainVerticesWithoutGroups(boolean retainVerticesWithoutGroups) {
       this.retainVerticesWithoutGroups = retainVerticesWithoutGroups;
       return this;
     }
@@ -835,11 +852,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
           "Provide vertex key(s) and/or use vertex labels for grouping.");
       }
 
-/*      if (retainVerticesWithoutGroups && !useVertexLabel) {
-        throw new UnsupportedOperationException("retainVerticesWithoutGroups can only be used in " +
-          "conjunction with useVertexLabel");
-      }*/
-
       // adding the global aggregators to the associated label groups
       for (LabelGroup vertexLabelGroup : vertexLabelGroups) {
         for (AggregateFunction aggregateFunction : globalVertexAggregateFunctions) {
@@ -859,11 +871,11 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       case GROUP_REDUCE:
         groupingOperator =
           new GroupingGroupReduce(useVertexLabel, useEdgeLabel, vertexLabelGroups,
-            edgeLabelGroups, retainVerticesWithoutGroups, defaultVertexLabelGroup);
+            edgeLabelGroups, retainVerticesWithoutGroups);
         break;
       case GROUP_COMBINE:
         groupingOperator = new GroupingGroupCombine(useVertexLabel, useEdgeLabel, vertexLabelGroups,
-          edgeLabelGroups, retainVerticesWithoutGroups, defaultVertexLabelGroup);
+          edgeLabelGroups, retainVerticesWithoutGroups);
         break;
       default:
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);

@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
-import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -26,7 +25,6 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWith
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterRegularVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceVertexGroupItems;
-import org.gradoop.flink.model.impl.operators.grouping.functions.VertexSuperVertexIdentity;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
@@ -68,15 +66,12 @@ public class GroupingGroupReduce extends Grouping {
    * @param edgeLabelGroups             stores grouping properties for edge labels
    * @param retainVerticesWithoutGroups convert vertices that are not member of a group as is to
    *                                    supervertices
-   * @param defaultVertexLabelGroup     default vertex label group
    */
   GroupingGroupReduce(boolean useVertexLabels, boolean useEdgeLabels,
     List<LabelGroup> vertexLabelGroups, List<LabelGroup> edgeLabelGroups,
-    boolean retainVerticesWithoutGroups,
-    LabelGroup defaultVertexLabelGroup) {
+    boolean retainVerticesWithoutGroups) {
     super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups,
-      retainVerticesWithoutGroups,
-      defaultVertexLabelGroup);
+      retainVerticesWithoutGroups);
   }
 
   @Override
@@ -93,7 +88,7 @@ public class GroupingGroupReduce extends Grouping {
     }
 
     DataSet<VertexGroupItem> verticesForGrouping = vertices.flatMap(
-      new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups(), false));
+      new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> vertexGroupItems = groupVertices(verticesForGrouping)
