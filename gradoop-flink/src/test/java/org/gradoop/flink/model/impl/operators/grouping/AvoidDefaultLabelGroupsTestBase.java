@@ -1,6 +1,10 @@
 package org.gradoop.flink.model.impl.operators.grouping;
 
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -31,7 +35,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests correct conversion of a vertex with no properties.
    *
    * @throws Exception if collecting result values fails
@@ -55,7 +59,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -63,7 +67,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests correct conversion of a vertex with a single property.
    *
    * @throws Exception if collecting result values fails
@@ -88,7 +92,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -96,7 +100,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests correct conversion of a vertex with multiple properties.
    *
    * @throws Exception if collecting result values fails
@@ -120,7 +124,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .addVertexGroupingKey("c")
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -128,7 +132,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests correct conversion of an edge from a vertex to be converted to a grouped vertex.
    *
    * @throws Exception if collecting result values fails
@@ -160,7 +164,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
       .addEdgeAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -168,7 +172,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests correct conversion of edges from a vertex to be converted to a grouped vertices.
    *
    * @throws Exception if collecting result values fails
@@ -204,7 +208,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
       .addEdgeAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -212,7 +216,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests correct conversion of an edge from a vertex to be grouped to a converted vertex.
    *
    * @throws Exception if collecting result values fails
@@ -244,7 +248,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
       .addEdgeAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -252,7 +256,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests correct conversion of edges from vertices to be grouped to a converted vertex.
    *
    * @throws Exception if collecting result values fails
@@ -288,7 +292,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
       .addEdgeAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -296,7 +300,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests correct conversion of an edge from a vertex to itself.
    *
    * @throws Exception if collecting result values fails
@@ -325,7 +329,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -333,7 +337,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests correct conversion of edges between converted vertices.
    *
    * @throws Exception if collecting result values fails
@@ -365,7 +369,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
       .addEdgeAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -373,7 +377,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests correct conversion of edges between converted vertices.
    *
    * @throws Exception if collecting result values fails
@@ -409,7 +413,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
       .addEdgeAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -417,7 +421,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests a graph without vertices.
    *
    * @throws Exception if collecting result values fails
@@ -440,7 +444,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -448,7 +452,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests a graph that contains to vertices to be converted 1:1.
    *
    * @throws Exception if collecting result values fails
@@ -481,7 +485,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -489,7 +493,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * Tests a graph that contains only vertices to be converted 1:1.
    *
    * @throws Exception if collecting result values fails
@@ -524,7 +528,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .useVertexLabel(true)
       .addVertexGroupingKey("c")
       .addVertexAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -532,7 +536,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * <p>
    * Groups a graph by label.
    * The graph contains:
@@ -569,7 +573,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -577,7 +581,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * <p>
    * Groups a graph by label and property a.
    * The graph contains:
@@ -621,7 +625,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .useVertexLabel(true)
       .addVertexGroupingKey("a")
       .addVertexAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -629,7 +633,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * <p>
    * Groups a graph by label and properties a, b.
    * The graph contains:
@@ -667,7 +671,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .useVertexLabel(true)
       .addVertexGroupingKeys(Arrays.asList("a", "b"))
       .addVertexAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -675,7 +679,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * <p>
    * Groups a graph by property a.
    * The graph contains:
@@ -718,7 +722,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .useVertexLabel(false)
       .addVertexGroupingKey("a")
       .addVertexAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -726,7 +730,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * <p>
    * Groups a graph by properties a, b.
    * The graph contains:
@@ -763,7 +767,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .useVertexLabel(false)
       .addVertexGroupingKeys(Arrays.asList("a", "b"))
       .addVertexAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -771,7 +775,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * <p>
    * Groups a graph by nothing, so every vertex needs to be converted as it is.
    * The graph contains:
@@ -808,7 +812,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(false)
       .addVertexAggregateFunction(new Count())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -816,7 +820,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * When using label specific grouping and no vertex will be converted 1:1.
    *
    * @throws Exception if collecting result values fails
@@ -855,7 +859,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .useVertexLabel(true)
       .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
       .addVertexLabelGroup("B", "SuperB", Collections.singletonList("b"))
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -864,7 +868,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * <p>
    * Groups a graph by label A and two properties a, b.
    * The graph contains:
@@ -917,7 +921,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .useVertexLabel(false)
       .addVertexLabelGroup("A", "A", Arrays.asList("a", "b"),
         Collections.singletonList(new Count()))
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -925,7 +929,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * <p>
    * Uses label specific grouping and global grouping by a property.
    * Vertices without the grouped by property and non-matching labels will be converted.
@@ -971,7 +975,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .addVertexGroupingKey("f")
       .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
       .addVertexLabelGroup("B", "SuperB", Collections.singletonList("b"))
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -979,7 +983,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   }
 
   /**
-   * Tests function {@link Grouping#groupInternal(LogicalGraph)}.
+   * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * <p>
    * Uses label specific grouping and no global grouping.
    * Multiple Vertices are not members of specific labelGroups and will not be grouped.
@@ -1022,7 +1026,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
       .useVertexLabel(false)
       .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
       .addVertexLabelGroup("B", "SuperB", Collections.singletonList("b"))
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(

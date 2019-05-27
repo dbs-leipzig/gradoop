@@ -27,6 +27,8 @@ import org.s1ck.gdl.model.predicates.booleans.Or;
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
+import java.util.Objects;
+
 /**
  * Wraps a {@link org.s1ck.gdl.model.predicates.booleans.Not} predicate
  */
@@ -124,8 +126,7 @@ public class NotPredicate extends QueryPredicate {
 
     NotPredicate that = (NotPredicate) o;
 
-    return not != null ? not.equals(that.not) : that.not == null;
-
+    return Objects.equals(not, that.not);
   }
 
   @Override

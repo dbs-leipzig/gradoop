@@ -15,22 +15,26 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
-import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.GradoopConstants;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.filters.Not;
 import org.gradoop.flink.model.impl.functions.filters.Or;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.CombineEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceEdgeGroupItems;
+import org.gradoop.flink.model.impl.operators.grouping.functions.SubtractCoGroupFunction;
 import org.gradoop.flink.model.impl.operators.grouping.functions.UpdateEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.VertexSuperVertexIdentity;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
@@ -38,7 +42,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
-import org.gradoop.flink.util.GradoopFlinkConfig;
+import org.gradoop.flink.model.impl.operators.verify.Verify;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -84,8 +88,17 @@ import java.util.stream.Collectors;
  * <p>
  * In addition to vertex properties, grouping is also possible on edge
  * properties, vertex- and edge labels as well as combinations of those.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
  */
-public abstract class Grouping implements UnaryGraphToGraphOperator {
+public abstract class Grouping<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG>>  implements UnaryBaseGraphToBaseGraphOperator<LG> {
   /**
    * Used as property key to declare a label based grouping.
    * <p>
@@ -100,10 +113,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * Used to verify if a grouping key is used for all edges.
    */
   public static final String DEFAULT_EDGE_LABEL_GROUP = ":defaultEdgeLabelGroup";
-  /**
-   * Gradoop Flink configuration.
-   */
-  protected GradoopFlinkConfig config;
   /**
    * True if vertices shall be grouped using their label.
    */
@@ -132,7 +141,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   /**
    * Returns true, if a vertex is not a member of any labelGroup.
    */
-  private final FilterFunction<Vertex> vertexInNoGroupFilter;
+  private final FilterFunction<V> vertexInNoGroupFilter;
 
   /**
    * Creates grouping operator instance.
@@ -159,14 +168,12 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
       .collect(Collectors.toList())
       .toArray(new FilterFunction[getVertexLabelGroups().size()]);
 
-    vertexInNoGroupFilter = new Not<>(new Or<Vertex>(isVertexInLabelGroupFunctions));
+    vertexInNoGroupFilter = new Not<V>(new Or<V>(isVertexInLabelGroupFunctions));
   }
 
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
-    LogicalGraph result;
-
-    config = graph.getConfig();
+  public LG execute(LG graph) {
+    LG result;
 
     if (!useVertexProperties() &&
       !useEdgeProperties() &&
@@ -285,17 +292,19 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   /**
    * Build super edges by joining them with vertices and their super vertex.
    *
-   * @param inputEdges                input edges
+   * @param factory factory
+   * @param edgesToGroup input edgesToGroup
    * @param vertexToRepresentativeMap dataset containing tuples of vertex id and super vertex id
    * @return super edges
    */
-  protected DataSet<Edge> buildSuperEdges(
-    DataSet<Edge> inputEdges,
+  protected DataSet<E> buildSuperEdges(
+    BaseGraphFactory<G,V,E,LG> factory,
+    DataSet<E> edgesToGroup,
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap) {
 
-    DataSet<EdgeGroupItem> edges = inputEdges
+    DataSet<EdgeGroupItem> edges = edgesToGroup
       // build edge group items
-      .flatMap(new BuildEdgeGroupItem(useEdgeLabels(), getEdgeLabelGroups()))
+      .flatMap(new BuildEdgeGroupItem<>(useEdgeLabels(), getEdgeLabelGroups()))
       // join edges with vertex-group-map on source-id == vertex-id
       .join(vertexToRepresentativeMap)
       .where(0).equalTo(0)
@@ -315,9 +324,9 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
 
     // group + reduce + build final edges
     return groupEdges(combinedEdges)
-      .reduceGroup(new ReduceEdgeGroupItems(
+      .reduceGroup(new ReduceEdgeGroupItems<>(
         useEdgeLabels(),
-        config.getEdgeFactory()));
+        factory.getEdgeFactory()));
   }
 
   /**
@@ -326,7 +335,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * @param graph input graphe
    * @return grouped output graph
    */
-  protected abstract LogicalGraph groupInternal(LogicalGraph graph);
+  protected abstract LG groupInternal(LG graph);
 
   /**
    * Returns a {@link FilterFunction<Vertex>} that checks if a vertex is member of a
@@ -392,10 +401,13 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * @param graph to filter
    * @return subgraph
    */
-  LogicalGraph getRetainedVerticesSubgraph(LogicalGraph graph) {
-    return graph
-      .subgraph(vertexInNoGroupFilter, new True<>(), Subgraph.Strategy.VERTEX_INDUCED)
-      .verify();
+  LG getRetainedVerticesSubgraph(LG graph) {
+
+    LG filtered = new Subgraph<G, V, E, LG>(vertexInNoGroupFilter, new True<>(),
+      Subgraph.Strategy.VERTEX_INDUCED)
+      .execute(graph);
+
+    return new Verify<G, V, E, LG>().execute(filtered);
   }
 
   /**
@@ -405,7 +417,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * @param vertices to check
    * @return filtered vertices
    */
-  DataSet<Vertex> getVerticesToGroup(DataSet<Vertex> vertices) {
+  DataSet<V> getVerticesToGroup(DataSet<V> vertices) {
     return vertices.filter(new Not<>(vertexInNoGroupFilter));
   }
 
@@ -419,22 +431,15 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    * @param retainedVerticesSubgraph graph that contains all retained vertices
    * @return reduced set of edges
    */
-  DataSet<Edge> subtractRetainedEdgesFromDefaultGraph(LogicalGraph graph,
-    LogicalGraph retainedVerticesSubgraph) {
+  DataSet<E> subtractRetainedEdgesFromDefaultGraph(LG graph,
+    LG retainedVerticesSubgraph) {
 
     return graph.getEdges()
       .coGroup(retainedVerticesSubgraph.getEdges())
       .where("sourceId", "targetId")
       .equalTo("sourceId", "targetId")
-      .with((CoGroupFunction<Edge, Edge, Edge>) (first, second, out) -> {
-
-        // only collect edges that do not exist in retainedVerticesSubgraph
-        if (!second.iterator().hasNext()) {
-          first.forEach(out::collect);
-        }
-
-      })
-      .returns(Edge.class);
+      //.with(new SubtractCoGroupFunction())
+      .with(new SubtractCoGroupFunction<>());
   }
 
   /**
@@ -448,29 +453,13 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    */
   DataSet<VertexWithSuperVertex> updateVertexRepresentativesWithUngroupedVertices(
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap,
-    LogicalGraph retainedVerticesSubgraph) {
+    LG retainedVerticesSubgraph) {
     DataSet<VertexWithSuperVertex> verticesRepresentatives =
       retainedVerticesSubgraph.getVertices()
-        .map(new VertexSuperVertexIdentity());
+        .map(new VertexSuperVertexIdentity<>());
 
     vertexToRepresentativeMap = vertexToRepresentativeMap.union(verticesRepresentatives);
     return vertexToRepresentativeMap;
-  }
-
-  /**
-   * Builds a graph that contains all grouped vertices and edges.
-   *
-   * @param superVertices set of vertices
-   * @param vertexToRepresentativeMap set of representatives of vertices
-   * @param edgesToGroup edges to be grouped
-   * @return grouped graph
-   */
-  LogicalGraph buildGroupedGraph(DataSet<Vertex> superVertices,
-    DataSet<VertexWithSuperVertex> vertexToRepresentativeMap, DataSet<Edge> edgesToGroup) {
-    // build super edges
-    DataSet<Edge> superEdges = buildSuperEdges(edgesToGroup, vertexToRepresentativeMap);
-
-    return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
   }
 
   /**
@@ -844,9 +833,17 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Creates a new grouping operator instance based on the configured
      * parameters.
      *
+     * @param <G> The graph head type.
+     * @param <V> The vertex type.
+     * @param <E> The edge type.
+     * @param <LG> The type of the graph.
      * @return grouping operator instance
      */
-    public Grouping build() {
+    public <
+      G extends EPGMGraphHead,
+      V extends EPGMVertex,
+      E extends EPGMEdge,
+      LG extends BaseGraph<G, V, E, LG>> Grouping<G, V, E, LG> build() {
       if (vertexLabelGroups.isEmpty() && !useVertexLabel) {
         throw new IllegalArgumentException(
           "Provide vertex key(s) and/or use vertex labels for grouping.");
@@ -865,17 +862,16 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
         }
       }
 
-      Grouping groupingOperator;
+      Grouping<G, V, E, LG> groupingOperator;
 
       switch (strategy) {
       case GROUP_REDUCE:
-        groupingOperator =
-          new GroupingGroupReduce(useVertexLabel, useEdgeLabel, vertexLabelGroups,
-            edgeLabelGroups, retainVerticesWithoutGroups);
+        groupingOperator = new GroupingGroupReduce<>(
+          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups, retainVerticesWithoutGroups);
         break;
       case GROUP_COMBINE:
-        groupingOperator = new GroupingGroupCombine(useVertexLabel, useEdgeLabel, vertexLabelGroups,
-          edgeLabelGroups, retainVerticesWithoutGroups);
+        groupingOperator = new GroupingGroupCombine<>(
+          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups, retainVerticesWithoutGroups);
         break;
       default:
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);
