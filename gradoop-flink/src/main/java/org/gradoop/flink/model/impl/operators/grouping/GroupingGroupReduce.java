@@ -16,9 +16,10 @@
 package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWithSuperVertex;
@@ -53,8 +54,17 @@ import java.util.List;
  *    and/or edge property.
  * 8) Group combine on the workers and compute aggregate.
  * 9) Group reduce globally and create final super edges.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
  */
-public class GroupingGroupReduce extends Grouping {
+public class GroupingGroupReduce<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG>> extends Grouping<G, V, E, LG> {
   /**
    * Creates grouping operator instance.
    *
@@ -73,22 +83,22 @@ public class GroupingGroupReduce extends Grouping {
   }
 
   @Override
-  protected LogicalGraph groupInternal(LogicalGraph graph) {
+  protected LG groupInternal(LG graph) {
 
     DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices()
       // map vertex to vertex group item
-      .flatMap(new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups()));
+      .flatMap(new BuildVertexGroupItem<>(useVertexLabels(), getVertexLabelGroups()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> vertexGroupItems = groupVertices(verticesForGrouping)
       // apply aggregate function
       .reduceGroup(new ReduceVertexGroupItems(useVertexLabels()));
 
-    DataSet<Vertex> superVertices = vertexGroupItems
+    DataSet<V> superVertices = vertexGroupItems
       // filter group representative tuples
       .filter(new FilterSuperVertices())
       // build super vertices
-      .map(new BuildSuperVertex(useVertexLabels(), config.getVertexFactory()));
+      .map(new BuildSuperVertex<>(useVertexLabels(), graph.getFactory().getVertexFactory()));
 
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap = vertexGroupItems
       // filter group element tuples
@@ -97,8 +107,8 @@ public class GroupingGroupReduce extends Grouping {
       .map(new BuildVertexWithSuperVertex());
 
     // build super edges
-    DataSet<Edge> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
+    DataSet<E> superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);
 
-    return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
+    return graph.getFactory().fromDataSets(superVertices, superEdges);
   }
 }
