@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
+import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -29,6 +30,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.CombineVertexGr
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterRegularVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.TransposeVertexGroupItems;
+import org.gradoop.flink.model.impl.operators.grouping.functions.VertexSuperVertexIdentity;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
@@ -36,6 +38,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVer
 import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Grouping implementation that uses group + groupCombine + groupReduce for
@@ -88,9 +91,21 @@ public class GroupingGroupCombine extends Grouping {
 
   @Override
   protected LogicalGraph groupInternal(LogicalGraph graph) {
+
+    DataSet<Vertex> vertices = graph.getVertices();
+
+    Optional<LogicalGraph> optionalRetainedVerticesSubgraph =
+      isRetainingVerticesWithoutGroups() ? Optional.of(getRetainedVerticesSubgraph(graph)) :
+        Optional.empty();
+
+    if (optionalRetainedVerticesSubgraph.isPresent()) {
+      vertices = getVerticesToGroup(vertices);
+    }
+
     // map vertex to vertex group item
-    DataSet<VertexGroupItem> verticesForGrouping = graph.getVertices().flatMap(
-      new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups(), isRetainingVerticesWithoutGroups()));
+    DataSet<VertexGroupItem> verticesForGrouping = vertices.flatMap(
+      new BuildVertexGroupItem(useVertexLabels(), getVertexLabelGroups(),
+        isRetainingVerticesWithoutGroups()));
 
     // group vertices by label / properties / both
     DataSet<VertexGroupItem> combinedVertexGroupItems = groupVertices(verticesForGrouping)
@@ -121,9 +136,29 @@ public class GroupingGroupCombine extends Grouping {
       .map(new BuildVertexWithSuperVertexBC())
       .withBroadcastSet(mapping, BuildVertexWithSuperVertexBC.BC_MAPPING);
 
-    // build super edges
-    DataSet<Edge> superEdges = buildSuperEdges(graph.getEdges(), vertexToRepresentativeMap);
 
-    return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
+    DataSet<Edge> edgesToGroup = graph.getEdges();
+
+    if (optionalRetainedVerticesSubgraph.isPresent()) {
+      LogicalGraph retainedVerticesSubgraph = optionalRetainedVerticesSubgraph.get();
+
+      // To add support for grouped edges between retained vertices and supervertices,
+      // vertices are their group representatives themselves
+      vertexToRepresentativeMap =
+        updateVertexRepresentativesWithUngroupedVertices(vertexToRepresentativeMap,
+          retainedVerticesSubgraph);
+
+      // don't execute grouping on edges between retained vertices
+      // but execute on edges between retained vertices and grouped vertices
+      //   graph.getEdges() - retainedVerticesSubgraph.getEdges()
+      edgesToGroup = subtractRetainedEdgesFromDefaultGraph(graph, retainedVerticesSubgraph);
+    }
+
+    LogicalGraph groupedGraph =
+      buildGroupedGraph(superVertices, vertexToRepresentativeMap, edgesToGroup);
+
+    return optionalRetainedVerticesSubgraph.isPresent() ?
+      groupedGraph.combine(optionalRetainedVerticesSubgraph.get()) : groupedGraph;
   }
+
 }

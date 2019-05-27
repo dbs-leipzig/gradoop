@@ -16,32 +16,24 @@
 package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.apache.flink.api.common.functions.CoGroupFunction;
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.bool.True;
-import org.gradoop.flink.model.impl.functions.filters.Not;
-import org.gradoop.flink.model.impl.functions.filters.Or;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWithSuperVertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterRegularVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceVertexGroupItems;
+import org.gradoop.flink.model.impl.operators.grouping.functions.VertexSuperVertexIdentity;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
-import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 /**
  * Grouping implementation that uses group + groupReduce for building super
@@ -68,11 +60,6 @@ import java.util.stream.Collectors;
 public class GroupingGroupReduce extends Grouping {
 
   /**
-   * Returns true, if a vertex is not a member of any labelGroup.
-   */
-  private final FilterFunction<Vertex> vertexIsInNoGroupFilter;
-
-  /**
    * Creates grouping operator instance.
    *
    * @param useVertexLabels             group on vertex label true/false
@@ -90,15 +77,6 @@ public class GroupingGroupReduce extends Grouping {
     super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups,
       retainVerticesWithoutGroups,
       defaultVertexLabelGroup);
-
-    FilterFunction[] isVertexInLabelGroupFunctions = getVertexLabelGroups()
-      .parallelStream()
-      .map(this::getIsVertexMemberOfLabelGroupFilter)
-      .collect(Collectors.toList())
-      .toArray(new FilterFunction[getVertexLabelGroups().size()]);
-
-    vertexIsInNoGroupFilter = new Not<>(new Or<Vertex>(isVertexInLabelGroupFunctions));
-
   }
 
   @Override
@@ -142,145 +120,22 @@ public class GroupingGroupReduce extends Grouping {
 
       // To add support for grouped edges between retained vertices and supervertices,
       // vertices are their group representatives themselves
-
-      DataSet<VertexWithSuperVertex> verticesRepresentatives =
-        retainedVerticesSubgraph.getVertices()
-          .map(new VertexSuperVertexIdentity());
-
-      vertexToRepresentativeMap = vertexToRepresentativeMap.union(verticesRepresentatives);
+      vertexToRepresentativeMap =
+        updateVertexRepresentativesWithUngroupedVertices(vertexToRepresentativeMap,
+          retainedVerticesSubgraph);
 
       // don't execute grouping on edges between retained vertices
       // but execute on edges between retained vertices and grouped vertices
       //   graph.getEdges() - retainedVerticesSubgraph.getEdges()
-
-      edgesToGroup = graph.getEdges()
-        .coGroup(retainedVerticesSubgraph.getEdges())
-        .where("sourceId", "targetId")
-        .equalTo("sourceId", "targetId")
-        .with((CoGroupFunction<Edge, Edge, Edge>) (first, second, out) -> {
-
-          // only collect edges that do not exist in retainedVerticesSubgraph
-          if (!second.iterator().hasNext()) {
-            first.forEach(out::collect);
-          }
-
-        })
-        .returns(Edge.class);
+      edgesToGroup = subtractRetainedEdgesFromDefaultGraph(graph, retainedVerticesSubgraph);
     }
 
-    // build super edges
-    DataSet<Edge> superEdges =
-      buildSuperEdges(edgesToGroup, vertexToRepresentativeMap);
-
     LogicalGraph groupedGraph =
-      config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
+      buildGroupedGraph(superVertices, vertexToRepresentativeMap, edgesToGroup);
 
     return optionalRetainedVerticesSubgraph.isPresent() ?
       groupedGraph.combine(optionalRetainedVerticesSubgraph.get()) : groupedGraph;
   }
 
-  /**
-   * Returns a subgraph that only includes vertices that are not member of any labelGroups.
-   * Also returns only edges between said vertices.
-   *
-   * @param graph to filter
-   * @return subgraph
-   */
-  private LogicalGraph getRetainedVerticesSubgraph(LogicalGraph graph) {
-    return graph
-      .subgraph(vertexIsInNoGroupFilter, new True<>(), Subgraph.Strategy.VERTEX_INDUCED)
-      .verify();
-  }
-
-  /**
-   * Returns a {@link DataSet<Vertex>} that contains all vertices that belong to a
-   * {@link LabelGroup}.
-   *
-   * @param vertices to check
-   * @return filtered vertices
-   */
-  private DataSet<Vertex> getVerticesToGroup(DataSet<Vertex> vertices) {
-    return vertices.filter(new Not<>(vertexIsInNoGroupFilter));
-  }
-
-  /**
-   * Returns a {@link FilterFunction<Vertex>} that checks if a vertex is member of a
-   * {@link LabelGroup}.
-   *
-   * @param group to check
-   * @return function
-   */
-  private FilterFunction<Vertex> getIsVertexMemberOfLabelGroupFilter(LabelGroup group) {
-
-    // Returns true, if a vertex exhibits all properties of a labelGroup.
-    // Also returns true, if grouped by properties are empty
-    BiFunction<LabelGroup, Vertex, Boolean> hasVertexAllPropertiesOfGroup =
-      (BiFunction<LabelGroup, Vertex, Boolean> & Serializable) (labelGroup, vertex) ->
-        group.getPropertyKeys()
-          .parallelStream()
-          .allMatch(vertex::hasProperty);
-
-    boolean groupingByLabels = useVertexLabels();
-
-    // Default case (parameter group is not label specific)
-    if (group.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP)) {
-
-      return (FilterFunction<Vertex>) vertex -> {
-
-        if (groupingByLabels) {
-
-          // if the vertex's label is empty,
-          // a) and the group by properties are empty => vertex is not member of the group
-          // b) and group by properties are not empty => vertex can be member of the group
-          if (vertex.getLabel().isEmpty()) {
-            return !group.getPropertyKeys().isEmpty() && hasVertexAllPropertiesOfGroup.apply(group,
-              vertex);
-          } else {
-            return hasVertexAllPropertiesOfGroup.apply(group,
-              vertex);
-          }
-
-        } else {
-
-          // if we are not grouping by labels, we need to check if the vertex has all
-          // properties grouped by
-          // if there is no grouped by property, no vertex should be part of the group
-
-          return !group.getPropertyKeys().isEmpty() && hasVertexAllPropertiesOfGroup.apply(group,
-            vertex);
-        }
-      };
-    }
-
-    // Label specific grouping case:
-    // a vertex is a member of a label specific group, if the labels match and if the vertex has
-    // all of the required properties
-    return (FilterFunction<Vertex>) vertex -> vertex.getLabel().equals(group.getGroupingLabel()) &&
-      hasVertexAllPropertiesOfGroup.apply(group, vertex);
-  }
-
-  /**
-   * Creates a {@link VertexWithSuperVertex} with both components referencing the same
-   * vertex that is mapped on.
-   */
-  private class VertexSuperVertexIdentity implements MapFunction<Vertex, VertexWithSuperVertex> {
-
-    /**
-     * Avoid object instantiation.
-     */
-    private final VertexWithSuperVertex reuseTuple;
-
-    private VertexSuperVertexIdentity() {
-      reuseTuple = new VertexWithSuperVertex();
-    }
-
-    @Override
-    public VertexWithSuperVertex map(Vertex value) throws Exception {
-      reuseTuple.setVertexId(value.getId());
-      reuseTuple.setSuperVertexId((value.getId()));
-      return reuseTuple;
-    }
-
-  }
 
 }

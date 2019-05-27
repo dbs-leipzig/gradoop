@@ -15,26 +15,37 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
+import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.impl.functions.bool.True;
+import org.gradoop.flink.model.impl.functions.filters.Not;
+import org.gradoop.flink.model.impl.functions.filters.Or;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.CombineEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.UpdateEdgeGroupItem;
+import org.gradoop.flink.model.impl.operators.grouping.functions.VertexSuperVertexIdentity;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
+import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 /**
  * The grouping operator determines a structural grouping of vertices and edges
@@ -125,6 +136,11 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   private final boolean retainVerticesWithoutGroups;
 
   /**
+   * Returns true, if a vertex is not a member of any labelGroup.
+   */
+  protected final FilterFunction<Vertex> vertexInNoGroupFilter;
+
+  /**
    * Creates grouping operator instance.
    *
    * @param useVertexLabels             group on vertex label true/false
@@ -144,6 +160,14 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
     this.edgeLabelGroups = edgeLabelGroups;
     this.retainVerticesWithoutGroups = retainVerticesWithoutGroups;
     this.defaultVertexLabelGroup = defaultVertexLabelGroup;
+
+    FilterFunction[] isVertexInLabelGroupFunctions = getVertexLabelGroups()
+      .parallelStream()
+      .map(this::getIsVertexMemberOfLabelGroupFilter)
+      .collect(Collectors.toList())
+      .toArray(new FilterFunction[getVertexLabelGroups().size()]);
+
+    vertexInNoGroupFilter = new Not<>(new Or<Vertex>(isVertexInLabelGroupFunctions));
   }
 
   @Override
@@ -210,15 +234,6 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   }
 
   /**
-   * TODO doc
-   *
-   * @return
-   */
-  protected LabelGroup getDefaultVertexLabelGroup() {
-    return defaultVertexLabelGroup;
-  }
-
-  /**
    * Returns tuple which contains the properties used for a specific vertex label.
    *
    * @return vertex label groups
@@ -278,7 +293,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
   /**
    * Build super edges by joining them with vertices and their super vertex.
    *
-   * @param inputEdges input edges
+   * @param inputEdges                input edges
    * @param vertexToRepresentativeMap dataset containing tuples of vertex id and super vertex id
    * @return super edges
    */
@@ -321,6 +336,123 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
    */
   protected abstract LogicalGraph groupInternal(LogicalGraph graph);
 
+  /**
+   * Returns a {@link FilterFunction<Vertex>} that checks if a vertex is member of a
+   * {@link LabelGroup}.
+   *
+   * @param group to check
+   * @return function
+   */
+  private FilterFunction<Vertex> getIsVertexMemberOfLabelGroupFilter(LabelGroup group) {
+
+    // Returns true, if a vertex exhibits all properties of a labelGroup.
+    // Also returns true, if grouped by properties are empty
+    BiFunction<LabelGroup, Vertex, Boolean> hasVertexAllPropertiesOfGroup =
+      (BiFunction<LabelGroup, Vertex, Boolean> & Serializable) (labelGroup, vertex) ->
+        group.getPropertyKeys()
+          .parallelStream()
+          .allMatch(vertex::hasProperty);
+
+    boolean groupingByLabels = useVertexLabels();
+
+    // Default case (parameter group is not label specific)
+    if (group.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP)) {
+
+      return (FilterFunction<Vertex>) vertex -> {
+
+        if (groupingByLabels) {
+
+          // if the vertex's label is empty,
+          // a) and the group by properties are empty => vertex is not member of the group
+          // b) and group by properties are not empty => vertex can be member of the group
+          if (vertex.getLabel().isEmpty()) {
+            return !group.getPropertyKeys().isEmpty() && hasVertexAllPropertiesOfGroup.apply(group,
+              vertex);
+          } else {
+            return hasVertexAllPropertiesOfGroup.apply(group,
+              vertex);
+          }
+
+        } else {
+
+          // if we are not grouping by labels, we need to check if the vertex has all
+          // properties grouped by
+          // if there is no grouped by property, no vertex should be part of the group
+
+          return !group.getPropertyKeys().isEmpty() && hasVertexAllPropertiesOfGroup.apply(group,
+            vertex);
+        }
+      };
+    }
+
+    // Label specific grouping case:
+    // a vertex is a member of a label specific group, if the labels match and if the vertex has
+    // all of the required properties
+    return (FilterFunction<Vertex>) vertex -> vertex.getLabel().equals(group.getGroupingLabel()) &&
+      hasVertexAllPropertiesOfGroup.apply(group, vertex);
+  }
+
+  /**
+   * Returns a subgraph that only includes vertices that are not member of any labelGroups.
+   * Also returns only edges between said vertices.
+   *
+   * @param graph to filter
+   * @return subgraph
+   */
+  LogicalGraph getRetainedVerticesSubgraph(LogicalGraph graph) {
+    return graph
+      .subgraph(vertexInNoGroupFilter, new True<>(), Subgraph.Strategy.VERTEX_INDUCED)
+      .verify();
+  }
+
+  /**
+   * Returns a {@link DataSet<Vertex>} that contains all vertices that belong to a
+   * {@link LabelGroup}.
+   *
+   * @param vertices to check
+   * @return filtered vertices
+   */
+  DataSet<Vertex> getVerticesToGroup(DataSet<Vertex> vertices) {
+    return vertices.filter(new Not<>(vertexInNoGroupFilter));
+  }
+
+  protected DataSet<Edge> subtractRetainedEdgesFromDefaultGraph(LogicalGraph graph,
+    LogicalGraph retainedVerticesSubgraph) {
+    DataSet<Edge> edgesToGroup;
+    edgesToGroup = graph.getEdges()
+      .coGroup(retainedVerticesSubgraph.getEdges())
+      .where("sourceId", "targetId")
+      .equalTo("sourceId", "targetId")
+      .with((CoGroupFunction<Edge, Edge, Edge>) (first, second, out) -> {
+
+        // only collect edges that do not exist in retainedVerticesSubgraph
+        if (!second.iterator().hasNext()) {
+          first.forEach(out::collect);
+        }
+
+      })
+      .returns(Edge.class);
+    return edgesToGroup;
+  }
+
+  protected DataSet<VertexWithSuperVertex> updateVertexRepresentativesWithUngroupedVertices(
+    DataSet<VertexWithSuperVertex> vertexToRepresentativeMap,
+    LogicalGraph retainedVerticesSubgraph) {
+    DataSet<VertexWithSuperVertex> verticesRepresentatives =
+      retainedVerticesSubgraph.getVertices()
+        .map(new VertexSuperVertexIdentity());
+
+    vertexToRepresentativeMap = vertexToRepresentativeMap.union(verticesRepresentatives);
+    return vertexToRepresentativeMap;
+  }
+
+  protected LogicalGraph buildGroupedGraph(DataSet<Vertex> superVertices,
+    DataSet<VertexWithSuperVertex> vertexToRepresentativeMap, DataSet<Edge> edgesToGroup) {
+    // build super edges
+    DataSet<Edge> superEdges = buildSuperEdges(edgesToGroup, vertexToRepresentativeMap);
+
+    return config.getLogicalGraphFactory().fromDataSets(superVertices, superEdges);
+  }
 
   /**
    * Used for building a grouping operator instance.
@@ -490,7 +622,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Adds a vertex label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
-     * @param label vertex label
+     * @param label        vertex label
      * @param groupingKeys keys used for grouping
      * @return this builder
      */
@@ -504,8 +636,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Adds a vertex label group which defines the grouping keys and the aggregate functions for a
      * specific label. Note that a label may be used multiple times.
      *
-     * @param label vertex label
-     * @param groupingKeys keys used for grouping
+     * @param label              vertex label
+     * @param groupingKeys       keys used for grouping
      * @param aggregateFunctions vertex aggregate functions
      * @return this builder
      */
@@ -520,9 +652,9 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Adds a vertex label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
-     * @param label vertex label
+     * @param label            vertex label
      * @param superVertexLabel label of the group and therefore of the new super vertex
-     * @param groupingKeys keys used for grouping
+     * @param groupingKeys     keys used for grouping
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
@@ -536,9 +668,9 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Adds a vertex label group which defines the grouping keys and the aggregate functions for a
      * specific label. Note that a label may be used multiple times.
      *
-     * @param label vertex label
-     * @param superVertexLabel label of the group and therefore of the new super vertex
-     * @param groupingKeys keys used for grouping
+     * @param label              vertex label
+     * @param superVertexLabel   label of the group and therefore of the new super vertex
+     * @param groupingKeys       keys used for grouping
      * @param aggregateFunctions vertex aggregate functions
      * @return this builder
      */
@@ -556,7 +688,7 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Adds a vertex label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
-     * @param label edge label
+     * @param label        edge label
      * @param groupingKeys keys used for grouping
      * @return this builder
      */
@@ -570,8 +702,8 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Adds a vertex label group which defines the grouping keys and the aggregate functions for a
      * specific label. Note that a label may be used multiple times.
      *
-     * @param label edge label
-     * @param groupingKeys keys used for grouping
+     * @param label              edge label
+     * @param groupingKeys       keys used for grouping
      * @param aggregateFunctions edge aggregate functions
      * @return this builder
      */
@@ -586,9 +718,9 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Adds a vertex label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
-     * @param label edge label
+     * @param label          edge label
      * @param superEdgeLabel label of the group and therefore of the new super edge
-     * @param groupingKeys keys used for grouping
+     * @param groupingKeys   keys used for grouping
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
@@ -602,9 +734,9 @@ public abstract class Grouping implements UnaryGraphToGraphOperator {
      * Adds a vertex label group which defines the grouping keys and the aggregate functions for a
      * specific label. Note that a label may be used multiple times.
      *
-     * @param label edge label
-     * @param superEdgeLabel label of the group and therefore of the new super edge
-     * @param groupingKeys keys used for grouping
+     * @param label              edge label
+     * @param superEdgeLabel     label of the group and therefore of the new super edge
+     * @param groupingKeys       keys used for grouping
      * @param aggregateFunctions edge aggregate functions
      * @return this builder
      */

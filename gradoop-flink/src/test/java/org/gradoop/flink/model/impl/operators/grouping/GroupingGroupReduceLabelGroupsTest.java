@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
-//TODO create edge conversion properties and labels test? 'just create super edges between them'?
 public class GroupingGroupReduceLabelGroupsTest extends AvoidDefaultLabelGroupsTestBase {
 
   @Override
