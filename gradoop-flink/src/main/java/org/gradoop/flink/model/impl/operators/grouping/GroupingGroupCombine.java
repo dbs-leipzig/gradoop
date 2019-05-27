@@ -79,11 +79,11 @@ public class GroupingGroupCombine<
   /**
    * Creates grouping operator instance.
    *
-   * @param useVertexLabels         group on vertex label true/false
-   * @param useEdgeLabels           group on edge label true/false
-   * @param vertexLabelGroups       stores grouping properties for vertex labels
-   * @param edgeLabelGroups         stores grouping properties for edge labels
-   * @param retainVerticesWithoutGroups            keep vertices without labels (when grouping by label)
+   * @param useVertexLabels             group on vertex label true/false
+   * @param useEdgeLabels               group on edge label true/false
+   * @param vertexLabelGroups           stores grouping properties for vertex labels
+   * @param edgeLabelGroups             stores grouping properties for edge labels
+   * @param retainVerticesWithoutGroups keep vertices without labels (when grouping by label)
    */
   GroupingGroupCombine(
     boolean useVertexLabels,
@@ -91,7 +91,8 @@ public class GroupingGroupCombine<
     List<LabelGroup> vertexLabelGroups,
     List<LabelGroup> edgeLabelGroups,
     boolean retainVerticesWithoutGroups) {
-    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups, retainVerticesWithoutGroups);
+    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups,
+      retainVerticesWithoutGroups);
   }
 
   @Override

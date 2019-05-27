@@ -298,7 +298,7 @@ public abstract class Grouping<
    * @return super edges
    */
   protected DataSet<E> buildSuperEdges(
-    BaseGraphFactory<G,V,E,LG> factory,
+    BaseGraphFactory<G, V, E, LG> factory,
     DataSet<E> edgesToGroup,
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap) {
 
@@ -867,11 +867,13 @@ public abstract class Grouping<
       switch (strategy) {
       case GROUP_REDUCE:
         groupingOperator = new GroupingGroupReduce<>(
-          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups, retainVerticesWithoutGroups);
+          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups,
+          retainVerticesWithoutGroups);
         break;
       case GROUP_COMBINE:
         groupingOperator = new GroupingGroupCombine<>(
-          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups, retainVerticesWithoutGroups);
+          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups,
+          retainVerticesWithoutGroups);
         break;
       default:
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);

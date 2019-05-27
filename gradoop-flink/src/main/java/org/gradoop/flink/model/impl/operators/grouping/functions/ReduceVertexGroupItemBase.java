@@ -36,7 +36,6 @@ abstract class ReduceVertexGroupItemBase extends BuildBase {
   protected ReduceVertexGroupItemBase(boolean useLabel) {
     super(useLabel);
     this.reuseVertexGroupItem = new VertexGroupItem();
-    this.reuseVertexGroupItem.setTemporaryLabel(false);
   }
 
   protected VertexGroupItem getReuseVertexGroupItem() {

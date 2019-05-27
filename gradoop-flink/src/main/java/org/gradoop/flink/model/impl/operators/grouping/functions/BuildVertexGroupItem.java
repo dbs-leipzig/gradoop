@@ -55,7 +55,6 @@ public class BuildVertexGroupItem<V extends EPGMVertex> extends BuildGroupItemBa
     this.reuseVertexGroupItem = new VertexGroupItem();
     this.reuseVertexGroupItem.setSuperVertexId(GradoopId.NULL_VALUE);
     this.reuseVertexGroupItem.setSuperVertex(false);
-    this.reuseVertexGroupItem.setTemporaryLabel(false);
   }
 
   @Override
@@ -63,7 +62,6 @@ public class BuildVertexGroupItem<V extends EPGMVertex> extends BuildGroupItemBa
     boolean usedVertexLabelGroup = false;
 
     reuseVertexGroupItem.setVertexId(vertex.getId());
-    reuseVertexGroupItem.setTemporaryLabel(false);
 
     // check if vertex shall be grouped by a special set of keys
     for (LabelGroup vertexLabelGroup : getLabelGroups()) {
