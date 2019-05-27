@@ -21,7 +21,6 @@ import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
@@ -338,20 +337,20 @@ public abstract class Grouping<
   protected abstract LG groupInternal(LG graph);
 
   /**
-   * Returns a {@link FilterFunction<Vertex>} that checks if a vertex is member of a
+   * Returns a {@link FilterFunction<V>} that checks if a vertex is member of a
    * {@link LabelGroup}.
    *
    * @param group to check
    * @return function
    */
-  private FilterFunction<Vertex> getIsVertexMemberOfLabelGroupFilter(LabelGroup group) {
+  private FilterFunction<V> getIsVertexMemberOfLabelGroupFilter(LabelGroup group) {
 
     /*
      * Returns true, if a vertex exhibits all properties of a labelGroup.
      * Also returns true, if grouped by properties (propertyKeys) are empty.
      */
-    BiFunction<LabelGroup, Vertex, Boolean> hasVertexAllPropertiesOfGroup =
-      (BiFunction<LabelGroup, Vertex, Boolean> & Serializable) (labelGroup, vertex) ->
+    BiFunction<LabelGroup, V, Boolean> hasVertexAllPropertiesOfGroup =
+      (BiFunction<LabelGroup, V, Boolean> & Serializable) (labelGroup, vertex) ->
         group.getPropertyKeys()
           .parallelStream()
           .allMatch(vertex::hasProperty);
@@ -361,7 +360,7 @@ public abstract class Grouping<
     // Default case (parameter group is not label specific)
     if (group.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP)) {
 
-      return (FilterFunction<Vertex>) vertex -> {
+      return (FilterFunction<V>) vertex -> {
 
         if (groupingByLabels) {
 
@@ -391,7 +390,7 @@ public abstract class Grouping<
     // Label specific grouping case:
     // a vertex is a member of a label specific group, if the labels match and if the vertex has
     // all of the required properties
-    return (FilterFunction<Vertex>) vertex -> vertex.getLabel().equals(group.getGroupingLabel()) &&
+    return (FilterFunction<V>) vertex -> vertex.getLabel().equals(group.getGroupingLabel()) &&
       hasVertexAllPropertiesOfGroup.apply(group, vertex);
   }
 
@@ -411,7 +410,7 @@ public abstract class Grouping<
   }
 
   /**
-   * Returns a {@link DataSet<Vertex>} that contains all vertices that belong to a
+   * Returns a {@link DataSet<V>} that contains all vertices that belong to a
    * {@link LabelGroup}.
    *
    * @param vertices to check
