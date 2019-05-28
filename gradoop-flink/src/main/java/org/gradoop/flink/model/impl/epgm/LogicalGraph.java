@@ -39,8 +39,6 @@ import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
 import org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQuery;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
 import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
-import org.gradoop.flink.model.impl.operators.grouping.Grouping;
-import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.CypherPatternMatching;
@@ -207,42 +205,6 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   @Override
   public LogicalGraph sample(SamplingAlgorithm algorithm) {
     return callForGraph(algorithm);
-  }
-
-  @Override
-  public LogicalGraph groupBy(List<String> vertexGroupingKeys) {
-    return groupBy(vertexGroupingKeys, null);
-  }
-
-  @Override
-  public LogicalGraph groupBy(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
-    return groupBy(vertexGroupingKeys, null, edgeGroupingKeys, null, GroupingStrategy.GROUP_REDUCE);
-  }
-
-  @Override
-  public LogicalGraph groupBy(
-    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions,
-    GroupingStrategy groupingStrategy) {
-
-    Objects.requireNonNull(vertexGroupingKeys, "missing vertex grouping key(s)");
-    Objects.requireNonNull(groupingStrategy, "missing vertex grouping strategy");
-
-    Grouping.GroupingBuilder builder = new Grouping.GroupingBuilder();
-
-    builder.addVertexGroupingKeys(vertexGroupingKeys);
-    builder.setStrategy(groupingStrategy);
-
-    if (edgeGroupingKeys != null) {
-      builder.addEdgeGroupingKeys(edgeGroupingKeys);
-    }
-    if (vertexAggregateFunctions != null) {
-      vertexAggregateFunctions.forEach(builder::addVertexAggregateFunction);
-    }
-    if (edgeAggregateFunctions != null) {
-      edgeAggregateFunctions.forEach(builder::addEdgeAggregateFunction);
-    }
-    return callForGraph(builder.build());
   }
 
   @Override

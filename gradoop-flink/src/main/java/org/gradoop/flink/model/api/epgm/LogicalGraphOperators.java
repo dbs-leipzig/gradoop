@@ -26,8 +26,6 @@ import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
-import org.gradoop.flink.model.impl.operators.grouping.Grouping;
-import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
@@ -187,70 +185,6 @@ public interface LogicalGraphOperators
    * @return logical graph with random nodes and their associated edges
    */
   LogicalGraph sample(SamplingAlgorithm algorithm);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices based on the specified
-   * property keys.
-   * <p>
-   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
-   * incident vertices.
-   * <p>
-   * Note: To group vertices by their type label, one needs to add the specific symbol
-   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
-   *
-   * @param vertexGroupingKeys property keys to group vertices
-   * @return summary graph
-   * @see Grouping
-   */
-  LogicalGraph groupBy(List<String> vertexGroupingKeys);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices and edges based on given
-   * property keys.
-   * <p>
-   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
-   * incident vertices and explicitly by the specified edge grouping keys.
-   * <p>
-   * One needs to at least specify a list of vertex grouping keys. Any other argument may be
-   * {@code null}.
-   * <p>
-   * Note: To group vertices/edges by their type label, one needs to add the specific symbol
-   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
-   *
-   * @param vertexGroupingKeys property keys to group vertices
-   * @param edgeGroupingKeys   property keys to group edges
-   * @return summary graph
-   * @see Grouping
-   */
-  LogicalGraph groupBy(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices and edges based on given
-   * property keys.
-   * <p>
-   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
-   * incident vertices and explicitly by the specified edge grouping keys. Furthermore, one can
-   * specify sets of vertex and edge aggregate functions which are applied on vertices/edges
-   * represented by the same super vertex/edge.
-   * <p>
-   * One needs to at least specify a list of vertex grouping keys. Any other argument may be
-   * {@code null}.
-   * <p>
-   * Note: To group vertices/edges by their type label, one needs to add the specific symbol
-   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
-   *
-   * @param vertexGroupingKeys       property keys to group vertices
-   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
-   * @param edgeGroupingKeys         property keys to group edges
-   * @param edgeAggregateFunctions   aggregate functions to apply on super edges
-   * @param groupingStrategy         execution strategy for vertex grouping
-   * @return summary graph
-   * @see Grouping
-   */
-  LogicalGraph groupBy(
-    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions,
-    GroupingStrategy groupingStrategy);
 
   /**
    * Checks, if another logical graph contains exactly the same vertices and

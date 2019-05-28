@@ -29,6 +29,8 @@ import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
+import org.gradoop.flink.model.impl.operators.grouping.Grouping;
+import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceEdgeNeighborhood;
 import org.gradoop.flink.model.impl.operators.neighborhood.ReduceVertexNeighborhood;
@@ -37,6 +39,7 @@ import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 import org.gradoop.flink.model.impl.operators.verify.Verify;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -66,6 +69,94 @@ public interface BaseGraphOperators<
    */
   default LG copy() {
     return callForGraph(new Cloning<>());
+  }
+
+  /**
+   * Creates a condensed version of the logical graph by grouping vertices based on the specified
+   * property keys.
+   * <p>
+   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
+   * incident vertices.
+   * <p>
+   * Note: To group vertices by their type label, one needs to add the specific symbol
+   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
+   *
+   * @param vertexGroupingKeys property keys to group vertices
+   * @return summary graph
+   * @see Grouping
+   */
+  default LG groupBy(List<String> vertexGroupingKeys) {
+    return groupBy(vertexGroupingKeys, null);
+  }
+
+  /**
+   * Creates a condensed version of the logical graph by grouping vertices and edges based on given
+   * property keys.
+   * <p>
+   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
+   * incident vertices and explicitly by the specified edge grouping keys.
+   * <p>
+   * One needs to at least specify a list of vertex grouping keys. Any other argument may be
+   * {@code null}.
+   * <p>
+   * Note: To group vertices/edges by their type label, one needs to add the specific symbol
+   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
+   *
+   * @param vertexGroupingKeys property keys to group vertices
+   * @param edgeGroupingKeys   property keys to group edges
+   * @return summary graph
+   * @see Grouping
+   */
+  default LG groupBy(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys) {
+    return groupBy(vertexGroupingKeys, null, edgeGroupingKeys, null, GroupingStrategy.GROUP_REDUCE);
+  }
+
+  /**
+   * Creates a condensed version of the logical graph by grouping vertices and edges based on given
+   * property keys.
+   * <p>
+   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
+   * incident vertices and explicitly by the specified edge grouping keys. Furthermore, one can
+   * specify sets of vertex and edge aggregate functions which are applied on vertices/edges
+   * represented by the same super vertex/edge.
+   * <p>
+   * One needs to at least specify a list of vertex grouping keys. Any other argument may be
+   * {@code null}.
+   * <p>
+   * Note: To group vertices/edges by their type label, one needs to add the specific symbol
+   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
+   *
+   * @param vertexGroupingKeys       property keys to group vertices
+   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
+   * @param edgeGroupingKeys         property keys to group edges
+   * @param edgeAggregateFunctions   aggregate functions to apply on super edges
+   * @param groupingStrategy         execution strategy for vertex grouping
+   * @return summary graph
+   * @see Grouping
+   */
+  default LG groupBy(
+    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
+    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions,
+    GroupingStrategy groupingStrategy) {
+
+    Objects.requireNonNull(vertexGroupingKeys, "missing vertex grouping key(s)");
+    Objects.requireNonNull(groupingStrategy, "missing vertex grouping strategy");
+
+    Grouping.GroupingBuilder builder = new Grouping.GroupingBuilder();
+
+    builder.addVertexGroupingKeys(vertexGroupingKeys);
+    builder.setStrategy(groupingStrategy);
+
+    if (edgeGroupingKeys != null) {
+      builder.addEdgeGroupingKeys(edgeGroupingKeys);
+    }
+    if (vertexAggregateFunctions != null) {
+      vertexAggregateFunctions.forEach(builder::addVertexAggregateFunction);
+    }
+    if (edgeAggregateFunctions != null) {
+      edgeAggregateFunctions.forEach(builder::addEdgeAggregateFunction);
+    }
+    return callForGraph(builder.build());
   }
 
   /**
