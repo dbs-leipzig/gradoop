@@ -16,7 +16,9 @@
 package org.gradoop.flink.model.impl.operators.layouting;
 
 import org.apache.flink.api.common.functions.JoinFunction;
+import org.apache.flink.api.common.functions.util.ListCollector;
 import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -27,6 +29,9 @@ import org.gradoop.flink.model.impl.operators.layouting.functions.FRRepulsionFun
 import org.gradoop.flink.model.impl.operators.layouting.util.Vector;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FRLayouterTest extends LayoutingAlgorithmTest {
 
@@ -97,9 +102,29 @@ public class FRLayouterTest extends LayoutingAlgorithmTest {
     Vector vec14 = Vector.fromForceTuple(jf.join(v1, v4));
     Vector vec11 = Vector.fromForceTuple(jf.join(v1, v1));
 
+    Assert.assertTrue(vec12.getX() < 0 && vec12.getY() < 0);
     Assert.assertTrue(vec12.magnitude() > vec13.magnitude());
     Assert.assertTrue(vec14.magnitude() > 0);
     Assert.assertTrue(vec11.magnitude() == 0);
+  }
+
+  @Test
+  public void testRepulseFlatMap() throws Exception {
+    FRRepulsionFunction jf = new FRRepulsionFunction(1);
+    Vertex v1 = getDummyVertex(1, 1);
+    Vertex v2 = getDummyVertex(2, 3);
+
+    Vector vec12join = Vector.fromForceTuple(jf.join(v1, v2));
+
+    List<Tuple3<GradoopId, Double, Double>> collectorList = new ArrayList<>();
+    ListCollector<Tuple3<GradoopId, Double, Double>> collector = new ListCollector<>(collectorList);
+    jf.flatMap(new Tuple2<>(v1, v2), collector);
+
+    Vector vec12 = Vector.fromForceTuple(collectorList.get(0));
+    Vector vec21 = Vector.fromForceTuple(collectorList.get(1));
+
+    Assert.assertEquals(vec12join, vec12);
+    Assert.assertEquals(vec12, vec21.mul(-1));
   }
 
 

@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.layouting;
 
-import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.aggregation.Aggregations;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -36,18 +35,30 @@ import org.gradoop.flink.model.impl.operators.layouting.functions.FRRepulsionFun
  */
 public class FRLayouter extends LayoutingAlgorithm {
 
-  /** Name of the property the cellid for a vertex is stored in */
+  /**
+   * Name of the property the cellid for a vertex is stored in
+   */
   public static final String CELLID_PROPERTY = "cellid";
 
-  /** Main-parameter of the FR-Algorithm. Optimum distance between connected vertices. */
+  /**
+   * Main-parameter of the FR-Algorithm. Optimum distance between connected vertices.
+   */
   protected double k;
-  /** Number of iterations to perform */
+  /**
+   * Number of iterations to perform
+   */
   protected int iterations;
-  /** Width of the layouting-space */
+  /**
+   * Width of the layouting-space
+   */
   protected int width;
-  /** Height of the layouting-space */
+  /**
+   * Height of the layouting-space
+   */
   protected int height;
-  /** Number of subcells per axis */
+  /**
+   * Number of subcells per axis
+   */
   protected int cellResolution;
 
   /**
@@ -126,6 +137,7 @@ public class FRLayouter extends LayoutingAlgorithm {
       .with(new FRForceApplicator(width, height, k, iterations));
   }
 
+
   /**
    * Calculates the repusive forces between the given vertices.
    *
@@ -137,58 +149,30 @@ public class FRLayouter extends LayoutingAlgorithm {
 
     KeySelector<Vertex, Integer> selfselector =
       new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.SELF);
-    JoinFunction<Vertex, Vertex, Tuple3<GradoopId, Double, Double>> repulsionFunction =
-      new FRRepulsionFunction(k);
+    FRRepulsionFunction repulsionFunction = new FRRepulsionFunction(k);
 
-    DataSet<Tuple3<GradoopId, Double, Double>> self =
-      vertices.join(vertices)
-        .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.SELF))
-        .equalTo(selfselector).with(repulsionFunction);
+    DataSet<Tuple3<GradoopId, Double, Double>> self = vertices.join(vertices)
+      .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.SELF))
+      .equalTo(selfselector).with(repulsionFunction);
 
-    DataSet<Tuple3<GradoopId, Double, Double>> up =
-      vertices.join(vertices)
-        .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.UP))
-        .equalTo(selfselector).with(repulsionFunction);
+    DataSet<Tuple3<GradoopId, Double, Double>> up = vertices.join(vertices)
+      .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.UP))
+      .equalTo(selfselector).flatMap(repulsionFunction);
 
-    DataSet<Tuple3<GradoopId, Double, Double>> down =
-      vertices.join(vertices)
-        .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.DOWN))
-        .equalTo(selfselector).with(repulsionFunction);
+    DataSet<Tuple3<GradoopId, Double, Double>> left = vertices.join(vertices)
+      .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.LEFT))
+      .equalTo(selfselector).flatMap(repulsionFunction);
 
-    DataSet<Tuple3<GradoopId, Double, Double>> left =
-      vertices.join(vertices)
-        .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.LEFT))
-        .equalTo(selfselector).with(repulsionFunction);
+    DataSet<Tuple3<GradoopId, Double, Double>> uright = vertices.join(vertices)
+      .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.UPRIGHT))
+      .equalTo(selfselector).flatMap(repulsionFunction);
 
-    DataSet<Tuple3<GradoopId, Double, Double>> right =
-      vertices.join(vertices)
-        .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.RIGHT))
-        .equalTo(selfselector).with(repulsionFunction);
+    DataSet<Tuple3<GradoopId, Double, Double>> uleft = vertices.join(vertices)
+      .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.UPLEFT))
+      .equalTo(selfselector).flatMap(repulsionFunction);
 
-    DataSet<Tuple3<GradoopId, Double, Double>> uright =
-      vertices.join(vertices)
-        .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.UPRIGHT))
-        .equalTo(selfselector).with(repulsionFunction);
 
-    DataSet<Tuple3<GradoopId, Double, Double>> uleft =
-      vertices.join(vertices)
-        .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.UPLEFT))
-        .equalTo(selfselector).with(repulsionFunction);
-
-    DataSet<Tuple3<GradoopId, Double, Double>> dright =
-      vertices.join(vertices)
-        .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.DOWNRIGHT))
-        .equalTo(selfselector).with(repulsionFunction);
-
-    DataSet<Tuple3<GradoopId, Double, Double>> dleft =
-      vertices.join(vertices)
-        .where(new FRCellIdSelector(cellResolution, FRCellIdSelector.NeighborType.DOWNLEFT))
-        .equalTo(selfselector).with(repulsionFunction);
-
-    return self.union(up).union(down)
-      .union(left).union(right)
-      .union(uright).union(uleft)
-      .union(dright).union(dleft);
+    return self.union(up).union(left).union(uright).union(uleft);
   }
 
   /**
