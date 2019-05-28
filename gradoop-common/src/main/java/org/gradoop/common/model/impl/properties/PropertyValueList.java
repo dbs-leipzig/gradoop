@@ -180,7 +180,7 @@ public class PropertyValueList
         try {
           inputStream.close();
         } catch (IOException e) {
-          throw new UncheckedIOException(e);
+          // This should not happen
         }
         hasNext = false;
       }

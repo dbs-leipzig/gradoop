@@ -70,7 +70,7 @@ public class NetworkHelper {
         }
       }
     } catch (UnknownHostException | SocketException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException("This should not happen", e);
     }
     return address;
   }
