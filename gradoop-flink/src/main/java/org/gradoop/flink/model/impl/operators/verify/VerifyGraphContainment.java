@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.verify.functions.RemoveOtherGraphs;
 
 /**
- * Verifies a graphs elements, removing dangling graph ids, i.e. different from this graphs id.
+ * Verifies a graphs elements, removing dangling graph ids, i.e. ids different from this graphs id.
  *
  * @param <G>  The graph head type.
  * @param <V>  The vertex type.
