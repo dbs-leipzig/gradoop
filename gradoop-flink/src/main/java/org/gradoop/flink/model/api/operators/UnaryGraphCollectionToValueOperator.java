@@ -23,12 +23,6 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
  *
  * @param <T> result type
  */
-public interface UnaryGraphCollectionToValueOperator<T> {
-  /**
-   * Executes the operator.
-   *
-   * @param collection input collection
-   * @return operator result
-   */
-  DataSet<T> execute(GraphCollection collection);
+public interface UnaryGraphCollectionToValueOperator<T>
+  extends UnaryBaseGraphCollectionToValueOperator<GraphCollection, DataSet<T>> {
 }

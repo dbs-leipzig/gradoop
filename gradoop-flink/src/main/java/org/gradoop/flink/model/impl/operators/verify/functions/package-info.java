@@ -13,14 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.operators;
-
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-
 /**
- * Creates a {@link LogicalGraph} from one input collection.
+ * Contains classes related to the verify operators.
  */
-public interface UnaryCollectionToGraphOperator
-  extends UnaryBaseGraphCollectionToBaseGraphOperator<GraphCollection, LogicalGraph> {
-}
+package org.gradoop.flink.model.impl.operators.verify.functions;
