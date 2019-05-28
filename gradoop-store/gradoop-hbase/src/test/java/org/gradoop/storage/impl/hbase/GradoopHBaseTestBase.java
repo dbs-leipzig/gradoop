@@ -54,6 +54,8 @@ public class GradoopHBaseTestBase {
   public static final String PROP_STATUS = "status";
   public static final String PROP_VERTEX_COUNT = "vertexCount";
 
+  private static final int NUM_SLAVES = 4;
+
   private static Collection<GraphHead> socialGraphHeads;
   private static Collection<Vertex> socialVertices;
   private static Collection<Edge> socialEdges;
@@ -75,7 +77,7 @@ public class GradoopHBaseTestBase {
   public static void setUpHBase() throws Exception {
     if (utility == null) {
       utility = new HBaseTestingUtility(HBaseConfiguration.create());
-      utility.startMiniCluster().waitForActiveAndReadyMaster();
+      utility.startMiniCluster(NUM_SLAVES).waitForActiveAndReadyMaster();
     }
   }
 
