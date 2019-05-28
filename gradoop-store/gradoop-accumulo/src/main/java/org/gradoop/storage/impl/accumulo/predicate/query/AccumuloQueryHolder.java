@@ -111,7 +111,6 @@ public class AccumuloQueryHolder<T extends EPGMElement> implements Serializable 
    * @return seek range
    */
   public List<Range> getQueryRanges() {
-    //noinspection unchecked
     return queryRanges == null ? null : RangeWrapper.decrypt(queryRanges).ranges;
   }
 

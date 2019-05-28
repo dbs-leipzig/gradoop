@@ -32,11 +32,11 @@ import static org.junit.Assert.assertTrue;
 
 public class CombinableFilterTest extends GradoopFlinkTestBase {
 
-  private CombinableFilter<Object> alwaysTrue = e -> true;
+  private final CombinableFilter<Object> alwaysTrue = e -> true;
 
-  private CombinableFilter<Object> alwaysFalse = e -> false;
+  private final CombinableFilter<Object> alwaysFalse = e -> false;
 
-  private Object testObject = new Object();
+  private final Object testObject = new Object();
 
   @Test
   public void testAnd() throws Exception {

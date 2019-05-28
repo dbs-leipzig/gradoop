@@ -243,8 +243,7 @@ public class Properties implements Iterable<Property>, Value, Serializable {
 
     Properties that = (Properties) o;
 
-    return !(properties != null ? !properties.equals(that.properties) :
-      that.properties != null);
+    return Objects.equals(properties, that.properties);
   }
 
   /**

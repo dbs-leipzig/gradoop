@@ -10,66 +10,20 @@
     </parent>
 
     <artifactId>gradoop-examples</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>gradoop-examples-operators</module>
+    </modules>
 
     <name>Gradoop Examples</name>
     <description>Contains examples for Gradoop programs.</description>
 
     <profiles>
         <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>snapshot</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>javadoc</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-site-plugin</artifactId>
@@ -79,114 +33,32 @@
         </profile>
     </profiles>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <minimizeJar>true</minimizeJar>
-                            <artifactSet>
-                                <includes>
-                                    <!-- libs that are not provided by flink binary -->
-                                    <include>org.apache.hbase:hbase-common</include>
-                                    <include>org.apache.flink:flink-gelly_2.11</include>
-                                    <include>org.neo4j:*</include>
-                                    <include>org.gradoop:*</include>
-                                    <include>com.github.s1ck:gdl</include>
-                                    <include>org.codehaus.jettison:jettison</include>
-                                    <include>com.google.guava:guava</include>
-                                    <include>org.antlr:antlr4-runtime</include>
-                                    <include>me.lemire.integercompression:*</include>
-                                    <include>commons-cli:*</include>
-                                    <!-- CAPF dependencies -->
-                                    <include>org.opencypher:*</include>
-                                    <include>org.apache.flink:flink-gelly_2.11</include>
-                                    <include>org.apache.flink:flink-table_2.11</include>
-                                    <include>org.parboiled:parboiled-scala_2.11</include>
-                                    <include>com.lihaoyi:ujson_2.11</include>
-                                    <include>com.lihaoyi:upickle_2.11</include>
-                                    <include>org.typelevel:cats-kernel_2.11</include>
-                                    <include>org.typelevel:cats-core_2.11</include>
-                                    <include>org.atnos:eff_2.11</include>
-                                    <include>org.parboiled:*</include>
-                                </includes>
-                            </artifactSet>
-                            <!-- relocate commons-cli to avoid issues with version used by flink -->
-                            <relocations>
-                                <relocation>
-                                    <pattern>org.apache.commons.cli</pattern>
-                                    <shadedPattern>org.gradoop.examples.thirdparty.commons-cli</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+    <dependencyManagement>
+        <dependencies>
+            <!-- Flink -->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-java</artifactId>
+                <version>${dep.flink.version}</version>
+            </dependency>
 
-    <dependencies>
-        <!-- Compile dependencies -->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-clients_2.11</artifactId>
+                <version>${dep.flink.version}</version>
+            </dependency>
 
-        <dependency>
-            <groupId>org.gradoop</groupId>
-            <artifactId>gradoop-flink</artifactId>
-        </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${dep.log4j.version}</version>
+            </dependency>
 
-        <dependency>
-            <groupId>org.gradoop</groupId>
-            <artifactId>gradoop-data-integration</artifactId>
-        </dependency>
-
-        <!-- Flink -->
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-java</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-clients_2.11</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-        </dependency>
-    </dependencies>
+            <dependency>
+                <groupId>commons-cli</groupId>
+                <artifactId>commons-cli</artifactId>
+                <version>${dep.commons-cli.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

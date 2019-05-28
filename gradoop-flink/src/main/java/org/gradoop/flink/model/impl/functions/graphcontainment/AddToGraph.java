@@ -43,7 +43,7 @@ public class AddToGraph<GE extends GraphElement> implements
   }
 
   @Override
-  public GE map(GE graphElement) throws Exception {
+  public GE map(GE graphElement) {
     graphElement.addGraphId(graphHeadId);
     return graphElement;
   }

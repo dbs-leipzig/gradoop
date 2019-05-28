@@ -401,7 +401,6 @@ public class GradoopTestUtils {
    * @return method result
    * @throws Exception in case anything goes wrong
    */
-  @SuppressWarnings("unchecked")
   public static <T1, T2> T1 call(Class<T2> clazz, T2 object, String methodName)
     throws Exception {
     return call(clazz, object, methodName, null, null);

@@ -674,11 +674,7 @@ public class Embedding implements Value, CopyableValue<Embedding> {
     if (!Arrays.equals(propertyData, that.propertyData)) {
       return false;
     }
-    if (!Arrays.equals(idListData, that.idListData)) {
-      return false;
-    }
-
-    return true;
+    return Arrays.equals(idListData, that.idListData);
   }
 
   @Override

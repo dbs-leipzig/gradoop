@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>gradoop-examples</artifactId>
+        <groupId>org.gradoop</groupId>
+        <version>0.5.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>gradoop-examples-operators</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Gradoop Examples Operators</name>
+    <description>Contains examples for a subset of Gradoop operators.</description>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>snapshot</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>javadoc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-site-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.gradoop</groupId>
+            <artifactId>gradoop-flink</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.gradoop</groupId>
+            <artifactId>gradoop-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.gradoop</groupId>
+            <artifactId>gradoop-data-integration</artifactId>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <minimizeJar>true</minimizeJar>
+                            <artifactSet>
+                                <includes>
+                                    <!-- gradoop dependencies -->
+                                    <include>org.gradoop:gradoop-flink</include>
+                                    <include>org.gradoop:gradoop-common</include>
+                                    <include>org.gradoop:gradoop-data-integration</include>
+                                    <!-- libs that are not provided by flink binary -->
+                                    <include>org.apache.flink:flink-gelly_2.11</include>
+                                    <include>org.apache.flink:flink-java</include>
+                                    <!-- others -->
+                                    <include>org.apache.hbase:hbase-common</include>
+                                    <include>com.github.s1ck:gdl</include>
+                                    <include>org.antlr:antlr4-runtime</include>
+                                    <include>me.lemire.integercompression:*</include>
+                                    <!-- capf example dependencies -->
+                                    <include>org.opencypher:*</include>
+                                    <include>org.apache.flink:flink-table_2.11</include>
+                                    <include>org.parboiled:parboiled-scala_2.11</include>
+                                    <include>com.lihaoyi:ujson_2.11</include>
+                                    <include>com.lihaoyi:upickle_2.11</include>
+                                    <include>org.typelevel:cats-kernel_2.11</include>
+                                    <include>org.typelevel:cats-core_2.11</include>
+                                    <include>org.atnos:eff_2.11</include>
+                                    <include>org.parboiled:*</include>
+                                </includes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
