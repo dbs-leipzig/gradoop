@@ -179,7 +179,7 @@ public class PropertyValueList
         try {
           inputStream.close();
         } catch (IOException e) {
-          // This should not happen
+          // Ignore this exception because, it is not critical in this case
         }
         hasNext = false;
       }
