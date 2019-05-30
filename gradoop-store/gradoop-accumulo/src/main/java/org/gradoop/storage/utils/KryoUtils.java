@@ -69,7 +69,6 @@ public final class KryoUtils {
       ByteArrayInputStream content = new ByteArrayInputStream(encoded);
       Input input = new Input(content)
     ) {
-      //noinspection unchecked
       return KRYO_POOLS.get().readObject(input, type);
     }
   }

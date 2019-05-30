@@ -21,7 +21,7 @@ import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 import org.junit.Test;
 
 import java.util.regex.Pattern;
@@ -59,7 +59,7 @@ public class HBasePropRegTest {
       Bytes.toBytesBinary(CF_PROPERTY_TYPE),
       Bytes.toBytesBinary(key),
       CompareFilter.CompareOp.EQUAL,
-      new byte[] {PropertyValue.TYPE_STRING});
+      new byte[] {Type.STRING.getTypeByte()});
 
     // Define that the entire row will be skipped if the column is not found
     typeFilter.setFilterIfMissing(true);

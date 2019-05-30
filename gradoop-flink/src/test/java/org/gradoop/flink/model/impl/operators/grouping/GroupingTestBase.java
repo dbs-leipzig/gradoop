@@ -16,17 +16,23 @@
 package org.gradoop.flink.model.impl.operators.grouping;
 
 import com.google.common.collect.Lists;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.SumPlusOne;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.max.MaxProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.min.MinProperty;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumProperty;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping.GroupingBuilder;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.gradoop.common.util.GradoopConstants.NULL_STRING;
 
@@ -87,7 +93,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -119,7 +125,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -158,7 +164,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -183,7 +189,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -211,7 +217,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -245,7 +251,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -297,7 +303,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(loader.getLogicalGraphByVariable("input"));
 
     collectAndAssertTrue(
@@ -352,7 +358,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(loader.getLogicalGraphByVariable("input"));
 
     collectAndAssertTrue(
@@ -380,7 +386,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new Count("count"))
         .addEdgeAggregateFunction(new Count("count"))
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -408,7 +414,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -441,7 +447,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -479,7 +485,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -508,7 +514,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -540,7 +546,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -575,7 +581,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -605,7 +611,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .setStrategy(getStrategy())
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -639,7 +645,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -680,7 +686,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -710,7 +716,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -745,7 +751,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -781,7 +787,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexAggregateFunction(new Count("count"))
       .addEdgeAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -826,7 +832,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new Count("count"))
         .addEdgeAggregateFunction(new Count("count"))
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -870,7 +876,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       new GroupingBuilder()
         .useVertexLabel(true)
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -912,7 +918,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new Count("count"))
         .addEdgeAggregateFunction(new Count("count"))
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -954,7 +960,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new SumProperty("a", "sumA"))
         .addEdgeAggregateFunction(new SumProperty("b", "sumB"))
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -996,7 +1002,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new SumProperty("a", "sumA"))
         .addEdgeAggregateFunction(new SumProperty("b", "sumB"))
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1038,7 +1044,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new SumProperty("a", "sumA"))
         .addEdgeAggregateFunction(new SumProperty("b", "sumB"))
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1080,7 +1086,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new MinProperty("a", "minA"))
         .addEdgeAggregateFunction(new MinProperty("b", "minB"))
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1122,7 +1128,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new MinProperty("a", "minA"))
         .addEdgeAggregateFunction(new MinProperty("b", "minB"))
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1164,7 +1170,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new MinProperty("a", "minA"))
         .addEdgeAggregateFunction(new MinProperty("b", "minB"))
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1206,7 +1212,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new MaxProperty("a", "maxA"))
         .addEdgeAggregateFunction(new MaxProperty("b", "maxB"))
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1248,7 +1254,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new MaxProperty("a", "maxA"))
         .addEdgeAggregateFunction(new MaxProperty("b", "maxB"))
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1290,7 +1296,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addVertexAggregateFunction(new MaxProperty("a", "maxA"))
         .addEdgeAggregateFunction(new MaxProperty("b", "maxB"))
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1338,7 +1344,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         .addEdgeAggregateFunction(new SumProperty("b", "sumB"))
         .addEdgeAggregateFunction(new Count("count"))
         .setStrategy(getStrategy())
-        .build()
+        .<GraphHead, Vertex, Edge, LogicalGraph>build()
         .execute(input);
 
     collectAndAssertTrue(
@@ -1373,7 +1379,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("topic")
       .addVertexLabelGroup("User", Lists.newArrayList("gender"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1404,7 +1410,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("topic")
       .addVertexLabelGroup("User", "UserGender", Lists.newArrayList("gender"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1434,7 +1440,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("gender")
       .addVertexLabelGroup("Forum", Lists.newArrayList("topic"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1467,7 +1473,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexLabelGroup("User", Lists.newArrayList("gender"),
         Lists.newArrayList(new SumProperty("age", "sum")))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1500,7 +1506,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("topic")
       .addVertexLabelGroup("User", Lists.newArrayList("gender"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1544,7 +1550,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addVertexLabelGroup("User", Lists.newArrayList("gender"))
       .addVertexLabelGroup("User", Lists.newArrayList("age"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1591,7 +1597,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
         Lists.newArrayList(new Count("count"), new SumProperty("age", "sum")))
       .addVertexAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1619,7 +1625,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addEdgeGroupingKey("until")
       .addEdgeLabelGroup("knows", Lists.newArrayList("since"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1647,7 +1653,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addEdgeGroupingKey("until")
       .addEdgeLabelGroup("knows", "knowsSince", Lists.newArrayList("since"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1674,7 +1680,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addEdgeGroupingKey("until")
       .addEdgeLabelGroup("knows", Lists.newArrayList("since"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1704,7 +1710,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
         Lists.newArrayList(new SumProperty("since", "sum")))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1735,7 +1741,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
         Lists.newArrayList(new SumProperty("since", "sum")))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1764,7 +1770,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addEdgeLabelGroup("knows", Lists.newArrayList())
       .addEdgeLabelGroup("member", Lists.newArrayList("until"))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1796,7 +1802,7 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       .addEdgeLabelGroup("member", Lists.newArrayList("until"),
         Lists.newArrayList(new MinProperty("until", "min")))
       .setStrategy(getStrategy())
-      .build()
+      .<GraphHead, Vertex, Edge, LogicalGraph>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1822,5 +1828,26 @@ public abstract class GroupingTestBase extends GradoopFlinkTestBase {
       "(v3)-[:knows {since : 2013}]->(v5)" +
       "(v5)-[:knows {since : 2013}]->(v4)" +
       "]";
+  }
+
+  /**
+   * Test the aggregation with a post-processing step during graph grouping.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testAggregationWithPostAggregateForGraphGrouping() throws Exception {
+    FlinkAsciiGraphLoader loader = getLoaderFromString("input[" +
+      "(:A {p: 1L})(:A {p: 2L})(:B {p: -1L})(:B {p: -1L})" +
+      "] expected [" +
+      "(:A {sum_p: 3L, sum_p_plusone: 4L})(:B{sum_p: -2L, sum_p_plusone: -1L})" +
+      "]");
+    LogicalGraph input = loader.getLogicalGraphByVariable("input");
+    LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
+    LogicalGraph result = input.groupBy(
+      Arrays.asList(Grouping.LABEL_SYMBOL), Arrays.asList(new SumVertexProperty("p", "sum_p"),
+        new SumPlusOne("p", "sum_p_plusone")),
+      Collections.emptyList(), Collections.emptyList(), getStrategy());
+    collectAndAssertTrue(expected.equalsByData(result));
   }
 }

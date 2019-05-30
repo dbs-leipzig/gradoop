@@ -31,7 +31,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
   public void testExistingSubgraph() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("expected[" +
+    loader.appendToDatabaseFromString("expected:_DB[" +
       "(alice)-[akb]->(bob)-[bkc]->(carol)-[ckd]->(dave)" +
       "(alice)<-[bka]-(bob)<-[ckb]-(carol)<-[dkc]-(dave)" +
       "(eve)-[eka]->(alice)" +
@@ -50,14 +50,14 @@ public class SubgraphTest extends GradoopFlinkTestBase {
         v -> v.getLabel().equals("Person"),
         e -> e.getLabel().equals("knows"));
 
-    collectAndAssertTrue(output.equalsByElementData(expected));
+    collectAndAssertTrue(output.equalsByData(expected));
   }
 
   @Test
   public void testExistingSubgraphWithVerification() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("expected[" +
+    loader.appendToDatabaseFromString("expected:_DB[" +
       "(alice)-[akb]->(bob)-[bkc]->(carol)-[ckd]->(dave)" +
       "(alice)<-[bka]-(bob)<-[ckb]-(carol)<-[dkc]-(dave)" +
       "(eve)-[eka]->(alice)" +
@@ -77,7 +77,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
         e -> e.getLabel().equals("knows"),
         Subgraph.Strategy.BOTH_VERIFIED);
 
-    collectAndAssertTrue(output.equalsByElementData(expected));
+    collectAndAssertTrue(output.equalsByData(expected));
   }
 
   /**
@@ -87,7 +87,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
   public void testPartialSubgraph() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("expected[" +
+    loader.appendToDatabaseFromString("expected:_DB[" +
       "(alice),(bob),(carol),(dave),(eve),(frank)" +
       "]");
 
@@ -100,7 +100,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
         v -> v.getLabel().equals("Person"),
         e -> e.getLabel().equals("friendOf"));
 
-    collectAndAssertTrue(output.equalsByElementData(expected));
+    collectAndAssertTrue(output.equalsByData(expected));
   }
 
   /**
@@ -112,7 +112,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
   public void testEmptySubgraph() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("expected[]");
+    loader.appendToDatabaseFromString("expected:_DB[]");
 
     LogicalGraph input = loader.getLogicalGraph();
 
@@ -122,14 +122,14 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       v -> v.getLabel().equals("User"),
       e -> e.getLabel().equals("friendOf"));
 
-    collectAndAssertTrue(output.equalsByElementData(expected));
+    collectAndAssertTrue(output.equalsByData(expected));
   }
 
   @Test
   public void testVertexInducedSubgraph() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("expected[" +
+    loader.appendToDatabaseFromString("expected:_DB[" +
       "(databases)<-[ghtd]-(gdbs)-[ghtg1]->(graphs)" +
       "(graphs)<-[ghtg2]-(gps)-[ghth]->(hadoop)" +
       "]");
@@ -141,14 +141,14 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     LogicalGraph output = input.vertexInducedSubgraph(
       v -> v.getLabel().equals("Forum") || v.getLabel().equals("Tag"));
 
-    collectAndAssertTrue(output.equalsByElementData(expected));
+    collectAndAssertTrue(output.equalsByData(expected));
   }
 
   @Test
   public void testEdgeInducedSubgraph() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("expected[" +
+    loader.appendToDatabaseFromString("expected:_DB[" +
       "(databases)<-[ghtd]-(gdbs)-[ghtg1]->(graphs)" +
       "(graphs)<-[ghtg2]-(gps)-[ghth]->(hadoop)" +
       "]");
@@ -160,14 +160,14 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     LogicalGraph output = input.edgeInducedSubgraph(
       e -> e.getLabel().equals("hasTag"));
 
-    collectAndAssertTrue(output.equalsByElementData(expected));
+    collectAndAssertTrue(output.equalsByData(expected));
   }
 
   @Test
   public void testEdgeInducedSubgraphProjectFirst() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("expected[" +
+    loader.appendToDatabaseFromString("expected:_DB[" +
       "(databases)<-[ghtd]-(gdbs)-[ghtg1]->(graphs)" +
       "(graphs)<-[ghtg2]-(gps)-[ghth]->(hadoop)" +
       "]");
@@ -179,7 +179,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     LogicalGraph output = input.subgraph(null,
       e -> e.getLabel().equals("hasTag"), Subgraph.Strategy.EDGE_INDUCED_PROJECT_FIRST);
 
-    collectAndAssertTrue(output.equalsByElementData(expected));
+    collectAndAssertTrue(output.equalsByData(expected));
   }
 
   @Test
@@ -220,9 +220,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     FilterFunction<Edge> edgeFilterFunction = e -> {
       if (e.getLabel().equals("knows")) {
-        if (e.getPropertyValue("since").getInt() == 2016) {
-          return true;
-        }
+        return e.getPropertyValue("since").getInt() == 2016;
       }
       return false;
     };

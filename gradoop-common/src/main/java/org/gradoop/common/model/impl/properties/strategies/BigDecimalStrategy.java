@@ -18,10 +18,10 @@ package org.gradoop.common.model.impl.properties.strategies;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.Type;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Arrays;
 
 /**
  * Strategy class for handling {@link PropertyValue} operations with a value of the type
@@ -57,44 +57,12 @@ public class BigDecimalStrategy extends AbstractVariableSizedPropertyValueStrate
 
   @Override
   public BigDecimal get(byte[] bytes) {
-
-    BigDecimal decimal;
-    byte type = bytes[0];
-    byte[] valueBytes = Arrays.copyOfRange(bytes, PropertyValue.OFFSET, bytes.length);
-
-    switch (type) {
-    case PropertyValue.TYPE_BIG_DECIMAL:
-      decimal = Bytes.toBigDecimal(valueBytes);
-      break;
-    case PropertyValue.TYPE_FLOAT:
-      decimal = BigDecimal.valueOf(Bytes.toFloat(valueBytes));
-      break;
-    case PropertyValue.TYPE_DOUBLE:
-      decimal = BigDecimal.valueOf(Bytes.toDouble(valueBytes));
-      break;
-    case PropertyValue.TYPE_SHORT:
-      decimal = BigDecimal.valueOf(Bytes.toShort(valueBytes));
-      break;
-    case PropertyValue.TYPE_INTEGER:
-      decimal = BigDecimal.valueOf(Bytes.toInt(valueBytes));
-      break;
-    case PropertyValue.TYPE_LONG:
-      decimal = BigDecimal.valueOf(Bytes.toLong(valueBytes));
-      break;
-    case PropertyValue.TYPE_STRING:
-      decimal = new BigDecimal(Bytes.toString(valueBytes));
-      break;
-    default:
-      throw new IllegalArgumentException(
-        "Cannot convert byte array with type byte " + type + " to " +
-        BigDecimal.class.getSimpleName());
-    }
-    return decimal;
+    return Bytes.toBigDecimal(bytes, PropertyValue.OFFSET, bytes.length - PropertyValue.OFFSET);
   }
 
   @Override
   public byte getRawType() {
-    return PropertyValue.TYPE_BIG_DECIMAL;
+    return Type.BIG_DECIMAL.getTypeByte();
   }
 
   @Override
