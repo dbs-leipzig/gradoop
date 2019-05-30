@@ -16,7 +16,6 @@
 package org.gradoop.storage.impl.hbase;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Queues;
 import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.api.entities.EPGMEdge;
@@ -31,14 +30,18 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.AsciiGraphLoader;
+import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
 
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -49,6 +52,8 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
   /**
    * Creates persistent graph, vertex and edge data. Writes data to HBase,
    * closes the store, opens it and reads/validates the data again.
+   *
+   * @throws IOException on failure
    */
   @Test
   public void writeCloseOpenReadTest() throws IOException {
@@ -78,6 +83,8 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
   /**
    * Creates persistent graph, vertex and edge data. Writes data to HBase,
    * closes the store, opens it and reads/validates the data again.
+   *
+   * @throws IOException on failure
    */
   @Test
   public void writeCloseOpenReadTestWithPrefix() throws IOException {
@@ -108,6 +115,8 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
   /**
    * Creates persistent graph, vertex and edge data. Writes data to HBase,
    * flushes the tables and reads/validates the data.
+   *
+   * @throws IOException on failure
    */
   @Test
   public void writeFlushReadTest() throws IOException {
@@ -191,6 +200,8 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
 
   /**
    * Tries to add an unsupported property type {@link Queue} as property value.
+   *
+   * @throws IOException on failure
    */
   @Test(expected = UnsupportedTypeException.class)
   public void wrongPropertyTypeTest() throws IOException {
@@ -199,7 +210,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
     EPGMVertexFactory<Vertex> vertexFactory = new VertexFactory();
 
     // Queue is not supported by
-    final Queue<String> value = Queues.newPriorityQueue();
+    final Queue<String> value = new PriorityQueue<>();
 
     GradoopId vertexID = GradoopId.get();
     final String label = "A";
@@ -215,8 +226,9 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
 
   /**
    * Checks if property values are read correctly.
+   *
+   * @throws IOException on failure
    */
-  @SuppressWarnings("Duplicates")
   @Test
   public void propertyTypeTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore();
@@ -313,6 +325,52 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
     graphStore.close();
   }
 
+  /**
+   * Test the truncate tables functionality.
+   */
+  @Test
+  public void truncateTablesTest() throws IOException {
+    HBaseEPGMStore store = createEmptyEPGMStore("truncateTest");
+    AsciiGraphLoader<GraphHead, Vertex, Edge> loader = getMinimalFullFeaturedGraphLoader();
+    checkIfStoreIsEmpty("Store was not empty before writing anything.", store);
+    // Now write something to the store, check if it was written (i.e. the store is not empty).
+    GraphHead graphHead = loader.getGraphHeads().iterator().next();
+    Vertex vertex = loader.getVertices().iterator().next();
+    Edge edge = loader.getEdges().iterator().next();
+    store.writeGraphHead(graphHead);
+    store.writeVertex(vertex);
+    store.writeEdge(edge);
+    store.flush();
+    validateGraphHead(store, graphHead);
+    validateVertex(store, vertex);
+    validateEdge(store, edge);
+    // Now truncate and check if the store if empty afterwards.
+    store.truncateTables();
+    checkIfStoreIsEmpty("Store was not empty after truncating.", store);
+    // Finally check if we can write elements.
+    store.writeGraphHead(graphHead);
+    store.writeVertex(vertex);
+    store.writeEdge(edge);
+    store.close();
+  }
+
+  /**
+   * Check if all tables of are store are empty.
+   *
+   * @param message The messenge used in the assertion.
+   * @param store The HBase store to check.
+   * @throws IOException when accessing the store fails.
+   */
+  private void checkIfStoreIsEmpty(String message, HBaseEPGMStore store) throws IOException {
+    for (ClosableIterator<?> space : Arrays.asList(store.getGraphSpace(),
+      store.getVertexSpace(), store.getEdgeSpace())) {
+      boolean hasNext = space.hasNext();
+      // Make sure to close the iterator before the assertion.
+      space.close();
+      assertFalse(message, hasNext);
+    }
+  }
+
   private AsciiGraphLoader<GraphHead, Vertex, Edge> getMinimalFullFeaturedGraphLoader() {
     String asciiGraph = ":G{k:\"v\"}[(v:V{k:\"v\"}),(v)-[:e{k:\"v\"}]->(v)]";
     return AsciiGraphLoader.fromString(asciiGraph, GradoopConfig.getDefaultConfig());
@@ -334,7 +392,6 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
     validateEPGMGraphElements(originalVertex, loadedVertex);
   }
 
-  @SuppressWarnings("Duplicates")
   private void validateEdge(HBaseEPGMStore graphStore, Edge originalEdge) throws IOException {
 
     EPGMEdge loadedEdge = graphStore.readEdge(originalEdge.getId());

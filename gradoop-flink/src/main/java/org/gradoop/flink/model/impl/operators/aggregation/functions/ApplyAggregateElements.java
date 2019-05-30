@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * (graphId,vertex),.. => (graphId,aggregateValue),..
- */
 package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
 import org.apache.flink.api.common.functions.GroupCombineFunction;

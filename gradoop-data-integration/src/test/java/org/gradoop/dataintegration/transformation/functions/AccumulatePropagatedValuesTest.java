@@ -39,6 +39,8 @@ public class AccumulatePropagatedValuesTest extends GradoopFlinkTestBase {
 
   /**
    * Test the coGroup function using some values.
+   *
+   * @throws Exception on failure
    */
   @Test
   public void testCoGroup() throws Exception {

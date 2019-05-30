@@ -39,7 +39,7 @@ public class AddGraphsToElementsCoGroup<EL extends GraphElement>
   public void coGroup(
     Iterable<Tuple2<GradoopId, GradoopIdSet>> graphs,
     Iterable<EL> elements,
-    Collector<EL> collector) throws Exception {
+    Collector<EL> collector) {
     boolean wasGraphSetEmpty = true;
     for (EL element : elements) {
       for (Tuple2<GradoopId, GradoopIdSet> graphSet : graphs) {

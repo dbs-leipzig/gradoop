@@ -77,7 +77,7 @@ public abstract class LabelPropagation extends GradoopGellyAlgorithm<PropertyVal
 
     // return labeled graph
     return currentGraph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(labeledVertices, currentGraph.getEdges());
+      .fromDataSets(currentGraph.getGraphHead(), labeledVertices, currentGraph.getEdges());
   }
 
   /**

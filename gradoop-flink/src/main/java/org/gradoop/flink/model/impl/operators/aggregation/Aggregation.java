@@ -16,13 +16,13 @@
 package org.gradoop.flink.model.impl.operators.aggregation;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.AggregateElements;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.CombinePartitionAggregates;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.SetAggregateProperty;
@@ -39,8 +39,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Takes a logical graph and user defined aggregate functions as input. The
  * aggregate functions are applied on the logical graph and the resulting
  * aggregate is stored as additional properties at the result graph.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
  */
-public class Aggregation implements UnaryGraphToGraphOperator {
+public class Aggregation<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * User-defined aggregate functions which are applied on a single logical graph.
@@ -61,20 +70,19 @@ public class Aggregation implements UnaryGraphToGraphOperator {
   }
 
   @Override
-  public LogicalGraph execute(LogicalGraph graph) {
-    DataSet<Vertex> vertices = graph.getVertices();
-    DataSet<Edge> edges = graph.getEdges();
+  public LG execute(LG graph) {
+    DataSet<V> vertices = graph.getVertices();
+    DataSet<E> edges = graph.getEdges();
 
     DataSet<Map<String, PropertyValue>> aggregate = aggregateVertices(vertices)
       .union(aggregateEdges(edges))
       .reduceGroup(new CombinePartitionAggregates(aggregateFunctions));
 
-    DataSet<GraphHead> graphHead = graph.getGraphHead()
-      .map(new SetAggregateProperty(aggregateFunctions))
+    DataSet<G> graphHead = graph.getGraphHead()
+      .map(new SetAggregateProperty<>(aggregateFunctions))
       .withBroadcastSet(aggregate, SetAggregateProperty.VALUE);
 
-    return graph.getConfig().getLogicalGraphFactory()
-      .fromDataSets(graphHead, vertices, edges);
+    return graph.getFactory().fromDataSets(graphHead, vertices, edges);
   }
 
   /**
@@ -83,7 +91,7 @@ public class Aggregation implements UnaryGraphToGraphOperator {
    * @param vertices vertex data set
    * @return partition aggregate values mapped from their property key
    */
-  private DataSet<Map<String, PropertyValue>> aggregateVertices(DataSet<Vertex> vertices) {
+  private DataSet<Map<String, PropertyValue>> aggregateVertices(DataSet<V> vertices) {
     return vertices.combineGroup(new AggregateElements<>(aggregateFunctions.stream()
       .filter(AggregateFunction::isVertexAggregation)
       .collect(Collectors.toSet())));
@@ -95,7 +103,7 @@ public class Aggregation implements UnaryGraphToGraphOperator {
    * @param edges edge data set
    * @return partition aggregate values
    */
-  private DataSet<Map<String, PropertyValue>> aggregateEdges(DataSet<Edge> edges) {
+  private DataSet<Map<String, PropertyValue>> aggregateEdges(DataSet<E> edges) {
     return edges.combineGroup(new AggregateElements<>(aggregateFunctions.stream()
       .filter(AggregateFunction::isEdgeAggregation)
       .collect(Collectors.toSet())));

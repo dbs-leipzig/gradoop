@@ -43,7 +43,7 @@ import org.gradoop.storage.impl.accumulo.predicate.query.AccumuloQueryHolder;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -130,6 +130,7 @@ public abstract class BaseInputFormat<T extends Element> extends GenericInputFor
    *
    * @param row accumulo result
    * @return gradoop element
+   * @throws IOException on failure
    */
   protected abstract T mapRow(Map.Entry<Key, Value> row) throws IOException;
 
@@ -175,7 +176,7 @@ public abstract class BaseInputFormat<T extends Element> extends GenericInputFor
       }
       if (split.getSplitNumber() + 1 > ranges.size()) {
         scanner = null;
-        iterator = new ArrayList<Map.Entry<Key, Value>>().iterator();
+        iterator = Collections.emptyIterator();
       } else {
         scanner = conn.createBatchScanner(tableName, auth, batchSize);
         attachIterator(scanner, iteratorPriority, options);

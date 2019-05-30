@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Abstract base class for graphs, vertices and edges.
@@ -151,7 +152,7 @@ public abstract class Element implements EPGMElement {
 
     Element that = (Element) o;
 
-    return !(id != null ? !id.equals(that.id) : that.id != null);
+    return Objects.equals(id, that.id);
   }
 
   @Override

@@ -39,7 +39,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
    * Whether this order makes any sense is not relevant for this test, it is just used to make sure
    * that two list-typed properties have the same order.
    */
-  private static Comparator<PropertyValue> byTypeFirst = Comparator
+  private static final Comparator<PropertyValue> byTypeFirst = Comparator
     .comparing((PropertyValue pv) -> pv.getType().getSimpleName())
     .thenComparing(Comparator.naturalOrder());
 
@@ -47,11 +47,12 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
    * The loader with the graphs used in this test.
    */
   private FlinkAsciiGraphLoader loader = getLoaderFromString(
-    "input1[" + "(s1:Source {p1: 1, p2: 1.1d})-[e1:edge1]->(t:Target {t: 0})" +
+    "input1:test[" + "(s1:Source {p1: 1, p2: 1.1d})-[e1:edge1]->(t:Target {t: 0})" +
       "(s2:Source {p1: \"\"})-[e2:edge2]->(t)" +
       "(s1)-[e12:edge1]->(t2:Target2 {t: 0})" +
       "(s2)-[e22:edge2]->(t2)" +
-      "] input2 [" +
+      "]" +
+      "input2:test [" +
       "(v:Vertex {t: 1})-->(v)" +
       "]");
 
@@ -76,7 +77,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
     LogicalGraph result = input.callForGraph(operator)
       .callForGraph(new PropertyTransformation<>("t", pv -> pv,
       PropagatePropertyToNeighborTest::orderListProperty, pv -> pv));
-    collectAndAssertTrue(expected.equalsByElementData(result));
+    collectAndAssertTrue(expected.equalsByData(result));
   }
 
   /**
@@ -97,7 +98,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
       return v;
     });
     LogicalGraph result = input.callForGraph(operator);
-    collectAndAssertTrue(expected.equalsByElementData(result));
+    collectAndAssertTrue(expected.equalsByData(result));
   }
 
   /**
@@ -121,7 +122,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
     LogicalGraph result = input.callForGraph(operator)
       .callForGraph(new PropertyTransformation<>("t", pv -> pv,
       PropagatePropertyToNeighborTest::orderListProperty, pv -> pv));
-    collectAndAssertTrue(expected.equalsByElementData(result));
+    collectAndAssertTrue(expected.equalsByData(result));
   }
 
   /**
@@ -143,7 +144,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
       return v;
     });
     LogicalGraph result = input.callForGraph(operator);
-    collectAndAssertTrue(expected.equalsByElementData(result));
+    collectAndAssertTrue(expected.equalsByData(result));
   }
 
   /**
@@ -161,7 +162,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
       return v;
     });
     LogicalGraph result = input.callForGraph(operator);
-    collectAndAssertTrue(expected.equalsByElementData(result));
+    collectAndAssertTrue(expected.equalsByData(result));
   }
 
   /**

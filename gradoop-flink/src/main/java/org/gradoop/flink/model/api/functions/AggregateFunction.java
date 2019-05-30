@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.api.functions;
 
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 
@@ -49,7 +49,7 @@ public interface AggregateFunction extends Serializable {
    * @param element element used to get the increment
    * @return increment, may be NULL, which is handled in the operator
    */
-  PropertyValue getIncrement(Element element);
+  PropertyValue getIncrement(EPGMElement element);
 
   /**
    * Returns whether this function aggregates vertices.
@@ -66,5 +66,19 @@ public interface AggregateFunction extends Serializable {
    */
   default boolean isEdgeAggregation() {
     return true;
+  }
+
+  /**
+   * Compute the final result after the aggregation step was completed. This method may be
+   * implemented if the aggregate function uses some internal aggregate value not equal to the
+   * result.<br>
+   * The default implementation of this method does nothing, it returns the result unchanged.<br>
+   * This method will not be called when the aggregate value is {@code null}.
+   *
+   * @param result The result of the aggregation step.
+   * @return The final result, computed from the previous result in a post-processing step.
+   */
+  default PropertyValue postAggregate(PropertyValue result) {
+    return result;
   }
 }

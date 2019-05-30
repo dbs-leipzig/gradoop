@@ -32,6 +32,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Represents a list of property values.
@@ -77,8 +78,8 @@ public class PropertyValueList
    * Creates a Property value list from a collection of property values.
    *
    * @param propertyValues property values
-   *
    * @return property value list containing the given properties
+   * @throws IOException on failure
    */
   public static PropertyValueList fromPropertyValues(
     Collection<PropertyValue> propertyValues) throws IOException {
@@ -186,13 +187,13 @@ public class PropertyValueList
     }
 
     @Override
-    public PropertyValue next() {
+    public PropertyValue next() throws NoSuchElementException {
       PropertyValue nextValue = new PropertyValue();
       try {
         DataInputView inputView = new DataInputViewStreamWrapper(inputStream);
         nextValue.read(inputView);
       } catch (IOException e) {
-        e.printStackTrace();
+        throw new NoSuchElementException("Error while reading from input stream.");
       }
       return nextValue;
     }

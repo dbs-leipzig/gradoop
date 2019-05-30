@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
 
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 
@@ -53,7 +53,7 @@ public class SumProperty extends BaseAggregateFunction implements Sum {
   }
 
   @Override
-  public PropertyValue getIncrement(Element element) {
+  public PropertyValue getIncrement(EPGMElement element) {
     return element.getPropertyValue(propertyKey);
   }
 }

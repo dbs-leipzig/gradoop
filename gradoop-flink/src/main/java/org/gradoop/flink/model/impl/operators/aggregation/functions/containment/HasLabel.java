@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.containment;
 
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -67,7 +67,7 @@ public class HasLabel extends BaseAggregateFunction
   }
 
   @Override
-  public PropertyValue getIncrement(Element element) {
+  public PropertyValue getIncrement(EPGMElement element) {
     return PropertyValue.create(element.getLabel().equals(label));
   }
 

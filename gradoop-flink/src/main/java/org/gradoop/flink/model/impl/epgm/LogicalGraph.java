@@ -18,6 +18,7 @@ package org.gradoop.flink.model.impl.epgm;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
@@ -42,6 +43,8 @@ import org.gradoop.flink.model.impl.functions.epgm.PropertyGetter;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 import org.gradoop.flink.model.impl.operators.cloning.Cloning;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
+import org.gradoop.flink.model.impl.operators.cypher.capf.query.CAPFQuery;
+import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
 import org.gradoop.flink.model.impl.operators.equality.GraphEquality;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
@@ -65,6 +68,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmpt
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
+import org.gradoop.flink.model.impl.operators.verify.Verify;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -74,14 +78,14 @@ import java.util.Objects;
 /**
  * A logical graph is one of the base concepts of the Extended Property Graph Model. A logical graph
  * encapsulates three concepts:
- *
+ * <p>
  * - a so-called graph head, that stores information about the graph (i.e. label and properties)
  * - a set of vertices assigned to the graph
  * - a set of directed, possibly parallel edges assigned to the graph
- *
+ * <p>
  * Furthermore, a logical graph provides operations that are performed on the underlying data. These
  * operations result in either another logical graph or in a {@link GraphCollection}.
- *
+ * <p>
  * A logical graph is wrapping a {@link LogicalGraphLayout} which defines, how the graph is
  * represented in Apache Flink. Note that the LogicalGraph also implements that interface and
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
@@ -164,45 +168,18 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   //----------------------------------------------------------------------------
 
   @Override
-  @Deprecated
-  public GraphCollection cypher(String query) {
-    return cypher(query, new GraphStatistics(1, 1, 1, 1));
+  public CAPFQueryResult cypher(String query) throws Exception {
+    CAPFQuery capfQuery = new CAPFQuery(
+      query, this.config.getExecutionEnvironment()
+    );
+    return capfQuery.execute(this);
   }
 
   @Override
-  @Deprecated
-  public GraphCollection cypher(String query, String constructionPattern) {
-    return cypher(query, constructionPattern, new GraphStatistics(1, 1, 1, 1));
-  }
-
-  @Override
-  @Deprecated
-  public GraphCollection cypher(String query, GraphStatistics graphStatistics) {
-    return cypher(query, true,
-      MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
-  }
-
-  @Override
-  @Deprecated
-    public GraphCollection cypher(String query, String constructionPattern,
-    GraphStatistics graphStatistics) {
-    return cypher(query, constructionPattern, true,
-            MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
-  }
-
-  @Override
-  @Deprecated
-  public GraphCollection cypher(String query, boolean attachData, MatchStrategy vertexStrategy,
-    MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-    return cypher(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
-  }
-
-  @Override
-  @Deprecated
-  public GraphCollection cypher(String query, String constructionPattern, boolean attachData,
-    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
-    return callForCollection(new CypherPatternMatching(query, constructionPattern, attachData,
-            vertexStrategy, edgeStrategy, graphStatistics));
+  public CAPFQueryResult cypher(String query, MetaData metaData) throws Exception {
+    CAPFQuery capfQuery = new CAPFQuery(
+      query, metaData, this.config.getExecutionEnvironment());
+    return capfQuery.execute(this);
   }
 
   @Override
@@ -223,21 +200,21 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
 
   @Override
   public GraphCollection query(String query, String constructionPattern,
-                                GraphStatistics graphStatistics) {
+    GraphStatistics graphStatistics) {
     return query(query, constructionPattern, true,
       MatchStrategy.HOMOMORPHISM, MatchStrategy.ISOMORPHISM, graphStatistics);
   }
 
   @Override
   public GraphCollection query(String query, boolean attachData, MatchStrategy vertexStrategy,
-                                MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
+    MatchStrategy edgeStrategy, GraphStatistics graphStatistics) {
     return query(query, null, attachData, vertexStrategy, edgeStrategy, graphStatistics);
   }
 
   @Override
   public GraphCollection query(String query, String constructionPattern, boolean attachData,
-                               MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
-                               GraphStatistics graphStatistics) {
+    MatchStrategy vertexStrategy, MatchStrategy edgeStrategy,
+    GraphStatistics graphStatistics) {
     return callForCollection(new CypherPatternMatching(query, constructionPattern, attachData,
       vertexStrategy, edgeStrategy, graphStatistics));
   }
@@ -292,15 +269,17 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   }
 
   @Override
-  public LogicalGraph subgraph(FilterFunction<Vertex> vertexFilterFunction,
+  public LogicalGraph subgraph(
+    FilterFunction<Vertex> vertexFilterFunction,
     FilterFunction<Edge> edgeFilterFunction, Subgraph.Strategy strategy) {
+
     return callForGraph(
       new Subgraph<>(vertexFilterFunction, edgeFilterFunction, strategy));
   }
 
   @Override
   public LogicalGraph aggregate(AggregateFunction... aggregateFunctions) {
-    return callForGraph(new Aggregation(aggregateFunctions));
+    return callForGraph(new Aggregation<>(aggregateFunctions));
   }
 
   @Override
@@ -378,6 +357,11 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
 
     return callForCollection(new EdgeRollUp(vertexGroupingKeys, vertexAggregateFunctions,
       edgeGroupingKeys, edgeAggregateFunctions));
+  }
+
+  @Override
+  public LogicalGraph verify() {
+    return callForGraph(new Verify<>());
   }
 
   //----------------------------------------------------------------------------

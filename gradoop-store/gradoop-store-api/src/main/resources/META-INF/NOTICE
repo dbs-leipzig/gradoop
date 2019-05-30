@@ -1,0 +1,6 @@
+gradoop-store-api
+Copyright 2014-2019 Leipzig University (Database Research Group)
+
+This project bundles the following dependencies under the Apache Software License 2.0 (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+- org.apache.flink:flink-java:1.7.0

@@ -28,21 +28,19 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertTrue;
-
 public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
 
   @Test
   public void testSameGraph() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    loader.appendToDatabaseFromString("expected[]");
+    loader.appendToDatabaseFromString(
+      "expected:Community {interest:\"Databases\", vertexCount:3}[]");
 
     LogicalGraph g0 = loader.getLogicalGraphByVariable("g0");
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
-    assertTrue("exclusion of same graph failed",
-      expected.equalsByElementIds(g0.exclude(g0)).collect().get(0));
+    collectAndAssertTrue(g0.exclude(g0).equalsByData(expected));
   }
 
   @Test
@@ -50,32 +48,34 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString("" +
-      "expected1[(eve)]" +
-      "expected2[(carol)-[ckd]->(dave)-[dkc]->(carol)]");
+      "expected1:Community {interest:\"Databases\", vertexCount:3}" +
+      "[(eve)]" +
+      "expected2:Community {interest : \"Graphs\", vertexCount : 4}" +
+      "[(carol)-[ckd]->(dave)-[dkc]->(carol)]");
 
     LogicalGraph g0 = loader.getLogicalGraphByVariable("g0");
     LogicalGraph g2 = loader.getLogicalGraphByVariable("g2");
     LogicalGraph expected1 = loader.getLogicalGraphByVariable("expected1");
     LogicalGraph expected2 = loader.getLogicalGraphByVariable("expected2");
 
-    assertTrue("excluding overlapping graphs failed",
-      expected1.equalsByElementIds(g0.exclude(g2)).collect().get(0));
-    assertTrue("excluding switched overlapping graphs failed",
-      expected2.equalsByElementIds(g2.exclude(g0)).collect().get(0));
+    collectAndAssertTrue(g0.exclude(g2).equalsByData(expected1));
+    collectAndAssertTrue(g2.exclude(g0).equalsByData(expected2));
+
   }
 
   @Test
   public void testDerivedOverlappingGraphs() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString("g[(a {x: true, y: true}),(b {x:true, y: false})]");
+    FlinkAsciiGraphLoader loader = getLoaderFromString("g:test" +
+      "[(a {x: true, y: true}),(b {x:true, y: false})]");
 
     LogicalGraph baseGraph = loader.getLogicalGraphByVariable("g");
     LogicalGraph derivedGraph1 = baseGraph.vertexInducedSubgraph(v -> v.getPropertyValue("x").getBoolean());
     LogicalGraph derivedGraph2 = baseGraph.vertexInducedSubgraph(v -> !v.getPropertyValue("y").getBoolean());
 
-    loader.appendToDatabaseFromString("expected[(a)]");
+    loader.appendToDatabaseFromString("expected:test[(a)]");
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
-    collectAndAssertTrue(derivedGraph1.exclude(derivedGraph2).equalsByElementIds(expected));
+    collectAndAssertTrue(derivedGraph1.exclude(derivedGraph2).equalsByData(expected));
   }
 
   @Test
@@ -85,24 +85,23 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
     LogicalGraph g0 = loader.getLogicalGraphByVariable("g0");
     LogicalGraph g1 = loader.getLogicalGraphByVariable("g1");
 
-    assertTrue("excluding non overlapping graphs failed",
-      g0.equalsByElementIds(g0.exclude(g1)).collect().get(0));
-    assertTrue("excluding switched non overlapping graphs failed",
-      g1.equalsByElementIds(g1.exclude(g0)).collect().get(0));
+    collectAndAssertTrue(g0.exclude(g1).equalsByData(g0));
+    collectAndAssertTrue(g1.exclude(g0).equalsByData(g1));
   }
 
   @Test
   public void testDerivedNonOverlappingGraphs() throws Exception {
-    FlinkAsciiGraphLoader loader = getLoaderFromString("g[(a {x: true}),(b {x: false})]");
+    FlinkAsciiGraphLoader loader = getLoaderFromString("g:test" +
+      "[(a {x: true}),(b {x: false})]");
 
     LogicalGraph baseGraph = loader.getLogicalGraphByVariable("g");
     LogicalGraph derivedGraph1 = baseGraph.vertexInducedSubgraph(v -> v.getPropertyValue("x").getBoolean());
     LogicalGraph derivedGraph2 = baseGraph.vertexInducedSubgraph(v -> !v.getPropertyValue("x").getBoolean());
 
-    loader.appendToDatabaseFromString("expected[(a)]");
+    loader.appendToDatabaseFromString("expected:test[(a)]");
     LogicalGraph expected = loader.getLogicalGraphByVariable("expected");
 
-    collectAndAssertTrue(derivedGraph1.exclude(derivedGraph2).equalsByElementIds(expected));
+    collectAndAssertTrue(derivedGraph1.exclude(derivedGraph2).equalsByData(expected));
   }
 
   @Test
@@ -137,7 +136,6 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
         inVertices.add(vertex);
       }
     }
-    Set<GraphElement> inEdges = new HashSet<>();
     for (Edge edge : edges2) {
       if (!edges0.contains(edge)) {
         inVertices.add(edge);
@@ -147,7 +145,7 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
     Set<GraphElement> outVertices = new HashSet<>();
     inVertices.addAll(outVertices);
     Set<GraphElement> outEdges = new HashSet<>();
-    inEdges.addAll(resEdges);
+    Set<GraphElement> inEdges = new HashSet<>(resEdges);
 
     checkElementMatches(inVertices, outVertices);
     checkElementMatches(inEdges, outEdges);

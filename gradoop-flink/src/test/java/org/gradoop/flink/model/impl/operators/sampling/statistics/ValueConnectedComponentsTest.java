@@ -20,6 +20,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.statistics.ConnectedComponentsDistributionAsValues;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -84,7 +85,7 @@ public class ValueConnectedComponentsTest extends GradoopFlinkTestBase {
 
     // execute Gelly ConnectedComponents.
     DataSet<Tuple2<Long, Long>> cComponents =
-      new ValueConnectedComponentsDistribution(Integer.MAX_VALUE).execute(graph);
+      new ConnectedComponentsDistributionAsValues(Integer.MAX_VALUE).execute(graph);
 
     List<Tuple2<Long, Long>> vertexComponentList = new ArrayList<>();
     cComponents.output(new LocalCollectionOutputFormat<>(vertexComponentList));

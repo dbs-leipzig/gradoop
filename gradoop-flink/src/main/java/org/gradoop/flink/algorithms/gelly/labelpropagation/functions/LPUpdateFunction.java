@@ -36,11 +36,10 @@ public class LPUpdateFunction
    *
    * @param vertex  vertex to be updated
    * @param msg     message
-   * @throws Exception
    */
   @Override
   public void updateVertex(Vertex<GradoopId, PropertyValue> vertex,
-    MessageIterator<PropertyValue> msg) throws Exception {
+    MessageIterator<PropertyValue> msg) {
     PropertyValue value = getNewValue(vertex,
       Lists.newArrayList(msg.iterator()));
     if (!vertex.getValue().equals(value)) {

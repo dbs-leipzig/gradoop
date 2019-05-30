@@ -20,6 +20,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
@@ -27,17 +28,18 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 /**
  * Creates a new super vertex representing a vertex group. The vertex stores the
  * group label, the group property value and the aggregate values for its group.
+ *
+ * @param <V> The vertex type.
  */
 @FunctionAnnotation.ForwardedFields("f1->id;f2->label")
 @FunctionAnnotation.ReadFields("f1;f2;f3;f4;f6")
-public class BuildSuperVertex
-  extends BuildBase
-  implements MapFunction<VertexGroupItem, Vertex>, ResultTypeQueryable<Vertex> {
+public class BuildSuperVertex<V extends EPGMVertex> extends BuildBase
+  implements MapFunction<VertexGroupItem, V>, ResultTypeQueryable<V> {
 
   /**
    * Vertex vertexFactory.
    */
-  private final EPGMVertexFactory<Vertex> vertexFactory;
+  private final EPGMVertexFactory<V> vertexFactory;
 
   /**
    * Creates map function.
@@ -45,7 +47,7 @@ public class BuildSuperVertex
    * @param useLabel true, if vertex label shall be considered
    * @param epgmVertexFactory vertex factory
    */
-  public BuildSuperVertex(boolean useLabel, EPGMVertexFactory<Vertex> epgmVertexFactory) {
+  public BuildSuperVertex(boolean useLabel, EPGMVertexFactory<V> epgmVertexFactory) {
     super(useLabel);
     this.vertexFactory = epgmVertexFactory;
   }
@@ -59,9 +61,8 @@ public class BuildSuperVertex
    * @throws Exception on failure
    */
   @Override
-  public Vertex map(VertexGroupItem groupItem) throws
-    Exception {
-    Vertex supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());
+  public V map(VertexGroupItem groupItem) throws Exception {
+    V supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());
 
     supVertex.setLabel(groupItem.getGroupLabel());
     setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getLabelGroup());
@@ -73,9 +74,8 @@ public class BuildSuperVertex
     return supVertex;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public TypeInformation<Vertex> getProducedType() {
+  public TypeInformation<V> getProducedType() {
     return TypeExtractor.createTypeInfo(vertexFactory.getType());
   }
 }

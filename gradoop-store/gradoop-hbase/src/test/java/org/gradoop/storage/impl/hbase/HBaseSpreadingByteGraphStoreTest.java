@@ -32,6 +32,8 @@ public class HBaseSpreadingByteGraphStoreTest extends HBaseDefaultGraphStoreTest
   /**
    * Instantiate the EPGMStore with a prefix and persist social media data.
    * In addition, use a spreading byte as prefix of each row key.
+   *
+   * @throws IOException on failure
    */
   @BeforeClass
   public static void setUp() throws IOException {

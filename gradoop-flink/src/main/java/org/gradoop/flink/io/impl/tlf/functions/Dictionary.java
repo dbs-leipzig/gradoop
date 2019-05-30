@@ -34,7 +34,7 @@ public class Dictionary
    *
    * @param iterable containing tuples of integer and string
    * @param collector collects one map from integer to string
-   * @throws Exception
+   * @throws Exception on failure
    */
   @Override
   public void reduce(
@@ -43,7 +43,7 @@ public class Dictionary
     Map<Integer, String> dictionary = Maps.newHashMap();
     for (Tuple2<Integer, String> tuple : iterable) {
       dictionary.put(
-        (Integer) tuple.getField(0), (String) tuple.getField(1));
+        tuple.getField(0), tuple.getField(1));
     }
     collector.collect(dictionary);
   }

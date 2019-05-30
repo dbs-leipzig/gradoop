@@ -172,6 +172,7 @@ public class GradoopTestUtils {
    * gradoop/dev-support/social-network.pdf
    *
    * @return graph store containing a simple social network for tests.
+   * @throws IOException on failure
    */
   public static AsciiGraphLoader<GraphHead, Vertex, Edge> getSocialNetworkLoader()
     throws IOException {
@@ -402,7 +403,6 @@ public class GradoopTestUtils {
    * @return method result
    * @throws Exception in case anything goes wrong
    */
-  @SuppressWarnings("unchecked")
   public static <T1, T2> T1 call(Class<T2> clazz, T2 object, String methodName)
     throws Exception {
     return call(clazz, object, methodName, null, null);

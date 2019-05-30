@@ -91,6 +91,7 @@ public abstract class GradoopGellyAlgorithm<VV, EV>
    *
    * @param graph The Gelly graph.
    * @return The Gradoop graph.
+   * @throws Exception on failure
    */
   public abstract LogicalGraph executeInGelly(Graph<GradoopId, VV, EV> graph) throws Exception;
 }

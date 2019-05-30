@@ -156,7 +156,7 @@ public class AsciiGraphLoader
    * @param <E> EPGM edge type
    *
    * @return AsciiGraphLoader
-   * @throws IOException
+   * @throws IOException on failure
    */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
@@ -180,7 +180,7 @@ public class AsciiGraphLoader
    * @param <E> EPGM edge type
    *
    * @return AsciiGraphLoader
-   * @throws IOException
+   * @throws IOException on failure
    */
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>

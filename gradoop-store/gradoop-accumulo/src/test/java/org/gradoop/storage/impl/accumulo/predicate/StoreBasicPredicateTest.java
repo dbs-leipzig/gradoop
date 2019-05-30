@@ -137,7 +137,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
         .fromSets(sampleRange)
         .where(AccumuloFilters.<GraphHead>labelIn("Community")
           .and(AccumuloFilters.<GraphHead>propEquals("interest", "Hadoop")
-            .or(AccumuloFilters.<GraphHead>propEquals("interest", "Graphs"))));
+            .or(AccumuloFilters.propEquals("interest", "Graphs"))));
 
       List<GraphHead> query = store
         .getGraphSpace(queryFormula)

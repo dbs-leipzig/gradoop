@@ -48,7 +48,7 @@ public class AdoptEmptyPaths extends RichFlatMapFunction<Embedding, Embedding> {
   }
 
   @Override
-  public void flatMap(Embedding value, Collector<Embedding> out) throws Exception {
+  public void flatMap(Embedding value, Collector<Embedding> out) {
     if (closingColumn >= 0 &&
       !ArrayUtils.isEquals(value.getRawId(expandColumn), value.getRawId(closingColumn))) {
       return;

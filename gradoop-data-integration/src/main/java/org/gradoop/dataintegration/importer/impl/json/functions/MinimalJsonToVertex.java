@@ -69,6 +69,7 @@ public class MinimalJsonToVertex implements MapFunction<String, Vertex> {
    *
    * @param jsonString The String representation of a JSON object.
    * @return A new vertex from the JSON object.
+   * @throws Exception on failure
    */
   @Override
   public Vertex map(String jsonString) throws Exception {
