@@ -105,7 +105,7 @@ public class CreateEdges {
           DataSet<Fk1Fk2Props> fkPropsTable = dsSQLResult
             .map(new RowToFk1Fk2PropsTuple(counter))
             .withBroadcastSet(
-              env.fromCollection(tablesToEdges), BROADCAST_VARIABLE);
+              dsTablesToEdges, BROADCAST_VARIABLE);
 
           // Represents vertices in relation with foreign key one
           DataSet<IdKeyTuple> idPkTableOne = vertices

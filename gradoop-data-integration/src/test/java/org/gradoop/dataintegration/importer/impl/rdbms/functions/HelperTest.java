@@ -17,7 +17,6 @@ package org.gradoop.dataintegration.importer.impl.rdbms.functions;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.gradoop.dataintegration.importer.impl.rdbms.constants.RdbmsConstants;
 import org.gradoop.dataintegration.importer.impl.rdbms.tuples.FkTuple;
 import org.gradoop.dataintegration.importer.impl.rdbms.tuples.NameTypeTuple;
@@ -96,8 +95,8 @@ public class HelperTest extends GradoopFlinkTestBase {
     assertEquals(BasicTypeInfo.STRING_TYPE_INFO,
       Helper.getTypeInfo(JDBCType.LONGVARCHAR, SQLSERVER_TYPE));
     assertEquals(BasicTypeInfo.INT_TYPE_INFO, Helper.getTypeInfo(JDBCType.SMALLINT, MYSQL_TYPE));
-    assertEquals(TypeInformation.of(java.sql.Blob.class),
-      Helper.getTypeInfo(JDBCType.BLOB, MYSQL_TYPE));
+    assertEquals(BasicTypeInfo.BYTE_TYPE_INFO,
+      Helper.getTypeInfo(JDBCType.VARBINARY, MYSQL_TYPE));
   }
 
   @Test

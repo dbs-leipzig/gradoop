@@ -27,19 +27,29 @@ import java.sql.SQLException;
 public class RdbmsConnection {
 
   /**
+   * Standard logger.
+   */
+  private static final Logger LOGGER = Logger.getLogger(RdbmsConnection.class);
+
+  /**
    * Instance variable of class {@link RdbmsConnection}.
    */
   private static RdbmsConnection OBJ = null;
 
   /**
-   * Singelton instance of class {@link RdbmsConnection}.
+   * Database connection object.
+   */
+  private Connection connection;
+
+  /**
+   * Singleton instance of class {@link RdbmsConnection}.
    */
   private RdbmsConnection() { }
 
   /**
    * Creates only one instance of {@link RdbmsConnection}.
    *
-   * @return singelton instance of {@link RdbmsConnection}
+   * @return singleton instance of {@link RdbmsConnection}
    */
   public static RdbmsConnection create() {
     if (OBJ == null) {
@@ -56,16 +66,15 @@ public class RdbmsConnection {
    */
   public Connection getConnection(RdbmsConfig config) {
 
-    Logger logger = Logger.getLogger(RdbmsConnection.class);
-    Connection connection = null;
 
     try {
-      RegisterDriver.create().register(config);
-      connection = DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPw());
+      RegisterDriver.register(config);
+      this.connection =
+        DriverManager.getConnection(config.getUrl(), config.getUser(), config.getPw());
     } catch (SQLException e) {
-      logger.error(e);
+      LOGGER.error(e);
     }
 
-    return connection;
+    return this.connection;
   }
 }

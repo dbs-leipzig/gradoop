@@ -53,6 +53,8 @@ public class CreateVertices {
     MetaDataParser metadataParser) {
 
     List<TableToVertex> tablesToVertices = metadataParser.getTablesToVertices();
+    DataSet<TableToVertex> dsTableToVertices =
+      flinkConfig.getExecutionEnvironment().fromCollection(tablesToVertices);
 
     DataSet<Vertex> vertices = null;
     VertexFactory vertexFactory = flinkConfig.getVertexFactory();
@@ -60,25 +62,22 @@ public class CreateVertices {
     int counter = 0;
     for (TableToVertex table : tablesToVertices) {
       DataSet<Row> dsSQLResult = Helper.getRdbmsInput(
-          flinkConfig.getExecutionEnvironment(), rdbmsConfig, table.getRowCount(),
-          table.getSqlQuery(), table.getRowTypeInfo());
+        flinkConfig.getExecutionEnvironment(), rdbmsConfig, table.getRowCount(),
+        table.getSqlQuery(), table.getRowTypeInfo());
 
       if (vertices == null) {
         vertices = dsSQLResult
           .map(new RowToVertex(vertexFactory, table.getTableName(), counter))
           .withBroadcastSet(
-            flinkConfig.getExecutionEnvironment().fromCollection(tablesToVertices),
-            BROADCAST_VARIABLE);
+            dsTableToVertices, BROADCAST_VARIABLE);
       } else {
         vertices = vertices
           .union(
             dsSQLResult
               .map(new RowToVertex(vertexFactory, table.getTableName(), counter))
               .withBroadcastSet(
-                flinkConfig.getExecutionEnvironment().fromCollection(tablesToVertices),
-                BROADCAST_VARIABLE));
+                dsTableToVertices, BROADCAST_VARIABLE));
       }
-
       counter++;
     }
     return vertices;

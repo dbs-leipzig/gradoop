@@ -18,6 +18,7 @@ package org.gradoop.dataintegration.importer.impl.rdbms.functions;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.types.Row;
+import org.apache.log4j.Logger;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
@@ -42,6 +43,11 @@ public class RowToVertex extends RichMapFunction<Row, Vertex> {
    * Default serial version uid.
    */
   private static final long serialVersionUID = 1L;
+
+  /**
+   * Logger.
+   */
+  private static final Logger LOGGER = Logger.getLogger(Helper.class);
 
   /**
    * EPGM vertex factory.
@@ -90,10 +96,19 @@ public class RowToVertex extends RichMapFunction<Row, Vertex> {
   @Override
   public Vertex map(Row tuple) {
     this.rowHeader = tables.get(tablePos).getRowheader();
+    Properties properties = new Properties();
 
     GradoopId id = GradoopId.get();
     String label = tableName;
-    Properties properties = Helper.parseRowToProperties(tuple, rowHeader);
+
+    for (RowHeaderTuple rowHeaderTuple : rowHeader) {
+      try {
+        properties.set(rowHeaderTuple.getAttributeName(),
+          Helper.toPropertyValue(tuple.getField(rowHeaderTuple.getRowPostition())));
+      } catch (IndexOutOfBoundsException e) {
+        LOGGER.warn("Empty value field in column " + rowHeaderTuple.getAttributeName());
+      }
+    }
     properties.set(PK_ID, getPrimaryKeyString(tuple));
 
     return vertexFactory.initVertex(id, label, properties);
@@ -101,6 +116,7 @@ public class RowToVertex extends RichMapFunction<Row, Vertex> {
 
   /**
    * Provides a concatenated string of all primary key values.
+   *
    * @param tuple database row
    * @return string consisting of primary key values
    */

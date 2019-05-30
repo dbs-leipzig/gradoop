@@ -45,6 +45,12 @@ public class VerticesToPkTable extends RichFlatMapFunction<TableToEdge, LabelIdK
   private List<Vertex> vertices;
 
   @Override
+  public void open(Configuration parameters) {
+    this.vertices =
+      getRuntimeContext().getBroadcastVariable(BROADCAST_VARIABLE);
+  }
+
+  @Override
   public void flatMap(TableToEdge table, Collector<LabelIdKeyTuple> out) {
     String label =
       table.getStartAttribute().f0 + RdbmsConstants.EDGE_DELIMITER + table.getTableName();
@@ -58,11 +64,5 @@ public class VerticesToPkTable extends RichFlatMapFunction<TableToEdge, LabelIdK
         out.collect(new LabelIdKeyTuple(label, id, key));
       }
     }
-  }
-
-  @Override
-  public void open(Configuration parameters) {
-    this.vertices =
-      getRuntimeContext().getBroadcastVariable(BROADCAST_VARIABLE);
   }
 }

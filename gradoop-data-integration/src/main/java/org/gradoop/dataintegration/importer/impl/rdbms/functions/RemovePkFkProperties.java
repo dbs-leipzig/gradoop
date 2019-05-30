@@ -17,19 +17,13 @@ package org.gradoop.dataintegration.importer.impl.rdbms.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.hadoop.shaded.com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.properties.Properties;
-import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.dataintegration.importer.impl.rdbms.metadata.TableToVertex;
 import org.gradoop.dataintegration.importer.impl.rdbms.tuples.RowHeaderTuple;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static org.gradoop.dataintegration.importer.impl.rdbms.constants.RdbmsConstants.BROADCAST_VARIABLE;
-import static org.gradoop.dataintegration.importer.impl.rdbms.constants.RdbmsConstants.FK_FIELD;
 import static org.gradoop.dataintegration.importer.impl.rdbms.constants.RdbmsConstants.PK_ID;
 
 /**
@@ -55,28 +49,15 @@ public class RemovePkFkProperties extends RichMapFunction<Vertex, Vertex> {
 
   @Override
   public Vertex map(Vertex v) {
-
-    Properties newProps = Properties.create();
+    v.getProperties().remove(PK_ID);
 
     for (TableToVertex table : tablesToVertices) {
       if (table.getTableName().equals(v.getLabel())) {
-
-        ArrayList<String> foreignKeys = Lists.newArrayList();
-        for (RowHeaderTuple rowHeaderTuple : table.getRowheader()) {
-          if (rowHeaderTuple.getAttributeRole().equals(FK_FIELD)) {
-            foreignKeys.add(rowHeaderTuple.f0);
-          }
-        }
-
-        for (Property oldProperty : Objects.requireNonNull(v.getProperties())) {
-          if (!oldProperty.getKey().equals(PK_ID) &&
-            !foreignKeys.contains(oldProperty.getKey())) {
-            newProps.set(oldProperty);
-          }
+        for (RowHeaderTuple fk : table.getForeignKeyHeader()) {
+          v.getProperties().remove(fk.f0);
         }
       }
     }
-    v.setProperties(newProps);
     return v;
   }
 }

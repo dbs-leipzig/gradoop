@@ -78,7 +78,7 @@ public class MetaDataParser {
 
     while (rsTables.next()) {
       String tableName = rsTables.getString("TABLE_NAME");
-      String schemName = rsTables.getString("TABLE_SCHEM");
+      String schemaName = rsTables.getString("TABLE_SCHEM");
 
       // used to store primary key metadata representation
       ArrayList<NameTypeTuple> primaryKeys = Lists.newArrayList();
@@ -93,7 +93,7 @@ public class MetaDataParser {
       // foreign key attributes
       ArrayList<String> pkfkAttributes = Lists.newArrayList();
 
-      ResultSet rsPrimaryKeys = metadata.getPrimaryKeys(null, schemName, tableName);
+      ResultSet rsPrimaryKeys = metadata.getPrimaryKeys(null, schemaName, tableName);
 
       // parses primary keys if exists
       if (rsPrimaryKeys != null) {
@@ -112,7 +112,7 @@ public class MetaDataParser {
         }
       }
 
-      ResultSet rsForeignKeys = metadata.getImportedKeys(null, schemName, tableName);
+      ResultSet rsForeignKeys = metadata.getImportedKeys(null, schemaName, tableName);
 
       // parses foreign keys if exists
       if (rsForeignKeys != null) {
@@ -143,7 +143,7 @@ public class MetaDataParser {
         }
       }
 
-      ResultSet rsAttributes = metadata.getColumns(null, schemName, tableName, null);
+      ResultSet rsAttributes = metadata.getColumns(null, schemaName, tableName, null);
 
       // parses further attributes if exists
       // assigning attribute name and belonging data type
@@ -164,15 +164,15 @@ public class MetaDataParser {
       // number of rows (needed for distributed data querying via
       // flink)
       int rowCount;
-      if (schemName == null) {
+      if (schemaName == null) {
 
         rowCount = Helper.getTableRowCount(connection, tableName);
         tableBase.add(
           new RdbmsTableBase(tableName, primaryKeys, foreignKeys, furtherAttributes, rowCount));
       } else {
 
-        rowCount = Helper.getTableRowCount(connection, schemName + "." + tableName);
-        tableBase.add(new RdbmsTableBase(schemName + "." + tableName, primaryKeys, foreignKeys,
+        rowCount = Helper.getTableRowCount(connection, schemaName + "." + tableName);
+        tableBase.add(new RdbmsTableBase(schemaName + "." + tableName, primaryKeys, foreignKeys,
           furtherAttributes, rowCount));
       }
     }

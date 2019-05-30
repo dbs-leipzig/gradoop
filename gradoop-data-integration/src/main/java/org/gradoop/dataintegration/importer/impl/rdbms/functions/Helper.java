@@ -23,7 +23,6 @@ import org.apache.flink.api.java.io.jdbc.JDBCInputFormat;
 import org.apache.flink.api.java.io.jdbc.split.GenericParameterValuesProvider;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.types.Row;
-import org.apache.log4j.Logger;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -87,7 +86,8 @@ public class Helper {
   /* Flink related */
 
   /**
-   * Provides a {@link org.apache.hadoop.mapred.InputFormat} from a given relational database.
+   * Provides a {@link org.apache.flink.api.common.io.InputFormat} from a given relational
+   * database.
    *
    * @param env flink execution environment
    * @param rdbmsConfig configuration of the used database management system
@@ -105,7 +105,8 @@ public class Helper {
     // run jdbc input format with pagination
     JDBCInputFormat jdbcInput = JDBCInputFormat.buildJDBCInputFormat()
       .setDrivername(GradoopJDBCDriver.class.getName())
-      .setDBUrl(rdbmsConfig.getUrl()).setUsername(rdbmsConfig.getUser())
+      .setDBUrl(rdbmsConfig.getUrl())
+      .setUsername(rdbmsConfig.getUser())
       .setPassword(rdbmsConfig.getPw())
       .setQuery(sqlQuery + choosePaginationQuery(rdbmsConfig.getRdbmsType()))
       .setRowTypeInfo(typeInfo)
@@ -144,7 +145,7 @@ public class Helper {
    * @param rowCount count of database table rows
    * @return 2d array containing pagination border parameters
    */
-  public static Serializable[][] choosePartitionParameters(
+  static Serializable[][] choosePartitionParameters(
     RdbmsConstants.RdbmsType rdbmsType, int parallelism, int rowCount) {
     Serializable[][] parameters;
 
@@ -189,11 +190,11 @@ public class Helper {
    * @param rdbmsType type of database management system
    * @return flink type information array
    */
-  public static TypeInformation<?> getTypeInfo(
+  public static TypeInformation<BasicTypeInfo> getTypeInfo(
     JDBCType jdbcType, RdbmsConstants.RdbmsType rdbmsType) throws
     UnsupportedTypeException {
 
-    TypeInformation<?> typeInfo;
+    BasicTypeInfo typeInfo;
 
     switch (jdbcType.name()) {
 
@@ -244,18 +245,12 @@ public class Helper {
     case "BINARY":
     case "VARBINARY":
     case "LONGVARBINARY":
-      typeInfo = TypeInformation.of(byte[].class);
+      typeInfo = BasicTypeInfo.BYTE_TYPE_INFO;
       break;
     case "DATE":
     case "TIME":
     case "TIMESTAMP":
       typeInfo = BasicTypeInfo.DATE_TYPE_INFO;
-      break;
-    case "CLOB":
-      typeInfo = TypeInformation.of(java.sql.Clob.class);
-      break;
-    case "BLOB":
-      typeInfo = TypeInformation.of(java.sql.Blob.class);
       break;
     }
     return typeInfo;
@@ -377,46 +372,23 @@ public class Helper {
    * @param value value of database tuple
    * @return gradoop property value
    */
-  private static PropertyValue toPropertyValue(Object value) {
-
+  static PropertyValue toPropertyValue(Object value) {
     PropertyValue propValue;
 
-    if (value == null) {
-      propValue = PropertyValue.NULL_VALUE;
-    } else {
+    if (value != null) {
       if (value.getClass() == java.util.Date.class) {
         propValue = PropertyValue
+          //.create(value.toString());
           .create(((Date) value).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
       } else if (value.getClass() == byte[].class) {
         propValue = PropertyValue.create(String.valueOf(value));
       } else {
         propValue = PropertyValue.create(value);
       }
+    } else {
+      propValue = PropertyValue.NULL_VALUE;
     }
     return propValue;
-  }
-
-  /**
-   * Converts a tuple of a database relation to EPGM properties.
-   *
-   * @param tuple database relation-tuple
-   * @param rowHeader rowheader for this relation
-   * @return EPGM properties
-   */
-  static Properties parseRowToProperties(Row tuple, ArrayList<RowHeaderTuple> rowHeader) {
-
-    Logger logger = Logger.getLogger(Helper.class);
-    Properties properties = Properties.create();
-
-    for (RowHeaderTuple rowHeaderTuple : rowHeader) {
-      try {
-        properties.set(rowHeaderTuple.getAttributeName(),
-          toPropertyValue(tuple.getField(rowHeaderTuple.getRowPostition())));
-      } catch (IndexOutOfBoundsException e) {
-        logger.warn("Empty value field in column " + rowHeaderTuple.getAttributeName());
-      }
-    }
-    return properties;
   }
 
   /**

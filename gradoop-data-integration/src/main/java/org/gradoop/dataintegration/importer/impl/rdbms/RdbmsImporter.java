@@ -85,6 +85,7 @@ public class RdbmsImporter implements DataSource {
       rdbmsConfig.setRdbmsType(con.getMetaData().getDatabaseProductName().toLowerCase());
       metadataParser = new MetaDataParser(con, rdbmsConfig.getRdbmsType());
       metadataParser.parse();
+      con.close();
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }

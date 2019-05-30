@@ -30,7 +30,7 @@ import java.sql.SQLException;
 /**
  * Registers a JDBC driver.
  */
-public class RegisterDriver {
+class RegisterDriver {
 
   /**
    * Object variable of calss {@link RegisterDriver}.
@@ -60,7 +60,7 @@ public class RegisterDriver {
    *
    * @param config database configuration
    */
-  void register(RdbmsConfig config) {
+  static void register(RdbmsConfig config) {
     AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
       @Override

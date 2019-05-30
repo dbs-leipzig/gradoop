@@ -171,10 +171,11 @@
         
         <!-- Rdbms Importer -->
         <dependency>
-			<groupId>org.apache.flink</groupId>
-			<artifactId>flink-jdbc</artifactId>
-			<version>1.5.2</version>
-		</dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-jdbc_2.12</artifactId>
+            <version>1.7.0</version>
+        </dependency>
+
         <dependency>
 			<groupId>ru.yandex.qatools.embed</groupId>
 			<artifactId>postgresql-embedded</artifactId>
@@ -185,6 +186,7 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>42.2.5</version>
+            <scope>test</scope>
 		</dependency>
     </dependencies>
 </project>

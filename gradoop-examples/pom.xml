@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -13,6 +15,20 @@
 
     <name>Gradoop Examples</name>
     <description>Contains examples for Gradoop programs.</description>
+
+    <repositories>
+        <repository>
+            <id>dbleipzig</id>
+            <name>Database Group Leipzig University</name>
+            <url>https://wdiserv1.informatik.uni-leipzig.de:443/archiva/repository/dbleipzig/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <profiles>
         <profile>
@@ -106,12 +122,13 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <minimizeJar>true</minimizeJar>
+                            <minimizeJar>false</minimizeJar>
                             <artifactSet>
                                 <includes>
-                                    <!-- libs that are not provided by flink binary -->
+                                     <!--libs that are not provided by flink binary-->
                                     <include>org.apache.hbase:hbase-common</include>
-                                    <include>org.apache.flink:flink-gelly_2.11</include>
+                                    <!--<include>org.apache.flink:flink-gelly_2.11</include>-->
+                                    <include>org.apache.flink:flink-core</include>
                                     <include>org.gradoop:*</include>
                                     <include>com.github.s1ck:gdl</include>
                                     <include>org.codehaus.jettison:jettison</include>
@@ -119,13 +136,21 @@
                                     <include>org.antlr:antlr4-runtime</include>
                                     <include>me.lemire.integercompression:*</include>
                                     <include>commons-cli:*</include>
+
+                                    <include>org.apache.flink:flink-jdbc_2.12</include>
+                                    <include>org.apache.flink:flink-shaded-hadoop2</include>
+                                    <include>commons-lang:commons-lang</include>
+                                    <include>commons-logging:commons-logging</include>
+                                    <include>log4j:log4j</include>
+                                    <include>logkit:logkit</include>
                                 </includes>
                             </artifactSet>
                             <!-- relocate commons-cli to avoid issues with version used by flink -->
                             <relocations>
                                 <relocation>
                                     <pattern>org.apache.commons.cli</pattern>
-                                    <shadedPattern>org.gradoop.examples.thirdparty.commons-cli</shadedPattern>
+                                    <shadedPattern>org.gradoop.examples.thirdparty.commons-cli
+                                    </shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -136,22 +161,34 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-assembly-plugin</artifactId>-->
+                <!--<version>3.1.1</version>-->
+                <!--<configuration>-->
+                    <!--<descriptorRefs>-->
+                        <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
+                    <!--</descriptorRefs>-->
+
+                <!--</configuration>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>assemble-all</id>-->
+                        <!--<phase>package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>single</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 
     <dependencies>
-        <!-- Compile dependencies -->
-
         <dependency>
             <groupId>org.gradoop</groupId>
             <artifactId>gradoop-flink</artifactId>
         </dependency>
-        
-        <dependency>
-            <groupId>org.gradoop</groupId>
-            <artifactId>gradoop-data-integration</artifactId>
-        </dependency>
-        
 
         <dependency>
             <groupId>org.gradoop</groupId>
@@ -182,5 +219,11 @@
             <artifactId>commons-cli</artifactId>
         </dependency>
 
+        <!--temp dependencies-->
+        <dependency>
+            <groupId>org.s1ck</groupId>
+            <artifactId>ldbc-flink-import</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
