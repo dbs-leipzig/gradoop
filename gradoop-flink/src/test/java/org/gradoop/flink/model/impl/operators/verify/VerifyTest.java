@@ -98,38 +98,36 @@ public class VerifyTest extends GradoopFlinkTestBase {
   }
 
   /**
-   * Test VerifyGraphContainment on a logical graph
+   * Test {@link VerifyGraphContainment} on a logical graph.
    *
-   * @throws Exception on failure
+   * @throws Exception when the execution in Flink fails.
    */
   @Test
   public void testVerifyGraphContainment() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     LogicalGraph graph = loader.getLogicalGraphByVariable("g1");
+    graph = graph.verifyGraphContainment();
 
     GradoopIdSet idSet = GradoopIdSet.fromExisting(graph.getGraphHead().map(new Id<>()).collect());
-
-    graph = graph.verifyGraphContainment();
 
     assertGraphContainment(idSet, graph.getVertices());
     assertGraphContainment(idSet, graph.getEdges());
   }
 
   /**
-   * Test VerifyGraphsContainment on a graph collection
+   * Test {@link VerifyGraphsContainment} on a graph collection.
    *
-   * @throws Exception on failure
+   * @throws Exception when the execution in Flink fails.
    */
   @Test
   public void testVerifyGraphsContainment() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     GraphCollection collection = loader.getGraphCollectionByVariables("g1", "g2");
+    collection = collection.verifyGraphsContainment();
 
     GradoopIdSet idSet = GradoopIdSet.fromExisting(collection.getGraphHeads().map(new Id<>()).collect());
-
-    collection = collection.verifyGraphsContainment();
 
     assertGraphContainment(idSet, collection.getVertices());
     assertGraphContainment(idSet, collection.getEdges());
@@ -138,10 +136,10 @@ public class VerifyTest extends GradoopFlinkTestBase {
   /**
    * Function to test graph element datasets for dangling graph ids.
    *
-   * @param idSet ids of the corresponding graph or graph collection
-   * @param elements element dataset to test
-   * @param <E> element type
-   * @throws Exception on failure
+   * @param idSet ids of the corresponding graph or graph collection.
+   * @param elements element dataset to test for dangling grahp ids.
+   * @param <E> element type.
+   * @throws Exception when the execution in Flink fails.
    */
   private <E extends EPGMGraphElement> void assertGraphContainment(GradoopIdSet idSet, DataSet<E> elements)
     throws Exception {
@@ -149,7 +147,7 @@ public class VerifyTest extends GradoopFlinkTestBase {
       GradoopIdSet ids = element.getGraphIds();
       assertFalse("Element has no graph ids", ids.isEmpty());
       ids.removeAll(idSet);
-      assertTrue("There were dangling graph ids", ids.isEmpty());
+      assertTrue("Element has dangling graph ids", ids.isEmpty());
     }
   }
 }

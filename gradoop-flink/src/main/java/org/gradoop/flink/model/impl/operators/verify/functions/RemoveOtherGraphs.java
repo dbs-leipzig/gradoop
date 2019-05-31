@@ -44,9 +44,9 @@ public class RemoveOtherGraphs<E extends EPGMGraphElement> extends RichMapFuncti
 
   @Override
   public E map(E element) {
-    GradoopIdSet ids = element.getGraphIds();
-    ids.retainAll(idSet);
-    element.setGraphIds(ids);
+    GradoopIdSet graphIds = element.getGraphIds();
+    graphIds.retainAll(idSet);
+    element.setGraphIds(graphIds);
     return element;
   }
 }
