@@ -77,7 +77,7 @@ public class CSVDataSink extends CSVBase implements DataSink {
 
   @Override
   public void write(LogicalGraph logicalGraph, boolean overwrite) throws IOException {
-    write(logicalGraph.getCollectionFactory().fromGraph(logicalGraph), overwrite);
+    write(logicalGraph.getConfig().getGraphCollectionFactory().fromGraph(logicalGraph), overwrite);
   }
 
   @Override
