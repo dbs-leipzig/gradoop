@@ -46,7 +46,7 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
   /**
    * Creates instances of {@link LogicalGraph}
    */
-  private final BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph> logicalGraphFactory;
+  private final BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection> graphFac;
 
   /**
    * Creates instances of {@link GraphCollection}
@@ -74,8 +74,8 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
     this.executionEnvironment = executionEnvironment;
 
     // init with default layout factories
-    this.logicalGraphFactory = new LogicalGraphFactory(this);
-    this.logicalGraphFactory.setLayoutFactory(logicalGraphLayoutFactory);
+    this.graphFac = new LogicalGraphFactory(this);
+    this.graphFac.setLayoutFactory(logicalGraphLayoutFactory);
 
     this.graphCollectionFactory = new GraphCollectionFactory(this);
     this.graphCollectionFactory.setLayoutFactory(graphCollectionLayoutFactory);
@@ -122,7 +122,7 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    * @return factory for logical graph layouts
    */
   public LogicalGraphFactory getLogicalGraphFactory() {
-    return (LogicalGraphFactory) logicalGraphFactory;
+    return (LogicalGraphFactory) graphFac;
   }
 
   /**
@@ -144,7 +144,7 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
     LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> factory) {
     Objects.requireNonNull(factory);
     factory.setGradoopFlinkConfig(this);
-    logicalGraphFactory.setLayoutFactory(factory);
+    graphFac.setLayoutFactory(factory);
   }
 
   /**

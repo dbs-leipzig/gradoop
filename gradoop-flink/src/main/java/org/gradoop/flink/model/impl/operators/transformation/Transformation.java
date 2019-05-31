@@ -21,6 +21,7 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
@@ -39,12 +40,14 @@ import org.gradoop.flink.model.impl.operators.transformation.functions.Transform
  * @param <V> the EPGM vertex type
  * @param <E> the EPGM edge type
  * @param <LG> the logical graph type
+ * @param <GC> the graph collection type
  */
 public class Transformation<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, GC>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Modification function for graph heads
@@ -101,7 +104,7 @@ public class Transformation<
    */
   @SuppressWarnings("unchecked")
   protected LG executeInternal(DataSet<G> graphHeads, DataSet<V> vertices, DataSet<E> edges,
-    BaseGraphFactory<G, V, E, LG> factory) {
+    BaseGraphFactory<G, V, E, LG, GC> factory) {
 
     DataSet<G> transformedGraphHeads = graphHeadTransFunc != null ? graphHeads
       .map(new TransformGraphHead(graphHeadTransFunc, factory.getGraphHeadFactory()))
