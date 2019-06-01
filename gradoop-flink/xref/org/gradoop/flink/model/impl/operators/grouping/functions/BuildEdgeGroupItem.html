@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.FlatMapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.functions.FunctionAnnotation;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMEdge;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 <a name="24" href="#24">24</a>  
@@ -37,50 +37,52 @@
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * Takes an EPGM edge as input and creates a {@link EdgeGroupItem} which</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * contains only necessary information for further processing.</em>
-<a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="31" href="#31">31</a>  @FunctionAnnotation.ForwardedFields(<span class="jxr_string">"sourceId-&gt;f0;targetId-&gt;f1;"</span>)
-<a name="32" href="#32">32</a>  @FunctionAnnotation.ReadFields(<span class="jxr_string">"label;properties"</span>)
-<a name="33" href="#33">33</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/grouping/functions/BuildEdgeGroupItem.html">BuildEdgeGroupItem</a>
-<a name="34" href="#34">34</a>    <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/grouping/functions/BuildGroupItemBase.html">BuildGroupItemBase</a>
-<a name="35" href="#35">35</a>    implements FlatMapFunction&lt;Edge, EdgeGroupItem&gt; {
-<a name="36" href="#36">36</a>  
-<a name="37" href="#37">37</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   * Avoid object initialization in each call.</em>
-<a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="40" href="#40">40</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/grouping/tuples/EdgeGroupItem.html">EdgeGroupItem</a> reuseEdgeGroupItem;
-<a name="41" href="#41">41</a>  
-<a name="42" href="#42">42</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="43" href="#43">43</a>  <em class="jxr_javadoccomment">   * Creates map function.</em>
-<a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="45" href="#45">45</a>  <em class="jxr_javadoccomment">   * @param useLabel true, if vertex label shall be used</em>
-<a name="46" href="#46">46</a>  <em class="jxr_javadoccomment">   * @param edgeLabelGroups stores grouping properties for edge labels</em>
-<a name="47" href="#47">47</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="48" href="#48">48</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/grouping/functions/BuildEdgeGroupItem.html">BuildEdgeGroupItem</a>(<strong class="jxr_keyword">boolean</strong> useLabel, List&lt;LabelGroup&gt; edgeLabelGroups) {
-<a name="49" href="#49">49</a>      <strong class="jxr_keyword">super</strong>(useLabel, edgeLabelGroups);
-<a name="50" href="#50">50</a>      <strong class="jxr_keyword">this</strong>.reuseEdgeGroupItem = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/grouping/tuples/EdgeGroupItem.html">EdgeGroupItem</a>();
-<a name="51" href="#51">51</a>    }
-<a name="52" href="#52">52</a>  
-<a name="53" href="#53">53</a>    @Override
-<a name="54" href="#54">54</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(Edge edge, Collector&lt;EdgeGroupItem&gt; collector) <strong class="jxr_keyword">throws</strong> Exception {
-<a name="55" href="#55">55</a>      <strong class="jxr_keyword">boolean</strong> usedEdgeLabelGroup = false;
-<a name="56" href="#56">56</a>      reuseEdgeGroupItem.setSourceId(edge.getSourceId());
-<a name="57" href="#57">57</a>      reuseEdgeGroupItem.setTargetId(edge.getTargetId());
-<a name="58" href="#58">58</a>  
-<a name="59" href="#59">59</a>      <em class="jxr_comment">// check if edge shall be grouped by a special set of keys</em>
-<a name="60" href="#60">60</a>      <strong class="jxr_keyword">for</strong> (LabelGroup edgeLabelGroup : getLabelGroups()) {
-<a name="61" href="#61">61</a>        <strong class="jxr_keyword">if</strong> (edgeLabelGroup.getGroupingLabel().equals(edge.getLabel())) {
-<a name="62" href="#62">62</a>          usedEdgeLabelGroup = <strong class="jxr_keyword">true</strong>;
-<a name="63" href="#63">63</a>          setGroupItem(reuseEdgeGroupItem, edge, edgeLabelGroup);
-<a name="64" href="#64">64</a>          collector.collect(reuseEdgeGroupItem);
-<a name="65" href="#65">65</a>        }
-<a name="66" href="#66">66</a>      }
-<a name="67" href="#67">67</a>      <em class="jxr_comment">// standard grouping case</em>
-<a name="68" href="#68">68</a>      <strong class="jxr_keyword">if</strong> (!usedEdgeLabelGroup) {
-<a name="69" href="#69">69</a>        setGroupItem(reuseEdgeGroupItem, edge, getDefaultLabelGroup());
-<a name="70" href="#70">70</a>        collector.collect(reuseEdgeGroupItem);
-<a name="71" href="#71">71</a>      }
-<a name="72" href="#72">72</a>    }
-<a name="73" href="#73">73</a>  }
+<a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> *</em>
+<a name="31" href="#31">31</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; The edge type.</em>
+<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment"> */</em>
+<a name="33" href="#33">33</a>  @FunctionAnnotation.ForwardedFields(<span class="jxr_string">"sourceId-&gt;f0;targetId-&gt;f1;"</span>)
+<a name="34" href="#34">34</a>  @FunctionAnnotation.ReadFields(<span class="jxr_string">"label;properties"</span>)
+<a name="35" href="#35">35</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> BuildEdgeGroupItem&lt;E <strong class="jxr_keyword">extends</strong> EPGMEdge&gt;
+<a name="36" href="#36">36</a>    <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/grouping/functions/BuildGroupItemBase.html">BuildGroupItemBase</a>
+<a name="37" href="#37">37</a>    implements FlatMapFunction&lt;E, EdgeGroupItem&gt; {
+<a name="38" href="#38">38</a>  
+<a name="39" href="#39">39</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="40" href="#40">40</a>  <em class="jxr_javadoccomment">   * Avoid object initialization in each call.</em>
+<a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="42" href="#42">42</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/grouping/tuples/EdgeGroupItem.html">EdgeGroupItem</a> reuseEdgeGroupItem;
+<a name="43" href="#43">43</a>  
+<a name="44" href="#44">44</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="45" href="#45">45</a>  <em class="jxr_javadoccomment">   * Creates map function.</em>
+<a name="46" href="#46">46</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="47" href="#47">47</a>  <em class="jxr_javadoccomment">   * @param useLabel true, if vertex label shall be used</em>
+<a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * @param edgeLabelGroups stores grouping properties for edge labels</em>
+<a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="50" href="#50">50</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/grouping/functions/BuildEdgeGroupItem.html">BuildEdgeGroupItem</a>(<strong class="jxr_keyword">boolean</strong> useLabel, List&lt;LabelGroup&gt; edgeLabelGroups) {
+<a name="51" href="#51">51</a>      <strong class="jxr_keyword">super</strong>(useLabel, edgeLabelGroups);
+<a name="52" href="#52">52</a>      <strong class="jxr_keyword">this</strong>.reuseEdgeGroupItem = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/grouping/tuples/EdgeGroupItem.html">EdgeGroupItem</a>();
+<a name="53" href="#53">53</a>    }
+<a name="54" href="#54">54</a>  
+<a name="55" href="#55">55</a>    @Override
+<a name="56" href="#56">56</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(E edge, Collector&lt;EdgeGroupItem&gt; collector) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="57" href="#57">57</a>      <strong class="jxr_keyword">boolean</strong> usedEdgeLabelGroup = false;
+<a name="58" href="#58">58</a>      reuseEdgeGroupItem.setSourceId(edge.getSourceId());
+<a name="59" href="#59">59</a>      reuseEdgeGroupItem.setTargetId(edge.getTargetId());
+<a name="60" href="#60">60</a>  
+<a name="61" href="#61">61</a>      <em class="jxr_comment">// check if edge shall be grouped by a special set of keys</em>
+<a name="62" href="#62">62</a>      <strong class="jxr_keyword">for</strong> (LabelGroup edgeLabelGroup : getLabelGroups()) {
+<a name="63" href="#63">63</a>        <strong class="jxr_keyword">if</strong> (edgeLabelGroup.getGroupingLabel().equals(edge.getLabel())) {
+<a name="64" href="#64">64</a>          usedEdgeLabelGroup = <strong class="jxr_keyword">true</strong>;
+<a name="65" href="#65">65</a>          setGroupItem(reuseEdgeGroupItem, edge, edgeLabelGroup);
+<a name="66" href="#66">66</a>          collector.collect(reuseEdgeGroupItem);
+<a name="67" href="#67">67</a>        }
+<a name="68" href="#68">68</a>      }
+<a name="69" href="#69">69</a>      <em class="jxr_comment">// standard grouping case</em>
+<a name="70" href="#70">70</a>      <strong class="jxr_keyword">if</strong> (!usedEdgeLabelGroup) {
+<a name="71" href="#71">71</a>        setGroupItem(reuseEdgeGroupItem, edge, getDefaultLabelGroup());
+<a name="72" href="#72">72</a>        collector.collect(reuseEdgeGroupItem);
+<a name="73" href="#73">73</a>      }
+<a name="74" href="#74">74</a>    }
+<a name="75" href="#75">75</a>  }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

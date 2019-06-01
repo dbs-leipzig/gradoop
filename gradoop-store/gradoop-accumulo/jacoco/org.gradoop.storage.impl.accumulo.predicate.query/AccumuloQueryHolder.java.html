@@ -111,8 +111,7 @@ public class AccumuloQueryHolder&lt;T extends EPGMElement&gt; implements Seriali
    * @return seek range
    */
   public List&lt;Range&gt; getQueryRanges() {
-    //noinspection unchecked
-<span class="pc bpc" id="L115" title="1 of 2 branches missed.">    return queryRanges == null ? null : RangeWrapper.decrypt(queryRanges).ranges;</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">    return queryRanges == null ? null : RangeWrapper.decrypt(queryRanges).ranges;</span>
   }
 
   /**
@@ -121,18 +120,18 @@ public class AccumuloQueryHolder&lt;T extends EPGMElement&gt; implements Seriali
    * @return accumulo element filter
    */
   public AccumuloElementFilter&lt;T&gt; getReduceFilter() {
-<span class="fc" id="L124">    return reduceFilter;</span>
+<span class="fc" id="L123">    return reduceFilter;</span>
   }
 
   @Override
   public String toString() {
-<span class="nc bnc" id="L129" title="All 2 branches missed.">    List&lt;String&gt; ranges = getQueryRanges() == null ? null :</span>
-<span class="nc" id="L130">      getQueryRanges().stream()</span>
-<span class="nc bnc" id="L131" title="All 2 branches missed.">        .map(it -&gt; it == null ? null : String.format(&quot;%s:%s&quot;,</span>
-<span class="nc" id="L132">          it.getStartKey().getRow(),</span>
-<span class="nc" id="L133">          it.getEndKey().getRow()))</span>
-<span class="nc" id="L134">        .collect(Collectors.toList());</span>
-<span class="nc" id="L135">    return String.format(&quot;range=%1$s, filter=%2$s&quot;, ranges, getReduceFilter());</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">    List&lt;String&gt; ranges = getQueryRanges() == null ? null :</span>
+<span class="nc" id="L129">      getQueryRanges().stream()</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        .map(it -&gt; it == null ? null : String.format(&quot;%s:%s&quot;,</span>
+<span class="nc" id="L131">          it.getStartKey().getRow(),</span>
+<span class="nc" id="L132">          it.getEndKey().getRow()))</span>
+<span class="nc" id="L133">        .collect(Collectors.toList());</span>
+<span class="nc" id="L134">    return String.format(&quot;range=%1$s, filter=%2$s&quot;, ranges, getReduceFilter());</span>
   }
 
   /**
@@ -152,9 +151,9 @@ public class AccumuloQueryHolder&lt;T extends EPGMElement&gt; implements Seriali
      */
     private byte[] encrypt() {
       try {
-<span class="fc" id="L155">        return KryoUtils.dumps(this);</span>
-<span class="nc" id="L156">      } catch (IOException e) {</span>
-<span class="nc" id="L157">        throw new RuntimeException(e);</span>
+<span class="fc" id="L154">        return KryoUtils.dumps(this);</span>
+<span class="nc" id="L155">      } catch (IOException e) {</span>
+<span class="nc" id="L156">        throw new RuntimeException(e);</span>
       }
     }
 
@@ -166,9 +165,9 @@ public class AccumuloQueryHolder&lt;T extends EPGMElement&gt; implements Seriali
      */
     private static RangeWrapper decrypt(byte[] data) {
       try {
-<span class="fc" id="L169">        return KryoUtils.loads(data, RangeWrapper.class);</span>
-<span class="nc" id="L170">      } catch (IOException e) {</span>
-<span class="nc" id="L171">        throw new RuntimeException(e);</span>
+<span class="fc" id="L168">        return KryoUtils.loads(data, RangeWrapper.class);</span>
+<span class="nc" id="L169">      } catch (IOException e) {</span>
+<span class="nc" id="L170">        throw new RuntimeException(e);</span>
       }
     }
   }

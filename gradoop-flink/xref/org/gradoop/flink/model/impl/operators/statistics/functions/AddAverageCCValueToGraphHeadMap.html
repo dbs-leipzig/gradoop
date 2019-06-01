@@ -67,7 +67,7 @@
 <a name="57" href="#57">57</a>    }
 <a name="58" href="#58">58</a>  
 <a name="59" href="#59">59</a>    @Override
-<a name="60" href="#60">60</a>    <strong class="jxr_keyword">public</strong> GraphHead map(GraphHead graphHead) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="60" href="#60">60</a>    <strong class="jxr_keyword">public</strong> GraphHead map(GraphHead graphHead) {
 <a name="61" href="#61">61</a>      PropertyValue averageProperty = graphHead.getPropertyValue(propertyKeySumLocal);
 <a name="62" href="#62">62</a>      <strong class="jxr_keyword">double</strong> sumLocal = averageProperty.isNull() ? 0.0 : averageProperty.getDouble();
 <a name="63" href="#63">63</a>      <strong class="jxr_keyword">long</strong> vertexCount = graphHead.getPropertyValue(propertyKeyVertexCount).getLong();

@@ -1,7 +1,7 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueUtils,3,0,0,0,1,0,1,0,1,0
 Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValue,43,395,4,20,6,105,5,76,2,67
-Gradoop Common,org.gradoop.common.model.impl.properties,Properties,26,258,9,19,7,59,9,29,1,23
+Gradoop Common,org.gradoop.common.model.impl.properties,Properties,23,250,6,16,7,59,7,28,1,23
 Gradoop Common,org.gradoop.common.model.impl.properties,Property,30,144,4,12,3,35,4,18,1,13
 Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueUtils.Numeric,217,726,43,153,46,152,24,90,2,11
 Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueList,9,102,2,4,3,27,3,11,1,10
@@ -35,7 +35,7 @@ Gradoop Common,org.gradoop.common.util,GradoopConstants,7,0,0,0,2,0,2,0,2,0
 Gradoop Common,org.gradoop.common.util,Order,24,0,0,0,3,0,1,0,1,0
 Gradoop Common,org.gradoop.common.util,AsciiGraphLoader,16,707,3,41,5,144,4,50,1,31
 Gradoop Common,org.gradoop.common.model.impl.pojo,EdgeFactory,49,54,0,0,8,9,7,5,7,5
-Gradoop Common,org.gradoop.common.model.impl.pojo,Element,76,131,13,19,16,29,15,21,6,14
+Gradoop Common,org.gradoop.common.model.impl.pojo,Element,73,123,10,16,16,29,13,20,6,14
 Gradoop Common,org.gradoop.common.model.impl.pojo,VertexFactory,44,33,0,0,8,6,8,4,8,4
 Gradoop Common,org.gradoop.common.model.impl.pojo,GraphHeadFactory,17,30,0,0,4,6,4,4,4,4
 Gradoop Common,org.gradoop.common.model.impl.pojo,GraphHead,13,6,0,0,3,2,2,1,2,1

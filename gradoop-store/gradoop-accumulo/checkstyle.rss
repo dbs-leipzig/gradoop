@@ -25,7 +25,7 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2014 - 2019 - 2019 University of Leipzig</copyright>
     <item>
-      <title>File: 59,
+      <title>File: 12,
              Errors: 0,
              Warnings: 0,
              Infos: 0
@@ -46,567 +46,7 @@ under the License.
           <tbody>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.config.package-info.java">org/gradoop/storage/config/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.iterator.client.package-info.java">org/gradoop/storage/impl/accumulo/iterator/client/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.handler.AccumuloGraphHandler.java">org/gradoop/storage/impl/accumulo/handler/AccumuloGraphHandler.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.package-info.java">org/gradoop/storage/impl/accumulo/io/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.query.AccumuloQueryHolder.java">org/gradoop/storage/impl/accumulo/predicate/query/AccumuloQueryHolder.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.filter.impl.package-info.java">org/gradoop/storage/impl/accumulo/predicate/filter/impl/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.StoreBasicPredicateTest.java">org/gradoop/storage/impl/accumulo/predicate/StoreBasicPredicateTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.AccumuloBase.java">org/gradoop/storage/impl/accumulo/io/AccumuloBase.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.package-info.java">org/gradoop/storage/impl/accumulo/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.basic.StoreTest.java">org/gradoop/storage/impl/accumulo/basic/StoreTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.StoreLabelPredicateTest.java">org/gradoop/storage/impl/accumulo/predicate/StoreLabelPredicateTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopEdgeIterator.java">org/gradoop/storage/impl/accumulo/iterator/tserver/GradoopEdgeIterator.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.AccumuloDataSink.java">org/gradoop/storage/impl/accumulo/io/AccumuloDataSink.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.outputformats.ElementOutputFormat.java">org/gradoop/storage/impl/accumulo/io/outputformats/ElementOutputFormat.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.iterator.tserver.BaseElementIterator.java">org/gradoop/storage/impl/accumulo/iterator/tserver/BaseElementIterator.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.query.package-info.java">org/gradoop/storage/impl/accumulo/predicate/query/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.iterator.client.ClientClosableIterator.java">org/gradoop/storage/impl/accumulo/iterator/client/ClientClosableIterator.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.inputformats.package-info.java">org/gradoop/storage/impl/accumulo/io/inputformats/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.StoreIdsPredicateTest.java">org/gradoop/storage/impl/accumulo/predicate/StoreIdsPredicateTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.inputformats.VertexInputFormat.java">org/gradoop/storage/impl/accumulo/io/inputformats/VertexInputFormat.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter.java">org/gradoop/storage/impl/accumulo/predicate/filter/api/AccumuloElementFilter.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.handler.AccumuloEdgeHandler.java">org/gradoop/storage/impl/accumulo/handler/AccumuloEdgeHandler.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.filter.impl.AccumuloPropEquals.java">org/gradoop/storage/impl/accumulo/predicate/filter/impl/AccumuloPropEquals.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.filter.calculate.package-info.java">org/gradoop/storage/impl/accumulo/predicate/filter/calculate/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.source.IOElementIdRangeTest.java">org/gradoop/storage/impl/accumulo/io/source/IOElementIdRangeTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.config.GradoopAccumuloConfig.java">org/gradoop/storage/config/GradoopAccumuloConfig.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.inputformats.EdgeInputFormat.java">org/gradoop/storage/impl/accumulo/io/inputformats/EdgeInputFormat.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.AccumuloEPGMStore.java">org/gradoop/storage/impl/accumulo/AccumuloEPGMStore.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.StorePropPredicateTest.java">org/gradoop/storage/impl/accumulo/predicate/StorePropPredicateTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.inputformats.GraphHeadInputFormat.java">org/gradoop/storage/impl/accumulo/io/inputformats/GraphHeadInputFormat.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.filter.calculate.And.java">org/gradoop/storage/impl/accumulo/predicate/filter/calculate/And.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.handler.AccumuloVertexHandler.java">org/gradoop/storage/impl/accumulo/handler/AccumuloVertexHandler.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.utils.KryoUtils.java">org/gradoop/storage/utils/KryoUtils.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopGraphHeadIterator.java">org/gradoop/storage/impl/accumulo/iterator/tserver/GradoopGraphHeadIterator.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.source.IOEdgePredicateTest.java">org/gradoop/storage/impl/accumulo/io/source/IOEdgePredicateTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.inputformats.BaseInputFormat.java">org/gradoop/storage/impl/accumulo/io/inputformats/BaseInputFormat.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.filter.impl.AccumuloLabelReg.java">org/gradoop/storage/impl/accumulo/predicate/filter/impl/AccumuloLabelReg.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.IOBasicTest.java">org/gradoop/storage/impl/accumulo/io/IOBasicTest.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.constants.AccumuloDefault.java">org/gradoop/storage/impl/accumulo/constants/AccumuloDefault.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.filter.calculate.Or.java">org/gradoop/storage/impl/accumulo/predicate/filter/calculate/Or.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopVertexIterator.java">org/gradoop/storage/impl/accumulo/iterator/tserver/GradoopVertexIterator.java</a>
                 </td>
                 <td>
                   0
@@ -634,133 +74,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.utils.AccumuloFilters.java">org/gradoop/storage/utils/AccumuloFilters.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.handler.package-info.java">org/gradoop/storage/impl/accumulo/handler/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.AccumuloDataSource.java">org/gradoop/storage/impl/accumulo/io/AccumuloDataSource.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.filter.impl.AccumuloPropLargerThan.java">org/gradoop/storage/impl/accumulo/predicate/filter/impl/AccumuloPropLargerThan.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.constants.package-info.java">org/gradoop/storage/impl/accumulo/constants/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.filter.calculate.Not.java">org/gradoop/storage/impl/accumulo/predicate/filter/calculate/Not.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.filter.impl.AccumuloLabelIn.java">org/gradoop/storage/impl/accumulo/predicate/filter/impl/AccumuloLabelIn.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.utils.package-info.java">org/gradoop/storage/utils/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.filter.impl.AccumuloPropReg.java">org/gradoop/storage/impl/accumulo/predicate/filter/impl/AccumuloPropReg.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.handler.AccumuloRowHandler.java">org/gradoop/storage/impl/accumulo/handler/AccumuloRowHandler.java</a>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.source.IOEdgePredicateTest.java">org/gradoop/storage/impl/accumulo/io/source/IOEdgePredicateTest.java</a>
                 </td>
                 <td>
                   0
@@ -788,49 +102,7 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.iterator.tserver.package-info.java">org/gradoop/storage/impl/accumulo/iterator/tserver/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.filter.api.package-info.java">org/gradoop/storage/impl/accumulo/predicate/filter/api/package-info.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.constants.AccumuloTables.java">org/gradoop/storage/impl/accumulo/constants/AccumuloTables.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.outputformats.package-info.java">org/gradoop/storage/impl/accumulo/io/outputformats/package-info.java</a>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.source.IOElementIdRangeTest.java">org/gradoop/storage/impl/accumulo/io/source/IOElementIdRangeTest.java</a>
                 </td>
                 <td>
                   0
@@ -845,6 +117,76 @@ under the License.
                           <tr>
                 <td>
                   <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.source.IOGraphPredicateTest.java">org/gradoop/storage/impl/accumulo/io/source/IOGraphPredicateTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.StoreBasicPredicateTest.java">org/gradoop/storage/impl/accumulo/predicate/StoreBasicPredicateTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.io.IOBasicTest.java">org/gradoop/storage/impl/accumulo/io/IOBasicTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.StorePropPredicateTest.java">org/gradoop/storage/impl/accumulo/predicate/StorePropPredicateTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.predicate.StoreIdsPredicateTest.java">org/gradoop/storage/impl/accumulo/predicate/StoreIdsPredicateTest.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  0
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.gradoop.org/gradoop-store/gradoop-accumulo/checkstyle.html#org.gradoop.storage.impl.accumulo.basic.StoreTest.java">org/gradoop/storage/impl/accumulo/basic/StoreTest.java</a>
                 </td>
                 <td>
                   0

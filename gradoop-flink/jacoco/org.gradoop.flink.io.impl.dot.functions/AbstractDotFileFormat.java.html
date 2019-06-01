@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AbstractDotFileFormat.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.io.impl.dot.functions</a> &gt; <span class="el_source">AbstractDotFileFormat.java</span></div><h1>AbstractDotFileFormat.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.io.impl.dot.functions;
+
+import org.apache.flink.api.java.io.TextOutputFormat;
+import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
+
+/**
+ * Base class for implementing a dot formatting.
+ */
+<span class="fc" id="L28">public abstract class AbstractDotFileFormat</span>
+  implements TextOutputFormat.TextFormatter&lt;GraphTransaction&gt; {
+
+  /**
+   * .DOT vertex identifier prefix
+   */
+  static final String VERTEX_ID_PREFIX = &quot;v&quot;;
+
+  /**
+   * id that needs to be update upon changes to this class' structure.
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * flag to print graph head information to dot
+   */
+  private boolean printGraphHead;
+
+
+
+  @Override
+  public String format(GraphTransaction transaction) {
+
+<span class="fc" id="L51">    StringBuilder builder = new StringBuilder();</span>
+
+    //--------------------------------------------------------------------------
+    // write DOT head lines and open block
+    //--------------------------------------------------------------------------
+
+<span class="fc" id="L57">    GradoopId id = transaction.getGraphHead().getId();</span>
+
+<span class="fc" id="L59">    builder.append(&quot;subgraph cluster_g&quot;)</span>
+<span class="fc" id="L60">      .append(id)</span>
+<span class="fc" id="L61">      .append(&quot;{\n&quot;);</span>
+
+    //--------------------------------------------------------------------------
+    // write DOT body
+    //--------------------------------------------------------------------------
+
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">    if (printGraphHead) {</span>
+<span class="fc" id="L68">      writeGraphHead(transaction, builder);</span>
+    }
+
+<span class="fc" id="L71">    writeVertices(transaction, builder, id.toString());</span>
+
+<span class="fc" id="L73">    writeEdges(transaction, builder, id.toString());</span>
+
+    //--------------------------------------------------------------------------
+    // close DOT block
+    //--------------------------------------------------------------------------
+
+<span class="fc" id="L79">    builder.append(&quot;}\n&quot;);</span>
+
+<span class="fc" id="L81">    return builder.toString();</span>
+  }
+
+  /**
+   * Adds graph head information to the specified builder.
+   *
+   * Output: label=&quot;label&quot;;
+   * @param transaction graph transaction
+   * @param builder string builder to append
+   */
+  private void writeGraphHead(GraphTransaction transaction, StringBuilder builder) {
+<span class="fc" id="L92">    GraphHead graphHead = transaction.getGraphHead();</span>
+
+<span class="fc" id="L94">    writeLabel(builder, graphHead);</span>
+
+<span class="fc" id="L96">    builder.append(&quot;;\n&quot;);</span>
+<span class="fc" id="L97">  }</span>
+
+  /**
+   * Adds vertex information to the specified builder.
+   *
+   * vertexId [label=&quot;label&quot;, property1=&quot;value1&quot;, ...];
+   *
+   * @param transaction graph transaction
+   * @param builder string builder to append
+   * @param suffix id suffix specific for the current {@link GraphTransaction}
+   */
+  abstract void writeVertices(GraphTransaction transaction, StringBuilder builder, String suffix);
+
+  /**
+   * Adds edge information to the specified builder
+   *
+   * sourceId-&gt;targetId [label=&quot;label&quot;, property1=&quot;value1&quot;, ...];
+   *
+   * @param transaction graph transaction
+   * @param builder string builder to append
+   * @param suffix id suffix specific for the current {@link GraphTransaction}
+   */
+  private void writeEdges(GraphTransaction transaction, StringBuilder builder, String suffix) {
+<span class="fc bfc" id="L120" title="All 2 branches covered.">    for (Edge edge: transaction.getEdges()) {</span>
+
+<span class="fc" id="L122">      builder.append(VERTEX_ID_PREFIX)</span>
+<span class="fc" id="L123">        .append(edge.getSourceId())</span>
+<span class="fc" id="L124">        .append(suffix)</span>
+<span class="fc" id="L125">        .append(&quot;-&gt;&quot;)</span>
+<span class="fc" id="L126">        .append(VERTEX_ID_PREFIX)</span>
+<span class="fc" id="L127">        .append(edge.getTargetId())</span>
+<span class="fc" id="L128">        .append(suffix)</span>
+<span class="fc" id="L129">        .append(&quot; [&quot;);</span>
+      // write dot attributes if existent
+<span class="fc" id="L131">      writeLabel(builder, edge);</span>
+<span class="fc" id="L132">      builder.append(&quot;];\n&quot;);</span>
+<span class="fc" id="L133">    }</span>
+<span class="fc" id="L134">  }</span>
+
+  /**
+   * Writes the specified label and properties.
+   *
+   * @param builder string builder to append
+   * @param element graph element with id, label and properties
+   */
+  abstract void writeLabel(StringBuilder builder, EPGMElement element);
+
+  void setPrintGraphHead(boolean printGraphHead) {
+<span class="fc" id="L145">    this.printGraphHead = printGraphHead;</span>
+<span class="fc" id="L146">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

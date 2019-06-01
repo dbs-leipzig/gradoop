@@ -20,6 +20,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
@@ -27,17 +28,18 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 /**
  * Creates a new super vertex representing a vertex group. The vertex stores the
  * group label, the group property value and the aggregate values for its group.
+ *
+ * @param &lt;V&gt; The vertex type.
  */
 @FunctionAnnotation.ForwardedFields(&quot;f1-&gt;id;f2-&gt;label&quot;)
 @FunctionAnnotation.ReadFields(&quot;f1;f2;f3;f4;f6&quot;)
-public class BuildSuperVertex
-  extends BuildBase
-  implements MapFunction&lt;VertexGroupItem, Vertex&gt;, ResultTypeQueryable&lt;Vertex&gt; {
+public class BuildSuperVertex&lt;V extends EPGMVertex&gt; extends BuildBase
+  implements MapFunction&lt;VertexGroupItem, V&gt;, ResultTypeQueryable&lt;V&gt; {
 
   /**
    * Vertex vertexFactory.
    */
-  private final EPGMVertexFactory&lt;Vertex&gt; vertexFactory;
+  private final EPGMVertexFactory&lt;V&gt; vertexFactory;
 
   /**
    * Creates map function.
@@ -45,10 +47,10 @@ public class BuildSuperVertex
    * @param useLabel true, if vertex label shall be considered
    * @param epgmVertexFactory vertex factory
    */
-  public BuildSuperVertex(boolean useLabel, EPGMVertexFactory&lt;Vertex&gt; epgmVertexFactory) {
-<span class="fc" id="L49">    super(useLabel);</span>
-<span class="fc" id="L50">    this.vertexFactory = epgmVertexFactory;</span>
-<span class="fc" id="L51">  }</span>
+  public BuildSuperVertex(boolean useLabel, EPGMVertexFactory&lt;V&gt; epgmVertexFactory) {
+<span class="fc" id="L51">    super(useLabel);</span>
+<span class="fc" id="L52">    this.vertexFactory = epgmVertexFactory;</span>
+<span class="fc" id="L53">  }</span>
 
   /**
    * Creates a {@link Vertex} object from the given {@link VertexGroupItem}
@@ -59,23 +61,21 @@ public class BuildSuperVertex
    * @throws Exception on failure
    */
   @Override
-  public Vertex map(VertexGroupItem groupItem) throws
-    Exception {
-<span class="fc" id="L64">    Vertex supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());</span>
+  public V map(VertexGroupItem groupItem) throws Exception {
+<span class="fc" id="L65">    V supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());</span>
 
-<span class="fc" id="L66">    supVertex.setLabel(groupItem.getGroupLabel());</span>
-<span class="fc" id="L67">    setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getLabelGroup());</span>
-<span class="fc" id="L68">    setAggregateProperties(</span>
+<span class="fc" id="L67">    supVertex.setLabel(groupItem.getGroupLabel());</span>
+<span class="fc" id="L68">    setGroupProperties(supVertex, groupItem.getGroupingValues(), groupItem.getLabelGroup());</span>
+<span class="fc" id="L69">    setAggregateProperties(</span>
       supVertex,
-<span class="fc" id="L70">      groupItem.getAggregateValues(),</span>
-<span class="fc" id="L71">      groupItem.getLabelGroup().getAggregateFunctions());</span>
+<span class="fc" id="L71">      groupItem.getAggregateValues(),</span>
+<span class="fc" id="L72">      groupItem.getLabelGroup().getAggregateFunctions());</span>
 
-<span class="fc" id="L73">    return supVertex;</span>
+<span class="fc" id="L74">    return supVertex;</span>
   }
 
-  @SuppressWarnings(&quot;unchecked&quot;)
   @Override
-  public TypeInformation&lt;Vertex&gt; getProducedType() {
+  public TypeInformation&lt;V&gt; getProducedType() {
 <span class="fc" id="L79">    return TypeExtractor.createTypeInfo(vertexFactory.getType());</span>
   }
 }

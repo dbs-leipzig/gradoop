@@ -42,7 +42,7 @@ import java.util.Iterator;
 
   @Override
   public void reduce(Iterable&lt;Tuple2&lt;T, GradoopId&gt;&gt; iterable,
-                     Collector&lt;Tuple2&lt;T, GradoopIdSet&gt;&gt; collector) throws Exception {
+                     Collector&lt;Tuple2&lt;T, GradoopIdSet&gt;&gt; collector) {
 
 <span class="fc bfc" id="L47" title="All 2 branches covered.">    if (returnTuple.f1 == null) {</span>
 <span class="fc" id="L48">      returnTuple.f1 = new GradoopIdSet();</span>

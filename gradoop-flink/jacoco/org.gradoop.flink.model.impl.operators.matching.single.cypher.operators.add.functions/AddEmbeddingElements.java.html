@@ -38,7 +38,7 @@ public class AddEmbeddingElements extends RichMapFunction&lt;Embedding, Embeddin
 <span class="fc" id="L38">  }</span>
 
   @Override
-  public Embedding map(Embedding embedding) throws Exception {
+  public Embedding map(Embedding embedding) {
 <span class="fc bfc" id="L42" title="All 2 branches covered.">    for (int i = 0; i &lt; count; i++) {</span>
 <span class="fc" id="L43">      GradoopId id = GradoopId.get();</span>
 <span class="fc" id="L44">      embedding.add(id);</span>

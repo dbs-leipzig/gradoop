@@ -53,7 +53,7 @@
 <a name="43" href="#43">43</a>  
 <a name="44" href="#44">44</a>  <strong class="jxr_keyword">import</strong> javax.annotation.Nonnull;
 <a name="45" href="#45">45</a>  <strong class="jxr_keyword">import</strong> java.io.IOException;
-<a name="46" href="#46">46</a>  <strong class="jxr_keyword">import</strong> java.util.ArrayList;
+<a name="46" href="#46">46</a>  <strong class="jxr_keyword">import</strong> java.util.Collections;
 <a name="47" href="#47">47</a>  <strong class="jxr_keyword">import</strong> java.util.HashMap;
 <a name="48" href="#48">48</a>  <strong class="jxr_keyword">import</strong> java.util.Iterator;
 <a name="49" href="#49">49</a>  <strong class="jxr_keyword">import</strong> java.util.List;
@@ -186,7 +186,7 @@
 <a name="176" href="#176">176</a>       }
 <a name="177" href="#177">177</a>       <strong class="jxr_keyword">if</strong> (split.getSplitNumber() + 1 &gt; ranges.size()) {
 <a name="178" href="#178">178</a>         scanner = <strong class="jxr_keyword">null</strong>;
-<a name="179" href="#179">179</a>         iterator = <strong class="jxr_keyword">new</strong> ArrayList&lt;Map.Entry&lt;Key, Value&gt;&gt;().iterator();
+<a name="179" href="#179">179</a>         iterator = Collections.emptyIterator();
 <a name="180" href="#180">180</a>       } <strong class="jxr_keyword">else</strong> {
 <a name="181" href="#181">181</a>         scanner = conn.createBatchScanner(tableName, auth, batchSize);
 <a name="182" href="#182">182</a>         attachIterator(scanner, iteratorPriority, options);

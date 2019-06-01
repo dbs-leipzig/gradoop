@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.grouping.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
@@ -27,12 +27,14 @@ import java.util.List;
 /**
  * Takes an EPGM edge as input and creates a {@link EdgeGroupItem} which
  * contains only necessary information for further processing.
+ *
+ * @param &lt;E&gt; The edge type.
  */
 @FunctionAnnotation.ForwardedFields(&quot;sourceId-&gt;f0;targetId-&gt;f1;&quot;)
 @FunctionAnnotation.ReadFields(&quot;label;properties&quot;)
-public class BuildEdgeGroupItem
+public class BuildEdgeGroupItem&lt;E extends EPGMEdge&gt;
   extends BuildGroupItemBase
-  implements FlatMapFunction&lt;Edge, EdgeGroupItem&gt; {
+  implements FlatMapFunction&lt;E, EdgeGroupItem&gt; {
 
   /**
    * Avoid object initialization in each call.
@@ -46,29 +48,29 @@ public class BuildEdgeGroupItem
    * @param edgeLabelGroups stores grouping properties for edge labels
    */
   public BuildEdgeGroupItem(boolean useLabel, List&lt;LabelGroup&gt; edgeLabelGroups) {
-<span class="fc" id="L49">    super(useLabel, edgeLabelGroups);</span>
-<span class="fc" id="L50">    this.reuseEdgeGroupItem = new EdgeGroupItem();</span>
-<span class="fc" id="L51">  }</span>
+<span class="fc" id="L51">    super(useLabel, edgeLabelGroups);</span>
+<span class="fc" id="L52">    this.reuseEdgeGroupItem = new EdgeGroupItem();</span>
+<span class="fc" id="L53">  }</span>
 
   @Override
-  public void flatMap(Edge edge, Collector&lt;EdgeGroupItem&gt; collector) throws Exception {
-<span class="fc" id="L55">    boolean usedEdgeLabelGroup = false;</span>
-<span class="fc" id="L56">    reuseEdgeGroupItem.setSourceId(edge.getSourceId());</span>
-<span class="fc" id="L57">    reuseEdgeGroupItem.setTargetId(edge.getTargetId());</span>
+  public void flatMap(E edge, Collector&lt;EdgeGroupItem&gt; collector) throws Exception {
+<span class="fc" id="L57">    boolean usedEdgeLabelGroup = false;</span>
+<span class="fc" id="L58">    reuseEdgeGroupItem.setSourceId(edge.getSourceId());</span>
+<span class="fc" id="L59">    reuseEdgeGroupItem.setTargetId(edge.getTargetId());</span>
 
     // check if edge shall be grouped by a special set of keys
-<span class="fc bfc" id="L60" title="All 2 branches covered.">    for (LabelGroup edgeLabelGroup : getLabelGroups()) {</span>
-<span class="fc bfc" id="L61" title="All 2 branches covered.">      if (edgeLabelGroup.getGroupingLabel().equals(edge.getLabel())) {</span>
-<span class="fc" id="L62">        usedEdgeLabelGroup = true;</span>
-<span class="fc" id="L63">        setGroupItem(reuseEdgeGroupItem, edge, edgeLabelGroup);</span>
-<span class="fc" id="L64">        collector.collect(reuseEdgeGroupItem);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">    for (LabelGroup edgeLabelGroup : getLabelGroups()) {</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">      if (edgeLabelGroup.getGroupingLabel().equals(edge.getLabel())) {</span>
+<span class="fc" id="L64">        usedEdgeLabelGroup = true;</span>
+<span class="fc" id="L65">        setGroupItem(reuseEdgeGroupItem, edge, edgeLabelGroup);</span>
+<span class="fc" id="L66">        collector.collect(reuseEdgeGroupItem);</span>
       }
-<span class="fc" id="L66">    }</span>
+<span class="fc" id="L68">    }</span>
     // standard grouping case
-<span class="fc bfc" id="L68" title="All 2 branches covered.">    if (!usedEdgeLabelGroup) {</span>
-<span class="fc" id="L69">      setGroupItem(reuseEdgeGroupItem, edge, getDefaultLabelGroup());</span>
-<span class="fc" id="L70">      collector.collect(reuseEdgeGroupItem);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">    if (!usedEdgeLabelGroup) {</span>
+<span class="fc" id="L71">      setGroupItem(reuseEdgeGroupItem, edge, getDefaultLabelGroup());</span>
+<span class="fc" id="L72">      collector.collect(reuseEdgeGroupItem);</span>
     }
-<span class="fc" id="L72">  }</span>
+<span class="fc" id="L74">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

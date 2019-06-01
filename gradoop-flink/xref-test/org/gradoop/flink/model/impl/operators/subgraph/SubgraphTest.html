@@ -230,125 +230,123 @@
 <a name="220" href="#220">220</a> 
 <a name="221" href="#221">221</a>     FilterFunction&lt;Edge&gt; edgeFilterFunction = e -&gt; {
 <a name="222" href="#222">222</a>       <strong class="jxr_keyword">if</strong> (e.getLabel().equals(<span class="jxr_string">"knows"</span>)) {
-<a name="223" href="#223">223</a>         <strong class="jxr_keyword">if</strong> (e.getPropertyValue(<span class="jxr_string">"since"</span>).getInt() == 2016) {
-<a name="224" href="#224">224</a>           <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">true</strong>;
-<a name="225" href="#225">225</a>         }
-<a name="226" href="#226">226</a>       }
-<a name="227" href="#227">227</a>       <strong class="jxr_keyword">return</strong> false;
-<a name="228" href="#228">228</a>     };
-<a name="229" href="#229">229</a> 
-<a name="230" href="#230">230</a>     GraphCollection result = input
-<a name="231" href="#231">231</a>       .apply(<strong class="jxr_keyword">new</strong> ApplySubgraph(vertexFilterFunction, edgeFilterFunction));
-<a name="232" href="#232">232</a> 
-<a name="233" href="#233">233</a>     collectAndAssertTrue(result.equalsByGraphElementIds(
-<a name="234" href="#234">234</a>       loader.getGraphCollectionByVariables(
-<a name="235" href="#235">235</a>         <span class="jxr_string">"expected0"</span>, <span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected4"</span>)));
-<a name="236" href="#236">236</a>     collectAndAssertTrue(result.equalsByGraphData(
-<a name="237" href="#237">237</a>       loader.getGraphCollectionByVariables(
-<a name="238" href="#238">238</a>         <span class="jxr_string">"expected0"</span>, <span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected4"</span>)));
-<a name="239" href="#239">239</a>   }
-<a name="240" href="#240">240</a> 
-<a name="241" href="#241">241</a>   @Test
-<a name="242" href="#242">242</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionVertexInducedSubgraph() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="243" href="#243">243</a>     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
-<a name="244" href="#244">244</a> 
-<a name="245" href="#245">245</a>     loader.appendToDatabaseFromString(
-<a name="246" href="#246">246</a>       <span class="jxr_string">"(jay:Person {"</span> +
-<a name="247" href="#247">247</a>         <span class="jxr_string">"name : \&quot;Jay\&quot;, age : 45, gender : \&quot;f\&quot;, city : \&quot;Leipzig\&quot;})"</span> +
-<a name="248" href="#248">248</a>       <span class="jxr_string">"g4:Community["</span> +
-<a name="249" href="#249">249</a>         <span class="jxr_string">"(jay)-[jkb:knows]-&gt;(bob)"</span> +
-<a name="250" href="#250">250</a>         <span class="jxr_string">"(bob)-[blj:likes]-&gt;(jay)"</span> +
-<a name="251" href="#251">251</a>         <span class="jxr_string">"]"</span>);
-<a name="252" href="#252">252</a> 
-<a name="253" href="#253">253</a>     loader.appendToDatabaseFromString(
-<a name="254" href="#254">254</a>       <span class="jxr_string">"expected0["</span> +
-<a name="255" href="#255">255</a>         <span class="jxr_string">"(alice)-[akb]-&gt;(bob)-[bka]-&gt;(alice)"</span> +
-<a name="256" href="#256">256</a>         <span class="jxr_string">"]"</span>
-<a name="257" href="#257">257</a>     );
-<a name="258" href="#258">258</a> 
-<a name="259" href="#259">259</a>     loader.appendToDatabaseFromString(
-<a name="260" href="#260">260</a>       <span class="jxr_string">"expected1[]"</span>
-<a name="261" href="#261">261</a>     );
-<a name="262" href="#262">262</a> 
-<a name="263" href="#263">263</a>     loader.appendToDatabaseFromString(
-<a name="264" href="#264">264</a>       <span class="jxr_string">"expected4["</span> +
-<a name="265" href="#265">265</a>         <span class="jxr_string">"(jay)-[jkb]-&gt;(bob)-[blj]-&gt;(jay)"</span> +
-<a name="266" href="#266">266</a>         <span class="jxr_string">"]"</span>
-<a name="267" href="#267">267</a>     );
+<a name="223" href="#223">223</a>         <strong class="jxr_keyword">return</strong> e.getPropertyValue(<span class="jxr_string">"since"</span>).getInt() == 2016;
+<a name="224" href="#224">224</a>       }
+<a name="225" href="#225">225</a>       <strong class="jxr_keyword">return</strong> false;
+<a name="226" href="#226">226</a>     };
+<a name="227" href="#227">227</a> 
+<a name="228" href="#228">228</a>     GraphCollection result = input
+<a name="229" href="#229">229</a>       .apply(<strong class="jxr_keyword">new</strong> ApplySubgraph(vertexFilterFunction, edgeFilterFunction));
+<a name="230" href="#230">230</a> 
+<a name="231" href="#231">231</a>     collectAndAssertTrue(result.equalsByGraphElementIds(
+<a name="232" href="#232">232</a>       loader.getGraphCollectionByVariables(
+<a name="233" href="#233">233</a>         <span class="jxr_string">"expected0"</span>, <span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected4"</span>)));
+<a name="234" href="#234">234</a>     collectAndAssertTrue(result.equalsByGraphData(
+<a name="235" href="#235">235</a>       loader.getGraphCollectionByVariables(
+<a name="236" href="#236">236</a>         <span class="jxr_string">"expected0"</span>, <span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected4"</span>)));
+<a name="237" href="#237">237</a>   }
+<a name="238" href="#238">238</a> 
+<a name="239" href="#239">239</a>   @Test
+<a name="240" href="#240">240</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionVertexInducedSubgraph() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="241" href="#241">241</a>     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+<a name="242" href="#242">242</a> 
+<a name="243" href="#243">243</a>     loader.appendToDatabaseFromString(
+<a name="244" href="#244">244</a>       <span class="jxr_string">"(jay:Person {"</span> +
+<a name="245" href="#245">245</a>         <span class="jxr_string">"name : \&quot;Jay\&quot;, age : 45, gender : \&quot;f\&quot;, city : \&quot;Leipzig\&quot;})"</span> +
+<a name="246" href="#246">246</a>       <span class="jxr_string">"g4:Community["</span> +
+<a name="247" href="#247">247</a>         <span class="jxr_string">"(jay)-[jkb:knows]-&gt;(bob)"</span> +
+<a name="248" href="#248">248</a>         <span class="jxr_string">"(bob)-[blj:likes]-&gt;(jay)"</span> +
+<a name="249" href="#249">249</a>         <span class="jxr_string">"]"</span>);
+<a name="250" href="#250">250</a> 
+<a name="251" href="#251">251</a>     loader.appendToDatabaseFromString(
+<a name="252" href="#252">252</a>       <span class="jxr_string">"expected0["</span> +
+<a name="253" href="#253">253</a>         <span class="jxr_string">"(alice)-[akb]-&gt;(bob)-[bka]-&gt;(alice)"</span> +
+<a name="254" href="#254">254</a>         <span class="jxr_string">"]"</span>
+<a name="255" href="#255">255</a>     );
+<a name="256" href="#256">256</a> 
+<a name="257" href="#257">257</a>     loader.appendToDatabaseFromString(
+<a name="258" href="#258">258</a>       <span class="jxr_string">"expected1[]"</span>
+<a name="259" href="#259">259</a>     );
+<a name="260" href="#260">260</a> 
+<a name="261" href="#261">261</a>     loader.appendToDatabaseFromString(
+<a name="262" href="#262">262</a>       <span class="jxr_string">"expected4["</span> +
+<a name="263" href="#263">263</a>         <span class="jxr_string">"(jay)-[jkb]-&gt;(bob)-[blj]-&gt;(jay)"</span> +
+<a name="264" href="#264">264</a>         <span class="jxr_string">"]"</span>
+<a name="265" href="#265">265</a>     );
+<a name="266" href="#266">266</a> 
+<a name="267" href="#267">267</a>     GraphCollection input = loader.getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g4"</span>);
 <a name="268" href="#268">268</a> 
-<a name="269" href="#269">269</a>     GraphCollection input = loader.getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g4"</span>);
-<a name="270" href="#270">270</a> 
-<a name="271" href="#271">271</a>     FilterFunction&lt;Vertex&gt; vertexFilterFunction = v -&gt; {
-<a name="272" href="#272">272</a>       PropertyValue city = v.getPropertyValue(<span class="jxr_string">"city"</span>);
-<a name="273" href="#273">273</a>       <strong class="jxr_keyword">return</strong> city != <strong class="jxr_keyword">null</strong> &amp;&amp; city.toString().equals(<span class="jxr_string">"Leipzig"</span>);
-<a name="274" href="#274">274</a>     };
-<a name="275" href="#275">275</a> 
-<a name="276" href="#276">276</a>     GraphCollection result = input
-<a name="277" href="#277">277</a>       .apply(<strong class="jxr_keyword">new</strong> ApplySubgraph(vertexFilterFunction, <strong class="jxr_keyword">null</strong>));
-<a name="278" href="#278">278</a> 
-<a name="279" href="#279">279</a>     collectAndAssertTrue(result.equalsByGraphElementIds(
-<a name="280" href="#280">280</a>       loader.getGraphCollectionByVariables(
-<a name="281" href="#281">281</a>         <span class="jxr_string">"expected0"</span>, <span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected4"</span>)));
-<a name="282" href="#282">282</a>     collectAndAssertTrue(result.equalsByGraphData(
-<a name="283" href="#283">283</a>       loader.getGraphCollectionByVariables(
-<a name="284" href="#284">284</a>         <span class="jxr_string">"expected0"</span>, <span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected4"</span>)));
-<a name="285" href="#285">285</a>   }
-<a name="286" href="#286">286</a> 
-<a name="287" href="#287">287</a>   @Test
-<a name="288" href="#288">288</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionEdgeInducedSubgraph() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="289" href="#289">289</a>     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
-<a name="290" href="#290">290</a> 
-<a name="291" href="#291">291</a>     loader.appendToDatabaseFromString(
-<a name="292" href="#292">292</a>       <span class="jxr_string">"expected0["</span> +
-<a name="293" href="#293">293</a>         <span class="jxr_string">"(eve)-[ekb]-&gt;(bob)"</span> +
-<a name="294" href="#294">294</a>         <span class="jxr_string">"]"</span>
-<a name="295" href="#295">295</a>     );
-<a name="296" href="#296">296</a> 
-<a name="297" href="#297">297</a>     loader.appendToDatabaseFromString(
-<a name="298" href="#298">298</a>       <span class="jxr_string">"expected1["</span> +
-<a name="299" href="#299">299</a>         <span class="jxr_string">"(frank)-[fkc]-&gt;(carol)"</span> +
-<a name="300" href="#300">300</a>         <span class="jxr_string">"(frank)-[fkd]-&gt;(dave)"</span> +
-<a name="301" href="#301">301</a>         <span class="jxr_string">"]"</span>
-<a name="302" href="#302">302</a>     );
-<a name="303" href="#303">303</a> 
-<a name="304" href="#304">304</a>     loader.appendToDatabaseFromString(
-<a name="305" href="#305">305</a>       <span class="jxr_string">"expected2[]"</span>
-<a name="306" href="#306">306</a>     );
+<a name="269" href="#269">269</a>     FilterFunction&lt;Vertex&gt; vertexFilterFunction = v -&gt; {
+<a name="270" href="#270">270</a>       PropertyValue city = v.getPropertyValue(<span class="jxr_string">"city"</span>);
+<a name="271" href="#271">271</a>       <strong class="jxr_keyword">return</strong> city != <strong class="jxr_keyword">null</strong> &amp;&amp; city.toString().equals(<span class="jxr_string">"Leipzig"</span>);
+<a name="272" href="#272">272</a>     };
+<a name="273" href="#273">273</a> 
+<a name="274" href="#274">274</a>     GraphCollection result = input
+<a name="275" href="#275">275</a>       .apply(<strong class="jxr_keyword">new</strong> ApplySubgraph(vertexFilterFunction, <strong class="jxr_keyword">null</strong>));
+<a name="276" href="#276">276</a> 
+<a name="277" href="#277">277</a>     collectAndAssertTrue(result.equalsByGraphElementIds(
+<a name="278" href="#278">278</a>       loader.getGraphCollectionByVariables(
+<a name="279" href="#279">279</a>         <span class="jxr_string">"expected0"</span>, <span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected4"</span>)));
+<a name="280" href="#280">280</a>     collectAndAssertTrue(result.equalsByGraphData(
+<a name="281" href="#281">281</a>       loader.getGraphCollectionByVariables(
+<a name="282" href="#282">282</a>         <span class="jxr_string">"expected0"</span>, <span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected4"</span>)));
+<a name="283" href="#283">283</a>   }
+<a name="284" href="#284">284</a> 
+<a name="285" href="#285">285</a>   @Test
+<a name="286" href="#286">286</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCollectionEdgeInducedSubgraph() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="287" href="#287">287</a>     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+<a name="288" href="#288">288</a> 
+<a name="289" href="#289">289</a>     loader.appendToDatabaseFromString(
+<a name="290" href="#290">290</a>       <span class="jxr_string">"expected0["</span> +
+<a name="291" href="#291">291</a>         <span class="jxr_string">"(eve)-[ekb]-&gt;(bob)"</span> +
+<a name="292" href="#292">292</a>         <span class="jxr_string">"]"</span>
+<a name="293" href="#293">293</a>     );
+<a name="294" href="#294">294</a> 
+<a name="295" href="#295">295</a>     loader.appendToDatabaseFromString(
+<a name="296" href="#296">296</a>       <span class="jxr_string">"expected1["</span> +
+<a name="297" href="#297">297</a>         <span class="jxr_string">"(frank)-[fkc]-&gt;(carol)"</span> +
+<a name="298" href="#298">298</a>         <span class="jxr_string">"(frank)-[fkd]-&gt;(dave)"</span> +
+<a name="299" href="#299">299</a>         <span class="jxr_string">"]"</span>
+<a name="300" href="#300">300</a>     );
+<a name="301" href="#301">301</a> 
+<a name="302" href="#302">302</a>     loader.appendToDatabaseFromString(
+<a name="303" href="#303">303</a>       <span class="jxr_string">"expected2[]"</span>
+<a name="304" href="#304">304</a>     );
+<a name="305" href="#305">305</a> 
+<a name="306" href="#306">306</a>     GraphCollection input = loader.getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g2"</span>);
 <a name="307" href="#307">307</a> 
-<a name="308" href="#308">308</a>     GraphCollection input = loader.getGraphCollectionByVariables(<span class="jxr_string">"g0"</span>, <span class="jxr_string">"g1"</span>, <span class="jxr_string">"g2"</span>);
-<a name="309" href="#309">309</a> 
-<a name="310" href="#310">310</a>     GraphCollection result = input
-<a name="311" href="#311">311</a>       .apply(<strong class="jxr_keyword">new</strong> ApplySubgraph(<strong class="jxr_keyword">null</strong>, e -&gt; e.getPropertyValue(<span class="jxr_string">"since"</span>).getInt() == 2015));
-<a name="312" href="#312">312</a> 
-<a name="313" href="#313">313</a>     collectAndAssertTrue(result.equalsByGraphElementIds(
-<a name="314" href="#314">314</a>       loader.getGraphCollectionByVariables(
-<a name="315" href="#315">315</a>         <span class="jxr_string">"expected0"</span>, <span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected2"</span>)));
-<a name="316" href="#316">316</a>     collectAndAssertTrue(result.equalsByGraphData(
-<a name="317" href="#317">317</a>       loader.getGraphCollectionByVariables(
-<a name="318" href="#318">318</a>         <span class="jxr_string">"expected0"</span>, <span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected2"</span>)));
-<a name="319" href="#319">319</a>   }
-<a name="320" href="#320">320</a> 
-<a name="321" href="#321">321</a>   @Test
-<a name="322" href="#322">322</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testKeepOnlyRelevantVertices() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="323" href="#323">323</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"source:G {source : \&quot;graph\&quot;}["</span> +
-<a name="324" href="#324">324</a>         <span class="jxr_string">"      (a:Patent {author : \&quot;asdf\&quot;, year: 2000, title: \&quot;P1\&quot;})-[:cite {difference : 0}]-&gt;(b:Patent {author : \&quot;asdf\&quot;, year: 2000, title: \&quot;P2\&quot;})"</span> +
-<a name="325" href="#325">325</a>         <span class="jxr_string">"      (a)-[:cite {difference : 0}]-&gt;(c:Patent {author : \&quot;asdf\&quot;, year: 2000, title: \&quot;P3\&quot;})"</span> +
-<a name="326" href="#326">326</a>         <span class="jxr_string">"      (b)-[:cite {difference : 0}]-&gt;(c)\n"</span> +
-<a name="327" href="#327">327</a>         <span class="jxr_string">"      (a)-[:cite {difference : 5}]-&gt;(d:Patent {author : \&quot;zxcv\&quot;, year: 1995, title: \&quot;Earlier...\&quot;})"</span> +
-<a name="328" href="#328">328</a>         <span class="jxr_string">"      (b)-[:cite {difference : 5}]-&gt;(d)"</span> +
-<a name="329" href="#329">329</a>         <span class="jxr_string">"      (e:Patent {author : \&quot;kdkdkd\&quot;, year: 1997, title: \&quot;Once upon a time\&quot;})-[e_d:cite {difference : 2}]-&gt;(d)"</span> +
-<a name="330" href="#330">330</a>         <span class="jxr_string">"]"</span>);
-<a name="331" href="#331">331</a>     GraphCollection sourceGraph = loader.getGraphCollectionByVariables(<span class="jxr_string">"source"</span>);
-<a name="332" href="#332">332</a>     <em class="jxr_comment">// Caution: We can't use result.equalsByGraphElementIds because it internally uses a cross join</em>
-<a name="333" href="#333">333</a>     <em class="jxr_comment">// with equality of elements, which means, it ignores elements that are not within the other dataset</em>
-<a name="334" href="#334">334</a>     <em class="jxr_comment">// This means, the test would succeed even though we have too many vertices as a result of the</em>
-<a name="335" href="#335">335</a>     <em class="jxr_comment">// subgraph operator.</em>
-<a name="336" href="#336">336</a>     org.junit.Assert.assertEquals(3, sourceGraph
-<a name="337" href="#337">337</a>         .apply(<strong class="jxr_keyword">new</strong> ApplySubgraph(<strong class="jxr_keyword">null</strong>, edge -&gt; edge.getPropertyValue(<span class="jxr_string">"difference"</span>).getInt() == 0))
-<a name="338" href="#338">338</a>         .getVertices()
-<a name="339" href="#339">339</a>         .collect().size());
-<a name="340" href="#340">340</a>   }
-<a name="341" href="#341">341</a> }
+<a name="308" href="#308">308</a>     GraphCollection result = input
+<a name="309" href="#309">309</a>       .apply(<strong class="jxr_keyword">new</strong> ApplySubgraph(<strong class="jxr_keyword">null</strong>, e -&gt; e.getPropertyValue(<span class="jxr_string">"since"</span>).getInt() == 2015));
+<a name="310" href="#310">310</a> 
+<a name="311" href="#311">311</a>     collectAndAssertTrue(result.equalsByGraphElementIds(
+<a name="312" href="#312">312</a>       loader.getGraphCollectionByVariables(
+<a name="313" href="#313">313</a>         <span class="jxr_string">"expected0"</span>, <span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected2"</span>)));
+<a name="314" href="#314">314</a>     collectAndAssertTrue(result.equalsByGraphData(
+<a name="315" href="#315">315</a>       loader.getGraphCollectionByVariables(
+<a name="316" href="#316">316</a>         <span class="jxr_string">"expected0"</span>, <span class="jxr_string">"expected1"</span>, <span class="jxr_string">"expected2"</span>)));
+<a name="317" href="#317">317</a>   }
+<a name="318" href="#318">318</a> 
+<a name="319" href="#319">319</a>   @Test
+<a name="320" href="#320">320</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testKeepOnlyRelevantVertices() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="321" href="#321">321</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"source:G {source : \&quot;graph\&quot;}["</span> +
+<a name="322" href="#322">322</a>         <span class="jxr_string">"      (a:Patent {author : \&quot;asdf\&quot;, year: 2000, title: \&quot;P1\&quot;})-[:cite {difference : 0}]-&gt;(b:Patent {author : \&quot;asdf\&quot;, year: 2000, title: \&quot;P2\&quot;})"</span> +
+<a name="323" href="#323">323</a>         <span class="jxr_string">"      (a)-[:cite {difference : 0}]-&gt;(c:Patent {author : \&quot;asdf\&quot;, year: 2000, title: \&quot;P3\&quot;})"</span> +
+<a name="324" href="#324">324</a>         <span class="jxr_string">"      (b)-[:cite {difference : 0}]-&gt;(c)\n"</span> +
+<a name="325" href="#325">325</a>         <span class="jxr_string">"      (a)-[:cite {difference : 5}]-&gt;(d:Patent {author : \&quot;zxcv\&quot;, year: 1995, title: \&quot;Earlier...\&quot;})"</span> +
+<a name="326" href="#326">326</a>         <span class="jxr_string">"      (b)-[:cite {difference : 5}]-&gt;(d)"</span> +
+<a name="327" href="#327">327</a>         <span class="jxr_string">"      (e:Patent {author : \&quot;kdkdkd\&quot;, year: 1997, title: \&quot;Once upon a time\&quot;})-[e_d:cite {difference : 2}]-&gt;(d)"</span> +
+<a name="328" href="#328">328</a>         <span class="jxr_string">"]"</span>);
+<a name="329" href="#329">329</a>     GraphCollection sourceGraph = loader.getGraphCollectionByVariables(<span class="jxr_string">"source"</span>);
+<a name="330" href="#330">330</a>     <em class="jxr_comment">// Caution: We can't use result.equalsByGraphElementIds because it internally uses a cross join</em>
+<a name="331" href="#331">331</a>     <em class="jxr_comment">// with equality of elements, which means, it ignores elements that are not within the other dataset</em>
+<a name="332" href="#332">332</a>     <em class="jxr_comment">// This means, the test would succeed even though we have too many vertices as a result of the</em>
+<a name="333" href="#333">333</a>     <em class="jxr_comment">// subgraph operator.</em>
+<a name="334" href="#334">334</a>     org.junit.Assert.assertEquals(3, sourceGraph
+<a name="335" href="#335">335</a>         .apply(<strong class="jxr_keyword">new</strong> ApplySubgraph(<strong class="jxr_keyword">null</strong>, edge -&gt; edge.getPropertyValue(<span class="jxr_string">"difference"</span>).getInt() == 0))
+<a name="336" href="#336">336</a>         .getVertices()
+<a name="337" href="#337">337</a>         .collect().size());
+<a name="338" href="#338">338</a>   }
+<a name="339" href="#339">339</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

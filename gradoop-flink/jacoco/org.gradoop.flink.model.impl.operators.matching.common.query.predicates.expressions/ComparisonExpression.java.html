@@ -26,6 +26,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -41,16 +42,16 @@ public class ComparisonExpression extends QueryPredicate {
    * Creates a new comparison wrapped
    * @param comparison the wrapped comparison
    */
-<span class="fc" id="L44">  public ComparisonExpression(Comparison comparison) {</span>
-<span class="fc" id="L45">    this.comparison = comparison;</span>
-<span class="fc" id="L46">  }</span>
+<span class="fc" id="L45">  public ComparisonExpression(Comparison comparison) {</span>
+<span class="fc" id="L46">    this.comparison = comparison;</span>
+<span class="fc" id="L47">  }</span>
 
   /**
    * Returns the wrapped left hand side of the comparison
    * @return wrapped left hand side
    */
   public QueryComparable getLhs() {
-<span class="fc" id="L53">    return QueryComparable.createFrom(comparison.getComparableExpressions()[0]);</span>
+<span class="fc" id="L54">    return QueryComparable.createFrom(comparison.getComparableExpressions()[0]);</span>
   }
 
   /**
@@ -58,11 +59,11 @@ public class ComparisonExpression extends QueryPredicate {
    * @return wrapped left hand side
    */
   public QueryComparable getRhs() {
-<span class="fc" id="L61">    return QueryComparable.createFrom(comparison.getComparableExpressions()[1]);</span>
+<span class="fc" id="L62">    return QueryComparable.createFrom(comparison.getComparableExpressions()[1]);</span>
   }
 
   public Comparator getComparator() {
-<span class="fc" id="L65">    return comparison.getComparator();</span>
+<span class="fc" id="L66">    return comparison.getComparator();</span>
   }
 
   /**
@@ -73,10 +74,10 @@ public class ComparisonExpression extends QueryPredicate {
    * @return evaluation result
    */
   public boolean evaluate(Embedding embedding, EmbeddingMetaData metaData) {
-<span class="fc" id="L76">    PropertyValue lhsValue = getLhs().evaluate(embedding, metaData);</span>
-<span class="fc" id="L77">    PropertyValue rhsValue = getRhs().evaluate(embedding, metaData);</span>
+<span class="fc" id="L77">    PropertyValue lhsValue = getLhs().evaluate(embedding, metaData);</span>
+<span class="fc" id="L78">    PropertyValue rhsValue = getRhs().evaluate(embedding, metaData);</span>
 
-<span class="fc" id="L79">    return compare(lhsValue, rhsValue);</span>
+<span class="fc" id="L80">    return compare(lhsValue, rhsValue);</span>
   }
 
   /**
@@ -86,10 +87,10 @@ public class ComparisonExpression extends QueryPredicate {
    * @return evaluation result
    */
   public boolean evaluate(GraphElement element) {
-<span class="fc" id="L89">    PropertyValue lhsValue = getLhs().evaluate(element);</span>
-<span class="fc" id="L90">    PropertyValue rhsValue = getRhs().evaluate(element);</span>
+<span class="fc" id="L90">    PropertyValue lhsValue = getLhs().evaluate(element);</span>
+<span class="fc" id="L91">    PropertyValue rhsValue = getRhs().evaluate(element);</span>
 
-<span class="fc" id="L92">    return compare(lhsValue, rhsValue);</span>
+<span class="fc" id="L93">    return compare(lhsValue, rhsValue);</span>
   }
 
   /**
@@ -101,18 +102,18 @@ public class ComparisonExpression extends QueryPredicate {
    */
   private boolean compare(PropertyValue lhsValue, PropertyValue rhsValue) {
     try {
-<span class="fc" id="L104">      int result = lhsValue.compareTo(rhsValue);</span>
+<span class="fc" id="L105">      int result = lhsValue.compareTo(rhsValue);</span>
 
-<span class="fc" id="L106">      return</span>
-<span class="fc bfc" id="L107" title="All 4 branches covered.">        comparison.getComparator() == Comparator.EQ  &amp;&amp; result ==  0 ||</span>
-<span class="fc bfc" id="L108" title="All 4 branches covered.">          comparison.getComparator() == Comparator.NEQ &amp;&amp; result !=  0 ||</span>
-<span class="fc bfc" id="L109" title="All 4 branches covered.">          comparison.getComparator() == Comparator.LT  &amp;&amp; result == -1 ||</span>
-<span class="fc bfc" id="L110" title="All 4 branches covered.">          comparison.getComparator() == Comparator.GT  &amp;&amp; result ==  1 ||</span>
-<span class="fc bfc" id="L111" title="All 4 branches covered.">          comparison.getComparator() == Comparator.LTE &amp;&amp; result &lt;=  0 ||</span>
-<span class="fc bfc" id="L112" title="All 4 branches covered.">          comparison.getComparator() == Comparator.GTE &amp;&amp; result &gt;=  0;</span>
+<span class="fc" id="L107">      return</span>
+<span class="fc bfc" id="L108" title="All 4 branches covered.">        comparison.getComparator() == Comparator.EQ  &amp;&amp; result ==  0 ||</span>
+<span class="fc bfc" id="L109" title="All 4 branches covered.">          comparison.getComparator() == Comparator.NEQ &amp;&amp; result !=  0 ||</span>
+<span class="fc bfc" id="L110" title="All 4 branches covered.">          comparison.getComparator() == Comparator.LT  &amp;&amp; result == -1 ||</span>
+<span class="fc bfc" id="L111" title="All 4 branches covered.">          comparison.getComparator() == Comparator.GT  &amp;&amp; result ==  1 ||</span>
+<span class="fc bfc" id="L112" title="All 4 branches covered.">          comparison.getComparator() == Comparator.LTE &amp;&amp; result &lt;=  0 ||</span>
+<span class="fc bfc" id="L113" title="All 4 branches covered.">          comparison.getComparator() == Comparator.GTE &amp;&amp; result &gt;=  0;</span>
 
-<span class="fc" id="L114">    } catch (IllegalArgumentException e) {</span>
-<span class="fc bfc" id="L115" title="All 2 branches covered.">      return comparison.getComparator() == Comparator.NEQ;</span>
+<span class="fc" id="L115">    } catch (IllegalArgumentException e) {</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">      return comparison.getComparator() == Comparator.NEQ;</span>
     }
   }
 
@@ -122,7 +123,7 @@ public class ComparisonExpression extends QueryPredicate {
    * @return set of variables
    */
   public Set&lt;String&gt; getVariables() {
-<span class="fc" id="L125">    return comparison.getVariables();</span>
+<span class="fc" id="L126">    return comparison.getVariables();</span>
   }
 
   /**
@@ -131,10 +132,10 @@ public class ComparisonExpression extends QueryPredicate {
    * @return set of referenced properties
    */
   public Set&lt;String&gt; getPropertyKeys(String variable) {
-<span class="fc" id="L134">    Set&lt;String&gt; properties = getLhs().getPropertyKeys(variable);</span>
-<span class="fc" id="L135">    properties.addAll(getRhs().getPropertyKeys(variable));</span>
+<span class="fc" id="L135">    Set&lt;String&gt; properties = getLhs().getPropertyKeys(variable);</span>
+<span class="fc" id="L136">    properties.addAll(getRhs().getPropertyKeys(variable));</span>
 
-<span class="fc" id="L137">    return properties;</span>
+<span class="fc" id="L138">    return properties;</span>
   }
 
   /**
@@ -143,38 +144,38 @@ public class ComparisonExpression extends QueryPredicate {
    */
   @Override
   public CNF asCNF() {
-<span class="fc" id="L146">    CNF cnf = new CNF();</span>
-<span class="fc" id="L147">    CNFElement cnfElement = new CNFElement();</span>
+<span class="fc" id="L147">    CNF cnf = new CNF();</span>
+<span class="fc" id="L148">    CNFElement cnfElement = new CNFElement();</span>
 
-<span class="fc" id="L149">    cnfElement.addPredicate(this);</span>
-<span class="fc" id="L150">    cnf.addPredicate(cnfElement);</span>
+<span class="fc" id="L150">    cnfElement.addPredicate(this);</span>
+<span class="fc" id="L151">    cnf.addPredicate(cnfElement);</span>
 
-<span class="fc" id="L152">    return cnf;</span>
+<span class="fc" id="L153">    return cnf;</span>
   }
 
   @Override
   public boolean equals(Object o) {
-<span class="fc bfc" id="L157" title="All 2 branches covered.">    if (this == o) {</span>
-<span class="fc" id="L158">      return true;</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">    if (this == o) {</span>
+<span class="fc" id="L159">      return true;</span>
     }
-<span class="pc bpc" id="L160" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
-<span class="nc" id="L161">      return false;</span>
+<span class="pc bpc" id="L161" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L162">      return false;</span>
     }
 
-<span class="fc" id="L164">    ComparisonExpression that = (ComparisonExpression) o;</span>
+<span class="fc" id="L165">    ComparisonExpression that = (ComparisonExpression) o;</span>
 
-<span class="pc bpc" id="L166" title="3 of 4 branches missed.">    return comparison != null ? comparison.equals(that.comparison) : that.comparison == null;</span>
+<span class="fc" id="L167">    return Objects.equals(comparison, that.comparison);</span>
 
   }
 
   @Override
   public int hashCode() {
-<span class="nc bnc" id="L172" title="All 2 branches missed.">    return comparison != null ? comparison.hashCode() : 0;</span>
+<span class="nc bnc" id="L173" title="All 2 branches missed.">    return comparison != null ? comparison.hashCode() : 0;</span>
   }
 
   @Override
   public String toString() {
-<span class="fc" id="L177">    return comparison.toString();</span>
+<span class="fc" id="L178">    return comparison.toString();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

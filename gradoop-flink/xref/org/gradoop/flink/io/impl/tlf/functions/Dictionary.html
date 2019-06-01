@@ -53,7 +53,7 @@
 <a name="43" href="#43">43</a>      Map&lt;Integer, String&gt; dictionary = Maps.newHashMap();
 <a name="44" href="#44">44</a>      <strong class="jxr_keyword">for</strong> (Tuple2&lt;Integer, String&gt; tuple : iterable) {
 <a name="45" href="#45">45</a>        dictionary.put(
-<a name="46" href="#46">46</a>          (Integer) tuple.getField(0), (String) tuple.getField(1));
+<a name="46" href="#46">46</a>          tuple.getField(0), tuple.getField(1));
 <a name="47" href="#47">47</a>      }
 <a name="48" href="#48">48</a>      collector.collect(dictionary);
 <a name="49" href="#49">49</a>    }

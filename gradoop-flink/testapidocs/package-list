@@ -15,6 +15,7 @@ org.gradoop.flink.io.impl.csv.functions
 org.gradoop.flink.io.impl.csv.indexed
 org.gradoop.flink.io.impl.deprecated.json
 org.gradoop.flink.io.impl.dot
+org.gradoop.flink.io.impl.dot.functions
 org.gradoop.flink.io.impl.edgelist
 org.gradoop.flink.io.impl.gdl
 org.gradoop.flink.io.impl.graph

@@ -18,6 +18,8 @@ package org.gradoop.flink.model.impl.operators.matching.common.query;
 import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Vertex;
 
+import java.util.Objects;
+
 /**
  * A triple representation of a query edge.
  */
@@ -42,46 +44,46 @@ public class Triple {
    * @param edge edge
    * @param targetVertex target vertex
    */
-<span class="fc" id="L45">  public Triple(Vertex sourceVertex, Edge edge, Vertex targetVertex) {</span>
-<span class="fc" id="L46">    this.sourceVertex = sourceVertex;</span>
-<span class="fc" id="L47">    this.edge = edge;</span>
-<span class="fc" id="L48">    this.targetVertex = targetVertex;</span>
-<span class="fc" id="L49">  }</span>
+<span class="fc" id="L47">  public Triple(Vertex sourceVertex, Edge edge, Vertex targetVertex) {</span>
+<span class="fc" id="L48">    this.sourceVertex = sourceVertex;</span>
+<span class="fc" id="L49">    this.edge = edge;</span>
+<span class="fc" id="L50">    this.targetVertex = targetVertex;</span>
+<span class="fc" id="L51">  }</span>
 
   public Vertex getSourceVertex() {
-<span class="fc" id="L52">    return sourceVertex;</span>
+<span class="fc" id="L54">    return sourceVertex;</span>
   }
 
   public Edge getEdge() {
-<span class="fc" id="L56">    return edge;</span>
+<span class="fc" id="L58">    return edge;</span>
   }
 
   public Vertex getTargetVertex() {
-<span class="fc" id="L60">    return targetVertex;</span>
+<span class="fc" id="L62">    return targetVertex;</span>
   }
 
   @Override
   public boolean equals(Object o) {
-<span class="fc bfc" id="L65" title="All 2 branches covered.">    if (this == o) {</span>
-<span class="fc" id="L66">      return true;</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">    if (this == o) {</span>
+<span class="fc" id="L68">      return true;</span>
     }
-<span class="pc bpc" id="L68" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
-<span class="nc" id="L69">      return false;</span>
+<span class="pc bpc" id="L70" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L71">      return false;</span>
     }
 
-<span class="fc" id="L72">    Triple triple = (Triple) o;</span>
+<span class="fc" id="L74">    Triple triple = (Triple) o;</span>
 
-<span class="pc bpc" id="L74" title="3 of 4 branches missed.">    return edge != null ? edge.equals(triple.edge) : triple.edge == null;</span>
+<span class="fc" id="L76">    return Objects.equals(edge, triple.edge);</span>
   }
 
   @Override
   public int hashCode() {
-<span class="pc bpc" id="L79" title="1 of 2 branches missed.">    return edge != null ? edge.hashCode() : 0;</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">    return edge != null ? edge.hashCode() : 0;</span>
   }
 
   @Override
   public String toString() {
-<span class="nc" id="L84">    return &quot;Triple{&quot; + &quot;sourceVertex=&quot; + sourceVertex + &quot;, edge=&quot; + edge + &quot;, targetVertex=&quot; +</span>
+<span class="nc" id="L86">    return &quot;Triple{&quot; + &quot;sourceVertex=&quot; + sourceVertex + &quot;, edge=&quot; + edge + &quot;, targetVertex=&quot; +</span>
       targetVertex + '}';
   }
 }

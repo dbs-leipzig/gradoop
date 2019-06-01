@@ -160,37 +160,36 @@
 <a name="150" href="#150">150</a>         inVertices.add(vertex);
 <a name="151" href="#151">151</a>       }
 <a name="152" href="#152">152</a>     }
-<a name="153" href="#153">153</a>     Set&lt;GraphElement&gt; inEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="154" href="#154">154</a>     <strong class="jxr_keyword">for</strong> (Edge edge : edges0) {
-<a name="155" href="#155">155</a>       <strong class="jxr_keyword">if</strong> (edges2.contains(edge)) {
-<a name="156" href="#156">156</a>         inVertices.add(edge);
-<a name="157" href="#157">157</a>       }
-<a name="158" href="#158">158</a>     }
-<a name="159" href="#159">159</a> 
-<a name="160" href="#160">160</a>     Set&lt;GraphElement&gt; outVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="161" href="#161">161</a>     inVertices.addAll(outVertices);
-<a name="162" href="#162">162</a>     Set&lt;GraphElement&gt; outEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="163" href="#163">163</a>     inEdges.addAll(resEdges);
-<a name="164" href="#164">164</a> 
-<a name="165" href="#165">165</a>     checkElementMatches(inVertices, outVertices);
-<a name="166" href="#166">166</a>     checkElementMatches(inEdges, outEdges);
-<a name="167" href="#167">167</a>   }
-<a name="168" href="#168">168</a> 
-<a name="169" href="#169">169</a>   @Test
-<a name="170" href="#170">170</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testReduceCollection() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="171" href="#171">171</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">""</span> +
-<a name="172" href="#172">172</a>         <span class="jxr_string">"g1[(a)-[e1]-&gt;(b)]"</span> +
-<a name="173" href="#173">173</a>         <span class="jxr_string">"g2[(b)-[e2]-&gt;(c)]"</span> +
-<a name="174" href="#174">174</a>         <span class="jxr_string">"g3[(c)-[e3]-&gt;(d)]"</span> +
-<a name="175" href="#175">175</a>         <span class="jxr_string">"g4[(a)-[e1]-&gt;(b)]"</span> +
-<a name="176" href="#176">176</a>         <span class="jxr_string">"exp12[(b)]"</span> +
-<a name="177" href="#177">177</a>         <span class="jxr_string">"exp13[]"</span> +
-<a name="178" href="#178">178</a>         <span class="jxr_string">"exp14[(a)-[e1]-&gt;(b)]"</span>
-<a name="179" href="#179">179</a>       );
-<a name="180" href="#180">180</a> 
-<a name="181" href="#181">181</a>     checkExpectationsEqualResults(loader, <strong class="jxr_keyword">new</strong> ReduceOverlap());
-<a name="182" href="#182">182</a>   }
-<a name="183" href="#183">183</a> }
+<a name="153" href="#153">153</a>     <strong class="jxr_keyword">for</strong> (Edge edge : edges0) {
+<a name="154" href="#154">154</a>       <strong class="jxr_keyword">if</strong> (edges2.contains(edge)) {
+<a name="155" href="#155">155</a>         inVertices.add(edge);
+<a name="156" href="#156">156</a>       }
+<a name="157" href="#157">157</a>     }
+<a name="158" href="#158">158</a> 
+<a name="159" href="#159">159</a>     Set&lt;GraphElement&gt; outVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="160" href="#160">160</a>     inVertices.addAll(outVertices);
+<a name="161" href="#161">161</a>     Set&lt;GraphElement&gt; outEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="162" href="#162">162</a>     Set&lt;GraphElement&gt; inEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;(resEdges);
+<a name="163" href="#163">163</a> 
+<a name="164" href="#164">164</a>     checkElementMatches(inVertices, outVertices);
+<a name="165" href="#165">165</a>     checkElementMatches(inEdges, outEdges);
+<a name="166" href="#166">166</a>   }
+<a name="167" href="#167">167</a> 
+<a name="168" href="#168">168</a>   @Test
+<a name="169" href="#169">169</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testReduceCollection() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="170" href="#170">170</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">""</span> +
+<a name="171" href="#171">171</a>         <span class="jxr_string">"g1[(a)-[e1]-&gt;(b)]"</span> +
+<a name="172" href="#172">172</a>         <span class="jxr_string">"g2[(b)-[e2]-&gt;(c)]"</span> +
+<a name="173" href="#173">173</a>         <span class="jxr_string">"g3[(c)-[e3]-&gt;(d)]"</span> +
+<a name="174" href="#174">174</a>         <span class="jxr_string">"g4[(a)-[e1]-&gt;(b)]"</span> +
+<a name="175" href="#175">175</a>         <span class="jxr_string">"exp12[(b)]"</span> +
+<a name="176" href="#176">176</a>         <span class="jxr_string">"exp13[]"</span> +
+<a name="177" href="#177">177</a>         <span class="jxr_string">"exp14[(a)-[e1]-&gt;(b)]"</span>
+<a name="178" href="#178">178</a>       );
+<a name="179" href="#179">179</a> 
+<a name="180" href="#180">180</a>     checkExpectationsEqualResults(loader, <strong class="jxr_keyword">new</strong> ReduceOverlap());
+<a name="181" href="#181">181</a>   }
+<a name="182" href="#182">182</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

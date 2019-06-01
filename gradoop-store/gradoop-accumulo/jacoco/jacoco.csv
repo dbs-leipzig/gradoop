@@ -13,7 +13,7 @@ Gradoop Accumulo,org.gradoop.storage.impl.accumulo.constants,AccumuloTables,3,0,
 Gradoop Accumulo,org.gradoop.storage.impl.accumulo.constants,AccumuloTables.KEY,3,0,0,0,1,0,1,0,1,0
 Gradoop Accumulo,org.gradoop.storage.impl.accumulo.io.inputformats,EdgeInputFormat,0,51,0,0,0,10,0,5,0,5
 Gradoop Accumulo,org.gradoop.storage.impl.accumulo.io.inputformats,VertexInputFormat,0,51,0,0,0,10,0,5,0,5
-Gradoop Accumulo,org.gradoop.storage.impl.accumulo.io.inputformats,BaseInputFormat,11,246,2,12,3,60,2,12,0,7
+Gradoop Accumulo,org.gradoop.storage.impl.accumulo.io.inputformats,BaseInputFormat,11,243,2,12,3,60,2,12,0,7
 Gradoop Accumulo,org.gradoop.storage.impl.accumulo.io.inputformats,GraphHeadInputFormat,0,51,0,0,0,10,0,5,0,5
 Gradoop Accumulo,org.gradoop.storage.impl.accumulo.predicate.query,AccumuloQueryHolder,66,60,8,2,10,17,8,4,3,4
 Gradoop Accumulo,org.gradoop.storage.impl.accumulo.predicate.query,AccumuloQueryHolder.RangeWrapper,12,8,0,0,4,2,0,2,0,2

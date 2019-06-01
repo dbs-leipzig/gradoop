@@ -19,6 +19,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.s1ck.gdl.model.predicates.booleans.Or;
 
+import java.util.Objects;
+
 /**
  * Wraps an {@link org.s1ck.gdl.model.predicates.booleans.Or} predicate
  */
@@ -32,16 +34,16 @@ public class OrPredicate extends QueryPredicate {
    * Creates a new or wrapper
    * @param or the wrapped or predicate
    */
-<span class="fc" id="L35">  public OrPredicate(Or or) {</span>
-<span class="fc" id="L36">    this.or = or;</span>
-<span class="fc" id="L37">  }</span>
+<span class="fc" id="L37">  public OrPredicate(Or or) {</span>
+<span class="fc" id="L38">    this.or = or;</span>
+<span class="fc" id="L39">  }</span>
 
   /**
    * Converts the predicate into conjunctive normal form
    * @return predicate in cnf
    */
   public CNF asCNF() {
-<span class="fc" id="L44">    return getLhs().asCNF().or(getRhs().asCNF());</span>
+<span class="fc" id="L46">    return getLhs().asCNF().or(getRhs().asCNF());</span>
   }
 
   /**
@@ -49,7 +51,7 @@ public class OrPredicate extends QueryPredicate {
    * @return the left hand side predicate
    */
   public QueryPredicate getLhs() {
-<span class="fc" id="L52">    return QueryPredicate.createFrom(or.getArguments()[0]);</span>
+<span class="fc" id="L54">    return QueryPredicate.createFrom(or.getArguments()[0]);</span>
   }
 
   /**
@@ -57,26 +59,26 @@ public class OrPredicate extends QueryPredicate {
    * @return the right hand side predicate
    */
   public QueryPredicate getRhs() {
-<span class="fc" id="L60">    return QueryPredicate.createFrom(or.getArguments()[1]);</span>
+<span class="fc" id="L62">    return QueryPredicate.createFrom(or.getArguments()[1]);</span>
   }
 
   @Override
   public boolean equals(Object o) {
-<span class="nc bnc" id="L65" title="All 2 branches missed.">    if (this == o) {</span>
-<span class="nc" id="L66">      return true;</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L68">      return true;</span>
     }
-<span class="nc bnc" id="L68" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
-<span class="nc" id="L69">      return false;</span>
+<span class="nc bnc" id="L70" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L71">      return false;</span>
     }
 
-<span class="nc" id="L72">    OrPredicate orPredicateWrapper = (OrPredicate) o;</span>
+<span class="nc" id="L74">    OrPredicate orPredicateWrapper = (OrPredicate) o;</span>
 
-<span class="nc bnc" id="L74" title="All 4 branches missed.">    return or != null ? or.equals(orPredicateWrapper.or) : orPredicateWrapper.or == null;</span>
+<span class="nc" id="L76">    return Objects.equals(or, orPredicateWrapper.or);</span>
   }
 
   @Override
   public int hashCode() {
-<span class="nc bnc" id="L79" title="All 2 branches missed.">    return or != null ? or.hashCode() : 0;</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">    return or != null ? or.hashCode() : 0;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

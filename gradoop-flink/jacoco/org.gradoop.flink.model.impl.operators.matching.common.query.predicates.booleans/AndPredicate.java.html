@@ -19,6 +19,8 @@ import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.C
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryPredicate;
 import org.s1ck.gdl.model.predicates.booleans.And;
 
+import java.util.Objects;
+
 /**
  * Wraps an {@link org.s1ck.gdl.model.predicates.booleans.And} predicate
  */
@@ -32,17 +34,17 @@ public class AndPredicate extends QueryPredicate {
    * Returns a new AndPredicate
    * @param and the predicate
    */
-<span class="fc" id="L35">  public AndPredicate(And and) {</span>
-<span class="fc" id="L36">    this.and = and;</span>
-<span class="fc" id="L37">  }</span>
+<span class="fc" id="L37">  public AndPredicate(And and) {</span>
+<span class="fc" id="L38">    this.and = and;</span>
+<span class="fc" id="L39">  }</span>
 
   /**
    * Converts the predicate into conjunctive normal form
    * @return predicate in CNF
    */
   public CNF asCNF() {
-<span class="fc" id="L44">    return getLhs().asCNF()</span>
-<span class="fc" id="L45">      .and(getRhs().asCNF());</span>
+<span class="fc" id="L46">    return getLhs().asCNF()</span>
+<span class="fc" id="L47">      .and(getRhs().asCNF());</span>
   }
 
   /**
@@ -50,7 +52,7 @@ public class AndPredicate extends QueryPredicate {
    * @return the left hand side
    */
   public QueryPredicate getLhs() {
-<span class="fc" id="L53">    return QueryPredicate.createFrom(and.getArguments()[0]);</span>
+<span class="fc" id="L55">    return QueryPredicate.createFrom(and.getArguments()[0]);</span>
   }
 
   /**
@@ -58,26 +60,26 @@ public class AndPredicate extends QueryPredicate {
    * @return the right hand side
    */
   public QueryPredicate getRhs() {
-<span class="fc" id="L61">    return QueryPredicate.createFrom(and.getArguments()[1]);</span>
+<span class="fc" id="L63">    return QueryPredicate.createFrom(and.getArguments()[1]);</span>
   }
 
   @Override
   public boolean equals(Object o) {
-<span class="nc bnc" id="L66" title="All 2 branches missed.">    if (this == o) {</span>
-<span class="nc" id="L67">      return true;</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L69">      return true;</span>
     }
-<span class="nc bnc" id="L69" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
-<span class="nc" id="L70">      return false;</span>
+<span class="nc bnc" id="L71" title="All 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L72">      return false;</span>
     }
 
-<span class="nc" id="L73">    AndPredicate that = (AndPredicate) o;</span>
+<span class="nc" id="L75">    AndPredicate that = (AndPredicate) o;</span>
 
-<span class="nc bnc" id="L75" title="All 4 branches missed.">    return and != null ? and.equals(that.and) : that.and == null;</span>
+<span class="nc" id="L77">    return Objects.equals(and, that.and);</span>
   }
 
   @Override
   public int hashCode() {
-<span class="nc bnc" id="L80" title="All 2 branches missed.">    return and != null ? and.hashCode() : 0;</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">    return and != null ? and.hashCode() : 0;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

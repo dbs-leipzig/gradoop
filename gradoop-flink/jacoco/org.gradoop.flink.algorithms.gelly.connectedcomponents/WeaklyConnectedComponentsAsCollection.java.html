@@ -15,10 +15,9 @@
  */
 package org.gradoop.flink.algorithms.gelly.connectedcomponents;
 
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
-import org.gradoop.flink.model.impl.functions.epgm.PropertyRemover;
 
 /**
  * Computes the weakly connected components of a graph. Uses the gradoop wrapper
@@ -50,8 +49,8 @@ public class WeaklyConnectedComponentsAsCollection implements UnaryGraphToCollec
    *                      {@link AnnotateWeaklyConnectedComponents}.
    */
   public WeaklyConnectedComponentsAsCollection(int maxIterations) {
-<span class="nc" id="L53">    this(DEFAULT_PROPERTY_KEY, maxIterations);</span>
-<span class="nc" id="L54">  }</span>
+<span class="nc" id="L52">    this(DEFAULT_PROPERTY_KEY, maxIterations);</span>
+<span class="nc" id="L53">  }</span>
 
   /**
    * Initialize the operator.
@@ -60,23 +59,18 @@ public class WeaklyConnectedComponentsAsCollection implements UnaryGraphToCollec
    * @param maxIterations Maximum number of iteration for
    *                      {@link AnnotateWeaklyConnectedComponents}.
    */
-<span class="fc" id="L63">  public WeaklyConnectedComponentsAsCollection(String propertyKey, int maxIterations) {</span>
-<span class="fc" id="L64">    this.propertyKey = propertyKey;</span>
-<span class="fc" id="L65">    this.maxIterations = maxIterations;</span>
-<span class="fc" id="L66">  }</span>
+<span class="fc" id="L62">  public WeaklyConnectedComponentsAsCollection(String propertyKey, int maxIterations) {</span>
+<span class="fc" id="L63">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L64">    this.maxIterations = maxIterations;</span>
+<span class="fc" id="L65">  }</span>
 
   @Override
   public GraphCollection execute(LogicalGraph graph) {
 
-<span class="fc" id="L71">    LogicalGraph graphWithWccIds = graph.callForGraph(new AnnotateWeaklyConnectedComponents(</span>
-      propertyKey, maxIterations));
+<span class="fc" id="L70">    LogicalGraph graphWithWccIds = graph.callForGraph(</span>
+      new AnnotateWeaklyConnectedComponents(propertyKey, maxIterations));
 
-<span class="fc" id="L74">    GraphCollection split = graphWithWccIds.splitBy(propertyKey);</span>
-
-<span class="fc" id="L76">    return graph.getConfig().getGraphCollectionFactory().fromDataSets(</span>
-<span class="fc" id="L77">      split.getGraphHeads(),</span>
-<span class="fc" id="L78">      split.getVertices().map(new PropertyRemover&lt;&gt;(propertyKey)),</span>
-<span class="fc" id="L79">      split.getEdges().map(new PropertyRemover&lt;&gt;(propertyKey)));</span>
+<span class="fc" id="L73">    return graphWithWccIds.splitBy(propertyKey);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

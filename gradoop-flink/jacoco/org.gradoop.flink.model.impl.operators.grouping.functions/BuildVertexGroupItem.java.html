@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.grouping.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 
@@ -30,12 +30,13 @@ import java.util.List;
  *
  * The output of that mapper is {@link VertexGroupItem} that contains the vertex id,
  * vertex label, vertex group properties and vertex aggregate properties.
+ *
+ * @param &lt;V&gt; The vertex type.
  */
 @FunctionAnnotation.ForwardedFields(&quot;id-&gt;f0&quot;)
 @FunctionAnnotation.ReadFields(&quot;label;properties&quot;)
-public class BuildVertexGroupItem
-  extends BuildGroupItemBase
-  implements FlatMapFunction&lt;Vertex, VertexGroupItem&gt; {
+public class BuildVertexGroupItem&lt;V extends EPGMVertex&gt; extends BuildGroupItemBase
+  implements FlatMapFunction&lt;V, VertexGroupItem&gt; {
 
   /**
    * Reduce object instantiations.
@@ -49,32 +50,32 @@ public class BuildVertexGroupItem
    * @param vertexLabelGroups stores grouping properties for vertex labels
    */
   public BuildVertexGroupItem(boolean useLabel, List&lt;LabelGroup&gt; vertexLabelGroups) {
-<span class="fc" id="L52">    super(useLabel, vertexLabelGroups);</span>
+<span class="fc" id="L53">    super(useLabel, vertexLabelGroups);</span>
 
-<span class="fc" id="L54">    this.reuseVertexGroupItem = new VertexGroupItem();</span>
-<span class="fc" id="L55">    this.reuseVertexGroupItem.setSuperVertexId(GradoopId.NULL_VALUE);</span>
-<span class="fc" id="L56">    this.reuseVertexGroupItem.setSuperVertex(false);</span>
-<span class="fc" id="L57">  }</span>
+<span class="fc" id="L55">    this.reuseVertexGroupItem = new VertexGroupItem();</span>
+<span class="fc" id="L56">    this.reuseVertexGroupItem.setSuperVertexId(GradoopId.NULL_VALUE);</span>
+<span class="fc" id="L57">    this.reuseVertexGroupItem.setSuperVertex(false);</span>
+<span class="fc" id="L58">  }</span>
 
   @Override
-  public void flatMap(Vertex vertex, Collector&lt;VertexGroupItem&gt; collector) throws Exception {
-<span class="fc" id="L61">    boolean usedVertexLabelGroup = false;</span>
+  public void flatMap(V vertex, Collector&lt;VertexGroupItem&gt; collector) throws Exception {
+<span class="fc" id="L62">    boolean usedVertexLabelGroup = false;</span>
 
-<span class="fc" id="L63">    reuseVertexGroupItem.setVertexId(vertex.getId());</span>
+<span class="fc" id="L64">    reuseVertexGroupItem.setVertexId(vertex.getId());</span>
 
     // check if vertex shall be grouped by a special set of keys
-<span class="fc bfc" id="L66" title="All 2 branches covered.">    for (LabelGroup vertexLabelGroup : getLabelGroups()) {</span>
-<span class="fc bfc" id="L67" title="All 2 branches covered.">      if (vertexLabelGroup.getGroupingLabel().equals(vertex.getLabel())) {</span>
-<span class="fc" id="L68">        usedVertexLabelGroup = true;</span>
-<span class="fc" id="L69">        setGroupItem(reuseVertexGroupItem, vertex, vertexLabelGroup);</span>
-<span class="fc" id="L70">        collector.collect(reuseVertexGroupItem);</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">    for (LabelGroup vertexLabelGroup : getLabelGroups()) {</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">      if (vertexLabelGroup.getGroupingLabel().equals(vertex.getLabel())) {</span>
+<span class="fc" id="L69">        usedVertexLabelGroup = true;</span>
+<span class="fc" id="L70">        setGroupItem(reuseVertexGroupItem, vertex, vertexLabelGroup);</span>
+<span class="fc" id="L71">        collector.collect(reuseVertexGroupItem);</span>
       }
-<span class="fc" id="L72">    }</span>
+<span class="fc" id="L73">    }</span>
     // standard grouping case
-<span class="fc bfc" id="L74" title="All 2 branches covered.">    if (!usedVertexLabelGroup) {</span>
-<span class="fc" id="L75">      setGroupItem(reuseVertexGroupItem, vertex, getDefaultLabelGroup());</span>
-<span class="fc" id="L76">      collector.collect(reuseVertexGroupItem);</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">    if (!usedVertexLabelGroup) {</span>
+<span class="fc" id="L76">      setGroupItem(reuseVertexGroupItem, vertex, getDefaultLabelGroup());</span>
+<span class="fc" id="L77">      collector.collect(reuseVertexGroupItem);</span>
     }
-<span class="fc" id="L78">  }</span>
+<span class="fc" id="L79">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

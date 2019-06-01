@@ -53,12 +53,11 @@ public class GradoopConfig
   /**
    * Creates a new Configuration.
    */
-  @SuppressWarnings(&quot;unchecked&quot;)
-<span class="fc" id="L57">  protected GradoopConfig() {</span>
-<span class="fc" id="L58">    this.graphHeadFactory = new GraphHeadFactory();</span>
-<span class="fc" id="L59">    this.vertexFactory = new VertexFactory();</span>
-<span class="fc" id="L60">    this.edgeFactory = new EdgeFactory();</span>
-<span class="fc" id="L61">  }</span>
+<span class="fc" id="L56">  protected GradoopConfig() {</span>
+<span class="fc" id="L57">    this.graphHeadFactory = new GraphHeadFactory();</span>
+<span class="fc" id="L58">    this.vertexFactory = new VertexFactory();</span>
+<span class="fc" id="L59">    this.edgeFactory = new EdgeFactory();</span>
+<span class="fc" id="L60">  }</span>
 
   /**
    * Creates a default Configuration using POJO handlers for vertices, edges
@@ -67,19 +66,19 @@ public class GradoopConfig
    * @return Default Gradoop configuration.
    */
   public static GradoopConfig&lt;GraphHead, Vertex, Edge&gt; getDefaultConfig() {
-<span class="fc" id="L70">    return new GradoopConfig&lt;&gt;();</span>
+<span class="fc" id="L69">    return new GradoopConfig&lt;&gt;();</span>
   }
 
   public GraphHeadFactory getGraphHeadFactory() {
-<span class="fc" id="L74">    return graphHeadFactory;</span>
+<span class="fc" id="L73">    return graphHeadFactory;</span>
   }
 
   public VertexFactory getVertexFactory() {
-<span class="fc" id="L78">    return vertexFactory;</span>
+<span class="fc" id="L77">    return vertexFactory;</span>
   }
 
   public EdgeFactory getEdgeFactory() {
-<span class="fc" id="L82">    return edgeFactory;</span>
+<span class="fc" id="L81">    return edgeFactory;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

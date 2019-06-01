@@ -74,190 +74,189 @@
 <a name="64" href="#64">64</a>  <em class="jxr_javadoccomment">   * @param mayOverlap    elements may be contained in multiple graphs</em>
 <a name="65" href="#65">65</a>  <em class="jxr_javadoccomment">   * @return Graph collection</em>
 <a name="66" href="#66">66</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="67" href="#67">67</a>    @SuppressWarnings(<span class="jxr_string">"unchecked"</span>)
-<a name="68" href="#68">68</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> extractGraphCollection(
-<a name="69" href="#69">69</a>      DataSet&lt;Element&gt; elements, <a href="../../../../../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a> config, <strong class="jxr_keyword">boolean</strong> mayOverlap) {
-<a name="70" href="#70">70</a>  
-<a name="71" href="#71">71</a>      Class&lt;GraphHead&gt; graphHeadType = config.getGraphHeadFactory().getType();
-<a name="72" href="#72">72</a>      Class&lt;Vertex&gt; vertexType = config.getVertexFactory().getType();
-<a name="73" href="#73">73</a>      Class&lt;Edge&gt; edgeType = config.getEdgeFactory().getType();
-<a name="74" href="#74">74</a>      <strong class="jxr_keyword">return</strong> config.getGraphCollectionFactory().fromDataSets(
-<a name="75" href="#75">75</a>        extractGraphHeads(elements, graphHeadType),
-<a name="76" href="#76">76</a>        extractVertices(elements, vertexType, mayOverlap),
-<a name="77" href="#77">77</a>        extractEdges(elements, edgeType, mayOverlap)
-<a name="78" href="#78">78</a>      );
-<a name="79" href="#79">79</a>    }
-<a name="80" href="#80">80</a>  
-<a name="81" href="#81">81</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="82" href="#82">82</a>  <em class="jxr_javadoccomment">   * Extracts a {@link GraphCollection} from a set of {@link Element} and</em>
-<a name="83" href="#83">83</a>  <em class="jxr_javadoccomment">   * attaches the original data from the input {@link LogicalGraph}.</em>
-<a name="84" href="#84">84</a>  <em class="jxr_javadoccomment">   *</em>
-<a name="85" href="#85">85</a>  <em class="jxr_javadoccomment">   * @param elements      EPGM elements</em>
-<a name="86" href="#86">86</a>  <em class="jxr_javadoccomment">   * @param inputGraph    original input graph</em>
-<a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   * @param mayOverlap    true, if elements may be contained in multiple graphs</em>
-<a name="88" href="#88">88</a>  <em class="jxr_javadoccomment">   * @return Graph collection</em>
-<a name="89" href="#89">89</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="90" href="#90">90</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> extractGraphCollectionWithData(
-<a name="91" href="#91">91</a>      DataSet&lt;Element&gt; elements, <a href="../../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> inputGraph, <strong class="jxr_keyword">boolean</strong> mayOverlap) {
-<a name="92" href="#92">92</a>  
-<a name="93" href="#93">93</a>      <a href="../../../../../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a> config = inputGraph.getConfig();
-<a name="94" href="#94">94</a>  
-<a name="95" href="#95">95</a>      <em class="jxr_comment">// get result collection without data</em>
-<a name="96" href="#96">96</a>      <a href="../../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> collection = extractGraphCollection(elements, config, mayOverlap);
-<a name="97" href="#97">97</a>  
-<a name="98" href="#98">98</a>      <em class="jxr_comment">// attach data by joining first and merging the graph head ids</em>
-<a name="99" href="#99">99</a>      DataSet&lt;Vertex&gt; newVertices = inputGraph.getVertices()
-<a name="100" href="#100">100</a>       .rightOuterJoin(collection.getVertices())
-<a name="101" href="#101">101</a>       .where(<strong class="jxr_keyword">new</strong> Id&lt;&gt;()).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
-<a name="102" href="#102">102</a>       .with(<strong class="jxr_keyword">new</strong> MergedGraphIds&lt;&gt;())
-<a name="103" href="#103">103</a>       .withForwardedFieldsFirst(<span class="jxr_string">"id;label;properties;"</span>);
+<a name="67" href="#67">67</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> extractGraphCollection(
+<a name="68" href="#68">68</a>      DataSet&lt;Element&gt; elements, <a href="../../../../../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a> config, <strong class="jxr_keyword">boolean</strong> mayOverlap) {
+<a name="69" href="#69">69</a>  
+<a name="70" href="#70">70</a>      Class&lt;GraphHead&gt; graphHeadType = config.getGraphHeadFactory().getType();
+<a name="71" href="#71">71</a>      Class&lt;Vertex&gt; vertexType = config.getVertexFactory().getType();
+<a name="72" href="#72">72</a>      Class&lt;Edge&gt; edgeType = config.getEdgeFactory().getType();
+<a name="73" href="#73">73</a>      <strong class="jxr_keyword">return</strong> config.getGraphCollectionFactory().fromDataSets(
+<a name="74" href="#74">74</a>        extractGraphHeads(elements, graphHeadType),
+<a name="75" href="#75">75</a>        extractVertices(elements, vertexType, mayOverlap),
+<a name="76" href="#76">76</a>        extractEdges(elements, edgeType, mayOverlap)
+<a name="77" href="#77">77</a>      );
+<a name="78" href="#78">78</a>    }
+<a name="79" href="#79">79</a>  
+<a name="80" href="#80">80</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="81" href="#81">81</a>  <em class="jxr_javadoccomment">   * Extracts a {@link GraphCollection} from a set of {@link Element} and</em>
+<a name="82" href="#82">82</a>  <em class="jxr_javadoccomment">   * attaches the original data from the input {@link LogicalGraph}.</em>
+<a name="83" href="#83">83</a>  <em class="jxr_javadoccomment">   *</em>
+<a name="84" href="#84">84</a>  <em class="jxr_javadoccomment">   * @param elements      EPGM elements</em>
+<a name="85" href="#85">85</a>  <em class="jxr_javadoccomment">   * @param inputGraph    original input graph</em>
+<a name="86" href="#86">86</a>  <em class="jxr_javadoccomment">   * @param mayOverlap    true, if elements may be contained in multiple graphs</em>
+<a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   * @return Graph collection</em>
+<a name="88" href="#88">88</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="89" href="#89">89</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> extractGraphCollectionWithData(
+<a name="90" href="#90">90</a>      DataSet&lt;Element&gt; elements, <a href="../../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> inputGraph, <strong class="jxr_keyword">boolean</strong> mayOverlap) {
+<a name="91" href="#91">91</a>  
+<a name="92" href="#92">92</a>      <a href="../../../../../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a> config = inputGraph.getConfig();
+<a name="93" href="#93">93</a>  
+<a name="94" href="#94">94</a>      <em class="jxr_comment">// get result collection without data</em>
+<a name="95" href="#95">95</a>      <a href="../../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> collection = extractGraphCollection(elements, config, mayOverlap);
+<a name="96" href="#96">96</a>  
+<a name="97" href="#97">97</a>      <em class="jxr_comment">// attach data by joining first and merging the graph head ids</em>
+<a name="98" href="#98">98</a>      DataSet&lt;Vertex&gt; newVertices = inputGraph.getVertices()
+<a name="99" href="#99">99</a>        .rightOuterJoin(collection.getVertices())
+<a name="100" href="#100">100</a>       .where(<strong class="jxr_keyword">new</strong> Id&lt;&gt;()).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
+<a name="101" href="#101">101</a>       .with(<strong class="jxr_keyword">new</strong> MergedGraphIds&lt;&gt;())
+<a name="102" href="#102">102</a>       .withForwardedFieldsFirst(<span class="jxr_string">"id;label;properties;"</span>);
+<a name="103" href="#103">103</a> 
 <a name="104" href="#104">104</a> 
-<a name="105" href="#105">105</a> 
-<a name="106" href="#106">106</a>     DataSet&lt;Edge&gt; newEdges = inputGraph.getEdges()
-<a name="107" href="#107">107</a>       .rightOuterJoin(collection.getEdges())
-<a name="108" href="#108">108</a>       .where(<strong class="jxr_keyword">new</strong> Id&lt;&gt;()).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
-<a name="109" href="#109">109</a>       .with(<strong class="jxr_keyword">new</strong> MergedGraphIds&lt;&gt;())
-<a name="110" href="#110">110</a>       .withForwardedFieldsFirst(<span class="jxr_string">"id;label;properties"</span>);
-<a name="111" href="#111">111</a> 
-<a name="112" href="#112">112</a>     <strong class="jxr_keyword">return</strong> config.getGraphCollectionFactory().fromDataSets(
-<a name="113" href="#113">113</a>       collection.getGraphHeads(), newVertices, newEdges);
-<a name="114" href="#114">114</a>   }
-<a name="115" href="#115">115</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="116" href="#116">116</a> <em class="jxr_javadoccomment">   * Extracts vertex ids from the given pattern matching result.</em>
-<a name="117" href="#117">117</a> <em class="jxr_javadoccomment">   *</em>
-<a name="118" href="#118">118</a> <em class="jxr_javadoccomment">   * @param result pattern matching result</em>
-<a name="119" href="#119">119</a> <em class="jxr_javadoccomment">   * @return dataset with (vertexId) tuples</em>
-<a name="120" href="#120">120</a> <em class="jxr_javadoccomment">   */</em>
-<a name="121" href="#121">121</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; extractVertexIds(
-<a name="122" href="#122">122</a>     DataSet&lt;FatVertex&gt; result) {
-<a name="123" href="#123">123</a>     <strong class="jxr_keyword">return</strong> result.project(0);
-<a name="124" href="#124">124</a>   }
-<a name="125" href="#125">125</a> 
-<a name="126" href="#126">126</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="127" href="#127">127</a> <em class="jxr_javadoccomment">   * Extracts edge-source-target id triples from the given pattern matching</em>
-<a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   * result.</em>
-<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   *</em>
-<a name="130" href="#130">130</a> <em class="jxr_javadoccomment">   * @param result pattern matching result</em>
-<a name="131" href="#131">131</a> <em class="jxr_javadoccomment">   * @return dataset with (edgeId, sourceId, targetId) tuples</em>
-<a name="132" href="#132">132</a> <em class="jxr_javadoccomment">   */</em>
-<a name="133" href="#133">133</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Tuple3&lt;GradoopId, GradoopId, GradoopId&gt;&gt; extractEdgeIds(
-<a name="134" href="#134">134</a>     DataSet&lt;FatVertex&gt; result) {
-<a name="135" href="#135">135</a>     <strong class="jxr_keyword">return</strong> result.flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/simulation/dual/functions/EdgeTriple.html">EdgeTriple</a>());
-<a name="136" href="#136">136</a>   }
-<a name="137" href="#137">137</a> 
-<a name="138" href="#138">138</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="139" href="#139">139</a> <em class="jxr_javadoccomment">   * Filters and casts EPGM graph heads from a given set of {@link Element}</em>
-<a name="140" href="#140">140</a> <em class="jxr_javadoccomment">   *</em>
-<a name="141" href="#141">141</a> <em class="jxr_javadoccomment">   * @param elements      EPGM elements</em>
-<a name="142" href="#142">142</a> <em class="jxr_javadoccomment">   * @param graphHeadType graph head type</em>
-<a name="143" href="#143">143</a> <em class="jxr_javadoccomment">   * @return EPGM graph heads</em>
-<a name="144" href="#144">144</a> <em class="jxr_javadoccomment">   */</em>
-<a name="145" href="#145">145</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;GraphHead&gt; extractGraphHeads(DataSet&lt;Element&gt; elements,
-<a name="146" href="#146">146</a>     Class&lt;GraphHead&gt; graphHeadType) {
-<a name="147" href="#147">147</a>     <strong class="jxr_keyword">return</strong> elements
-<a name="148" href="#148">148</a>       .filter(<strong class="jxr_keyword">new</strong> IsInstance&lt;&gt;(graphHeadType))
-<a name="149" href="#149">149</a>       .map(<strong class="jxr_keyword">new</strong> Cast&lt;&gt;(graphHeadType))
-<a name="150" href="#150">150</a>       .returns(TypeExtractor.createTypeInfo(graphHeadType));
-<a name="151" href="#151">151</a>   }
-<a name="152" href="#152">152</a> 
-<a name="153" href="#153">153</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="154" href="#154">154</a> <em class="jxr_javadoccomment">   * Initializes EPGM vertices from the given pattern matching result.</em>
-<a name="155" href="#155">155</a> <em class="jxr_javadoccomment">   *</em>
-<a name="156" href="#156">156</a> <em class="jxr_javadoccomment">   * @param result        pattern matching result</em>
-<a name="157" href="#157">157</a> <em class="jxr_javadoccomment">   * @param epgmVertexFactory EPGM vertex factory</em>
-<a name="158" href="#158">158</a> <em class="jxr_javadoccomment">   * @return EPGM vertices</em>
-<a name="159" href="#159">159</a> <em class="jxr_javadoccomment">   */</em>
-<a name="160" href="#160">160</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Vertex&gt; extractVertices(DataSet&lt;FatVertex&gt; result,
-<a name="161" href="#161">161</a>                                                 EPGMVertexFactory&lt;Vertex&gt; epgmVertexFactory) {
-<a name="162" href="#162">162</a>     <strong class="jxr_keyword">return</strong> extractVertexIds(result).map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/functions/epgm/VertexFromId.html">VertexFromId</a>(epgmVertexFactory));
-<a name="163" href="#163">163</a>   }
-<a name="164" href="#164">164</a> 
-<a name="165" href="#165">165</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="166" href="#166">166</a> <em class="jxr_javadoccomment">   * Filters and casts EPGM vertices from a given set of {@link Element}</em>
-<a name="167" href="#167">167</a> <em class="jxr_javadoccomment">   *</em>
-<a name="168" href="#168">168</a> <em class="jxr_javadoccomment">   * @param elements  EPGM elements</em>
-<a name="169" href="#169">169</a> <em class="jxr_javadoccomment">   * @param vertexType    vertex type</em>
-<a name="170" href="#170">170</a> <em class="jxr_javadoccomment">   * @param mayOverlap    vertices may be contained in multiple graphs</em>
-<a name="171" href="#171">171</a> <em class="jxr_javadoccomment">   * @return EPGM vertices</em>
-<a name="172" href="#172">172</a> <em class="jxr_javadoccomment">   */</em>
-<a name="173" href="#173">173</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Vertex&gt; extractVertices(DataSet&lt;Element&gt; elements,
-<a name="174" href="#174">174</a>     Class&lt;Vertex&gt; vertexType, <strong class="jxr_keyword">boolean</strong> mayOverlap) {
-<a name="175" href="#175">175</a>     DataSet&lt;Vertex&gt; result = elements
-<a name="176" href="#176">176</a>       .filter(<strong class="jxr_keyword">new</strong> IsInstance&lt;&gt;(vertexType))
-<a name="177" href="#177">177</a>       .map(<strong class="jxr_keyword">new</strong> Cast&lt;&gt;(vertexType))
-<a name="178" href="#178">178</a>       .returns(TypeExtractor.createTypeInfo(vertexType));
-<a name="179" href="#179">179</a>     <strong class="jxr_keyword">return</strong> mayOverlap ? result
-<a name="180" href="#180">180</a>       .groupBy(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
-<a name="181" href="#181">181</a>       .combineGroup(<strong class="jxr_keyword">new</strong> MergedGraphIds&lt;&gt;())
-<a name="182" href="#182">182</a>       .groupBy(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
-<a name="183" href="#183">183</a>       .reduceGroup(<strong class="jxr_keyword">new</strong> MergedGraphIds&lt;&gt;()) : result;
-<a name="184" href="#184">184</a>   }
-<a name="185" href="#185">185</a> 
-<a name="186" href="#186">186</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="187" href="#187">187</a> <em class="jxr_javadoccomment">   * Initializes EPGM edges from the given pattern matching result.</em>
-<a name="188" href="#188">188</a> <em class="jxr_javadoccomment">   *</em>
-<a name="189" href="#189">189</a> <em class="jxr_javadoccomment">   * @param result      pattern matching result</em>
-<a name="190" href="#190">190</a> <em class="jxr_javadoccomment">   * @param epgmEdgeFactory EPGM edge factory</em>
-<a name="191" href="#191">191</a> <em class="jxr_javadoccomment">   * @return EPGM edges</em>
-<a name="192" href="#192">192</a> <em class="jxr_javadoccomment">   */</em>
-<a name="193" href="#193">193</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Edge&gt; extractEdges(DataSet&lt;FatVertex&gt; result,
-<a name="194" href="#194">194</a>     EPGMEdgeFactory&lt;Edge&gt; epgmEdgeFactory) {
-<a name="195" href="#195">195</a>     <strong class="jxr_keyword">return</strong> extractEdgeIds(result).map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/functions/epgm/EdgeFromIds.html">EdgeFromIds</a>(epgmEdgeFactory));
-<a name="196" href="#196">196</a>   }
-<a name="197" href="#197">197</a> 
-<a name="198" href="#198">198</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="199" href="#199">199</a> <em class="jxr_javadoccomment">   * Filters and casts EPGM edges from a given set of {@link Element}</em>
-<a name="200" href="#200">200</a> <em class="jxr_javadoccomment">   *</em>
-<a name="201" href="#201">201</a> <em class="jxr_javadoccomment">   * @param elements      EPGM elements</em>
-<a name="202" href="#202">202</a> <em class="jxr_javadoccomment">   * @param edgeType      edge type</em>
-<a name="203" href="#203">203</a> <em class="jxr_javadoccomment">   * @param mayOverlap    edges may be contained in multiple graphs</em>
-<a name="204" href="#204">204</a> <em class="jxr_javadoccomment">   * @return EPGM edges</em>
-<a name="205" href="#205">205</a> <em class="jxr_javadoccomment">   */</em>
-<a name="206" href="#206">206</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Edge&gt; extractEdges(DataSet&lt;Element&gt; elements,
-<a name="207" href="#207">207</a>     Class&lt;Edge&gt; edgeType, <strong class="jxr_keyword">boolean</strong> mayOverlap) {
-<a name="208" href="#208">208</a>     DataSet&lt;Edge&gt; result = elements
-<a name="209" href="#209">209</a>       .filter(<strong class="jxr_keyword">new</strong> IsInstance&lt;&gt;(edgeType))
-<a name="210" href="#210">210</a>       .map(<strong class="jxr_keyword">new</strong> Cast&lt;&gt;(edgeType))
-<a name="211" href="#211">211</a>       .returns(TypeExtractor.createTypeInfo(edgeType));
-<a name="212" href="#212">212</a> 
-<a name="213" href="#213">213</a>     <strong class="jxr_keyword">return</strong> mayOverlap ? result
-<a name="214" href="#214">214</a>       .groupBy(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
-<a name="215" href="#215">215</a>       .combineGroup(<strong class="jxr_keyword">new</strong> MergedGraphIds&lt;&gt;()).groupBy(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
-<a name="216" href="#216">216</a>       .reduceGroup(<strong class="jxr_keyword">new</strong> MergedGraphIds&lt;&gt;()) : result;
-<a name="217" href="#217">217</a>   }
-<a name="218" href="#218">218</a> 
-<a name="219" href="#219">219</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="220" href="#220">220</a> <em class="jxr_javadoccomment">   * Initializes EPGM vertices including their original data from the given</em>
-<a name="221" href="#221">221</a> <em class="jxr_javadoccomment">   * pattern matching result.</em>
-<a name="222" href="#222">222</a> <em class="jxr_javadoccomment">   *</em>
-<a name="223" href="#223">223</a> <em class="jxr_javadoccomment">   * @param result        pattern matching result</em>
-<a name="224" href="#224">224</a> <em class="jxr_javadoccomment">   * @param inputVertices original data graph vertices</em>
-<a name="225" href="#225">225</a> <em class="jxr_javadoccomment">   * @return EPGM vertices including data</em>
-<a name="226" href="#226">226</a> <em class="jxr_javadoccomment">   */</em>
-<a name="227" href="#227">227</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Vertex&gt; extractVerticesWithData(
-<a name="228" href="#228">228</a>     DataSet&lt;FatVertex&gt; result, DataSet&lt;Vertex&gt; inputVertices) {
-<a name="229" href="#229">229</a>     <strong class="jxr_keyword">return</strong> extractVertexIds(result)
-<a name="230" href="#230">230</a>       .join(inputVertices)
-<a name="231" href="#231">231</a>       .where(0).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
-<a name="232" href="#232">232</a>       .with(<strong class="jxr_keyword">new</strong> RightSide&lt;&gt;());
-<a name="233" href="#233">233</a>   }
-<a name="234" href="#234">234</a> 
-<a name="235" href="#235">235</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="236" href="#236">236</a> <em class="jxr_javadoccomment">   * Initializes EPGM edges including their original data from the given pattern</em>
-<a name="237" href="#237">237</a> <em class="jxr_javadoccomment">   * matching result.</em>
-<a name="238" href="#238">238</a> <em class="jxr_javadoccomment">   *</em>
-<a name="239" href="#239">239</a> <em class="jxr_javadoccomment">   * @param result      pattern matching result</em>
-<a name="240" href="#240">240</a> <em class="jxr_javadoccomment">   * @param inputEdges  original data graph edges</em>
-<a name="241" href="#241">241</a> <em class="jxr_javadoccomment">   * @return EPGM edges including data</em>
-<a name="242" href="#242">242</a> <em class="jxr_javadoccomment">   */</em>
-<a name="243" href="#243">243</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Edge&gt; extractEdgesWithData(DataSet&lt;FatVertex&gt; result,
-<a name="244" href="#244">244</a>     DataSet&lt;Edge&gt; inputEdges) {
-<a name="245" href="#245">245</a>     <strong class="jxr_keyword">return</strong> extractEdgeIds(result)
-<a name="246" href="#246">246</a>       .join(inputEdges)
-<a name="247" href="#247">247</a>       .where(0).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
-<a name="248" href="#248">248</a>       .with(<strong class="jxr_keyword">new</strong> RightSide&lt;&gt;());
-<a name="249" href="#249">249</a>   }
-<a name="250" href="#250">250</a> }
+<a name="105" href="#105">105</a>     DataSet&lt;Edge&gt; newEdges = inputGraph.getEdges()
+<a name="106" href="#106">106</a>       .rightOuterJoin(collection.getEdges())
+<a name="107" href="#107">107</a>       .where(<strong class="jxr_keyword">new</strong> Id&lt;&gt;()).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
+<a name="108" href="#108">108</a>       .with(<strong class="jxr_keyword">new</strong> MergedGraphIds&lt;&gt;())
+<a name="109" href="#109">109</a>       .withForwardedFieldsFirst(<span class="jxr_string">"id;label;properties"</span>);
+<a name="110" href="#110">110</a> 
+<a name="111" href="#111">111</a>     <strong class="jxr_keyword">return</strong> config.getGraphCollectionFactory().fromDataSets(
+<a name="112" href="#112">112</a>       collection.getGraphHeads(), newVertices, newEdges);
+<a name="113" href="#113">113</a>   }
+<a name="114" href="#114">114</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="115" href="#115">115</a> <em class="jxr_javadoccomment">   * Extracts vertex ids from the given pattern matching result.</em>
+<a name="116" href="#116">116</a> <em class="jxr_javadoccomment">   *</em>
+<a name="117" href="#117">117</a> <em class="jxr_javadoccomment">   * @param result pattern matching result</em>
+<a name="118" href="#118">118</a> <em class="jxr_javadoccomment">   * @return dataset with (vertexId) tuples</em>
+<a name="119" href="#119">119</a> <em class="jxr_javadoccomment">   */</em>
+<a name="120" href="#120">120</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; extractVertexIds(
+<a name="121" href="#121">121</a>     DataSet&lt;FatVertex&gt; result) {
+<a name="122" href="#122">122</a>     <strong class="jxr_keyword">return</strong> result.project(0);
+<a name="123" href="#123">123</a>   }
+<a name="124" href="#124">124</a> 
+<a name="125" href="#125">125</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="126" href="#126">126</a> <em class="jxr_javadoccomment">   * Extracts edge-source-target id triples from the given pattern matching</em>
+<a name="127" href="#127">127</a> <em class="jxr_javadoccomment">   * result.</em>
+<a name="128" href="#128">128</a> <em class="jxr_javadoccomment">   *</em>
+<a name="129" href="#129">129</a> <em class="jxr_javadoccomment">   * @param result pattern matching result</em>
+<a name="130" href="#130">130</a> <em class="jxr_javadoccomment">   * @return dataset with (edgeId, sourceId, targetId) tuples</em>
+<a name="131" href="#131">131</a> <em class="jxr_javadoccomment">   */</em>
+<a name="132" href="#132">132</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Tuple3&lt;GradoopId, GradoopId, GradoopId&gt;&gt; extractEdgeIds(
+<a name="133" href="#133">133</a>     DataSet&lt;FatVertex&gt; result) {
+<a name="134" href="#134">134</a>     <strong class="jxr_keyword">return</strong> result.flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/simulation/dual/functions/EdgeTriple.html">EdgeTriple</a>());
+<a name="135" href="#135">135</a>   }
+<a name="136" href="#136">136</a> 
+<a name="137" href="#137">137</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="138" href="#138">138</a> <em class="jxr_javadoccomment">   * Filters and casts EPGM graph heads from a given set of {@link Element}</em>
+<a name="139" href="#139">139</a> <em class="jxr_javadoccomment">   *</em>
+<a name="140" href="#140">140</a> <em class="jxr_javadoccomment">   * @param elements      EPGM elements</em>
+<a name="141" href="#141">141</a> <em class="jxr_javadoccomment">   * @param graphHeadType graph head type</em>
+<a name="142" href="#142">142</a> <em class="jxr_javadoccomment">   * @return EPGM graph heads</em>
+<a name="143" href="#143">143</a> <em class="jxr_javadoccomment">   */</em>
+<a name="144" href="#144">144</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;GraphHead&gt; extractGraphHeads(DataSet&lt;Element&gt; elements,
+<a name="145" href="#145">145</a>     Class&lt;GraphHead&gt; graphHeadType) {
+<a name="146" href="#146">146</a>     <strong class="jxr_keyword">return</strong> elements
+<a name="147" href="#147">147</a>       .filter(<strong class="jxr_keyword">new</strong> IsInstance&lt;&gt;(graphHeadType))
+<a name="148" href="#148">148</a>       .map(<strong class="jxr_keyword">new</strong> Cast&lt;&gt;(graphHeadType))
+<a name="149" href="#149">149</a>       .returns(TypeExtractor.createTypeInfo(graphHeadType));
+<a name="150" href="#150">150</a>   }
+<a name="151" href="#151">151</a> 
+<a name="152" href="#152">152</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="153" href="#153">153</a> <em class="jxr_javadoccomment">   * Initializes EPGM vertices from the given pattern matching result.</em>
+<a name="154" href="#154">154</a> <em class="jxr_javadoccomment">   *</em>
+<a name="155" href="#155">155</a> <em class="jxr_javadoccomment">   * @param result        pattern matching result</em>
+<a name="156" href="#156">156</a> <em class="jxr_javadoccomment">   * @param epgmVertexFactory EPGM vertex factory</em>
+<a name="157" href="#157">157</a> <em class="jxr_javadoccomment">   * @return EPGM vertices</em>
+<a name="158" href="#158">158</a> <em class="jxr_javadoccomment">   */</em>
+<a name="159" href="#159">159</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Vertex&gt; extractVertices(DataSet&lt;FatVertex&gt; result,
+<a name="160" href="#160">160</a>                                                 EPGMVertexFactory&lt;Vertex&gt; epgmVertexFactory) {
+<a name="161" href="#161">161</a>     <strong class="jxr_keyword">return</strong> extractVertexIds(result).map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/functions/epgm/VertexFromId.html">VertexFromId</a>(epgmVertexFactory));
+<a name="162" href="#162">162</a>   }
+<a name="163" href="#163">163</a> 
+<a name="164" href="#164">164</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="165" href="#165">165</a> <em class="jxr_javadoccomment">   * Filters and casts EPGM vertices from a given set of {@link Element}</em>
+<a name="166" href="#166">166</a> <em class="jxr_javadoccomment">   *</em>
+<a name="167" href="#167">167</a> <em class="jxr_javadoccomment">   * @param elements  EPGM elements</em>
+<a name="168" href="#168">168</a> <em class="jxr_javadoccomment">   * @param vertexType    vertex type</em>
+<a name="169" href="#169">169</a> <em class="jxr_javadoccomment">   * @param mayOverlap    vertices may be contained in multiple graphs</em>
+<a name="170" href="#170">170</a> <em class="jxr_javadoccomment">   * @return EPGM vertices</em>
+<a name="171" href="#171">171</a> <em class="jxr_javadoccomment">   */</em>
+<a name="172" href="#172">172</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Vertex&gt; extractVertices(DataSet&lt;Element&gt; elements,
+<a name="173" href="#173">173</a>     Class&lt;Vertex&gt; vertexType, <strong class="jxr_keyword">boolean</strong> mayOverlap) {
+<a name="174" href="#174">174</a>     DataSet&lt;Vertex&gt; result = elements
+<a name="175" href="#175">175</a>       .filter(<strong class="jxr_keyword">new</strong> IsInstance&lt;&gt;(vertexType))
+<a name="176" href="#176">176</a>       .map(<strong class="jxr_keyword">new</strong> Cast&lt;&gt;(vertexType))
+<a name="177" href="#177">177</a>       .returns(TypeExtractor.createTypeInfo(vertexType));
+<a name="178" href="#178">178</a>     <strong class="jxr_keyword">return</strong> mayOverlap ? result
+<a name="179" href="#179">179</a>       .groupBy(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
+<a name="180" href="#180">180</a>       .combineGroup(<strong class="jxr_keyword">new</strong> MergedGraphIds&lt;&gt;())
+<a name="181" href="#181">181</a>       .groupBy(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
+<a name="182" href="#182">182</a>       .reduceGroup(<strong class="jxr_keyword">new</strong> MergedGraphIds&lt;&gt;()) : result;
+<a name="183" href="#183">183</a>   }
+<a name="184" href="#184">184</a> 
+<a name="185" href="#185">185</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="186" href="#186">186</a> <em class="jxr_javadoccomment">   * Initializes EPGM edges from the given pattern matching result.</em>
+<a name="187" href="#187">187</a> <em class="jxr_javadoccomment">   *</em>
+<a name="188" href="#188">188</a> <em class="jxr_javadoccomment">   * @param result      pattern matching result</em>
+<a name="189" href="#189">189</a> <em class="jxr_javadoccomment">   * @param epgmEdgeFactory EPGM edge factory</em>
+<a name="190" href="#190">190</a> <em class="jxr_javadoccomment">   * @return EPGM edges</em>
+<a name="191" href="#191">191</a> <em class="jxr_javadoccomment">   */</em>
+<a name="192" href="#192">192</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Edge&gt; extractEdges(DataSet&lt;FatVertex&gt; result,
+<a name="193" href="#193">193</a>     EPGMEdgeFactory&lt;Edge&gt; epgmEdgeFactory) {
+<a name="194" href="#194">194</a>     <strong class="jxr_keyword">return</strong> extractEdgeIds(result).map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/functions/epgm/EdgeFromIds.html">EdgeFromIds</a>(epgmEdgeFactory));
+<a name="195" href="#195">195</a>   }
+<a name="196" href="#196">196</a> 
+<a name="197" href="#197">197</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="198" href="#198">198</a> <em class="jxr_javadoccomment">   * Filters and casts EPGM edges from a given set of {@link Element}</em>
+<a name="199" href="#199">199</a> <em class="jxr_javadoccomment">   *</em>
+<a name="200" href="#200">200</a> <em class="jxr_javadoccomment">   * @param elements      EPGM elements</em>
+<a name="201" href="#201">201</a> <em class="jxr_javadoccomment">   * @param edgeType      edge type</em>
+<a name="202" href="#202">202</a> <em class="jxr_javadoccomment">   * @param mayOverlap    edges may be contained in multiple graphs</em>
+<a name="203" href="#203">203</a> <em class="jxr_javadoccomment">   * @return EPGM edges</em>
+<a name="204" href="#204">204</a> <em class="jxr_javadoccomment">   */</em>
+<a name="205" href="#205">205</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Edge&gt; extractEdges(DataSet&lt;Element&gt; elements,
+<a name="206" href="#206">206</a>     Class&lt;Edge&gt; edgeType, <strong class="jxr_keyword">boolean</strong> mayOverlap) {
+<a name="207" href="#207">207</a>     DataSet&lt;Edge&gt; result = elements
+<a name="208" href="#208">208</a>       .filter(<strong class="jxr_keyword">new</strong> IsInstance&lt;&gt;(edgeType))
+<a name="209" href="#209">209</a>       .map(<strong class="jxr_keyword">new</strong> Cast&lt;&gt;(edgeType))
+<a name="210" href="#210">210</a>       .returns(TypeExtractor.createTypeInfo(edgeType));
+<a name="211" href="#211">211</a> 
+<a name="212" href="#212">212</a>     <strong class="jxr_keyword">return</strong> mayOverlap ? result
+<a name="213" href="#213">213</a>       .groupBy(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
+<a name="214" href="#214">214</a>       .combineGroup(<strong class="jxr_keyword">new</strong> MergedGraphIds&lt;&gt;()).groupBy(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
+<a name="215" href="#215">215</a>       .reduceGroup(<strong class="jxr_keyword">new</strong> MergedGraphIds&lt;&gt;()) : result;
+<a name="216" href="#216">216</a>   }
+<a name="217" href="#217">217</a> 
+<a name="218" href="#218">218</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="219" href="#219">219</a> <em class="jxr_javadoccomment">   * Initializes EPGM vertices including their original data from the given</em>
+<a name="220" href="#220">220</a> <em class="jxr_javadoccomment">   * pattern matching result.</em>
+<a name="221" href="#221">221</a> <em class="jxr_javadoccomment">   *</em>
+<a name="222" href="#222">222</a> <em class="jxr_javadoccomment">   * @param result        pattern matching result</em>
+<a name="223" href="#223">223</a> <em class="jxr_javadoccomment">   * @param inputVertices original data graph vertices</em>
+<a name="224" href="#224">224</a> <em class="jxr_javadoccomment">   * @return EPGM vertices including data</em>
+<a name="225" href="#225">225</a> <em class="jxr_javadoccomment">   */</em>
+<a name="226" href="#226">226</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Vertex&gt; extractVerticesWithData(
+<a name="227" href="#227">227</a>     DataSet&lt;FatVertex&gt; result, DataSet&lt;Vertex&gt; inputVertices) {
+<a name="228" href="#228">228</a>     <strong class="jxr_keyword">return</strong> extractVertexIds(result)
+<a name="229" href="#229">229</a>       .join(inputVertices)
+<a name="230" href="#230">230</a>       .where(0).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
+<a name="231" href="#231">231</a>       .with(<strong class="jxr_keyword">new</strong> RightSide&lt;&gt;());
+<a name="232" href="#232">232</a>   }
+<a name="233" href="#233">233</a> 
+<a name="234" href="#234">234</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="235" href="#235">235</a> <em class="jxr_javadoccomment">   * Initializes EPGM edges including their original data from the given pattern</em>
+<a name="236" href="#236">236</a> <em class="jxr_javadoccomment">   * matching result.</em>
+<a name="237" href="#237">237</a> <em class="jxr_javadoccomment">   *</em>
+<a name="238" href="#238">238</a> <em class="jxr_javadoccomment">   * @param result      pattern matching result</em>
+<a name="239" href="#239">239</a> <em class="jxr_javadoccomment">   * @param inputEdges  original data graph edges</em>
+<a name="240" href="#240">240</a> <em class="jxr_javadoccomment">   * @return EPGM edges including data</em>
+<a name="241" href="#241">241</a> <em class="jxr_javadoccomment">   */</em>
+<a name="242" href="#242">242</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Edge&gt; extractEdgesWithData(DataSet&lt;FatVertex&gt; result,
+<a name="243" href="#243">243</a>     DataSet&lt;Edge&gt; inputEdges) {
+<a name="244" href="#244">244</a>     <strong class="jxr_keyword">return</strong> extractEdgeIds(result)
+<a name="245" href="#245">245</a>       .join(inputEdges)
+<a name="246" href="#246">246</a>       .where(0).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
+<a name="247" href="#247">247</a>       .with(<strong class="jxr_keyword">new</strong> RightSide&lt;&gt;());
+<a name="248" href="#248">248</a>   }
+<a name="249" href="#249">249</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

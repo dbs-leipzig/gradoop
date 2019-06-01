@@ -23,6 +23,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.s1ck.gdl.model.comparables.Literal;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -39,9 +40,9 @@ public class LiteralComparable extends QueryComparable {
    *
    * @param literal the wrapped literal
    */
-<span class="fc" id="L42">  public LiteralComparable(Literal literal) {</span>
-<span class="fc" id="L43">    this.literal = literal;</span>
-<span class="fc" id="L44">  }</span>
+<span class="fc" id="L43">  public LiteralComparable(Literal literal) {</span>
+<span class="fc" id="L44">    this.literal = literal;</span>
+<span class="fc" id="L45">  }</span>
 
   /**
    * Returns the value of the literal.
@@ -49,7 +50,7 @@ public class LiteralComparable extends QueryComparable {
    * @return literal value
    */
   public Object getValue() {
-<span class="nc" id="L52">    return literal.getValue();</span>
+<span class="nc" id="L53">    return literal.getValue();</span>
   }
 
   /**
@@ -61,32 +62,31 @@ public class LiteralComparable extends QueryComparable {
    */
   @Override
   public PropertyValue evaluate(Embedding embedding, EmbeddingMetaData metaData) {
-<span class="fc" id="L64">    return PropertyValue.create(literal.getValue());</span>
+<span class="fc" id="L65">    return PropertyValue.create(literal.getValue());</span>
   }
 
   @Override
   public PropertyValue evaluate(GraphElement element) {
-<span class="fc" id="L69">    return PropertyValue.create(literal.getValue());</span>
+<span class="fc" id="L70">    return PropertyValue.create(literal.getValue());</span>
   }
 
   @Override
   public Set&lt;String&gt; getPropertyKeys(String variable) {
-<span class="fc" id="L74">    return new HashSet&lt;&gt;(0);</span>
+<span class="fc" id="L75">    return new HashSet&lt;&gt;(0);</span>
   }
 
   @Override
   public boolean equals(Object o) {
-<span class="pc bpc" id="L79" title="1 of 2 branches missed.">    if (this == o) {</span>
-<span class="nc" id="L80">      return true;</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">    if (this == o) {</span>
+<span class="nc" id="L81">      return true;</span>
     }
-<span class="pc bpc" id="L82" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
-<span class="nc" id="L83">      return false;</span>
+<span class="pc bpc" id="L83" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L84">      return false;</span>
     }
 
-<span class="fc" id="L86">    LiteralComparable that = (LiteralComparable) o;</span>
+<span class="fc" id="L87">    LiteralComparable that = (LiteralComparable) o;</span>
 
-<span class="pc bpc" id="L88" title="3 of 4 branches missed.">    return literal != null ? literal.equals(that.literal) : that.literal == null;</span>
-
+<span class="fc" id="L89">    return Objects.equals(literal, that.literal);</span>
   }
 
   @Override

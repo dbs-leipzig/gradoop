@@ -31,7 +31,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
    * @see org.apache.flink.api.common.functions.GroupReduceFunction#reduce(java.lang.Iterable, org.apache.flink.util.Collector)
    */
   @Override
-  public void reduce(Iterable&lt;Edge&gt; values, Collector&lt;Edge&gt; out) throws Exception {
+  public void reduce(Iterable&lt;Edge&gt; values, Collector&lt;Edge&gt; out) {
 <span class="fc" id="L35">    boolean sawFirst = false;</span>
 <span class="fc bfc" id="L36" title="All 2 branches covered.">    for (Edge edge: values) {</span>
 <span class="fc bfc" id="L37" title="All 2 branches covered.">      if (sawFirst) {</span>

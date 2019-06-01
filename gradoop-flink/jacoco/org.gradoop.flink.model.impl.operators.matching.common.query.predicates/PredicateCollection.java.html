@@ -22,6 +22,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.stream.Collectors.joining;
@@ -31,7 +32,7 @@ import static java.util.stream.Collectors.joining;
  *
  * @param &lt;P&gt; the stored predicate type
  */
-<span class="fc" id="L34">public abstract class PredicateCollection&lt;P&gt; implements Iterable&lt;P&gt;, Serializable {</span>
+<span class="fc" id="L35">public abstract class PredicateCollection&lt;P&gt; implements Iterable&lt;P&gt;, Serializable {</span>
   /**
    * Holds the predicate collection
    */
@@ -43,7 +44,7 @@ import static java.util.stream.Collectors.joining;
    * @return predicates
    */
   public List&lt;P&gt; getPredicates() {
-<span class="fc" id="L46">    return this.predicates;</span>
+<span class="fc" id="L47">    return this.predicates;</span>
   }
 
   /**
@@ -52,8 +53,8 @@ import static java.util.stream.Collectors.joining;
    * @param predicates new predicates
    */
   public void setPredicates(List&lt;P&gt; predicates) {
-<span class="nc" id="L55">    this.predicates = predicates;</span>
-<span class="nc" id="L56">  }</span>
+<span class="nc" id="L56">    this.predicates = predicates;</span>
+<span class="nc" id="L57">  }</span>
 
   /**
    * Add a single predicate to the collection
@@ -61,8 +62,8 @@ import static java.util.stream.Collectors.joining;
    * @param predicate the predicate to be added
    */
   public void addPredicate(P predicate) {
-<span class="fc" id="L64">    this.predicates.add(predicate);</span>
-<span class="fc" id="L65">  }</span>
+<span class="fc" id="L65">    this.predicates.add(predicate);</span>
+<span class="fc" id="L66">  }</span>
 
   /**
    * Add a list of predicates
@@ -70,8 +71,8 @@ import static java.util.stream.Collectors.joining;
    * @param predicateList the predicaes to be added
    */
   public void addPredicates(List&lt;P&gt; predicateList) {
-<span class="fc" id="L73">    this.predicates.addAll(predicateList);</span>
-<span class="fc" id="L74">  }</span>
+<span class="fc" id="L74">    this.predicates.addAll(predicateList);</span>
+<span class="fc" id="L75">  }</span>
 
   /**
    * Returns the number of predicates contained in this predicate collection.
@@ -79,7 +80,7 @@ import static java.util.stream.Collectors.joining;
    * @return number of predicates
    */
   public int size() {
-<span class="fc" id="L82">    return predicates.size();</span>
+<span class="fc" id="L83">    return predicates.size();</span>
   }
 
   /**
@@ -121,29 +122,28 @@ import static java.util.stream.Collectors.joining;
 
   @Override
   public Iterator&lt;P&gt; iterator() {
-<span class="nc" id="L124">    return predicates.iterator();</span>
+<span class="nc" id="L125">    return predicates.iterator();</span>
   }
 
   @Override
   public String toString() {
-<span class="fc" id="L129">    return &quot;(&quot; + predicates.stream()</span>
-<span class="fc" id="L130">            .map(P::toString)</span>
-<span class="fc" id="L131">            .collect(joining(&quot; &quot; + operatorName() + &quot; &quot;)) + &quot;)&quot;;</span>
+<span class="fc" id="L130">    return &quot;(&quot; + predicates.stream()</span>
+<span class="fc" id="L131">            .map(P::toString)</span>
+<span class="fc" id="L132">            .collect(joining(&quot; &quot; + operatorName() + &quot; &quot;)) + &quot;)&quot;;</span>
   }
 
   @Override
   public boolean equals(Object o) {
-<span class="fc bfc" id="L136" title="All 2 branches covered.">    if (this == o) {</span>
-<span class="fc" id="L137">      return true;</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">    if (this == o) {</span>
+<span class="fc" id="L138">      return true;</span>
     }
-<span class="pc bpc" id="L139" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
-<span class="nc" id="L140">      return false;</span>
+<span class="pc bpc" id="L140" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L141">      return false;</span>
     }
 
-<span class="fc" id="L143">    PredicateCollection predicateCollection = (PredicateCollection) o;</span>
+<span class="fc" id="L144">    PredicateCollection predicateCollection = (PredicateCollection) o;</span>
 
-<span class="pc bpc" id="L145" title="1 of 2 branches missed.">    return predicates != null ?</span>
-<span class="pc bnc" id="L146" title="All 2 branches missed.">      predicates.equals(predicateCollection.predicates) : predicateCollection.predicates == null;</span>
+<span class="fc" id="L146">    return Objects.equals(predicates, predicateCollection.predicates);</span>
   }
 
   @Override

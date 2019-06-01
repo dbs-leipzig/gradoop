@@ -57,7 +57,7 @@ public class AddAverageCCValueToGraphHeadMap implements MapFunction&lt;GraphHead
 <span class="fc" id="L57">  }</span>
 
   @Override
-  public GraphHead map(GraphHead graphHead) throws Exception {
+  public GraphHead map(GraphHead graphHead) {
 <span class="fc" id="L61">    PropertyValue averageProperty = graphHead.getPropertyValue(propertyKeySumLocal);</span>
 <span class="pc bpc" id="L62" title="1 of 2 branches missed.">    double sumLocal = averageProperty.isNull() ? 0.0 : averageProperty.getDouble();</span>
 <span class="fc" id="L63">    long vertexCount = graphHead.getPropertyValue(propertyKeyVertexCount).getLong();</span>

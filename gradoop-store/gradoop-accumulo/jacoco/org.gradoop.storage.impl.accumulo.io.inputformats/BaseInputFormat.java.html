@@ -43,7 +43,7 @@ import org.gradoop.storage.impl.accumulo.predicate.query.AccumuloQueryHolder;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -176,7 +176,7 @@ public abstract class BaseInputFormat&lt;T extends Element&gt; extends GenericIn
       }
 <span class="fc bfc" id="L177" title="All 2 branches covered.">      if (split.getSplitNumber() + 1 &gt; ranges.size()) {</span>
 <span class="fc" id="L178">        scanner = null;</span>
-<span class="fc" id="L179">        iterator = new ArrayList&lt;Map.Entry&lt;Key, Value&gt;&gt;().iterator();</span>
+<span class="fc" id="L179">        iterator = Collections.emptyIterator();</span>
       } else {
 <span class="fc" id="L181">        scanner = conn.createBatchScanner(tableName, auth, batchSize);</span>
 <span class="fc" id="L182">        attachIterator(scanner, iteratorPriority, options);</span>

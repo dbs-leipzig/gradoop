@@ -70,14 +70,12 @@ public class ByProperty&lt;E extends EPGMElement&gt; implements CombinableFilter
   public boolean filter(E e) throws Exception {
 <span class="fc bfc" id="L71" title="All 2 branches covered.">    if (e.hasProperty(key)) {</span>
 <span class="fc bfc" id="L72" title="All 2 branches covered.">      if (value != null) {</span>
-<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (e.getPropertyValue(key).equals(value)) {</span>
-<span class="fc" id="L74">          return true;</span>
-        }
+<span class="fc" id="L73">        return e.getPropertyValue(key).equals(value);</span>
       } else {
-<span class="fc" id="L77">        return true;</span>
+<span class="fc" id="L75">        return true;</span>
       }
     }
-<span class="fc" id="L80">    return false;</span>
+<span class="fc" id="L78">    return false;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

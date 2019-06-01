@@ -57,44 +57,43 @@ import java.util.Set;
 <span class="fc" id="L57">    long current = rootVertex;</span>
 
 <span class="fc" id="L59">    vertexVisited.add(current);</span>
-<span class="fc" id="L60">    Deque&lt;Edge&gt; edgeStack = new ArrayDeque&lt;&gt;();</span>
-<span class="fc" id="L61">    edgeStack.addAll(queryHandler.getEdgesByVertexId(current));</span>
+<span class="fc" id="L60">    Deque&lt;Edge&gt; edgeStack = new ArrayDeque&lt;&gt;(queryHandler.getEdgesByVertexId(current));</span>
 
-<span class="fc bfc" id="L63" title="All 2 branches covered.">    while (!edgeStack.isEmpty()) {</span>
-<span class="fc" id="L64">      Edge edge = edgeStack.removeLast();</span>
-<span class="fc" id="L65">      long via = edge.getId();</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">    while (!edgeStack.isEmpty()) {</span>
+<span class="fc" id="L63">      Edge edge = edgeStack.removeLast();</span>
+<span class="fc" id="L64">      long via = edge.getId();</span>
 
-<span class="fc bfc" id="L67" title="All 2 branches covered.">      if (!edgeVisited.contains(via)) {</span>
-<span class="fc" id="L68">        long source = edge.getSourceVertexId();</span>
-<span class="fc" id="L69">        long target = edge.getTargetVertexId();</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">      if (!edgeVisited.contains(via)) {</span>
+<span class="fc" id="L67">        long source = edge.getSourceVertexId();</span>
+<span class="fc" id="L68">        long target = edge.getTargetVertexId();</span>
 
         // backtrack?
-<span class="fc bfc" id="L72" title="All 4 branches covered.">        if (current != source &amp;&amp; current != target) {</span>
-<span class="pc bpc" id="L73" title="1 of 2 branches missed.">          current = vertexVisited.contains(source) ? source : target;</span>
+<span class="fc bfc" id="L71" title="All 4 branches covered.">        if (current != source &amp;&amp; current != target) {</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">          current = vertexVisited.contains(source) ? source : target;</span>
         }
 
         // do step
-<span class="fc bfc" id="L77" title="All 2 branches covered.">        boolean isOutgoing  = current == source;</span>
-<span class="fc bfc" id="L78" title="All 2 branches covered.">        long from           = isOutgoing ? source : target;</span>
-<span class="fc bfc" id="L79" title="All 2 branches covered.">        long to             = isOutgoing ? target : source;</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        boolean isOutgoing  = current == source;</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">        long from           = isOutgoing ? source : target;</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        long to             = isOutgoing ? target : source;</span>
 
-<span class="fc" id="L81">        traversalCode.add(new Step(from, via, to, isOutgoing));</span>
+<span class="fc" id="L80">        traversalCode.add(new Step(from, via, to, isOutgoing));</span>
 
         // go deeper
-<span class="fc" id="L84">        boolean visitedFrom = vertexVisited.contains(from);</span>
-<span class="fc" id="L85">        boolean visitedTo   = vertexVisited.contains(to);</span>
+<span class="fc" id="L83">        boolean visitedFrom = vertexVisited.contains(from);</span>
+<span class="fc" id="L84">        boolean visitedTo   = vertexVisited.contains(to);</span>
 
-<span class="pc bpc" id="L87" title="1 of 4 branches missed.">        if (!visitedFrom || !visitedTo) {</span>
-<span class="pc bpc" id="L88" title="1 of 2 branches missed.">          current = visitedFrom ? to : from;</span>
-<span class="fc" id="L89">          edgeStack.addAll(queryHandler.getEdgesByVertexId(current));</span>
+<span class="pc bpc" id="L86" title="1 of 4 branches missed.">        if (!visitedFrom || !visitedTo) {</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">          current = visitedFrom ? to : from;</span>
+<span class="fc" id="L88">          edgeStack.addAll(queryHandler.getEdgesByVertexId(current));</span>
         }
 
-<span class="fc" id="L92">        vertexVisited.add(current);</span>
-<span class="fc" id="L93">        edgeVisited.add(via);</span>
+<span class="fc" id="L91">        vertexVisited.add(current);</span>
+<span class="fc" id="L92">        edgeVisited.add(via);</span>
       }
-<span class="fc" id="L95">    }</span>
+<span class="fc" id="L94">    }</span>
 
-<span class="fc" id="L97">    return traversalCode;</span>
+<span class="fc" id="L96">    return traversalCode;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

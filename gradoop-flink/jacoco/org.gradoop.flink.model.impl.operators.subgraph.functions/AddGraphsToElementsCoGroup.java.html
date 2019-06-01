@@ -39,7 +39,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
   public void coGroup(
     Iterable&lt;Tuple2&lt;GradoopId, GradoopIdSet&gt;&gt; graphs,
     Iterable&lt;EL&gt; elements,
-    Collector&lt;EL&gt; collector) throws Exception {
+    Collector&lt;EL&gt; collector) {
 <span class="fc" id="L43">    boolean wasGraphSetEmpty = true;</span>
 <span class="fc bfc" id="L44" title="All 2 branches covered.">    for (EL element : elements) {</span>
 <span class="fc bfc" id="L45" title="All 2 branches covered.">      for (Tuple2&lt;GradoopId, GradoopIdSet&gt; graphSet : graphs) {</span>

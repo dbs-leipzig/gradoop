@@ -347,12 +347,10 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
 <span class="fc" id="L347">    if (patternEdge.getSourceVertexId()</span>
 <span class="fc bfc" id="L348" title="All 2 branches covered.">      .equals(patternEdge.getTargetVertexId())) {</span>
 <span class="pc bpc" id="L349" title="1 of 2 branches missed.">      if (edgeCandidate.f0.equals(edgeCandidate.f1)) {</span>
-<span class="pc bpc" id="L350" title="1 of 2 branches missed.">        if (edgeCandidate.f2[(int) patternEdge.getId()]) {</span>
-<span class="fc" id="L351">          return true;</span>
-        }
+<span class="fc" id="L350">        return edgeCandidate.f2[(int) patternEdge.getId()];</span>
       }
     }
-<span class="fc" id="L355">    return false;</span>
+<span class="fc" id="L353">    return false;</span>
   }
 
   /**
@@ -366,19 +364,19 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
   private List&lt;Edge&gt; filterPatternEdges(
     List&lt;Edge&gt; patternEdges,
     Embedding&lt;GradoopId&gt; embedding) {
-<span class="fc bfc" id="L369" title="All 2 branches covered.">    for (int i = 0; i &lt; patternEdges.size(); i++) {</span>
-<span class="fc" id="L370">      long sourceId = patternEdges.get(i).getSourceVertexId();</span>
-<span class="fc" id="L371">      long targetId = patternEdges.get(i).getTargetVertexId();</span>
-<span class="fc" id="L372">      GradoopId[] vertexMapping = embedding.getVertexMapping();</span>
-<span class="fc bfc" id="L373" title="All 4 branches covered.">      if ((vertexMapping[(int) sourceId] == null) &amp;&amp;</span>
+<span class="fc bfc" id="L367" title="All 2 branches covered.">    for (int i = 0; i &lt; patternEdges.size(); i++) {</span>
+<span class="fc" id="L368">      long sourceId = patternEdges.get(i).getSourceVertexId();</span>
+<span class="fc" id="L369">      long targetId = patternEdges.get(i).getTargetVertexId();</span>
+<span class="fc" id="L370">      GradoopId[] vertexMapping = embedding.getVertexMapping();</span>
+<span class="fc bfc" id="L371" title="All 4 branches covered.">      if ((vertexMapping[(int) sourceId] == null) &amp;&amp;</span>
         (vertexMapping[(int) targetId] == null)) {
-<span class="fc bfc" id="L375" title="All 2 branches covered.">        if (sourceId != targetId) {</span>
-<span class="fc" id="L376">          patternEdges.remove(i);</span>
-<span class="fc" id="L377">          i--;</span>
+<span class="fc bfc" id="L373" title="All 2 branches covered.">        if (sourceId != targetId) {</span>
+<span class="fc" id="L374">          patternEdges.remove(i);</span>
+<span class="fc" id="L375">          i--;</span>
         }
       }
     }
-<span class="fc" id="L381">    return patternEdges;</span>
+<span class="fc" id="L379">    return patternEdges;</span>
   }
 
   /**
@@ -397,58 +395,58 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
     Map&lt;Long, Set&lt;GradoopId&gt;&gt; edgeMatches) {
 
     // begin with the start embedding
-<span class="fc" id="L400">    List&lt;Embedding&lt;GradoopId&gt;&gt; result = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L401">    result.add(startEmbedding);</span>
+<span class="fc" id="L398">    List&lt;Embedding&lt;GradoopId&gt;&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L399">    result.add(startEmbedding);</span>
 
     // list of embeddings in next growing step
     List&lt;Embedding&lt;GradoopId&gt;&gt; temporaryEmbeddings;
 
     // get edge matches
-<span class="fc" id="L407">    List&lt;Map.Entry&lt;Long, Set&lt;GradoopId&gt;&gt;&gt; entries =</span>
-<span class="fc" id="L408">      new ArrayList&lt;&gt;(edgeMatches.entrySet());</span>
+<span class="fc" id="L405">    List&lt;Map.Entry&lt;Long, Set&lt;GradoopId&gt;&gt;&gt; entries =</span>
+<span class="fc" id="L406">      new ArrayList&lt;&gt;(edgeMatches.entrySet());</span>
 
     // if no edge matches have been found, the result is an embedding with only
     // one vertex
-<span class="fc bfc" id="L412" title="All 2 branches covered.">    if (entries.isEmpty()) {</span>
-<span class="fc" id="L413">      Embedding&lt;GradoopId&gt; newEmbedding = copyEmbedding(startEmbedding);</span>
-<span class="fc" id="L414">      newEmbedding.getVertexMapping()[step] = vertexMatch;</span>
-<span class="fc" id="L415">      result.clear();</span>
-<span class="fc" id="L416">      result.add(newEmbedding);</span>
+<span class="fc bfc" id="L410" title="All 2 branches covered.">    if (entries.isEmpty()) {</span>
+<span class="fc" id="L411">      Embedding&lt;GradoopId&gt; newEmbedding = copyEmbedding(startEmbedding);</span>
+<span class="fc" id="L412">      newEmbedding.getVertexMapping()[step] = vertexMatch;</span>
+<span class="fc" id="L413">      result.clear();</span>
+<span class="fc" id="L414">      result.add(newEmbedding);</span>
     }
 
     // for each edge with matches
-<span class="fc bfc" id="L420" title="All 2 branches covered.">    for (Map.Entry&lt;Long, Set&lt;GradoopId&gt;&gt; entry : entries) {</span>
-<span class="fc" id="L421">      temporaryEmbeddings = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L418" title="All 2 branches covered.">    for (Map.Entry&lt;Long, Set&lt;GradoopId&gt;&gt; entry : entries) {</span>
+<span class="fc" id="L419">      temporaryEmbeddings = new ArrayList&lt;&gt;();</span>
       // for each embedding in the result so far
-<span class="fc bfc" id="L423" title="All 2 branches covered.">      for (Embedding&lt;GradoopId&gt; embedding : result) {</span>
+<span class="fc bfc" id="L421" title="All 2 branches covered.">      for (Embedding&lt;GradoopId&gt; embedding : result) {</span>
         // for each edge match
-<span class="fc bfc" id="L425" title="All 2 branches covered.">        for (GradoopId id : entry.getValue()) {</span>
+<span class="fc bfc" id="L423" title="All 2 branches covered.">        for (GradoopId id : entry.getValue()) {</span>
           // check if the edge match already occurs in the embedding
-<span class="fc" id="L427">          boolean contains = false;</span>
-<span class="fc bfc" id="L428" title="All 2 branches covered.">          for (GradoopId edgeId : embedding.getEdgeMapping()) {</span>
-<span class="fc bfc" id="L429" title="All 2 branches covered.">            if (edgeId == null) {</span>
-<span class="fc" id="L430">              continue;</span>
+<span class="fc" id="L425">          boolean contains = false;</span>
+<span class="fc bfc" id="L426" title="All 2 branches covered.">          for (GradoopId edgeId : embedding.getEdgeMapping()) {</span>
+<span class="fc bfc" id="L427" title="All 2 branches covered.">            if (edgeId == null) {</span>
+<span class="fc" id="L428">              continue;</span>
             }
-<span class="pc bpc" id="L432" title="1 of 2 branches missed.">            if (edgeId.equals(id)) {</span>
-<span class="nc" id="L433">              contains = true;</span>
-<span class="nc" id="L434">              break;</span>
+<span class="pc bpc" id="L430" title="1 of 2 branches missed.">            if (edgeId.equals(id)) {</span>
+<span class="nc" id="L431">              contains = true;</span>
+<span class="nc" id="L432">              break;</span>
             }
           }
           // if yes, skip it
-<span class="pc bpc" id="L438" title="1 of 2 branches missed.">          if (contains) {</span>
-<span class="nc" id="L439">            continue;</span>
+<span class="pc bpc" id="L436" title="1 of 2 branches missed.">          if (contains) {</span>
+<span class="nc" id="L437">            continue;</span>
           }
           // else, copy the embedding, add the edge match and add it to the
           // results in the next iteration
-<span class="fc" id="L443">          Embedding&lt;GradoopId&gt; newEmbedding = copyEmbedding(embedding);</span>
-<span class="fc" id="L444">          newEmbedding.getVertexMapping()[step] = vertexMatch;</span>
-<span class="fc" id="L445">          newEmbedding.getEdgeMapping()[Math.toIntExact(entry.getKey())] = id;</span>
-<span class="fc" id="L446">          temporaryEmbeddings.add(newEmbedding);</span>
-<span class="fc" id="L447">        }</span>
-<span class="fc" id="L448">      }</span>
-<span class="fc" id="L449">      result = new ArrayList&lt;&gt;(temporaryEmbeddings);</span>
-<span class="fc" id="L450">    }</span>
-<span class="fc" id="L451">    return result;</span>
+<span class="fc" id="L441">          Embedding&lt;GradoopId&gt; newEmbedding = copyEmbedding(embedding);</span>
+<span class="fc" id="L442">          newEmbedding.getVertexMapping()[step] = vertexMatch;</span>
+<span class="fc" id="L443">          newEmbedding.getEdgeMapping()[Math.toIntExact(entry.getKey())] = id;</span>
+<span class="fc" id="L444">          temporaryEmbeddings.add(newEmbedding);</span>
+<span class="fc" id="L445">        }</span>
+<span class="fc" id="L446">      }</span>
+<span class="fc" id="L447">      result = new ArrayList&lt;&gt;(temporaryEmbeddings);</span>
+<span class="fc" id="L448">    }</span>
+<span class="fc" id="L449">    return result;</span>
   }
 
   /**
@@ -458,19 +456,19 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
    * @return copy of the existing embedding
    */
   private Embedding&lt;GradoopId&gt; copyEmbedding(Embedding&lt;GradoopId&gt; existing) {
-<span class="fc" id="L461">    Embedding&lt;GradoopId&gt; newEmbedding = new Embedding&lt;&gt;();</span>
+<span class="fc" id="L459">    Embedding&lt;GradoopId&gt; newEmbedding = new Embedding&lt;&gt;();</span>
 
-<span class="fc" id="L463">    GradoopId[] vertexCopy = new GradoopId[existing.getVertexMapping().length];</span>
-<span class="fc" id="L464">    System.arraycopy(existing.getVertexMapping(), 0, vertexCopy, 0,</span>
-<span class="fc" id="L465">      existing.getVertexMapping().length);</span>
+<span class="fc" id="L461">    GradoopId[] vertexCopy = new GradoopId[existing.getVertexMapping().length];</span>
+<span class="fc" id="L462">    System.arraycopy(existing.getVertexMapping(), 0, vertexCopy, 0,</span>
+<span class="fc" id="L463">      existing.getVertexMapping().length);</span>
 
-<span class="fc" id="L467">    GradoopId[] edgeCopy = new GradoopId[existing.getEdgeMapping().length];</span>
-<span class="fc" id="L468">    System.arraycopy(existing.getEdgeMapping(), 0, edgeCopy, 0,</span>
-<span class="fc" id="L469">      existing.getEdgeMapping().length);</span>
+<span class="fc" id="L465">    GradoopId[] edgeCopy = new GradoopId[existing.getEdgeMapping().length];</span>
+<span class="fc" id="L466">    System.arraycopy(existing.getEdgeMapping(), 0, edgeCopy, 0,</span>
+<span class="fc" id="L467">      existing.getEdgeMapping().length);</span>
 
-<span class="fc" id="L471">    newEmbedding.setVertexMapping(vertexCopy);</span>
-<span class="fc" id="L472">    newEmbedding.setEdgeMapping(edgeCopy);</span>
-<span class="fc" id="L473">    return newEmbedding;</span>
+<span class="fc" id="L469">    newEmbedding.setVertexMapping(vertexCopy);</span>
+<span class="fc" id="L470">    newEmbedding.setEdgeMapping(edgeCopy);</span>
+<span class="fc" id="L471">    return newEmbedding;</span>
   }
 
   /**
@@ -480,16 +478,16 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
    * @return list containing the ids of the matching vertices
    */
   public List&lt;GradoopId&gt; getCandidates(int step) {
-<span class="fc" id="L483">    List&lt;GradoopId&gt; possibilities = new ArrayList&lt;&gt;(vertexDict.keySet());</span>
-<span class="fc bfc" id="L484" title="All 2 branches covered.">    for (int i = 0; i &lt; possibilities.size(); i++) {</span>
-<span class="fc" id="L485">      GradoopId vertexId = possibilities.get(i);</span>
-<span class="fc" id="L486">      boolean[] candidates = vertexDict.get(vertexId);</span>
-<span class="fc bfc" id="L487" title="All 2 branches covered.">      if (!candidates[step]) {</span>
-<span class="fc" id="L488">        possibilities.remove(i);</span>
-<span class="fc" id="L489">        --i;</span>
+<span class="fc" id="L481">    List&lt;GradoopId&gt; possibilities = new ArrayList&lt;&gt;(vertexDict.keySet());</span>
+<span class="fc bfc" id="L482" title="All 2 branches covered.">    for (int i = 0; i &lt; possibilities.size(); i++) {</span>
+<span class="fc" id="L483">      GradoopId vertexId = possibilities.get(i);</span>
+<span class="fc" id="L484">      boolean[] candidates = vertexDict.get(vertexId);</span>
+<span class="fc bfc" id="L485" title="All 2 branches covered.">      if (!candidates[step]) {</span>
+<span class="fc" id="L486">        possibilities.remove(i);</span>
+<span class="fc" id="L487">        --i;</span>
       }
     }
-<span class="fc" id="L492">    return possibilities;</span>
+<span class="fc" id="L490">    return possibilities;</span>
   }
 
   /**
@@ -502,14 +500,12 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
    */
   private boolean matchOutgoingEdge(Edge patternEdge, GradoopId edgeCandidate,
     GradoopId target) {
-<span class="fc" id="L505">    Tuple3&lt;GradoopId, GradoopId, boolean[]&gt; edge = edgeDict.get(edgeCandidate);</span>
-<span class="fc bfc" id="L506" title="All 2 branches covered.">    if (edge.f2[(int) patternEdge.getId()]) {</span>
-<span class="fc" id="L507">      GradoopId possibleVertex = edge.f1;</span>
-<span class="fc bfc" id="L508" title="All 2 branches covered.">      if (possibleVertex.equals(target)) {</span>
-<span class="fc" id="L509">        return true;</span>
-      }
+<span class="fc" id="L503">    Tuple3&lt;GradoopId, GradoopId, boolean[]&gt; edge = edgeDict.get(edgeCandidate);</span>
+<span class="fc bfc" id="L504" title="All 2 branches covered.">    if (edge.f2[(int) patternEdge.getId()]) {</span>
+<span class="fc" id="L505">      GradoopId possibleVertex = edge.f1;</span>
+<span class="fc" id="L506">      return possibleVertex.equals(target);</span>
     }
-<span class="fc" id="L512">    return false;</span>
+<span class="fc" id="L508">    return false;</span>
   }
 
   /**
@@ -522,14 +518,12 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
    */
   private boolean matchIncomingEdge(Edge patternEdge, GradoopId edgeCandidate,
     GradoopId source) {
-<span class="fc" id="L525">    Tuple3&lt;GradoopId, GradoopId, boolean[]&gt; edge = edgeDict.get(edgeCandidate);</span>
-<span class="fc bfc" id="L526" title="All 2 branches covered.">    if (edge.f2[(int) patternEdge.getId()]) {</span>
-<span class="fc" id="L527">      GradoopId possibleVertex = edge.f0;</span>
-<span class="fc bfc" id="L528" title="All 2 branches covered.">      if (possibleVertex.equals(source)) {</span>
-<span class="fc" id="L529">        return true;</span>
-      }
+<span class="fc" id="L521">    Tuple3&lt;GradoopId, GradoopId, boolean[]&gt; edge = edgeDict.get(edgeCandidate);</span>
+<span class="fc bfc" id="L522" title="All 2 branches covered.">    if (edge.f2[(int) patternEdge.getId()]) {</span>
+<span class="fc" id="L523">      GradoopId possibleVertex = edge.f0;</span>
+<span class="fc" id="L524">      return possibleVertex.equals(source);</span>
     }
-<span class="fc" id="L532">    return false;</span>
+<span class="fc" id="L526">    return false;</span>
   }
 
   /**
@@ -538,27 +532,27 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
    * @param graph graphs with candidate sets
    */
   private void initializeMaps(GraphWithCandidates graph) {
-<span class="fc bfc" id="L541" title="All 2 branches covered.">    for (IdWithCandidates&lt;GradoopId&gt; vertex : graph.getVertexCandidates()) {</span>
-<span class="fc" id="L542">      vertexDict.put(vertex.getId(), vertex.getCandidates());</span>
+<span class="fc bfc" id="L535" title="All 2 branches covered.">    for (IdWithCandidates&lt;GradoopId&gt; vertex : graph.getVertexCandidates()) {</span>
+<span class="fc" id="L536">      vertexDict.put(vertex.getId(), vertex.getCandidates());</span>
+<span class="fc" id="L537">    }</span>
+
+<span class="fc bfc" id="L539" title="All 2 branches covered.">    for (TripleWithCandidates&lt;GradoopId&gt; edge : graph.getEdgeCandidates()) {</span>
+<span class="fc" id="L540">      edgeDict.put(edge.getEdgeId(),</span>
+<span class="fc" id="L541">        new Tuple3&lt;&gt;(edge.getSourceId(), edge.getTargetId(),</span>
+<span class="fc" id="L542">          edge.getCandidates()));</span>
 <span class="fc" id="L543">    }</span>
 
 <span class="fc bfc" id="L545" title="All 2 branches covered.">    for (TripleWithCandidates&lt;GradoopId&gt; edge : graph.getEdgeCandidates()) {</span>
-<span class="fc" id="L546">      edgeDict.put(edge.getEdgeId(),</span>
-<span class="fc" id="L547">        new Tuple3&lt;&gt;(edge.getSourceId(), edge.getTargetId(),</span>
-<span class="fc" id="L548">          edge.getCandidates()));</span>
-<span class="fc" id="L549">    }</span>
-
-<span class="fc bfc" id="L551" title="All 2 branches covered.">    for (TripleWithCandidates&lt;GradoopId&gt; edge : graph.getEdgeCandidates()) {</span>
-<span class="fc bfc" id="L552" title="All 2 branches covered.">      if (!sourceDict.containsKey(edge.getSourceId())) {</span>
-<span class="fc" id="L553">        sourceDict.put(edge.getSourceId(), new HashSet&lt;&gt;());</span>
+<span class="fc bfc" id="L546" title="All 2 branches covered.">      if (!sourceDict.containsKey(edge.getSourceId())) {</span>
+<span class="fc" id="L547">        sourceDict.put(edge.getSourceId(), new HashSet&lt;&gt;());</span>
       }
-<span class="fc" id="L555">      sourceDict.get(edge.getSourceId()).add(edge.getEdgeId());</span>
-<span class="fc bfc" id="L556" title="All 2 branches covered.">      if (!targetDict.containsKey(edge.getTargetId())) {</span>
-<span class="fc" id="L557">        targetDict.put(edge.getTargetId(), new HashSet&lt;&gt;());</span>
+<span class="fc" id="L549">      sourceDict.get(edge.getSourceId()).add(edge.getEdgeId());</span>
+<span class="fc bfc" id="L550" title="All 2 branches covered.">      if (!targetDict.containsKey(edge.getTargetId())) {</span>
+<span class="fc" id="L551">        targetDict.put(edge.getTargetId(), new HashSet&lt;&gt;());</span>
       }
-<span class="fc" id="L559">      targetDict.get(edge.getTargetId()).add(edge.getEdgeId());</span>
-<span class="fc" id="L560">    }</span>
-<span class="fc" id="L561">  }</span>
+<span class="fc" id="L553">      targetDict.get(edge.getTargetId()).add(edge.getEdgeId());</span>
+<span class="fc" id="L554">    }</span>
+<span class="fc" id="L555">  }</span>
 
   /**
    * Method to create query plan, determining how patterns are grown.
@@ -566,26 +560,26 @@ public class DepthSearchMatching implements PatternMatchingAlgorithm {
    * @return plan for walk through
    */
   private int[] buildQueryPlan() {
-<span class="fc" id="L569">    int[] queryPlan = new int[handler.getVertices().size()];</span>
-<span class="fc" id="L570">    int step = 0;</span>
-<span class="fc" id="L571">    Set&lt;Long&gt; alreadyVisited = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L572">    Stack&lt;Vertex&gt; stack = new Stack&lt;&gt;();</span>
-<span class="fc" id="L573">    stack.push(handler.getVertexById(0L));</span>
-<span class="fc" id="L574">    alreadyVisited.add(0L);</span>
-<span class="fc bfc" id="L575" title="All 2 branches covered.">    while (!stack.isEmpty()) {</span>
-<span class="fc" id="L576">      Vertex current = stack.pop();</span>
-<span class="fc" id="L577">      Collection&lt;Vertex&gt; neighbors = handler.getNeighbors(current.getId());</span>
-<span class="fc" id="L578">      queryPlan[step] = (int) current.getId();</span>
-<span class="fc" id="L579">      step++;</span>
-<span class="fc" id="L580">      neighbors.stream()</span>
-<span class="fc bfc" id="L581" title="All 2 branches covered.">        .filter(neighbor -&gt; !alreadyVisited.contains(neighbor.getId()))</span>
-<span class="fc" id="L582">        .forEach(neighbor -&gt; {</span>
-<span class="fc" id="L583">            alreadyVisited.add(neighbor.getId());</span>
-<span class="fc" id="L584">            stack.push(neighbor);</span>
-<span class="fc" id="L585">          }</span>
+<span class="fc" id="L563">    int[] queryPlan = new int[handler.getVertices().size()];</span>
+<span class="fc" id="L564">    int step = 0;</span>
+<span class="fc" id="L565">    Set&lt;Long&gt; alreadyVisited = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L566">    Stack&lt;Vertex&gt; stack = new Stack&lt;&gt;();</span>
+<span class="fc" id="L567">    stack.push(handler.getVertexById(0L));</span>
+<span class="fc" id="L568">    alreadyVisited.add(0L);</span>
+<span class="fc bfc" id="L569" title="All 2 branches covered.">    while (!stack.isEmpty()) {</span>
+<span class="fc" id="L570">      Vertex current = stack.pop();</span>
+<span class="fc" id="L571">      Collection&lt;Vertex&gt; neighbors = handler.getNeighbors(current.getId());</span>
+<span class="fc" id="L572">      queryPlan[step] = (int) current.getId();</span>
+<span class="fc" id="L573">      step++;</span>
+<span class="fc" id="L574">      neighbors.stream()</span>
+<span class="fc bfc" id="L575" title="All 2 branches covered.">        .filter(neighbor -&gt; !alreadyVisited.contains(neighbor.getId()))</span>
+<span class="fc" id="L576">        .forEach(neighbor -&gt; {</span>
+<span class="fc" id="L577">            alreadyVisited.add(neighbor.getId());</span>
+<span class="fc" id="L578">            stack.push(neighbor);</span>
+<span class="fc" id="L579">          }</span>
         );
-<span class="fc" id="L587">    }</span>
-<span class="fc" id="L588">    return queryPlan;</span>
+<span class="fc" id="L581">    }</span>
+<span class="fc" id="L582">    return queryPlan;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

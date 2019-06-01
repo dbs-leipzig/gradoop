@@ -62,17 +62,17 @@
 <a name="52" href="#52">52</a>      <em class="jxr_javadoccomment">/**</em>
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">     * The key in the configuration.</em>
 <a name="54" href="#54">54</a>  <em class="jxr_javadoccomment">     */</em>
-<a name="55" href="#55">55</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> String KEY = <span class="jxr_string">"filterKey"</span>;
+<a name="55" href="#55">55</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String KEY = <span class="jxr_string">"filterKey"</span>;
 <a name="56" href="#56">56</a>  
 <a name="57" href="#57">57</a>      @Override
-<a name="58" href="#58">58</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> open(Configuration parameters) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="58" href="#58">58</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> open(Configuration parameters) {
 <a name="59" href="#59">59</a>        assertNotNull(<span class="jxr_string">"Parameters not set"</span>, parameters);
 <a name="60" href="#60">60</a>        assertNotNull(<span class="jxr_string">"RuntimeContext not set"</span>, getRuntimeContext());
 <a name="61" href="#61">61</a>        expectedValue = parameters.getInteger(KEY, -1);
 <a name="62" href="#62">62</a>      }
 <a name="63" href="#63">63</a>  
 <a name="64" href="#64">64</a>      @Override
-<a name="65" href="#65">65</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> filter(Integer value) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="65" href="#65">65</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> filter(Integer value) {
 <a name="66" href="#66">66</a>        assertNotNull(<span class="jxr_string">"Context not set."</span>, getRuntimeContext());
 <a name="67" href="#67">67</a>        <strong class="jxr_keyword">return</strong> value == expectedValue;
 <a name="68" href="#68">68</a>      }

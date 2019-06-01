@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Abstract base class for graphs, vertices and edges.
@@ -46,8 +47,8 @@ public abstract class Element implements EPGMElement {
   /**
    * Default constructor.
    */
-<span class="nc" id="L49">  protected Element() {</span>
-<span class="nc" id="L50">  }</span>
+<span class="nc" id="L50">  protected Element() {</span>
+<span class="nc" id="L51">  }</span>
 
   /**
    * Creates an object from the given parameters. Can only be called by
@@ -58,114 +59,114 @@ public abstract class Element implements EPGMElement {
    * @param properties key-value properties
    */
   protected Element(
-<span class="fc" id="L61">    GradoopId id, String label, Properties properties) {</span>
-<span class="fc" id="L62">    this.id = id;</span>
-<span class="fc" id="L63">    this.label = label;</span>
-<span class="fc" id="L64">    this.properties = properties;</span>
-<span class="fc" id="L65">  }</span>
+<span class="fc" id="L62">    GradoopId id, String label, Properties properties) {</span>
+<span class="fc" id="L63">    this.id = id;</span>
+<span class="fc" id="L64">    this.label = label;</span>
+<span class="fc" id="L65">    this.properties = properties;</span>
+<span class="fc" id="L66">  }</span>
 
   @Override
   public GradoopId getId() {
-<span class="fc" id="L69">    return id;</span>
+<span class="fc" id="L70">    return id;</span>
   }
 
   @Override
   public void setId(GradoopId id) {
-<span class="fc" id="L74">    this.id = id;</span>
-<span class="fc" id="L75">  }</span>
+<span class="fc" id="L75">    this.id = id;</span>
+<span class="fc" id="L76">  }</span>
 
   @Override
   public String getLabel() {
-<span class="fc" id="L79">    return label;</span>
+<span class="fc" id="L80">    return label;</span>
   }
 
   @Override
   public void setLabel(String label) {
-<span class="nc" id="L84">    this.label = label;</span>
-<span class="nc" id="L85">  }</span>
+<span class="nc" id="L85">    this.label = label;</span>
+<span class="nc" id="L86">  }</span>
 
   @Override
   @Nullable
   public Properties getProperties() {
-<span class="fc" id="L90">    return properties;</span>
+<span class="fc" id="L91">    return properties;</span>
   }
 
   @Override
   public Iterable&lt;String&gt; getPropertyKeys() {
-<span class="fc bfc" id="L95" title="All 2 branches covered.">    return (properties != null) ? properties.getKeys() : null;</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    return (properties != null) ? properties.getKeys() : null;</span>
   }
 
   @Override
   public PropertyValue getPropertyValue(String key) {
     // TODO: return PropertyValue.NULL_VALUE instead?
-<span class="fc bfc" id="L101" title="All 2 branches covered.">    return (properties != null) ? properties.get(key) : null;</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">    return (properties != null) ? properties.get(key) : null;</span>
   }
 
   @Override
   public void setProperties(Properties properties) {
-<span class="nc" id="L106">    this.properties = properties;</span>
-<span class="nc" id="L107">  }</span>
+<span class="nc" id="L107">    this.properties = properties;</span>
+<span class="nc" id="L108">  }</span>
 
   @Override
   public void setProperty(Property property) {
-<span class="nc" id="L111">    Preconditions.checkNotNull(property, &quot;Property was null&quot;);</span>
-<span class="nc" id="L112">    initProperties();</span>
-<span class="nc" id="L113">    this.properties.set(property);</span>
-<span class="nc" id="L114">  }</span>
+<span class="nc" id="L112">    Preconditions.checkNotNull(property, &quot;Property was null&quot;);</span>
+<span class="nc" id="L113">    initProperties();</span>
+<span class="nc" id="L114">    this.properties.set(property);</span>
+<span class="nc" id="L115">  }</span>
 
   @Override
   public void setProperty(String key, Object value) {
-<span class="fc" id="L118">    initProperties();</span>
-<span class="fc" id="L119">    this.properties.set(key, value);</span>
-<span class="fc" id="L120">  }</span>
+<span class="fc" id="L119">    initProperties();</span>
+<span class="fc" id="L120">    this.properties.set(key, value);</span>
+<span class="fc" id="L121">  }</span>
 
   @Override
   public void setProperty(String key, PropertyValue value) {
-<span class="nc" id="L124">    initProperties();</span>
-<span class="nc" id="L125">    this.properties.set(key, value);</span>
-<span class="nc" id="L126">  }</span>
+<span class="nc" id="L125">    initProperties();</span>
+<span class="nc" id="L126">    this.properties.set(key, value);</span>
+<span class="nc" id="L127">  }</span>
 
   @Override
   public PropertyValue removeProperty(String key) {
-<span class="fc bfc" id="L130" title="All 2 branches covered.">    return this.properties != null ? properties.remove(key) : null;</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">    return this.properties != null ? properties.remove(key) : null;</span>
   }
 
   @Override
   public int getPropertyCount() {
-<span class="fc bfc" id="L135" title="All 2 branches covered.">    return (this.properties != null) ? this.properties.size() : 0;</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">    return (this.properties != null) ? this.properties.size() : 0;</span>
   }
 
   @Override
   public boolean hasProperty(String key) {
-<span class="pc bpc" id="L140" title="1 of 4 branches missed.">    return this.properties != null &amp;&amp; this.properties.containsKey(key);</span>
+<span class="pc bpc" id="L141" title="1 of 4 branches missed.">    return this.properties != null &amp;&amp; this.properties.containsKey(key);</span>
   }
 
   @Override
   public boolean equals(Object o) {
-<span class="fc bfc" id="L145" title="All 2 branches covered.">    if (this == o) {</span>
-<span class="fc" id="L146">      return true;</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">    if (this == o) {</span>
+<span class="fc" id="L147">      return true;</span>
     }
-<span class="pc bpc" id="L148" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
-<span class="nc" id="L149">      return false;</span>
+<span class="pc bpc" id="L149" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L150">      return false;</span>
     }
 
-<span class="fc" id="L152">    Element that = (Element) o;</span>
+<span class="fc" id="L153">    Element that = (Element) o;</span>
 
-<span class="pc bpc" id="L154" title="3 of 6 branches missed.">    return !(id != null ? !id.equals(that.id) : that.id != null);</span>
+<span class="fc" id="L155">    return Objects.equals(id, that.id);</span>
   }
 
   @Override
   public int hashCode() {
-<span class="fc" id="L159">    int result = id.hashCode();</span>
-<span class="fc" id="L160">    result = 31 * result + id.hashCode();</span>
-<span class="fc" id="L161">    return result;</span>
+<span class="fc" id="L160">    int result = id.hashCode();</span>
+<span class="fc" id="L161">    result = 31 * result + id.hashCode();</span>
+<span class="fc" id="L162">    return result;</span>
   }
 
   @Override
   public String toString() {
-<span class="nc bnc" id="L166" title="All 2 branches missed.">    return String.format(&quot;%s%s%s{%s}&quot;,</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">    return String.format(&quot;%s%s%s{%s}&quot;,</span>
       id,
-<span class="nc bnc" id="L168" title="All 4 branches missed.">      label == null || label.equals(&quot;&quot;) ? &quot;&quot; : &quot;:&quot;,</span>
+<span class="nc bnc" id="L169" title="All 4 branches missed.">      label == null || label.equals(&quot;&quot;) ? &quot;&quot; : &quot;:&quot;,</span>
       label,
       properties == null ? &quot;&quot; : properties);
   }
@@ -174,9 +175,9 @@ public abstract class Element implements EPGMElement {
    * Initializes the internal properties field if necessary.
    */
   private void initProperties() {
-<span class="pc bpc" id="L177" title="1 of 2 branches missed.">    if (this.properties == null) {</span>
-<span class="fc" id="L178">      this.properties = Properties.create();</span>
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">    if (this.properties == null) {</span>
+<span class="fc" id="L179">      this.properties = Properties.create();</span>
     }
-<span class="fc" id="L180">  }</span>
+<span class="fc" id="L181">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

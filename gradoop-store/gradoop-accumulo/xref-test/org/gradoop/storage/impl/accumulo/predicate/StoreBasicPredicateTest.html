@@ -147,7 +147,7 @@
 <a name="137" href="#137">137</a>         .fromSets(sampleRange)
 <a name="138" href="#138">138</a>         .where(AccumuloFilters.&lt;GraphHead&gt;labelIn(<span class="jxr_string">"Community"</span>)
 <a name="139" href="#139">139</a>           .and(AccumuloFilters.&lt;GraphHead&gt;propEquals(<span class="jxr_string">"interest"</span>, <span class="jxr_string">"Hadoop"</span>)
-<a name="140" href="#140">140</a>             .or(AccumuloFilters.&lt;GraphHead&gt;propEquals(<span class="jxr_string">"interest"</span>, <span class="jxr_string">"Graphs"</span>))));
+<a name="140" href="#140">140</a>             .or(AccumuloFilters.propEquals(<span class="jxr_string">"interest"</span>, <span class="jxr_string">"Graphs"</span>))));
 <a name="141" href="#141">141</a> 
 <a name="142" href="#142">142</a>       List&lt;GraphHead&gt; query = store
 <a name="143" href="#143">143</a>         .getGraphSpace(queryFormula)

@@ -19,7 +19,6 @@ import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -50,8 +49,8 @@ public class LabelGroup
    * Default constructor.
    */
   public LabelGroup() {
-<span class="fc" id="L53">    this(null, null);</span>
-<span class="fc" id="L54">  }</span>
+<span class="fc" id="L52">    this(null, null);</span>
+<span class="fc" id="L53">  }</span>
 
   /**
    * Constructor to only define the label.
@@ -60,8 +59,8 @@ public class LabelGroup
    * @param groupLabel label used after grouping
    */
   public LabelGroup(String groupingLabel, String groupLabel) {
-<span class="fc" id="L63">    this(groupingLabel, groupLabel, new ArrayList&lt;&gt;(), new ArrayList&lt;&gt;());</span>
-<span class="fc" id="L64">  }</span>
+<span class="fc" id="L62">    this(groupingLabel, groupLabel, new ArrayList&lt;&gt;(), new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L63">  }</span>
 
   /**
    * Constructor with varargs.
@@ -75,8 +74,8 @@ public class LabelGroup
     String groupingLabel, String groupLabel,
     List&lt;String&gt; propertyKeys,
     List&lt;AggregateFunction&gt; aggregators) {
-<span class="fc" id="L78">    super(groupingLabel, groupLabel, propertyKeys, aggregators, new ArrayList&lt;&gt;());</span>
-<span class="fc" id="L79">  }</span>
+<span class="fc" id="L77">    super(groupingLabel, groupLabel, propertyKeys, aggregators, new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L78">  }</span>
 
   /**
    * Returns the grouping label
@@ -84,7 +83,7 @@ public class LabelGroup
    * @return grouping label
    */
   public String getGroupingLabel() {
-<span class="fc" id="L87">    return f0;</span>
+<span class="fc" id="L86">    return f0;</span>
   }
 
   /**
@@ -93,8 +92,8 @@ public class LabelGroup
    * @param label grouping label
    */
   public void setGroupingLabel(String label) {
-<span class="nc" id="L96">    f0 = label;</span>
-<span class="nc" id="L97">  }</span>
+<span class="nc" id="L95">    f0 = label;</span>
+<span class="nc" id="L96">  }</span>
 
   /**
    * Returns the group label
@@ -102,7 +101,7 @@ public class LabelGroup
    * @return group label
    */
   public String getGroupLabel() {
-<span class="fc" id="L105">    return f1;</span>
+<span class="fc" id="L104">    return f1;</span>
   }
 
   /**
@@ -111,8 +110,8 @@ public class LabelGroup
    * @param label group label
    */
   public void setGroupLabel(String label) {
-<span class="nc" id="L114">    f1 = label;</span>
-<span class="nc" id="L115">  }</span>
+<span class="nc" id="L113">    f1 = label;</span>
+<span class="nc" id="L114">  }</span>
 
   /**
    * Returns the property keys
@@ -120,7 +119,7 @@ public class LabelGroup
    * @return list of property keys
    */
   public List&lt;String&gt; getPropertyKeys() {
-<span class="fc" id="L123">    return f2;</span>
+<span class="fc" id="L122">    return f2;</span>
   }
 
   /**
@@ -129,8 +128,8 @@ public class LabelGroup
    * @param propertyKeys list of property keys
    */
   public void setPropertyKeys(List&lt;String&gt; propertyKeys) {
-<span class="nc" id="L132">    f2 = propertyKeys;</span>
-<span class="nc" id="L133">  }</span>
+<span class="nc" id="L131">    f2 = propertyKeys;</span>
+<span class="nc" id="L132">  }</span>
 
   /**
    * Adds a property key to the current list of keys.
@@ -138,8 +137,8 @@ public class LabelGroup
    * @param propertyKey property key as string
    */
   public void addPropertyKey(String propertyKey) {
-<span class="fc" id="L141">    f2.add(propertyKey);</span>
-<span class="fc" id="L142">  }</span>
+<span class="fc" id="L140">    f2.add(propertyKey);</span>
+<span class="fc" id="L141">  }</span>
 
   /**
    * Returns the aggregate functions as list
@@ -147,7 +146,7 @@ public class LabelGroup
    * @return list of aggregate functions
    */
   public List&lt;AggregateFunction&gt; getAggregateFunctions() {
-<span class="fc" id="L150">    return f3;</span>
+<span class="fc" id="L149">    return f3;</span>
   }
 
   /**
@@ -156,8 +155,8 @@ public class LabelGroup
    * @param aggregateFunctions aggregate functions
    */
   public void setAggregateFunctions(List&lt;AggregateFunction&gt; aggregateFunctions) {
-<span class="nc" id="L159">    f3 = aggregateFunctions;</span>
-<span class="nc" id="L160">  }</span>
+<span class="nc" id="L158">    f3 = aggregateFunctions;</span>
+<span class="nc" id="L159">  }</span>
 
   /**
    * Adds an aggregate function to the current list of aggregators.
@@ -165,8 +164,8 @@ public class LabelGroup
    * @param aggregateFunction property value aggregate function
    */
   public void addAggregateFunction(AggregateFunction aggregateFunction) {
-<span class="fc" id="L168">    f3.add(aggregateFunction);</span>
-<span class="fc" id="L169">  }</span>
+<span class="fc" id="L167">    f3.add(aggregateFunction);</span>
+<span class="fc" id="L168">  }</span>
 
   /**
    * Returns the aggregate values as list
@@ -174,10 +173,10 @@ public class LabelGroup
    * @return aggregate values
    */
   public List&lt;PropertyValue&gt; getAggregateValues() {
-<span class="pc bpc" id="L177" title="1 of 2 branches missed.">    if (f4.size() &lt; f3.size()) {</span>
-<span class="nc" id="L178">      return f3.stream().map(AggregateUtil::getDefaultAggregate).collect(Collectors.toList());</span>
+<span class="pc bpc" id="L176" title="1 of 2 branches missed.">    if (f4.size() &lt; f3.size()) {</span>
+<span class="nc" id="L177">      return f3.stream().map(AggregateUtil::getDefaultAggregate).collect(Collectors.toList());</span>
     }
-<span class="fc" id="L180">    return f4;</span>
+<span class="fc" id="L179">    return f4;</span>
   }
 
   /**
@@ -186,8 +185,8 @@ public class LabelGroup
    * @param aggregateValues list of aggregate values
    */
   public void setAggregateValues(List&lt;PropertyValue&gt; aggregateValues) {
-<span class="fc" id="L189">    f4 = aggregateValues;</span>
-<span class="fc" id="L190">  }</span>
+<span class="fc" id="L188">    f4 = aggregateValues;</span>
+<span class="fc" id="L189">  }</span>
 
   /**
    * Sets the aggregate values
@@ -195,17 +194,17 @@ public class LabelGroup
    * @param aggregateValues aggregate value list
    */
   public void setAggregateValues(PropertyValueList aggregateValues) {
-<span class="fc" id="L198">    List&lt;PropertyValue&gt; aggregate = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L199">    aggregateValues.iterator().forEachRemaining(aggregate::add);</span>
-<span class="fc" id="L200">    setAggregateValues(aggregate);</span>
-<span class="fc" id="L201">  }</span>
+<span class="fc" id="L197">    List&lt;PropertyValue&gt; aggregate = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L198">    aggregateValues.iterator().forEachRemaining(aggregate::add);</span>
+<span class="fc" id="L199">    setAggregateValues(aggregate);</span>
+<span class="fc" id="L200">  }</span>
 
   /**
    * Resets the current aggregate values
    */
   public void resetAggregateValues() {
-<span class="fc" id="L207">    f4.clear();</span>
-<span class="fc" id="L208">  }</span>
+<span class="fc" id="L206">    f4.clear();</span>
+<span class="fc" id="L207">  }</span>
 
   /**
    * Returns the aggregate values as property value list
@@ -214,7 +213,7 @@ public class LabelGroup
    * @throws IOException on failure
    */
   public PropertyValueList getAggregateValueList() throws IOException {
-<span class="fc" id="L217">    return PropertyValueList.fromPropertyValues(getAggregateValues());</span>
+<span class="fc" id="L216">    return PropertyValueList.fromPropertyValues(getAggregateValues());</span>
   }
 
   /**
@@ -223,27 +222,27 @@ public class LabelGroup
    * @param values values to aggregate with
    */
   public void aggregate(PropertyValueList values) {
-<span class="fc bfc" id="L226" title="All 2 branches covered.">    if (f4.isEmpty()) {</span>
-<span class="fc" id="L227">      setAggregateValues(values);</span>
-<span class="fc" id="L228">      return;</span>
+<span class="fc bfc" id="L225" title="All 2 branches covered.">    if (f4.isEmpty()) {</span>
+<span class="fc" id="L226">      setAggregateValues(values);</span>
+<span class="fc" id="L227">      return;</span>
     }
 
-<span class="fc" id="L231">    Iterator&lt;PropertyValue&gt; valueIt = values.iterator();</span>
-<span class="fc" id="L232">    ListIterator&lt;PropertyValue&gt; aggregateIt = f4.listIterator();</span>
+<span class="fc" id="L230">    Iterator&lt;PropertyValue&gt; valueIt = values.iterator();</span>
+<span class="fc" id="L231">    ListIterator&lt;PropertyValue&gt; aggregateIt = f4.listIterator();</span>
     PropertyValue value;
     PropertyValue aggregate;
-<span class="fc bfc" id="L235" title="All 2 branches covered.">    for (AggregateFunction valueAggregator : getAggregateFunctions()) {</span>
-<span class="fc" id="L236">      value = valueIt.next();</span>
-<span class="fc bfc" id="L237" title="All 2 branches covered.">      if (!PropertyValue.NULL_VALUE.equals(value)) {</span>
-<span class="fc" id="L238">        aggregate = aggregateIt.next();</span>
-<span class="fc bfc" id="L239" title="All 2 branches covered.">        if (!PropertyValue.NULL_VALUE.equals(aggregate)) {</span>
-<span class="fc" id="L240">          aggregateIt.set(valueAggregator.aggregate(aggregate, value));</span>
+<span class="fc bfc" id="L234" title="All 2 branches covered.">    for (AggregateFunction valueAggregator : getAggregateFunctions()) {</span>
+<span class="fc" id="L235">      value = valueIt.next();</span>
+<span class="fc bfc" id="L236" title="All 2 branches covered.">      if (!PropertyValue.NULL_VALUE.equals(value)) {</span>
+<span class="fc" id="L237">        aggregate = aggregateIt.next();</span>
+<span class="fc bfc" id="L238" title="All 2 branches covered.">        if (!PropertyValue.NULL_VALUE.equals(aggregate)) {</span>
+<span class="fc" id="L239">          aggregateIt.set(valueAggregator.aggregate(aggregate, value));</span>
         } else {
-<span class="fc" id="L242">          aggregateIt.set(value);</span>
+<span class="fc" id="L241">          aggregateIt.set(value);</span>
         }
       }
-<span class="fc" id="L245">    }</span>
-<span class="fc" id="L246">  }</span>
+<span class="fc" id="L244">    }</span>
+<span class="fc" id="L245">  }</span>
 
   /**
    * Returns the property values of the given element which are used for
@@ -255,13 +254,13 @@ public class LabelGroup
    * @throws IOException on failure
    */
   public PropertyValueList getIncrementValues(EPGMElement element) throws IOException {
-<span class="fc bfc" id="L258" title="All 2 branches covered.">    if (f3.isEmpty()) {</span>
-<span class="fc" id="L259">      return PropertyValueList.createEmptyList();</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">    if (f3.isEmpty()) {</span>
+<span class="fc" id="L258">      return PropertyValueList.createEmptyList();</span>
     }
-<span class="fc" id="L261">    List&lt;PropertyValue&gt; propertyValues = getAggregateFunctions().stream()</span>
-<span class="fc" id="L262">      .map(f -&gt; getIncrement(f, element))</span>
-<span class="fc" id="L263">      .collect(Collectors.toList());</span>
-<span class="fc" id="L264">    return PropertyValueList.fromPropertyValues(propertyValues);</span>
+<span class="fc" id="L260">    List&lt;PropertyValue&gt; propertyValues = getAggregateFunctions().stream()</span>
+<span class="fc" id="L261">      .map(f -&gt; getIncrement(f, element))</span>
+<span class="fc" id="L262">      .collect(Collectors.toList());</span>
+<span class="fc" id="L263">    return PropertyValueList.fromPropertyValues(propertyValues);</span>
   }
 
   /**
@@ -273,12 +272,12 @@ public class LabelGroup
    */
   private static PropertyValue getIncrement(AggregateFunction aggregateFunction,
                                             EPGMElement element) {
-<span class="fc" id="L276">    PropertyValue increment = null;</span>
-<span class="pc bpc" id="L277" title="2 of 6 branches missed.">    if ((element instanceof EPGMVertex &amp;&amp; aggregateFunction.isVertexAggregation()) ||</span>
-<span class="pc bpc" id="L278" title="1 of 2 branches missed.">      (element instanceof EPGMEdge &amp;&amp; aggregateFunction.isEdgeAggregation())) {</span>
-<span class="fc" id="L279">      increment = aggregateFunction.getIncrement((Element) element);</span>
+<span class="fc" id="L275">    PropertyValue increment = null;</span>
+<span class="pc bpc" id="L276" title="2 of 6 branches missed.">    if ((element instanceof EPGMVertex &amp;&amp; aggregateFunction.isVertexAggregation()) ||</span>
+<span class="pc bpc" id="L277" title="1 of 2 branches missed.">      (element instanceof EPGMEdge &amp;&amp; aggregateFunction.isEdgeAggregation())) {</span>
+<span class="fc" id="L278">      increment = aggregateFunction.getIncrement(element);</span>
     }
-<span class="fc bfc" id="L281" title="All 2 branches covered.">    return increment == null ? AggregateUtil.getDefaultAggregate(aggregateFunction) : increment;</span>
+<span class="fc bfc" id="L280" title="All 2 branches covered.">    return increment == null ? AggregateUtil.getDefaultAggregate(aggregateFunction) : increment;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

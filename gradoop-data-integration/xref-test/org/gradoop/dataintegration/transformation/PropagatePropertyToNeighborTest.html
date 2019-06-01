@@ -49,7 +49,7 @@
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   * Whether this order makes any sense is not relevant for this test, it is just used to make sure</em>
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment">   * that two list-typed properties have the same order.</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="42" href="#42">42</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> Comparator&lt;PropertyValue&gt; byTypeFirst = Comparator
+<a name="42" href="#42">42</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> Comparator&lt;PropertyValue&gt; byTypeFirst = Comparator
 <a name="43" href="#43">43</a>      .comparing((PropertyValue pv) -&gt; pv.getType().getSimpleName())
 <a name="44" href="#44">44</a>      .thenComparing(Comparator.naturalOrder());
 <a name="45" href="#45">45</a>  

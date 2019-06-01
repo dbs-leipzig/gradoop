@@ -674,46 +674,42 @@ public class Embedding implements Value, CopyableValue&lt;Embedding&gt; {
 <span class="pc bpc" id="L674" title="1 of 2 branches missed.">    if (!Arrays.equals(propertyData, that.propertyData)) {</span>
 <span class="nc" id="L675">      return false;</span>
     }
-<span class="pc bpc" id="L677" title="1 of 2 branches missed.">    if (!Arrays.equals(idListData, that.idListData)) {</span>
-<span class="nc" id="L678">      return false;</span>
-    }
-
-<span class="fc" id="L681">    return true;</span>
+<span class="fc" id="L677">    return Arrays.equals(idListData, that.idListData);</span>
   }
 
   @Override
   public int hashCode() {
-<span class="nc" id="L686">    int result = Arrays.hashCode(idData);</span>
-<span class="nc" id="L687">    result = 31 * result + Arrays.hashCode(propertyData);</span>
-<span class="nc" id="L688">    result = 31 * result + Arrays.hashCode(idListData);</span>
-<span class="nc" id="L689">    return result;</span>
+<span class="nc" id="L682">    int result = Arrays.hashCode(idData);</span>
+<span class="nc" id="L683">    result = 31 * result + Arrays.hashCode(propertyData);</span>
+<span class="nc" id="L684">    result = 31 * result + Arrays.hashCode(idListData);</span>
+<span class="nc" id="L685">    return result;</span>
   }
 
   @Override
   public String toString() {
-<span class="fc" id="L694">    List&lt;List&lt;GradoopId&gt;&gt; idCollection = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L695" title="All 2 branches covered.">    for (int i = 0; i &lt; size(); i++) {</span>
-<span class="fc" id="L696">      idCollection.add(getIdAsList(i));</span>
+<span class="fc" id="L690">    List&lt;List&lt;GradoopId&gt;&gt; idCollection = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L691" title="All 2 branches covered.">    for (int i = 0; i &lt; size(); i++) {</span>
+<span class="fc" id="L692">      idCollection.add(getIdAsList(i));</span>
     }
 
-<span class="fc" id="L699">    String idString = idCollection</span>
-<span class="fc" id="L700">      .stream()</span>
-<span class="fc" id="L701">      .map(entry -&gt; {</span>
-<span class="fc bfc" id="L702" title="All 2 branches covered.">        if (entry.size() == 1) {</span>
-<span class="fc" id="L703">          return entry.get(0).toString();</span>
+<span class="fc" id="L695">    String idString = idCollection</span>
+<span class="fc" id="L696">      .stream()</span>
+<span class="fc" id="L697">      .map(entry -&gt; {</span>
+<span class="fc bfc" id="L698" title="All 2 branches covered.">        if (entry.size() == 1) {</span>
+<span class="fc" id="L699">          return entry.get(0).toString();</span>
         } else {
-<span class="fc" id="L705">          return entry.stream().map(GradoopId::toString).collect(joining(&quot;, &quot;, &quot;[&quot;, &quot;]&quot;));</span>
+<span class="fc" id="L701">          return entry.stream().map(GradoopId::toString).collect(joining(&quot;, &quot;, &quot;[&quot;, &quot;]&quot;));</span>
         }
       })
-<span class="fc" id="L708">      .collect(joining(&quot;, &quot;));</span>
+<span class="fc" id="L704">      .collect(joining(&quot;, &quot;));</span>
 
-<span class="fc" id="L710">    String propertyString = getProperties()</span>
-<span class="fc" id="L711">      .stream()</span>
-<span class="fc" id="L712">      .map(PropertyValue::toString)</span>
-<span class="fc" id="L713">      .collect(joining(&quot;, &quot;));</span>
+<span class="fc" id="L706">    String propertyString = getProperties()</span>
+<span class="fc" id="L707">      .stream()</span>
+<span class="fc" id="L708">      .map(PropertyValue::toString)</span>
+<span class="fc" id="L709">      .collect(joining(&quot;, &quot;));</span>
 
 
-<span class="fc" id="L716">    return &quot;Embedding{ &quot; +</span>
+<span class="fc" id="L712">    return &quot;Embedding{ &quot; +</span>
       &quot;entries: {&quot; + idString + &quot;},  &quot; +
       &quot;properties: {&quot; + propertyString + &quot;} &quot; +
       &quot;}&quot;;

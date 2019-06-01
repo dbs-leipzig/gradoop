@@ -140,7 +140,7 @@ public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
   }
 
   /**
-   * According to the specified {@link JoinEmbeddingsNode#vertexStrategy} and the specified
+   * According to the specified {@link #vertexStrategy} and the specified
    * {@link EmbeddingMetaData}, the method returns the columns that need to contain distinct
    * entries.
    *
@@ -154,7 +154,7 @@ public class ExpandEmbeddingsNode extends BinaryNode implements JoinNode {
   }
 
   /**
-   * According to the specified {@link JoinEmbeddingsNode#edgeStrategy} and the specified
+   * According to the specified {@link #edgeStrategy} and the specified
    * {@link EmbeddingMetaData}, the method returns the columns that need to contain distinct
    * entries.
    *

@@ -70,7 +70,7 @@ public class AddGraphElementToNewGraph&lt;GE extends GraphElement&gt;
 <span class="fc" id="L70">  }</span>
 
   @Override
-  public Tuple2&lt;GE, GraphHead&gt; map(GE value) throws Exception {
+  public Tuple2&lt;GE, GraphHead&gt; map(GE value) {
 <span class="fc" id="L74">    reuseVariableMapping.clear();</span>
 <span class="fc" id="L75">    reuseVariableMapping.put(</span>
 <span class="fc" id="L76">      PropertyValue.create(this.variable),</span>

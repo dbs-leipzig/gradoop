@@ -36,7 +36,7 @@ public class VertexIdsWithEdge implements FlatMapFunction&lt;Edge, Tuple2&lt;Gra
    * Constructor which instantiates the reuse tuple.
    */
 <span class="fc" id="L38">  public VertexIdsWithEdge() {</span>
-<span class="fc" id="L39">    reuseTuple = new Tuple2&lt;GradoopId, Edge&gt;();</span>
+<span class="fc" id="L39">    reuseTuple = new Tuple2&lt;&gt;();</span>
 <span class="fc" id="L40">  }</span>
 
   @Override

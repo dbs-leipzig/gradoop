@@ -57,7 +57,7 @@ public class AddMatchesToProperties
   @Override
   public void coGroup(Iterable&lt;GraphHead&gt; heads,
     Iterable&lt;Tuple2&lt;GradoopId, Boolean&gt;&gt; matches,
-    Collector&lt;GraphHead&gt; collector) throws Exception {
+    Collector&lt;GraphHead&gt; collector) {
 <span class="nc" id="L61">    GraphHead graphHead = heads.iterator().next();</span>
 <span class="nc" id="L62">    Iterator&lt;Tuple2&lt;GradoopId, Boolean&gt;&gt; it = matches.iterator();</span>
 <span class="nc bnc" id="L63" title="All 2 branches missed.">    if (!it.hasNext()) {</span>

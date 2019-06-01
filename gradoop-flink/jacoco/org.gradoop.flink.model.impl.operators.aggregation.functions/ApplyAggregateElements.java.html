@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * (graphId,vertex),.. =&gt; (graphId,aggregateValue),..
- */
 package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
 import org.apache.flink.api.common.functions.GroupCombineFunction;
@@ -47,37 +44,37 @@ public class ApplyAggregateElements&lt;T extends Element&gt; implements GroupCom
   /**
    * Reuse tuple.
    */
-<span class="fc" id="L50">  private final Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt; reusePair = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L47">  private final Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt; reusePair = new Tuple2&lt;&gt;();</span>
 
   /**
    * Creates a new instance of a ApplyAggregateElements group combine function.
    *
    * @param aggregateFunctions aggregate functions
    */
-<span class="fc" id="L57">  public ApplyAggregateElements(Set&lt;AggregateFunction&gt; aggregateFunctions) {</span>
-<span class="fc" id="L58">    this.aggregateFunctions = aggregateFunctions;</span>
-<span class="fc" id="L59">  }</span>
+<span class="fc" id="L54">  public ApplyAggregateElements(Set&lt;AggregateFunction&gt; aggregateFunctions) {</span>
+<span class="fc" id="L55">    this.aggregateFunctions = aggregateFunctions;</span>
+<span class="fc" id="L56">  }</span>
 
   @Override
   public void combine(Iterable&lt;Tuple2&lt;GradoopId, T&gt;&gt; elements,
     Collector&lt;Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt;&gt; out) {
 
-<span class="fc" id="L65">    Iterator&lt;Tuple2&lt;GradoopId, T&gt;&gt; iterator = elements.iterator();</span>
-<span class="fc" id="L66">    Tuple2&lt;GradoopId, T&gt; graphIdElement = iterator.next();</span>
+<span class="fc" id="L62">    Iterator&lt;Tuple2&lt;GradoopId, T&gt;&gt; iterator = elements.iterator();</span>
+<span class="fc" id="L63">    Tuple2&lt;GradoopId, T&gt; graphIdElement = iterator.next();</span>
 
-<span class="fc" id="L68">    Map&lt;String, PropertyValue&gt; aggregate = AggregateUtil.increment(new HashMap&lt;&gt;(),</span>
+<span class="fc" id="L65">    Map&lt;String, PropertyValue&gt; aggregate = AggregateUtil.increment(new HashMap&lt;&gt;(),</span>
       graphIdElement.f1, aggregateFunctions);
 
-<span class="fc bfc" id="L71" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
-<span class="fc" id="L72">      T element = iterator.next().f1;</span>
-<span class="fc" id="L73">      aggregate = AggregateUtil.increment(aggregate, element, aggregateFunctions);</span>
-<span class="fc" id="L74">    }</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
+<span class="fc" id="L69">      T element = iterator.next().f1;</span>
+<span class="fc" id="L70">      aggregate = AggregateUtil.increment(aggregate, element, aggregateFunctions);</span>
+<span class="fc" id="L71">    }</span>
 
-<span class="fc bfc" id="L76" title="All 2 branches covered.">    if (!aggregate.isEmpty()) {</span>
-<span class="fc" id="L77">      reusePair.f0 = graphIdElement.f0;</span>
-<span class="fc" id="L78">      reusePair.f1 = aggregate;</span>
-<span class="fc" id="L79">      out.collect(reusePair);</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">    if (!aggregate.isEmpty()) {</span>
+<span class="fc" id="L74">      reusePair.f0 = graphIdElement.f0;</span>
+<span class="fc" id="L75">      reusePair.f1 = aggregate;</span>
+<span class="fc" id="L76">      out.collect(reusePair);</span>
     }
-<span class="fc" id="L81">  }</span>
+<span class="fc" id="L78">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

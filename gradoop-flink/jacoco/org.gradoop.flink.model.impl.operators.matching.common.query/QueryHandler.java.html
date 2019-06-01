@@ -405,7 +405,7 @@ public class QueryHandler {
 <span class="fc" id="L405">    Collection&lt;Edge&gt; predecessors =</span>
 <span class="fc" id="L406">      getEdgesByTargetVertexId(getEdgeById(edgeId).getSourceVertexId());</span>
 <span class="pc bpc" id="L407" title="1 of 2 branches missed.">    return predecessors != null ?</span>
-<span class="pc" id="L408">      Lists.newArrayList(predecessors) : Lists.&lt;Edge&gt;newArrayList();</span>
+<span class="pc" id="L408">      Lists.newArrayList(predecessors) : Lists.newArrayList();</span>
   }
 
   /**
@@ -419,7 +419,7 @@ public class QueryHandler {
 <span class="fc" id="L419">    Collection&lt;Edge&gt; successors =</span>
 <span class="fc" id="L420">      getEdgesBySourceVertexId(getEdgeById(edgeId).getTargetVertexId());</span>
 <span class="pc bpc" id="L421" title="1 of 2 branches missed.">    return successors != null ?</span>
-<span class="pc" id="L422">      Lists.newArrayList(successors) : Lists.&lt;Edge&gt;newArrayList();</span>
+<span class="pc" id="L422">      Lists.newArrayList(successors) : Lists.newArrayList();</span>
   }
 
   /**

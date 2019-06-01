@@ -35,15 +35,13 @@ import org.gradoop.common.model.impl.pojo.GraphElement;
   implements JoinFunction&lt;Tuple2&lt;Long, GradoopIdSet&gt;, Tuple2&lt;Long, E&gt;, E&gt; {
 
   @Override
-  public E join(
-    Tuple2&lt;Long, GradoopIdSet&gt; idTuple,
-    Tuple2&lt;Long, E&gt; elementTuple) throws Exception {
+  public E join(Tuple2&lt;Long, GradoopIdSet&gt; idTuple, Tuple2&lt;Long, E&gt; elementTuple) {
 
-<span class="fc" id="L42">    E element = elementTuple.f1;</span>
-<span class="fc bfc" id="L43" title="All 2 branches covered.">    for (GradoopId id : idTuple.f1) {</span>
-<span class="fc" id="L44">      element.addGraphId(id);</span>
-<span class="fc" id="L45">    }</span>
-<span class="fc" id="L46">    return element;</span>
+<span class="fc" id="L40">    E element = elementTuple.f1;</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">    for (GradoopId id : idTuple.f1) {</span>
+<span class="fc" id="L42">      element.addGraphId(id);</span>
+<span class="fc" id="L43">    }</span>
+<span class="fc" id="L44">    return element;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

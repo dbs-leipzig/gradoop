@@ -243,8 +243,7 @@ public class Properties implements Iterable&lt;Property&gt;, Value, Serializable
 
 <span class="fc" id="L244">    Properties that = (Properties) o;</span>
 
-<span class="pc bpc" id="L246" title="3 of 6 branches missed.">    return !(properties != null ? !properties.equals(that.properties) :</span>
-      that.properties != null);
+<span class="fc" id="L246">    return Objects.equals(properties, that.properties);</span>
   }
 
   /**
@@ -255,12 +254,12 @@ public class Properties implements Iterable&lt;Property&gt;, Value, Serializable
    */
   @Override
   public int hashCode() {
-<span class="pc bpc" id="L258" title="1 of 2 branches missed.">    return properties != null ? properties.hashCode() : 0;</span>
+<span class="pc bpc" id="L257" title="1 of 2 branches missed.">    return properties != null ? properties.hashCode() : 0;</span>
   }
 
   @Override
   public Iterator&lt;Property&gt; iterator() {
-<span class="fc" id="L263">    return toList().iterator();</span>
+<span class="fc" id="L262">    return toList().iterator();</span>
   }
 
   /**
@@ -269,42 +268,42 @@ public class Properties implements Iterable&lt;Property&gt;, Value, Serializable
    * @return List of properties
    */
   public List&lt;Property&gt; toList() {
-<span class="fc" id="L272">    return  properties.entrySet().stream()</span>
-<span class="fc" id="L273">            .map(e -&gt; Property.create(e.getKey(), e.getValue()))</span>
-<span class="fc" id="L274">            .collect(Collectors.toList());</span>
+<span class="fc" id="L271">    return  properties.entrySet().stream()</span>
+<span class="fc" id="L272">            .map(e -&gt; Property.create(e.getKey(), e.getValue()))</span>
+<span class="fc" id="L273">            .collect(Collectors.toList());</span>
   }
 
   @Override
   public void write(DataOutputView outputView) throws IOException {
-<span class="fc" id="L279">    outputView.writeInt(properties.size());</span>
+<span class="fc" id="L278">    outputView.writeInt(properties.size());</span>
 
-<span class="fc bfc" id="L281" title="All 2 branches covered.">    for (Map.Entry&lt;String, PropertyValue&gt; entry : properties.entrySet()) {</span>
-<span class="fc" id="L282">      outputView.writeUTF(entry.getKey());</span>
-<span class="fc" id="L283">      entry.getValue().write(outputView);</span>
-<span class="fc" id="L284">    }</span>
-<span class="fc" id="L285">  }</span>
+<span class="fc bfc" id="L280" title="All 2 branches covered.">    for (Map.Entry&lt;String, PropertyValue&gt; entry : properties.entrySet()) {</span>
+<span class="fc" id="L281">      outputView.writeUTF(entry.getKey());</span>
+<span class="fc" id="L282">      entry.getValue().write(outputView);</span>
+<span class="fc" id="L283">    }</span>
+<span class="fc" id="L284">  }</span>
 
   @Override
   public void read(DataInputView inputView) throws IOException {
-<span class="fc" id="L289">    int propertyCount = inputView.readInt();</span>
-<span class="fc" id="L290">    this.properties = new HashMap&lt;&gt;(propertyCount);</span>
+<span class="fc" id="L288">    int propertyCount = inputView.readInt();</span>
+<span class="fc" id="L289">    this.properties = new HashMap&lt;&gt;(propertyCount);</span>
 
     String key;
     PropertyValue value;
 
-<span class="fc bfc" id="L295" title="All 2 branches covered.">    for (int i = 0; i &lt; propertyCount; i++) {</span>
-<span class="fc" id="L296">      key = inputView.readUTF();</span>
-<span class="fc" id="L297">      value = new PropertyValue();</span>
-<span class="fc" id="L298">      value.read(inputView);</span>
-<span class="fc" id="L299">      properties.put(key, value);</span>
+<span class="fc bfc" id="L294" title="All 2 branches covered.">    for (int i = 0; i &lt; propertyCount; i++) {</span>
+<span class="fc" id="L295">      key = inputView.readUTF();</span>
+<span class="fc" id="L296">      value = new PropertyValue();</span>
+<span class="fc" id="L297">      value.read(inputView);</span>
+<span class="fc" id="L298">      properties.put(key, value);</span>
     }
-<span class="fc" id="L301">  }</span>
+<span class="fc" id="L300">  }</span>
 
   @Override
   public String toString() {
-<span class="nc" id="L305">    return toList().stream()</span>
-<span class="nc" id="L306">      .map(Property::toString)</span>
-<span class="nc" id="L307">      .collect(Collectors.joining(&quot;,&quot;));</span>
+<span class="nc" id="L304">    return toList().stream()</span>
+<span class="nc" id="L305">      .map(Property::toString)</span>
+<span class="nc" id="L306">      .collect(Collectors.joining(&quot;,&quot;));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

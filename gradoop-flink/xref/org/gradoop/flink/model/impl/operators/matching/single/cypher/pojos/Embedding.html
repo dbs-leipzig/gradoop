@@ -684,51 +684,47 @@
 <a name="674" href="#674">674</a>     <strong class="jxr_keyword">if</strong> (!Arrays.equals(propertyData, that.propertyData)) {
 <a name="675" href="#675">675</a>       <strong class="jxr_keyword">return</strong> false;
 <a name="676" href="#676">676</a>     }
-<a name="677" href="#677">677</a>     <strong class="jxr_keyword">if</strong> (!Arrays.equals(idListData, that.idListData)) {
-<a name="678" href="#678">678</a>       <strong class="jxr_keyword">return</strong> false;
-<a name="679" href="#679">679</a>     }
-<a name="680" href="#680">680</a> 
-<a name="681" href="#681">681</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">true</strong>;
-<a name="682" href="#682">682</a>   }
-<a name="683" href="#683">683</a> 
-<a name="684" href="#684">684</a>   @Override
-<a name="685" href="#685">685</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">int</strong> hashCode() {
-<a name="686" href="#686">686</a>     <strong class="jxr_keyword">int</strong> result = Arrays.hashCode(idData);
-<a name="687" href="#687">687</a>     result = 31 * result + Arrays.hashCode(propertyData);
-<a name="688" href="#688">688</a>     result = 31 * result + Arrays.hashCode(idListData);
-<a name="689" href="#689">689</a>     <strong class="jxr_keyword">return</strong> result;
-<a name="690" href="#690">690</a>   }
-<a name="691" href="#691">691</a> 
-<a name="692" href="#692">692</a>   @Override
-<a name="693" href="#693">693</a>   <strong class="jxr_keyword">public</strong> String toString() {
-<a name="694" href="#694">694</a>     List&lt;List&lt;GradoopId&gt;&gt; idCollection = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
-<a name="695" href="#695">695</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; size(); i++) {
-<a name="696" href="#696">696</a>       idCollection.add(getIdAsList(i));
-<a name="697" href="#697">697</a>     }
-<a name="698" href="#698">698</a> 
-<a name="699" href="#699">699</a>     String idString = idCollection
-<a name="700" href="#700">700</a>       .stream()
-<a name="701" href="#701">701</a>       .map(entry -&gt; {
-<a name="702" href="#702">702</a>         <strong class="jxr_keyword">if</strong> (entry.size() == 1) {
-<a name="703" href="#703">703</a>           <strong class="jxr_keyword">return</strong> entry.get(0).toString();
-<a name="704" href="#704">704</a>         } <strong class="jxr_keyword">else</strong> {
-<a name="705" href="#705">705</a>           <strong class="jxr_keyword">return</strong> entry.stream().map(GradoopId::toString).collect(joining(<span class="jxr_string">", "</span>, <span class="jxr_string">"["</span>, <span class="jxr_string">"]"</span>));
-<a name="706" href="#706">706</a>         }
-<a name="707" href="#707">707</a>       })
-<a name="708" href="#708">708</a>       .collect(joining(<span class="jxr_string">", "</span>));
-<a name="709" href="#709">709</a> 
-<a name="710" href="#710">710</a>     String propertyString = getProperties()
-<a name="711" href="#711">711</a>       .stream()
-<a name="712" href="#712">712</a>       .map(PropertyValue::toString)
-<a name="713" href="#713">713</a>       .collect(joining(<span class="jxr_string">", "</span>));
-<a name="714" href="#714">714</a> 
-<a name="715" href="#715">715</a> 
-<a name="716" href="#716">716</a>     <strong class="jxr_keyword">return</strong> <span class="jxr_string">"Embedding{ "</span> +
-<a name="717" href="#717">717</a>       <span class="jxr_string">"entries: {"</span> + idString + <span class="jxr_string">"},  "</span> +
-<a name="718" href="#718">718</a>       <span class="jxr_string">"properties: {"</span> + propertyString + <span class="jxr_string">"} "</span> +
-<a name="719" href="#719">719</a>       <span class="jxr_string">"}"</span>;
-<a name="720" href="#720">720</a>   }
-<a name="721" href="#721">721</a> }
+<a name="677" href="#677">677</a>     <strong class="jxr_keyword">return</strong> Arrays.equals(idListData, that.idListData);
+<a name="678" href="#678">678</a>   }
+<a name="679" href="#679">679</a> 
+<a name="680" href="#680">680</a>   @Override
+<a name="681" href="#681">681</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">int</strong> hashCode() {
+<a name="682" href="#682">682</a>     <strong class="jxr_keyword">int</strong> result = Arrays.hashCode(idData);
+<a name="683" href="#683">683</a>     result = 31 * result + Arrays.hashCode(propertyData);
+<a name="684" href="#684">684</a>     result = 31 * result + Arrays.hashCode(idListData);
+<a name="685" href="#685">685</a>     <strong class="jxr_keyword">return</strong> result;
+<a name="686" href="#686">686</a>   }
+<a name="687" href="#687">687</a> 
+<a name="688" href="#688">688</a>   @Override
+<a name="689" href="#689">689</a>   <strong class="jxr_keyword">public</strong> String toString() {
+<a name="690" href="#690">690</a>     List&lt;List&lt;GradoopId&gt;&gt; idCollection = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="691" href="#691">691</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> i = 0; i &lt; size(); i++) {
+<a name="692" href="#692">692</a>       idCollection.add(getIdAsList(i));
+<a name="693" href="#693">693</a>     }
+<a name="694" href="#694">694</a> 
+<a name="695" href="#695">695</a>     String idString = idCollection
+<a name="696" href="#696">696</a>       .stream()
+<a name="697" href="#697">697</a>       .map(entry -&gt; {
+<a name="698" href="#698">698</a>         <strong class="jxr_keyword">if</strong> (entry.size() == 1) {
+<a name="699" href="#699">699</a>           <strong class="jxr_keyword">return</strong> entry.get(0).toString();
+<a name="700" href="#700">700</a>         } <strong class="jxr_keyword">else</strong> {
+<a name="701" href="#701">701</a>           <strong class="jxr_keyword">return</strong> entry.stream().map(GradoopId::toString).collect(joining(<span class="jxr_string">", "</span>, <span class="jxr_string">"["</span>, <span class="jxr_string">"]"</span>));
+<a name="702" href="#702">702</a>         }
+<a name="703" href="#703">703</a>       })
+<a name="704" href="#704">704</a>       .collect(joining(<span class="jxr_string">", "</span>));
+<a name="705" href="#705">705</a> 
+<a name="706" href="#706">706</a>     String propertyString = getProperties()
+<a name="707" href="#707">707</a>       .stream()
+<a name="708" href="#708">708</a>       .map(PropertyValue::toString)
+<a name="709" href="#709">709</a>       .collect(joining(<span class="jxr_string">", "</span>));
+<a name="710" href="#710">710</a> 
+<a name="711" href="#711">711</a> 
+<a name="712" href="#712">712</a>     <strong class="jxr_keyword">return</strong> <span class="jxr_string">"Embedding{ "</span> +
+<a name="713" href="#713">713</a>       <span class="jxr_string">"entries: {"</span> + idString + <span class="jxr_string">"},  "</span> +
+<a name="714" href="#714">714</a>       <span class="jxr_string">"properties: {"</span> + propertyString + <span class="jxr_string">"} "</span> +
+<a name="715" href="#715">715</a>       <span class="jxr_string">"}"</span>;
+<a name="716" href="#716">716</a>   }
+<a name="717" href="#717">717</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

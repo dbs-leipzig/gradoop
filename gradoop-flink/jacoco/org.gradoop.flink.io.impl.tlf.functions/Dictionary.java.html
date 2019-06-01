@@ -43,7 +43,7 @@ import java.util.Map;
 <span class="fc" id="L43">    Map&lt;Integer, String&gt; dictionary = Maps.newHashMap();</span>
 <span class="fc bfc" id="L44" title="All 2 branches covered.">    for (Tuple2&lt;Integer, String&gt; tuple : iterable) {</span>
 <span class="fc" id="L45">      dictionary.put(</span>
-<span class="fc" id="L46">        (Integer) tuple.getField(0), (String) tuple.getField(1));</span>
+<span class="fc" id="L46">        tuple.getField(0), tuple.getField(1));</span>
 <span class="fc" id="L47">    }</span>
 <span class="fc" id="L48">    collector.collect(dictionary);</span>
 <span class="fc" id="L49">  }</span>

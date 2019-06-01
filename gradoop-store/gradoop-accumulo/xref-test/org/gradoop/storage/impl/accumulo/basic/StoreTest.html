@@ -304,146 +304,144 @@
 <a name="294" href="#294">294</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="295" href="#295">295</a> <em class="jxr_javadoccomment">   * Checks if property values are read correctly.</em>
 <a name="296" href="#296">296</a> <em class="jxr_javadoccomment">   */</em>
-<a name="297" href="#297">297</a>   @SuppressWarnings(<span class="jxr_string">"Duplicates"</span>)
-<a name="298" href="#298">298</a>   @Test
-<a name="299" href="#299">299</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> propertyTypeTest()
-<a name="300" href="#300">300</a>     <strong class="jxr_keyword">throws</strong> AccumuloSecurityException, AccumuloException, IOException {
-<a name="301" href="#301">301</a>     GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(TEST05);
-<a name="302" href="#302">302</a>     AccumuloEPGMStore graphStore = <strong class="jxr_keyword">new</strong> AccumuloEPGMStore(config);
-<a name="303" href="#303">303</a> 
-<a name="304" href="#304">304</a>     <strong class="jxr_keyword">final</strong> GradoopId vertexID = GradoopId.get();
-<a name="305" href="#305">305</a>     <strong class="jxr_keyword">final</strong> String label = <span class="jxr_string">"A"</span>;
-<a name="306" href="#306">306</a> 
-<a name="307" href="#307">307</a>     Properties properties = Properties.createFromMap(SUPPORTED_PROPERTIES);
-<a name="308" href="#308">308</a> 
-<a name="309" href="#309">309</a>     <strong class="jxr_keyword">final</strong> GradoopIdSet graphs = <strong class="jxr_keyword">new</strong> GradoopIdSet();
-<a name="310" href="#310">310</a> 
-<a name="311" href="#311">311</a>     <em class="jxr_comment">// write to store</em>
-<a name="312" href="#312">312</a>     GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
-<a name="313" href="#313">313</a>     graphStore.writeVertex(flinkConfig
-<a name="314" href="#314">314</a>       .getVertexFactory()
-<a name="315" href="#315">315</a>       .initVertex(vertexID, label, properties, graphs));
-<a name="316" href="#316">316</a> 
-<a name="317" href="#317">317</a>     graphStore.flush();
-<a name="318" href="#318">318</a> 
-<a name="319" href="#319">319</a>     <em class="jxr_comment">// read from store</em>
-<a name="320" href="#320">320</a>     Vertex v = graphStore.readVertex(vertexID);
-<a name="321" href="#321">321</a>     assert v != <strong class="jxr_keyword">null</strong>;
-<a name="322" href="#322">322</a>     List&lt;String&gt; propertyKeys = Lists.newArrayList(v.getPropertyKeys());
-<a name="323" href="#323">323</a>     assertEquals(properties.size(), propertyKeys.size());
-<a name="324" href="#324">324</a> 
-<a name="325" href="#325">325</a>     <strong class="jxr_keyword">for</strong> (String propertyKey : propertyKeys) {
-<a name="326" href="#326">326</a>       <strong class="jxr_keyword">switch</strong> (propertyKey) {
-<a name="327" href="#327">327</a>       <strong class="jxr_keyword">case</strong> KEY_0:
-<a name="328" href="#328">328</a>         assertTrue(v.getPropertyValue(propertyKey).isNull());
-<a name="329" href="#329">329</a>         assertEquals(NULL_VAL_0, v.getPropertyValue(propertyKey).getObject());
-<a name="330" href="#330">330</a>         <strong class="jxr_keyword">break</strong>;
-<a name="331" href="#331">331</a>       <strong class="jxr_keyword">case</strong> KEY_1:
-<a name="332" href="#332">332</a>         assertTrue(v.getPropertyValue(propertyKey).isBoolean());
-<a name="333" href="#333">333</a>         assertEquals(BOOL_VAL_1, v.getPropertyValue(propertyKey).getBoolean());
-<a name="334" href="#334">334</a>         <strong class="jxr_keyword">break</strong>;
-<a name="335" href="#335">335</a>       <strong class="jxr_keyword">case</strong> KEY_2:
-<a name="336" href="#336">336</a>         assertTrue(v.getPropertyValue(propertyKey).isInt());
-<a name="337" href="#337">337</a>         assertEquals(INT_VAL_2, v.getPropertyValue(propertyKey).getInt());
-<a name="338" href="#338">338</a>         <strong class="jxr_keyword">break</strong>;
-<a name="339" href="#339">339</a>       <strong class="jxr_keyword">case</strong> KEY_3:
-<a name="340" href="#340">340</a>         assertTrue(v.getPropertyValue(propertyKey).isLong());
-<a name="341" href="#341">341</a>         assertEquals(LONG_VAL_3, v.getPropertyValue(propertyKey).getLong());
-<a name="342" href="#342">342</a>         <strong class="jxr_keyword">break</strong>;
-<a name="343" href="#343">343</a>       <strong class="jxr_keyword">case</strong> KEY_4:
-<a name="344" href="#344">344</a>         assertTrue(v.getPropertyValue(propertyKey).isFloat());
-<a name="345" href="#345">345</a>         assertEquals(FLOAT_VAL_4, v.getPropertyValue(propertyKey).getFloat(), 0);
-<a name="346" href="#346">346</a>         <strong class="jxr_keyword">break</strong>;
-<a name="347" href="#347">347</a>       <strong class="jxr_keyword">case</strong> KEY_5:
-<a name="348" href="#348">348</a>         assertTrue(v.getPropertyValue(propertyKey).isDouble());
-<a name="349" href="#349">349</a>         assertEquals(DOUBLE_VAL_5, v.getPropertyValue(propertyKey).getDouble(), 0);
-<a name="350" href="#350">350</a>         <strong class="jxr_keyword">break</strong>;
-<a name="351" href="#351">351</a>       <strong class="jxr_keyword">case</strong> KEY_6:
-<a name="352" href="#352">352</a>         assertTrue(v.getPropertyValue(propertyKey).isString());
-<a name="353" href="#353">353</a>         assertEquals(STRING_VAL_6, v.getPropertyValue(propertyKey).getString());
-<a name="354" href="#354">354</a>         <strong class="jxr_keyword">break</strong>;
-<a name="355" href="#355">355</a>       <strong class="jxr_keyword">case</strong> KEY_7:
-<a name="356" href="#356">356</a>         assertTrue(v.getPropertyValue(propertyKey).isBigDecimal());
-<a name="357" href="#357">357</a>         assertEquals(BIG_DECIMAL_VAL_7, v.getPropertyValue(propertyKey).getBigDecimal());
-<a name="358" href="#358">358</a>         <strong class="jxr_keyword">break</strong>;
-<a name="359" href="#359">359</a>       <strong class="jxr_keyword">case</strong> KEY_8:
-<a name="360" href="#360">360</a>         assertTrue(v.getPropertyValue(propertyKey).isGradoopId());
-<a name="361" href="#361">361</a>         assertEquals(GRADOOP_ID_VAL_8, v.getPropertyValue(propertyKey).getGradoopId());
-<a name="362" href="#362">362</a>         <strong class="jxr_keyword">break</strong>;
-<a name="363" href="#363">363</a>       <strong class="jxr_keyword">case</strong> KEY_9:
-<a name="364" href="#364">364</a>         assertTrue(v.getPropertyValue(propertyKey).isMap());
-<a name="365" href="#365">365</a>         assertEquals(MAP_VAL_9, v.getPropertyValue(propertyKey).getMap());
-<a name="366" href="#366">366</a>         <strong class="jxr_keyword">break</strong>;
-<a name="367" href="#367">367</a>       <strong class="jxr_keyword">case</strong> KEY_a:
-<a name="368" href="#368">368</a>         assertTrue(v.getPropertyValue(propertyKey).isList());
-<a name="369" href="#369">369</a>         assertEquals(LIST_VAL_a, v.getPropertyValue(propertyKey).getList());
-<a name="370" href="#370">370</a>         <strong class="jxr_keyword">break</strong>;
-<a name="371" href="#371">371</a>       <strong class="jxr_keyword">case</strong> KEY_b:
-<a name="372" href="#372">372</a>         assertTrue(v.getPropertyValue(propertyKey).isDate());
-<a name="373" href="#373">373</a>         assertEquals(DATE_VAL_b, v.getPropertyValue(propertyKey).getDate());
-<a name="374" href="#374">374</a>         <strong class="jxr_keyword">break</strong>;
-<a name="375" href="#375">375</a>       <strong class="jxr_keyword">case</strong> KEY_c:
-<a name="376" href="#376">376</a>         assertTrue(v.getPropertyValue(propertyKey).isTime());
-<a name="377" href="#377">377</a>         assertEquals(TIME_VAL_c, v.getPropertyValue(propertyKey).getTime());
-<a name="378" href="#378">378</a>         <strong class="jxr_keyword">break</strong>;
-<a name="379" href="#379">379</a>       <strong class="jxr_keyword">case</strong> KEY_d:
-<a name="380" href="#380">380</a>         assertTrue(v.getPropertyValue(propertyKey).isDateTime());
-<a name="381" href="#381">381</a>         assertEquals(DATETIME_VAL_d, v.getPropertyValue(propertyKey).getDateTime());
-<a name="382" href="#382">382</a>         <strong class="jxr_keyword">break</strong>;
-<a name="383" href="#383">383</a>       <strong class="jxr_keyword">case</strong> KEY_e:
-<a name="384" href="#384">384</a>         assertTrue(v.getPropertyValue(propertyKey).isShort());
-<a name="385" href="#385">385</a>         assertEquals(SHORT_VAL_e, v.getPropertyValue(propertyKey).getShort());
-<a name="386" href="#386">386</a>         <strong class="jxr_keyword">break</strong>;
-<a name="387" href="#387">387</a>       <strong class="jxr_keyword">case</strong> KEY_f:
-<a name="388" href="#388">388</a>         assertTrue(v.getPropertyValue(propertyKey).isSet());
-<a name="389" href="#389">389</a>         assertEquals(SET_VAL_f, v.getPropertyValue(propertyKey).getSet());
-<a name="390" href="#390">390</a>         <strong class="jxr_keyword">break</strong>;
-<a name="391" href="#391">391</a>       <strong class="jxr_keyword">default</strong>: <strong class="jxr_keyword">break</strong>;
-<a name="392" href="#392">392</a>       }
-<a name="393" href="#393">393</a>     }
-<a name="394" href="#394">394</a>   }
-<a name="395" href="#395">395</a> 
-<a name="396" href="#396">396</a>   <strong class="jxr_keyword">private</strong> AsciiGraphLoader&lt;GraphHead, Vertex, Edge&gt; getMinimalFullFeaturedGraphLoader() {
-<a name="397" href="#397">397</a>     String asciiGraph = <span class="jxr_string">":G{k:\&quot;v\&quot;}[(v:V{k:\&quot;v\&quot;}),(v)-[:e{k:\&quot;v\&quot;}]-&gt;(v)]"</span>;
-<a name="398" href="#398">398</a> 
-<a name="399" href="#399">399</a>     <strong class="jxr_keyword">return</strong> AsciiGraphLoader.fromString(asciiGraph, GradoopConfig.getDefaultConfig());
-<a name="400" href="#400">400</a>   }
-<a name="401" href="#401">401</a> 
-<a name="402" href="#402">402</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> validateGraphHead(
-<a name="403" href="#403">403</a>     AccumuloEPGMStore graphStore,
-<a name="404" href="#404">404</a>     GraphHead originalGraphHead
-<a name="405" href="#405">405</a>   ) <strong class="jxr_keyword">throws</strong> IOException {
-<a name="406" href="#406">406</a>     EPGMGraphHead loadedGraphHead = graphStore.readGraph(originalGraphHead.getId());
-<a name="407" href="#407">407</a> 
-<a name="408" href="#408">408</a>     validateEPGMElements(originalGraphHead, loadedGraphHead);
-<a name="409" href="#409">409</a>   }
-<a name="410" href="#410">410</a> 
-<a name="411" href="#411">411</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> validateVertex(
-<a name="412" href="#412">412</a>     AccumuloEPGMStore graphStore,
-<a name="413" href="#413">413</a>     Vertex originalVertex
-<a name="414" href="#414">414</a>   ) <strong class="jxr_keyword">throws</strong> IOException {
-<a name="415" href="#415">415</a>     EPGMVertex loadedVertex = graphStore.readVertex(originalVertex.getId());
-<a name="416" href="#416">416</a> 
-<a name="417" href="#417">417</a>     validateEPGMElements(originalVertex, loadedVertex);
-<a name="418" href="#418">418</a>     validateEPGMGraphElements(originalVertex, loadedVertex);
-<a name="419" href="#419">419</a>   }
-<a name="420" href="#420">420</a> 
-<a name="421" href="#421">421</a>   @SuppressWarnings(<span class="jxr_string">"Duplicates"</span>)
-<a name="422" href="#422">422</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> validateEdge(
-<a name="423" href="#423">423</a>     AccumuloEPGMStore graphStore,
-<a name="424" href="#424">424</a>     Edge originalEdge
-<a name="425" href="#425">425</a>   ) <strong class="jxr_keyword">throws</strong> IOException {
-<a name="426" href="#426">426</a>     EPGMEdge loadedEdge = graphStore.readEdge(originalEdge.getId());
-<a name="427" href="#427">427</a>     validateEPGMElements(originalEdge, loadedEdge);
-<a name="428" href="#428">428</a>     validateEPGMGraphElements(originalEdge, loadedEdge);
-<a name="429" href="#429">429</a>     assert loadedEdge != <strong class="jxr_keyword">null</strong>;
-<a name="430" href="#430">430</a>     assertEquals(<span class="jxr_string">"source vertex mismatch"</span>,
-<a name="431" href="#431">431</a>       originalEdge.getSourceId(), loadedEdge.getSourceId());
-<a name="432" href="#432">432</a>     assertEquals(<span class="jxr_string">"target vertex mismatch"</span>,
-<a name="433" href="#433">433</a>       originalEdge.getTargetId(), loadedEdge.getTargetId());
-<a name="434" href="#434">434</a>   }
-<a name="435" href="#435">435</a> 
-<a name="436" href="#436">436</a> }
+<a name="297" href="#297">297</a>   @Test
+<a name="298" href="#298">298</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> propertyTypeTest()
+<a name="299" href="#299">299</a>     <strong class="jxr_keyword">throws</strong> AccumuloSecurityException, AccumuloException, IOException {
+<a name="300" href="#300">300</a>     GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(TEST05);
+<a name="301" href="#301">301</a>     AccumuloEPGMStore graphStore = <strong class="jxr_keyword">new</strong> AccumuloEPGMStore(config);
+<a name="302" href="#302">302</a> 
+<a name="303" href="#303">303</a>     <strong class="jxr_keyword">final</strong> GradoopId vertexID = GradoopId.get();
+<a name="304" href="#304">304</a>     <strong class="jxr_keyword">final</strong> String label = <span class="jxr_string">"A"</span>;
+<a name="305" href="#305">305</a> 
+<a name="306" href="#306">306</a>     Properties properties = Properties.createFromMap(SUPPORTED_PROPERTIES);
+<a name="307" href="#307">307</a> 
+<a name="308" href="#308">308</a>     <strong class="jxr_keyword">final</strong> GradoopIdSet graphs = <strong class="jxr_keyword">new</strong> GradoopIdSet();
+<a name="309" href="#309">309</a> 
+<a name="310" href="#310">310</a>     <em class="jxr_comment">// write to store</em>
+<a name="311" href="#311">311</a>     GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
+<a name="312" href="#312">312</a>     graphStore.writeVertex(flinkConfig
+<a name="313" href="#313">313</a>       .getVertexFactory()
+<a name="314" href="#314">314</a>       .initVertex(vertexID, label, properties, graphs));
+<a name="315" href="#315">315</a> 
+<a name="316" href="#316">316</a>     graphStore.flush();
+<a name="317" href="#317">317</a> 
+<a name="318" href="#318">318</a>     <em class="jxr_comment">// read from store</em>
+<a name="319" href="#319">319</a>     Vertex v = graphStore.readVertex(vertexID);
+<a name="320" href="#320">320</a>     assert v != <strong class="jxr_keyword">null</strong>;
+<a name="321" href="#321">321</a>     List&lt;String&gt; propertyKeys = Lists.newArrayList(v.getPropertyKeys());
+<a name="322" href="#322">322</a>     assertEquals(properties.size(), propertyKeys.size());
+<a name="323" href="#323">323</a> 
+<a name="324" href="#324">324</a>     <strong class="jxr_keyword">for</strong> (String propertyKey : propertyKeys) {
+<a name="325" href="#325">325</a>       <strong class="jxr_keyword">switch</strong> (propertyKey) {
+<a name="326" href="#326">326</a>       <strong class="jxr_keyword">case</strong> KEY_0:
+<a name="327" href="#327">327</a>         assertTrue(v.getPropertyValue(propertyKey).isNull());
+<a name="328" href="#328">328</a>         assertEquals(NULL_VAL_0, v.getPropertyValue(propertyKey).getObject());
+<a name="329" href="#329">329</a>         <strong class="jxr_keyword">break</strong>;
+<a name="330" href="#330">330</a>       <strong class="jxr_keyword">case</strong> KEY_1:
+<a name="331" href="#331">331</a>         assertTrue(v.getPropertyValue(propertyKey).isBoolean());
+<a name="332" href="#332">332</a>         assertEquals(BOOL_VAL_1, v.getPropertyValue(propertyKey).getBoolean());
+<a name="333" href="#333">333</a>         <strong class="jxr_keyword">break</strong>;
+<a name="334" href="#334">334</a>       <strong class="jxr_keyword">case</strong> KEY_2:
+<a name="335" href="#335">335</a>         assertTrue(v.getPropertyValue(propertyKey).isInt());
+<a name="336" href="#336">336</a>         assertEquals(INT_VAL_2, v.getPropertyValue(propertyKey).getInt());
+<a name="337" href="#337">337</a>         <strong class="jxr_keyword">break</strong>;
+<a name="338" href="#338">338</a>       <strong class="jxr_keyword">case</strong> KEY_3:
+<a name="339" href="#339">339</a>         assertTrue(v.getPropertyValue(propertyKey).isLong());
+<a name="340" href="#340">340</a>         assertEquals(LONG_VAL_3, v.getPropertyValue(propertyKey).getLong());
+<a name="341" href="#341">341</a>         <strong class="jxr_keyword">break</strong>;
+<a name="342" href="#342">342</a>       <strong class="jxr_keyword">case</strong> KEY_4:
+<a name="343" href="#343">343</a>         assertTrue(v.getPropertyValue(propertyKey).isFloat());
+<a name="344" href="#344">344</a>         assertEquals(FLOAT_VAL_4, v.getPropertyValue(propertyKey).getFloat(), 0);
+<a name="345" href="#345">345</a>         <strong class="jxr_keyword">break</strong>;
+<a name="346" href="#346">346</a>       <strong class="jxr_keyword">case</strong> KEY_5:
+<a name="347" href="#347">347</a>         assertTrue(v.getPropertyValue(propertyKey).isDouble());
+<a name="348" href="#348">348</a>         assertEquals(DOUBLE_VAL_5, v.getPropertyValue(propertyKey).getDouble(), 0);
+<a name="349" href="#349">349</a>         <strong class="jxr_keyword">break</strong>;
+<a name="350" href="#350">350</a>       <strong class="jxr_keyword">case</strong> KEY_6:
+<a name="351" href="#351">351</a>         assertTrue(v.getPropertyValue(propertyKey).isString());
+<a name="352" href="#352">352</a>         assertEquals(STRING_VAL_6, v.getPropertyValue(propertyKey).getString());
+<a name="353" href="#353">353</a>         <strong class="jxr_keyword">break</strong>;
+<a name="354" href="#354">354</a>       <strong class="jxr_keyword">case</strong> KEY_7:
+<a name="355" href="#355">355</a>         assertTrue(v.getPropertyValue(propertyKey).isBigDecimal());
+<a name="356" href="#356">356</a>         assertEquals(BIG_DECIMAL_VAL_7, v.getPropertyValue(propertyKey).getBigDecimal());
+<a name="357" href="#357">357</a>         <strong class="jxr_keyword">break</strong>;
+<a name="358" href="#358">358</a>       <strong class="jxr_keyword">case</strong> KEY_8:
+<a name="359" href="#359">359</a>         assertTrue(v.getPropertyValue(propertyKey).isGradoopId());
+<a name="360" href="#360">360</a>         assertEquals(GRADOOP_ID_VAL_8, v.getPropertyValue(propertyKey).getGradoopId());
+<a name="361" href="#361">361</a>         <strong class="jxr_keyword">break</strong>;
+<a name="362" href="#362">362</a>       <strong class="jxr_keyword">case</strong> KEY_9:
+<a name="363" href="#363">363</a>         assertTrue(v.getPropertyValue(propertyKey).isMap());
+<a name="364" href="#364">364</a>         assertEquals(MAP_VAL_9, v.getPropertyValue(propertyKey).getMap());
+<a name="365" href="#365">365</a>         <strong class="jxr_keyword">break</strong>;
+<a name="366" href="#366">366</a>       <strong class="jxr_keyword">case</strong> KEY_a:
+<a name="367" href="#367">367</a>         assertTrue(v.getPropertyValue(propertyKey).isList());
+<a name="368" href="#368">368</a>         assertEquals(LIST_VAL_a, v.getPropertyValue(propertyKey).getList());
+<a name="369" href="#369">369</a>         <strong class="jxr_keyword">break</strong>;
+<a name="370" href="#370">370</a>       <strong class="jxr_keyword">case</strong> KEY_b:
+<a name="371" href="#371">371</a>         assertTrue(v.getPropertyValue(propertyKey).isDate());
+<a name="372" href="#372">372</a>         assertEquals(DATE_VAL_b, v.getPropertyValue(propertyKey).getDate());
+<a name="373" href="#373">373</a>         <strong class="jxr_keyword">break</strong>;
+<a name="374" href="#374">374</a>       <strong class="jxr_keyword">case</strong> KEY_c:
+<a name="375" href="#375">375</a>         assertTrue(v.getPropertyValue(propertyKey).isTime());
+<a name="376" href="#376">376</a>         assertEquals(TIME_VAL_c, v.getPropertyValue(propertyKey).getTime());
+<a name="377" href="#377">377</a>         <strong class="jxr_keyword">break</strong>;
+<a name="378" href="#378">378</a>       <strong class="jxr_keyword">case</strong> KEY_d:
+<a name="379" href="#379">379</a>         assertTrue(v.getPropertyValue(propertyKey).isDateTime());
+<a name="380" href="#380">380</a>         assertEquals(DATETIME_VAL_d, v.getPropertyValue(propertyKey).getDateTime());
+<a name="381" href="#381">381</a>         <strong class="jxr_keyword">break</strong>;
+<a name="382" href="#382">382</a>       <strong class="jxr_keyword">case</strong> KEY_e:
+<a name="383" href="#383">383</a>         assertTrue(v.getPropertyValue(propertyKey).isShort());
+<a name="384" href="#384">384</a>         assertEquals(SHORT_VAL_e, v.getPropertyValue(propertyKey).getShort());
+<a name="385" href="#385">385</a>         <strong class="jxr_keyword">break</strong>;
+<a name="386" href="#386">386</a>       <strong class="jxr_keyword">case</strong> KEY_f:
+<a name="387" href="#387">387</a>         assertTrue(v.getPropertyValue(propertyKey).isSet());
+<a name="388" href="#388">388</a>         assertEquals(SET_VAL_f, v.getPropertyValue(propertyKey).getSet());
+<a name="389" href="#389">389</a>         <strong class="jxr_keyword">break</strong>;
+<a name="390" href="#390">390</a>       <strong class="jxr_keyword">default</strong>: <strong class="jxr_keyword">break</strong>;
+<a name="391" href="#391">391</a>       }
+<a name="392" href="#392">392</a>     }
+<a name="393" href="#393">393</a>   }
+<a name="394" href="#394">394</a> 
+<a name="395" href="#395">395</a>   <strong class="jxr_keyword">private</strong> AsciiGraphLoader&lt;GraphHead, Vertex, Edge&gt; getMinimalFullFeaturedGraphLoader() {
+<a name="396" href="#396">396</a>     String asciiGraph = <span class="jxr_string">":G{k:\&quot;v\&quot;}[(v:V{k:\&quot;v\&quot;}),(v)-[:e{k:\&quot;v\&quot;}]-&gt;(v)]"</span>;
+<a name="397" href="#397">397</a> 
+<a name="398" href="#398">398</a>     <strong class="jxr_keyword">return</strong> AsciiGraphLoader.fromString(asciiGraph, GradoopConfig.getDefaultConfig());
+<a name="399" href="#399">399</a>   }
+<a name="400" href="#400">400</a> 
+<a name="401" href="#401">401</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> validateGraphHead(
+<a name="402" href="#402">402</a>     AccumuloEPGMStore graphStore,
+<a name="403" href="#403">403</a>     GraphHead originalGraphHead
+<a name="404" href="#404">404</a>   ) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="405" href="#405">405</a>     EPGMGraphHead loadedGraphHead = graphStore.readGraph(originalGraphHead.getId());
+<a name="406" href="#406">406</a> 
+<a name="407" href="#407">407</a>     validateEPGMElements(originalGraphHead, loadedGraphHead);
+<a name="408" href="#408">408</a>   }
+<a name="409" href="#409">409</a> 
+<a name="410" href="#410">410</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> validateVertex(
+<a name="411" href="#411">411</a>     AccumuloEPGMStore graphStore,
+<a name="412" href="#412">412</a>     Vertex originalVertex
+<a name="413" href="#413">413</a>   ) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="414" href="#414">414</a>     EPGMVertex loadedVertex = graphStore.readVertex(originalVertex.getId());
+<a name="415" href="#415">415</a> 
+<a name="416" href="#416">416</a>     validateEPGMElements(originalVertex, loadedVertex);
+<a name="417" href="#417">417</a>     validateEPGMGraphElements(originalVertex, loadedVertex);
+<a name="418" href="#418">418</a>   }
+<a name="419" href="#419">419</a> 
+<a name="420" href="#420">420</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> validateEdge(
+<a name="421" href="#421">421</a>     AccumuloEPGMStore graphStore,
+<a name="422" href="#422">422</a>     Edge originalEdge
+<a name="423" href="#423">423</a>   ) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="424" href="#424">424</a>     EPGMEdge loadedEdge = graphStore.readEdge(originalEdge.getId());
+<a name="425" href="#425">425</a>     validateEPGMElements(originalEdge, loadedEdge);
+<a name="426" href="#426">426</a>     validateEPGMGraphElements(originalEdge, loadedEdge);
+<a name="427" href="#427">427</a>     assert loadedEdge != <strong class="jxr_keyword">null</strong>;
+<a name="428" href="#428">428</a>     assertEquals(<span class="jxr_string">"source vertex mismatch"</span>,
+<a name="429" href="#429">429</a>       originalEdge.getSourceId(), loadedEdge.getSourceId());
+<a name="430" href="#430">430</a>     assertEquals(<span class="jxr_string">"target vertex mismatch"</span>,
+<a name="431" href="#431">431</a>       originalEdge.getTargetId(), loadedEdge.getTargetId());
+<a name="432" href="#432">432</a>   }
+<a name="433" href="#433">433</a> 
+<a name="434" href="#434">434</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

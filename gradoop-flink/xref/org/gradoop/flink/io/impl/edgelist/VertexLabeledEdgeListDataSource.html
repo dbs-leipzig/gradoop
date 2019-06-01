@@ -109,7 +109,7 @@
 <a name="99" href="#99">99</a>  
 <a name="100" href="#100">100</a>     DataSet&lt;ImportVertex&lt;Long&gt;&gt; importVertices = lineTuples
 <a name="101" href="#101">101</a>       .&lt;Tuple2&lt;Long, String&gt;&gt;project(0, 1)
-<a name="102" href="#102">102</a>       .union(lineTuples.&lt;Tuple2&lt;Long, String&gt;&gt;project(2, 3))
+<a name="102" href="#102">102</a>       .union(lineTuples.project(2, 3))
 <a name="103" href="#103">103</a>       .distinct(0)
 <a name="104" href="#104">104</a>       .map(<strong class="jxr_keyword">new</strong> CreateLabeledImportVertex&lt;&gt;(propertyKey));
 <a name="105" href="#105">105</a> 

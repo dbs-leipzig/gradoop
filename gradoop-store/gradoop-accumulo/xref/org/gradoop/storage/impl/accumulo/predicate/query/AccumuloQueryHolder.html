@@ -121,69 +121,68 @@
 <a name="111" href="#111">111</a> <em class="jxr_javadoccomment">   * @return seek range</em>
 <a name="112" href="#112">112</a> <em class="jxr_javadoccomment">   */</em>
 <a name="113" href="#113">113</a>   <strong class="jxr_keyword">public</strong> List&lt;Range&gt; getQueryRanges() {
-<a name="114" href="#114">114</a>     <em class="jxr_comment">//noinspection unchecked</em>
-<a name="115" href="#115">115</a>     <strong class="jxr_keyword">return</strong> queryRanges == <strong class="jxr_keyword">null</strong> ? <strong class="jxr_keyword">null</strong> : RangeWrapper.decrypt(queryRanges).ranges;
-<a name="116" href="#116">116</a>   }
-<a name="117" href="#117">117</a> 
-<a name="118" href="#118">118</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="119" href="#119">119</a> <em class="jxr_javadoccomment">   * Get reduce filter</em>
-<a name="120" href="#120">120</a> <em class="jxr_javadoccomment">   *</em>
-<a name="121" href="#121">121</a> <em class="jxr_javadoccomment">   * @return accumulo element filter</em>
-<a name="122" href="#122">122</a> <em class="jxr_javadoccomment">   */</em>
-<a name="123" href="#123">123</a>   <strong class="jxr_keyword">public</strong> AccumuloElementFilter&lt;T&gt; getReduceFilter() {
-<a name="124" href="#124">124</a>     <strong class="jxr_keyword">return</strong> reduceFilter;
-<a name="125" href="#125">125</a>   }
-<a name="126" href="#126">126</a> 
-<a name="127" href="#127">127</a>   @Override
-<a name="128" href="#128">128</a>   <strong class="jxr_keyword">public</strong> String toString() {
-<a name="129" href="#129">129</a>     List&lt;String&gt; ranges = getQueryRanges() == <strong class="jxr_keyword">null</strong> ? <strong class="jxr_keyword">null</strong> :
-<a name="130" href="#130">130</a>       getQueryRanges().stream()
-<a name="131" href="#131">131</a>         .map(it -&gt; it == <strong class="jxr_keyword">null</strong> ? <strong class="jxr_keyword">null</strong> : String.format(<span class="jxr_string">"%s:%s"</span>,
-<a name="132" href="#132">132</a>           it.getStartKey().getRow(),
-<a name="133" href="#133">133</a>           it.getEndKey().getRow()))
-<a name="134" href="#134">134</a>         .collect(Collectors.toList());
-<a name="135" href="#135">135</a>     <strong class="jxr_keyword">return</strong> String.format(<span class="jxr_string">"range=%1$s, filter=%2$s"</span>, ranges, getReduceFilter());
-<a name="136" href="#136">136</a>   }
-<a name="137" href="#137">137</a> 
-<a name="138" href="#138">138</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="139" href="#139">139</a> <em class="jxr_javadoccomment">   * range wrapper definition, just for request transport</em>
-<a name="140" href="#140">140</a> <em class="jxr_javadoccomment">   */</em>
-<a name="141" href="#141">141</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/storage/impl/accumulo/predicate/query/AccumuloQueryHolder.html">RangeWrapper</a> {
-<a name="142" href="#142">142</a> 
-<a name="143" href="#143">143</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="144" href="#144">144</a> <em class="jxr_javadoccomment">     * query ranges, may be null</em>
-<a name="145" href="#145">145</a> <em class="jxr_javadoccomment">     */</em>
-<a name="146" href="#146">146</a>     <strong class="jxr_keyword">private</strong> List&lt;Range&gt; ranges;
-<a name="147" href="#147">147</a> 
-<a name="148" href="#148">148</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="149" href="#149">149</a> <em class="jxr_javadoccomment">     * encrypt as byte array</em>
-<a name="150" href="#150">150</a> <em class="jxr_javadoccomment">     *</em>
-<a name="151" href="#151">151</a> <em class="jxr_javadoccomment">     * @return byte array result</em>
-<a name="152" href="#152">152</a> <em class="jxr_javadoccomment">     */</em>
-<a name="153" href="#153">153</a>     <strong class="jxr_keyword">private</strong> byte[] encrypt() {
-<a name="154" href="#154">154</a>       <strong class="jxr_keyword">try</strong> {
-<a name="155" href="#155">155</a>         <strong class="jxr_keyword">return</strong> KryoUtils.dumps(<strong class="jxr_keyword">this</strong>);
-<a name="156" href="#156">156</a>       } <strong class="jxr_keyword">catch</strong> (IOException e) {
-<a name="157" href="#157">157</a>         <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> RuntimeException(e);
-<a name="158" href="#158">158</a>       }
-<a name="159" href="#159">159</a>     }
-<a name="160" href="#160">160</a> 
-<a name="161" href="#161">161</a>     <em class="jxr_javadoccomment">/**</em>
-<a name="162" href="#162">162</a> <em class="jxr_javadoccomment">     * decrypted from byte array</em>
-<a name="163" href="#163">163</a> <em class="jxr_javadoccomment">     *</em>
-<a name="164" href="#164">164</a> <em class="jxr_javadoccomment">     * @param data encrypted data</em>
-<a name="165" href="#165">165</a> <em class="jxr_javadoccomment">     * @return range wrapper instance</em>
-<a name="166" href="#166">166</a> <em class="jxr_javadoccomment">     */</em>
-<a name="167" href="#167">167</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <a href="../../../../../../../org/gradoop/storage/impl/accumulo/predicate/query/AccumuloQueryHolder.html">RangeWrapper</a> decrypt(byte[] data) {
-<a name="168" href="#168">168</a>       <strong class="jxr_keyword">try</strong> {
-<a name="169" href="#169">169</a>         <strong class="jxr_keyword">return</strong> KryoUtils.loads(data, RangeWrapper.<strong class="jxr_keyword">class</strong>);
-<a name="170" href="#170">170</a>       } <strong class="jxr_keyword">catch</strong> (IOException e) {
-<a name="171" href="#171">171</a>         <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> RuntimeException(e);
-<a name="172" href="#172">172</a>       }
-<a name="173" href="#173">173</a>     }
-<a name="174" href="#174">174</a>   }
-<a name="175" href="#175">175</a> 
-<a name="176" href="#176">176</a> }
+<a name="114" href="#114">114</a>     <strong class="jxr_keyword">return</strong> queryRanges == <strong class="jxr_keyword">null</strong> ? <strong class="jxr_keyword">null</strong> : RangeWrapper.decrypt(queryRanges).ranges;
+<a name="115" href="#115">115</a>   }
+<a name="116" href="#116">116</a> 
+<a name="117" href="#117">117</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="118" href="#118">118</a> <em class="jxr_javadoccomment">   * Get reduce filter</em>
+<a name="119" href="#119">119</a> <em class="jxr_javadoccomment">   *</em>
+<a name="120" href="#120">120</a> <em class="jxr_javadoccomment">   * @return accumulo element filter</em>
+<a name="121" href="#121">121</a> <em class="jxr_javadoccomment">   */</em>
+<a name="122" href="#122">122</a>   <strong class="jxr_keyword">public</strong> AccumuloElementFilter&lt;T&gt; getReduceFilter() {
+<a name="123" href="#123">123</a>     <strong class="jxr_keyword">return</strong> reduceFilter;
+<a name="124" href="#124">124</a>   }
+<a name="125" href="#125">125</a> 
+<a name="126" href="#126">126</a>   @Override
+<a name="127" href="#127">127</a>   <strong class="jxr_keyword">public</strong> String toString() {
+<a name="128" href="#128">128</a>     List&lt;String&gt; ranges = getQueryRanges() == <strong class="jxr_keyword">null</strong> ? <strong class="jxr_keyword">null</strong> :
+<a name="129" href="#129">129</a>       getQueryRanges().stream()
+<a name="130" href="#130">130</a>         .map(it -&gt; it == <strong class="jxr_keyword">null</strong> ? <strong class="jxr_keyword">null</strong> : String.format(<span class="jxr_string">"%s:%s"</span>,
+<a name="131" href="#131">131</a>           it.getStartKey().getRow(),
+<a name="132" href="#132">132</a>           it.getEndKey().getRow()))
+<a name="133" href="#133">133</a>         .collect(Collectors.toList());
+<a name="134" href="#134">134</a>     <strong class="jxr_keyword">return</strong> String.format(<span class="jxr_string">"range=%1$s, filter=%2$s"</span>, ranges, getReduceFilter());
+<a name="135" href="#135">135</a>   }
+<a name="136" href="#136">136</a> 
+<a name="137" href="#137">137</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="138" href="#138">138</a> <em class="jxr_javadoccomment">   * range wrapper definition, just for request transport</em>
+<a name="139" href="#139">139</a> <em class="jxr_javadoccomment">   */</em>
+<a name="140" href="#140">140</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/storage/impl/accumulo/predicate/query/AccumuloQueryHolder.html">RangeWrapper</a> {
+<a name="141" href="#141">141</a> 
+<a name="142" href="#142">142</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="143" href="#143">143</a> <em class="jxr_javadoccomment">     * query ranges, may be null</em>
+<a name="144" href="#144">144</a> <em class="jxr_javadoccomment">     */</em>
+<a name="145" href="#145">145</a>     <strong class="jxr_keyword">private</strong> List&lt;Range&gt; ranges;
+<a name="146" href="#146">146</a> 
+<a name="147" href="#147">147</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="148" href="#148">148</a> <em class="jxr_javadoccomment">     * encrypt as byte array</em>
+<a name="149" href="#149">149</a> <em class="jxr_javadoccomment">     *</em>
+<a name="150" href="#150">150</a> <em class="jxr_javadoccomment">     * @return byte array result</em>
+<a name="151" href="#151">151</a> <em class="jxr_javadoccomment">     */</em>
+<a name="152" href="#152">152</a>     <strong class="jxr_keyword">private</strong> byte[] encrypt() {
+<a name="153" href="#153">153</a>       <strong class="jxr_keyword">try</strong> {
+<a name="154" href="#154">154</a>         <strong class="jxr_keyword">return</strong> KryoUtils.dumps(<strong class="jxr_keyword">this</strong>);
+<a name="155" href="#155">155</a>       } <strong class="jxr_keyword">catch</strong> (IOException e) {
+<a name="156" href="#156">156</a>         <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> RuntimeException(e);
+<a name="157" href="#157">157</a>       }
+<a name="158" href="#158">158</a>     }
+<a name="159" href="#159">159</a> 
+<a name="160" href="#160">160</a>     <em class="jxr_javadoccomment">/**</em>
+<a name="161" href="#161">161</a> <em class="jxr_javadoccomment">     * decrypted from byte array</em>
+<a name="162" href="#162">162</a> <em class="jxr_javadoccomment">     *</em>
+<a name="163" href="#163">163</a> <em class="jxr_javadoccomment">     * @param data encrypted data</em>
+<a name="164" href="#164">164</a> <em class="jxr_javadoccomment">     * @return range wrapper instance</em>
+<a name="165" href="#165">165</a> <em class="jxr_javadoccomment">     */</em>
+<a name="166" href="#166">166</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <a href="../../../../../../../org/gradoop/storage/impl/accumulo/predicate/query/AccumuloQueryHolder.html">RangeWrapper</a> decrypt(byte[] data) {
+<a name="167" href="#167">167</a>       <strong class="jxr_keyword">try</strong> {
+<a name="168" href="#168">168</a>         <strong class="jxr_keyword">return</strong> KryoUtils.loads(data, RangeWrapper.<strong class="jxr_keyword">class</strong>);
+<a name="169" href="#169">169</a>       } <strong class="jxr_keyword">catch</strong> (IOException e) {
+<a name="170" href="#170">170</a>         <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> RuntimeException(e);
+<a name="171" href="#171">171</a>       }
+<a name="172" href="#172">172</a>     }
+<a name="173" href="#173">173</a>   }
+<a name="174" href="#174">174</a> 
+<a name="175" href="#175">175</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>
