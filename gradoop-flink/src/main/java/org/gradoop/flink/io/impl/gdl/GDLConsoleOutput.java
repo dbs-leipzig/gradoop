@@ -37,7 +37,7 @@ public class GDLConsoleOutput {
    * @param <G>   the graph head type
    * @param <V>   the vertex type
    * @param <E>   the edge type
-   * @param <LG>  the type of the logical graph that will be created with this factory
+   * @param <LG>  the type of the logical graph instance
    * @param <GC>  the type of the according graph collection
    * @throws Exception Forwarded from flink execute.
    */
@@ -59,7 +59,7 @@ public class GDLConsoleOutput {
    * @param <G>        the graph head type
    * @param <V>        the vertex type
    * @param <E>        the edge type
-   * @param <GC>       the type of the according graph collection
+   * @param <GC>       the type of the graph collection
    * @throws Exception Forwarded from flink execute.
    */
   public static <

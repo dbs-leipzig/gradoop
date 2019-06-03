@@ -37,10 +37,7 @@ import java.util.stream.Collectors;
  * @param <V> vertex type
  * @param <E> edge type
  */
-public class GDLEncoder<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge> {
+public class GDLEncoder<G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
 
   /**
    * Marks the beginning of the definition of vertices and edges.
@@ -252,8 +249,8 @@ public class GDLEncoder<
    * @param firstOccurrence Is it the first occurrence of the vertex in all graphs?
    * @return A GDL formatted vertex string.
    */
-  private String vertexToGDLString(
-    V vertex, Map<GradoopId, String> idToVertexName, boolean firstOccurrence) {
+  private String vertexToGDLString(V vertex, Map<GradoopId, String> idToVertexName,
+    boolean firstOccurrence) {
     if (firstOccurrence) {
       return String.format("(%s:%s %s)",
         idToVertexName.get(vertex.getId()),

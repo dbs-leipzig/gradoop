@@ -102,20 +102,19 @@ public class Transformation<
    * @param factory the factory that is responsible for creating an instance of the logical graph
    * @return transformed logical graph
    */
-  @SuppressWarnings("unchecked")
   protected LG executeInternal(DataSet<G> graphHeads, DataSet<V> vertices, DataSet<E> edges,
     BaseGraphFactory<G, V, E, LG, GC> factory) {
 
     DataSet<G> transformedGraphHeads = graphHeadTransFunc != null ? graphHeads
-      .map(new TransformGraphHead(graphHeadTransFunc, factory.getGraphHeadFactory()))
+      .map(new TransformGraphHead<>(graphHeadTransFunc, factory.getGraphHeadFactory()))
       .returns(TypeExtractor.createTypeInfo(factory.getGraphHeadFactory().getType())) : graphHeads;
 
     DataSet<V> transformedVertices = vertexTransFunc != null ? vertices
-      .map(new TransformVertex(vertexTransFunc, factory.getVertexFactory()))
+      .map(new TransformVertex<>(vertexTransFunc, factory.getVertexFactory()))
       .returns(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())) : vertices;
 
     DataSet<E> transformedEdges = edgeTransFunc != null ? edges
-      .map(new TransformEdge(edgeTransFunc, factory.getEdgeFactory()))
+      .map(new TransformEdge<>(edgeTransFunc, factory.getEdgeFactory()))
       .returns(TypeExtractor.createTypeInfo(factory.getEdgeFactory().getType())) : edges;
 
     return factory.fromDataSets(transformedGraphHeads, transformedVertices, transformedEdges);
