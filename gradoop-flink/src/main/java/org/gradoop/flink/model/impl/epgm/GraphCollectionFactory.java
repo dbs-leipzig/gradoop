@@ -26,6 +26,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -123,7 +124,7 @@ public class GraphCollectionFactory
   }
 
   @Override
-  public GraphCollection fromGraph(LogicalGraph logicalGraphLayout) {
+  public GraphCollection fromGraph(LogicalGraphLayout<GraphHead, Vertex, Edge> logicalGraphLayout) {
     return new GraphCollection(layoutFactory.fromGraphLayout(logicalGraphLayout), config);
   }
 
