@@ -21,6 +21,7 @@ import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.verify.functions.RemoveOtherGraphs;
@@ -32,12 +33,14 @@ import org.gradoop.flink.model.impl.operators.verify.functions.RemoveOtherGraphs
  * @param <V>  The vertex type.
  * @param <E>  The edge type.
  * @param <LG> The graph type.
+ * @param <GC> The graph collection type.
  */
 public class VerifyGraphContainment<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, GC>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   @Override
   public LG execute(LG collection) {
