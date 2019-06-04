@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.operators.verify.functions.RemoveOtherGraphs;
+import org.gradoop.flink.model.impl.operators.verify.functions.RemoveDanglingGraphIds;
 
 /**
  * Verifies a collections elements, removing dangling graph ids, i.e. ids of graphs not contained
@@ -46,12 +46,12 @@ public class VerifyGraphsContainment<
     DataSet<GradoopId> idSet = collection.getGraphHeads().map(new Id<>());
 
     DataSet<V> verifiedVertices = collection.getVertices()
-      .map(new RemoveOtherGraphs<>())
-      .withBroadcastSet(idSet, RemoveOtherGraphs.GRAPH_ID_SET);
+      .map(new RemoveDanglingGraphIds<>())
+      .withBroadcastSet(idSet, RemoveDanglingGraphIds.GRAPH_ID_SET);
 
     DataSet<E> verifiedEdges = collection.getEdges()
-      .map(new RemoveOtherGraphs<>())
-      .withBroadcastSet(idSet, RemoveOtherGraphs.GRAPH_ID_SET);
+      .map(new RemoveDanglingGraphIds<>())
+      .withBroadcastSet(idSet, RemoveDanglingGraphIds.GRAPH_ID_SET);
 
     return collection.getFactory()
       .fromDataSets(collection.getGraphHeads(), verifiedVertices, verifiedEdges);

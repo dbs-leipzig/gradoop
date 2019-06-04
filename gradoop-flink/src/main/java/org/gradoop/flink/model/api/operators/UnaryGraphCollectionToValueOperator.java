@@ -15,14 +15,13 @@
  */
 package org.gradoop.flink.model.api.operators;
 
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 
 /**
  * Creates a value from one input collection.
  *
- * @param <T> result type
+ * @param <V> result type
  */
-public interface UnaryGraphCollectionToValueOperator<T>
-  extends UnaryBaseGraphCollectionToValueOperator<GraphCollection, DataSet<T>> {
+public interface UnaryGraphCollectionToValueOperator<V>
+  extends UnaryBaseGraphCollectionToValueOperator<GraphCollection, V> {
 }

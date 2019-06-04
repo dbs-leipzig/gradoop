@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  *
  * @param <E> graph element type
  */
-public class RemoveOtherGraphs<E extends EPGMGraphElement> extends RichMapFunction<E, E> {
+public class RemoveDanglingGraphIds<E extends EPGMGraphElement> extends RichMapFunction<E, E> {
 
   /**
    * String used to identify the graph id set on broadcast.
