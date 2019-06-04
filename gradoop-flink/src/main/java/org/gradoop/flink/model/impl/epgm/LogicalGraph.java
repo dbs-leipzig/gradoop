@@ -24,6 +24,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.epgm.LogicalGraphOperators;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -73,8 +74,8 @@ import java.util.Objects;
  * represented in Apache Flink. Note that the LogicalGraph also implements that interface and
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
-public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalGraph>,
-  LogicalGraphOperators {
+public class LogicalGraph implements
+  BaseGraph<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>, LogicalGraphOperators {
   /**
    * Layout for that logical graph.
    */
@@ -107,8 +108,14 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   }
 
   @Override
-  public BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph> getFactory() {
+  public BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection> getFactory() {
     return config.getLogicalGraphFactory();
+  }
+
+  @Override
+  public BaseGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection>
+  getCollectionFactory() {
+    return config.getGraphCollectionFactory();
   }
 
   @Override

@@ -37,6 +37,7 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.utils.LeftWhenRightIsNull;
@@ -47,16 +48,18 @@ import org.gradoop.flink.model.impl.functions.utils.LeftWhenRightIsNull;
  * the second graph. The graph head of the first graph is retained. Vertex and edge equality
  * is based on their respective identifiers.
  *
- * @param <G> type of the graph head
- * @param <V> the vertex type
- * @param <E> the edge type
- * @param <LG> the type of the logical graph
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
 public class Exclusion<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph<G, V, E, LG>> implements BinaryBaseGraphToBaseGraphOperator<LG> {
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, GC>> implements BinaryBaseGraphToBaseGraphOperator<LG> {
 
   @Override
   public LG execute(LG firstGraph, LG secondGraph) {

@@ -21,6 +21,7 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertex;
@@ -68,12 +69,14 @@ import java.util.List;
  * @param <V>  The vertex type.
  * @param <E>  The edge type.
  * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
 public class GroupingGroupCombine<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph<G, V, E, LG>> extends Grouping<G, V, E, LG> {
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, GC>> extends Grouping<G, V, E, LG, GC> {
 
   /**
    * Creates grouping operator instance.

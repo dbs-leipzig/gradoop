@@ -22,6 +22,7 @@ import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Clone;
 import org.gradoop.flink.model.impl.functions.epgm.ElementIdUpdater;
@@ -37,16 +38,18 @@ import org.gradoop.flink.model.impl.operators.cloning.functions.Value0Of2ToId;
 /**
  * Creates a copy of the logical graph with new ids for the graph head, vertices and edges.
  *
- * @param <G> type of the graph head
- * @param <V> the vertex type
- * @param <E> the edge type
- * @param <LG> the type of the logical graph
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
 public class Cloning<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph<G, V, E, LG>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, GC>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   @Override
   public LG execute(LG graph) {

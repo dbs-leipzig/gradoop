@@ -17,9 +17,6 @@ package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.metadata.MetaData;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
@@ -35,8 +32,7 @@ import java.util.List;
 /**
  * Defines the operators that are available on a {@link LogicalGraph}.
  */
-public interface LogicalGraphOperators
-  extends BaseGraphOperators<GraphHead, Vertex, Edge, LogicalGraph>, GraphBaseOperators {
+public interface LogicalGraphOperators extends GraphBaseOperators {
 
   //----------------------------------------------------------------------------
   // Unary Operators

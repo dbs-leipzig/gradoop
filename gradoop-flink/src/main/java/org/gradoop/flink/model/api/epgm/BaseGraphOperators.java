@@ -45,16 +45,18 @@ import java.util.Objects;
 /**
  * Defines the operators that are available on a {@link BaseGraph}.
  *
- * @param <G> type of the graph head
- * @param <V> the vertex type
- * @param <E> the edge type
- * @param <LG> the type of the logical graph
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
 public interface BaseGraphOperators<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph<G, V, E, LG>> {
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, GC>> {
 
   //----------------------------------------------------------------------------
   // Unary Operators
