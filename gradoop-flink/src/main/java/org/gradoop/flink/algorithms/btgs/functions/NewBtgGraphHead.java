@@ -54,7 +54,6 @@ public class NewBtgGraphHead<G extends EPGMGraphHead>
     return graphHead;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public TypeInformation<G> getProducedType() {
     return TypeExtractor.createTypeInfo(graphHeadFactory.getType());

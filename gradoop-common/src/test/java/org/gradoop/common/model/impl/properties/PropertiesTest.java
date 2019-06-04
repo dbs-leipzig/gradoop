@@ -24,7 +24,6 @@ import java.util.Map;
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.junit.Assert.*;
 
-@SuppressWarnings("Duplicates")
 public class PropertiesTest {
 
   @Test

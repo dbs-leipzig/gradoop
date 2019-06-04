@@ -21,24 +21,25 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 
 /**
  * Creates a new super edge representing an edge group. The edge stores the
  * group label, the group property value and the aggregate values for its group.
+ *
+ * @param <E> The edge type.
  */
 @FunctionAnnotation.ForwardedFields("f0->sourceId;f1->targetId;f2->label")
 @FunctionAnnotation.ReadFields("f3;f5")
-public class ReduceEdgeGroupItems
-  extends BuildSuperEdge
-  implements GroupReduceFunction<EdgeGroupItem, Edge>, ResultTypeQueryable<Edge> {
+public class ReduceEdgeGroupItems<E extends EPGMEdge> extends BuildSuperEdge
+  implements GroupReduceFunction<EdgeGroupItem, E>, ResultTypeQueryable<E> {
 
   /**
    * Edge factory.
    */
-  private final EPGMEdgeFactory<Edge> edgeFactory;
+  private final EPGMEdgeFactory<E> edgeFactory;
 
   /**
    * Creates group reducer
@@ -46,7 +47,7 @@ public class ReduceEdgeGroupItems
    * @param useLabel use edge label
    * @param epgmEdgeFactory edge factory
    */
-  public ReduceEdgeGroupItems(boolean useLabel, EPGMEdgeFactory<Edge> epgmEdgeFactory) {
+  public ReduceEdgeGroupItems(boolean useLabel, EPGMEdgeFactory<E> epgmEdgeFactory) {
     super(useLabel);
     this.edgeFactory = epgmEdgeFactory;
   }
@@ -61,11 +62,11 @@ public class ReduceEdgeGroupItems
    */
   @Override
   public void reduce(Iterable<EdgeGroupItem> edgeGroupItems,
-    Collector<Edge> collector) throws Exception {
+    Collector<E> collector) throws Exception {
 
     EdgeGroupItem edgeGroupItem = reduceInternal(edgeGroupItems);
 
-    Edge superEdge = edgeFactory.createEdge(
+    E superEdge = edgeFactory.createEdge(
       edgeGroupItem.getGroupLabel(),
       edgeGroupItem.getSourceId(),
       edgeGroupItem.getTargetId());
@@ -79,9 +80,8 @@ public class ReduceEdgeGroupItems
     collector.collect(superEdge);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public TypeInformation<Edge> getProducedType() {
+  public TypeInformation<E> getProducedType() {
     return TypeExtractor.createTypeInfo(edgeFactory.getType());
   }
 }

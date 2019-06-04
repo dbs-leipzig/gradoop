@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.grouping.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 
@@ -30,12 +30,13 @@ import java.util.List;
  *
  * The output of that mapper is {@link VertexGroupItem} that contains the vertex id,
  * vertex label, vertex group properties and vertex aggregate properties.
+ *
+ * @param <V> The vertex type.
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
 @FunctionAnnotation.ReadFields("label;properties")
-public class BuildVertexGroupItem
-  extends BuildGroupItemBase
-  implements FlatMapFunction<Vertex, VertexGroupItem> {
+public class BuildVertexGroupItem<V extends EPGMVertex> extends BuildGroupItemBase
+  implements FlatMapFunction<V, VertexGroupItem> {
 
   /**
    * Reduce object instantiations.
@@ -57,7 +58,7 @@ public class BuildVertexGroupItem
   }
 
   @Override
-  public void flatMap(Vertex vertex, Collector<VertexGroupItem> collector) throws Exception {
+  public void flatMap(V vertex, Collector<VertexGroupItem> collector) throws Exception {
     boolean usedVertexLabelGroup = false;
 
     reuseVertexGroupItem.setVertexId(vertex.getId());

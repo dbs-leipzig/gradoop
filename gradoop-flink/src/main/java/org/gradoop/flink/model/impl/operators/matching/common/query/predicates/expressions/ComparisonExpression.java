@@ -26,6 +26,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import org.s1ck.gdl.model.predicates.expressions.Comparison;
 import org.s1ck.gdl.utils.Comparator;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -163,7 +164,7 @@ public class ComparisonExpression extends QueryPredicate {
 
     ComparisonExpression that = (ComparisonExpression) o;
 
-    return comparison != null ? comparison.equals(that.comparison) : that.comparison == null;
+    return Objects.equals(comparison, that.comparison);
 
   }
 

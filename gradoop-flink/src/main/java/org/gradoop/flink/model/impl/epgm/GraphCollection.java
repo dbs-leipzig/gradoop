@@ -66,6 +66,7 @@ import org.gradoop.flink.model.impl.operators.union.Union;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -185,9 +186,7 @@ public class GraphCollection implements
 
     GradoopIdSet graphIds = new GradoopIdSet();
 
-    for (GradoopId id : identifiers) {
-      graphIds.add(id);
-    }
+    graphIds.addAll(Arrays.asList(identifiers));
 
     return getGraphs(graphIds);
   }
