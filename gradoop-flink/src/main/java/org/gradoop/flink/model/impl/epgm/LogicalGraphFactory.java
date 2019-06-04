@@ -35,7 +35,7 @@ import java.util.Objects;
  * {@link org.gradoop.flink.model.api.layouts.LogicalGraphLayout}.
  */
 public class LogicalGraphFactory
-  implements BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph> {
+  implements BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection> {
   /**
    * Creates the layout from given data.
    */
