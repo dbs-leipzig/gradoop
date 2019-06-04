@@ -44,7 +44,7 @@ import org.gradoop.flink.model.impl.operators.verify.Verify;
  * (no joins, use {@link Verify} to verify the subgraph)</li>
  * </ol>
  */
-public class ApplySubgraph extends Subgraph<GraphHead, Vertex, Edge, LogicalGraph>
+public class ApplySubgraph extends Subgraph<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>
   implements ApplicableUnaryGraphToGraphOperator {
 
   /**
