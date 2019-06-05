@@ -171,20 +171,8 @@ public class GradoopTestUtils {
     SUPPORTED_PROPERTIES.put(KEY_f, SET_VAL_f);
   }
 
-  /**
-   * Creates a social network as a basis for tests.
-   * <p/>
-   * An image of the network can be found in
-   * gradoop/dev-support/social-network.pdf
-   *
-   * @return graph store containing a simple social network for tests.
-   * @throws IOException on failure
-   */
-  public static AsciiGraphLoader<GraphHead, Vertex, Edge> getSocialNetworkLoader()
-    throws IOException {
-
-    ElementFactoryProvider<GraphHead, Vertex, Edge> elementFactoryProvider =
-      new ElementFactoryProvider<GraphHead, Vertex, Edge>() {
+  public static ElementFactoryProvider<GraphHead, Vertex, Edge> getElementFactoryProvider() {
+    return new ElementFactoryProvider<GraphHead, Vertex, Edge>() {
       EPGMGraphHeadFactory<GraphHead> graphHeadFactory = new GraphHeadFactory();
       EPGMVertexFactory<Vertex> vertexFactory = new VertexFactory();
       EPGMEdgeFactory<Edge> edgeFactory = new EdgeFactory();
@@ -204,9 +192,20 @@ public class GradoopTestUtils {
         return edgeFactory;
       }
     };
+  }
 
+  /**
+   * Creates a social network as a basis for tests.
+   * <p/>
+   * An image of the network can be found in
+   * gradoop/dev-support/social-network.pdf
+   *
+   * @return graph store containing a simple social network for tests.
+   * @throws IOException on failure
+   */
+  public static AsciiGraphLoader<GraphHead, Vertex, Edge> getSocialNetworkLoader() throws IOException {
     InputStream inputStream = GradoopTestUtils.class.getResourceAsStream(SOCIAL_NETWORK_GDL_FILE);
-    return AsciiGraphLoader.fromStream(inputStream, elementFactoryProvider);
+    return AsciiGraphLoader.fromStream(inputStream, getElementFactoryProvider());
   }
 
   /**

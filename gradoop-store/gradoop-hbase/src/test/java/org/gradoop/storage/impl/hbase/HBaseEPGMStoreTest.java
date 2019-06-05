@@ -16,7 +16,6 @@
 package org.gradoop.storage.impl.hbase;
 
 import com.google.common.collect.Lists;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
@@ -30,7 +29,6 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.AsciiGraphLoader;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.junit.Test;
 
@@ -374,8 +372,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
 
   private AsciiGraphLoader<GraphHead, Vertex, Edge> getMinimalFullFeaturedGraphLoader() {
     String asciiGraph = ":G{k:\"v\"}[(v:V{k:\"v\"}),(v)-[:e{k:\"v\"}]->(v)]";
-    return AsciiGraphLoader.fromString(asciiGraph, GradoopFlinkConfig
-      .createConfig(ExecutionEnvironment.getExecutionEnvironment()).getLogicalGraphFactory());
+    return AsciiGraphLoader.fromString(asciiGraph, getElementFactoryProvider());
   }
 
   private void validateGraphHead(HBaseEPGMStore graphStore, GraphHead originalGraphHead)
