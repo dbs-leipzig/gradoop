@@ -25,6 +25,9 @@ import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
 import java.util.List;
 import java.util.Objects;
 
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_RESERVED;
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_SUPERID;
+
 /**
  * Build the final super-vertex from the internal tuple-based representation.
  *
@@ -32,7 +35,7 @@ import java.util.Objects;
  * @param <E> The final vertex type.
  */
 public class BuildSuperVertexFromTuple<T extends Tuple, E extends EPGMVertex>
-  extends BuildSuperElementFromTuple<T, E> implements TemporalGroupingConstants {
+  extends BuildSuperElementFromTuple<T, E> {
 
   /**
    * The result vertex type.

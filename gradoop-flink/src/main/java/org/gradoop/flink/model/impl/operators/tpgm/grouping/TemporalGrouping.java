@@ -27,12 +27,26 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.*;
+import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.BuildSuperEdgeFromTuple;
+import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.BuildSuperVertexFromTuple;
+import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.BuildTuplesFromEdges;
+import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.BuildTuplesFromVertices;
+import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.FilterSuperVertices;
+import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.ReduceEdgeTuples;
+import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.ReduceVertexTuples;
+import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.UpdateIdField;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
+
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_RESERVED;
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_SOURCEID;
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_TARGETID;
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_ID;
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_RESERVED;
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_SUPERID;
 
 /**
  * A grouping operator similar to {@link org.gradoop.flink.model.impl.operators.grouping.Grouping}
@@ -49,8 +63,7 @@ public class TemporalGrouping<
   V extends EPGMVertex,
   E extends EPGMEdge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, GC>> implements UnaryBaseGraphToBaseGraphOperator<LG>,
-  TemporalGroupingConstants {
+  GC extends BaseGraphCollection<G, V, E, GC>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * The vertex grouping keys.
@@ -86,12 +99,12 @@ public class TemporalGrouping<
     List<GroupingKeyFunction<? super E, ?>> edgeGroupingKeys,
     List<AggregateFunction> edgeAggregateFunctions) {
     this.vertexGroupingKeys = Objects.requireNonNull(vertexGroupingKeys);
-    this.vertexAggregateFunctions = vertexAggregateFunctions == null ? Collections.emptyList()
-      : vertexAggregateFunctions;
-    this.edgeGroupingKeys = edgeGroupingKeys == null ? Collections.emptyList()
-      : edgeGroupingKeys;
-    this.edgeAggregateFunctions = edgeAggregateFunctions == null ? Collections.emptyList()
-      : edgeAggregateFunctions;
+    this.vertexAggregateFunctions = vertexAggregateFunctions == null ? Collections.emptyList() :
+      vertexAggregateFunctions;
+    this.edgeGroupingKeys = edgeGroupingKeys == null ? Collections.emptyList() :
+      edgeGroupingKeys;
+    this.edgeAggregateFunctions = edgeAggregateFunctions == null ? Collections.emptyList() :
+      edgeAggregateFunctions;
   }
 
   @Override

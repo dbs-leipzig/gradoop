@@ -33,9 +33,11 @@ import java.util.Objects;
  * Build a tuple-based representation of elements for grouping.
  * Tuples will contain some Gradoop IDs, all grouping keys followed by all properties to be
  * aggregated.
- *
- * @implSpec This function sets all grouping keys and aggregate values, make sure to set additional
+ * <p>
+ * <i>Note: </i> This function sets all grouping keys and aggregate values, make sure to set
+ * additional
  * fields, if {@code tupleDataOffset} is not {@code 0}.
+ *
  * @param <E> The element type.
  */
 public class BuildTuplesFromElements<E extends EPGMElement>
@@ -85,8 +87,8 @@ public class BuildTuplesFromElements<E extends EPGMElement>
     this.aggregateFunctions = Objects.requireNonNull(aggregateFunctions);
     final int tupleSize = tupleDataOffset + keys.size() + aggregateFunctions.size();
     if (tupleSize > Tuple.MAX_ARITY) {
-      throw new UnsupportedOperationException("Number of elements is too high for tuple: "
-        + tupleSize);
+      throw new UnsupportedOperationException("Number of elements is too high for tuple: " +
+        tupleSize);
     }
     elementTypes = new Class[tupleSize];
     for (int i = 0; i < tupleDataOffset; i++) {

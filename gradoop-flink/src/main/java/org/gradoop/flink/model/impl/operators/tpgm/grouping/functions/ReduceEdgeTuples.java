@@ -28,8 +28,7 @@ import java.util.List;
  *
  * @param <T> The tuple type.
  */
-public class ReduceEdgeTuples<T extends Tuple>
-  implements GroupReduceFunction<T, T>, TemporalGroupingConstants {
+public class ReduceEdgeTuples<T extends Tuple> implements GroupReduceFunction<T, T> {
 
   /**
    * The data offset for tuples. Aggregate values are expected to start at this index.
@@ -45,8 +44,8 @@ public class ReduceEdgeTuples<T extends Tuple>
    * Initialize this reduce function.
    *
    * @param tupleDataOffset    The data offset of the tuple. This will be
-   *                           {@value EDGE_TUPLE_RESERVED} {@code +} the number of the grouping
-   *                           keys.
+   *                           {@value TemporalGroupingConstants#EDGE_TUPLE_RESERVED} {@code +} the
+   *                           number of the grouping keys.
    * @param aggregateFunctions The vertex aggregate functions.
    */
   public ReduceEdgeTuples(int tupleDataOffset, List<AggregateFunction> aggregateFunctions) {

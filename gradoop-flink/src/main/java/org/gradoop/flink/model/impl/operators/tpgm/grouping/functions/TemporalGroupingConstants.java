@@ -18,29 +18,29 @@ package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
 /**
  * Holds common constants used by functions in grouping.
  */
-public interface TemporalGroupingConstants {
+public abstract class TemporalGroupingConstants {
   /**
    * The index of the vertex ID in the tuple-representation of a vertex.
    */
-  int VERTEX_TUPLE_ID = 0;
+  public static final int VERTEX_TUPLE_ID = 0;
   /**
    * The index of the super vertex ID in the tuple-representation of a vertex.
    */
-  int VERTEX_TUPLE_SUPERID = 1;
+  public static final int VERTEX_TUPLE_SUPERID = 1;
   /**
    * The number of reserved fields in the tuple-representation of a vertex.
    */
-  int VERTEX_TUPLE_RESERVED = 2;
+  public static final int VERTEX_TUPLE_RESERVED = 2;
   /**
    * The index of the source ID in the tuple-representation of an edge.
    */
-  int EDGE_TUPLE_SOURCEID = 0;
+  public static final int EDGE_TUPLE_SOURCEID = 0;
   /**
    * The index of the target ID in the tuple-representation of an edge.
    */
-  int EDGE_TUPLE_TARGETID = 1;
+  public static final int EDGE_TUPLE_TARGETID = 1;
   /**
    * The number of reserved fields in the tuple-representation of an edge.
    */
-  int EDGE_TUPLE_RESERVED = 2;
+  public static final int EDGE_TUPLE_RESERVED = 2;
 }

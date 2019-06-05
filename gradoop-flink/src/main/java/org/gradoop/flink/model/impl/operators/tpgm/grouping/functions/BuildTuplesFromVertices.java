@@ -22,6 +22,9 @@ import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
 
 import java.util.List;
 
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_ID;
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_RESERVED;
+
 /**
  * Build a tuple-based representation of vertices for grouping.
  * Tuples will contain the vertex ID, a reserved field for the super vertex ID, all grouping keys
@@ -29,8 +32,7 @@ import java.util.List;
  *
  * @param <E> The element type.
  */
-public class BuildTuplesFromVertices<E extends EPGMElement> extends BuildTuplesFromElements<E>
-  implements TemporalGroupingConstants {
+public class BuildTuplesFromVertices<E extends EPGMElement> extends BuildTuplesFromElements<E> {
 
   /**
    * Initialize this function, setting the grouping keys abd aggregate functions.

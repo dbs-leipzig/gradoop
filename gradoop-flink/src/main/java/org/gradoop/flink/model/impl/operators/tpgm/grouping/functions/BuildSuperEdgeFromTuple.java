@@ -26,6 +26,10 @@ import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
 import java.util.List;
 import java.util.Objects;
 
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_RESERVED;
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_SOURCEID;
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_TARGETID;
+
 /**
  * Build the final super-edge from the internal tuple-based representation.
  *
@@ -33,7 +37,7 @@ import java.util.Objects;
  * @param <E> The final edge type.
  */
 public class BuildSuperEdgeFromTuple<T extends Tuple, E extends EPGMEdge>
-  extends BuildSuperElementFromTuple<T, E> implements TemporalGroupingConstants {
+  extends BuildSuperElementFromTuple<T, E> {
 
   /**
    * The result edge type.

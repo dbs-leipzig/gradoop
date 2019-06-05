@@ -19,12 +19,16 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.gradoop.common.model.impl.id.GradoopId;
 
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_ID;
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.VERTEX_TUPLE_SUPERID;
+
 /**
  * A filter function used to select super vertices from the set of vertex-tuples.
  * Super-vertices are identified by them having the same ID and super ID.
+ *
+ * @param <T> The type of the vertex-tuples.
  */
-public class FilterSuperVertices<T extends Tuple> implements FilterFunction<T>,
-  TemporalGroupingConstants {
+public class FilterSuperVertices<T extends Tuple> implements FilterFunction<T> {
 
   @Override
   public boolean filter(T t) throws Exception {

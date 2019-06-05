@@ -22,14 +22,17 @@ import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
 
 import java.util.List;
 
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_RESERVED;
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_SOURCEID;
+import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.TemporalGroupingConstants.EDGE_TUPLE_TARGETID;
+
 /**
  * Build a tuple-based representation of edges for grouping.
  * Tuples will contain the source ID, the target ID, all grouping keys and all aggregate values.
  *
  * @param <E> The element type.
  */
-public class BuildTuplesFromEdges<E extends EPGMEdge> extends BuildTuplesFromElements<E>
-  implements TemporalGroupingConstants {
+public class BuildTuplesFromEdges<E extends EPGMEdge> extends BuildTuplesFromElements<E> {
 
   /**
    * Initialize this function, setting the grouping keys and aggregate functions.
