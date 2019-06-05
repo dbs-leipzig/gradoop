@@ -555,7 +555,7 @@ public abstract class Grouping<
      * @param retainVerticesWithoutGroups flag
      * @return this builder
      */
-    GroupingBuilder setRetainVerticesWithoutGroups(boolean retainVerticesWithoutGroups) {
+    public GroupingBuilder setRetainVerticesWithoutGroups(boolean retainVerticesWithoutGroups) {
       this.retainVerticesWithoutGroups = retainVerticesWithoutGroups;
       return this;
     }
