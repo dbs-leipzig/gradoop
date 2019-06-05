@@ -19,14 +19,7 @@ import org.gradoop.flink.model.impl.epgm.GraphCollection;
 
 /**
  * Creates a {@link GraphCollection} based on one input collection.
- *
  */
-public interface UnaryCollectionToCollectionOperator extends Operator {
-  /**
-   * Executes the operator.
-   *
-   * @param collection input collection
-   * @return operator result
-   */
-  GraphCollection execute(GraphCollection collection);
+public interface UnaryCollectionToCollectionOperator
+  extends UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GraphCollection> {
 }

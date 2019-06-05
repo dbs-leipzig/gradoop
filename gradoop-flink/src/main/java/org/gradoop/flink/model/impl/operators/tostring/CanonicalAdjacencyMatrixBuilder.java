@@ -44,7 +44,7 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
  * The representation follows the concept of a canonical adjacency matrix.
  */
 public class CanonicalAdjacencyMatrixBuilder implements
-  UnaryGraphCollectionToValueOperator<String> {
+  UnaryGraphCollectionToValueOperator<DataSet<String>> {
 
   /**
    * function describing string representation of graph heads

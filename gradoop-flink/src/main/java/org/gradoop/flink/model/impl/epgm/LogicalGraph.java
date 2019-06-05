@@ -70,6 +70,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataStr
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 import org.gradoop.flink.model.impl.operators.verify.Verify;
+import org.gradoop.flink.model.impl.operators.verify.VerifyGraphContainment;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -369,6 +370,11 @@ public class LogicalGraph implements
   @Override
   public LogicalGraph verify() {
     return callForGraph(new Verify<>());
+  }
+
+  @Override
+  public LogicalGraph verifyGraphContainment() {
+    return callForGraph(new VerifyGraphContainment<>());
   }
 
   //----------------------------------------------------------------------------

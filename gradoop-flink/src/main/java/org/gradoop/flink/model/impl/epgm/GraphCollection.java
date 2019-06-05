@@ -34,7 +34,7 @@ import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
@@ -312,8 +312,8 @@ public class GraphCollection implements
 
   @Override
   public GraphCollection callForCollection(
-    UnaryCollectionToCollectionOperator op) {
-    return op.execute(this);
+    UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GraphCollection> operator) {
+    return operator.execute(this);
   }
 
   @Override
