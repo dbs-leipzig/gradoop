@@ -30,7 +30,7 @@ import java.util.Collections;
 
 import static org.junit.Assert.assertTrue;
 
-public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBase {
+public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
   protected abstract GroupingStrategy getStrategy();
 
@@ -51,12 +51,12 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
 
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
-   * Tests correct conversion of a vertex with no properties.
+   * Tests correct retention of a vertex with no properties.
    *
    * @throws Exception if collecting result values fails
    */
   @Test
-  public void testConversionNoProperties() throws Exception {
+  public void testRetentionNoProperties() throws Exception {
     String asciiInput = "input[" +
       "(v0 {})" +
       "]";
@@ -83,12 +83,12 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
 
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
-   * Tests correct conversion of a vertex with a single property.
+   * Tests correct retention of a vertex with a single property.
    *
    * @throws Exception if collecting result values fails
    */
   @Test
-  public void testConversionSingleProperty() throws Exception {
+  public void testRetentionSingleProperty() throws Exception {
     String asciiInput = "input[" +
       "(v0 {a: 3})" +
       "]";
@@ -116,12 +116,12 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
 
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
-   * Tests correct conversion of a vertex with multiple properties.
+   * Tests correct retention of a vertex with multiple properties.
    *
    * @throws Exception if collecting result values fails
    */
   @Test
-  public void testConversionMultipleProperties() throws Exception {
+  public void testRetentionMultipleProperties() throws Exception {
     String asciiInput = "input[" +
       "(v0 {a: 3, b:'c'})" +
       "]";
@@ -148,15 +148,15 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
 
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
-   * Tests correct conversion of an edge from a vertex to be converted to a grouped vertex.
+   * Tests correct retention of an edge from a vertex to be retained to a grouped vertex.
    *
    * @throws Exception if collecting result values fails
    */
   @Test
-  public void testConversionSingleEdgeFromConvertedToGrouped() throws Exception {
+  public void testRetentionSingleEdgeFromRetainedToGrouped() throws Exception {
 
     String asciiInput = "input[" +
-      "(v0 {a : 1})" + // convert
+      "(v0 {a : 1})" + // retain
       "(v1 {b : 2})" + // group
       "(v0)-->(v1)" +
       "]";
@@ -188,15 +188,15 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
 
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
-   * Tests correct conversion of edges from a vertex to be converted to a grouped vertices.
+   * Tests correct retention of edges of a vertex to be retained to grouped vertices.
    *
    * @throws Exception if collecting result values fails
    */
   @Test
-  public void testConversionMultipleEdgesFromConvertedToGrouped() throws Exception {
+  public void testRetentionMultipleEdgesFromRetainedToGrouped() throws Exception {
 
     String asciiInput = "input[" +
-      "(v0 {a : 1})" + // convert
+      "(v0 {a : 1})" + // retain
       "(v1 {b : 2})" + // group
       "(v2 {b : 4})" + // group
       "(v0)-->(v1)" +
@@ -232,15 +232,15 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
 
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
-   * Tests correct conversion of an edge from a vertex to be grouped to a converted vertex.
+   * Tests correct retention of an edge from a vertex to be grouped to a retained vertex.
    *
    * @throws Exception if collecting result values fails
    */
   @Test
-  public void testConversionSingleEdgeFromGroupedToConverted() throws Exception {
+  public void testRetentionSingleEdgeFromGroupedToRetained() throws Exception {
 
     String asciiInput = "input[" +
-      "(v0 {a : 1})" + // convert
+      "(v0 {a : 1})" + // retain
       "(v1 {b : 2})" + // group
       "(v1)-->(v0)" +
       "]";
@@ -272,15 +272,15 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
 
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
-   * Tests correct conversion of edges from vertices to be grouped to a converted vertex.
+   * Tests correct retention of edges from vertices to be grouped to a retained vertex.
    *
    * @throws Exception if collecting result values fails
    */
   @Test
-  public void testConversionMultipleEdgesFromGroupedToConverted() throws Exception {
+  public void testRetentionMultipleEdgesFromGroupedToRetained() throws Exception {
 
     String asciiInput = "input[" +
-      "(v0 {a : 1})" + // convert
+      "(v0 {a : 1})" + // retain
       "(v1 {b : 2})" + // group
       "(v2 {b : 3})" + // group
       "(v1)-->(v0)" +
@@ -316,15 +316,15 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
 
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
-   * Tests correct conversion of an edge from a vertex to itself.
+   * Tests correct retention of an edge from a vertex to itself.
    *
    * @throws Exception if collecting result values fails
    */
   @Test
-  public void testConversionIdentityEdge() throws Exception {
+  public void testRetentionIdentityEdge() throws Exception {
 
     String asciiInput = "input[" +
-      "(v0 {a : 1})" + // convert
+      "(v0 {a : 1})" + // retain
       "(v0)-[{b : 1L}]->(v0)" +
       "]";
 
@@ -353,16 +353,16 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
 
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
-   * Tests correct conversion of edges between converted vertices.
+   * Tests correct retention of edges between retained vertices.
    *
    * @throws Exception if collecting result values fails
    */
   @Test
-  public void testConversionSingleEdgeConvertedToConverted() throws Exception {
+  public void testRetentionSingleEdgeRetainedToRetained() throws Exception {
 
     String asciiInput = "input[" +
-      "(v0 {a : 1})" + // convert
-      "(v1 {c : 2})" + // convert
+      "(v0 {a : 1})" + // retain
+      "(v1 {c : 2})" + // retain
       "(v1)-[:foo {e : 1}]->(v0)" +
       "]";
 
@@ -393,17 +393,17 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
 
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
-   * Tests correct conversion of edges between converted vertices.
+   * Tests correct retention of edges between retained vertices.
    *
    * @throws Exception if collecting result values fails
    */
   @Test
-  public void testConversionMultipleEdgesConvertedToConverted() throws Exception {
+  public void testRetentionMultipleEdgesRetainedToRetained() throws Exception {
 
     String asciiInput = "input[" +
-      "(v0 {a : 1})" + // convert
-      "(v1 {c : 2})" + // convert
-      "(v2 {d : 3})" + // convert
+      "(v0 {a : 1})" + // retain
+      "(v1 {c : 2})" + // retain
+      "(v2 {d : 3})" + // retain
       "(v1)-[:foo {e : 1, f : 2}]->(v0)" +
       "(v2)-->(v0)" +
       "]";
@@ -468,7 +468,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
 
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
-   * Tests a graph that contains to vertices to be converted 1:1.
+   * Tests a graph that contains to vertices to be retained 1:1.
    *
    * @throws Exception if collecting result values fails
    */
@@ -509,12 +509,12 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
 
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
-   * Tests a graph that contains only vertices to be converted 1:1.
+   * Tests a graph that contains only vertices to be retained 1:1.
    *
    * @throws Exception if collecting result values fails
    */
   @Test
-  public void testGraphOnlyVerticesToConvert() throws Exception {
+  public void testGraphOnlyVerticesToRetain() throws Exception {
 
     String asciiInput = "input[" +
       "(v0 {a : 1})" +
@@ -555,7 +555,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
    * <p>
    * Groups a graph by label.
    * The graph contains:
-   * - vertices without a label: convert
+   * - vertices without a label: retain
    * - vertices with a matching label: group
    *
    * @throws Exception if collecting result values fails
@@ -600,11 +600,11 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
    * <p>
    * Groups a graph by label and property a.
    * The graph contains:
-   * - a vertex without a label and no property: convert
-   * - a vertex without a label and another property: convert
+   * - a vertex without a label and no property: retain
+   * - a vertex without a label and another property: retain
    * - a vertex without a label and a matching property: group
-   * - a vertex with a label and no property: convert
-   * - a vertex with a label and another property: convert
+   * - a vertex with a label and no property: retain
+   * - a vertex with a label and another property: retain
    * - a vertex with a label and a matching property: group
    *
    * @throws Exception if collecting result values fails
@@ -652,9 +652,9 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
    * <p>
    * Groups a graph by label and properties a, b.
    * The graph contains:
-   * - a vertex without a label and a: convert
+   * - a vertex without a label and a: retain
    * - a vertex without a label and a, b: group
-   * - a vertex with a label and a: convert
+   * - a vertex with a label and a: retain
    * - a vertex with a label and a, b: group
    *
    * @throws Exception if collecting result values fails
@@ -698,11 +698,11 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
    * <p>
    * Groups a graph by property a.
    * The graph contains:
-   * - a vertex without a label and no property: convert
-   * - a vertex without a label and another property: convert
+   * - a vertex without a label and no property: retain
+   * - a vertex without a label and another property: retain
    * - a vertex without a label and a: group
-   * - a vertex with a label and no property: convert
-   * - a vertex with a label and another property: convert
+   * - a vertex with a label and no property: retain
+   * - a vertex with a label and another property: retain
    * - a vertex with a label and a: group
    *
    * @throws Exception if collecting result values fails
@@ -749,9 +749,9 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
    * <p>
    * Groups a graph by properties a, b.
    * The graph contains:
-   * - a vertex without a label and a: convert
+   * - a vertex without a label and a: retain
    * - a vertex without a label and a, b: group
-   * - a vertex with a label and a: convert
+   * - a vertex with a label and a: retain
    * - a vertex with a label and a, b: group
    *
    * @throws Exception if collecting result values fails
@@ -792,7 +792,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * <p>
-   * Groups a graph by nothing, so every vertex needs to be converted as it is.
+   * Groups a graph by nothing, so every vertex needs to be retained.
    * The graph contains:
    * - a vertex without a label and without properties
    * - a vertex without a label but a property
@@ -836,7 +836,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
 
   /**
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
-   * When using label specific grouping and no vertex will be converted 1:1.
+   * When using label specific grouping and no vertex will be retain 1:1.
    *
    * @throws Exception if collecting result values fails
    */
@@ -887,14 +887,14 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
    * <p>
    * Groups a graph by label A and two properties a, b.
    * The graph contains:
-   * - a vertex without a label and no properties: convert
-   * - a vertex without a label and one matching property: convert
-   * - a vertex without a label but matching properties: convert
-   * - a vertex with a non matching label, no properties: convert
-   * - a vertex with a non matching label, and one matching property: convert
-   * - a vertex with a non matching label, and two matching properties: convert
-   * - a vertex with a matching label, no properties: convert
-   * - a vertex with a matching label, one matching property: convert
+   * - a vertex without a label and no properties: retain
+   * - a vertex without a label and one matching property: retain
+   * - a vertex without a label but matching properties: retain
+   * - a vertex with a non matching label, no properties: retain
+   * - a vertex with a non matching label, and one matching property: retain
+   * - a vertex with a non matching label, and two matching properties: retain
+   * - a vertex with a matching label, no properties: retain
+   * - a vertex with a matching label, one matching property: retain
    * - two vertices with matching labels, two matching properties: group
    *
    * @throws Exception if collecting result values fails
@@ -947,7 +947,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
    * Tests function {@link Grouping#groupInternal(BaseGraph)}.
    * <p>
    * Uses label specific grouping and global grouping by a property.
-   * Vertices without the grouped by property and non-matching labels will be converted.
+   * Vertices without the grouped by property and non-matching labels will be retained.
    *
    * @throws Exception if collecting result values fails
    */
@@ -957,7 +957,7 @@ public abstract class AvoidDefaultLabelGroupsTestBase extends GradoopFlinkTestBa
     String asciiInput = "input[" +
       "(v0:A {a: 1, foo: true})" +
       "(v1:B {b: 2, foo: true})" +
-      "(v2:A {c : 3})" + // A and D are not member of a group => convert 1:1
+      "(v2:A {c : 3})" + // A and D are not member of a group => retain
       "(v3:D {d: 4})" +
       "(v4 {d: 4})" +
       "(v0)-->(v2)" +

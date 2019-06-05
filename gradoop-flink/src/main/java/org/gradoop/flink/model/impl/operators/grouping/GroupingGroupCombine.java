@@ -83,7 +83,8 @@ public class GroupingGroupCombine<
    * @param useEdgeLabels               group on edge label true/false
    * @param vertexLabelGroups           stores grouping properties for vertex labels
    * @param edgeLabelGroups             stores grouping properties for edge labels
-   * @param retainVerticesWithoutGroups keep vertices without labels (when grouping by label)
+   * @param retainVerticesWithoutGroups convert vertices that are not member of a group as is to
+   *                                    supervertices
    */
   GroupingGroupCombine(
     boolean useVertexLabels,
@@ -164,13 +165,11 @@ public class GroupingGroupCombine<
     if (optionalRetainedVerticesSubgraph.isPresent()) {
 
       LG retainedVerticesSubgraph = optionalRetainedVerticesSubgraph.get();
-      DataSet<V> vs = superVertices.union(retainedVerticesSubgraph.getVertices());
-      DataSet<E> es = superEdges.union(retainedVerticesSubgraph.getEdges());
-
-      return graph.getFactory().fromDataSets(vs, es);
-    } else {
-      return graph.getFactory().fromDataSets(superVertices, superEdges);
+      superVertices = superVertices.union(retainedVerticesSubgraph.getVertices());
+      superEdges = superEdges.union(retainedVerticesSubgraph.getEdges());
     }
+
+    return graph.getFactory().fromDataSets(superVertices, superEdges);
 
   }
 

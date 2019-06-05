@@ -15,10 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
-public class GroupingGroupReduceLabelGroupsTest extends AvoidDefaultLabelGroupsTestBase {
-
+public class GroupingGroupCombineVertexRetentionTest extends VertexRetentionTestBase {
   @Override
   protected GroupingStrategy getStrategy() {
-    return GroupingStrategy.GROUP_REDUCE;
+    return GroupingStrategy.GROUP_COMBINE;
   }
 }

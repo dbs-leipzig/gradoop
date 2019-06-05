@@ -153,6 +153,7 @@ public abstract class Grouping<
    *                                    applies when
    *                                    grouping by labels)
    */
+  @SuppressWarnings("unchecked")
   Grouping(boolean useVertexLabels, boolean useEdgeLabels, List<LabelGroup> vertexLabelGroups,
     List<LabelGroup> edgeLabelGroups, boolean retainVerticesWithoutGroups) {
     this.useVertexLabels = useVertexLabels;
@@ -167,7 +168,7 @@ public abstract class Grouping<
       .collect(Collectors.toList())
       .toArray(new FilterFunction[getVertexLabelGroups().size()]);
 
-    vertexInNoGroupFilter = new Not<V>(new Or<V>(isVertexInLabelGroupFunctions));
+    vertexInNoGroupFilter = new Not<>(new Or<V>(isVertexInLabelGroupFunctions));
   }
 
   @Override
@@ -368,11 +369,10 @@ public abstract class Grouping<
           // a) and the group by properties are empty => vertex is not member of the group
           // b) and group by properties are not empty => vertex can be member of the group
           if (vertex.getLabel().isEmpty()) {
-            return !group.getPropertyKeys().isEmpty() && hasVertexAllPropertiesOfGroup.apply(group,
-              vertex);
+            return !group.getPropertyKeys().isEmpty() && hasVertexAllPropertiesOfGroup
+              .apply(group, vertex);
           } else {
-            return hasVertexAllPropertiesOfGroup.apply(group,
-              vertex);
+            return hasVertexAllPropertiesOfGroup.apply(group, vertex);
           }
 
         } else {
@@ -381,8 +381,8 @@ public abstract class Grouping<
           // properties grouped by
           // if there is no grouped by property, no vertex should be part of the group
 
-          return !group.getPropertyKeys().isEmpty() && hasVertexAllPropertiesOfGroup.apply(group,
-            vertex);
+          return !group.getPropertyKeys().isEmpty() && hasVertexAllPropertiesOfGroup
+            .apply(group, vertex);
         }
       };
     }
@@ -405,6 +405,7 @@ public abstract class Grouping<
     LG filtered = new Subgraph<G, V, E, LG>(vertexInNoGroupFilter, new True<>(),
       Subgraph.Strategy.VERTEX_INDUCED)
       .execute(graph);
+    // TODO after next update: is verify still necesarry?
 
     return new Verify<G, V, E, LG>().execute(filtered);
   }

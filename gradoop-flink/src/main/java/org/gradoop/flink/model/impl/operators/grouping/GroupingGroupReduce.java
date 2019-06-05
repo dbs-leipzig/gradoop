@@ -141,13 +141,11 @@ public class GroupingGroupReduce<
     if (optionalRetainedVerticesSubgraph.isPresent()) {
 
       LG retainedVerticesSubgraph = optionalRetainedVerticesSubgraph.get();
-      DataSet<V> vs = superVertices.union(retainedVerticesSubgraph.getVertices());
-      DataSet<E> es = superEdges.union(retainedVerticesSubgraph.getEdges());
-
-      return graph.getFactory().fromDataSets(vs, es);
-    } else {
-      return graph.getFactory().fromDataSets(superVertices, superEdges);
+      superVertices = superVertices.union(retainedVerticesSubgraph.getVertices());
+      superEdges = superEdges.union(retainedVerticesSubgraph.getEdges());
     }
+
+    return graph.getFactory().fromDataSets(superVertices, superEdges);
   }
 
 }
