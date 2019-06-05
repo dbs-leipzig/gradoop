@@ -38,6 +38,7 @@ import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 import org.gradoop.flink.model.impl.operators.verify.Verify;
+import org.gradoop.flink.model.impl.operators.verify.VerifyGraphContainment;
 
 import java.util.List;
 import java.util.Objects;
@@ -320,6 +321,18 @@ public interface BaseGraphOperators<
    */
   default LG verify() {
     return callForGraph(new Verify<>());
+  }
+
+  /**
+   * Verifies this graph, removing dangling graph ids from its elements,
+   * i.e. ids different from this graph heads id.<br>
+   * This operator can be applied after an operator that has not checked the graphs validity.
+   * The graph head of this logical graph remains unchanged.
+   *
+   * @return this graph with all dangling graph ids removed.
+   */
+  default LG verifyGraphContainment() {
+    return callForGraph(new VerifyGraphContainment<>());
   }
 
   //----------------------------------------------------------------------------

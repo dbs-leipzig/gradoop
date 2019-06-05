@@ -241,16 +241,6 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
     List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
     List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions);
 
-  /**
-   * Verifies this graph, removing dangling graph ids from its elements,
-   * i.e. ids different from this graph heads id.<br>
-   * This operator can be applied after an operator that has not checked the graphs validity.
-   * The graph head of this logical graph remains unchanged.
-   *
-   * @return this graph with all dangling graph ids removed.
-   */
-  LogicalGraph verifyGraphContainment();
-
   //----------------------------------------------------------------------------
   // Auxiliary Operators
   //----------------------------------------------------------------------------
