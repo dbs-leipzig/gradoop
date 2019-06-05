@@ -26,7 +26,6 @@ import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -222,15 +221,6 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
   //----------------------------------------------------------------------------
   // Auxiliary operators
   //----------------------------------------------------------------------------
-
-  /**
-   * Calls the given unary collection to collection operator for the collection.
-   *
-   * @param op unary collection to collection operator
-   * @return result of given operator
-   */
-  GraphCollection callForCollection(
-    UnaryCollectionToCollectionOperator op);
 
   /**
    * Calls the given binary collection to collection operator using that

@@ -53,6 +53,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToData
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
+import org.gradoop.flink.model.impl.operators.verify.VerifyGraphContainment;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -236,6 +237,11 @@ public class LogicalGraph implements
 
     return callForCollection(new EdgeRollUp(vertexGroupingKeys, vertexAggregateFunctions,
       edgeGroupingKeys, edgeAggregateFunctions));
+  }
+
+  @Override
+  public LogicalGraph verifyGraphContainment() {
+    return callForGraph(new VerifyGraphContainment<>());
   }
 
   //----------------------------------------------------------------------------
