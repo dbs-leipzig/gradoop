@@ -49,6 +49,7 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory
     Objects.requireNonNull(vertices, "Vertex DataSet was null");
     Objects.requireNonNull(edges, "Edge DataSet was null");
     GraphHead graphHead = getConfig()
+      .getLogicalGraphFactory()
       .getGraphHeadFactory()
       .createGraphHead();
 
@@ -77,6 +78,7 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory
     Map<String, DataSet<Vertex>> vertices,
     Map<String, DataSet<Edge>> edges) {
     GraphHead graphHead = getConfig()
+      .getLogicalGraphFactory()
       .getGraphHeadFactory()
       .createGraphHead();
 

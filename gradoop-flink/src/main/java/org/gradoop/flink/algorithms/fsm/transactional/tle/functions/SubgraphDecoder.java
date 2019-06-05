@@ -63,9 +63,9 @@ public abstract class SubgraphDecoder implements Serializable {
    * @param config Gradoop configuration
    */
   public SubgraphDecoder(GradoopFlinkConfig config) {
-    vertexFactory = config.getVertexFactory();
-    graphHeadFactory = config.getGraphHeadFactory();
-    edgeFactory = config.getEdgeFactory();
+    vertexFactory = config.getLogicalGraphFactory().getVertexFactory();
+    graphHeadFactory = config.getLogicalGraphFactory().getGraphHeadFactory();
+    edgeFactory = config.getLogicalGraphFactory().getEdgeFactory();
   }
 
   /**

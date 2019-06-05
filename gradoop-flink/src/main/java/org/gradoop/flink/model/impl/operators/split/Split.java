@@ -115,7 +115,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
 
     // add new graph id's to the initial graph set
     DataSet<GraphHead> newGraphs = newGraphIds
-      .map(new InitGraphHead(graph.getConfig().getGraphHeadFactory()));
+      .map(new InitGraphHead(graph.getFactory().getGraphHeadFactory()));
 
     //--------------------------------------------------------------------------
     // compute edges

@@ -16,9 +16,9 @@
 package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Test;
@@ -41,9 +41,9 @@ public class CreateVertexFromEdgesTest extends GradoopFlinkTestBase {
   @Test
   public void testFunction() throws Exception {
     CreateVertexFromEdges<Vertex, Edge> function = new CreateVertexFromEdges<>("test",
-      getConfig().getVertexFactory());
+      getConfig().getLogicalGraphFactory().getVertexFactory());
     GradoopId dummy = GradoopId.get();
-    EdgeFactory edgeFactory = getConfig().getEdgeFactory();
+    EPGMEdgeFactory<Edge> edgeFactory = getConfig().getLogicalGraphFactory().getEdgeFactory();
     // Create some test edges, with some having no properties or label.
     Edge withoutProperties = edgeFactory.createEdge(dummy, dummy);
     Edge withProperties = edgeFactory.createEdge("TestEdge2", dummy, dummy);

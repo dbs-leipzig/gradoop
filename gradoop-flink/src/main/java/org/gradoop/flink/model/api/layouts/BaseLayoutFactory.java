@@ -15,12 +15,23 @@
  */
 package org.gradoop.flink.model.api.layouts;
 
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.ElementFactoryProvider;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
  * Base interface for layout factories.
+ *
+ * @param <G> GraphHead type.
+ * @param <V> Vertex type.
+ * @param <E> Edge type.
  */
-public interface BaseLayoutFactory {
+public interface BaseLayoutFactory<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge> extends ElementFactoryProvider<G, V, E> {
   /**
    * Sets the config.
    *

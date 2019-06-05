@@ -18,9 +18,9 @@ package org.gradoop.dataintegration.transformation.impl.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.dataintegration.transformation.impl.config.EdgeDirection;
 
@@ -34,7 +34,7 @@ public class CreateNewEdges implements FlatMapFunction<Tuple2<Vertex, List<Grado
   /**
    * The edge factory which is used for the creation of new edges.
    */
-  private final EdgeFactory edgeFactory;
+  private final EPGMEdgeFactory<Edge> edgeFactory;
 
   /**
    * The direction of the created edge(s).
@@ -54,7 +54,8 @@ public class CreateNewEdges implements FlatMapFunction<Tuple2<Vertex, List<Grado
    * @param edgeDirection The direction of the created edge(s).
    * @param edgeLabel     The label of the newly created edge(s).
    */
-  public CreateNewEdges(EdgeFactory factory, EdgeDirection edgeDirection, String edgeLabel) {
+  public CreateNewEdges(EPGMEdgeFactory<Edge> factory, EdgeDirection edgeDirection,
+                        String edgeLabel) {
     this.edgeDirection = edgeDirection;
     this.edgeLabel = edgeLabel;
     this.edgeFactory = factory;

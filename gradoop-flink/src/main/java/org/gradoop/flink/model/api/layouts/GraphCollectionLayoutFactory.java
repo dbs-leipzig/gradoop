@@ -35,7 +35,7 @@ import java.util.Map;
 public interface GraphCollectionLayoutFactory<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
-  E extends EPGMEdge> extends BaseLayoutFactory {
+  E extends EPGMEdge> extends BaseLayoutFactory<G, V, E> {
   /**
    * Creates a collection layout from the given datasets.
    *

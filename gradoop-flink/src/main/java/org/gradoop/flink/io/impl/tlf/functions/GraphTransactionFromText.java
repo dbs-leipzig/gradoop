@@ -19,13 +19,13 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.io.impl.tlf.TLFConstants;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -48,15 +48,15 @@ public class GraphTransactionFromText
   /**
    * Graph head factory.
    */
-  private GraphHeadFactory graphHeadFactory;
+  private EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
   /**
    * Vertex factory.
    */
-  private VertexFactory vertexFactory;
+  private EPGMVertexFactory<Vertex> vertexFactory;
   /**
    * Edge factory.
    */
-  private EdgeFactory edgeFactory;
+  private EPGMEdgeFactory<Edge> edgeFactory;
 
   /**
    * Valued constructor.
@@ -64,9 +64,9 @@ public class GraphTransactionFromText
    * @param config gradoop flink config
    */
   public GraphTransactionFromText(GradoopFlinkConfig config) {
-    this.graphHeadFactory = config.getGraphHeadFactory();
-    this.vertexFactory = config.getVertexFactory();
-    this.edgeFactory = config.getEdgeFactory();
+    this.graphHeadFactory = config.getLogicalGraphFactory().getGraphHeadFactory();
+    this.vertexFactory = config.getLogicalGraphFactory().getVertexFactory();
+    this.edgeFactory = config.getLogicalGraphFactory().getEdgeFactory();
   }
 
   /**

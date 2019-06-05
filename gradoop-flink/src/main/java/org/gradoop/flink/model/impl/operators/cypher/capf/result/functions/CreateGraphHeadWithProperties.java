@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.operators.cypher.capf.result.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.types.Row;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public class CreateGraphHeadWithProperties implements MapFunction<Row, GraphHead
   /**
    * The factory used to create the graph heads.
    */
-  private GraphHeadFactory headFactory;
+  private EPGMGraphHeadFactory<GraphHead> headFactory;
 
   /**
    * List containing names for the properties to be set.
@@ -62,7 +62,7 @@ public class CreateGraphHeadWithProperties implements MapFunction<Row, GraphHead
   public CreateGraphHeadWithProperties(
     int start,
     int end,
-    GraphHeadFactory headFactory,
+    EPGMGraphHeadFactory<GraphHead> headFactory,
     List<String> propertyNames) {
 
     this.start = start;

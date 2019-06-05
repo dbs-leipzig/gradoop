@@ -16,10 +16,10 @@
 package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Before;
@@ -52,15 +52,16 @@ public class CreateCartesianNeighborhoodEdgesTest extends GradoopFlinkTestBase {
   /**
    * The factory used to create new vertices.
    */
-  private VertexFactory vertexFactory;
+  private EPGMVertexFactory<Vertex> vertexFactory;
 
   /**
    * Set this test up, creating the function to test.
    */
   @Before
   public void setUp() {
-    vertexFactory = getConfig().getVertexFactory();
-    toTest = new CreateCartesianNeighborhoodEdges<>(getConfig().getEdgeFactory(), edgeLabel);
+    vertexFactory = getConfig().getLogicalGraphFactory().getVertexFactory();
+    toTest = new CreateCartesianNeighborhoodEdges<>(getConfig().getLogicalGraphFactory()
+      .getEdgeFactory(), edgeLabel);
   }
 
   /**

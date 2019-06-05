@@ -201,7 +201,7 @@ public class CAPFQueryResult {
       .map(new CreateGraphHeadWithProperties(
         entityFieldsCount,
         entityFieldsCount + otherFieldsCount,
-        config.getGraphHeadFactory(),
+        config.getLogicalGraphFactory().getGraphHeadFactory(),
         otherVarNames)
       );
 

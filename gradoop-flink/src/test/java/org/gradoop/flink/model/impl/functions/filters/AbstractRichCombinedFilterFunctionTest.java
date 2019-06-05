@@ -19,8 +19,8 @@ import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.functions.epgm.IdInBroadcast;
 import org.junit.Test;
@@ -96,7 +96,7 @@ public class AbstractRichCombinedFilterFunctionTest
    */
   @Test
   public void testNotNotOrAnd() throws Exception {
-    VertexFactory factory = getConfig().getVertexFactory();
+    EPGMVertexFactory<Vertex> factory = getConfig().getLogicalGraphFactory().getVertexFactory();
     Vertex vertex1 = factory.createVertex();
     Vertex vertex2 = factory.createVertex();
     List<Vertex> input = Stream.generate(factory::createVertex).limit(100)

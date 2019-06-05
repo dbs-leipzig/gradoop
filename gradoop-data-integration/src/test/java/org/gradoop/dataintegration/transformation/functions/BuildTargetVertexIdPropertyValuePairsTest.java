@@ -47,8 +47,8 @@ public class BuildTargetVertexIdPropertyValuePairsTest extends GradoopFlinkTestB
     GradoopId target1 = GradoopId.get();
     GradoopId source2 = GradoopId.get();
     GradoopId target2 = GradoopId.get();
-    Edge edge1 = getConfig().getEdgeFactory().createEdge(source1, target1);
-    Edge edge2 = getConfig().getEdgeFactory().createEdge(source2, target2);
+    Edge edge1 = getConfig().getLogicalGraphFactory().getEdgeFactory().createEdge(source1, target1);
+    Edge edge2 = getConfig().getLogicalGraphFactory().getEdgeFactory().createEdge(source2, target2);
     Tuple2<GradoopId, PropertyValue> tuple1 = new Tuple2<>(source1, PropertyValue.create(1L));
     Tuple2<GradoopId, PropertyValue> tuple2 = new Tuple2<>(source2, PropertyValue.create(2L));
     List<Tuple2<GradoopId, PropertyValue>> result = getExecutionEnvironment()

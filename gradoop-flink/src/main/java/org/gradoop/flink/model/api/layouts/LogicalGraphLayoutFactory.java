@@ -33,7 +33,7 @@ import java.util.Map;
 public interface LogicalGraphLayoutFactory<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
-  E extends EPGMEdge> extends BaseLayoutFactory {
+  E extends EPGMEdge> extends BaseLayoutFactory<G, V, E> {
   /**
    * Creates a logical graph layout from the given vertex dataset.
    *

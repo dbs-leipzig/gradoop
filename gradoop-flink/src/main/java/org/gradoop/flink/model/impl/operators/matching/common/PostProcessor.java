@@ -27,6 +27,7 @@ import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.EdgeFromIds;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -66,11 +67,12 @@ public class PostProcessor {
    */
   public static GraphCollection extractGraphCollection(
     DataSet<Element> elements, GradoopFlinkConfig config, boolean mayOverlap) {
+    GraphCollectionFactory factory = config.getGraphCollectionFactory();
 
-    Class<GraphHead> graphHeadType = config.getGraphHeadFactory().getType();
-    Class<Vertex> vertexType = config.getVertexFactory().getType();
-    Class<Edge> edgeType = config.getEdgeFactory().getType();
-    return config.getGraphCollectionFactory().fromDataSets(
+    Class<GraphHead> graphHeadType = factory.getGraphHeadFactory().getType();
+    Class<Vertex> vertexType = factory.getVertexFactory().getType();
+    Class<Edge> edgeType = factory.getEdgeFactory().getType();
+    return factory.fromDataSets(
       extractGraphHeads(elements, graphHeadType),
       extractVertices(elements, vertexType, mayOverlap),
       extractEdges(elements, edgeType, mayOverlap)

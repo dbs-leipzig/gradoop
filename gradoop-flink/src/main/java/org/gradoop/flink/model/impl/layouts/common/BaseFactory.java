@@ -17,10 +17,16 @@ package org.gradoop.flink.model.impl.layouts.common;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.model.api.layouts.BaseLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -31,12 +37,51 @@ import java.util.Objects;
 /**
  * Base class for graph layout factories.
  */
-public abstract class BaseFactory implements BaseLayoutFactory {
+public abstract class BaseFactory implements BaseLayoutFactory<GraphHead, Vertex, Edge> {
 
   /**
    * Gradoop Flink config
    */
   private GradoopFlinkConfig config;
+
+  /**
+   * Knows how to create {@link GraphHead}
+   */
+  private final GraphHeadFactory graphHeadFactory;
+
+  /**
+   * Knows how to create {@link Vertex}
+   */
+  private final VertexFactory vertexFactory;
+
+  /**
+   *  Knows how to create {@link Edge}
+   */
+  private final EdgeFactory edgeFactory;
+
+  /**
+   * Creates a new Configuration.
+   */
+  protected BaseFactory() {
+    this.graphHeadFactory = new GraphHeadFactory();
+    this.vertexFactory = new VertexFactory();
+    this.edgeFactory = new EdgeFactory();
+  }
+
+  @Override
+  public EPGMGraphHeadFactory<GraphHead> getGraphHeadFactory() {
+    return graphHeadFactory;
+  }
+
+  @Override
+  public EPGMVertexFactory<Vertex> getVertexFactory() {
+    return vertexFactory;
+  }
+
+  @Override
+  public EPGMEdgeFactory<Edge> getEdgeFactory() {
+    return edgeFactory;
+  }
 
   @Override
   public void setGradoopFlinkConfig(GradoopFlinkConfig config) {
@@ -62,7 +107,7 @@ public abstract class BaseFactory implements BaseLayoutFactory {
     DataSet<GraphHead> graphHeadSet;
     if (graphHeads.isEmpty()) {
       graphHeadSet = env
-        .fromElements(getConfig().getGraphHeadFactory().createGraphHead())
+        .fromElements(getGraphHeadFactory().createGraphHead())
         .filter(new False<>());
     } else {
       graphHeadSet =  env.fromCollection(graphHeads);
@@ -84,7 +129,7 @@ public abstract class BaseFactory implements BaseLayoutFactory {
     DataSet<Vertex> vertexSet;
     if (vertices.isEmpty()) {
       vertexSet = env
-        .fromElements(getConfig().getVertexFactory().createVertex())
+        .fromElements(getVertexFactory().createVertex())
         .filter(new False<>());
     } else {
       vertexSet = env.fromCollection(vertices);
@@ -106,7 +151,7 @@ public abstract class BaseFactory implements BaseLayoutFactory {
     if (edges.isEmpty()) {
       GradoopId dummyId = GradoopId.get();
       edgeSet = env
-        .fromElements(getConfig().getEdgeFactory().createEdge(dummyId, dummyId))
+        .fromElements(getEdgeFactory().createEdge(dummyId, dummyId))
         .filter(new False<>());
     } else {
       edgeSet = env.fromCollection(edges);

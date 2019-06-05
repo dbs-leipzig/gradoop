@@ -68,34 +68,19 @@ public class GraphCollectionFactory
     this.layoutFactory.setGradoopFlinkConfig(config);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * The factory is passed from {@link GradoopFlinkConfig} at the moment.
-   */
   @Override
   public EPGMGraphHeadFactory<GraphHead> getGraphHeadFactory() {
-    return config.getGraphHeadFactory();
+    return layoutFactory.getGraphHeadFactory();
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * The factory is passed from {@link GradoopFlinkConfig} at the moment.
-   */
   @Override
   public EPGMVertexFactory<Vertex> getVertexFactory() {
-    return config.getVertexFactory();
+    return layoutFactory.getVertexFactory();
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * The factory is passed from {@link GradoopFlinkConfig} at the moment.
-   */
   @Override
   public EPGMEdgeFactory<Edge> getEdgeFactory() {
-    return config.getEdgeFactory();
+    return layoutFactory.getEdgeFactory();
   }
 
   @Override

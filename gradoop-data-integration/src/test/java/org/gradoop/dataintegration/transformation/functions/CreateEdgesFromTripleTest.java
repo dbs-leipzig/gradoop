@@ -17,11 +17,11 @@ package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Test;
 
@@ -43,8 +43,9 @@ public class CreateEdgesFromTripleTest extends GradoopFlinkTestBase {
   @Test
   public void testFunction() throws Exception {
     CreateEdgesFromTriple<Vertex, Edge> function = new CreateEdgesFromTriple<>(
-      getConfig().getEdgeFactory(), "source", "target");
-    VertexFactory vertexFactory = getConfig().getVertexFactory();
+      getConfig().getLogicalGraphFactory().getEdgeFactory(), "source", "target");
+    EPGMVertexFactory<Vertex> vertexFactory = getConfig().getLogicalGraphFactory()
+      .getVertexFactory();
     Vertex testVertex1 = vertexFactory.createVertex();
     Vertex testVertex2 = vertexFactory.createVertex();
     GradoopId source1 = GradoopId.get();

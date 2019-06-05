@@ -20,12 +20,12 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.conf.Configuration;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVBase;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToEdge;
@@ -34,6 +34,7 @@ import org.gradoop.flink.io.impl.csv.functions.CSVLineToVertex;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -97,9 +98,10 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
       source.readDistributed(getMetaDataPath(), getConfig());
 
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-    GraphHeadFactory graphHeadFactory = getConfig().getGraphHeadFactory();
-    VertexFactory vertexFactory = getConfig().getVertexFactory();
-    EdgeFactory edgeFactory = getConfig().getEdgeFactory();
+    GraphCollectionFactory factory = getConfig().getGraphCollectionFactory();
+    EPGMGraphHeadFactory<GraphHead> graphHeadFactory = factory.getGraphHeadFactory();
+    EPGMVertexFactory<Vertex> vertexFactory = factory.getVertexFactory();
+    EPGMEdgeFactory<Edge> edgeFactory = factory.getEdgeFactory();
 
     Map<String, DataSet<GraphHead>> graphHeads = metaData.getGraphLabels().stream()
       .map(label -> Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))
@@ -122,6 +124,6 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
         .filter(edge -> edge.getLabel().equals(label))))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
 
-    return getConfig().getGraphCollectionFactory().fromIndexedDataSets(graphHeads, vertices, edges);
+    return factory.fromIndexedDataSets(graphHeads, vertices, edges);
   }
 }

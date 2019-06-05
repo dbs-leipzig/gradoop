@@ -16,12 +16,14 @@
 package org.gradoop.storage.impl.hbase.io;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
@@ -105,31 +107,31 @@ public class HBaseDataSource extends HBaseBase
 
   @Override
   public GraphCollection getGraphCollection() {
-    GradoopFlinkConfig config = getFlinkConfig();
+    GraphCollectionFactory factory = getFlinkConfig().getGraphCollectionFactory();
     HBaseEPGMStore store = getStore();
 
-    DataSet<GraphHead> graphHeads = config.getExecutionEnvironment()
+    DataSet<GraphHead> graphHeads = ExecutionEnvironment.getExecutionEnvironment()
       .createInput(new GraphHeadTableInputFormat(
           getHBaseConfig().getGraphHeadHandler().applyQuery(graphHeadQuery),
           store.getGraphHeadName()),
-        new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType())))
+        new TupleTypeInfo<>(TypeExtractor.createTypeInfo(factory.getGraphHeadFactory().getType())))
       .map(new ValueOf1<>());
 
-    DataSet<Vertex> vertices = config.getExecutionEnvironment()
+    DataSet<Vertex> vertices = ExecutionEnvironment.getExecutionEnvironment()
       .createInput(new VertexTableInputFormat(
           getHBaseConfig().getVertexHandler().applyQuery(vertexQuery),
           store.getVertexTableName()),
-        new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getVertexFactory().getType())))
+        new TupleTypeInfo<>(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())))
       .map(new ValueOf1<>());
 
-    DataSet<Edge> edges = config.getExecutionEnvironment()
+    DataSet<Edge> edges = ExecutionEnvironment.getExecutionEnvironment()
       .createInput(new EdgeTableInputFormat(
           getHBaseConfig().getEdgeHandler().applyQuery(edgeQuery),
           store.getEdgeTableName()),
-        new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getEdgeFactory().getType())))
+        new TupleTypeInfo<>(TypeExtractor.createTypeInfo(factory.getEdgeFactory().getType())))
       .map(new ValueOf1<>());
 
-    return config.getGraphCollectionFactory().fromDataSets(graphHeads, vertices, edges);
+    return factory.fromDataSets(graphHeads, vertices, edges);
   }
 
   @Nonnull

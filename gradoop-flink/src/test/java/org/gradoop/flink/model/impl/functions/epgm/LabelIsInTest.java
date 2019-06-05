@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +53,7 @@ public class LabelIsInTest extends GradoopFlinkTestBase {
    */
   @Before
   public void setUp() {
-    VertexFactory vertexFactory = getConfig().getVertexFactory();
+    EPGMVertexFactory<Vertex> vertexFactory = getConfig().getLogicalGraphFactory().getVertexFactory();
     Vertex v1 = vertexFactory.createVertex();
     Vertex v2 = vertexFactory.createVertex("a");
     Vertex v3 = vertexFactory.createVertex("b");

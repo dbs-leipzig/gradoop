@@ -23,15 +23,21 @@ import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.flink.types.Value;
-import org.gradoop.common.config.GradoopConfig;
+import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
+import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.ElementFactoryProvider;
 import org.gradoop.common.model.impl.comparators.EPGMIdentifiableComparator;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.util.AsciiGraphLoader;
 
@@ -177,10 +183,30 @@ public class GradoopTestUtils {
   public static AsciiGraphLoader<GraphHead, Vertex, Edge> getSocialNetworkLoader()
     throws IOException {
 
-    GradoopConfig<GraphHead, Vertex, Edge> config = GradoopConfig.getDefaultConfig();
+    ElementFactoryProvider<GraphHead, Vertex, Edge> elementFactoryProvider =
+      new ElementFactoryProvider<GraphHead, Vertex, Edge>() {
+      EPGMGraphHeadFactory<GraphHead> graphHeadFactory = new GraphHeadFactory();
+      EPGMVertexFactory<Vertex> vertexFactory = new VertexFactory();
+      EPGMEdgeFactory<Edge> edgeFactory = new EdgeFactory();
+
+      @Override
+      public EPGMGraphHeadFactory<GraphHead> getGraphHeadFactory() {
+        return graphHeadFactory;
+      }
+
+      @Override
+      public EPGMVertexFactory<Vertex> getVertexFactory() {
+        return vertexFactory;
+      }
+
+      @Override
+      public EPGMEdgeFactory<Edge> getEdgeFactory() {
+        return edgeFactory;
+      }
+    };
 
     InputStream inputStream = GradoopTestUtils.class.getResourceAsStream(SOCIAL_NETWORK_GDL_FILE);
-    return AsciiGraphLoader.fromStream(inputStream, config);
+    return AsciiGraphLoader.fromStream(inputStream, elementFactoryProvider);
   }
 
   /**

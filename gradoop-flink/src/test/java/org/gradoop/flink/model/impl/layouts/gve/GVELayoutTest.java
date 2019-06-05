@@ -22,6 +22,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.junit.BeforeClass;
@@ -48,17 +49,17 @@ public class GVELayoutTest extends GradoopFlinkTestBase {
   @BeforeClass
   public static void setup() {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-    GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
+    LogicalGraphFactory factory = GradoopFlinkConfig.createConfig(env).getLogicalGraphFactory();
 
-    g0 = config.getGraphHeadFactory().createGraphHead("A");
-    g1 = config.getGraphHeadFactory().createGraphHead("B");
+    g0 = factory.getGraphHeadFactory().createGraphHead("A");
+    g1 = factory.getGraphHeadFactory().createGraphHead("B");
 
-    v0 = config.getVertexFactory().createVertex("A");
-    v1 = config.getVertexFactory().createVertex("B");
-    v2 = config.getVertexFactory().createVertex("C");
+    v0 = factory.getVertexFactory().createVertex("A");
+    v1 = factory.getVertexFactory().createVertex("B");
+    v2 = factory.getVertexFactory().createVertex("C");
 
-    e0 = config.getEdgeFactory().createEdge("a", v0.getId(), v1.getId());
-    e1 = config.getEdgeFactory().createEdge("b", v1.getId(), v2.getId());
+    e0 = factory.getEdgeFactory().createEdge("a", v0.getId(), v1.getId());
+    e1 = factory.getEdgeFactory().createEdge("b", v1.getId(), v2.getId());
 
     v0.addGraphId(g0.getId());
     v1.addGraphId(g0.getId());

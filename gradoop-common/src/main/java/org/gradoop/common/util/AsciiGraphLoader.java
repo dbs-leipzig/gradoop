@@ -21,8 +21,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.ElementFactoryProvider;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -50,9 +50,9 @@ public class AsciiGraphLoader
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
 
   /**
-   * Gradoop configuration
+   * Factory provider for EPGM elements.
    */
-  private final GradoopConfig<G, V, E> config;
+  private final ElementFactoryProvider<G, V, E> elementFactoryProvider;
 
   /**
    * Used to parse GDL scripts.
@@ -101,12 +101,12 @@ public class AsciiGraphLoader
    * Creates a new AsciiGraphLoader.
    *
    * @param gdlHandler GDL Handler
-   * @param config Gradoop configuration
+   * @param elementFactoryProvider Factory provider for EPGM elements.
    */
   private AsciiGraphLoader(GDLHandler gdlHandler,
-    GradoopConfig<G, V, E> config) {
+                           ElementFactoryProvider<G, V, E> elementFactoryProvider) {
     this.gdlHandler = gdlHandler;
-    this.config = config;
+    this.elementFactoryProvider = elementFactoryProvider;
 
     this.graphHeads     = Maps.newHashMap();
     this.vertices       = Maps.newHashMap();
@@ -126,8 +126,8 @@ public class AsciiGraphLoader
   /**
    * Creates an AsciiGraphLoader from the given ASCII GDL string.
    *
-   * @param asciiGraph  GDL string
-   * @param config      Gradoop configuration
+   * @param asciiGraph GDL string
+   * @param elementFactoryProvider Factory provider for EPGM elements.
    * @param <G> EPGM graph head type
    * @param <V> EPGM vertex type
    * @param <E> EPGM edge type
@@ -137,20 +137,20 @@ public class AsciiGraphLoader
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   AsciiGraphLoader<G, V, E> fromString(String asciiGraph,
-    GradoopConfig<G, V, E> config) {
+                                       ElementFactoryProvider<G, V, E> elementFactoryProvider) {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromString(asciiGraph),
-      config);
+      elementFactoryProvider);
   }
 
   /**
    * Creates an AsciiGraphLoader from the given ASCII GDL file.
    *
-   * @param fileName  File that contains a GDL script
-   * @param config    Gradoop configuration
+   * @param fileName File that contains a GDL script
+   * @param elementFactoryProvider Factory provider for EPGM elements.
    * @param <G> EPGM graph head type
    * @param <V> EPGM vertex type
    * @param <E> EPGM edge type
@@ -161,20 +161,21 @@ public class AsciiGraphLoader
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   AsciiGraphLoader<G, V, E> fromFile(String fileName,
-    GradoopConfig<G, V, E> config) throws IOException {
+                                     ElementFactoryProvider<G, V, E> elementFactoryProvider)
+    throws IOException {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromFile(fileName),
-      config);
+      elementFactoryProvider);
   }
 
   /**
    * Creates an AsciiGraphLoader from the given ASCII GDL file.
    *
-   * @param inputStream   File that contains a GDL script
-   * @param config        Gradoop configuration
+   * @param inputStream File that contains a GDL script
+   * @param elementFactoryProvider Factory provider for EPGM elements.
    * @param <G> EPGM graph head type
    * @param <V> EPGM vertex type
    * @param <E> EPGM edge type
@@ -185,13 +186,14 @@ public class AsciiGraphLoader
   public static
   <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
   AsciiGraphLoader<G, V, E> fromStream(InputStream inputStream,
-    GradoopConfig<G, V, E> config) throws IOException {
+                                       ElementFactoryProvider<G, V, E> elementFactoryProvider)
+    throws IOException {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
       .setDefaultGraphLabel(GradoopConstants.DEFAULT_GRAPH_LABEL)
       .setDefaultVertexLabel(GradoopConstants.DEFAULT_VERTEX_LABEL)
       .setDefaultEdgeLabel(GradoopConstants.DEFAULT_EDGE_LABEL)
       .buildFromStream(inputStream),
-      config);
+      elementFactoryProvider);
   }
 
   /**
@@ -482,7 +484,7 @@ public class AsciiGraphLoader
    * @return EPGM graph head
    */
   private G initGraphHead(Graph g) {
-    G graphHead = (G) config.getGraphHeadFactory().createGraphHead(
+    G graphHead = elementFactoryProvider.getGraphHeadFactory().createGraphHead(
       g.getLabel(), Properties.createFromMap(g.getProperties()));
     graphHeadIds.put(g.getId(), graphHead.getId());
     graphHeads.put(graphHead.getId(), graphHead);
@@ -498,7 +500,7 @@ public class AsciiGraphLoader
   private V initVertex(Vertex v) {
     V vertex;
     if (!vertexIds.containsKey(v.getId())) {
-      vertex = (V) config.getVertexFactory().createVertex(
+      vertex = elementFactoryProvider.getVertexFactory().createVertex(
         v.getLabel(),
         Properties.createFromMap(v.getProperties()),
         createGradoopIdSet(v));
@@ -520,7 +522,7 @@ public class AsciiGraphLoader
   private E initEdge(Edge e) {
     E edge;
     if (!edgeIds.containsKey(e.getId())) {
-      edge = (E) config.getEdgeFactory().createEdge(
+      edge = elementFactoryProvider.getEdgeFactory().createEdge(
         e.getLabel(),
         vertexIds.get(e.getSourceVertexId()),
         vertexIds.get(e.getTargetVertexId()),

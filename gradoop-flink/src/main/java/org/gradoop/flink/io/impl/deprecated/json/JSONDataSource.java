@@ -27,6 +27,7 @@ import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToEdge;
 import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToGraphHead;
 import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.combination.ReduceCombination;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -76,35 +77,34 @@ public class JSONDataSource extends JSONBase implements DataSource {
   @Override
   public GraphCollection getGraphCollection() {
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
+    GraphCollectionFactory factory = getConfig().getGraphCollectionFactory();
 
     // used for type hinting when loading vertex data
     TypeInformation<Vertex> vertexTypeInfo = TypeExtractor
-      .createTypeInfo(getConfig().getVertexFactory().getType());
+      .createTypeInfo(factory.getVertexFactory().getType());
     // used for type hinting when loading edge data
     TypeInformation<Edge> edgeTypeInfo = TypeExtractor
-      .createTypeInfo(getConfig().getEdgeFactory().getType());
+      .createTypeInfo(factory.getEdgeFactory().getType());
     // used for type hinting when loading graph data
     TypeInformation<GraphHead> graphTypeInfo = TypeExtractor
-      .createTypeInfo(getConfig().getGraphHeadFactory().getType());
+      .createTypeInfo(factory.getGraphHeadFactory().getType());
 
     // read vertex, edge and graph data
     DataSet<Vertex> vertices = env.readTextFile(getVertexPath())
-      .map(new JSONToVertex(getConfig().getVertexFactory()))
+      .map(new JSONToVertex(factory.getVertexFactory()))
       .returns(vertexTypeInfo);
     DataSet<Edge> edges = env.readTextFile(getEdgePath())
-      .map(new JSONToEdge(getConfig().getEdgeFactory()))
+      .map(new JSONToEdge(factory.getEdgeFactory()))
       .returns(edgeTypeInfo);
     DataSet<GraphHead> graphHeads;
     if (getGraphHeadPath() != null) {
       graphHeads = env.readTextFile(getGraphHeadPath())
-        .map(new JSONToGraphHead(getConfig().getGraphHeadFactory()))
+        .map(new JSONToGraphHead(factory.getGraphHeadFactory()))
         .returns(graphTypeInfo);
     } else {
-      graphHeads = env.fromElements(
-        getConfig().getGraphHeadFactory().createGraphHead());
+      graphHeads = env.fromElements(factory.getGraphHeadFactory().createGraphHead());
     }
 
-    return getConfig().getGraphCollectionFactory()
-      .fromDataSets(graphHeads, vertices, edges);
+    return factory.fromDataSets(graphHeads, vertices, edges);
   }
 }
