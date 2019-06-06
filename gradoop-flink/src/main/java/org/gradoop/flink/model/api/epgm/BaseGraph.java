@@ -35,7 +35,7 @@ public interface BaseGraph<
   V extends EPGMVertex,
   E extends EPGMEdge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, GC>> extends LogicalGraphLayout<G, V, E> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends LogicalGraphLayout<G, V, E> {
   /**
    * Returns the Gradoop Flink configuration.
    *
@@ -56,6 +56,6 @@ public interface BaseGraph<
    *
    * @return a factory that can be used to create a {@link GC} instance.
    */
-  BaseGraphCollectionFactory<G, V, E, GC> getCollectionFactory();
+  BaseGraphCollectionFactory<G, V, E, LG, GC> getCollectionFactory();
 
 }
