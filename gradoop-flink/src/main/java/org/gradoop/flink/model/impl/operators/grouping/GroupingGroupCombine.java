@@ -43,26 +43,26 @@ import java.util.Optional;
 /**
  * Grouping implementation that uses group + groupCombine + groupReduce for
  * building super vertices and updating the original vertices.
- * <p>
+ *
  * Algorithmic idea:
- * <p>
+ *
  * 1) Map vertices to a minimal representation, i.e. {@link VertexGroupItem}.
  * 2) Group vertices on label and/or property
  * 3) Use groupCombine to process the grouped partitions. Creates a super vertex
- * tuple for each group partition, including the local aggregates.
- * Update each vertex tuple with their super vertex id and forward them.
+ *    tuple for each group partition, including the local aggregates.
+ *    Update each vertex tuple with their super vertex id and forward them.
  * 4) Filter output of 3)
- * a) super vertex tuples are filtered, grouped and merged via groupReduce to
- * create a final super vertex representing the group. An additional
- * mapping from the final super vertex id to the super vertex ids of the
- * original partitions is also created.
- * b) non-candidate tuples are mapped to {@link VertexWithSuperVertex} using
- * the broadcasted mapping output of 4a)
+ *    a) super vertex tuples are filtered, grouped and merged via groupReduce to
+ *       create a final super vertex representing the group. An additional
+ *       mapping from the final super vertex id to the super vertex ids of the
+ *       original partitions is also created.
+ *    b) non-candidate tuples are mapped to {@link VertexWithSuperVertex} using
+ *       the broadcasted mapping output of 4a)
  * 5) Map edges to a minimal representation, i.e. {@link EdgeGroupItem}
  * 6) Join edges with output of 4b) and replace source/target id with super
- * vertex id.
+ *    vertex id.
  * 7) Updated edges are grouped by source and target id and optionally by label
- * and/or edge property.
+ *    and/or edge property.
  * 8) Group combine on the workers and compute aggregate.
  * 9) Group reduce globally and create final super edges.
  *

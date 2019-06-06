@@ -167,8 +167,6 @@ public abstract class Grouping<
     vertexInNoGroupFilter = getVertexIsNotMemberOfAnyLabelGroupFilter(getVertexLabelGroups());
   }
 
-
-
   @Override
   public LG execute(LG graph) {
     LG result;
@@ -501,16 +499,16 @@ public abstract class Grouping<
      * Creates a new grouping builder
      */
     public GroupingBuilder() {
-      this.useVertexLabel = false;
-      this.useEdgeLabel = false;
-      this.vertexLabelGroups = new ArrayList<>();
-      this.edgeLabelGroups = new ArrayList<>();
+      this.useVertexLabel               = false;
+      this.useEdgeLabel                 = false;
+      this.vertexLabelGroups            = new ArrayList<>();
+      this.edgeLabelGroups              = new ArrayList<>();
       this.globalVertexAggregateFunctions = new ArrayList<>();
       this.globalEdgeAggregateFunctions = new ArrayList<>();
-      this.defaultVertexLabelGroup =
-        new LabelGroup(Grouping.DEFAULT_VERTEX_LABEL_GROUP, GradoopConstants.DEFAULT_VERTEX_LABEL);
-      this.defaultEdgeLabelGroup =
-        new LabelGroup(Grouping.DEFAULT_EDGE_LABEL_GROUP, GradoopConstants.DEFAULT_EDGE_LABEL);
+      this.defaultVertexLabelGroup      = new LabelGroup(
+        Grouping.DEFAULT_VERTEX_LABEL_GROUP, GradoopConstants.DEFAULT_VERTEX_LABEL);
+      this.defaultEdgeLabelGroup        = new LabelGroup(
+        Grouping.DEFAULT_EDGE_LABEL_GROUP, GradoopConstants.DEFAULT_EDGE_LABEL);
 
       vertexLabelGroups.add(defaultVertexLabelGroup);
       edgeLabelGroups.add(defaultEdgeLabelGroup);
@@ -609,7 +607,7 @@ public abstract class Grouping<
      * Adds a vertex label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
-     * @param label        vertex label
+     * @param label vertex label
      * @param groupingKeys keys used for grouping
      * @return this builder
      */
@@ -623,8 +621,8 @@ public abstract class Grouping<
      * Adds a vertex label group which defines the grouping keys and the aggregate functions for a
      * specific label. Note that a label may be used multiple times.
      *
-     * @param label              vertex label
-     * @param groupingKeys       keys used for grouping
+     * @param label vertex label
+     * @param groupingKeys keys used for grouping
      * @param aggregateFunctions vertex aggregate functions
      * @return this builder
      */
@@ -639,9 +637,9 @@ public abstract class Grouping<
      * Adds a vertex label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
-     * @param label            vertex label
+     * @param label vertex label
      * @param superVertexLabel label of the group and therefore of the new super vertex
-     * @param groupingKeys     keys used for grouping
+     * @param groupingKeys keys used for grouping
      * @return this builder
      */
     public GroupingBuilder addVertexLabelGroup(
@@ -655,9 +653,9 @@ public abstract class Grouping<
      * Adds a vertex label group which defines the grouping keys and the aggregate functions for a
      * specific label. Note that a label may be used multiple times.
      *
-     * @param label              vertex label
-     * @param superVertexLabel   label of the group and therefore of the new super vertex
-     * @param groupingKeys       keys used for grouping
+     * @param label vertex label
+     * @param superVertexLabel label of the group and therefore of the new super vertex
+     * @param groupingKeys keys used for grouping
      * @param aggregateFunctions vertex aggregate functions
      * @return this builder
      */
@@ -675,7 +673,7 @@ public abstract class Grouping<
      * Adds a vertex label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
-     * @param label        edge label
+     * @param label edge label
      * @param groupingKeys keys used for grouping
      * @return this builder
      */
@@ -689,8 +687,8 @@ public abstract class Grouping<
      * Adds a vertex label group which defines the grouping keys and the aggregate functions for a
      * specific label. Note that a label may be used multiple times.
      *
-     * @param label              edge label
-     * @param groupingKeys       keys used for grouping
+     * @param label edge label
+     * @param groupingKeys keys used for grouping
      * @param aggregateFunctions edge aggregate functions
      * @return this builder
      */
@@ -705,9 +703,9 @@ public abstract class Grouping<
      * Adds a vertex label group which defines the grouping keys for a specific label.
      * Note that a label may be used multiple times.
      *
-     * @param label          edge label
+     * @param label edge label
      * @param superEdgeLabel label of the group and therefore of the new super edge
-     * @param groupingKeys   keys used for grouping
+     * @param groupingKeys keys used for grouping
      * @return this builder
      */
     public GroupingBuilder addEdgeLabelGroup(
@@ -721,9 +719,9 @@ public abstract class Grouping<
      * Adds a vertex label group which defines the grouping keys and the aggregate functions for a
      * specific label. Note that a label may be used multiple times.
      *
-     * @param label              edge label
-     * @param superEdgeLabel     label of the group and therefore of the new super edge
-     * @param groupingKeys       keys used for grouping
+     * @param label edge label
+     * @param superEdgeLabel label of the group and therefore of the new super edge
+     * @param groupingKeys keys used for grouping
      * @param aggregateFunctions edge aggregate functions
      * @return this builder
      */
