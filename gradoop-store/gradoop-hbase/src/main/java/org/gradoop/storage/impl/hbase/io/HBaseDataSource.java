@@ -16,7 +16,6 @@
 package org.gradoop.storage.impl.hbase.io;
 
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.pojo.Edge;
@@ -107,24 +106,25 @@ public class HBaseDataSource extends HBaseBase
 
   @Override
   public GraphCollection getGraphCollection() {
-    GraphCollectionFactory factory = getFlinkConfig().getGraphCollectionFactory();
+    GradoopFlinkConfig config = getFlinkConfig();
+    GraphCollectionFactory factory = config.getGraphCollectionFactory();
     HBaseEPGMStore store = getStore();
 
-    DataSet<GraphHead> graphHeads = ExecutionEnvironment.getExecutionEnvironment()
+    DataSet<GraphHead> graphHeads = config.getExecutionEnvironment()
       .createInput(new GraphHeadTableInputFormat(
           getHBaseConfig().getGraphHeadHandler().applyQuery(graphHeadQuery),
           store.getGraphHeadName()),
         new TupleTypeInfo<>(TypeExtractor.createTypeInfo(factory.getGraphHeadFactory().getType())))
       .map(new ValueOf1<>());
 
-    DataSet<Vertex> vertices = ExecutionEnvironment.getExecutionEnvironment()
+    DataSet<Vertex> vertices = config.getExecutionEnvironment()
       .createInput(new VertexTableInputFormat(
           getHBaseConfig().getVertexHandler().applyQuery(vertexQuery),
           store.getVertexTableName()),
         new TupleTypeInfo<>(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())))
       .map(new ValueOf1<>());
 
-    DataSet<Edge> edges = ExecutionEnvironment.getExecutionEnvironment()
+    DataSet<Edge> edges = config.getExecutionEnvironment()
       .createInput(new EdgeTableInputFormat(
           getHBaseConfig().getEdgeHandler().applyQuery(edgeQuery),
           store.getEdgeTableName()),

@@ -15,41 +15,25 @@
  */
 package org.gradoop.common.util;
 
-import org.gradoop.common.model.api.entities.ElementFactoryProvider;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
+import static org.gradoop.common.GradoopTestUtils.getElementFactoryProvider;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 public class AsciiGraphLoaderTest {
-
-  private static ElementFactoryProvider<GraphHead, Vertex, Edge> elementFactoryProvider = null;
-
-  @BeforeClass
-  @SuppressWarnings("unchecked")
-  public static void initElementFactoryProvider() {
-    elementFactoryProvider = mock(ElementFactoryProvider.class);
-    when(elementFactoryProvider.getGraphHeadFactory()).thenReturn(new GraphHeadFactory());
-    when(elementFactoryProvider.getVertexFactory()).thenReturn(new VertexFactory());
-    when(elementFactoryProvider.getEdgeFactory()).thenReturn(new EdgeFactory());
-  }
 
   @Test
   public void testFromString() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[()-->()]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("[()-->()]", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -60,7 +44,7 @@ public class AsciiGraphLoaderTest {
     String file = URLDecoder.decode(
         getClass().getResource("/data/gdl/example.gdl").getFile(), StandardCharsets.UTF_8.name());
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromFile(file, elementFactoryProvider);
+      AsciiGraphLoader.fromFile(file, getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -69,7 +53,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetGraphHeads() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[()]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("[()]", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 1, 0);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -84,7 +68,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetGraphHeadByVariable() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g[()],h[()]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("g[()],h[()]", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 2, 2, 0);
     validateCaches(asciiGraphLoader, 2, 0, 0);
@@ -99,7 +83,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetGraphHeadsByVariables() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g[()],h[()]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("g[()],h[()]", getElementFactoryProvider());
 
     Collection<GraphHead> graphHeadPojos = asciiGraphLoader
       .getGraphHeadsByVariables("g", "h");
@@ -110,7 +94,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetVertices() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[()]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("[()]", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 1, 0);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -124,7 +108,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetVertexByVariable() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("(a)", elementFactoryProvider);
+      AsciiGraphLoader.fromString("(a)", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 0, 1, 0);
     validateCaches(asciiGraphLoader, 0, 1, 0);
@@ -138,7 +122,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetVerticesByVariables() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[(a),(b),(a)]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("[(a),(b),(a)]", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 0);
     validateCaches(asciiGraphLoader, 0, 2, 0);
@@ -157,7 +141,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetVerticesByGraphIds() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g[(a),(b)],h[(a),(c)]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("g[(a),(b)],h[(a),(c)]", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 2, 3, 0);
     validateCaches(asciiGraphLoader, 2, 3, 0);
@@ -193,7 +177,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetVerticesByGraphVariables() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g[(a),(b)],h[(a),(c)]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("g[(a),(b)],h[(a),(c)]", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 2, 3, 0);
     validateCaches(asciiGraphLoader, 2, 3, 0);
@@ -226,7 +210,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetEdges() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[()-->()]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("[()-->()]", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -240,7 +224,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetEdgesByVariables() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[()-[e]->()<-[f]-()]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("[()-[e]->()<-[f]-()]", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 3, 2);
     validateCaches(asciiGraphLoader, 0, 0, 2);
@@ -260,7 +244,7 @@ public class AsciiGraphLoaderTest {
   public void testGetEdgesByGraphIds() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()-[a]->()<-[b]-()],h[()-[c]->()-[d]->()]",
-        elementFactoryProvider);
+        getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 2, 6, 4);
     validateCaches(asciiGraphLoader, 2, 0, 4);
@@ -299,7 +283,7 @@ public class AsciiGraphLoaderTest {
   public void testGetEdgesByGraphVariables() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()-[a]->()<-[b]-()],h[()-[c]->()-[d]->()]",
-        elementFactoryProvider);
+        getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 2, 6, 4);
     validateCaches(asciiGraphLoader, 2, 0, 4);
@@ -335,7 +319,7 @@ public class AsciiGraphLoaderTest {
   public void testGetGraphHeadCache() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()],h[()],[()]",
-        elementFactoryProvider);
+        getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 3, 3, 0);
     validateCaches(asciiGraphLoader, 2, 0, 0);
@@ -353,7 +337,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetVertexCache() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("(a),(b),()", elementFactoryProvider);
+      AsciiGraphLoader.fromString("(a),(b),()", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 0, 3, 0);
     validateCaches(asciiGraphLoader, 0, 2, 0);
@@ -371,7 +355,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetEdgeCache() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("()-[e]->()<-[f]-()-->()", elementFactoryProvider);
+      AsciiGraphLoader.fromString("()-[e]->()<-[f]-()-->()", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 0, 4, 3);
     validateCaches(asciiGraphLoader, 0, 0, 2);
@@ -389,7 +373,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testAppendFromString() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[()-->()]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("[()-->()]", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -402,7 +386,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testAppendFromString2() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[()-->()]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("[()-->()]", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -415,7 +399,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testAppendFromStringWithVariables() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g0[(a)-[e]->(b)]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("g0[(a)-[e]->(b)]", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 1, 2, 1);
@@ -441,7 +425,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testUpdateFromStringWithVariables2() {
     AsciiGraphLoader<GraphHead, Vertex, Edge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g[(a)-[e]->(b)]", elementFactoryProvider);
+      AsciiGraphLoader.fromString("g[(a)-[e]->(b)]", getElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 1, 2, 1);
