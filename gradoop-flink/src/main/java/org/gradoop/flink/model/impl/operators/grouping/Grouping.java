@@ -24,6 +24,7 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -92,12 +93,14 @@ import java.util.stream.Collectors;
  * @param <V>  The vertex type.
  * @param <E>  The edge type.
  * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
 public abstract class Grouping<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph<G, V, E, LG>>  implements UnaryBaseGraphToBaseGraphOperator<LG> {
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, GC>>  implements UnaryBaseGraphToBaseGraphOperator<LG> {
   /**
    * Used as property key to declare a label based grouping.
    * <p>
@@ -293,7 +296,7 @@ public abstract class Grouping<
    * @return super edges
    */
   protected DataSet<E> buildSuperEdges(
-    BaseGraphFactory<G, V, E, LG> factory,
+    BaseGraphFactory<G, V, E, LG, GC> factory,
     DataSet<E> edgesToGroup,
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap) {
 
@@ -379,12 +382,12 @@ public abstract class Grouping<
    */
   LG getRetainedVerticesSubgraph(LG graph) {
 
-    LG filtered = new Subgraph<G, V, E, LG>(vertexInNoGroupFilter, new True<>(),
+    LG filtered = new Subgraph<G, V, E, LG, GC>(vertexInNoGroupFilter, new True<>(),
       Subgraph.Strategy.VERTEX_INDUCED)
       .execute(graph);
     // TODO after next update: is verify still necesarry?
 
-    return new Verify<G, V, E, LG>().execute(filtered);
+    return new Verify<G, V, E, LG, GC>().execute(filtered);
   }
 
   /**
@@ -815,13 +818,15 @@ public abstract class Grouping<
      * @param <V> The vertex type.
      * @param <E> The edge type.
      * @param <LG> The type of the graph.
+     * @param <GC> The type of the graph collection.
      * @return grouping operator instance
      */
     public <
       G extends EPGMGraphHead,
       V extends EPGMVertex,
       E extends EPGMEdge,
-      LG extends BaseGraph<G, V, E, LG>> Grouping<G, V, E, LG> build() {
+      LG extends BaseGraph<G, V, E, LG, GC>,
+      GC extends BaseGraphCollection<G, V, E, GC>> Grouping<G, V, E, LG, GC> build() {
       if (vertexLabelGroups.isEmpty() && !useVertexLabel) {
         throw new IllegalArgumentException(
           "Provide vertex key(s) and/or use vertex labels for grouping.");
@@ -840,7 +845,7 @@ public abstract class Grouping<
         }
       }
 
-      Grouping<G, V, E, LG> groupingOperator;
+      Grouping<G, V, E, LG, GC> groupingOperator;
 
       switch (strategy) {
       case GROUP_REDUCE:

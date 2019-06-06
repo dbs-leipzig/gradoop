@@ -19,17 +19,15 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.SourceId;
-import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.utils.LeftSide;
+import org.gradoop.flink.model.impl.operators.verify.functions.RemoveDanglingGraphIds;
 
 /**
- * Verifies a graph's edge set, removing dangling edges, i.e. edges with a source- or target-id
- * not matching any vertices of this graph.
+ * Verifies a graphs elements, removing dangling graph ids, i.e. ids different from this graphs id.
  *
  * @param <G>  The graph head type.
  * @param <V>  The vertex type.
@@ -37,7 +35,7 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
  * @param <LG> The graph type.
  * @param <GC> The graph collection type.
  */
-public class Verify<
+public class VerifyGraphContainment<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
@@ -45,19 +43,18 @@ public class Verify<
   GC extends BaseGraphCollection<G, V, E, GC>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   @Override
-  public LG execute(LG graph) {
-    DataSet<V> vertices = graph.getVertices();
-    DataSet<E> verifiedEdges = graph.getEdges()
-      .join(vertices)
-      .where(new SourceId<>())
-      .equalTo(new Id<>())
-      .with(new LeftSide<>())
-      .name("Verify Edges (1/2)")
-      .join(vertices)
-      .where(new TargetId<>())
-      .equalTo(new Id<>())
-      .with(new LeftSide<>())
-      .name("Verify Edges (2/2)");
-    return graph.getFactory().fromDataSets(graph.getGraphHead(), vertices, verifiedEdges);
+  public LG execute(LG collection) {
+    DataSet<GradoopId> idSet = collection.getGraphHead().map(new Id<>());
+
+    DataSet<V> verifiedVertices = collection.getVertices()
+      .map(new RemoveDanglingGraphIds<>())
+      .withBroadcastSet(idSet, RemoveDanglingGraphIds.GRAPH_ID_SET);
+
+    DataSet<E> verifiedEdges = collection.getEdges()
+      .map(new RemoveDanglingGraphIds<>())
+      .withBroadcastSet(idSet, RemoveDanglingGraphIds.GRAPH_ID_SET);
+
+    return collection.getFactory()
+      .fromDataSets(collection.getGraphHead(), verifiedVertices, verifiedEdges);
   }
 }
