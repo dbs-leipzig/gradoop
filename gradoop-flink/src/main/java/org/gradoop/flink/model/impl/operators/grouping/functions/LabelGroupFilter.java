@@ -14,7 +14,7 @@ public abstract class LabelGroupFilter<V extends EPGMVertex> implements FilterFu
    * @return true, if a vertex exhibits all properties or if grouped by properties (propertyKeys)
    * are empty.
    */
-  protected boolean hasVertexAllPropertiesOfGroup(LabelGroup group, V vertex) {
+  boolean hasVertexAllPropertiesOfGroup(LabelGroup group, V vertex) {
     return group.getPropertyKeys()
       .parallelStream()
       .allMatch(vertex::hasProperty);

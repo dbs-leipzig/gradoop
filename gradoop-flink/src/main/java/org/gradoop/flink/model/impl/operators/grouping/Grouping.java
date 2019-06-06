@@ -153,7 +153,6 @@ public abstract class Grouping<
    *                                    applies when
    *                                    grouping by labels)
    */
-  @SuppressWarnings("unchecked")
   Grouping(boolean useVertexLabels, boolean useEdgeLabels, List<LabelGroup> vertexLabelGroups,
     List<LabelGroup> edgeLabelGroups, boolean retainVerticesWithoutGroups) {
     this.useVertexLabels = useVertexLabels;
@@ -162,14 +161,10 @@ public abstract class Grouping<
     this.edgeLabelGroups = edgeLabelGroups;
     this.retainVerticesWithoutGroups = retainVerticesWithoutGroups;
 
-    FilterFunction[] isVertexInLabelGroupFunctions = getVertexLabelGroups()
-      .parallelStream()
-      .map(this::getIsVertexMemberOfLabelGroupFilter)
-      .collect(Collectors.toList())
-      .toArray(new FilterFunction[getVertexLabelGroups().size()]);
-
-    vertexInNoGroupFilter = new Not<>(new Or<V>(isVertexInLabelGroupFunctions));
+    vertexInNoGroupFilter = getVertexIsNotMemberOfAnyLabelGroupFilter(getVertexLabelGroups());
   }
+
+
 
   @Override
   public LG execute(LG graph) {
@@ -338,14 +333,33 @@ public abstract class Grouping<
   protected abstract LG groupInternal(LG graph);
 
   /**
+   * Returns a {@link FilterFunction} that checks whether a vertex is not a member of any
+   * {@link LabelGroup}.
+   *
+   * @param labelGroups groups to check
+   * @return true if a vertex is member of any labelGroup.
+   */
+  @SuppressWarnings("unchecked")
+  private FilterFunction<V> getVertexIsNotMemberOfAnyLabelGroupFilter(
+    List<LabelGroup> labelGroups) {
+
+    FilterFunction[] isVertexInLabelGroupFunctions = labelGroups
+      .parallelStream()
+      .map(this::getVertexIsMemberOfLabelGroupFilter)
+      .collect(Collectors.toList())
+      .toArray(new FilterFunction[getVertexLabelGroups().size()]);
+
+    return new Not<>(new Or<V>(isVertexInLabelGroupFunctions));
+  }
+
+  /**
    * Returns a {@link FilterFunction<V>} that checks if a vertex is member of a
    * {@link LabelGroup}.
    *
    * @param group to check
    * @return function
    */
-  private FilterFunction<V> getIsVertexMemberOfLabelGroupFilter(LabelGroup group) {
-
+  private FilterFunction<V> getVertexIsMemberOfLabelGroupFilter(LabelGroup group) {
 
     boolean groupingByLabels = useVertexLabels();
 
@@ -474,8 +488,9 @@ public abstract class Grouping<
     private List<AggregateFunction> globalEdgeAggregateFunctions;
 
     /**
-     * True, iff vertices without labels will be converted to individual groups/ supervertices.
-     * False, iff vertices without labels will be collapsed into a single group/ supervertice.
+     * True: vertices that are not member of any labelGroup are converted as is to supervertices.
+     * False: vertices that are not member of any labelGroup will be collapsed into a single group/
+     * supervertice.
      */
     private boolean retainVerticesWithoutGroups;
 
