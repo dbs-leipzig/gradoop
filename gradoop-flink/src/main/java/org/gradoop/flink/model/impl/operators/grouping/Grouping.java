@@ -32,6 +32,8 @@ import org.gradoop.flink.model.impl.functions.filters.Not;
 import org.gradoop.flink.model.impl.functions.filters.Or;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.CombineEdgeGroupItems;
+import org.gradoop.flink.model.impl.operators.grouping.functions.DefaultLabelGroupFilter;
+import org.gradoop.flink.model.impl.operators.grouping.functions.LabelSpecificLabelGroupFilter;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceEdgeGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.SubtractCoGroupFunction;
 import org.gradoop.flink.model.impl.operators.grouping.functions.UpdateEdgeGroupItem;
@@ -43,11 +45,9 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVer
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.model.impl.operators.verify.Verify;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -346,52 +346,15 @@ public abstract class Grouping<
    */
   private FilterFunction<V> getIsVertexMemberOfLabelGroupFilter(LabelGroup group) {
 
-    /*
-     * Returns true, if a vertex exhibits all properties of a labelGroup.
-     * Also returns true, if grouped by properties (propertyKeys) are empty.
-     */
-    BiFunction<LabelGroup, V, Boolean> hasVertexAllPropertiesOfGroup =
-      (BiFunction<LabelGroup, V, Boolean> & Serializable) (labelGroup, vertex) ->
-        group.getPropertyKeys()
-          .parallelStream()
-          .allMatch(vertex::hasProperty);
 
     boolean groupingByLabels = useVertexLabels();
 
     // Default case (parameter group is not label specific)
     if (group.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP)) {
-
-      return (FilterFunction<V>) vertex -> {
-
-        if (groupingByLabels) {
-
-          // if the vertex's label is empty,
-          // a) and the group by properties are empty => vertex is not member of the group
-          // b) and group by properties are not empty => vertex can be member of the group
-          if (vertex.getLabel().isEmpty()) {
-            return !group.getPropertyKeys().isEmpty() && hasVertexAllPropertiesOfGroup
-              .apply(group, vertex);
-          } else {
-            return hasVertexAllPropertiesOfGroup.apply(group, vertex);
-          }
-
-        } else {
-
-          // if we are not grouping by labels, we need to check if the vertex has all
-          // properties grouped by
-          // if there is no grouped by property, no vertex should be part of the group
-
-          return !group.getPropertyKeys().isEmpty() && hasVertexAllPropertiesOfGroup
-            .apply(group, vertex);
-        }
-      };
+      return new DefaultLabelGroupFilter<>(groupingByLabels, group);
     }
 
-    // Label specific grouping case:
-    // a vertex is a member of a label specific group, if the labels match and if the vertex has
-    // all of the required properties
-    return (FilterFunction<V>) vertex -> vertex.getLabel().equals(group.getGroupingLabel()) &&
-      hasVertexAllPropertiesOfGroup.apply(group, vertex);
+    return new LabelSpecificLabelGroupFilter<>(group);
   }
 
   /**
@@ -882,4 +845,5 @@ public abstract class Grouping<
       return groupingOperator;
     }
   }
+
 }
