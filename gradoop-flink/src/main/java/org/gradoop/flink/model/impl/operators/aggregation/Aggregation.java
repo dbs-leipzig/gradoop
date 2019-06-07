@@ -52,7 +52,8 @@ public class Aggregation<
   V extends EPGMVertex,
   E extends EPGMEdge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, GC>> implements UnaryBaseGraphToBaseGraphOperator<LG> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * User-defined aggregate functions which are applied on a single logical graph.
