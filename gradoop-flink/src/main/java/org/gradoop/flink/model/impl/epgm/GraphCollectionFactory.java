@@ -40,7 +40,7 @@ import java.util.Objects;
  * {@link GraphCollectionLayout}.
  */
 public class GraphCollectionFactory
-  implements BaseGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection> {
+  implements BaseGraphCollectionFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection> {
   /**
    * Creates the layout from given data.
    */
