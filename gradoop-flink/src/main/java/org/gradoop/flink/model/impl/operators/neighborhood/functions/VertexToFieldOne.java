@@ -31,7 +31,7 @@ public class VertexToFieldOne<K, V>
   /**
    * Avoid object instantiation.
    */
-  private Tuple2<K, Vertex> reuseTuple = new Tuple2<K, Vertex>();
+  private Tuple2<K, Vertex> reuseTuple = new Tuple2<>();
 
   @Override
   public Tuple2<K, Vertex> join(Tuple2<K, V> tuple, Vertex vertex) throws Exception {

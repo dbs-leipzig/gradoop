@@ -34,7 +34,7 @@ import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
@@ -66,6 +66,7 @@ import org.gradoop.flink.model.impl.operators.union.Union;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -185,9 +186,7 @@ public class GraphCollection implements
 
     GradoopIdSet graphIds = new GradoopIdSet();
 
-    for (GradoopId id : identifiers) {
-      graphIds.add(id);
-    }
+    graphIds.addAll(Arrays.asList(identifiers));
 
     return getGraphs(graphIds);
   }
@@ -313,8 +312,8 @@ public class GraphCollection implements
 
   @Override
   public GraphCollection callForCollection(
-    UnaryCollectionToCollectionOperator op) {
-    return op.execute(this);
+    UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GraphCollection> operator) {
+    return operator.execute(this);
   }
 
   @Override

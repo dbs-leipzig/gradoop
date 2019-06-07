@@ -19,16 +19,19 @@ import org.apache.flink.api.java.io.TextOutputFormat;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.core.fs.Path;
 import org.gradoop.flink.io.api.DataSink;
-import org.gradoop.flink.io.impl.dot.functions.DOTFileFormat;
+import org.gradoop.flink.io.impl.dot.functions.AbstractDotFileFormat;
+import org.gradoop.flink.io.impl.dot.functions.DotFileFormatHtml;
+import org.gradoop.flink.io.impl.dot.functions.DotFileFormatSimple;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Writes an EPGM representation into one DOT file. The format
- * is documented at {@link DOTFileFormat}.
+ * is documented at {@link DotFileFormatHtml}.
  *
  * For more information see:
  * https://en.wikipedia.org/wiki/DOT_(graph_description_language)
@@ -44,14 +47,31 @@ public class DOTDataSink implements DataSink {
   private final boolean graphInformation;
 
   /**
+   * The format in which the graph elements should be written.
+   */
+  private final DotFormat format;
+
+  /**
    * Creates a new data sink. Path can be local (file://) or HDFS (hdfs://).
    *
-   * @param path              dot data file
-   * @param graphInformation  flag to print graph head information
+   * @param path             dot data file
+   * @param graphInformation flag to print graph head information
    */
   public DOTDataSink(String path, boolean graphInformation) {
-    this.path = path;
+    this(path, graphInformation, DotFormat.HTML);
+  }
+
+  /**
+   * Creates a new data sink that uses the specified dot format for output.
+   *
+   * @param path             dot data file
+   * @param graphInformation flag to print graph head information
+   * @param format           output format
+   */
+  public DOTDataSink(String path, boolean graphInformation, DotFormat format) {
+    this.path = Objects.requireNonNull(path);
     this.graphInformation = graphInformation;
+    this.format = Objects.requireNonNull(format);
   }
 
   @Override
@@ -73,9 +93,9 @@ public class DOTDataSink implements DataSink {
   @Override
   public void write(GraphCollection graphCollection, boolean overwrite) throws IOException {
     FileSystem.WriteMode writeMode =
-      overwrite ? FileSystem.WriteMode.OVERWRITE :  FileSystem.WriteMode.NO_OVERWRITE;
+      overwrite ? FileSystem.WriteMode.OVERWRITE : FileSystem.WriteMode.NO_OVERWRITE;
 
-    DOTFileFormat dotFileFormat = new DOTFileFormat(graphInformation);
+    AbstractDotFileFormat dotFileFormat = format.getDotFileFormat(graphInformation);
     GraphvizWriter graphvizWriter = new GraphvizWriter(new Path(path));
     graphvizWriter.setWriteMode(writeMode);
 
@@ -101,16 +121,6 @@ public class DOTDataSink implements DataSink {
      * see super constructor.
      *
      * @param outputPath graphviz dot file name
-     * @param charset encoding
-     */
-    GraphvizWriter(Path outputPath, String charset) {
-      super(outputPath, charset);
-    }
-
-    /**
-     * see super constructor.
-     *
-     * @param outputPath graphviz dot file name
      */
     GraphvizWriter(Path outputPath) {
       super(outputPath);
@@ -126,6 +136,39 @@ public class DOTDataSink implements DataSink {
     public void close() throws IOException {
       super.writeRecord("}");
       super.close();
+    }
+  }
+
+  /**
+   * Enumeration of supported dot formats.
+   */
+  public enum DotFormat {
+    /**
+     * Format that uses HTML tables to display element data.
+     */
+    HTML,
+    /**
+     * Format that uses plain dot formatting.
+     */
+    SIMPLE;
+
+    /**
+     * Returns a subclass of {@link AbstractDotFileFormat} that implements the specified formatting.
+     *
+     * @param printGraphHeadInformation flag that indicates that the graph head is included
+     * @return a subclass of AbstractDotFileFormat
+     */
+    public AbstractDotFileFormat getDotFileFormat(boolean printGraphHeadInformation) {
+
+      String htmlColorGrey = "AAAAAAA";
+
+      switch (this) {
+      case SIMPLE:
+        return new DotFileFormatSimple(printGraphHeadInformation);
+      case HTML:
+      default:
+        return new DotFileFormatHtml(printGraphHeadInformation, htmlColorGrey);
+      }
     }
   }
 }
