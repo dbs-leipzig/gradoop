@@ -25,7 +25,18 @@ public class GroupingBuilderTest {
    * grouping by anything.
    */
   @Test(expected = IllegalStateException.class)
-  public void testNoGroupedByPropertyAndLabelError() {
+  public void testGroupByNothingError() {
+
+    new Grouping.GroupingBuilder()
+      .build();
+  }
+
+  /**
+   * Tests {@link Grouping.GroupingBuilder#build()}, expects a correct exception when not
+   * grouping by anything.
+   */
+  @Test(expected = IllegalStateException.class)
+  public void testGroupByNothingError2() {
 
     new Grouping.GroupingBuilder()
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
@@ -46,7 +57,7 @@ public class GroupingBuilderTest {
 
   /**
    * Tests successful call to {@link Grouping.GroupingBuilder#build()} when a strategy is set and
-   * when only grouping a vertex labels.
+   * when only grouping by vertex labels.
    */
   @Test
   public void testStrategySet() {
