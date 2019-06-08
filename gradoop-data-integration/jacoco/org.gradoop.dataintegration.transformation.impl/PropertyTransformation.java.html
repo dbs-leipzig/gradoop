@@ -20,6 +20,7 @@ import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 
@@ -33,12 +34,15 @@ import org.gradoop.flink.model.impl.operators.transformation.Transformation;
  * @param &lt;V&gt; the vertex type
  * @param &lt;E&gt; the edge type
  * @param &lt;LG&gt; type of the logical graph instance
+ * @param &lt;GC&gt; type of the graph collection instance
  */
 public class PropertyTransformation&lt;
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph&lt;G, V, E, LG&gt;&gt; implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
 
   /**
    * Label of the element whose property shall be transformed.
@@ -88,20 +92,20 @@ public class PropertyTransformation&lt;
       PropertyTransformationFunction graphHeadTransformationFunction,
       PropertyTransformationFunction vertexTransformationFunction,
       PropertyTransformationFunction edgeTransformationFunction, String label,
-<span class="fc" id="L91">      String newPropertyKey, boolean keepHistory) {</span>
-<span class="pc bpc" id="L92" title="1 of 6 branches missed.">    if (graphHeadTransformationFunction == null &amp;&amp; vertexTransformationFunction == null &amp;&amp;</span>
+<span class="fc" id="L95">      String newPropertyKey, boolean keepHistory) {</span>
+<span class="pc bpc" id="L96" title="1 of 6 branches missed.">    if (graphHeadTransformationFunction == null &amp;&amp; vertexTransformationFunction == null &amp;&amp;</span>
         edgeTransformationFunction == null) {
-<span class="nc" id="L94">      throw new IllegalArgumentException(&quot;Provide at least one transformation function.&quot;);</span>
+<span class="nc" id="L98">      throw new IllegalArgumentException(&quot;Provide at least one transformation function.&quot;);</span>
     }
 
-<span class="fc" id="L97">    this.label = label;</span>
-<span class="fc" id="L98">    this.propertyKey = propertyKey;</span>
-<span class="fc" id="L99">    this.graphHeadTransformationFunction = graphHeadTransformationFunction;</span>
-<span class="fc" id="L100">    this.vertexTransformationFunction = vertexTransformationFunction;</span>
-<span class="fc" id="L101">    this.edgeTransformationFunction = edgeTransformationFunction;</span>
-<span class="fc" id="L102">    this.newPropertyKey = newPropertyKey;</span>
-<span class="fc" id="L103">    this.keepHistory = keepHistory;</span>
-<span class="fc" id="L104">  }</span>
+<span class="fc" id="L101">    this.label = label;</span>
+<span class="fc" id="L102">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L103">    this.graphHeadTransformationFunction = graphHeadTransformationFunction;</span>
+<span class="fc" id="L104">    this.vertexTransformationFunction = vertexTransformationFunction;</span>
+<span class="fc" id="L105">    this.edgeTransformationFunction = edgeTransformationFunction;</span>
+<span class="fc" id="L106">    this.newPropertyKey = newPropertyKey;</span>
+<span class="fc" id="L107">    this.keepHistory = keepHistory;</span>
+<span class="fc" id="L108">  }</span>
 
   /**
    * Creates a new property transformation operator instance.
@@ -118,9 +122,9 @@ public class PropertyTransformation&lt;
       PropertyTransformationFunction graphHeadTransformationFunction,
       PropertyTransformationFunction vertexTransformationFunction,
       PropertyTransformationFunction edgeTransformationFunction) {
-<span class="fc" id="L121">    this(propertyKey, graphHeadTransformationFunction, vertexTransformationFunction,</span>
+<span class="fc" id="L125">    this(propertyKey, graphHeadTransformationFunction, vertexTransformationFunction,</span>
          edgeTransformationFunction, null, null, false);
-<span class="fc" id="L123">  }</span>
+<span class="fc" id="L127">  }</span>
 
   /**
    * Applies the property transformation functions on the given input graph.
@@ -130,14 +134,14 @@ public class PropertyTransformation&lt;
    */
   @Override
   public LG execute(LG graph) {
-<span class="fc bfc" id="L133" title="All 6 branches covered.">    return new Transformation&lt;G, V, E, LG&gt;(</span>
+<span class="fc bfc" id="L137" title="All 6 branches covered.">    return new Transformation&lt;G, V, E, LG, GC&gt;(</span>
         graphHeadTransformationFunction == null ? null : new BasePropertyTransformationFunction&lt;&gt;(
             propertyKey, graphHeadTransformationFunction, label, newPropertyKey, keepHistory),
         vertexTransformationFunction == null ? null : new BasePropertyTransformationFunction&lt;&gt;(
             propertyKey, vertexTransformationFunction, label, newPropertyKey, keepHistory),
         edgeTransformationFunction == null ? null : new BasePropertyTransformationFunction&lt;&gt;(
             propertyKey, edgeTransformationFunction, label, newPropertyKey, keepHistory))
-<span class="fc" id="L140">      .execute(graph);</span>
+<span class="fc" id="L144">      .execute(graph);</span>
   }
 
 }

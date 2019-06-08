@@ -15,10 +15,10 @@
  */
 package org.gradoop.flink.io.impl.gdl;
 
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -32,8 +32,13 @@ import java.util.stream.Collectors;
 
 /**
  * Encodes data structures using the GDL format.
+ *
+ * @param &lt;G&gt; graph head type
+ * @param &lt;V&gt; vertex type
+ * @param &lt;E&gt; edge type
  */
-public class GDLEncoder {
+public class GDLEncoder&lt;G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge&gt; {
+
   /**
    * Marks the beginning of the definition of vertices and edges.
    */
@@ -98,15 +103,15 @@ public class GDLEncoder {
   /**
    * Graph head to encode.
    */
-  private List&lt;GraphHead&gt; graphHeads;
+  private List&lt;G&gt; graphHeads;
   /**
    * Vertices to encode.
    */
-  private List&lt;Vertex&gt; vertices;
+  private List&lt;V&gt; vertices;
   /**
    * Edges to encode.
    */
-  private List&lt;Edge&gt; edges;
+  private List&lt;E&gt; edges;
 
   /**
    * Creates a GDLEncoder using the passed parameters.
@@ -115,11 +120,11 @@ public class GDLEncoder {
    * @param vertices vertices that should be encoded
    * @param edges edges that should be encoded
    */
-<span class="fc" id="L118">  public GDLEncoder(List&lt;GraphHead&gt; graphHeads, List&lt;Vertex&gt; vertices, List&lt;Edge&gt; edges) {</span>
-<span class="fc" id="L119">    this.graphHeads = graphHeads;</span>
-<span class="fc" id="L120">    this.vertices = vertices;</span>
-<span class="fc" id="L121">    this.edges = edges;</span>
-<span class="fc" id="L122">  }</span>
+<span class="fc" id="L123">  public GDLEncoder(List&lt;G&gt; graphHeads, List&lt;V&gt; vertices, List&lt;E&gt; edges) {</span>
+<span class="fc" id="L124">    this.graphHeads = graphHeads;</span>
+<span class="fc" id="L125">    this.vertices = vertices;</span>
+<span class="fc" id="L126">    this.edges = edges;</span>
+<span class="fc" id="L127">  }</span>
 
   /**
    * Creates a GDL formatted string from the graph heads, vertices and edges.
@@ -127,49 +132,49 @@ public class GDLEncoder {
    * @return GDL formatted string
    */
   public String getGDLString() {
-<span class="fc" id="L130">    Map&lt;GradoopId, String&gt; idToGraphHeadName = getGraphHeadNameMapping(graphHeads);</span>
-<span class="fc" id="L131">    Map&lt;GradoopId, String&gt; idToVertexName = getVertexNameMapping(vertices);</span>
-<span class="fc" id="L132">    Map&lt;GradoopId, String&gt; idToEdgeName = getEdgeNameMapping(edges);</span>
+<span class="fc" id="L135">    Map&lt;GradoopId, String&gt; idToGraphHeadName = getGraphHeadNameMapping(graphHeads);</span>
+<span class="fc" id="L136">    Map&lt;GradoopId, String&gt; idToVertexName = getVertexNameMapping(vertices);</span>
+<span class="fc" id="L137">    Map&lt;GradoopId, String&gt; idToEdgeName = getEdgeNameMapping(edges);</span>
 
-<span class="fc" id="L134">    Set&lt;GradoopId&gt; usedVertexIds = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L135">    Set&lt;GradoopId&gt; usedEdgeIds = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L139">    Set&lt;GradoopId&gt; usedVertexIds = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L140">    Set&lt;GradoopId&gt; usedEdgeIds = new HashSet&lt;&gt;();</span>
 
-<span class="fc" id="L137">    StringBuilder result = new StringBuilder();</span>
+<span class="fc" id="L142">    StringBuilder result = new StringBuilder();</span>
 
-<span class="fc bfc" id="L139" title="All 2 branches covered.">    for (GraphHead gh : graphHeads) {</span>
-<span class="fc" id="L140">      StringBuilder verticesString = new StringBuilder();</span>
-<span class="fc" id="L141">      StringBuilder edgesString = new StringBuilder();</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">    for (G graphHead : graphHeads) {</span>
+<span class="fc" id="L145">      StringBuilder verticesString = new StringBuilder();</span>
+<span class="fc" id="L146">      StringBuilder edgesString = new StringBuilder();</span>
 
-<span class="fc bfc" id="L143" title="All 2 branches covered.">      for (Vertex v : vertices) {</span>
-<span class="fc" id="L144">        boolean containedInGraph = v.getGraphIds().contains(gh.getId());</span>
-<span class="fc bfc" id="L145" title="All 2 branches covered.">        boolean firstOccurrence = !usedVertexIds.contains(v.getId());</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">      for (V vertex : vertices) {</span>
+<span class="fc" id="L149">        boolean containedInGraph = vertex.getGraphIds().contains(graphHead.getId());</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">        boolean firstOccurrence = !usedVertexIds.contains(vertex.getId());</span>
 
-<span class="fc bfc" id="L147" title="All 2 branches covered.">        if (containedInGraph) {</span>
-<span class="fc" id="L148">          String vertexString = vertexToGDLString(v, idToVertexName, firstOccurrence);</span>
-<span class="fc" id="L149">          usedVertexIds.add(v.getId());</span>
-<span class="fc" id="L150">          verticesString.append(vertexString).append(System.lineSeparator());</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">        if (containedInGraph) {</span>
+<span class="fc" id="L153">          String vertexString = vertexToGDLString(vertex, idToVertexName, firstOccurrence);</span>
+<span class="fc" id="L154">          usedVertexIds.add(vertex.getId());</span>
+<span class="fc" id="L155">          verticesString.append(vertexString).append(System.lineSeparator());</span>
         }
-<span class="fc" id="L152">      }</span>
+<span class="fc" id="L157">      }</span>
 
-<span class="fc bfc" id="L154" title="All 2 branches covered.">      for (Edge e : edges) {</span>
-<span class="fc bfc" id="L155" title="All 2 branches covered.">        if (e.getGraphIds().contains(gh.getId())) {</span>
-<span class="fc bfc" id="L156" title="All 2 branches covered.">          boolean firstOccurrence = !usedEdgeIds.contains(e.getId());</span>
-<span class="fc" id="L157">          String edgeString = edgeToGDLString(e, idToVertexName, idToEdgeName, firstOccurrence);</span>
-<span class="fc" id="L158">          usedEdgeIds.add(e.getId());</span>
-<span class="fc" id="L159">          edgesString.append(edgeString).append(System.lineSeparator());</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">      for (E edge : edges) {</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">        if (edge.getGraphIds().contains(graphHead.getId())) {</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">          boolean firstOccurrence = !usedEdgeIds.contains(edge.getId());</span>
+<span class="fc" id="L162">          String edgeString = edgeToGDLString(edge, idToVertexName, idToEdgeName, firstOccurrence);</span>
+<span class="fc" id="L163">          usedEdgeIds.add(edge.getId());</span>
+<span class="fc" id="L164">          edgesString.append(edgeString).append(System.lineSeparator());</span>
         }
-<span class="fc" id="L161">      }</span>
+<span class="fc" id="L166">      }</span>
 
-<span class="fc" id="L163">      result</span>
-<span class="fc" id="L164">        .append(graphHeadToGDLString(gh, idToGraphHeadName))</span>
-<span class="fc" id="L165">        .append(GRAPH_ELEMENTS_DEFINITION_START).append(System.lineSeparator())</span>
-<span class="fc" id="L166">        .append(verticesString)</span>
-<span class="pc bpc" id="L167" title="1 of 2 branches missed.">        .append(edgesString.length() &gt; 0 ? System.lineSeparator() : &quot;&quot;)</span>
-<span class="fc" id="L168">        .append(edgesString)</span>
-<span class="fc" id="L169">        .append(GRAPH_ELEMENTS_DEFINITION_END)</span>
-<span class="fc" id="L170">        .append(System.lineSeparator()).append(System.lineSeparator());</span>
-<span class="fc" id="L171">    }</span>
-<span class="fc" id="L172">    return result.toString();</span>
+<span class="fc" id="L168">      result</span>
+<span class="fc" id="L169">        .append(graphHeadToGDLString(graphHead, idToGraphHeadName))</span>
+<span class="fc" id="L170">        .append(GRAPH_ELEMENTS_DEFINITION_START).append(System.lineSeparator())</span>
+<span class="fc" id="L171">        .append(verticesString)</span>
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">        .append(edgesString.length() &gt; 0 ? System.lineSeparator() : &quot;&quot;)</span>
+<span class="fc" id="L173">        .append(edgesString)</span>
+<span class="fc" id="L174">        .append(GRAPH_ELEMENTS_DEFINITION_END)</span>
+<span class="fc" id="L175">        .append(System.lineSeparator()).append(System.lineSeparator());</span>
+<span class="fc" id="L176">    }</span>
+<span class="fc" id="L177">    return result.toString();</span>
   }
 
   /**
@@ -178,14 +183,14 @@ public class GDLEncoder {
    * @param graphHeads The graph heads.
    * @return Mapping between graph head and GDL variable name.
    */
-  private Map&lt;GradoopId, String&gt; getGraphHeadNameMapping(List&lt;GraphHead&gt; graphHeads) {
-<span class="fc" id="L182">    Map&lt;GradoopId, String&gt; idToGraphHeadName = new HashMap&lt;&gt;(graphHeads.size());</span>
-<span class="fc bfc" id="L183" title="All 2 branches covered.">    for (int i = 0; i &lt; graphHeads.size(); i++) {</span>
-<span class="fc" id="L184">      GraphHead g = graphHeads.get(i);</span>
-<span class="fc" id="L185">      String gName = String.format(&quot;%s%s&quot;, GRAPH_VARIABLE_PREFIX, i);</span>
-<span class="fc" id="L186">      idToGraphHeadName.put(g.getId(), gName);</span>
+  private Map&lt;GradoopId, String&gt; getGraphHeadNameMapping(List&lt;G&gt; graphHeads) {
+<span class="fc" id="L187">    Map&lt;GradoopId, String&gt; idToGraphHeadName = new HashMap&lt;&gt;(graphHeads.size());</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">    for (int i = 0; i &lt; graphHeads.size(); i++) {</span>
+<span class="fc" id="L189">      G graphHead = graphHeads.get(i);</span>
+<span class="fc" id="L190">      String gName = String.format(&quot;%s%s&quot;, GRAPH_VARIABLE_PREFIX, i);</span>
+<span class="fc" id="L191">      idToGraphHeadName.put(graphHead.getId(), gName);</span>
     }
-<span class="fc" id="L188">    return idToGraphHeadName;</span>
+<span class="fc" id="L193">    return idToGraphHeadName;</span>
   }
 
   /**
@@ -194,14 +199,14 @@ public class GDLEncoder {
    * @param vertices The graph vertices.
    * @return Mapping between vertex and GDL variable name.
    */
-  private Map&lt;GradoopId, String&gt; getVertexNameMapping(List&lt;Vertex&gt; vertices) {
-<span class="fc" id="L198">    Map&lt;GradoopId, String&gt; idToVertexName = new HashMap&lt;&gt;(vertices.size());</span>
-<span class="fc bfc" id="L199" title="All 2 branches covered.">    for (int i = 0; i &lt; vertices.size(); i++) {</span>
-<span class="fc" id="L200">      Vertex v = vertices.get(i);</span>
-<span class="fc" id="L201">      String vName = String.format(&quot;%s_%s_%s&quot;, VERTEX_VARIABLE_PREFIX, v.getLabel(), i);</span>
-<span class="fc" id="L202">      idToVertexName.put(v.getId(), vName);</span>
+  private Map&lt;GradoopId, String&gt; getVertexNameMapping(List&lt;V&gt; vertices) {
+<span class="fc" id="L203">    Map&lt;GradoopId, String&gt; idToVertexName = new HashMap&lt;&gt;(vertices.size());</span>
+<span class="fc bfc" id="L204" title="All 2 branches covered.">    for (int i = 0; i &lt; vertices.size(); i++) {</span>
+<span class="fc" id="L205">      V vertex = vertices.get(i);</span>
+<span class="fc" id="L206">      String vName = String.format(&quot;%s_%s_%s&quot;, VERTEX_VARIABLE_PREFIX, vertex.getLabel(), i);</span>
+<span class="fc" id="L207">      idToVertexName.put(vertex.getId(), vName);</span>
     }
-<span class="fc" id="L204">    return idToVertexName;</span>
+<span class="fc" id="L209">    return idToVertexName;</span>
   }
 
   /**
@@ -210,28 +215,28 @@ public class GDLEncoder {
    * @param edges The graph edges.
    * @return Mapping between edge and GDL variable name.
    */
-  private Map&lt;GradoopId, String&gt; getEdgeNameMapping(List&lt;Edge&gt; edges) {
-<span class="fc" id="L214">    Map&lt;GradoopId, String&gt; idToEdgeName = new HashMap&lt;&gt;(edges.size());</span>
-<span class="fc bfc" id="L215" title="All 2 branches covered.">    for (int i = 0; i &lt; edges.size(); i++) {</span>
-<span class="fc" id="L216">      Edge e = edges.get(i);</span>
-<span class="fc" id="L217">      String eName = String.format(&quot;%s_%s_%s&quot;, EDGE_VARIABLE_PREFIX, e.getLabel(), i);</span>
-<span class="fc" id="L218">      idToEdgeName.put(e.getId(), eName);</span>
+  private Map&lt;GradoopId, String&gt; getEdgeNameMapping(List&lt;E&gt; edges) {
+<span class="fc" id="L219">    Map&lt;GradoopId, String&gt; idToEdgeName = new HashMap&lt;&gt;(edges.size());</span>
+<span class="fc bfc" id="L220" title="All 2 branches covered.">    for (int i = 0; i &lt; edges.size(); i++) {</span>
+<span class="fc" id="L221">      E edge = edges.get(i);</span>
+<span class="fc" id="L222">      String eName = String.format(&quot;%s_%s_%s&quot;, EDGE_VARIABLE_PREFIX, edge.getLabel(), i);</span>
+<span class="fc" id="L223">      idToEdgeName.put(edge.getId(), eName);</span>
     }
-<span class="fc" id="L220">    return idToEdgeName;</span>
+<span class="fc" id="L225">    return idToEdgeName;</span>
   }
 
   /**
    * Returns a GDL formatted graph head string.
    *
-   * @param g graph head
+   * @param graphhead graph head
    * @param idToGraphHeadName mapping from graph head id to its GDL variable name
    * @return GDL formatted string
    */
-  private String graphHeadToGDLString(GraphHead g, Map&lt;GradoopId, String&gt; idToGraphHeadName) {
-<span class="fc" id="L231">    return String.format(&quot;%s:%s %s&quot;,</span>
-<span class="fc" id="L232">      idToGraphHeadName.get(g.getId()),</span>
-<span class="fc" id="L233">      g.getLabel(),</span>
-<span class="fc" id="L234">      propertiesToGDLString(g.getProperties()));</span>
+  private String graphHeadToGDLString(G graphhead, Map&lt;GradoopId, String&gt; idToGraphHeadName) {
+<span class="fc" id="L236">    return String.format(&quot;%s:%s %s&quot;,</span>
+<span class="fc" id="L237">      idToGraphHeadName.get(graphhead.getId()),</span>
+<span class="fc" id="L238">      graphhead.getLabel(),</span>
+<span class="fc" id="L239">      propertiesToGDLString(graphhead.getProperties()));</span>
   }
 
   /**
@@ -244,17 +249,15 @@ public class GDLEncoder {
    * @param firstOccurrence Is it the first occurrence of the vertex in all graphs?
    * @return A GDL formatted vertex string.
    */
-  private String vertexToGDLString(
-    Vertex vertex,
-    Map&lt;GradoopId, String&gt; idToVertexName,
+  private String vertexToGDLString(V vertex, Map&lt;GradoopId, String&gt; idToVertexName,
     boolean firstOccurrence) {
-<span class="fc bfc" id="L251" title="All 2 branches covered.">    if (firstOccurrence) {</span>
-<span class="fc" id="L252">      return String.format(&quot;(%s:%s %s)&quot;,</span>
-<span class="fc" id="L253">        idToVertexName.get(vertex.getId()),</span>
-<span class="fc" id="L254">        vertex.getLabel(),</span>
-<span class="fc" id="L255">        propertiesToGDLString(vertex.getProperties()));</span>
+<span class="fc bfc" id="L254" title="All 2 branches covered.">    if (firstOccurrence) {</span>
+<span class="fc" id="L255">      return String.format(&quot;(%s:%s %s)&quot;,</span>
+<span class="fc" id="L256">        idToVertexName.get(vertex.getId()),</span>
+<span class="fc" id="L257">        vertex.getLabel(),</span>
+<span class="fc" id="L258">        propertiesToGDLString(vertex.getProperties()));</span>
     } else {
-<span class="fc" id="L257">      return String.format(&quot;(%s)&quot;, idToVertexName.get(vertex.getId()));</span>
+<span class="fc" id="L260">      return String.format(&quot;(%s)&quot;, idToVertexName.get(vertex.getId()));</span>
     }
   }
 
@@ -270,11 +273,8 @@ public class GDLEncoder {
    * @param firstOccurrence Is it the first occurrence of the edge in all graphs?
    * @return A GDL formatted edge string.
    */
-  private String edgeToGDLString(
-    Edge edge,
-    Map&lt;GradoopId, String&gt; idToVertexName,
-    Map&lt;GradoopId, String&gt; idToEdgeName,
-    boolean firstOccurrence) {
+  private String edgeToGDLString(E edge, Map&lt;GradoopId, String&gt; idToVertexName,
+    Map&lt;GradoopId, String&gt; idToEdgeName, boolean firstOccurrence) {
     String result;
 <span class="fc bfc" id="L279" title="All 2 branches covered.">    if (firstOccurrence) {</span>
 <span class="fc" id="L280">      result =  String.format(&quot;(%s)-[%s:%s%s]-&gt;(%s)&quot;,</span>

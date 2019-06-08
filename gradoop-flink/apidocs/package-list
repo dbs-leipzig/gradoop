@@ -203,6 +203,7 @@ org.gradoop.flink.model.impl.operators.transformation
 org.gradoop.flink.model.impl.operators.transformation.functions
 org.gradoop.flink.model.impl.operators.union
 org.gradoop.flink.model.impl.operators.verify
+org.gradoop.flink.model.impl.operators.verify.functions
 org.gradoop.flink.model.impl.tuples
 org.gradoop.flink.representation
 org.gradoop.flink.representation.common.adjacencylist

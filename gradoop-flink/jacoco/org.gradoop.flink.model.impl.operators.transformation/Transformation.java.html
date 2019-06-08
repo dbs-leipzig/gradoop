@@ -21,6 +21,7 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
@@ -39,12 +40,15 @@ import org.gradoop.flink.model.impl.operators.transformation.functions.Transform
  * @param &lt;V&gt; the EPGM vertex type
  * @param &lt;E&gt; the EPGM edge type
  * @param &lt;LG&gt; the logical graph type
+ * @param &lt;GC&gt; the graph collection type
  */
 public class Transformation&lt;
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph&lt;G, V, E, LG&gt;&gt; implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
 
   /**
    * Modification function for graph heads
@@ -71,23 +75,23 @@ public class Transformation&lt;
   public Transformation(
     TransformationFunction&lt;G&gt; graphHeadTransFunc,
     TransformationFunction&lt;V&gt; vertexTransFunc,
-<span class="fc" id="L74">    TransformationFunction&lt;E&gt; edgeTransFunc) {</span>
+<span class="fc" id="L78">    TransformationFunction&lt;E&gt; edgeTransFunc) {</span>
 
-<span class="fc bfc" id="L76" title="All 6 branches covered.">    if (graphHeadTransFunc == null &amp;&amp; vertexTransFunc == null &amp;&amp; edgeTransFunc == null) {</span>
-<span class="fc" id="L77">      throw new IllegalArgumentException(&quot;Provide at least one transformation function.&quot;);</span>
+<span class="fc bfc" id="L80" title="All 6 branches covered.">    if (graphHeadTransFunc == null &amp;&amp; vertexTransFunc == null &amp;&amp; edgeTransFunc == null) {</span>
+<span class="fc" id="L81">      throw new IllegalArgumentException(&quot;Provide at least one transformation function.&quot;);</span>
     }
-<span class="fc" id="L79">    this.graphHeadTransFunc = graphHeadTransFunc;</span>
-<span class="fc" id="L80">    this.vertexTransFunc    = vertexTransFunc;</span>
-<span class="fc" id="L81">    this.edgeTransFunc      = edgeTransFunc;</span>
-<span class="fc" id="L82">  }</span>
+<span class="fc" id="L83">    this.graphHeadTransFunc = graphHeadTransFunc;</span>
+<span class="fc" id="L84">    this.vertexTransFunc    = vertexTransFunc;</span>
+<span class="fc" id="L85">    this.edgeTransFunc      = edgeTransFunc;</span>
+<span class="fc" id="L86">  }</span>
 
   @Override
   public LG execute(LG graph) {
-<span class="fc" id="L86">    return executeInternal(</span>
-<span class="fc" id="L87">      graph.getGraphHead(),</span>
-<span class="fc" id="L88">      graph.getVertices(),</span>
-<span class="fc" id="L89">      graph.getEdges(),</span>
-<span class="fc" id="L90">      graph.getFactory());</span>
+<span class="fc" id="L90">    return executeInternal(</span>
+<span class="fc" id="L91">      graph.getGraphHead(),</span>
+<span class="fc" id="L92">      graph.getVertices(),</span>
+<span class="fc" id="L93">      graph.getEdges(),</span>
+<span class="fc" id="L94">      graph.getFactory());</span>
   }
 
   /**
@@ -99,23 +103,22 @@ public class Transformation&lt;
    * @param factory the factory that is responsible for creating an instance of the logical graph
    * @return transformed logical graph
    */
-  @SuppressWarnings(&quot;unchecked&quot;)
   protected LG executeInternal(DataSet&lt;G&gt; graphHeads, DataSet&lt;V&gt; vertices, DataSet&lt;E&gt; edges,
-    BaseGraphFactory&lt;G, V, E, LG&gt; factory) {
+    BaseGraphFactory&lt;G, V, E, LG, GC&gt; factory) {
 
-<span class="fc bfc" id="L106" title="All 2 branches covered.">    DataSet&lt;G&gt; transformedGraphHeads = graphHeadTransFunc != null ? graphHeads</span>
-<span class="fc" id="L107">      .map(new TransformGraphHead(graphHeadTransFunc, factory.getGraphHeadFactory()))</span>
-<span class="fc" id="L108">      .returns(TypeExtractor.createTypeInfo(factory.getGraphHeadFactory().getType())) : graphHeads;</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">    DataSet&lt;G&gt; transformedGraphHeads = graphHeadTransFunc != null ? graphHeads</span>
+<span class="fc" id="L110">      .map(new TransformGraphHead&lt;&gt;(graphHeadTransFunc, factory.getGraphHeadFactory()))</span>
+<span class="fc" id="L111">      .returns(TypeExtractor.createTypeInfo(factory.getGraphHeadFactory().getType())) : graphHeads;</span>
 
-<span class="fc bfc" id="L110" title="All 2 branches covered.">    DataSet&lt;V&gt; transformedVertices = vertexTransFunc != null ? vertices</span>
-<span class="fc" id="L111">      .map(new TransformVertex(vertexTransFunc, factory.getVertexFactory()))</span>
-<span class="fc" id="L112">      .returns(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())) : vertices;</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">    DataSet&lt;V&gt; transformedVertices = vertexTransFunc != null ? vertices</span>
+<span class="fc" id="L114">      .map(new TransformVertex&lt;&gt;(vertexTransFunc, factory.getVertexFactory()))</span>
+<span class="fc" id="L115">      .returns(TypeExtractor.createTypeInfo(factory.getVertexFactory().getType())) : vertices;</span>
 
-<span class="fc bfc" id="L114" title="All 2 branches covered.">    DataSet&lt;E&gt; transformedEdges = edgeTransFunc != null ? edges</span>
-<span class="fc" id="L115">      .map(new TransformEdge(edgeTransFunc, factory.getEdgeFactory()))</span>
-<span class="fc" id="L116">      .returns(TypeExtractor.createTypeInfo(factory.getEdgeFactory().getType())) : edges;</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">    DataSet&lt;E&gt; transformedEdges = edgeTransFunc != null ? edges</span>
+<span class="fc" id="L118">      .map(new TransformEdge&lt;&gt;(edgeTransFunc, factory.getEdgeFactory()))</span>
+<span class="fc" id="L119">      .returns(TypeExtractor.createTypeInfo(factory.getEdgeFactory().getType())) : edges;</span>
 
-<span class="fc" id="L118">    return factory.fromDataSets(transformedGraphHeads, transformedVertices, transformedEdges);</span>
+<span class="fc" id="L121">    return factory.fromDataSets(transformedGraphHeads, transformedVertices, transformedEdges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

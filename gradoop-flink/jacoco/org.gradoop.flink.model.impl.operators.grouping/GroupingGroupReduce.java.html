@@ -20,6 +20,7 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWithSuperVertex;
@@ -59,12 +60,14 @@ import java.util.List;
  * @param &lt;V&gt;  The vertex type.
  * @param &lt;E&gt;  The edge type.
  * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
 public class GroupingGroupReduce&lt;
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph&lt;G, V, E, LG&gt;&gt; extends Grouping&lt;G, V, E, LG&gt; {
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends Grouping&lt;G, V, E, LG, GC&gt; {
   /**
    * Creates grouping operator instance.
    *
@@ -78,38 +81,38 @@ public class GroupingGroupReduce&lt;
     boolean useEdgeLabels,
     List&lt;LabelGroup&gt; vertexLabelGroups,
     List&lt;LabelGroup&gt; edgeLabelGroups) {
-<span class="fc" id="L81">    super(</span>
+<span class="fc" id="L84">    super(</span>
       useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);
-<span class="fc" id="L83">  }</span>
+<span class="fc" id="L86">  }</span>
 
   @Override
   protected LG groupInternal(LG graph) {
 
-<span class="fc" id="L88">    DataSet&lt;VertexGroupItem&gt; verticesForGrouping = graph.getVertices()</span>
+<span class="fc" id="L91">    DataSet&lt;VertexGroupItem&gt; verticesForGrouping = graph.getVertices()</span>
       // map vertex to vertex group item
-<span class="fc" id="L90">      .flatMap(new BuildVertexGroupItem&lt;&gt;(useVertexLabels(), getVertexLabelGroups()));</span>
+<span class="fc" id="L93">      .flatMap(new BuildVertexGroupItem&lt;&gt;(useVertexLabels(), getVertexLabelGroups()));</span>
 
     // group vertices by label / properties / both
-<span class="fc" id="L93">    DataSet&lt;VertexGroupItem&gt; vertexGroupItems = groupVertices(verticesForGrouping)</span>
+<span class="fc" id="L96">    DataSet&lt;VertexGroupItem&gt; vertexGroupItems = groupVertices(verticesForGrouping)</span>
       // apply aggregate function
-<span class="fc" id="L95">      .reduceGroup(new ReduceVertexGroupItems(useVertexLabels()));</span>
+<span class="fc" id="L98">      .reduceGroup(new ReduceVertexGroupItems(useVertexLabels()));</span>
 
-<span class="fc" id="L97">    DataSet&lt;V&gt; superVertices = vertexGroupItems</span>
+<span class="fc" id="L100">    DataSet&lt;V&gt; superVertices = vertexGroupItems</span>
       // filter group representative tuples
-<span class="fc" id="L99">      .filter(new FilterSuperVertices())</span>
+<span class="fc" id="L102">      .filter(new FilterSuperVertices())</span>
       // build super vertices
-<span class="fc" id="L101">      .map(new BuildSuperVertex&lt;&gt;(useVertexLabels(), graph.getFactory().getVertexFactory()));</span>
+<span class="fc" id="L104">      .map(new BuildSuperVertex&lt;&gt;(useVertexLabels(), graph.getFactory().getVertexFactory()));</span>
 
-<span class="fc" id="L103">    DataSet&lt;VertexWithSuperVertex&gt; vertexToRepresentativeMap = vertexGroupItems</span>
+<span class="fc" id="L106">    DataSet&lt;VertexWithSuperVertex&gt; vertexToRepresentativeMap = vertexGroupItems</span>
       // filter group element tuples
-<span class="fc" id="L105">      .filter(new FilterRegularVertices())</span>
+<span class="fc" id="L108">      .filter(new FilterRegularVertices())</span>
       // build vertex to group representative tuple
-<span class="fc" id="L107">      .map(new BuildVertexWithSuperVertex());</span>
+<span class="fc" id="L110">      .map(new BuildVertexWithSuperVertex());</span>
 
     // build super edges
-<span class="fc" id="L110">    DataSet&lt;E&gt; superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);</span>
+<span class="fc" id="L113">    DataSet&lt;E&gt; superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);</span>
 
-<span class="fc" id="L112">    return graph.getFactory().fromDataSets(superVertices, superEdges);</span>
+<span class="fc" id="L115">    return graph.getFactory().fromDataSets(superVertices, superEdges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

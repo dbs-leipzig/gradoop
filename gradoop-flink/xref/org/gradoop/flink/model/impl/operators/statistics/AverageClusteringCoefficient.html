@@ -25,46 +25,32 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.statistics;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyLocalClusteringCoefficientDirected;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.statistics.functions.AddAverageCCValueToGraphHeadMap;
-<a name="27" href="#27">27</a>  
-<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * Calculates the average local clustering coefficient of a graph and writes it to the graph head.</em>
-<a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> * Uses the Gradoop EPGM model wrapper for Flink Gellys implementation of the local clustering</em>
-<a name="31" href="#31">31</a>  <em class="jxr_javadoccomment"> * coefficient algorithm for directed graphs {@link GellyLocalClusteringCoefficientDirected}</em>
-<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="33" href="#33">33</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/statistics/AverageClusteringCoefficient.html">AverageClusteringCoefficient</a> implements <a href="../../../../../../../org/gradoop/flink/model/api/operators/UnaryGraphToGraphOperator.html">UnaryGraphToGraphOperator</a> {
-<a name="34" href="#34">34</a>  
-<a name="35" href="#35">35</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="36" href="#36">36</a>  <em class="jxr_javadoccomment">   * Property key to access the average clustering coefficient value stored the graph head</em>
-<a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="38" href="#38">38</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String PROPERTY_KEY_AVERAGE = <span class="jxr_string">"clustering_coefficient_average"</span>;
-<a name="39" href="#39">39</a>  
-<a name="40" href="#40">40</a>    @Override
-<a name="41" href="#41">41</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> execute(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph) {
-<a name="42" href="#42">42</a>  
-<a name="43" href="#43">43</a>      <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/count/VertexCount.html">VertexCount</a> vertexCountAggregate = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/count/VertexCount.html">VertexCount</a>();
-<a name="44" href="#44">44</a>      <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/sum/SumVertexProperty.html">SumVertexProperty</a> localCCAggregate = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/sum/SumVertexProperty.html">SumVertexProperty</a>(
-<a name="45" href="#45">45</a>        ClusteringCoefficientBase.PROPERTY_KEY_LOCAL);
-<a name="46" href="#46">46</a>  
-<a name="47" href="#47">47</a>      graph = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/algorithms/gelly/clusteringcoefficient/GellyLocalClusteringCoefficientDirected.html">GellyLocalClusteringCoefficientDirected</a>().execute(graph)
-<a name="48" href="#48">48</a>        .aggregate(vertexCountAggregate, localCCAggregate);
-<a name="49" href="#49">49</a>  
-<a name="50" href="#50">50</a>      DataSet&lt;GraphHead&gt; graphHead = graph.getGraphHead().map(<strong class="jxr_keyword">new</strong> AddAverageCCValueToGraphHeadMap(
-<a name="51" href="#51">51</a>          localCCAggregate.getAggregatePropertyKey(), vertexCountAggregate.getAggregatePropertyKey(),
-<a name="52" href="#52">52</a>          PROPERTY_KEY_AVERAGE));
-<a name="53" href="#53">53</a>  
-<a name="54" href="#54">54</a>      <strong class="jxr_keyword">return</strong> graph.getConfig().getLogicalGraphFactory().fromDataSets(
-<a name="55" href="#55">55</a>        graphHead, graph.getVertices(), graph.getEdges());
-<a name="56" href="#56">56</a>    }
-<a name="57" href="#57">57</a>  }
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyLocalClusteringCoefficientDirected;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.average.AverageVertexProperty;
+<a name="23" href="#23">23</a>  
+<a name="24" href="#24">24</a>  <em class="jxr_javadoccomment">/**</em>
+<a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * Calculates the average local clustering coefficient of a graph and writes it to the graph head.</em>
+<a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * Uses the Gradoop EPGM model wrapper for Flink Gellys implementation of the local clustering</em>
+<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * coefficient algorithm for directed graphs {@link GellyLocalClusteringCoefficientDirected}</em>
+<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> */</em>
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/statistics/AverageClusteringCoefficient.html">AverageClusteringCoefficient</a> implements <a href="../../../../../../../org/gradoop/flink/model/api/operators/UnaryGraphToGraphOperator.html">UnaryGraphToGraphOperator</a> {
+<a name="30" href="#30">30</a>  
+<a name="31" href="#31">31</a>    <em class="jxr_javadoccomment">/**</em>
+<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * Property key to access the average clustering coefficient value stored the graph head</em>
+<a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   */</em>
+<a name="34" href="#34">34</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String PROPERTY_KEY_AVERAGE = <span class="jxr_string">"clustering_coefficient_average"</span>;
+<a name="35" href="#35">35</a>  
+<a name="36" href="#36">36</a>    @Override
+<a name="37" href="#37">37</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> execute(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph) {
+<a name="38" href="#38">38</a>  
+<a name="39" href="#39">39</a>      <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/algorithms/gelly/clusteringcoefficient/GellyLocalClusteringCoefficientDirected.html">GellyLocalClusteringCoefficientDirected</a>().execute(graph).aggregate(
+<a name="40" href="#40">40</a>        <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/average/AverageVertexProperty.html">AverageVertexProperty</a>(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL,
+<a name="41" href="#41">41</a>          PROPERTY_KEY_AVERAGE));
+<a name="42" href="#42">42</a>    }
+<a name="43" href="#43">43</a>  }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

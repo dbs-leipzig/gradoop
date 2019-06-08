@@ -20,6 +20,7 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -34,28 +35,31 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
  * @param &lt;V&gt;  The vertex type.
  * @param &lt;E&gt;  The edge type.
  * @param &lt;LG&gt; The graph type.
+ * @param &lt;GC&gt; The graph collection type.
  */
-<span class="fc" id="L38">public class Verify&lt;</span>
+<span class="fc" id="L40">public class Verify&lt;</span>
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph&lt;G, V, E, LG&gt;&gt; implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {
 
   @Override
   public LG execute(LG graph) {
-<span class="fc" id="L46">    DataSet&lt;V&gt; vertices = graph.getVertices();</span>
-<span class="fc" id="L47">    DataSet&lt;E&gt; verifiedEdges = graph.getEdges()</span>
-<span class="fc" id="L48">      .join(vertices)</span>
-<span class="fc" id="L49">      .where(new SourceId&lt;&gt;())</span>
-<span class="fc" id="L50">      .equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L51">      .with(new LeftSide&lt;&gt;())</span>
-<span class="fc" id="L52">      .name(&quot;Verify Edges (1/2)&quot;)</span>
-<span class="fc" id="L53">      .join(vertices)</span>
-<span class="fc" id="L54">      .where(new TargetId&lt;&gt;())</span>
-<span class="fc" id="L55">      .equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L56">      .with(new LeftSide&lt;&gt;())</span>
-<span class="fc" id="L57">      .name(&quot;Verify Edges (2/2)&quot;);</span>
-<span class="fc" id="L58">    return graph.getFactory().fromDataSets(graph.getGraphHead(), vertices, verifiedEdges);</span>
+<span class="fc" id="L50">    DataSet&lt;V&gt; vertices = graph.getVertices();</span>
+<span class="fc" id="L51">    DataSet&lt;E&gt; verifiedEdges = graph.getEdges()</span>
+<span class="fc" id="L52">      .join(vertices)</span>
+<span class="fc" id="L53">      .where(new SourceId&lt;&gt;())</span>
+<span class="fc" id="L54">      .equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L55">      .with(new LeftSide&lt;&gt;())</span>
+<span class="fc" id="L56">      .name(&quot;Verify Edges (1/2)&quot;)</span>
+<span class="fc" id="L57">      .join(vertices)</span>
+<span class="fc" id="L58">      .where(new TargetId&lt;&gt;())</span>
+<span class="fc" id="L59">      .equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L60">      .with(new LeftSide&lt;&gt;())</span>
+<span class="fc" id="L61">      .name(&quot;Verify Edges (2/2)&quot;);</span>
+<span class="fc" id="L62">    return graph.getFactory().fromDataSets(graph.getGraphHead(), vertices, verifiedEdges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

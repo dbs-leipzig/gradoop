@@ -21,6 +21,7 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
 import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildSuperVertex;
@@ -68,12 +69,14 @@ import java.util.List;
  * @param &lt;V&gt;  The vertex type.
  * @param &lt;E&gt;  The edge type.
  * @param &lt;LG&gt; The type of the graph.
+ * @param &lt;GC&gt; The type of the graph collection.
  */
 public class GroupingGroupCombine&lt;
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  LG extends BaseGraph&lt;G, V, E, LG&gt;&gt; extends Grouping&lt;G, V, E, LG&gt; {
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends Grouping&lt;G, V, E, LG, GC&gt; {
 
   /**
    * Creates grouping operator instance.
@@ -88,48 +91,48 @@ public class GroupingGroupCombine&lt;
     boolean useEdgeLabels,
     List&lt;LabelGroup&gt; vertexLabelGroups,
     List&lt;LabelGroup&gt; edgeLabelGroups) {
-<span class="fc" id="L91">    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);</span>
-<span class="fc" id="L92">  }</span>
+<span class="fc" id="L94">    super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups);</span>
+<span class="fc" id="L95">  }</span>
 
   @Override
   protected LG groupInternal(LG graph) {
     // map vertex to vertex group item
-<span class="fc" id="L97">    DataSet&lt;VertexGroupItem&gt; verticesForGrouping = graph.getVertices()</span>
-<span class="fc" id="L98">      .flatMap(new BuildVertexGroupItem&lt;&gt;(useVertexLabels(), getVertexLabelGroups()));</span>
+<span class="fc" id="L100">    DataSet&lt;VertexGroupItem&gt; verticesForGrouping = graph.getVertices()</span>
+<span class="fc" id="L101">      .flatMap(new BuildVertexGroupItem&lt;&gt;(useVertexLabels(), getVertexLabelGroups()));</span>
 
     // group vertices by label / properties / both
-<span class="fc" id="L101">    DataSet&lt;VertexGroupItem&gt; combinedVertexGroupItems = groupVertices(verticesForGrouping)</span>
+<span class="fc" id="L104">    DataSet&lt;VertexGroupItem&gt; combinedVertexGroupItems = groupVertices(verticesForGrouping)</span>
       // apply aggregate function per combined partition
-<span class="fc" id="L103">      .combineGroup(new CombineVertexGroupItems(useVertexLabels()));</span>
+<span class="fc" id="L106">      .combineGroup(new CombineVertexGroupItems(useVertexLabels()));</span>
 
     // filter super vertex tuples (1..n per partition/group)
     // group  super vertex tuples
     // create super vertex tuple (1 per group) + previous super vertex ids
-<span class="fc" id="L108">    DataSet&lt;Tuple2&lt;VertexGroupItem, IdWithIdSet&gt;&gt; superVertexTuples =</span>
-<span class="fc" id="L109">      groupVertices(combinedVertexGroupItems.filter(new FilterSuperVertices()))</span>
-<span class="fc" id="L110">        .reduceGroup(new TransposeVertexGroupItems(useVertexLabels()));</span>
+<span class="fc" id="L111">    DataSet&lt;Tuple2&lt;VertexGroupItem, IdWithIdSet&gt;&gt; superVertexTuples =</span>
+<span class="fc" id="L112">      groupVertices(combinedVertexGroupItems.filter(new FilterSuperVertices()))</span>
+<span class="fc" id="L113">        .reduceGroup(new TransposeVertexGroupItems(useVertexLabels()));</span>
 
     // build super vertices from super vertex tuples
-<span class="fc" id="L113">    DataSet&lt;V&gt; superVertices = superVertexTuples</span>
-<span class="fc" id="L114">      .map(new Value0Of2&lt;&gt;())</span>
-<span class="fc" id="L115">      .map(new BuildSuperVertex&lt;&gt;(</span>
-<span class="fc" id="L116">        useVertexLabels(), graph.getFactory().getVertexFactory()));</span>
+<span class="fc" id="L116">    DataSet&lt;V&gt; superVertices = superVertexTuples</span>
+<span class="fc" id="L117">      .map(new Value0Of2&lt;&gt;())</span>
+<span class="fc" id="L118">      .map(new BuildSuperVertex&lt;&gt;(</span>
+<span class="fc" id="L119">        useVertexLabels(), graph.getFactory().getVertexFactory()));</span>
 
     // extract mapping
-<span class="fc" id="L119">    DataSet&lt;IdWithIdSet&gt; mapping = superVertexTuples</span>
-<span class="fc" id="L120">      .map(new Value1Of2&lt;&gt;());</span>
+<span class="fc" id="L122">    DataSet&lt;IdWithIdSet&gt; mapping = superVertexTuples</span>
+<span class="fc" id="L123">      .map(new Value1Of2&lt;&gt;());</span>
 
     // filter non-candidates from combiner output
     // update their vertex representative according to the mapping
-<span class="fc" id="L124">    DataSet&lt;VertexWithSuperVertex&gt; vertexToRepresentativeMap = combinedVertexGroupItems</span>
-<span class="fc" id="L125">      .filter(new FilterRegularVertices())</span>
-<span class="fc" id="L126">      .map(new BuildVertexWithSuperVertexBC())</span>
-<span class="fc" id="L127">      .withBroadcastSet(mapping, BuildVertexWithSuperVertexBC.BC_MAPPING);</span>
+<span class="fc" id="L127">    DataSet&lt;VertexWithSuperVertex&gt; vertexToRepresentativeMap = combinedVertexGroupItems</span>
+<span class="fc" id="L128">      .filter(new FilterRegularVertices())</span>
+<span class="fc" id="L129">      .map(new BuildVertexWithSuperVertexBC())</span>
+<span class="fc" id="L130">      .withBroadcastSet(mapping, BuildVertexWithSuperVertexBC.BC_MAPPING);</span>
 
     // build super edges
-<span class="fc" id="L130">    DataSet&lt;E&gt; superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);</span>
+<span class="fc" id="L133">    DataSet&lt;E&gt; superEdges = buildSuperEdges(graph, vertexToRepresentativeMap);</span>
 
-<span class="fc" id="L132">    return graph.getFactory().fromDataSets(superVertices, superEdges);</span>
+<span class="fc" id="L135">    return graph.getFactory().fromDataSets(superVertices, superEdges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

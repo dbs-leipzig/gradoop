@@ -15,22 +15,18 @@
  */
 package org.gradoop.flink.model.impl.operators.statistics;
 
-import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.GellyLocalClusteringCoefficientDirected;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
-import org.gradoop.flink.model.impl.operators.aggregation.functions.sum.SumVertexProperty;
-import org.gradoop.flink.model.impl.operators.statistics.functions.AddAverageCCValueToGraphHeadMap;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.operators.aggregation.functions.average.AverageVertexProperty;
 
 /**
  * Calculates the average local clustering coefficient of a graph and writes it to the graph head.
  * Uses the Gradoop EPGM model wrapper for Flink Gellys implementation of the local clustering
  * coefficient algorithm for directed graphs {@link GellyLocalClusteringCoefficientDirected}
  */
-<span class="fc" id="L33">public class AverageClusteringCoefficient implements UnaryGraphToGraphOperator {</span>
+<span class="fc" id="L29">public class AverageClusteringCoefficient implements UnaryGraphToGraphOperator {</span>
 
   /**
    * Property key to access the average clustering coefficient value stored the graph head
@@ -40,19 +36,9 @@ import org.gradoop.flink.model.impl.operators.statistics.functions.AddAverageCCV
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
 
-<span class="fc" id="L43">    VertexCount vertexCountAggregate = new VertexCount();</span>
-<span class="fc" id="L44">    SumVertexProperty localCCAggregate = new SumVertexProperty(</span>
-      ClusteringCoefficientBase.PROPERTY_KEY_LOCAL);
-
-<span class="fc" id="L47">    graph = new GellyLocalClusteringCoefficientDirected().execute(graph)</span>
-<span class="fc" id="L48">      .aggregate(vertexCountAggregate, localCCAggregate);</span>
-
-<span class="fc" id="L50">    DataSet&lt;GraphHead&gt; graphHead = graph.getGraphHead().map(new AddAverageCCValueToGraphHeadMap(</span>
-<span class="fc" id="L51">        localCCAggregate.getAggregatePropertyKey(), vertexCountAggregate.getAggregatePropertyKey(),</span>
+<span class="fc" id="L39">    return new GellyLocalClusteringCoefficientDirected().execute(graph).aggregate(</span>
+      new AverageVertexProperty(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL,
         PROPERTY_KEY_AVERAGE));
-
-<span class="fc" id="L54">    return graph.getConfig().getLogicalGraphFactory().fromDataSets(</span>
-<span class="fc" id="L55">      graphHead, graph.getVertices(), graph.getEdges());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

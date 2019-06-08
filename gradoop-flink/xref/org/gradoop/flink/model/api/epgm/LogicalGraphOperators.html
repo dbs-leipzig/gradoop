@@ -479,94 +479,104 @@
 <a name="469" href="#469">469</a> <em class="jxr_javadoccomment">   */</em>
 <a name="470" href="#470">470</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> verify();
 <a name="471" href="#471">471</a> 
-<a name="472" href="#472">472</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
-<a name="473" href="#473">473</a>   <em class="jxr_comment">// Binary Operators</em>
-<a name="474" href="#474">474</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
-<a name="475" href="#475">475</a> 
-<a name="476" href="#476">476</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="477" href="#477">477</a> <em class="jxr_javadoccomment">   * Creates a new logical graph by combining the vertex and edge sets of</em>
-<a name="478" href="#478">478</a> <em class="jxr_javadoccomment">   * this graph and the given graph. Vertex and edge equality is based on their</em>
-<a name="479" href="#479">479</a> <em class="jxr_javadoccomment">   * identifiers.</em>
-<a name="480" href="#480">480</a> <em class="jxr_javadoccomment">   *</em>
-<a name="481" href="#481">481</a> <em class="jxr_javadoccomment">   * @param otherGraph logical graph to combine this graph with</em>
-<a name="482" href="#482">482</a> <em class="jxr_javadoccomment">   * @return logical graph containing all vertices and edges of the</em>
-<a name="483" href="#483">483</a> <em class="jxr_javadoccomment">   * input graphs</em>
-<a name="484" href="#484">484</a> <em class="jxr_javadoccomment">   */</em>
-<a name="485" href="#485">485</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> combine(<a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> otherGraph);
-<a name="486" href="#486">486</a> 
-<a name="487" href="#487">487</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="488" href="#488">488</a> <em class="jxr_javadoccomment">   * Creates a new logical graph containing the overlapping vertex and edge</em>
-<a name="489" href="#489">489</a> <em class="jxr_javadoccomment">   * sets of this graph and the given graph. Vertex and edge equality is</em>
-<a name="490" href="#490">490</a> <em class="jxr_javadoccomment">   * based on their identifiers.</em>
-<a name="491" href="#491">491</a> <em class="jxr_javadoccomment">   *</em>
-<a name="492" href="#492">492</a> <em class="jxr_javadoccomment">   * @param otherGraph logical graph to compute overlap with</em>
-<a name="493" href="#493">493</a> <em class="jxr_javadoccomment">   * @return logical graph that contains all vertices and edges that exist in</em>
-<a name="494" href="#494">494</a> <em class="jxr_javadoccomment">   * both input graphs</em>
-<a name="495" href="#495">495</a> <em class="jxr_javadoccomment">   */</em>
-<a name="496" href="#496">496</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> overlap(<a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> otherGraph);
-<a name="497" href="#497">497</a> 
-<a name="498" href="#498">498</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="499" href="#499">499</a> <em class="jxr_javadoccomment">   * Creates a new logical graph containing only vertices and edges that</em>
-<a name="500" href="#500">500</a> <em class="jxr_javadoccomment">   * exist in that graph but not in the other graph. Vertex and edge equality</em>
-<a name="501" href="#501">501</a> <em class="jxr_javadoccomment">   * is based on their identifiers.</em>
-<a name="502" href="#502">502</a> <em class="jxr_javadoccomment">   *</em>
-<a name="503" href="#503">503</a> <em class="jxr_javadoccomment">   * @param otherGraph logical graph to exclude from that graph</em>
-<a name="504" href="#504">504</a> <em class="jxr_javadoccomment">   * @return logical that contains only vertices and edges that are not in</em>
-<a name="505" href="#505">505</a> <em class="jxr_javadoccomment">   * the other graph</em>
-<a name="506" href="#506">506</a> <em class="jxr_javadoccomment">   */</em>
-<a name="507" href="#507">507</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> exclude(<a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> otherGraph);
-<a name="508" href="#508">508</a> 
-<a name="509" href="#509">509</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
-<a name="510" href="#510">510</a>   <em class="jxr_comment">// Auxiliary Operators</em>
-<a name="511" href="#511">511</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
-<a name="512" href="#512">512</a> 
-<a name="513" href="#513">513</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="514" href="#514">514</a> <em class="jxr_javadoccomment">   * Splits the graph into multiple logical graphs using the property value</em>
-<a name="515" href="#515">515</a> <em class="jxr_javadoccomment">   * which is assigned to the given property key. Vertices and edges that do</em>
-<a name="516" href="#516">516</a> <em class="jxr_javadoccomment">   * not have this property will be removed from the resulting collection.</em>
-<a name="517" href="#517">517</a> <em class="jxr_javadoccomment">   *</em>
-<a name="518" href="#518">518</a> <em class="jxr_javadoccomment">   * @param propertyKey split property key</em>
-<a name="519" href="#519">519</a> <em class="jxr_javadoccomment">   * @return graph collection</em>
-<a name="520" href="#520">520</a> <em class="jxr_javadoccomment">   */</em>
-<a name="521" href="#521">521</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> splitBy(String propertyKey);
+<a name="472" href="#472">472</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="473" href="#473">473</a> <em class="jxr_javadoccomment">   * Verifies this graph, removing dangling graph ids from its elements,</em>
+<a name="474" href="#474">474</a> <em class="jxr_javadoccomment">   * i.e. ids different from this graph heads id.&lt;br&gt;</em>
+<a name="475" href="#475">475</a> <em class="jxr_javadoccomment">   * This operator can be applied after an operator that has not checked the graphs validity.</em>
+<a name="476" href="#476">476</a> <em class="jxr_javadoccomment">   * The graph head of this logical graph remains unchanged.</em>
+<a name="477" href="#477">477</a> <em class="jxr_javadoccomment">   *</em>
+<a name="478" href="#478">478</a> <em class="jxr_javadoccomment">   * @return this graph with all dangling graph ids removed.</em>
+<a name="479" href="#479">479</a> <em class="jxr_javadoccomment">   */</em>
+<a name="480" href="#480">480</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> verifyGraphContainment();
+<a name="481" href="#481">481</a> 
+<a name="482" href="#482">482</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
+<a name="483" href="#483">483</a>   <em class="jxr_comment">// Binary Operators</em>
+<a name="484" href="#484">484</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
+<a name="485" href="#485">485</a> 
+<a name="486" href="#486">486</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="487" href="#487">487</a> <em class="jxr_javadoccomment">   * Creates a new logical graph by combining the vertex and edge sets of</em>
+<a name="488" href="#488">488</a> <em class="jxr_javadoccomment">   * this graph and the given graph. Vertex and edge equality is based on their</em>
+<a name="489" href="#489">489</a> <em class="jxr_javadoccomment">   * identifiers.</em>
+<a name="490" href="#490">490</a> <em class="jxr_javadoccomment">   *</em>
+<a name="491" href="#491">491</a> <em class="jxr_javadoccomment">   * @param otherGraph logical graph to combine this graph with</em>
+<a name="492" href="#492">492</a> <em class="jxr_javadoccomment">   * @return logical graph containing all vertices and edges of the</em>
+<a name="493" href="#493">493</a> <em class="jxr_javadoccomment">   * input graphs</em>
+<a name="494" href="#494">494</a> <em class="jxr_javadoccomment">   */</em>
+<a name="495" href="#495">495</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> combine(<a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> otherGraph);
+<a name="496" href="#496">496</a> 
+<a name="497" href="#497">497</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="498" href="#498">498</a> <em class="jxr_javadoccomment">   * Creates a new logical graph containing the overlapping vertex and edge</em>
+<a name="499" href="#499">499</a> <em class="jxr_javadoccomment">   * sets of this graph and the given graph. Vertex and edge equality is</em>
+<a name="500" href="#500">500</a> <em class="jxr_javadoccomment">   * based on their identifiers.</em>
+<a name="501" href="#501">501</a> <em class="jxr_javadoccomment">   *</em>
+<a name="502" href="#502">502</a> <em class="jxr_javadoccomment">   * @param otherGraph logical graph to compute overlap with</em>
+<a name="503" href="#503">503</a> <em class="jxr_javadoccomment">   * @return logical graph that contains all vertices and edges that exist in</em>
+<a name="504" href="#504">504</a> <em class="jxr_javadoccomment">   * both input graphs</em>
+<a name="505" href="#505">505</a> <em class="jxr_javadoccomment">   */</em>
+<a name="506" href="#506">506</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> overlap(<a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> otherGraph);
+<a name="507" href="#507">507</a> 
+<a name="508" href="#508">508</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="509" href="#509">509</a> <em class="jxr_javadoccomment">   * Creates a new logical graph containing only vertices and edges that</em>
+<a name="510" href="#510">510</a> <em class="jxr_javadoccomment">   * exist in that graph but not in the other graph. Vertex and edge equality</em>
+<a name="511" href="#511">511</a> <em class="jxr_javadoccomment">   * is based on their identifiers.</em>
+<a name="512" href="#512">512</a> <em class="jxr_javadoccomment">   *</em>
+<a name="513" href="#513">513</a> <em class="jxr_javadoccomment">   * @param otherGraph logical graph to exclude from that graph</em>
+<a name="514" href="#514">514</a> <em class="jxr_javadoccomment">   * @return logical that contains only vertices and edges that are not in</em>
+<a name="515" href="#515">515</a> <em class="jxr_javadoccomment">   * the other graph</em>
+<a name="516" href="#516">516</a> <em class="jxr_javadoccomment">   */</em>
+<a name="517" href="#517">517</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> exclude(<a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> otherGraph);
+<a name="518" href="#518">518</a> 
+<a name="519" href="#519">519</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
+<a name="520" href="#520">520</a>   <em class="jxr_comment">// Auxiliary Operators</em>
+<a name="521" href="#521">521</a>   <em class="jxr_comment">//----------------------------------------------------------------------------</em>
 <a name="522" href="#522">522</a> 
 <a name="523" href="#523">523</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="524" href="#524">524</a> <em class="jxr_javadoccomment">   * Creates a logical graph using the given unary graph operator.</em>
-<a name="525" href="#525">525</a> <em class="jxr_javadoccomment">   *</em>
-<a name="526" href="#526">526</a> <em class="jxr_javadoccomment">   * @param operator unary graph to graph operator</em>
-<a name="527" href="#527">527</a> <em class="jxr_javadoccomment">   * @return result of given operator</em>
-<a name="528" href="#528">528</a> <em class="jxr_javadoccomment">   */</em>
-<a name="529" href="#529">529</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> callForGraph(UnaryBaseGraphToBaseGraphOperator&lt;LogicalGraph&gt; <strong class="jxr_keyword">operator</strong>);
-<a name="530" href="#530">530</a> 
-<a name="531" href="#531">531</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="532" href="#532">532</a> <em class="jxr_javadoccomment">   * Creates a logical graph from that graph and the input graph using the</em>
-<a name="533" href="#533">533</a> <em class="jxr_javadoccomment">   * given binary operator.</em>
-<a name="534" href="#534">534</a> <em class="jxr_javadoccomment">   *</em>
-<a name="535" href="#535">535</a> <em class="jxr_javadoccomment">   * @param operator   binary graph to graph operator</em>
-<a name="536" href="#536">536</a> <em class="jxr_javadoccomment">   * @param otherGraph other graph</em>
+<a name="524" href="#524">524</a> <em class="jxr_javadoccomment">   * Splits the graph into multiple logical graphs using the property value</em>
+<a name="525" href="#525">525</a> <em class="jxr_javadoccomment">   * which is assigned to the given property key. Vertices and edges that do</em>
+<a name="526" href="#526">526</a> <em class="jxr_javadoccomment">   * not have this property will be removed from the resulting collection.</em>
+<a name="527" href="#527">527</a> <em class="jxr_javadoccomment">   *</em>
+<a name="528" href="#528">528</a> <em class="jxr_javadoccomment">   * @param propertyKey split property key</em>
+<a name="529" href="#529">529</a> <em class="jxr_javadoccomment">   * @return graph collection</em>
+<a name="530" href="#530">530</a> <em class="jxr_javadoccomment">   */</em>
+<a name="531" href="#531">531</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> splitBy(String propertyKey);
+<a name="532" href="#532">532</a> 
+<a name="533" href="#533">533</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="534" href="#534">534</a> <em class="jxr_javadoccomment">   * Creates a logical graph using the given unary graph operator.</em>
+<a name="535" href="#535">535</a> <em class="jxr_javadoccomment">   *</em>
+<a name="536" href="#536">536</a> <em class="jxr_javadoccomment">   * @param operator unary graph to graph operator</em>
 <a name="537" href="#537">537</a> <em class="jxr_javadoccomment">   * @return result of given operator</em>
 <a name="538" href="#538">538</a> <em class="jxr_javadoccomment">   */</em>
-<a name="539" href="#539">539</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> callForGraph(<a href="../../../../../../org/gradoop/flink/model/api/operators/BinaryGraphToGraphOperator.html">BinaryGraphToGraphOperator</a> <strong class="jxr_keyword">operator</strong>, <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> otherGraph);
+<a name="539" href="#539">539</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> callForGraph(UnaryBaseGraphToBaseGraphOperator&lt;LogicalGraph&gt; <strong class="jxr_keyword">operator</strong>);
 <a name="540" href="#540">540</a> 
 <a name="541" href="#541">541</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="542" href="#542">542</a> <em class="jxr_javadoccomment">   * Creates a logical graph from that graph and other graphs using the given</em>
-<a name="543" href="#543">543</a> <em class="jxr_javadoccomment">   * operator.</em>
+<a name="542" href="#542">542</a> <em class="jxr_javadoccomment">   * Creates a logical graph from that graph and the input graph using the</em>
+<a name="543" href="#543">543</a> <em class="jxr_javadoccomment">   * given binary operator.</em>
 <a name="544" href="#544">544</a> <em class="jxr_javadoccomment">   *</em>
-<a name="545" href="#545">545</a> <em class="jxr_javadoccomment">   * @param operator    multi graph to graph operator</em>
-<a name="546" href="#546">546</a> <em class="jxr_javadoccomment">   * @param otherGraphs other graphs</em>
+<a name="545" href="#545">545</a> <em class="jxr_javadoccomment">   * @param operator   binary graph to graph operator</em>
+<a name="546" href="#546">546</a> <em class="jxr_javadoccomment">   * @param otherGraph other graph</em>
 <a name="547" href="#547">547</a> <em class="jxr_javadoccomment">   * @return result of given operator</em>
 <a name="548" href="#548">548</a> <em class="jxr_javadoccomment">   */</em>
-<a name="549" href="#549">549</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> callForGraph(<a href="../../../../../../org/gradoop/flink/model/api/operators/GraphsToGraphOperator.html">GraphsToGraphOperator</a> <strong class="jxr_keyword">operator</strong>, LogicalGraph... otherGraphs);
+<a name="549" href="#549">549</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> callForGraph(<a href="../../../../../../org/gradoop/flink/model/api/operators/BinaryGraphToGraphOperator.html">BinaryGraphToGraphOperator</a> <strong class="jxr_keyword">operator</strong>, <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> otherGraph);
 <a name="550" href="#550">550</a> 
 <a name="551" href="#551">551</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="552" href="#552">552</a> <em class="jxr_javadoccomment">   * Creates a graph collection from that graph using the given unary graph</em>
+<a name="552" href="#552">552</a> <em class="jxr_javadoccomment">   * Creates a logical graph from that graph and other graphs using the given</em>
 <a name="553" href="#553">553</a> <em class="jxr_javadoccomment">   * operator.</em>
 <a name="554" href="#554">554</a> <em class="jxr_javadoccomment">   *</em>
-<a name="555" href="#555">555</a> <em class="jxr_javadoccomment">   * @param operator unary graph to collection operator</em>
-<a name="556" href="#556">556</a> <em class="jxr_javadoccomment">   * @return result of given operator</em>
-<a name="557" href="#557">557</a> <em class="jxr_javadoccomment">   */</em>
-<a name="558" href="#558">558</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> callForCollection(<a href="../../../../../../org/gradoop/flink/model/api/operators/UnaryGraphToCollectionOperator.html">UnaryGraphToCollectionOperator</a> <strong class="jxr_keyword">operator</strong>);
-<a name="559" href="#559">559</a> }
+<a name="555" href="#555">555</a> <em class="jxr_javadoccomment">   * @param operator    multi graph to graph operator</em>
+<a name="556" href="#556">556</a> <em class="jxr_javadoccomment">   * @param otherGraphs other graphs</em>
+<a name="557" href="#557">557</a> <em class="jxr_javadoccomment">   * @return result of given operator</em>
+<a name="558" href="#558">558</a> <em class="jxr_javadoccomment">   */</em>
+<a name="559" href="#559">559</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> callForGraph(<a href="../../../../../../org/gradoop/flink/model/api/operators/GraphsToGraphOperator.html">GraphsToGraphOperator</a> <strong class="jxr_keyword">operator</strong>, LogicalGraph... otherGraphs);
+<a name="560" href="#560">560</a> 
+<a name="561" href="#561">561</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="562" href="#562">562</a> <em class="jxr_javadoccomment">   * Creates a graph collection from that graph using the given unary graph</em>
+<a name="563" href="#563">563</a> <em class="jxr_javadoccomment">   * operator.</em>
+<a name="564" href="#564">564</a> <em class="jxr_javadoccomment">   *</em>
+<a name="565" href="#565">565</a> <em class="jxr_javadoccomment">   * @param operator unary graph to collection operator</em>
+<a name="566" href="#566">566</a> <em class="jxr_javadoccomment">   * @return result of given operator</em>
+<a name="567" href="#567">567</a> <em class="jxr_javadoccomment">   */</em>
+<a name="568" href="#568">568</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> callForCollection(<a href="../../../../../../org/gradoop/flink/model/api/operators/UnaryGraphToCollectionOperator.html">UnaryGraphToCollectionOperator</a> <strong class="jxr_keyword">operator</strong>);
+<a name="569" href="#569">569</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

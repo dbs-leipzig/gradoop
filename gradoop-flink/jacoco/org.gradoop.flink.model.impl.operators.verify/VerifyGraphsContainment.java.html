@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VerifyGraphsContainment.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Flink</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.flink.model.impl.operators.verify</a> &gt; <span class="el_source">VerifyGraphsContainment.java</span></div><h1>VerifyGraphsContainment.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.flink.model.impl.operators.verify;
+
+import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
+import org.gradoop.flink.model.impl.operators.verify.functions.RemoveDanglingGraphIds;
+
+/**
+ * Verifies a collections elements, removing dangling graph ids, i.e. ids of graphs not contained
+ * in the collection.
+ *
+ * @param &lt;G&gt;  The graph head type.
+ * @param &lt;V&gt;  The vertex type.
+ * @param &lt;E&gt;  The edge type.
+ * @param &lt;LG&gt; The logical graph type.
+ * @param &lt;GC&gt; The graph collection type.
+ */
+<span class="fc" id="L39">public class VerifyGraphsContainment&lt;</span>
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
+  implements UnaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; {
+
+  @Override
+  public GC execute(GC collection) {
+<span class="fc" id="L49">    DataSet&lt;GradoopId&gt; idSet = collection.getGraphHeads().map(new Id&lt;&gt;());</span>
+
+<span class="fc" id="L51">    DataSet&lt;V&gt; verifiedVertices = collection.getVertices()</span>
+<span class="fc" id="L52">      .map(new RemoveDanglingGraphIds&lt;&gt;())</span>
+<span class="fc" id="L53">      .withBroadcastSet(idSet, RemoveDanglingGraphIds.GRAPH_ID_SET);</span>
+
+<span class="fc" id="L55">    DataSet&lt;E&gt; verifiedEdges = collection.getEdges()</span>
+<span class="fc" id="L56">      .map(new RemoveDanglingGraphIds&lt;&gt;())</span>
+<span class="fc" id="L57">      .withBroadcastSet(idSet, RemoveDanglingGraphIds.GRAPH_ID_SET);</span>
+
+<span class="fc" id="L59">    return collection.getFactory()</span>
+<span class="fc" id="L60">      .fromDataSets(collection.getGraphHeads(), verifiedVertices, verifiedEdges);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
