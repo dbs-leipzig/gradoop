@@ -27,7 +27,7 @@ import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
  * @param <G> type of the graph head
  * @param <V> the vertex type
  * @param <E> the edge type
- * @param <LG> the type of the logical graph
+ * @param <LG> the type of the base graph
  * @param <GC> the type of the graph collection
  */
 public interface BaseGraphCollectionOperators<

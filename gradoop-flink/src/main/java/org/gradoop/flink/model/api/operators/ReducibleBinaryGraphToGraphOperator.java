@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.api.operators;
 
 /**
- * A marker interface for instances of {@link BinaryBaseGraphToValueOperator} that
+ * A marker interface for instances of {@link UnaryCollectionToGraphOperator} that
  * support the reduction of a collection to a single logical graph.
  */
 public interface ReducibleBinaryGraphToGraphOperator

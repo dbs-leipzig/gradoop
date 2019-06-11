@@ -43,7 +43,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.utils.LeftWhenRightIsNull;
 
 /**
- * Computes the exclusion graph from two logical graphs.
+ * Computes the exclusion graph from two base graphs.
  * Reduces the first input graph to contain only vertices and edges that don't exist in
  * the second graph. The graph head of the first graph is retained. Vertex and edge equality
  * is based on their respective identifiers.

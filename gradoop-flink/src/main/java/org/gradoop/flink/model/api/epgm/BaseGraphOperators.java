@@ -64,18 +64,18 @@ public interface BaseGraphOperators<
   //----------------------------------------------------------------------------
 
   /**
-   * Creates a copy of the logical graph.
+   * Creates a copy of the base graph.
    * <p>
    * Note that this method creates new graph head, vertex and edge instances.
    *
-   * @return projected logical graph
+   * @return projected base graph
    */
   default LG copy() {
     return callForGraph(new Cloning<>());
   }
 
   /**
-   * Creates a condensed version of the logical graph by grouping vertices based on the specified
+   * Creates a condensed version of the base graph by grouping vertices based on the specified
    * property keys.
    * <p>
    * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
@@ -93,7 +93,7 @@ public interface BaseGraphOperators<
   }
 
   /**
-   * Creates a condensed version of the logical graph by grouping vertices and edges based on given
+   * Creates a condensed version of the base graph by grouping vertices and edges based on given
    * property keys.
    * <p>
    * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
@@ -115,7 +115,7 @@ public interface BaseGraphOperators<
   }
 
   /**
-   * Creates a condensed version of the logical graph by grouping vertices and edges based on given
+   * Creates a condensed version of the base graph by grouping vertices and edges based on given
    * property keys.
    * <p>
    * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
@@ -163,13 +163,13 @@ public interface BaseGraphOperators<
   }
 
   /**
-   * Transforms the elements of the logical graph using the given transformation functions.
+   * Transforms the elements of the base graph using the given transformation functions.
    * The identity of the elements is preserved.
    *
    * @param graphHeadTransformationFunction graph head transformation function
    * @param vertexTransformationFunction    vertex transformation function
    * @param edgeTransformationFunction      edge transformation function
-   * @return transformed logical graph
+   * @return transformed base graph
    */
   default LG transform(
     TransformationFunction<G> graphHeadTransformationFunction,
@@ -182,33 +182,33 @@ public interface BaseGraphOperators<
   }
 
   /**
-   * Transforms the graph head of the logical graph using the given
+   * Transforms the graph head of the base graph using the given
    * transformation function. The identity of the graph is preserved.
    *
    * @param graphHeadTransformationFunction graph head transformation function
-   * @return transformed logical graph
+   * @return transformed base graph
    */
   default LG transformGraphHead(TransformationFunction<G> graphHeadTransformationFunction) {
     return transform(graphHeadTransformationFunction, null, null);
   }
 
   /**
-   * Transforms the vertices of the logical graph using the given transformation
+   * Transforms the vertices of the base graph using the given transformation
    * function. The identity of the vertices is preserved.
    *
    * @param vertexTransformationFunction vertex transformation function
-   * @return transformed logical graph
+   * @return transformed base graph
    */
   default LG transformVertices(TransformationFunction<V> vertexTransformationFunction) {
     return transform(null, vertexTransformationFunction, null);
   }
 
   /**
-   * Transforms the edges of the logical graph using the given transformation function.
+   * Transforms the edges of the base graph using the given transformation function.
    * The identity of the edges is preserved.
    *
    * @param edgeTransformationFunction edge transformation function
-   * @return transformed logical graph
+   * @return transformed base graph
    */
   default LG transformEdges(TransformationFunction<E> edgeTransformationFunction) {
     return transform(null, null, edgeTransformationFunction);
@@ -238,7 +238,7 @@ public interface BaseGraphOperators<
   }
 
   /**
-   * Returns a subgraph of the logical graph which contains only those vertices
+   * Returns a subgraph of the base graph which contains only those vertices
    * and edges that fulfil the given vertex and edge filter functions respectively.
    * <p>
    * Note, that the operator does not verify the consistency of the resulting graph.
@@ -246,7 +246,7 @@ public interface BaseGraphOperators<
    *
    * @param vertexFilterFunction vertex filter function
    * @param edgeFilterFunction   edge filter function
-   * @return logical graph which fulfils the given predicates and is a subgraph of that graph
+   * @return base graph which fulfils the given predicates and is a subgraph of that graph
    */
   default LG subgraph(FilterFunction<V> vertexFilterFunction,
                       FilterFunction<E> edgeFilterFunction) {
@@ -256,7 +256,7 @@ public interface BaseGraphOperators<
   }
 
   /**
-   * Returns a subgraph of the logical graph which contains only those vertices
+   * Returns a subgraph of the base graph which contains only those vertices
    * and edges that fulfil the given vertex and edge filter functions respectively.
    * <p>
    * Note, that the operator does not verify the consistency of the resulting graph.
@@ -265,7 +265,7 @@ public interface BaseGraphOperators<
    * @param vertexFilterFunction vertex filter function
    * @param edgeFilterFunction   edge filter function
    * @param strategy             execution strategy for the operator
-   * @return logical graph which fulfils the given predicates and is a subgraph of that graph
+   * @return base graph which fulfils the given predicates and is a subgraph of that graph
    */
   default LG subgraph(FilterFunction<V> vertexFilterFunction,
                       FilterFunction<E> edgeFilterFunction, Subgraph.Strategy strategy) {
@@ -273,11 +273,11 @@ public interface BaseGraphOperators<
   }
 
   /**
-   * Applies the given aggregate functions to the logical graph and stores the
+   * Applies the given aggregate functions to the base graph and stores the
    * result of those functions at the resulting graph using the given property keys.
    *
-   * @param aggregateFunctions computes aggregates on the logical graph
-   * @return logical graph with additional properties storing the aggregates
+   * @param aggregateFunctions computes aggregates on the base graph
+   * @return base graph with additional properties storing the aggregates
    */
   default LG aggregate(AggregateFunction... aggregateFunctions) {
     return callForGraph(new Aggregation<>(aggregateFunctions));
@@ -290,7 +290,7 @@ public interface BaseGraphOperators<
    *
    * @param function      aggregate function
    * @param edgeDirection incoming, outgoing edges or both
-   * @return logical graph where vertices store aggregated information about connected edges
+   * @return base graph where vertices store aggregated information about connected edges
    */
   default LG reduceOnEdges(EdgeAggregateFunction function,
                            Neighborhood.EdgeDirection edgeDirection) {
@@ -304,7 +304,7 @@ public interface BaseGraphOperators<
    *
    * @param function      aggregate function
    * @param edgeDirection incoming, outgoing edges or both
-   * @return logical graph where vertices store aggregated information about connected vertices
+   * @return base graph where vertices store aggregated information about connected vertices
    */
   default LG reduceOnNeighbors(VertexAggregateFunction function,
                                Neighborhood.EdgeDirection edgeDirection) {
@@ -315,7 +315,7 @@ public interface BaseGraphOperators<
    * Verifies this graph, removing dangling edges, i.e. edges pointing to or from
    * a vertex not contained in this graph.<br>
    * This operator can be applied after an operator that has not checked the graphs validity.
-   * The graph head of this logical graph remains unchanged.
+   * The graph head of this base graph remains unchanged.
    *
    * @return this graph with all dangling edges removed.
    */
@@ -327,7 +327,7 @@ public interface BaseGraphOperators<
    * Verifies this graph, removing dangling graph ids from its elements,
    * i.e. ids different from this graph heads id.<br>
    * This operator can be applied after an operator that has not checked the graphs validity.
-   * The graph head of this logical graph remains unchanged.
+   * The graph head of this base graph remains unchanged.
    *
    * @return this graph with all dangling graph ids removed.
    */
@@ -340,34 +340,34 @@ public interface BaseGraphOperators<
   //----------------------------------------------------------------------------
 
   /**
-   * Creates a new logical graph by combining the vertex and edge sets of
+   * Creates a new base graph by combining the vertex and edge sets of
    * this graph and the given graph. Vertex and edge equality is based on their identifiers.
    *
-   * @param otherGraph logical graph to combine this graph with
-   * @return logical graph containing all vertices and edges of the input graphs
+   * @param otherGraph base graph to combine this graph with
+   * @return base graph containing all vertices and edges of the input graphs
    */
   default LG combine(LG otherGraph) {
     return callForGraph(new Combination<>(), otherGraph);
   }
 
   /**
-   * Creates a new logical graph containing the overlapping vertex and edge sets of this graph
+   * Creates a new base graph containing the overlapping vertex and edge sets of this graph
    * and the given graph. Vertex and edge equality is based on their identifiers.
    *
-   * @param otherGraph logical graph to compute overlap with
-   * @return logical graph that contains all vertices and edges that exist in both input graphs
+   * @param otherGraph base graph to compute overlap with
+   * @return base graph that contains all vertices and edges that exist in both input graphs
    */
   default LG overlap(LG otherGraph) {
     return callForGraph(new Overlap<>(), otherGraph);
   }
 
   /**
-   * Creates a new logical graph containing only vertices and edges that exist in that graph
+   * Creates a new base graph containing only vertices and edges that exist in that graph
    * but not in the other graph. Vertex and edge equality is based on their identifiers.
    * The graph head of this graph is retained.
    *
-   * @param otherGraph logical graph to exclude from that graph
-   * @return logical that contains only vertices and edges that are not in the other graph
+   * @param otherGraph base graph to exclude from that graph
+   * @return base that contains only vertices and edges that are not in the other graph
    */
   default LG exclude(LG otherGraph) {
     return callForGraph(new Exclusion<>(), otherGraph);
@@ -378,7 +378,7 @@ public interface BaseGraphOperators<
   //----------------------------------------------------------------------------
 
   /**
-   * Creates a logical graph using the given unary graph operator.
+   * Creates a base graph using the given unary graph operator.
    *
    * @param operator unary graph to graph operator
    * @return result of given operator
@@ -386,7 +386,7 @@ public interface BaseGraphOperators<
   LG callForGraph(UnaryBaseGraphToBaseGraphOperator<LG> operator);
 
   /**
-   * Creates a logical graph from that graph and the input graph using the given binary operator.
+   * Creates a base graph from that graph and the input graph using the given binary operator.
    *
    * @param operator   binary graph to graph operator
    * @param otherGraph other graph

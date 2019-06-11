@@ -42,7 +42,7 @@ import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.
 import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.EDGE_INDUCED_PROJECT_FIRST;
 
 /**
- * Extracts a subgraph from a logical graph using the given filter functions.
+ * Extracts a subgraph from a base graph using the given filter functions.
  * The graph head stays unchanged for the subgraph.
  *
  * The operator is able to:
@@ -67,12 +67,12 @@ public class Subgraph<
   implements UnaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
-   * Used to filter vertices from the logical graph.
+   * Used to filter vertices from the graph.
    */
   private final FilterFunction<V> vertexFilterFunction;
 
   /**
-   * Used to filter edges from the logical graph.
+   * Used to filter edges from the graph.
    */
   private final FilterFunction<E> edgeFilterFunction;
 

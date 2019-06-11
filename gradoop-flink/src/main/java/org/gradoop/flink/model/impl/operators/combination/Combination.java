@@ -25,7 +25,7 @@ import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
- * Computes the combined graph from two logical graphs.
+ * Computes the combined graph from two base graph instances.
  *
  * @param <G>  The graph head type.
  * @param <V>  The vertex type.
@@ -42,7 +42,7 @@ public class Combination<
   implements BinaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
-   * Creates a new logical graph by union the vertex and edge sets of two
+   * Creates a new base graph by union the vertex and edge sets of two
    * input graphs. Vertex and edge equality is based on their respective identifiers.
    *
    * @param firstGraph  first input graph

@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 /**
- * Computes the overlap graph from two logical graphs.
+ * Computes the overlap graph from two base graphs.
  *
  * @param <G>  The graph head type.
  * @param <V>  The vertex type.
@@ -43,7 +43,7 @@ public class Overlap<
   implements BinaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
-   * Creates a new logical graph containing the overlapping vertex and edge
+   * Creates a new base graph containing the overlapping vertex and edge
    * sets of two input graphs. Vertex and edge equality is based on their respective identifiers.
    *
    * @param firstGraph  first input graph
@@ -67,6 +67,4 @@ public class Overlap<
 
     return firstGraph.getFactory().fromDataSets(newVertices, newEdges);
   }
-
-
 }
