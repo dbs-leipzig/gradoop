@@ -89,15 +89,6 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
   GraphCollection sortBy(String propertyKey, Order order);
 
   /**
-   * Returns the first {@code n} arbitrary logical graphs contained in that
-   * collection.
-   *
-   * @param n number of graphs to return from collection
-   * @return subset of the graph collection
-   */
-  GraphCollection limit(int n);
-
-  /**
    * Matches a given pattern on a graph collection.
    * The boolean flag specifies, if the return shall be the input graphs with
    * a new property ("contains pattern"), or a new collection consisting of the

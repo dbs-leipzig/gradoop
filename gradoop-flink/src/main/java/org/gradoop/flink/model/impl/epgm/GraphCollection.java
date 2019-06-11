@@ -230,11 +230,6 @@ public class GraphCollection implements
   }
 
   @Override
-  public GraphCollection limit(int n) {
-    return callForCollection(new Limit(n));
-  }
-
-  @Override
   public GraphCollection match(
     String pattern,
     PatternMatchingAlgorithm algorithm,

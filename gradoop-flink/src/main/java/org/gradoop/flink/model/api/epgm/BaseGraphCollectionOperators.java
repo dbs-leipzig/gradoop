@@ -19,6 +19,7 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
+import org.gradoop.flink.model.impl.operators.limit.Limit;
 import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
 
 /**
@@ -40,6 +41,17 @@ public interface BaseGraphCollectionOperators<
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
+
+  /**
+   * Returns the first {@code n} arbitrary logical graphs contained in that
+   * collection.
+   *
+   * @param n number of graphs to return from collection
+   * @return subset of the graph collection
+   */
+  default GC limit(int n) {
+    return callForCollection(new Limit<>(n));
+  }
 
   /**
    * Verifies this graph collection, removing dangling graph ids from its elements,

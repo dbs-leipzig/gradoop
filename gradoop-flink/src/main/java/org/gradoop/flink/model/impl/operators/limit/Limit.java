@@ -16,23 +16,35 @@
 package org.gradoop.flink.model.impl.operators.limit;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
 
 /**
- * Returns the first n (arbitrary) logical graphs from a collection.
+ * Returns the first n (arbitrary) base graphs from a collection.
  *
- * Note that this operator uses broadcasting to distribute the relevant graph
- * identifiers.
+ * Note that this operator uses broadcasting to distribute the relevant graph identifiers.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the logical graph instance
+ * @param <GC> type of the graph collection
  */
-public class Limit implements UnaryCollectionToCollectionOperator {
+public class Limit<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> {
 
   /**
    * Number of graphs that are retrieved from the collection.
@@ -49,21 +61,21 @@ public class Limit implements UnaryCollectionToCollectionOperator {
   }
 
   @Override
-  public GraphCollection execute(GraphCollection collection) {
+  public GC execute(GC collection) {
 
-    DataSet<GraphHead> graphHeads = collection.getGraphHeads().first(limit);
+    DataSet<G> graphHeads = collection.getGraphHeads().first(limit);
 
     DataSet<GradoopId> firstIds = graphHeads.map(new Id<>());
 
-    DataSet<Vertex> filteredVertices = collection.getVertices()
+    DataSet<V> filteredVertices = collection.getVertices()
       .filter(new InAnyGraphBroadcast<>())
       .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    DataSet<Edge> filteredEdges = collection.getEdges()
+    DataSet<E> filteredEdges = collection.getEdges()
       .filter(new InAnyGraphBroadcast<>())
       .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    return collection.getConfig().getGraphCollectionFactory()
+    return collection.getFactory()
       .fromDataSets(graphHeads, filteredVertices, filteredEdges);
   }
 }
