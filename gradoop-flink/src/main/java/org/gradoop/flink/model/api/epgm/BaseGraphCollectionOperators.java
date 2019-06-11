@@ -27,13 +27,15 @@ import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
  * @param <G> type of the graph head
  * @param <V> the vertex type
  * @param <E> the edge type
+ * @param <LG> the type of the logical graph
  * @param <GC> the type of the graph collection
  */
 public interface BaseGraphCollectionOperators<
   G extends EPGMGraphHead,
   V extends EPGMVertex,
   E extends EPGMEdge,
-  GC extends BaseGraphCollection<G, V, E, GC>> {
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> {
 
   //----------------------------------------------------------------------------
   // Unary Operators
