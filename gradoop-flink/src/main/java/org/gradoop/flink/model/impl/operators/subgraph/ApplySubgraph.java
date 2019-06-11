@@ -29,6 +29,7 @@ import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgeToSourceAndTargetIdWithGraphIds;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.LeftSideWithRightGraphs;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.RightSideWithLeftGraphs;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.RightSideWithLeftGraphs2To1;
 import org.gradoop.flink.model.impl.operators.verify.Verify;
 
 /**
@@ -166,10 +167,7 @@ public class ApplySubgraph<
       .distinct(0)
       .join(collection.getVertices())
       .where(0).equalTo(new Id<>())
-      .with((l, r) -> {
-        r.getGraphIds().retainAll(l.f1);
-        return r;
-      });
+      .with(new RightSideWithLeftGraphs2To1<>());
 
     return collection.getFactory()
       .fromDataSets(collection.getGraphHeads(), inducedVertices, filteredEdges);
