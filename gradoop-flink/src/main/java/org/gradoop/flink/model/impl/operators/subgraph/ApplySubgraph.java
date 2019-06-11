@@ -17,12 +17,12 @@ package org.gradoop.flink.model.impl.operators.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.ApplicableUnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -32,7 +32,7 @@ import org.gradoop.flink.model.impl.operators.subgraph.functions.RightSideWithLe
 import org.gradoop.flink.model.impl.operators.verify.Verify;
 
 /**
- * Extracts a subgraph from each logical graph in a graph collection using
+ * Extracts a subgraph from each base graph in a graph collection using
  * the given filter functions. The graph head stays unchanged for the subgraph.
  * <p/>
  * The operator is able to:
@@ -43,9 +43,20 @@ import org.gradoop.flink.model.impl.operators.verify.Verify;
  * <li>extract subgraph based on vertex and edge filter function without verification
  * (no joins, use {@link Verify} to verify the subgraph)</li>
  * </ol>
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the logical graph instance
+ * @param <GC> type of the graph collection
  */
-public class ApplySubgraph extends Subgraph<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>
-  implements ApplicableUnaryGraphToGraphOperator {
+public class ApplySubgraph<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends Subgraph<G, V, E, LG, GC>
+  implements ApplicableUnaryBaseGraphToBaseGraphOperator<GC> {
 
   /**
    * Creates a new sub graph operator instance.
@@ -63,15 +74,15 @@ public class ApplySubgraph extends Subgraph<GraphHead, Vertex, Edge, LogicalGrap
    * @param edgeFilterFunction   edge filter function
    * @param strategy             sets the execution strategy for the operator
    */
-  public ApplySubgraph(FilterFunction<Vertex> vertexFilterFunction,
-    FilterFunction<Edge> edgeFilterFunction, Strategy strategy) {
+  public ApplySubgraph(FilterFunction<V> vertexFilterFunction,
+    FilterFunction<E> edgeFilterFunction, Strategy strategy) {
     super(vertexFilterFunction, edgeFilterFunction, strategy);
   }
 
   @Override
-  public GraphCollection executeForGVELayout(GraphCollection collection) {
+  public GC executeForGVELayout(GC collection) {
 
-    GraphCollection result;
+    GC result;
     switch (strategy) {
     case BOTH:
       result = subgraph(collection);
@@ -93,7 +104,7 @@ public class ApplySubgraph extends Subgraph<GraphHead, Vertex, Edge, LogicalGrap
   }
 
   @Override
-  public GraphCollection executeForTxLayout(GraphCollection collection) {
+  public GC executeForTxLayout(GC collection) {
     return executeForGVELayout(collection);
   }
 
@@ -104,9 +115,9 @@ public class ApplySubgraph extends Subgraph<GraphHead, Vertex, Edge, LogicalGrap
    * @param collection collection of supergraphs
    * @return collection of vertex-induced subgraphs
    */
-  private GraphCollection vertexInducedSubgraph(GraphCollection collection) {
-    DataSet<Vertex> filteredVertices = collection.getVertices().filter(vertexFilterFunction);
-    DataSet<Edge> inducedEdges = collection.getEdges()
+  private GC vertexInducedSubgraph(GC collection) {
+    DataSet<V> filteredVertices = collection.getVertices().filter(vertexFilterFunction);
+    DataSet<E> inducedEdges = collection.getEdges()
       .join(filteredVertices)
       .where(new SourceId<>()).equalTo(new Id<>())
       .with(new LeftSideWithRightGraphs<>())
@@ -114,7 +125,7 @@ public class ApplySubgraph extends Subgraph<GraphHead, Vertex, Edge, LogicalGrap
       .where(new TargetId<>()).equalTo(new Id<>())
       .with(new LeftSideWithRightGraphs<>());
 
-    return collection.getConfig().getGraphCollectionFactory()
+    return collection.getFactory()
       .fromDataSets(collection.getGraphHeads(), filteredVertices, inducedEdges);
   }
 
@@ -125,9 +136,9 @@ public class ApplySubgraph extends Subgraph<GraphHead, Vertex, Edge, LogicalGrap
    * @param collection collection of supergraphs
    * @return collection of edge-induced subgraphs
    */
-  private GraphCollection edgeInducedSubgraph(GraphCollection collection) {
-    DataSet<Edge> filteredEdges = collection.getEdges().filter(edgeFilterFunction);
-    DataSet<Vertex> inducedVertices = filteredEdges
+  private GC edgeInducedSubgraph(GC collection) {
+    DataSet<E> filteredEdges = collection.getEdges().filter(edgeFilterFunction);
+    DataSet<V> inducedVertices = filteredEdges
       .join(collection.getVertices())
       .where(new SourceId<>()).equalTo(new Id<>())
       .with(new RightSideWithLeftGraphs<>())
@@ -148,9 +159,9 @@ public class ApplySubgraph extends Subgraph<GraphHead, Vertex, Edge, LogicalGrap
    * @param collection collection of supergraph
    * @return collection of edge-induced subgraph
    */
-  private GraphCollection edgeInducedSubgraphProjectFirst(GraphCollection collection) {
-    DataSet<Edge> filteredEdges = collection.getEdges().filter(edgeFilterFunction);
-    DataSet<Vertex> inducedVertices = filteredEdges
+  private GC edgeInducedSubgraphProjectFirst(GC collection) {
+    DataSet<E> filteredEdges = collection.getEdges().filter(edgeFilterFunction);
+    DataSet<V> inducedVertices = filteredEdges
       .flatMap(new EdgeToSourceAndTargetIdWithGraphIds<>())
       .distinct(0)
       .join(collection.getVertices())
@@ -174,11 +185,11 @@ public class ApplySubgraph extends Subgraph<GraphHead, Vertex, Edge, LogicalGrap
    * @param collection collection of supergraphs
    * @return collection of subgraphs
    */
-  private GraphCollection subgraph(GraphCollection collection) {
-    DataSet<Vertex> newVertices = collection.getVertices().filter(vertexFilterFunction);
-    DataSet<Edge> newEdges = collection.getEdges().filter(edgeFilterFunction);
+  private GC subgraph(GC collection) {
+    DataSet<V> newVertices = collection.getVertices().filter(vertexFilterFunction);
+    DataSet<E> newEdges = collection.getEdges().filter(edgeFilterFunction);
 
-    return collection.getConfig().getGraphCollectionFactory()
+    return collection.getFactory()
       .fromDataSets(collection.getGraphHeads(), newVertices, newEdges);
   }
 }

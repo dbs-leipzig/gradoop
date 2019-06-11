@@ -225,7 +225,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     };
 
     GraphCollection result = input
-      .apply(new ApplySubgraph(vertexFilterFunction, edgeFilterFunction, Subgraph.Strategy.BOTH));
+      .apply(new ApplySubgraph<>(vertexFilterFunction, edgeFilterFunction, Subgraph.Strategy.BOTH));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables(
@@ -274,7 +274,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     };
 
     GraphCollection result = input
-      .apply(new ApplySubgraph(vertexFilterFunction,
+      .apply(new ApplySubgraph<>(vertexFilterFunction,
         null,
         Subgraph.Strategy.VERTEX_INDUCED));
 
@@ -308,7 +308,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1", "g2");
 
-    GraphCollection result = input.apply(new ApplySubgraph(null, e ->
+    GraphCollection result = input.apply(new ApplySubgraph<>(null, e ->
       e.getPropertyValue("since").getInt() == 2015,
       Subgraph.Strategy.EDGE_INDUCED));
 
@@ -342,7 +342,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1", "g2");
 
-    GraphCollection result = input.apply(new ApplySubgraph(null, e ->
+    GraphCollection result = input.apply(new ApplySubgraph<>(null, e ->
       e.getPropertyValue("since").getInt() == 2015,
       Subgraph.Strategy.EDGE_INDUCED_PROJECT_FIRST));
 
@@ -366,7 +366,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     // This means, the test would succeed even though we have too many vertices as a result of the
     // subgraph operator.
     org.junit.Assert.assertEquals(3, sourceGraph
-        .apply(new ApplySubgraph(null, edge ->
+        .apply(new ApplySubgraph<>(null, edge ->
           edge.getPropertyValue("difference").getInt() == 0,
           Subgraph.Strategy.EDGE_INDUCED))
         .getVertices()
