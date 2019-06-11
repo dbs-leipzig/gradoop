@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.api.operators;
 
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.intersection.Intersection;
@@ -26,8 +27,12 @@ import org.gradoop.flink.model.impl.operators.union.Union;
  * @see Union
  * @see Intersection
  * @see Difference
+ *
+ * @param <GC> the type of the graph collection used as input and return value.
  */
-public interface BinaryCollectionToCollectionOperator extends Operator {
+public interface BinaryBaseGraphCollectionToBaseGraphCollectionOperator<
+  GC extends BaseGraphCollection> extends Operator {
+
   /**
    * Executes the operator.
    *
@@ -35,6 +40,5 @@ public interface BinaryCollectionToCollectionOperator extends Operator {
    * @param secondCollection second input collection
    * @return operator result
    */
-  GraphCollection execute(GraphCollection firstCollection,
-    GraphCollection secondCollection);
+  GC execute(GC firstCollection, GC secondCollection);
 }

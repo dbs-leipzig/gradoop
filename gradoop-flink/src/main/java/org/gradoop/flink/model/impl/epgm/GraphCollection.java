@@ -32,7 +32,7 @@ import org.gradoop.flink.model.api.epgm.GraphCollectionOperators;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
-import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
@@ -43,16 +43,11 @@ import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
-import org.gradoop.flink.model.impl.operators.difference.Difference;
-import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
 import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
 import org.gradoop.flink.model.impl.operators.distinction.DistinctByIsomorphism;
 import org.gradoop.flink.model.impl.operators.distinction.GroupByIsomorphism;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds;
-import org.gradoop.flink.model.impl.operators.intersection.Intersection;
-import org.gradoop.flink.model.impl.operators.intersection.IntersectionBroadcast;
-import org.gradoop.flink.model.impl.operators.limit.Limit;
 import org.gradoop.flink.model.impl.operators.matching.transactional.TransactionalPatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
 import org.gradoop.flink.model.impl.operators.selection.Selection;
@@ -62,7 +57,6 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToData
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
-import org.gradoop.flink.model.impl.operators.union.Union;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -240,39 +234,6 @@ public class GraphCollection implements
       returnEmbeddings).execute(this);
   }
 
-  //----------------------------------------------------------------------------
-  // Binary Operators
-  //----------------------------------------------------------------------------
-
-  @Override
-  public GraphCollection union(GraphCollection otherCollection) {
-    return callForCollection(new Union(), otherCollection);
-  }
-
-  @Override
-  public GraphCollection intersect(GraphCollection otherCollection) {
-    return callForCollection(new Intersection(), otherCollection);
-  }
-
-  @Override
-  public GraphCollection intersectWithSmallResult(
-    GraphCollection otherCollection) {
-    return callForCollection(new IntersectionBroadcast(),
-      otherCollection);
-  }
-
-  @Override
-  public GraphCollection difference(GraphCollection otherCollection) {
-    return callForCollection(new Difference(), otherCollection);
-  }
-
-  @Override
-  public GraphCollection differenceWithSmallResult(
-    GraphCollection otherCollection) {
-    return callForCollection(new DifferenceBroadcast(),
-      otherCollection);
-  }
-
   @Override
   public DataSet<Boolean> equalsByGraphIds(GraphCollection other) {
     return new CollectionEqualityByGraphIds().execute(this, other);
@@ -314,7 +275,7 @@ public class GraphCollection implements
 
   @Override
   public GraphCollection callForCollection(
-    BinaryCollectionToCollectionOperator op,
+    BinaryBaseGraphCollectionToBaseGraphCollectionOperator op,
     GraphCollection otherCollection) {
     return op.execute(this, otherCollection);
   }

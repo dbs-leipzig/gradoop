@@ -35,7 +35,7 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadca
  * @param <G> type of the graph head
  * @param <V> the vertex type
  * @param <E> the edge type
- * @param <LG> type of the logical graph instance
+ * @param <LG> type of the base graph instance
  * @param <GC> type of the graph collection
  */
 public class Limit<

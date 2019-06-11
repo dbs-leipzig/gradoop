@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
-import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
@@ -111,61 +111,6 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
   //----------------------------------------------------------------------------
 
   /**
-   * Returns a collection with all logical graphs from two input collections.
-   * Graph equality is based on their identifiers.
-   *
-   * @param otherCollection collection to build union with
-   * @return union of both collections
-   */
-  GraphCollection union(GraphCollection otherCollection);
-
-  /**
-   * Returns a collection with all logical graphs that exist in both input
-   * collections. Graph equality is based on their identifiers.
-   *
-   * @param otherCollection collection to build intersect with
-   * @return intersection of both collections
-   */
-  GraphCollection intersect(GraphCollection otherCollection);
-
-  /**
-   * Returns a collection with all logical graphs that exist in both input
-   * collections. Graph equality is based on their identifiers.
-   * <p>
-   * Implementation that works faster if {@code otherCollection} is small
-   * (e.g. fits in the workers main memory).
-   *
-   * @param otherCollection collection to build intersect with
-   * @return intersection of both collections
-   */
-  GraphCollection intersectWithSmallResult(
-    GraphCollection otherCollection);
-
-  /**
-   * Returns a collection with all logical graphs that are contained in that
-   * collection but not in the other. Graph equality is based on their
-   * identifiers.
-   *
-   * @param otherCollection collection to subtract from that collection
-   * @return difference between that and the other collection
-   */
-  GraphCollection difference(GraphCollection otherCollection);
-
-  /**
-   * Returns a collection with all logical graphs that are contained in that
-   * collection but not in the other. Graph equality is based on their
-   * identifiers.
-   * <p>
-   * Alternate implementation that works faster if the intermediate result
-   * (list of graph identifiers) fits into the workers memory.
-   *
-   * @param otherCollection collection to subtract from that collection
-   * @return difference between that and the other collection
-   */
-  GraphCollection differenceWithSmallResult(
-    GraphCollection otherCollection);
-
-  /**
    * Checks, if another collection contains the same graphs as this graph
    * (by id).
    *
@@ -222,7 +167,7 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    * @return result of given operator
    */
   GraphCollection callForCollection(
-    BinaryCollectionToCollectionOperator op,
+    BinaryBaseGraphCollectionToBaseGraphCollectionOperator op,
     GraphCollection otherCollection);
 
   /**

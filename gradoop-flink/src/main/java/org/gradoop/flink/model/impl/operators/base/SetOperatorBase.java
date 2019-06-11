@@ -17,14 +17,15 @@ package org.gradoop.flink.model.impl.operators.base;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.graphcontainment
-  .PairVertexWithGraphs;
+import org.gradoop.flink.model.impl.functions.graphcontainment.PairVertexWithGraphs;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.operators.base.functions.LeftJoin0OfTuple2;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
@@ -33,15 +34,25 @@ import org.gradoop.flink.model.impl.operators.union.Union;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Base class for set operations that share common methods to build vertex,
- * edge and data sets.
+ * Base class for set operations that share common methods to build vertex, edge and data sets.
  *
  * @see Difference
  * @see Intersection
  * @see Union
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public abstract class SetOperatorBase extends
-  BinaryCollectionToCollectionOperatorBase {
+public abstract class SetOperatorBase<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  extends BinaryCollectionToCollectionOperatorBase<G, V, E, LG, GC> {
 
   /**
    * Computes new vertices based on the new subgraphs. For each vertex, each
@@ -52,10 +63,9 @@ public abstract class SetOperatorBase extends
    * @return vertex set of the resulting graph collection
    */
   @Override
-  protected DataSet<Vertex> computeNewVertices(
-    DataSet<GraphHead> newGraphHeads) {
+  protected DataSet<V> computeNewVertices(DataSet<G> newGraphHeads) {
 
-    DataSet<Tuple2<Vertex, GradoopId>> verticesWithGraphs =
+    DataSet<Tuple2<V, GradoopId>> verticesWithGraphs =
       firstCollection.getVertices().flatMap(new PairVertexWithGraphs<>());
 
     return verticesWithGraphs
@@ -68,8 +78,7 @@ public abstract class SetOperatorBase extends
   }
 
   /**
-   * Constructs new edges by joining the edges of the first graph with the new
-   * vertices.
+   * Constructs new edges by joining the edges of the first graph with the new vertices.
    *
    * @param newVertices vertex set of the resulting graph collection
    * @return edges set only connect vertices in {@code newVertices}
@@ -77,7 +86,7 @@ public abstract class SetOperatorBase extends
    * @see Intersection
    */
   @Override
-  protected DataSet<Edge> computeNewEdges(DataSet<Vertex> newVertices) {
+  protected DataSet<E> computeNewEdges(DataSet<V> newVertices) {
     return firstCollection.getEdges().join(newVertices)
       .where(new SourceId<>())
       .equalTo(new Id<>())

@@ -19,7 +19,13 @@ import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.operators.difference.Difference;
+import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
+import org.gradoop.flink.model.impl.operators.intersection.Intersection;
+import org.gradoop.flink.model.impl.operators.intersection.IntersectionBroadcast;
 import org.gradoop.flink.model.impl.operators.limit.Limit;
+import org.gradoop.flink.model.impl.operators.union.Union;
 import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
 
 /**
@@ -63,6 +69,71 @@ public interface BaseGraphCollectionOperators<
    */
   default GC verifyGraphsContainment() {
     return callForCollection(new VerifyGraphsContainment<>());
+  }
+
+  //----------------------------------------------------------------------------
+  // Binary Operators
+  //----------------------------------------------------------------------------
+
+  /**
+   * Returns a collection with all base graphs from two input collections.
+   * Graph equality is based on their identifiers.
+   *
+   * @param otherCollection collection to build union with
+   * @return union of both collections
+   */
+  default GC union(GC otherCollection) {
+    return callForCollection(new Union(), otherCollection);
+  }
+
+  /**
+   * Returns a collection with all base graphs that exist in both input
+   * collections. Graph equality is based on their identifiers.
+   *
+   * @param otherCollection collection to build intersect with
+   * @return intersection of both collections
+   */
+  default GC intersect(GC otherCollection) {
+    return callForCollection(new Intersection(), otherCollection);
+  }
+
+  /**
+   * Returns a collection with all base graphs that exist in both input
+   * collections. Graph equality is based on their identifiers.
+   * <p>
+   * Implementation that works faster if {@code otherCollection} is small
+   * (e.g. fits in the workers main memory).
+   *
+   * @param otherCollection collection to build intersect with
+   * @return intersection of both collections
+   */
+  default GC intersectWithSmallResult(GC otherCollection) {
+    return callForCollection(new IntersectionBroadcast(),otherCollection);
+  }
+
+  /**
+   * Returns a collection with all base graphs that are contained in that
+   * collection but not in the other. Graph equality is based on their identifiers.
+   *
+   * @param otherCollection collection to subtract from that collection
+   * @return difference between that and the other collection
+   */
+  default GC difference(GC otherCollection) {
+    return callForCollection(new Difference(), otherCollection);
+  }
+
+  /**
+   * Returns a collection with all base graphs that are contained in that
+   * collection but not in the other. Graph equality is based on their identifiers.
+   * <p>
+   * Alternate implementation that works faster if the intermediate result
+   * (list of graph identifiers) fits into the workers memory.
+   *
+   * @param otherCollection collection to subtract from that collection
+   * @return difference between that and the other collection
+   */
+  default GC differenceWithSmallResult(GC otherCollection) {
+    return callForCollection(new DifferenceBroadcast(), otherCollection);
   }
 
   //----------------------------------------------------------------------------

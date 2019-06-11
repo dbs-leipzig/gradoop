@@ -17,20 +17,36 @@ package org.gradoop.flink.model.impl.operators.difference;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
 import org.gradoop.flink.model.impl.operators.difference.functions.CreateTuple2WithLong;
 import org.gradoop.flink.model.impl.operators.difference.functions.IdOf0InTuple2;
 import org.gradoop.flink.model.impl.operators.difference.functions.RemoveCut;
 
 /**
- * Returns a collection with all logical graphs that are contained in the
+ * Returns a collection with all base graphs that are contained in the
  * first input collection but not in the second.
  * Graph equality is based on their respective identifiers.
  *
  * @see DifferenceBroadcast
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class Difference extends SetOperatorBase {
+public class Difference<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends SetOperatorBase<G, V, E, LG, GC> {
 
   /**
    * Computes the logical graph dataset for the resulting collection.
@@ -38,21 +54,21 @@ public class Difference extends SetOperatorBase {
    * @return logical graph dataset of the resulting collection
    */
   @Override
-  protected DataSet<GraphHead> computeNewGraphHeads() {
-    // assign 1L to each logical graph in the first collection
-    DataSet<Tuple2<GraphHead, Long>> thisGraphs = firstCollection
+  protected DataSet<G> computeNewGraphHeads() {
+    // assign 1L to each graph in the first collection
+    DataSet<Tuple2<G, Long>> thisGraphs = firstCollection
       .getGraphHeads()
-      .map(new CreateTuple2WithLong<GraphHead>(1L));
-    // assign 2L to each logical graph in the second collection
-    DataSet<Tuple2<GraphHead, Long>> otherGraphs = secondCollection
+      .map(new CreateTuple2WithLong<>(1L));
+    // assign 2L to each graph in the second collection
+    DataSet<Tuple2<G, Long>> otherGraphs = secondCollection
       .getGraphHeads()
-      .map(new CreateTuple2WithLong<GraphHead>(2L));
+      .map(new CreateTuple2WithLong<>(2L));
 
-    // union the logical graphs, group them by their identifier and check that
+    // union the graphs, group them by their identifier and check that
     // there is no graph in the group that belongs to the second collection
     return thisGraphs
       .union(otherGraphs)
-      .groupBy(new IdOf0InTuple2<GraphHead, Long>())
-      .reduceGroup(new RemoveCut<GraphHead>());
+      .groupBy(new IdOf0InTuple2<>())
+      .reduceGroup(new RemoveCut<>());
   }
 }
