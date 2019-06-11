@@ -15,16 +15,26 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
+import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
+import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
+import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds;
 import org.gradoop.flink.model.impl.operators.intersection.Intersection;
 import org.gradoop.flink.model.impl.operators.intersection.IntersectionBroadcast;
 import org.gradoop.flink.model.impl.operators.limit.Limit;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
+import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.union.Union;
 import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
 
@@ -83,7 +93,7 @@ public interface BaseGraphCollectionOperators<
    * @return union of both collections
    */
   default GC union(GC otherCollection) {
-    return callForCollection(new Union(), otherCollection);
+    return callForCollection(new Union<>(), otherCollection);
   }
 
   /**
@@ -94,7 +104,7 @@ public interface BaseGraphCollectionOperators<
    * @return intersection of both collections
    */
   default GC intersect(GC otherCollection) {
-    return callForCollection(new Intersection(), otherCollection);
+    return callForCollection(new Intersection<>(), otherCollection);
   }
 
   /**
@@ -108,7 +118,7 @@ public interface BaseGraphCollectionOperators<
    * @return intersection of both collections
    */
   default GC intersectWithSmallResult(GC otherCollection) {
-    return callForCollection(new IntersectionBroadcast(),otherCollection);
+    return callForCollection(new IntersectionBroadcast<>(), otherCollection);
   }
 
   /**
@@ -119,7 +129,7 @@ public interface BaseGraphCollectionOperators<
    * @return difference between that and the other collection
    */
   default GC difference(GC otherCollection) {
-    return callForCollection(new Difference(), otherCollection);
+    return callForCollection(new Difference<>(), otherCollection);
   }
 
   /**
@@ -133,7 +143,66 @@ public interface BaseGraphCollectionOperators<
    * @return difference between that and the other collection
    */
   default GC differenceWithSmallResult(GC otherCollection) {
-    return callForCollection(new DifferenceBroadcast(), otherCollection);
+    return callForCollection(new DifferenceBroadcast<>(), otherCollection);
+  }
+
+  /**
+   * Checks, if another collection contains the same graphs as this graph (by id).
+   *
+   * @param otherCollection other graph collection
+   * @return 1-element dataset containing true, if equal by graph ids
+   */
+  default DataSet<Boolean> equalsByGraphIds(GC otherCollection) {
+    return callForCollection(new CollectionEqualityByGraphIds<>(), otherCollection);
+  }
+
+  /**
+   * Checks, if another collection contains the same graphs as this graph (by vertex and edge ids).
+   *
+   * @param otherCollection other graph
+   * @return 1-element dataset containing true, if equal by element ids
+   */
+  default DataSet<Boolean> equalsByGraphElementIds(GC otherCollection) {
+    return callForCollection(new CollectionEquality<>(
+      new GraphHeadToEmptyString<>(),
+      new VertexToIdString<>(),
+      new EdgeToIdString<>(), true), otherCollection);
+  }
+
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which
+   * indicates if the graph collection is equal to the given graph collection.
+   *
+   * Equality is defined on the element data contained inside the collection,
+   * i.e. vertices and edges.
+   *
+   * @param otherCollection graph collection to compare with
+   * @return 1-element dataset containing {@code true} if the two collections
+   * are equal or {@code false} if not
+   */
+  default DataSet<Boolean> equalsByGraphElementData(GC otherCollection) {
+    return callForCollection(new CollectionEquality<>(
+      new GraphHeadToEmptyString<>(),
+      new VertexToDataString<>(),
+      new EdgeToDataString<>(), true), otherCollection);
+  }
+
+  /**
+   * Returns a 1-element dataset containing a {@code boolean} value which
+   * indicates if the graph collection is equal to the given graph collection.
+   *
+   * Equality is defined on the data contained inside the collection, i.e.
+   * graph heads, vertices and edges.
+   *
+   * @param otherCollection graph collection to compare with
+   * @return 1-element dataset containing {@code true} if the two collections
+   * are equal or {@code false} if not
+   */
+  default DataSet<Boolean> equalsByGraphData(GC otherCollection) {
+    return callForCollection(new CollectionEquality<>(
+      new GraphHeadToDataString<>(),
+      new VertexToDataString<>(),
+      new EdgeToDataString<>(), true), otherCollection);
   }
 
   //----------------------------------------------------------------------------
@@ -147,4 +216,27 @@ public interface BaseGraphCollectionOperators<
    * @return result of given operator
    */
   GC callForCollection(UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> operator);
+
+  /**
+   * Calls the given binary collection to value operator using that
+   * graph collection and the input graph collection.
+   *
+   * @param operator        binary collection to value operator
+   * @param otherCollection second input collection for operator
+   * @param <T> return type
+   * @return result of given operator
+   */
+  <T> T callForCollection(BinaryBaseGraphCollectionToValueOperator<GC, T> operator,
+                          GC otherCollection);
+
+  /**
+   * Calls the given binary collection to collection operator using that
+   * graph collection and the input graph collection.
+   *
+   * @param operator        binary collection to collection operator
+   * @param otherCollection second input collection for operator
+   * @return result of given operator
+   */
+  GC callForCollection(BinaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> operator,
+                       GC otherCollection);
 }

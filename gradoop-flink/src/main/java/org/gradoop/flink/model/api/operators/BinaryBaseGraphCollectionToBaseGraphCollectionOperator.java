@@ -31,14 +31,5 @@ import org.gradoop.flink.model.impl.operators.union.Union;
  * @param <GC> the type of the graph collection used as input and return value.
  */
 public interface BinaryBaseGraphCollectionToBaseGraphCollectionOperator<
-  GC extends BaseGraphCollection> extends Operator {
-
-  /**
-   * Executes the operator.
-   *
-   * @param firstCollection  first input collection
-   * @param secondCollection second input collection
-   * @return operator result
-   */
-  GC execute(GC firstCollection, GC secondCollection);
+  GC extends BaseGraphCollection> extends BinaryBaseGraphCollectionToValueOperator<GC, GC> {
 }

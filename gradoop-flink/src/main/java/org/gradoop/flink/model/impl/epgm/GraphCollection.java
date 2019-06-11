@@ -33,6 +33,7 @@ import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
@@ -46,17 +47,9 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
 import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
 import org.gradoop.flink.model.impl.operators.distinction.DistinctByIsomorphism;
 import org.gradoop.flink.model.impl.operators.distinction.GroupByIsomorphism;
-import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
-import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds;
 import org.gradoop.flink.model.impl.operators.matching.transactional.TransactionalPatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
 import org.gradoop.flink.model.impl.operators.selection.Selection;
-import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToEmptyString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
-import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -234,35 +227,6 @@ public class GraphCollection implements
       returnEmbeddings).execute(this);
   }
 
-  @Override
-  public DataSet<Boolean> equalsByGraphIds(GraphCollection other) {
-    return new CollectionEqualityByGraphIds().execute(this, other);
-  }
-
-  @Override
-  public DataSet<Boolean> equalsByGraphElementIds(GraphCollection other) {
-    return new CollectionEquality(
-      new GraphHeadToEmptyString(),
-      new VertexToIdString(),
-      new EdgeToIdString(), true).execute(this, other);
-  }
-
-  @Override
-  public DataSet<Boolean> equalsByGraphElementData(GraphCollection other) {
-    return new CollectionEquality(
-      new GraphHeadToEmptyString(),
-      new VertexToDataString(),
-      new EdgeToDataString(), true).execute(this, other);
-  }
-
-  @Override
-  public DataSet<Boolean> equalsByGraphData(GraphCollection other) {
-    return new CollectionEquality(
-      new GraphHeadToDataString(),
-      new VertexToDataString(),
-      new EdgeToDataString(), true).execute(this, other);
-  }
-
   //----------------------------------------------------------------------------
   // Auxiliary Operators
   //----------------------------------------------------------------------------
@@ -275,9 +239,16 @@ public class GraphCollection implements
 
   @Override
   public GraphCollection callForCollection(
-    BinaryBaseGraphCollectionToBaseGraphCollectionOperator op,
+    BinaryBaseGraphCollectionToBaseGraphCollectionOperator<GraphCollection> operator,
     GraphCollection otherCollection) {
-    return op.execute(this, otherCollection);
+    return operator.execute(this, otherCollection);
+  }
+
+  @Override
+  public <T> T callForCollection(
+    BinaryBaseGraphCollectionToValueOperator<GraphCollection, T> operator,
+    GraphCollection otherCollection) {
+    return operator.execute(this, otherCollection);
   }
 
   @Override

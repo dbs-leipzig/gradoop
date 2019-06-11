@@ -16,8 +16,12 @@
 package org.gradoop.flink.model.impl.operators.tostring;
 
 import org.apache.commons.io.FileUtils;
+import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataString;
@@ -36,11 +40,11 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
 
     GraphCollection g = loader.getGraphCollection();
 
-    CanonicalAdjacencyMatrixBuilder cam =
-      new CanonicalAdjacencyMatrixBuilder(
-        new GraphHeadToDataString(),
-        new VertexToDataString(),
-        new EdgeToDataString(), true);
+    CanonicalAdjacencyMatrixBuilder<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection> cam =
+      new CanonicalAdjacencyMatrixBuilder<>(
+        new GraphHeadToDataString<>(),
+        new VertexToDataString<>(),
+        new EdgeToDataString<>(), true);
 
     String result = cam.execute(g).collect().get(0);
 
@@ -58,11 +62,11 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
 
     GraphCollection g = loader.getGraphCollection();
 
-    CanonicalAdjacencyMatrixBuilder cam =
-      new CanonicalAdjacencyMatrixBuilder(
-        new GraphHeadToDataString(),
-        new VertexToDataString(),
-        new EdgeToDataString(), false);
+    CanonicalAdjacencyMatrixBuilder<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection> cam =
+      new CanonicalAdjacencyMatrixBuilder<>(
+        new GraphHeadToDataString<>(),
+        new VertexToDataString<>(),
+        new EdgeToDataString<>(), false);
 
     String result = cam.execute(g).collect().get(0);
 

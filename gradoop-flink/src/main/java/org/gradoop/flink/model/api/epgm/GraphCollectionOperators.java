@@ -16,14 +16,12 @@
 package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
-import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
@@ -107,68 +105,8 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
     boolean returnEmbeddings);
 
   //----------------------------------------------------------------------------
-  // Binary operators
-  //----------------------------------------------------------------------------
-
-  /**
-   * Checks, if another collection contains the same graphs as this graph
-   * (by id).
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, if equal by graph ids
-   */
-  DataSet<Boolean> equalsByGraphIds(GraphCollection other);
-
-  /**
-   * Checks, if another collection contains the same graphs as this graph
-   * (by vertex and edge ids).
-   *
-   * @param other other graph
-   * @return 1-element dataset containing true, if equal by element ids
-   */
-  DataSet<Boolean> equalsByGraphElementIds(GraphCollection other);
-
-  /**
-   * Returns a 1-element dataset containing a {@code boolean} value which
-   * indicates if the graph collection is equal to the given graph collection.
-   *
-   * Equality is defined on the element data contained inside the collection,
-   * i.e. vertices and edges.
-   *
-   * @param other graph collection to compare with
-   * @return  1-element dataset containing {@code true} if the two collections
-   *          are equal or {@code false} if not
-   */
-  DataSet<Boolean> equalsByGraphElementData(GraphCollection other);
-
-  /**
-   * Returns a 1-element dataset containing a {@code boolean} value which
-   * indicates if the graph collection is equal to the given graph collection.
-   *
-   * Equality is defined on the data contained inside the collection, i.e.
-   * graph heads, vertices and edges.
-   *
-   * @param other graph collection to compare with
-   * @return  1-element dataset containing {@code true} if the two collections
-   *          are equal or {@code false} if not
-   */
-  DataSet<Boolean> equalsByGraphData(GraphCollection other);
-
-  //----------------------------------------------------------------------------
   // Auxiliary operators
   //----------------------------------------------------------------------------
-
-  /**
-   * Calls the given binary collection to collection operator using that
-   * graph and the input graph.
-   *
-   * @param op              binary collection to collection operator
-   * @param otherCollection second input collection for operator
-   * @return result of given operator
-   */
-  GraphCollection callForCollection(
-    BinaryBaseGraphCollectionToBaseGraphCollectionOperator op,
-    GraphCollection otherCollection);
 
   /**
    * Calls the given unary collection to graph operator for the collection.

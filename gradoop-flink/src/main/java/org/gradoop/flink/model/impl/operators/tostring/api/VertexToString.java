@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.tostring.api;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
 
 /**
@@ -24,5 +24,5 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
  *
  * @param <V> vertex type
  */
-public interface VertexToString<V extends Vertex> extends FlatMapFunction<V, VertexString> {
+public interface VertexToString<V extends EPGMVertex> extends FlatMapFunction<V, VertexString> {
 }
