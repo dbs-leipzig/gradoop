@@ -113,7 +113,7 @@ public class LogicalGraph implements
   }
 
   @Override
-  public BaseGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection>
+  public BaseGraphCollectionFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>
   getCollectionFactory() {
     return config.getGraphCollectionFactory();
   }

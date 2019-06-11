@@ -45,7 +45,7 @@ public class ReduceEdgeNeighborhood<
   V extends EPGMVertex,
   E extends EPGMEdge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, GC>> extends EdgeNeighborhood<LG> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends EdgeNeighborhood<LG> {
 
   /**
    * Valued constructor.

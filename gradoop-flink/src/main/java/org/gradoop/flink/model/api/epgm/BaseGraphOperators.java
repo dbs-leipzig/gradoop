@@ -57,7 +57,7 @@ public interface BaseGraphOperators<
   V extends EPGMVertex,
   E extends EPGMEdge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, GC>> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> {
 
   //----------------------------------------------------------------------------
   // Unary Operators

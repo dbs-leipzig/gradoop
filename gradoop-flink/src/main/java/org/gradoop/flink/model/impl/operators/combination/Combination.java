@@ -38,7 +38,8 @@ public class Combination<
   V extends EPGMVertex,
   E extends EPGMEdge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, GC>> implements BinaryBaseGraphToBaseGraphOperator<LG> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements BinaryBaseGraphToBaseGraphOperator<LG> {
 
   /**
    * Creates a new logical graph by union the vertex and edge sets of two

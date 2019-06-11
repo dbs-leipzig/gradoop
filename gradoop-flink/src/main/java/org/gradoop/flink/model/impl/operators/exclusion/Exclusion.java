@@ -59,7 +59,8 @@ public class Exclusion<
   V extends EPGMVertex,
   E extends EPGMEdge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, GC>> implements BinaryBaseGraphToBaseGraphOperator<LG> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements BinaryBaseGraphToBaseGraphOperator<LG> {
 
   @Override
   public LG execute(LG firstGraph, LG secondGraph) {

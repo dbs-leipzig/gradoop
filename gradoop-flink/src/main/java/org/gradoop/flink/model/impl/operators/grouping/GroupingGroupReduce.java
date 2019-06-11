@@ -67,7 +67,7 @@ public class GroupingGroupReduce<
   V extends EPGMVertex,
   E extends EPGMEdge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, GC>> extends Grouping<G, V, E, LG, GC> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends Grouping<G, V, E, LG, GC> {
   /**
    * Creates grouping operator instance.
    *
