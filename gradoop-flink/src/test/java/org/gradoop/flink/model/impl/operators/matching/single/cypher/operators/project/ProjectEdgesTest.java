@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
@@ -52,7 +52,7 @@ public class ProjectEdgesTest extends PhysicalOperatorTest {
   @Test
   public void testProjectLoop() throws Exception {
     GradoopId a = GradoopId.get();
-    EPGMEdge edge = new EdgeFactory().createEdge(a, a);
+    EPGMEdge edge = new EPGMEdgeFactory().createEdge(a, a);
 
     DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(edge);
 

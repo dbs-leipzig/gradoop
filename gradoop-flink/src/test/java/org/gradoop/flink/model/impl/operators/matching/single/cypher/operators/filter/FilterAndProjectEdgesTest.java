@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
@@ -39,7 +39,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
   public void testFilterWithNoPredicates() throws Exception {
     CNF predicates = predicateFromQuery("MATCH ()-[a]->()");
 
-    EdgeFactory edgeFactory = new EdgeFactory();
+    EPGMEdgeFactory edgeFactory = new EPGMEdgeFactory();
     Properties properties = Properties.create();
     properties.set("name", "Anton");
     EPGMEdge e1 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get(), properties);
@@ -58,7 +58,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
   public void testFilterEdgesByProperties() throws Exception {
     CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.since > 2013");
 
-    EdgeFactory edgeFactory = new EdgeFactory();
+    EPGMEdgeFactory edgeFactory = new EPGMEdgeFactory();
     Properties properties = Properties.create();
     properties.set("since", 2014);
     EPGMEdge e1 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get(), properties);
@@ -81,7 +81,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
   public void testFilterEdgesByLabel() throws Exception {
     CNF predicates = predicateFromQuery("MATCH ()-[a:likes]->()");
 
-    EdgeFactory edgeFactory = new EdgeFactory();
+    EPGMEdgeFactory edgeFactory = new EPGMEdgeFactory();
     EPGMEdge e1 = edgeFactory.createEdge("likes", GradoopId.get(), GradoopId.get());
     EPGMEdge e2 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get());
     DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(e1, e2);
@@ -101,7 +101,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     Properties properties = Properties.create();
     properties.set("name", "Alice");
     EPGMEdge
-      edge = new EdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties);
+      edge = new EPGMEdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties);
 
     DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(edge);
 
@@ -121,7 +121,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     Properties properties = Properties.create();
     properties.set("name", "Alice");
     EPGMEdge
-      edge = new EdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties);
+      edge = new EPGMEdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties);
 
     DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(edge);
 
@@ -140,7 +140,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     Properties properties = Properties.create();
     properties.set("name", "Alice");
     EPGMEdge
-      edge = new EdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties);
+      edge = new EPGMEdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties);
 
     DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(edge);
 
@@ -158,7 +158,7 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     CNF predicates = predicateFromQuery("MATCH (a)-[b]->(a)");
 
     GradoopId a = GradoopId.get();
-    EPGMEdge edge = new EdgeFactory().createEdge(a, a);
+    EPGMEdge edge = new EPGMEdgeFactory().createEdge(a, a);
 
     DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(edge);
 

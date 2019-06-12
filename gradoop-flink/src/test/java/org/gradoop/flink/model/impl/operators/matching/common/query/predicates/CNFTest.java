@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 import com.google.common.collect.Sets;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -186,7 +186,7 @@ public class CNFTest {
 
     Properties properties = new Properties();
     properties.set("name", "Alice");
-    EPGMVertex vertex = new VertexFactory().createVertex("Person", properties);
+    EPGMVertex vertex = new EPGMVertexFactory().createVertex("Person", properties);
     assertTrue(cnf.evaluate(vertex));
 
     properties.set("name", "Bob");
@@ -200,7 +200,7 @@ public class CNFTest {
 
     Properties properties = new Properties();
     properties.set("age", 42);
-    EPGMVertex vertex = new VertexFactory().createVertex("Person", properties);
+    EPGMVertex vertex = new EPGMVertexFactory().createVertex("Person", properties);
     assertFalse(cnf.evaluate(vertex));
   }
 

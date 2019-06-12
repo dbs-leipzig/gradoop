@@ -17,8 +17,8 @@ package org.gradoop.storage.impl.accumulo.io.source;
 
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.Element;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
@@ -53,7 +53,7 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
 
       //vertex id query
       GradoopIdSet ids = GradoopIdSet.fromExisting(inputVertices.stream()
-        .map(Element::getId)
+        .map(EPGMElement::getId)
         .collect(Collectors.toList()));
 
       AccumuloDataSource source = new AccumuloDataSource(store, config);
@@ -86,7 +86,7 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
 
       //edge id query
       GradoopIdSet ids = GradoopIdSet.fromExisting(inputEdges.stream()
-        .map(Element::getId)
+        .map(EPGMElement::getId)
         .collect(Collectors.toList()));
 
       AccumuloDataSource source = new AccumuloDataSource(store, config);
@@ -119,7 +119,7 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
 
       //vertex id query
       GradoopIdSet ids = GradoopIdSet.fromExisting(inputGraphs.stream()
-        .map(Element::getId)
+        .map(EPGMElement::getId)
         .collect(Collectors.toList()));
 
       AccumuloDataSource source = new AccumuloDataSource(store, config);

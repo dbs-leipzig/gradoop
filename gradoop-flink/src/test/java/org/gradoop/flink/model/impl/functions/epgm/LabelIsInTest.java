@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +36,7 @@ public class LabelIsInTest extends GradoopFlinkTestBase {
   /**
    * The comparator used to sort results.
    */
-  private Comparator<EPGMVertex> comparator = Comparator.comparing(Element::getId);
+  private Comparator<EPGMVertex> comparator = Comparator.comparing(EPGMElement::getId);
 
   /**
    * Some test vertices to filter.
@@ -53,7 +53,7 @@ public class LabelIsInTest extends GradoopFlinkTestBase {
    */
   @Before
   public void setUp() {
-    VertexFactory vertexFactory = getConfig().getVertexFactory();
+    EPGMVertexFactory vertexFactory = getConfig().getVertexFactory();
     EPGMVertex v1 = vertexFactory.createVertex();
     EPGMVertex v2 = vertexFactory.createVertex("a");
     EPGMVertex v3 = vertexFactory.createVertex("b");

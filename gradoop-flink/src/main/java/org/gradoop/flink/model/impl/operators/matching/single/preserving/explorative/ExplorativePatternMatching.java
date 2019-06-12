@@ -22,12 +22,12 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.log4j.Logger;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
@@ -127,8 +127,8 @@ public class ExplorativePatternMatching
   @Override
   protected GraphCollection executeForVertex(LogicalGraph graph) {
     GradoopFlinkConfig config = graph.getConfig();
-    EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory = config.getGraphHeadFactory();
-    EPGMVertexFactory<EPGMVertex> vertexFactory = config.getVertexFactory();
+    GraphHeadFactory<EPGMGraphHead> graphHeadFactory = config.getGraphHeadFactory();
+    VertexFactory<EPGMVertex> vertexFactory = config.getVertexFactory();
     String variable = getQueryHandler().getVertices().iterator().next().getVariable();
 
     DataSet<EPGMVertex> matchingVertices = graph.getVertices()
@@ -211,7 +211,7 @@ public class ExplorativePatternMatching
     // Post-Processing (build Graph Collection from embeddings)
     //--------------------------------------------------------------------------
 
-    DataSet<Element> elements = embeddings
+    DataSet<EPGMElement> elements = embeddings
       .flatMap(new ElementsFromEmbedding(traversalCode,
         graph.getConfig().getGraphHeadFactory(),
         graph.getConfig().getVertexFactory(),

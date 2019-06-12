@@ -18,7 +18,7 @@ package org.gradoop.dataintegration.transformation.functions;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -44,7 +44,7 @@ public class AccumulatePropagatedValuesTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testCoGroup() throws Exception {
-    VertexFactory vertexFactory = getConfig().getVertexFactory();
+    EPGMVertexFactory vertexFactory = getConfig().getVertexFactory();
     EPGMVertex v1 = vertexFactory.createVertex("a");
     Tuple2<GradoopId, PropertyValue> property1 = Tuple2.of(v1.getId(), PropertyValue.create(1L));
     EPGMVertex v2 = vertexFactory.createVertex("a");

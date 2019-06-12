@@ -24,7 +24,7 @@ import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.impl.graph.tuples.ImportVertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -45,7 +45,7 @@ public class InitVertex<K extends Comparable<K>>
   /**
    * Used to create new EPGM vertex.
    */
-  private final EPGMVertexFactory<EPGMVertex> vertexFactory;
+  private final VertexFactory<EPGMVertex> vertexFactory;
 
   /**
    * Reduce object instantiation.
@@ -59,7 +59,7 @@ public class InitVertex<K extends Comparable<K>>
    *                            (can be {@code null})
    * @param externalIdType         type info for the import vertex identifier
    */
-  public InitVertex(EPGMVertexFactory<EPGMVertex> epgmVertexFactory,
+  public InitVertex(VertexFactory<EPGMVertex> epgmVertexFactory,
     String lineagePropertyKey, TypeInformation<K> externalIdType) {
     super(lineagePropertyKey, externalIdType);
     this.vertexFactory      = epgmVertexFactory;

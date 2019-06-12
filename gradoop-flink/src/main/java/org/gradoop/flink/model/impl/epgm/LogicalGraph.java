@@ -93,7 +93,8 @@ import java.util.Objects;
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class LogicalGraph implements
-  BaseGraph<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>, LogicalGraphOperators {
+  BaseGraph<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>,
+  LogicalGraphOperators {
   /**
    * Layout for that logical graph.
    */
@@ -109,7 +110,8 @@ public class LogicalGraph implements
    * @param layout representation of the logical graph
    * @param config the Gradoop Flink configuration
    */
-  LogicalGraph(LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> layout, GradoopFlinkConfig config) {
+  LogicalGraph(LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> layout,
+    GradoopFlinkConfig config) {
     Objects.requireNonNull(layout);
     Objects.requireNonNull(config);
     this.layout = layout;
@@ -126,13 +128,14 @@ public class LogicalGraph implements
   }
 
   @Override
-  public BaseGraphFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> getFactory() {
+  public BaseGraphFactory<
+    EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> getFactory() {
     return config.getLogicalGraphFactory();
   }
 
   @Override
-  public BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
-  getCollectionFactory() {
+  public BaseGraphCollectionFactory<
+    EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> getCollectionFactory() {
     return config.getGraphCollectionFactory();
   }
 

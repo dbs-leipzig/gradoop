@@ -18,12 +18,12 @@ package org.gradoop.common.model.api.entities;
 import java.io.Serializable;
 
 /**
- * Base interface for all elements in the EPGM.
+ * Base interface for all elements.
  *
  * @see GraphHead
  * @see Vertex
  * @see Edge
  */
-public interface EPGMElement
-  extends EPGMIdentifiable, EPGMLabeled, EPGMAttributed, Serializable {
+public interface Element
+  extends Identifiable, Labeled, Attributed, Serializable {
 }

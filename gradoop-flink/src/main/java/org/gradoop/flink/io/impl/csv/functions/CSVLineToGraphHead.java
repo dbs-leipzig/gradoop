@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.io.impl.csv.functions;
 
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
@@ -33,14 +33,14 @@ public class CSVLineToGraphHead extends CSVLineToElement<EPGMGraphHead> {
   /**
    * Used to create the graph head.
    */
-  private final EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory;
+  private final GraphHeadFactory<EPGMGraphHead> graphHeadFactory;
 
   /**
    * Creates a CSVLineToGraphHead converter
    *
    * @param graphHeadFactory The factory class that is used to create the graph heads.
    */
-  public CSVLineToGraphHead(EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory) {
+  public CSVLineToGraphHead(GraphHeadFactory<EPGMGraphHead> graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 

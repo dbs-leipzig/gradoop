@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -36,7 +36,7 @@ public class TransformGraphTransaction implements MapFunction<GraphTransaction, 
   /**
    * Factory to init modified graph head.
    */
-  private final EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory;
+  private final GraphHeadFactory<EPGMGraphHead> graphHeadFactory;
   /**
    * Graph head modification function
    */
@@ -45,7 +45,7 @@ public class TransformGraphTransaction implements MapFunction<GraphTransaction, 
   /**
    * Factory to init modified vertex.
    */
-  private final EPGMVertexFactory<EPGMVertex> vertexFactory;
+  private final VertexFactory<EPGMVertex> vertexFactory;
 
   /**
    * EPGMVertex modification function
@@ -55,7 +55,7 @@ public class TransformGraphTransaction implements MapFunction<GraphTransaction, 
   /**
    * Factory to init modified edge.
    */
-  private final EPGMEdgeFactory<EPGMEdge> edgeFactory;
+  private final EdgeFactory<EPGMEdge> edgeFactory;
   /**
    * EPGMEdge modification function
    */
@@ -71,9 +71,9 @@ public class TransformGraphTransaction implements MapFunction<GraphTransaction, 
    * @param edgeFactory edge factory
    * @param edgeTransFunc edge transformation function
    */
-  public TransformGraphTransaction(EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory,
-    TransformationFunction<EPGMGraphHead> graphHeadTransFunc, EPGMVertexFactory<EPGMVertex> vertexFactory,
-    TransformationFunction<EPGMVertex> vertexTransFunc, EPGMEdgeFactory<EPGMEdge> edgeFactory,
+  public TransformGraphTransaction(GraphHeadFactory<EPGMGraphHead> graphHeadFactory,
+    TransformationFunction<EPGMGraphHead> graphHeadTransFunc, VertexFactory<EPGMVertex> vertexFactory,
+    TransformationFunction<EPGMVertex> vertexTransFunc, EdgeFactory<EPGMEdge> edgeFactory,
     TransformationFunction<EPGMEdge> edgeTransFunc) {
     this.graphHeadFactory = graphHeadFactory;
     this.graphHeadTransFunc = graphHeadTransFunc;

@@ -16,11 +16,11 @@
 package org.gradoop.common.model.api.entities;
 
 /**
- * Base interfaces for all EPGM factories.
+ * Base interface for all element factories.
  *
- * @param <EL> EPGM element type
+ * @param <EL> element type
  */
-public interface EPGMElementFactory<EL extends EPGMElement> {
+public interface ElementFactory<EL extends Element> {
   /**
    * Returns the type of the instances produced by that factory.
    *

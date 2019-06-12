@@ -22,8 +22,8 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -170,12 +170,12 @@ public class GradoopFlinkTestUtils {
     assertEqualGraphElements(a, b);
   }
 
-  private static void assertEqualGraphElements(EPGMGraphElement a, EPGMGraphElement b) {
+  private static void assertEqualGraphElements(GraphElement a, GraphElement b) {
     Assert.assertEquals(a.getGraphIds(), b.getGraphIds());
     assertEqualElements(a, b);
   }
 
-  private static void assertEqualElements(EPGMElement a, EPGMElement b) {
+  private static void assertEqualElements(Element a, Element b) {
     Assert.assertEquals(a.getId(), b.getId());
     Assert.assertEquals(a.getLabel(), b.getLabel());
     assertTrue(a.getProperties() == null && b.getProperties() == null ||

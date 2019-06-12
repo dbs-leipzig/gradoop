@@ -23,7 +23,7 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.storage.impl.accumulo.handler.AccumuloEdgeHandler;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopEdgeIterator;
@@ -69,7 +69,7 @@ public class EdgeInputFormat extends BaseInputFormat<EPGMEdge> {
   @Override
   protected void initiate() {
     iterator = new GradoopEdgeIterator();
-    handler = new AccumuloEdgeHandler(new EdgeFactory());
+    handler = new AccumuloEdgeHandler(new EPGMEdgeFactory());
   }
 
   @Override

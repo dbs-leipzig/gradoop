@@ -23,9 +23,9 @@ import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.api.DataSink;
@@ -162,15 +162,15 @@ public class CSVDataSinkTest extends CSVTestBase {
     props.set(GradoopTestUtils.KEY_5, map2);
     props.set(GradoopTestUtils.KEY_6, map3);
 
-    EPGMGraphHead graphHead = new GraphHeadFactory().createGraphHead(string1, props);
+    EPGMGraphHead graphHead = new EPGMGraphHeadFactory().createGraphHead(string1, props);
     DataSet<EPGMGraphHead> graphHeads = env.fromElements(graphHead);
 
-    EPGMVertex vertex = new VertexFactory().createVertex(string1, props);
+    EPGMVertex vertex = new EPGMVertexFactory().createVertex(string1, props);
     DataSet<EPGMVertex> vertices = env.fromElements(vertex)
       .map(new AddToGraph<>(graphHead))
       .withForwardedFields("id;label;properties");
 
-    DataSet<EPGMEdge> edges = env.fromElements(new EdgeFactory()
+    DataSet<EPGMEdge> edges = env.fromElements(new EPGMEdgeFactory()
       .createEdge(string1, vertex.getId(), vertex.getId(), props))
       .map(new AddToGraph<>(graphHead))
       .withForwardedFields("id;label;properties");

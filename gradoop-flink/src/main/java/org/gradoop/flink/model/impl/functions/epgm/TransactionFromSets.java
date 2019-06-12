@@ -41,8 +41,8 @@ import java.util.Set;
  */
 @FunctionAnnotation.ForwardedFieldsFirst("*->f0")
 @FunctionAnnotation.ForwardedFieldsSecond("f1;f2")
-public class TransactionFromSets
-  implements JoinFunction<EPGMGraphHead, Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>>, GraphTransaction> {
+public class TransactionFromSets implements
+  JoinFunction<EPGMGraphHead, Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>>, GraphTransaction> {
   /**
    * Used if right hand side is empty
    */
@@ -57,8 +57,8 @@ public class TransactionFromSets
   private final GraphTransaction reuseTransaction = new GraphTransaction();
 
   @Override
-  public GraphTransaction join(EPGMGraphHead graphHead, Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>> sets)
-    throws Exception {
+  public GraphTransaction join(EPGMGraphHead graphHead, Tuple3<GradoopId, Set<EPGMVertex>,
+    Set<EPGMEdge>> sets) throws Exception {
 
     reuseTransaction.setGraphHead(graphHead);
     reuseTransaction.setVertices(sets == null ? EMPTY_VERTEX_SET : sets.f1);

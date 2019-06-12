@@ -15,7 +15,7 @@
  */
 package org.gradoop.common.model.impl.pojo;
 
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -26,9 +26,9 @@ import java.io.Serializable;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Factory for creating edge POJOs.
+ * Factory for creating EPGM edge POJOs.
  */
-public class EdgeFactory implements EPGMEdgeFactory<EPGMEdge>, Serializable {
+public class EPGMEdgeFactory implements EdgeFactory<EPGMEdge>, Serializable {
 
   /**
    * serial version uid

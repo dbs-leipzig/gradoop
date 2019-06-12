@@ -15,8 +15,8 @@
  */
 package org.gradoop.flink.model.api.functions;
 
-import org.gradoop.common.model.api.entities.EPGMAttributed;
-import org.gradoop.common.model.api.entities.EPGMLabeled;
+import org.gradoop.common.model.api.entities.Attributed;
+import org.gradoop.common.model.api.entities.Labeled;
 
 import java.io.Serializable;
 
@@ -26,7 +26,7 @@ import java.io.Serializable;
  *
  * @param <EL> EPGM attributed / labeled element
  */
-public interface TransformationFunction<EL extends EPGMAttributed & EPGMLabeled>
+public interface TransformationFunction<EL extends Attributed & Labeled>
   extends Serializable {
 
   /**
@@ -49,7 +49,7 @@ public interface TransformationFunction<EL extends EPGMAttributed & EPGMLabeled>
    * @param <EL> EPGM attributed / labeled element
    * @return a function that always returns the current element
    */
-  static <EL extends EPGMAttributed & EPGMLabeled> TransformationFunction<EL>
+  static <EL extends Attributed & Labeled> TransformationFunction<EL>
   keep() {
     return (c, t) -> c;
   }

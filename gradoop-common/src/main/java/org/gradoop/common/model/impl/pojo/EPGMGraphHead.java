@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 /**
  * POJO Implementation of an EPGM graph head.
  */
-public class EPGMGraphHead extends Element implements GraphHead {
+public class EPGMGraphHead extends EPGMElement implements GraphHead {
 
   /**
    * Default constructor.

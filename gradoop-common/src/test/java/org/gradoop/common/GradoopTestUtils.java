@@ -24,9 +24,9 @@ import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
 import org.apache.flink.types.Value;
 import org.gradoop.common.config.GradoopConfig;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
-import org.gradoop.common.model.api.entities.EPGMIdentifiable;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphElement;
+import org.gradoop.common.model.api.entities.Identifiable;
 import org.gradoop.common.model.impl.comparators.EPGMIdentifiableComparator;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
@@ -101,7 +101,7 @@ public class GradoopTestUtils {
   public static final short               SHORT_VAL_e               = (short) 23;
   public static final Set<PropertyValue>  SET_VAL_f                 = new HashSet<>();
 
-  private static Comparator<EPGMIdentifiable> ID_COMPARATOR = new EPGMIdentifiableComparator();
+  private static Comparator<Identifiable> ID_COMPARATOR = new EPGMIdentifiableComparator();
 
   static {
     MAP_VAL_9.put(PropertyValue.create(KEY_0), PropertyValue.create(NULL_VAL_0));
@@ -233,22 +233,22 @@ public class GradoopTestUtils {
    * @param collection2 second collection
    */
   public static void validateEPGMElementCollections(
-    Collection<? extends EPGMElement> collection1,
-    Collection<? extends EPGMElement> collection2) {
+    Collection<? extends Element> collection1,
+    Collection<? extends Element> collection2) {
     assertNotNull("first collection was null", collection1);
     assertNotNull("second collection was null", collection1);
     assertEquals(String.format(
       "collections of different size: %d and %d", collection1.size(), collection2.size()),
       collection1.size(), collection2.size());
 
-    List<? extends EPGMElement> list1 = Lists.newArrayList(collection1);
-    List<? extends EPGMElement> list2 = Lists.newArrayList(collection2);
+    List<? extends Element> list1 = Lists.newArrayList(collection1);
+    List<? extends Element> list2 = Lists.newArrayList(collection2);
 
     Collections.sort(list1, ID_COMPARATOR);
     Collections.sort(list2, ID_COMPARATOR);
 
-    Iterator<? extends EPGMElement> it1 = list1.iterator();
-    Iterator<? extends EPGMElement> it2 = list2.iterator();
+    Iterator<? extends Element> it1 = list1.iterator();
+    Iterator<? extends Element> it2 = list2.iterator();
 
     while (it1.hasNext()) {
       validateEPGMElements(
@@ -267,19 +267,19 @@ public class GradoopTestUtils {
    * @param collection2 second collection
    */
   public static void validateEPGMGraphElementCollections(
-    Collection<? extends EPGMGraphElement> collection1,
-    Collection<? extends EPGMGraphElement> collection2) {
+    Collection<? extends GraphElement> collection1,
+    Collection<? extends GraphElement> collection2) {
     assertNotNull("first collection was null", collection1);
     assertNotNull("second collection was null", collection1);
 
-    List<? extends EPGMGraphElement> list1 = Lists.newArrayList(collection1);
-    List<? extends EPGMGraphElement> list2 = Lists.newArrayList(collection2);
+    List<? extends GraphElement> list1 = Lists.newArrayList(collection1);
+    List<? extends GraphElement> list2 = Lists.newArrayList(collection2);
 
     Collections.sort(list1, ID_COMPARATOR);
     Collections.sort(list2, ID_COMPARATOR);
 
-    Iterator<? extends EPGMGraphElement> it1 = list1.iterator();
-    Iterator<? extends EPGMGraphElement> it2 = list2.iterator();
+    Iterator<? extends GraphElement> it1 = list1.iterator();
+    Iterator<? extends GraphElement> it2 = list2.iterator();
 
     while (it1.hasNext()) {
       validateEPGMGraphElements(it1.next(), it2.next());
@@ -295,7 +295,8 @@ public class GradoopTestUtils {
    * @param element1 first element
    * @param element2 second element
    */
-  public static void validateEPGMElements(EPGMElement element1, EPGMElement element2) {
+  public static void validateEPGMElements(
+    Element element1, Element element2) {
     assertNotNull("first element was null", element1);
     assertNotNull("second element was null", element2);
 
@@ -336,7 +337,7 @@ public class GradoopTestUtils {
    * @param element2 second element
    */
   public static void validateEPGMGraphElements(
-    EPGMGraphElement element1, EPGMGraphElement element2) {
+    GraphElement element1, GraphElement element2) {
 
     assertNotNull("first element was null", element1);
     assertNotNull("second element was null", element2);

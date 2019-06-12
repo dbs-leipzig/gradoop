@@ -16,7 +16,7 @@
 package org.gradoop.flink.io.impl.tlf;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMLabeled;
+import org.gradoop.common.model.api.entities.Labeled;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
@@ -171,7 +171,7 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
     //get vertices of the first transaction/graph
     Vertex[] vertexArray = graphTransaction.getVertices().toArray(new Vertex[0]);
     //sort vertices by label(alphabetically)
-    Arrays.sort(vertexArray, Comparator.comparing(EPGMLabeled::getLabel));
+    Arrays.sort(vertexArray, Comparator.comparing(Labeled::getLabel));
 
     assertEquals("Wrong vertex label", "0", vertexArray[0].getLabel());
     assertEquals("Wrong vertex label", "1", vertexArray[1].getLabel());

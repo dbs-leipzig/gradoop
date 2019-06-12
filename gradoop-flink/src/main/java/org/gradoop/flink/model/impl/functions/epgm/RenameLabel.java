@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -27,12 +27,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * A serializable function that is applied on an EPGM element (i.e. graph head,
  * vertex and edge) to rename a label
  *
- * @param <T> the {@link EPGMElement} which is target of change, e.g.
+ * @param <T> the {@link Element} which is target of change, e.g.
  * {@link EPGMVertex},
  * {@link EPGMEdge} or
  * {@link EPGMGraphHead}
  */
-public class RenameLabel<T extends EPGMElement> implements TransformationFunction<T> {
+public class RenameLabel<T extends Element> implements TransformationFunction<T> {
 
   /**
    * the old label which will be renamed by the process

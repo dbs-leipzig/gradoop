@@ -26,9 +26,9 @@ import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -48,7 +48,7 @@ public class RenamePropertyKeysTest extends GradoopFlinkTestBase {
     props.set("k2", "v2");
 
     GraphHead graphHead =
-        new GraphHeadFactory().initGraphHead(graphID, label, props);
+        new EPGMGraphHeadFactory().initGraphHead(graphID, label, props);
 
     HashMap<String, String> newProps = new HashMap<>();
     newProps.put("k1", "new_k1");
@@ -77,7 +77,7 @@ public class RenamePropertyKeysTest extends GradoopFlinkTestBase {
     props.set("k2", "v2");
 
     Edge edge =
-        new EdgeFactory().initEdge(edgeId, label, sourceId, targetId, props);
+        new EPGMEdgeFactory().initEdge(edgeId, label, sourceId, targetId, props);
 
     HashMap<String, String> newProps = new HashMap<>();
     newProps.put("k1", "new_k1");
@@ -104,7 +104,7 @@ public class RenamePropertyKeysTest extends GradoopFlinkTestBase {
     props.set("k2", "v2");
 
     Vertex vertex =
-        new VertexFactory().initVertex(vertexId, label, props);
+        new EPGMVertexFactory().initVertex(vertexId, label, props);
 
     HashMap<String, String> newProps = new HashMap<>();
     newProps.put("k1", "new_k1");

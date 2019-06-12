@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 /**
  * Used to describe entities that can have properties.
  */
-public interface EPGMAttributed {
+public interface Attributed {
 
   /**
    * Returns all properties of that entity.

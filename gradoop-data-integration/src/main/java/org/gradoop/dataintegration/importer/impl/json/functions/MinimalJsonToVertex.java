@@ -18,7 +18,7 @@ package org.gradoop.dataintegration.importer.impl.json.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -59,7 +59,7 @@ public class MinimalJsonToVertex implements MapFunction<String, EPGMVertex> {
    *
    * @param vertexFactory The vertex factory used to create new vertices.
    */
-  public MinimalJsonToVertex(EPGMVertexFactory<EPGMVertex> vertexFactory) {
+  public MinimalJsonToVertex(VertexFactory<EPGMVertex> vertexFactory) {
     this.reuse = Objects.requireNonNull(vertexFactory).createVertex(JSON_VERTEX_LABEL);
     this.reuse.setProperties(Properties.create());
   }

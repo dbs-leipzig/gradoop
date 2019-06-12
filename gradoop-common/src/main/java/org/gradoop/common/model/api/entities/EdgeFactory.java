@@ -22,10 +22,9 @@ import org.gradoop.common.model.impl.properties.Properties;
 /**
  * Initializes {@link Edge} objects of a given type.
  *
- * @param <E> EPGM edge type
+ * @param <E> edge type
  */
-public interface EPGMEdgeFactory<E extends Edge>
-  extends EPGMElementFactory<E> {
+public interface EdgeFactory<E extends Edge> extends ElementFactory<E> {
 
   /**
    * Creates a new edge based on the given parameters.

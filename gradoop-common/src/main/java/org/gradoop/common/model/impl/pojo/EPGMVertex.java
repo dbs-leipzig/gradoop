@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 /**
  * POJO Implementation of an EPGM vertex.
  */
-public class EPGMVertex extends GraphElement implements Vertex {
+public class EPGMVertex extends EPGMGraphElement implements Vertex {
 
   /**
    * Default constructor.

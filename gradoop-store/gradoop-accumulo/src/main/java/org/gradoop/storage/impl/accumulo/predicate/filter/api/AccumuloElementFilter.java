@@ -15,7 +15,7 @@
  */
 package org.gradoop.storage.impl.accumulo.predicate.filter.api;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.common.predicate.filter.api.ElementFilter;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopEdgeIterator;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopGraphHeadIterator;
@@ -36,14 +36,14 @@ import java.util.Base64;
 import java.util.function.Predicate;
 
 /**
- * Accumulo Element Filter
+ * Accumulo EPGMElement Filter
  *
  * @param <T> epgm element type
  * @see GradoopEdgeIterator
  * @see GradoopGraphHeadIterator
  * @see GradoopVertexIterator
  */
-public interface AccumuloElementFilter<T extends EPGMElement>
+public interface AccumuloElementFilter<T extends Element>
   extends Predicate<T>, ElementFilter<AccumuloElementFilter<T>>, Serializable {
 
   /**
@@ -55,7 +55,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
    * @return filter instance
    */
   @Nonnull
-  static <T extends EPGMElement> AccumuloElementFilter<T> decode(String encoded) {
+  static <T extends Element> AccumuloElementFilter<T> decode(String encoded) {
     byte[] content = Base64.getDecoder().decode(encoded);
     try (
       ByteArrayInputStream arr = new ByteArrayInputStream(content);

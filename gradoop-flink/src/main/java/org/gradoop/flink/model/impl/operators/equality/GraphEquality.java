@@ -50,7 +50,8 @@ public class GraphEquality implements BinaryGraphToValueOperator<Boolean> {
    * @param directed sets mode for directed or undirected graphs
    */
   public GraphEquality(GraphHeadToString<EPGMGraphHead> graphHeadToString,
-    VertexToString<EPGMVertex> vertexToString, EdgeToString<EPGMEdge> edgeToString, boolean directed) {
+    VertexToString<EPGMVertex> vertexToString, EdgeToString<EPGMEdge> edgeToString,
+    boolean directed) {
     this.directed = directed;
 
     this.collectionEquality =

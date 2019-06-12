@@ -23,7 +23,7 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -45,14 +45,14 @@ public class EdgeFromIds implements
   /**
    * EPGM edge factory
    */
-  private final EPGMEdgeFactory<EPGMEdge> edgeFactory;
+  private final EdgeFactory<EPGMEdge> edgeFactory;
 
   /**
    * Constructor
    *
    * @param epgmEdgeFactory EPGM edge factory
    */
-  public EdgeFromIds(EPGMEdgeFactory<EPGMEdge> epgmEdgeFactory) {
+  public EdgeFromIds(EdgeFactory<EPGMEdge> epgmEdgeFactory) {
     this.edgeFactory = epgmEdgeFactory;
   }
 

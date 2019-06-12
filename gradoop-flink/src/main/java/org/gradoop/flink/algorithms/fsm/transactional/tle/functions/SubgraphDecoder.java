@@ -18,9 +18,9 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
@@ -47,15 +47,15 @@ public abstract class SubgraphDecoder implements Serializable {
   /**
    * graph Head Factory
    */
-  protected final EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory;
+  protected final GraphHeadFactory<EPGMGraphHead> graphHeadFactory;
   /**
    * vertex Factory
    */
-  protected final EPGMVertexFactory<EPGMVertex> vertexFactory;
+  protected final VertexFactory<EPGMVertex> vertexFactory;
   /**
    * edge Factory
    */
-  protected final EPGMEdgeFactory<EPGMEdge> edgeFactory;
+  protected final EdgeFactory<EPGMEdge> edgeFactory;
 
   /**
    * Constructor.

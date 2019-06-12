@@ -21,7 +21,7 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.minicluster.LocalFlinkMiniCluster;
 import org.apache.flink.test.util.TestEnvironment;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -228,7 +228,7 @@ public abstract class GradoopFlinkTestBase {
     assertFalse("expected false", result.collect().get(0));
   }
 
-  protected <T extends EPGMElement> DataSet<T> getEmptyDataSet(T dummy) {
+  protected <T extends Element> DataSet<T> getEmptyDataSet(T dummy) {
     return getExecutionEnvironment()
       .fromElements(dummy)
       .filter(new False<>());

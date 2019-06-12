@@ -21,13 +21,13 @@ import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.storage.common.iterator.ClosableIterator;
@@ -207,7 +207,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
   public void wrongPropertyTypeTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore();
 
-    EPGMVertexFactory<EPGMVertex> vertexFactory = new VertexFactory();
+    VertexFactory<EPGMVertex> vertexFactory = new EPGMVertexFactory();
 
     // Queue is not supported by
     final Queue<String> value = new PriorityQueue<>();
@@ -233,7 +233,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
   public void propertyTypeTest() throws IOException {
     HBaseEPGMStore graphStore = createEmptyEPGMStore();
 
-    EPGMVertexFactory<EPGMVertex> vertexFactory = new VertexFactory();
+    VertexFactory<EPGMVertex> vertexFactory = new EPGMVertexFactory();
 
     final GradoopId vertexID = GradoopId.get();
     final String label = "A";

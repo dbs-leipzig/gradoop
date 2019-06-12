@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.csv;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
@@ -140,7 +140,7 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
    *
    * @param epgmElement the element to check
    */
-  protected void checkProperties(EPGMElement epgmElement) {
+  protected void checkProperties(Element epgmElement) {
     // assert that the element has properties
     assertNotNull(epgmElement.getProperties());
     // assert that there are 3 properties

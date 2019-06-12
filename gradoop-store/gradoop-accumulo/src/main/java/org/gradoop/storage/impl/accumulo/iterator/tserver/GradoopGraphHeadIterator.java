@@ -22,7 +22,7 @@ import org.apache.accumulo.core.util.Pair;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.storage.utils.KryoUtils;
@@ -41,7 +41,7 @@ public class GradoopGraphHeadIterator extends BaseElementIterator<GraphHead> {
   /**
    * Graph head factory
    */
-  private final GraphHeadFactory factory = new GraphHeadFactory();
+  private final EPGMGraphHeadFactory factory = new EPGMGraphHeadFactory();
 
   @Nonnull
   @Override

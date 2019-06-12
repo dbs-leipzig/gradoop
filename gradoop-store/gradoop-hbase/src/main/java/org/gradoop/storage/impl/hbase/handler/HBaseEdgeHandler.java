@@ -22,7 +22,7 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
@@ -65,7 +65,7 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
   /**
    * Creates edge data objects from the rows.
    */
-  private final EPGMEdgeFactory<EPGMEdge> edgeFactory;
+  private final EdgeFactory<EPGMEdge> edgeFactory;
 
   /**
    * An optional query to define predicates for the graph store.
@@ -77,7 +77,7 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
    *
    * @param edgeFactory edge data factory
    */
-  public HBaseEdgeHandler(EPGMEdgeFactory<EPGMEdge> edgeFactory) {
+  public HBaseEdgeHandler(EdgeFactory<EPGMEdge> edgeFactory) {
     this.edgeFactory = edgeFactory;
   }
 

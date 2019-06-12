@@ -18,9 +18,9 @@ package org.gradoop.common.model.api.entities;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Describes data assigned to an edge in the EPGM.
+ * Describes data assigned to an edge.
  */
-public interface Edge extends EPGMGraphElement {
+public interface Edge extends GraphElement {
   /**
    * Returns the source vertex identifier.
    *

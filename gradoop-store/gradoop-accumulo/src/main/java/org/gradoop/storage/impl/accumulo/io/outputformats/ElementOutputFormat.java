@@ -24,7 +24,7 @@ import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.config.GradoopAccumuloConfig;
@@ -38,7 +38,7 @@ import java.io.IOException;
  *
  * @param <E> gradoop element
  */
-public class ElementOutputFormat<E extends Element> implements OutputFormat<E> {
+public class ElementOutputFormat<E extends EPGMElement> implements OutputFormat<E> {
 
   /**
    * serialize id
@@ -51,7 +51,7 @@ public class ElementOutputFormat<E extends Element> implements OutputFormat<E> {
   private final GradoopAccumuloConfig config;
 
   /**
-   * Element type
+   * EPGMElement type
    */
   private final Class<E> elementType;
 

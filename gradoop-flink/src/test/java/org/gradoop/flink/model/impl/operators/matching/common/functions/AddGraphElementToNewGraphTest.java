@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.junit.Test;
@@ -32,9 +32,9 @@ public class AddGraphElementToNewGraphTest {
   @Test
   public void testVariableMappingCreation() throws Exception {
     AddGraphElementToNewGraph<EPGMVertex> udf =
-      new AddGraphElementToNewGraph<>(new GraphHeadFactory(), "a");
+      new AddGraphElementToNewGraph<>(new EPGMGraphHeadFactory(), "a");
 
-    EPGMVertex vertex = new VertexFactory().createVertex();
+    EPGMVertex vertex = new EPGMVertexFactory().createVertex();
     Tuple2<EPGMVertex, EPGMGraphHead> result = udf.map(vertex);
 
     assertTrue(result.f1.hasProperty(PatternMatching.VARIABLE_MAPPING_KEY));

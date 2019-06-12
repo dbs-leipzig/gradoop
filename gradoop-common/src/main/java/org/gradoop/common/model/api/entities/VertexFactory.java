@@ -24,8 +24,7 @@ import org.gradoop.common.model.impl.properties.Properties;
  *
  * @param <V> EPGM vertex type
  */
-public interface EPGMVertexFactory<V extends Vertex>
-  extends EPGMElementFactory<V> {
+public interface VertexFactory<V extends Vertex> extends ElementFactory<V> {
 
   /**
    * Initializes a new vertex based on the given parameters.

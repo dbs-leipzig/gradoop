@@ -23,7 +23,7 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.storage.impl.accumulo.handler.AccumuloVertexHandler;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopVertexIterator;
@@ -69,7 +69,7 @@ public class VertexInputFormat extends BaseInputFormat<EPGMVertex> {
   @Override
   protected void initiate() {
     iterator = new GradoopVertexIterator();
-    handler = new AccumuloVertexHandler(new VertexFactory());
+    handler = new AccumuloVertexHandler(new EPGMVertexFactory());
   }
 
   @Override

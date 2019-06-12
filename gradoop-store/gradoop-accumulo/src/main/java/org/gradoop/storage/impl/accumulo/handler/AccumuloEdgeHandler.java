@@ -18,7 +18,7 @@ package org.gradoop.storage.impl.accumulo.handler;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
@@ -31,14 +31,14 @@ public class AccumuloEdgeHandler implements AccumuloRowHandler<EPGMEdge, Edge> {
   /**
    * edge factory
    */
-  private final EPGMEdgeFactory<EPGMEdge> factory;
+  private final EdgeFactory<EPGMEdge> factory;
 
   /**
    * accumulo edge handler constructor
    *
    * @param factory edge factory
    */
-  public AccumuloEdgeHandler(EPGMEdgeFactory<EPGMEdge> factory) {
+  public AccumuloEdgeHandler(EdgeFactory<EPGMEdge> factory) {
     this.factory = factory;
   }
 

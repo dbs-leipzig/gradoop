@@ -16,7 +16,7 @@
 package org.gradoop.storage.impl.hbase;
 
 import com.google.common.collect.Lists;
-import org.gradoop.common.model.api.entities.EPGMIdentifiable;
+import org.gradoop.common.model.api.entities.Identifiable;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
@@ -91,7 +91,7 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
     graphHeads = graphHeads.subList(1, 2);
     // Extract the graph ids
     GradoopIdSet ids = GradoopIdSet.fromExisting(graphHeads.stream()
-      .map(EPGMIdentifiable::getId)
+      .map(Identifiable::getId)
       .collect(Collectors.toList()));
     // Query with the extracted ids
     List<EPGMGraphHead> queryResult = socialNetworkStore.getGraphSpace(
@@ -136,7 +136,7 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
 
     // Extract the vertex ids
     GradoopIdSet ids = GradoopIdSet.fromExisting(vertices.stream()
-      .map(EPGMIdentifiable::getId)
+      .map(Identifiable::getId)
       .collect(Collectors.toList()));
     // Query with the extracted ids
     List<EPGMVertex> queryResult = socialNetworkStore.getVertexSpace(
@@ -180,7 +180,7 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
     edges = edges.subList(3, 8);
     // Extract the edge ids
     GradoopIdSet ids = GradoopIdSet.fromExisting(edges.stream()
-      .map(EPGMIdentifiable::getId)
+      .map(Identifiable::getId)
       .collect(Collectors.toList()));
     // Query with the extracted ids
     List<EPGMEdge> queryResult = socialNetworkStore.getEdgeSpace(

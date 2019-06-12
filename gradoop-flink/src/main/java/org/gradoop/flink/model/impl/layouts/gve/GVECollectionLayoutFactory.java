@@ -42,8 +42,8 @@ public class GVECollectionLayoutFactory extends GVEBaseFactory
   implements GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> {
 
   @Override
-  public GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromDataSets(DataSet<EPGMGraphHead> graphHeads,
-    DataSet<EPGMVertex> vertices) {
+  public GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromDataSets(
+    DataSet<EPGMGraphHead> graphHeads, DataSet<EPGMVertex> vertices) {
     return fromDataSets(graphHeads, vertices,
       createEdgeDataSet(new ArrayList<>(0)));
   }

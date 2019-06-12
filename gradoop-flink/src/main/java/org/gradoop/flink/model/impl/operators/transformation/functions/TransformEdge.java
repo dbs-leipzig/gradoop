@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.common.util.GradoopConstants;
 
@@ -34,7 +34,7 @@ public class TransformEdge<E extends Edge> extends TransformBase<E> {
   /**
    * Factory to init modified edge.
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final EdgeFactory<E> edgeFactory;
 
   /**
    * Constructor
@@ -44,7 +44,7 @@ public class TransformEdge<E extends Edge> extends TransformBase<E> {
    */
   public TransformEdge(
     TransformationFunction<E> transformationFunction,
-    EPGMEdgeFactory<E> epgmEdgeFactory) {
+    EdgeFactory<E> epgmEdgeFactory) {
     super(transformationFunction);
     this.edgeFactory = checkNotNull(epgmEdgeFactory);
   }

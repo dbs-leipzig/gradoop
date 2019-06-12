@@ -16,7 +16,7 @@
 package org.gradoop.flink.io.impl.graph.functions;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 
 import java.io.Serializable;
 
@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <K>  Import EPGMEdge/EPGMVertex identifier type
  */
 public abstract class InitElement
-  <EL extends Element, K extends Comparable<K>> implements Serializable {
+  <EL extends EPGMElement, K extends Comparable<K>> implements Serializable {
 
   /**
    * Decides if lineage info (original identifier) shall be stored

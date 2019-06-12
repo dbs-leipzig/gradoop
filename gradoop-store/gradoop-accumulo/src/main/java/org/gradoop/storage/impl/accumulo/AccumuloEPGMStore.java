@@ -34,8 +34,8 @@ import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -388,14 +388,14 @@ public class AccumuloEPGMStore implements
   }
 
   /**
-   * Write an EPGM Element instance into table
+   * Write an EPGM EPGMElement instance into table
    *
    * @param record  gradoop EPGM element
    * @param writer  accumulo batch writer
    * @param handler accumulo row handler
    * @param <T>     element type
    */
-  private <T extends EPGMElement> void writeRecord(
+  private <T extends Element> void writeRecord(
     @Nonnull T record,
     @Nonnull BatchWriter writer,
     @Nonnull AccumuloRowHandler handler
@@ -423,7 +423,7 @@ public class AccumuloEPGMStore implements
    * @return batch scanner instance
    * @throws IOException if create fail
    */
-  private <T extends EPGMElement> BatchScanner createBatchScanner(
+  private <T extends Element> BatchScanner createBatchScanner(
     String table,
     Class<? extends SortedKeyValueIterator<Key, Value>> iterator,
     @Nullable ElementQuery<AccumuloElementFilter<T>> predicate

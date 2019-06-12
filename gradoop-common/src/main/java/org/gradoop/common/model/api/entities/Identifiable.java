@@ -20,7 +20,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Describes an identifiable entity.
  */
-public interface EPGMIdentifiable {
+public interface Identifiable {
   /**
    * Returns the identifier of that entity.
    *

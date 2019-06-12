@@ -22,7 +22,7 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 
 /**
@@ -39,7 +39,7 @@ public class ReduceEdgeGroupItems<E extends Edge> extends BuildSuperEdge
   /**
    * EPGMEdge factory.
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final EdgeFactory<E> edgeFactory;
 
   /**
    * Creates group reducer
@@ -47,7 +47,7 @@ public class ReduceEdgeGroupItems<E extends Edge> extends BuildSuperEdge
    * @param useLabel use edge label
    * @param epgmEdgeFactory edge factory
    */
-  public ReduceEdgeGroupItems(boolean useLabel, EPGMEdgeFactory<E> epgmEdgeFactory) {
+  public ReduceEdgeGroupItems(boolean useLabel, EdgeFactory<E> epgmEdgeFactory) {
     super(useLabel);
     this.edgeFactory = epgmEdgeFactory;
   }

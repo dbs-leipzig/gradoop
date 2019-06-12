@@ -18,7 +18,7 @@ package org.gradoop.storage.impl.accumulo.handler;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 
@@ -30,14 +30,14 @@ public class AccumuloGraphHandler implements AccumuloRowHandler<EPGMGraphHead, G
   /**
    * graph head factory
    */
-  private final EPGMGraphHeadFactory<EPGMGraphHead> factory;
+  private final GraphHeadFactory<EPGMGraphHead> factory;
 
   /**
    * graph head handler constructor
    *
    * @param factory graph head factory
    */
-  public AccumuloGraphHandler(EPGMGraphHeadFactory<EPGMGraphHead> factory) {
+  public AccumuloGraphHandler(GraphHeadFactory<EPGMGraphHead> factory) {
     this.factory = factory;
   }
 

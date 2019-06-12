@@ -16,7 +16,7 @@
 package org.gradoop.common.model.impl.pojo;
 
 import com.google.common.base.Preconditions;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -25,9 +25,9 @@ import org.gradoop.common.util.GradoopConstants;
 import java.io.Serializable;
 
 /**
- * Factory for creating vertex POJOs.
+ * Factory for creating EPGM vertex POJOs.
  */
-public class VertexFactory implements EPGMVertexFactory<EPGMVertex>, Serializable {
+public class EPGMVertexFactory implements VertexFactory<EPGMVertex>, Serializable {
 
   /**
    * serial version uid

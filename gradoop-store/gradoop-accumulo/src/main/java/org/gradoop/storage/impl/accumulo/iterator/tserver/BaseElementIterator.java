@@ -22,7 +22,7 @@ import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.IteratorEnvironment;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.apache.accumulo.core.util.Pair;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 
@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * Accumulo Tablet Server Iterator
  * This Iterator will be created in accumulo tablet server runtime, when executing a partition
- * range query. A Gradoop Element iterator will decode query options as query filter, transform
+ * range query. A Gradoop EPGMElement iterator will decode query options as query filter, transform
  * multi-rows into epgm element and check if this element should be return by predicate. Each
  * element that fulfill the predicate will be serialized into one row.
  *
@@ -45,7 +45,7 @@ import java.util.Map;
  * @see <a href="https://accumulo.apache.org/1.9/accumulo_user_manual.html#_iterator_design">
  *   accumulo iterator design</a>
  */
-public abstract class BaseElementIterator<E extends EPGMElement> implements
+public abstract class BaseElementIterator<E extends Element> implements
   SortedKeyValueIterator<Key, Value> {
 
   /**
@@ -64,7 +64,7 @@ public abstract class BaseElementIterator<E extends EPGMElement> implements
   private Pair<Key, Value> top;
 
   /**
-   * Element filter predicate
+   * EPGMElement filter predicate
    */
   private AccumuloElementFilter<E> filter;
 

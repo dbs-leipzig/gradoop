@@ -22,7 +22,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
@@ -141,11 +141,11 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
     validateEPGMElementCollections(loadedVertices, loader.getVertices());
     validateEPGMElementCollections(loadedEdges, loader.getEdges());
 
-    Collection<GraphElement> epgmElements = new ArrayList<>();
+    Collection<EPGMGraphElement> epgmElements = new ArrayList<>();
     epgmElements.addAll(loadedVertices);
     epgmElements.addAll(loadedEdges);
 
-    for (GraphElement loadedVertex : epgmElements) {
+    for (EPGMGraphElement loadedVertex : epgmElements) {
       assertEquals("graph element has wrong graph count",
         1, loadedVertex.getGraphCount());
       assertTrue("graph element was not in new graph",

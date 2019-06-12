@@ -16,7 +16,7 @@
 package org.gradoop.flink.io.impl.dot.functions;
 
 import org.apache.flink.api.java.io.TextOutputFormat;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
@@ -139,7 +139,7 @@ public abstract class AbstractDotFileFormat
    * @param builder string builder to append
    * @param element graph element with id, label and properties
    */
-  abstract void writeLabel(StringBuilder builder, EPGMElement element);
+  abstract void writeLabel(StringBuilder builder, Element element);
 
   void setPrintGraphHead(boolean printGraphHead) {
     this.printGraphHead = printGraphHead;

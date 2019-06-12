@@ -31,7 +31,7 @@ public class GraphHeadTest {
   @Test
   public void createWithIDTest() {
     GradoopId graphID = GradoopId.get();
-    GraphHead g = new GraphHeadFactory().initGraphHead(graphID);
+    GraphHead g = new EPGMGraphHeadFactory().initGraphHead(graphID);
     assertThat(g.getId(), is(graphID));
     assertThat(g.getPropertyCount(), is(0));
   }
@@ -45,7 +45,7 @@ public class GraphHeadTest {
     props.set("k2", "v2");
 
     GraphHead graphHead =
-      new GraphHeadFactory().initGraphHead(graphID, label, props);
+      new EPGMGraphHeadFactory().initGraphHead(graphID, label, props);
 
     assertThat(graphHead.getId(), is(graphID));
     assertEquals(label, graphHead.getLabel());
@@ -57,19 +57,19 @@ public class GraphHeadTest {
   @Test
   public void createWithMissingLabelTest() {
     GradoopId graphID = GradoopId.get();
-    GraphHead g = new GraphHeadFactory().initGraphHead(graphID);
+    GraphHead g = new EPGMGraphHeadFactory().initGraphHead(graphID);
     assertThat(g.getLabel(), is(GradoopConstants.DEFAULT_GRAPH_LABEL));
   }
 
   @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullIDTest() {
-    new GraphHeadFactory().initGraphHead(null);
+    new EPGMGraphHeadFactory().initGraphHead(null);
   }
 
   @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullLabelTest() {
     GradoopId graphID = GradoopId.get();
-    new GraphHeadFactory().initGraphHead(graphID, null);
+    new EPGMGraphHeadFactory().initGraphHead(graphID, null);
   }
 
   @Test
@@ -77,9 +77,9 @@ public class GraphHeadTest {
     GradoopId graphID1 = GradoopId.get();
     GradoopId graphID2 = GradoopId.get();
 
-    GraphHead graphHead1 = new GraphHeadFactory().initGraphHead(graphID1);
-    GraphHead graphHead2 = new GraphHeadFactory().initGraphHead(graphID1);
-    GraphHead graphHead3 = new GraphHeadFactory().initGraphHead(graphID2);
+    GraphHead graphHead1 = new EPGMGraphHeadFactory().initGraphHead(graphID1);
+    GraphHead graphHead2 = new EPGMGraphHeadFactory().initGraphHead(graphID1);
+    GraphHead graphHead3 = new EPGMGraphHeadFactory().initGraphHead(graphID2);
 
     assertEquals("Graph heads were not equal", graphHead1, graphHead1);
     assertEquals("Graph heads were not equal", graphHead1, graphHead2);
@@ -91,9 +91,9 @@ public class GraphHeadTest {
     GradoopId graphID1 = GradoopId.get();
     GradoopId graphID2 = GradoopId.get();
 
-    GraphHead graphHead1 = new GraphHeadFactory().initGraphHead(graphID1);
-    GraphHead graphHead2 = new GraphHeadFactory().initGraphHead(graphID1);
-    GraphHead graphHead3 = new GraphHeadFactory().initGraphHead(graphID2);
+    GraphHead graphHead1 = new EPGMGraphHeadFactory().initGraphHead(graphID1);
+    GraphHead graphHead2 = new EPGMGraphHeadFactory().initGraphHead(graphID1);
+    GraphHead graphHead3 = new EPGMGraphHeadFactory().initGraphHead(graphID2);
 
     assertEquals("Graph heads have different hash", graphHead2.hashCode(), graphHead1.hashCode());
     assertFalse("Graph heads have same hash",

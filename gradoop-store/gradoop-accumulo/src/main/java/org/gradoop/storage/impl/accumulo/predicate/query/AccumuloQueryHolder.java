@@ -16,7 +16,7 @@
 package org.gradoop.storage.impl.accumulo.predicate.query;
 
 import org.apache.accumulo.core.data.Range;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  *
  * @param <T> epgm element type
  */
-public class AccumuloQueryHolder<T extends EPGMElement> implements Serializable {
+public class AccumuloQueryHolder<T extends Element> implements Serializable {
 
   /**
    * query ranges in accumulo table, should be serializable
@@ -73,7 +73,7 @@ public class AccumuloQueryHolder<T extends EPGMElement> implements Serializable 
    * @param <T>   epgm element type
    * @return accumulo predicate
    */
-  public static <T extends EPGMElement> AccumuloQueryHolder<T> create(
+  public static <T extends Element> AccumuloQueryHolder<T> create(
     @Nonnull ElementQuery<AccumuloElementFilter<T>> query
   ) {
     List<Range> ranges = Range.mergeOverlapping(Optional.ofNullable(query.getQueryRanges())
@@ -95,7 +95,7 @@ public class AccumuloQueryHolder<T extends EPGMElement> implements Serializable 
    * @param <T>           epgm element type
    * @return accumulo predicate
    */
-  public static <T extends EPGMElement> AccumuloQueryHolder<T> create(
+  public static <T extends Element> AccumuloQueryHolder<T> create(
     @Nonnull List<Range> idRanges,
     @Nullable AccumuloElementFilter<T> reduceFilter
   ) {

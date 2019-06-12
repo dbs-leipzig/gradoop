@@ -23,9 +23,9 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.filter.FilterList;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
@@ -358,7 +358,7 @@ public class HBaseEPGMStore implements
    * @param isSpreadingByteUsed indicates whether a spreading byte is used as row key prefix or not
    * @param <T> the type of the EPGM element
    */
-  private <T extends EPGMElement> void attachFilter(
+  private <T extends Element> void attachFilter(
     @Nonnull ElementQuery<HBaseElementFilter<T>> query,
     @Nonnull Scan scan,
     boolean isSpreadingByteUsed) {

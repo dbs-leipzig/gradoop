@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 /**
  *
  * Creates the fused vertex from the collection of the graph head of the pattern graph element.
- * The new vertex is stored as an occurence of the searchGraph
+ * The new vertex is stored as an occurrence of the searchGraph
  *
  */
 @FunctionAnnotation.ForwardedFieldsFirst("id")
@@ -50,7 +50,7 @@ public class CreateFusedVertex implements CrossFunction<EPGMGraphHead, EPGMGraph
   }
 
   @Override
-  public EPGMVertex cross(EPGMGraphHead searchGraphHead, EPGMGraphHead patternGraphSeachHead) throws Exception {
+  public EPGMVertex cross(EPGMGraphHead searchGraphHead, EPGMGraphHead patternGraphSeachHead) {
     REUSABLE_VERTEX.setLabel(patternGraphSeachHead.getLabel());
     REUSABLE_VERTEX.setProperties(patternGraphSeachHead.getProperties());
     REUSABLE_VERTEX.setId(newVertexId);

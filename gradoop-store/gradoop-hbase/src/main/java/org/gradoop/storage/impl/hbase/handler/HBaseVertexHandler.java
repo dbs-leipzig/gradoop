@@ -21,7 +21,7 @@ import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
@@ -54,7 +54,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
   /**
    * Creates vertex data objects from the rows.
    */
-  private final EPGMVertexFactory<EPGMVertex> vertexFactory;
+  private final VertexFactory<EPGMVertex> vertexFactory;
 
   /**
    * An optional query to define predicates for the graph store.
@@ -66,7 +66,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
    *
    * @param vertexFactory used to create runtime vertex data objects
    */
-  public HBaseVertexHandler(EPGMVertexFactory<EPGMVertex> vertexFactory) {
+  public HBaseVertexHandler(VertexFactory<EPGMVertex> vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
 

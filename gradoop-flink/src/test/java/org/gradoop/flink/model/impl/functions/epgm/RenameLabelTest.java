@@ -19,9 +19,9 @@ import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -43,7 +43,7 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    GraphHead graphHead = new GraphHeadFactory().initGraphHead(graphId, label, props);
+    GraphHead graphHead = new EPGMGraphHeadFactory().initGraphHead(graphId, label, props);
 
     String newLabel = "B";
 
@@ -68,7 +68,7 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    Edge edge = new EdgeFactory().initEdge(edgeId, label, sourceId, targetId, props);
+    Edge edge = new EPGMEdgeFactory().initEdge(edgeId, label, sourceId, targetId, props);
 
     String newLabel = "B";
 
@@ -91,7 +91,7 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    Vertex vertex = new VertexFactory().initVertex(vertexId, label, props);
+    Vertex vertex = new EPGMVertexFactory().initVertex(vertexId, label, props);
 
     String newLabel = "B";
 

@@ -22,7 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
@@ -47,7 +47,7 @@ public class InitEdge<K extends Comparable<K>>
   /**
    * Used to create new EPGM edge.
    */
-  private final EPGMEdgeFactory<EPGMEdge> edgeFactory;
+  private final EdgeFactory<EPGMEdge> edgeFactory;
 
   /**
    * Reduce object instantiation.
@@ -62,7 +62,7 @@ public class InitEdge<K extends Comparable<K>>
    *                            (can be {@code null})
    * @param keyTypeInfo         type info for the import edge identifier
    */
-  public InitEdge(EPGMEdgeFactory<EPGMEdge> epgmEdgeFactory, String lineagePropertyKey,
+  public InitEdge(EdgeFactory<EPGMEdge> epgmEdgeFactory, String lineagePropertyKey,
     TypeInformation<K> keyTypeInfo) {
     super(lineagePropertyKey, keyTypeInfo);
     this.edgeFactory        = epgmEdgeFactory;

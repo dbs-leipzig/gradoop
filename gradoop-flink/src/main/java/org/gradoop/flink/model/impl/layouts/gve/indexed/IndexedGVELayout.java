@@ -31,7 +31,8 @@ import java.util.Map;
  * efficient as they avoid duplicating rows during program execution.
  */
 public class IndexedGVELayout extends GVELayout implements
-  LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge>, GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> {
+  LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge>,
+  GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> {
   /**
    * Mapping from graph label to graph heads with that label.
    */

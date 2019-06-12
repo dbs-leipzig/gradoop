@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 /**
  * POJO Implementation of an EPGM edge.
  */
-public class EPGMEdge extends GraphElement implements Edge {
+public class EPGMEdge extends EPGMGraphElement implements Edge {
 
   /**
    * Vertex identifier of the source vertex.

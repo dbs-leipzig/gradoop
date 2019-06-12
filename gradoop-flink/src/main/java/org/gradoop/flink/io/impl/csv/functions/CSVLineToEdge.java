@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.io.impl.csv.functions;
 
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
@@ -33,14 +33,14 @@ public class CSVLineToEdge extends CSVLineToElement<EPGMEdge> {
   /**
    * Used to instantiate the edge.
    */
-  private final EPGMEdgeFactory<EPGMEdge> edgeFactory;
+  private final EdgeFactory<EPGMEdge> edgeFactory;
 
   /**
    * Constructor.
    *
    * @param epgmEdgeFactory EPGM edge factory
    */
-  public CSVLineToEdge(EPGMEdgeFactory<EPGMEdge> epgmEdgeFactory) {
+  public CSVLineToEdge(EdgeFactory<EPGMEdge> epgmEdgeFactory) {
     this.edgeFactory = epgmEdgeFactory;
   }
 

@@ -20,8 +20,8 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -34,7 +34,7 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
 
   protected DataSet<EPGMVertex> createVerticesWithProperties(List<String> propertyNames) {
     Properties properties = getProperties(propertyNames);
-    VertexFactory vertexFactory = new VertexFactory();
+    EPGMVertexFactory vertexFactory = new EPGMVertexFactory();
 
     List<EPGMVertex> vertices = Lists.newArrayList(
       vertexFactory.createVertex("Label1", properties),
@@ -46,7 +46,7 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
 
   protected DataSet<EPGMEdge> createEdgesWithProperties(List<String> propertyNames) {
     Properties properties = getProperties(propertyNames);
-    EdgeFactory edgeFactory = new EdgeFactory();
+    EPGMEdgeFactory edgeFactory = new EPGMEdgeFactory();
 
     List<EPGMEdge> edges = Lists.newArrayList(
       edgeFactory.createEdge("Label1", GradoopId.get(), GradoopId.get(), properties),

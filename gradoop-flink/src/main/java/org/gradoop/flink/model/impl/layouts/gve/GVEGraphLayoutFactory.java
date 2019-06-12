@@ -40,12 +40,12 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory
 
   @Override
   public GVELayout fromDataSets(DataSet<EPGMVertex> vertices) {
-    return fromDataSets(vertices,
-      createEdgeDataSet(Lists.newArrayListWithCapacity(0)));
+    return fromDataSets(vertices, createEdgeDataSet(Lists.newArrayListWithCapacity(0)));
   }
 
   @Override
   public GVELayout fromDataSets(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
+
     Objects.requireNonNull(vertices, "EPGMVertex DataSet was null");
     Objects.requireNonNull(edges, "EPGMEdge DataSet was null");
     EPGMGraphHead graphHead = getConfig()
@@ -67,15 +67,15 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory
   }
 
   @Override
-  public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromDataSets(DataSet<EPGMGraphHead> graphHead,
-    DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
+  public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromDataSets(
+    DataSet<EPGMGraphHead> graphHead, DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
     return create(graphHead, vertices, edges);
   }
 
   @Override
   public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromIndexedDataSets(
-    Map<String, DataSet<EPGMVertex>> vertices,
-    Map<String, DataSet<EPGMEdge>> edges) {
+    Map<String, DataSet<EPGMVertex>> vertices, Map<String, DataSet<EPGMEdge>> edges) {
+
     EPGMGraphHead graphHead = getConfig()
       .getGraphHeadFactory()
       .createGraphHead();
@@ -133,8 +133,8 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory
   }
 
   @Override
-  public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromCollections(Collection<EPGMVertex> vertices,
-    Collection<EPGMEdge> edges) {
+  public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromCollections(
+    Collection<EPGMVertex> vertices, Collection<EPGMEdge> edges) {
     Objects.requireNonNull(vertices, "EPGMVertex collection was null");
     Objects.requireNonNull(edges, "EPGMEdge collection was null");
     return fromDataSets(createVertexDataSet(vertices), createEdgeDataSet(edges));

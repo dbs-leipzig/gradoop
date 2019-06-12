@@ -36,7 +36,7 @@ public class EdgeTest {
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
     Edge e =
-      new EdgeFactory().initEdge(edgeId, sourceId, targetId);
+      new EPGMEdgeFactory().initEdge(edgeId, sourceId, targetId);
     assertThat(e.getId(), is(edgeId));
     assertThat(e.getSourceId(), is(sourceId));
     assertThat(e.getTargetId(), is(targetId));
@@ -57,7 +57,7 @@ public class EdgeTest {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    Edge edge = new EdgeFactory()
+    Edge edge = new EPGMEdgeFactory()
       .initEdge(edgeId, label, sourceId, targetId, props, graphIds);
 
     assertThat(edge.getId(), is(edgeId));
@@ -80,7 +80,7 @@ public class EdgeTest {
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
     Edge e =
-      new EdgeFactory().initEdge(edgeId, sourceId, targetId);
+      new EPGMEdgeFactory().initEdge(edgeId, sourceId, targetId);
     assertThat(e.getLabel(), is(GradoopConstants.DEFAULT_EDGE_LABEL));
   }
 
@@ -88,21 +88,21 @@ public class EdgeTest {
   public void createWithNullIDTest() {
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
-    new EdgeFactory().initEdge(null, sourceId, targetId);
+    new EPGMEdgeFactory().initEdge(null, sourceId, targetId);
   }
 
   @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullSourceIdTest() {
     GradoopId edgeId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
-    new EdgeFactory().initEdge(edgeId, null, targetId);
+    new EPGMEdgeFactory().initEdge(edgeId, null, targetId);
   }
 
   @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullTargetIdTest() {
     GradoopId edgeId = GradoopId.get();
     GradoopId sourceId = GradoopId.get();
-    new EdgeFactory().initEdge(edgeId, sourceId, null);
+    new EPGMEdgeFactory().initEdge(edgeId, sourceId, null);
   }
 
   @Test(expectedExceptions = NullPointerException.class)
@@ -110,6 +110,6 @@ public class EdgeTest {
     GradoopId edgeId = GradoopId.get();
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
-    new EdgeFactory().initEdge(edgeId, null, sourceId, targetId);
+    new EPGMEdgeFactory().initEdge(edgeId, null, sourceId, targetId);
   }
 }

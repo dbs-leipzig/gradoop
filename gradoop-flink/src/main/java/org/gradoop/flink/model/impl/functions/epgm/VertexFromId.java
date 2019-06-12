@@ -22,7 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -36,14 +36,14 @@ public class VertexFromId implements
   /**
    * EPGM vertex factory
    */
-  private final EPGMVertexFactory<EPGMVertex> vertexFactory;
+  private final VertexFactory<EPGMVertex> vertexFactory;
 
   /**
    * Create new function.
    *
    * @param vertexFactory EPGM vertex factory
    */
-  public VertexFromId(EPGMVertexFactory<EPGMVertex> vertexFactory) {
+  public VertexFromId(VertexFactory<EPGMVertex> vertexFactory) {
     this.vertexFactory = vertexFactory;
   }
 

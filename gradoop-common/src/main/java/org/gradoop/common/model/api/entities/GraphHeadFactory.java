@@ -23,8 +23,7 @@ import org.gradoop.common.model.impl.properties.Properties;
  *
  * @param <G> EPGM graph head type
  */
-public interface EPGMGraphHeadFactory<G extends GraphHead>
-  extends EPGMElementFactory<G> {
+public interface GraphHeadFactory<G extends GraphHead> extends ElementFactory<G> {
 
   /**
    * Creates a new graph head based.

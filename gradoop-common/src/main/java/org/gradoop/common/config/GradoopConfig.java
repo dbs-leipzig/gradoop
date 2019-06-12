@@ -20,10 +20,10 @@ import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 
 /**
  * Basic Gradoop Configuration.
@@ -38,25 +38,25 @@ public class GradoopConfig
   /**
    * Knows how to create {@link EPGMGraphHead}
    */
-  private final GraphHeadFactory graphHeadFactory;
+  private final EPGMGraphHeadFactory graphHeadFactory;
 
   /**
    * Knows how to create {@link EPGMVertex}
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory vertexFactory;
 
   /**
    *  Knows how to create {@link EPGMEdge}
    */
-  private final EdgeFactory edgeFactory;
+  private final EPGMEdgeFactory edgeFactory;
 
   /**
    * Creates a new Configuration.
    */
   protected GradoopConfig() {
-    this.graphHeadFactory = new GraphHeadFactory();
-    this.vertexFactory = new VertexFactory();
-    this.edgeFactory = new EdgeFactory();
+    this.graphHeadFactory = new EPGMGraphHeadFactory();
+    this.vertexFactory = new EPGMVertexFactory();
+    this.edgeFactory = new EPGMEdgeFactory();
   }
 
   /**
@@ -69,15 +69,15 @@ public class GradoopConfig
     return new GradoopConfig<>();
   }
 
-  public GraphHeadFactory getGraphHeadFactory() {
+  public EPGMGraphHeadFactory getGraphHeadFactory() {
     return graphHeadFactory;
   }
 
-  public VertexFactory getVertexFactory() {
+  public EPGMVertexFactory getVertexFactory() {
     return vertexFactory;
   }
 
-  public EdgeFactory getEdgeFactory() {
+  public EPGMEdgeFactory getEdgeFactory() {
     return edgeFactory;
   }
 }

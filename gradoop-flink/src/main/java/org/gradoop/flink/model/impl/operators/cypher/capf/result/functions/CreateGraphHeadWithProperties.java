@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public class CreateGraphHeadWithProperties implements MapFunction<Row, EPGMGraph
   /**
    * The factory used to create the graph heads.
    */
-  private GraphHeadFactory headFactory;
+  private EPGMGraphHeadFactory headFactory;
 
   /**
    * List containing names for the properties to be set.
@@ -62,7 +62,7 @@ public class CreateGraphHeadWithProperties implements MapFunction<Row, EPGMGraph
   public CreateGraphHeadWithProperties(
     int start,
     int end,
-    GraphHeadFactory headFactory,
+    EPGMGraphHeadFactory headFactory,
     List<String> propertyNames) {
 
     this.start = start;

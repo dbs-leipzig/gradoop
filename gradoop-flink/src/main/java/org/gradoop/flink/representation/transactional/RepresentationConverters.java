@@ -18,7 +18,7 @@ package org.gradoop.flink.representation.transactional;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
@@ -116,7 +116,7 @@ public class RepresentationConverters {
    * @param properties id-properties map
    */
   private static void addLabelsAndProperties(
-    EPGMElement element,
+    Element element,
     Map<GradoopId, String> labels,
     Map<GradoopId, Properties> properties
   ) {

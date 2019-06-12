@@ -19,7 +19,7 @@ import javax.annotation.Nonnull;
 import java.io.Serializable;
 
 /**
- * Element Filter Formula
+ * EPGMElement Filter Formula
  * A element filter predicate will be
  *  - created by client,
  *  - transform to query options and send to region servers

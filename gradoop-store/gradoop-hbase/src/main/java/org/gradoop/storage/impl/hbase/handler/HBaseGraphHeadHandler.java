@@ -21,7 +21,7 @@ import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
@@ -53,7 +53,7 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
   /**
    * Creates graph data objects from the rows.
    */
-  private final EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory;
+  private final GraphHeadFactory<EPGMGraphHead> graphHeadFactory;
 
   /**
    * An optional query to define predicates for the graph store.
@@ -65,7 +65,7 @@ public class HBaseGraphHeadHandler extends HBaseElementHandler implements GraphH
    *
    * @param graphHeadFactory used to create runtime graph data objects
    */
-  public HBaseGraphHeadHandler(EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory) {
+  public HBaseGraphHeadHandler(GraphHeadFactory<EPGMGraphHead> graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 

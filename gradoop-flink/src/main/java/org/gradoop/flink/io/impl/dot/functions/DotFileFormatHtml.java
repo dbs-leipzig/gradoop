@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.dot.functions;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
@@ -95,7 +95,7 @@ public class DotFileFormatHtml extends AbstractDotFileFormat {
    * @param elem graph element with id, label and properties
    */
   @Override
-  void writeLabel(StringBuilder builder, EPGMElement elem) {
+  void writeLabel(StringBuilder builder, Element elem) {
     String label = elem.getLabel();
     String id = elem.getId().toString();
     Properties properties = elem.getProperties();

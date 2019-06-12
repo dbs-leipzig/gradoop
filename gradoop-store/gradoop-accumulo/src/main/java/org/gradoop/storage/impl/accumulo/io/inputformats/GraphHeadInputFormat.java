@@ -21,7 +21,7 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.storage.impl.accumulo.handler.AccumuloGraphHandler;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopGraphHeadIterator;
@@ -69,7 +69,7 @@ public class GraphHeadInputFormat extends BaseInputFormat<EPGMGraphHead> {
   @Override
   protected void initiate() {
     iterator = new GradoopGraphHeadIterator();
-    handler = new AccumuloGraphHandler(new GraphHeadFactory());
+    handler = new AccumuloGraphHandler(new EPGMGraphHeadFactory());
   }
 
   @Override

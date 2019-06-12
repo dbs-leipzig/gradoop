@@ -17,9 +17,9 @@ package org.gradoop.storage.config;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.TableName;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.storage.common.config.GradoopStoreConfig;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
@@ -137,9 +137,9 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
    * @return Default Gradoop HBase configuration.
    */
   public static GradoopHBaseConfig getDefaultConfig() {
-    GraphHeadHandler graphHeadHandler = new HBaseGraphHeadHandler(new GraphHeadFactory());
-    VertexHandler vertexHandler = new HBaseVertexHandler(new VertexFactory());
-    EdgeHandler edgeHandler = new HBaseEdgeHandler(new EdgeFactory());
+    GraphHeadHandler graphHeadHandler = new HBaseGraphHeadHandler(new EPGMGraphHeadFactory());
+    VertexHandler vertexHandler = new HBaseVertexHandler(new EPGMVertexFactory());
+    EdgeHandler edgeHandler = new HBaseEdgeHandler(new EPGMEdgeFactory());
 
     return new GradoopHBaseConfig(
       graphHeadHandler,

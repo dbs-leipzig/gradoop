@@ -19,7 +19,7 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.dataintegration.transformation.impl.config.EdgeDirection;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -202,7 +202,7 @@ public class ExtractPropertyFromVertexTest extends GradoopFlinkTestBase {
    */
   @Test
   public void listPropertyTest() throws Exception {
-    VertexFactory vf = getConfig().getVertexFactory();
+    EPGMVertexFactory vf = getConfig().getVertexFactory();
     EPGMVertex v1 = vf.createVertex("foo");
     v1.setProperty("a", PropertyValue.create(Arrays.asList(PropertyValue.create("m"),
       PropertyValue.create("n"))));

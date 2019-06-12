@@ -46,14 +46,14 @@ public class GradoopFlinkConfig extends GradoopConfig<EPGMGraphHead, EPGMVertex,
   /**
    * Creates instances of {@link LogicalGraph}
    */
-  private final BaseGraphFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
-    graphFactory;
+  private final BaseGraphFactory<
+    EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> graphFactory;
 
   /**
    * Creates instances of {@link GraphCollection}
    */
-  private final BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
-    graphCollectionFactory;
+  private final BaseGraphCollectionFactory<
+    EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> graphCollectionFactory;
 
   /**
    * Creates a new Configuration.

@@ -20,7 +20,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.io.impl.deprecated.json.JSONConstants;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -46,14 +46,14 @@ public class JSONToEdge extends JSONToEntity
   /**
    * EPGMEdge data factory.
    */
-  private final EPGMEdgeFactory<EPGMEdge> edgeFactory;
+  private final EdgeFactory<EPGMEdge> edgeFactory;
 
   /**
    * Creates map function.
    *
    * @param epgmEdgeFactory edge data factory
    */
-  public JSONToEdge(EPGMEdgeFactory<EPGMEdge> epgmEdgeFactory) {
+  public JSONToEdge(EdgeFactory<EPGMEdge> epgmEdgeFactory) {
     this.edgeFactory = epgmEdgeFactory;
   }
 

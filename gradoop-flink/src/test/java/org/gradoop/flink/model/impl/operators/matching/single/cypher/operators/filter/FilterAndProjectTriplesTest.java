@@ -19,8 +19,8 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
@@ -37,13 +37,13 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
-  private VertexFactory vertexFactory;
-  private EdgeFactory edgeFactory;
+  private EPGMVertexFactory vertexFactory;
+  private EPGMEdgeFactory edgeFactory;
 
   @Before
   public void setUp() throws Exception {
-    this.vertexFactory = new VertexFactory();
-    this.edgeFactory = new EdgeFactory();
+    this.vertexFactory = new EPGMVertexFactory();
+    this.edgeFactory = new EPGMEdgeFactory();
   }
 
   @Test

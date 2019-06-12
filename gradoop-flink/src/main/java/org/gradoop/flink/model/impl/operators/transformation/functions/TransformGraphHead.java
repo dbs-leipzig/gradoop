@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
@@ -34,7 +34,7 @@ public class TransformGraphHead<G extends GraphHead> extends TransformBase<G> {
   /**
    * Factory to init modified graph head.
    */
-  private final EPGMGraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory<G> graphHeadFactory;
 
   /**
    * Constructor
@@ -44,7 +44,7 @@ public class TransformGraphHead<G extends GraphHead> extends TransformBase<G> {
    */
   public TransformGraphHead(
     TransformationFunction<G> transformationFunction,
-    EPGMGraphHeadFactory<G> epgmGraphHeadFactory) {
+    GraphHeadFactory<G> epgmGraphHeadFactory) {
     super(transformationFunction);
     this.graphHeadFactory = checkNotNull(epgmGraphHeadFactory);
   }

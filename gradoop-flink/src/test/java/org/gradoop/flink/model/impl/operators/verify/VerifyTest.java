@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.verify;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -141,13 +141,13 @@ public class VerifyTest extends GradoopFlinkTestBase {
    * @param <E> element type.
    * @throws Exception when the execution in Flink fails.
    */
-  private <E extends EPGMGraphElement> void assertGraphContainment(GradoopIdSet idSet, DataSet<E> elements)
+  private <E extends GraphElement> void assertGraphContainment(GradoopIdSet idSet, DataSet<E> elements)
     throws Exception {
     for (E element : elements.collect()) {
       GradoopIdSet ids = element.getGraphIds();
-      assertFalse("Element has no graph ids", ids.isEmpty());
+      assertFalse("EPGMElement has no graph ids", ids.isEmpty());
       ids.removeAll(idSet);
-      assertTrue("Element has dangling graph ids", ids.isEmpty());
+      assertTrue("EPGMElement has dangling graph ids", ids.isEmpty());
     }
   }
 }

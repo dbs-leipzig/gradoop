@@ -22,7 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.Edge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
@@ -57,7 +57,7 @@ public class CreateCartesianNeighborhoodEdges<V extends Vertex, E extends Edge>
    * @param factory      The factory the edges are created with.
    * @param newEdgeLabel The label of the created edge between the neighbors.
    */
-  public CreateCartesianNeighborhoodEdges(EPGMEdgeFactory<E> factory, String newEdgeLabel) {
+  public CreateCartesianNeighborhoodEdges(EdgeFactory<E> factory, String newEdgeLabel) {
     this.edgeType = Objects.requireNonNull(factory).getType();
     this.reuseEdge = factory.createEdge(Objects.requireNonNull(newEdgeLabel),
       GradoopId.NULL_VALUE, GradoopId.NULL_VALUE);

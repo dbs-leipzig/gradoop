@@ -44,8 +44,7 @@ import java.util.Map;
  * @param <V> EPGM vertex type
  * @param <E> EPGM edge type
  */
-public class AsciiGraphLoader
-  <G extends GraphHead, V extends Vertex, E extends Edge> {
+public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends Edge> {
 
   /**
    * Gradoop configuration

@@ -22,10 +22,10 @@ import org.apache.hadoop.io.Text;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.flink.io.impl.tlf.TLFConstants;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -48,15 +48,15 @@ public class GraphTransactionFromText
   /**
    * Graph head factory.
    */
-  private GraphHeadFactory graphHeadFactory;
+  private EPGMGraphHeadFactory graphHeadFactory;
   /**
    * EPGMVertex factory.
    */
-  private VertexFactory vertexFactory;
+  private EPGMVertexFactory vertexFactory;
   /**
    * EPGMEdge factory.
    */
-  private EdgeFactory edgeFactory;
+  private EPGMEdgeFactory edgeFactory;
 
   /**
    * Valued constructor.

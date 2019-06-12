@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import org.gradoop.common.model.api.entities.EPGMLabeled;
+import org.gradoop.common.model.api.entities.Labeled;
 import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
@@ -23,7 +23,7 @@ import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
  *
  * @param <L> EPGM labeled type
  */
-public class ByLabel<L extends EPGMLabeled> implements CombinableFilter<L> {
+public class ByLabel<L extends Labeled> implements CombinableFilter<L> {
   /**
    * Label to be filtered on.
    */

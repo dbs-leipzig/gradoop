@@ -20,7 +20,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.api.entities.GraphHead;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.common.model.impl.id.GradoopId;
 
@@ -34,13 +34,13 @@ public class NewBtgGraphHead<G extends GraphHead>
   /**
    * graph head factory
    */
-  private final EPGMGraphHeadFactory<G> graphHeadFactory;
+  private final GraphHeadFactory<G> graphHeadFactory;
 
   /**
    * Constructor
    * @param graphHeadFactory graph head factory
    */
-  public NewBtgGraphHead(EPGMGraphHeadFactory<G> graphHeadFactory) {
+  public NewBtgGraphHead(GraphHeadFactory<G> graphHeadFactory) {
     this.graphHeadFactory = graphHeadFactory;
   }
 

@@ -16,7 +16,7 @@
 package org.gradoop.storage.impl.hbase.predicate.filter.impl;
 
 import org.apache.hadoop.hbase.filter.Filter;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.common.predicate.filter.impl.PropLargerThan;
 import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
 import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
  *
  * @param <T> EPGM element type
  */
-public class HBasePropLargerThan<T extends EPGMElement>
+public class HBasePropLargerThan<T extends Element>
   extends PropLargerThan<HBaseElementFilter<T>> implements HBaseElementFilter<T> {
 
   /**

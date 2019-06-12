@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
@@ -53,8 +53,9 @@ public class TxCollectionLayoutFactory extends BaseFactory
   implements GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> {
 
   @Override
-  public GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromDataSets(DataSet<EPGMGraphHead> graphHeads,
-    DataSet<EPGMVertex> vertices) {
+  public GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromDataSets(
+    DataSet<EPGMGraphHead> graphHeads, DataSet<EPGMVertex> vertices) {
+
     Objects.requireNonNull(graphHeads);
     Objects.requireNonNull(vertices);
 
@@ -78,14 +79,14 @@ public class TxCollectionLayoutFactory extends BaseFactory
     );
     inGraphHeads = inGraphHeads.union(dbGraphHead);
 
-    DataSet<Tuple2<GradoopId, GraphElement>> vertices = inVertices
-      .map(new Cast<>(GraphElement.class))
-      .returns(TypeExtractor.getForClass(GraphElement.class))
+    DataSet<Tuple2<GradoopId, EPGMGraphElement>> vertices = inVertices
+      .map(new Cast<>(EPGMGraphElement.class))
+      .returns(TypeExtractor.getForClass(EPGMGraphElement.class))
       .flatMap(new GraphElementExpander<>());
 
-    DataSet<Tuple2<GradoopId, GraphElement>> edges = inEdges
-      .map(new Cast<>(GraphElement.class))
-      .returns(TypeExtractor.getForClass(GraphElement.class))
+    DataSet<Tuple2<GradoopId, EPGMGraphElement>> edges = inEdges
+      .map(new Cast<>(EPGMGraphElement.class))
+      .returns(TypeExtractor.getForClass(EPGMGraphElement.class))
       .flatMap(new GraphElementExpander<>());
 
     DataSet<Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>>> transactions = vertices

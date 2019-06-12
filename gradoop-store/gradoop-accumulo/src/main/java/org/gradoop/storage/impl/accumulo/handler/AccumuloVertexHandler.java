@@ -18,7 +18,7 @@ package org.gradoop.storage.impl.accumulo.handler;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
 import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
@@ -31,14 +31,14 @@ public class AccumuloVertexHandler implements AccumuloRowHandler<EPGMVertex, Ver
   /**
    * vertex factory
    */
-  private final EPGMVertexFactory<EPGMVertex> factory;
+  private final VertexFactory<EPGMVertex> factory;
 
   /**
    * vertex handler factory constructor
    *
    * @param factory vertex factory
    */
-  public AccumuloVertexHandler(EPGMVertexFactory<EPGMVertex> factory) {
+  public AccumuloVertexHandler(VertexFactory<EPGMVertex> factory) {
     this.factory = factory;
   }
 

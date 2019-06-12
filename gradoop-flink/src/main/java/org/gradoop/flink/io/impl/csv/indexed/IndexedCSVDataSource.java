@@ -22,10 +22,10 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.conf.Configuration;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVBase;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToEdge;
@@ -97,9 +97,9 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
       source.readDistributed(getMetaDataPath(), getConfig());
 
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-    GraphHeadFactory graphHeadFactory = getConfig().getGraphHeadFactory();
-    VertexFactory vertexFactory = getConfig().getVertexFactory();
-    EdgeFactory edgeFactory = getConfig().getEdgeFactory();
+    EPGMGraphHeadFactory graphHeadFactory = getConfig().getGraphHeadFactory();
+    EPGMVertexFactory vertexFactory = getConfig().getVertexFactory();
+    EPGMEdgeFactory edgeFactory = getConfig().getEdgeFactory();
 
     Map<String, DataSet<EPGMGraphHead>> graphHeads = metaData.getGraphLabels().stream()
       .map(label -> Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))

@@ -22,7 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -40,11 +40,11 @@ import java.util.Set;
  */
 @FunctionAnnotation.ReadFieldsFirst("f1")
 public class GraphElementsHeadsToTransaction implements CoGroupFunction
-  <Tuple2<GradoopId, GraphElement>, EPGMGraphHead, GraphTransaction> {
+  <Tuple2<GradoopId, EPGMGraphElement>, EPGMGraphHead, GraphTransaction> {
 
   @Override
   public void coGroup(
-    Iterable<Tuple2<GradoopId, GraphElement>> graphElements,
+    Iterable<Tuple2<GradoopId, EPGMGraphElement>> graphElements,
     Iterable<EPGMGraphHead> graphHeads,
     Collector<GraphTransaction> out) throws Exception {
 
@@ -55,9 +55,9 @@ public class GraphElementsHeadsToTransaction implements CoGroupFunction
       Set<EPGMEdge> edges = Sets.newHashSet();
       EPGMGraphHead graphHead = graphHeadIter.next();
 
-      for (Tuple2<GradoopId, GraphElement> graphElement : graphElements) {
+      for (Tuple2<GradoopId, EPGMGraphElement> graphElement : graphElements) {
 
-        GraphElement el = graphElement.f1;
+        EPGMGraphElement el = graphElement.f1;
         if (el instanceof EPGMVertex) {
           vertices.add((EPGMVertex) el);
         } else if (el instanceof EPGMEdge) {

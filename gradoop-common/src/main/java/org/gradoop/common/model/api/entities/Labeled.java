@@ -18,7 +18,7 @@ package org.gradoop.common.model.api.entities;
 /**
  * Describes an entity that has a label.
  */
-public interface EPGMLabeled {
+public interface Labeled {
   /**
    * Returns the label of that entity.
    *

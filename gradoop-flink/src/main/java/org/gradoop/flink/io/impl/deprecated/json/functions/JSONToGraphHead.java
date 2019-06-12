@@ -18,7 +18,7 @@ package org.gradoop.flink.io.impl.deprecated.json.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 
@@ -43,14 +43,14 @@ public class JSONToGraphHead extends JSONToEntity
   /**
    * Creates graph data objects
    */
-  private final EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory;
+  private final GraphHeadFactory<EPGMGraphHead> graphHeadFactory;
 
   /**
    * Creates map function
    *
    * @param epgmGraphHeadFactory graph data factory
    */
-  public JSONToGraphHead(EPGMGraphHeadFactory<EPGMGraphHead> epgmGraphHeadFactory) {
+  public JSONToGraphHead(GraphHeadFactory<EPGMGraphHead> epgmGraphHeadFactory) {
     this.graphHeadFactory = epgmGraphHeadFactory;
   }
 

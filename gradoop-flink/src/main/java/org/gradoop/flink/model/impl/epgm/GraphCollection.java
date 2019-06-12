@@ -349,8 +349,8 @@ public class GraphCollection implements
   }
 
   @Override
-  public BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
-  getFactory() {
+  public BaseGraphCollectionFactory<
+    EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> getFactory() {
     return config.getGraphCollectionFactory();
   }
 

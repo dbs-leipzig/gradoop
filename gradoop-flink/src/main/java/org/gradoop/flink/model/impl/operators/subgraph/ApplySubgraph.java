@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
@@ -121,7 +121,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<EPGMGraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
+    GraphHeadFactory<EPGMGraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
     DataSet<EPGMGraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())
@@ -224,7 +224,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<EPGMGraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
+    GraphHeadFactory<EPGMGraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
     DataSet<EPGMGraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())
@@ -298,7 +298,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<EPGMGraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
+    GraphHeadFactory<EPGMGraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
     DataSet<EPGMGraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())

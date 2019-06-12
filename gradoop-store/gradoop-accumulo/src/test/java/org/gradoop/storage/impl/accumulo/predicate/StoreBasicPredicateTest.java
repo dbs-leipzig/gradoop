@@ -19,7 +19,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
@@ -122,7 +122,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
       List<EPGMGraphHead> samples = sample(new ArrayList<>(loader.getGraphHeads()), 3);
 
       GradoopIdSet sampleRange = GradoopIdSet.fromExisting(samples.stream()
-        .map(Element::getId)
+        .map(EPGMElement::getId)
         .collect(Collectors.toList()));
 
       List<EPGMGraphHead> inputGraph = samples.stream()

@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
  * @param <EL> EPGM element type
  */
 @FunctionAnnotation.ReadFields("id")
-public class BySameId<EL extends Element> implements CombinableFilter<EL> {
+public class BySameId<EL extends EPGMElement> implements CombinableFilter<EL> {
 
   /**
    * id

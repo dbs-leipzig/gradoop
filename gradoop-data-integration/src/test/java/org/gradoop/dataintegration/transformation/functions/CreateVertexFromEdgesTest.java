@@ -19,7 +19,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Test;
 
@@ -43,7 +43,7 @@ public class CreateVertexFromEdgesTest extends GradoopFlinkTestBase {
     CreateVertexFromEdges<EPGMVertex, EPGMEdge> function = new CreateVertexFromEdges<>("test",
       getConfig().getVertexFactory());
     GradoopId dummy = GradoopId.get();
-    EdgeFactory edgeFactory = getConfig().getEdgeFactory();
+    EPGMEdgeFactory edgeFactory = getConfig().getEdgeFactory();
     // Create some test edges, with some having no properties or label.
     EPGMEdge withoutProperties = edgeFactory.createEdge(dummy, dummy);
     EPGMEdge withProperties = edgeFactory.createEdge("TestEdge2", dummy, dummy);

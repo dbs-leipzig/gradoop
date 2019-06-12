@@ -15,7 +15,7 @@
  */
 package org.gradoop.common.model.impl.comparators;
 
-import org.gradoop.common.model.api.entities.EPGMIdentifiable;
+import org.gradoop.common.model.api.entities.Identifiable;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -23,10 +23,10 @@ import java.util.Comparator;
 /**
  * Id based EPGM element comparator.
  */
-public class EPGMIdentifiableComparator implements Comparator<EPGMIdentifiable>, Serializable {
+public class EPGMIdentifiableComparator implements Comparator<Identifiable>, Serializable {
 
   @Override
-  public int compare(EPGMIdentifiable a, EPGMIdentifiable b) {
+  public int compare(Identifiable a, Identifiable b) {
     return a.getId().compareTo(b.getId());
   }
 }

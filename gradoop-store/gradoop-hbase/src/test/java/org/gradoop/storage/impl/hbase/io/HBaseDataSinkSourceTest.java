@@ -18,7 +18,7 @@ package org.gradoop.storage.impl.hbase.io;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.api.entities.EPGMIdentifiable;
+import org.gradoop.common.model.api.entities.Identifiable;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -249,7 +249,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       .subList(1, 3);
 
     GradoopIdSet ids = GradoopIdSet.fromExisting(
-      testGraphs.stream().map(EPGMIdentifiable::getId).collect(Collectors.toList())
+      testGraphs.stream().map(Identifiable::getId).collect(Collectors.toList())
     );
 
     HBaseDataSource source = new HBaseDataSource(epgmStores[storeIndex], getConfig());
@@ -283,7 +283,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       .subList(0, 3);
 
     GradoopIdSet ids = GradoopIdSet.fromExisting(
-      testVertices.stream().map(EPGMIdentifiable::getId).collect(Collectors.toList())
+      testVertices.stream().map(Identifiable::getId).collect(Collectors.toList())
     );
 
     HBaseDataSource source = new HBaseDataSource(epgmStores[storeIndex], getConfig());
@@ -318,7 +318,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
       .subList(0, 3);
 
     GradoopIdSet ids = GradoopIdSet.fromExisting(
-      testEdges.stream().map(EPGMIdentifiable::getId).collect(Collectors.toList())
+      testEdges.stream().map(Identifiable::getId).collect(Collectors.toList())
     );
 
     HBaseDataSource source = new HBaseDataSource(epgmStores[storeIndex], getConfig());

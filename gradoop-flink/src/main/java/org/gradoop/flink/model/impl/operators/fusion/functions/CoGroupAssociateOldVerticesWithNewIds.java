@@ -32,7 +32,8 @@ import java.util.Collection;
 @FunctionAnnotation.ForwardedFieldsFirst("f0->f0")
 @FunctionAnnotation.ReadFieldsSecond("f0")
 public class CoGroupAssociateOldVerticesWithNewIds implements
-  CoGroupFunction<Tuple2<EPGMVertex, GradoopId>, Tuple2<EPGMVertex, GradoopId>, Tuple2<EPGMVertex, GradoopId>> {
+  CoGroupFunction<
+    Tuple2<EPGMVertex, GradoopId>, Tuple2<EPGMVertex, GradoopId>, Tuple2<EPGMVertex, GradoopId>> {
 
   /**
    * Reusable element
