@@ -15,25 +15,40 @@
  */
 package org.gradoop.flink.model.impl.operators.combination;
 
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.ReducibleBinaryBaseGraphToBaseGraphOperator;
 
 /**
  * Computes the combined graph from a collection of logical graphs.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class ReduceCombination implements ReducibleBinaryGraphToGraphOperator {
+public class ReduceCombination<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements ReducibleBinaryBaseGraphToBaseGraphOperator<GC, LG> {
 
   /**
-   * Creates a new logical graph by union the vertex and edge sets of all graph
+   * Creates a new base graph by union the vertex and edge sets of all graph
    * contained in the given collection.
    *
    * @param collection input collection
    * @return combined graph
    */
   @Override
-  public LogicalGraph execute(GraphCollection collection) {
-    return collection.getConfig().getLogicalGraphFactory().fromDataSets(
+  public LG execute(GC collection) {
+    return collection.getGraphFactory().fromDataSets(
       collection.getVertices(), collection.getEdges());
   }
 }

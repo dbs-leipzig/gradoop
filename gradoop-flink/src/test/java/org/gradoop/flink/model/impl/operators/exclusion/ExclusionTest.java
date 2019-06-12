@@ -162,7 +162,7 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
         "exp13[(a)-[e1]->(b)]" +
         "exp14[]");
 
-    checkExpectationsEqualResults(loader, new ReduceExclusion(loader
+    checkExpectationsEqualResults(loader, new ReduceExclusion<>(loader
       .getGraphHeadByVariable("g1").getId()));
   }
 }

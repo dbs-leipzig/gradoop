@@ -90,7 +90,7 @@ public class TLFDataSource extends TLFBase implements DataSource {
 
   @Override
   public LogicalGraph getLogicalGraph() {
-    return getGraphCollection().reduce(new ReduceCombination());
+    return getGraphCollection().reduce(new ReduceCombination<>());
   }
 
   @Override

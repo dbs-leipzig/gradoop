@@ -177,6 +177,6 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
       );
 
     checkExpectationsEqualResults(
-      loader, new ReduceCombination());
+      loader, new ReduceCombination<>());
   }
 }

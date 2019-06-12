@@ -177,6 +177,6 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
         "exp14[(a)-[e1]->(b)]"
       );
 
-    checkExpectationsEqualResults(loader, new ReduceOverlap());
+    checkExpectationsEqualResults(loader, new ReduceOverlap<>());
   }
 }

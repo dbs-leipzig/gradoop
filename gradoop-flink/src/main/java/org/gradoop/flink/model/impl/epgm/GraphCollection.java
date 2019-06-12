@@ -34,9 +34,8 @@ import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
-import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
+import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
@@ -252,18 +251,14 @@ public class GraphCollection implements
   }
 
   @Override
-  public LogicalGraph callForGraph(UnaryCollectionToGraphOperator op) {
-    return op.execute(this);
+  public LogicalGraph callForGraph(
+    UnaryBaseGraphCollectionToBaseGraphOperator<GraphCollection, LogicalGraph> operator) {
+    return operator.execute(this);
   }
 
   @Override
   public GraphCollection apply(ApplicableUnaryGraphToGraphOperator op) {
     return callForCollection(op);
-  }
-
-  @Override
-  public LogicalGraph reduce(ReducibleBinaryGraphToGraphOperator op) {
-    return callForGraph(op);
   }
 
   //----------------------------------------------------------------------------

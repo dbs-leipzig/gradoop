@@ -16,12 +16,13 @@
 package org.gradoop.flink.model.impl.operators.exclusion;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.ReducibleBinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.ByDifferentId;
 import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -33,8 +34,20 @@ import org.gradoop.flink.model.impl.functions.graphcontainment.NotInGraphsBroadc
  * Reduces the starting graph to contain only vertices and edges that are not contained in any
  * other graph that is part of the given collection.
  * The graph head of the starting graph is retained.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class ReduceExclusion implements ReducibleBinaryGraphToGraphOperator {
+public class ReduceExclusion<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements ReducibleBinaryBaseGraphToBaseGraphOperator<GC, LG> {
 
   /**
    * Graph identifier to start excluding from in a collection scenario.
@@ -53,22 +66,22 @@ public class ReduceExclusion implements ReducibleBinaryGraphToGraphOperator {
   }
 
   @Override
-  public LogicalGraph execute(GraphCollection collection) {
+  public LG execute(GC collection) {
     DataSet<GradoopId> excludedGraphIds = collection.getGraphHeads()
       .filter(new ByDifferentId<>(startId))
       .map(new Id<>());
 
-    DataSet<Vertex> vertices = collection.getVertices()
+    DataSet<V> vertices = collection.getVertices()
       .filter(new InGraph<>(startId))
       .filter(new NotInGraphsBroadcast<>())
       .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);
 
-    DataSet<Edge> edges = collection.getEdges()
+    DataSet<E> edges = collection.getEdges()
       .filter(new InGraph<>(startId))
       .filter(new NotInGraphsBroadcast<>())
       .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);
 
-    return collection.getConfig().getLogicalGraphFactory()
+    return collection.getGraphFactory()
       .fromDataSets(collection.getGraphHeads().filter(new BySameId<>(startId)), vertices, edges);
   }
 }
