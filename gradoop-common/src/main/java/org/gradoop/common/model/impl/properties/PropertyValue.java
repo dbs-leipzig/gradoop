@@ -324,8 +324,9 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
     if (strategy.is(value)) {
       return (T) value;
     }
-    throw new UnsupportedOperationException("Value '" + value + "' of type " +
-      value.getClass().getSimpleName() + ", cannot be accessed as " + clazz.getSimpleName());
+    String type = value == null ? "null" : value.getClass().getSimpleName();
+    throw new UnsupportedOperationException("Value '" + value + "' of type " + type +
+      ", cannot be accessed as " + clazz.getSimpleName());
   }
 
   /**
