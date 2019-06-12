@@ -15,10 +15,11 @@
  */
 package org.gradoop.common.model.impl.properties;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import static org.gradoop.common.GradoopTestUtils.writeAndReadFields;
-import static org.junit.Assert.*;
+import static org.testng.AssertJUnit.*;
+import static org.testng.Assert.assertNotEquals;
 
 public class PropertyTest {
 
@@ -35,23 +36,23 @@ public class PropertyTest {
     assertEquals("newKey", property.getKey());
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void testSetKeyNull() {
     new Property(null, PropertyValue.create(10));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void testSetKeyNull2() {
     Property property = new Property("key", PropertyValue.create(10));
     property.setKey(null);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testSetKeyEmpty() {
     new Property("", PropertyValue.create(10));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testSetKeyEmpty2() {
     Property property = new Property("key", PropertyValue.create(10));
     property.setKey("");
@@ -72,13 +73,13 @@ public class PropertyTest {
     assertEquals(propertyValue, p.getValue());
   }
 
-  @Test (expected = NullPointerException.class)
+  @Test (expectedExceptions = NullPointerException.class)
   public void testSetValueNull() {
     Property p = new Property("key", PropertyValue.create(11));
     p.setValue(null);
   }
 
-  @Test (expected = NullPointerException.class)
+  @Test (expectedExceptions = NullPointerException.class)
   public void testSetValueNull2() {
     new Property("key", null);
   }
