@@ -15,12 +15,11 @@
  */
 package org.gradoop.common.model.impl.properties;
 
-import com.google.common.collect.Lists;
 import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataOutputView;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
-import org.junit.Test;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -28,376 +27,110 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Set;
+import java.util.*;
 
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.gradoop.common.model.impl.properties.PropertyValue.create;
-import static org.junit.Assert.*;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.AssertJUnit.*;
 
 public class PropertyValueTest {
 
   /**
+   * Tests if any type conversion of the kind PropertyValue.getType == A to B with
+   * PropertyValue.getB raises an {@link UnsupportedOperationException}.
+   */
+  @Test(expectedExceptions = UnsupportedOperationException.class,
+    dataProvider = "propertyValueProvider",
+    dataProviderClass = PropertyValueTestProvider.class)
+  public void testIfTypeConversionThrowsException(PropertyValue actual) {
+    if (actual.getType() != BigDecimal.class) {
+      actual.getBigDecimal();
+    } else {
+      actual.getDate();
+    }
+  }
+
+  /**
    * Tests if {@link PropertyValue#create(Object)} works with supported types.
    */
-  @Test
-  public void testCreate() {
-    // null
-    PropertyValue p = create(null);
-    assertTrue(p.isNull());
-    assertNull(p.getObject());
-    // boolean
-    p = create(BOOL_VAL_1);
-    assertTrue(p.isBoolean());
-    assertEquals(BOOL_VAL_1, p.getBoolean());
-    // short
-    p = create(SHORT_VAL_e);
-    assertTrue(p.isShort());
-    assertEquals(SHORT_VAL_e, p.getShort());
-    // int
-    p = create(INT_VAL_2);
-    assertTrue(p.isInt());
-    assertEquals(INT_VAL_2, p.getInt());
-    // long
-    p = create(LONG_VAL_3);
-    assertTrue(p.isLong());
-    assertEquals(LONG_VAL_3, p.getLong());
-    // float
-    p = create(FLOAT_VAL_4);
-    assertTrue(p.isFloat());
-    assertEquals(FLOAT_VAL_4, p.getFloat(), 0);
-    // double
-    p = create(DOUBLE_VAL_5);
-    assertTrue(p.isDouble());
-    assertEquals(DOUBLE_VAL_5, p.getDouble(), 0);
-    // String
-    p = create(STRING_VAL_6);
-    assertTrue(p.isString());
-    assertEquals(STRING_VAL_6, p.getString());
-    // BigDecimal
-    p = create(BIG_DECIMAL_VAL_7);
-    assertTrue(p.isBigDecimal());
-    assertEquals(BIG_DECIMAL_VAL_7, p.getBigDecimal());
-    // GradoopId
-    p = create(GRADOOP_ID_VAL_8);
-    assertTrue(p.isGradoopId());
-    assertEquals(GRADOOP_ID_VAL_8, p.getGradoopId());
-    // Map
-    p = create(MAP_VAL_9);
-    assertTrue(p.isMap());
-    assertEquals(MAP_VAL_9, p.getMap());
-    // List
-    p = create(LIST_VAL_a);
-    assertTrue(p.isList());
-    assertEquals(LIST_VAL_a, p.getList());
-    // Date
-    p = create(DATE_VAL_b);
-    assertTrue(p.isDate());
-    assertEquals(DATE_VAL_b, p.getDate());
-    // Time
-    p = create(TIME_VAL_c);
-    assertTrue(p.isTime());
-    assertEquals(TIME_VAL_c, p.getTime());
-    // DateTime
-    p = create(DATETIME_VAL_d);
-    assertTrue(p.isDateTime());
-    assertEquals(DATETIME_VAL_d, p.getDateTime());
-    // Set
-    p = create(SET_VAL_f);
-    assertTrue(p.isSet());
-    assertEquals(SET_VAL_f, p.getSet());
+  @Test(dataProvider = "supportedTypeProvider", dataProviderClass = PropertyValueTestProvider.class)
+  public void testCreate(Object supportedType) {
+    PropertyValue p = create(supportedType);
+
+    if (supportedType != null) {
+      assertTrue(p.is(supportedType.getClass()));
+      assertEquals(supportedType, p.get(supportedType.getClass()));
+    } else {
+      assertTrue(p.isNull());
+      assertNull(p.getObject());
+    }
   }
 
   /**
-   * Test copying the property value
+   * Tests if {@link PropertyValue#copy()} works for every supported type.
    */
-  @Test
-  public void testCopyBoolean() {
-    PropertyValue p = create(BOOL_VAL_1);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-  }
-
-  /**
-   * Tests if {@link PropertyValue#copy()} works when a float type is wrapped.
-   */
-  @Test
-  public void testCopyFloat() {
-    PropertyValue p = create(FLOAT_VAL_4);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-    assertNotSame(FLOAT_VAL_4, copy.getObject());
-  }
-
-  /**
-   * Tests if {@link PropertyValue#copy()} works when a double type is wrapped.
-   */
-  @Test
-  public void testCopyDouble() {
-    PropertyValue p = create(DOUBLE_VAL_5);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-    assertNotSame(DOUBLE_VAL_5, copy.getObject());
-  }
-
-  /**
-   * Tests if {@link PropertyValue#copy()} works when a {@link BigDecimal} type is wrapped.
-   */
-  @Test
-  public void testCopyBigDecimal() {
-    PropertyValue p = create(BIG_DECIMAL_VAL_7);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-    assertNotSame(BIG_DECIMAL_VAL_7, copy.getObject());
-  }
-
-  /**
-   * Tests if {@link PropertyValue#copy()} works when a {@link GradoopId} type is wrapped.
-   */
-  @Test
-  public void testCopyGradoopId() {
-    PropertyValue p = create(GRADOOP_ID_VAL_8);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-    assertNotSame(GRADOOP_ID_VAL_8, copy.getObject());
-  }
-
-  /**
-   * Tests if {@link PropertyValue#copy()} works when a {@link LocalDate} type is wrapped.
-   */
-  @Test
-  public void testCopyDate() {
-    PropertyValue p = create(DATE_VAL_b);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-    assertNotSame(DATE_VAL_b, copy.getObject());
-  }
-
-  /**
-   * Tests if {@link PropertyValue#copy()} works when a {@link LocalDateTime} type is wrapped.
-   */
-  @Test
-  public void testCopyDateTime() {
-    PropertyValue p = create(DATETIME_VAL_d);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-    assertNotSame(DATETIME_VAL_d, copy.getObject());
-  }
-
-  /**
-   * Tests if {@link PropertyValue#copy()} works when a {@link LocalTime} type is wrapped.
-   */
-  @Test
-  public void testCopyTime() {
-    PropertyValue p = create(TIME_VAL_c);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-    assertNotSame(TIME_VAL_c, copy.getObject());
-  }
-
-  /**
-   * Tests if {@link PropertyValue#copy()} works when an int type is wrapped.
-   */
-  @Test
-  public void testCopyInteger() {
-    PropertyValue p = create(INT_VAL_2);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-  }
-
-  /**
-   * Tests if {@link PropertyValue#copy()} works when a {@link String} type is wrapped.
-   */
-  @Test
-  public void testCopyString() {
-    PropertyValue p = create(STRING_VAL_6);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-    assertNotSame(STRING_VAL_6, copy.getObject());
-  }
-
-  /**
-   * Tests if {@link PropertyValue#copy()} works when a {@link Map} type is wrapped.
-   */
-  @Test
-  public void testCopyMap() {
-    PropertyValue p = create(MAP_VAL_9);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-    assertNotSame(MAP_VAL_9, copy.getObject());
-  }
-
-  /**
-   * Tests if {@link PropertyValue#copy()} works when a {@link List} type is wrapped.
-   */
-  @Test
-  public void testCopyList() {
-    PropertyValue p = create(LIST_VAL_a);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-    assertNotSame(LIST_VAL_a, copy.getObject());
-  }
-
-  /**
-   * Tests if {@link PropertyValue#copy()} works when a {@link Set} type is wrapped.
-   */
-  @Test
-  public void testCopySet() {
-    PropertyValue p = create(SET_VAL_f);
-    PropertyValue copy = p.copy();
-    assertEquals(p, copy);
-    assertNotSame(p, copy);
-    assertNotSame(SET_VAL_f, copy.getObject());
+  @Test(dataProvider = "testIsProvider", dataProviderClass = PropertyValueTestProvider.class)
+  public void testCopy(PropertyValue value, Object supportedType) {
+    PropertyValue copy = value.copy();
+    assertEquals(value, copy);
+    assertNotSame(value, copy);
+    if (value instanceof List || value instanceof Map || value instanceof Set) {
+      assertNotSame(supportedType, copy.getObject());
+    }
   }
 
   /**
    * Tests if {@link PropertyValue} setter and getter methods work as expected.
    * X -> p.setObject(X) -> p.getObject() -> X | where X equals X
    */
-  @Test
-  public void testSetAndGetObject() {
-    PropertyValue p = new PropertyValue();
-    // null
-    p.setObject(null);
-    assertTrue(p.isNull());
-    assertNull(p.getObject());
-    // boolean
-    p.setObject(BOOL_VAL_1);
-    assertTrue(p.isBoolean());
-    assertEquals(BOOL_VAL_1, p.getObject());
-    // short
-    p.setObject(SHORT_VAL_e);
-    assertTrue(p.isShort());
-    assertEquals(SHORT_VAL_e, p.getObject());
-    // int
-    p.setObject(INT_VAL_2);
-    assertTrue(p.isInt());
-    assertEquals(INT_VAL_2, p.getObject());
-    // long
-    p.setObject(LONG_VAL_3);
-    assertTrue(p.isLong());
-    assertEquals(LONG_VAL_3, p.getObject());
-    // float
-    p.setObject(FLOAT_VAL_4);
-    assertTrue(p.isFloat());
-    assertEquals(FLOAT_VAL_4, p.getObject());
-    // double
-    p.setObject(DOUBLE_VAL_5);
-    assertTrue(p.isDouble());
-    assertEquals(DOUBLE_VAL_5, p.getObject());
-    // String
-    p.setObject(STRING_VAL_6);
-    assertTrue(p.isString());
-    assertEquals(STRING_VAL_6, p.getObject());
-    // BigDecimal
-    p.setObject(BIG_DECIMAL_VAL_7);
-    assertTrue(p.isBigDecimal());
-    assertEquals(BIG_DECIMAL_VAL_7, p.getObject());
-    // GradoopId
-    p.setObject(GRADOOP_ID_VAL_8);
-    assertTrue(p.isGradoopId());
-    assertEquals(GRADOOP_ID_VAL_8, p.getObject());
-    // Map
-    p.setObject(MAP_VAL_9);
-    assertTrue(p.isMap());
-    assertEquals(MAP_VAL_9, p.getObject());
-    // List
-    p.setObject(LIST_VAL_a);
-    assertTrue(p.isList());
-    assertEquals(LIST_VAL_a, p.getObject());
-    // Date
-    p.setObject(DATE_VAL_b);
-    assertTrue(p.isDate());
-    assertEquals(DATE_VAL_b, p.getDate());
-    // Time
-    p.setObject(TIME_VAL_c);
-    assertTrue(p.isTime());
-    assertEquals(TIME_VAL_c, p.getTime());
-    // DateTime
-    p.setObject(DATETIME_VAL_d);
-    assertTrue(p.isDateTime());
-    assertEquals(DATETIME_VAL_d, p.getDateTime());
-    // Set
-    p.setObject(SET_VAL_f);
-    assertTrue(p.isSet());
-    assertEquals(SET_VAL_f, p.getSet());
+  @Test(dataProvider = "supportedTypeProvider", dataProviderClass = PropertyValueTestProvider.class)
+  public void testSetAndGetObject(Object supportedType) {
+    PropertyValue value = new PropertyValue();
+
+    value.setObject(supportedType);
+    if (supportedType != null) {
+      assertTrue(value.is(supportedType.getClass()));
+    } else {
+      assertTrue(value.isNull());
+    }
+    assertEquals(supportedType, value.getObject());
   }
 
   /**
    * Tests if {@link PropertyValue#setObject(Object)} throws an {@link UnsupportedTypeException} if
    * an unsupported type is passed as an argument.
    */
-  @Test(expected = UnsupportedTypeException.class)
+  @Test(expectedExceptions = UnsupportedTypeException.class)
   public void testSetObjectWithUnsupportedType() {
     PropertyValue p = new PropertyValue();
     p.setObject(new PriorityQueue<>());
   }
 
   /**
-   * Tests whether {@link PropertyValue#isNull()} returns true iff the instance wraps {@code null}.
+   * Tests whether isX only returns true iff the given value represents type X.
+   *
+   * @param value a PropertyValue
+   * @param expectedType the type which is represented by value
    */
-  @Test
-  public void testIsNull() {
-    PropertyValue p = PropertyValue.create(null);
-    assertTrue(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
-  }
-
-  /**
-   * Tests whether {@link PropertyValue#isBoolean()} returns true iff the instance wraps a
-   * {@code boolean}.
-   */
-  @Test
-  public void testIsBoolean() {
-    PropertyValue p = PropertyValue.create(true);
-    assertFalse(p.isNull());
-    assertTrue(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
+  @Test(dataProvider = "testIsProvider", dataProviderClass = PropertyValueTestProvider.class)
+  public void testIs(PropertyValue value, Object expectedType) {
+    assertEquals(Objects.equals(expectedType, NULL_VAL_0), value.isNull());
+    assertEquals(Objects.equals(expectedType, BOOL_VAL_1), value.isBoolean());
+    assertEquals(Objects.equals(expectedType, INT_VAL_2), value.isInt());
+    assertEquals(Objects.equals(expectedType, LONG_VAL_3), value.isLong());
+    assertEquals(Objects.equals(expectedType, FLOAT_VAL_4), value.isFloat());
+    assertEquals(Objects.equals(expectedType, DOUBLE_VAL_5), value.isDouble());
+    assertEquals(Objects.equals(expectedType, STRING_VAL_6), value.isString());
+    assertEquals(Objects.equals(expectedType, BIG_DECIMAL_VAL_7), value.isBigDecimal());
+    assertEquals(Objects.equals(expectedType, GRADOOP_ID_VAL_8), value.isGradoopId());
+    assertEquals(Objects.equals(expectedType, MAP_VAL_9), value.isMap());
+    assertEquals(Objects.equals(expectedType, LIST_VAL_a), value.isList());
+    assertEquals(Objects.equals(expectedType, DATE_VAL_b), value.isDate());
+    assertEquals(Objects.equals(expectedType, TIME_VAL_c), value.isTime());
+    assertEquals(Objects.equals(expectedType, DATETIME_VAL_d), value.isDateTime());
+    assertEquals(Objects.equals(expectedType, SHORT_VAL_e), value.isShort());
+    assertEquals(Objects.equals(expectedType, SET_VAL_f), value.isSet());
   }
 
   /**
@@ -420,30 +153,6 @@ public class PropertyValueTest {
   }
 
   /**
-   * Tests {@link PropertyValue#isShort()}.
-   */
-  @Test
-  public void testIsShort() {
-    PropertyValue p = PropertyValue.create(SHORT_VAL_e);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertTrue(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
-  }
-
-  /**
    * Tests {@link PropertyValue#getShort()}.
    */
   @Test
@@ -460,30 +169,6 @@ public class PropertyValueTest {
     PropertyValue p = new PropertyValue();
     p.setShort(SHORT_VAL_e);
     assertEquals(SHORT_VAL_e, p.getShort());
-  }
-
-  /**
-   * Tests {@link PropertyValue#isInt()}.
-   */
-  @Test
-  public void testIsInt() {
-    PropertyValue p = PropertyValue.create(INT_VAL_2);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertTrue(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
   }
 
   /**
@@ -506,30 +191,6 @@ public class PropertyValueTest {
   }
 
   /**
-   * Tests {@link PropertyValue#isLong()}.
-   */
-  @Test
-  public void testIsLong() {
-    PropertyValue p = PropertyValue.create(LONG_VAL_3);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertTrue(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
-  }
-
-  /**
    * Tests {@link PropertyValue#getLong()}.
    */
   @Test
@@ -546,30 +207,6 @@ public class PropertyValueTest {
     PropertyValue p = new PropertyValue();
     p.setLong(LONG_VAL_3);
     assertEquals(LONG_VAL_3, p.getLong());
-  }
-
-  /**
-   * Tests {@link PropertyValue#isFloat()}.
-   */
-  @Test
-  public void testIsFloat()  {
-    PropertyValue p = PropertyValue.create(FLOAT_VAL_4);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertTrue(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
   }
 
   /**
@@ -592,30 +229,6 @@ public class PropertyValueTest {
   }
 
   /**
-   * Tests {@link PropertyValue#isDouble()}.
-   */
-  @Test
-  public void testIsDouble() {
-    PropertyValue p = PropertyValue.create(DOUBLE_VAL_5);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertTrue(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
-  }
-
-  /**
    * Tests {@link PropertyValue#getDouble()}.
    */
   @Test
@@ -633,31 +246,6 @@ public class PropertyValueTest {
     p.setDouble(DOUBLE_VAL_5);
     assertEquals(DOUBLE_VAL_5, p.getDouble(), 0);
   }
-
-  /**
-   * Tests {@link PropertyValue#isString()}.
-   */
-  @Test
-  public void testIsString() {
-    PropertyValue p = PropertyValue.create(STRING_VAL_6);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertTrue(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
-  }
-
   /**
    * Tests {@link PropertyValue#getString()}.
    */
@@ -675,30 +263,6 @@ public class PropertyValueTest {
     PropertyValue p = new PropertyValue();
     p.setString(STRING_VAL_6);
     assertEquals(STRING_VAL_6, p.getString());
-  }
-
-  /**
-   * Tests {@link PropertyValue#isBigDecimal()}.
-   */
-  @Test
-  public void testIsBigDecimal() {
-    PropertyValue p = PropertyValue.create(BIG_DECIMAL_VAL_7);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertTrue(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
   }
 
   /**
@@ -721,30 +285,6 @@ public class PropertyValueTest {
   }
 
   /**
-   * Tests {@link PropertyValue#isGradoopId()}.
-   */
-  @Test
-  public void testIsGradoopId() {
-    PropertyValue p = PropertyValue.create(GRADOOP_ID_VAL_8);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertTrue(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
-  }
-
-  /**
    * Tests {@link PropertyValue#getGradoopId()}.
    */
   @Test
@@ -761,30 +301,6 @@ public class PropertyValueTest {
     PropertyValue p = new PropertyValue();
     p.setGradoopId(GRADOOP_ID_VAL_8);
     assertEquals(GRADOOP_ID_VAL_8, p.getGradoopId());
-  }
-
-  /**
-   * Tests {@link PropertyValue#isMap()}.
-   */
-  @Test
-  public void testIsMap() {
-    PropertyValue p = PropertyValue.create(MAP_VAL_9);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertTrue(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
   }
 
   /**
@@ -807,34 +323,10 @@ public class PropertyValueTest {
   }
 
   /**
-   * Tests {@link PropertyValue#isList()}.
-   */
-  @Test
-  public void testIsList() {
-    PropertyValue p = PropertyValue.create(LIST_VAL_a);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertTrue(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
-  }
-
-  /**
    * Tests whether passing a {@link List} which is not parametrized as {@link PropertyValue} to
    * {@link PropertyValue#create(Object)} will result in an {@link UnsupportedTypeException}.
    */
-  @Test(expected = UnsupportedTypeException.class)
+  @Test(expectedExceptions = UnsupportedTypeException.class)
   public void testCreateWrongParameterizedList() {
     List<String> list = new ArrayList<>();
     list.add("test1");
@@ -847,7 +339,7 @@ public class PropertyValueTest {
    * Tests whether passing a {@link Map} which is not parametrized as {@link PropertyValue} to
    * {@link PropertyValue#create(Object)} will result in an {@link UnsupportedTypeException}.
    */
-  @Test(expected = UnsupportedTypeException.class)
+  @Test(expectedExceptions = UnsupportedTypeException.class)
   public void testCreateWrongParameterizedMap() {
     Map<String, String> map = new HashMap<>();
     map.put("key1", "val1");
@@ -860,7 +352,7 @@ public class PropertyValueTest {
    * Tests whether passing a {@link Set} which is not parametrized as {@link PropertyValue} to
    * {@link PropertyValue#create(Object)} will result in an {@link UnsupportedTypeException}.
    */
-  @Test(expected = UnsupportedTypeException.class)
+  @Test(expectedExceptions = UnsupportedTypeException.class)
   public void testCreateWrongParameterizedSet() {
     Set<String> set = new HashSet<>();
     set.add("test1");
@@ -897,31 +389,6 @@ public class PropertyValueTest {
     p.setList(LIST_VAL_a);
     assertEquals(LIST_VAL_a, p.getList());
   }
-
-  /**
-   * Tests {@link PropertyValue#isDate()}.
-   */
-  @Test
-  public void testIsDate() {
-    PropertyValue p = PropertyValue.create(DATE_VAL_b);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertTrue(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
-  }
-
   /**
    * Tests {@link PropertyValue#getDate()}.
    */
@@ -940,31 +407,6 @@ public class PropertyValueTest {
     p.setDate(DATE_VAL_b);
     assertEquals(DATE_VAL_b, p.getDate());
   }
-
-  /**
-   * Tests {@link PropertyValue#isTime()}.
-   */
-  @Test
-  public void testIsTime() {
-    PropertyValue p = PropertyValue.create(TIME_VAL_c);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertTrue(p.isTime());
-    assertFalse(p.isDateTime());
-    assertFalse(p.isSet());
-  }
-
   /**
    * tests {@link PropertyValue#getTime()}.
    */
@@ -983,31 +425,6 @@ public class PropertyValueTest {
     p.setTime(TIME_VAL_c);
     assertEquals(TIME_VAL_c, p.getTime());
   }
-
-  /**
-   * Tests {@link PropertyValue#isDateTime()}.
-   */
-  @Test
-  public void testIsDateTime() {
-    PropertyValue p = PropertyValue.create(DATETIME_VAL_d);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertTrue(p.isDateTime());
-    assertFalse(p.isSet());
-  }
-
   /**
    * Tests {@link PropertyValue#getDateTime()}.
    */
@@ -1026,31 +443,6 @@ public class PropertyValueTest {
     p.setDateTime(DATETIME_VAL_d);
     assertEquals(DATETIME_VAL_d, p.getDateTime());
   }
-
-  /**
-   * Tests {@link PropertyValue#isSet()}.
-   */
-  @Test
-  public void testIsSet() {
-    PropertyValue p = PropertyValue.create(SET_VAL_f);
-    assertFalse(p.isNull());
-    assertFalse(p.isBoolean());
-    assertFalse(p.isShort());
-    assertFalse(p.isInt());
-    assertFalse(p.isLong());
-    assertFalse(p.isFloat());
-    assertFalse(p.isDouble());
-    assertFalse(p.isString());
-    assertFalse(p.isBigDecimal());
-    assertFalse(p.isGradoopId());
-    assertFalse(p.isMap());
-    assertFalse(p.isList());
-    assertFalse(p.isDate());
-    assertFalse(p.isTime());
-    assertFalse(p.isDateTime());
-    assertTrue(p.isSet());
-  }
-
   /**
    * Tests {@link PropertyValue#getSet()}.
    */
@@ -1073,119 +465,20 @@ public class PropertyValueTest {
   /**
    * Tests {@link PropertyValue#isNumber()}.
    */
-  @Test
-  public void testIsNumber() {
-    PropertyValue p = PropertyValue.create(SHORT_VAL_e);
-    assertTrue(p.isNumber());
-    p = PropertyValue.create(INT_VAL_2);
-    assertTrue(p.isNumber());
-    p = PropertyValue.create(LONG_VAL_3);
-    assertTrue(p.isNumber());
-    p = PropertyValue.create(FLOAT_VAL_4);
-    assertTrue(p.isNumber());
-    p = PropertyValue.create(DOUBLE_VAL_5);
-    assertTrue(p.isNumber());
-    p = PropertyValue.create(BIG_DECIMAL_VAL_7);
-    assertTrue(p.isNumber());
-
-    p = PropertyValue.create(NULL_VAL_0);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(BOOL_VAL_1);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(STRING_VAL_6);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(GRADOOP_ID_VAL_8);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(MAP_VAL_9);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(LIST_VAL_a);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(DATE_VAL_b);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(TIME_VAL_c);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(DATETIME_VAL_d);
-    assertFalse(p.isNumber());
-    p = PropertyValue.create(SET_VAL_f);
-    assertFalse(p.isNumber());
+  @Test(dataProvider = "testIsNumberProvider", dataProviderClass = PropertyValueTestProvider.class)
+  public void testIsNumber(PropertyValue value, boolean expected) {
+    assertEquals(expected, value.isNumber());
   }
 
   /**
    * Tests {@link PropertyValue#equals(Object)} and {@link PropertyValue#hashCode()}.
    */
-  @Test
-  public void testEqualsAndHashCode() {
-    validateEqualsAndHashCode(create(null), create(null), create(false));
-
-    validateEqualsAndHashCode(create(true), create(true), create(false));
-
-    validateEqualsAndHashCode(create((short) 10), create((short) 10), create((short) 11));
-
-    validateEqualsAndHashCode(create(10), create(10), create(11));
-
-    validateEqualsAndHashCode(create(10L), create(10L), create(11L));
-
-    validateEqualsAndHashCode(create(10F), create(10F), create(11F));
-
-    validateEqualsAndHashCode(create(10.), create(10.), create(11.));
-
-    validateEqualsAndHashCode(create("10"), create("10"), create("11"));
-
-    validateEqualsAndHashCode(create(new BigDecimal(10)),
-      create(new BigDecimal(10)),
-      create(new BigDecimal(11)));
-
-    validateEqualsAndHashCode(
-      create(GradoopId.fromString("583ff8ffbd7d222690a90999")),
-      create(GradoopId.fromString("583ff8ffbd7d222690a90999")),
-      create(GradoopId.fromString("583ff8ffbd7d222690a9099a"))
-    );
-
-    Map<PropertyValue, PropertyValue> map1 = new HashMap<>();
-    map1.put(PropertyValue.create("foo"), PropertyValue.create("bar"));
-    Map<PropertyValue, PropertyValue> map2 = new HashMap<>();
-    map2.put(PropertyValue.create("foo"), PropertyValue.create("bar"));
-    Map<PropertyValue, PropertyValue> map3 = new HashMap<>();
-    map3.put(PropertyValue.create("foo"), PropertyValue.create("baz"));
-    validateEqualsAndHashCode(create(map1), create(map2), create(map3));
-
-    List<PropertyValue> list1 = Lists.newArrayList(
-      PropertyValue.create("foo"), PropertyValue.create("bar")
-    );
-    List<PropertyValue> list2 = Lists.newArrayList(
-      PropertyValue.create("foo"), PropertyValue.create("bar")
-    );
-    List<PropertyValue> list3 = Lists.newArrayList(
-      PropertyValue.create("foo"), PropertyValue.create("baz")
-    );
-    validateEqualsAndHashCode(create(list1), create(list2), create(list3));
-
-    LocalDate date1 = LocalDate.MAX;
-    LocalDate date2 = LocalDate.MAX;
-    LocalDate date3 = LocalDate.now();
-
-    validateEqualsAndHashCode(create(date1), create(date2), create(date3));
-
-    LocalTime time1 = LocalTime.MAX;
-    LocalTime time2 = LocalTime.MAX;
-    LocalTime time3 = LocalTime.now();
-
-    validateEqualsAndHashCode(create(time1), create(time2), create(time3));
-
-    LocalDateTime dateTime1 = LocalDateTime.of(date1, time1);
-    LocalDateTime dateTime2 = LocalDateTime.of(date2, time2);
-    LocalDateTime dateTime3 = LocalDateTime.of(date3, time3);
-
-    validateEqualsAndHashCode(create(dateTime1), create(dateTime2), create(dateTime3));
-
-    Set<PropertyValue> set1 = new HashSet<>();
-    set1.add(PropertyValue.create("bar"));
-    Set<PropertyValue> set2 = new HashSet<>();
-    set2.add(PropertyValue.create("bar"));
-    Set<PropertyValue> set3 = new HashSet<>();
-    set3.add(PropertyValue.create("baz"));
-    validateEqualsAndHashCode(create(set1), create(set2), create(set3));
+  @Test(dataProvider = "testEqualsAndHashCodeProvider",
+    dataProviderClass = PropertyValueTestProvider.class)
+  public void testEqualsAndHashCode(PropertyValue value1, PropertyValue value2, PropertyValue value3) {
+    validateEqualsAndHashCode(value1, value2, value3);
   }
+
 
   private void validateEqualsAndHashCode(PropertyValue p1, PropertyValue p2, PropertyValue p3) {
     assertEquals(p1, p1);
@@ -1326,7 +619,7 @@ public class PropertyValueTest {
    * Tests whether {@link PropertyValue#compareTo(PropertyValue)} throws an
    * {@link IllegalArgumentException} when the instances types are incomparable.
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void testCompareToWithIncompatibleTypes() {
     create(10).compareTo(create("10"));
   }
@@ -1335,7 +628,7 @@ public class PropertyValueTest {
    * Tests whether {@link PropertyValue#compareTo(PropertyValue)} throws an
    * {@link IllegalArgumentException} if the instance is of {@link Map}.
    */
-  @Test(expected = UnsupportedOperationException.class)
+  @Test(expectedExceptions = UnsupportedOperationException.class)
   public void testCompareToWithMap() {
     create(MAP_VAL_9).compareTo(create(MAP_VAL_9));
   }
@@ -1344,7 +637,7 @@ public class PropertyValueTest {
    * Tests whether {@link PropertyValue#compareTo(PropertyValue)} throws an
    * {@link IllegalArgumentException} if the instance is of {@link List}.
    */
-  @Test(expected = UnsupportedOperationException.class)
+  @Test(expectedExceptions = UnsupportedOperationException.class)
   public void testCompareToWithList() {
     create(LIST_VAL_a).compareTo(create(LIST_VAL_a));
   }
@@ -1353,7 +646,7 @@ public class PropertyValueTest {
    * Tests whether {@link PropertyValue#compareTo(PropertyValue)} throws an
    * {@link IllegalArgumentException} if the instance is of {@link Set}.
    */
-  @Test(expected = UnsupportedOperationException.class)
+  @Test(expectedExceptions = UnsupportedOperationException.class)
   public void testCompareToWithSet() {
     create(SET_VAL_f).compareTo(create(SET_VAL_f));
   }
@@ -1505,55 +798,9 @@ public class PropertyValueTest {
    *
    * @throws IOException if something goes wrong.
    */
-  @Test
-  public void testWriteAndReadFields() throws IOException {
-    PropertyValue p = create(NULL_VAL_0);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(BOOL_VAL_1);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(SHORT_VAL_e);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(INT_VAL_2);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(LONG_VAL_3);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(FLOAT_VAL_4);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(DOUBLE_VAL_5);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(STRING_VAL_6);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(BIG_DECIMAL_VAL_7);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(GRADOOP_ID_VAL_8);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(MAP_VAL_9);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(LIST_VAL_a);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(DATE_VAL_b);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(TIME_VAL_c);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(DATETIME_VAL_d);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
-
-    p = create(SET_VAL_f);
-    assertEquals(p, writeAndReadFields(PropertyValue.class, p));
+  @Test(dataProvider = "propertyValueProvider", dataProviderClass = PropertyValueTestProvider.class)
+  public void testWriteAndReadFields(PropertyValue value) throws IOException {
+    assertEquals(value, writeAndReadFields(PropertyValue.class, value));
   }
 
   /**
@@ -1603,55 +850,16 @@ public class PropertyValueTest {
   /**
    * Tests {@link PropertyValue#getType()}.
    */
-  @Test
-  public void testGetType() {
-    PropertyValue p = create(NULL_VAL_0);
-    assertNull(p.getType());
-
-    p = create(BOOL_VAL_1);
-    assertEquals(Boolean.class, p.getType());
-
-    p = create(SHORT_VAL_e);
-    assertEquals(Short.class, p.getType());
-
-    p = create(INT_VAL_2);
-    assertEquals(Integer.class, p.getType());
-
-    p = create(LONG_VAL_3);
-    assertEquals(Long.class, p.getType());
-
-    p = create(FLOAT_VAL_4);
-    assertEquals(Float.class, p.getType());
-
-    p = create(DOUBLE_VAL_5);
-    assertEquals(Double.class, p.getType());
-
-    p = create(STRING_VAL_6);
-    assertEquals(String.class, p.getType());
-
-    p = create(BIG_DECIMAL_VAL_7);
-    assertEquals(BigDecimal.class, p.getType());
-
-    p = create(GRADOOP_ID_VAL_8);
-    assertEquals(GradoopId.class, p.getType());
-
-    p = create(MAP_VAL_9);
-    assertEquals(Map.class, p.getType());
-
-    p = create(LIST_VAL_a);
-    assertEquals(List.class, p.getType());
-
-    p = create(DATE_VAL_b);
-    assertEquals(LocalDate.class, p.getType());
-
-    p = create(TIME_VAL_c);
-    assertEquals(LocalTime.class, p.getType());
-
-    p = create(DATETIME_VAL_d);
-    assertEquals(LocalDateTime.class, p.getType());
-
-    p = create(SET_VAL_f);
-    assertEquals(Set.class, p.getType());
+  @Test(dataProvider = "supportedTypeProvider", dataProviderClass = PropertyValueTestProvider.class)
+  public void testGetType(Object supportedType) {
+    PropertyValue value = create(supportedType);
+    if (supportedType instanceof List || supportedType instanceof Map || supportedType instanceof Set) {
+      assertEquals(supportedType.getClass().getInterfaces()[0], value.getType());
+    } else if (supportedType != null) {
+      assertEquals(supportedType.getClass(), value.getType());
+    } else {
+      assertNull(value.getType());
+    }
   }
 
   /**

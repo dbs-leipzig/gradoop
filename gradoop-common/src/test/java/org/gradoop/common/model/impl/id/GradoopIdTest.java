@@ -15,13 +15,14 @@
  */
 package org.gradoop.common.model.impl.id;
 
-import org.junit.Test;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.AssertJUnit.*;
 
 public class GradoopIdTest {
 
@@ -48,7 +49,7 @@ public class GradoopIdTest {
     GradoopId id1 = GradoopId.get();
     GradoopId id2 = GradoopId.get();
 
-    assertThat(id1.compareTo(id1), is(0));
+    assertEquals(id1.compareTo(id1), 0);
     assertTrue(id1.compareTo(id2) != 0);
   }
 
@@ -121,5 +122,43 @@ public class GradoopIdTest {
     assertTrue("First ID is smaller then the minimum.", first.compareTo(min) >= 0);
     assertTrue("Second ID is smaller then the minimum.", second.compareTo(min) >= 0);
     assertTrue(first == min || second == min);
+  }
+
+  /**
+   * Test if {@link GradoopId#isValid(String)} returns false for invalid input strings
+   *
+   * @param input an invalid input string
+   */
+  @Test(dataProvider = "invalid strings")
+  public void testIsValidWithInvalidInput(String input) {
+    assertFalse("Invalid input string was evaluated as valid: " + input,
+      GradoopId.isValid(input));
+  }
+
+  @DataProvider(name = "invalid strings")
+  private Object[][] invalidStringsDataProvider() {
+    return new Object[][] {
+      {"abc3451d98ebd3452fff32a"},   // too short
+      {"1234567891011121131415161"}, // too long
+      {"12345678910111211314151G"}}; // 'G' is not a valid char in a hex string
+  }
+
+  /**
+   * Test if {@link GradoopId#isValid(String)} returns true for valid input strings.
+   *
+   * @param input a valid input string
+   */
+  @Test(dataProvider = "valid strings")
+  public void testIsValidWithValidInput(String input) {
+    assertTrue("Valid input string was evaluated as invalid: " + input,
+      GradoopId.isValid(input));
+  }
+
+  @DataProvider(name = "valid strings")
+  private Object[][] validStringDataProvider() {
+    return new Object[][] {
+      {"912345678910111213141516"},
+      {"1AB363914FD1325CC43790AB"},
+      {"bcdef12345678910bac76d4e"}};
   }
 }
