@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
 
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
 
@@ -42,7 +43,7 @@ public class LabelKeyFunction<T extends EPGMLabeled> implements GroupingKeyFunct
   }
 
   @Override
-  public Class<String> getType() {
-    return String.class;
+  public TypeInformation<String> getType() {
+    return TypeInformation.of(String.class);
   }
 }

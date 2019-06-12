@@ -34,6 +34,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
+import org.gradoop.flink.model.impl.operators.tpgm.grouping.TemporalGrouping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -659,7 +660,7 @@ public abstract class Grouping<
       V extends Vertex,
       E extends Edge,
       LG extends BaseGraph<G, V, E, LG, GC>,
-      GC extends BaseGraphCollection<G, V, E, LG, GC>> Grouping<G, V, E, LG, GC> build() {
+      GC extends BaseGraphCollection<G, V, E, LG, GC>> UnaryBaseGraphToBaseGraphOperator<LG> build() {
 
       if (strategy == null) {
         throw new IllegalStateException("A GroupingStrategy has to be set.");
@@ -678,7 +679,7 @@ public abstract class Grouping<
         }
       }
 
-      Grouping<G, V, E, LG, GC> groupingOperator;
+      UnaryBaseGraphToBaseGraphOperator<LG> groupingOperator;
 
       switch (strategy) {
       case GROUP_REDUCE:
@@ -687,6 +688,10 @@ public abstract class Grouping<
         break;
       case GROUP_COMBINE:
         groupingOperator = new GroupingGroupCombine<>(
+          useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
+        break;
+      case GROUP_AS_TUPLES:
+        groupingOperator = new TemporalGrouping<>(
           useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups);
         break;
       default:

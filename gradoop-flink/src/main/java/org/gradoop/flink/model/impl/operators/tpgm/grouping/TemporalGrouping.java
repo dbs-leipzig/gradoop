@@ -16,9 +16,11 @@
 package org.gradoop.flink.model.impl.operators.tpgm.grouping;
 
 import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -27,6 +29,9 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
+import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeys;
+import org.gradoop.flink.model.impl.operators.grouping.Grouping;
+import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.BuildSuperEdgeFromTuple;
 import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.BuildSuperVertexFromTuple;
 import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.BuildTuplesFromEdges;
@@ -36,6 +41,7 @@ import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.ReduceEdge
 import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.ReduceVertexTuples;
 import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.UpdateIdField;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -107,6 +113,25 @@ public class TemporalGrouping<
       edgeAggregateFunctions;
   }
 
+  /**
+   * Instantiate this grouping function.<p>
+   * <b>Hint:</b> This constructor is only used for compatibility with the old grouping API. It is
+   * advised to use {@link #TemporalGrouping(List, List, List, List)} instead.<p>
+   * <b>Warning:</b> Label-specific grouping is not (yet) supported by this grouping implementation.
+   * An {@link UnsupportedOperationException} will be thrown when any label group other than the
+   * default label groups is given.
+   *
+   * @param useVertexLabels  Group by vertex labels.
+   * @param useEdgeLabels    Group by edge labels.
+   * @param vertexLabelGroup The default vertex label group.
+   * @param edgeLabelGroup   The default edge label group.
+   */
+  public TemporalGrouping(boolean useVertexLabels, boolean useEdgeLabels,
+    List<LabelGroup> vertexLabelGroup, List<LabelGroup> edgeLabelGroup) {
+    this(asKeyFunctions(useVertexLabels, vertexLabelGroup), asAggregateFunctions(vertexLabelGroup),
+      asKeyFunctions(useEdgeLabels, edgeLabelGroup), asAggregateFunctions(edgeLabelGroup));
+  }
+
   @Override
   public LG execute(LG graph) {
     if (vertexGroupingKeys.isEmpty() && edgeGroupingKeys.isEmpty()) {
@@ -172,5 +197,55 @@ public class TemporalGrouping<
   private int[] getInternalVertexGroupingKeys() {
     return IntStream.range(VERTEX_TUPLE_RESERVED,
       VERTEX_TUPLE_RESERVED + vertexGroupingKeys.size()).toArray();
+  }
+
+  /**
+   * For compatibility reasons only: Convert label groups to aggregate functions.
+   *
+   * @param labelGroups The label groups to convert. (Only the default group is supported.)
+   * @return Aggregate functions corresponding to those groups.
+   */
+  private static List<AggregateFunction> asAggregateFunctions(List<LabelGroup> labelGroups) {
+    return getDefaultGroup(labelGroups).getAggregateFunctions();
+  }
+
+  /**
+   * For compatibility reasons only: Convert label groups to key functions.
+   *
+   * @param useLabels   Should labels be used for grouping?
+   * @param labelGroups The label groups to convert. (Only the default group is supported.)
+   * @return Key functions corresponding to those groups.
+   */
+  private static <T extends EPGMElement> List<GroupingKeyFunction<? super T, ?>> asKeyFunctions(
+    boolean useLabels, List<LabelGroup> labelGroups) {
+    List<GroupingKeyFunction<? super T, ?>> keyFunctions = new ArrayList<>();
+    if (useLabels) {
+      keyFunctions.add(GroupingKeys.label());
+    }
+    getDefaultGroup(labelGroups).getPropertyKeys()
+      .forEach(k -> keyFunctions.add(GroupingKeys.property(k)));
+    return keyFunctions;
+  }
+
+  /**
+   * For compatibility reasons only: Get the default label group or throw an exception.
+   *
+   * @param labelGroups A list of label groups.
+   * @return The default label group, if it is the only label group.
+   */
+  private static LabelGroup getDefaultGroup(List<LabelGroup> labelGroups) {
+    if (labelGroups.size() != 1) {
+      throw new UnsupportedOperationException(
+        "Label specific grouping is not supported by this implementation.");
+    } else {
+      LabelGroup labelGroup = labelGroups.get(0);
+      if (!(labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_EDGE_LABEL_GROUP) ||
+        labelGroup.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP))) {
+        throw new UnsupportedOperationException("Label specific grouping is not supported",
+          new IllegalArgumentException(
+            "The list of label groups does not contain the default label group."));
+      }
+      return labelGroup;
+    }
   }
 }

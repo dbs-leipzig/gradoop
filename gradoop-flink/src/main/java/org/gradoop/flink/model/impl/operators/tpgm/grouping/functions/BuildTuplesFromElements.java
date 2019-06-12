@@ -62,7 +62,7 @@ public class BuildTuplesFromElements<E extends EPGMElement>
   /**
    * The types of the produced tuple.
    */
-  private final Class<?>[] elementTypes;
+  private final TypeInformation<?>[] elementTypes;
 
   /**
    * Reduce object instantiations.
@@ -90,9 +90,9 @@ public class BuildTuplesFromElements<E extends EPGMElement>
       throw new UnsupportedOperationException("Number of elements is too high for tuple: " +
         tupleSize);
     }
-    elementTypes = new Class[tupleSize];
+    elementTypes = new TypeInformation[tupleSize];
     for (int i = 0; i < tupleDataOffset; i++) {
-      elementTypes[i] = GradoopId.class;
+      elementTypes[i] = TypeInformation.of(GradoopId.class);
     }
     // Fill grouping key types.
     for (int i = 0; i < keys.size(); i++) {
@@ -100,7 +100,7 @@ public class BuildTuplesFromElements<E extends EPGMElement>
     }
     // Fill remaining spots with property value types.
     for (int i = 0; i < aggregateFunctions.size(); i++) {
-      elementTypes[i + keys.size() + tupleDataOffset] = PropertyValue.class;
+      elementTypes[i + keys.size() + tupleDataOffset] = TypeInformation.of(PropertyValue.class);
     }
     reuseTuple = Tuple.newInstance(tupleSize);
     // Fill first fields with default ID values.
@@ -113,7 +113,7 @@ public class BuildTuplesFromElements<E extends EPGMElement>
   public TypeInformation<Tuple> getProducedType() {
     TypeInformation<?>[] componentTypes = new TypeInformation[elementTypes.length];
     for (int i = 0; i < componentTypes.length; i++) {
-      componentTypes[i] = TypeInformation.of(elementTypes[i]);
+      componentTypes[i] = elementTypes[i];
     }
     return new TupleTypeInfo<>(componentTypes);
   }

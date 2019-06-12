@@ -15,6 +15,8 @@
  */
 package org.gradoop.flink.model.api.tpgm.functions.grouping;
 
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+
 import java.io.Serializable;
 
 /**
@@ -49,5 +51,5 @@ public interface GroupingKeyFunction<E, K> extends Serializable {
    *
    * @return The key type.
    */
-  Class<K> getType();
+  TypeInformation<K> getType();
 }

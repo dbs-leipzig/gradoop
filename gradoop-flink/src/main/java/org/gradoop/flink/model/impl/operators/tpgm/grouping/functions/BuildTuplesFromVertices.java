@@ -49,6 +49,15 @@ public class BuildTuplesFromVertices<E extends EPGMElement> extends BuildTuplesF
   public Tuple map(E element) throws Exception {
     final Tuple result = super.map(element);
     result.setField(element.getId(), VERTEX_TUPLE_ID);
-    return result;
+    return checkTuple(result);
+  }
+
+  private Tuple checkTuple(Tuple t) {
+    for (int i = 0; i < t.getArity(); i++) {
+      if (t.getField(i) == null) {
+        throw new IllegalStateException("Tuple contains null: " + t);
+      }
+    }
+    return t;
   }
 }

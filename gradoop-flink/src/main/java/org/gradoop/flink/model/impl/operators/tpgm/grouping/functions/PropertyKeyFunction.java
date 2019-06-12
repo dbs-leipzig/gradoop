@@ -15,6 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
 
+import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.gradoop.common.model.api.entities.EPGMAttributed;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
@@ -55,7 +56,7 @@ public class PropertyKeyFunction<T extends EPGMAttributed>
   }
 
   @Override
-  public Class<PropertyValue> getType() {
-    return PropertyValue.class;
+  public TypeInformation<PropertyValue> getType() {
+    return TypeInformation.of(PropertyValue.class);
   }
 }

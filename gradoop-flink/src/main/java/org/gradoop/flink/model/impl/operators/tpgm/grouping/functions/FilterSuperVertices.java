@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.operators.tpgm.grouping.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.gradoop.common.model.impl.id.GradoopId;
 
@@ -28,6 +29,7 @@ import static org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.Tem
  *
  * @param <T> The type of the vertex-tuples.
  */
+@FunctionAnnotation.ReadFields({"f0", "f1"})
 public class FilterSuperVertices<T extends Tuple> implements FilterFunction<T> {
 
   @Override

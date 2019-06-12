@@ -15,22 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.TemporalGrouping;
-
-/**
- * Used to define the grouping strategy which is used for computing the summary graph.
- */
-public enum GroupingStrategy {
-  /**
-   * {@see GroupingGroupReduce}
-   */
-  GROUP_REDUCE,
-  /**
-   * {@see GroupingGroupCombine}
-   */
-  GROUP_COMBINE,
-  /**
-   * {@link TemporalGrouping}
-   */
-  GROUP_AS_TUPLES
+public class TupleBasedGroupingTest extends GroupingTestBase {
+  @Override
+  public GroupingStrategy getStrategy() {
+    return GroupingStrategy.GROUP_AS_TUPLES;
+  }
 }
