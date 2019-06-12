@@ -20,9 +20,9 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -182,9 +182,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     GraphCollection collection = new HBaseDataSource(epgmStores[storeIndex], getConfig())
       .getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
-    Collection<Vertex> loadedVertices = Lists.newArrayList();
-    Collection<Edge> loadedEdges = Lists.newArrayList();
+    Collection<EPGMGraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<EPGMVertex> loadedVertices = Lists.newArrayList();
+    Collection<EPGMEdge> loadedEdges = Lists.newArrayList();
 
     collection.getGraphHeads().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
     collection.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
@@ -222,9 +222,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     GraphCollection collection = hBaseDataSource.getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
-    Collection<Vertex> loadedVertices = Lists.newArrayList();
-    Collection<Edge> loadedEdges = Lists.newArrayList();
+    Collection<EPGMGraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<EPGMVertex> loadedVertices = Lists.newArrayList();
+    Collection<EPGMEdge> loadedEdges = Lists.newArrayList();
 
     collection.getGraphHeads().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
     collection.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
@@ -245,7 +245,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testReadWithGraphIdPredicate() throws Throwable {
-    List<GraphHead> testGraphs = new ArrayList<>(getSocialGraphHeads())
+    List<EPGMGraphHead> testGraphs = new ArrayList<>(getSocialGraphHeads())
       .subList(1, 3);
 
     GradoopIdSet ids = GradoopIdSet.fromExisting(
@@ -263,9 +263,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     GraphCollection graphCollection = source.getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
-    Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
-    Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
+    Collection<EPGMGraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
+    Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
+    Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
     validateEPGMElementCollections(testGraphs, loadedGraphHeads);
     validateEPGMElementCollections(getSocialVertices(), loadedVertices);
@@ -279,7 +279,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testReadWithVertexIdPredicate() throws Throwable {
-    List<Vertex> testVertices = new ArrayList<>(getSocialVertices())
+    List<EPGMVertex> testVertices = new ArrayList<>(getSocialVertices())
       .subList(0, 3);
 
     GradoopIdSet ids = GradoopIdSet.fromExisting(
@@ -288,7 +288,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     HBaseDataSource source = new HBaseDataSource(epgmStores[storeIndex], getConfig());
 
-    // Apply Vertex-Id predicate
+    // Apply EPGMVertex-Id predicate
     source = source.applyVertexPredicate(
       Query.elements()
         .fromSets(ids)
@@ -298,9 +298,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     GraphCollection graphCollection = source.getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
-    Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
-    Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
+    Collection<EPGMGraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
+    Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
+    Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
     validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
     validateEPGMElementCollections(testVertices, loadedVertices);
@@ -314,7 +314,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testReadWithEdgeIdPredicate() throws Throwable {
-    List<Edge> testEdges = new ArrayList<>(getSocialEdges())
+    List<EPGMEdge> testEdges = new ArrayList<>(getSocialEdges())
       .subList(0, 3);
 
     GradoopIdSet ids = GradoopIdSet.fromExisting(
@@ -323,7 +323,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     HBaseDataSource source = new HBaseDataSource(epgmStores[storeIndex], getConfig());
 
-    // Apply Edge-Id predicate
+    // Apply EPGMEdge-Id predicate
     source = source.applyEdgePredicate(
       Query.elements()
         .fromSets(ids)
@@ -333,9 +333,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     GraphCollection graphCollection = source.getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
-    Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
-    Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
+    Collection<EPGMGraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
+    Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
+    Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
     validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
     validateEPGMElementCollections(getSocialVertices(), loadedVertices);
@@ -353,18 +353,18 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test
   public void testReadWithLabelInPredicate() throws Exception {
     // Extract parts of social graph to filter for
-    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
+    List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
       .filter(e -> e.getLabel().equals(LABEL_FORUM))
       .collect(Collectors.toList());
 
-    List<Edge> edges = Lists.newArrayList(getSocialEdges())
+    List<EPGMEdge> edges = Lists.newArrayList(getSocialEdges())
       .stream()
       .filter(e -> e.getLabel().equals(LABEL_HAS_MODERATOR) ||
         e.getLabel().equals(LABEL_HAS_MEMBER))
       .collect(Collectors.toList());
 
-    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
+    List<EPGMVertex> vertices = Lists.newArrayList(getSocialVertices())
       .stream()
       .filter(e -> e.getLabel().equals(LABEL_TAG) || e.getLabel().equals(LABEL_FORUM))
       .collect(Collectors.toList());
@@ -391,9 +391,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
-    Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
-    Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
+    Collection<EPGMGraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
+    Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
+    Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
     validateEPGMElementCollections(graphHeads, loadedGraphHeads);
     validateEPGMElementCollections(vertices, loadedVertices);
@@ -411,17 +411,17 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test
   public void testReadWithLabelRegPredicate() throws Exception {
     // Extract parts of social graph to filter for
-    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
+    List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
       .filter(g -> PATTERN_GRAPH.matcher(g.getLabel()).matches())
       .collect(Collectors.toList());
 
-    List<Edge> edges = Lists.newArrayList(getSocialEdges())
+    List<EPGMEdge> edges = Lists.newArrayList(getSocialEdges())
       .stream()
       .filter(e -> PATTERN_EDGE.matcher(e.getLabel()).matches())
       .collect(Collectors.toList());
 
-    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
+    List<EPGMVertex> vertices = Lists.newArrayList(getSocialVertices())
       .stream()
       .filter(v -> PATTERN_VERTEX.matcher(v.getLabel()).matches())
       .collect(Collectors.toList());
@@ -445,9 +445,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
-    Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
-    Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
+    Collection<EPGMGraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
+    Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
+    Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
     validateEPGMElementCollections(graphHeads, loadedGraphHeads);
     validateEPGMElementCollections(vertices, loadedVertices);
@@ -469,19 +469,19 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     PropertyValue propertyValueCity = PropertyValue.create("Leipzig");
 
     // Extract parts of social graph to filter for
-    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
+    List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
       .filter(g -> g.hasProperty(PROP_VERTEX_COUNT))
       .filter(g -> g.getPropertyValue(PROP_VERTEX_COUNT).equals(propertyValueVertexCount))
       .collect(Collectors.toList());
 
-    List<Edge> edges = Lists.newArrayList(getSocialEdges())
+    List<EPGMEdge> edges = Lists.newArrayList(getSocialEdges())
       .stream()
       .filter(e -> e.hasProperty(PROP_SINCE))
       .filter(e -> e.getPropertyValue(PROP_SINCE).equals(propertyValueSince))
       .collect(Collectors.toList());
 
-    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
+    List<EPGMVertex> vertices = Lists.newArrayList(getSocialVertices())
       .stream()
       .filter(v -> v.hasProperty(PROP_CITY))
       .filter(v -> v.getPropertyValue(PROP_CITY).equals(propertyValueCity))
@@ -507,9 +507,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
-    Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
-    Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
+    Collection<EPGMGraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
+    Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
+    Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
     validateEPGMElementCollections(graphHeads, loadedGraphHeads);
     validateEPGMElementCollections(vertices, loadedVertices);
@@ -531,21 +531,21 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     PropertyValue propertyValueAge = PropertyValue.create(30);
 
     // Extract parts of social graph to filter for
-    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
+    List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
       // graph with property "vertexCount" and value >= 3
       .filter(g -> g.hasProperty(PROP_VERTEX_COUNT))
       .filter(g -> g.getPropertyValue(PROP_VERTEX_COUNT).compareTo(propertyValueVertexCount) >= 0)
       .collect(Collectors.toList());
 
-    List<Edge> edges = Lists.newArrayList(getSocialEdges())
+    List<EPGMEdge> edges = Lists.newArrayList(getSocialEdges())
       .stream()
       // edge with property "since" and value > 2014
       .filter(e -> e.hasProperty(PROP_SINCE))
       .filter(e -> e.getPropertyValue(PROP_SINCE).compareTo(propertyValueSince) > 0)
       .collect(Collectors.toList());
 
-    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
+    List<EPGMVertex> vertices = Lists.newArrayList(getSocialVertices())
       .stream()
       // vertex with property "age" and value > 30
       .filter(v -> v.hasProperty(PROP_AGE))
@@ -575,9 +575,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
-    Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
-    Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
+    Collection<EPGMGraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
+    Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
+    Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
     validateEPGMElementCollections(graphHeads, loadedGraphHeads);
     validateEPGMElementCollections(vertices, loadedVertices);
@@ -595,7 +595,7 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test
   public void testReadWithPropRegPredicate() throws Exception {
     // Extract parts of social graph to filter for
-    List<GraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
+    List<EPGMGraphHead> graphHeads = Lists.newArrayList(getSocialGraphHeads())
       .stream()
       // graph with property "name" and value matches regex ".*doop$"
       .filter(g -> g.hasProperty(PROP_INTEREST))
@@ -603,14 +603,14 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
         .matches(PATTERN_GRAPH_PROP.pattern()))
       .collect(Collectors.toList());
 
-    List<Edge> edges = Lists.newArrayList(getSocialEdges())
+    List<EPGMEdge> edges = Lists.newArrayList(getSocialEdges())
       .stream()
       // edge with property "status" and value matches regex "^start..$"
       .filter(e -> e.hasProperty(PROP_STATUS))
       .filter(e -> e.getPropertyValue(PROP_STATUS).getString().matches(PATTERN_EDGE_PROP.pattern()))
       .collect(Collectors.toList());
 
-    List<Vertex> vertices = Lists.newArrayList(getSocialVertices())
+    List<EPGMVertex> vertices = Lists.newArrayList(getSocialVertices())
       .stream()
       // vertex with property "name" and value matches regex ".*ve$"
       .filter(v -> v.hasProperty(PROP_NAME))
@@ -639,9 +639,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
-    Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
-    Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
+    Collection<EPGMGraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
+    Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
+    Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
     assertEquals(1, loadedGraphHeads.size());
     assertEquals(2, loadedEdges.size());
@@ -663,20 +663,20 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
   @Test
   public void testReadWithChainedPredicates() throws Exception {
     // Extract parts of social graph to filter for
-    List<GraphHead> graphHeads = getSocialGraphHeads()
+    List<EPGMGraphHead> graphHeads = getSocialGraphHeads()
       .stream()
       .filter(g -> g.getLabel().equals("Community"))
       .filter(g -> !g.getPropertyValue(PROP_INTEREST).getString().equals("Hadoop") &&
         !g.getPropertyValue(PROP_INTEREST).getString().equals("Graphs"))
       .collect(Collectors.toList());
 
-    List<Edge> edges = getSocialEdges()
+    List<EPGMEdge> edges = getSocialEdges()
       .stream()
       .filter(e -> e.getLabel().matches(PATTERN_EDGE.pattern()) ||
         (e.hasProperty(PROP_SINCE) && e.getPropertyValue(PROP_SINCE).getInt() < 2015))
       .collect(Collectors.toList());
 
-    List<Vertex> vertices = getSocialVertices()
+    List<EPGMVertex> vertices = getSocialVertices()
       .stream()
       .filter(v -> v.getLabel().equals("Person"))
       .collect(Collectors.toList())
@@ -689,21 +689,21 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
       Query.elements().fromAll()
         // WHERE gh.label = "Community" AND NOT(gh.interest = "Hadoop" OR gh.interest = "Graphs")
-        .where(HBaseFilters.<GraphHead>labelIn("Community")
-          .and(HBaseFilters.<GraphHead>propEquals(PROP_INTEREST, "Hadoop")
+        .where(HBaseFilters.<EPGMGraphHead>labelIn("Community")
+          .and(HBaseFilters.<EPGMGraphHead>propEquals(PROP_INTEREST, "Hadoop")
             .or(HBaseFilters.propEquals(PROP_INTEREST, "Graphs")).negate())));
 
     // Apply edge predicate
     hBaseDataSource = hBaseDataSource.applyEdgePredicate(
       Query.elements().fromAll()
         // WHERE edge.label LIKE '^has.*$' OR edge.since < 2015
-        .where(HBaseFilters.<Edge>labelReg(PATTERN_EDGE)
-          .or(HBaseFilters.<Edge>propLargerThan(PROP_SINCE, 2015, true).negate())));
+        .where(HBaseFilters.<EPGMEdge>labelReg(PATTERN_EDGE)
+          .or(HBaseFilters.<EPGMEdge>propLargerThan(PROP_SINCE, 2015, true).negate())));
 
     // Apply vertex predicate
-    final HBaseElementFilter<Vertex> vertexFilter = HBaseFilters.<Vertex>labelIn("Person")
-      .and(HBaseFilters.<Vertex>propEquals(PROP_NAME, vertices.get(0).getPropertyValue("name"))
-        .or(HBaseFilters.<Vertex>propEquals(PROP_NAME, vertices.get(1).getPropertyValue("name"))
+    final HBaseElementFilter<EPGMVertex> vertexFilter = HBaseFilters.<EPGMVertex>labelIn("Person")
+      .and(HBaseFilters.<EPGMVertex>propEquals(PROP_NAME, vertices.get(0).getPropertyValue("name"))
+        .or(HBaseFilters.<EPGMVertex>propEquals(PROP_NAME, vertices.get(1).getPropertyValue("name"))
           .or(HBaseFilters.propEquals(PROP_NAME, vertices.get(2).getPropertyValue("name")))));
 
     hBaseDataSource = hBaseDataSource.applyVertexPredicate(
@@ -714,9 +714,9 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
-    Collection<Vertex> loadedVertices = graphCollection.getVertices().collect();
-    Collection<Edge> loadedEdges = graphCollection.getEdges().collect();
+    Collection<EPGMGraphHead> loadedGraphHeads = graphCollection.getGraphHeads().collect();
+    Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
+    Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
     assertEquals(1, loadedGraphHeads.size());
     assertEquals(21, loadedEdges.size());

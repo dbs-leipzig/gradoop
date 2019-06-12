@@ -20,7 +20,7 @@ import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.junit.Test;
@@ -77,7 +77,7 @@ public class HBasePropEqualsTest {
   @Test
   public void testToHBaseFilter() {
 
-    HBasePropEquals<Vertex> vertexFilter = new HBasePropEquals<>(propertyKey, propertyValue);
+    HBasePropEquals<EPGMVertex> vertexFilter = new HBasePropEquals<>(propertyKey, propertyValue);
 
     FilterList expectedFilter = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 

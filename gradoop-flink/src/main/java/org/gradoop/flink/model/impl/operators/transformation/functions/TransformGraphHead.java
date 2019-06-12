@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <G> the type of the EPGM graph head
  */
 @FunctionAnnotation.ForwardedFields("id")
-public class TransformGraphHead<G extends EPGMGraphHead> extends TransformBase<G> {
+public class TransformGraphHead<G extends GraphHead> extends TransformBase<G> {
 
   /**
    * Factory to init modified graph head.

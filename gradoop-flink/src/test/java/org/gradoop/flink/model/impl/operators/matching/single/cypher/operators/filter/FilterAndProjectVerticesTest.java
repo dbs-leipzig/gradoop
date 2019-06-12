@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.DataSource;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -40,7 +40,7 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
 
     Properties properties = Properties.create();
     properties.set("name", "Anton");
-    DataSet<Vertex> vertices = getExecutionEnvironment()
+    DataSet<EPGMVertex> vertices = getExecutionEnvironment()
       .fromElements(new VertexFactory().createVertex("Person", properties));
 
     FilterAndProjectVertices filter =
@@ -56,12 +56,12 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     VertexFactory vertexFactory = new VertexFactory();
     Properties properties = Properties.create();
     properties.set("name", "Alice");
-    Vertex v1 = vertexFactory.createVertex("Person", properties);
+    EPGMVertex v1 = vertexFactory.createVertex("Person", properties);
     properties = Properties.create();
     properties.set("name", "Bob");
-    Vertex v2 = vertexFactory.createVertex("Person", properties);
+    EPGMVertex v2 = vertexFactory.createVertex("Person", properties);
 
-    DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
+    DataSet<EPGMVertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
 
     List<Embedding> result =
@@ -78,9 +78,9 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
     CNF predicates = predicateFromQuery("MATCH (a:Person)");
 
     VertexFactory vertexFactory = new VertexFactory();
-    Vertex v1 = vertexFactory.createVertex("Person");
-    Vertex v2 = vertexFactory.createVertex("Forum");
-    DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
+    EPGMVertex v1 = vertexFactory.createVertex("Person");
+    EPGMVertex v2 = vertexFactory.createVertex("Forum");
+    DataSet<EPGMVertex> vertices = getExecutionEnvironment().fromElements(v1, v2);
 
     List<Embedding> result =
       new FilterAndProjectVertices(vertices, predicates, new ArrayList<>())
@@ -97,8 +97,8 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
-    Vertex person = new VertexFactory().createVertex("Person", properties);
-    DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(person);
+    EPGMVertex person = new VertexFactory().createVertex("Person", properties);
+    DataSet<EPGMVertex> vertices = getExecutionEnvironment().fromElements(person);
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name");
 
@@ -119,8 +119,8 @@ public class FilterAndProjectVerticesTest extends PhysicalOperatorTest {
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
-    Vertex person = new VertexFactory().createVertex("Person", properties);
-    DataSource<Vertex> vertices = getExecutionEnvironment().fromElements(person);
+    EPGMVertex person = new VertexFactory().createVertex("Person", properties);
+    DataSource<EPGMVertex> vertices = getExecutionEnvironment().fromElements(person);
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name", "age");
 

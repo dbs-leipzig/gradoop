@@ -18,10 +18,10 @@ package org.gradoop.flink.io.api.metadata.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.flink.io.api.metadata.MetaDataSource;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
@@ -55,11 +55,11 @@ public class ElementToPropertyMetaData<E extends Element>
   public Tuple3<String, String, Set<String>> map(E e) throws Exception {
     Class<? extends Element> type = e.getClass();
 
-    if (type == Edge.class) {
+    if (type == EPGMEdge.class) {
       reuseTuple.f0 = MetaDataSource.EDGE_TYPE;
-    } else if (type == Vertex.class) {
+    } else if (type == EPGMVertex.class) {
       reuseTuple.f0 = MetaDataSource.VERTEX_TYPE;
-    } else if (type == GraphHead.class) {
+    } else if (type == EPGMGraphHead.class) {
       reuseTuple.f0 = MetaDataSource.GRAPH_TYPE;
     } else {
       throw new Exception("Unsupported element class");

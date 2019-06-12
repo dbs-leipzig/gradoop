@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Abstract base class for initializing EPGM elements from import elements.
  *
  * @param <EL> EPGM element type
- * @param <K>  Import Edge/Vertex identifier type
+ * @param <K>  Import EPGMEdge/EPGMVertex identifier type
  */
 public abstract class InitElement
   <EL extends Element, K extends Comparable<K>> implements Serializable {

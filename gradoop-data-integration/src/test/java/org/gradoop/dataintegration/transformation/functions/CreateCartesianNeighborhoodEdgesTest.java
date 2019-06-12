@@ -17,8 +17,8 @@ package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -47,7 +47,7 @@ public class CreateCartesianNeighborhoodEdgesTest extends GradoopFlinkTestBase {
   /**
    * The function to test.
    */
-  private CreateCartesianNeighborhoodEdges<Vertex, Edge> toTest;
+  private CreateCartesianNeighborhoodEdges<EPGMVertex, EPGMEdge> toTest;
 
   /**
    * The factory used to create new vertices.
@@ -70,10 +70,10 @@ public class CreateCartesianNeighborhoodEdgesTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWithEmptyNeighborhood() throws Exception {
-    Vertex someVertex = vertexFactory.createVertex();
-    Tuple2<Vertex, List<NeighborhoodVertex>> inputEmpty = new Tuple2<>(someVertex,
+    EPGMVertex someVertex = vertexFactory.createVertex();
+    Tuple2<EPGMVertex, List<NeighborhoodVertex>> inputEmpty = new Tuple2<>(someVertex,
       Collections.emptyList());
-    List<Edge> result = getExecutionEnvironment().fromElements(inputEmpty)
+    List<EPGMEdge> result = getExecutionEnvironment().fromElements(inputEmpty)
       .flatMap(toTest).collect();
     assertEquals(0, result.size());
   }
@@ -85,21 +85,21 @@ public class CreateCartesianNeighborhoodEdgesTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWithNonEmptyNeighborhood() throws Exception {
-    Vertex someVertex = vertexFactory.createVertex();
+    EPGMVertex someVertex = vertexFactory.createVertex();
     final int count = 10;
     List<GradoopId> ids = Stream.generate(GradoopId::get).limit(count).collect(Collectors.toList());
     // Create some dummy neighborhood vertex pojos.
     List<NeighborhoodVertex> vertexPojos = ids.stream()
       .map(id -> new NeighborhoodVertex(id, ""))
       .collect(Collectors.toList());
-    Tuple2<Vertex, List<NeighborhoodVertex>> inputNonEmpty = new Tuple2<>(someVertex,
+    Tuple2<EPGMVertex, List<NeighborhoodVertex>> inputNonEmpty = new Tuple2<>(someVertex,
       vertexPojos);
-    List<Edge> result = getExecutionEnvironment().fromElements(inputNonEmpty)
+    List<EPGMEdge> result = getExecutionEnvironment().fromElements(inputNonEmpty)
       .flatMap(toTest).collect();
     // Connect each neighbor with another neighbor, except for itself.
     assertEquals(count * (count - 1), result.size());
     // The result should not contain loops
-    for (Edge edge : result) {
+    for (EPGMEdge edge : result) {
       assertNotEquals(edge.getSourceId(), edge.getTargetId());
     }
     // or duplicate edges.

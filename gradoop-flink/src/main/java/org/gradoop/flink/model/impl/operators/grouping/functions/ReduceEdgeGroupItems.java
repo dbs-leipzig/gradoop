@@ -21,7 +21,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 
@@ -33,11 +33,11 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
  */
 @FunctionAnnotation.ForwardedFields("f0->sourceId;f1->targetId;f2->label")
 @FunctionAnnotation.ReadFields("f3;f5")
-public class ReduceEdgeGroupItems<E extends EPGMEdge> extends BuildSuperEdge
+public class ReduceEdgeGroupItems<E extends Edge> extends BuildSuperEdge
   implements GroupReduceFunction<EdgeGroupItem, E>, ResultTypeQueryable<E> {
 
   /**
-   * Edge factory.
+   * EPGMEdge factory.
    */
   private final EPGMEdgeFactory<E> edgeFactory;
 

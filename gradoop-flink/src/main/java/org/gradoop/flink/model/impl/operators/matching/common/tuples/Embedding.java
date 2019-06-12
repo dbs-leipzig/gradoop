@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.tuples;
 import org.apache.flink.api.java.tuple.Tuple2;
 
 /**
- * Represents an embedding of a query pattern in the search graph. Vertex and
+ * Represents an embedding of a query pattern in the search graph. EPGMVertex and
  * edge mappings are represented by two arrays where the index in the array
  * refers to the index of the query vertex/edge.
  *

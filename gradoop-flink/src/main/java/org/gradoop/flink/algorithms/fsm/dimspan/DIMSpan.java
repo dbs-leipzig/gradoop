@@ -90,12 +90,12 @@ public class DIMSpan {
   protected final GSpanLogic gSpan;
 
   /**
-   * Vertex label dictionary for dictionary coding.
+   * EPGMVertex label dictionary for dictionary coding.
    */
   private DataSet<String[]> vertexDictionary;
 
   /**
-   * Edge label dictionary for dictionary coding.
+   * EPGMEdge label dictionary for dictionary coding.
    */
   private DataSet<String[]> edgeDictionary;
 

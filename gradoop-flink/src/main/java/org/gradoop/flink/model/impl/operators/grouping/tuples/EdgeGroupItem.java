@@ -20,7 +20,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 
 /**
- * Edge representation used for grouping edges to super edges.
+ * EPGMEdge representation used for grouping edges to super edges.
  *
  * <pre>
  * f0: source vertex id

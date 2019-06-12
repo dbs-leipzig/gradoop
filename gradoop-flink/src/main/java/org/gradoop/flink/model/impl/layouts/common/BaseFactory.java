@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.layouts.common;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.api.layouts.BaseLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -55,11 +55,11 @@ public abstract class BaseFactory implements BaseLayoutFactory {
    * @param graphHeads  graph heads
    * @return graph head dataset
    */
-  protected DataSet<GraphHead> createGraphHeadDataSet(Collection<GraphHead> graphHeads) {
+  protected DataSet<EPGMGraphHead> createGraphHeadDataSet(Collection<EPGMGraphHead> graphHeads) {
 
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
-    DataSet<GraphHead> graphHeadSet;
+    DataSet<EPGMGraphHead> graphHeadSet;
     if (graphHeads.isEmpty()) {
       graphHeadSet = env
         .fromElements(getConfig().getGraphHeadFactory().createGraphHead())
@@ -77,11 +77,11 @@ public abstract class BaseFactory implements BaseLayoutFactory {
    * @param vertices  vertex collection
    * @return vertex dataset
    */
-  protected DataSet<Vertex> createVertexDataSet(Collection<Vertex> vertices) {
+  protected DataSet<EPGMVertex> createVertexDataSet(Collection<EPGMVertex> vertices) {
 
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
-    DataSet<Vertex> vertexSet;
+    DataSet<EPGMVertex> vertexSet;
     if (vertices.isEmpty()) {
       vertexSet = env
         .fromElements(getConfig().getVertexFactory().createVertex())
@@ -99,10 +99,10 @@ public abstract class BaseFactory implements BaseLayoutFactory {
    * @param edges edge collection
    * @return edge dataset
    */
-  protected DataSet<Edge> createEdgeDataSet(Collection<Edge> edges) {
+  protected DataSet<EPGMEdge> createEdgeDataSet(Collection<EPGMEdge> edges) {
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 
-    DataSet<Edge> edgeSet;
+    DataSet<EPGMEdge> edgeSet;
     if (edges.isEmpty()) {
       GradoopId dummyId = GradoopId.get();
       edgeSet = env

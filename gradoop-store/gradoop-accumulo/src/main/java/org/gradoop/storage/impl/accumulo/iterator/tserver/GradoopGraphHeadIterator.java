@@ -19,9 +19,9 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.apache.accumulo.core.util.Pair;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
@@ -36,7 +36,7 @@ import java.util.Objects;
 /**
  * Accumulo gradoop graph head iterator
  */
-public class GradoopGraphHeadIterator extends BaseElementIterator<EPGMGraphHead> {
+public class GradoopGraphHeadIterator extends BaseElementIterator<GraphHead> {
 
   /**
    * Graph head factory
@@ -45,9 +45,9 @@ public class GradoopGraphHeadIterator extends BaseElementIterator<EPGMGraphHead>
 
   @Nonnull
   @Override
-  public EPGMGraphHead fromRow(@Nonnull Map.Entry<Key, Value> pair) throws IOException {
+  public GraphHead fromRow(@Nonnull Map.Entry<Key, Value> pair) throws IOException {
     //map from serialize content
-    GraphHead content = KryoUtils.loads(pair.getValue().get(), GraphHead.class);
+    EPGMGraphHead content = KryoUtils.loads(pair.getValue().get(), EPGMGraphHead.class);
     content.setId(GradoopId.fromString(pair.getKey().getRow().toString()));
     //read from content
     return content;
@@ -55,7 +55,7 @@ public class GradoopGraphHeadIterator extends BaseElementIterator<EPGMGraphHead>
 
   @Nonnull
   @Override
-  public Pair<Key, Value> toRow(@Nonnull EPGMGraphHead record) throws IOException {
+  public Pair<Key, Value> toRow(@Nonnull GraphHead record) throws IOException {
     //write to content
     return new Pair<>(new Key(record.getId().toString()),
       new Value(KryoUtils.dumps(factory.initGraphHead(
@@ -73,14 +73,14 @@ public class GradoopGraphHeadIterator extends BaseElementIterator<EPGMGraphHead>
    * @throws IOException on failure
    */
   @Nullable
-  public GraphHead readLine(
+  public EPGMGraphHead readLine(
     @Nonnull SortedKeyValueIterator<Key, Value> source
   ) throws IOException {
     if (!source.hasTop()) {
       return null;
     }
 
-    GraphHead row = new GraphHead();
+    EPGMGraphHead row = new EPGMGraphHead();
     row.setId(GradoopId.fromString(source.getTopKey().getRow().toString()));
     while (source.hasTop()) {
       Key key = source.getTopKey();

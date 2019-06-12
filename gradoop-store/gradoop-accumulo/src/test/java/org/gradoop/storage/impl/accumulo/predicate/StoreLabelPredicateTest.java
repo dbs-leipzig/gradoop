@@ -15,9 +15,9 @@
  */
 package org.gradoop.storage.impl.accumulo.predicate;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.utils.AccumuloFilters;
@@ -50,14 +50,14 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
   @Test
   public void vertexLabelEquals() throws Throwable {
     doTest(TEST01, (loader, store, config) -> {
-      List<Vertex> inputVertex = loader.getVertices().stream()
+      List<EPGMVertex> inputVertex = loader.getVertices().stream()
         .filter(it ->
           Objects.equals(it.getLabel(), "Person") ||
             Objects.equals(it.getLabel(), "Tag"))
         .collect(Collectors.toList());
 
       //vertex label query
-      List<Vertex> queryResult = store
+      List<EPGMVertex> queryResult = store
         .getVertexSpace(
           Query.elements()
             .fromAll()
@@ -76,14 +76,14 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
   @Test
   public void edgeLabelEquals() throws Throwable {
     doTest(TEST02, (loader, store, config) -> {
-      List<Edge> inputEdges = loader.getEdges().stream()
+      List<EPGMEdge> inputEdges = loader.getEdges().stream()
         .filter(it ->
           Objects.equals(it.getLabel(), "hasInterest") ||
             Objects.equals(it.getLabel(), "hasMember"))
         .collect(Collectors.toList());
 
       //edge label query
-      List<Edge> queryResult = store
+      List<EPGMEdge> queryResult = store
         .getEdgeSpace(
           Query.elements()
             .fromAll()
@@ -103,12 +103,12 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
     doTest(TEST03, (loader, store, config) -> {
       Pattern queryFormula = Pattern.compile("[Pers|Ta].*+");
 
-      List<Vertex> inputVertex = loader.getVertices().stream()
+      List<EPGMVertex> inputVertex = loader.getVertices().stream()
         .filter(it -> queryFormula.matcher(it.getLabel()).matches())
         .collect(Collectors.toList());
 
       //vertex label regex query
-      List<Vertex> queryResult = store
+      List<EPGMVertex> queryResult = store
         .getVertexSpace(
           Query.elements()
             .fromAll()
@@ -130,12 +130,12 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
       Pattern queryFormula = Pattern.compile("has.*+");
 
       //graph label query
-      List<Edge> inputVertex = loader.getEdges().stream()
+      List<EPGMEdge> inputVertex = loader.getEdges().stream()
         .filter(it -> queryFormula.matcher(it.getLabel()).matches())
         .collect(Collectors.toList());
 
       //graph label regex query
-      List<Edge> queryResult = store
+      List<EPGMEdge> queryResult = store
         .getEdgeSpace(
           Query.elements()
             .fromAll()
@@ -152,12 +152,12 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
   @Test
   public void graphLabelEquals() throws Throwable {
     doTest(TEST05, (loader, store, config) -> {
-      List<GraphHead> inputGraph = loader.getGraphHeads().stream()
+      List<EPGMGraphHead> inputGraph = loader.getGraphHeads().stream()
         .filter(it -> Objects.equals(it.getLabel(), "Community") ||
           Objects.equals(it.getLabel(), "Person"))
         .collect(Collectors.toList());
 
-      List<GraphHead> queryResult = store
+      List<EPGMGraphHead> queryResult = store
         .getGraphSpace(
           Query.elements()
             .fromAll()
@@ -176,11 +176,11 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
     doTest(TEST06, (loader, store, config) -> {
       Pattern queryFormula = Pattern.compile("Com.*+");
 
-      List<GraphHead> inputGraph = loader.getGraphHeads().stream()
+      List<EPGMGraphHead> inputGraph = loader.getGraphHeads().stream()
         .filter(it -> queryFormula.matcher(it.getLabel()).matches())
         .collect(Collectors.toList());
 
-      List<GraphHead> queryResult = store
+      List<EPGMGraphHead> queryResult = store
         .getGraphSpace(
           Query.elements()
             .fromAll()

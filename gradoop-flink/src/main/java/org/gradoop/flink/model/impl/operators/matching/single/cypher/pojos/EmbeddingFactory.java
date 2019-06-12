@@ -15,21 +15,21 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos;
 
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.List;
 
 /**
- * Utility class to convert an EPGM element ({@link Vertex} and {@link Edge} into an
+ * Utility class to convert an EPGM element ({@link EPGMVertex} and {@link EPGMEdge} into an
  * {@link Embedding}.
  */
 public class EmbeddingFactory {
 
   /**
-   * Converts a {@link Vertex} into an {@link Embedding}.
+   * Converts a {@link EPGMVertex} into an {@link Embedding}.
    *
    * The resulting embedding has one entry containing the vertex id and one entry for each property
    * value associated with the specified property keys (ordered by list order). Note that missing
@@ -39,7 +39,7 @@ public class EmbeddingFactory {
    * @param propertyKeys properties that will be stored in the embedding
    * @return Embedding
    */
-  public static Embedding fromVertex(Vertex vertex, List<String> propertyKeys) {
+  public static Embedding fromVertex(EPGMVertex vertex, List<String> propertyKeys) {
     Embedding embedding = new Embedding();
     embedding.add(vertex.getId(), project(vertex, propertyKeys));
 
@@ -47,7 +47,7 @@ public class EmbeddingFactory {
   }
 
   /**
-   * Converts an {@link Edge} into an {@link Embedding}.
+   * Converts an {@link EPGMEdge} into an {@link Embedding}.
    *
    * The resulting embedding has three entries containing the source vertex id, the edge id and the
    * target vertex id. Furthermore, the embedding has one entry for each property value associated
@@ -59,7 +59,7 @@ public class EmbeddingFactory {
    * @param isLoop indicates if the edges is a loop
    * @return Embedding
    */
-  public static Embedding fromEdge(Edge edge, List<String> propertyKeys, boolean isLoop) {
+  public static Embedding fromEdge(EPGMEdge edge, List<String> propertyKeys, boolean isLoop) {
     Embedding embedding = new Embedding();
 
     if (isLoop) {

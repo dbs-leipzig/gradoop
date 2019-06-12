@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.types.Row;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 import java.util.Collection;
 
@@ -31,7 +31,7 @@ import java.util.Collection;
 
 @FunctionAnnotation.ForwardedFields("f0->f0")
 @FunctionAnnotation.ReadFields("f1.properties")
-public class VertexToRow extends RichMapFunction<Tuple2<Long, Vertex>, Row> {
+public class VertexToRow extends RichMapFunction<Tuple2<Long, EPGMVertex>, Row> {
 
   /**
    * List of all property keys the edges with this label have.
@@ -54,7 +54,7 @@ public class VertexToRow extends RichMapFunction<Tuple2<Long, Vertex>, Row> {
   }
 
   @Override
-  public Row map(Tuple2<Long, Vertex> tuple) throws Exception {
+  public Row map(Tuple2<Long, EPGMVertex> tuple) throws Exception {
     returnRow.setField(0, tuple.f0);
 
     int i = 1;

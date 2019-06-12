@@ -16,7 +16,7 @@
 package org.gradoop.storage.impl.accumulo.io.source;
 
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
@@ -43,7 +43,7 @@ public class IOGraphPredicateTest extends AccumuloStoreTestBase {
   @Test
   public void queryGraphByProperty() throws Throwable {
     doTest(TEST01, (loader, store, config) -> {
-      List<GraphHead> storeGraphs = loader.getGraphHeads().stream()
+      List<EPGMGraphHead> storeGraphs = loader.getGraphHeads().stream()
         .filter(it -> {
           assert it.getProperties() != null;
           return it.getProperties().get("vertexCount") != null &&
@@ -54,7 +54,7 @@ public class IOGraphPredicateTest extends AccumuloStoreTestBase {
         .collect(Collectors.toList());
 
       AccumuloDataSource source = new AccumuloDataSource(store, config);
-      List<GraphHead> query = source.applyGraphPredicate(
+      List<EPGMGraphHead> query = source.applyGraphPredicate(
         Query.elements()
           .fromAll()
           .where(AccumuloFilters.propLargerThan("vertexCount", 3, false)))
@@ -74,7 +74,7 @@ public class IOGraphPredicateTest extends AccumuloStoreTestBase {
   @Test
   public void queryByMulti() throws Throwable {
     doTest(TEST02, (loader, store, config) -> {
-      List<GraphHead> storeGraphs = loader.getGraphHeads().stream()
+      List<EPGMGraphHead> storeGraphs = loader.getGraphHeads().stream()
         .filter(it -> Objects.equals(it.getLabel(), "Community"))
         .filter(it -> it.getProperties() != null)
         .filter(it -> it.getPropertyValue("vertexCount") != null)
@@ -83,11 +83,11 @@ public class IOGraphPredicateTest extends AccumuloStoreTestBase {
         .collect(Collectors.toList());
 
       AccumuloDataSource source = new AccumuloDataSource(store, config);
-      List<GraphHead> query = source.applyGraphPredicate(
+      List<EPGMGraphHead> query = source.applyGraphPredicate(
         Query.elements()
           .fromAll()
-          .where(AccumuloFilters.<GraphHead>labelIn("Community")
-            .and(AccumuloFilters.<GraphHead>propLargerThan("vertexCount", 4, true)
+          .where(AccumuloFilters.<EPGMGraphHead>labelIn("Community")
+            .and(AccumuloFilters.<EPGMGraphHead>propLargerThan("vertexCount", 4, true)
               .negate())))
         .getGraphCollection()
         .getGraphHeads()

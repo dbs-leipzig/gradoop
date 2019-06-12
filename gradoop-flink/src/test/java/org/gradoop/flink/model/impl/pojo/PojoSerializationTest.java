@@ -16,11 +16,11 @@
 package org.gradoop.flink.model.impl.pojo;
 
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
@@ -34,36 +34,36 @@ public class PojoSerializationTest extends GradoopFlinkTestBase {
 
   @Test
   public void testVertexSerialization() throws Exception {
-    EPGMVertex vertexIn = new VertexFactory().createVertex(
+    Vertex vertexIn = new VertexFactory().createVertex(
       "Person",
       Properties.createFromMap(GradoopTestUtils.SUPPORTED_PROPERTIES),
       GradoopIdSet.fromExisting(GradoopId.get()));
 
-    Assert.assertEquals("EPGMVertex POJOs were not equal",
+    Assert.assertEquals("Vertex POJOs were not equal",
       vertexIn, GradoopFlinkTestUtils.writeAndRead(vertexIn));
   }
 
   @Test
   public void testEdgeSerialization() throws Exception {
-    EPGMEdge edgeIn = new EdgeFactory().createEdge(
+    Edge edgeIn = new EdgeFactory().createEdge(
       "knows",
       GradoopId.get(),
       GradoopId.get(),
       Properties.createFromMap(GradoopTestUtils.SUPPORTED_PROPERTIES),
       GradoopIdSet.fromExisting(GradoopId.get(), GradoopId.get()));
 
-    Assert.assertEquals("EPGMEdge POJOs were not equal",
+    Assert.assertEquals("Edge POJOs were not equal",
       edgeIn, GradoopFlinkTestUtils.writeAndRead(edgeIn));
   }
 
   @Test
   public void testGraphHeadSerialization() throws Exception {
-    EPGMGraphHead graphHeadIn = new GraphHeadFactory().createGraphHead(
+    GraphHead graphHeadIn = new GraphHeadFactory().createGraphHead(
       "Community",
       Properties.createFromMap(GradoopTestUtils.SUPPORTED_PROPERTIES)
     );
 
-    Assert.assertEquals("EPGMGraphHead POJOs were not equal",
+    Assert.assertEquals("GraphHead POJOs were not equal",
       graphHeadIn, GradoopFlinkTestUtils.writeAndRead(graphHeadIn));
   }
 

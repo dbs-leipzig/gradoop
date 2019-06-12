@@ -19,10 +19,10 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.apache.accumulo.core.util.Pair;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
@@ -37,18 +37,18 @@ import java.util.Objects;
 /**
  * Accumulo gradoop vertex iterator
  */
-public class GradoopVertexIterator extends BaseElementIterator<EPGMVertex> {
+public class GradoopVertexIterator extends BaseElementIterator<Vertex> {
 
   /**
-   * Vertex factory
+   * EPGMVertex factory
    */
   private final VertexFactory factory = new VertexFactory();
 
   @Nonnull
   @Override
-  public Vertex fromRow(@Nonnull Map.Entry<Key, Value> pair) throws IOException {
+  public EPGMVertex fromRow(@Nonnull Map.Entry<Key, Value> pair) throws IOException {
     //map from serialize content
-    Vertex content = KryoUtils.loads(pair.getValue().get(), Vertex.class);
+    EPGMVertex content = KryoUtils.loads(pair.getValue().get(), EPGMVertex.class);
     content.setId(GradoopId.fromString(pair.getKey().getRow().toString()));
     //read from content
     return content;
@@ -56,7 +56,7 @@ public class GradoopVertexIterator extends BaseElementIterator<EPGMVertex> {
 
   @Nonnull
   @Override
-  public Pair<Key, Value> toRow(@Nonnull EPGMVertex record) throws IOException {
+  public Pair<Key, Value> toRow(@Nonnull Vertex record) throws IOException {
     //write to content
     return new Pair<>(new Key(record.getId().toString()),
       new Value(KryoUtils.dumps(factory.initVertex(
@@ -75,14 +75,14 @@ public class GradoopVertexIterator extends BaseElementIterator<EPGMVertex> {
    * @throws IOException on failure
    */
   @Nullable
-  public Vertex readLine(
+  public EPGMVertex readLine(
     @Nonnull SortedKeyValueIterator<Key, Value> source
   ) throws IOException {
     if (!source.hasTop()) {
       return null;
     }
 
-    Vertex row = new Vertex();
+    EPGMVertex row = new EPGMVertex();
     row.setId(GradoopId.fromString(source.getTopKey().getRow().toString()));
     row.setGraphIds(new GradoopIdSet());
     while (source.hasTop()) {

@@ -56,11 +56,11 @@ public class QueryHandler {
    */
   private Map<Integer, Set<String>> components;
   /**
-   * Cache: vId --> Vertex with Id == vId
+   * Cache: vId --> EPGMVertex with Id == vId
    */
   private Map<Long, Vertex> idToVertexCache;
   /**
-   * Cache: eId --> Edge with Id == eId
+   * Cache: eId --> EPGMEdge with Id == eId
    */
   private Map<Long, Edge> idToEdgeCache;
   /**
@@ -288,7 +288,7 @@ public class QueryHandler {
 
 
   /**
-   * Returns the Edge associated with the given variable or {@code null} if the variable does
+   * Returns the EPGMEdge associated with the given variable or {@code null} if the variable does
    * not exist. The variable can be either user-defined or auto-generated.
    *
    * @param variable query edge variable

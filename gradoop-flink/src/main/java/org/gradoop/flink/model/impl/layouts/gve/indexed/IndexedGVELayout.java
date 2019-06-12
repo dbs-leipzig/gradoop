@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.layouts.gve.indexed;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.layouts.gve.GVELayout;
@@ -31,19 +31,19 @@ import java.util.Map;
  * efficient as they avoid duplicating rows during program execution.
  */
 public class IndexedGVELayout extends GVELayout implements
-  LogicalGraphLayout<GraphHead, Vertex, Edge>, GraphCollectionLayout<GraphHead, Vertex, Edge> {
+  LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge>, GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> {
   /**
    * Mapping from graph label to graph heads with that label.
    */
-  private final Map<String, DataSet<GraphHead>> graphHeads;
+  private final Map<String, DataSet<EPGMGraphHead>> graphHeads;
   /**
    * Mapping from vertex label to vertices with that label.
    */
-  private final Map<String, DataSet<Vertex>> vertices;
+  private final Map<String, DataSet<EPGMVertex>> vertices;
   /**
    * Mapping from edge label to edges with that label.
    */
-  private final Map<String, DataSet<Edge>> edges;
+  private final Map<String, DataSet<EPGMEdge>> edges;
 
   /**
    * Creates a new Indexed GVE Layout.
@@ -52,9 +52,9 @@ public class IndexedGVELayout extends GVELayout implements
    * @param vertices mapping from label to vertices
    * @param edges mapping from label to edges
    */
-  IndexedGVELayout(Map<String, DataSet<GraphHead>> graphHeads,
-    Map<String, DataSet<Vertex>> vertices,
-    Map<String, DataSet<Edge>> edges) {
+  IndexedGVELayout(Map<String, DataSet<EPGMGraphHead>> graphHeads,
+    Map<String, DataSet<EPGMVertex>> vertices,
+    Map<String, DataSet<EPGMEdge>> edges) {
     super(
       graphHeads.values().stream().reduce(DataSet::union)
         .orElseThrow(() -> new RuntimeException("Error during graph head union")),
@@ -74,17 +74,17 @@ public class IndexedGVELayout extends GVELayout implements
   }
 
   @Override
-  public DataSet<GraphHead> getGraphHeadsByLabel(String label) {
+  public DataSet<EPGMGraphHead> getGraphHeadsByLabel(String label) {
     return graphHeads.get(label);
   }
 
   @Override
-  public DataSet<Vertex> getVerticesByLabel(String label) {
+  public DataSet<EPGMVertex> getVerticesByLabel(String label) {
     return vertices.get(label);
   }
 
   @Override
-  public DataSet<Edge> getEdgesByLabel(String label) {
+  public DataSet<EPGMEdge> getEdgesByLabel(String label) {
     return edges.get(label);
   }
 }

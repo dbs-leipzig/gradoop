@@ -17,16 +17,16 @@ package org.gradoop.flink.model.impl.layouts.transactional.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 import java.util.Set;
 
 /**
  * An encapsulated representation of a logical graph with duplicated elements.
  */
-public class GraphTransaction extends Tuple3<GraphHead, Set<Vertex>, Set<Edge>> {
+public class GraphTransaction extends Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set<EPGMEdge>> {
 
   /**
    * default constructor
@@ -40,33 +40,33 @@ public class GraphTransaction extends Tuple3<GraphHead, Set<Vertex>, Set<Edge>> 
    * @param vertices set of vertices
    * @param edges set of edges
    */
-  public GraphTransaction(GraphHead graphHead, Set<Vertex> vertices, Set<Edge> edges) {
+  public GraphTransaction(EPGMGraphHead graphHead, Set<EPGMVertex> vertices, Set<EPGMEdge> edges) {
     setGraphHead(graphHead);
     setVertices(vertices);
     setEdges(edges);
   }
 
-  public GraphHead getGraphHead() {
+  public EPGMGraphHead getGraphHead() {
     return this.f0;
   }
 
-  public void setGraphHead(GraphHead graphHead) {
+  public void setGraphHead(EPGMGraphHead graphHead) {
     this.f0 = graphHead;
   }
 
-  public Set<Vertex> getVertices() {
+  public Set<EPGMVertex> getVertices() {
     return this.f1;
   }
 
-  public void setVertices(Set<Vertex> vertices) {
+  public void setVertices(Set<EPGMVertex> vertices) {
     this.f1 = vertices;
   }
 
-  public Set<Edge> getEdges() {
+  public Set<EPGMEdge> getEdges() {
     return this.f2;
   }
 
-  public void  setEdges(Set<Edge> edges) {
+  public void  setEdges(Set<EPGMEdge> edges) {
     this.f2 = edges;
   }
 
@@ -76,10 +76,10 @@ public class GraphTransaction extends Tuple3<GraphHead, Set<Vertex>, Set<Edge>> 
    * @param id identifier.
    * @return vertex
    */
-  public Vertex getVertexById(GradoopId id) {
-    Vertex match = null;
+  public EPGMVertex getVertexById(GradoopId id) {
+    EPGMVertex match = null;
 
-    for (Vertex vertex : getVertices()) {
+    for (EPGMVertex vertex : getVertices()) {
       if (vertex.getId().equals(id)) {
         match = vertex;
         break;

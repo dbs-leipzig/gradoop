@@ -19,8 +19,8 @@ import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.IteratorSetting;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.storage.impl.accumulo.handler.AccumuloGraphHandler;
@@ -36,7 +36,7 @@ import java.util.Properties;
 /**
  * gradoop accumulo graph head input format
  */
-public class GraphHeadInputFormat extends BaseInputFormat<GraphHead> {
+public class GraphHeadInputFormat extends BaseInputFormat<EPGMGraphHead> {
 
   /**
    * serialize id
@@ -61,7 +61,7 @@ public class GraphHeadInputFormat extends BaseInputFormat<GraphHead> {
    */
   public GraphHeadInputFormat(
     @Nonnull Properties properties,
-    @Nullable AccumuloQueryHolder<GraphHead> predicate
+    @Nullable AccumuloQueryHolder<EPGMGraphHead> predicate
   ) {
     super(properties, predicate);
   }
@@ -88,8 +88,8 @@ public class GraphHeadInputFormat extends BaseInputFormat<GraphHead> {
   }
 
   @Override
-  protected GraphHead mapRow(Map.Entry<Key, Value> row) throws IOException {
-    EPGMGraphHead decoded = iterator.fromRow(row);
+  protected EPGMGraphHead mapRow(Map.Entry<Key, Value> row) throws IOException {
+    GraphHead decoded = iterator.fromRow(row);
     return handler.readRow(decoded);
   }
 

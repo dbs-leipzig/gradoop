@@ -15,7 +15,7 @@
  */
 package org.gradoop.storage.impl.accumulo.io.source;
 
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
@@ -48,7 +48,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
   public void writeAndQueryVertexByName() throws Throwable {
     doTest(TEST01, (loader, store, config) -> {
       //vertex label and property query
-      List<Vertex> inputVertices = sample(loader.getVertices()
+      List<EPGMVertex> inputVertices = sample(loader.getVertices()
         .stream()
         .filter(it -> Objects.equals(it.getLabel(), "Person"))
         .collect(Collectors.toList()), 3);
@@ -59,15 +59,15 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
           return it.getProperties().get("name").getString();
         })
         .collect(Collectors.toList());
-      AccumuloElementFilter<Vertex> labelFilter = AccumuloFilters.labelIn("Person");
-      AccumuloElementFilter<Vertex> nameFilter = AccumuloFilters.propEquals("name", names.get(0));
+      AccumuloElementFilter<EPGMVertex> labelFilter = AccumuloFilters.labelIn("Person");
+      AccumuloElementFilter<EPGMVertex> nameFilter = AccumuloFilters.propEquals("name", names.get(0));
       for (int i = 1; i < names.size(); i++) {
         nameFilter = nameFilter.or(AccumuloFilters.propEquals("name", names.get(i)));
       }
-      AccumuloElementFilter<Vertex> whereCases = labelFilter.and(nameFilter);
+      AccumuloElementFilter<EPGMVertex> whereCases = labelFilter.and(nameFilter);
 
       AccumuloDataSource source = new AccumuloDataSource(store, config);
-      List<Vertex> queryResult = source
+      List<EPGMVertex> queryResult = source
         .applyVertexPredicate(
           Query.elements()
             .fromAll()
@@ -89,7 +89,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
   public void findPersonByAgeBiggerThan35() throws Throwable {
     doTest(TEST02, (loader, store, config) -> {
       //vertex label and property query
-      List<Vertex> inputVertices = loader.getVertices()
+      List<EPGMVertex> inputVertices = loader.getVertices()
         .stream()
         .filter(it -> Objects.equals(it.getLabel(), "Person"))
         .filter(it -> it.getProperties() != null)
@@ -98,11 +98,11 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
         .collect(Collectors.toList());
 
       AccumuloDataSource source = new AccumuloDataSource(store, config);
-      List<Vertex> queryResult = source
+      List<EPGMVertex> queryResult = source
         .applyVertexPredicate(
           Query.elements()
             .fromAll()
-            .where(AccumuloFilters.<Vertex>labelIn("Person")
+            .where(AccumuloFilters.<EPGMVertex>labelIn("Person")
               .and(AccumuloFilters.propLargerThan("age", 35, true)))
         )
         .getGraphCollection()
@@ -122,7 +122,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
   public void findPersonByAgeSmallerThan35() throws Throwable {
     doTest(TEST03, (loader, store, config) -> {
       //vertex label and property query
-      List<Vertex> inputVertices = loader.getVertices()
+      List<EPGMVertex> inputVertices = loader.getVertices()
         .stream()
         .filter(it -> Objects.equals(it.getLabel(), "Person"))
         .filter(it -> it.getProperties() != null)
@@ -131,12 +131,12 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
         .collect(Collectors.toList());
 
       AccumuloDataSource source = new AccumuloDataSource(store, config);
-      List<Vertex> queryResult = source
+      List<EPGMVertex> queryResult = source
         .applyVertexPredicate(
           Query.elements()
             .fromAll()
-            .where(AccumuloFilters.<Vertex>labelIn("Person")
-              .and(AccumuloFilters.<Vertex>propLargerThan("age", 35, true)
+            .where(AccumuloFilters.<EPGMVertex>labelIn("Person")
+              .and(AccumuloFilters.<EPGMVertex>propLargerThan("age", 35, true)
                 .negate())))
         .getGraphCollection()
         .getVertices()

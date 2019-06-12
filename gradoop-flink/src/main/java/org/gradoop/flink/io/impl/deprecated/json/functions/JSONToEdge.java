@@ -18,7 +18,7 @@ package org.gradoop.flink.io.impl.deprecated.json.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.io.impl.deprecated.json.JSONConstants;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
@@ -42,18 +42,18 @@ import org.gradoop.common.model.impl.properties.Properties;
  * }
  */
 public class JSONToEdge extends JSONToEntity
-  implements MapFunction<String, Edge> {
+  implements MapFunction<String, EPGMEdge> {
   /**
-   * Edge data factory.
+   * EPGMEdge data factory.
    */
-  private final EPGMEdgeFactory<Edge> edgeFactory;
+  private final EPGMEdgeFactory<EPGMEdge> edgeFactory;
 
   /**
    * Creates map function.
    *
    * @param epgmEdgeFactory edge data factory
    */
-  public JSONToEdge(EPGMEdgeFactory<Edge> epgmEdgeFactory) {
+  public JSONToEdge(EPGMEdgeFactory<EPGMEdge> epgmEdgeFactory) {
     this.edgeFactory = epgmEdgeFactory;
   }
 
@@ -65,7 +65,7 @@ public class JSONToEdge extends JSONToEntity
    * @throws Exception on failure
    */
   @Override
-  public Edge map(String s) throws Exception {
+  public EPGMEdge map(String s) throws Exception {
     JSONObject jsonEdge = new JSONObject(s);
     GradoopId edgeID = getID(jsonEdge);
     String edgeLabel = getLabel(jsonEdge);

@@ -17,35 +17,35 @@ package org.gradoop.storage.impl.accumulo.handler;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 
 /**
  * accumulo edge handler for row's read/write operator
  */
-public class AccumuloEdgeHandler implements AccumuloRowHandler<Edge, EPGMEdge> {
+public class AccumuloEdgeHandler implements AccumuloRowHandler<EPGMEdge, Edge> {
 
   /**
    * edge factory
    */
-  private final EPGMEdgeFactory<Edge> factory;
+  private final EPGMEdgeFactory<EPGMEdge> factory;
 
   /**
    * accumulo edge handler constructor
    *
    * @param factory edge factory
    */
-  public AccumuloEdgeHandler(EPGMEdgeFactory<Edge> factory) {
+  public AccumuloEdgeHandler(EPGMEdgeFactory<EPGMEdge> factory) {
     this.factory = factory;
   }
 
   @Override
   public Mutation writeRow(
     Mutation mutation,
-    EPGMEdge record
+    Edge record
   ) {
     mutation.put(AccumuloTables.KEY.LABEL, AccumuloTables.KEY.NONE, record.getLabel());
     mutation.put(AccumuloTables.KEY.SOURCE, AccumuloTables.KEY.NONE,
@@ -72,7 +72,7 @@ public class AccumuloEdgeHandler implements AccumuloRowHandler<Edge, EPGMEdge> {
   }
 
   @Override
-  public Edge readRow(EPGMEdge origin) {
+  public EPGMEdge readRow(Edge origin) {
     return factory.initEdge(
       origin.getId(),
       origin.getLabel(),

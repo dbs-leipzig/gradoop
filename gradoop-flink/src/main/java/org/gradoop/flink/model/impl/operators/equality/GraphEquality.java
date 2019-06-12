@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.BinaryGraphToValueOperator;
@@ -49,8 +49,8 @@ public class GraphEquality implements BinaryGraphToValueOperator<Boolean> {
    * @param edgeToString string representation of edges
    * @param directed sets mode for directed or undirected graphs
    */
-  public GraphEquality(GraphHeadToString<GraphHead> graphHeadToString,
-    VertexToString<Vertex> vertexToString, EdgeToString<Edge> edgeToString, boolean directed) {
+  public GraphEquality(GraphHeadToString<EPGMGraphHead> graphHeadToString,
+    VertexToString<EPGMVertex> vertexToString, EdgeToString<EPGMEdge> edgeToString, boolean directed) {
     this.directed = directed;
 
     this.collectionEquality =

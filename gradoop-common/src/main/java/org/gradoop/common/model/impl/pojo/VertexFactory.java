@@ -27,7 +27,7 @@ import java.io.Serializable;
 /**
  * Factory for creating vertex POJOs.
  */
-public class VertexFactory implements EPGMVertexFactory<Vertex>, Serializable {
+public class VertexFactory implements EPGMVertexFactory<EPGMVertex>, Serializable {
 
   /**
    * serial version uid
@@ -35,63 +35,63 @@ public class VertexFactory implements EPGMVertexFactory<Vertex>, Serializable {
   private static final long serialVersionUID = 42L;
 
   @Override
-  public Vertex createVertex() {
+  public EPGMVertex createVertex() {
     return initVertex(GradoopId.get());
   }
 
   @Override
-  public Vertex initVertex(final GradoopId vertexID) {
+  public EPGMVertex initVertex(final GradoopId vertexID) {
     return initVertex(vertexID, GradoopConstants.DEFAULT_VERTEX_LABEL, null, null);
   }
 
   @Override
-  public Vertex createVertex(String label) {
+  public EPGMVertex createVertex(String label) {
     return initVertex(GradoopId.get(), label);
   }
 
   @Override
-  public Vertex initVertex(final GradoopId vertexID, final String label) {
+  public EPGMVertex initVertex(final GradoopId vertexID, final String label) {
     return initVertex(vertexID, label, null, null);
   }
 
   @Override
-  public Vertex createVertex(String label, Properties properties) {
+  public EPGMVertex createVertex(String label, Properties properties) {
     return initVertex(GradoopId.get(), label, properties);
   }
 
   @Override
-  public Vertex initVertex(final GradoopId vertexID, final String label,
+  public EPGMVertex initVertex(final GradoopId vertexID, final String label,
     Properties properties) {
     return initVertex(vertexID, label, properties, null);
   }
 
   @Override
-  public Vertex createVertex(String label, GradoopIdSet graphIds) {
+  public EPGMVertex createVertex(String label, GradoopIdSet graphIds) {
     return initVertex(GradoopId.get(), label, graphIds);
   }
 
   @Override
-  public Vertex initVertex(final GradoopId vertexID, final String label,
+  public EPGMVertex initVertex(final GradoopId vertexID, final String label,
     final GradoopIdSet graphs) {
     return initVertex(vertexID, label, null, graphs);
   }
 
   @Override
-  public Vertex createVertex(String label, Properties properties,
+  public EPGMVertex createVertex(String label, Properties properties,
     GradoopIdSet graphIds) {
     return initVertex(GradoopId.get(), label, properties, graphIds);
   }
 
   @Override
-  public Vertex initVertex(final GradoopId id, final String label,
+  public EPGMVertex initVertex(final GradoopId id, final String label,
     final Properties properties, final GradoopIdSet graphs) {
     Preconditions.checkNotNull(id, "Identifier was null");
     Preconditions.checkNotNull(label, "Label was null");
-    return new Vertex(id, label, properties, graphs);
+    return new EPGMVertex(id, label, properties, graphs);
   }
 
   @Override
-  public Class<Vertex> getType() {
-    return Vertex.class;
+  public Class<EPGMVertex> getType() {
+    return EPGMVertex.class;
   }
 }

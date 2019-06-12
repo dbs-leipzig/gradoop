@@ -122,7 +122,7 @@ public abstract class ExpandEmbeddings implements PhysicalOperator {
   /**
    * Runs a traversal over the given edgeCandidates withing the given bounds
    *
-   * @return the input appened by 2 entries (IdList(Path), IdEntry(End Vertex)
+   * @return the input appened by 2 entries (IdList(Path), IdEntry(End EPGMVertex)
    */
   @Override
   public DataSet<Embedding> evaluate() {

@@ -23,9 +23,9 @@ package org.gradoop.common.model.api.entities;
  * @param <E> type of the EPGM edge
  */
 public interface ElementFactoryProvider<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge> {
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge> {
 
   /**
    * Get the factory that is responsible for creating graph head instances.

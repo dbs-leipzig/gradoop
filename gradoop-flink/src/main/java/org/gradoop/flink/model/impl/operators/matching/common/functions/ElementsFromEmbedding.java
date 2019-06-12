@@ -24,10 +24,10 @@ import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
@@ -53,15 +53,15 @@ public class ElementsFromEmbedding
   /**
    * Constructs EPGM graph heads
    */
-  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
+  private final EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory;
   /**
    * Constructs EPGM vertices
    */
-  private final EPGMVertexFactory<Vertex> vertexFactory;
+  private final EPGMVertexFactory<EPGMVertex> vertexFactory;
   /**
    * Constructs EPGM edges
    */
-  private final EPGMEdgeFactory<Edge> edgeFactory;
+  private final EPGMEdgeFactory<EPGMEdge> edgeFactory;
   /**
    * Maps query vertex ids to variables
    */
@@ -84,9 +84,9 @@ public class ElementsFromEmbedding
    * @param query             query handler
    */
   public ElementsFromEmbedding(TraversalCode traversalCode,
-    EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory,
-    EPGMVertexFactory<Vertex> epgmVertexFactory,
-    EPGMEdgeFactory<Edge> epgmEdgeFactory,
+    EPGMGraphHeadFactory<EPGMGraphHead> epgmGraphHeadFactory,
+    EPGMVertexFactory<EPGMVertex> epgmVertexFactory,
+    EPGMEdgeFactory<EPGMEdge> epgmEdgeFactory,
     QueryHandler query) {
     this.graphHeadFactory = epgmGraphHeadFactory;
     this.vertexFactory = epgmVertexFactory;
@@ -122,12 +122,12 @@ public class ElementsFromEmbedding
 
 
     // create graph head for this embedding
-    GraphHead graphHead = graphHeadFactory.createGraphHead();
+    EPGMGraphHead graphHead = graphHeadFactory.createGraphHead();
 
     // collect vertices (and assign to graph head)
     for (int i = 0; i < vertexMapping.length; i++) {
       if (!isProcessed(vertexMapping, i)) {
-        Vertex v = vertexFactory.initVertex(vertexMapping[i]);
+        EPGMVertex v = vertexFactory.initVertex(vertexMapping[i]);
         v.addGraphId(graphHead.getId());
         out.collect(v);
       }
@@ -147,7 +147,7 @@ public class ElementsFromEmbedding
           vertexMapping[(int) s.getFrom()] : vertexMapping[(int) s.getTo()];
         GradoopId targetId = s.isOutgoing() ?
           vertexMapping[(int) s.getTo()] : vertexMapping[(int) s.getFrom()];
-        Edge e = edgeFactory.initEdge(edgeMapping[i], sourceId, targetId);
+        EPGMEdge e = edgeFactory.initEdge(edgeMapping[i], sourceId, targetId);
         e.addGraphId(graphHead.getId());
         out.collect(e);
       }

@@ -15,7 +15,7 @@
  */
 package org.gradoop.common.model.impl.pojo;
 
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -31,7 +31,7 @@ public class VertexTest {
   @Test
   public void createWithIDTest() {
     GradoopId vertexID = GradoopId.get();
-    EPGMVertex v = new VertexFactory().initVertex(vertexID);
+    Vertex v = new VertexFactory().initVertex(vertexID);
     assertThat(v.getId(), is(vertexID));
     assertThat(v.getPropertyCount(), is(0));
     assertThat(v.getGraphCount(), is(0));
@@ -52,7 +52,7 @@ public class VertexTest {
     graphIds.add(graphId1);
     graphIds.add(graphId2);
 
-    EPGMVertex vertex = new VertexFactory()
+    Vertex vertex = new VertexFactory()
       .initVertex(vertexID, label, props, graphIds);
 
     assertThat(vertex.getId(), is(vertexID));
@@ -68,7 +68,7 @@ public class VertexTest {
   @Test
   public void createWithMissingLabelTest() {
     GradoopId vertexID = GradoopId.get();
-    EPGMVertex v = new VertexFactory().initVertex(vertexID);
+    Vertex v = new VertexFactory().initVertex(vertexID);
     assertThat(v.getLabel(), is(GradoopConstants.DEFAULT_VERTEX_LABEL));
   }
 

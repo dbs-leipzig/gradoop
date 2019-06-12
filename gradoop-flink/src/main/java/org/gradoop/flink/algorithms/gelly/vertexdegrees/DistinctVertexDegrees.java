@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
@@ -55,7 +55,7 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm<NullValue, Null
   private final boolean includeZeroDegreeVertices;
 
   /**
-   * Constructor for Vertex Degree with in- and out-degree and total of degrees of a graph.
+   * Constructor for EPGMVertex Degree with in- and out-degree and total of degrees of a graph.
    *
    * @param propertyKey Property key to store the sum of in- and out-degrees in.
    * @param propertyKeyIn Property key to store the in-degree in.
@@ -66,7 +66,7 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm<NullValue, Null
   }
 
   /**
-   * Constructor for Vertex Degree with fixed set of whether to output
+   * Constructor for EPGMVertex Degree with fixed set of whether to output
    * vertices with an in-degree of zero.
    *
    * @param propertyKey Property key to store the sum of in- and out-degrees in.
@@ -87,7 +87,7 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm<NullValue, Null
   @Override
   public LogicalGraph executeInGelly(Graph<GradoopId, NullValue, NullValue> graph)
     throws Exception {
-    DataSet<Vertex> newVertices =
+    DataSet<EPGMVertex> newVertices =
       new org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees<GradoopId, NullValue,
       NullValue>()
       .setIncludeZeroDegreeVertices(includeZeroDegreeVertices)

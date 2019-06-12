@@ -22,9 +22,9 @@ import org.apache.flink.runtime.minicluster.LocalFlinkMiniCluster;
 import org.apache.flink.test.util.TestEnvironment;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
@@ -72,12 +72,12 @@ public abstract class GradoopFlinkTestBase {
   /**
    * The factory to create a logical graph layout.
    */
-  private LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> graphLayoutFactory;
+  private LogicalGraphLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> graphLayoutFactory;
 
   /**
    * The factory to create a graph collection layout.
    */
-  private GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> collectionLayoutFactory;
+  private GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> collectionLayoutFactory;
 
   /**
    * Creates a new instance of {@link GradoopFlinkTestBase}.
@@ -122,7 +122,7 @@ public abstract class GradoopFlinkTestBase {
   }
 
   protected void setCollectionLayoutFactory(
-    GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> collectionLayoutFactory) {
+    GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> collectionLayoutFactory) {
     this.collectionLayoutFactory = collectionLayoutFactory;
   }
 

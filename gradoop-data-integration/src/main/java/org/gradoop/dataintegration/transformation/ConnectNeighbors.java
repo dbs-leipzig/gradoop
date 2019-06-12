@@ -17,8 +17,8 @@ package org.gradoop.dataintegration.transformation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.dataintegration.transformation.functions.CreateCartesianNeighborhoodEdges;
 import org.gradoop.dataintegration.transformation.impl.Neighborhood;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
@@ -78,18 +78,18 @@ public class ConnectNeighbors implements UnaryGraphToGraphOperator {
   public LogicalGraph execute(LogicalGraph graph) {
 
     // determine the vertices the neighborhood should be calculated for
-    DataSet<Vertex> verticesByLabel = graph.getVerticesByLabel(sourceVertexLabel);
+    DataSet<EPGMVertex> verticesByLabel = graph.getVerticesByLabel(sourceVertexLabel);
 
     // prepare the graph
     LogicalGraph reducedGraph = graph
       .vertexInducedSubgraph(new LabelIsIn<>(sourceVertexLabel, neighborhoodVertexLabel));
 
     // determine the neighborhood by edge direction
-    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> neighborhood =
+    DataSet<Tuple2<EPGMVertex, List<NeighborhoodVertex>>> neighborhood =
       Neighborhood.getPerVertex(reducedGraph, verticesByLabel, edgeDirection);
 
     // calculate the new edges and add them to the original graph
-    DataSet<Edge> newEdges = neighborhood.flatMap(
+    DataSet<EPGMEdge> newEdges = neighborhood.flatMap(
       new CreateCartesianNeighborhoodEdges<>(graph.getFactory().getEdgeFactory(), newEdgeLabel))
       .map(new AddToGraphBroadcast<>())
       .withBroadcastSet(graph.getGraphHead().map(new Id<>()), AddToGraphBroadcast.GRAPH_ID);

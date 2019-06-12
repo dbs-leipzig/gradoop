@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.ElementFactoryProvider;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 
@@ -36,9 +36,9 @@ import java.util.Map;
  * @param <GC> the type of the according graph collection
  */
 public interface BaseGraphFactory<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>> extends ElementFactoryProvider<G, V, E> {
 
@@ -63,8 +63,8 @@ public interface BaseGraphFactory<
    * The method creates a new graph head element and assigns the vertices and
    * edges to that graph.
    *
-   * @param vertices Vertex DataSet
-   * @param edges    Edge DataSet
+   * @param vertices EPGMVertex DataSet
+   * @param edges    EPGMEdge DataSet
    * @return Logical graph
    */
   LG fromDataSets(DataSet<V> vertices, DataSet<E> edges);
@@ -75,9 +75,9 @@ public interface BaseGraphFactory<
    * The method assumes that the given vertices and edges are already assigned
    * to the given graph head.
    *
-   * @param graphHead   1-element GraphHead DataSet
-   * @param vertices    Vertex DataSet
-   * @param edges       Edge DataSet
+   * @param graphHead   1-element EPGMGraphHead DataSet
+   * @param vertices    EPGMVertex DataSet
+   * @param edges       EPGMEdge DataSet
    * @return Logical graph
    */
   LG fromDataSets(DataSet<G> graphHead, DataSet<V> vertices, DataSet<E> edges);
@@ -109,8 +109,8 @@ public interface BaseGraphFactory<
    * Creates a logical graph from the given single graph head, vertex and edge collections.
    *
    * @param graphHead Graph head associated with the logical graph
-   * @param vertices  Vertex collection
-   * @param edges     Edge collection
+   * @param vertices  EPGMVertex collection
+   * @param edges     EPGMEdge collection
    * @return Logical graph
    */
   LG fromCollections(G graphHead, Collection<V> vertices, Collection<E> edges);
@@ -119,8 +119,8 @@ public interface BaseGraphFactory<
    * Creates a logical graph from the given vertex and edge collections. A new graph head is
    * created and all vertices and edges are assigned to that graph.
    *
-   * @param vertices    Vertex collection
-   * @param edges       Edge collection
+   * @param vertices    EPGMVertex collection
+   * @param edges       EPGMEdge collection
    * @return Logical graph
    */
   LG fromCollections(Collection<V> vertices, Collection<E> edges);

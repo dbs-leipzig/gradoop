@@ -21,7 +21,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 import java.util.Collection;
 
@@ -32,12 +32,12 @@ import java.util.Collection;
 @FunctionAnnotation.ForwardedFieldsFirst("f0->f0")
 @FunctionAnnotation.ReadFieldsSecond("f0")
 public class CoGroupAssociateOldVerticesWithNewIds implements
-  CoGroupFunction<Tuple2<Vertex, GradoopId>, Tuple2<Vertex, GradoopId>, Tuple2<Vertex, GradoopId>> {
+  CoGroupFunction<Tuple2<EPGMVertex, GradoopId>, Tuple2<EPGMVertex, GradoopId>, Tuple2<EPGMVertex, GradoopId>> {
 
   /**
    * Reusable element
    */
-  private final Tuple2<Vertex, GradoopId> reusable;
+  private final Tuple2<EPGMVertex, GradoopId> reusable;
 
   /**
    * Reusable collection for traversing the second operand
@@ -53,12 +53,12 @@ public class CoGroupAssociateOldVerticesWithNewIds implements
   }
 
   @Override
-  public void coGroup(Iterable<Tuple2<Vertex, GradoopId>> first,
-    Iterable<Tuple2<Vertex, GradoopId>> second, Collector<Tuple2<Vertex, GradoopId>> out)
+  public void coGroup(Iterable<Tuple2<EPGMVertex, GradoopId>> first,
+    Iterable<Tuple2<EPGMVertex, GradoopId>> second, Collector<Tuple2<EPGMVertex, GradoopId>> out)
       throws Exception {
     reusableList.clear();
     second.forEach(x -> reusableList.add(x.f0.getId()));
-    for (Tuple2<Vertex, GradoopId> x : first) {
+    for (Tuple2<EPGMVertex, GradoopId> x : first) {
       for (GradoopId y : reusableList) {
         reusable.f0 = x.f0;
         reusable.f1 = y;

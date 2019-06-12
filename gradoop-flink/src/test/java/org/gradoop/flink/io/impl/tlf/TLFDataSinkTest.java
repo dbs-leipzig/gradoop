@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.tlf;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.EPGMLabeled;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -130,12 +130,12 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
     // get first transaction which contains one complete graph
     GraphTransaction graphTransaction = graphTransactions.collect().get(0);
     // get vertices of the first transaction/graph
-    EPGMVertex[] vertexArray = graphTransaction.getVertices().toArray(
-      new EPGMVertex[graphTransaction.getVertices().size()]);
+    Vertex[] vertexArray = graphTransaction.getVertices().toArray(
+      new Vertex[graphTransaction.getVertices().size()]);
     // sort vertices by label(alphabetically)
-    Arrays.sort(vertexArray, new Comparator<EPGMVertex>() {
+    Arrays.sort(vertexArray, new Comparator<Vertex>() {
       @Override
-      public int compare(EPGMVertex vertex1, EPGMVertex vertex2) {
+      public int compare(Vertex vertex1, Vertex vertex2) {
         return vertex1.getLabel().compareTo(vertex2.getLabel());
       }
     });
@@ -169,7 +169,7 @@ public class TLFDataSinkTest extends GradoopFlinkTestBase {
     //get first transaction which contains one complete graph
     GraphTransaction graphTransaction = graphTransactions.collect().get(0);
     //get vertices of the first transaction/graph
-    EPGMVertex[] vertexArray = graphTransaction.getVertices().toArray(new EPGMVertex[0]);
+    Vertex[] vertexArray = graphTransaction.getVertices().toArray(new Vertex[0]);
     //sort vertices by label(alphabetically)
     Arrays.sort(vertexArray, Comparator.comparing(EPGMLabeled::getLabel));
 

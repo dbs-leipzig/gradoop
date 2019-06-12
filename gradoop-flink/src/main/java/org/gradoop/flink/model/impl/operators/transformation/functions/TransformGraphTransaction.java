@@ -19,9 +19,9 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -36,30 +36,30 @@ public class TransformGraphTransaction implements MapFunction<GraphTransaction, 
   /**
    * Factory to init modified graph head.
    */
-  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
+  private final EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory;
   /**
    * Graph head modification function
    */
-  private final TransformationFunction<GraphHead> graphHeadTransFunc;
+  private final TransformationFunction<EPGMGraphHead> graphHeadTransFunc;
 
   /**
    * Factory to init modified vertex.
    */
-  private final EPGMVertexFactory<Vertex> vertexFactory;
+  private final EPGMVertexFactory<EPGMVertex> vertexFactory;
 
   /**
-   * Vertex modification function
+   * EPGMVertex modification function
    */
-  private final TransformationFunction<Vertex> vertexTransFunc;
+  private final TransformationFunction<EPGMVertex> vertexTransFunc;
 
   /**
    * Factory to init modified edge.
    */
-  private final EPGMEdgeFactory<Edge> edgeFactory;
+  private final EPGMEdgeFactory<EPGMEdge> edgeFactory;
   /**
-   * Edge modification function
+   * EPGMEdge modification function
    */
-  private final TransformationFunction<Edge> edgeTransFunc;
+  private final TransformationFunction<EPGMEdge> edgeTransFunc;
 
   /**
    * Constructor
@@ -71,10 +71,10 @@ public class TransformGraphTransaction implements MapFunction<GraphTransaction, 
    * @param edgeFactory edge factory
    * @param edgeTransFunc edge transformation function
    */
-  public TransformGraphTransaction(EPGMGraphHeadFactory<GraphHead> graphHeadFactory,
-    TransformationFunction<GraphHead> graphHeadTransFunc, EPGMVertexFactory<Vertex> vertexFactory,
-    TransformationFunction<Vertex> vertexTransFunc, EPGMEdgeFactory<Edge> edgeFactory,
-    TransformationFunction<Edge> edgeTransFunc) {
+  public TransformGraphTransaction(EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory,
+    TransformationFunction<EPGMGraphHead> graphHeadTransFunc, EPGMVertexFactory<EPGMVertex> vertexFactory,
+    TransformationFunction<EPGMVertex> vertexTransFunc, EPGMEdgeFactory<EPGMEdge> edgeFactory,
+    TransformationFunction<EPGMEdge> edgeTransFunc) {
     this.graphHeadFactory = graphHeadFactory;
     this.graphHeadTransFunc = graphHeadTransFunc;
     this.vertexFactory = vertexFactory;

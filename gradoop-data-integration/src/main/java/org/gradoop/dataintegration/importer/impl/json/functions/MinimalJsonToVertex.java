@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
@@ -42,7 +42,7 @@ import java.util.Objects;
  * "name":"Alice","gender":"female","age":42
  * }}</pre>
  */
-public class MinimalJsonToVertex implements MapFunction<String, Vertex> {
+public class MinimalJsonToVertex implements MapFunction<String, EPGMVertex> {
 
   /**
    * The default label used for the newly created vertices.
@@ -52,14 +52,14 @@ public class MinimalJsonToVertex implements MapFunction<String, Vertex> {
   /**
    * Reduce object instantiations.
    */
-  private final Vertex reuse;
+  private final EPGMVertex reuse;
 
   /**
    * Creates a new instance of this JSON string to vertex converting function.
    *
    * @param vertexFactory The vertex factory used to create new vertices.
    */
-  public MinimalJsonToVertex(EPGMVertexFactory<Vertex> vertexFactory) {
+  public MinimalJsonToVertex(EPGMVertexFactory<EPGMVertex> vertexFactory) {
     this.reuse = Objects.requireNonNull(vertexFactory).createVertex(JSON_VERTEX_LABEL);
     this.reuse.setProperties(Properties.create());
   }
@@ -72,7 +72,7 @@ public class MinimalJsonToVertex implements MapFunction<String, Vertex> {
    * @throws Exception on failure
    */
   @Override
-  public Vertex map(String jsonString) throws Exception {
+  public EPGMVertex map(String jsonString) throws Exception {
     JSONObject jsonVertex = new JSONObject(jsonString);
 
     Properties properties = reuse.getProperties();

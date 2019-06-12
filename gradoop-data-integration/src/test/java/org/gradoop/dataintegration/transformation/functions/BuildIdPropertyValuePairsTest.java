@@ -17,7 +17,7 @@ package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -41,14 +41,14 @@ public class BuildIdPropertyValuePairsTest extends GradoopFlinkTestBase {
   @Test
   public void testFunction() throws Exception {
     VertexFactory vertexFactory = getConfig().getVertexFactory();
-    Vertex v1 = vertexFactory.createVertex("a");
-    Vertex v2 = vertexFactory.createVertex("a");
+    EPGMVertex v1 = vertexFactory.createVertex("a");
+    EPGMVertex v2 = vertexFactory.createVertex("a");
     v2.setProperty("k1", 1L);
     v2.setProperty("k2", 1L);
-    Vertex v3 = vertexFactory.createVertex("b");
+    EPGMVertex v3 = vertexFactory.createVertex("b");
     v3.setProperty("k1", 1L);
     v3.setProperty("k2", 1L);
-    Vertex v4 = vertexFactory.createVertex();
+    EPGMVertex v4 = vertexFactory.createVertex();
     List<Tuple2<GradoopId, PropertyValue>> result = getExecutionEnvironment()
       .fromElements(v1, v2, v3, v4).flatMap(new BuildIdPropertyValuePairs<>("a", "k1"))
       .collect();

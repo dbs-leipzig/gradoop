@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -52,15 +52,15 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
-    Vertex a = vertexFactory.createVertex("Person", properties);
+    EPGMVertex a = vertexFactory.createVertex("Person", properties);
 
     properties = Properties.create();
     properties.set("name", "Bob");
-    Vertex b = vertexFactory.createVertex("Person", properties);
+    EPGMVertex b = vertexFactory.createVertex("Person", properties);
 
     properties = Properties.create();
     properties.set("since", "2013");
-    Edge e = edgeFactory.createEdge("knows", a.getId(), b.getId(), properties);
+    EPGMEdge e = edgeFactory.createEdge("knows", a.getId(), b.getId(), properties);
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a, e, b));
 
@@ -85,24 +85,24 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     Properties properties = Properties.create();
     properties.set("name", "Alice");
     properties.set("age", "25");
-    Vertex a = vertexFactory.createVertex("Person", properties);
+    EPGMVertex a = vertexFactory.createVertex("Person", properties);
 
     properties = Properties.create();
     properties.set("name", "Bob");
     properties.set("age", "24");
-    Vertex b = vertexFactory.createVertex("Person", properties);
+    EPGMVertex b = vertexFactory.createVertex("Person", properties);
 
     properties = Properties.create();
     properties.set("since", 2013);
-    Edge e1 = edgeFactory.createEdge("knows", a.getId(), b.getId(), properties);
+    EPGMEdge e1 = edgeFactory.createEdge("knows", a.getId(), b.getId(), properties);
 
     properties = Properties.create();
     properties.set("since", 2013);
-    Edge e2 = edgeFactory.createEdge("knows", b.getId(), a.getId(), properties);
+    EPGMEdge e2 = edgeFactory.createEdge("knows", b.getId(), a.getId(), properties);
 
     properties = Properties.create();
     properties.set("since", 2014);
-    Edge e3 = edgeFactory.createEdge("knows", a.getId(), b.getId(), properties);
+    EPGMEdge e3 = edgeFactory.createEdge("knows", a.getId(), b.getId(), properties);
 
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(
@@ -126,12 +126,12 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
   public void testFilterByLabel() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a:Person)-[e:likes]->(b)");
 
-    Vertex a1 = vertexFactory.createVertex("Person");
-    Vertex a2 = vertexFactory.createVertex("Orc");
-    Vertex b = vertexFactory.createVertex("Person");
-    Edge e1 = edgeFactory.createEdge("likes", a1.getId(), b.getId());
-    Edge e2 = edgeFactory.createEdge("likes", a2.getId(), b.getId());
-    Edge e3 = edgeFactory.createEdge("knows", a1.getId(), b.getId());
+    EPGMVertex a1 = vertexFactory.createVertex("Person");
+    EPGMVertex a2 = vertexFactory.createVertex("Orc");
+    EPGMVertex b = vertexFactory.createVertex("Person");
+    EPGMEdge e1 = edgeFactory.createEdge("likes", a1.getId(), b.getId());
+    EPGMEdge e2 = edgeFactory.createEdge("likes", a2.getId(), b.getId());
+    EPGMEdge e3 = edgeFactory.createEdge("knows", a1.getId(), b.getId());
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(
       new Triple(a1, e1, b),
@@ -155,10 +155,10 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
   public void testFilterBySelfLoop() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a)-[e]->(a)");
 
-    Vertex a = vertexFactory.createVertex("Person");
-    Vertex b = vertexFactory.createVertex("Person");
-    Edge e1 = edgeFactory.createEdge("loves", a.getId(), a.getId());
-    Edge e2 = edgeFactory.createEdge("loves", a.getId(), b.getId());
+    EPGMVertex a = vertexFactory.createVertex("Person");
+    EPGMVertex b = vertexFactory.createVertex("Person");
+    EPGMEdge e1 = edgeFactory.createEdge("loves", a.getId(), a.getId());
+    EPGMEdge e2 = edgeFactory.createEdge("loves", a.getId(), b.getId());
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(
       new Triple(a, e1, a),
@@ -179,10 +179,10 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
   public void testFilterByIsomorphism() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a)-[e]->(b)");
 
-    Vertex a = vertexFactory.createVertex("Person");
-    Vertex b = vertexFactory.createVertex("Person");
-    Edge e1 = edgeFactory.createEdge("loves", a.getId(), a.getId());
-    Edge e2 = edgeFactory.createEdge("loves", a.getId(), b.getId());
+    EPGMVertex a = vertexFactory.createVertex("Person");
+    EPGMVertex b = vertexFactory.createVertex("Person");
+    EPGMEdge e1 = edgeFactory.createEdge("loves", a.getId(), a.getId());
+    EPGMEdge e2 = edgeFactory.createEdge("loves", a.getId(), b.getId());
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(
       new Triple(a, e1, a),
@@ -204,10 +204,10 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
   public void testFilterByHomomorphism() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a)-[e]->(b)");
 
-    Vertex a = vertexFactory.createVertex("Person");
-    Vertex b = vertexFactory.createVertex("Person");
-    Edge e1 = edgeFactory.createEdge("loves", a.getId(), a.getId());
-    Edge e2 = edgeFactory.createEdge("loves", a.getId(), b.getId());
+    EPGMVertex a = vertexFactory.createVertex("Person");
+    EPGMVertex b = vertexFactory.createVertex("Person");
+    EPGMEdge e1 = edgeFactory.createEdge("loves", a.getId(), a.getId());
+    EPGMEdge e2 = edgeFactory.createEdge("loves", a.getId(), b.getId());
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(
       new Triple(a, e1, a),
@@ -226,9 +226,9 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
   public void testResultingEntryList() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a)-[e]->(b)");
 
-    Vertex a = vertexFactory.createVertex("Person");
-    Vertex b = vertexFactory.createVertex("Person");
-    Edge e = edgeFactory.createEdge("loves", a.getId(), b.getId());
+    EPGMVertex a = vertexFactory.createVertex("Person");
+    EPGMVertex b = vertexFactory.createVertex("Person");
+    EPGMEdge e = edgeFactory.createEdge("loves", a.getId(), b.getId());
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a, e, b));
 
@@ -248,8 +248,8 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
   public void testResultingEntryForSelfLoops() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a)-[e]->(a)");
 
-    Vertex a = vertexFactory.createVertex("Person");
-    Edge e = edgeFactory.createEdge("loves", a.getId(), a.getId());
+    EPGMVertex a = vertexFactory.createVertex("Person");
+    EPGMEdge e = edgeFactory.createEdge("loves", a.getId(), a.getId());
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a, e, a));
 
@@ -271,17 +271,17 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
     Properties properties = Properties.create();
     properties.set("name", "Alice");
     properties.set("age", 25);
-    Vertex a = vertexFactory.createVertex("Person", properties);
+    EPGMVertex a = vertexFactory.createVertex("Person", properties);
 
     properties = Properties.create();
     properties.set("name", "Bob");
     properties.set("age", 24);
-    Vertex b = vertexFactory.createVertex("Person", properties);
+    EPGMVertex b = vertexFactory.createVertex("Person", properties);
 
     properties = Properties.create();
     properties.set("since", 2013);
     properties.set("active", true);
-    Edge e = edgeFactory.createEdge("knows", a.getId(), b.getId(), properties);
+    EPGMEdge e = edgeFactory.createEdge("knows", a.getId(), b.getId(), properties);
 
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a, e, b));
@@ -306,9 +306,9 @@ public class FilterAndProjectTriplesTest extends PhysicalOperatorTest {
   public void testProjectionOfMissingValues() throws Exception {
     CNF predicates = predicateFromQuery("MATCH (a)-[e]->(b)");
 
-    Vertex a = vertexFactory.createVertex("Person");
-    Vertex b = vertexFactory.createVertex("Person");
-    Edge e = edgeFactory.createEdge("knows", a.getId(), b.getId());
+    EPGMVertex a = vertexFactory.createVertex("Person");
+    EPGMVertex b = vertexFactory.createVertex("Person");
+    EPGMEdge e = edgeFactory.createEdge("knows", a.getId(), b.getId());
 
 
     DataSet<Triple> triples = getExecutionEnvironment().fromElements(new Triple(a, e, b));

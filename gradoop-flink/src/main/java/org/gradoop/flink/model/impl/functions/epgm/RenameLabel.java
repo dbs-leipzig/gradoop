@@ -16,6 +16,9 @@
 package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -25,9 +28,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * vertex and edge) to rename a label
  *
  * @param <T> the {@link EPGMElement} which is target of change, e.g.
- * {@link org.gradoop.common.model.impl.pojo.Vertex},
- * {@link org.gradoop.common.model.impl.pojo.Edge} or
- * {@link org.gradoop.common.model.impl.pojo.GraphHead}
+ * {@link EPGMVertex},
+ * {@link EPGMEdge} or
+ * {@link EPGMGraphHead}
  */
 public class RenameLabel<T extends EPGMElement> implements TransformationFunction<T> {
 

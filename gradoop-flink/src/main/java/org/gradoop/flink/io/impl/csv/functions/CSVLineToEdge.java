@@ -18,34 +18,34 @@ package org.gradoop.flink.io.impl.csv.functions;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.metadata.MetaData;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.io.api.metadata.MetaDataSource;
 
 /**
- * Creates an {@link Edge} from a CSV string. The function uses a
+ * Creates an {@link EPGMEdge} from a CSV string. The function uses a
  * {@link MetaData} object to correctly parse the property values.
  *
  * The string needs to be encoded in the following format:
  *
  * {@code edge-id;[graph-ids];source-id;target-id;edge-label;value_1|value_2|...|value_n}
  */
-public class CSVLineToEdge extends CSVLineToElement<Edge> {
+public class CSVLineToEdge extends CSVLineToElement<EPGMEdge> {
   /**
    * Used to instantiate the edge.
    */
-  private final EPGMEdgeFactory<Edge> edgeFactory;
+  private final EPGMEdgeFactory<EPGMEdge> edgeFactory;
 
   /**
    * Constructor.
    *
    * @param epgmEdgeFactory EPGM edge factory
    */
-  public CSVLineToEdge(EPGMEdgeFactory<Edge> epgmEdgeFactory) {
+  public CSVLineToEdge(EPGMEdgeFactory<EPGMEdge> epgmEdgeFactory) {
     this.edgeFactory = epgmEdgeFactory;
   }
 
   @Override
-  public Edge map(String csvLine) throws Exception {
+  public EPGMEdge map(String csvLine) throws Exception {
     String[] tokens = split(csvLine, 6);
     String label = StringEscaper.unescape(tokens[4]);
     return edgeFactory.initEdge(GradoopId.fromString(tokens[0]),

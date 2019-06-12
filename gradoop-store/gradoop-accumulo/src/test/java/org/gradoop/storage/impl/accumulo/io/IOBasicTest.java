@@ -18,9 +18,9 @@ package org.gradoop.storage.impl.accumulo.io;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -50,18 +50,18 @@ public class IOBasicTest extends GradoopFlinkTestBase {
   public void read() throws Exception {
     AccumuloEPGMStore accumuloStore = new AccumuloEPGMStore(AccumuloTestSuite.getAcConfig(TEST_01));
 
-    Collection<GraphHead> graphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
-    Collection<Vertex> vertices = GradoopTestUtils.getSocialNetworkLoader().getVertices();
-    Collection<Edge> edges = GradoopTestUtils.getSocialNetworkLoader().getEdges();
+    Collection<EPGMGraphHead> graphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
+    Collection<EPGMVertex> vertices = GradoopTestUtils.getSocialNetworkLoader().getVertices();
+    Collection<EPGMEdge> edges = GradoopTestUtils.getSocialNetworkLoader().getEdges();
 
     // write social graph to HBase
-    for (GraphHead g : graphHeads) {
+    for (EPGMGraphHead g : graphHeads) {
       accumuloStore.writeGraphHead(g);
     }
-    for (Vertex v : vertices) {
+    for (EPGMVertex v : vertices) {
       accumuloStore.writeVertex(v);
     }
-    for (Edge e : edges) {
+    for (EPGMEdge e : edges) {
       accumuloStore.writeEdge(e);
     }
     accumuloStore.flush();
@@ -70,9 +70,9 @@ public class IOBasicTest extends GradoopFlinkTestBase {
     GraphCollection collection = new AccumuloDataSource(accumuloStore, flinkConfig)
       .getGraphCollection();
 
-    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
-    Collection<Vertex> loadedVertices = Lists.newArrayList();
-    Collection<Edge> loadedEdges = Lists.newArrayList();
+    Collection<EPGMGraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<EPGMVertex> loadedVertices = Lists.newArrayList();
+    Collection<EPGMEdge> loadedEdges = Lists.newArrayList();
 
     collection.getGraphHeads().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
     collection.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));

@@ -19,9 +19,9 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.util.HashSet;
@@ -42,22 +42,22 @@ import java.util.Set;
 @FunctionAnnotation.ForwardedFieldsFirst("*->f0")
 @FunctionAnnotation.ForwardedFieldsSecond("f1;f2")
 public class TransactionFromSets
-  implements JoinFunction<GraphHead, Tuple3<GradoopId, Set<Vertex>, Set<Edge>>, GraphTransaction> {
+  implements JoinFunction<EPGMGraphHead, Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>>, GraphTransaction> {
   /**
    * Used if right hand side is empty
    */
-  private static final Set<Vertex> EMPTY_VERTEX_SET = new HashSet<>(0);
+  private static final Set<EPGMVertex> EMPTY_VERTEX_SET = new HashSet<>(0);
   /**
    * Used if right hand side is empty
    */
-  private static final Set<Edge> EMPTY_EDGE_SET = new HashSet<>(0);
+  private static final Set<EPGMEdge> EMPTY_EDGE_SET = new HashSet<>(0);
   /**
    * Reduce object instantiations
    */
   private final GraphTransaction reuseTransaction = new GraphTransaction();
 
   @Override
-  public GraphTransaction join(GraphHead graphHead, Tuple3<GradoopId, Set<Vertex>, Set<Edge>> sets)
+  public GraphTransaction join(EPGMGraphHead graphHead, Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>> sets)
     throws Exception {
 
     reuseTransaction.setGraphHead(graphHead);

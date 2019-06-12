@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.pojo.GraphElement;
  * Adds GradoopIds to the graph ids of a GraphElement based on a long id
  * that is defined on both datasets.
  *
- * @param <E> a type extending GraphElement, e.g. Vertex or Edge
+ * @param <E> a type extending GraphElement, e.g. EPGMVertex or EPGMEdge
  */
 
 @FunctionAnnotation.ReadFieldsFirst("f1")

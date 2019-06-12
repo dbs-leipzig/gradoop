@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.aggregation;
 
 import org.apache.flink.runtime.client.JobExecutionException;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -88,7 +88,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
       .aggregate(minEdgeProperty)
       .aggregate(minProperty);
 
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("edge minimum not set",
       graphHead.hasProperty(minEdgeProperty.getAggregatePropertyKey()));
@@ -134,7 +134,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
       .aggregate(maxEdgeProperty)
       .aggregate(maxProperty);
 
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("vertex maximum not set",
       graphHead.hasProperty(maxEdgeProperty.getAggregatePropertyKey()));
@@ -180,7 +180,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
       .aggregate(sumEdgeProperty)
       .aggregate(sumProperty);
 
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("edge sum not set",
       graphHead.hasProperty(sumEdgeProperty.getAggregatePropertyKey()));
@@ -248,7 +248,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
       .aggregate(sumEdgeProperty)
       .aggregate(sumProperty);
 
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("edge sum not set", graphHead.hasProperty(
       sumEdgeProperty.getAggregatePropertyKey()));
@@ -283,7 +283,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
       .aggregate(edgeCount)
       .aggregate(count);
 
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("vertex count not set",
       graphHead.hasProperty(vertexCount.getAggregatePropertyKey()));
@@ -303,7 +303,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
    * @param expectedVertexCount expected vertex count
    * @param expectedEdgeCount expected edge count
    */
-  void assertCounts(EPGMGraphHead graphHead, long expectedVertexCount, long expectedEdgeCount) {
+  void assertCounts(GraphHead graphHead, long expectedVertexCount, long expectedEdgeCount) {
     assertEquals("wrong vertex count", expectedVertexCount,
       graphHead.getPropertyValue(new VertexCount().getAggregatePropertyKey()).getLong());
     assertEquals("wrong edge count", expectedEdgeCount,
@@ -322,7 +322,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable("g2");
     HasVertexLabel hasPerson = new HasVertexLabel("Person");
     graph = graph.aggregate(hasPerson);
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("Property hasVertexLabel_Person not set",
       graphHead.hasProperty(hasPerson.getAggregatePropertyKey()));
@@ -340,7 +340,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable("g2");
     HasVertexLabel hasNotExistent = new HasVertexLabel("LabelDoesNotExist");
     graph = graph.aggregate(hasNotExistent);
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("Property hasVertexLabel_LabelDoesNotExist not set",
       graphHead.hasProperty(hasNotExistent.getAggregatePropertyKey()));
@@ -358,7 +358,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable("g2");
     HasEdgeLabel hasKnows = new HasEdgeLabel("knows");
     graph = graph.aggregate(hasKnows);
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("Property hasEdgeLabel_knows not set",
       graphHead.hasProperty(hasKnows.getAggregatePropertyKey()));
@@ -376,7 +376,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable("g2");
     HasEdgeLabel hasNotExistent = new HasEdgeLabel("LabelDoesNotExist");
     graph = graph.aggregate(hasNotExistent);
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("Property hasEdgeLabel_LabelDoesNotExist not set",
       graphHead.hasProperty(hasNotExistent.getAggregatePropertyKey()));
@@ -395,7 +395,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("g0");
     HasEdgeLabel hasLabel = new HasEdgeLabel("anyLabel");
     graph = graph.aggregate(hasLabel);
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("Property hasEdgeLabel_anyLabel not set",
       graphHead.hasProperty(hasLabel.getAggregatePropertyKey()));
@@ -414,7 +414,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("g0");
     HasVertexLabel hasLabel = new HasVertexLabel("");
     graph = graph.aggregate(hasLabel);
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("Property hasVertexLabel_ not set",
       graphHead.hasProperty(hasLabel.getAggregatePropertyKey()));
@@ -432,7 +432,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable("g2");
     HasLabel hasPerson = new HasLabel("Person");
     graph = graph.aggregate(hasPerson);
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("Property hasLabel_Person not set",
       graphHead.hasProperty(hasPerson.getAggregatePropertyKey()));
@@ -450,7 +450,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable("g2");
     HasLabel hasNotExistent = new HasLabel("LabelDoesNotExist");
     graph = graph.aggregate(hasNotExistent);
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("Property hasLabel_LabelDoesNotExist not set",
       graphHead.hasProperty(hasNotExistent.getAggregatePropertyKey()));
@@ -469,7 +469,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("g0");
     HasLabel hasLabel = new HasLabel("anyLabel");
     graph = graph.aggregate(hasLabel);
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("Property hasLabel_anyLabel not set",
       graphHead.hasProperty(hasLabel.getAggregatePropertyKey()));
@@ -488,7 +488,7 @@ public class AggregationTest extends GradoopFlinkTestBase {
       .getLogicalGraphByVariable("g0");
     HasLabel hasLabel = new HasLabel("");
     graph = graph.aggregate(hasLabel);
-    EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+    GraphHead graphHead = graph.getGraphHead().collect().get(0);
 
     assertTrue("Property hasLabel_ not set",
       graphHead.hasProperty(hasLabel.getAggregatePropertyKey()));

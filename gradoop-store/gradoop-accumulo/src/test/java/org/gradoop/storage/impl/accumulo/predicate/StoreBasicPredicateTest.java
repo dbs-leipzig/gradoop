@@ -15,12 +15,12 @@
  */
 package org.gradoop.storage.impl.accumulo.predicate;
 
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 import org.gradoop.storage.impl.accumulo.predicate.filter.calculate.Or;
@@ -56,24 +56,24 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
   public void findPersonByName() throws Throwable {
     doTest(TEST01, (loader, store, config) -> {
       //vertex label and property query
-      List<Vertex> inputVertices = sample(loader.getVertices()
+      List<EPGMVertex> inputVertices = sample(loader.getVertices()
         .stream()
         .filter(it -> Objects.equals(it.getLabel(), "Person"))
         .collect(Collectors.toList()), 3);
 
 
-      List<Vertex> queryResult = store
+      List<EPGMVertex> queryResult = store
         .getVertexSpace(
           Query.elements()
             .fromAll()
             .where(AccumuloFilters
-              .<Vertex>labelIn("Person")
+              .<EPGMVertex>labelIn("Person")
               .and(inputVertices.stream()
                 .map(it -> {
                   assert it.getProperties() != null;
                   String name = it.getProperties().get("name").getString();
-                  return (AccumuloElementFilter<Vertex>) AccumuloFilters
-                    .<Vertex>propEquals("name", name);
+                  return (AccumuloElementFilter<EPGMVertex>) AccumuloFilters
+                    .<EPGMVertex>propEquals("name", name);
                 })
                 .reduce((a, b) -> Or.create(a, b))
                 .orElse(it -> false))
@@ -93,7 +93,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
   public void findPersonByAge() throws Throwable {
     doTest(TEST02, (loader, store, config) -> {
       //vertex label and property query
-      List<Vertex> inputVertices = loader.getVertices()
+      List<EPGMVertex> inputVertices = loader.getVertices()
         .stream()
         .filter(it -> Objects.equals(it.getLabel(), "Person"))
         .filter(it -> it.getProperties() != null)
@@ -101,7 +101,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
         .filter(it -> it.getProperties().get("age").getInt() >= 35)
         .collect(Collectors.toList());
 
-      List<Vertex> queryResult = store
+      List<EPGMVertex> queryResult = store
         .getVertexSpace(
           Query.elements()
             .fromAll()
@@ -119,13 +119,13 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
   @Test
   public void findGraphByIdsAndProperty() throws Throwable {
     doTest(TEST03, (loader, store, config) -> {
-      List<GraphHead> samples = sample(new ArrayList<>(loader.getGraphHeads()), 3);
+      List<EPGMGraphHead> samples = sample(new ArrayList<>(loader.getGraphHeads()), 3);
 
       GradoopIdSet sampleRange = GradoopIdSet.fromExisting(samples.stream()
         .map(Element::getId)
         .collect(Collectors.toList()));
 
-      List<GraphHead> inputGraph = samples.stream()
+      List<EPGMGraphHead> inputGraph = samples.stream()
         .filter(it -> Objects.equals(it.getLabel(), "Community"))
         .filter(it -> it.getPropertyValue("interest") != null)
         .filter(it ->
@@ -133,13 +133,13 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
             Objects.equals(it.getPropertyValue("interest").getString(), "Graphs"))
         .collect(Collectors.toList());
 
-      ElementQuery<AccumuloElementFilter<GraphHead>> queryFormula = Query.elements()
+      ElementQuery<AccumuloElementFilter<EPGMGraphHead>> queryFormula = Query.elements()
         .fromSets(sampleRange)
-        .where(AccumuloFilters.<GraphHead>labelIn("Community")
-          .and(AccumuloFilters.<GraphHead>propEquals("interest", "Hadoop")
+        .where(AccumuloFilters.<EPGMGraphHead>labelIn("Community")
+          .and(AccumuloFilters.<EPGMGraphHead>propEquals("interest", "Hadoop")
             .or(AccumuloFilters.propEquals("interest", "Graphs"))));
 
-      List<GraphHead> query = store
+      List<EPGMGraphHead> query = store
         .getGraphSpace(queryFormula)
         .readRemainsAndClose();
       GradoopTestUtils.validateEPGMElementCollections(inputGraph, query);

@@ -24,10 +24,10 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
@@ -50,11 +50,11 @@ import java.util.Set;
  * Responsible for producing instances of {@link TxCollectionLayout}.
  */
 public class TxCollectionLayoutFactory extends BaseFactory
-  implements GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> {
+  implements GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> {
 
   @Override
-  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromDataSets(DataSet<GraphHead> graphHeads,
-    DataSet<Vertex> vertices) {
+  public GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromDataSets(DataSet<EPGMGraphHead> graphHeads,
+    DataSet<EPGMVertex> vertices) {
     Objects.requireNonNull(graphHeads);
     Objects.requireNonNull(vertices);
 
@@ -63,16 +63,16 @@ public class TxCollectionLayoutFactory extends BaseFactory
   }
 
   @Override
-  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromDataSets(
-    DataSet<GraphHead> inGraphHeads,
-    DataSet<Vertex> inVertices,
-    DataSet<Edge> inEdges) {
+  public GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromDataSets(
+    DataSet<EPGMGraphHead> inGraphHeads,
+    DataSet<EPGMVertex> inVertices,
+    DataSet<EPGMEdge> inEdges) {
     Objects.requireNonNull(inGraphHeads);
     Objects.requireNonNull(inVertices);
     Objects.requireNonNull(inEdges);
 
     // Add a dummy graph head for entities which have no assigned graph
-    DataSet<GraphHead> dbGraphHead = getConfig().getExecutionEnvironment().fromElements(
+    DataSet<EPGMGraphHead> dbGraphHead = getConfig().getExecutionEnvironment().fromElements(
       getConfig().getGraphHeadFactory()
         .initGraphHead(GradoopConstants.DB_GRAPH_ID, GradoopConstants.DB_GRAPH_LABEL)
     );
@@ -88,7 +88,7 @@ public class TxCollectionLayoutFactory extends BaseFactory
       .returns(TypeExtractor.getForClass(GraphElement.class))
       .flatMap(new GraphElementExpander<>());
 
-    DataSet<Tuple3<GradoopId, Set<Vertex>, Set<Edge>>> transactions = vertices
+    DataSet<Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>>> transactions = vertices
       .union(edges)
       .groupBy(0)
       .combineGroup(new GraphVerticesEdges())
@@ -104,10 +104,10 @@ public class TxCollectionLayoutFactory extends BaseFactory
   }
 
   @Override
-  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromIndexedDataSets(
-    Map<String, DataSet<GraphHead>> graphHeads,
-    Map<String, DataSet<Vertex>> vertices,
-    Map<String, DataSet<Edge>> edges) {
+  public GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromIndexedDataSets(
+    Map<String, DataSet<EPGMGraphHead>> graphHeads,
+    Map<String, DataSet<EPGMVertex>> vertices,
+    Map<String, DataSet<EPGMEdge>> edges) {
     Objects.requireNonNull(graphHeads);
     Objects.requireNonNull(vertices);
     Objects.requireNonNull(edges);
@@ -122,10 +122,10 @@ public class TxCollectionLayoutFactory extends BaseFactory
   }
 
   @Override
-  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromCollections(
-    Collection<GraphHead> graphHeads,
-    Collection<Vertex> vertices,
-    Collection<Edge> edges) {
+  public GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromCollections(
+    Collection<EPGMGraphHead> graphHeads,
+    Collection<EPGMVertex> vertices,
+    Collection<EPGMEdge> edges) {
     return fromDataSets(
       createGraphHeadDataSet(graphHeads),
       createVertexDataSet(vertices),
@@ -134,29 +134,29 @@ public class TxCollectionLayoutFactory extends BaseFactory
   }
 
   @Override
-  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromGraphLayout(
-    LogicalGraphLayout<GraphHead, Vertex, Edge> logicalGraphLayout) {
+  public GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromGraphLayout(
+    LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> logicalGraphLayout) {
     return fromDataSets(logicalGraphLayout.getGraphHead(),
       logicalGraphLayout.getVertices(),
       logicalGraphLayout.getEdges());
   }
 
   @Override
-  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromTransactions(
+  public GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromTransactions(
     DataSet<GraphTransaction> transactions) {
     return new TxCollectionLayout(transactions);
   }
 
   @Override
-  public GraphCollectionLayout<GraphHead, Vertex, Edge> fromTransactions(
+  public GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromTransactions(
     DataSet<GraphTransaction> transactions,
-    GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
-    GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
+    GroupReduceFunction<EPGMVertex, EPGMVertex> vertexMergeReducer,
+    GroupReduceFunction<EPGMEdge, EPGMEdge> edgeMergeReducer) {
     return new TxCollectionLayout(transactions);
   }
 
   @Override
-  public GraphCollectionLayout<GraphHead, Vertex, Edge> createEmptyCollection() {
+  public GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> createEmptyCollection() {
     return fromTransactions(createGraphTransactionDataSet(Lists.newArrayListWithCapacity(0)));
   }
 

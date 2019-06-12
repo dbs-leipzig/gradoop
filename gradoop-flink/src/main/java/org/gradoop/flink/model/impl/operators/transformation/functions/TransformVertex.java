@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <V> the type of the EPGM vertex
  */
 @FunctionAnnotation.ForwardedFields("id;graphIds")
-public class TransformVertex<V extends EPGMVertex> extends TransformBase<V> {
+public class TransformVertex<V extends Vertex> extends TransformBase<V> {
 
   /**
    * Factory to init modified vertex.

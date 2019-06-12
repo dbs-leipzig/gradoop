@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Compute function for {@link KRandomJumpGellyVCI}. Vertex values are of type
+ * Compute function for {@link KRandomJumpGellyVCI}. EPGMVertex values are of type
  * {@link VCIVertexValue}, with fields:
  * <p><ul>
  * <li>f0: {@code Boolean} set to {@code true} if the vertex was visited, to {@code false}

@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.deprecated.json.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -38,19 +38,19 @@ import org.gradoop.common.model.impl.properties.Properties;
  * }
  */
 public class JSONToGraphHead extends JSONToEntity
-  implements MapFunction<String, GraphHead> {
+  implements MapFunction<String, EPGMGraphHead> {
 
   /**
    * Creates graph data objects
    */
-  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
+  private final EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory;
 
   /**
    * Creates map function
    *
    * @param epgmGraphHeadFactory graph data factory
    */
-  public JSONToGraphHead(EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory) {
+  public JSONToGraphHead(EPGMGraphHeadFactory<EPGMGraphHead> epgmGraphHeadFactory) {
     this.graphHeadFactory = epgmGraphHeadFactory;
   }
 
@@ -62,7 +62,7 @@ public class JSONToGraphHead extends JSONToEntity
    * @throws Exception on failure
    */
   @Override
-  public GraphHead map(String s) throws Exception {
+  public EPGMGraphHead map(String s) throws Exception {
     JSONObject jsonGraph = new JSONObject(s);
     GradoopId graphID = getID(jsonGraph);
     String label = getLabel(jsonGraph);

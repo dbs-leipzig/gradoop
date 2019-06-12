@@ -19,18 +19,16 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.config.GradoopConfig;
-import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.s1ck.gdl.GDLHandler;
-import org.s1ck.gdl.model.Edge;
 import org.s1ck.gdl.model.Graph;
 import org.s1ck.gdl.model.GraphElement;
-import org.s1ck.gdl.model.Vertex;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +45,7 @@ import java.util.Map;
  * @param <E> EPGM edge type
  */
 public class AsciiGraphLoader
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
+  <G extends GraphHead, V extends Vertex, E extends Edge> {
 
   /**
    * Gradoop configuration
@@ -135,7 +133,7 @@ public class AsciiGraphLoader
    * @return AsciiGraphLoader
    */
   public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   AsciiGraphLoader<G, V, E> fromString(String asciiGraph,
     GradoopConfig<G, V, E> config) {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
@@ -159,7 +157,7 @@ public class AsciiGraphLoader
    * @throws IOException on failure
    */
   public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   AsciiGraphLoader<G, V, E> fromFile(String fileName,
     GradoopConfig<G, V, E> config) throws IOException {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
@@ -183,7 +181,7 @@ public class AsciiGraphLoader
    * @throws IOException on failure
    */
   public static
-  <G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge>
+  <G extends GraphHead, V extends Vertex, E extends Edge>
   AsciiGraphLoader<G, V, E> fromStream(InputStream inputStream,
     GradoopConfig<G, V, E> config) throws IOException {
     return new AsciiGraphLoader<>(new GDLHandler.Builder()
@@ -222,7 +220,7 @@ public class AsciiGraphLoader
   }
 
   /**
-   * Returns EPGMGraphHead by given variable.
+   * Returns GraphHead by given variable.
    *
    * @param variable variable used in GDL script
    * @return graphHead or {@code null} if graph is not cached
@@ -250,7 +248,7 @@ public class AsciiGraphLoader
   }
 
   // ---------------------------------------------------------------------------
-  //  EPGMVertex methods
+  //  Vertex methods
   // ---------------------------------------------------------------------------
 
   /**
@@ -320,7 +318,7 @@ public class AsciiGraphLoader
   }
 
   // ---------------------------------------------------------------------------
-  //  EPGMEdge methods
+  //  Edge methods
   // ---------------------------------------------------------------------------
 
   /**
@@ -453,11 +451,11 @@ public class AsciiGraphLoader
    * Initializes vertices and their cache.
    */
   private void initVertices() {
-    for (Vertex v : gdlHandler.getVertices()) {
+    for (org.s1ck.gdl.model.Vertex v : gdlHandler.getVertices()) {
       initVertex(v);
     }
 
-    for (Map.Entry<String, Vertex> e : gdlHandler.getVertexCache().entrySet()) {
+    for (Map.Entry<String, org.s1ck.gdl.model.Vertex> e : gdlHandler.getVertexCache().entrySet()) {
       updateVertexCache(e.getKey(), e.getValue());
     }
   }
@@ -466,11 +464,11 @@ public class AsciiGraphLoader
    * Initializes edges and their cache.
    */
   private void initEdges() {
-    for (Edge e : gdlHandler.getEdges()) {
+    for (org.s1ck.gdl.model.Edge e : gdlHandler.getEdges()) {
       initEdge(e);
     }
 
-    for (Map.Entry<String, Edge> e : gdlHandler.getEdgeCache().entrySet()) {
+    for (Map.Entry<String, org.s1ck.gdl.model.Edge> e : gdlHandler.getEdgeCache().entrySet()) {
       updateEdgeCache(e.getKey(), e.getValue());
     }
   }
@@ -490,12 +488,12 @@ public class AsciiGraphLoader
   }
 
   /**
-   * Creates a new EPGMVertex from the GDL Loader or updates an existing one.
+   * Creates a new Vertex from the GDL Loader or updates an existing one.
    *
    * @param v vertex from GDL Loader
    * @return EPGM vertex
    */
-  private V initVertex(Vertex v) {
+  private V initVertex(org.s1ck.gdl.model.Vertex v) {
     V vertex;
     if (!vertexIds.containsKey(v.getId())) {
       vertex = (V) config.getVertexFactory().createVertex(
@@ -512,12 +510,12 @@ public class AsciiGraphLoader
   }
 
   /**
-   * Creates a new EPGMEdge from the GDL Loader.
+   * Creates a new Edge from the GDL Loader.
    *
    * @param e edge from GDL loader
    * @return EPGM edge
    */
-  private E initEdge(Edge e) {
+  private E initEdge(org.s1ck.gdl.model.Edge e) {
     E edge;
     if (!edgeIds.containsKey(e.getId())) {
       edge = (E) config.getEdgeFactory().createEdge(
@@ -552,7 +550,7 @@ public class AsciiGraphLoader
    * @param variable vertex variable used in GDL script
    * @param v vertex from GDL loader
    */
-  private void updateVertexCache(String variable, Vertex v) {
+  private void updateVertexCache(String variable, org.s1ck.gdl.model.Vertex v) {
     vertexCache.put(variable, vertices.get(vertexIds.get(v.getId())));
   }
 
@@ -562,7 +560,7 @@ public class AsciiGraphLoader
    * @param variable edge variable used in the GDL script
    * @param e edge from GDL loader
    */
-  private void updateEdgeCache(String variable, Edge e) {
+  private void updateEdgeCache(String variable, org.s1ck.gdl.model.Edge e) {
     edgeCache.put(variable, edges.get(edgeIds.get(e.getId())));
   }
 

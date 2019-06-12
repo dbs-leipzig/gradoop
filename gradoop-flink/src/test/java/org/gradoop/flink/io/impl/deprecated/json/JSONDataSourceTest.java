@@ -17,9 +17,9 @@ package org.gradoop.flink.io.impl.deprecated.json;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -41,9 +41,9 @@ public class JSONDataSourceTest extends GradoopFlinkTestBase {
 
     GraphCollection collection = dataSource.getGraphCollection();
 
-    Collection<GraphHead> graphHeads = Lists.newArrayList();
-    Collection<Vertex> vertices = Lists.newArrayList();
-    Collection<Edge> edges = Lists.newArrayList();
+    Collection<EPGMGraphHead> graphHeads = Lists.newArrayList();
+    Collection<EPGMVertex> vertices = Lists.newArrayList();
+    Collection<EPGMEdge> edges = Lists.newArrayList();
 
     collection.getGraphHeads().output(new LocalCollectionOutputFormat<>(graphHeads));
     collection.getVertices().output(new LocalCollectionOutputFormat<>(vertices));

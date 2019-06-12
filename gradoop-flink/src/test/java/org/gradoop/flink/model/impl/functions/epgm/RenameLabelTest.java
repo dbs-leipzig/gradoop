@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
@@ -43,11 +43,11 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    EPGMGraphHead graphHead = new GraphHeadFactory().initGraphHead(graphId, label, props);
+    GraphHead graphHead = new GraphHeadFactory().initGraphHead(graphId, label, props);
 
     String newLabel = "B";
 
-    TransformationFunction<EPGMGraphHead> renameFunction = new RenameLabel<>(label, newLabel);
+    TransformationFunction<GraphHead> renameFunction = new RenameLabel<>(label, newLabel);
 
     renameFunction.apply(graphHead, graphHead);
 
@@ -68,11 +68,11 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    EPGMEdge edge = new EdgeFactory().initEdge(edgeId, label, sourceId, targetId, props);
+    Edge edge = new EdgeFactory().initEdge(edgeId, label, sourceId, targetId, props);
 
     String newLabel = "B";
 
-    TransformationFunction<EPGMEdge> renameFunction = new RenameLabel<>(label, newLabel);
+    TransformationFunction<Edge> renameFunction = new RenameLabel<>(label, newLabel);
 
     renameFunction.apply(edge, edge);
 
@@ -91,11 +91,11 @@ public class RenameLabelTest extends GradoopFlinkTestBase {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    EPGMVertex vertex = new VertexFactory().initVertex(vertexId, label, props);
+    Vertex vertex = new VertexFactory().initVertex(vertexId, label, props);
 
     String newLabel = "B";
 
-    TransformationFunction<EPGMVertex> renameFunction = new RenameLabel<>(label, newLabel);
+    TransformationFunction<Vertex> renameFunction = new RenameLabel<>(label, newLabel);
 
     renameFunction.apply(vertex, vertex);
 

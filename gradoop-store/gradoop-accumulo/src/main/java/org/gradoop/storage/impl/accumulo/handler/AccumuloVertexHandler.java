@@ -17,35 +17,35 @@ package org.gradoop.storage.impl.accumulo.handler;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 
 /**
  * Accumulo vertex handler for row's read/write operator
  */
-public class AccumuloVertexHandler implements AccumuloRowHandler<Vertex, EPGMVertex> {
+public class AccumuloVertexHandler implements AccumuloRowHandler<EPGMVertex, Vertex> {
 
   /**
    * vertex factory
    */
-  private final EPGMVertexFactory<Vertex> factory;
+  private final EPGMVertexFactory<EPGMVertex> factory;
 
   /**
    * vertex handler factory constructor
    *
    * @param factory vertex factory
    */
-  public AccumuloVertexHandler(EPGMVertexFactory<Vertex> factory) {
+  public AccumuloVertexHandler(EPGMVertexFactory<EPGMVertex> factory) {
     this.factory = factory;
   }
 
   @Override
   public Mutation writeRow(
     Mutation mutation,
-    EPGMVertex record
+    Vertex record
   ) {
     mutation.put(AccumuloTables.KEY.LABEL, AccumuloTables.KEY.NONE, record.getLabel());
 
@@ -68,7 +68,7 @@ public class AccumuloVertexHandler implements AccumuloRowHandler<Vertex, EPGMVer
   }
 
   @Override
-  public Vertex readRow(EPGMVertex origin) {
+  public EPGMVertex readRow(Vertex origin) {
     return factory.initVertex(
       origin.getId(),
       origin.getLabel(),

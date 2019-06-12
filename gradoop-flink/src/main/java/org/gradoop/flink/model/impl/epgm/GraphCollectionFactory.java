@@ -20,9 +20,9 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
@@ -40,11 +40,11 @@ import java.util.Objects;
  * {@link GraphCollectionLayout}.
  */
 public class GraphCollectionFactory
-  implements BaseGraphCollectionFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection> {
+  implements BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> {
   /**
    * Creates the layout from given data.
    */
-  private GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> layoutFactory;
+  private GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> layoutFactory;
 
   /**
    * The Gradoop Flink configuration.
@@ -62,7 +62,7 @@ public class GraphCollectionFactory
 
   @Override
   public void setLayoutFactory(
-    GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> layoutFactory) {
+    GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> layoutFactory) {
     Objects.requireNonNull(layoutFactory);
     this.layoutFactory = layoutFactory;
     this.layoutFactory.setGradoopFlinkConfig(config);
@@ -74,7 +74,7 @@ public class GraphCollectionFactory
    * The factory is passed from {@link GradoopFlinkConfig} at the moment.
    */
   @Override
-  public EPGMGraphHeadFactory<GraphHead> getGraphHeadFactory() {
+  public EPGMGraphHeadFactory<EPGMGraphHead> getGraphHeadFactory() {
     return config.getGraphHeadFactory();
   }
 
@@ -84,7 +84,7 @@ public class GraphCollectionFactory
    * The factory is passed from {@link GradoopFlinkConfig} at the moment.
    */
   @Override
-  public EPGMVertexFactory<Vertex> getVertexFactory() {
+  public EPGMVertexFactory<EPGMVertex> getVertexFactory() {
     return config.getVertexFactory();
   }
 
@@ -94,46 +94,46 @@ public class GraphCollectionFactory
    * The factory is passed from {@link GradoopFlinkConfig} at the moment.
    */
   @Override
-  public EPGMEdgeFactory<Edge> getEdgeFactory() {
+  public EPGMEdgeFactory<EPGMEdge> getEdgeFactory() {
     return config.getEdgeFactory();
   }
 
   @Override
-  public GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices) {
+  public GraphCollection fromDataSets(DataSet<EPGMGraphHead> graphHeads, DataSet<EPGMVertex> vertices) {
     return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices), config);
   }
 
   @Override
-  public GraphCollection fromDataSets(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
-    DataSet<Edge> edges) {
+  public GraphCollection fromDataSets(DataSet<EPGMGraphHead> graphHeads, DataSet<EPGMVertex> vertices,
+    DataSet<EPGMEdge> edges) {
     return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, edges), config);
   }
 
   @Override
-  public GraphCollection fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHeads,
-    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
-    GraphCollectionLayout<GraphHead, Vertex, Edge> layout = layoutFactory
+  public GraphCollection fromIndexedDataSets(Map<String, DataSet<EPGMGraphHead>> graphHeads,
+    Map<String, DataSet<EPGMVertex>> vertices, Map<String, DataSet<EPGMEdge>> edges) {
+    GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> layout = layoutFactory
       .fromIndexedDataSets(graphHeads, vertices, edges);
     return new GraphCollection(layout, config);
   }
 
   @Override
-  public GraphCollection fromCollections(Collection<GraphHead> graphHeads,
-    Collection<Vertex> vertices, Collection<Edge> edges) {
+  public GraphCollection fromCollections(Collection<EPGMGraphHead> graphHeads,
+    Collection<EPGMVertex> vertices, Collection<EPGMEdge> edges) {
     return new GraphCollection(layoutFactory.fromCollections(graphHeads, vertices, edges), config);
   }
 
   @Override
-  public GraphCollection fromGraph(LogicalGraphLayout<GraphHead, Vertex, Edge> logicalGraphLayout) {
+  public GraphCollection fromGraph(LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> logicalGraphLayout) {
     return new GraphCollection(layoutFactory.fromGraphLayout(logicalGraphLayout), config);
   }
 
   @Override
   public GraphCollection fromGraphs(LogicalGraph... logicalGraphLayouts) {
     if (logicalGraphLayouts.length != 0) {
-      DataSet<GraphHead> graphHeads = null;
-      DataSet<Vertex> vertices = null;
-      DataSet<Edge> edges = null;
+      DataSet<EPGMGraphHead> graphHeads = null;
+      DataSet<EPGMVertex> vertices = null;
+      DataSet<EPGMEdge> edges = null;
 
       if (logicalGraphLayouts.length == 1) {
         return fromGraph(logicalGraphLayouts[0]);
@@ -162,8 +162,8 @@ public class GraphCollectionFactory
 
   @Override
   public GraphCollection fromTransactions(DataSet<GraphTransaction> transactions,
-    GroupReduceFunction<Vertex, Vertex> vertexMergeReducer,
-    GroupReduceFunction<Edge, Edge> edgeMergeReducer) {
+    GroupReduceFunction<EPGMVertex, EPGMVertex> vertexMergeReducer,
+    GroupReduceFunction<EPGMEdge, EPGMEdge> edgeMergeReducer) {
     return new GraphCollection(layoutFactory
       .fromTransactions(transactions, vertexMergeReducer, edgeMergeReducer), config);
   }

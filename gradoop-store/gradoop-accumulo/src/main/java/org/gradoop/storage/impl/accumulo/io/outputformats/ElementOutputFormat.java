@@ -19,13 +19,13 @@ import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.flink.api.common.io.OutputFormat;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.config.GradoopAccumuloConfig;
 import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
@@ -95,12 +95,12 @@ public class ElementOutputFormat<E extends Element> implements OutputFormat<E> {
 
   @Override
   public final void writeRecord(E record) {
-    if (elementType == Edge.class) {
-      this.store.writeEdge((EPGMEdge) record);
-    } else if (elementType == Vertex.class) {
-      this.store.writeVertex((EPGMVertex) record);
-    } else if (elementType == GraphHead.class) {
-      this.store.writeGraphHead((EPGMGraphHead) record);
+    if (elementType == EPGMEdge.class) {
+      this.store.writeEdge((Edge) record);
+    } else if (elementType == EPGMVertex.class) {
+      this.store.writeVertex((Vertex) record);
+    } else if (elementType == EPGMGraphHead.class) {
+      this.store.writeGraphHead((GraphHead) record);
     } else {
       throw new IllegalArgumentException(String.format("illegal element type %s", elementType));
     }

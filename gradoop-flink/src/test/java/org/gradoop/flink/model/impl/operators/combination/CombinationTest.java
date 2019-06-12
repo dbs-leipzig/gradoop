@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.combination;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -130,12 +130,12 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
     LogicalGraph g2 = loader.getLogicalGraphByVariable("g2");
 
     // use collections as data sink
-    Collection<Vertex> vertices0 = new HashSet<>();
-    Collection<Edge> edges0 = new HashSet<>();
-    Collection<Vertex> vertices2 = new HashSet<>();
-    Collection<Edge> edges2 = new HashSet<>();
-    Collection<Vertex> resVertices = new HashSet<>();
-    Collection<Edge> resEdges = new HashSet<>();
+    Collection<EPGMVertex> vertices0 = new HashSet<>();
+    Collection<EPGMEdge> edges0 = new HashSet<>();
+    Collection<EPGMVertex> vertices2 = new HashSet<>();
+    Collection<EPGMEdge> edges2 = new HashSet<>();
+    Collection<EPGMVertex> resVertices = new HashSet<>();
+    Collection<EPGMEdge> resEdges = new HashSet<>();
 
     LogicalGraph expected = g0.combine(g2);
 

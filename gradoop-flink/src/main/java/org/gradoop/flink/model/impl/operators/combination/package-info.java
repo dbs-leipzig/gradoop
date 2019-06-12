@@ -15,7 +15,7 @@
  */
 /**
  * A combination operator creates a new logical graph by combining the vertex
- * and edge sets of two input graphs. Vertex and edge equality is based on their
+ * and edge sets of two input graphs. EPGMVertex and edge equality is based on their
  * respective identifiers.
  */
 package org.gradoop.flink.model.impl.operators.combination;

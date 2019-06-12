@@ -21,8 +21,8 @@ import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.IteratorSetting;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.VertexFactory;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.storage.impl.accumulo.handler.AccumuloVertexHandler;
@@ -36,7 +36,7 @@ import java.util.Properties;
 /**
  * gradoop accumulo vertex input format
  */
-public class VertexInputFormat extends BaseInputFormat<Vertex> {
+public class VertexInputFormat extends BaseInputFormat<EPGMVertex> {
 
   /**
    * serialize id
@@ -61,7 +61,7 @@ public class VertexInputFormat extends BaseInputFormat<Vertex> {
    */
   public VertexInputFormat(
     @NonNull Properties properties,
-    @Nullable AccumuloQueryHolder<Vertex> predicate
+    @Nullable AccumuloQueryHolder<EPGMVertex> predicate
   ) {
     super(properties, predicate);
   }
@@ -88,8 +88,8 @@ public class VertexInputFormat extends BaseInputFormat<Vertex> {
   }
 
   @Override
-  protected Vertex mapRow(Map.Entry<Key, Value> row) throws IOException {
-    EPGMVertex decoded = iterator.fromRow(row);
+  protected EPGMVertex mapRow(Map.Entry<Key, Value> row) throws IOException {
+    Vertex decoded = iterator.fromRow(row);
     return handler.readRow(decoded);
   }
 

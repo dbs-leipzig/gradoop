@@ -23,14 +23,14 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.filter.FilterList;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.api.EPGMConfigProvider;
 import org.gradoop.storage.common.api.EPGMGraphInput;
 import org.gradoop.storage.common.api.EPGMGraphPredictableOutput;
@@ -62,9 +62,9 @@ public class HBaseEPGMStore implements
   EPGMConfigProvider<GradoopHBaseConfig>,
   EPGMGraphInput,
   EPGMGraphPredictableOutput<
-    HBaseElementFilter<GraphHead>,
-    HBaseElementFilter<Vertex>,
-    HBaseElementFilter<Edge>> {
+    HBaseElementFilter<EPGMGraphHead>,
+    HBaseElementFilter<EPGMVertex>,
+    HBaseElementFilter<EPGMEdge>> {
 
   /**
    * Gradoop configuration.
@@ -136,7 +136,7 @@ public class HBaseEPGMStore implements
   }
 
   @Override
-  public void writeGraphHead(@Nonnull final EPGMGraphHead graphHead) throws IOException {
+  public void writeGraphHead(@Nonnull final GraphHead graphHead) throws IOException {
     GraphHeadHandler graphHeadHandler = config.getGraphHeadHandler();
     // graph id
     Put put = new Put(graphHeadHandler.getRowKey(graphHead.getId()));
@@ -150,7 +150,7 @@ public class HBaseEPGMStore implements
   }
 
   @Override
-  public void writeVertex(@Nonnull final EPGMVertex vertexData) throws IOException {
+  public void writeVertex(@Nonnull final Vertex vertexData) throws IOException {
     VertexHandler vertexHandler = config.getVertexHandler();
     // vertex id
     Put put = new Put(vertexHandler.getRowKey(vertexData.getId()));
@@ -164,7 +164,7 @@ public class HBaseEPGMStore implements
   }
 
   @Override
-  public void writeEdge(@Nonnull final EPGMEdge edgeData) throws IOException {
+  public void writeEdge(@Nonnull final Edge edgeData) throws IOException {
     // write to table
     EdgeHandler edgeHandler = config.getEdgeHandler();
     // edge id
@@ -178,8 +178,8 @@ public class HBaseEPGMStore implements
   }
 
   @Override
-  public GraphHead readGraph(@Nonnull final GradoopId graphId) throws IOException {
-    GraphHead graphData = null;
+  public EPGMGraphHead readGraph(@Nonnull final GradoopId graphId) throws IOException {
+    EPGMGraphHead graphData = null;
     GraphHeadHandler graphHeadHandler = config.getGraphHeadHandler();
     List<Get> getList = new ArrayList<>();
 
@@ -201,8 +201,8 @@ public class HBaseEPGMStore implements
   }
 
   @Override
-  public Vertex readVertex(@Nonnull final GradoopId vertexId) throws IOException {
-    Vertex vertexData = null;
+  public EPGMVertex readVertex(@Nonnull final GradoopId vertexId) throws IOException {
+    EPGMVertex vertexData = null;
     VertexHandler vertexHandler = config.getVertexHandler();
     List<Get> getList = new ArrayList<>();
 
@@ -226,8 +226,8 @@ public class HBaseEPGMStore implements
   }
 
   @Override
-  public Edge readEdge(@Nonnull final GradoopId edgeId) throws IOException {
-    Edge edgeData = null;
+  public EPGMEdge readEdge(@Nonnull final GradoopId edgeId) throws IOException {
+    EPGMEdge edgeData = null;
     EdgeHandler edgeHandler = config.getEdgeHandler();
     List<Get> getList = new ArrayList<>();
 
@@ -252,8 +252,8 @@ public class HBaseEPGMStore implements
 
   @Nonnull
   @Override
-  public ClosableIterator<GraphHead> getGraphSpace(
-    @Nullable ElementQuery<HBaseElementFilter<GraphHead>> query,
+  public ClosableIterator<EPGMGraphHead> getGraphSpace(
+    @Nullable ElementQuery<HBaseElementFilter<EPGMGraphHead>> query,
     int cacheSize
   ) throws IOException {
     Scan scan = new Scan();
@@ -269,8 +269,8 @@ public class HBaseEPGMStore implements
 
   @Nonnull
   @Override
-  public ClosableIterator<Vertex> getVertexSpace(
-    @Nullable ElementQuery<HBaseElementFilter<Vertex>> query,
+  public ClosableIterator<EPGMVertex> getVertexSpace(
+    @Nullable ElementQuery<HBaseElementFilter<EPGMVertex>> query,
     int cacheSize
   ) throws IOException {
     Scan scan = new Scan();
@@ -286,8 +286,8 @@ public class HBaseEPGMStore implements
 
   @Nonnull
   @Override
-  public ClosableIterator<Edge> getEdgeSpace(
-    @Nullable ElementQuery<HBaseElementFilter<Edge>> query,
+  public ClosableIterator<EPGMEdge> getEdgeSpace(
+    @Nullable ElementQuery<HBaseElementFilter<EPGMEdge>> query,
     int cacheSize
   ) throws IOException {
     Scan scan = new Scan();

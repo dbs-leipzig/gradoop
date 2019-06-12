@@ -21,9 +21,9 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 
@@ -38,7 +38,7 @@ import java.util.Objects;
  * @see org.gradoop.dataintegration.transformation.ConnectNeighbors
  */
 @FunctionAnnotation.ReadFields({"f1"})
-public class CreateCartesianNeighborhoodEdges<V extends EPGMVertex, E extends EPGMEdge>
+public class CreateCartesianNeighborhoodEdges<V extends Vertex, E extends Edge>
   implements FlatMapFunction<Tuple2<V, List<NeighborhoodVertex>>, E>, ResultTypeQueryable<E> {
 
   /**

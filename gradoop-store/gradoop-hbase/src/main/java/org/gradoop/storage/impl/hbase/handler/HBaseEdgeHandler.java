@@ -21,10 +21,10 @@ import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
@@ -36,7 +36,7 @@ import java.io.IOException;
 /**
  * Used to read/write EPGM edge data from/to a HBase table.
  * <p>
- * EPGMEdge data in HBase:
+ * Edge data in HBase:
  * <p>
  * |---------|---------------------------------------------|-------|
  * | row-key | meta                                        | data  |
@@ -65,19 +65,19 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
   /**
    * Creates edge data objects from the rows.
    */
-  private final EPGMEdgeFactory<Edge> edgeFactory;
+  private final EPGMEdgeFactory<EPGMEdge> edgeFactory;
 
   /**
    * An optional query to define predicates for the graph store.
    */
-  private ElementQuery<HBaseElementFilter<Edge>> edgeQuery;
+  private ElementQuery<HBaseElementFilter<EPGMEdge>> edgeQuery;
 
   /**
    * Creates an edge data handler.
    *
    * @param edgeFactory edge data factory
    */
-  public HBaseEdgeHandler(EPGMEdgeFactory<Edge> edgeFactory) {
+  public HBaseEdgeHandler(EPGMEdgeFactory<EPGMEdge> edgeFactory) {
     this.edgeFactory = edgeFactory;
   }
 
@@ -119,7 +119,7 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
   }
 
   @Override
-  public Put writeEdge(Put put, EPGMEdge edgeData) {
+  public Put writeEdge(Put put, Edge edgeData) {
     writeLabel(put, edgeData);
     writeSource(put, edgeData.getSourceId());
     writeTarget(put, edgeData.getTargetId());
@@ -129,19 +129,19 @@ public class HBaseEdgeHandler extends HBaseGraphElementHandler implements EdgeHa
   }
 
   @Override
-  public Edge readEdge(Result res) {
+  public EPGMEdge readEdge(Result res) {
     return edgeFactory.initEdge(readId(res), readLabel(res), readSourceId(res), readTargetId(res),
         readProperties(res), readGraphIds(res));
   }
 
   @Override
-  public EdgeHandler applyQuery(ElementQuery<HBaseElementFilter<Edge>> query) {
+  public EdgeHandler applyQuery(ElementQuery<HBaseElementFilter<EPGMEdge>> query) {
     this.edgeQuery = query;
     return this;
   }
 
   @Override
-  public ElementQuery<HBaseElementFilter<Edge>> getQuery() {
+  public ElementQuery<HBaseElementFilter<EPGMEdge>> getQuery() {
     return this.edgeQuery;
   }
 }

@@ -17,9 +17,9 @@ package org.gradoop.flink.model.api.layouts;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.util.Collection;
@@ -33,14 +33,14 @@ import java.util.Map;
  * @param <E> the edge type
  */
 public interface GraphCollectionLayoutFactory<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge> extends BaseLayoutFactory {
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge> extends BaseLayoutFactory {
   /**
    * Creates a collection layout from the given datasets.
    *
-   * @param graphHeads GraphHead DataSet
-   * @param vertices Vertex DataSet
+   * @param graphHeads EPGMGraphHead DataSet
+   * @param vertices EPGMVertex DataSet
    * @return Graph collection layout
    */
   GraphCollectionLayout<G, V, E> fromDataSets(DataSet<G> graphHeads, DataSet<V> vertices);
@@ -48,9 +48,9 @@ public interface GraphCollectionLayoutFactory<
   /**
    * Creates a collection layout from the given datasets.
    *
-   * @param graphHeads GraphHead DataSet
-   * @param vertices Vertex DataSet
-   * @param edges Edge DataSet
+   * @param graphHeads EPGMGraphHead DataSet
+   * @param vertices EPGMVertex DataSet
+   * @param edges EPGMEdge DataSet
    * @return Graph collection layout
    */
   GraphCollectionLayout<G, V, E> fromDataSets(DataSet<G> graphHeads, DataSet<V> vertices,
@@ -71,8 +71,8 @@ public interface GraphCollectionLayoutFactory<
    * Creates a collection layout from the given collections.
    *
    * @param graphHeads Graph Head collection
-   * @param vertices Vertex collection
-   * @param edges Edge collection
+   * @param vertices EPGMVertex collection
+   * @param edges EPGMEdge collection
    * @return Graph collection layout
    */
   GraphCollectionLayout<G, V, E> fromCollections(Collection<G> graphHeads,

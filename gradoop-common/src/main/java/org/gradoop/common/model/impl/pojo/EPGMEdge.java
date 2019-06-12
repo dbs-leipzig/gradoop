@@ -15,7 +15,7 @@
  */
 package org.gradoop.common.model.impl.pojo;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -23,22 +23,22 @@ import org.gradoop.common.model.impl.properties.Properties;
 /**
  * POJO Implementation of an EPGM edge.
  */
-public class Edge extends GraphElement implements EPGMEdge {
+public class EPGMEdge extends GraphElement implements Edge {
 
   /**
-   * EPGMVertex identifier of the source vertex.
+   * Vertex identifier of the source vertex.
    */
   private GradoopId sourceId;
 
   /**
-   * EPGMVertex identifier of the target vertex.
+   * Vertex identifier of the target vertex.
    */
   private GradoopId targetId;
 
   /**
    * Default constructor is necessary to apply to POJO rules.
    */
-  public Edge() {
+  public EPGMEdge() {
   }
 
   /**
@@ -51,7 +51,7 @@ public class Edge extends GraphElement implements EPGMEdge {
    * @param properties  edge properties
    * @param graphIds    graphs that edge is contained in
    */
-  public Edge(final GradoopId id, final String label, final GradoopId sourceId,
+  public EPGMEdge(final GradoopId id, final String label, final GradoopId sourceId,
     final GradoopId targetId, final Properties properties,
     GradoopIdSet graphIds) {
     super(id, label, properties, graphIds);

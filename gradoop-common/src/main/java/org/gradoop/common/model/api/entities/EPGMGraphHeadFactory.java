@@ -19,11 +19,11 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
- * Initializes {@link EPGMGraphHead} objects of a given type.
+ * Initializes {@link GraphHead} objects of a given type.
  *
  * @param <G> EPGM graph head type
  */
-public interface EPGMGraphHeadFactory<G extends EPGMGraphHead>
+public interface EPGMGraphHeadFactory<G extends GraphHead>
   extends EPGMElementFactory<G> {
 
   /**

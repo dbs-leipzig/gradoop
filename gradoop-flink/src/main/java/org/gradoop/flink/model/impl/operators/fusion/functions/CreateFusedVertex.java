@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.fusion.functions;
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 
 /**
  *
@@ -29,12 +29,12 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  */
 @FunctionAnnotation.ForwardedFieldsFirst("id")
 @FunctionAnnotation.ForwardedFieldsSecond("label;properties")
-public class CreateFusedVertex implements CrossFunction<GraphHead, GraphHead, Vertex> {
+public class CreateFusedVertex implements CrossFunction<EPGMGraphHead, EPGMGraphHead, EPGMVertex> {
 
   /**
    * Basic vertex reused each time. It'll be the fused vertex
    */
-  private static final Vertex REUSABLE_VERTEX = new Vertex();
+  private static final EPGMVertex REUSABLE_VERTEX = new EPGMVertex();
 
   /**
    * newly generated vertex id for the new vertex
@@ -50,7 +50,7 @@ public class CreateFusedVertex implements CrossFunction<GraphHead, GraphHead, Ve
   }
 
   @Override
-  public Vertex cross(GraphHead searchGraphHead, GraphHead patternGraphSeachHead) throws Exception {
+  public EPGMVertex cross(EPGMGraphHead searchGraphHead, EPGMGraphHead patternGraphSeachHead) throws Exception {
     REUSABLE_VERTEX.setLabel(patternGraphSeachHead.getLabel());
     REUSABLE_VERTEX.setProperties(patternGraphSeachHead.getProperties());
     REUSABLE_VERTEX.setId(newVertexId);

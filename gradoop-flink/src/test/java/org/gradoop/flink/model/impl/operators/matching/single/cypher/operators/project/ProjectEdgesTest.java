@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EdgeFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
@@ -35,7 +35,7 @@ public class ProjectEdgesTest extends PhysicalOperatorTest {
 
   @Test
   public void returnsEmbeddingWithIdProjectionId() throws Exception {
-    DataSet<Edge> edgeDataSet = createEdgesWithProperties(Lists.newArrayList("foo", "bar", "baz"));
+    DataSet<EPGMEdge> edgeDataSet = createEdgesWithProperties(Lists.newArrayList("foo", "bar", "baz"));
     ArrayList<String> extractedPropertyKeys = Lists.newArrayList("foo", "bar");
 
     ProjectEdges operator = new ProjectEdges(edgeDataSet, extractedPropertyKeys, false);
@@ -52,9 +52,9 @@ public class ProjectEdgesTest extends PhysicalOperatorTest {
   @Test
   public void testProjectLoop() throws Exception {
     GradoopId a = GradoopId.get();
-    Edge edge = new EdgeFactory().createEdge(a, a);
+    EPGMEdge edge = new EdgeFactory().createEdge(a, a);
 
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
+    DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(edge);
 
     Embedding result = new ProjectEdges(edges, Collections.emptyList(), true)
       .evaluate().collect().get(0);

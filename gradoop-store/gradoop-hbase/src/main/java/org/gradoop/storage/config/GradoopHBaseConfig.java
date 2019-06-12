@@ -50,12 +50,12 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
   private final String graphTableName;
 
   /**
-   * EPGMVertex table name.
+   * Vertex table name.
    */
   private final String vertexTableName;
 
   /**
-   * EPGMEdge table name.
+   * Edge table name.
    */
   private final String edgeTableName;
 
@@ -65,12 +65,12 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
   private final GraphHeadHandler graphHeadHandler;
 
   /**
-   * EPGMVertex handler.
+   * Vertex handler.
    */
   private final VertexHandler vertexHandler;
 
   /**
-   * EPGMEdge handler.
+   * Edge handler.
    */
   private final EdgeHandler edgeHandler;
 
@@ -95,9 +95,9 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
     checkArgument(!StringUtils.isEmpty(graphTableName),
       "Graph table name was null or empty");
     checkArgument(!StringUtils.isEmpty(vertexTableName),
-      "EPGMVertex table name was null or empty");
+      "Vertex table name was null or empty");
     checkArgument(!StringUtils.isEmpty(edgeTableName),
-      "EPGMEdge table name was null or empty");
+      "Edge table name was null or empty");
 
     this.graphTableName = graphTableName;
     this.vertexTableName = vertexTableName;

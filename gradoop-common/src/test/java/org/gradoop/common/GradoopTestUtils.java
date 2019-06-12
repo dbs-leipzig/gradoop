@@ -29,9 +29,9 @@ import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.api.entities.EPGMIdentifiable;
 import org.gradoop.common.model.impl.comparators.EPGMIdentifiableComparator;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.util.AsciiGraphLoader;
 
@@ -174,10 +174,10 @@ public class GradoopTestUtils {
    * @return graph store containing a simple social network for tests.
    * @throws IOException on failure
    */
-  public static AsciiGraphLoader<GraphHead, Vertex, Edge> getSocialNetworkLoader()
+  public static AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> getSocialNetworkLoader()
     throws IOException {
 
-    GradoopConfig<GraphHead, Vertex, Edge> config = GradoopConfig.getDefaultConfig();
+    GradoopConfig<EPGMGraphHead, EPGMVertex, EPGMEdge> config = GradoopConfig.getDefaultConfig();
 
     InputStream inputStream = GradoopTestUtils.class.getResourceAsStream(SOCIAL_NETWORK_GDL_FILE);
     return AsciiGraphLoader.fromStream(inputStream, config);

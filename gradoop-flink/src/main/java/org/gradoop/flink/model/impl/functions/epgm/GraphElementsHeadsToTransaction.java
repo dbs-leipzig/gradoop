@@ -20,11 +20,11 @@ import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.Iterator;
@@ -40,28 +40,28 @@ import java.util.Set;
  */
 @FunctionAnnotation.ReadFieldsFirst("f1")
 public class GraphElementsHeadsToTransaction implements CoGroupFunction
-  <Tuple2<GradoopId, GraphElement>, GraphHead, GraphTransaction> {
+  <Tuple2<GradoopId, GraphElement>, EPGMGraphHead, GraphTransaction> {
 
   @Override
   public void coGroup(
     Iterable<Tuple2<GradoopId, GraphElement>> graphElements,
-    Iterable<GraphHead> graphHeads,
+    Iterable<EPGMGraphHead> graphHeads,
     Collector<GraphTransaction> out) throws Exception {
 
-    Iterator<GraphHead> graphHeadIter = graphHeads.iterator();
+    Iterator<EPGMGraphHead> graphHeadIter = graphHeads.iterator();
 
     if (graphHeadIter.hasNext()) {
-      Set<Vertex> vertices = Sets.newHashSet();
-      Set<Edge> edges = Sets.newHashSet();
-      GraphHead graphHead = graphHeadIter.next();
+      Set<EPGMVertex> vertices = Sets.newHashSet();
+      Set<EPGMEdge> edges = Sets.newHashSet();
+      EPGMGraphHead graphHead = graphHeadIter.next();
 
       for (Tuple2<GradoopId, GraphElement> graphElement : graphElements) {
 
         GraphElement el = graphElement.f1;
-        if (el instanceof Vertex) {
-          vertices.add((Vertex) el);
-        } else if (el instanceof Edge) {
-          edges.add((Edge) el);
+        if (el instanceof EPGMVertex) {
+          vertices.add((EPGMVertex) el);
+        } else if (el instanceof EPGMEdge) {
+          edges.add((EPGMEdge) el);
         }
       }
 

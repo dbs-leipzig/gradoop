@@ -20,11 +20,11 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
- * Initializes {@link EPGMEdge} objects of a given type.
+ * Initializes {@link Edge} objects of a given type.
  *
  * @param <E> EPGM edge type
  */
-public interface EPGMEdgeFactory<E extends EPGMEdge>
+public interface EPGMEdgeFactory<E extends Edge>
   extends EPGMElementFactory<E> {
 
   /**

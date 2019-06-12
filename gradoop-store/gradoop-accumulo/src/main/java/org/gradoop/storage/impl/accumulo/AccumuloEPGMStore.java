@@ -34,14 +34,14 @@ import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.api.EPGMConfigProvider;
 import org.gradoop.storage.common.api.EPGMGraphInput;
 import org.gradoop.storage.common.api.EPGMGraphPredictableOutput;
@@ -80,9 +80,9 @@ public class AccumuloEPGMStore implements
   EPGMConfigProvider<GradoopAccumuloConfig>,
   EPGMGraphInput,
   EPGMGraphPredictableOutput<
-    AccumuloElementFilter<GraphHead>,
-    AccumuloElementFilter<Vertex>,
-    AccumuloElementFilter<Edge>> {
+    AccumuloElementFilter<EPGMGraphHead>,
+    AccumuloElementFilter<EPGMVertex>,
+    AccumuloElementFilter<EPGMEdge>> {
 
   /**
    * accumulo epgm store logger
@@ -186,17 +186,17 @@ public class AccumuloEPGMStore implements
   }
 
   @Override
-  public void writeGraphHead(@Nonnull EPGMGraphHead record) {
+  public void writeGraphHead(@Nonnull GraphHead record) {
     writeRecord(record, graphWriter, config.getGraphHandler());
   }
 
   @Override
-  public void writeVertex(@Nonnull EPGMVertex record) {
+  public void writeVertex(@Nonnull Vertex record) {
     writeRecord(record, vertexWriter, config.getVertexHandler());
   }
 
   @Override
-  public void writeEdge(@Nonnull EPGMEdge record) {
+  public void writeEdge(@Nonnull Edge record) {
     writeRecord(record, edgeWriter, config.getEdgeHandler());
   }
 
@@ -260,44 +260,44 @@ public class AccumuloEPGMStore implements
 
   @Nullable
   @Override
-  public GraphHead readGraph(@Nonnull GradoopId graphId) throws IOException {
-    ElementQuery<AccumuloElementFilter<GraphHead>> query = Query
+  public EPGMGraphHead readGraph(@Nonnull GradoopId graphId) throws IOException {
+    ElementQuery<AccumuloElementFilter<EPGMGraphHead>> query = Query
       .elements()
       .fromSets(graphId)
       .noFilter();
-    try (ClosableIterator<GraphHead> it = getGraphSpace(query, 1)) {
+    try (ClosableIterator<EPGMGraphHead> it = getGraphSpace(query, 1)) {
       return it.hasNext() ? it.next() : null;
     }
   }
 
   @Nullable
   @Override
-  public Vertex readVertex(@Nonnull GradoopId vertexId) throws IOException {
-    ElementQuery<AccumuloElementFilter<Vertex>> query = Query
+  public EPGMVertex readVertex(@Nonnull GradoopId vertexId) throws IOException {
+    ElementQuery<AccumuloElementFilter<EPGMVertex>> query = Query
       .elements()
       .fromSets(vertexId)
       .noFilter();
-    try (ClosableIterator<Vertex> it = getVertexSpace(query, 1)) {
+    try (ClosableIterator<EPGMVertex> it = getVertexSpace(query, 1)) {
       return it.hasNext() ? it.next() : null;
     }
   }
 
   @Nullable
   @Override
-  public Edge readEdge(@Nonnull GradoopId edgeId) throws IOException {
-    ElementQuery<AccumuloElementFilter<Edge>> query = Query
+  public EPGMEdge readEdge(@Nonnull GradoopId edgeId) throws IOException {
+    ElementQuery<AccumuloElementFilter<EPGMEdge>> query = Query
       .elements()
       .fromSets(edgeId)
       .noFilter();
-    try (ClosableIterator<Edge> it = getEdgeSpace(query, 1)) {
+    try (ClosableIterator<EPGMEdge> it = getEdgeSpace(query, 1)) {
       return it.hasNext() ? it.next() : null;
     }
   }
 
   @Nonnull
   @Override
-  public ClosableIterator<GraphHead> getGraphSpace(
-    @Nullable ElementQuery<AccumuloElementFilter<GraphHead>> query,
+  public ClosableIterator<EPGMGraphHead> getGraphSpace(
+    @Nullable ElementQuery<AccumuloElementFilter<EPGMGraphHead>> query,
     int cacheSize
   ) throws IOException {
     if (query != null &&
@@ -327,8 +327,8 @@ public class AccumuloEPGMStore implements
 
   @Nonnull
   @Override
-  public ClosableIterator<Vertex> getVertexSpace(
-    @Nullable ElementQuery<AccumuloElementFilter<Vertex>> query,
+  public ClosableIterator<EPGMVertex> getVertexSpace(
+    @Nullable ElementQuery<AccumuloElementFilter<EPGMVertex>> query,
     int cacheSize
   ) throws IOException {
     if (query != null &&
@@ -358,8 +358,8 @@ public class AccumuloEPGMStore implements
 
   @Nonnull
   @Override
-  public ClosableIterator<Edge> getEdgeSpace(
-    @Nullable ElementQuery<AccumuloElementFilter<Edge>> query,
+  public ClosableIterator<EPGMEdge> getEdgeSpace(
+    @Nullable ElementQuery<AccumuloElementFilter<EPGMEdge>> query,
     int cacheSize
   ) throws IOException {
     if (query != null &&

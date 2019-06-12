@@ -20,9 +20,9 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.EPGMVertexFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 
 /**
@@ -33,11 +33,11 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
  */
 @FunctionAnnotation.ForwardedFields("f1->id;f2->label")
 @FunctionAnnotation.ReadFields("f1;f2;f3;f4;f6")
-public class BuildSuperVertex<V extends EPGMVertex> extends BuildBase
+public class BuildSuperVertex<V extends Vertex> extends BuildBase
   implements MapFunction<VertexGroupItem, V>, ResultTypeQueryable<V> {
 
   /**
-   * Vertex vertexFactory.
+   * EPGMVertex vertexFactory.
    */
   private final EPGMVertexFactory<V> vertexFactory;
 
@@ -53,7 +53,7 @@ public class BuildSuperVertex<V extends EPGMVertex> extends BuildBase
   }
 
   /**
-   * Creates a {@link Vertex} object from the given {@link VertexGroupItem}
+   * Creates a {@link EPGMVertex} object from the given {@link VertexGroupItem}
    * and returns a new {@link org.apache.flink.graph.Vertex}.
    *
    * @param groupItem vertex group item

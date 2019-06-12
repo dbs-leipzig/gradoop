@@ -22,9 +22,9 @@ import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -55,11 +55,11 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
   /**
    * Used to filter vertices from the logical graph.
    */
-  private final FilterFunction<Vertex> vertexFilterFunction;
+  private final FilterFunction<EPGMVertex> vertexFilterFunction;
   /**
    * Used to filter edges from the logical graph.
    */
-  private final FilterFunction<Edge> edgeFilterFunction;
+  private final FilterFunction<EPGMEdge> edgeFilterFunction;
 
   /**
    * Creates a new sub graph operator instance.
@@ -76,8 +76,8 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
    * @param vertexFilterFunction vertex filter function
    * @param edgeFilterFunction   edge filter function
    */
-  public ApplySubgraph(FilterFunction<Vertex> vertexFilterFunction,
-    FilterFunction<Edge> edgeFilterFunction) {
+  public ApplySubgraph(FilterFunction<EPGMVertex> vertexFilterFunction,
+    FilterFunction<EPGMEdge> edgeFilterFunction) {
     if (vertexFilterFunction == null && edgeFilterFunction == null) {
       throw new IllegalArgumentException("No filter functions was given.");
     }
@@ -121,9 +121,9 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
+    EPGMGraphHeadFactory<EPGMGraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
-    DataSet<GraphHead> newGraphHeads = graphIdDictionary
+    DataSet<EPGMGraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())
       .map(new InitGraphHead(graphFactory));
 
@@ -148,7 +148,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new vertices
     //--------------------------------------------------------------------------
 
-    DataSet<Vertex> newVertices = vertexIdsWithNewGraphs
+    DataSet<EPGMVertex> newVertices = vertexIdsWithNewGraphs
         .join(collection.getVertices())
         .where(0)
         .equalTo(new Id<>())
@@ -191,7 +191,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute the new edges
     //--------------------------------------------------------------------------
 
-    DataSet<Edge> newEdges = edgeIdsWithNewGraphs
+    DataSet<EPGMEdge> newEdges = edgeIdsWithNewGraphs
       .join(collection.getEdges())
       .where(0)
       .equalTo(new Id<>())
@@ -224,9 +224,9 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
+    EPGMGraphHeadFactory<EPGMGraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
-    DataSet<GraphHead> newGraphHeads = graphIdDictionary
+    DataSet<EPGMGraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())
       .map(new InitGraphHead(graphFactory));
 
@@ -236,7 +236,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // contained in and finally adding the new graphs to the edges
     //--------------------------------------------------------------------------
 
-    DataSet<Edge> newEdges = collection
+    DataSet<EPGMEdge> newEdges = collection
       .getEdges()
       .filter(edgeFilterFunction)
       .flatMap(new ElementIdGraphIdTuple<>())
@@ -259,7 +259,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // are added to the vertices
     //--------------------------------------------------------------------------
 
-    DataSet<Vertex> newVertices = newEdges
+    DataSet<EPGMVertex> newVertices = newEdges
       .flatMap(new SourceTargetIdGraphsTuple<>())
       .distinct(0)
       .coGroup(collection.getVertices())
@@ -298,9 +298,9 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // compute new graphs
     //--------------------------------------------------------------------------
 
-    EPGMGraphHeadFactory<GraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
+    EPGMGraphHeadFactory<EPGMGraphHead> graphFactory = collection.getFactory().getGraphHeadFactory();
 
-    DataSet<GraphHead> newGraphHeads = graphIdDictionary
+    DataSet<EPGMGraphHead> newGraphHeads = graphIdDictionary
       .map(new Project2To1<>())
       .map(new InitGraphHead(graphFactory));
 
@@ -310,7 +310,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // filter function is applied first to improve performance
     //--------------------------------------------------------------------------
 
-    DataSet<Vertex> newVertices =
+    DataSet<EPGMVertex> newVertices =
       collection.getVertices()
         .filter(vertexFilterFunction)
         .flatMap(new ElementIdGraphIdTuple<>())
@@ -330,7 +330,7 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
     // filter function is applied first to improve performance
     //--------------------------------------------------------------------------
 
-    DataSet<Edge> newEdges = collection.getEdges()
+    DataSet<EPGMEdge> newEdges = collection.getEdges()
       .filter(edgeFilterFunction)
       .flatMap(new ElementIdGraphIdTuple<>())
       .join(graphIdDictionary)

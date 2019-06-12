@@ -22,7 +22,7 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -30,24 +30,24 @@ import org.gradoop.common.model.impl.properties.Properties;
  * source graph this one was created from.
  */
 public class InitGraphHeadWithLineage
-  implements MapFunction<Tuple2<GradoopId, GradoopId>, GraphHead>, ResultTypeQueryable<GraphHead> {
+  implements MapFunction<Tuple2<GradoopId, GradoopId>, EPGMGraphHead>, ResultTypeQueryable<EPGMGraphHead> {
   /**
    * GraphHeadFactory
    */
-  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
+  private final EPGMGraphHeadFactory<EPGMGraphHead> graphHeadFactory;
 
   /**
    * Constructor
    *
    * @param epgmGraphHeadFactory graph head factory
    */
-  public InitGraphHeadWithLineage(EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory) {
+  public InitGraphHeadWithLineage(EPGMGraphHeadFactory<EPGMGraphHead> epgmGraphHeadFactory) {
     this.graphHeadFactory = epgmGraphHeadFactory;
   }
 
   @Override
-  public GraphHead map(Tuple2<GradoopId, GradoopId> idTuple) {
-    GraphHead head = graphHeadFactory.initGraphHead(idTuple.f0);
+  public EPGMGraphHead map(Tuple2<GradoopId, GradoopId> idTuple) {
+    EPGMGraphHead head = graphHeadFactory.initGraphHead(idTuple.f0);
     Properties properties = Properties.createWithCapacity(1);
     properties.set("lineage", idTuple.f1);
     head.setProperties(properties);
@@ -55,7 +55,7 @@ public class InitGraphHeadWithLineage
   }
 
   @Override
-  public TypeInformation<GraphHead> getProducedType() {
+  public TypeInformation<EPGMGraphHead> getProducedType() {
     return TypeExtractor.createTypeInfo(graphHeadFactory.getType());
   }
 }

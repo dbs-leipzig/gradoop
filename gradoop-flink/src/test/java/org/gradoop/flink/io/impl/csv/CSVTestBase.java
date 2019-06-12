@@ -20,9 +20,9 @@ import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -119,17 +119,17 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
     GradoopIdSet heads = GradoopIdSet.fromExisting(idForum);
     Properties properties = Properties.createFromMap(PROPERTY_MAP);
 
-    DataSet<GraphHead> graphHead = getExecutionEnvironment().fromElements(
-      new GraphHead(idForum, "Forum", properties)
+    DataSet<EPGMGraphHead> graphHead = getExecutionEnvironment().fromElements(
+      new EPGMGraphHead(idForum, "Forum", properties)
     );
 
-    DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(
-      new Vertex(idUser, "User", properties, heads),
-      new Vertex(idPost, "Post", properties, heads)
+    DataSet<EPGMVertex> vertices = getExecutionEnvironment().fromElements(
+      new EPGMVertex(idUser, "User", properties, heads),
+      new EPGMVertex(idPost, "Post", properties, heads)
     );
 
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(
-      new Edge(GradoopId.get(), "creatorOf", idUser, idPost, properties, heads)
+    DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(
+      new EPGMEdge(GradoopId.get(), "creatorOf", idUser, idPost, properties, heads)
     );
 
     return getConfig().getLogicalGraphFactory().fromDataSets(graphHead, vertices, edges);

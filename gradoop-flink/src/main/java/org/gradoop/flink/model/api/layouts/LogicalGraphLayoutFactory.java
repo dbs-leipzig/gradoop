@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.api.layouts;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 
 import java.util.Collection;
 import java.util.Map;
@@ -31,13 +31,13 @@ import java.util.Map;
  * @param <E> the edge type
  */
 public interface LogicalGraphLayoutFactory<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge> extends BaseLayoutFactory {
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge> extends BaseLayoutFactory {
   /**
    * Creates a logical graph layout from the given vertex dataset.
    *
-   * @param vertices  Vertex dataset
+   * @param vertices  EPGMVertex dataset
    * @return Logical graph layout
    */
   LogicalGraphLayout<G, V, E> fromDataSets(DataSet<V> vertices);
@@ -48,8 +48,8 @@ public interface LogicalGraphLayoutFactory<
    * The method creates a new graph head element and assigns the vertices and
    * edges to that graph.
    *
-   * @param vertices Vertex DataSet
-   * @param edges    Edge DataSet
+   * @param vertices EPGMVertex DataSet
+   * @param edges    EPGMEdge DataSet
    * @return Logical graph layout
    */
   LogicalGraphLayout<G, V, E> fromDataSets(DataSet<V> vertices, DataSet<E> edges);
@@ -60,9 +60,9 @@ public interface LogicalGraphLayoutFactory<
    * The method assumes that the given vertices and edges are already assigned
    * to the given graph head.
    *
-   * @param graphHead   1-element GraphHead DataSet
-   * @param vertices    Vertex DataSet
-   * @param edges       Edge DataSet
+   * @param graphHead   1-element EPGMGraphHead DataSet
+   * @param vertices    EPGMVertex DataSet
+   * @param edges       EPGMEdge DataSet
    * @return Logical graph layout
    */
   LogicalGraphLayout<G, V, E> fromDataSets(DataSet<G> graphHead, DataSet<V> vertices,
@@ -84,7 +84,7 @@ public interface LogicalGraphLayoutFactory<
    * The method assumes that the given vertices and edges are already assigned
    * to the given graph head.
    *
-   * @param graphHeads 1-element Mapping from label to GraphHead DataSet
+   * @param graphHeads 1-element Mapping from label to EPGMGraphHead DataSet
    * @param vertices Mapping from label to vertex dataset
    * @param edges Mapping from label to edge dataset
    * @return Logical graph layout
@@ -99,8 +99,8 @@ public interface LogicalGraphLayoutFactory<
    * to the given graph head.
    *
    * @param graphHead Graph head associated with the logical graph
-   * @param vertices  Vertex collection
-   * @param edges     Edge collection
+   * @param vertices  EPGMVertex collection
+   * @param edges     EPGMEdge collection
    * @return Logical graph layout
    */
   LogicalGraphLayout<G, V, E> fromCollections(G graphHead, Collection<V> vertices,
@@ -110,8 +110,8 @@ public interface LogicalGraphLayoutFactory<
    * Creates a logical graph layout from the given vertex and edge collections. A new graph head is
    * created and all vertices and edges are assigned to that graph.
    *
-   * @param vertices    Vertex collection
-   * @param edges       Edge collection
+   * @param vertices    EPGMVertex collection
+   * @param edges       EPGMEdge collection
    * @return Logical graph layout
    */
   LogicalGraphLayout<G, V, E> fromCollections(Collection<V> vertices, Collection<E> edges);

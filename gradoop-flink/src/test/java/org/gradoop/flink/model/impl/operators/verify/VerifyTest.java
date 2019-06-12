@@ -20,8 +20,8 @@ import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.api.entities.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -61,13 +61,13 @@ public class VerifyTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("g0");
     // Apply a subgraph operator that would result in dangling edges.
     LogicalGraph subgraph = input.subgraph(
-      new ByProperty<Vertex>("name", PropertyValue.create("Alice")).negate(),
+      new ByProperty<EPGMVertex>("name", PropertyValue.create("Alice")).negate(),
       new True<>(), Subgraph.Strategy.BOTH);
     // Make sure that the graph contains dangling edges.
-    List<Edge> danglingEdges = getDanglingEdges(subgraph);
-    List<Edge> expectedDanglingEdges = Arrays.asList(loader.getEdgeByVariable("eka"),
+    List<EPGMEdge> danglingEdges = getDanglingEdges(subgraph);
+    List<EPGMEdge> expectedDanglingEdges = Arrays.asList(loader.getEdgeByVariable("eka"),
       loader.getEdgeByVariable("akb"), loader.getEdgeByVariable("bka"));
-    Comparator<Edge> comparator = Comparator.comparing(Edge::getId);
+    Comparator<EPGMEdge> comparator = Comparator.comparing(EPGMEdge::getId);
     danglingEdges.sort(comparator);
     expectedDanglingEdges.sort(comparator);
     assertArrayEquals(expectedDanglingEdges.toArray(), danglingEdges.toArray());
@@ -85,13 +85,13 @@ public class VerifyTest extends GradoopFlinkTestBase {
    *
    * @throws Exception when the execution in Flink fails.
    */
-  private List<Edge> getDanglingEdges(LogicalGraph graph) throws Exception {
-    List<Vertex> vertices = new ArrayList<>();
-    List<Edge> edges = new ArrayList<>();
+  private List<EPGMEdge> getDanglingEdges(LogicalGraph graph) throws Exception {
+    List<EPGMVertex> vertices = new ArrayList<>();
+    List<EPGMEdge> edges = new ArrayList<>();
     graph.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
     graph.getEdges().output(new LocalCollectionOutputFormat<>(edges));
     getExecutionEnvironment().execute();
-    Set<GradoopId> ids = vertices.stream().map(Vertex::getId).collect(Collectors.toSet());
+    Set<GradoopId> ids = vertices.stream().map(EPGMVertex::getId).collect(Collectors.toSet());
     return edges.stream()
       .filter(e -> !ids.contains(e.getSourceId()) || !ids.contains(e.getTargetId()))
       .collect(Collectors.toList());
