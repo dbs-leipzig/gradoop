@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Gradoop Common Suite" verbose="1" >
+    <test name="Gradoop Common Tests">
+        <packages>
+            <package name="org.gradoop.common.model.impl.properties"/>
+            <package name="org.gradoop.common.util"/>
+            <package name="org.gradoop.common.model.impl.pojo"/>
+            <package name="org.gradoop.common.model.impl.metadata"/>
+            <package name="org.gradoop.common.model.impl.id"/>
+        </packages>
+    </test>
+</suite>

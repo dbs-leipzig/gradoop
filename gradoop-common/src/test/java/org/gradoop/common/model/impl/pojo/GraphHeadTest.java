@@ -20,10 +20,12 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
 import org.hamcrest.core.Is;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.AssertJUnit.*;
+import static org.testng.Assert.assertNotEquals;
 
 public class GraphHeadTest {
   @Test
@@ -59,12 +61,12 @@ public class GraphHeadTest {
     assertThat(g.getLabel(), is(GradoopConstants.DEFAULT_GRAPH_LABEL));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullIDTest() {
     new GraphHeadFactory().initGraphHead(null);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullLabelTest() {
     GradoopId graphID = GradoopId.get();
     new GraphHeadFactory().initGraphHead(graphID, null);
@@ -81,7 +83,7 @@ public class GraphHeadTest {
 
     assertEquals("Graph heads were not equal", graphHead1, graphHead1);
     assertEquals("Graph heads were not equal", graphHead1, graphHead2);
-    assertNotEquals("Graph heads were equal", graphHead1, graphHead3);
+    assertNotEquals(graphHead1, graphHead3, "Graph heads were equal");
   }
 
   @Test
@@ -93,8 +95,7 @@ public class GraphHeadTest {
     EPGMGraphHead graphHead2 = new GraphHeadFactory().initGraphHead(graphID1);
     EPGMGraphHead graphHead3 = new GraphHeadFactory().initGraphHead(graphID2);
 
-    assertTrue("Graph heads have different hash",
-      graphHead1.hashCode() == graphHead2.hashCode());
+    assertEquals("Graph heads have different hash", graphHead2.hashCode(), graphHead1.hashCode());
     assertFalse("Graph heads have same hash",
       graphHead1.hashCode() == graphHead3.hashCode());
   }

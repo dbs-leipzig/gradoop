@@ -20,7 +20,7 @@ import org.apache.flink.core.memory.DataInputView;
 import org.apache.flink.core.memory.DataInputViewStreamWrapper;
 import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.DataOutputViewStreamWrapper;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,7 +29,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.AssertJUnit.*;
+import static org.testng.Assert.assertNotEquals;
 
 public class GradoopIdsTest {
 
@@ -40,18 +42,18 @@ public class GradoopIdsTest {
 
     GradoopIdSet ids = new GradoopIdSet();
 
-    assertThat(ids.size(), is(0));
+    assertEquals(0, ids.size());
 
     ids.add(id1);
-    assertThat(ids.size(), is(1));
+    assertEquals(1, ids.size());
     assertTrue(ids.contains(id1));
     // must not change
     ids.add(id1);
-    assertThat(ids.size(), is(1));
+    assertEquals(1, ids.size());
     assertTrue(ids.contains(id1));
     // must change
     ids.add(id2);
-    assertThat(ids.size(), is(2));
+    assertEquals(2, ids.size());
     assertTrue(ids.contains(id1));
     assertTrue(ids.contains(id2));
   }
@@ -219,7 +221,7 @@ public class GradoopIdsTest {
     assertFalse(idsIterator.hasNext());
   }
 
-  @Test(expected = NoSuchElementException.class)
+  @Test(expectedExceptions = NoSuchElementException.class)
   public void testIteratorException() {
     GradoopIdSet ids = new GradoopIdSet();
 
@@ -297,7 +299,7 @@ public class GradoopIdsTest {
     assertEquals("hashCode succeeds for same ids but different sizes", aab.hashCode(), ab.hashCode());
 
     GradoopIdSet empty = new GradoopIdSet();
-    assertTrue("equals failed for one empty list", !abc.equals(empty));
+    assertNotEquals(empty, abc, "equals failed for one empty list");
     assertTrue("hashCode failed for one empty list", abc.hashCode() != empty.hashCode());
 
     GradoopIdSet empty2 = new GradoopIdSet();
