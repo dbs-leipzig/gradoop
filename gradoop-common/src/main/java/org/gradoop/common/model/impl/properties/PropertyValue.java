@@ -677,7 +677,11 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
 
   @Override
   public int compareTo(PropertyValue other) {
-    return PropertyValueStrategyFactory.compare(value, other.value);
+    if (this == other) {
+      return 0;
+    } else {
+      return PropertyValueComparator.getInstance().compare(this, other);
+    }
   }
 
   /**
