@@ -321,11 +321,12 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
   @SuppressWarnings(&quot;unchecked&quot;)
   public &lt;T&gt; T get(Class&lt;T&gt; clazz) throws UnsupportedOperationException {
 <span class="fc" id="L323">    PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(clazz);</span>
-<span class="pc bpc" id="L324" title="1 of 2 branches missed.">    if (strategy.is(value)) {</span>
+<span class="fc bfc" id="L324" title="All 2 branches covered.">    if (strategy.is(value)) {</span>
 <span class="fc" id="L325">      return (T) value;</span>
     }
-<span class="nc" id="L327">    throw new UnsupportedOperationException(&quot;Value '&quot; + value + &quot;' of type &quot; +</span>
-<span class="nc" id="L328">      value.getClass().getSimpleName() + &quot;, cannot be accessed as &quot; + clazz.getSimpleName());</span>
+<span class="fc bfc" id="L327" title="All 2 branches covered.">    String type = value == null ? &quot;null&quot; : value.getClass().getSimpleName();</span>
+<span class="fc" id="L328">    throw new UnsupportedOperationException(&quot;Value '&quot; + value + &quot;' of type &quot; + type +</span>
+<span class="fc" id="L329">      &quot;, cannot be accessed as &quot; + clazz.getSimpleName());</span>
   }
 
   /**
@@ -334,11 +335,11 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return value or {@code null} if the value is empty
    */
   public Object getObject() {
-<span class="fc" id="L337">    Object obj = null;</span>
-<span class="fc bfc" id="L338" title="All 2 branches covered.">    if (value != null) {</span>
-<span class="fc" id="L339">      obj = get(value.getClass());</span>
+<span class="fc" id="L338">    Object obj = null;</span>
+<span class="fc bfc" id="L339" title="All 2 branches covered.">    if (value != null) {</span>
+<span class="fc" id="L340">      obj = get(value.getClass());</span>
     }
-<span class="fc" id="L341">    return obj;</span>
+<span class="fc" id="L342">    return obj;</span>
   }
 
   /**
@@ -347,7 +348,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@code boolean} value
    */
   public boolean getBoolean() {
-<span class="fc" id="L350">    return get(Boolean.class);</span>
+<span class="fc" id="L351">    return get(Boolean.class);</span>
   }
 
   /**
@@ -356,7 +357,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@code short} value
    */
   public short getShort() {
-<span class="fc" id="L359">    return get(Short.class);</span>
+<span class="fc" id="L360">    return get(Short.class);</span>
   }
 
   /**
@@ -365,7 +366,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@code int} value
    */
   public int getInt() {
-<span class="fc" id="L368">    return get(Integer.class);</span>
+<span class="fc" id="L369">    return get(Integer.class);</span>
   }
 
   /**
@@ -374,7 +375,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@code long} value
    */
   public long getLong() {
-<span class="fc" id="L377">    return get(Long.class);</span>
+<span class="fc" id="L378">    return get(Long.class);</span>
   }
 
   /**
@@ -383,7 +384,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@code float} value
    */
   public float getFloat() {
-<span class="fc" id="L386">    return get(Float.class);</span>
+<span class="fc" id="L387">    return get(Float.class);</span>
   }
 
   /**
@@ -392,7 +393,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@code double} value
    */
   public double getDouble() {
-<span class="fc" id="L395">    return get(Double.class);</span>
+<span class="fc" id="L396">    return get(Double.class);</span>
   }
 
   /**
@@ -401,7 +402,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@link String} value
    */
   public String getString() {
-<span class="fc" id="L404">    return get(String.class);</span>
+<span class="fc" id="L405">    return get(String.class);</span>
   }
 
   /**
@@ -411,7 +412,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @see BigDecimal
    */
   public BigDecimal getBigDecimal() {
-<span class="fc" id="L414">    return get(BigDecimal.class);</span>
+<span class="fc" id="L415">    return get(BigDecimal.class);</span>
   }
 
   /**
@@ -420,7 +421,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@link GradoopId} value
    */
   public GradoopId getGradoopId() {
-<span class="fc" id="L423">    return get(GradoopId.class);</span>
+<span class="fc" id="L424">    return get(GradoopId.class);</span>
   }
 
   /**
@@ -429,7 +430,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@code Map&lt;PropertyValue, PropertyValue&gt;} value
    */
   public Map&lt;PropertyValue, PropertyValue&gt; getMap() {
-<span class="fc" id="L432">    return get(Map.class);</span>
+<span class="fc" id="L433">    return get(Map.class);</span>
   }
 
   /**
@@ -438,7 +439,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@code List&lt;PropertyValue&gt;} value
    */
   public List&lt;PropertyValue&gt; getList() {
-<span class="fc" id="L441">    return get(List.class);</span>
+<span class="fc" id="L442">    return get(List.class);</span>
   }
 
   /**
@@ -447,7 +448,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@link LocalDate} value
    */
   public LocalDate getDate() {
-<span class="fc" id="L450">    return get(LocalDate.class);</span>
+<span class="fc" id="L451">    return get(LocalDate.class);</span>
   }
 
   /**
@@ -456,7 +457,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@link LocalTime} value
    */
   public LocalTime getTime() {
-<span class="fc" id="L459">    return get(LocalTime.class);</span>
+<span class="fc" id="L460">    return get(LocalTime.class);</span>
   }
 
   /**
@@ -465,7 +466,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@link LocalDateTime} value
    */
   public LocalDateTime getDateTime() {
-<span class="fc" id="L468">    return get(LocalDateTime.class);</span>
+<span class="fc" id="L469">    return get(LocalDateTime.class);</span>
   }
 
   /**
@@ -474,7 +475,7 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return {@code Set&lt;PropertyValue&gt;} value
    */
   public Set&lt;PropertyValue&gt; getSet() {
-<span class="fc" id="L477">    return get(Set.class);</span>
+<span class="fc" id="L478">    return get(Set.class);</span>
   }
 
   //----------------------------------------------------------------------------
@@ -488,11 +489,11 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @throws UnsupportedTypeException if the type of the Object is not supported
    */
   public void setObject(Object value) {
-<span class="fc bfc" id="L491" title="All 4 branches covered.">    if (value != null &amp;&amp; !PropertyValueStrategyFactory.get(value.getClass()).is(value)) {</span>
-<span class="fc" id="L492">      throw new UnsupportedTypeException(value.getClass());</span>
+<span class="fc bfc" id="L492" title="All 4 branches covered.">    if (value != null &amp;&amp; !PropertyValueStrategyFactory.get(value.getClass()).is(value)) {</span>
+<span class="fc" id="L493">      throw new UnsupportedTypeException(value.getClass());</span>
     }
-<span class="fc" id="L494">    this.value = value;</span>
-<span class="fc" id="L495">  }</span>
+<span class="fc" id="L495">    this.value = value;</span>
+<span class="fc" id="L496">  }</span>
 
   /**
    * Sets the wrapped value as {@code boolean} value.
@@ -500,8 +501,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param booleanValue value
    */
   public void setBoolean(boolean booleanValue) {
-<span class="fc" id="L503">    setObject(booleanValue);</span>
-<span class="fc" id="L504">  }</span>
+<span class="fc" id="L504">    setObject(booleanValue);</span>
+<span class="fc" id="L505">  }</span>
 
   /**
    * Sets the wrapped value as {@code short} value.
@@ -509,8 +510,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param shortValue value
    */
   public void setShort(short shortValue) {
-<span class="fc" id="L512">    setObject(shortValue);</span>
-<span class="fc" id="L513">  }</span>
+<span class="fc" id="L513">    setObject(shortValue);</span>
+<span class="fc" id="L514">  }</span>
 
   /**
    * Sets the wrapped value as {@code int} value.
@@ -518,8 +519,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param intValue intValue
    */
   public void setInt(int intValue) {
-<span class="fc" id="L521">    setObject(intValue);</span>
-<span class="fc" id="L522">  }</span>
+<span class="fc" id="L522">    setObject(intValue);</span>
+<span class="fc" id="L523">  }</span>
 
   /**
    * Sets the wrapped value as {@code long} value.
@@ -527,8 +528,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param longValue value
    */
   public void setLong(long longValue) {
-<span class="fc" id="L530">    setObject(longValue);</span>
-<span class="fc" id="L531">  }</span>
+<span class="fc" id="L531">    setObject(longValue);</span>
+<span class="fc" id="L532">  }</span>
 
   /**
    * Sets the wrapped value as {@code float} value.
@@ -536,8 +537,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param floatValue value
    */
   public void setFloat(float floatValue) {
-<span class="fc" id="L539">    setObject(floatValue);</span>
-<span class="fc" id="L540">  }</span>
+<span class="fc" id="L540">    setObject(floatValue);</span>
+<span class="fc" id="L541">  }</span>
 
   /**
    * Sets the wrapped value as {@code double} value.
@@ -545,8 +546,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param doubleValue value
    */
   public void setDouble(double doubleValue) {
-<span class="fc" id="L548">    setObject(doubleValue);</span>
-<span class="fc" id="L549">  }</span>
+<span class="fc" id="L549">    setObject(doubleValue);</span>
+<span class="fc" id="L550">  }</span>
 
   /**
    * Sets the wrapped value as {@link String} value.
@@ -554,8 +555,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param stringValue value
    */
   public void setString(String stringValue) {
-<span class="fc" id="L557">    setObject(stringValue);</span>
-<span class="fc" id="L558">  }</span>
+<span class="fc" id="L558">    setObject(stringValue);</span>
+<span class="fc" id="L559">  }</span>
 
   /**
    * Sets the wrapped value as {@link BigDecimal} value.
@@ -563,8 +564,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param bigDecimalValue value
    */
   public void setBigDecimal(BigDecimal bigDecimalValue) {
-<span class="fc" id="L566">    setObject(bigDecimalValue);</span>
-<span class="fc" id="L567">  }</span>
+<span class="fc" id="L567">    setObject(bigDecimalValue);</span>
+<span class="fc" id="L568">  }</span>
 
   /**
    * Sets the wrapped value as {@link GradoopId} value.
@@ -572,8 +573,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param gradoopIdValue value
    */
   public void setGradoopId(GradoopId gradoopIdValue) {
-<span class="fc" id="L575">    setObject(gradoopIdValue);</span>
-<span class="fc" id="L576">  }</span>
+<span class="fc" id="L576">    setObject(gradoopIdValue);</span>
+<span class="fc" id="L577">  }</span>
 
   /**
    * Sets the wrapped value as {@link Map} value.
@@ -581,8 +582,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param map value
    */
   public void setMap(Map&lt;PropertyValue, PropertyValue&gt; map) {
-<span class="fc" id="L584">    setObject(map);</span>
-<span class="fc" id="L585">  }</span>
+<span class="fc" id="L585">    setObject(map);</span>
+<span class="fc" id="L586">  }</span>
 
   /**
    * Sets the wrapped value as {@link List} value.
@@ -590,8 +591,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param list value
    */
   public void setList(List&lt;PropertyValue&gt; list) {
-<span class="fc" id="L593">    setObject(list);</span>
-<span class="fc" id="L594">  }</span>
+<span class="fc" id="L594">    setObject(list);</span>
+<span class="fc" id="L595">  }</span>
 
   /**
    * Sets the wrapped value as {@link LocalDate} value.
@@ -599,8 +600,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param date value
    */
   public void setDate(LocalDate date) {
-<span class="fc" id="L602">    setObject(date);</span>
-<span class="fc" id="L603">  }</span>
+<span class="fc" id="L603">    setObject(date);</span>
+<span class="fc" id="L604">  }</span>
 
   /**
    * Sets the wrapped value as {@link LocalTime} value.
@@ -608,8 +609,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param time value
    */
   public void setTime(LocalTime time) {
-<span class="fc" id="L611">    setObject(time);</span>
-<span class="fc" id="L612">  }</span>
+<span class="fc" id="L612">    setObject(time);</span>
+<span class="fc" id="L613">  }</span>
 
   /**
    * Sets the wrapped value as {@code LocalDateTime} value.
@@ -617,8 +618,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param dateTime value
    */
   public void setDateTime(LocalDateTime dateTime) {
-<span class="fc" id="L620">    setObject(dateTime);</span>
-<span class="fc" id="L621">  }</span>
+<span class="fc" id="L621">    setObject(dateTime);</span>
+<span class="fc" id="L622">  }</span>
 
   /**
    * Sets the wrapped value as {@code Set} value.
@@ -626,8 +627,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param set value
    */
   public void setSet(Set&lt;PropertyValue&gt; set) {
-<span class="fc" id="L629">    setObject(set);</span>
-<span class="fc" id="L630">  }</span>
+<span class="fc" id="L630">    setObject(set);</span>
+<span class="fc" id="L631">  }</span>
 
   //----------------------------------------------------------------------------
   // Util
@@ -639,20 +640,20 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return Class object
    */
   public Class&lt;?&gt; getType() {
-<span class="fc" id="L642">    Class&lt;?&gt; clazz = null;</span>
-<span class="fc bfc" id="L643" title="All 2 branches covered.">    if (value != null) {</span>
-<span class="fc" id="L644">      clazz = PropertyValueStrategyFactory.get(value.getClass()).getType();</span>
+<span class="fc" id="L643">    Class&lt;?&gt; clazz = null;</span>
+<span class="fc bfc" id="L644" title="All 2 branches covered.">    if (value != null) {</span>
+<span class="fc" id="L645">      clazz = PropertyValueStrategyFactory.get(value.getClass()).getType();</span>
     }
 
-<span class="fc" id="L647">    return clazz;</span>
+<span class="fc" id="L648">    return clazz;</span>
   }
 
   public int getByteSize() {
-<span class="nc" id="L651">    return getRawBytes().length;</span>
+<span class="nc" id="L652">    return getRawBytes().length;</span>
   }
 
   public byte[] getRawBytes() {
-<span class="fc" id="L655">    return PropertyValueStrategyFactory.getRawBytes(value);</span>
+<span class="fc" id="L656">    return PropertyValueStrategyFactory.getRawBytes(value);</span>
   }
 
   /**
@@ -661,22 +662,22 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @param bytes array
    */
   public void setBytes(byte[] bytes) {
-<span class="fc" id="L664">    value = PropertyValueStrategyFactory.fromRawBytes(bytes);</span>
-<span class="fc" id="L665">  }</span>
+<span class="fc" id="L665">    value = PropertyValueStrategyFactory.fromRawBytes(bytes);</span>
+<span class="fc" id="L666">  }</span>
 
   @Override
   public boolean equals(Object object) {
-<span class="fc bfc" id="L669" title="All 4 branches covered.">    return object instanceof PropertyValue &amp;&amp; Objects.equals(value, ((PropertyValue) object).value);</span>
+<span class="pc bpc" id="L670" title="1 of 4 branches missed.">    return object instanceof PropertyValue &amp;&amp; Objects.equals(value, ((PropertyValue) object).value);</span>
   }
 
   @Override
   public int hashCode() {
-<span class="fc" id="L674">    return Arrays.hashCode(PropertyValueStrategyFactory.getRawBytes(value));</span>
+<span class="fc" id="L675">    return Arrays.hashCode(PropertyValueStrategyFactory.getRawBytes(value));</span>
   }
 
   @Override
   public int compareTo(PropertyValue other) {
-<span class="fc" id="L679">    return PropertyValueStrategyFactory.compare(value, other.value);</span>
+<span class="fc" id="L680">    return PropertyValueStrategyFactory.compare(value, other.value);</span>
   }
 
   /**
@@ -685,8 +686,8 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    * @return byte size
    */
   public int byteSize() {
-<span class="fc" id="L688">    byte[] rawBytes = PropertyValueStrategyFactory.getRawBytes(value);</span>
-<span class="fc" id="L689">    return rawBytes.length;</span>
+<span class="fc" id="L689">    byte[] rawBytes = PropertyValueStrategyFactory.getRawBytes(value);</span>
+<span class="fc" id="L690">    return rawBytes.length;</span>
   }
 
   /**
@@ -717,29 +718,29 @@ public class PropertyValue implements Value, Serializable, Comparable&lt;Propert
    */
   @Override
   public void write(DataOutputView outputView) throws IOException {
-<span class="fc" id="L720">    PropertyValueStrategyFactory.get(value).write(value, outputView);</span>
-<span class="fc" id="L721">  }</span>
+<span class="fc" id="L721">    PropertyValueStrategyFactory.get(value).write(value, outputView);</span>
+<span class="fc" id="L722">  }</span>
 
   @Override
   public void read(DataInputView inputView) throws IOException {
     // type
-<span class="fc" id="L726">    byte typeByte = inputView.readByte();</span>
+<span class="fc" id="L727">    byte typeByte = inputView.readByte();</span>
     // Apply bitmask to get the actual type.
-<span class="fc" id="L728">    byte type = (byte) (~PropertyValue.FLAG_LARGE &amp; typeByte);</span>
+<span class="fc" id="L729">    byte type = (byte) (~PropertyValue.FLAG_LARGE &amp; typeByte);</span>
 
-<span class="fc" id="L730">    PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(type);</span>
+<span class="fc" id="L731">    PropertyValueStrategy strategy = PropertyValueStrategyFactory.get(type);</span>
 
-<span class="pc bpc" id="L732" title="1 of 2 branches missed.">    if (strategy == null) {</span>
-<span class="nc" id="L733">      throw new UnsupportedTypeException(&quot;No strategy for type byte from input view found&quot;);</span>
+<span class="pc bpc" id="L733" title="1 of 2 branches missed.">    if (strategy == null) {</span>
+<span class="nc" id="L734">      throw new UnsupportedTypeException(&quot;No strategy for type byte from input view found&quot;);</span>
     } else {
-<span class="fc" id="L735">      value = strategy.read(inputView, typeByte);</span>
+<span class="fc" id="L736">      value = strategy.read(inputView, typeByte);</span>
     }
-<span class="fc" id="L737">  }</span>
+<span class="fc" id="L738">  }</span>
 
   @Override
   public String toString() {
-<span class="nc bnc" id="L741" title="All 2 branches missed.">    return getObject() != null ?</span>
-<span class="nc" id="L742">      getObject().toString() :</span>
+<span class="fc bfc" id="L742" title="All 2 branches covered.">    return getObject() != null ?</span>
+<span class="fc" id="L743">      getObject().toString() :</span>
       GradoopConstants.NULL_STRING;
   }
 }

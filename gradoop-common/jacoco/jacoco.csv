@@ -1,10 +1,10 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueUtils,3,0,0,0,1,0,1,0,1,0
-Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValue,43,395,4,20,6,105,5,76,2,67
-Gradoop Common,org.gradoop.common.model.impl.properties,Properties,23,250,6,16,7,59,7,28,1,23
-Gradoop Common,org.gradoop.common.model.impl.properties,Property,30,144,4,12,3,35,4,18,1,13
+Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValue,9,436,2,24,2,110,3,79,1,68
+Gradoop Common,org.gradoop.common.model.impl.properties,Properties,13,260,6,16,4,62,6,29,0,24
+Gradoop Common,org.gradoop.common.model.impl.properties,Property,2,172,2,14,1,37,2,20,0,14
 Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueUtils.Numeric,217,726,43,153,46,152,24,90,2,11
-Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueList,9,102,2,4,3,27,3,11,1,10
+Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueList,4,107,2,4,2,28,2,12,0,11
 Gradoop Common,org.gradoop.common.model.impl.properties,PropertyValueList.PropertyValueListIterator,4,58,0,4,3,19,1,5,1,3
 Gradoop Common,org.gradoop.common.model.impl.properties,DateTimeSerializer,3,229,0,2,1,39,1,8,1,7
 Gradoop Common,org.gradoop.common.model.impl.properties,Type,0,214,0,0,0,23,0,4,0,4
@@ -35,15 +35,15 @@ Gradoop Common,org.gradoop.common.util,GradoopConstants,7,0,0,0,2,0,2,0,2,0
 Gradoop Common,org.gradoop.common.util,Order,24,0,0,0,3,0,1,0,1,0
 Gradoop Common,org.gradoop.common.util,AsciiGraphLoader,16,707,3,41,5,144,4,50,1,31
 Gradoop Common,org.gradoop.common.model.impl.pojo,EdgeFactory,49,54,0,0,8,9,7,5,7,5
-Gradoop Common,org.gradoop.common.model.impl.pojo,Element,73,123,10,16,16,29,13,20,6,14
+Gradoop Common,org.gradoop.common.model.impl.pojo,Element,35,161,6,20,14,31,11,22,5,15
 Gradoop Common,org.gradoop.common.model.impl.pojo,VertexFactory,44,33,0,0,8,6,8,4,8,4
 Gradoop Common,org.gradoop.common.model.impl.pojo,GraphHeadFactory,17,30,0,0,4,6,4,4,4,4
-Gradoop Common,org.gradoop.common.model.impl.pojo,GraphHead,13,6,0,0,3,2,2,1,2,1
+Gradoop Common,org.gradoop.common.model.impl.pojo,GraphHead,3,16,0,0,2,3,1,2,1,2
 Gradoop Common,org.gradoop.common.model.impl.pojo,Edge,31,19,0,0,8,6,4,3,4,3
 Gradoop Common,org.gradoop.common.model.impl.pojo,Vertex,13,7,0,0,3,2,2,1,2,1
 Gradoop Common,org.gradoop.common.model.impl.pojo,GraphElement,18,46,2,4,3,14,4,7,2,6
-Gradoop Common,org.gradoop.common.model.impl.id,GradoopId,101,603,17,39,29,101,24,35,9,22
-Gradoop Common,org.gradoop.common.model.impl.id,GradoopIdSet,65,327,9,37,19,84,11,38,4,22
+Gradoop Common,org.gradoop.common.model.impl.id,GradoopId,88,616,10,46,24,106,19,40,9,22
+Gradoop Common,org.gradoop.common.model.impl.id,GradoopIdSet,26,366,5,41,8,95,8,41,3,23
 Gradoop Common,org.gradoop.common.model.impl.comparators,EPGMIdentifiableComparator,6,3,0,0,1,1,1,1,1,1
 Gradoop Common,org.gradoop.common.model.impl.metadata,PropertyMetaData,9,12,0,0,3,5,3,1,3,1
 Gradoop Common,org.gradoop.common.model.impl.metadata,MetaData,15,317,1,31,1,68,1,26,0,11

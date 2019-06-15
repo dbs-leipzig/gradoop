@@ -338,22 +338,22 @@ public class GradoopIdSet extends AbstractSet&lt;GradoopId&gt; implements Value 
 
   @Override
   public String toString() {
-<span class="nc bnc" id="L341" title="All 2 branches missed.">    if (isEmpty()) {</span>
-<span class="nc" id="L342">      return &quot;[]&quot;;</span>
+<span class="fc bfc" id="L341" title="All 2 branches covered.">    if (isEmpty()) {</span>
+<span class="fc" id="L342">      return &quot;[]&quot;;</span>
     }
 
-<span class="nc" id="L345">    Iterator&lt;GradoopId&gt; it = iterator();</span>
-<span class="nc" id="L346">    StringBuilder sb = new StringBuilder();</span>
-<span class="nc" id="L347">    sb.append('[');</span>
+<span class="fc" id="L345">    Iterator&lt;GradoopId&gt; it = iterator();</span>
+<span class="fc" id="L346">    StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L347">    sb.append('[');</span>
 
     for (;;) {
-<span class="nc" id="L350">      GradoopId id = it.next();</span>
-<span class="nc" id="L351">      sb.append(id);</span>
-<span class="nc bnc" id="L352" title="All 2 branches missed.">      if (!it.hasNext()) {</span>
-<span class="nc" id="L353">        return sb.append(']').toString();</span>
+<span class="fc" id="L350">      GradoopId id = it.next();</span>
+<span class="fc" id="L351">      sb.append(id);</span>
+<span class="fc bfc" id="L352" title="All 2 branches covered.">      if (!it.hasNext()) {</span>
+<span class="fc" id="L353">        return sb.append(']').toString();</span>
       }
-<span class="nc" id="L355">      sb.append(',').append(' ');</span>
-<span class="nc" id="L356">    }</span>
+<span class="fc" id="L355">      sb.append(',').append(' ');</span>
+<span class="fc" id="L356">    }</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
