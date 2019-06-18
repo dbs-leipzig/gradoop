@@ -20,6 +20,8 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
@@ -66,6 +68,35 @@ public interface BaseGraphCollectionOperators<
   E extends EPGMEdge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>> {
+
+  //----------------------------------------------------------------------------
+  // Base Graph / Graph Head Getters
+  //----------------------------------------------------------------------------
+
+  /**
+   * Returns base graph from collection using the given identifier. If the
+   * graph does not exist, an empty base graph is returned.
+   *
+   * @param graphID graph identifier
+   * @return base graph with given id or an empty base graph
+   */
+  LG getGraph(final GradoopId graphID);
+
+  /**
+   * Extracts base graphs from collection using their identifiers.
+   *
+   * @param identifiers graph identifiers
+   * @return collection containing requested base graphs
+   */
+  GC getGraphs(final GradoopId... identifiers);
+
+  /**
+   * Extracts base graphs from collection using their identifiers.
+   *
+   * @param identifiers graph identifiers
+   * @return collection containing requested base graphs
+   */
+  GC getGraphs(final GradoopIdSet identifiers);
 
   //----------------------------------------------------------------------------
   // Unary Operators

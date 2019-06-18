@@ -143,58 +143,6 @@ public class GraphCollection implements
   }
 
   //----------------------------------------------------------------------------
-  // Logical Graph / Graph Head Getters
-  //----------------------------------------------------------------------------
-
-  @Override
-  public LogicalGraph getGraph(final GradoopId graphID) {
-    // filter vertices and edges based on given graph id
-    DataSet<GraphHead> graphHead = getGraphHeads()
-      .filter(new BySameId<>(graphID));
-    DataSet<Vertex> vertices = getVertices()
-      .filter(new InGraph<>(graphID));
-    DataSet<Edge> edges = getEdges()
-      .filter(new InGraph<>(graphID));
-
-    return new LogicalGraph(
-      config.getLogicalGraphFactory().fromDataSets(graphHead, vertices, edges),
-      getConfig());
-  }
-
-  @Override
-  public GraphCollection getGraphs(final GradoopId... identifiers) {
-
-    GradoopIdSet graphIds = new GradoopIdSet();
-
-    graphIds.addAll(Arrays.asList(identifiers));
-
-    return getGraphs(graphIds);
-  }
-
-  @Override
-  public GraphCollection getGraphs(final GradoopIdSet identifiers) {
-
-    DataSet<GraphHead> newGraphHeads = this.getGraphHeads()
-      .filter(new FilterFunction<GraphHead>() {
-        @Override
-        public boolean filter(GraphHead graphHead) {
-          return identifiers.contains(graphHead.getId());
-        }
-      });
-
-    // build new vertex set
-    DataSet<Vertex> vertices = getVertices()
-      .filter(new InAnyGraph<>(identifiers));
-
-    // build new edge set
-    DataSet<Edge> edges = getEdges()
-      .filter(new InAnyGraph<>(identifiers));
-
-    return new GraphCollection(getFactory().fromDataSets(newGraphHeads, vertices, edges),
-      getConfig());
-  }
-
-  //----------------------------------------------------------------------------
   // Auxiliary Operators
   //----------------------------------------------------------------------------
 

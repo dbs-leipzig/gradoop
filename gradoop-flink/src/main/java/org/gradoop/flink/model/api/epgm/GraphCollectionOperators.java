@@ -15,45 +15,13 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.util.Order;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 /**
  * Defines the operators that are available on a {@link GraphCollection}.
  */
 public interface GraphCollectionOperators extends GraphBaseOperators {
-
-  //----------------------------------------------------------------------------
-  // Logical Graph / Graph Head Getters
-  //----------------------------------------------------------------------------
-
-  /**
-   * Returns logical graph from collection using the given identifier. If the
-   * graph does not exist, an empty logical graph is returned.
-   *
-   * @param graphID graph identifier
-   * @return logical graph with given id or an empty logical graph
-   */
-  LogicalGraph getGraph(final GradoopId graphID);
-  /**
-   * Extracts logical graphs from collection using their identifiers.
-   *
-   * @param identifiers graph identifiers
-   * @return collection containing requested logical graphs
-   */
-  GraphCollection getGraphs(final GradoopId... identifiers);
-
-  /**
-   * Extracts logical graphs from collection using their identifiers.
-   *
-   * @param identifiers graph identifiers
-   * @return collection containing requested logical graphs
-   */
-  GraphCollection getGraphs(GradoopIdSet identifiers);
 
   //----------------------------------------------------------------------------
   // Auxiliary operators
