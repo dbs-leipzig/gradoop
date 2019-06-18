@@ -195,15 +195,6 @@ public class GraphCollection implements
   }
 
   //----------------------------------------------------------------------------
-  // Unary Operators
-  //----------------------------------------------------------------------------
-
-  @Override
-  public GraphCollection sortBy(String propertyKey, Order order) {
-    throw new NotImplementedException();
-  }
-
-  //----------------------------------------------------------------------------
   // Auxiliary Operators
   //----------------------------------------------------------------------------
 

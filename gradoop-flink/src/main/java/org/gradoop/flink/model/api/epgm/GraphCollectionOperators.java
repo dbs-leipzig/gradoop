@@ -56,19 +56,6 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
   GraphCollection getGraphs(GradoopIdSet identifiers);
 
   //----------------------------------------------------------------------------
-  // Unary operators
-  //----------------------------------------------------------------------------
-
-  /**
-   * Returns a graph collection that is sorted by a given graph property key.
-   *
-   * @param propertyKey property which is used for comparison
-   * @param order       ascending, descending
-   * @return ordered collection
-   */
-  GraphCollection sortBy(String propertyKey, Order order);
-
-  //----------------------------------------------------------------------------
   // Auxiliary operators
   //----------------------------------------------------------------------------
 
