@@ -23,7 +23,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.gradoop.common.model.impl.properties.PropertyValue.create;
@@ -97,6 +103,29 @@ public class PropertyValueTestProvider {
       {create(SHORT_VAL_e)},
       {create(SET_VAL_f)},
     };
+  }
+
+  /**
+   * Provides pairs of property values where the first value is smaller than the second value and
+   * both values have a different kind.
+   *
+   * @return Pairs of property values, as an array.
+   */
+  @DataProvider
+  private Object[][] differentPropertyValueTypesProvider() {
+    // A list of instances for all property value kinds.
+    List<PropertyValue> allDifferentTypes = Arrays.asList(
+      create(NULL_VAL_0), create(BOOL_VAL_1), create(INT_VAL_2), create(GRADOOP_ID_VAL_8),
+      create(TIME_VAL_c), create(DATE_VAL_b), create(DATETIME_VAL_d), create(STRING_VAL_6),
+      create(LIST_VAL_a), create(MAP_VAL_9));
+    List<PropertyValue[]> pairs = new ArrayList<>();
+    for (int first = 0; first < allDifferentTypes.size(); first++) {
+      for (int second = first + 1; second < allDifferentTypes.size(); second++) {
+        pairs.add(new PropertyValue[] {allDifferentTypes.get(first),
+          allDifferentTypes.get(second)});
+      }
+    }
+    return pairs.toArray(new Object[0][]);
   }
 
   /**

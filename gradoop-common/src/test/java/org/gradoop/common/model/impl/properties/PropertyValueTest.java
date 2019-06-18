@@ -32,7 +32,10 @@ import java.util.*;
 import static org.gradoop.common.GradoopTestUtils.*;
 import static org.gradoop.common.model.impl.properties.PropertyValue.create;
 import static org.testng.Assert.assertNotEquals;
-import static org.testng.AssertJUnit.*;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNotSame;
+import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class PropertyValueTest {
 
@@ -619,36 +622,72 @@ public class PropertyValueTest {
    * Tests whether {@link PropertyValue#compareTo(PropertyValue)} throws an
    * {@link IllegalArgumentException} when the instances types are incomparable.
    */
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void testCompareToWithIncompatibleTypes() {
-    create(10).compareTo(create("10"));
+  @Test(dataProvider = "differentPropertyValueTypesProvider",
+    dataProviderClass = PropertyValueTestProvider.class)
+  public void testCompareWithDifferentTypes(PropertyValue first, PropertyValue second) {
+    validateCompareTo(first, first, second);
   }
 
   /**
-   * Tests whether {@link PropertyValue#compareTo(PropertyValue)} throws an
-   * {@link IllegalArgumentException} if the instance is of {@link Map}.
+   * Tests whether {@link PropertyValue#compareTo(PropertyValue)} compares {@link Map}s
+   * property.
    */
-  @Test(expectedExceptions = UnsupportedOperationException.class)
+  @Test
   public void testCompareToWithMap() {
-    create(MAP_VAL_9).compareTo(create(MAP_VAL_9));
+    PropertyValue empty = create(Collections.emptyMap());
+    Map<PropertyValue, PropertyValue> value = new HashMap<>();
+    value.put(create(1L), create(1L));
+    value.put(create(2L), create(2L));
+    // Greater than empty, since it has more entries.
+    PropertyValue map1 = create(new HashMap<>(value));
+    value.put(create(2L), create(3L));
+    // Greater than map1, since its values are greater for the same keys.
+    PropertyValue map2 = create(new HashMap<>(value));
+    value.remove(create(1L));
+    // Greater than map2, since its key set is greater.
+    value.put(create(3L), create(3L));
+    PropertyValue map3 = create(new HashMap<>(value));
+    validateCompareTo(empty, empty, map1);
+    validateCompareTo(map1, map1, map2);
+    validateCompareTo(map2, map2, map3);
+    validateCompareTo(map1, map1, map3);
   }
 
   /**
-   * Tests whether {@link PropertyValue#compareTo(PropertyValue)} throws an
-   * {@link IllegalArgumentException} if the instance is of {@link List}.
+   * Tests whether {@link PropertyValue#compareTo(PropertyValue)} compares {@link List}s
+   * and {@link Set}s properly.
    */
-  @Test(expectedExceptions = UnsupportedOperationException.class)
-  public void testCompareToWithList() {
-    create(LIST_VAL_a).compareTo(create(LIST_VAL_a));
-  }
-
-  /**
-   * Tests whether {@link PropertyValue#compareTo(PropertyValue)} throws an
-   * {@link IllegalArgumentException} if the instance is of {@link Set}.
-   */
-  @Test(expectedExceptions = UnsupportedOperationException.class)
-  public void testCompareToWithSet() {
-    create(SET_VAL_f).compareTo(create(SET_VAL_f));
+  @Test
+  public void testCompareToWithListAndSet() {
+    // Compare lists.
+    PropertyValue emptyList = create(Collections.emptyList());
+    PropertyValue listWithOneValue = create(Collections.singletonList(create(1L)));
+    PropertyValue listWithTwoValues = create(Arrays.asList(create(1L), create(2L)));
+    PropertyValue listWithOneValue2 = create(Collections.singletonList(create(2L)));
+    validateCompareTo(emptyList, emptyList, listWithOneValue);
+    validateCompareTo(emptyList, emptyList, listWithTwoValues);
+    validateCompareTo(listWithOneValue, listWithOneValue, listWithTwoValues);
+    validateCompareTo(listWithOneValue, listWithOneValue, listWithOneValue2);
+    validateCompareTo(listWithOneValue2, listWithOneValue2, listWithTwoValues);
+    // Compare sets.
+    PropertyValue emptySet = create(Collections.emptySet());
+    PropertyValue setWithOneValue = create(Collections.singleton(create(1L)));
+    PropertyValue setWithTwoValues = create(new HashSet<>(Arrays.asList(create(2L), create(1L))));
+    PropertyValue setWithOneValue2 = create(Collections.singleton(create(2L)));
+    validateCompareTo(emptySet, emptySet, setWithOneValue);
+    validateCompareTo(emptySet, emptySet, setWithTwoValues);
+    validateCompareTo(setWithOneValue, setWithOneValue, setWithTwoValues);
+    validateCompareTo(setWithOneValue, setWithOneValue, setWithOneValue2);
+    validateCompareTo(setWithOneValue2, setWithOneValue2, setWithTwoValues);
+    // Compare lists and sets.
+    validateCompareTo(emptyList, emptySet, listWithOneValue);
+    validateCompareTo(setWithOneValue, listWithOneValue, setWithTwoValues);
+    validateCompareTo(listWithOneValue, setWithOneValue, listWithOneValue2);
+    assertEquals(0, listWithTwoValues.compareTo(setWithTwoValues));
+    assertEquals(0, setWithTwoValues.compareTo(listWithTwoValues));
+    // Check a corner case. Necessary since sets are sorted prior to comparison, lists aren't.
+    PropertyValue listWithTwoValues2 = create(Arrays.asList(create(2L), create(1L)));
+    validateCompareTo(listWithTwoValues, setWithTwoValues, listWithTwoValues2);
   }
 
   /**

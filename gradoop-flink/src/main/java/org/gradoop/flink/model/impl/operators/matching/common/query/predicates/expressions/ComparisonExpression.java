@@ -17,6 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.
 
 import org.gradoop.common.model.impl.pojo.GraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.model.impl.properties.strategies.PropertyValueStrategyFactory;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNFElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
@@ -102,7 +103,7 @@ public class ComparisonExpression extends QueryPredicate {
    */
   private boolean compare(PropertyValue lhsValue, PropertyValue rhsValue) {
     try {
-      int result = lhsValue.compareTo(rhsValue);
+      int result = PropertyValueStrategyFactory.compare(lhsValue.getObject(), rhsValue.getObject());
 
       return
         comparison.getComparator() == Comparator.EQ  && result ==  0 ||
