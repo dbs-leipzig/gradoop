@@ -20,14 +20,12 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphOperator;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
@@ -40,6 +38,8 @@ import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
 import org.gradoop.flink.model.impl.operators.intersection.Intersection;
 import org.gradoop.flink.model.impl.operators.intersection.IntersectionBroadcast;
 import org.gradoop.flink.model.impl.operators.limit.Limit;
+import org.gradoop.flink.model.impl.operators.matching.transactional.TransactionalPatternMatching;
+import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
 import org.gradoop.flink.model.impl.operators.selection.Selection;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
@@ -101,6 +101,23 @@ public interface BaseGraphCollectionOperators<
    */
   default GC verifyGraphsContainment() {
     return callForCollection(new VerifyGraphsContainment<>());
+  }
+
+  /**
+   * Matches a given pattern on a graph collection.
+   * The boolean flag specifies, if the return shall be the input graphs with a new property
+   * ("contains pattern"), or a new collection consisting of the constructed embeddings
+   *
+   * @param algorithm        custom pattern matching algorithm
+   * @param pattern          query pattern
+   * @param returnEmbeddings true -> return embeddings as new collection,
+   *                         false -> return collection with new property
+   * @return  a graph collection containing either the embeddings or the input
+   * graphs with a new property ("contains pattern")
+   */
+  default GC match(String pattern, PatternMatchingAlgorithm algorithm, boolean returnEmbeddings) {
+    return callForCollection(
+      new TransactionalPatternMatching<>(pattern, algorithm, returnEmbeddings));
   }
 
   //----------------------------------------------------------------------------

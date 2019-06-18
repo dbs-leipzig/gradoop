@@ -42,8 +42,6 @@ import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
-import org.gradoop.flink.model.impl.operators.matching.transactional.TransactionalPatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -203,17 +201,6 @@ public class GraphCollection implements
   @Override
   public GraphCollection sortBy(String propertyKey, Order order) {
     throw new NotImplementedException();
-  }
-
-  @Override
-  public GraphCollection match(
-    String pattern,
-    PatternMatchingAlgorithm algorithm,
-    boolean returnEmbeddings) {
-    return new TransactionalPatternMatching(
-      pattern,
-      algorithm,
-      returnEmbeddings).execute(this);
   }
 
   //----------------------------------------------------------------------------

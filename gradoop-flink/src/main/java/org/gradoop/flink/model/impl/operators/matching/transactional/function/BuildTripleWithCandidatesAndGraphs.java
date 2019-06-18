@@ -17,11 +17,11 @@ package org.gradoop.flink.model.impl.operators.matching.transactional.function;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.AbstractBuilder;
 import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 
 import java.util.Collection;
@@ -34,7 +34,7 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_EDGE_LABEL;
  *
  * @param <E> EPGM edge type
  */
-public class BuildTripleWithCandidatesAndGraphs<E extends Edge>
+public class BuildTripleWithCandidatesAndGraphs<E extends EPGMEdge>
   extends AbstractBuilder<E, Tuple2<GradoopIdSet, TripleWithCandidates<GradoopId>>> {
 
   /**

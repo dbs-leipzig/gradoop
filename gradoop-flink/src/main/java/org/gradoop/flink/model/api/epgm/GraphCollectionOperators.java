@@ -15,16 +15,12 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.util.Order;
-import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
 
 /**
  * Defines the operators that are available on a {@link GraphCollection}.
@@ -71,24 +67,6 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    * @return ordered collection
    */
   GraphCollection sortBy(String propertyKey, Order order);
-
-  /**
-   * Matches a given pattern on a graph collection.
-   * The boolean flag specifies, if the return shall be the input graphs with
-   * a new property ("contains pattern"), or a new collection consisting of the
-   * constructed embeddings
-   *
-   * @param algorithm         custom pattern matching algorithm
-   * @param pattern           query pattern
-   * @param returnEmbeddings  true -> return embeddings as new collection,
-   *                          false -> return collection with new property
-   * @return  a graph collection containing either the embeddings or the input
-   * graphs with a new property ("contains pattern")
-   */
-  GraphCollection match(
-    String pattern,
-    PatternMatchingAlgorithm algorithm,
-    boolean returnEmbeddings);
 
   //----------------------------------------------------------------------------
   // Auxiliary operators

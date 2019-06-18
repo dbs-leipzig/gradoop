@@ -20,34 +20,34 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
  * Initializes a new graph head from a given GradoopId and its lineage information, e.g. the
  * source graph this one was created from.
  */
-public class InitGraphHeadWithLineage
-  implements MapFunction<Tuple2<GradoopId, GradoopId>, GraphHead>, ResultTypeQueryable<GraphHead> {
+public class InitGraphHeadWithLineage<G extends EPGMGraphHead>
+  implements MapFunction<Tuple2<GradoopId, GradoopId>, G>, ResultTypeQueryable<G> {
   /**
    * GraphHeadFactory
    */
-  private final EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
+  private final EPGMGraphHeadFactory<G> graphHeadFactory;
 
   /**
    * Constructor
    *
    * @param epgmGraphHeadFactory graph head factory
    */
-  public InitGraphHeadWithLineage(EPGMGraphHeadFactory<GraphHead> epgmGraphHeadFactory) {
+  public InitGraphHeadWithLineage(EPGMGraphHeadFactory<G> epgmGraphHeadFactory) {
     this.graphHeadFactory = epgmGraphHeadFactory;
   }
 
   @Override
-  public GraphHead map(Tuple2<GradoopId, GradoopId> idTuple) {
-    GraphHead head = graphHeadFactory.initGraphHead(idTuple.f0);
+  public G map(Tuple2<GradoopId, GradoopId> idTuple) {
+    G head = graphHeadFactory.initGraphHead(idTuple.f0);
     Properties properties = Properties.createWithCapacity(1);
     properties.set("lineage", idTuple.f1);
     head.setProperties(properties);
@@ -55,7 +55,7 @@ public class InitGraphHeadWithLineage
   }
 
   @Override
-  public TypeInformation<GraphHead> getProducedType() {
+  public TypeInformation<G> getProducedType() {
     return TypeExtractor.createTypeInfo(graphHeadFactory.getType());
   }
 }
