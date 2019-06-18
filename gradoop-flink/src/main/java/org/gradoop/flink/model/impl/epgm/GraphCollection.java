@@ -29,7 +29,6 @@ import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.GraphCollectionOperators;
-import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
@@ -43,12 +42,8 @@ import org.gradoop.flink.model.impl.functions.epgm.BySameId;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
-import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
-import org.gradoop.flink.model.impl.operators.distinction.DistinctByIsomorphism;
-import org.gradoop.flink.model.impl.operators.distinction.GroupByIsomorphism;
 import org.gradoop.flink.model.impl.operators.matching.transactional.TransactionalPatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.transactional.algorithm.PatternMatchingAlgorithm;
-import org.gradoop.flink.model.impl.operators.selection.Selection;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -59,14 +54,14 @@ import java.util.Objects;
  * A graph collection graph is one of the base concepts of the Extended Property Graph Model. From
  * a model perspective, the collection represents a set of logical graphs. From a data perspective
  * this is reflected by providing three concepts:
- *
- * - a set of graph heads assigned to the graphs in that collection
- * - a set of vertices which is the union of all vertex sets of the represented graphs
- * - a set of edges which is the union of all edge sets of the represented graphs
- *
+ * <ul>
+ * <li>a set of graph heads assigned to the graphs in that collection</li>
+ * <li>a set of vertices which is the union of all vertex sets of the represented graphs</li>
+ * <li>a set of edges which is the union of all edge sets of the represented graphs</li>
+ * </ul>
  * Furthermore, a graph collection provides operations that are performed on the underlying data.
  * These operations result in either another graph collection or in a {@link LogicalGraph}.
- *
+ * <p>
  * A graph collection is wrapping a {@link GraphCollectionLayout} which defines, how the collection
  * is represented in Apache Flink. Note that the GraphCollection also implements that interface and
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
@@ -206,11 +201,6 @@ public class GraphCollection implements
   //----------------------------------------------------------------------------
 
   @Override
-  public GraphCollection select(final FilterFunction<GraphHead> predicate) {
-    return callForCollection(new Selection(predicate));
-  }
-
-  @Override
   public GraphCollection sortBy(String propertyKey, Order order) {
     throw new NotImplementedException();
   }
@@ -284,21 +274,6 @@ public class GraphCollection implements
       .union(getConfig().getExecutionEnvironment().fromElements(false))
       .reduce(new Or())
       .map(new Not());
-  }
-
-  @Override
-  public GraphCollection distinctById() {
-    return callForCollection(new DistinctById());
-  }
-
-  @Override
-  public GraphCollection distinctByIsomorphism() {
-    return callForCollection(new DistinctByIsomorphism());
-  }
-
-  @Override
-  public GraphCollection groupByIsomorphism(GraphHeadReduceFunction func) {
-    return callForCollection(new GroupByIsomorphism(func));
   }
 
   @Override

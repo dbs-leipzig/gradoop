@@ -64,14 +64,6 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
   //----------------------------------------------------------------------------
 
   /**
-   * Filter containing graphs based on their associated graph head.
-   *
-   * @param predicateFunction predicate function for graph head
-   * @return collection with logical graphs that fulfil the predicate
-   */
-  GraphCollection select(FilterFunction<GraphHead> predicateFunction);
-
-  /**
    * Returns a graph collection that is sorted by a given graph property key.
    *
    * @param propertyKey property which is used for comparison
@@ -111,30 +103,4 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    */
   GraphCollection apply(
     ApplicableUnaryGraphToGraphOperator op);
-
-  /**
-   * Returns a distinct collection of logical graphs.
-   * Graph equality is based on graph identifiers.
-   *
-   * @return distinct graph collection
-   */
-  GraphCollection distinctById();
-
-  /**
-   * Groups a graph collection by isomorphism.
-   * Graph equality is based on isomorphism including labels and properties.
-   *
-   * @return distinct graph collection
-   */
-  GraphCollection distinctByIsomorphism();
-
-  /**
-   * Groups a graph collection by isomorphism including labels and values.
-   *
-   * @param func function to reduce all graph heads of a group into a single representative one,
-   *             e.g., to count the number of group members
-   *
-   * @return grouped graph collection
-   */
-  GraphCollection groupByIsomorphism(GraphHeadReduceFunction func);
 }

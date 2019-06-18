@@ -16,34 +16,47 @@
 package org.gradoop.flink.model.impl.operators.distinction;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.IdInBroadcast;
 import org.gradoop.flink.model.impl.operators.distinction.functions.FirstGraphHead;
 import org.gradoop.flink.model.impl.operators.distinction.functions.IdFromGraphHeadString;
 
 /**
- * Returns a distinct collection of logical graphs.
- * Graphs are compared by isomorphism testing.
+ * Returns a distinct collection of base graphs. Graphs are compared by isomorphism testing.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the base graph instance
+ * @param <GC> type of the graph collection
  */
-public class DistinctByIsomorphism extends GroupByIsomorphism {
+public class DistinctByIsomorphism<
+  G extends EPGMGraphHead,
+  V extends EPGMVertex,
+  E extends EPGMEdge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends GroupByIsomorphism<G, V, E, LG, GC> {
 
   /**
    * Default constructor.
    */
   public DistinctByIsomorphism() {
-    super(new FirstGraphHead());
+    super(new FirstGraphHead<>());
   }
 
   @Override
-  public GraphCollection execute(GraphCollection collection) {
+  public GC execute(GC collection) {
     // create canonical labels for all graph heads and choose representative for all distinct ones
     DataSet<GradoopId> graphIds = getCanonicalLabels(collection)
       .distinct(1)
       .map(new IdFromGraphHeadString());
 
-    DataSet<GraphHead> graphHeads = collection.getGraphHeads()
+    DataSet<G> graphHeads = collection.getGraphHeads()
       .filter(new IdInBroadcast<>())
       .withBroadcastSet(graphIds, IdInBroadcast.IDS);
 

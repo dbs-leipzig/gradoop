@@ -19,13 +19,10 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
-import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.graphcontainment.GraphsContainmentFilterBroadcast;
-import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
+import org.gradoop.flink.model.impl.operators.selection.SelectionBase;
 
 /**
  * Returns the first n (arbitrary) base graphs from a collection.
@@ -43,7 +40,7 @@ public class Limit<
   V extends EPGMVertex,
   E extends EPGMEdge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends SelectionBase<G, V, E, LG, GC>
   implements UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> {
 
   /**
@@ -62,20 +59,8 @@ public class Limit<
 
   @Override
   public GC execute(GC collection) {
-
     DataSet<G> graphHeads = collection.getGraphHeads().first(limit);
 
-    DataSet<GradoopId> firstIds = graphHeads.map(new Id<>());
-
-    DataSet<V> filteredVertices = collection.getVertices()
-      .filter(new InAnyGraphBroadcast<>())
-      .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
-
-    DataSet<E> filteredEdges = collection.getEdges()
-      .filter(new InAnyGraphBroadcast<>())
-      .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
-
-    return collection.getFactory()
-      .fromDataSets(graphHeads, filteredVertices, filteredEdges);
+    return selectVerticesAndEdges(collection, graphHeads);
   }
 }

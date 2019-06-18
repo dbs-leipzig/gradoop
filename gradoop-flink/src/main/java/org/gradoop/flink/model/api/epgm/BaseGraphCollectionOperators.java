@@ -15,18 +15,25 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.api.entities.EPGMEdge;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphOperator;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.operators.combination.Combination;
 import org.gradoop.flink.model.impl.operators.difference.Difference;
 import org.gradoop.flink.model.impl.operators.difference.DifferenceBroadcast;
+import org.gradoop.flink.model.impl.operators.distinction.DistinctById;
+import org.gradoop.flink.model.impl.operators.distinction.DistinctByIsomorphism;
+import org.gradoop.flink.model.impl.operators.distinction.GroupByIsomorphism;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEquality;
 import org.gradoop.flink.model.impl.operators.equality.CollectionEqualityByGraphIds;
 import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
@@ -34,6 +41,7 @@ import org.gradoop.flink.model.impl.operators.intersection.Intersection;
 import org.gradoop.flink.model.impl.operators.intersection.IntersectionBroadcast;
 import org.gradoop.flink.model.impl.operators.limit.Limit;
 import org.gradoop.flink.model.impl.operators.overlap.Overlap;
+import org.gradoop.flink.model.impl.operators.selection.Selection;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToDataString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.EdgeToIdString;
 import org.gradoop.flink.model.impl.operators.tostring.functions.GraphHeadToDataString;
@@ -64,8 +72,17 @@ public interface BaseGraphCollectionOperators<
   //----------------------------------------------------------------------------
 
   /**
-   * Returns the first {@code n} arbitrary logical graphs contained in that
-   * collection.
+   * Filter containing graphs based on their associated graph head.
+   *
+   * @param predicateFunction predicate function for graph head
+   * @return collection with base graphs that fulfil the predicate
+   */
+  default GC select(final FilterFunction<G> predicateFunction) {
+    return callForCollection(new Selection<>(predicateFunction));
+  }
+
+  /**
+   * Returns the first {@code n} arbitrary logical graphs contained in that collection.
    *
    * @param n number of graphs to return from collection
    * @return subset of the graph collection
@@ -113,8 +130,8 @@ public interface BaseGraphCollectionOperators<
   }
 
   /**
-   * Returns a collection with all base graphs that exist in both input
-   * collections. Graph equality is based on their identifiers.
+   * Returns a collection with all base graphs that exist in both input collections.
+   * Graph equality is based on their identifiers.
    * <p>
    * Implementation that works faster if {@code otherCollection} is small
    * (e.g. fits in the workers main memory).
@@ -177,7 +194,7 @@ public interface BaseGraphCollectionOperators<
   /**
    * Returns a 1-element dataset containing a {@code boolean} value which
    * indicates if the graph collection is equal to the given graph collection.
-   *
+   * <p>
    * Equality is defined on the element data contained inside the collection,
    * i.e. vertices and edges.
    *
@@ -195,7 +212,7 @@ public interface BaseGraphCollectionOperators<
   /**
    * Returns a 1-element dataset containing a {@code boolean} value which
    * indicates if the graph collection is equal to the given graph collection.
-   *
+   * <p>
    * Equality is defined on the data contained inside the collection, i.e.
    * graph heads, vertices and edges.
    *
@@ -266,5 +283,40 @@ public interface BaseGraphCollectionOperators<
    */
   default LG reduce(ReducibleBinaryBaseGraphToBaseGraphOperator<GC, LG> operator) {
     return callForGraph(operator);
+  }
+
+  //----------------------------------------------------------------------------
+  // Utility methods
+  //----------------------------------------------------------------------------
+
+  /**
+   * Returns a distinct collection of base graphs. Graph equality is based on graph identifiers.
+   *
+   * @return distinct graph collection
+   */
+  default GC distinctById() {
+    return callForCollection(new DistinctById<>());
+  }
+
+  /**
+   * Groups a graph collection by isomorphism.
+   * Graph equality is based on isomorphism including labels and properties.
+   *
+   * @return distinct graph collection
+   */
+  default GC distinctByIsomorphism() {
+    return callForCollection(new DistinctByIsomorphism<>());
+  }
+
+  /**
+   * Groups a graph collection by isomorphism including labels and values.
+   *
+   * @param func function to reduce all graph heads of a group into a single representative one,
+   *             e.g., to count the number of group members
+   *
+   * @return grouped graph collection
+   */
+  default GC groupByIsomorphism(GraphHeadReduceFunction<G> func) {
+    return callForCollection(new GroupByIsomorphism<>(func));
   }
 }
