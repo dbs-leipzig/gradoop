@@ -22,6 +22,8 @@ import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 
 /**
  * Distinction function that just selects the first graph head of an isomorphic group.
+ *
+ * @param <G> graph head type
  */
 public class FirstGraphHead<G extends EPGMGraphHead> implements GraphHeadReduceFunction<G> {
 

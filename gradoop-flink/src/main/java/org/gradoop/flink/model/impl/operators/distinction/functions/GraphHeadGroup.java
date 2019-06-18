@@ -23,6 +23,8 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**
  * (label, graphId) |><| graphHead => (label, graphHead)
+ *
+ * @param <G> graph head type
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f1->f0")
 public class GraphHeadGroup<G extends EPGMGraphHead>

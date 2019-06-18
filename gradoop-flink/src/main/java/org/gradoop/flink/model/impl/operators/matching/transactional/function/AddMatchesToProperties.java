@@ -20,12 +20,13 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 
 import java.util.Iterator;
 
 /**
  * Adds a property to a graph that states if the graph contained the embedding.
+ *
+ * @param <G> graph head type
  */
 public class AddMatchesToProperties<G extends EPGMGraphHead>
   implements CoGroupFunction<G, Tuple2<GradoopId, Boolean>, G> {

@@ -21,6 +21,9 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 /**
  * A marker interface for instances of {@link BinaryBaseGraphToBaseGraphOperator} that
  * support the reduction of a collection to a single base graph.
+ *
+ * @param <GC> the type of the graph collection used as input.
+ * @param <LG> the type of the graph used as return value.
  */
 public interface ReducibleBinaryBaseGraphToBaseGraphOperator<
   GC extends BaseGraphCollection,

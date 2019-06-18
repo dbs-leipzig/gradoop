@@ -26,6 +26,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @see Overlap
  * @see ReduceOverlap
+ *
+ * @param <V> vertex type
+ * @param <E> edge type
  */
 public abstract class OverlapBase<V extends EPGMVertex, E extends EPGMEdge> {
 

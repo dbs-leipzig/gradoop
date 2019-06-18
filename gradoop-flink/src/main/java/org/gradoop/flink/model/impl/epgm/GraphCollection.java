@@ -15,15 +15,10 @@
  */
 package org.gradoop.flink.model.impl.epgm;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.util.Order;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
@@ -38,14 +33,10 @@ import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraph
 import org.gradoop.flink.model.impl.functions.bool.Not;
 import org.gradoop.flink.model.impl.functions.bool.Or;
 import org.gradoop.flink.model.impl.functions.bool.True;
-import org.gradoop.flink.model.impl.functions.epgm.BySameId;
-import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraph;
-import org.gradoop.flink.model.impl.functions.graphcontainment.InGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**

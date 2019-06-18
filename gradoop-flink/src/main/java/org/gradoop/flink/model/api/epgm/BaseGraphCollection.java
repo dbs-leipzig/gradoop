@@ -75,7 +75,7 @@ public interface BaseGraphCollection<
     DataSet<E> edges = getEdges()
       .filter(new InGraph<>(graphID));
 
-    return getGraphFactory.fromDataSets(graphHead, vertices, edges);
+    return getGraphFactory().fromDataSets(graphHead, vertices, edges);
   }
 
   @Override

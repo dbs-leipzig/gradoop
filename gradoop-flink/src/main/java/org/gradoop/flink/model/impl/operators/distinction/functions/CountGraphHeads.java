@@ -24,6 +24,8 @@ import java.util.Iterator;
 
 /**
  * Distinction function that just selects the first graph head of an isomorphic group.
+ *
+ * @param <G> graph head type
  */
 public class CountGraphHeads<G extends EPGMGraphHead> implements GraphHeadReduceFunction<G> {
 

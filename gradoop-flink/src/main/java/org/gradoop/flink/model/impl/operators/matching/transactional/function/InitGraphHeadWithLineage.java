@@ -28,6 +28,8 @@ import org.gradoop.common.model.impl.properties.Properties;
 /**
  * Initializes a new graph head from a given GradoopId and its lineage information, e.g. the
  * source graph this one was created from.
+ *
+ * @param <G> graph head type
  */
 public class InitGraphHeadWithLineage<G extends EPGMGraphHead>
   implements MapFunction<Tuple2<GradoopId, GradoopId>, G>, ResultTypeQueryable<G> {
