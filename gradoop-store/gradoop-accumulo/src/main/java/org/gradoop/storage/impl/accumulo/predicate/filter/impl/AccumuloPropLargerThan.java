@@ -23,7 +23,7 @@ import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFil
 /**
  * Accumulo property value compare predicate implement
  *
- * @param <T> EPGM element type
+ * @param <T> element type
  */
 public class AccumuloPropLargerThan<T extends Element>
   extends PropLargerThan<AccumuloElementFilter<T>>

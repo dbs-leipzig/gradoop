@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IOElementIdRangeTest extends AccumuloStoreTestBase {
@@ -70,7 +70,7 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
         .getVertices()
         .collect();
 
-      validateEPGMElementCollections(inputVertices, queryResult);
+      validateElementCollections(inputVertices, queryResult);
     });
   }
 
@@ -103,7 +103,7 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
         .getEdges()
         .collect();
 
-      validateEPGMElementCollections(inputEdges, queryResult);
+      validateElementCollections(inputEdges, queryResult);
     });
   }
 
@@ -136,7 +136,7 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
         .getGraphHeads()
         .collect();
 
-      validateEPGMElementCollections(inputGraphs, queryResult);
+      validateElementCollections(inputGraphs, queryResult);
     });
   }
 

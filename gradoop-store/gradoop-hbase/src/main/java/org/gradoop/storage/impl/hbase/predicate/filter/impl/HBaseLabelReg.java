@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 /**
  * HBase label regex predicate implementation
  *
- * @param <T> EPGM element type
+ * @param <T> element type
  */
 public class HBaseLabelReg<T extends Element> extends LabelReg<HBaseElementFilter<T>>
   implements HBaseElementFilter<T> {

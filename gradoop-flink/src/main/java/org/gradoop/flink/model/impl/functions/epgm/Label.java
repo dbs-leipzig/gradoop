@@ -21,9 +21,9 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.gradoop.common.model.api.entities.Labeled;
 
 /**
- * labeled EPGM element => label
+ * labeled element => label
  *
- * @param <L> EPGM labeled type
+ * @param <L> labeled type
  */
 @FunctionAnnotation.ForwardedFields("label->*")
 public class Label<L extends Labeled>

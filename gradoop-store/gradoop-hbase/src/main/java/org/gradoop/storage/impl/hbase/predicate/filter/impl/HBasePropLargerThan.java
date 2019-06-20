@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
 /**
  * HBase property value compare predicate implement
  *
- * @param <T> EPGM element type
+ * @param <T> element type
  */
 public class HBasePropLargerThan<T extends Element>
   extends PropLargerThan<HBaseElementFilter<T>> implements HBaseElementFilter<T> {

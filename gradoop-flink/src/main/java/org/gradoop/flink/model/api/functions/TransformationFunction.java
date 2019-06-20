@@ -24,7 +24,7 @@ import java.io.Serializable;
  * A serializable function that is applied on an EPGM element (i.e. graph head,
  * vertex and edge) to transform its data, but not its identity.
  *
- * @param <EL> EPGM attributed / labeled element
+ * @param <EL> attributed / labeled element
  */
 public interface TransformationFunction<EL extends Attributed & Labeled>
   extends Serializable {
@@ -46,7 +46,7 @@ public interface TransformationFunction<EL extends Attributed & Labeled>
   /**
    * Returns the unmodified element.
    *
-   * @param <EL> EPGM attributed / labeled element
+   * @param <EL> attributed / labeled element
    * @return a function that always returns the current element
    */
   static <EL extends Attributed & Labeled> TransformationFunction<EL>

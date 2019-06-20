@@ -20,7 +20,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 
 /**
- * EPGMVertex representation used for grouping vertices to super vertices.
+ * Vertex representation used for grouping vertices to super vertices.
  *
  * <pre>
  * f0: vertex id

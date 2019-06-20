@@ -20,7 +20,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 
 /**
- * Represents an EPGMEdge with an extracted tie point
+ * Represents an Edge with an extracted tie point
  *
  * f0 -> edge join key
  * f1 -> edge id
@@ -35,7 +35,7 @@ public class EdgeWithTiePoint extends Tuple3<GradoopId, GradoopId, GradoopId> {
   }
 
   /**
-   * Creates a new EPGMEdge with extracted tie point from the given edge
+   * Creates a new Edge with extracted tie point from the given edge
    * @param edge edge embedding
    */
   public EdgeWithTiePoint(Embedding edge) {

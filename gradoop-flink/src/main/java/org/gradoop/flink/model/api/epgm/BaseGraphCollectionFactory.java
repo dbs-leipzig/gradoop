@@ -56,8 +56,8 @@ public interface BaseGraphCollectionFactory<
   /**
    * Creates a collection from the given datasets.
    *
-   * @param graphHeads  EPGMGraphHead DataSet
-   * @param vertices    EPGMVertex DataSet
+   * @param graphHeads  GraphHead DataSet
+   * @param vertices    Vertex DataSet
    * @return Graph collection
    */
   GC fromDataSets(DataSet<G> graphHeads, DataSet<V> vertices);
@@ -65,9 +65,9 @@ public interface BaseGraphCollectionFactory<
   /**
    * Creates a collection layout from the given datasets.
    *
-   * @param graphHeads  EPGMGraphHead DataSet
-   * @param vertices    EPGMVertex DataSet
-   * @param edges       EPGMEdge DataSet
+   * @param graphHeads  GraphHead DataSet
+   * @param vertices    Vertex DataSet
+   * @param edges       Edge DataSet
    * @return Graph collection
    */
   GC fromDataSets(DataSet<G> graphHeads, DataSet<V> vertices, DataSet<E> edges);
@@ -88,8 +88,8 @@ public interface BaseGraphCollectionFactory<
    * Creates a collection layout from the given collections.
    *
    * @param graphHeads  Graph Head collection
-   * @param vertices    EPGMVertex collection
-   * @param edges       EPGMEdge collection
+   * @param vertices    Vertex collection
+   * @param edges       Edge collection
    * @return Graph collection
    */
   GC fromCollections(Collection<G> graphHeads, Collection<V> vertices, Collection<E> edges);

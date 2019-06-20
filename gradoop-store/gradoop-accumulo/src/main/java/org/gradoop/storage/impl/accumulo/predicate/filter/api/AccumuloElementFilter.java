@@ -36,9 +36,9 @@ import java.util.Base64;
 import java.util.function.Predicate;
 
 /**
- * Accumulo EPGMElement Filter
+ * Accumulo Element Filter
  *
- * @param <T> epgm element type
+ * @param <T> element type
  * @see GradoopEdgeIterator
  * @see GradoopGraphHeadIterator
  * @see GradoopVertexIterator
@@ -47,7 +47,7 @@ public interface AccumuloElementFilter<T extends Element>
   extends Predicate<T>, ElementFilter<AccumuloElementFilter<T>>, Serializable {
 
   /**
-   * anti-serialize reducer from base64 encoded string
+   * Anti-serialize reducer from base64 encoded string
    * this action will be execute by tserver
    *
    * @param encoded encoded string
@@ -68,7 +68,7 @@ public interface AccumuloElementFilter<T extends Element>
   }
 
   /**
-   * serialize reducer as base64 encoded string
+   * Serialize reducer as base64 encoded string
    * this action will be execute by client
    *
    * @return encoded string
@@ -85,7 +85,7 @@ public interface AccumuloElementFilter<T extends Element>
   }
 
   /**
-   * disjunctive operator
+   * Disjunctive operator
    *
    * @param another another reduce filter
    * @return conjunctive logic filter
@@ -96,7 +96,7 @@ public interface AccumuloElementFilter<T extends Element>
   }
 
   /**
-   * conjunctive operator
+   * Conjunctive operator
    *
    * @param another another reduce filter
    * @return conjunctive logic filter
@@ -107,7 +107,7 @@ public interface AccumuloElementFilter<T extends Element>
   }
 
   /**
-   * negative operator
+   * Negative operator
    * @return negative logic for current filter
    */
   @Nonnull

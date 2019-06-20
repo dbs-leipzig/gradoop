@@ -55,7 +55,7 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm<NullValue, Null
   private final boolean includeZeroDegreeVertices;
 
   /**
-   * Constructor for EPGMVertex Degree with in- and out-degree and total of degrees of a graph.
+   * Constructor for vertex degree with in- and out-degree and total of degrees of a graph.
    *
    * @param propertyKey Property key to store the sum of in- and out-degrees in.
    * @param propertyKeyIn Property key to store the in-degree in.
@@ -66,7 +66,7 @@ public class DistinctVertexDegrees extends GradoopGellyAlgorithm<NullValue, Null
   }
 
   /**
-   * Constructor for EPGMVertex Degree with fixed set of whether to output
+   * Constructor for vertex degree with fixed set of whether to output
    * vertices with an in-degree of zero.
    *
    * @param propertyKey Property key to store the sum of in- and out-degrees in.

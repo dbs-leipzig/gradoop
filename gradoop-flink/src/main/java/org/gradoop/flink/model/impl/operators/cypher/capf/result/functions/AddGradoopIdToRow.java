@@ -20,7 +20,7 @@ import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Extracts the first field of a Row, which is expected to be a EPGMGraphHead.
+ * Extracts the first field of a Row, which is expected to be a GraphHead.
  */
 public class AddGradoopIdToRow implements MapFunction<Row, Row> {
 

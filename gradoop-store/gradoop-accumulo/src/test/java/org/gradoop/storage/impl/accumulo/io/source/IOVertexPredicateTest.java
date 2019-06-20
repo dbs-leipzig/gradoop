@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IOVertexPredicateTest extends AccumuloStoreTestBase {
@@ -76,7 +76,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
         .getVertices()
         .collect();
 
-      validateEPGMElementCollections(inputVertices, queryResult);
+      validateElementCollections(inputVertices, queryResult);
     });
   }
 
@@ -109,7 +109,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
         .getVertices()
         .collect();
 
-      validateEPGMElementCollections(inputVertices, queryResult);
+      validateElementCollections(inputVertices, queryResult);
     });
   }
 
@@ -142,7 +142,7 @@ public class IOVertexPredicateTest extends AccumuloStoreTestBase {
         .getVertices()
         .collect();
 
-      validateEPGMElementCollections(inputVertices, queryResult);
+      validateElementCollections(inputVertices, queryResult);
     });
   }
 

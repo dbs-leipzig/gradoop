@@ -32,26 +32,26 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * accumulo predicate filter definition, this is a internal model, should not be used outside
+ * Accumulo predicate filter definition, this is a internal model, should not be used outside
  *
- * @param <T> epgm element type
+ * @param <T> element type
  */
 public class AccumuloQueryHolder<T extends Element> implements Serializable {
 
   /**
-   * query ranges in accumulo table, should be serializable
+   * Query ranges in accumulo table, should be serializable
    */
   private final byte[] queryRanges;
 
   /**
-   * reduce filter for epgm element
+   * Reduce filter for element
    */
   private final AccumuloElementFilter<T> reduceFilter;
 
   /**
-   * accumulo predicate instance, low level api for store implement
+   * Accumulo predicate instance, low level api for store implement
    *
-   * @param logicalRanges accumulo logical ranges for ele ment table,
+   * @param logicalRanges accumulo logical ranges for element table,
    * @param reduceFilter query reduce filter
    *                     only those in predicate should be return from tserver.
    *                     if null, return all in range
@@ -67,10 +67,10 @@ public class AccumuloQueryHolder<T extends Element> implements Serializable {
   }
 
   /**
-   * create a predicate within a certain id ranges
+   * Create a predicate within a certain id ranges
    *
    * @param query element query
-   * @param <T>   epgm element type
+   * @param <T>   element type
    * @return accumulo predicate
    */
   public static <T extends Element> AccumuloQueryHolder<T> create(
@@ -88,11 +88,11 @@ public class AccumuloQueryHolder<T extends Element> implements Serializable {
   }
 
   /**
-   * create a predicate within a certain accumulo id ranges
+   * Create a predicate within a certain accumulo id ranges
    *
    * @param idRanges      gradoop row-id ranges for query element
    * @param reduceFilter  reducer filter logic
-   * @param <T>           epgm element type
+   * @param <T>           element type
    * @return accumulo predicate
    */
   public static <T extends Element> AccumuloQueryHolder<T> create(
@@ -106,7 +106,7 @@ public class AccumuloQueryHolder<T extends Element> implements Serializable {
   }
 
   /**
-   * get query ranges by anti-encrypt wrapper
+   * Qet query ranges by anti-encrypt wrapper
    *
    * @return seek range
    */
@@ -135,17 +135,17 @@ public class AccumuloQueryHolder<T extends Element> implements Serializable {
   }
 
   /**
-   * range wrapper definition, just for request transport
+   * Range wrapper definition, just for request transport
    */
   private static class RangeWrapper {
 
     /**
-     * query ranges, may be null
+     * Query ranges, may be null
      */
     private List<Range> ranges;
 
     /**
-     * encrypt as byte array
+     * Encrypt as byte array
      *
      * @return byte array result
      */
@@ -158,7 +158,7 @@ public class AccumuloQueryHolder<T extends Element> implements Serializable {
     }
 
     /**
-     * decrypted from byte array
+     * Decrypted from byte array
      *
      * @param data encrypted data
      * @return range wrapper instance

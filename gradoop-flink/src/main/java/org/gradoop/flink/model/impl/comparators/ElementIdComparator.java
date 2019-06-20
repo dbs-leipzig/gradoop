@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * Id based EPGM element comparator.
+ * Id based element comparator.
  */
 public class ElementIdComparator implements Comparator<Element>, Serializable {
 

@@ -68,7 +68,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
             .where(AccumuloFilters.propEquals("gender", "f")))
         .readRemainsAndClose();
 
-      GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+      GradoopTestUtils.validateElementCollections(inputVertices, query);
     });
   }
 
@@ -97,7 +97,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
             .where(AccumuloFilters.propEquals("since", 2014)))
         .readRemainsAndClose();
 
-      GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+      GradoopTestUtils.validateElementCollections(inputVertices, query);
     });
   }
 
@@ -129,7 +129,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
             .where(AccumuloFilters.propReg("city", queryFormula)))
         .readRemainsAndClose();
 
-      GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+      GradoopTestUtils.validateElementCollections(inputVertices, query);
     });
   }
 
@@ -160,7 +160,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
               .propLargerThan("since", 2014, true)))
         .readRemainsAndClose();
 
-      GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+      GradoopTestUtils.validateElementCollections(inputVertices, query);
     });
   }
 
@@ -186,7 +186,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
               .propLargerThan("vertexCount", 4, true)))
         .readRemainsAndClose();
 
-      GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+      GradoopTestUtils.validateElementCollections(inputVertices, query);
     });
   }
 

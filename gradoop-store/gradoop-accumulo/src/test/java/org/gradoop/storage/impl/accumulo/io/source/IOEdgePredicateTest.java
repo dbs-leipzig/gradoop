@@ -61,7 +61,7 @@ public class IOEdgePredicateTest extends AccumuloStoreTestBase {
         .getEdges()
         .collect();
 
-      GradoopTestUtils.validateEPGMElementCollections(storeEdges, query);
+      GradoopTestUtils.validateElementCollections(storeEdges, query);
     });
   }
 
@@ -85,7 +85,7 @@ public class IOEdgePredicateTest extends AccumuloStoreTestBase {
         .getEdges()
         .collect();
 
-      GradoopTestUtils.validateEPGMGraphElementCollections(storeEdges, query);
+      GradoopTestUtils.validateGraphElementCollections(storeEdges, query);
     });
   }
 

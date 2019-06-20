@@ -159,9 +159,9 @@ public class GradoopFlinkTestUtils {
   }
 
   public static void assertEquals(GraphTransaction a, GraphTransaction b) {
-    GradoopTestUtils.validateEPGMElements(a.getGraphHead(), b.getGraphHead());
-    GradoopTestUtils.validateEPGMElementCollections(a.getVertices(), b.getVertices());
-    GradoopTestUtils.validateEPGMElementCollections(a.getEdges(), b.getEdges());
+    GradoopTestUtils.validateElements(a.getGraphHead(), b.getGraphHead());
+    GradoopTestUtils.validateElementCollections(a.getVertices(), b.getVertices());
+    GradoopTestUtils.validateElementCollections(a.getEdges(), b.getEdges());
   }
 
   private static void assertEqualEdges(Edge a, Edge b) {

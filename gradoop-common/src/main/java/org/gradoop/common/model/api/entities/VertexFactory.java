@@ -22,7 +22,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 /**
  * Initializes {@link Vertex} objects of a given type.
  *
- * @param <V> EPGM vertex type
+ * @param <V> vertex type
  */
 public interface VertexFactory<V extends Vertex> extends ElementFactory<V> {
 

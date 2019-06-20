@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 /**
  * Accumulo property regex predicate implement
  *
- * @param <T> EPGM element type
+ * @param <T> element type
  */
 public class AccumuloPropReg<T extends Element>
   extends PropReg<AccumuloElementFilter<T>>

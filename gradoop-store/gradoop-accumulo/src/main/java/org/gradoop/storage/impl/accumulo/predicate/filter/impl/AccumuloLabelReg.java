@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 /**
  * Accumulo label regex predicate implement
  *
- * @param <T> EPGM element type
+ * @param <T> element type
  */
 public class AccumuloLabelReg<T extends Element>
   extends LabelReg<AccumuloElementFilter<T>>

@@ -26,9 +26,9 @@ import javax.annotation.Nonnull;
 import java.io.Serializable;
 
 /**
- * HBase EPGMElement Filter interface to chain predicates
+ * HBase Element Filter interface to chain predicates
  *
- * @param <T> EPGM element type
+ * @param <T> element type
  */
 public interface HBaseElementFilter<T extends Element>
   extends ElementFilter<HBaseElementFilter<T>>, Serializable {

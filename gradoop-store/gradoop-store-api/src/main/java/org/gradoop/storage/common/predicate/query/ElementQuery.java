@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
- * EPGMElement Query Formula
+ * Element Query Formula
  *
  * A element query contains
  *  - id range set (which define the query id range of result element)

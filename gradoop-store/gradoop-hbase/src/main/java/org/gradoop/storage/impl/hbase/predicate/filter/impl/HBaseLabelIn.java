@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
 /**
  * HBase label equality predicate implementation
  *
- * @param <T> EPGM element type
+ * @param <T> element type
  */
 public class HBaseLabelIn<T extends Element> extends LabelIn<HBaseElementFilter<T>>
   implements HBaseElementFilter<T> {

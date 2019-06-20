@@ -172,25 +172,25 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
     graphStore.flush();
 
     // graph heads
-    validateEPGMElementCollections(
+    validateElementCollections(
       graphHeads,
       graphStore.getGraphSpace().readRemainsAndClose()
     );
     // vertices
-    validateEPGMElementCollections(
+    validateElementCollections(
       vertices,
       graphStore.getVertexSpace().readRemainsAndClose()
     );
-    validateEPGMGraphElementCollections(
+    validateGraphElementCollections(
       vertices,
       graphStore.getVertexSpace().readRemainsAndClose()
     );
     // edges
-    validateEPGMElementCollections(
+    validateElementCollections(
       edges,
       graphStore.getEdgeSpace().readRemainsAndClose()
     );
-    validateEPGMGraphElementCollections(
+    validateGraphElementCollections(
       edges,
       graphStore.getEdgeSpace().readRemainsAndClose()
     );
@@ -381,23 +381,23 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
 
     GraphHead loadedGraphHead = graphStore.readGraph(originalGraphHead.getId());
 
-    validateEPGMElements(originalGraphHead, loadedGraphHead);
+    validateElements(originalGraphHead, loadedGraphHead);
   }
 
   private void validateVertex(HBaseEPGMStore graphStore, EPGMVertex originalVertex) throws IOException {
 
     Vertex loadedVertex = graphStore.readVertex(originalVertex.getId());
 
-    validateEPGMElements(originalVertex, loadedVertex);
-    validateEPGMGraphElements(originalVertex, loadedVertex);
+    validateElements(originalVertex, loadedVertex);
+    validateGraphElements(originalVertex, loadedVertex);
   }
 
   private void validateEdge(HBaseEPGMStore graphStore, EPGMEdge originalEdge) throws IOException {
 
     Edge loadedEdge = graphStore.readEdge(originalEdge.getId());
 
-    validateEPGMElements(originalEdge, loadedEdge);
-    validateEPGMGraphElements(originalEdge, loadedEdge);
+    validateElements(originalEdge, loadedEdge);
+    validateGraphElements(originalEdge, loadedEdge);
 
     assert loadedEdge != null;
     assertEquals("source vertex mismatch", originalEdge.getSourceId(), loadedEdge.getSourceId());

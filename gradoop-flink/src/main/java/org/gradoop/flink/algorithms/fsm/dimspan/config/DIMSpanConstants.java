@@ -31,12 +31,12 @@ public class DIMSpanConstants {
   public static final String MIN_FREQUENCY = "fmin";
 
   /**
-   * EPGMVertex label dictionary.
+   * Vertex label dictionary.
    */
   public static final String VERTEX_DICTIONARY = "vld";
 
   /**
-   * EPGMEdge label Dictionary
+   * Edge label Dictionary
    */
   public static final String EDGE_DICTIONARY = "eld";
 

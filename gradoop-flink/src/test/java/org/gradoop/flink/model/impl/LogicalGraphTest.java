@@ -25,8 +25,8 @@ import org.junit.Test;
 import java.util.Collection;
 import java.util.List;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
-import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
 import static org.junit.Assert.assertEquals;
 
 public class LogicalGraphTest extends GradoopFlinkTestBase {
@@ -53,8 +53,8 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
     List<EPGMVertex> outputVertices = loader.getLogicalGraph(false).getVertices().collect();
 
-    validateEPGMElementCollections(inputVertices, outputVertices);
-    validateEPGMGraphElementCollections(inputVertices, outputVertices);
+    validateElementCollections(inputVertices, outputVertices);
+    validateGraphElementCollections(inputVertices, outputVertices);
   }
 
   @Test
@@ -66,7 +66,7 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
 
     List<EPGMEdge> outputEdges = loader.getLogicalGraph(false).getEdges().collect();
 
-    validateEPGMElementCollections(inputEdges, outputEdges);
-    validateEPGMGraphElementCollections(inputEdges, outputEdges);
+    validateElementCollections(inputEdges, outputEdges);
+    validateGraphElementCollections(inputEdges, outputEdges);
   }
 }

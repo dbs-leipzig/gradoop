@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Transformation map function for edges.
  *
- * @param <E> the type of the EPGM edge
+ * @param <E> the type of the edge
  */
 @FunctionAnnotation.ForwardedFields("id;sourceId;targetId;graphIds")
 public class TransformEdge<E extends Edge> extends TransformBase<E> {

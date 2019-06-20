@@ -21,7 +21,7 @@ import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 /**
  * True, if the element has not graph ids.
  *
- * @param <EL> epgm graph element
+ * @param <EL> graph element
  */
 public class InNoGraph<EL extends GraphElement> implements CombinableFilter<EL> {
 

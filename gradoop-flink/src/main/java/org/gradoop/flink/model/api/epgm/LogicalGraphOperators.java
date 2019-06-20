@@ -485,7 +485,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
 
   /**
    * Creates a new logical graph by combining the vertex and edge sets of
-   * this graph and the given graph. EPGMVertex and edge equality is based on their
+   * this graph and the given graph. Vertex and edge equality is based on their
    * identifiers.
    *
    * @param otherGraph logical graph to combine this graph with
@@ -496,7 +496,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge
-   * sets of this graph and the given graph. EPGMVertex and edge equality is
+   * sets of this graph and the given graph. Vertex and edge equality is
    * based on their identifiers.
    *
    * @param otherGraph logical graph to compute overlap with
@@ -507,7 +507,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
 
   /**
    * Creates a new logical graph containing only vertices and edges that
-   * exist in that graph but not in the other graph. EPGMVertex and edge equality
+   * exist in that graph but not in the other graph. Vertex and edge equality
    * is based on their identifiers.
    *
    * @param otherGraph logical graph to exclude from that graph

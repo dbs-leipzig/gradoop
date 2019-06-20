@@ -23,7 +23,7 @@ import java.util.Comparator;
 /**
  * Id based EPGM element comparator.
  */
-public class EPGMIdentifiableComparator implements Comparator<Identifiable>, Serializable {
+public class IdentifiableComparator implements Comparator<Identifiable>, Serializable {
 
   @Override
   public int compare(Identifiable a, Identifiable b) {

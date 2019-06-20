@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
 /**
  * Base class for common functionality of HBase input formats
  *
- * @param <E> type of EPGM element
+ * @param <E> type of element
  */
 abstract class BaseTableInputFormat<E extends Element> extends TableInputFormat<Tuple1<E>> {
 

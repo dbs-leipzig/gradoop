@@ -23,7 +23,7 @@ import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 /**
  * Accepts all elements which have a property with the specified key or key value combination.
  *
- * @param <E> EPGM element
+ * @param <E> element
  */
 public class ByProperty<E extends Element> implements CombinableFilter<E> {
   /**

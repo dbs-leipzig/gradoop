@@ -29,7 +29,7 @@ public class Combination implements BinaryGraphToGraphOperator {
 
   /**
    * Creates a new logical graph by union the vertex and edge sets of two
-   * input graphs. EPGMVertex and edge equality is based on their respective
+   * input graphs. Vertex and edge equality is based on their respective
    * identifiers.
    *
    * @param firstGraph  first input graph
@@ -42,11 +42,11 @@ public class Combination implements BinaryGraphToGraphOperator {
 
     DataSet<EPGMVertex> newVertexSet = firstGraph.getVertices()
       .union(secondGraph.getVertices())
-      .distinct(new Id<EPGMVertex>());
+      .distinct(new Id<>());
 
     DataSet<EPGMEdge> newEdgeSet = firstGraph.getEdges()
       .union(secondGraph.getEdges())
-      .distinct(new Id<EPGMEdge>());
+      .distinct(new Id<>());
 
     return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertexSet, newEdgeSet);
   }

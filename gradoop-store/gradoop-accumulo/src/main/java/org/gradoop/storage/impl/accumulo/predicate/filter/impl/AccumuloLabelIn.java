@@ -22,7 +22,7 @@ import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFil
 /**
  * Accumulo label equality predicate implement
  *
- * @param <T> EPGM element type
+ * @param <T> element type
  */
 public class AccumuloLabelIn<T extends Element>
   extends LabelIn<AccumuloElementFilter<T>>

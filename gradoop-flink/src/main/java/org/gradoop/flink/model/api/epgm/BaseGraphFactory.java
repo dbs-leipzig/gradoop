@@ -63,8 +63,8 @@ public interface BaseGraphFactory<
    * The method creates a new graph head element and assigns the vertices and
    * edges to that graph.
    *
-   * @param vertices EPGMVertex DataSet
-   * @param edges    EPGMEdge DataSet
+   * @param vertices Vertex DataSet
+   * @param edges    Edge DataSet
    * @return Logical graph
    */
   LG fromDataSets(DataSet<V> vertices, DataSet<E> edges);
@@ -76,8 +76,8 @@ public interface BaseGraphFactory<
    * to the given graph head.
    *
    * @param graphHead   1-element EPGMGraphHead DataSet
-   * @param vertices    EPGMVertex DataSet
-   * @param edges       EPGMEdge DataSet
+   * @param vertices    Vertex DataSet
+   * @param edges       Edge DataSet
    * @return Logical graph
    */
   LG fromDataSets(DataSet<G> graphHead, DataSet<V> vertices, DataSet<E> edges);
@@ -109,8 +109,8 @@ public interface BaseGraphFactory<
    * Creates a logical graph from the given single graph head, vertex and edge collections.
    *
    * @param graphHead Graph head associated with the logical graph
-   * @param vertices  EPGMVertex collection
-   * @param edges     EPGMEdge collection
+   * @param vertices  Vertex collection
+   * @param edges     Edge collection
    * @return Logical graph
    */
   LG fromCollections(G graphHead, Collection<V> vertices, Collection<E> edges);
@@ -119,8 +119,8 @@ public interface BaseGraphFactory<
    * Creates a logical graph from the given vertex and edge collections. A new graph head is
    * created and all vertices and edges are assigned to that graph.
    *
-   * @param vertices    EPGMVertex collection
-   * @param edges       EPGMEdge collection
+   * @param vertices    Vertex collection
+   * @param edges       Edge collection
    * @return Logical graph
    */
   LG fromCollections(Collection<V> vertices, Collection<E> edges);

@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Used to select the target vertex id of an edge.
  *
- * @param <E> EPGM edge type
+ * @param <E> edge type
  */
 @FunctionAnnotation.ForwardedFieldsFirst("targetId->*")
 public class TargetId<E extends Edge>

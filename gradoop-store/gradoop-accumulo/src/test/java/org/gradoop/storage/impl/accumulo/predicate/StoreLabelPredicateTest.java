@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
@@ -64,7 +64,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
             .where(AccumuloFilters.labelIn("Person", "Tag")))
         .readRemainsAndClose();
 
-      validateEPGMElementCollections(inputVertex, queryResult);
+      validateElementCollections(inputVertex, queryResult);
     });
   }
 
@@ -89,7 +89,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
             .fromAll()
             .where(AccumuloFilters.labelIn("hasInterest", "hasMember")))
         .readRemainsAndClose();
-      validateEPGMElementCollections(inputEdges, queryResult);
+      validateElementCollections(inputEdges, queryResult);
     });
   }
 
@@ -115,7 +115,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
             .where(AccumuloFilters.labelReg(queryFormula)))
         .readRemainsAndClose();
 
-      validateEPGMElementCollections(inputVertex, queryResult);
+      validateElementCollections(inputVertex, queryResult);
     });
   }
 
@@ -142,7 +142,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
             .where(AccumuloFilters.labelReg(queryFormula)))
         .readRemainsAndClose();
 
-      validateEPGMElementCollections(inputVertex, queryResult);
+      validateElementCollections(inputVertex, queryResult);
     });
   }
 
@@ -164,7 +164,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
             .where(AccumuloFilters.labelIn("Community", "Person")))
         .readRemainsAndClose();
 
-      validateEPGMElementCollections(inputGraph, queryResult);
+      validateElementCollections(inputGraph, queryResult);
     });
   }
 
@@ -187,7 +187,7 @@ public class StoreLabelPredicateTest extends AccumuloStoreTestBase {
             .where(AccumuloFilters.labelReg(queryFormula)))
         .readRemainsAndClose();
 
-      validateEPGMElementCollections(inputGraph, queryResult);
+      validateElementCollections(inputGraph, queryResult);
     });
   }
 

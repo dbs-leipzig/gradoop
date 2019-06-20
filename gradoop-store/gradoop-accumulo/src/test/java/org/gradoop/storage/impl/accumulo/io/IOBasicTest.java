@@ -34,8 +34,8 @@ import org.junit.runners.MethodSorters;
 import java.io.InputStream;
 import java.util.Collection;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
-import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
 
 /**
  * accumulo data read write test
@@ -80,11 +80,11 @@ public class IOBasicTest extends GradoopFlinkTestBase {
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-    validateEPGMElementCollections(vertices, loadedVertices);
-    validateEPGMGraphElementCollections(vertices, loadedVertices);
-    validateEPGMElementCollections(edges, loadedEdges);
-    validateEPGMGraphElementCollections(edges, loadedEdges);
+    validateElementCollections(graphHeads, loadedGraphHeads);
+    validateElementCollections(vertices, loadedVertices);
+    validateGraphElementCollections(vertices, loadedVertices);
+    validateElementCollections(edges, loadedEdges);
+    validateGraphElementCollections(edges, loadedEdges);
 
     accumuloStore.close();
   }
@@ -111,15 +111,15 @@ public class IOBasicTest extends GradoopFlinkTestBase {
     getExecutionEnvironment().execute();
     accumuloStore.flush();
 
-    validateEPGMElementCollections(loader.getGraphHeads(),
+    validateElementCollections(loader.getGraphHeads(),
       accumuloStore.getGraphSpace().readRemainsAndClose());
-    validateEPGMElementCollections(loader.getVertices(),
+    validateElementCollections(loader.getVertices(),
       accumuloStore.getVertexSpace().readRemainsAndClose());
-    validateEPGMGraphElementCollections(loader.getVertices(),
+    validateGraphElementCollections(loader.getVertices(),
       accumuloStore.getVertexSpace().readRemainsAndClose());
-    validateEPGMElementCollections(loader.getEdges(),
+    validateElementCollections(loader.getEdges(),
       accumuloStore.getEdgeSpace().readRemainsAndClose());
-    validateEPGMGraphElementCollections(loader.getEdges(),
+    validateGraphElementCollections(loader.getEdges(),
       accumuloStore.getEdgeSpace().readRemainsAndClose());
 
     accumuloStore.close();

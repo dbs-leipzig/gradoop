@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 
 /**
  * Accumulo graph store predicate test
@@ -80,7 +80,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
             ))
         .readRemainsAndClose();
 
-      validateEPGMElementCollections(inputVertices, queryResult);
+      validateElementCollections(inputVertices, queryResult);
     });
   }
 
@@ -107,7 +107,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
             .fromAll()
             .where(AccumuloFilters.propLargerThan("age", 35, true)))
         .readRemainsAndClose();
-      validateEPGMElementCollections(inputVertices, queryResult);
+      validateElementCollections(inputVertices, queryResult);
     });
   }
 
@@ -142,7 +142,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
       List<EPGMGraphHead> query = store
         .getGraphSpace(queryFormula)
         .readRemainsAndClose();
-      GradoopTestUtils.validateEPGMElementCollections(inputGraph, query);
+      GradoopTestUtils.validateElementCollections(inputGraph, query);
     });
   }
 

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
@@ -60,7 +60,7 @@ public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
             .noFilter())
         .readRemainsAndClose();
 
-      validateEPGMElementCollections(inputVertices, queryResult);
+      validateElementCollections(inputVertices, queryResult);
     });
   }
 
@@ -85,7 +85,7 @@ public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
             .noFilter())
         .readRemainsAndClose();
 
-      validateEPGMElementCollections(inputEdges, queryResult);
+      validateElementCollections(inputEdges, queryResult);
     });
   }
 
@@ -104,7 +104,7 @@ public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
             .noFilter())
         .readRemainsAndClose();
 
-      validateEPGMElementCollections(inputGraphs, queryResult);
+      validateElementCollections(inputGraphs, queryResult);
     });
   }
 

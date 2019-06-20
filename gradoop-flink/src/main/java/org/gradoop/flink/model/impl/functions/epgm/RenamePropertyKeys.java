@@ -16,9 +16,6 @@
 package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.gradoop.common.model.api.entities.Element;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
 import java.util.Map;
@@ -26,14 +23,11 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A serializable function that is applied on an EPGM element (i.e. graph head,
+ * A serializable function that is applied on an element (i.e. graph head,
  * vertex and edge) to rename property keys. If the new property key is already in use
  * the value will also be overwritten
  *
- *  @param <T> the {@link Element} which is target of change, e.g.
- *  {@link EPGMVertex},
- *  {@link EPGMEdge} or
- *  {@link EPGMGraphHead}
+ *  @param <T> the {@link Element} which is target of change.
  */
 public class RenamePropertyKeys<T extends Element> implements TransformationFunction<T> {
 

@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
 /**
  * HBase property equality implementation
  *
- * @param <T> EPGM element type
+ * @param <T> element type
  */
 public class HBasePropEquals<T extends Element> extends PropEquals<HBaseElementFilter<T>>
   implements HBaseElementFilter<T> {

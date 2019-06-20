@@ -40,7 +40,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -100,7 +100,7 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
         .noFilter())
       .readRemainsAndClose();
 
-    validateEPGMElementCollections(graphHeads, queryResult);
+    validateElementCollections(graphHeads, queryResult);
   }
 
   /**
@@ -119,7 +119,7 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
         .noFilter())
       .readRemainsAndClose();
 
-    validateEPGMElementCollections(graphHeads, queryResult);
+    validateElementCollections(graphHeads, queryResult);
   }
 
   /**
@@ -145,7 +145,7 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
         .noFilter())
       .readRemainsAndClose();
 
-    validateEPGMElementCollections(vertices, queryResult);
+    validateElementCollections(vertices, queryResult);
   }
 
   /**
@@ -164,7 +164,7 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
         .noFilter())
       .readRemainsAndClose();
 
-    validateEPGMElementCollections(vertices, queryResult);
+    validateElementCollections(vertices, queryResult);
   }
 
   /**
@@ -189,7 +189,7 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
         .noFilter())
       .readRemainsAndClose();
 
-    validateEPGMElementCollections(edges, queryResult);
+    validateElementCollections(edges, queryResult);
   }
 
   /**
@@ -208,7 +208,7 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
         .noFilter())
       .readRemainsAndClose();
 
-    validateEPGMElementCollections(edges, queryResult);
+    validateElementCollections(edges, queryResult);
   }
 
   /**
@@ -255,9 +255,9 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
         .where(HBaseFilters.<EPGMVertex>labelIn(LABEL_TAG, LABEL_FORUM).negate()))
       .readRemainsAndClose();
 
-    validateEPGMElementCollections(graphHeads, graphHeadResult);
-    validateEPGMElementCollections(vertices, vertexResult);
-    validateEPGMElementCollections(edges, edgeResult);
+    validateElementCollections(graphHeads, graphHeadResult);
+    validateElementCollections(vertices, vertexResult);
+    validateElementCollections(edges, edgeResult);
   }
 
   /**
@@ -303,9 +303,9 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
         .where(HBaseFilters.labelReg(PATTERN_VERTEX)))
       .readRemainsAndClose();
 
-    validateEPGMElementCollections(graphHeads, graphHeadResult);
-    validateEPGMElementCollections(vertices, vertexResult);
-    validateEPGMElementCollections(edges, edgeResult);
+    validateElementCollections(graphHeads, graphHeadResult);
+    validateElementCollections(vertices, vertexResult);
+    validateElementCollections(edges, edgeResult);
   }
 
   /**
@@ -359,9 +359,9 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
         .where(HBaseFilters.propEquals(PROP_CITY, propertyValueCity)))
       .readRemainsAndClose();
 
-    validateEPGMElementCollections(graphHeads, graphHeadResult);
-    validateEPGMElementCollections(vertices, vertexResult);
-    validateEPGMElementCollections(edges, edgeResult);
+    validateElementCollections(graphHeads, graphHeadResult);
+    validateElementCollections(vertices, vertexResult);
+    validateElementCollections(edges, edgeResult);
   }
 
   /**
@@ -419,9 +419,9 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
         .where(HBaseFilters.propLargerThan(PROP_AGE, propertyValueAge, false)))
       .readRemainsAndClose();
 
-    validateEPGMElementCollections(graphHeads, graphHeadResult);
-    validateEPGMElementCollections(vertices, vertexResult);
-    validateEPGMElementCollections(edges, edgeResult);
+    validateElementCollections(graphHeads, graphHeadResult);
+    validateElementCollections(vertices, vertexResult);
+    validateElementCollections(edges, edgeResult);
   }
 
   /**
@@ -478,9 +478,9 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
     assertEquals(2, edgeResult.size());
     assertEquals(2, vertexResult.size());
 
-    validateEPGMElementCollections(graphHeads, graphHeadResult);
-    validateEPGMElementCollections(vertices, vertexResult);
-    validateEPGMElementCollections(edges, edgeResult);
+    validateElementCollections(graphHeads, graphHeadResult);
+    validateElementCollections(vertices, vertexResult);
+    validateElementCollections(edges, edgeResult);
   }
 
   /**
@@ -543,8 +543,8 @@ public class HBaseDefaultGraphStoreTest extends GradoopHBaseTestBase {
     assertEquals(21, edgeResult.size());
     assertEquals(3, vertexResult.size());
 
-    validateEPGMElementCollections(graphHeads, graphHeadResult);
-    validateEPGMElementCollections(vertices, vertexResult);
-    validateEPGMElementCollections(edges, edgeResult);
+    validateElementCollections(graphHeads, graphHeadResult);
+    validateElementCollections(vertices, vertexResult);
+    validateElementCollections(edges, edgeResult);
   }
 }

@@ -39,7 +39,7 @@ import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithC
 public abstract class PatternMatching implements UnaryGraphToCollectionOperator {
 
   /**
-   * The property key used to stored the variable mappings inside the EPGMGraphHead properties
+   * The property key used to stored the variable mappings inside the GraphHead properties
    */
   public static final transient String VARIABLE_MAPPING_KEY = "__variable_mapping";
 
@@ -61,11 +61,11 @@ public abstract class PatternMatching implements UnaryGraphToCollectionOperator 
    */
   private final boolean attachData;
   /**
-   * EPGMVertex mapping used for debug
+   * Vertex mapping used for debug
    */
   private DataSet<Tuple2<GradoopId, PropertyValue>> vertexMapping;
   /**
-   * EPGMEdge mapping used for debug
+   * Edge mapping used for debug
    */
   private DataSet<Tuple2<GradoopId, PropertyValue>> edgeMapping;
 

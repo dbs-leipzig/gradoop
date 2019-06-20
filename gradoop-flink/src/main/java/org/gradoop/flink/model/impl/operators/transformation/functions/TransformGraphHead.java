@@ -26,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Transformation map function for graph heads.
  *
- * @param <G> the type of the EPGM graph head
+ * @param <G> the type of the graph head
  */
 @FunctionAnnotation.ForwardedFields("id")
 public class TransformGraphHead<G extends GraphHead> extends TransformBase<G> {

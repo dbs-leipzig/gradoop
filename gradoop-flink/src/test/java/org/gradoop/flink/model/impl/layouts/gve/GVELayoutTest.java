@@ -102,43 +102,43 @@ public class GVELayoutTest extends GradoopFlinkTestBase {
 
   @Test
   public void getGraphHead() throws Exception {
-    GradoopTestUtils.validateEPGMElementCollections(Sets.newHashSet(g0),
+    GradoopTestUtils.validateElementCollections(Sets.newHashSet(g0),
       from(singletonList(g0), asList(v0, v1), singletonList(e0)).getGraphHead().collect());
   }
 
   @Test
   public void getGraphHeads() throws Exception {
-    GradoopTestUtils.validateEPGMElementCollections(Sets.newHashSet(g0, g1),
+    GradoopTestUtils.validateElementCollections(Sets.newHashSet(g0, g1),
       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getGraphHeads().collect());
   }
 
   @Test
   public void getGraphHeadsByLabel() throws Exception {
-    GradoopTestUtils.validateEPGMElementCollections(Sets.newHashSet(g0),
+    GradoopTestUtils.validateElementCollections(Sets.newHashSet(g0),
       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getGraphHeadsByLabel("A").collect());
   }
 
   @Test
   public void getVertices() throws Exception {
-    GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(v0, v1, v2),
+    GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(v0, v1, v2),
       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getVertices().collect());
   }
 
   @Test
   public void getVerticesByLabel() throws Exception {
-    GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(v0),
+    GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(v0),
       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getVerticesByLabel("A").collect());
   }
 
   @Test
   public void getEdges() throws Exception {
-    GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(e0, e1),
+    GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(e0, e1),
       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getEdges().collect());
   }
 
   @Test
   public void getEdgesByLabel() throws Exception {
-    GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(e0),
+    GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(e0),
       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getEdgesByLabel("a").collect());
   }
 }

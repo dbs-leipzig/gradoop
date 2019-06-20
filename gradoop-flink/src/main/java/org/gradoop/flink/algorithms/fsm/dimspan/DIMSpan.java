@@ -58,7 +58,7 @@ import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * abstract superclass of different implementations of the gSpan frequent
+ * Abstract superclass of different implementations of the gSpan frequent
  * subgraph mining algorithm as Gradoop operator
  */
 public class DIMSpan {
@@ -90,12 +90,12 @@ public class DIMSpan {
   protected final GSpanLogic gSpan;
 
   /**
-   * EPGMVertex label dictionary for dictionary coding.
+   * Vertex label dictionary for dictionary coding.
    */
   private DataSet<String[]> vertexDictionary;
 
   /**
-   * EPGMEdge label dictionary for dictionary coding.
+   * Edge label dictionary for dictionary coding.
    */
   private DataSet<String[]> edgeDictionary;
 

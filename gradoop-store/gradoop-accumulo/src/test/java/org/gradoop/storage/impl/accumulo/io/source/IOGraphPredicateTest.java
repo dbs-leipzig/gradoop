@@ -62,7 +62,7 @@ public class IOGraphPredicateTest extends AccumuloStoreTestBase {
         .getGraphHeads()
         .collect();
 
-      GradoopTestUtils.validateEPGMElementCollections(storeGraphs, query);
+      GradoopTestUtils.validateElementCollections(storeGraphs, query);
     });
   }
 
@@ -93,7 +93,7 @@ public class IOGraphPredicateTest extends AccumuloStoreTestBase {
         .getGraphHeads()
         .collect();
 
-      GradoopTestUtils.validateEPGMElementCollections(storeGraphs, query);
+      GradoopTestUtils.validateElementCollections(storeGraphs, query);
     });
   }
 

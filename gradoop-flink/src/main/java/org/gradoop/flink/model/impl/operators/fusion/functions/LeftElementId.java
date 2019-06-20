@@ -23,7 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Left projection with id obtained.
- * @param <K> EPGMElement where the id is extracted
+ * @param <K> Element where the id is extracted
  *
  */
 @FunctionAnnotation.ForwardedFieldsFirst("id -> *")

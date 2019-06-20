@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 /**
  * Accumulo property equality implement
  *
- * @param <T> EPGM element type
+ * @param <T> element type
  */
 public class AccumuloPropEquals<T extends Element>
   extends PropEquals<AccumuloElementFilter<T>>

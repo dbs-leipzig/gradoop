@@ -71,11 +71,11 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElements(graphHead, loadedGraphHeads.iterator().next());
-    validateEPGMElementCollections(vertices, loadedVertices);
-    validateEPGMElementCollections(edges, loadedEdges);
-    validateEPGMGraphElementCollections(vertices, loadedVertices);
-    validateEPGMGraphElementCollections(edges, loadedEdges);
+    validateElements(graphHead, loadedGraphHeads.iterator().next());
+    validateElementCollections(vertices, loadedVertices);
+    validateElementCollections(edges, loadedEdges);
+    validateGraphElementCollections(vertices, loadedVertices);
+    validateGraphElementCollections(edges, loadedEdges);
   }
 
   @Test
@@ -110,11 +110,11 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElements(g0, loadedGraphHeads.iterator().next());
-    validateEPGMElementCollections(loader.getVerticesByGraphVariables("g0"), loadedVertices);
-    validateEPGMElementCollections(loader.getEdgesByGraphVariables("g0"), loadedEdges);
-    validateEPGMGraphElementCollections(loader.getVerticesByGraphVariables("g0"), loadedVertices);
-    validateEPGMGraphElementCollections(loader.getEdgesByGraphVariables("g0"), loadedEdges);
+    validateElements(g0, loadedGraphHeads.iterator().next());
+    validateElementCollections(loader.getVerticesByGraphVariables("g0"), loadedVertices);
+    validateElementCollections(loader.getEdgesByGraphVariables("g0"), loadedEdges);
+    validateGraphElementCollections(loader.getVerticesByGraphVariables("g0"), loadedVertices);
+    validateGraphElementCollections(loader.getEdgesByGraphVariables("g0"), loadedEdges);
   }
 
   @Test
@@ -138,8 +138,8 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
 
     EPGMGraphHead newGraphHead = loadedGraphHead.iterator().next();
 
-    validateEPGMElementCollections(loadedVertices, loader.getVertices());
-    validateEPGMElementCollections(loadedEdges, loader.getEdges());
+    validateElementCollections(loadedVertices, loader.getVertices());
+    validateElementCollections(loadedEdges, loader.getEdges());
 
     Collection<EPGMGraphElement> epgmElements = new ArrayList<>();
     epgmElements.addAll(loadedVertices);
@@ -174,11 +174,11 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElements(graphHead, loadedGraphHeads.iterator().next());
-    validateEPGMElementCollections(loader.getVerticesByGraphVariables("g0"), loadedVertices);
-    validateEPGMElementCollections(loader.getEdgesByGraphVariables("g0"), loadedEdges);
-    validateEPGMGraphElementCollections(loader.getVerticesByGraphVariables("g0"), loadedVertices);
-    validateEPGMGraphElementCollections(loader.getEdgesByGraphVariables("g0"), loadedEdges);
+    validateElements(graphHead, loadedGraphHeads.iterator().next());
+    validateElementCollections(loader.getVerticesByGraphVariables("g0"), loadedVertices);
+    validateElementCollections(loader.getEdgesByGraphVariables("g0"), loadedEdges);
+    validateGraphElementCollections(loader.getVerticesByGraphVariables("g0"), loadedVertices);
+    validateGraphElementCollections(loader.getEdgesByGraphVariables("g0"), loadedEdges);
   }
 
   /**

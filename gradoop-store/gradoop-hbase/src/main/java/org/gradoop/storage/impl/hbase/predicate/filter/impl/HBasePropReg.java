@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 /**
  * HBase property regex filter implementation
  *
- * @param <T> EPGM element type
+ * @param <T> element type
  */
 public class HBasePropReg<T extends Element> extends PropReg<HBaseElementFilter<T>>
   implements HBaseElementFilter<T> {

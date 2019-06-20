@@ -25,7 +25,7 @@ import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Creates an EPGM graph head representing a business transaction graphs.
+ * Creates an graph head representing a business transaction graphs.
  * @param <G> graph head type
  */
 public class NewBtgGraphHead<G extends GraphHead>

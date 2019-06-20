@@ -33,8 +33,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
-import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
 import static org.junit.Assert.assertEquals;
 
 public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestBase {
@@ -74,11 +74,11 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-    validateEPGMElementCollections(vertices, loadedVertices);
-    validateEPGMElementCollections(edges, loadedEdges);
-    validateEPGMGraphElementCollections(vertices, loadedVertices);
-    validateEPGMGraphElementCollections(edges, loadedEdges);
+    validateElementCollections(graphHeads, loadedGraphHeads);
+    validateElementCollections(vertices, loadedVertices);
+    validateElementCollections(edges, loadedEdges);
+    validateGraphElementCollections(vertices, loadedVertices);
+    validateGraphElementCollections(edges, loadedEdges);
   }
 
   @Test
@@ -113,11 +113,11 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(loader.getGraphHeads(), loadedGraphHeads);
-    validateEPGMElementCollections(loader.getVertices(), loadedVertices);
-    validateEPGMElementCollections(loader.getEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(loader.getVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(loader.getEdges(), loadedEdges);
+    validateElementCollections(loader.getGraphHeads(), loadedGraphHeads);
+    validateElementCollections(loader.getVertices(), loadedVertices);
+    validateElementCollections(loader.getEdges(), loadedEdges);
+    validateGraphElementCollections(loader.getVertices(), loadedVertices);
+    validateGraphElementCollections(loader.getEdges(), loadedEdges);
   }
 
   @Test
@@ -140,11 +140,11 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(loader.getGraphHeads(), loadedGraphHeads);
-    validateEPGMElementCollections(loader.getVertices(), loadedVertices);
-    validateEPGMElementCollections(loader.getEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(loader.getVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(loader.getEdges(), loadedEdges);
+    validateElementCollections(loader.getGraphHeads(), loadedGraphHeads);
+    validateElementCollections(loader.getVertices(), loadedVertices);
+    validateElementCollections(loader.getEdges(), loadedEdges);
+    validateGraphElementCollections(loader.getVertices(), loadedVertices);
+    validateGraphElementCollections(loader.getEdges(), loadedEdges);
   }
 
   @Test
@@ -166,11 +166,11 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(loader.getGraphHeads(), loadedGraphHeads);
-    validateEPGMElementCollections(loader.getVertices(), loadedVertices);
-    validateEPGMElementCollections(loader.getEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(loader.getVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(loader.getEdges(), loadedEdges);
+    validateElementCollections(loader.getGraphHeads(), loadedGraphHeads);
+    validateElementCollections(loader.getVertices(), loadedVertices);
+    validateElementCollections(loader.getEdges(), loadedEdges);
+    validateGraphElementCollections(loader.getVertices(), loadedVertices);
+    validateGraphElementCollections(loader.getEdges(), loadedEdges);
   }
 
   @Test
@@ -203,11 +203,11 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(loader.getGraphHeadsByVariables("g0", "g1", "g2"), loadedGraphHeads);
-    validateEPGMElementCollections(loader.getVerticesByGraphVariables("g0", "g1", "g2"), loadedVertices);
-    validateEPGMElementCollections(loader.getEdgesByGraphVariables("g0", "g1", "g2"), loadedEdges);
-    validateEPGMGraphElementCollections(loader.getVerticesByGraphVariables("g0", "g1", "g2"), loadedVertices);
-    validateEPGMGraphElementCollections(loader.getEdgesByGraphVariables("g0", "g1", "g2"), loadedEdges);
+    validateElementCollections(loader.getGraphHeadsByVariables("g0", "g1", "g2"), loadedGraphHeads);
+    validateElementCollections(loader.getVerticesByGraphVariables("g0", "g1", "g2"), loadedVertices);
+    validateElementCollections(loader.getEdgesByGraphVariables("g0", "g1", "g2"), loadedEdges);
+    validateGraphElementCollections(loader.getVerticesByGraphVariables("g0", "g1", "g2"), loadedVertices);
+    validateGraphElementCollections(loader.getEdgesByGraphVariables("g0", "g1", "g2"), loadedEdges);
   }
 
   @Test

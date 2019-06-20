@@ -54,8 +54,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
-import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
 import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -192,11 +192,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
-    validateEPGMElementCollections(getSocialVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(getSocialVertices(), loadedVertices);
-    validateEPGMElementCollections(getSocialEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(getSocialEdges(), loadedEdges);
+    validateElementCollections(getSocialGraphHeads(), loadedGraphHeads);
+    validateElementCollections(getSocialVertices(), loadedVertices);
+    validateGraphElementCollections(getSocialVertices(), loadedVertices);
+    validateElementCollections(getSocialEdges(), loadedEdges);
+    validateGraphElementCollections(getSocialEdges(), loadedEdges);
   }
 
   /**
@@ -232,11 +232,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
-    validateEPGMElementCollections(getSocialVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(getSocialVertices(), loadedVertices);
-    validateEPGMElementCollections(getSocialEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(getSocialEdges(), loadedEdges);
+    validateElementCollections(getSocialGraphHeads(), loadedGraphHeads);
+    validateElementCollections(getSocialVertices(), loadedVertices);
+    validateGraphElementCollections(getSocialVertices(), loadedVertices);
+    validateElementCollections(getSocialEdges(), loadedEdges);
+    validateGraphElementCollections(getSocialEdges(), loadedEdges);
 
   }
 
@@ -267,11 +267,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
     Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
-    validateEPGMElementCollections(testGraphs, loadedGraphHeads);
-    validateEPGMElementCollections(getSocialVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(getSocialVertices(), loadedVertices);
-    validateEPGMElementCollections(getSocialEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(getSocialEdges(), loadedEdges);
+    validateElementCollections(testGraphs, loadedGraphHeads);
+    validateElementCollections(getSocialVertices(), loadedVertices);
+    validateGraphElementCollections(getSocialVertices(), loadedVertices);
+    validateElementCollections(getSocialEdges(), loadedEdges);
+    validateGraphElementCollections(getSocialEdges(), loadedEdges);
   }
 
   /**
@@ -302,11 +302,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
     Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
-    validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
-    validateEPGMElementCollections(testVertices, loadedVertices);
-    validateEPGMGraphElementCollections(testVertices, loadedVertices);
-    validateEPGMElementCollections(getSocialEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(getSocialEdges(), loadedEdges);
+    validateElementCollections(getSocialGraphHeads(), loadedGraphHeads);
+    validateElementCollections(testVertices, loadedVertices);
+    validateGraphElementCollections(testVertices, loadedVertices);
+    validateElementCollections(getSocialEdges(), loadedEdges);
+    validateGraphElementCollections(getSocialEdges(), loadedEdges);
   }
 
   /**
@@ -337,11 +337,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
     Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
-    validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
-    validateEPGMElementCollections(getSocialVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(getSocialVertices(), loadedVertices);
-    validateEPGMElementCollections(testEdges, loadedEdges);
-    validateEPGMGraphElementCollections(testEdges, loadedEdges);
+    validateElementCollections(getSocialGraphHeads(), loadedGraphHeads);
+    validateElementCollections(getSocialVertices(), loadedVertices);
+    validateGraphElementCollections(getSocialVertices(), loadedVertices);
+    validateElementCollections(testEdges, loadedEdges);
+    validateGraphElementCollections(testEdges, loadedEdges);
   }
 
   /**
@@ -395,11 +395,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
     Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
-    validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-    validateEPGMElementCollections(vertices, loadedVertices);
-    validateEPGMGraphElementCollections(vertices, loadedVertices);
-    validateEPGMElementCollections(edges, loadedEdges);
-    validateEPGMGraphElementCollections(edges, loadedEdges);
+    validateElementCollections(graphHeads, loadedGraphHeads);
+    validateElementCollections(vertices, loadedVertices);
+    validateGraphElementCollections(vertices, loadedVertices);
+    validateElementCollections(edges, loadedEdges);
+    validateGraphElementCollections(edges, loadedEdges);
   }
 
   /**
@@ -449,11 +449,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
     Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
-    validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-    validateEPGMElementCollections(vertices, loadedVertices);
-    validateEPGMGraphElementCollections(vertices, loadedVertices);
-    validateEPGMElementCollections(edges, loadedEdges);
-    validateEPGMGraphElementCollections(edges, loadedEdges);
+    validateElementCollections(graphHeads, loadedGraphHeads);
+    validateElementCollections(vertices, loadedVertices);
+    validateGraphElementCollections(vertices, loadedVertices);
+    validateElementCollections(edges, loadedEdges);
+    validateGraphElementCollections(edges, loadedEdges);
   }
 
   /**
@@ -511,11 +511,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
     Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
-    validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-    validateEPGMElementCollections(vertices, loadedVertices);
-    validateEPGMGraphElementCollections(vertices, loadedVertices);
-    validateEPGMElementCollections(edges, loadedEdges);
-    validateEPGMGraphElementCollections(edges, loadedEdges);
+    validateElementCollections(graphHeads, loadedGraphHeads);
+    validateElementCollections(vertices, loadedVertices);
+    validateGraphElementCollections(vertices, loadedVertices);
+    validateElementCollections(edges, loadedEdges);
+    validateGraphElementCollections(edges, loadedEdges);
   }
 
   /**
@@ -579,11 +579,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     Collection<EPGMVertex> loadedVertices = graphCollection.getVertices().collect();
     Collection<EPGMEdge> loadedEdges = graphCollection.getEdges().collect();
 
-    validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-    validateEPGMElementCollections(vertices, loadedVertices);
-    validateEPGMGraphElementCollections(vertices, loadedVertices);
-    validateEPGMElementCollections(edges, loadedEdges);
-    validateEPGMGraphElementCollections(edges, loadedEdges);
+    validateElementCollections(graphHeads, loadedGraphHeads);
+    validateElementCollections(vertices, loadedVertices);
+    validateGraphElementCollections(vertices, loadedVertices);
+    validateElementCollections(edges, loadedEdges);
+    validateGraphElementCollections(edges, loadedEdges);
   }
 
   /**
@@ -647,11 +647,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     assertEquals(2, loadedEdges.size());
     assertEquals(2, loadedVertices.size());
 
-    validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-    validateEPGMElementCollections(vertices, loadedVertices);
-    validateEPGMGraphElementCollections(vertices, loadedVertices);
-    validateEPGMElementCollections(edges, loadedEdges);
-    validateEPGMGraphElementCollections(edges, loadedEdges);
+    validateElementCollections(graphHeads, loadedGraphHeads);
+    validateElementCollections(vertices, loadedVertices);
+    validateGraphElementCollections(vertices, loadedVertices);
+    validateElementCollections(edges, loadedEdges);
+    validateGraphElementCollections(edges, loadedEdges);
   }
 
   /**
@@ -722,11 +722,11 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     assertEquals(21, loadedEdges.size());
     assertEquals(3, loadedVertices.size());
 
-    validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-    validateEPGMElementCollections(vertices, loadedVertices);
-    validateEPGMGraphElementCollections(vertices, loadedVertices);
-    validateEPGMElementCollections(edges, loadedEdges);
-    validateEPGMGraphElementCollections(edges, loadedEdges);
+    validateElementCollections(graphHeads, loadedGraphHeads);
+    validateElementCollections(vertices, loadedVertices);
+    validateGraphElementCollections(vertices, loadedVertices);
+    validateElementCollections(edges, loadedEdges);
+    validateGraphElementCollections(edges, loadedEdges);
   }
 
   /**
@@ -775,25 +775,25 @@ public class HBaseDataSinkSourceTest extends GradoopFlinkTestBase {
     // read social network from HBase
 
     // graph heads
-    validateEPGMElementCollections(
+    validateElementCollections(
       loader.getGraphHeads(),
       newStore.getGraphSpace().readRemainsAndClose()
     );
     // vertices
-    validateEPGMElementCollections(
+    validateElementCollections(
       loader.getVertices(),
       newStore.getVertexSpace().readRemainsAndClose()
     );
-    validateEPGMGraphElementCollections(
+    validateGraphElementCollections(
       loader.getVertices(),
       newStore.getVertexSpace().readRemainsAndClose()
     );
     // edges
-    validateEPGMElementCollections(
+    validateElementCollections(
       loader.getEdges(),
       newStore.getEdgeSpace().readRemainsAndClose()
     );
-    validateEPGMGraphElementCollections(
+    validateGraphElementCollections(
       loader.getEdges(),
       newStore.getEdgeSpace().readRemainsAndClose()
     );

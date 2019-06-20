@@ -53,7 +53,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
       "(s2)-[e22:edge2]->(t2)" +
       "]" +
       "input2:test [" +
-      "(v:EPGMVertex {t: 1})-->(v)" +
+      "(v:Vertex {t: 1})-->(v)" +
       "]");
 
   /**
@@ -156,7 +156,7 @@ public class PropagatePropertyToNeighborTest extends GradoopFlinkTestBase {
   @Test
   public void testPropagateInLoops() throws Exception {
     LogicalGraph input = loader.getLogicalGraphByVariable("input2");
-    UnaryGraphToGraphOperator operator = new PropagatePropertyToNeighbor("EPGMVertex", "t", "t");
+    UnaryGraphToGraphOperator operator = new PropagatePropertyToNeighbor("Vertex", "t", "t");
     LogicalGraph expected = input.transformVertices((v, c) -> {
       v.setProperty("t", Collections.singletonList(PropertyValue.create(1L)));
       return v;
