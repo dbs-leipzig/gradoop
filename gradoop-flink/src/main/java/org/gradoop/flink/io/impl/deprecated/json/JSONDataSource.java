@@ -19,9 +19,9 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToEdge;
 import org.gradoop.flink.io.impl.deprecated.json.functions.JSONToGraphHead;
@@ -80,23 +80,23 @@ public class JSONDataSource extends JSONBase implements DataSource {
     GraphCollectionFactory factory = getConfig().getGraphCollectionFactory();
 
     // used for type hinting when loading vertex data
-    TypeInformation<Vertex> vertexTypeInfo = TypeExtractor
+    TypeInformation<EPGMVertex> vertexTypeInfo = TypeExtractor
       .createTypeInfo(factory.getVertexFactory().getType());
     // used for type hinting when loading edge data
-    TypeInformation<Edge> edgeTypeInfo = TypeExtractor
+    TypeInformation<EPGMEdge> edgeTypeInfo = TypeExtractor
       .createTypeInfo(factory.getEdgeFactory().getType());
     // used for type hinting when loading graph data
-    TypeInformation<GraphHead> graphTypeInfo = TypeExtractor
+    TypeInformation<EPGMGraphHead> graphTypeInfo = TypeExtractor
       .createTypeInfo(factory.getGraphHeadFactory().getType());
 
     // read vertex, edge and graph data
-    DataSet<Vertex> vertices = env.readTextFile(getVertexPath())
+    DataSet<EPGMVertex> vertices = env.readTextFile(getVertexPath())
       .map(new JSONToVertex(factory.getVertexFactory()))
       .returns(vertexTypeInfo);
-    DataSet<Edge> edges = env.readTextFile(getEdgePath())
+    DataSet<EPGMEdge> edges = env.readTextFile(getEdgePath())
       .map(new JSONToEdge(factory.getEdgeFactory()))
       .returns(edgeTypeInfo);
-    DataSet<GraphHead> graphHeads;
+    DataSet<EPGMGraphHead> graphHeads;
     if (getGraphHeadPath() != null) {
       graphHeads = env.readTextFile(getGraphHeadPath())
         .map(new JSONToGraphHead(factory.getGraphHeadFactory()))

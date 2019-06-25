@@ -21,8 +21,8 @@ import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.log4j.Logger;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -54,7 +54,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
 /**
- * Vertex-centric Dual-Simulation.
+ * EPGMVertex-centric Dual-Simulation.
  */
 public class DualSimulation extends PatternMatching {
 
@@ -283,11 +283,11 @@ public class DualSimulation extends PatternMatching {
     DataSet<FatVertex> vertices) {
     GradoopFlinkConfig config = graph.getConfig();
 
-    DataSet<Vertex> matchVertices = doAttachData() ?
+    DataSet<EPGMVertex> matchVertices = doAttachData() ?
       PostProcessor.extractVerticesWithData(vertices, graph.getVertices()) :
       PostProcessor.extractVertices(vertices, graph.getFactory().getVertexFactory());
 
-    DataSet<Edge> matchEdges = doAttachData() ?
+    DataSet<EPGMEdge> matchEdges = doAttachData() ?
       PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :
       PostProcessor.extractEdges(vertices, graph.getFactory().getEdgeFactory());
 

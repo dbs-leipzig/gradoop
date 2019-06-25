@@ -18,13 +18,13 @@ package org.gradoop.flink.model.impl.operators.cypher.capf.query.functions;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
- * Function filters tuples by the label of the {@link Vertex} in the second field.
+ * Function filters tuples by the label of the {@link EPGMVertex} in the second field.
  */
 @FunctionAnnotation.ReadFields("f1")
-public class VertexLabelFilter implements FilterFunction<Tuple2<Long, Vertex>> {
+public class VertexLabelFilter implements FilterFunction<Tuple2<Long, EPGMVertex>> {
 
   /**
    * The label to be filtered for.
@@ -41,7 +41,7 @@ public class VertexLabelFilter implements FilterFunction<Tuple2<Long, Vertex>> {
   }
 
   @Override
-  public boolean filter(Tuple2<Long, Vertex> tuple) throws Exception {
+  public boolean filter(Tuple2<Long, EPGMVertex> tuple) throws Exception {
     return tuple.f1.getLabel().equals(label);
   }
 }

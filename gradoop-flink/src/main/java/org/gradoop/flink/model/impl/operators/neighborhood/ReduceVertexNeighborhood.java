@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.neighborhood;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -46,7 +46,7 @@ public class ReduceVertexNeighborhood extends VertexNeighborhood {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    DataSet<Vertex> vertices;
+    DataSet<EPGMVertex> vertices;
     switch (getDirection()) {
     case IN:
       // takes edges and gets the corresponding vertices and applies the aggregate function for
@@ -61,9 +61,9 @@ public class ReduceVertexNeighborhood extends VertexNeighborhood {
         .join(graph.getVertices())
         // replace the first id with the vertex
         .where(0).equalTo(new Id<>())
-        .with(new VertexToFieldZero<GradoopId, Vertex>())
+        .with(new VertexToFieldZero<GradoopId, EPGMVertex>())
         // group by the target vertex
-        .groupBy(new IdInTuple<Tuple2<Vertex, Vertex>>(1))
+        .groupBy(new IdInTuple<Tuple2<EPGMVertex, EPGMVertex>>(1))
         // aggregate values
         .reduceGroup(new NeighborVertexReduceFunction((VertexAggregateFunction) getFunction()));
       break;
@@ -80,9 +80,9 @@ public class ReduceVertexNeighborhood extends VertexNeighborhood {
         .join(graph.getVertices())
         // replace the first id with the vertex
         .where(0).equalTo(new Id<>())
-        .with(new VertexToFieldZero<GradoopId, Vertex>())
+        .with(new VertexToFieldZero<GradoopId, EPGMVertex>())
         // group by the target vertex
-        .groupBy(new IdInTuple<Tuple2<Vertex, Vertex>>(1))
+        .groupBy(new IdInTuple<Tuple2<EPGMVertex, EPGMVertex>>(1))
         // aggregate values
         .reduceGroup(new NeighborVertexReduceFunction((VertexAggregateFunction) getFunction()));
       break;
@@ -99,8 +99,8 @@ public class ReduceVertexNeighborhood extends VertexNeighborhood {
         .join(graph.getVertices())
         .where(0).equalTo(new Id<>())
         // replace the first id with the vertex
-        .with(new VertexToFieldZero<GradoopId, Vertex>())
-        .groupBy(new IdInTuple<Tuple2<Vertex, Vertex>>(1))
+        .with(new VertexToFieldZero<GradoopId, EPGMVertex>())
+        .groupBy(new IdInTuple<Tuple2<EPGMVertex, EPGMVertex>>(1))
         // aggregate values
         .reduceGroup(new NeighborVertexReduceFunction((VertexAggregateFunction) getFunction()));
       break;

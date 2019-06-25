@@ -18,9 +18,9 @@ package org.gradoop.dataintegration.transformation.impl.functions;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import java.util.List;
  * A {@link GroupReduceFunction} that creates one new vertex and adds all origin Ids to a {@link List}
  * for later use. This function reduces the amount of equal property values significantly.
  */
-public class CreateNewVertexWithEqualityCondense implements GroupReduceFunction<Tuple2<PropertyValue, GradoopId>, Tuple2<Vertex, List<GradoopId>>> {
+public class CreateNewVertexWithEqualityCondense implements GroupReduceFunction<Tuple2<PropertyValue, GradoopId>, Tuple2<EPGMVertex, List<GradoopId>>> {
 
   /**
    * The new vertex label.
@@ -45,12 +45,12 @@ public class CreateNewVertexWithEqualityCondense implements GroupReduceFunction<
   /**
    * The factory new vertices are created with.
    */
-  private final EPGMVertexFactory<Vertex> vertexFactory;
+  private final VertexFactory<EPGMVertex> vertexFactory;
 
   /**
     * Reduce object instantiation.
     */
-  private final Tuple2<Vertex, List<GradoopId>> reuseTuple;
+  private final Tuple2<EPGMVertex, List<GradoopId>> reuseTuple;
 
   /**
    * The constructor for condensation of same property values to one newly created vertex.
@@ -59,8 +59,7 @@ public class CreateNewVertexWithEqualityCondense implements GroupReduceFunction<
    * @param newVertexLabel  The new vertex label.
    * @param newPropertyName The new property key.
    */
-  public CreateNewVertexWithEqualityCondense(EPGMVertexFactory<Vertex> factory,
-                                             String newVertexLabel,
+  public CreateNewVertexWithEqualityCondense(VertexFactory<EPGMVertex> factory, String newVertexLabel,
                                              String newPropertyName) {
     this.vertexFactory = factory;
     this.newVertexLabel = newVertexLabel;
@@ -71,7 +70,7 @@ public class CreateNewVertexWithEqualityCondense implements GroupReduceFunction<
 
   @Override
   public void reduce(Iterable<Tuple2<PropertyValue, GradoopId>> values,
-                     Collector<Tuple2<Vertex, List<GradoopId>>> out) {
+                     Collector<Tuple2<EPGMVertex, List<GradoopId>>> out) {
     List<GradoopId> sources = new ArrayList<>();
     PropertyValue pv = null;
 
@@ -83,7 +82,7 @@ public class CreateNewVertexWithEqualityCondense implements GroupReduceFunction<
       }
     }
 
-    Vertex vertex = vertexFactory.createVertex(newVertexLabel);
+    EPGMVertex vertex = vertexFactory.createVertex(newVertexLabel);
     vertex.setProperty(newPropertyName, pv);
 
     reuseTuple.f0 = vertex;

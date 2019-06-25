@@ -18,7 +18,7 @@ package org.gradoop.flink.algorithms.gelly.functions;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * Maps EPGM edge to a Gelly edge consisting of EPGM source and target
@@ -40,7 +40,7 @@ public class EdgeToGellyEdgeWithNullValue implements EdgeToGellyEdge<NullValue> 
   }
 
   @Override
-  public org.apache.flink.graph.Edge<GradoopId, NullValue> map(Edge epgmEdge)
+  public org.apache.flink.graph.Edge<GradoopId, NullValue> map(EPGMEdge epgmEdge)
       throws Exception {
     reuseEdge.setSource(epgmEdge.getSourceId());
     reuseEdge.setTarget(epgmEdge.getTargetId());

@@ -15,16 +15,37 @@
  */
 package org.gradoop.common.model.api.entities;
 
+import org.gradoop.common.model.impl.id.GradoopId;
+
 /**
- * Base interfaces for all EPGM factories.
- *
- * @param <EL> EPGM element type
+ * Describes data assigned to an edge.
  */
-public interface EPGMElementFactory<EL extends EPGMElement> {
+public interface Edge extends GraphElement {
   /**
-   * Returns the type of the instances produced by that factory.
+   * Returns the source vertex identifier.
    *
-   * @return produced entity type
+   * @return source vertex id
    */
-  Class<EL> getType();
+  GradoopId getSourceId();
+
+  /**
+   * Sets the source vertex identifier.
+   *
+   * @param sourceId source vertex id
+   */
+  void setSourceId(GradoopId sourceId);
+
+  /**
+   * Returns the target vertex identifier.
+   *
+   * @return target vertex id
+   */
+  GradoopId getTargetId();
+
+  /**
+   * Sets the target vertex identifier.
+   *
+   * @param targetId target vertex id.
+   */
+  void setTargetId(GradoopId targetId);
 }

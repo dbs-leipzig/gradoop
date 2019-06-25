@@ -19,10 +19,10 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.hadoop.conf.Configuration;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -81,17 +81,16 @@ public class LogicalGraphIndexedCSVDataSource extends LogicalGraphCSVBase implem
     MetaData metaData = MetaData.fromFile(getMetaDataPath(), hdfsConfig);
 
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-    EPGMVertexFactory<Vertex> vertexFactory = getConfig().getLogicalGraphFactory()
-      .getVertexFactory();
-    EPGMEdgeFactory<Edge> edgeFactory = getConfig().getLogicalGraphFactory().getEdgeFactory();
+    VertexFactory<EPGMVertex> vertexFactory = getConfig().getLogicalGraphFactory().getVertexFactory();
+    EdgeFactory<EPGMEdge> edgeFactory = getConfig().getLogicalGraphFactory().getEdgeFactory();
 
-    Map<String, DataSet<Vertex>> vertices = metaData.getVertexLabels().stream()
+    Map<String, DataSet<EPGMVertex>> vertices = metaData.getVertexLabels().stream()
       .map(l -> Tuple2.of(l, env.readTextFile(getVertexCSVPath(l))
         .map(new CSVLineToVertex(vertexFactory))
         .withBroadcastSet(MetaData.fromFile(getMetaDataPath(), getConfig()), BC_METADATA)))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
 
-    Map<String, DataSet<Edge>> edges = metaData.getEdgeLabels().stream()
+    Map<String, DataSet<EPGMEdge>> edges = metaData.getEdgeLabels().stream()
       .map(l -> Tuple2.of(l, env.readTextFile(getEdgeCSVPath(l))
         .map(new CSVLineToEdge(edgeFactory))
         .withBroadcastSet(MetaData.fromFile(getMetaDataPath(), getConfig()), BC_METADATA)))

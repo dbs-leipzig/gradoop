@@ -25,9 +25,9 @@ import org.apache.flink.table.calcite.CalciteConfig;
 import org.apache.flink.table.calcite.CalciteConfigBuilder;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AddGradoopIdToRow;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AddNewGraphs;
@@ -80,12 +80,12 @@ public class CAPFQueryResult {
   /**
    * Mapping between the long ids and the original vertices.
    */
-  private DataSet<Tuple2<Long, Vertex>> verticesWithIds;
+  private DataSet<Tuple2<Long, EPGMVertex>> verticesWithIds;
 
   /**
    * Mapping between the long ids and the original edges.
    */
-  private DataSet<Tuple2<Long, Edge>> edgesWithIds;
+  private DataSet<Tuple2<Long, EPGMEdge>> edgesWithIds;
 
   /**
    * The GradoopFlinkConfig.
@@ -102,8 +102,8 @@ public class CAPFQueryResult {
    */
   public CAPFQueryResult(
     CypherResult result,
-    DataSet<Tuple2<Long, Vertex>> verticesWithIds,
-    DataSet<Tuple2<Long, Edge>> edgesWithIds,
+    DataSet<Tuple2<Long, EPGMVertex>> verticesWithIds,
+    DataSet<Tuple2<Long, EPGMEdge>> edgesWithIds,
     GradoopFlinkConfig config) {
     this.records = (CAPFRecords) result.records();
     this.verticesWithIds = verticesWithIds;
@@ -197,7 +197,7 @@ public class CAPFQueryResult {
     int entityFieldsCount = nodeVars.size() + relVars.size();
     int otherFieldsCount = otherVars.size();
 
-    DataSet<GraphHead> graphHeads = rowsWithNewIds
+    DataSet<EPGMGraphHead> graphHeads = rowsWithNewIds
       .map(new CreateGraphHeadWithProperties(
         entityFieldsCount,
         entityFieldsCount + otherFieldsCount,
@@ -210,14 +210,14 @@ public class CAPFQueryResult {
       .groupBy(0)
       .reduceGroup(new AggregateGraphs<>());
 
-    DataSet<Vertex> vertices =
+    DataSet<EPGMVertex> vertices =
       rowsWithGraphIdSets
         .join(verticesWithIds)
         .where(0)
         .equalTo(0)
         .with(new AddNewGraphs<>());
 
-    DataSet<Edge> edges =
+    DataSet<EPGMEdge> edges =
       rowsWithGraphIdSets
         .join(edgesWithIds)
         .where(0)

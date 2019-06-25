@@ -18,8 +18,8 @@ package org.gradoop.flink.io.impl.deprecated.json.functions;
 import org.apache.flink.api.java.io.TextOutputFormat;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.impl.deprecated.json.JSONConstants;
-import org.gradoop.common.model.impl.pojo.Vertex;
 
 /**
  * Converts a vertex into the following format:
@@ -32,7 +32,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  *
  * @param <V> EPGM vertex type
  */
-public class VertexToJSON<V extends Vertex>
+public class VertexToJSON<V extends EPGMVertex>
   extends EntityToJSON
   implements TextOutputFormat.TextFormatter<V> {
 

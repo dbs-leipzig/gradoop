@@ -19,13 +19,13 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.io.impl.tlf.TLFConstants;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -48,15 +48,15 @@ public class GraphTransactionFromText
   /**
    * Graph head factory.
    */
-  private EPGMGraphHeadFactory<GraphHead> graphHeadFactory;
+  private GraphHeadFactory<EPGMGraphHead> graphHeadFactory;
   /**
-   * Vertex factory.
+   * EPGMVertex factory.
    */
-  private EPGMVertexFactory<Vertex> vertexFactory;
+  private VertexFactory<EPGMVertex> vertexFactory;
   /**
-   * Edge factory.
+   * EPGMEdge factory.
    */
-  private EPGMEdgeFactory<Edge> edgeFactory;
+  private EdgeFactory<EPGMEdge> edgeFactory;
 
   /**
    * Valued constructor.
@@ -79,9 +79,9 @@ public class GraphTransactionFromText
   @Override
   public GraphTransaction map(Tuple2<LongWritable, Text> inputTuple) throws Exception {
     Map<Long, GradoopId> idMap = new HashMap<>();
-    Set<Vertex> vertices = new HashSet<>();
-    Set<Edge> edges = new HashSet<>();
-    GraphHead graphHead = null;
+    Set<EPGMVertex> vertices = new HashSet<>();
+    Set<EPGMEdge> edges = new HashSet<>();
+    EPGMGraphHead graphHead = null;
 
     String[] lines = inputTuple.f1.toString().split("\\R", -1);
     for (int i = 0; i < lines.length; i++) {
@@ -94,12 +94,12 @@ public class GraphTransactionFromText
 
       } else if (TLFConstants.VERTEX_SYMBOL.equals(fields[0])) {
         idMap.put(Long.valueOf(fields[1]), gradoopId);
-        Vertex vertex = vertexFactory.initVertex(gradoopId, getLabel(fields, 2));
+        EPGMVertex vertex = vertexFactory.initVertex(gradoopId, getLabel(fields, 2));
         vertex.addGraphId(graphHead.getId());
         vertices.add(vertex);
 
       } else if (TLFConstants.EDGE_SYMBOL.equals(fields[0])) {
-        Edge edge = edgeFactory.initEdge(gradoopId,
+        EPGMEdge edge = edgeFactory.initEdge(gradoopId,
           getLabel(fields, 3),
           idMap.get(Long.valueOf(fields[1])),
           idMap.get(Long.valueOf(fields[2]))

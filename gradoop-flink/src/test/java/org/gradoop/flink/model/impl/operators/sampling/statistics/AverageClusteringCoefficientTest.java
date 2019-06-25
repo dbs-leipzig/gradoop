@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling.statistics;
 
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.statistics.AverageClusteringCoefficient;
@@ -82,7 +82,7 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
     LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient());
     validateGraphProperties(result);
 
-    GraphHead head = result.getGraphHead().collect().get(0);
+    EPGMGraphHead head = result.getGraphHead().collect().get(0);
 
     assertEquals("Wrong average value for fully connected graph, should be 1",
       1d, head.getPropertyValue(AverageClusteringCoefficient.PROPERTY_KEY_AVERAGE)
@@ -99,7 +99,7 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
     LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient());
     validateGraphProperties(result);
 
-    GraphHead head = result.getGraphHead().collect().get(0);
+    EPGMGraphHead head = result.getGraphHead().collect().get(0);
 
     double average = head.getPropertyValue(AverageClusteringCoefficient.PROPERTY_KEY_AVERAGE)
       .getDouble();
@@ -117,7 +117,7 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
     LogicalGraph result = graph.callForGraph(new AverageClusteringCoefficient());
     validateGraphProperties(result);
 
-    GraphHead head = result.getGraphHead().collect().get(0);
+    EPGMGraphHead head = result.getGraphHead().collect().get(0);
 
     double average = head.getPropertyValue(AverageClusteringCoefficient.PROPERTY_KEY_AVERAGE)
       .getDouble();
@@ -131,7 +131,7 @@ public class AverageClusteringCoefficientTest extends GradoopFlinkTestBase {
    * @param graph Graph with properties
    */
   private void validateGraphProperties(LogicalGraph graph) throws Exception {
-    GraphHead head = graph.getGraphHead().collect().get(0);
+    EPGMGraphHead head = graph.getGraphHead().collect().get(0);
     assertTrue("No average value stored in graph head",
       head.hasProperty(AverageClusteringCoefficient.PROPERTY_KEY_AVERAGE));
   }

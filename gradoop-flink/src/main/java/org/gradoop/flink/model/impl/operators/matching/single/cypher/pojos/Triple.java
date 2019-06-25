@@ -18,14 +18,14 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * This class represents a Triple.
  * A Triple represents an edge extended with information about the source and target vertex.
  */
-public class Triple extends Tuple3<Vertex, Edge, Vertex> {
+public class Triple extends Tuple3<EPGMVertex, EPGMEdge, EPGMVertex> {
 
   /**
    * Default Constructor
@@ -40,7 +40,7 @@ public class Triple extends Tuple3<Vertex, Edge, Vertex> {
    * @param edge edge
    * @param targetVertex target vertex
    */
-  public Triple(Vertex sourceVertex, Edge edge, Vertex targetVertex) {
+  public Triple(EPGMVertex sourceVertex, EPGMEdge edge, EPGMVertex targetVertex) {
     super(sourceVertex, edge, targetVertex);
     requireValidTriple(sourceVertex, edge, targetVertex);
   }
@@ -49,7 +49,7 @@ public class Triple extends Tuple3<Vertex, Edge, Vertex> {
    * Returns the source vertex.
    * @return source vertex
    */
-  public Vertex getSourceVertex() {
+  public EPGMVertex getSourceVertex() {
     return f0;
   }
 
@@ -57,7 +57,7 @@ public class Triple extends Tuple3<Vertex, Edge, Vertex> {
    * returns the edge
    * @return edge
    */
-  public Edge getEdge() {
+  public EPGMEdge getEdge() {
     return f1;
   }
 
@@ -65,7 +65,7 @@ public class Triple extends Tuple3<Vertex, Edge, Vertex> {
    * Returns the target vertex
    * @return target vertex
    */
-  public Vertex getTargetVertex() {
+  public EPGMVertex getTargetVertex() {
     return f2;
   }
 
@@ -100,7 +100,8 @@ public class Triple extends Tuple3<Vertex, Edge, Vertex> {
    * @param edge edge
    * @param targetVertex target vertex
    */
-  private static void requireValidTriple(Vertex sourceVertex, Edge edge, Vertex targetVertex) {
+  private static void requireValidTriple(
+    EPGMVertex sourceVertex, EPGMEdge edge, EPGMVertex targetVertex) {
     if (sourceVertex.getId() != edge.getSourceId()) {
       throw new IllegalArgumentException("Source IDs do not match");
     }

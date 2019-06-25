@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
@@ -27,13 +27,13 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
  *
  * @param <T> value type
  */
-public class VertexValueDistribution<T> extends ValueDistribution<Vertex, T> {
+public class VertexValueDistribution<T> extends ValueDistribution<EPGMVertex, T> {
   /**
    * Constructor
    *
    * @param valueFunction extracts a value from a vertex
    */
-  public VertexValueDistribution(MapFunction<Vertex, T> valueFunction) {
+  public VertexValueDistribution(MapFunction<EPGMVertex, T> valueFunction) {
     super(valueFunction);
   }
 

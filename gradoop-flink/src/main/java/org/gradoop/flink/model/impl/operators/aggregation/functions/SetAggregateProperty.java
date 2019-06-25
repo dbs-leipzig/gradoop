@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
@@ -33,7 +33,7 @@ import java.util.Set;
  * @param <G> The graph head type.
  */
 @FunctionAnnotation.ForwardedFields("id")
-public class SetAggregateProperty<G extends EPGMGraphHead>
+public class SetAggregateProperty<G extends GraphHead>
   extends RichMapFunction<G, G> {
 
   /**

@@ -24,7 +24,7 @@ import org.junit.Test;
 
 public class NeighborhoodTest extends GradoopFlinkTestBase {
 
-  // Reduce on Edge Tests
+  // Reduce on EPGMEdge Tests
 
   @Test
   public void testReduceOnEdgesSumAggIncEdge() throws Exception {

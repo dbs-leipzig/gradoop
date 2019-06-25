@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.api.layouts;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 
 /**
  * Base description of a graph / collection layout.
@@ -25,7 +25,7 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
  * @param <V> the vertex type
  * @param <E> the edge type
  */
-public interface Layout<V extends EPGMVertex, E extends EPGMEdge> {
+public interface Layout<V extends Vertex, E extends Edge> {
 
   /**
    * Returns all vertices.

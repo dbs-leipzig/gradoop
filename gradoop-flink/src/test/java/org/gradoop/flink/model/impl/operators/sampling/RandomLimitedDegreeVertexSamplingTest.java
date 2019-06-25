@@ -17,8 +17,8 @@ package org.gradoop.flink.model.impl.operators.sampling;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.functions.VertexDegree;
@@ -53,7 +53,7 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParameterizedTestForG
 
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
-    List<Vertex> dbDegreeVertices = Lists.newArrayList();
+    List<EPGMVertex> dbDegreeVertices = Lists.newArrayList();
     LogicalGraph inputWithDegrees = new DistinctVertexDegrees(
       VertexDegree.BOTH.getName(),
       VertexDegree.IN.getName(),
@@ -68,21 +68,21 @@ public class RandomLimitedDegreeVertexSamplingTest extends ParameterizedTestForG
     }
 
     dbEdges.removeAll(newEdges);
-    for (Edge edge : dbEdges) {
+    for (EPGMEdge edge : dbEdges) {
       assertFalse("edge from original graph was not sampled but source and target were",
         newVertexIDs.contains(edge.getSourceId()) &&
           newVertexIDs.contains(edge.getTargetId()));
     }
 
-    List<Vertex> verticesSampledByDegree = Lists.newArrayList();
-    for (Vertex vertex : dbDegreeVertices) {
+    List<EPGMVertex> verticesSampledByDegree = Lists.newArrayList();
+    for (EPGMVertex vertex : dbDegreeVertices) {
       if ((Long.parseLong(vertex.getPropertyValue(degreeType.getName()).toString()) > degreeThreshold) &&
         newVertices.contains(vertex)) {
         verticesSampledByDegree.add(vertex);
       }
     }
     dbDegreeVertices.removeAll(verticesSampledByDegree);
-    for (Vertex vertex : dbDegreeVertices) {
+    for (EPGMVertex vertex : dbDegreeVertices) {
       assertFalse("vertex with degree greater than degree threshold was not sampled",
         Long.parseLong(vertex.getPropertyValue(degreeType.getName()).toString()) > degreeThreshold);
     }

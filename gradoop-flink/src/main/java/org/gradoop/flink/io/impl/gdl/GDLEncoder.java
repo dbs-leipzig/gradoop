@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.io.impl.gdl;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  * @param <V> vertex type
  * @param <E> edge type
  */
-public class GDLEncoder<G extends EPGMGraphHead, V extends EPGMVertex, E extends EPGMEdge> {
+public class GDLEncoder<G extends GraphHead, V extends Vertex, E extends Edge> {
 
   /**
    * Marks the beginning of the definition of vertices and edges.

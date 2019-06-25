@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param <EL> element type
  */
 @FunctionAnnotation.ForwardedFields("label;properties")
-public class Clone<EL extends Element> implements MapFunction<EL, EL> {
+public class Clone<EL extends EPGMElement> implements MapFunction<EL, EL> {
 
   @Override
   public EL map(EL el) throws Exception {

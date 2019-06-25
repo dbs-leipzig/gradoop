@@ -17,8 +17,8 @@ package org.gradoop.dataintegration.transformation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.dataintegration.transformation.functions.EdgesFromLocalTransitiveClosure;
 import org.gradoop.dataintegration.transformation.impl.Neighborhood;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
@@ -74,15 +74,15 @@ public class VertexToEdge implements UnaryGraphToGraphOperator {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> incomingNeighborhood = Neighborhood
+    DataSet<Tuple2<EPGMVertex, List<NeighborhoodVertex>>> incomingNeighborhood = Neighborhood
       .getPerVertex(graph, graph.getVerticesByLabel(centralVertexLabel),
         Neighborhood.EdgeDirection.INCOMING);
 
-    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> outgoingNeighborhood = Neighborhood
+    DataSet<Tuple2<EPGMVertex, List<NeighborhoodVertex>>> outgoingNeighborhood = Neighborhood
       .getPerVertex(graph, graph.getVerticesByLabel(centralVertexLabel),
         Neighborhood.EdgeDirection.OUTGOING);
 
-    DataSet<Edge> newEdges = incomingNeighborhood
+    DataSet<EPGMEdge> newEdges = incomingNeighborhood
       .coGroup(outgoingNeighborhood)
       .where(new IdInTuple<>(0))
       .equalTo(new IdInTuple<>(0))

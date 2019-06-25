@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
@@ -28,7 +28,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
   */
 public class NeighborVertexReduceFunction
   extends NeighborVertexFunction
-  implements GroupReduceFunction<Tuple2<Vertex, Vertex>, Vertex> {
+  implements GroupReduceFunction<Tuple2<EPGMVertex, EPGMVertex>, EPGMVertex> {
 
   /**
    * Valued constructor.
@@ -40,16 +40,16 @@ public class NeighborVertexReduceFunction
   }
 
   @Override
-  public void reduce(Iterable<Tuple2<Vertex, Vertex>> tuples,
-    Collector<Vertex> collector) throws Exception {
+  public void reduce(Iterable<Tuple2<EPGMVertex, EPGMVertex>> tuples,
+    Collector<EPGMVertex> collector) throws Exception {
 
     PropertyValue propertyValue = PropertyValue.NULL_VALUE;
-    Vertex vertex = null;
-    Vertex edgeVertex;
+    EPGMVertex vertex = null;
+    EPGMVertex edgeVertex;
     boolean isFirst = true;
 
     // aggregates the value of each opposite vertex of an edge
-    for (Tuple2<Vertex, Vertex> tuple : tuples) {
+    for (Tuple2<EPGMVertex, EPGMVertex> tuple : tuples) {
       edgeVertex = tuple.f0;
       if (isFirst) {
         // the current vertex is the same for each tuple

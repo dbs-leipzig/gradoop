@@ -17,9 +17,9 @@ package org.gradoop.flink.io.impl.csv;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToEdge;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToGraphHead;
@@ -74,17 +74,17 @@ public class CSVDataSource extends CSVBase implements DataSource {
     DataSet<Tuple3<String, String, String>> metaData =
       new CSVMetaDataSource().readDistributed(getMetaDataPath(), getConfig());
 
-    DataSet<GraphHead> graphHeads = getConfig().getExecutionEnvironment()
+    DataSet<EPGMGraphHead> graphHeads = getConfig().getExecutionEnvironment()
       .readTextFile(getGraphHeadCSVPath())
       .map(new CSVLineToGraphHead(factory.getGraphHeadFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
-    DataSet<Vertex> vertices = getConfig().getExecutionEnvironment()
+    DataSet<EPGMVertex> vertices = getConfig().getExecutionEnvironment()
       .readTextFile(getVertexCSVPath())
       .map(new CSVLineToVertex(factory.getVertexFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
-    DataSet<Edge> edges = getConfig().getExecutionEnvironment()
+    DataSet<EPGMEdge> edges = getConfig().getExecutionEnvironment()
       .readTextFile(getEdgeCSVPath())
       .map(new CSVLineToEdge(factory.getEdgeFactory()))
       .withBroadcastSet(metaData, BC_METADATA);

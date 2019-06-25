@@ -22,14 +22,14 @@ import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.accumulo.core.client.Connector;
 import org.gradoop.common.GradoopTestUtils;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -79,10 +79,10 @@ import static org.gradoop.common.GradoopTestUtils.SHORT_VAL_e;
 import static org.gradoop.common.GradoopTestUtils.STRING_VAL_6;
 import static org.gradoop.common.GradoopTestUtils.SUPPORTED_PROPERTIES;
 import static org.gradoop.common.GradoopTestUtils.TIME_VAL_c;
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElements;
-import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
-import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElements;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElements;
+import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateGraphElements;
 import static org.junit.Assert.*;
 
 /**
@@ -136,11 +136,11 @@ public class StoreTest extends AccumuloStoreTestBase {
 
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
-    AsciiGraphLoader<GraphHead, Vertex, Edge> loader = getMinimalFullFeaturedGraphLoader();
+    AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> loader = getMinimalFullFeaturedGraphLoader();
 
-    GraphHead graphHead = loader.getGraphHeads().iterator().next();
-    Vertex vertex = loader.getVertices().iterator().next();
-    Edge edge = loader.getEdges().iterator().next();
+    EPGMGraphHead graphHead = loader.getGraphHeads().iterator().next();
+    EPGMVertex vertex = loader.getVertices().iterator().next();
+    EPGMEdge edge = loader.getEdges().iterator().next();
 
     graphStore.writeGraphHead(graphHead);
     graphStore.writeVertex(vertex);
@@ -168,11 +168,11 @@ public class StoreTest extends AccumuloStoreTestBase {
 
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
-    AsciiGraphLoader<GraphHead, Vertex, Edge> loader = getMinimalFullFeaturedGraphLoader();
+    AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> loader = getMinimalFullFeaturedGraphLoader();
 
-    GraphHead graphHead = loader.getGraphHeads().iterator().next();
-    Vertex vertex = loader.getVertices().iterator().next();
-    Edge edge = loader.getEdges().iterator().next();
+    EPGMGraphHead graphHead = loader.getGraphHeads().iterator().next();
+    EPGMVertex vertex = loader.getVertices().iterator().next();
+    EPGMEdge edge = loader.getEdges().iterator().next();
 
     graphStore.writeGraphHead(graphHead);
     graphStore.writeVertex(vertex);
@@ -201,11 +201,11 @@ public class StoreTest extends AccumuloStoreTestBase {
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
     graphStore.setAutoFlush(false);
 
-    AsciiGraphLoader<GraphHead, Vertex, Edge> loader = getMinimalFullFeaturedGraphLoader();
+    AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> loader = getMinimalFullFeaturedGraphLoader();
 
-    GraphHead graphHead = loader.getGraphHeads().iterator().next();
-    Vertex vertex = loader.getVertices().iterator().next();
-    Edge edge = loader.getEdges().iterator().next();
+    EPGMGraphHead graphHead = loader.getGraphHeads().iterator().next();
+    EPGMVertex vertex = loader.getVertices().iterator().next();
+    EPGMEdge edge = loader.getEdges().iterator().next();
 
     graphStore.writeGraphHead(graphHead);
     graphStore.writeVertex(vertex);
@@ -232,35 +232,35 @@ public class StoreTest extends AccumuloStoreTestBase {
     GradoopAccumuloConfig config = AccumuloTestSuite.getAcConfig(TEST03);
     AccumuloEPGMStore graphStore = new AccumuloEPGMStore(config);
 
-    Collection<GraphHead> graphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
-    Collection<Edge> edges = GradoopTestUtils.getSocialNetworkLoader().getEdges();
-    Collection<Vertex> vertices = GradoopTestUtils.getSocialNetworkLoader().getVertices();
+    Collection<EPGMGraphHead> graphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
+    Collection<EPGMEdge> edges = GradoopTestUtils.getSocialNetworkLoader().getEdges();
+    Collection<EPGMVertex> vertices = GradoopTestUtils.getSocialNetworkLoader().getVertices();
 
     // store some data
-    for (GraphHead g : graphHeads) {
+    for (EPGMGraphHead g : graphHeads) {
       graphStore.writeGraphHead(g);
     }
-    for (Edge e : edges) {
+    for (EPGMEdge e : edges) {
       graphStore.writeEdge(e);
     }
-    for (Vertex v : vertices) {
+    for (EPGMVertex v : vertices) {
       graphStore.writeVertex(v);
     }
 
     graphStore.flush();
 
     // graph heads
-    validateEPGMElementCollections(graphHeads,
+    validateElementCollections(graphHeads,
       graphStore.getGraphSpace().readRemainsAndClose());
     // vertices
-    validateEPGMElementCollections(vertices,
+    validateElementCollections(vertices,
       graphStore.getVertexSpace().readRemainsAndClose());
-    validateEPGMGraphElementCollections(vertices,
+    validateGraphElementCollections(vertices,
       graphStore.getVertexSpace().readRemainsAndClose());
     // edges
-    validateEPGMElementCollections(edges,
+    validateElementCollections(edges,
       graphStore.getEdgeSpace().readRemainsAndClose());
-    validateEPGMGraphElementCollections(edges,
+    validateGraphElementCollections(edges,
       graphStore.getEdgeSpace().readRemainsAndClose());
 
     graphStore.close();
@@ -317,7 +317,7 @@ public class StoreTest extends AccumuloStoreTestBase {
     graphStore.flush();
 
     // read from store
-    Vertex v = graphStore.readVertex(vertexID);
+    EPGMVertex v = graphStore.readVertex(vertexID);
     assert v != null;
     List<String> propertyKeys = Lists.newArrayList(v.getPropertyKeys());
     assertEquals(properties.size(), propertyKeys.size());
@@ -393,7 +393,7 @@ public class StoreTest extends AccumuloStoreTestBase {
     }
   }
 
-  private AsciiGraphLoader<GraphHead, Vertex, Edge> getMinimalFullFeaturedGraphLoader() {
+  private AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> getMinimalFullFeaturedGraphLoader() {
     String asciiGraph = ":G{k:\"v\"}[(v:V{k:\"v\"}),(v)-[:e{k:\"v\"}]->(v)]";
 
     return AsciiGraphLoader.fromString(asciiGraph, getConfig().getLogicalGraphFactory());
@@ -401,30 +401,30 @@ public class StoreTest extends AccumuloStoreTestBase {
 
   private void validateGraphHead(
     AccumuloEPGMStore graphStore,
-    GraphHead originalGraphHead
+    EPGMGraphHead originalGraphHead
   ) throws IOException {
-    EPGMGraphHead loadedGraphHead = graphStore.readGraph(originalGraphHead.getId());
+    GraphHead loadedGraphHead = graphStore.readGraph(originalGraphHead.getId());
 
-    validateEPGMElements(originalGraphHead, loadedGraphHead);
+    validateElements(originalGraphHead, loadedGraphHead);
   }
 
   private void validateVertex(
     AccumuloEPGMStore graphStore,
-    Vertex originalVertex
+    EPGMVertex originalVertex
   ) throws IOException {
-    EPGMVertex loadedVertex = graphStore.readVertex(originalVertex.getId());
+    Vertex loadedVertex = graphStore.readVertex(originalVertex.getId());
 
-    validateEPGMElements(originalVertex, loadedVertex);
-    validateEPGMGraphElements(originalVertex, loadedVertex);
+    validateElements(originalVertex, loadedVertex);
+    validateGraphElements(originalVertex, loadedVertex);
   }
 
   private void validateEdge(
     AccumuloEPGMStore graphStore,
-    Edge originalEdge
+    EPGMEdge originalEdge
   ) throws IOException {
-    EPGMEdge loadedEdge = graphStore.readEdge(originalEdge.getId());
-    validateEPGMElements(originalEdge, loadedEdge);
-    validateEPGMGraphElements(originalEdge, loadedEdge);
+    Edge loadedEdge = graphStore.readEdge(originalEdge.getId());
+    validateElements(originalEdge, loadedEdge);
+    validateGraphElements(originalEdge, loadedEdge);
     assert loadedEdge != null;
     assertEquals("source vertex mismatch",
       originalEdge.getSourceId(), loadedEdge.getSourceId());

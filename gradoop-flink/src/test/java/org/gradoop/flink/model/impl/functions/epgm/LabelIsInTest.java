@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,28 +36,28 @@ public class LabelIsInTest extends GradoopFlinkTestBase {
   /**
    * The comparator used to sort results.
    */
-  private Comparator<Vertex> comparator = Comparator.comparing(Element::getId);
+  private Comparator<EPGMVertex> comparator = Comparator.comparing(EPGMElement::getId);
 
   /**
    * Some test vertices to filter.
    */
-  private List<Vertex> inputVertices;
+  private List<EPGMVertex> inputVertices;
 
   /**
    * The expected vertices after the filter.
    */
-  private List<Vertex> expected;
+  private List<EPGMVertex> expected;
 
   /**
    * Initialize input vertices and expected result.
    */
   @Before
   public void setUp() {
-    EPGMVertexFactory<Vertex> vertexFactory = getConfig().getLogicalGraphFactory().getVertexFactory();
-    Vertex v1 = vertexFactory.createVertex();
-    Vertex v2 = vertexFactory.createVertex("a");
-    Vertex v3 = vertexFactory.createVertex("b");
-    Vertex v4 = vertexFactory.createVertex("c");
+    VertexFactory<EPGMVertex> vertexFactory = getConfig().getLogicalGraphFactory().getVertexFactory();
+    EPGMVertex v1 = vertexFactory.createVertex();
+    EPGMVertex v2 = vertexFactory.createVertex("a");
+    EPGMVertex v3 = vertexFactory.createVertex("b");
+    EPGMVertex v4 = vertexFactory.createVertex("c");
     inputVertices = Arrays.asList(v1, v2, v3, v4);
     expected = Arrays.asList(v2, v3);
     expected.sort(comparator);
@@ -71,7 +71,7 @@ public class LabelIsInTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testFilterVarargs() throws Exception {
-    List<Vertex> result = getExecutionEnvironment().fromCollection(inputVertices)
+    List<EPGMVertex> result = getExecutionEnvironment().fromCollection(inputVertices)
       .filter(new LabelIsIn<>("a", "b", "a", null)).collect();
     result.sort(comparator);
     assertArrayEquals(expected.toArray(), result.toArray());
@@ -85,7 +85,7 @@ public class LabelIsInTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testFilterCollection() throws Exception {
-    List<Vertex> result = getExecutionEnvironment().fromCollection(inputVertices)
+    List<EPGMVertex> result = getExecutionEnvironment().fromCollection(inputVertices)
       .filter(new LabelIsIn<>(Arrays.asList("a", "b", "a", null))).collect();
     result.sort(comparator);
     assertArrayEquals(expected.toArray(), result.toArray());

@@ -17,11 +17,11 @@ package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Test;
 
@@ -42,36 +42,35 @@ public class CreateEdgesFromTripleTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testFunction() throws Exception {
-    CreateEdgesFromTriple<Vertex, Edge> function = new CreateEdgesFromTriple<>(
+    CreateEdgesFromTriple<EPGMVertex, EPGMEdge> function = new CreateEdgesFromTriple<>(
       getConfig().getLogicalGraphFactory().getEdgeFactory(), "source", "target");
-    EPGMVertexFactory<Vertex> vertexFactory = getConfig().getLogicalGraphFactory()
-      .getVertexFactory();
-    Vertex testVertex1 = vertexFactory.createVertex();
-    Vertex testVertex2 = vertexFactory.createVertex();
+    VertexFactory<EPGMVertex> vertexFactory = getConfig().getLogicalGraphFactory().getVertexFactory();
+    EPGMVertex testVertex1 = vertexFactory.createVertex();
+    EPGMVertex testVertex2 = vertexFactory.createVertex();
     GradoopId source1 = GradoopId.get();
     GradoopId source2 = GradoopId.get();
     GradoopId target1 = GradoopId.get();
     GradoopId target2 = GradoopId.get();
-    Tuple3<Vertex, GradoopId, GradoopId> tuple1 = new Tuple3<>(testVertex1, source1, target1);
-    Tuple3<Vertex, GradoopId, GradoopId> tuple2 = new Tuple3<>(testVertex2, source2, target2);
-    List<Edge> result = getExecutionEnvironment().fromElements(tuple1, tuple2).flatMap(function)
+    Tuple3<EPGMVertex, GradoopId, GradoopId> tuple1 = new Tuple3<>(testVertex1, source1, target1);
+    Tuple3<EPGMVertex, GradoopId, GradoopId> tuple2 = new Tuple3<>(testVertex2, source2, target2);
+    List<EPGMEdge> result = getExecutionEnvironment().fromElements(tuple1, tuple2).flatMap(function)
       .collect();
     // Check if the correct number of edges were created and if they are distinct.
     assertEquals(4, result.size());
     // By id.
-    assertEquals(4, result.stream().map(Element::getId).count());
+    assertEquals(4, result.stream().map(EPGMElement::getId).count());
     // By source and target id.
     assertEquals(4,
       result.stream().map(e -> Tuple2.of(e.getSourceId(), e.getTargetId())).distinct().count());
     // Finally check the data of the edges.
-    for (Edge resultEdge : result) {
+    for (EPGMEdge resultEdge : result) {
       if (resultEdge.getLabel().equals("source")) {
         if (resultEdge.getSourceId().equals(source1)) {
           assertEquals(testVertex1.getId(), resultEdge.getTargetId());
         } else if (resultEdge.getSourceId().equals(source2)) {
           assertEquals(testVertex2.getId(), resultEdge.getTargetId());
         } else {
-          fail("Edge with invalid source ID created.");
+          fail("EPGMEdge with invalid source ID created.");
         }
       } else if (resultEdge.getLabel().equals("target")) {
         if (resultEdge.getSourceId().equals(testVertex1.getId())) {
@@ -79,10 +78,10 @@ public class CreateEdgesFromTripleTest extends GradoopFlinkTestBase {
         } else if (resultEdge.getSourceId().equals(testVertex2.getId())) {
           assertEquals(target2, resultEdge.getTargetId());
         } else {
-          fail("Edge with invalid source ID created.");
+          fail("EPGMEdge with invalid source ID created.");
         }
       } else {
-        fail("Edge with invalid label created.");
+        fail("EPGMEdge with invalid label created.");
       }
     }
   }

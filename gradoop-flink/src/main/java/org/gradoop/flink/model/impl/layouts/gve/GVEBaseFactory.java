@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.layouts.gve;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.layouts.common.BaseFactory;
 
 import java.util.Collections;
@@ -33,16 +33,16 @@ abstract class GVEBaseFactory extends BaseFactory {
   /**
    * Creates a collection layout from the given datasets.
    *
-   * @param graphHeads GraphHead DataSet
-   * @param vertices Vertex DataSet
-   * @param edges Edge DataSet
+   * @param graphHeads EPGMGraphHead DataSet
+   * @param vertices EPGMVertex DataSet
+   * @param edges EPGMEdge DataSet
    * @return GVE layout
    */
-  GVELayout create(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
-    DataSet<Edge> edges) {
-    Objects.requireNonNull(graphHeads, "GraphHead DataSet was null");
-    Objects.requireNonNull(vertices, "Vertex DataSet was null");
-    Objects.requireNonNull(edges, "Edge DataSet was null");
+  GVELayout create(DataSet<EPGMGraphHead> graphHeads, DataSet<EPGMVertex> vertices,
+    DataSet<EPGMEdge> edges) {
+    Objects.requireNonNull(graphHeads, "EPGMGraphHead DataSet was null");
+    Objects.requireNonNull(vertices, "EPGMVertex DataSet was null");
+    Objects.requireNonNull(edges, "EPGMEdge DataSet was null");
     return new GVELayout(graphHeads, vertices, edges);
   }
 
@@ -54,8 +54,8 @@ abstract class GVEBaseFactory extends BaseFactory {
    * @param edges Mapping from label to edge dataset
    * @return GVE layout
    */
-  GVELayout create(Map<String, DataSet<GraphHead>> graphHeads,
-    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
+  GVELayout create(Map<String, DataSet<EPGMGraphHead>> graphHeads,
+    Map<String, DataSet<EPGMVertex>> vertices, Map<String, DataSet<EPGMEdge>> edges) {
     Objects.requireNonNull(graphHeads);
     Objects.requireNonNull(vertices);
     Objects.requireNonNull(edges);

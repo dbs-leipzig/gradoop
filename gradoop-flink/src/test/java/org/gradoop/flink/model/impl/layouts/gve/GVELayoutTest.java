@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.layouts.gve;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -36,15 +36,15 @@ import static org.junit.Assert.*;
 
 public class GVELayoutTest extends GradoopFlinkTestBase {
 
-  protected static GraphHead g0;
-  protected static GraphHead g1;
+  protected static EPGMGraphHead g0;
+  protected static EPGMGraphHead g1;
 
-  protected static Vertex v0;
-  protected static Vertex v1;
-  protected static Vertex v2;
+  protected static EPGMVertex v0;
+  protected static EPGMVertex v1;
+  protected static EPGMVertex v2;
 
-  protected static Edge e0;
-  protected static Edge e1;
+  protected static EPGMEdge e0;
+  protected static EPGMEdge e1;
 
   @BeforeClass
   public static void setup() {
@@ -70,8 +70,8 @@ public class GVELayoutTest extends GradoopFlinkTestBase {
     e1.addGraphId(g1.getId());
   }
 
-  protected GVELayout from(Collection<GraphHead> graphHeads, Collection<Vertex> vertices,
-    Collection<Edge> edges) {
+  protected GVELayout from(Collection<EPGMGraphHead> graphHeads, Collection<EPGMVertex> vertices,
+    Collection<EPGMEdge> edges) {
     return new GVELayout(
       getExecutionEnvironment().fromCollection(graphHeads),
       getExecutionEnvironment().fromCollection(vertices),
@@ -103,43 +103,43 @@ public class GVELayoutTest extends GradoopFlinkTestBase {
 
   @Test
   public void getGraphHead() throws Exception {
-    GradoopTestUtils.validateEPGMElementCollections(Sets.newHashSet(g0),
+    GradoopTestUtils.validateElementCollections(Sets.newHashSet(g0),
       from(singletonList(g0), asList(v0, v1), singletonList(e0)).getGraphHead().collect());
   }
 
   @Test
   public void getGraphHeads() throws Exception {
-    GradoopTestUtils.validateEPGMElementCollections(Sets.newHashSet(g0, g1),
+    GradoopTestUtils.validateElementCollections(Sets.newHashSet(g0, g1),
       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getGraphHeads().collect());
   }
 
   @Test
   public void getGraphHeadsByLabel() throws Exception {
-    GradoopTestUtils.validateEPGMElementCollections(Sets.newHashSet(g0),
+    GradoopTestUtils.validateElementCollections(Sets.newHashSet(g0),
       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getGraphHeadsByLabel("A").collect());
   }
 
   @Test
   public void getVertices() throws Exception {
-    GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(v0, v1, v2),
+    GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(v0, v1, v2),
       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getVertices().collect());
   }
 
   @Test
   public void getVerticesByLabel() throws Exception {
-    GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(v0),
+    GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(v0),
       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getVerticesByLabel("A").collect());
   }
 
   @Test
   public void getEdges() throws Exception {
-    GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(e0, e1),
+    GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(e0, e1),
       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getEdges().collect());
   }
 
   @Test
   public void getEdgesByLabel() throws Exception {
-    GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(e0),
+    GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(e0),
       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getEdgesByLabel("a").collect());
   }
 }
