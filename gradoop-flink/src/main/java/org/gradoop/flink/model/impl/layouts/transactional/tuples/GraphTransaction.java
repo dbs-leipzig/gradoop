@@ -27,15 +27,15 @@ import java.util.Set;
  * An encapsulated representation of a logical graph with duplicated elements.
  */
 public class GraphTransaction extends Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set<EPGMEdge>> {
-
   /**
-   * default constructor
+   * Default constructor
    */
   public GraphTransaction() {
   }
 
   /**
-   * valued constructor
+   * Valued constructor
+   *
    * @param graphHead graph head
    * @param vertices set of vertices
    * @param edges set of edges

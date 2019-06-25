@@ -105,8 +105,8 @@ public class GraphCollectionFactory implements
   }
 
   @Override
-  public GraphCollection fromDataSets(DataSet<EPGMGraphHead> graphHeads,
-    DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
+  public GraphCollection fromDataSets(DataSet<EPGMGraphHead> graphHeads, DataSet<EPGMVertex> vertices,
+    DataSet<EPGMEdge> edges) {
     return new GraphCollection(layoutFactory.fromDataSets(graphHeads, vertices, edges), config);
   }
 

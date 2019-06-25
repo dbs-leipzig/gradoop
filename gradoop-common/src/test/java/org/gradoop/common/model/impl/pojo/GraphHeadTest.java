@@ -44,8 +44,7 @@ public class GraphHeadTest {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    GraphHead graphHead =
-      new EPGMGraphHeadFactory().initGraphHead(graphID, label, props);
+    GraphHead graphHead = new EPGMGraphHeadFactory().initGraphHead(graphID, label, props);
 
     assertThat(graphHead.getId(), is(graphID));
     assertEquals(label, graphHead.getLabel());
@@ -96,8 +95,7 @@ public class GraphHeadTest {
     GraphHead graphHead3 = new EPGMGraphHeadFactory().initGraphHead(graphID2);
 
     assertEquals("Graph heads have different hash", graphHead2.hashCode(), graphHead1.hashCode());
-    assertFalse("Graph heads have same hash",
-      graphHead1.hashCode() == graphHead3.hashCode());
+    assertFalse("Graph heads have same hash", graphHead1.hashCode() == graphHead3.hashCode());
   }
 
 }

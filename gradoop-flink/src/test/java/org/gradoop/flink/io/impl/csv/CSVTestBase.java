@@ -138,89 +138,89 @@ abstract class CSVTestBase extends GradoopFlinkTestBase {
   /**
    * Check all time properties of an epgm element
    *
-   * @param epgmElement the element to check
+   * @param element the element to check
    */
-  protected void checkProperties(Element epgmElement) {
+  protected void checkProperties(Element element) {
     // assert that the element has properties
-    assertNotNull(epgmElement.getProperties());
+    assertNotNull(element.getProperties());
     // assert that there are 3 properties
-    assertEquals(PROPERTY_MAP.size(), epgmElement.getPropertyCount());
+    assertEquals(PROPERTY_MAP.size(), element.getPropertyCount());
     // assert that there are properties with keys "h", "i" and "j"
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_0));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_1));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_2));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_3));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_4));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_5));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_6));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_7));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_8));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_9));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_a));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_b));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_c));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_d));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_e));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_f));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_g));
-    assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_h));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_0));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_1));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_2));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_3));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_4));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_5));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_6));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_7));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_8));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_9));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_a));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_b));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_c));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_d));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_e));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_f));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_g));
+    assertTrue(element.hasProperty(GradoopTestUtils.KEY_h));
 
     // assert that the properties have valid data types
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_0).isBoolean());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_1).isInt());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_2).isLong());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_3).isFloat());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_4).isDouble());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_5).isString());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_6).isGradoopId());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_7).isDate());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_8).isTime());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_9).isDateTime());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_a).isBigDecimal());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_b).isMap());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_c).isList());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_d).isList());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_e).isShort());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_f).isNull());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_g).isSet());
-    assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_h).isSet());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_0).isBoolean());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_1).isInt());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_2).isLong());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_3).isFloat());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_4).isDouble());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_5).isString());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_6).isGradoopId());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_7).isDate());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_8).isTime());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_9).isDateTime());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_a).isBigDecimal());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_b).isMap());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_c).isList());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_d).isList());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_e).isShort());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_f).isNull());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_g).isSet());
+    assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_h).isSet());
 
     // assert that the properties have valid values
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_0).getBoolean(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_0).getBoolean(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_0));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_1).getInt(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_1).getInt(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_1));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_2).getLong(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_2).getLong(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_2));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_3).getFloat(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_3).getFloat(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_3));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_4).getDouble(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_4).getDouble(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_4));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_5).getString(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_5).getString(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_5));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_6).getGradoopId(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_6).getGradoopId(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_6));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_7).getDate(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_7).getDate(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_7));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_8).getTime(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_8).getTime(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_8));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_9).getDateTime(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_9).getDateTime(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_9));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_a).getBigDecimal(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_a).getBigDecimal(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_a));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_b).getMap(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_b).getMap(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_b));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_c).getList(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_c).getList(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_c));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_d).getList(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_d).getList(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_d));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_e).getShort(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_e).getShort(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_e));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_f).getObject(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_f).getObject(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_f));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_g).getSet(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_g).getSet(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_g));
-    assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_h).getSet(),
+    assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_h).getSet(),
       PROPERTY_MAP.get(GradoopTestUtils.KEY_h));
   }
 

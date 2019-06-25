@@ -97,8 +97,7 @@ public class AccumuloQueryHolder<T extends Element> implements Serializable {
    */
   public static <T extends Element> AccumuloQueryHolder<T> create(
     @Nonnull List<Range> idRanges,
-    @Nullable AccumuloElementFilter<T> reduceFilter
-  ) {
+    @Nullable AccumuloElementFilter<T> reduceFilter) {
     if (idRanges.isEmpty()) {
       throw new IllegalArgumentException("id range is empty");
     }
@@ -106,7 +105,7 @@ public class AccumuloQueryHolder<T extends Element> implements Serializable {
   }
 
   /**
-   * Qet query ranges by anti-encrypt wrapper
+   * Get query ranges by anti-encrypt wrapper
    *
    * @return seek range
    */

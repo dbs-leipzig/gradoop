@@ -52,7 +52,7 @@ public abstract class BaseFactory implements BaseLayoutFactory {
    * Creates a graph head dataset from a given collection.
    * Encapsulates the workaround for dataset creation from an empty collection.
    *
-   * @param graphHeads  graph heads
+   * @param graphHeads graph heads
    * @return graph head dataset
    */
   protected DataSet<EPGMGraphHead> createGraphHeadDataSet(Collection<EPGMGraphHead> graphHeads) {

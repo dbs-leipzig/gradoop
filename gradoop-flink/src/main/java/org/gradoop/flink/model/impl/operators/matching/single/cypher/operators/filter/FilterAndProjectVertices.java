@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.f
 import java.util.List;
 
 /**
- * Filters a set of EPGM {@link EPGMVertex} objects based on a specified predicate. Additionally, the
+ * Filters a set of {@link EPGMVertex} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
  *

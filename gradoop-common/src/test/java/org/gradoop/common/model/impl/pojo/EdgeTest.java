@@ -35,8 +35,7 @@ public class EdgeTest {
     GradoopId edgeId = GradoopId.get();
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
-    Edge e =
-      new EPGMEdgeFactory().initEdge(edgeId, sourceId, targetId);
+    Edge e = new EPGMEdgeFactory().initEdge(edgeId, sourceId, targetId);
     assertThat(e.getId(), is(edgeId));
     assertThat(e.getSourceId(), is(sourceId));
     assertThat(e.getTargetId(), is(targetId));
@@ -57,8 +56,7 @@ public class EdgeTest {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    Edge edge = new EPGMEdgeFactory()
-      .initEdge(edgeId, label, sourceId, targetId, props, graphIds);
+    Edge edge = new EPGMEdgeFactory().initEdge(edgeId, label, sourceId, targetId, props, graphIds);
 
     assertThat(edge.getId(), is(edgeId));
     assertEquals(label, edge.getLabel());

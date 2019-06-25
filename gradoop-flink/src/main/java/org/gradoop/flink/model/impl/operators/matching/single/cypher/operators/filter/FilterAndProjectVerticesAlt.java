@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Alternative FilterAndProjectVertices using Filter + Map operators
  *
- * Filters a set of EPGM {@link EPGMVertex} objects based on a specified predicate. Additionally, the
+ * Filters a set of {@link EPGMVertex} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
  *

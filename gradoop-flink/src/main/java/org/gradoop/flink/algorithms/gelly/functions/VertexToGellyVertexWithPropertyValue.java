@@ -34,8 +34,7 @@ public class VertexToGellyVertexWithPropertyValue implements VertexToGellyVertex
   /**
    * Reduce object instantiations
    */
-  private final org.apache.flink.graph.Vertex<GradoopId, PropertyValue>
-  reuseVertex;
+  private final org.apache.flink.graph.Vertex<GradoopId, PropertyValue> reuseVertex;
 
   /**
    * Constructor
@@ -48,8 +47,7 @@ public class VertexToGellyVertexWithPropertyValue implements VertexToGellyVertex
   }
 
   @Override
-  public org.apache.flink.graph.Vertex<GradoopId, PropertyValue> map(
-    EPGMVertex epgmVertex) throws Exception {
+  public org.apache.flink.graph.Vertex<GradoopId, PropertyValue> map(EPGMVertex epgmVertex) throws Exception {
     reuseVertex.setId(epgmVertex.getId());
     reuseVertex.setValue(epgmVertex.getPropertyValue(propertyKey));
     return reuseVertex;

@@ -388,7 +388,7 @@ public class AccumuloEPGMStore implements
   }
 
   /**
-   * Write an EPGM EPGMElement instance into table
+   * Write an EPGM Element instance into table
    *
    * @param record  gradoop EPGM element
    * @param writer  accumulo batch writer

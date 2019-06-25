@@ -84,17 +84,17 @@ public class GradoopAccumuloConfig implements GradoopStoreConfig {
   private final Properties accumuloProperties = new Properties();
 
   /**
-   * row handler for EPGM EPGMGraphHead
+   * row handler for EPGMGraphHead
    */
   private final AccumuloGraphHandler graphHandler;
 
   /**
-   * row handler for EPGM EPGMVertex
+   * row handler for EPGMVertex
    */
   private final AccumuloVertexHandler vertexHandler;
 
   /**
-   * row handler for EPGM EPGMEdge
+   * row handler for EPGMEdge
    */
   private final AccumuloEdgeHandler edgeHandler;
 

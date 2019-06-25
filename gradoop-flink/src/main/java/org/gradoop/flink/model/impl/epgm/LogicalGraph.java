@@ -93,8 +93,7 @@ import java.util.Objects;
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class LogicalGraph implements
-  BaseGraph<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>,
-  LogicalGraphOperators {
+  BaseGraph<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>, LogicalGraphOperators {
   /**
    * Layout for that logical graph.
    */

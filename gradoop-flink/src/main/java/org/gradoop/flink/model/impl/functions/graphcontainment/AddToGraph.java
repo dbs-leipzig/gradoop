@@ -25,9 +25,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
  *
  * @param <GE> EPGM graph element
  */
-public class AddToGraph<GE extends EPGMGraphElement> implements
-  MapFunction<GE, GE> {
-
+public class AddToGraph<GE extends EPGMGraphElement> implements MapFunction<GE, GE> {
   /**
    * Graph head identifier which gets added to the graph element.
    */

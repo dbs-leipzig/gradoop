@@ -24,17 +24,17 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 
 /**
- * accumulo edge handler for row's read/write operator
+ * Accumulo edge handler for row's read/write operator
  */
 public class AccumuloEdgeHandler implements AccumuloRowHandler<EPGMEdge, Edge> {
 
   /**
-   * edge factory
+   * Edge factory
    */
   private final EdgeFactory<EPGMEdge> factory;
 
   /**
-   * accumulo edge handler constructor
+   * Accumulo edge handler constructor
    *
    * @param factory edge factory
    */

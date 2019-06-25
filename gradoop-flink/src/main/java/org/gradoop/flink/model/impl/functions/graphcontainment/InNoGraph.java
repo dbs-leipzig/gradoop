@@ -19,7 +19,7 @@ import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
- * True, if the element has not graph ids.
+ * True, if the element has no graph ids.
  *
  * @param <EL> graph element
  */

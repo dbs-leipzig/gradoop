@@ -40,8 +40,8 @@ import java.util.Map;
  * query result will always be fetch block by block for better performance. And the
  * block size for result is called cache size.
  *
- * @param <R> EPGM EPGMElement type for reading result
- * @param <E> EPGM EPGMElement type for reading source (remote definition)
+ * @param <R> EPGMElement type for reading result
+ * @param <E> EPGMElement type for reading source (remote definition)
  * @see EPGMGraphOutput
  * @see EPGMGraphPredictableOutput
  */

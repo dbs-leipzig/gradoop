@@ -37,7 +37,7 @@ public class ReduceEdgeGroupItems<E extends Edge> extends BuildSuperEdge
   implements GroupReduceFunction<EdgeGroupItem, E>, ResultTypeQueryable<E> {
 
   /**
-   * EPGMEdge factory.
+   * Edge factory.
    */
   private final EdgeFactory<E> edgeFactory;
 
@@ -45,24 +45,23 @@ public class ReduceEdgeGroupItems<E extends Edge> extends BuildSuperEdge
    * Creates group reducer
    *
    * @param useLabel use edge label
-   * @param epgmEdgeFactory edge factory
+   * @param edgeFactory edge factory
    */
-  public ReduceEdgeGroupItems(boolean useLabel, EdgeFactory<E> epgmEdgeFactory) {
+  public ReduceEdgeGroupItems(boolean useLabel, EdgeFactory<E> edgeFactory) {
     super(useLabel);
-    this.edgeFactory = epgmEdgeFactory;
+    this.edgeFactory = edgeFactory;
   }
 
   /**
    * Reduces edge group items to a single edge group item, creates a new
-   * super EPGM edge and collects it.
+   * super edge and collects it.
    *
    * @param edgeGroupItems  edge group items
    * @param collector       output collector
    * @throws Exception on failure
    */
   @Override
-  public void reduce(Iterable<EdgeGroupItem> edgeGroupItems,
-    Collector<E> collector) throws Exception {
+  public void reduce(Iterable<EdgeGroupItem> edgeGroupItems, Collector<E> collector) throws Exception {
 
     EdgeGroupItem edgeGroupItem = reduceInternal(edgeGroupItems);
 
@@ -71,8 +70,7 @@ public class ReduceEdgeGroupItems<E extends Edge> extends BuildSuperEdge
       edgeGroupItem.getSourceId(),
       edgeGroupItem.getTargetId());
 
-    setGroupProperties(
-      superEdge, edgeGroupItem.getGroupingValues(), edgeGroupItem.getLabelGroup());
+    setGroupProperties(superEdge, edgeGroupItem.getGroupingValues(), edgeGroupItem.getLabelGroup());
     setAggregateProperties(superEdge, edgeGroupItem.getLabelGroup().getAggregateValueList(),
       edgeGroupItem.getLabelGroup().getAggregateFunctions());
     edgeGroupItem.getLabelGroup().resetAggregateValues();

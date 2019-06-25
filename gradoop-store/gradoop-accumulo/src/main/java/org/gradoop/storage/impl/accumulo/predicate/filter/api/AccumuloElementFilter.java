@@ -47,7 +47,7 @@ public interface AccumuloElementFilter<T extends Element>
   extends Predicate<T>, ElementFilter<AccumuloElementFilter<T>>, Serializable {
 
   /**
-   * Anti-serialize reducer from base64 encoded string
+   * Deserialize reducer from base64 encoded string
    * this action will be execute by tserver
    *
    * @param encoded encoded string
