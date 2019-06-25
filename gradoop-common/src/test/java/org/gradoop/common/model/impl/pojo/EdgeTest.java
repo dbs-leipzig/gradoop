@@ -21,10 +21,12 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
 import org.hamcrest.core.Is;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class EdgeTest {
 
@@ -82,28 +84,28 @@ public class EdgeTest {
     assertThat(e.getLabel(), is(GradoopConstants.DEFAULT_EDGE_LABEL));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullIDTest() {
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
     new EdgeFactory().initEdge(null, sourceId, targetId);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullSourceIdTest() {
     GradoopId edgeId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
     new EdgeFactory().initEdge(edgeId, null, targetId);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullTargetIdTest() {
     GradoopId edgeId = GradoopId.get();
     GradoopId sourceId = GradoopId.get();
     new EdgeFactory().initEdge(edgeId, sourceId, null);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullLabelTest() {
     GradoopId edgeId = GradoopId.get();
     GradoopId sourceId = GradoopId.get();

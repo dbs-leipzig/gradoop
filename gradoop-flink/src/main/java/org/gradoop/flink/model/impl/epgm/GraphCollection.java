@@ -28,6 +28,7 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.epgm.GraphCollectionOperators;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
@@ -86,7 +87,8 @@ import java.util.Objects;
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class GraphCollection implements
-  BaseGraphCollection<GraphHead, Vertex, Edge, GraphCollection>, GraphCollectionOperators {
+  BaseGraphCollection<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>,
+  GraphCollectionOperators {
   /**
    * Layout for that graph collection
    */
@@ -348,8 +350,15 @@ public class GraphCollection implements
   }
 
   @Override
-  public BaseGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection> getFactory() {
+  public BaseGraphCollectionFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>
+  getFactory() {
     return config.getGraphCollectionFactory();
+  }
+
+  @Override
+  public BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>
+  getGraphFactory() {
+    return config.getLogicalGraphFactory();
   }
 
   @Override

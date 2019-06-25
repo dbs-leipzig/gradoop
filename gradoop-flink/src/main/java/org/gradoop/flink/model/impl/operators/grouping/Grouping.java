@@ -88,7 +88,8 @@ public abstract class Grouping<
   V extends EPGMVertex,
   E extends EPGMEdge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, GC>>  implements UnaryBaseGraphToBaseGraphOperator<LG> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphToBaseGraphOperator<LG> {
   /**
    * Used as property key to declare a label based grouping.
    *
@@ -658,7 +659,7 @@ public abstract class Grouping<
       V extends EPGMVertex,
       E extends EPGMEdge,
       LG extends BaseGraph<G, V, E, LG, GC>,
-      GC extends BaseGraphCollection<G, V, E, GC>> Grouping<G, V, E, LG, GC> build() {
+      GC extends BaseGraphCollection<G, V, E, LG, GC>> Grouping<G, V, E, LG, GC> build() {
       if (vertexLabelGroups.isEmpty() && !useVertexLabel) {
         throw new IllegalArgumentException(
           "Provide vertex key(s) and/or use vertex labels for grouping.");

@@ -52,7 +52,7 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
   /**
    * Creates instances of {@link GraphCollection}
    */
-  private final BaseGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection>
+  private final BaseGraphCollectionFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>
     graphCollectionFactory;
 
   /**
