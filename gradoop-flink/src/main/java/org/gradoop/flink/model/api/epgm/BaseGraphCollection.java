@@ -50,4 +50,11 @@ public interface BaseGraphCollection<
    * @return a factory that can be used to create a {@link GC} instance
    */
   BaseGraphCollectionFactory<G, V, E, LG, GC> getFactory();
+
+  /**
+   * Get the factory that is responsible for creating an instance of {@link LG}.
+   *
+   * @return a factory that can be used to create a {@link LG} instance
+   */
+  BaseGraphFactory<G, V, E, LG, GC> getGraphFactory();
 }
