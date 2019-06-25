@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
 import org.hamcrest.core.Is;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -72,12 +72,12 @@ public class VertexTest {
     assertThat(v.getLabel(), is(GradoopConstants.DEFAULT_VERTEX_LABEL));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullIDTest() {
     new VertexFactory().initVertex(null);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullLabelTest() {
     GradoopId vertexID = GradoopId.get();
     new VertexFactory().initVertex(vertexID, null);
