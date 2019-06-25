@@ -16,8 +16,8 @@
 package org.gradoop.flink.io.impl.dot.functions;
 
 import org.apache.commons.lang3.StringUtils;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -60,7 +60,7 @@ public class DotFileFormatSimple extends AbstractDotFileFormat {
    */
   @Override
   void writeVertices(GraphTransaction transaction, StringBuilder builder, String suffix) {
-    for (Vertex vertex: transaction.getVertices()) {
+    for (EPGMVertex vertex: transaction.getVertices()) {
       builder.append(VERTEX_ID_PREFIX)
         .append(vertex.getId())
         .append(suffix)
@@ -73,7 +73,7 @@ public class DotFileFormatSimple extends AbstractDotFileFormat {
   }
 
   @Override
-  void writeLabel(StringBuilder builder, EPGMElement element) {
+  void writeLabel(StringBuilder builder, Element element) {
     String label = StringUtils.isEmpty(element.getLabel()) ? element.getId().toString() :
       element.getLabel();
     Properties properties = element.getProperties();

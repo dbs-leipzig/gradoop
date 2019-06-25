@@ -20,7 +20,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
@@ -33,7 +33,7 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
  * {@link org.apache.flink.graph.library.TriangleEnumerator}.
  * Counts all triangles (closed triplets) in a graph, without taking the edge direction in account.
  * Returns the initial {@code LogicalGraph} with the number of triangles written as property to the
- * {@code GraphHead}. The value is accessed via the property key in {@link #PROPERTY_KEY_TRIANGLES}.
+ * {@code EPGMGraphHead}. The value is accessed via the property key in {@link #PROPERTY_KEY_TRIANGLES}.
  */
 public class GellyTriangleCounting extends GradoopGellyAlgorithm<NullValue, NullValue> {
 
@@ -58,7 +58,7 @@ public class GellyTriangleCounting extends GradoopGellyAlgorithm<NullValue, Null
       new org.apache.flink.graph.library.TriangleEnumerator<GradoopId, NullValue, NullValue>()
       .run(graph);
 
-    DataSet<GraphHead> resultHead = currentGraph.getGraphHead()
+    DataSet<EPGMGraphHead> resultHead = currentGraph.getGraphHead()
       .map(new WritePropertyToGraphHeadMap(
         PROPERTY_KEY_TRIANGLES, PropertyValue.create(triangles.count())));
 

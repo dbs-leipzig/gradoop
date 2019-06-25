@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 import java.util.Set;
 
@@ -29,11 +29,11 @@ import java.util.Set;
  *
  * @param <T> tuple type
  */
-public class TransactionVertices<T extends Tuple3<GraphHead, Set<Vertex>, Set<Edge>>> implements
-  FlatMapFunction<T, Vertex> {
+public class TransactionVertices<T extends Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set<EPGMEdge>>> implements
+  FlatMapFunction<T, EPGMVertex> {
 
   @Override
-  public void flatMap(T graphTriple, Collector<Vertex> collector) throws Exception {
+  public void flatMap(T graphTriple, Collector<EPGMVertex> collector) throws Exception {
     graphTriple.f1.forEach(collector::collect);
   }
 }

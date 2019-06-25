@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.distinction;
 
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.impl.operators.distinction.functions.CountGraphHeads;
@@ -39,11 +39,11 @@ public class GroupByIsomorphismTest extends DistinctByIsomorphismTestBase {
 
     collection = collection.groupByIsomorphism(countFunc);
 
-    List<GraphHead> graphHeads = collection.getGraphHeads().collect();
+    List<EPGMGraphHead> graphHeads = collection.getGraphHeads().collect();
 
     assertEquals(3, graphHeads.size());
 
-    for (GraphHead graphHead : graphHeads) {
+    for (EPGMGraphHead graphHead : graphHeads) {
       assertTrue(graphHead.hasProperty(propertyKey));
       int count = graphHead.getPropertyValue(propertyKey).getInt();
 

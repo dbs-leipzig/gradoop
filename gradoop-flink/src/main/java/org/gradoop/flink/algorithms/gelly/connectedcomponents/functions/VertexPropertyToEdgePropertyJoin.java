@@ -16,8 +16,8 @@
 package org.gradoop.flink.algorithms.gelly.connectedcomponents.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  * If the edge already has this property, compare the edge value to the vertex value and store the
  * smaller property value.
  */
-public class VertexPropertyToEdgePropertyJoin implements JoinFunction<Edge, Vertex, Edge> {
+public class VertexPropertyToEdgePropertyJoin implements JoinFunction<EPGMEdge, EPGMVertex, EPGMEdge> {
 
   /**
    * Property key to store the property.
@@ -42,7 +42,7 @@ public class VertexPropertyToEdgePropertyJoin implements JoinFunction<Edge, Vert
   }
 
   @Override
-  public Edge join(Edge edge, Vertex vertex) throws Exception {
+  public EPGMEdge join(EPGMEdge edge, EPGMVertex vertex) throws Exception {
     PropertyValue newEdgeValue = vertex.getPropertyValue(propertyKey);
     if (edge.hasProperty(propertyKey)) {
       if (edge.getPropertyValue(propertyKey).compareTo(newEdgeValue) < 0) {

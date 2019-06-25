@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.split.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
@@ -29,7 +29,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  */
 @FunctionAnnotation.ReadFieldsFirst("graphIds")
 @FunctionAnnotation.ReadFieldsSecond("f1")
-public class AddNewGraphsToVertex<V extends Vertex>
+public class AddNewGraphsToVertex<V extends EPGMVertex>
   implements JoinFunction<V, Tuple2<GradoopId, GradoopIdSet>, V> {
 
   @Override

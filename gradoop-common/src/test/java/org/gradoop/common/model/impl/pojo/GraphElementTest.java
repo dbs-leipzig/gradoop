@@ -30,7 +30,7 @@ public class GraphElementTest {
 
   @Test
   public void testAddGraphIdNoGraphIds() {
-    GraphElement graphElementMock = mock(GraphElement.class, CALLS_REAL_METHODS);
+    EPGMGraphElement graphElementMock = mock(EPGMGraphElement.class, CALLS_REAL_METHODS);
 
     GradoopId id = GradoopId.get();
     graphElementMock.addGraphId(id);
@@ -44,7 +44,7 @@ public class GraphElementTest {
     GradoopIdSet idSet = new GradoopIdSet();
     idSet.add(GradoopId.get());
 
-    GraphElement graphElementMock = mock(GraphElement.class, withSettings()
+    EPGMGraphElement graphElementMock = mock(EPGMGraphElement.class, withSettings()
     .useConstructor(GradoopId.get(), "someLabel", propertiesMock, idSet)
     .defaultAnswer(CALLS_REAL_METHODS));
 

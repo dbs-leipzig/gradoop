@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
 
 import java.util.Collection;
@@ -30,7 +30,7 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_EDGE_LABEL;
  * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ReadFields("label;properties")
-public class MatchingEdges<E extends Edge> extends AbstractFilter<E> {
+public class MatchingEdges<E extends EPGMEdge> extends AbstractFilter<E> {
   /**
    * serial version uid
    */

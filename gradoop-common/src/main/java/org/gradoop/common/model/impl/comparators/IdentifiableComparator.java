@@ -13,10 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.common.model.api.entities;
+package org.gradoop.common.model.impl.comparators;
+
+import org.gradoop.common.model.api.entities.Identifiable;
+
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
- * Describes data assigned to a vertex in the EPGM.
+ * Id based EPGM element comparator.
  */
-public interface EPGMVertex extends EPGMGraphElement {
+public class IdentifiableComparator implements Comparator<Identifiable>, Serializable {
+
+  @Override
+  public int compare(Identifiable a, Identifiable b) {
+    return a.getId().compareTo(b.getId());
+  }
 }

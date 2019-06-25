@@ -15,36 +15,36 @@
  */
 package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;
 
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.metadata.MetaDataSource;
 
 /**
- * Creates a {@link Vertex} from a CSV string. The function uses a
+ * Creates a {@link EPGMVertex} from a CSV string. The function uses a
  * {@link MetaData} object to correctly parse the property values.
  *
  * The string needs to be encoded in the following format:
  *
  * {@code vertex-id;vertex-label;value_1|value_2|...|value_n}
  */
-public class CSVLineToVertex extends CSVLineToElement<Vertex> {
+public class CSVLineToVertex extends CSVLineToElement<EPGMVertex> {
   /**
    * Used to instantiate the vertex.
    */
-  private final EPGMVertexFactory<Vertex> vertexFactory;
+  private final VertexFactory<EPGMVertex> vertexFactory;
 
   /**
    * Constructor
    *
    * @param epgmVertexFactory EPGM vertex factory
    */
-  public CSVLineToVertex(EPGMVertexFactory<Vertex> epgmVertexFactory) {
+  public CSVLineToVertex(VertexFactory<EPGMVertex> epgmVertexFactory) {
     this.vertexFactory = epgmVertexFactory;
   }
 
   @Override
-  public Vertex map(String csvLine) {
+  public EPGMVertex map(String csvLine) {
     String[] tokens = split(csvLine, 3);
     return vertexFactory.initVertex(
       GradoopId.fromString(tokens[0]),

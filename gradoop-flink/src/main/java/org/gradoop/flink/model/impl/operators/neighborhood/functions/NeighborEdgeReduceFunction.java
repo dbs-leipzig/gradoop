@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
@@ -29,7 +29,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
  */
 public class NeighborEdgeReduceFunction
   extends NeighborEdgeFunction
-  implements GroupReduceFunction<Tuple2<Edge, Vertex>, Vertex> {
+  implements GroupReduceFunction<Tuple2<EPGMEdge, EPGMVertex>, EPGMVertex> {
 
   /**
    * Valued constructor.
@@ -41,15 +41,15 @@ public class NeighborEdgeReduceFunction
   }
 
   @Override
-  public void reduce(Iterable<Tuple2<Edge, Vertex>> tuples, Collector<Vertex> collector) throws
+  public void reduce(Iterable<Tuple2<EPGMEdge, EPGMVertex>> tuples, Collector<EPGMVertex> collector) throws
     Exception {
 
     PropertyValue propertyValue = PropertyValue.NULL_VALUE;
-    Vertex vertex = null;
-    Edge edge;
+    EPGMVertex vertex = null;
+    EPGMEdge edge;
     boolean isFirst = true;
 
-    for (Tuple2<Edge, Vertex> tuple: tuples) {
+    for (Tuple2<EPGMEdge, EPGMVertex> tuple: tuples) {
       edge = tuple.f0;
       if (isFirst) {
         //each tuple contains the same vertex

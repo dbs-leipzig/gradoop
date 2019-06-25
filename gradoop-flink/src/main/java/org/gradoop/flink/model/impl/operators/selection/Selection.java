@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.selection;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.model.impl.operators.selection.functions.FilterTransactions;
@@ -33,14 +33,14 @@ public class Selection extends SelectionBase {
   /**
    * User-defined predicate function
    */
-  private final FilterFunction<GraphHead> predicate;
+  private final FilterFunction<EPGMGraphHead> predicate;
 
   /**
    * Creates a new Selection operator.
    *
    * @param predicate user-defined predicate function
    */
-  public Selection(FilterFunction<GraphHead> predicate) {
+  public Selection(FilterFunction<EPGMGraphHead> predicate) {
     this.predicate = checkNotNull(predicate, "Predicate function was null");
   }
 
@@ -59,7 +59,7 @@ public class Selection extends SelectionBase {
    * @return result graph collection
    */
   private GraphCollection executeForGVELayout(GraphCollection collection) {
-    DataSet<GraphHead> graphHeads = collection.getGraphHeads()
+    DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads()
       .filter(predicate);
     return selectVerticesAndEdges(collection, graphHeads);
   }

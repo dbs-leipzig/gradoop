@@ -21,7 +21,7 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 
 /**
  * graphIds (BC)
@@ -31,7 +31,7 @@ import org.gradoop.common.model.impl.pojo.GraphElement;
  *
  * @param <EL> graph element type
  */
-public class ElementsOfSelectedGraphs<EL extends GraphElement> extends
+public class ElementsOfSelectedGraphs<EL extends EPGMGraphElement> extends
   RichFlatMapFunction<EL, Tuple2<GradoopId, EL>> {
 
   /**

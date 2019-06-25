@@ -17,12 +17,12 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * A map from a vertex to its degree
  */
-public class VertexToDegreeMap implements MapFunction<Vertex, Tuple1<Long>> {
+public class VertexToDegreeMap implements MapFunction<EPGMVertex, Tuple1<Long>> {
   /**
    * The property name for degree
    */
@@ -42,7 +42,7 @@ public class VertexToDegreeMap implements MapFunction<Vertex, Tuple1<Long>> {
    * @return the degree of that vertex
    */
   @Override
-  public Tuple1<Long> map(Vertex vertex) {
+  public Tuple1<Long> map(EPGMVertex vertex) {
     return new Tuple1<>(Long.parseLong(vertex.getPropertyValue(nameOfDegreeProperty).toString()));
   }
 }

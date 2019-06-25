@@ -17,9 +17,9 @@ package org.gradoop.flink.io.impl.gdl.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.impl.gdl.GDLEncoder;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -34,9 +34,9 @@ public class GraphTransactionsToGDL implements GroupReduceFunction<GraphTransact
   @Override
   public void reduce(Iterable<GraphTransaction> graphTransactions, Collector<String> out)
     throws Exception {
-    List<GraphHead> graphHeads = new ArrayList<>();
-    List<Vertex> vertices = new ArrayList<>();
-    List<Edge> edges = new ArrayList<>();
+    List<EPGMGraphHead> graphHeads = new ArrayList<>();
+    List<EPGMVertex> vertices = new ArrayList<>();
+    List<EPGMEdge> edges = new ArrayList<>();
 
     for (GraphTransaction gt : graphTransactions) {
       graphHeads.add(gt.getGraphHead());

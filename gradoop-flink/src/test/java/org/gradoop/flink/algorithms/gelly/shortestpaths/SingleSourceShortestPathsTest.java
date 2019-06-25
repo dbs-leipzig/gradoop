@@ -16,7 +16,7 @@
 package org.gradoop.flink.algorithms.gelly.shortestpaths;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -87,7 +87,7 @@ public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
     //test a graph with double values as input
     FlinkAsciiGraphLoader loaderDouble = getLoaderFromString(graphsDouble);
     LogicalGraph inputDouble = loaderDouble.getLogicalGraphByVariable("input");
-    Vertex srcVertexDouble = loaderDouble.getVertexByVariable("v0");
+    EPGMVertex srcVertexDouble = loaderDouble.getVertexByVariable("v0");
     GradoopId srcVertexIdDouble = srcVertexDouble.getId();
 
     LogicalGraph outputGraphDouble = inputDouble.callForGraph(new SingleSourceShortestPaths(srcVertexIdDouble,
@@ -99,7 +99,7 @@ public class SingleSourceShortestPathsTest extends GradoopFlinkTestBase {
   //test a graph with float values as input
     FlinkAsciiGraphLoader loader = getLoaderFromString(graphs);
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
-    Vertex srcVertex = loader.getVertexByVariable("v0");
+    EPGMVertex srcVertex = loader.getVertexByVariable("v0");
     GradoopId srcVertexId = srcVertex.getId();
 
     LogicalGraph outputGraph = input.callForGraph(new SingleSourceShortestPaths(srcVertexId,

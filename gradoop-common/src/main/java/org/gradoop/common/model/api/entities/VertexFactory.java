@@ -20,12 +20,11 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
- * Initializes {@link EPGMVertex} objects of a given type.
+ * Initializes {@link Vertex} objects of a given type.
  *
- * @param <V> EPGM vertex type
+ * @param <V> vertex type
  */
-public interface EPGMVertexFactory<V extends EPGMVertex>
-  extends EPGMElementFactory<V> {
+public interface VertexFactory<V extends Vertex> extends ElementFactory<V> {
 
   /**
    * Initializes a new vertex based on the given parameters.

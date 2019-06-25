@@ -18,7 +18,7 @@ package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Joins a Gelly result vertex with an EPGM vertex. Assigning a boolean property value from the
@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 @FunctionAnnotation.ReadFieldsFirst("f1")
 @FunctionAnnotation.ForwardedFieldsSecond("id;label;graphIds")
 public class GellyVertexWithEPGMVertexJoin implements
-  JoinFunction<org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue>, Vertex, Vertex> {
+  JoinFunction<org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue>, EPGMVertex, EPGMVertex> {
 
   /**
    * Key for the boolean property value to assign to the EPGM vertex.
@@ -45,8 +45,8 @@ public class GellyVertexWithEPGMVertexJoin implements
   }
 
   @Override
-  public Vertex join(org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue> gellyVertex,
-    Vertex epgmVertex) throws Exception {
+  public EPGMVertex join(org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue> gellyVertex,
+    EPGMVertex epgmVertex) throws Exception {
     epgmVertex.setProperty(propertyKey, gellyVertex.getValue().f0);
     return epgmVertex;
   }
