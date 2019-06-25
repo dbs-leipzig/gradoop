@@ -19,22 +19,22 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.dataintegration.transformation.impl.config.EdgeDirection;
 
 import java.util.List;
 
 /**
- * The {@link FlatMapFunction} creates edges between f0 (Vertex) and all entries in f1 (Gradoop
+ * The {@link FlatMapFunction} creates edges between f0 (EPGMVertex) and all entries in f1 (Gradoop
  * Ids of other vertices).
  */
-public class CreateNewEdges implements FlatMapFunction<Tuple2<Vertex, List<GradoopId>>, Edge> {
+public class CreateNewEdges implements FlatMapFunction<Tuple2<EPGMVertex, List<GradoopId>>, EPGMEdge> {
   /**
    * The edge factory which is used for the creation of new edges.
    */
-  private final EdgeFactory edgeFactory;
+  private final EPGMEdgeFactory edgeFactory;
 
   /**
    * The direction of the created edge(s).
@@ -47,21 +47,21 @@ public class CreateNewEdges implements FlatMapFunction<Tuple2<Vertex, List<Grado
   private final String edgeLabel;
 
   /**
-   * Creates a new {@link FlatMapFunction} that creates edges between f0 (Vertex) and all entries
+   * Creates a new {@link FlatMapFunction} that creates edges between f0 (EPGMVertex) and all entries
    * in f1 (Gradoop Ids of other vertices).
    *
    * @param factory The edge factory which is used for the creation of new edges.
    * @param edgeDirection The direction of the created edge(s).
    * @param edgeLabel     The label of the newly created edge(s).
    */
-  public CreateNewEdges(EdgeFactory factory, EdgeDirection edgeDirection, String edgeLabel) {
+  public CreateNewEdges(EPGMEdgeFactory factory, EdgeDirection edgeDirection, String edgeLabel) {
     this.edgeDirection = edgeDirection;
     this.edgeLabel = edgeLabel;
     this.edgeFactory = factory;
   }
 
   @Override
-  public void flatMap(Tuple2<Vertex, List<GradoopId>> value, Collector<Edge> out) {
+  public void flatMap(Tuple2<EPGMVertex, List<GradoopId>> value, Collector<EPGMEdge> out) {
     for (GradoopId sourceId : value.f1) {
       if (edgeDirection.equals(EdgeDirection.BIDIRECTIONAL) ||
         edgeDirection.equals(EdgeDirection.NEWVERTEX_TO_ORIGIN)) {

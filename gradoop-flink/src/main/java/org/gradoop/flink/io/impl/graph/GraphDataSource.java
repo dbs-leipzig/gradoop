@@ -21,8 +21,8 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.graph.functions.InitEdge;
 import org.gradoop.flink.io.impl.graph.functions.InitVertex;
@@ -115,24 +115,24 @@ public class GraphDataSource<K extends Comparable<K>> implements DataSource {
     TypeInformation<K> externalIdType = ((TupleTypeInfo<?>) importVertices
       .getType()).getTypeAt(0);
 
-    DataSet<Tuple3<K, GradoopId, Vertex>> vertexTriples = importVertices
+    DataSet<Tuple3<K, GradoopId, EPGMVertex>> vertexTriples = importVertices
       .map(new InitVertex<K>(
         config.getVertexFactory(), lineagePropertyKey, externalIdType));
 
-    DataSet<Vertex> epgmVertices = vertexTriples
-      .map(new Value2Of3<K, GradoopId, Vertex>());
+    DataSet<EPGMVertex> epgmVertices = vertexTriples
+      .map(new Value2Of3<K, GradoopId, EPGMVertex>());
 
     DataSet<Tuple2<K, GradoopId>> vertexIdPair = vertexTriples
-      .map(new Project3To0And1<K, GradoopId, Vertex>());
+      .map(new Project3To0And1<K, GradoopId, EPGMVertex>());
 
-    DataSet<Edge> epgmEdges = importEdges
+    DataSet<EPGMEdge> epgmEdges = importEdges
       .join(vertexIdPair)
       .where(1).equalTo(0)
       .with(new InitEdge<K>(
         config.getEdgeFactory(), lineagePropertyKey, externalIdType))
       .join(vertexIdPair)
       .where(0).equalTo(0)
-      .with(new UpdateEdge<Edge, K>());
+      .with(new UpdateEdge<EPGMEdge, K>());
 
     return config.getLogicalGraphFactory().fromDataSets(epgmVertices, epgmEdges);
   }

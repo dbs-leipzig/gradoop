@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 
 import java.util.List;
@@ -28,8 +28,7 @@ import java.util.List;
  * @param <EL> EPGM element type
  * @param <OUT> output type
  */
-public abstract class AbstractBuilder<EL extends EPGMElement, OUT>
-  extends RichMapFunction<EL, OUT> {
+public abstract class AbstractBuilder<EL extends Element, OUT> extends RichMapFunction<EL, OUT> {
 
   /**
    * GDL query

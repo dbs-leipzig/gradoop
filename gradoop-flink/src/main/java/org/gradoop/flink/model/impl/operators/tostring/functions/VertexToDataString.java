@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.tostring.functions;
 
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
  *
  * @param <V> vertex type
  */
-public class VertexToDataString<V extends EPGMVertex>
+public class VertexToDataString<V extends Vertex>
   extends ElementToDataString<V>
   implements VertexToString<V> {
 

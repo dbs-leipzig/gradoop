@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.transactional.function;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.AbstractBuilder;
@@ -36,7 +36,7 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
  *
  * @param <V> EPGM vertex type
  */
-public class BuildIdWithCandidatesAndGraphs<V extends EPGMVertex>
+public class BuildIdWithCandidatesAndGraphs<V extends Vertex>
   extends AbstractBuilder<V, Tuple2<GradoopIdSet, IdWithCandidates<GradoopId>>> {
   /**
    * serial version uid

@@ -17,9 +17,9 @@ package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
@@ -31,7 +31,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import java.util.Arrays;
 
 /**
- * Default interface of a EPGM graph collection instance.
+ * Default interface of a graph collection instance.
  *
  * @param <G> type of the graph head
  * @param <V> the vertex type
@@ -40,9 +40,9 @@ import java.util.Arrays;
  * @param <GC> the type of the graph collection that will be created with a provided factory
  */
 public interface BaseGraphCollection<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>>
   extends GraphCollectionLayout<G, V, E>, BaseGraphCollectionOperators<G, V, E, LG, GC> {

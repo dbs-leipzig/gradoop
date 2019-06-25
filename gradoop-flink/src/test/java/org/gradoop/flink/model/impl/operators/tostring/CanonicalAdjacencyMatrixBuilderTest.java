@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.tostring;
 
 import org.apache.commons.io.FileUtils;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -40,7 +40,7 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
 
     GraphCollection g = loader.getGraphCollection();
 
-    CanonicalAdjacencyMatrixBuilder<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection> cam =
+    CanonicalAdjacencyMatrixBuilder<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> cam =
       new CanonicalAdjacencyMatrixBuilder<>(
         new GraphHeadToDataString<>(),
         new VertexToDataString<>(),
@@ -62,7 +62,7 @@ public class CanonicalAdjacencyMatrixBuilderTest extends GradoopFlinkTestBase {
 
     GraphCollection g = loader.getGraphCollection();
 
-    CanonicalAdjacencyMatrixBuilder<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection> cam =
+    CanonicalAdjacencyMatrixBuilder<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> cam =
       new CanonicalAdjacencyMatrixBuilder<>(
         new GraphHeadToDataString<>(),
         new VertexToDataString<>(),

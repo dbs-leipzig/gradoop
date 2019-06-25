@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.distinction.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 
 import java.util.Iterator;
@@ -27,7 +27,7 @@ import java.util.Iterator;
  *
  * @param <G> graph head type
  */
-public class CountGraphHeads<G extends EPGMGraphHead> implements GraphHeadReduceFunction<G> {
+public class CountGraphHeads<G extends GraphHead> implements GraphHeadReduceFunction<G> {
 
   /**
    * property key to store graph count.

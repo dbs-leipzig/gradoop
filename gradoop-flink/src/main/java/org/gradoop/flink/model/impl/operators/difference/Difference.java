@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.operators.difference;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
@@ -41,9 +41,9 @@ import org.gradoop.flink.model.impl.operators.difference.functions.RemoveCut;
  * @param <GC> type of the graph collection
  */
 public class Difference<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>> extends SetOperatorBase<G, V, E, LG, GC> {
 

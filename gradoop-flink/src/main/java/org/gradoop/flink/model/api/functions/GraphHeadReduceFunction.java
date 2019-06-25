@@ -17,7 +17,7 @@ package org.gradoop.flink.model.api.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 
 import java.io.Serializable;
 
@@ -28,6 +28,6 @@ import java.io.Serializable;
  *
  * @param <G> graph head type
  */
-public interface GraphHeadReduceFunction<G extends EPGMGraphHead>
+public interface GraphHeadReduceFunction<G extends GraphHead>
   extends GroupReduceFunction<Tuple2<String, G>, G>, Serializable {
 }

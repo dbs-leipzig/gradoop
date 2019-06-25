@@ -18,8 +18,8 @@ package org.gradoop.flink.algorithms.fsm.transactional.common.functions;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.tuples.IdWithLabel;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
@@ -40,8 +40,8 @@ public class ToDirectedAdjacencyList implements
   public AdjacencyList<GradoopId, String, IdWithLabel, IdWithLabel> map(
     GraphTransaction transaction) throws Exception {
 
-    Set<Vertex> vertices = transaction.getVertices();
-    Set<Edge> edges = transaction.getEdges();
+    Set<EPGMVertex> vertices = transaction.getVertices();
+    Set<EPGMEdge> edges = transaction.getEdges();
 
     int vertexCount = vertices.size();
 
@@ -54,13 +54,13 @@ public class ToDirectedAdjacencyList implements
     Map<GradoopId, String> labels = Maps.newHashMapWithExpectedSize(vertexCount);
 
     // VERTICES
-    for (Vertex vertex : vertices) {
+    for (EPGMVertex vertex : vertices) {
       labels.put(vertex.getId(), vertex.getLabel());
     }
 
     // EDGES
 
-    for (Edge edge : edges) {
+    for (EPGMEdge edge : edges) {
       GradoopId sourceId = edge.getSourceId();
 
       AdjacencyListRow<IdWithLabel, IdWithLabel> outgoingRow =

@@ -43,7 +43,7 @@ public abstract class Neighborhood implements UnaryGraphToGraphOperator {
   }
 
   /**
-   * Edge aggregate function.
+   * EPGMEdge aggregate function.
    */
   private AggregateFunction function;
 

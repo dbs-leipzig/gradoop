@@ -15,6 +15,17 @@
  */
 package org.gradoop.dataintegration.transformation.impl;
 
+import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
+import org.gradoop.flink.model.impl.functions.filters.Or;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,17 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
-import org.gradoop.flink.model.impl.functions.filters.Or;
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * Tests for the invert edge operator.
@@ -90,12 +90,12 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
      * (dave)-[:hasInterest]->(hadoop)
      */
 
-    List<Vertex> vertices = new ArrayList<>();
+    List<EPGMVertex> vertices = new ArrayList<>();
     invertedEdgeGraph.getVertices()
       .filter(new Or<>(new ByLabel<>("Person"), new ByLabel<>("Tag")))
       .output(new LocalCollectionOutputFormat<>(vertices));
 
-    List<Edge> newEdges = new ArrayList<>();
+    List<EPGMEdge> newEdges = new ArrayList<>();
     invertedEdgeGraph
       .getEdgesByLabel(invertedLabel)
       .output(new LocalCollectionOutputFormat<>(newEdges));
@@ -108,7 +108,7 @@ public class InvertEdgesTest extends GradoopFlinkTestBase {
     Set<String> tags = new HashSet<>(Arrays.asList("Databases", "Hadoop"));
     Set<String> persons = new HashSet<>(Arrays.asList("Eve", "Alice", "Frank", "Dave"));
 
-    for (Edge e : newEdges) {
+    for (EPGMEdge e : newEdges) {
       String sourceName = idMap.get(e.getSourceId());
       String targetName = idMap.get(e.getTargetId());
 

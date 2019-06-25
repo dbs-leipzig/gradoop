@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.epgm;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
@@ -57,12 +57,12 @@ import java.util.Objects;
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class GraphCollection implements
-  BaseGraphCollection<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>,
+  BaseGraphCollection<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>,
   GraphCollectionOperators {
   /**
    * Layout for that graph collection
    */
-  private final GraphCollectionLayout<GraphHead, Vertex, Edge> layout;
+  private final GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> layout;
   /**
    * Configuration
    */
@@ -74,7 +74,7 @@ public class GraphCollection implements
    * @param layout the graph collection layout
    * @param config the Gradoop Flink configuration
    */
-  GraphCollection(GraphCollectionLayout<GraphHead, Vertex, Edge> layout,
+  GraphCollection(GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> layout,
     GradoopFlinkConfig config) {
     this.layout = Objects.requireNonNull(layout);
     this.config = Objects.requireNonNull(config);
@@ -100,32 +100,32 @@ public class GraphCollection implements
   }
 
   @Override
-  public DataSet<Vertex> getVertices() {
+  public DataSet<EPGMVertex> getVertices() {
     return layout.getVertices();
   }
 
   @Override
-  public DataSet<Vertex> getVerticesByLabel(String label) {
+  public DataSet<EPGMVertex> getVerticesByLabel(String label) {
     return layout.getVerticesByLabel(label);
   }
 
   @Override
-  public DataSet<Edge> getEdges() {
+  public DataSet<EPGMEdge> getEdges() {
     return layout.getEdges();
   }
 
   @Override
-  public DataSet<Edge> getEdgesByLabel(String label) {
+  public DataSet<EPGMEdge> getEdgesByLabel(String label) {
     return layout.getEdgesByLabel(label);
   }
 
   @Override
-  public DataSet<GraphHead> getGraphHeads() {
+  public DataSet<EPGMGraphHead> getGraphHeads() {
     return layout.getGraphHeads();
   }
 
   @Override
-  public DataSet<GraphHead> getGraphHeadsByLabel(String label) {
+  public DataSet<EPGMGraphHead> getGraphHeadsByLabel(String label) {
     return layout.getGraphHeadsByLabel(label);
   }
 
@@ -179,13 +179,13 @@ public class GraphCollection implements
   }
 
   @Override
-  public BaseGraphCollectionFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>
-  getFactory() {
+  public BaseGraphCollectionFactory<
+    EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> getFactory() {
     return config.getGraphCollectionFactory();
   }
 
   @Override
-  public BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>
+  public BaseGraphFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
   getGraphFactory() {
     return config.getLogicalGraphFactory();
   }

@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.distinction.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**
@@ -27,7 +27,7 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
  * @param <G> graph head type
  */
 @FunctionAnnotation.ForwardedFieldsFirst("f1->f0")
-public class GraphHeadGroup<G extends EPGMGraphHead>
+public class GraphHeadGroup<G extends GraphHead>
   implements JoinFunction<GraphHeadString, G, Tuple2<String, G>> {
 
   @Override

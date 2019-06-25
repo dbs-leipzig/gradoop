@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.operators.fusion;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
@@ -92,7 +92,7 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
     // Missing in the theoric definition: creating a new header
     GradoopId newGraphid = GradoopId.get();
 
-    DataSet<GraphHead> gh = searchGraph.getGraphHead()
+    DataSet<EPGMGraphHead> gh = searchGraph.getGraphHead()
       .map(new MapGraphHeadForNewGraph(newGraphid));
 
     DataSet<GradoopId> patternVertexIds = graphPatterns.getVertices()
@@ -102,7 +102,7 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
 
     // PHASE 1: Induced Subgraphs
     // Associate each vertex to its graph id
-    DataSet<Tuple2<Vertex, GradoopId>> patternVerticesWithGraphIDs =
+    DataSet<Tuple2<EPGMVertex, GradoopId>> patternVerticesWithGraphIDs =
         graphPatterns.getVertices()
         .coGroup(searchGraph.getVertices())
         .where(new Id<>()).equalTo(new Id<>())
@@ -110,22 +110,22 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
         .flatMap(new MapVertexToPairWithGraphId());
 
     // Associate each gid in hypervertices.H to the merged vertices
-    DataSet<Tuple2<Vertex, GradoopId>> mergedVertices =
+    DataSet<Tuple2<EPGMVertex, GradoopId>> mergedVertices =
         graphPatterns.getGraphHeads()
         .map(new CoGroupGraphHeadToVertex());
 
     // PHASE 2: Recreating the vertices
-    DataSet<Vertex> vi = searchGraph.getVertices()
+    DataSet<EPGMVertex> vi = searchGraph.getVertices()
       .filter(new IdNotInBroadcast<>())
       .withBroadcastSet(patternVertexIds, IdNotInBroadcast.IDS);
 
-    DataSet<Tuple2<Vertex, GradoopId>> idJoin = patternVerticesWithGraphIDs
+    DataSet<Tuple2<EPGMVertex, GradoopId>> idJoin = patternVerticesWithGraphIDs
       .coGroup(mergedVertices)
       .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
       .with(new CoGroupAssociateOldVerticesWithNewIds())
       .union(vi.map(new MapVerticesAsTuplesWithNullId()));
 
-    DataSet<Vertex> vToRet = mergedVertices
+    DataSet<EPGMVertex> vToRet = mergedVertices
       .coGroup(patternVerticesWithGraphIDs)
       .where(new Value1Of2<>()).equalTo(new Value1Of2<>())
       .with(new LeftSide<>())
@@ -134,7 +134,7 @@ public class VertexFusion implements BinaryGraphToGraphOperator {
       .map(new MapFunctionAddGraphElementToGraph2<>(newGraphid));
 
     // PHASE 3: Recreating the edges
-    DataSet<Edge> edges = searchGraph.getEdges()
+    DataSet<EPGMEdge> edges = searchGraph.getEdges()
       .filter(new IdNotInBroadcast<>())
       .withBroadcastSet(patternEdgeIds, IdNotInBroadcast.IDS)
       .leftOuterJoin(idJoin)

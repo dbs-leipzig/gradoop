@@ -17,9 +17,9 @@ package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Test;
 
@@ -40,23 +40,23 @@ public class CreateVertexFromEdgesTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testFunction() throws Exception {
-    CreateVertexFromEdges<Vertex, Edge> function = new CreateVertexFromEdges<>("test",
+    CreateVertexFromEdges<EPGMVertex, EPGMEdge> function = new CreateVertexFromEdges<>("test",
       getConfig().getVertexFactory());
     GradoopId dummy = GradoopId.get();
-    EdgeFactory edgeFactory = getConfig().getEdgeFactory();
+    EPGMEdgeFactory edgeFactory = getConfig().getEdgeFactory();
     // Create some test edges, with some having no properties or label.
-    Edge withoutProperties = edgeFactory.createEdge(dummy, dummy);
-    Edge withProperties = edgeFactory.createEdge("TestEdge2", dummy, dummy);
+    EPGMEdge withoutProperties = edgeFactory.createEdge(dummy, dummy);
+    EPGMEdge withProperties = edgeFactory.createEdge("TestEdge2", dummy, dummy);
     withProperties.setProperty("TestProperty", 1L);
-    List<Edge> edges = Arrays.asList(withoutProperties, withProperties);
-    List<Tuple3<Vertex, GradoopId, GradoopId>> result = getExecutionEnvironment()
+    List<EPGMEdge> edges = Arrays.asList(withoutProperties, withProperties);
+    List<Tuple3<EPGMVertex, GradoopId, GradoopId>> result = getExecutionEnvironment()
       .fromCollection(edges).map(function).collect();
     // There should be a new vertex for each edge.
     assertEquals(edges.size(), result.size());
     // Every ID should be assigned only once.
     long idCount = result.stream().map(t -> t.f0.getId()).distinct().count();
-    assertEquals("Vertex IDs are not unique.", edges.size(), idCount);
-    for (Tuple3<Vertex, GradoopId, GradoopId> resultTuple : result) {
+    assertEquals("EPGMVertex IDs are not unique.", edges.size(), idCount);
+    for (Tuple3<EPGMVertex, GradoopId, GradoopId> resultTuple : result) {
       if (resultTuple.f0.getPropertyCount() > 0) {
         assertEquals(withProperties.getProperties(), resultTuple.f0.getProperties());
       }

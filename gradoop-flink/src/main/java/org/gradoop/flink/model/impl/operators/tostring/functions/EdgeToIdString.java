@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.tostring.functions;
 
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
  *
  * @param <E> edge type
  */
-public class EdgeToIdString<E extends EPGMEdge> extends ElementToDataString<E>
+public class EdgeToIdString<E extends Edge> extends ElementToDataString<E>
   implements EdgeToString<E> {
 
   @Override

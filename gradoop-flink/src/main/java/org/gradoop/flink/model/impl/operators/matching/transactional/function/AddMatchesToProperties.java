@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.transactional.function;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.Iterator;
@@ -28,7 +28,7 @@ import java.util.Iterator;
  *
  * @param <G> graph head type
  */
-public class AddMatchesToProperties<G extends EPGMGraphHead>
+public class AddMatchesToProperties<G extends GraphHead>
   implements CoGroupFunction<G, Tuple2<GradoopId, Boolean>, G> {
 
   /**

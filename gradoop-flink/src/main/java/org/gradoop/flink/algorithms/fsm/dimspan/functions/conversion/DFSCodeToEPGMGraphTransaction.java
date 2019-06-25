@@ -20,9 +20,9 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DataflowStep;
@@ -103,7 +103,7 @@ public class DFSCodeToEPGMGraphTransaction
 
 
     // GRAPH HEAD
-    GraphHead graphHead = new GraphHead(GradoopId.get(), "", null);
+    EPGMGraphHead graphHead = new EPGMGraphHead(GradoopId.get(), "", null);
     graphHead.setLabel(DIMSpanConstants.FREQUENT_PATTERN_LABEL);
     graphHead.setProperty(DIMSpanConstants.SUPPORT_KEY, (float) frequency / graphCount);
 
@@ -114,21 +114,21 @@ public class DFSCodeToEPGMGraphTransaction
 
     GradoopId[] vertexIds = new GradoopId[vertexLabels.length];
 
-    Set<Vertex> vertices = Sets.newHashSetWithExpectedSize(vertexLabels.length);
+    Set<EPGMVertex> vertices = Sets.newHashSetWithExpectedSize(vertexLabels.length);
 
     int intId = 0;
     for (int intLabel : vertexLabels) {
       String label = vertexDictionary[intLabel];
 
       GradoopId gradoopId = GradoopId.get();
-      vertices.add(new Vertex(gradoopId, label, null, graphIds));
+      vertices.add(new EPGMVertex(gradoopId, label, null, graphIds));
 
       vertexIds[intId] = gradoopId;
       intId++;
     }
 
     // EDGES
-    Set<Edge> edges = Sets.newHashSet();
+    Set<EPGMEdge> edges = Sets.newHashSet();
 
     for (int edgeId = 0; edgeId < graphUtils.getEdgeCount(pattern); edgeId++) {
       String label = edgeDictionary[graphUtils.getEdgeLabel(pattern, edgeId)];
@@ -144,7 +144,7 @@ public class DFSCodeToEPGMGraphTransaction
         targetId = vertexIds[graphUtils.getFromId(pattern, edgeId)];
       }
 
-      edges.add(new Edge(GradoopId.get(), label, sourceId, targetId, null, graphIds));
+      edges.add(new EPGMEdge(GradoopId.get(), label, sourceId, targetId, null, graphIds));
     }
 
     return new GraphTransaction(graphHead, vertices, edges);

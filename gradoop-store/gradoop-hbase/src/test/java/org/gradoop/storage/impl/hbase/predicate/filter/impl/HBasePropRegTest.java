@@ -20,7 +20,7 @@ import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Type;
 import org.junit.Test;
 
@@ -42,7 +42,7 @@ public class HBasePropRegTest {
     String key = "key";
     Pattern pattern = Pattern.compile("^FooBar.*$");
 
-    HBasePropReg<Vertex> vertexFilter = new HBasePropReg<>(key, pattern);
+    HBasePropReg<EPGMVertex> vertexFilter = new HBasePropReg<>(key, pattern);
 
     FilterList expectedFilter = new FilterList(FilterList.Operator.MUST_PASS_ALL);
 
