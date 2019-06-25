@@ -18,9 +18,9 @@ package org.gradoop.storage.impl.hbase.io;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
@@ -44,24 +44,24 @@ import javax.annotation.Nullable;
  */
 public class HBaseDataSource extends HBaseBase
   implements FilterableDataSource<
-  ElementQuery<HBaseElementFilter<GraphHead>>,
-  ElementQuery<HBaseElementFilter<Vertex>>,
-  ElementQuery<HBaseElementFilter<Edge>>> {
+  ElementQuery<HBaseElementFilter<EPGMGraphHead>>,
+  ElementQuery<HBaseElementFilter<EPGMVertex>>,
+  ElementQuery<HBaseElementFilter<EPGMEdge>>> {
 
   /**
    * Query definition for graph head elements
    */
-  private final ElementQuery<HBaseElementFilter<GraphHead>> graphHeadQuery;
+  private final ElementQuery<HBaseElementFilter<EPGMGraphHead>> graphHeadQuery;
 
   /**
    * Query definition for vertices
    */
-  private final ElementQuery<HBaseElementFilter<Vertex>> vertexQuery;
+  private final ElementQuery<HBaseElementFilter<EPGMVertex>> vertexQuery;
 
   /**
    * Query definition for edges
    */
-  private final ElementQuery<HBaseElementFilter<Edge>> edgeQuery;
+  private final ElementQuery<HBaseElementFilter<EPGMEdge>> edgeQuery;
 
   /**
    * Creates a new HBase data source.
@@ -88,9 +88,9 @@ public class HBaseDataSource extends HBaseBase
   private HBaseDataSource(
     @Nonnull HBaseEPGMStore epgmStore,
     @Nonnull GradoopFlinkConfig flinkConfig,
-    @Nullable ElementQuery<HBaseElementFilter<GraphHead>> graphHeadQuery,
-    @Nullable ElementQuery<HBaseElementFilter<Vertex>> vertexQuery,
-    @Nullable ElementQuery<HBaseElementFilter<Edge>> edgeQuery
+    @Nullable ElementQuery<HBaseElementFilter<EPGMGraphHead>> graphHeadQuery,
+    @Nullable ElementQuery<HBaseElementFilter<EPGMVertex>> vertexQuery,
+    @Nullable ElementQuery<HBaseElementFilter<EPGMEdge>> edgeQuery
   ) {
     super(epgmStore, flinkConfig);
     this.graphHeadQuery = graphHeadQuery;
@@ -108,21 +108,21 @@ public class HBaseDataSource extends HBaseBase
     GradoopFlinkConfig config = getFlinkConfig();
     HBaseEPGMStore store = getStore();
 
-    DataSet<GraphHead> graphHeads = config.getExecutionEnvironment()
+    DataSet<EPGMGraphHead> graphHeads = config.getExecutionEnvironment()
       .createInput(new GraphHeadTableInputFormat(
           getHBaseConfig().getGraphHeadHandler().applyQuery(graphHeadQuery),
           store.getGraphHeadName()),
         new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType())))
       .map(new ValueOf1<>());
 
-    DataSet<Vertex> vertices = config.getExecutionEnvironment()
+    DataSet<EPGMVertex> vertices = config.getExecutionEnvironment()
       .createInput(new VertexTableInputFormat(
           getHBaseConfig().getVertexHandler().applyQuery(vertexQuery),
           store.getVertexTableName()),
         new TupleTypeInfo<>(TypeExtractor.createTypeInfo(config.getVertexFactory().getType())))
       .map(new ValueOf1<>());
 
-    DataSet<Edge> edges = config.getExecutionEnvironment()
+    DataSet<EPGMEdge> edges = config.getExecutionEnvironment()
       .createInput(new EdgeTableInputFormat(
           getHBaseConfig().getEdgeHandler().applyQuery(edgeQuery),
           store.getEdgeTableName()),
@@ -135,7 +135,7 @@ public class HBaseDataSource extends HBaseBase
   @Nonnull
   @Override
   public HBaseDataSource applyGraphPredicate(
-    @Nonnull ElementQuery<HBaseElementFilter<GraphHead>> query
+    @Nonnull ElementQuery<HBaseElementFilter<EPGMGraphHead>> query
   ) {
     return new HBaseDataSource(getStore(), getFlinkConfig(), query, vertexQuery, edgeQuery);
   }
@@ -143,7 +143,7 @@ public class HBaseDataSource extends HBaseBase
   @Nonnull
   @Override
   public HBaseDataSource applyVertexPredicate(
-    @Nonnull ElementQuery<HBaseElementFilter<Vertex>> query
+    @Nonnull ElementQuery<HBaseElementFilter<EPGMVertex>> query
   ) {
     return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, query, edgeQuery);
   }
@@ -151,7 +151,7 @@ public class HBaseDataSource extends HBaseBase
   @Nonnull
   @Override
   public HBaseDataSource applyEdgePredicate(
-    @Nonnull ElementQuery<HBaseElementFilter<Edge>> query
+    @Nonnull ElementQuery<HBaseElementFilter<EPGMEdge>> query
   ) {
     return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, vertexQuery, query);
   }

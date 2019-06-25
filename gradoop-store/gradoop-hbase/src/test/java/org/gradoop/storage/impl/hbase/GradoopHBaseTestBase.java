@@ -19,9 +19,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HBaseTestingUtility;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.config.GradoopHBaseConfig;
 import org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
 
@@ -54,9 +54,9 @@ public class GradoopHBaseTestBase {
   public static final String PROP_STATUS = "status";
   public static final String PROP_VERTEX_COUNT = "vertexCount";
 
-  private static Collection<GraphHead> socialGraphHeads;
-  private static Collection<Vertex> socialVertices;
-  private static Collection<Edge> socialEdges;
+  private static Collection<EPGMGraphHead> socialGraphHeads;
+  private static Collection<EPGMVertex> socialVertices;
+  private static Collection<EPGMEdge> socialEdges;
 
   //----------------------------------------------------------------------------
   // Cluster related
@@ -178,7 +178,7 @@ public class GradoopHBaseTestBase {
    * @return collection of graph heads
    * @throws IOException if fetching graph elements failed
    */
-  public static Collection<GraphHead> getSocialGraphHeads() throws IOException {
+  public static Collection<EPGMGraphHead> getSocialGraphHeads() throws IOException {
     if (socialGraphHeads == null) {
       socialGraphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
     }
@@ -192,7 +192,7 @@ public class GradoopHBaseTestBase {
    * @return collection of vertices
    * @throws IOException if fetching graph elements failed
    */
-  public static Collection<Vertex> getSocialVertices() throws IOException {
+  public static Collection<EPGMVertex> getSocialVertices() throws IOException {
     if (socialVertices == null) {
       socialVertices = GradoopTestUtils.getSocialNetworkLoader().getVertices();
     }
@@ -206,7 +206,7 @@ public class GradoopHBaseTestBase {
    * @return collection of edges
    * @throws IOException if fetching graph elements failed
    */
-  public static Collection<Edge> getSocialEdges() throws IOException {
+  public static Collection<EPGMEdge> getSocialEdges() throws IOException {
     if (socialEdges == null) {
       socialEdges = GradoopTestUtils.getSocialNetworkLoader().getEdges();
     }
@@ -221,13 +221,13 @@ public class GradoopHBaseTestBase {
    */
   public static void writeSocialGraphToStore(HBaseEPGMStore epgmStore) throws IOException {
     // write social graph to HBase
-    for (GraphHead g : getSocialGraphHeads()) {
+    for (EPGMGraphHead g : getSocialGraphHeads()) {
       epgmStore.writeGraphHead(g);
     }
-    for (Vertex v : getSocialVertices()) {
+    for (EPGMVertex v : getSocialVertices()) {
       epgmStore.writeVertex(v);
     }
-    for (Edge e : getSocialEdges()) {
+    for (EPGMEdge e : getSocialEdges()) {
       epgmStore.writeEdge(e);
     }
     epgmStore.flush();

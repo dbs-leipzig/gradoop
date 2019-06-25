@@ -15,7 +15,7 @@
  */
 package org.gradoop.storage.utils;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.impl.accumulo.predicate.filter.impl.AccumuloLabelIn;
 import org.gradoop.storage.impl.accumulo.predicate.filter.impl.AccumuloLabelReg;
 import org.gradoop.storage.impl.accumulo.predicate.filter.impl.AccumuloPropEquals;
@@ -38,7 +38,7 @@ public class AccumuloFilters {
    * @return label in formula
    */
   @Nonnull
-  public static <T extends EPGMElement> AccumuloLabelIn<T> labelIn(
+  public static <T extends Element> AccumuloLabelIn<T> labelIn(
     @Nonnull String... value
   ) {
     return new AccumuloLabelIn<>(value);
@@ -52,7 +52,7 @@ public class AccumuloFilters {
    * @return label regex formula
    */
   @Nonnull
-  public static <T extends EPGMElement> AccumuloLabelReg<T> labelReg(
+  public static <T extends Element> AccumuloLabelReg<T> labelReg(
     @Nonnull Pattern reg
   ) {
     return new AccumuloLabelReg<>(reg);
@@ -67,7 +67,7 @@ public class AccumuloFilters {
    * @return label regex formula
    */
   @Nonnull
-  public static <T extends EPGMElement> AccumuloPropEquals<T> propEquals(
+  public static <T extends Element> AccumuloPropEquals<T> propEquals(
     @Nonnull String key,
     @Nonnull Object value
   ) {
@@ -84,7 +84,7 @@ public class AccumuloFilters {
    * @return property larger than formula
    */
   @Nonnull
-  public static <T extends EPGMElement> AccumuloPropLargerThan<T> propLargerThan(
+  public static <T extends Element> AccumuloPropLargerThan<T> propLargerThan(
     @Nonnull String key,
     Object value,
     boolean include
@@ -101,7 +101,7 @@ public class AccumuloFilters {
    * @return property regex formula
    */
   @Nonnull
-  public static <T extends EPGMElement> AccumuloPropReg<T> propReg(
+  public static <T extends Element> AccumuloPropReg<T> propReg(
     @Nonnull String key,
     @Nonnull Pattern reg
   ) {

@@ -17,7 +17,7 @@ package org.gradoop.dataintegration.importer.impl.csv;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -58,9 +58,9 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
     DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true);
 
-    DataSet<Vertex> importVertex = importVertexImporter.getLogicalGraph().getVertices();
+    DataSet<EPGMVertex> importVertex = importVertexImporter.getLogicalGraph().getVertices();
 
-    List<Vertex> lv = new ArrayList<>();
+    List<EPGMVertex> lv = new ArrayList<>();
     importVertex.output(new LocalCollectionOutputFormat<>(lv));
 
     getExecutionEnvironment().execute();
@@ -79,9 +79,9 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
 
     DataSource importVertexImporter = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true);
 
-    DataSet<Vertex> importVertex = importVertexImporter.getGraphCollection().getVertices();
+    DataSet<EPGMVertex> importVertex = importVertexImporter.getGraphCollection().getVertices();
 
-    List<Vertex> lv = new ArrayList<>();
+    List<EPGMVertex> lv = new ArrayList<>();
     importVertex.output(new LocalCollectionOutputFormat<>(lv));
 
     getExecutionEnvironment().execute();
@@ -104,9 +104,9 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
     List<String> columnNames = Arrays.asList("name", "value1", "value2", "value3");
 
     DataSource importer = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), columnNames, false);
-    DataSet<Vertex> importVertex = importer.getLogicalGraph().getVertices();
+    DataSet<EPGMVertex> importVertex = importer.getLogicalGraph().getVertices();
 
-    List<Vertex> lv = new ArrayList<>();
+    List<EPGMVertex> lv = new ArrayList<>();
     importVertex.output(new LocalCollectionOutputFormat<>(lv));
 
     getExecutionEnvironment().execute();
@@ -258,12 +258,12 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
     DataSource importer = new MinimalCSVImporter(csvPath, DELIMITER, getConfig(), true);
     LogicalGraph result = importer.getLogicalGraph();
 
-    List<Vertex> lv = new ArrayList<>();
+    List<EPGMVertex> lv = new ArrayList<>();
     result.getVertices().output(new LocalCollectionOutputFormat<>(lv));
 
     getExecutionEnvironment().execute();
 
-    for (Vertex v : lv) {
+    for (EPGMVertex v : lv) {
       if (v.hasProperty("name")) {
         assertEquals(2, v.getPropertyCount());
         assertFalse(v.hasProperty("value1"));
@@ -285,10 +285,10 @@ public class MinimalCSVImporterTest extends GradoopFlinkTestBase {
    *
    * @param vertices list of the import vertices
    */
-  private void checkImportedVertices(List<Vertex> vertices) {
+  private void checkImportedVertices(List<EPGMVertex> vertices) {
     assertEquals(3, vertices.size());
 
-    for (Vertex v : vertices) {
+    for (EPGMVertex v : vertices) {
       switch (String.valueOf(v.getPropertyValue("name"))) {
       case "foo":
         assertNotNull(v.getProperties());

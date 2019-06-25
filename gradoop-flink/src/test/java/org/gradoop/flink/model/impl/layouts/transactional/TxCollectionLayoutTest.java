@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.layouts.transactional;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -43,15 +43,15 @@ public class TxCollectionLayoutTest extends GradoopFlinkTestBase {
     ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 
-    GraphHead g0 = config.getGraphHeadFactory().createGraphHead("A");
-    GraphHead g1 = config.getGraphHeadFactory().createGraphHead("B");
+    EPGMGraphHead g0 = config.getGraphHeadFactory().createGraphHead("A");
+    EPGMGraphHead g1 = config.getGraphHeadFactory().createGraphHead("B");
 
-    Vertex v0 = config.getVertexFactory().createVertex("A");
-    Vertex v1 = config.getVertexFactory().createVertex("B");
-    Vertex v2 = config.getVertexFactory().createVertex("C");
+    EPGMVertex v0 = config.getVertexFactory().createVertex("A");
+    EPGMVertex v1 = config.getVertexFactory().createVertex("B");
+    EPGMVertex v2 = config.getVertexFactory().createVertex("C");
 
-    Edge e0 = config.getEdgeFactory().createEdge("a", v0.getId(), v1.getId());
-    Edge e1 = config.getEdgeFactory().createEdge("b", v1.getId(), v2.getId());
+    EPGMEdge e0 = config.getEdgeFactory().createEdge("a", v0.getId(), v1.getId());
+    EPGMEdge e1 = config.getEdgeFactory().createEdge("b", v1.getId(), v2.getId());
 
     v0.addGraphId(g0.getId());
     v1.addGraphId(g0.getId());
@@ -88,7 +88,7 @@ public class TxCollectionLayoutTest extends GradoopFlinkTestBase {
     TxCollectionLayout layout = new TxCollectionLayout(
       getExecutionEnvironment().fromElements(tx0, tx1));
 
-    GradoopTestUtils.validateEPGMElementCollections(
+    GradoopTestUtils.validateElementCollections(
       Sets.newHashSet(tx0.getGraphHead(), tx1.getGraphHead()),
       layout.getGraphHeads().collect());
   }
@@ -98,7 +98,7 @@ public class TxCollectionLayoutTest extends GradoopFlinkTestBase {
     TxCollectionLayout layout = new TxCollectionLayout(
       getExecutionEnvironment().fromElements(tx0, tx1));
 
-    GradoopTestUtils.validateEPGMElementCollections(
+    GradoopTestUtils.validateElementCollections(
       Sets.newHashSet(tx0.getGraphHead()),
       layout.getGraphHeadsByLabel("A").collect());
   }
@@ -108,10 +108,10 @@ public class TxCollectionLayoutTest extends GradoopFlinkTestBase {
     TxCollectionLayout layout = new TxCollectionLayout(
       getExecutionEnvironment().fromElements(tx0, tx1));
 
-    Set<Vertex> expected = Sets.newHashSet(tx0.getVertices());
+    Set<EPGMVertex> expected = Sets.newHashSet(tx0.getVertices());
     expected.addAll(tx1.getVertices());
 
-    GradoopTestUtils.validateEPGMGraphElementCollections(expected, layout.getVertices().collect());
+    GradoopTestUtils.validateGraphElementCollections(expected, layout.getVertices().collect());
   }
 
   @Test
@@ -120,7 +120,7 @@ public class TxCollectionLayoutTest extends GradoopFlinkTestBase {
       getExecutionEnvironment().fromElements(tx0, tx1));
 
 
-    GradoopTestUtils.validateEPGMGraphElementCollections(
+    GradoopTestUtils.validateGraphElementCollections(
       tx0.getVertices().stream().filter(v -> v.getLabel().equals("A")).collect(Collectors.toList()),
       layout.getVerticesByLabel("A").collect());
   }
@@ -130,10 +130,10 @@ public class TxCollectionLayoutTest extends GradoopFlinkTestBase {
     TxCollectionLayout layout = new TxCollectionLayout(
       getExecutionEnvironment().fromElements(tx0, tx1));
 
-    Set<Edge> expected = Sets.newHashSet(tx0.getEdges());
+    Set<EPGMEdge> expected = Sets.newHashSet(tx0.getEdges());
     expected.addAll(tx1.getEdges());
 
-    GradoopTestUtils.validateEPGMGraphElementCollections(expected, layout.getEdges().collect());
+    GradoopTestUtils.validateGraphElementCollections(expected, layout.getEdges().collect());
   }
 
   @Test
@@ -141,7 +141,7 @@ public class TxCollectionLayoutTest extends GradoopFlinkTestBase {
     TxCollectionLayout layout = new TxCollectionLayout(
       getExecutionEnvironment().fromElements(tx0, tx1));
 
-    GradoopTestUtils.validateEPGMGraphElementCollections(
+    GradoopTestUtils.validateGraphElementCollections(
       tx0.getEdges().stream().filter(e -> e.getLabel().equals("a")).collect(Collectors.toList()),
       layout.getEdgesByLabel("a").collect());
   }

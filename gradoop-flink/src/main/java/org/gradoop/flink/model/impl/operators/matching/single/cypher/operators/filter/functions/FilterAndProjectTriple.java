@@ -66,7 +66,7 @@ public class FilterAndProjectTriple extends RichFlatMapFunction<Triple, Embeddin
    */
   private final List<String> sourceFilterPropertyKeys;
   /**
-   * Edge propertyKeys of the embedding used for filtering
+   * EPGMEdge propertyKeys of the embedding used for filtering
    */
   private final List<String> edgeFilterPropertyKeys;
   /**

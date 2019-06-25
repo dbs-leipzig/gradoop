@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.layouts.gve.indexed;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.layouts.gve.GVEGraphLayoutFactory;
 
@@ -31,10 +31,10 @@ import java.util.Objects;
 public class IndexedGVEGraphLayoutFactory extends GVEGraphLayoutFactory {
 
   @Override
-  public LogicalGraphLayout<GraphHead, Vertex, Edge> fromIndexedDataSets(
-    Map<String, DataSet<GraphHead>> graphHeads,
-    Map<String, DataSet<Vertex>> vertices,
-    Map<String, DataSet<Edge>> edges) {
+  public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromIndexedDataSets(
+    Map<String, DataSet<EPGMGraphHead>> graphHeads,
+    Map<String, DataSet<EPGMVertex>> vertices,
+    Map<String, DataSet<EPGMEdge>> edges) {
     Objects.requireNonNull(graphHeads);
     Objects.requireNonNull(vertices);
     Objects.requireNonNull(edges);

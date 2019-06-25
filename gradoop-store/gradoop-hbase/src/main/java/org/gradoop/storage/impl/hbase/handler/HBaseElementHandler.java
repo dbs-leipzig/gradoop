@@ -18,7 +18,7 @@ package org.gradoop.storage.impl.hbase.handler;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
@@ -91,7 +91,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
   }
 
   @Override
-  public Put writeLabel(final Put put, final EPGMElement entity) {
+  public Put writeLabel(final Put put, final Element entity) {
     return (entity.getLabel() == null) ? put :
       put.addColumn(CF_META_BYTES, COL_LABEL_BYTES, Bytes.toBytes(entity.getLabel()));
   }
@@ -106,7 +106,7 @@ public abstract class HBaseElementHandler implements ElementHandler {
   }
 
   @Override
-  public Put writeProperties(final Put put, final EPGMElement entity) {
+  public Put writeProperties(final Put put, final Element entity) {
     if (entity.getProperties() != null && entity.getPropertyCount() > 0) {
       for (Property property : entity.getProperties()) {
         writeProperty(put, property);

@@ -20,11 +20,11 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 
 import java.util.Iterator;
@@ -40,7 +40,7 @@ import java.util.Objects;
  * @param <V> The vertex type.
  * @param <E> The edge type.
  */
-public class EdgesFromLocalTransitiveClosure<V extends EPGMVertex, E extends EPGMEdge>
+public class EdgesFromLocalTransitiveClosure<V extends Vertex, E extends Edge>
   implements CoGroupFunction<Tuple2<V, List<NeighborhoodVertex>>,
     Tuple2<V, List<NeighborhoodVertex>>, E>, ResultTypeQueryable<E> {
 
@@ -73,9 +73,9 @@ public class EdgesFromLocalTransitiveClosure<V extends EPGMVertex, E extends EPG
    * The constructor of the CoGroup function to created new edges based on transitivity.
    *
    * @param newEdgeLabel The edge label of the newly created edge.
-   * @param factory The {@link EdgeFactory} new edges are created with.
+   * @param factory The {@link EPGMEdgeFactory} new edges are created with.
    */
-  public EdgesFromLocalTransitiveClosure(String newEdgeLabel, EPGMEdgeFactory<E> factory) {
+  public EdgesFromLocalTransitiveClosure(String newEdgeLabel, EdgeFactory<E> factory) {
     this.edgeType = Objects.requireNonNull(factory).getType();
     this.reuse = factory.createEdge(Objects.requireNonNull(newEdgeLabel), GradoopId.NULL_VALUE,
       GradoopId.NULL_VALUE);

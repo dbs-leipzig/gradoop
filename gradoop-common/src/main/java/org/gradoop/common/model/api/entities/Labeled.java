@@ -15,15 +15,21 @@
  */
 package org.gradoop.common.model.api.entities;
 
-import java.io.Serializable;
-
 /**
- * Base interface for all elements in the EPGM.
- *
- * @see EPGMGraphHead
- * @see EPGMVertex
- * @see EPGMEdge
+ * Describes an entity that has a label.
  */
-public interface EPGMElement
-  extends EPGMIdentifiable, EPGMLabeled, EPGMAttributed, Serializable {
+public interface Labeled {
+  /**
+   * Returns the label of that entity.
+   *
+   * @return label
+   */
+  String getLabel();
+
+  /**
+   * Sets the label of that entity.
+   *
+   * @param label label to be set (must not be {@code null} or empty)
+   */
+  void setLabel(String label);
 }

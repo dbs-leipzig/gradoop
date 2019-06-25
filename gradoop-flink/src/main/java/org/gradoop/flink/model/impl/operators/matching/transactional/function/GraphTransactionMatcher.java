@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.matching.transactional.function;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
@@ -74,11 +74,11 @@ public class GraphTransactionMatcher
     GraphWithCandidates graph = new GraphWithCandidates(
       graphTransaction.getGraphHead().getId());
 
-    Set<Vertex> vertices = graphTransaction.getVertices();
+    Set<EPGMVertex> vertices = graphTransaction.getVertices();
     List<IdWithCandidates<GradoopId>> vertexCandidates
       = new ArrayList<>(vertices.size());
 
-    for (Vertex vertex : vertices) {
+    for (EPGMVertex vertex : vertices) {
       IdWithCandidates<GradoopId> candidates = new IdWithCandidates<>();
       candidates.setId(vertex.getId());
       candidates.setCandidates(
@@ -92,11 +92,11 @@ public class GraphTransactionMatcher
       vertexCandidates.add(candidates);
     }
 
-    Set<Edge> edges = graphTransaction.getEdges();
+    Set<EPGMEdge> edges = graphTransaction.getEdges();
     List<TripleWithCandidates<GradoopId>> edgeCandidates =
     new ArrayList<>(edges.size());
 
-    for (Edge edge : edges) {
+    for (EPGMEdge edge : edges) {
       TripleWithCandidates<GradoopId> candidates = new TripleWithCandidates<>();
       candidates.setEdgeId(edge.getId());
       candidates.setSourceId(edge.getSourceId());

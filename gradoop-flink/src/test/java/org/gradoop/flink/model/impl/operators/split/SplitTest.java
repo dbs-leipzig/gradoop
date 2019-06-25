@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.split;
 
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -28,7 +28,7 @@ import java.util.List;
 
 public class SplitTest extends GradoopFlinkTestBase {
 
-  private static List<PropertyValue> getSplitValues(Vertex v) {
+  private static List<PropertyValue> getSplitValues(EPGMVertex v) {
     String key1 = "key1";
     String key2 = "key2";
     List<PropertyValue> valueList = new ArrayList<>();

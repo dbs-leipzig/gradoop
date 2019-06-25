@@ -17,10 +17,10 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.common;
 
 import com.google.common.collect.Lists;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
@@ -37,7 +37,7 @@ public class EmbeddingFactoryTest {
     properties.set("foo", 1);
     properties.set("bar", "42");
     properties.set("baz", false);
-    Vertex vertex = new VertexFactory().createVertex("TestVertex",  properties);
+    EPGMVertex vertex = new EPGMVertexFactory().createVertex("TestVertex",  properties);
 
     Embedding embedding =
       EmbeddingFactory.fromVertex(vertex, Lists.newArrayList("foo", "bar"));
@@ -54,7 +54,7 @@ public class EmbeddingFactoryTest {
     properties.set("foo", 1);
     properties.set("bar", "42");
     properties.set("baz", false);
-    Edge edge = new EdgeFactory().createEdge(
+    EPGMEdge edge = new EPGMEdgeFactory().createEdge(
       "TestVertex", GradoopId.get(), GradoopId.get(), properties
     );
 
@@ -78,7 +78,7 @@ public class EmbeddingFactoryTest {
 
     GradoopId a = GradoopId.get();
 
-    Edge edge = new EdgeFactory().createEdge(
+    EPGMEdge edge = new EPGMEdgeFactory().createEdge(
       "TestVertex", a, a, properties
     );
 

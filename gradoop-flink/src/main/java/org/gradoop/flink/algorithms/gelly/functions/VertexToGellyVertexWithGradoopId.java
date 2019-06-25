@@ -17,7 +17,7 @@ package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Maps EPGM vertex to a Gelly vertex with the {@link GradoopId} as its id and value.
@@ -37,7 +37,7 @@ public class VertexToGellyVertexWithGradoopId implements VertexToGellyVertex<Gra
   }
 
   @Override
-  public org.apache.flink.graph.Vertex<GradoopId, GradoopId> map(Vertex epgmVertex) {
+  public org.apache.flink.graph.Vertex<GradoopId, GradoopId> map(EPGMVertex epgmVertex) {
     GradoopId id = epgmVertex.getId();
     reuseVertex.setId(id);
     reuseVertex.setValue(id);

@@ -17,12 +17,13 @@ package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.graph.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
- * Convert a Gradoop {@link Vertex} to a Gelly Vertex.
+ * Convert a Gradoop {@link Vertex} to a Gelly EPGMVertex.
  *
  * @param <VV> Value type of the output gelly vertex.
  */
 public interface VertexToGellyVertex<VV>
-  extends ElementToGellyVertex<org.gradoop.common.model.impl.pojo.Vertex, GradoopId, VV> {
+  extends ElementToGellyVertex<EPGMVertex, GradoopId, VV> {
 }

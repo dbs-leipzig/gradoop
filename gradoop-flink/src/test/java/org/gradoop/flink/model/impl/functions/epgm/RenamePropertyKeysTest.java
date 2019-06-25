@@ -22,13 +22,13 @@ import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -47,13 +47,13 @@ public class RenamePropertyKeysTest extends GradoopFlinkTestBase {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    EPGMGraphHead graphHead =
-        new GraphHeadFactory().initGraphHead(graphID, label, props);
+    GraphHead graphHead =
+        new EPGMGraphHeadFactory().initGraphHead(graphID, label, props);
 
     HashMap<String, String> newProps = new HashMap<>();
     newProps.put("k1", "new_k1");
 
-    TransformationFunction<EPGMGraphHead> renameFunction = new RenamePropertyKeys<>(newProps);
+    TransformationFunction<GraphHead> renameFunction = new RenamePropertyKeys<>(newProps);
 
     renameFunction.apply(graphHead, graphHead);
 
@@ -76,13 +76,13 @@ public class RenamePropertyKeysTest extends GradoopFlinkTestBase {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    EPGMEdge edge =
-        new EdgeFactory().initEdge(edgeId, label, sourceId, targetId, props);
+    Edge edge =
+        new EPGMEdgeFactory().initEdge(edgeId, label, sourceId, targetId, props);
 
     HashMap<String, String> newProps = new HashMap<>();
     newProps.put("k1", "new_k1");
 
-    TransformationFunction<EPGMEdge> renameFunction = new RenamePropertyKeys<>(newProps);
+    TransformationFunction<Edge> renameFunction = new RenamePropertyKeys<>(newProps);
 
     renameFunction.apply(edge, edge);
 
@@ -103,13 +103,13 @@ public class RenamePropertyKeysTest extends GradoopFlinkTestBase {
     props.set("k1", "v1");
     props.set("k2", "v2");
 
-    EPGMVertex vertex =
-        new VertexFactory().initVertex(vertexId, label, props);
+    Vertex vertex =
+        new EPGMVertexFactory().initVertex(vertexId, label, props);
 
     HashMap<String, String> newProps = new HashMap<>();
     newProps.put("k1", "new_k1");
 
-    TransformationFunction<EPGMVertex> renameFunction = new RenamePropertyKeys<>(newProps);
+    TransformationFunction<Vertex> renameFunction = new RenamePropertyKeys<>(newProps);
 
     renameFunction.apply(vertex, vertex);
 

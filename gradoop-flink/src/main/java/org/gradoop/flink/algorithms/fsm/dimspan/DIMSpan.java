@@ -58,7 +58,7 @@ import org.gradoop.flink.model.impl.operators.count.Count;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * abstract superclass of different implementations of the gSpan frequent
+ * Abstract superclass of different implementations of the gSpan frequent
  * subgraph mining algorithm as Gradoop operator
  */
 public class DIMSpan {

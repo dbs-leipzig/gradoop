@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.operators.transformation;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -49,13 +49,13 @@ public class TransformationTest extends GradoopFlinkTestBase {
     "g04:A { a : 1 } [(:A { a : 1, b : 2 })-->(:B { c : 2 })]" +
     "g14:B { a : 2 } [(:A { a : 2, b : 2 })-->(:B { c : 3 })]";
 
-  static GraphHead transformGraphHead(GraphHead current, GraphHead transformed) {
+  static EPGMGraphHead transformGraphHead(EPGMGraphHead current, EPGMGraphHead transformed) {
     transformed.setLabel(current.getLabel());
     transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1);
     return transformed;
   }
 
-  static Vertex transformVertex(Vertex current, Vertex transformed) {
+  static EPGMVertex transformVertex(EPGMVertex current, EPGMVertex transformed) {
     transformed.setLabel(current.getLabel());
     if (current.getLabel().equals("A")) {
       transformed.setProperty("a", current.getPropertyValue("a").getInt() + 1);
@@ -66,7 +66,7 @@ public class TransformationTest extends GradoopFlinkTestBase {
     return transformed;
   }
 
-  static Edge transformEdge(Edge current, Edge transformed) {
+  static EPGMEdge transformEdge(EPGMEdge current, EPGMEdge transformed) {
     return transformed;
   }
 

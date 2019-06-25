@@ -35,7 +35,8 @@ import static java.util.stream.Collectors.joining;
 
 /**
  * This class represents an Embedding, an ordered List of Embedding Entries. Every entry is
- * either a reference to a single Edge or Vertex, or a path (Edge, Vertex, Edge, Vertex, ..., Edge).
+ * either a reference to a single EPGMEdge or EPGMVertex, or a
+ * path (EPGMEdge, EPGMVertex, EPGMEdge, EPGMVertex, ..., EPGMEdge).
  * The reference is stored via the elements ID. Additionally the embedding ca store an ordered
  * list of PropertyValues.
  */
@@ -97,7 +98,7 @@ public class Embedding implements Value, CopyableValue<Embedding> {
   // ---------------------------------------------------------------------------------------------
 
   /**
-   * Appends a reference to an Vertex/Edge to the embedding
+   * Appends a reference to an EPGMVertex/EPGMEdge to the embedding
    * @param id the Id that will be appended
    */
   public void add(GradoopId id) {
@@ -191,9 +192,9 @@ public class Embedding implements Value, CopyableValue<Embedding> {
 
   /**
    * Adds an entry to the embedding.
-   * This can either be an ID representing referencing a Vertex/Edge or a pointer to a path entry
+   * This can either be an ID representing referencing a EPGMVertex/EPGMEdge or a pointer to a path entry
    * @param id the id that will be added to the embedding
-   * @param isIdList indicates if the id represents a GraphElement or points to a path entry
+   * @param isIdList indicates if the id represents a EPGMGraphElement or points to a path entry
    */
   private void add(GradoopId id, boolean isIdList) {
     byte[] newIds = new byte[idData.length + 1 + GradoopId.ID_SIZE];
