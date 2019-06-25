@@ -16,10 +16,10 @@
 package org.gradoop.storage.impl.accumulo.io.source;
 
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.impl.accumulo.io.AccumuloDataSource;
@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IOElementIdRangeTest extends AccumuloStoreTestBase {
@@ -49,11 +49,11 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
   @Test
   public void vertexIdSetQueryTest() throws Throwable {
     doTest(TEST01, (loader, store, config) -> {
-      List<Vertex> inputVertices = sample(new ArrayList<>(loader.getVertices()), 5);
+      List<EPGMVertex> inputVertices = sample(new ArrayList<>(loader.getVertices()), 5);
 
       //vertex id query
       GradoopIdSet ids = GradoopIdSet.fromExisting(inputVertices.stream()
-        .map(Element::getId)
+        .map(EPGMElement::getId)
         .collect(Collectors.toList()));
 
       AccumuloDataSource source = new AccumuloDataSource(store, config);
@@ -65,12 +65,12 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
           .noFilter());
       Assert.assertTrue(source.isFilterPushedDown());
 
-      List<Vertex> queryResult = source
+      List<EPGMVertex> queryResult = source
         .getGraphCollection()
         .getVertices()
         .collect();
 
-      validateEPGMElementCollections(inputVertices, queryResult);
+      validateElementCollections(inputVertices, queryResult);
     });
   }
 
@@ -82,11 +82,11 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
   @Test
   public void edgeIdSetQueryTest() throws Throwable {
     doTest(TEST02, (loader, store, config) -> {
-      List<Edge> inputEdges = sample(new ArrayList<>(loader.getEdges()), 5);
+      List<EPGMEdge> inputEdges = sample(new ArrayList<>(loader.getEdges()), 5);
 
       //edge id query
       GradoopIdSet ids = GradoopIdSet.fromExisting(inputEdges.stream()
-        .map(Element::getId)
+        .map(EPGMElement::getId)
         .collect(Collectors.toList()));
 
       AccumuloDataSource source = new AccumuloDataSource(store, config);
@@ -98,12 +98,12 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
           .noFilter());
       Assert.assertTrue(source.isFilterPushedDown());
 
-      List<Edge> queryResult = source
+      List<EPGMEdge> queryResult = source
         .getGraphCollection()
         .getEdges()
         .collect();
 
-      validateEPGMElementCollections(inputEdges, queryResult);
+      validateElementCollections(inputEdges, queryResult);
     });
   }
 
@@ -115,11 +115,11 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
   @Test
   public void graphIdSetQueryTest() throws Throwable {
     doTest(TEST03, (loader, store, config) -> {
-      List<GraphHead> inputGraphs = sample(new ArrayList<>(loader.getGraphHeads()), 3);
+      List<EPGMGraphHead> inputGraphs = sample(new ArrayList<>(loader.getGraphHeads()), 3);
 
       //vertex id query
       GradoopIdSet ids = GradoopIdSet.fromExisting(inputGraphs.stream()
-        .map(Element::getId)
+        .map(EPGMElement::getId)
         .collect(Collectors.toList()));
 
       AccumuloDataSource source = new AccumuloDataSource(store, config);
@@ -131,12 +131,12 @@ public class IOElementIdRangeTest extends AccumuloStoreTestBase {
           .noFilter());
       Assert.assertTrue(source.isFilterPushedDown());
 
-      List<GraphHead> queryResult = source
+      List<EPGMGraphHead> queryResult = source
         .getGraphCollection()
         .getGraphHeads()
         .collect();
 
-      validateEPGMElementCollections(inputGraphs, queryResult);
+      validateElementCollections(inputGraphs, queryResult);
     });
   }
 

@@ -21,9 +21,9 @@ import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.IteratorSetting;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.storage.impl.accumulo.handler.AccumuloEdgeHandler;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopEdgeIterator;
@@ -36,7 +36,7 @@ import java.util.Properties;
 /**
  * gradoop edge input format
  */
-public class EdgeInputFormat extends BaseInputFormat<Edge> {
+public class EdgeInputFormat extends BaseInputFormat<EPGMEdge> {
 
   /**
    * serialize id
@@ -61,7 +61,7 @@ public class EdgeInputFormat extends BaseInputFormat<Edge> {
    */
   public EdgeInputFormat(
     @NonNull Properties properties,
-    @Nullable AccumuloQueryHolder<Edge> predicate
+    @Nullable AccumuloQueryHolder<EPGMEdge> predicate
   ) {
     super(properties, predicate);
   }
@@ -69,7 +69,7 @@ public class EdgeInputFormat extends BaseInputFormat<Edge> {
   @Override
   protected void initiate() {
     iterator = new GradoopEdgeIterator();
-    handler = new AccumuloEdgeHandler(new EdgeFactory());
+    handler = new AccumuloEdgeHandler(new EPGMEdgeFactory());
   }
 
   @Override
@@ -88,8 +88,8 @@ public class EdgeInputFormat extends BaseInputFormat<Edge> {
   }
 
   @Override
-  protected Edge mapRow(Map.Entry<Key, Value> row) throws IOException {
-    EPGMEdge decoded = iterator.fromRow(row);
+  protected EPGMEdge mapRow(Map.Entry<Key, Value> row) throws IOException {
+    Edge decoded = iterator.fromRow(row);
     return handler.readRow(decoded);
   }
 

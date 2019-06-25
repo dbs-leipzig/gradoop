@@ -15,19 +15,19 @@
  */
 package org.gradoop.common.model.impl.pojo;
 
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
  * POJO Implementation of an EPGM graph head.
  */
-public class GraphHead extends Element implements EPGMGraphHead {
+public class EPGMGraphHead extends EPGMElement implements GraphHead {
 
   /**
    * Default constructor.
    */
-  public GraphHead() {
+  public EPGMGraphHead() {
   }
 
   /**
@@ -37,7 +37,7 @@ public class GraphHead extends Element implements EPGMGraphHead {
    * @param label      graph label
    * @param properties graph properties
    */
-  public GraphHead(final GradoopId id, final String label,
+  public EPGMGraphHead(final GradoopId id, final String label,
     final Properties properties) {
     super(id, label, properties);
   }

@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
@@ -30,7 +30,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
  * @param <E> edge type
  * @param <V> vertex type
  */
-public class NeighborEdgeReduceFunction<E extends EPGMEdge, V extends EPGMVertex>
+public class NeighborEdgeReduceFunction<E extends Edge, V extends Vertex>
   extends NeighborEdgeFunction
   implements GroupReduceFunction<Tuple2<E, V>, V> {
 

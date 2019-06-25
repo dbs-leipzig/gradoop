@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 /**
  * Puts the vertex to the first field of the tuple.
@@ -26,7 +26,7 @@ import org.gradoop.common.model.api.entities.EPGMVertex;
  * @param <Q> type of the second field of the tuple
  * @param <V> vertex type
  */
-public class VertexToFieldZero<P, Q, V extends EPGMVertex>
+public class VertexToFieldZero<P, Q, V extends Vertex>
   implements JoinFunction<Tuple2<P, Q>, V, Tuple2<V, Q>> {
 
   /**

@@ -15,15 +15,15 @@
  */
 package org.gradoop.flink.model.impl.functions.graphcontainment;
 
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 /**
- * True, if the element has not graph ids.
+ * True, if the element has no graph ids.
  *
- * @param <EL> epgm graph element
+ * @param <EL> graph element
  */
-public class InNoGraph<EL extends EPGMGraphElement> implements CombinableFilter<EL> {
+public class InNoGraph<EL extends GraphElement> implements CombinableFilter<EL> {
 
   @Override
   public boolean filter(EL value) throws Exception {

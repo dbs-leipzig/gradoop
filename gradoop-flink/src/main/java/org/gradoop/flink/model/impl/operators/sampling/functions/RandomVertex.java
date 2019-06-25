@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 import java.util.Random;
 
@@ -24,7 +24,7 @@ import java.util.Random;
  * Creates a random value for each vertex and marks those that are below a
  * given threshold.
  */
-public class RandomVertex implements MapFunction<Vertex, Vertex> {
+public class RandomVertex implements MapFunction<EPGMVertex, EPGMVertex> {
   /**
    * Threshold to decide if a vertex needs to be filtered.
    */
@@ -52,7 +52,7 @@ public class RandomVertex implements MapFunction<Vertex, Vertex> {
   }
 
   @Override
-  public Vertex map(Vertex vertex) throws Exception {
+  public EPGMVertex map(EPGMVertex vertex) throws Exception {
     if (randomGenerator.nextFloat() <= sampleSize) {
       vertex.setProperty(samplingKey, true);
     } else {

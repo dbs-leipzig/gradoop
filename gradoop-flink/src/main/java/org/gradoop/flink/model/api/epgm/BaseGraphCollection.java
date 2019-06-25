@@ -15,14 +15,14 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * Default interface of a EPGM graph collection instance.
+ * Default interface of a graph collection instance.
  *
  * @param <G> type of the graph head
  * @param <V> the vertex type
@@ -31,9 +31,9 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * @param <GC> the type of the graph collection that will be created with a provided factory
  */
 public interface BaseGraphCollection<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>>
   extends GraphCollectionLayout<G, V, E>, BaseGraphCollectionOperators<G, V, E, LG, GC> {

@@ -20,12 +20,12 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.hadoop.conf.Configuration;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.io.impl.csv.CSVBase;
 import org.gradoop.flink.io.impl.csv.functions.CSVLineToEdge;
@@ -97,25 +97,25 @@ public class IndexedCSVDataSource extends CSVBase implements DataSource {
       source.readDistributed(getMetaDataPath(), getConfig());
 
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-    GraphHeadFactory graphHeadFactory = getConfig().getGraphHeadFactory();
-    VertexFactory vertexFactory = getConfig().getVertexFactory();
-    EdgeFactory edgeFactory = getConfig().getEdgeFactory();
+    EPGMGraphHeadFactory graphHeadFactory = getConfig().getGraphHeadFactory();
+    EPGMVertexFactory vertexFactory = getConfig().getVertexFactory();
+    EPGMEdgeFactory edgeFactory = getConfig().getEdgeFactory();
 
-    Map<String, DataSet<GraphHead>> graphHeads = metaData.getGraphLabels().stream()
+    Map<String, DataSet<EPGMGraphHead>> graphHeads = metaData.getGraphLabels().stream()
       .map(label -> Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))
         .map(new CSVLineToGraphHead(graphHeadFactory))
         .withBroadcastSet(metaDataBroadcast, BC_METADATA)
         .filter(graphHead -> graphHead.getLabel().equals(label))))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
 
-    Map<String, DataSet<Vertex>> vertices = metaData.getVertexLabels().stream()
+    Map<String, DataSet<EPGMVertex>> vertices = metaData.getVertexLabels().stream()
       .map(label -> Tuple2.of(label, env.readTextFile(getVertexCSVPath(label))
         .map(new CSVLineToVertex(vertexFactory))
         .withBroadcastSet(metaDataBroadcast, BC_METADATA)
         .filter(vertex -> vertex.getLabel().equals(label))))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
 
-    Map<String, DataSet<Edge>> edges = metaData.getEdgeLabels().stream()
+    Map<String, DataSet<EPGMEdge>> edges = metaData.getEdgeLabels().stream()
       .map(label -> Tuple2.of(label, env.readTextFile(getEdgeCSVPath(label))
         .map(new CSVLineToEdge(edgeFactory))
         .withBroadcastSet(metaDataBroadcast, BC_METADATA)

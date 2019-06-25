@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.tlf.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
@@ -29,7 +29,7 @@ public class EdgeLabelList implements
   @Override
   public void flatMap(GraphTransaction graphTransaction, Collector<String> collector)
     throws Exception {
-    for (Edge edge : graphTransaction.getEdges()) {
+    for (EPGMEdge edge : graphTransaction.getEdges()) {
       collector.collect(edge.getLabel());
     }
   }

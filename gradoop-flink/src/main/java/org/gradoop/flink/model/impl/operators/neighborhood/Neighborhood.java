@@ -47,7 +47,7 @@ public abstract class Neighborhood<LG extends BaseGraph>
   }
 
   /**
-   * Edge aggregate function.
+   * EPGMEdge aggregate function.
    */
   private AggregateFunction function;
 

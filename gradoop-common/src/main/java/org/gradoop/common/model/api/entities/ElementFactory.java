@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.common.model.impl.comparators;
-
-import org.gradoop.common.model.api.entities.EPGMIdentifiable;
-
-import java.io.Serializable;
-import java.util.Comparator;
+package org.gradoop.common.model.api.entities;
 
 /**
- * Id based EPGM element comparator.
+ * Base interface for all element factories.
+ *
+ * @param <EL> element type
  */
-public class EPGMIdentifiableComparator implements Comparator<EPGMIdentifiable>, Serializable {
-
-  @Override
-  public int compare(EPGMIdentifiable a, EPGMIdentifiable b) {
-    return a.getId().compareTo(b.getId());
-  }
+public interface ElementFactory<EL extends Element> {
+  /**
+   * Returns the type of the instances produced by that factory.
+   *
+   * @return produced entity type
+   */
+  Class<EL> getType();
 }

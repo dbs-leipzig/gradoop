@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <E> edge type
  */
-public class ShuffledVertexIdsFromEdge<E extends EPGMEdge>
+public class ShuffledVertexIdsFromEdge<E extends Edge>
   implements FlatMapFunction<E, Tuple2<GradoopId, GradoopId>> {
 
   /**

@@ -18,14 +18,15 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
+
 /**
- * EPGMElement with properties => properties
+ * Element with properties => properties
  *
- * @param <L> EPGMElement type having properties
+ * @param <L> Element type having properties
  */
 @FunctionAnnotation.ForwardedFields("properties->*")
-public class Properties<L extends EPGMElement>
+public class Properties<L extends Element>
   implements MapFunction<L, org.gradoop.common.model.impl.properties.Properties>,
              KeySelector<L, org.gradoop.common.model.impl.properties.Properties> {
 

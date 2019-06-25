@@ -18,7 +18,7 @@ package org.gradoop.storage.impl.hbase.handler;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.storage.impl.hbase.api.GraphElementHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
@@ -34,7 +34,7 @@ public abstract class HBaseGraphElementHandler extends HBaseElementHandler
   private static final byte[] COL_GRAPHS_BYTES = Bytes.toBytes(HBaseConstants.COL_GRAPHS);
 
   @Override
-  public Put writeGraphIds(Put put, EPGMGraphElement graphElement) {
+  public Put writeGraphIds(Put put, GraphElement graphElement) {
     if (graphElement.getGraphCount() > 0) {
       put = put.addColumn(
         CF_META_BYTES,

@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 
@@ -102,7 +102,7 @@ public class CNF extends PredicateCollection<CNFElement> {
   }
 
   @Override
-  public boolean evaluate(GraphElement graphElement) {
+  public boolean evaluate(EPGMGraphElement graphElement) {
     for (CNFElement element : predicates) {
       if (!element.evaluate(graphElement)) {
         return false;

@@ -17,7 +17,7 @@ package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  *
  * @param <E> The edge type.
  */
-public class BuildTargetVertexIdPropertyValuePairs<E extends EPGMEdge>
+public class BuildTargetVertexIdPropertyValuePairs<E extends Edge>
   implements JoinFunction<Tuple2<GradoopId, PropertyValue>, E, Tuple2<GradoopId, PropertyValue>> {
 
   @Override

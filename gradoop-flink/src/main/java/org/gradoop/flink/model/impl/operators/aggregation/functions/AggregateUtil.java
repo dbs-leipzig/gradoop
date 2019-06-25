@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -37,7 +37,7 @@ public class AggregateUtil {
    * @return incremented aggregate map
    */
   static Map<String, PropertyValue> increment(Map<String, PropertyValue> aggregate,
-                                              EPGMElement element,
+                                              Element element,
                                               Set<AggregateFunction> aggregateFunctions) {
     for (AggregateFunction aggFunc : aggregateFunctions) {
       PropertyValue increment = aggFunc.getIncrement(element);

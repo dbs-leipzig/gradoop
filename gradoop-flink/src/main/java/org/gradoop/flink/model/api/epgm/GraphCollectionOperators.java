@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
@@ -76,7 +76,7 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    * @param predicateFunction predicate function for graph head
    * @return collection with logical graphs that fulfil the predicate
    */
-  GraphCollection select(FilterFunction<GraphHead> predicateFunction);
+  GraphCollection select(FilterFunction<EPGMGraphHead> predicateFunction);
 
   /**
    * Returns a graph collection that is sorted by a given graph property key.

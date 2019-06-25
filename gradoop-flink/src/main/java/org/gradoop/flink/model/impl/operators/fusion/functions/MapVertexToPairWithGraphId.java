@@ -20,19 +20,19 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Demultiplexes a vertex by associating its graphId
  */
 @FunctionAnnotation.ForwardedFields("*->f0")
 public class MapVertexToPairWithGraphId
-  implements FlatMapFunction<Vertex, Tuple2<Vertex, GradoopId>> {
+  implements FlatMapFunction<EPGMVertex, Tuple2<EPGMVertex, GradoopId>> {
 
   /**
    * Reusable element ot be returned
    */
-  private final Tuple2<Vertex,   GradoopId> reusableTuple;
+  private final Tuple2<EPGMVertex,   GradoopId> reusableTuple;
 
   /**
    * Default constructor
@@ -42,7 +42,7 @@ public class MapVertexToPairWithGraphId
   }
 
   @Override
-  public void flatMap(Vertex value, Collector<Tuple2<Vertex, GradoopId>> out)
+  public void flatMap(EPGMVertex value, Collector<Tuple2<EPGMVertex, GradoopId>> out)
       throws Exception {
     if (value != null) {
       for (GradoopId id : value.getGraphIds()) {

@@ -15,7 +15,7 @@
  */
 package org.gradoop.storage.impl.accumulo.predicate.filter.api;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.common.predicate.filter.api.ElementFilter;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopEdgeIterator;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopGraphHeadIterator;
@@ -38,16 +38,16 @@ import java.util.function.Predicate;
 /**
  * Accumulo Element Filter
  *
- * @param <T> epgm element type
+ * @param <T> element type
  * @see GradoopEdgeIterator
  * @see GradoopGraphHeadIterator
  * @see GradoopVertexIterator
  */
-public interface AccumuloElementFilter<T extends EPGMElement>
+public interface AccumuloElementFilter<T extends Element>
   extends Predicate<T>, ElementFilter<AccumuloElementFilter<T>>, Serializable {
 
   /**
-   * anti-serialize reducer from base64 encoded string
+   * Deserialize reducer from base64 encoded string
    * this action will be execute by tserver
    *
    * @param encoded encoded string
@@ -55,7 +55,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
    * @return filter instance
    */
   @Nonnull
-  static <T extends EPGMElement> AccumuloElementFilter<T> decode(String encoded) {
+  static <T extends Element> AccumuloElementFilter<T> decode(String encoded) {
     byte[] content = Base64.getDecoder().decode(encoded);
     try (
       ByteArrayInputStream arr = new ByteArrayInputStream(content);
@@ -68,7 +68,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
   }
 
   /**
-   * serialize reducer as base64 encoded string
+   * Serialize reducer as base64 encoded string
    * this action will be execute by client
    *
    * @return encoded string
@@ -85,7 +85,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
   }
 
   /**
-   * disjunctive operator
+   * Disjunctive operator
    *
    * @param another another reduce filter
    * @return conjunctive logic filter
@@ -96,7 +96,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
   }
 
   /**
-   * conjunctive operator
+   * Conjunctive operator
    *
    * @param another another reduce filter
    * @return conjunctive logic filter
@@ -107,7 +107,7 @@ public interface AccumuloElementFilter<T extends EPGMElement>
   }
 
   /**
-   * negative operator
+   * Negative operator
    * @return negative logic for current filter
    */
   @Nonnull

@@ -18,9 +18,9 @@ package org.gradoop.flink.representation;
 import com.google.common.collect.Sets;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
@@ -54,26 +54,26 @@ public class RepresentationConverterTest extends GradoopFlinkTestBase {
   }
 
   private GraphTransaction getGraphTransaction() {
-    GraphHead graphHead = new GraphHead(GradoopId.get(), "Test", null);
+    EPGMGraphHead graphHead = new EPGMGraphHead(GradoopId.get(), "Test", null);
 
     GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
-    Set<Vertex> vertices = Sets.newHashSet();
-    Set<Edge> edges = Sets.newHashSet();
+    Set<EPGMVertex> vertices = Sets.newHashSet();
+    Set<EPGMEdge> edges = Sets.newHashSet();
 
     Properties aProperties = new Properties();
     aProperties.set("x", 1);
-    Vertex v1 = new Vertex(GradoopId.get(), "A", aProperties, graphIds);
-    Vertex v2 = new Vertex(GradoopId.get(), "B", null, graphIds);
+    EPGMVertex v1 = new EPGMVertex(GradoopId.get(), "A", aProperties, graphIds);
+    EPGMVertex v2 = new EPGMVertex(GradoopId.get(), "B", null, graphIds);
 
     vertices.add(v1);
     vertices.add(v2);
 
     Properties loopProperties = new Properties();
 
-    edges.add(new Edge(GradoopId.get(), "loop", v1.getId(), v1.getId(), loopProperties, graphIds));
-    edges.add(new Edge(GradoopId.get(), "m", v1.getId(), v2.getId(), null, graphIds));
-    edges.add(new Edge(GradoopId.get(), "m", v1.getId(), v2.getId(), null, graphIds));
-    edges.add(new Edge(GradoopId.get(), "m", v2.getId(), v1.getId(), null, graphIds));
+    edges.add(new EPGMEdge(GradoopId.get(), "loop", v1.getId(), v1.getId(), loopProperties, graphIds));
+    edges.add(new EPGMEdge(GradoopId.get(), "m", v1.getId(), v2.getId(), null, graphIds));
+    edges.add(new EPGMEdge(GradoopId.get(), "m", v1.getId(), v2.getId(), null, graphIds));
+    edges.add(new EPGMEdge(GradoopId.get(), "m", v2.getId(), v1.getId(), null, graphIds));
 
     return new GraphTransaction(graphHead, vertices, edges);
   }
