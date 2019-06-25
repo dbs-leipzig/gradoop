@@ -3,6 +3,15 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/DECORATION/1.6.0 http://maven.apache.org/xsd/decoration-1.6.0.xsd"
          name="Gradoop">
+    <custom>
+        <fluidoSkin>
+            <gitHub>
+                <projectId>dbs-leipzig/gradoop</projectId>
+                <ribbonOrientation>right</ribbonOrientation>
+                <ribbonColor>gray</ribbonColor>
+            </gitHub>
+        </fluidoSkin>
+    </custom>
     <bannerLeft>
         <name>Gradoop</name>
         <src>https://dbs.uni-leipzig.de/file/gradoop.png</src>
