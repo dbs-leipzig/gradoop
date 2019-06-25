@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -54,10 +54,10 @@ public class FilterEdgesByLabel extends RichMapFunction<GraphTransaction, GraphT
 
     // drop edges with infrequent labels
 
-    Iterator<Edge> edgeIterator = transaction.getEdges().iterator();
+    Iterator<EPGMEdge> edgeIterator = transaction.getEdges().iterator();
 
     while (edgeIterator.hasNext()) {
-      Edge next = edgeIterator.next();
+      EPGMEdge next = edgeIterator.next();
 
       if (frequentEdgeLabels.contains(next.getLabel())) {
         referenceEdgeIds.add(next.getSourceId());

@@ -16,8 +16,8 @@
 package org.gradoop.flink.algorithms.gelly.randomjump;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
@@ -47,7 +47,7 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
   /**
    * List for result vertices
    */
-  private List<Vertex> resultVertices;
+  private List<EPGMVertex> resultVertices;
 
   /**
    * Initialize graphs for testing
@@ -152,7 +152,7 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
    */
   private void commonValidation(LogicalGraph graph, LogicalGraph resultGraph) throws Exception {
     resultVertices = new ArrayList<>();
-    List<Edge> resultEdges = new ArrayList<>();
+    List<EPGMEdge> resultEdges = new ArrayList<>();
     resultGraph.getVertices().output(new LocalCollectionOutputFormat<>(resultVertices));
     resultGraph.getEdges().output(new LocalCollectionOutputFormat<>(resultEdges));
     getExecutionEnvironment().execute();
@@ -166,7 +166,7 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
     resultEdges.forEach(edge -> assertTrue("edge " + edge.getId() + " is not annotated",
       edge.hasProperty(SamplingConstants.PROPERTY_KEY_SAMPLED)));
 
-    for (Edge edge : resultEdges) {
+    for (EPGMEdge edge : resultEdges) {
       if (edge.getPropertyValue(SamplingConstants.PROPERTY_KEY_SAMPLED).getBoolean()) {
         resultVertices.stream().filter(vertex -> vertex.getId().equals(edge.getSourceId())).forEach(
           sourceVertex -> assertTrue("source of visited edge is not visited",

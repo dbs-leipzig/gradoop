@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.aggregation.functions.average;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -59,14 +59,14 @@ public class AveragePropertyTest extends GradoopFlinkTestBase {
       .setStrategy(GroupingStrategy.GROUP_COMBINE).build());
     // We have to collect the graph here, since results are doubles which can not be checked using
     // equals.
-    List<Vertex> vertices = new ArrayList<>();
-    List<Edge> edges = new ArrayList<>();
+    List<EPGMVertex> vertices = new ArrayList<>();
+    List<EPGMEdge> edges = new ArrayList<>();
     result.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
     result.getEdges().output(new LocalCollectionOutputFormat<>(edges));
     getExecutionEnvironment().execute();
     assertEquals(0, edges.size());
     assertEquals(2, vertices.size());
-    for (Vertex vertex : vertices) {
+    for (EPGMVertex vertex : vertices) {
       PropertyValue valueA = vertex.getPropertyValue("avg_a");
       PropertyValue valueB = vertex.getPropertyValue("avg_b");
       assertNotNull("Aggregate property a was not set.", valueA);

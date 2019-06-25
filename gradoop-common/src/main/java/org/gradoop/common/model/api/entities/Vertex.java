@@ -16,8 +16,7 @@
 package org.gradoop.common.model.api.entities;
 
 /**
- * Describes data specifically assigned to a logical graph in the EPGM.
+ * Describes data assigned to a vertex.
  */
-public interface EPGMGraphHead extends EPGMElement {
-
+public interface Vertex extends GraphElement {
 }

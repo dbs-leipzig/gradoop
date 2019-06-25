@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +35,7 @@ public class GellyGlobalClusteringCoefficientUndirectedTest
   @Override
   public void testFullyConnectedGraph() throws Exception {
     validateGraphProperties(fullGraph);
-    GraphHead head = fullGraph.getGraphHead().collect().get(0);
+    EPGMGraphHead head = fullGraph.getGraphHead().collect().get(0);
     assertEquals("Wrong global value for fully connected graph, should be 1", 1d,
       head.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL).getDouble(), 0.0);
   }
@@ -43,7 +43,7 @@ public class GellyGlobalClusteringCoefficientUndirectedTest
   @Override
   public void testNonConnectedGraph() throws Exception {
     validateGraphProperties(nonConnectedGraph);
-    GraphHead head = nonConnectedGraph.getGraphHead().collect().get(0);
+    EPGMGraphHead head = nonConnectedGraph.getGraphHead().collect().get(0);
     double global = head.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL)
       .getDouble();
     assertTrue("Wrong global value for not connected graph, should be 0 or NaN",
@@ -74,7 +74,7 @@ public class GellyGlobalClusteringCoefficientUndirectedTest
 
     validateGraphProperties(result);
 
-    GraphHead head = result.getGraphHead().collect().get(0);
+    EPGMGraphHead head = result.getGraphHead().collect().get(0);
 
     double global = head.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL)
       .getDouble();
@@ -84,7 +84,7 @@ public class GellyGlobalClusteringCoefficientUndirectedTest
 
   @Override
   public void validateGraphProperties(LogicalGraph graph) throws Exception {
-    GraphHead head = graph.getGraphHead().collect().get(0);
+    EPGMGraphHead head = graph.getGraphHead().collect().get(0);
     assertTrue("No global value stored in graph head",
       head.hasProperty(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL));
   }

@@ -16,7 +16,7 @@
 package org.gradoop.common.model.impl.pojo;
 
 import com.google.common.base.Preconditions;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
@@ -26,9 +26,9 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
- * Abstract base class for graphs, vertices and edges.
+ * Abstract base class for EPGM elements.
  */
-public abstract class Element implements EPGMElement {
+public abstract class EPGMElement implements Element {
   /**
    * Entity identifier.
    */
@@ -47,7 +47,7 @@ public abstract class Element implements EPGMElement {
   /**
    * Default constructor.
    */
-  protected Element() {
+  protected EPGMElement() {
   }
 
   /**
@@ -58,7 +58,7 @@ public abstract class Element implements EPGMElement {
    * @param label      entity label
    * @param properties key-value properties
    */
-  protected Element(
+  protected EPGMElement(
     GradoopId id, String label, Properties properties) {
     this.id = id;
     this.label = label;
@@ -150,7 +150,7 @@ public abstract class Element implements EPGMElement {
       return false;
     }
 
-    Element that = (Element) o;
+    EPGMElement that = (EPGMElement) o;
 
     return Objects.equals(id, that.id);
   }

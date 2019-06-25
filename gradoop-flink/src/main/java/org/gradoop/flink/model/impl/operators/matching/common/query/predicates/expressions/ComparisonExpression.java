@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions;
 
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.strategies.PropertyValueStrategyFactory;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
@@ -84,10 +84,10 @@ public class ComparisonExpression extends QueryPredicate {
   /**
    * Evaluates the comparison for the given graph element
    *
-   * @param element GraphElement under which the comparison will be evaluated
+   * @param element EPGMGraphElement under which the comparison will be evaluated
    * @return evaluation result
    */
-  public boolean evaluate(GraphElement element) {
+  public boolean evaluate(EPGMGraphElement element) {
     PropertyValue lhsValue = getLhs().evaluate(element);
     PropertyValue rhsValue = getRhs().evaluate(element);
 

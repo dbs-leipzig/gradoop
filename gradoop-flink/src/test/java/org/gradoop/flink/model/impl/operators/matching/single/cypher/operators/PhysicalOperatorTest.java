@@ -18,10 +18,10 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators;
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -32,11 +32,11 @@ import java.util.List;
 
 public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
 
-  protected DataSet<Vertex> createVerticesWithProperties(List<String> propertyNames) {
+  protected DataSet<EPGMVertex> createVerticesWithProperties(List<String> propertyNames) {
     Properties properties = getProperties(propertyNames);
-    VertexFactory vertexFactory = new VertexFactory();
+    EPGMVertexFactory vertexFactory = new EPGMVertexFactory();
 
-    List<Vertex> vertices = Lists.newArrayList(
+    List<EPGMVertex> vertices = Lists.newArrayList(
       vertexFactory.createVertex("Label1", properties),
       vertexFactory.createVertex("Label2", properties)
     );
@@ -44,11 +44,11 @@ public abstract class PhysicalOperatorTest extends GradoopFlinkTestBase {
     return getExecutionEnvironment().fromCollection(vertices);
   }
 
-  protected DataSet<Edge> createEdgesWithProperties(List<String> propertyNames) {
+  protected DataSet<EPGMEdge> createEdgesWithProperties(List<String> propertyNames) {
     Properties properties = getProperties(propertyNames);
-    EdgeFactory edgeFactory = new EdgeFactory();
+    EPGMEdgeFactory edgeFactory = new EPGMEdgeFactory();
 
-    List<Edge> edges = Lists.newArrayList(
+    List<EPGMEdge> edges = Lists.newArrayList(
       edgeFactory.createEdge("Label1", GradoopId.get(), GradoopId.get(), properties),
       edgeFactory.createEdge("Label2", GradoopId.get(), GradoopId.get(), properties)
     );

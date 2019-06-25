@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.distinction;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.functions.epgm.IdInBroadcast;
 import org.gradoop.flink.model.impl.operators.distinction.functions.FirstGraphHead;
@@ -43,7 +43,7 @@ public class DistinctByIsomorphism extends GroupByIsomorphism {
       .distinct(1)
       .map(new IdFromGraphHeadString());
 
-    DataSet<GraphHead> graphHeads = collection.getGraphHeads()
+    DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads()
       .filter(new IdInBroadcast<>())
       .withBroadcastSet(graphIds, IdInBroadcast.IDS);
 

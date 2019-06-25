@@ -15,7 +15,7 @@
  */
 package org.gradoop.storage.utils;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBaseLabelIn;
 import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBaseLabelReg;
 import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropEquals;
@@ -39,7 +39,7 @@ public class HBaseFilters {
    * @return HBaseLabelIn filter instance
    */
   @Nonnull
-  public static <T extends EPGMElement> HBaseLabelIn<T> labelIn(@Nonnull String... value) {
+  public static <T extends Element> HBaseLabelIn<T> labelIn(@Nonnull String... value) {
     return new HBaseLabelIn<>(value);
   }
 
@@ -52,7 +52,7 @@ public class HBaseFilters {
    * @return HBaseLabelReg filter instance
    */
   @Nonnull
-  public static <T extends EPGMElement> HBaseLabelReg<T> labelReg(@Nonnull Pattern reg) {
+  public static <T extends Element> HBaseLabelReg<T> labelReg(@Nonnull Pattern reg) {
     return new HBaseLabelReg<>(reg);
   }
 
@@ -66,7 +66,7 @@ public class HBaseFilters {
    * @return HBasePropEquals filter instance
    */
   @Nonnull
-  public static <T extends EPGMElement> HBasePropEquals<T> propEquals(
+  public static <T extends Element> HBasePropEquals<T> propEquals(
     @Nonnull String key,
     @Nonnull Object value
   ) {
@@ -84,7 +84,7 @@ public class HBaseFilters {
    * @return HBasePropLargerThan filter instance
    */
   @Nonnull
-  public static <T extends EPGMElement> HBasePropLargerThan<T> propLargerThan(
+  public static <T extends Element> HBasePropLargerThan<T> propLargerThan(
     @Nonnull String key,
     Object value,
     boolean include) {
@@ -101,7 +101,7 @@ public class HBaseFilters {
    * @return HBasePropReg filter instance
    */
   @Nonnull
-  public static <T extends EPGMElement> HBasePropReg<T> propReg(
+  public static <T extends Element> HBasePropReg<T> propReg(
     @Nonnull String key,
     @Nonnull Pattern pattern) {
     return new HBasePropReg<>(key, pattern);

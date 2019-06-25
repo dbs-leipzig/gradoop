@@ -15,7 +15,7 @@
  */
 package org.gradoop.common.model.impl.pojo;
 
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -24,9 +24,7 @@ import org.gradoop.common.model.impl.properties.Properties;
  * Abstract class representing an EPGM element that is contained in a logical
  * graph (i.e. vertices and edges).
  */
-public abstract class GraphElement
-  extends Element
-  implements EPGMGraphElement {
+public abstract class EPGMGraphElement extends EPGMElement implements GraphElement {
 
   /**
    * Set of graph identifiers that element is contained in
@@ -36,7 +34,7 @@ public abstract class GraphElement
   /**
    * Default constructor.
    */
-  protected GraphElement() {
+  protected EPGMGraphElement() {
   }
 
   /**
@@ -46,7 +44,7 @@ public abstract class GraphElement
    * @param properties element properties
    * @param graphIds     graphIds that element is contained in
    */
-  protected GraphElement(GradoopId id, String label,
+  protected EPGMGraphElement(GradoopId id, String label,
     Properties properties, GradoopIdSet graphIds) {
     super(id, label, properties);
     this.graphIds = graphIds;

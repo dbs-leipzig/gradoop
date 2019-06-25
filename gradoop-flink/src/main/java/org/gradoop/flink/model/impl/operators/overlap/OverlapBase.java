@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
 import org.gradoop.common.model.impl.id.GradoopId;
 
@@ -36,10 +36,10 @@ public abstract class OverlapBase {
    * @param ids       graph identifiers
    * @return filtered vertices
    */
-  protected DataSet<Vertex> getVertices(DataSet<Vertex> vertices,
+  protected DataSet<EPGMVertex> getVertices(DataSet<EPGMVertex> vertices,
     DataSet<GradoopId> ids) {
     return vertices
-      .filter(new InAllGraphsBroadcast<Vertex>())
+      .filter(new InAllGraphsBroadcast<EPGMVertex>())
       .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);
   }
 
@@ -50,10 +50,10 @@ public abstract class OverlapBase {
    * @param ids   graph identifiers
    * @return filtered edges
    */
-  protected DataSet<Edge> getEdges(DataSet<Edge> edges,
+  protected DataSet<EPGMEdge> getEdges(DataSet<EPGMEdge> edges,
     DataSet<GradoopId> ids) {
     return edges
-      .filter(new InAllGraphsBroadcast<Edge>())
+      .filter(new InAllGraphsBroadcast<EPGMEdge>())
       .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);
   }
 }

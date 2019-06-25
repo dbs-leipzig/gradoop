@@ -15,7 +15,7 @@
  */
 package org.gradoop.storage.impl.accumulo.predicate.filter.calculate;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import java.util.StringJoiner;
  *
  * @param <T> element type
  */
-public final class Or<T extends EPGMElement> implements AccumuloElementFilter<T> {
+public final class Or<T extends Element> implements AccumuloElementFilter<T> {
 
   /**
    * Predicate list
@@ -56,7 +56,7 @@ public final class Or<T extends EPGMElement> implements AccumuloElementFilter<T>
    * @return Conjunctive filter instance
    */
   @SafeVarargs
-  public static <T extends EPGMElement> Or<T> create(AccumuloElementFilter<T>... predicates) {
+  public static <T extends Element> Or<T> create(AccumuloElementFilter<T>... predicates) {
     List<AccumuloElementFilter<T>> formula = new ArrayList<>();
     Collections.addAll(formula, predicates);
     return new Or<>(formula);

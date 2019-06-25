@@ -16,7 +16,7 @@
 package org.gradoop.flink.representation.transactional;
 
 import org.apache.flink.api.java.tuple.Tuple5;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
 
@@ -37,8 +37,7 @@ import java.util.Map;
  * @param <VD> vertex data type
  */
 public class AdjacencyList<ID extends Comparable<ID>, L extends Comparable<L>, ED, VD> extends
-  Tuple5<
-    GraphHead,
+  Tuple5<EPGMGraphHead,
     Map<ID, L>,
     Map<ID, Properties>,
     Map<ID, AdjacencyListRow<ED, VD>>,
@@ -60,7 +59,7 @@ public class AdjacencyList<ID extends Comparable<ID>, L extends Comparable<L>, E
    * @param incomingRows incoming adjacency list rows
    */
   public AdjacencyList(
-    GraphHead graphHead,
+    EPGMGraphHead graphHead,
     Map<ID, L> labels,
     Map<ID, Properties> properties,
     Map<ID, AdjacencyListRow<ED, VD>> outgoingRows,
@@ -89,11 +88,11 @@ public class AdjacencyList<ID extends Comparable<ID>, L extends Comparable<L>, E
     return f2.get(elementId);
   }
 
-  public GraphHead getGraphHead() {
+  public EPGMGraphHead getGraphHead() {
     return f0;
   }
 
-  public void setGraphHead(GraphHead graphId) {
+  public void setGraphHead(EPGMGraphHead graphId) {
     this.f0 = graphId;
   }
 

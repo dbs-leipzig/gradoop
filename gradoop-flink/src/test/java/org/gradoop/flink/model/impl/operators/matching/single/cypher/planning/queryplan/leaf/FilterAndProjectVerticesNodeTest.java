@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -59,10 +59,12 @@ public class FilterAndProjectVerticesNodeTest extends GradoopFlinkTestBase {
     Map<String, Object> vertex2Props = new HashMap<>();
     vertex2Props.put("foo", 42);
 
-    Vertex vertex1 = new Vertex(vertex1Id, "A", Properties.createFromMap(vertex1Props), new GradoopIdSet());
-    Vertex vertex2 = new Vertex(vertex2Id, "B", Properties.createFromMap(vertex2Props), new GradoopIdSet());
+    EPGMVertex
+      vertex1 = new EPGMVertex(vertex1Id, "A", Properties.createFromMap(vertex1Props), new GradoopIdSet());
+    EPGMVertex
+      vertex2 = new EPGMVertex(vertex2Id, "B", Properties.createFromMap(vertex2Props), new GradoopIdSet());
 
-    DataSet<Vertex> vertices = getExecutionEnvironment().fromElements(vertex1, vertex2);
+    DataSet<EPGMVertex> vertices = getExecutionEnvironment().fromElements(vertex1, vertex2);
 
     String query = "MATCH (n) WHERE n.foo = 23";
     QueryHandler queryHandler = new QueryHandler(query);

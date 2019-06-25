@@ -19,9 +19,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
@@ -33,8 +33,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
-import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
 import static org.junit.Assert.assertEquals;
 
 public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestBase {
@@ -44,29 +44,29 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
    *
    * @return the factory that should be tested.
    */
-  protected abstract GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> getFactory();
+  protected abstract GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> getFactory();
 
   @Test
   public void testFromDataSets() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    Collection<GraphHead> graphHeads = loader.getGraphHeads();
-    Collection<Vertex> vertices = loader.getVertices();
-    Collection<Edge> edges = loader.getEdges();
+    Collection<EPGMGraphHead> graphHeads = loader.getGraphHeads();
+    Collection<EPGMVertex> vertices = loader.getVertices();
+    Collection<EPGMEdge> edges = loader.getEdges();
 
-    DataSet<GraphHead> graphHeadDataSet = getExecutionEnvironment()
+    DataSet<EPGMGraphHead> graphHeadDataSet = getExecutionEnvironment()
       .fromCollection(graphHeads);
-    DataSet<Vertex> vertexDataSet = getExecutionEnvironment()
+    DataSet<EPGMVertex> vertexDataSet = getExecutionEnvironment()
       .fromCollection(vertices);
-    DataSet<Edge> edgeDataSet = getExecutionEnvironment()
+    DataSet<EPGMEdge> edgeDataSet = getExecutionEnvironment()
       .fromCollection(edges);
 
-    GraphCollectionLayout<GraphHead, Vertex, Edge> collectionLayout = getFactory()
+    GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> collectionLayout = getFactory()
       .fromDataSets(graphHeadDataSet, vertexDataSet, edgeDataSet);
 
-    Collection<GraphHead> loadedGraphHeads  = Lists.newArrayList();
-    Collection<Vertex> loadedVertices       = Lists.newArrayList();
-    Collection<Edge> loadedEdges            = Lists.newArrayList();
+    Collection<EPGMGraphHead> loadedGraphHeads  = Lists.newArrayList();
+    Collection<EPGMVertex> loadedVertices       = Lists.newArrayList();
+    Collection<EPGMEdge> loadedEdges            = Lists.newArrayList();
 
     collectionLayout.getGraphHeads().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
     collectionLayout.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
@@ -74,35 +74,35 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-    validateEPGMElementCollections(vertices, loadedVertices);
-    validateEPGMElementCollections(edges, loadedEdges);
-    validateEPGMGraphElementCollections(vertices, loadedVertices);
-    validateEPGMGraphElementCollections(edges, loadedEdges);
+    validateElementCollections(graphHeads, loadedGraphHeads);
+    validateElementCollections(vertices, loadedVertices);
+    validateElementCollections(edges, loadedEdges);
+    validateGraphElementCollections(vertices, loadedVertices);
+    validateGraphElementCollections(edges, loadedEdges);
   }
 
   @Test
   public void testFromIndexedDataSets() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    Map<String, DataSet<GraphHead>> indexedGraphHeads = loader.getGraphHeads().stream()
-      .collect(Collectors.groupingBy(GraphHead::getLabel)).entrySet().stream()
+    Map<String, DataSet<EPGMGraphHead>> indexedGraphHeads = loader.getGraphHeads().stream()
+      .collect(Collectors.groupingBy(EPGMGraphHead::getLabel)).entrySet().stream()
       .collect(Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
 
-    Map<String, DataSet<Vertex>> indexedVertices = loader.getVertices().stream()
-      .collect(Collectors.groupingBy(Vertex::getLabel)).entrySet().stream()
+    Map<String, DataSet<EPGMVertex>> indexedVertices = loader.getVertices().stream()
+      .collect(Collectors.groupingBy(EPGMVertex::getLabel)).entrySet().stream()
       .collect(Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
 
-    Map<String, DataSet<Edge>> indexedEdges = loader.getEdges().stream()
-      .collect(Collectors.groupingBy(Edge::getLabel)).entrySet().stream()
+    Map<String, DataSet<EPGMEdge>> indexedEdges = loader.getEdges().stream()
+      .collect(Collectors.groupingBy(EPGMEdge::getLabel)).entrySet().stream()
       .collect(Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
 
-    GraphCollectionLayout<GraphHead, Vertex, Edge> collectionLayout = getFactory()
+    GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> collectionLayout = getFactory()
       .fromIndexedDataSets(indexedGraphHeads, indexedVertices, indexedEdges);
 
-    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
-    Collection<Vertex> loadedVertices = Lists.newArrayList();
-    Collection<Edge> loadedEdges = Lists.newArrayList();
+    Collection<EPGMGraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<EPGMVertex> loadedVertices = Lists.newArrayList();
+    Collection<EPGMEdge> loadedEdges = Lists.newArrayList();
 
     collectionLayout.getGraphHeads().output(new LocalCollectionOutputFormat<>(
       loadedGraphHeads));
@@ -113,26 +113,26 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(loader.getGraphHeads(), loadedGraphHeads);
-    validateEPGMElementCollections(loader.getVertices(), loadedVertices);
-    validateEPGMElementCollections(loader.getEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(loader.getVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(loader.getEdges(), loadedEdges);
+    validateElementCollections(loader.getGraphHeads(), loadedGraphHeads);
+    validateElementCollections(loader.getVertices(), loadedVertices);
+    validateElementCollections(loader.getEdges(), loadedEdges);
+    validateGraphElementCollections(loader.getVertices(), loadedVertices);
+    validateGraphElementCollections(loader.getEdges(), loadedEdges);
   }
 
   @Test
   public void testFromDataSetsWithoutGraphHead() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("()-[]->(),[()]");
 
-    GraphCollectionLayout<GraphHead, Vertex, Edge> collectionLayout = getFactory()
+    GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> collectionLayout = getFactory()
       .fromDataSets(
         getExecutionEnvironment().fromCollection(loader.getGraphHeads()),
         getExecutionEnvironment().fromCollection(loader.getVertices()),
         getExecutionEnvironment().fromCollection(loader.getEdges()));
 
-    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
-    Collection<Vertex> loadedVertices = Lists.newArrayList();
-    Collection<Edge> loadedEdges = Lists.newArrayList();
+    Collection<EPGMGraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<EPGMVertex> loadedVertices = Lists.newArrayList();
+    Collection<EPGMEdge> loadedEdges = Lists.newArrayList();
 
     collectionLayout.getGraphHeads().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
     collectionLayout.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
@@ -140,25 +140,25 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(loader.getGraphHeads(), loadedGraphHeads);
-    validateEPGMElementCollections(loader.getVertices(), loadedVertices);
-    validateEPGMElementCollections(loader.getEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(loader.getVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(loader.getEdges(), loadedEdges);
+    validateElementCollections(loader.getGraphHeads(), loadedGraphHeads);
+    validateElementCollections(loader.getVertices(), loadedVertices);
+    validateElementCollections(loader.getEdges(), loadedEdges);
+    validateGraphElementCollections(loader.getVertices(), loadedVertices);
+    validateGraphElementCollections(loader.getEdges(), loadedEdges);
   }
 
   @Test
   public void testFromCollections() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
-    GraphCollectionLayout<GraphHead, Vertex, Edge> collectionLayout = getFactory()
+    GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> collectionLayout = getFactory()
       .fromCollections(loader.getGraphHeads(),
         loader.getVertices(),
         loader.getEdges());
 
-    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
-    Collection<Vertex> loadedVertices = Lists.newArrayList();
-    Collection<Edge> loadedEdges = Lists.newArrayList();
+    Collection<EPGMGraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<EPGMVertex> loadedVertices = Lists.newArrayList();
+    Collection<EPGMEdge> loadedEdges = Lists.newArrayList();
 
     collectionLayout.getGraphHeads().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
     collectionLayout.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
@@ -166,11 +166,11 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(loader.getGraphHeads(), loadedGraphHeads);
-    validateEPGMElementCollections(loader.getVertices(), loadedVertices);
-    validateEPGMElementCollections(loader.getEdges(), loadedEdges);
-    validateEPGMGraphElementCollections(loader.getVertices(), loadedVertices);
-    validateEPGMGraphElementCollections(loader.getEdges(), loadedEdges);
+    validateElementCollections(loader.getGraphHeads(), loadedGraphHeads);
+    validateElementCollections(loader.getVertices(), loadedVertices);
+    validateElementCollections(loader.getEdges(), loadedEdges);
+    validateGraphElementCollections(loader.getVertices(), loadedVertices);
+    validateGraphElementCollections(loader.getEdges(), loadedEdges);
   }
 
   @Test
@@ -191,11 +191,11 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
 
     DataSet<GraphTransaction> transactions = getExecutionEnvironment().fromElements(g0, g1, g2);
 
-    GraphCollectionLayout<GraphHead, Vertex, Edge> collectionLayout = getFactory().fromTransactions(transactions);
+    GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> collectionLayout = getFactory().fromTransactions(transactions);
 
-    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
-    Collection<Vertex> loadedVertices = Lists.newArrayList();
-    Collection<Edge> loadedEdges = Lists.newArrayList();
+    Collection<EPGMGraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<EPGMVertex> loadedVertices = Lists.newArrayList();
+    Collection<EPGMEdge> loadedEdges = Lists.newArrayList();
 
     collectionLayout.getGraphHeads().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
     collectionLayout.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));
@@ -203,20 +203,20 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
 
     getExecutionEnvironment().execute();
 
-    validateEPGMElementCollections(loader.getGraphHeadsByVariables("g0", "g1", "g2"), loadedGraphHeads);
-    validateEPGMElementCollections(loader.getVerticesByGraphVariables("g0", "g1", "g2"), loadedVertices);
-    validateEPGMElementCollections(loader.getEdgesByGraphVariables("g0", "g1", "g2"), loadedEdges);
-    validateEPGMGraphElementCollections(loader.getVerticesByGraphVariables("g0", "g1", "g2"), loadedVertices);
-    validateEPGMGraphElementCollections(loader.getEdgesByGraphVariables("g0", "g1", "g2"), loadedEdges);
+    validateElementCollections(loader.getGraphHeadsByVariables("g0", "g1", "g2"), loadedGraphHeads);
+    validateElementCollections(loader.getVerticesByGraphVariables("g0", "g1", "g2"), loadedVertices);
+    validateElementCollections(loader.getEdgesByGraphVariables("g0", "g1", "g2"), loadedEdges);
+    validateGraphElementCollections(loader.getVerticesByGraphVariables("g0", "g1", "g2"), loadedVertices);
+    validateGraphElementCollections(loader.getEdgesByGraphVariables("g0", "g1", "g2"), loadedEdges);
   }
 
   @Test
   public void testCreateEmptyCollection() throws Exception {
-    GraphCollectionLayout<GraphHead, Vertex, Edge> graphCollectionLayout = getFactory().createEmptyCollection();
+    GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> graphCollectionLayout = getFactory().createEmptyCollection();
 
-    Collection<GraphHead> loadedGraphHeads = Lists.newArrayList();
-    Collection<Vertex> loadedVertices = Lists.newArrayList();
-    Collection<Edge> loadedEdges = Lists.newArrayList();
+    Collection<EPGMGraphHead> loadedGraphHeads = Lists.newArrayList();
+    Collection<EPGMVertex> loadedVertices = Lists.newArrayList();
+    Collection<EPGMEdge> loadedEdges = Lists.newArrayList();
 
     graphCollectionLayout.getGraphHeads().output(new LocalCollectionOutputFormat<>(loadedGraphHeads));
     graphCollectionLayout.getVertices().output(new LocalCollectionOutputFormat<>(loadedVertices));

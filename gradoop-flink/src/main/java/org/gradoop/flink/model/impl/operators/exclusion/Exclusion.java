@@ -33,8 +33,8 @@
 package org.gradoop.flink.model.impl.operators.exclusion;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -54,13 +54,13 @@ public class Exclusion implements BinaryGraphToGraphOperator {
   @Override
   public LogicalGraph execute(
     LogicalGraph firstGraph, LogicalGraph secondGraph) {
-    DataSet<Vertex> newVertexSet = firstGraph.getVertices()
+    DataSet<EPGMVertex> newVertexSet = firstGraph.getVertices()
       .leftOuterJoin(secondGraph.getVertices())
       .where(new Id<>())
       .equalTo(new Id<>())
       .with(new LeftWhenRightIsNull<>());
 
-    DataSet<Edge> newEdgeSet = firstGraph.getEdges()
+    DataSet<EPGMEdge> newEdgeSet = firstGraph.getEdges()
       .join(newVertexSet)
       .where(new SourceId<>())
       .equalTo(new Id<>())

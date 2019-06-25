@@ -17,7 +17,7 @@ package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
@@ -34,8 +34,7 @@ public class VertexToGellyVertexWithPropertyValue implements VertexToGellyVertex
   /**
    * Reduce object instantiations
    */
-  private final org.apache.flink.graph.Vertex<GradoopId, PropertyValue>
-  reuseVertex;
+  private final org.apache.flink.graph.Vertex<GradoopId, PropertyValue> reuseVertex;
 
   /**
    * Constructor
@@ -48,8 +47,7 @@ public class VertexToGellyVertexWithPropertyValue implements VertexToGellyVertex
   }
 
   @Override
-  public org.apache.flink.graph.Vertex<GradoopId, PropertyValue> map(
-    Vertex epgmVertex) throws Exception {
+  public org.apache.flink.graph.Vertex<GradoopId, PropertyValue> map(EPGMVertex epgmVertex) throws Exception {
     reuseVertex.setId(epgmVertex.getId());
     reuseVertex.setValue(epgmVertex.getPropertyValue(propertyKey));
     return reuseVertex;

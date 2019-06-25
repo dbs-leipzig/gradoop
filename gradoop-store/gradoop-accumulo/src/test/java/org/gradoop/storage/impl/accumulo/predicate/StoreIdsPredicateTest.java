@@ -15,12 +15,12 @@
  */
 package org.gradoop.storage.impl.accumulo.predicate;
 
+import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
@@ -47,20 +47,20 @@ public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
   @Test
   public void vertexIdSetQueryTest() throws Throwable {
     doTest(TEST01, (loader, store, config) -> {
-      List<Vertex> inputVertices = sample(new ArrayList<>(loader.getVertices()), 5);
+      List<EPGMVertex> inputVertices = sample(new ArrayList<>(loader.getVertices()), 5);
 
       //vertex id query
       GradoopIdSet sourceIds = GradoopIdSet.fromExisting(inputVertices.stream()
-        .map(Element::getId)
+        .map(EPGMElement::getId)
         .collect(Collectors.toList()));
-      List<Vertex> queryResult = store
+      List<EPGMVertex> queryResult = store
         .getVertexSpace(
           Query.elements()
             .fromSets(sourceIds)
             .noFilter())
         .readRemainsAndClose();
 
-      validateEPGMElementCollections(inputVertices, queryResult);
+      validateElementCollections(inputVertices, queryResult);
     });
   }
 
@@ -72,39 +72,39 @@ public class StoreIdsPredicateTest extends AccumuloStoreTestBase {
   @Test
   public void edgeIdSetQueryTest() throws Throwable {
     doTest(TEST02, (loader, store, config) -> {
-      List<Edge> inputEdges = sample(new ArrayList<>(loader.getEdges()), 5);
+      List<EPGMEdge> inputEdges = sample(new ArrayList<>(loader.getEdges()), 5);
 
       //edge id query
       GradoopIdSet ids = GradoopIdSet.fromExisting(inputEdges.stream()
-        .map(Element::getId)
+        .map(EPGMElement::getId)
         .collect(Collectors.toList()));
-      List<Edge> queryResult = store
+      List<EPGMEdge> queryResult = store
         .getEdgeSpace(
           Query.elements()
             .fromSets(ids)
             .noFilter())
         .readRemainsAndClose();
 
-      validateEPGMElementCollections(inputEdges, queryResult);
+      validateElementCollections(inputEdges, queryResult);
     });
   }
 
   @Test
   public void graphIdSetQueryTest() throws Throwable {
     doTest(TEST03, (loader, store, config) -> {
-      List<GraphHead> inputGraphs = sample(new ArrayList<>(loader.getGraphHeads()), 3);
+      List<EPGMGraphHead> inputGraphs = sample(new ArrayList<>(loader.getGraphHeads()), 3);
 
       GradoopIdSet ids = GradoopIdSet.fromExisting(inputGraphs.stream()
-        .map(Element::getId)
+        .map(EPGMElement::getId)
         .collect(Collectors.toList()));
-      List<GraphHead> queryResult = store
+      List<EPGMGraphHead> queryResult = store
         .getGraphSpace(
           Query.elements()
             .fromSets(ids)
             .noFilter())
         .readRemainsAndClose();
 
-      validateEPGMElementCollections(inputGraphs, queryResult);
+      validateElementCollections(inputGraphs, queryResult);
     });
   }
 

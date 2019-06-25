@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -31,7 +31,7 @@ import org.gradoop.common.model.impl.properties.Properties;
 @FunctionAnnotation.ForwardedFieldsSecond("f0->f2")
 public class ReplaceTargetId implements JoinFunction<
   Tuple5<Long, Long, GradoopId, String, Properties>,
-  Tuple2<Long, Vertex>,
+  Tuple2<Long, EPGMVertex>,
   Tuple5<Long, Long, Long, String, Properties>> {
 
   /**
@@ -42,7 +42,7 @@ public class ReplaceTargetId implements JoinFunction<
   @Override
   public Tuple5<Long, Long, Long, String, Properties> join(
     Tuple5<Long, Long, GradoopId, String, Properties> inputTuple,
-    Tuple2<Long, Vertex> vertexTuple
+    Tuple2<Long, EPGMVertex> vertexTuple
   ) throws Exception {
     returnTuple.f0 = inputTuple.f0;
     returnTuple.f1 = inputTuple.f1;

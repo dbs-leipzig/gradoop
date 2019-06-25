@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.layouts.transactional;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -37,7 +37,7 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
  * Each row in the dataset represents a single {@link LogicalGraph}
  * with all its associated vertex and edge data.
  */
-public class TxCollectionLayout implements GraphCollectionLayout<GraphHead, Vertex, Edge> {
+public class TxCollectionLayout implements GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> {
   /**
    * Flink dataset holding the actual data of that layout.
    */
@@ -68,14 +68,14 @@ public class TxCollectionLayout implements GraphCollectionLayout<GraphHead, Vert
   }
 
   @Override
-  public DataSet<GraphHead> getGraphHeads() {
+  public DataSet<EPGMGraphHead> getGraphHeads() {
     return transactions
       .map(new TransactionGraphHead<>())
       .filter(new ByDifferentId<>(GradoopConstants.DB_GRAPH_ID));
   }
 
   @Override
-  public DataSet<GraphHead> getGraphHeadsByLabel(String label) {
+  public DataSet<EPGMGraphHead> getGraphHeadsByLabel(String label) {
     return getGraphHeads().filter(new ByLabel<>(label));
   }
 
@@ -85,26 +85,26 @@ public class TxCollectionLayout implements GraphCollectionLayout<GraphHead, Vert
   }
 
   @Override
-  public DataSet<Vertex> getVertices() {
+  public DataSet<EPGMVertex> getVertices() {
     return transactions
       .flatMap(new TransactionVertices<>())
       .distinct(new Id<>());
   }
 
   @Override
-  public DataSet<Vertex> getVerticesByLabel(String label) {
+  public DataSet<EPGMVertex> getVerticesByLabel(String label) {
     return getVertices().filter(new ByLabel<>(label));
   }
 
   @Override
-  public DataSet<Edge> getEdges() {
+  public DataSet<EPGMEdge> getEdges() {
     return transactions
       .flatMap(new TransactionEdges<>())
       .distinct(new Id<>());
   }
 
   @Override
-  public DataSet<Edge> getEdgesByLabel(String label) {
+  public DataSet<EPGMEdge> getEdgesByLabel(String label) {
     return getEdges().filter(new ByLabel<>(label));
   }
 }

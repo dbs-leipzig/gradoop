@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -98,7 +98,7 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
    */
   private Map<String, PropertyValue> aggregateVertices(Map<String, PropertyValue> aggregate,
                                                        GraphTransaction graphTransaction) {
-    for (Vertex vertex : graphTransaction.getVertices()) {
+    for (EPGMVertex vertex : graphTransaction.getVertices()) {
       aggregate = AggregateUtil.increment(aggregate, vertex, vertexAggregateFunctions);
     }
     return aggregate;
@@ -113,7 +113,7 @@ public class AggregateTransactions implements MapFunction<GraphTransaction, Grap
    */
   private Map<String, PropertyValue> aggregateEdges(Map<String, PropertyValue> aggregate,
                                                     GraphTransaction graphTransaction) {
-    for (Edge edge : graphTransaction.getEdges()) {
+    for (EPGMEdge edge : graphTransaction.getEdges()) {
       aggregate = AggregateUtil.increment(aggregate, edge, edgeAggregateFunctions);
     }
     return aggregate;

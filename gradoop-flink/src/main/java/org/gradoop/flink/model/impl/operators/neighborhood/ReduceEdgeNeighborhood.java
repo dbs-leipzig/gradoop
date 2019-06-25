@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.neighborhood;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -48,14 +48,14 @@ public class ReduceEdgeNeighborhood extends EdgeNeighborhood {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    DataSet<Vertex> vertices;
+    DataSet<EPGMVertex> vertices;
     switch (getDirection()) {
     case IN:
       // takes edges which target to the vertex and applies the aggregate function
       vertices = graph.getEdges()
         .join(graph.getVertices())
         .where(new TargetId<>()).equalTo(new Id<>())
-        .groupBy(new IdInTuple<Tuple2<Edge, Vertex>>(1))
+        .groupBy(new IdInTuple<Tuple2<EPGMEdge, EPGMVertex>>(1))
         .reduceGroup(new NeighborEdgeReduceFunction((EdgeAggregateFunction) getFunction()));
       break;
     case OUT:
@@ -63,7 +63,7 @@ public class ReduceEdgeNeighborhood extends EdgeNeighborhood {
       vertices = graph.getEdges()
         .join(graph.getVertices())
         .where(new SourceId<>()).equalTo(new Id<>())
-        .groupBy(new IdInTuple<Tuple2<Edge, Vertex>>(1))
+        .groupBy(new IdInTuple<Tuple2<EPGMEdge, EPGMVertex>>(1))
         .reduceGroup(new NeighborEdgeReduceFunction((EdgeAggregateFunction) getFunction()));
       break;
     case BOTH:
@@ -71,13 +71,13 @@ public class ReduceEdgeNeighborhood extends EdgeNeighborhood {
       vertices = graph.getEdges()
         // maps the source id to the edge and the target id to the edge
         .flatMap(new VertexIdsWithEdge())
-        .map(new SwitchPair<GradoopId, Edge>())
+        .map(new SwitchPair<GradoopId, EPGMEdge>())
         .join(graph.getVertices())
         .where(1).equalTo(new Id<>())
         // replace id with the vertex
-        .with(new VertexToFieldOne<Edge, GradoopId>())
+        .with(new VertexToFieldOne<EPGMEdge, GradoopId>())
         // group by the vertex id
-        .groupBy(new IdInTuple<Tuple2<Edge, Vertex>>(1))
+        .groupBy(new IdInTuple<Tuple2<EPGMEdge, EPGMVertex>>(1))
         .reduceGroup(new NeighborEdgeReduceFunction((EdgeAggregateFunction) getFunction()));
       break;
     default:

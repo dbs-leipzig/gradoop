@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.model.impl.layouts.gve.indexed;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.GraphCollectionLayoutFactoryTest;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -27,7 +27,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  */
 public class IndexedGVECollectionLayoutFactoryTest extends GraphCollectionLayoutFactoryTest {
   @Override
-  protected GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> getFactory() {
+  protected GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> getFactory() {
     // create the factory to test
     IndexedGVECollectionLayoutFactory factory = new IndexedGVECollectionLayoutFactory();
     // create a default gradoop flink config and set it to the layout

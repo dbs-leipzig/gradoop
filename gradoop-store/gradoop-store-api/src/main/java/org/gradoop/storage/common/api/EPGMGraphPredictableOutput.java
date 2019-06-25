@@ -15,9 +15,9 @@
  */
 package org.gradoop.storage.common.api;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.gradoop.storage.common.predicate.filter.api.ElementFilter;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
@@ -43,19 +43,19 @@ public interface EPGMGraphPredictableOutput<
 
   @Nonnull
   @Override
-  default ClosableIterator<GraphHead> getGraphSpace(int cacheSize) throws IOException {
+  default ClosableIterator<EPGMGraphHead> getGraphSpace(int cacheSize) throws IOException {
     return getGraphSpace(null, cacheSize);
   }
 
   @Nonnull
   @Override
-  default ClosableIterator<Vertex> getVertexSpace(int cacheSize) throws IOException {
+  default ClosableIterator<EPGMVertex> getVertexSpace(int cacheSize) throws IOException {
     return getVertexSpace(null, cacheSize);
   }
 
   @Nonnull
   @Override
-  default ClosableIterator<Edge> getEdgeSpace(int cacheSize) throws IOException {
+  default ClosableIterator<EPGMEdge> getEdgeSpace(int cacheSize) throws IOException {
     return getEdgeSpace(null, cacheSize);
   }
 
@@ -67,7 +67,7 @@ public interface EPGMGraphPredictableOutput<
    * @throws IOException on failure
    */
   @Nonnull
-  default ClosableIterator<GraphHead> getGraphSpace(
+  default ClosableIterator<EPGMGraphHead> getGraphSpace(
     @Nullable ElementQuery<GFilter> query
   ) throws IOException {
     return getGraphSpace(query, DEFAULT_CACHE_SIZE);
@@ -82,7 +82,7 @@ public interface EPGMGraphPredictableOutput<
    * @throws IOException on failure
    */
   @Nonnull
-  ClosableIterator<GraphHead> getGraphSpace(
+  ClosableIterator<EPGMGraphHead> getGraphSpace(
     @Nullable ElementQuery<GFilter> query,
     int cacheSize
   ) throws IOException;
@@ -95,7 +95,7 @@ public interface EPGMGraphPredictableOutput<
    * @throws IOException on failure
    */
   @Nonnull
-  default ClosableIterator<Vertex> getVertexSpace(
+  default ClosableIterator<EPGMVertex> getVertexSpace(
     @Nullable ElementQuery<VFilter> query
   ) throws IOException {
     return getVertexSpace(query, DEFAULT_CACHE_SIZE);
@@ -110,7 +110,7 @@ public interface EPGMGraphPredictableOutput<
    * @throws IOException on failure
    */
   @Nonnull
-  ClosableIterator<Vertex> getVertexSpace(
+  ClosableIterator<EPGMVertex> getVertexSpace(
     @Nullable ElementQuery<VFilter> query,
     int cacheSize
   ) throws IOException;
@@ -123,7 +123,7 @@ public interface EPGMGraphPredictableOutput<
    * @throws IOException on failure
    */
   @Nonnull
-  default ClosableIterator<Edge> getEdgeSpace(
+  default ClosableIterator<EPGMEdge> getEdgeSpace(
     @Nullable ElementQuery<EFilter> query
   ) throws IOException {
     return getEdgeSpace(query, DEFAULT_CACHE_SIZE);
@@ -138,7 +138,7 @@ public interface EPGMGraphPredictableOutput<
    * @throws IOException on failure
    */
   @Nonnull
-  ClosableIterator<Edge> getEdgeSpace(
+  ClosableIterator<EPGMEdge> getEdgeSpace(
     @Nullable ElementQuery<EFilter> query,
     int cacheSize
   ) throws IOException;
