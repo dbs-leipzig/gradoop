@@ -680,7 +680,6 @@ public class PropertyValue implements Value, Serializable, Comparable<PropertyVa
    * supports comparison of any two property values, even when their types are incompatible.
    * If you do not want incompatible types to be compared, use
    * {@link PropertyValueStrategyFactory#compare(Object, Object)} instead.<p>
-   * This implementation is {@code null}-safe.
    *
    * @param other The other object to be compared.
    * @return The comparison result, according to {@link Comparable#compareTo(Object)}.

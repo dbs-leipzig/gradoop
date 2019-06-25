@@ -36,6 +36,7 @@ import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotSame;
 import static org.testng.AssertJUnit.assertNull;
 import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.fail;
 
 public class PropertyValueTest {
 
@@ -619,8 +620,24 @@ public class PropertyValueTest {
   }
 
   /**
-   * Tests whether {@link PropertyValue#compareTo(PropertyValue)} throws an
-   * {@link IllegalArgumentException} when the instances types are incomparable.
+   * Test whether {@link PropertyValue#compareTo(PropertyValue)} throws a
+   * {@link NullPointerException} when comparing to {@code null}.
+   *
+   * @param otherValue The value to "compare" against {@code null}.
+   */
+  @Test(dataProvider = "propertyValueProvider", dataProviderClass = PropertyValueTestProvider.class,
+    expectedExceptions = {NullPointerException.class})
+  public void testCompareToWithNull(PropertyValue otherValue) {
+    otherValue.compareTo(null);
+    fail("compareTo should fail when comparing against null.");
+  }
+
+  /**
+   * Tests whether {@link PropertyValue#compareTo(PropertyValue)} works for two properties
+   * with a different type.
+   *
+   * @param first  The first property of the comparison.
+   * @param second The second property of the comparison.
    */
   @Test(dataProvider = "differentPropertyValueTypesProvider",
     dataProviderClass = PropertyValueTestProvider.class)
