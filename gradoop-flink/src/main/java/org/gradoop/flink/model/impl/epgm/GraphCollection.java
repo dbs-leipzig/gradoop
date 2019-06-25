@@ -23,6 +23,7 @@ import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.epgm.GraphCollectionOperators;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
@@ -181,6 +182,12 @@ public class GraphCollection implements
   public BaseGraphCollectionFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>
   getFactory() {
     return config.getGraphCollectionFactory();
+  }
+
+  @Override
+  public BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>
+  getGraphFactory() {
+    return config.getLogicalGraphFactory();
   }
 
   @Override
