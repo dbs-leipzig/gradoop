@@ -18,8 +18,8 @@ package org.gradoop.flink.model.api.tpgm.functions.grouping;
 import org.gradoop.common.model.api.entities.EPGMAttributed;
 import org.gradoop.common.model.api.entities.EPGMLabeled;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.LabelKeyFunction;
-import org.gradoop.flink.model.impl.operators.tpgm.grouping.functions.PropertyKeyFunction;
+import org.gradoop.flink.model.impl.operators.tpgm.grouping.keys.LabelKeyFunction;
+import org.gradoop.flink.model.impl.operators.tpgm.grouping.keys.PropertyKeyFunction;
 
 /**
  * A factory class for creating instances of commonly used grouping key functions.

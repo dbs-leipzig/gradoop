@@ -22,6 +22,7 @@ import org.gradoop.common.model.api.entities.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.tpgm.functions.grouping.GroupingKeyFunction;
+import org.gradoop.flink.model.impl.operators.tpgm.grouping.keys.LabelKeyFunction;
 
 import java.util.List;
 import java.util.Objects;
