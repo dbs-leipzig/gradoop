@@ -22,7 +22,7 @@ import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * Default interface of a EPGM logical graph instance.
+ * Default interface of a logical graph instance.
  *
  * @param <G> type of the graph head
  * @param <V> the vertex type

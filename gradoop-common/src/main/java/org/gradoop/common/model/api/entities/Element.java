@@ -24,6 +24,5 @@ import java.io.Serializable;
  * @see Vertex
  * @see Edge
  */
-public interface Element
-  extends Identifiable, Labeled, Attributed, Serializable {
+public interface Element extends Identifiable, Labeled, Attributed, Serializable {
 }

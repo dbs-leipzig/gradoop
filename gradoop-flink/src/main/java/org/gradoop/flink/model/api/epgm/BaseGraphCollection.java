@@ -22,7 +22,7 @@ import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 /**
- * Default interface of a EPGM graph collection instance.
+ * Default interface of a graph collection instance.
  *
  * @param <G> type of the graph head
  * @param <V> the vertex type
