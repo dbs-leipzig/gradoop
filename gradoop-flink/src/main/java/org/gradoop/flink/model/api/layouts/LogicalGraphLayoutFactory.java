@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.api.layouts;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 
 import java.util.Collection;
 import java.util.Map;
@@ -31,9 +31,9 @@ import java.util.Map;
  * @param <E> the edge type
  */
 public interface LogicalGraphLayoutFactory<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge> extends BaseLayoutFactory {
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge> extends BaseLayoutFactory {
   /**
    * Creates a logical graph layout from the given vertex dataset.
    *

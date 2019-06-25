@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.distinction;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -50,7 +50,7 @@ public class GroupByIsomorphism extends SelectionBase {
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
-    DataSet<GraphHead> graphHeads = getCanonicalLabels(collection)
+    DataSet<EPGMGraphHead> graphHeads = getCanonicalLabels(collection)
       .join(collection.getGraphHeads())
       .where(0).equalTo(new Id<>())
       .with(new GraphHeadGroup())

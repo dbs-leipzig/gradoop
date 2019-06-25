@@ -19,11 +19,11 @@ import org.apache.flink.api.common.functions.util.ListCollector;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.DFSTraverser;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -60,7 +60,7 @@ public class ElementsFromEmbeddingTest {
     TraversalCode traversalCode = traverser.traverse();
 
     ElementsFromEmbedding udf = new ElementsFromEmbedding(
-      traversalCode, new GraphHeadFactory(), new VertexFactory(), new EdgeFactory(), query
+      traversalCode, new EPGMGraphHeadFactory(), new EPGMVertexFactory(), new EPGMEdgeFactory(), query
     );
     udf.open(new Configuration());
 
@@ -71,13 +71,13 @@ public class ElementsFromEmbeddingTest {
     embedding.setVertexMapping(vertexMapping);
     embedding.setEdgeMapping(edgeMapping);
 
-    List<Element> result = new ArrayList<>();
+    List<EPGMElement> result = new ArrayList<>();
 
     udf.flatMap(Tuple1.of(embedding), new ListCollector<>(result));
 
-    GraphHead graphHead = (GraphHead) result
+    EPGMGraphHead graphHead = (EPGMGraphHead) result
       .stream()
-      .filter(e -> e instanceof GraphHead)
+      .filter(e -> e instanceof EPGMGraphHead)
       .findFirst()
       .get();
 

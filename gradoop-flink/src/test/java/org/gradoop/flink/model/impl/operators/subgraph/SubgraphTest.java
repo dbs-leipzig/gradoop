@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -212,12 +212,12 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1", "g4");
 
-    FilterFunction<Vertex> vertexFilterFunction = v -> {
+    FilterFunction<EPGMVertex> vertexFilterFunction = v -> {
       PropertyValue city = v.getPropertyValue("city");
       return city != null && city.toString().equals("Leipzig");
     };
 
-    FilterFunction<Edge> edgeFilterFunction = e -> {
+    FilterFunction<EPGMEdge> edgeFilterFunction = e -> {
       if (e.getLabel().equals("knows")) {
         return e.getPropertyValue("since").getInt() == 2016;
       }
@@ -268,7 +268,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1", "g4");
 
-    FilterFunction<Vertex> vertexFilterFunction = v -> {
+    FilterFunction<EPGMVertex> vertexFilterFunction = v -> {
       PropertyValue city = v.getPropertyValue("city");
       return city != null && city.toString().equals("Leipzig");
     };

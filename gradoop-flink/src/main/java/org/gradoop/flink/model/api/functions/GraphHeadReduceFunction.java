@@ -17,7 +17,7 @@ package org.gradoop.flink.model.api.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 
 import java.io.Serializable;
 
@@ -27,5 +27,5 @@ import java.io.Serializable;
  * For example, to count isomorphic graphs in a collection.
  */
 public interface GraphHeadReduceFunction
-  extends GroupReduceFunction<Tuple2<String, GraphHead>, GraphHead>, Serializable {
+  extends GroupReduceFunction<Tuple2<String, EPGMGraphHead>, EPGMGraphHead>, Serializable {
 }

@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
-import org.gradoop.common.model.impl.pojo.Edge;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 
 import java.util.Collection;
@@ -38,7 +38,7 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_EDGE_LABEL;
  * @param <E> EPGM edge type
  */
 @FunctionAnnotation.ForwardedFields("id->f0;sourceId->f1;targetId->f2")
-public class BuildTripleWithCandidates<E extends Edge>
+public class BuildTripleWithCandidates<E extends EPGMEdge>
   extends AbstractBuilder<E, TripleWithCandidates<GradoopId>> {
   /**
    * serial version uid

@@ -17,13 +17,13 @@ package org.gradoop.flink.algorithms.btgs.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 
 /**
  * Filters transactional vertices.
  * @param <V> vertex type.
  */
-public class TransactionalData<V extends EPGMVertex>
+public class TransactionalData<V extends Vertex>
   implements FilterFunction<V> {
 
   @Override

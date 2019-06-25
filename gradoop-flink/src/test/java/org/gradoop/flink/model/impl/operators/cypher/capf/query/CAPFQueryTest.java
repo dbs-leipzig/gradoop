@@ -22,7 +22,7 @@ import org.apache.flink.table.api.scala.BatchTableEnvironment;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Type;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -119,8 +119,8 @@ public class CAPFQueryTest extends GradoopFlinkTestBase {
 
     LogicalGraph graph = loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
 
-    DataSet<Vertex> verticesWithPayload = graph.getVertices()
-      .map((MapFunction<Vertex, Vertex>) vertex -> {
+    DataSet<EPGMVertex> verticesWithPayload = graph.getVertices()
+      .map((MapFunction<EPGMVertex, EPGMVertex>) vertex -> {
         vertex.setProperty("map", new HashMap());
         return vertex;
       });

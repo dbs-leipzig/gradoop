@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.operators.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
@@ -56,9 +56,9 @@ import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.
  * @param <GC> type of the graph collection
  */
 public class Subgraph<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>>
   implements UnaryBaseGraphToBaseGraphOperator<LG> {

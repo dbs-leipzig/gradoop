@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.grouping;
 
 import com.google.common.collect.Lists;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
@@ -57,7 +57,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
       .addVertexGroupingKey("topic")
       .addVertexLabelGroup("User", Lists.newArrayList("gender"))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -88,7 +88,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
       .addVertexGroupingKey("topic")
       .addVertexLabelGroup("User", "UserGender", Lists.newArrayList("gender"))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -118,7 +118,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
       .addVertexGroupingKey("gender")
       .addVertexLabelGroup("Forum", Lists.newArrayList("topic"))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -151,7 +151,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
       .addVertexLabelGroup("User", Lists.newArrayList("gender"),
         Lists.newArrayList(new SumProperty("age", "sum")))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -184,7 +184,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
       .addVertexGroupingKey("topic")
       .addVertexLabelGroup("User", Lists.newArrayList("gender"))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -228,7 +228,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
       .addVertexLabelGroup("User", Lists.newArrayList("gender"))
       .addVertexLabelGroup("User", Lists.newArrayList("age"))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -275,7 +275,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
         Lists.newArrayList(new Count("count"), new SumProperty("age", "sum")))
       .addVertexAggregateFunction(new Count("count"))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -303,7 +303,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
       .addEdgeGroupingKey("until")
       .addEdgeLabelGroup("knows", Lists.newArrayList("since"))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -331,7 +331,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
       .addEdgeGroupingKey("until")
       .addEdgeLabelGroup("knows", "knowsSince", Lists.newArrayList("since"))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -358,7 +358,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
       .addEdgeGroupingKey("until")
       .addEdgeLabelGroup("knows", Lists.newArrayList("since"))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -388,7 +388,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
       .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
         Lists.newArrayList(new SumProperty("since", "sum")))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -419,7 +419,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
       .addEdgeLabelGroup("knows", Lists.newArrayList("since"),
         Lists.newArrayList(new SumProperty("since", "sum")))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -448,7 +448,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
       .addEdgeLabelGroup("knows", Lists.newArrayList())
       .addEdgeLabelGroup("member", Lists.newArrayList("until"))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -480,7 +480,7 @@ public abstract class LabelSpecificGroupingTestBase extends GroupingTestBase {
       .addEdgeLabelGroup("member", Lists.newArrayList("until"),
         Lists.newArrayList(new MinProperty("until", "min")))
       .setStrategy(getStrategy())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(

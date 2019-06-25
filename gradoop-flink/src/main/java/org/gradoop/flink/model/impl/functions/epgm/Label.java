@@ -18,15 +18,15 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.common.model.api.entities.EPGMLabeled;
+import org.gradoop.common.model.api.entities.Labeled;
 
 /**
- * labeled EPGM element => label
+ * labeled element => label
  *
- * @param <L> EPGM labeled type
+ * @param <L> labeled type
  */
 @FunctionAnnotation.ForwardedFields("label->*")
-public class Label<L extends EPGMLabeled>
+public class Label<L extends Labeled>
   implements MapFunction<L, String>, KeySelector<L, String> {
 
   @Override

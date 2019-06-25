@@ -48,7 +48,7 @@ public class BuildEmbeddingFromTriple<K>
    */
   private final int targetIndex;
   /**
-   * Vertex candidate to continue traversal from
+   * EPGMVertex candidate to continue traversal from
    */
   private int nextFrom;
   /**

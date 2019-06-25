@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.junit.runners.Parameterized;
 
@@ -45,7 +45,7 @@ public class RandomVertexSamplingTest extends ParameterizedTestForGraphSampling 
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
 
     dbEdges.removeAll(newEdges);
-    for (Edge edge : dbEdges) {
+    for (EPGMEdge edge : dbEdges) {
       assertFalse("edge from original graph was not sampled but source and target were",
         newVertexIDs.contains(edge.getSourceId()) &&
           newVertexIDs.contains(edge.getTargetId()));

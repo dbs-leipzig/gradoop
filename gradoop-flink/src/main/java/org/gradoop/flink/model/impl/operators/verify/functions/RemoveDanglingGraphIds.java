@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.verify.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  *
  * @param <E> graph element type
  */
-public class RemoveDanglingGraphIds<E extends EPGMGraphElement> extends RichMapFunction<E, E> {
+public class RemoveDanglingGraphIds<E extends GraphElement> extends RichMapFunction<E, E> {
 
   /**
    * String used to identify the graph id set on broadcast.

@@ -17,9 +17,9 @@ package org.gradoop.flink.io.impl.tlf.functions;
 
 import com.google.common.collect.Maps;
 import org.apache.flink.api.java.io.TextOutputFormat;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.io.impl.tlf.TLFConstants;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -114,9 +114,9 @@ public class TLFFileFormat
    * @return builder with appended vertex representations
    */
   private StringBuilder writeVertices(StringBuilder builder,
-    Set<Vertex> vertices) {
+    Set<EPGMVertex> vertices) {
     long vertexId = 0;
-    for (Vertex vertex : vertices) {
+    for (EPGMVertex vertex : vertices) {
       vertexIdMap.put(vertex.getId(), vertexId);
       builder.append(String.format("%s %s %s%n",
         TLFConstants.VERTEX_SYMBOL,
@@ -140,8 +140,8 @@ public class TLFFileFormat
    * @param edges set of edges
    * @return builder with appended edge representations
    */
-  private StringBuilder writeEdges(StringBuilder builder, Set<Edge> edges) {
-    for (Edge edge : edges) {
+  private StringBuilder writeEdges(StringBuilder builder, Set<EPGMEdge> edges) {
+    for (EPGMEdge edge : edges) {
       Long sourceId = vertexIdMap.get(edge.getSourceId());
       Long targetId = vertexIdMap.get(edge.getTargetId());
 

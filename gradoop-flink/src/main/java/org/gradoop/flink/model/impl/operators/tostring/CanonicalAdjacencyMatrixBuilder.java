@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.operators.tostring;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.epgm.LabelCombiner;
@@ -49,15 +49,15 @@ public class CanonicalAdjacencyMatrixBuilder implements
   /**
    * function describing string representation of graph heads
    */
-  private final GraphHeadToString<GraphHead> graphHeadToString;
+  private final GraphHeadToString<EPGMGraphHead> graphHeadToString;
   /**
    * function describing string representation of vertices
    */
-  private final VertexToString<Vertex> vertexToString;
+  private final VertexToString<EPGMVertex> vertexToString;
   /**
    * function describing string representation of edges
    */
-  private final EdgeToString<Edge> egeLabelingFunction;
+  private final EdgeToString<EPGMEdge> egeLabelingFunction;
   /**
    * sets mode for either directed or undirected graph
    */
@@ -71,9 +71,9 @@ public class CanonicalAdjacencyMatrixBuilder implements
    * @param directed sets mode for either directed or undirected graph
    */
   public CanonicalAdjacencyMatrixBuilder(
-    GraphHeadToString<GraphHead> graphHeadToString,
-    VertexToString<Vertex> vertexToString,
-    EdgeToString<Edge> edgeLabelingFunction,
+    GraphHeadToString<EPGMGraphHead> graphHeadToString,
+    VertexToString<EPGMVertex> vertexToString,
+    EdgeToString<EPGMEdge> edgeLabelingFunction,
     boolean directed
   ) {
     this.graphHeadToString = graphHeadToString;

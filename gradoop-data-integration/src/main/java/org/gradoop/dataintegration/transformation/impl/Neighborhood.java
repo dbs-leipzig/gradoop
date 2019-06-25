@@ -17,7 +17,7 @@ package org.gradoop.dataintegration.transformation.impl;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.dataintegration.transformation.functions.CreateNeighborList;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -44,13 +44,13 @@ public class Neighborhood {
    * @return A Dataset of tuples containing vertices and their neighborhood.
    * @throws NullPointerException if any of the parameters is null.
    */
-  public static DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> getPerVertex(LogicalGraph graph,
-                 DataSet<Vertex> centralVertices, EdgeDirection edgeDirection) {
+  public static DataSet<Tuple2<EPGMVertex, List<NeighborhoodVertex>>> getPerVertex(LogicalGraph graph,
+                 DataSet<EPGMVertex> centralVertices, EdgeDirection edgeDirection) {
     Objects.requireNonNull(graph);
     Objects.requireNonNull(centralVertices);
     Objects.requireNonNull(edgeDirection);
-    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> incoming = null;
-    DataSet<Tuple2<Vertex, List<NeighborhoodVertex>>> outgoing = null;
+    DataSet<Tuple2<EPGMVertex, List<NeighborhoodVertex>>> incoming = null;
+    DataSet<Tuple2<EPGMVertex, List<NeighborhoodVertex>>> outgoing = null;
 
     // get incoming
     if (edgeDirection.equals(EdgeDirection.INCOMING) ||

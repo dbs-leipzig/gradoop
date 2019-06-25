@@ -17,7 +17,7 @@ package org.gradoop.storage.impl.hbase.iterator;
 
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
 
@@ -26,7 +26,7 @@ import java.util.Iterator;
 /**
  * HBase client iterator for Graph Head
  */
-public class HBaseGraphIterator implements ClosableIterator<GraphHead> {
+public class HBaseGraphIterator implements ClosableIterator<EPGMGraphHead> {
 
   /**
    * HBase result scanner
@@ -49,7 +49,7 @@ public class HBaseGraphIterator implements ClosableIterator<GraphHead> {
   private Result result;
 
   /**
-   * HBase GraphHead Iterator
+   * HBase EPGMGraphHead Iterator
    *
    * @param scanner HBase result scanner
    * @param handler element handler for gradoop
@@ -79,7 +79,7 @@ public class HBaseGraphIterator implements ClosableIterator<GraphHead> {
   }
 
   @Override
-  public GraphHead next() {
+  public EPGMGraphHead next() {
     return handler.readGraphHead(result);
   }
 }

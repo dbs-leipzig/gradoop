@@ -17,16 +17,16 @@ package org.gradoop.storage.impl.hbase.iterator;
 
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.storage.common.iterator.ClosableIterator;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 
 import java.util.Iterator;
 
 /**
- * HBase client iterator for Edge
+ * HBase client iterator for EPGMEdge
  */
-public class HBaseEdgeIterator implements ClosableIterator<Edge> {
+public class HBaseEdgeIterator implements ClosableIterator<EPGMEdge> {
 
   /**
    * HBase result scanner
@@ -49,7 +49,7 @@ public class HBaseEdgeIterator implements ClosableIterator<Edge> {
   private Result result;
 
   /**
-   * HBase GraphHead Iterator
+   * HBase EPGMGraphHead Iterator
    *
    * @param scanner HBase result scanner
    * @param handler element handler for gradoop
@@ -76,7 +76,7 @@ public class HBaseEdgeIterator implements ClosableIterator<Edge> {
   }
 
   @Override
-  public Edge next() {
+  public EPGMEdge next() {
     return handler.readEdge(result);
   }
 }

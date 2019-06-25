@@ -16,35 +16,35 @@
 package org.gradoop.common.model.api.entities;
 
 /**
- * Interface that provides getters for the EPGM element factories.
+ * Interface that provides getters for the element factories.
  *
- * @param <G> type of the EPGM graph head
- * @param <V> type of the EPGM vertex
- * @param <E> type of the EPGM edge
+ * @param <G> type of the graph head
+ * @param <V> type of the vertex
+ * @param <E> type of the edge
  */
 public interface ElementFactoryProvider<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge> {
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge> {
 
   /**
    * Get the factory that is responsible for creating graph head instances.
    *
    * @return a factory that creates graph heads
    */
-  EPGMGraphHeadFactory<G> getGraphHeadFactory();
+  GraphHeadFactory<G> getGraphHeadFactory();
 
   /**
    * Get the factory that is responsible for creating vertex instances.
    *
    * @return a factory that creates vertices
    */
-  EPGMVertexFactory<V> getVertexFactory();
+  VertexFactory<V> getVertexFactory();
 
   /**
    * Get the factory that is responsible for creating edge instances.
    *
    * @return a factory that creates edges
    */
-  EPGMEdgeFactory<E> getEdgeFactory();
+  EdgeFactory<E> getEdgeFactory();
 }

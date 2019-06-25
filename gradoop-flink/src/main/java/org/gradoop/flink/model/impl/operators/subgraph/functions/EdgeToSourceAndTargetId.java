@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.subgraph.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <E> edge type
  */
-public class EdgeToSourceAndTargetId<E extends EPGMEdge>
+public class EdgeToSourceAndTargetId<E extends Edge>
   implements FlatMapFunction<E, GradoopId> {
 
   @Override

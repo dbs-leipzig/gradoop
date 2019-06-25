@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.subgraph.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 
 /**
  * left, right => left (retain graphIds contained in right)
@@ -27,7 +27,7 @@ import org.gradoop.common.model.api.entities.EPGMGraphElement;
  */
 @FunctionAnnotation.NonForwardedFieldsFirst("graphIds")
 @FunctionAnnotation.ReadFieldsSecond("graphIds")
-public class LeftSideWithRightGraphs<L extends EPGMGraphElement, R extends EPGMGraphElement>
+public class LeftSideWithRightGraphs<L extends GraphElement, R extends GraphElement>
   implements JoinFunction<L, R, L> {
   @Override
   public L join(L left, R right) throws Exception {
