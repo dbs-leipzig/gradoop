@@ -29,7 +29,7 @@ public class ElementTest {
 
   @Test
   public void testSetId() {
-    Element elementMock = mock(Element.class, CALLS_REAL_METHODS);
+    EPGMElement elementMock = mock(EPGMElement.class, CALLS_REAL_METHODS);
     GradoopId id = GradoopId.get();
     elementMock.setId(id);
 
@@ -38,7 +38,7 @@ public class ElementTest {
 
   @Test
   public void testSetProperty() {
-    Element elementMock = mock(Element.class, CALLS_REAL_METHODS);
+    EPGMElement elementMock = mock(EPGMElement.class, CALLS_REAL_METHODS);
     elementMock.setProperty(KEY_0, STRING_VAL_6);
 
     Properties properties = Properties.create();
@@ -49,7 +49,7 @@ public class ElementTest {
 
   @Test(expectedExceptions = NullPointerException.class)
   public void testSetPropertyNull() {
-    Element elementMock = mock(Element.class, CALLS_REAL_METHODS);
+    EPGMElement elementMock = mock(EPGMElement.class, CALLS_REAL_METHODS);
     elementMock.setProperty(null);
   }
 
@@ -60,7 +60,7 @@ public class ElementTest {
     GradoopId gradoopId = GradoopId.get();
 
     // create element mock with property
-    Element elementMock = mock(Element.class, withSettings()
+    EPGMElement elementMock = mock(EPGMElement.class, withSettings()
       .useConstructor(gradoopId, "someLabel", properties)
       .defaultAnswer(CALLS_REAL_METHODS));
 
@@ -73,7 +73,7 @@ public class ElementTest {
     GradoopId gradoopId = GradoopId.get();
 
     // create element mock without properties
-    Element elementMock = mock(Element.class, withSettings()
+    EPGMElement elementMock = mock(EPGMElement.class, withSettings()
       .useConstructor(gradoopId, "someLabel", null)
       .defaultAnswer(CALLS_REAL_METHODS));
 
@@ -87,7 +87,7 @@ public class ElementTest {
     GradoopId gradoopId = GradoopId.get();
 
     // create element mock with property
-    Element elementMock = mock(Element.class, withSettings()
+    EPGMElement elementMock = mock(EPGMElement.class, withSettings()
       .useConstructor(gradoopId, "someLabel", properties)
       .defaultAnswer(CALLS_REAL_METHODS));
 
@@ -99,7 +99,7 @@ public class ElementTest {
     GradoopId gradoopId = GradoopId.get();
 
     // create element mock without properties
-    Element elementMock = mock(Element.class, withSettings()
+    EPGMElement elementMock = mock(EPGMElement.class, withSettings()
       .useConstructor(gradoopId, "someLabel", null)
       .defaultAnswer(CALLS_REAL_METHODS));
 
@@ -111,7 +111,7 @@ public class ElementTest {
     GradoopId gradoopId = GradoopId.get();
 
     // create element mock without properties
-    Element elementMock = mock(Element.class, withSettings()
+    EPGMElement elementMock = mock(EPGMElement.class, withSettings()
       .useConstructor(gradoopId, "someLabel", null)
       .defaultAnswer(CALLS_REAL_METHODS));
 
@@ -123,7 +123,7 @@ public class ElementTest {
     GradoopId gradoopId = GradoopId.get();
 
     // create element mock without properties
-    Element elementMock = mock(Element.class, withSettings()
+    EPGMElement elementMock = mock(EPGMElement.class, withSettings()
       .useConstructor(gradoopId, "someLabel", null)
       .defaultAnswer(CALLS_REAL_METHODS));
 
@@ -139,7 +139,7 @@ public class ElementTest {
     GradoopId gradoopId = GradoopId.get();
 
     // create element mock with property
-    Element elementMock = mock(Element.class, withSettings()
+    EPGMElement elementMock = mock(EPGMElement.class, withSettings()
       .useConstructor(gradoopId, "someLabel", properties)
       .defaultAnswer(CALLS_REAL_METHODS));
 

@@ -16,27 +16,27 @@
 package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.io.api.metadata.MetaDataSource;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.tuples.CSVGraphHead;
 
 /**
- * Converts an {@link org.gradoop.common.model.impl.pojo.GraphHead} into a CSV representation.
+ * Converts an {@link EPGMGraphHead} into a CSV representation.
  *
  * Forwarded fields:
  *
  * label
  */
 @FunctionAnnotation.ForwardedFields("label->f1")
-public class GraphHeadToCSVGraphHead extends ElementToCSV<GraphHead, CSVGraphHead> {
+public class GraphHeadToCSVGraphHead extends ElementToCSV<EPGMGraphHead, CSVGraphHead> {
   /**
    * Reduce object instantiations
    */
   private final CSVGraphHead csvGraphHead = new CSVGraphHead();
 
   @Override
-  public CSVGraphHead map(GraphHead graphHead) throws Exception {
+  public CSVGraphHead map(EPGMGraphHead graphHead) throws Exception {
     csvGraphHead.setId(graphHead.getId().toString());
     csvGraphHead.setLabel(StringEscaper.escape(graphHead.getLabel(),
       CSVConstants.ESCAPED_CHARACTERS));

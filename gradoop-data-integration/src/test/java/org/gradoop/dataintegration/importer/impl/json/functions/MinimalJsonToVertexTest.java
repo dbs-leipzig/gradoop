@@ -16,9 +16,9 @@
 package org.gradoop.dataintegration.importer.impl.json.functions;
 
 import org.codehaus.jettison.json.JSONException;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Before;
@@ -37,12 +37,12 @@ public class MinimalJsonToVertexTest extends GradoopFlinkTestBase {
   /**
    * The factory used to create new vertices.
    */
-  private VertexFactory vertexFactory;
+  private EPGMVertexFactory vertexFactory;
 
   /**
    * The vertex storing the expectedValue value.
    */
-  private Vertex expectedValue;
+  private EPGMVertex expectedValue;
 
   /**
    * An instance of the function to test.
@@ -66,7 +66,7 @@ public class MinimalJsonToVertexTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWithEmptyObject() throws Exception {
-    EPGMVertex vertex = function.map("{}");
+    Vertex vertex = function.map("{}");
     assertVertexEquals(vertex, expectedValue);
   }
 
@@ -77,7 +77,7 @@ public class MinimalJsonToVertexTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWithBoolean() throws Exception {
-    EPGMVertex vertex = function.map("{\"someBool\": true}");
+    Vertex vertex = function.map("{\"someBool\": true}");
     expectedValue.setProperty("someBool", "true");
     assertVertexEquals(expectedValue, vertex);
   }
@@ -89,7 +89,7 @@ public class MinimalJsonToVertexTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWithFloat() throws Exception {
-    EPGMVertex vertex = function.map("{\"someFloat\": -123.456}");
+    Vertex vertex = function.map("{\"someFloat\": -123.456}");
     expectedValue.setProperty("someFloat", "-123.456");
     assertVertexEquals(expectedValue, vertex);
   }
@@ -101,7 +101,7 @@ public class MinimalJsonToVertexTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWithInt() throws Exception {
-    EPGMVertex vertex = function.map("{\"someInt\": -123, \"withExponent\": 3.1e+2}");
+    Vertex vertex = function.map("{\"someInt\": -123, \"withExponent\": 3.1e+2}");
     expectedValue.setProperty("someInt", "-123");
     expectedValue.setProperty("withExponent", "310.0");
     assertVertexEquals(expectedValue, vertex);
@@ -114,7 +114,7 @@ public class MinimalJsonToVertexTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWithString() throws Exception {
-    EPGMVertex vertex = function.map("{\"someString\": \"test\"}");
+    Vertex vertex = function.map("{\"someString\": \"test\"}");
     expectedValue.setProperty("someString", "test");
     assertVertexEquals(expectedValue, vertex);
   }
@@ -127,7 +127,7 @@ public class MinimalJsonToVertexTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWithListOfPrimitives() throws Exception {
-    EPGMVertex vertex = function.map("{\"someList\": [\"test\", true, 1.6, -9]}");
+    Vertex vertex = function.map("{\"someList\": [\"test\", true, 1.6, -9]}");
     expectedValue.setProperty("someList", Arrays
       .asList(PropertyValue.create("test"), PropertyValue.create("true"),
         PropertyValue.create("1.6"), PropertyValue.create("-9")));
@@ -142,7 +142,7 @@ public class MinimalJsonToVertexTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWithListOfLists() throws Exception {
-    EPGMVertex vertex = function.map("{\"someList\": [1,[2,[\"s\", true, 1.6, -9]]]}");
+    Vertex vertex = function.map("{\"someList\": [1,[2,[\"s\", true, 1.6, -9]]]}");
     expectedValue.setProperty("someList", Arrays.asList(PropertyValue.create("1"),
       PropertyValue.create("[2,[\"s\",true,1.6,-9]]")));
     assertVertexEquals(expectedValue, vertex);
@@ -155,7 +155,7 @@ public class MinimalJsonToVertexTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testWithNestedObject() throws Exception {
-    EPGMVertex vertex = function.map("{\"someObj\": {\"a\": 1, \"b\": [true], \"c\":" +
+    Vertex vertex = function.map("{\"someObj\": {\"a\": 1, \"b\": [true], \"c\":" +
       "{\"d\": 1}}}");
     expectedValue.setProperty("someObj", "{\"a\":1,\"b\":[true],\"c\":{\"d\":1}}");
     assertVertexEquals(expectedValue, vertex);
@@ -178,7 +178,7 @@ public class MinimalJsonToVertexTest extends GradoopFlinkTestBase {
    * @param expected The expectedValue vertex value.
    * @param actual   The actual vertex value.
    */
-  private void assertVertexEquals(EPGMVertex expected, EPGMVertex actual) {
+  private void assertVertexEquals(Vertex expected, Vertex actual) {
     assertNotNull(expected);
     assertNotNull(actual);
     assertEquals(expected.getLabel(), actual.getLabel());

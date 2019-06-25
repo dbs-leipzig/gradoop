@@ -21,7 +21,7 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
 
 /**
@@ -29,7 +29,7 @@ import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
  * data handler.
  */
 public class BuildGraphHeadMutation extends
-  RichMapFunction<GraphHead, Tuple2<GradoopId, Mutation>> {
+  RichMapFunction<EPGMGraphHead, Tuple2<GradoopId, Mutation>> {
 
   /**
    * Serial version uid.
@@ -62,7 +62,7 @@ public class BuildGraphHeadMutation extends
   }
 
   @Override
-  public Tuple2<GradoopId, Mutation> map(GraphHead graphHead) throws Exception {
+  public Tuple2<GradoopId, Mutation> map(EPGMGraphHead graphHead) throws Exception {
     GradoopId key = graphHead.getId();
     Put put = new Put(graphHeadHandler.getRowKey(graphHead.getId()));
     put = graphHeadHandler.writeGraphHead(put, graphHead);

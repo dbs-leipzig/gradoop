@@ -16,8 +16,8 @@
 package org.gradoop.storage.impl.accumulo.handler;
 
 import org.apache.accumulo.core.data.Mutation;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 
 import java.io.Serializable;
 
@@ -27,14 +27,14 @@ import java.io.Serializable;
  * @param <R> row to read from DB (some element)
  * @param <W> row to write into DB (some EPGM element)
  */
-public interface AccumuloRowHandler<R extends Element, W extends EPGMElement>
+public interface AccumuloRowHandler<R extends EPGMElement, W extends Element>
   extends Serializable {
 
   /**
    * Write element to store
    *
    * @param mutation new row mutation
-   * @param record EPGMElement to be write
+   * @param record Element to be write
    * @return row mutation after writer
    */
   Mutation writeRow(

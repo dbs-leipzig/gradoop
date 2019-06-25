@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
-import org.gradoop.common.model.impl.pojo.Vertex;
 
 import java.util.Collection;
 
@@ -38,7 +38,7 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
  * @param <V> EPGM vertex type
  */
 @FunctionAnnotation.ForwardedFields("id->f0")
-public class BuildIdWithCandidates<V extends Vertex>
+public class BuildIdWithCandidates<V extends EPGMVertex>
   extends AbstractBuilder<V, IdWithCandidates<GradoopId>> {
   /**
    * serial version uid

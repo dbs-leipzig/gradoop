@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.graph.Vertex;
 
 /**
- * Convert class I to a Gelly Vertex with K key and VV value.
+ * Convert class I to a Gelly EPGMVertex with K key and VV value.
  *
  * @param <I>   Input type.
  * @param <K>   Key type of the output gelly vertex.

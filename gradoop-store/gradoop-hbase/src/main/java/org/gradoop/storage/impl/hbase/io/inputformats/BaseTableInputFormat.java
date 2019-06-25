@@ -19,7 +19,7 @@ import org.apache.flink.addons.hbase.TableInputFormat;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.FilterList;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
 import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
@@ -29,9 +29,9 @@ import javax.annotation.Nonnull;
 /**
  * Base class for common functionality of HBase input formats
  *
- * @param <E> type of EPGM element
+ * @param <E> type of element
  */
-abstract class BaseTableInputFormat<E extends EPGMElement> extends TableInputFormat<Tuple1<E>> {
+abstract class BaseTableInputFormat<E extends Element> extends TableInputFormat<Tuple1<E>> {
 
   /**
    * Attach a HBase filter represented by the given query to the given scan instance.

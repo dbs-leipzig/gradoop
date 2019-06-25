@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
@@ -36,7 +36,7 @@ public class FilterAndProjectVerticesNode extends LeafNode implements FilterNode
   /**
    * Input data set
    */
-  private DataSet<Vertex> vertices;
+  private DataSet<EPGMVertex> vertices;
   /**
    * Query variable of the vertex
    */
@@ -58,7 +58,7 @@ public class FilterAndProjectVerticesNode extends LeafNode implements FilterNode
    * @param filterPredicate filter predicate to be applied on edges
    * @param projectionKeys property keys whose associated values are projected to the output
    */
-  public FilterAndProjectVerticesNode(DataSet<Vertex> vertices, String vertexVariable,
+  public FilterAndProjectVerticesNode(DataSet<EPGMVertex> vertices, String vertexVariable,
     CNF filterPredicate, Set<String> projectionKeys) {
     this.vertices = vertices;
     this.vertexVariable = vertexVariable;

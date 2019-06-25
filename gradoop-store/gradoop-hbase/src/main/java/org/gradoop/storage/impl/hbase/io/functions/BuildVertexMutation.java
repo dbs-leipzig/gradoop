@@ -21,13 +21,13 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
 
 /**
  * Creates HBase {@link Mutation} from vertex data using vertex data handler.
  */
-public class BuildVertexMutation extends RichMapFunction<Vertex, Tuple2<GradoopId, Mutation>> {
+public class BuildVertexMutation extends RichMapFunction<EPGMVertex, Tuple2<GradoopId, Mutation>> {
 
   /**
    * Serial version uid.
@@ -40,7 +40,7 @@ public class BuildVertexMutation extends RichMapFunction<Vertex, Tuple2<GradoopI
   private transient Tuple2<GradoopId, Mutation> reuseTuple;
 
   /**
-   * Vertex data handler to create Mutations.
+   * EPGMVertex data handler to create Mutations.
    */
   private final VertexHandler vertexHandler;
 
@@ -60,7 +60,7 @@ public class BuildVertexMutation extends RichMapFunction<Vertex, Tuple2<GradoopI
   }
 
   @Override
-  public Tuple2<GradoopId, Mutation> map(Vertex vertex) throws Exception {
+  public Tuple2<GradoopId, Mutation> map(EPGMVertex vertex) throws Exception {
     GradoopId key = vertex.getId();
     Put put = new Put(vertexHandler.getRowKey(vertex.getId()));
     put = vertexHandler.writeVertex(put, vertex);

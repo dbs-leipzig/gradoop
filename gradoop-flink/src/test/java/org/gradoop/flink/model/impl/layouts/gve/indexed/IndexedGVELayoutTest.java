@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.layouts.gve.indexed;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.layouts.gve.GVELayout;
 import org.gradoop.flink.model.impl.layouts.gve.GVELayoutTest;
 
@@ -32,18 +32,18 @@ import static org.junit.Assert.assertTrue;
 public class IndexedGVELayoutTest extends GVELayoutTest {
 
   @Override
-  protected GVELayout from(Collection<GraphHead> graphHeads, Collection<Vertex> vertices,
-    Collection<Edge> edges) {
-    Map<String, DataSet<GraphHead>> indexedGraphHeads = graphHeads.stream()
-      .collect(Collectors.groupingBy(GraphHead::getLabel)).entrySet().stream()
+  protected GVELayout from(Collection<EPGMGraphHead> graphHeads, Collection<EPGMVertex> vertices,
+    Collection<EPGMEdge> edges) {
+    Map<String, DataSet<EPGMGraphHead>> indexedGraphHeads = graphHeads.stream()
+      .collect(Collectors.groupingBy(EPGMGraphHead::getLabel)).entrySet().stream()
       .collect(Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
 
-    Map<String, DataSet<Vertex>> indexedVertices = vertices.stream()
-      .collect(Collectors.groupingBy(Vertex::getLabel)).entrySet().stream()
+    Map<String, DataSet<EPGMVertex>> indexedVertices = vertices.stream()
+      .collect(Collectors.groupingBy(EPGMVertex::getLabel)).entrySet().stream()
       .collect(Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
 
-    Map<String, DataSet<Edge>> indexedEdges = edges.stream()
-      .collect(Collectors.groupingBy(Edge::getLabel)).entrySet().stream()
+    Map<String, DataSet<EPGMEdge>> indexedEdges = edges.stream()
+      .collect(Collectors.groupingBy(EPGMEdge::getLabel)).entrySet().stream()
       .collect(Collectors.toMap(Map.Entry::getKey, e -> getExecutionEnvironment().fromCollection(e.getValue())));
 
     return new IndexedGVELayout(indexedGraphHeads, indexedVertices, indexedEdges);

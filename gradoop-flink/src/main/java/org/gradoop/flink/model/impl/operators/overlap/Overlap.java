@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -30,7 +30,7 @@ public class Overlap implements BinaryGraphToGraphOperator {
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge
-   * sets of two input graphs. Vertex and edge equality is based on their
+   * sets of two input graphs. EPGMVertex and edge equality is based on their
    * respective identifiers.
    *
    * @param firstGraph  first input graph
@@ -41,13 +41,13 @@ public class Overlap implements BinaryGraphToGraphOperator {
   public LogicalGraph execute(
     LogicalGraph firstGraph, LogicalGraph secondGraph) {
 
-    DataSet<Vertex> newVertices = firstGraph.getVertices()
+    DataSet<EPGMVertex> newVertices = firstGraph.getVertices()
       .join(secondGraph.getVertices())
       .where(new Id<>())
       .equalTo(new Id<>())
       .with(new LeftSide<>());
 
-    DataSet<Edge> newEdges = firstGraph.getEdges()
+    DataSet<EPGMEdge> newEdges = firstGraph.getEdges()
       .join(secondGraph.getEdges())
       .where(new Id<>())
       .equalTo(new Id<>())

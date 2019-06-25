@@ -16,7 +16,7 @@
 package org.gradoop.common.model.impl.pojo;
 
 import com.google.common.base.Preconditions;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
@@ -24,10 +24,9 @@ import org.gradoop.common.util.GradoopConstants;
 import java.io.Serializable;
 
 /**
- * Factory for creating graph head POJOs.
+ * Factory for creating EPGM graph head POJOs.
  */
-public class GraphHeadFactory implements EPGMGraphHeadFactory<GraphHead>,
-  Serializable {
+public class EPGMGraphHeadFactory implements GraphHeadFactory<EPGMGraphHead>, Serializable {
 
   /**
    * serial version uid
@@ -35,40 +34,40 @@ public class GraphHeadFactory implements EPGMGraphHeadFactory<GraphHead>,
   private static final long serialVersionUID = 42L;
 
   @Override
-  public GraphHead createGraphHead() {
+  public EPGMGraphHead createGraphHead() {
     return initGraphHead(GradoopId.get());
   }
 
   @Override
-  public GraphHead initGraphHead(final GradoopId id) {
+  public EPGMGraphHead initGraphHead(final GradoopId id) {
     return initGraphHead(id, GradoopConstants.DEFAULT_GRAPH_LABEL, null);
   }
 
   @Override
-  public GraphHead createGraphHead(String label) {
+  public EPGMGraphHead createGraphHead(String label) {
     return initGraphHead(GradoopId.get(), label);
   }
 
   @Override
-  public GraphHead initGraphHead(final GradoopId id, final String label) {
+  public EPGMGraphHead initGraphHead(final GradoopId id, final String label) {
     return initGraphHead(id, label, null);
   }
 
   @Override
-  public GraphHead createGraphHead(String label, Properties properties) {
+  public EPGMGraphHead createGraphHead(String label, Properties properties) {
     return initGraphHead(GradoopId.get(), label, properties);
   }
 
   @Override
-  public GraphHead initGraphHead(final GradoopId id, final String label,
+  public EPGMGraphHead initGraphHead(final GradoopId id, final String label,
     Properties properties) {
     Preconditions.checkNotNull(id, "Identifier was null");
     Preconditions.checkNotNull(label, "Label was null");
-    return new GraphHead(id, label, properties);
+    return new EPGMGraphHead(id, label, properties);
   }
 
   @Override
-  public Class<GraphHead> getType() {
-    return GraphHead.class;
+  public Class<EPGMGraphHead> getType() {
+    return EPGMGraphHead.class;
   }
 }

@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.fusion.functions;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * 1) If there is no vertex match (the vertex is null) then it means that the edge should not be
@@ -29,12 +29,12 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  * 3) Ignore the edges not matching with the vertices (pointless edges that should not occur and
  *    should be removed)
  */
-public class UpdateEdgesThoughToBeFusedVertices implements FlatJoinFunction<Edge, Vertex, Edge> {
+public class UpdateEdgesThoughToBeFusedVertices implements FlatJoinFunction<EPGMEdge, EPGMVertex, EPGMEdge> {
   /**
    * Reusable edge that is used to update the previous edges in order to connect them with the
    * new fused vertex
    */
-  private static final Edge REUSABLE_EDGE = new Edge();
+  private static final EPGMEdge REUSABLE_EDGE = new EPGMEdge();
 
   /**
    * the fused vertex's id
@@ -57,7 +57,7 @@ public class UpdateEdgesThoughToBeFusedVertices implements FlatJoinFunction<Edge
   }
 
   @Override
-  public void join(Edge edge, Vertex vertex, Collector<Edge> collector) throws Exception {
+  public void join(EPGMEdge edge, EPGMVertex vertex, Collector<EPGMEdge> collector) throws Exception {
     if (vertex == null) {
       collector.collect(edge);
     } else if (edge != null) {

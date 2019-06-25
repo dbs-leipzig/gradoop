@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.matching;
 
 import com.google.common.collect.Lists;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.s1ck.gdl.model.GraphElement;
 
 import java.util.Collection;
@@ -39,7 +39,7 @@ public class ElementMatcher {
    * @param defaultLabel  default element label
    * @return true, iff the data graph element matches at least one query element
    */
-  public static <EL1 extends Element, EL2 extends GraphElement>
+  public static <EL1 extends EPGMElement, EL2 extends GraphElement>
   boolean matchAll(EL1 dbElement, Collection<EL2> queryElements, String defaultLabel) {
 
     boolean match = false;
@@ -64,7 +64,7 @@ public class ElementMatcher {
    * @param defaultLabel  default element label
    * @return all candidate ids for {@code dbElement}
    */
-  public static <EL1 extends Element, EL2 extends GraphElement>
+  public static <EL1 extends EPGMElement, EL2 extends GraphElement>
   List<Long> getMatches(EL1 dbElement, Collection<EL2> queryElements, String defaultLabel) {
 
     List<Long> matches = Lists.newArrayListWithCapacity(queryElements.size());
@@ -88,7 +88,7 @@ public class ElementMatcher {
    * @param defaultLabel  default element label
    * @return true, iff the data graph element matches the query graph element
    */
-  public static <EL1 extends Element, EL2 extends GraphElement>
+  public static <EL1 extends EPGMElement, EL2 extends GraphElement>
   boolean match(EL1 dbElement, EL2 queryElement, String defaultLabel) {
 
     boolean match  = false;

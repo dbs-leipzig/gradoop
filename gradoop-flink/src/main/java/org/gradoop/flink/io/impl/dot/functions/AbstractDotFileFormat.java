@@ -16,10 +16,10 @@
 package org.gradoop.flink.io.impl.dot.functions;
 
 import org.apache.flink.api.java.io.TextOutputFormat;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
@@ -89,7 +89,7 @@ public abstract class AbstractDotFileFormat
    * @param builder string builder to append
    */
   private void writeGraphHead(GraphTransaction transaction, StringBuilder builder) {
-    GraphHead graphHead = transaction.getGraphHead();
+    EPGMGraphHead graphHead = transaction.getGraphHead();
 
     writeLabel(builder, graphHead);
 
@@ -117,7 +117,7 @@ public abstract class AbstractDotFileFormat
    * @param suffix id suffix specific for the current {@link GraphTransaction}
    */
   private void writeEdges(GraphTransaction transaction, StringBuilder builder, String suffix) {
-    for (Edge edge: transaction.getEdges()) {
+    for (EPGMEdge edge: transaction.getEdges()) {
 
       builder.append(VERTEX_ID_PREFIX)
         .append(edge.getSourceId())
@@ -139,7 +139,7 @@ public abstract class AbstractDotFileFormat
    * @param builder string builder to append
    * @param element graph element with id, label and properties
    */
-  abstract void writeLabel(StringBuilder builder, EPGMElement element);
+  abstract void writeLabel(StringBuilder builder, Element element);
 
   void setPrintGraphHead(boolean printGraphHead) {
     this.printGraphHead = printGraphHead;

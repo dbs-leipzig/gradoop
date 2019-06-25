@@ -16,13 +16,13 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 
 /**
  * Filters vertices by a given predicate
  */
-public class FilterVertex implements FilterFunction<Vertex> {
+public class FilterVertex implements FilterFunction<EPGMVertex> {
 
   /**
    * Filter predicate
@@ -39,7 +39,7 @@ public class FilterVertex implements FilterFunction<Vertex> {
   }
 
   @Override
-  public boolean filter(Vertex vertex) throws Exception {
+  public boolean filter(EPGMVertex vertex) throws Exception {
     return predicates.evaluate(vertex);
   }
 }

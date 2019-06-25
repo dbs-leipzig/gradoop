@@ -15,6 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan;
 
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 
 import java.util.List;
@@ -22,8 +24,8 @@ import java.util.stream.IntStream;
 
 /**
  * Represents a leaf node in the query plan. Leaf nodes are different in terms of their input which
- * is a data set containing EPGM elements, i.e. {@link org.gradoop.common.model.impl.pojo.Vertex} or
- * {@link org.gradoop.common.model.impl.pojo.Edge}.
+ * is a data set containing EPGM elements, i.e. {@link EPGMVertex} or
+ * {@link EPGMEdge}.
  */
 public abstract class LeafNode extends PlanNode {
   /**

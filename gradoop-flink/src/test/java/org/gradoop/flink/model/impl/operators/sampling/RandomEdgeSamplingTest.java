@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.junit.runners.Parameterized;
 
@@ -47,7 +47,7 @@ public class RandomEdgeSamplingTest extends ParameterizedTestForGraphSampling {
   @Override
   public void validateSpecific(LogicalGraph input, LogicalGraph output) {
     Set<GradoopId> connectedVerticesIDs = new HashSet<>();
-    for (Edge edge : newEdges) {
+    for (EPGMEdge edge : newEdges) {
       connectedVerticesIDs.add(edge.getSourceId());
       connectedVerticesIDs.add(edge.getTargetId());
     }

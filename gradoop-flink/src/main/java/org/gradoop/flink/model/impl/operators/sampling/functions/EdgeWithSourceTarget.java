@@ -18,16 +18,16 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
- * Maps an Edge to Edge with its source and targets
+ * Maps an EPGMEdge to EPGMEdge with its source and targets
  */
-public class EdgeWithSourceTarget implements MapFunction<Edge, Tuple3<Edge, GradoopId, GradoopId>> {
+public class EdgeWithSourceTarget implements MapFunction<EPGMEdge, Tuple3<EPGMEdge, GradoopId, GradoopId>> {
   /**
    *  Reduce object instantiations
    */
-  private Tuple3<Edge, GradoopId, GradoopId> reuse;
+  private Tuple3<EPGMEdge, GradoopId, GradoopId> reuse;
 
   /**
    * Constructor
@@ -37,7 +37,7 @@ public class EdgeWithSourceTarget implements MapFunction<Edge, Tuple3<Edge, Grad
   }
 
   @Override
-  public Tuple3<Edge, GradoopId, GradoopId> map(Edge edge) throws Exception {
+  public Tuple3<EPGMEdge, GradoopId, GradoopId> map(EPGMEdge edge) throws Exception {
     reuse.f0 = edge;
     reuse.f1 = edge.getSourceId();
     reuse.f2 = edge.getTargetId();

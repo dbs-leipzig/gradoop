@@ -20,10 +20,10 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
@@ -42,20 +42,20 @@ import java.util.Set;
  * - the second dataset contains the vertices contained in all graphs of the collection
  * - the third dataset contains the edges contained in all graphs of the collection
  */
-public class GVELayout implements LogicalGraphLayout<GraphHead, Vertex, Edge>,
-  GraphCollectionLayout<GraphHead, Vertex, Edge> {
+public class GVELayout implements LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge>,
+  GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> {
   /**
    * Graph data associated with the logical graphs in that collection.
    */
-  private final DataSet<GraphHead> graphHeads;
+  private final DataSet<EPGMGraphHead> graphHeads;
   /**
    * DataSet containing vertices associated with that graph.
    */
-  private final DataSet<Vertex> vertices;
+  private final DataSet<EPGMVertex> vertices;
   /**
    * DataSet containing edges associated with that graph.
    */
-  private final DataSet<Edge> edges;
+  private final DataSet<EPGMEdge> edges;
 
   /**
    * Constructor
@@ -64,8 +64,8 @@ public class GVELayout implements LogicalGraphLayout<GraphHead, Vertex, Edge>,
    * @param vertices vertex dataset
    * @param edges edge dataset
    */
-  protected GVELayout(DataSet<GraphHead> graphHeads, DataSet<Vertex> vertices,
-    DataSet<Edge> edges) {
+  protected GVELayout(DataSet<EPGMGraphHead> graphHeads, DataSet<EPGMVertex> vertices,
+    DataSet<EPGMEdge> edges) {
     this.graphHeads = graphHeads;
     this.vertices = vertices;
     this.edges = edges;
@@ -87,28 +87,28 @@ public class GVELayout implements LogicalGraphLayout<GraphHead, Vertex, Edge>,
   }
 
   @Override
-  public DataSet<GraphHead> getGraphHeads() {
+  public DataSet<EPGMGraphHead> getGraphHeads() {
     return graphHeads;
   }
 
   @Override
-  public DataSet<GraphHead> getGraphHeadsByLabel(String label) {
+  public DataSet<EPGMGraphHead> getGraphHeadsByLabel(String label) {
     return graphHeads.filter(new ByLabel<>(label));
   }
 
   @Override
   public DataSet<GraphTransaction> getGraphTransactions() {
-    DataSet<Tuple2<GradoopId, GraphElement>> graphVertexTuples = getVertices()
-      .map(new Cast<>(GraphElement.class))
-      .returns(TypeExtractor.getForClass(GraphElement.class))
+    DataSet<Tuple2<GradoopId, EPGMGraphElement>> graphVertexTuples = getVertices()
+      .map(new Cast<>(EPGMGraphElement.class))
+      .returns(TypeExtractor.getForClass(EPGMGraphElement.class))
       .flatMap(new GraphElementExpander<>());
 
-    DataSet<Tuple2<GradoopId, GraphElement>> graphEdgeTuples = getEdges()
-      .map(new Cast<>(GraphElement.class))
-      .returns(TypeExtractor.getForClass(GraphElement.class))
+    DataSet<Tuple2<GradoopId, EPGMGraphElement>> graphEdgeTuples = getEdges()
+      .map(new Cast<>(EPGMGraphElement.class))
+      .returns(TypeExtractor.getForClass(EPGMGraphElement.class))
       .flatMap(new GraphElementExpander<>());
 
-    DataSet<Tuple3<GradoopId, Set<Vertex>, Set<Edge>>> transactions = graphVertexTuples
+    DataSet<Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>>> transactions = graphVertexTuples
       .union(graphEdgeTuples)
       .groupBy(0)
       .combineGroup(new GraphVerticesEdges())
@@ -122,27 +122,27 @@ public class GVELayout implements LogicalGraphLayout<GraphHead, Vertex, Edge>,
   }
 
   @Override
-  public DataSet<GraphHead> getGraphHead() {
+  public DataSet<EPGMGraphHead> getGraphHead() {
     return graphHeads;
   }
 
   @Override
-  public DataSet<Vertex> getVertices() {
+  public DataSet<EPGMVertex> getVertices() {
     return vertices;
   }
 
   @Override
-  public DataSet<Vertex> getVerticesByLabel(String label) {
+  public DataSet<EPGMVertex> getVerticesByLabel(String label) {
     return vertices.filter(new ByLabel<>(label));
   }
 
   @Override
-  public DataSet<Edge> getEdges() {
+  public DataSet<EPGMEdge> getEdges() {
     return edges;
   }
 
   @Override
-  public DataSet<Edge> getEdgesByLabel(String label) {
+  public DataSet<EPGMEdge> getEdgesByLabel(String label) {
     return edges.filter(new ByLabel<>(label));
   }
 }

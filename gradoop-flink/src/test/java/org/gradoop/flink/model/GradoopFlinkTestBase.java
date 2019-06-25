@@ -22,10 +22,10 @@ import org.apache.flink.runtime.testutils.MiniClusterResourceConfiguration;
 import org.apache.flink.test.util.MiniClusterWithClientResource;
 import org.apache.flink.test.util.TestBaseUtils;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
@@ -69,12 +69,12 @@ public abstract class GradoopFlinkTestBase extends TestBaseUtils {
   /**
    * The factory to create a logical graph layout.
    */
-  private LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> graphLayoutFactory;
+  private LogicalGraphLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> graphLayoutFactory;
 
   /**
    * The factory to create a graph collection layout.
    */
-  private GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> collectionLayoutFactory;
+  private GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> collectionLayoutFactory;
 
   /**
    * Creates a new instance of {@link GradoopFlinkTestBase}.
@@ -116,7 +116,7 @@ public abstract class GradoopFlinkTestBase extends TestBaseUtils {
   }
 
   protected void setCollectionLayoutFactory(
-    GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> collectionLayoutFactory) {
+    GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> collectionLayoutFactory) {
     this.collectionLayoutFactory = collectionLayoutFactory;
   }
 
@@ -201,7 +201,7 @@ public abstract class GradoopFlinkTestBase extends TestBaseUtils {
     assertFalse("expected false", result.collect().get(0));
   }
 
-  protected <T extends EPGMElement> DataSet<T> getEmptyDataSet(T dummy) {
+  protected <T extends Element> DataSet<T> getEmptyDataSet(T dummy) {
     return getExecutionEnvironment()
       .fromElements(dummy)
       .filter(new False<>());
