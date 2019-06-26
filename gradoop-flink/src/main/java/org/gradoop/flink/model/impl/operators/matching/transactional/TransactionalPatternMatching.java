@@ -45,7 +45,7 @@ import org.gradoop.flink.model.impl.operators.matching.transactional.function.In
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.Project4To0And2AndSwitch;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.Project4To0And3AndSwitch;
 import org.gradoop.flink.model.impl.operators.matching.transactional.tuples.GraphWithCandidates;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.AddGraphsToElements;
 
 /**
  * Operator to match a given pattern on a graph collection
