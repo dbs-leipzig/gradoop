@@ -63,7 +63,9 @@ public class NeighborVertexReduceFunction<V extends Vertex>
           .aggregate(propertyValue, getFunction().getIncrement(edgeVertex));
       }
     }
-    vertex.setProperty(getFunction().getAggregatePropertyKey(), propertyValue);
-    collector.collect(vertex);
+    if (vertex != null) {
+      vertex.setProperty(getFunction().getAggregatePropertyKey(), propertyValue);
+      collector.collect(vertex);
+    }
   }
 }
