@@ -8,7 +8,7 @@
             <gitHub>
                 <projectId>dbs-leipzig/gradoop</projectId>
                 <ribbonOrientation>right</ribbonOrientation>
-                <ribbonColor>gray</ribbonColor>
+                <ribbonColor>orange</ribbonColor>
             </gitHub>
         </fluidoSkin>
     </custom>
@@ -21,6 +21,9 @@
         <menu ref="parent" inherit="top"/>
         <menu ref="reports" inherit="top"/>
         <menu ref="modules" inherit="top"/>
+        <menu name="Wiki" inherit="bottom">
+            <item name="Gradoop Wiki" href="https://github.com/dbs-leipzig/gradoop/wiki"/>
+        </menu>
     </body>
     <skin>
         <groupId>org.apache.maven.skins</groupId>
