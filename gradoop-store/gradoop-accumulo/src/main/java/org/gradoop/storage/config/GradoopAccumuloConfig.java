@@ -16,9 +16,9 @@
 package org.gradoop.storage.config;
 
 import org.apache.accumulo.core.security.Authorizations;
-import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
+import org.gradoop.common.model.impl.factories.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.factories.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.factories.EPGMVertexFactory;
 import org.gradoop.storage.common.config.GradoopStoreConfig;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloDefault;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;

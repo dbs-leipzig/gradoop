@@ -16,6 +16,7 @@
 package org.gradoop.common.model.impl.pojo;
 
 import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.impl.factories.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;

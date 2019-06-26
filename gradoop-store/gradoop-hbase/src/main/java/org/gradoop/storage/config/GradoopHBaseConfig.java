@@ -17,9 +17,9 @@ package org.gradoop.storage.config;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.TableName;
-import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
+import org.gradoop.common.model.impl.factories.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.factories.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.factories.EPGMVertexFactory;
 import org.gradoop.storage.common.config.GradoopStoreConfig;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;

@@ -16,6 +16,7 @@
 package org.gradoop.common.model.impl.pojo;
 
 import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.impl.factories.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -77,8 +78,7 @@ public class EdgeTest {
     GradoopId edgeId = GradoopId.get();
     GradoopId sourceId = GradoopId.get();
     GradoopId targetId = GradoopId.get();
-    Edge e =
-      new EPGMEdgeFactory().initEdge(edgeId, sourceId, targetId);
+    Edge e = new EPGMEdgeFactory().initEdge(edgeId, sourceId, targetId);
     assertThat(e.getLabel(), is(GradoopConstants.DEFAULT_EDGE_LABEL));
   }
 

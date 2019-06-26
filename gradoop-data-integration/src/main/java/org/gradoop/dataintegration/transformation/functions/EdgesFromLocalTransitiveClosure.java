@@ -24,7 +24,7 @@ import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.factories.EPGMEdgeFactory;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 
 import java.util.Iterator;
