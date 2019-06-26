@@ -13,42 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.subgraph.functions;
+package org.gradoop.flink.model.impl.operators.matching.transactional.function;
 
-import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * CoGroups tuples containing gradoop ids and gradoop id sets with graph
- * elements with the same gradoop ids and adds the gradoop id sets to each
- * element.
+ * Add all gradoop ids in the second field of the first tuple to the element.
+ * id:el{id1} join (id, {id2, id3}) -> id:el{id1, id2, id3}
  * @param <EL> epgm graph element type
  */
-
 @FunctionAnnotation.ReadFieldsFirst("f1")
 @FunctionAnnotation.ForwardedFieldsSecond("id;label;properties")
-public class AddGraphsToElementsCoGroup<EL extends EPGMGraphElement>
-  implements CoGroupFunction<Tuple2<GradoopId, GradoopIdSet>, EL, EL> {
+public class AddGraphsToElements<EL extends EPGMGraphElement>
+  implements JoinFunction<Tuple2<GradoopId, GradoopIdSet>, EL, EL> {
 
   @Override
-  public void coGroup(
-    Iterable<Tuple2<GradoopId, GradoopIdSet>> graphs,
-    Iterable<EL> elements,
-    Collector<EL> collector) {
-    boolean wasGraphSetEmpty = true;
-    for (EL element : elements) {
-      for (Tuple2<GradoopId, GradoopIdSet> graphSet : graphs) {
-        element.getGraphIds().addAll(graphSet.f1);
-        wasGraphSetEmpty = false;
-      }
-      if (!wasGraphSetEmpty) {
-        collector.collect(element);
-      }
-    }
+  public EL join(
+    Tuple2<GradoopId, GradoopIdSet> left,
+    EL right) {
+    right.getGraphIds().addAll(left.f1);
+    return right;
   }
 }
