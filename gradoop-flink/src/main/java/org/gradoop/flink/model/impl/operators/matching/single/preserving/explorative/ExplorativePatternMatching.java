@@ -221,7 +221,7 @@ public class ExplorativePatternMatching
 
     return doAttachData() ?
       PostProcessor.extractGraphCollectionWithData(elements, graph, true) :
-      PostProcessor.extractGraphCollection(elements, graph.getConfig(), true);
+      PostProcessor.extractGraphCollection(elements, graph.getCollectionFactory(), true);
   }
 
 

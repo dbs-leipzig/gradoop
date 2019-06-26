@@ -109,6 +109,12 @@ public class GradoopTestUtils {
 
   private static Comparator<Identifiable> ID_COMPARATOR = new IdentifiableComparator();
 
+  /**
+   * Singleton instance of a EPGM ElementFactoryProvider.
+   */
+  private static ElementFactoryProvider<EPGMGraphHead, EPGMVertex, EPGMEdge> epgmElementFactoryProvider =
+    null;
+
   static {
     MAP_VAL_9.put(PropertyValue.create(KEY_0), PropertyValue.create(NULL_VAL_0));
     MAP_VAL_9.put(PropertyValue.create(KEY_1), PropertyValue.create(BOOL_VAL_1));
@@ -171,27 +177,35 @@ public class GradoopTestUtils {
     SUPPORTED_PROPERTIES.put(KEY_f, SET_VAL_f);
   }
 
-  public static ElementFactoryProvider<EPGMGraphHead, EPGMVertex, EPGMEdge> getElementFactoryProvider() {
-    return new ElementFactoryProvider<EPGMGraphHead, EPGMVertex, EPGMEdge>() {
-      GraphHeadFactory<EPGMGraphHead> graphHeadFactory = new EPGMGraphHeadFactory();
-      VertexFactory<EPGMVertex> vertexFactory = new EPGMVertexFactory();
-      EdgeFactory<EPGMEdge> edgeFactory = new EPGMEdgeFactory();
+  /**
+   * Returns a {@link ElementFactoryProvider} able to create EPGM elements.
+   *
+   * @return ElementFactoryProvider for EPGM elements
+   */
+  public static ElementFactoryProvider<EPGMGraphHead, EPGMVertex, EPGMEdge> getEPGMElementFactoryProvider() {
+    if (epgmElementFactoryProvider == null) {
+      epgmElementFactoryProvider = new ElementFactoryProvider<EPGMGraphHead, EPGMVertex, EPGMEdge>() {
+        GraphHeadFactory<EPGMGraphHead> graphHeadFactory = new EPGMGraphHeadFactory();
+        VertexFactory<EPGMVertex> vertexFactory = new EPGMVertexFactory();
+        EdgeFactory<EPGMEdge> edgeFactory = new EPGMEdgeFactory();
 
-      @Override
-      public GraphHeadFactory<EPGMGraphHead> getGraphHeadFactory() {
-        return graphHeadFactory;
-      }
+        @Override
+        public GraphHeadFactory<EPGMGraphHead> getGraphHeadFactory() {
+          return graphHeadFactory;
+        }
 
-      @Override
-      public VertexFactory<EPGMVertex> getVertexFactory() {
-        return vertexFactory;
-      }
+        @Override
+        public VertexFactory<EPGMVertex> getVertexFactory() {
+          return vertexFactory;
+        }
 
-      @Override
-      public EdgeFactory<EPGMEdge> getEdgeFactory() {
-        return edgeFactory;
-      }
-    };
+        @Override
+        public EdgeFactory<EPGMEdge> getEdgeFactory() {
+          return edgeFactory;
+        }
+      };
+    }
+    return epgmElementFactoryProvider;
   }
 
   /**
@@ -206,7 +220,7 @@ public class GradoopTestUtils {
   public static AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> getSocialNetworkLoader()
     throws IOException {
     InputStream inputStream = GradoopTestUtils.class.getResourceAsStream(SOCIAL_NETWORK_GDL_FILE);
-    return AsciiGraphLoader.fromStream(inputStream, getElementFactoryProvider());
+    return AsciiGraphLoader.fromStream(inputStream, getEPGMElementFactoryProvider());
   }
 
   /**

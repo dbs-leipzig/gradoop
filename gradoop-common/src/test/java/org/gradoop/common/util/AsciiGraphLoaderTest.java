@@ -25,7 +25,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
-import static org.gradoop.common.GradoopTestUtils.getElementFactoryProvider;
+import static org.gradoop.common.GradoopTestUtils.getEPGMElementFactoryProvider;
 import static org.testng.AssertJUnit.*;
 import static org.testng.Assert.assertNotEquals;
 
@@ -34,7 +34,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testFromString() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-        AsciiGraphLoader.fromString("[()-->()]", getElementFactoryProvider());
+        AsciiGraphLoader.fromString("[()-->()]", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -45,7 +45,7 @@ public class AsciiGraphLoaderTest {
     String file = URLDecoder.decode(
         getClass().getResource("/data/gdl/example.gdl").getFile(), StandardCharsets.UTF_8.name());
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromFile(file, getElementFactoryProvider());
+      AsciiGraphLoader.fromFile(file, getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -54,7 +54,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetGraphHeads() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[()]", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("[()]", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 1, 0);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -69,7 +69,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetGraphHeadByVariable() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g[()];h[()]", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("g[()];h[()]", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 2, 2, 0);
     validateCaches(asciiGraphLoader, 2, 0, 0);
@@ -84,7 +84,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetGraphHeadsByVariables() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g[()],h[()]", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("g[()],h[()]", getEPGMElementFactoryProvider());
 
     Collection<EPGMGraphHead> graphHeadPojos = asciiGraphLoader
       .getGraphHeadsByVariables("g", "h");
@@ -95,7 +95,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetVertices() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[()]", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("[()]", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 1, 0);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -109,7 +109,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetVertexByVariable() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("(a)", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("(a)", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 0, 1, 0);
     validateCaches(asciiGraphLoader, 0, 1, 0);
@@ -123,7 +123,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetVerticesByVariables() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[(a),(b),(a)]", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("[(a),(b),(a)]", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 0);
     validateCaches(asciiGraphLoader, 0, 2, 0);
@@ -142,7 +142,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetVerticesByGraphIds() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g[(a),(b)],h[(a),(c)]", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("g[(a),(b)],h[(a),(c)]", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 2, 3, 0);
     validateCaches(asciiGraphLoader, 2, 3, 0);
@@ -178,7 +178,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetVerticesByGraphVariables() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g[(a),(b)],h[(a),(c)]", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("g[(a),(b)],h[(a),(c)]", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 2, 3, 0);
     validateCaches(asciiGraphLoader, 2, 3, 0);
@@ -211,7 +211,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetEdges() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[()-->()]", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("[()-->()]", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -225,7 +225,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetEdgesByVariables() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[()-[e]->()<-[f]-()]", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("[()-[e]->()<-[f]-()]", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 3, 2);
     validateCaches(asciiGraphLoader, 0, 0, 2);
@@ -245,7 +245,7 @@ public class AsciiGraphLoaderTest {
   public void testGetEdgesByGraphIds() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()-[a]->()<-[b]-()],h[()-[c]->()-[d]->()]",
-        getElementFactoryProvider());
+        getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 2, 6, 4);
     validateCaches(asciiGraphLoader, 2, 0, 4);
@@ -284,7 +284,7 @@ public class AsciiGraphLoaderTest {
   public void testGetEdgesByGraphVariables() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()-[a]->()<-[b]-()],h[()-[c]->()-[d]->()]",
-        getElementFactoryProvider());
+        getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 2, 6, 4);
     validateCaches(asciiGraphLoader, 2, 0, 4);
@@ -320,7 +320,7 @@ public class AsciiGraphLoaderTest {
   public void testGetGraphHeadCache() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
       AsciiGraphLoader.fromString("g[()],h[()],[()]",
-        getElementFactoryProvider());
+        getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 3, 3, 0);
     validateCaches(asciiGraphLoader, 2, 0, 0);
@@ -338,7 +338,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetVertexCache() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("(a),(b),()", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("(a),(b),()", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 0, 3, 0);
     validateCaches(asciiGraphLoader, 0, 2, 0);
@@ -356,7 +356,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetEdgeCache() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("()-[e]->()<-[f]-()-->()", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("()-[e]->()<-[f]-()-->()", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 0, 4, 3);
     validateCaches(asciiGraphLoader, 0, 0, 2);
@@ -374,7 +374,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testAppendFromString() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[()-->()]", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("[()-->()]", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -387,7 +387,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testAppendFromString2() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("[()-->()]", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("[()-->()]", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 0, 0, 0);
@@ -400,7 +400,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testAppendFromStringWithVariables() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g0[(a)-[e]->(b)]", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("g0[(a)-[e]->(b)]", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 1, 2, 1);
@@ -426,7 +426,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testUpdateFromStringWithVariables2() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g[(a)-[e]->(b)]", getElementFactoryProvider());
+      AsciiGraphLoader.fromString("g[(a)-[e]->(b)]", getEPGMElementFactoryProvider());
 
     validateCollections(asciiGraphLoader, 1, 2, 1);
     validateCaches(asciiGraphLoader, 1, 2, 1);

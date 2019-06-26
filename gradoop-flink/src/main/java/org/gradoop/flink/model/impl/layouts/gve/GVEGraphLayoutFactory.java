@@ -47,10 +47,7 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory
   public GVELayout fromDataSets(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
     Objects.requireNonNull(vertices, "EPGMVertex DataSet was null");
     Objects.requireNonNull(edges, "EPGMEdge DataSet was null");
-    EPGMGraphHead graphHead = getConfig()
-      .getLogicalGraphFactory()
-      .getGraphHeadFactory()
-      .createGraphHead();
+    EPGMGraphHead graphHead = getGraphHeadFactory().createGraphHead();
 
     DataSet<EPGMGraphHead> graphHeadSet = getConfig().getExecutionEnvironment()
       .fromElements(graphHead);
@@ -75,10 +72,7 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory
   @Override
   public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromIndexedDataSets(
     Map<String, DataSet<EPGMVertex>> vertices, Map<String, DataSet<EPGMEdge>> edges) {
-    EPGMGraphHead graphHead = getConfig()
-    .getLogicalGraphFactory()
-      .getGraphHeadFactory()
-      .createGraphHead();
+    EPGMGraphHead graphHead = getGraphHeadFactory().createGraphHead();
 
     DataSet<EPGMGraphHead> graphHeadSet = getConfig().getExecutionEnvironment()
       .fromElements(graphHead);

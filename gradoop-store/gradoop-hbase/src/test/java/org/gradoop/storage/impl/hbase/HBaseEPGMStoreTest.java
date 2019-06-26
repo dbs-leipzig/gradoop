@@ -372,7 +372,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
 
   private AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> getMinimalFullFeaturedGraphLoader() {
     String asciiGraph = ":G{k:\"v\"}[(v:V{k:\"v\"}),(v)-[:e{k:\"v\"}]->(v)]";
-    return AsciiGraphLoader.fromString(asciiGraph, getElementFactoryProvider());
+    return AsciiGraphLoader.fromString(asciiGraph, getEPGMElementFactoryProvider());
   }
 
   private void validateGraphHead(HBaseEPGMStore graphStore, EPGMGraphHead originalGraphHead)

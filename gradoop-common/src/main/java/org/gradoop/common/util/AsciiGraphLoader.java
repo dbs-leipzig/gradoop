@@ -40,14 +40,14 @@ import java.util.Map;
  *
  * @see <a href="https://github.com/s1ck/gdl">GDL on GitHub</a>
  *
- * @param <G> EPGM graph head type
- * @param <V> EPGM vertex type
- * @param <E> EPGM edge type
+ * @param <G> graph head type
+ * @param <V> vertex type
+ * @param <E> edge type
  */
 public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends Edge> {
 
   /**
-   * Factory provider for EPGM elements.
+   * Factory provider for graph elements.
    */
   private final ElementFactoryProvider<G, V, E> elementFactoryProvider;
 
@@ -124,10 +124,10 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
    * Creates an AsciiGraphLoader from the given ASCII GDL string.
    *
    * @param asciiGraph GDL string
-   * @param elementFactoryProvider Factory provider for EPGM elements.
-   * @param <G> EPGM graph head type
-   * @param <V> EPGM vertex type
-   * @param <E> EPGM edge type
+   * @param elementFactoryProvider Factory provider for graph elements.
+   * @param <G> graph head type
+   * @param <V> vertex type
+   * @param <E> edge type
    *
    * @return AsciiGraphLoader
    */
@@ -147,10 +147,10 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
    * Creates an AsciiGraphLoader from the given ASCII GDL file.
    *
    * @param fileName File that contains a GDL script
-   * @param elementFactoryProvider Factory provider for EPGM elements.
-   * @param <G> EPGM graph head type
-   * @param <V> EPGM vertex type
-   * @param <E> EPGM edge type
+   * @param elementFactoryProvider Factory provider for graph elements.
+   * @param <G> graph head type
+   * @param <V> vertex type
+   * @param <E> edge type
    *
    * @return AsciiGraphLoader
    * @throws IOException on failure
@@ -172,10 +172,10 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
    * Creates an AsciiGraphLoader from the given ASCII GDL file.
    *
    * @param inputStream File that contains a GDL script
-   * @param elementFactoryProvider Factory provider for EPGM elements.
-   * @param <G> EPGM graph head type
-   * @param <V> EPGM vertex type
-   * @param <E> EPGM edge type
+   * @param elementFactoryProvider Factory provider for graph elements.
+   * @param <G> graph head type
+   * @param <V> vertex type
+   * @param <E> edge type
    *
    * @return AsciiGraphLoader
    * @throws IOException on failure
@@ -475,10 +475,10 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
   }
 
   /**
-   * Creates a new EPGMGraph from the GDL Loader.
+   * Creates a new Graph from the GDL Loader.
    *
    * @param g graph from GDL Loader
-   * @return EPGM graph head
+   * @return graph head
    */
   private G initGraphHead(Graph g) {
     G graphHead = elementFactoryProvider.getGraphHeadFactory().createGraphHead(
@@ -492,7 +492,7 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
    * Creates a new Vertex from the GDL Loader or updates an existing one.
    *
    * @param v vertex from GDL Loader
-   * @return EPGM vertex
+   * @return vertex
    */
   private V initVertex(org.s1ck.gdl.model.Vertex v) {
     V vertex;
@@ -514,7 +514,7 @@ public class AsciiGraphLoader<G extends GraphHead, V extends Vertex, E extends E
    * Creates a new Edge from the GDL Loader.
    *
    * @param e edge from GDL loader
-   * @return EPGM edge
+   * @return edge
    */
   private E initEdge(org.s1ck.gdl.model.Edge e) {
     E edge;
