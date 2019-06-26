@@ -17,26 +17,21 @@ package org.gradoop.flink.model.impl.operators.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple1;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
-import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
-import org.gradoop.flink.model.impl.functions.tuple.Value0Of2;
-import org.gradoop.flink.model.impl.functions.tuple.Value1Of2;
 import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgeToSourceAndTargetId;
+import org.gradoop.flink.model.impl.operators.verify.Verify;
 
 import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.BOTH;
-import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.BOTH_VERIFIED;
 import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.VERTEX_INDUCED;
 import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.EDGE_INDUCED;
 import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.EDGE_INDUCED_PROJECT_FIRST;
@@ -44,13 +39,15 @@ import static org.gradoop.flink.model.impl.operators.subgraph.Subgraph.Strategy.
 /**
  * Extracts a subgraph from a logical graph using the given filter functions.
  * The graph head stays unchanged for the subgraph.
- *
+ * <p>
  * The operator is able to:
- * 1) extract vertex-induced subgraph
- * 2) extract edge-induced subgraph via join + union strategy
- * 2) extract edge-induced subgraph via project + union + join strategy
- * 3) extract subgraph based on vertex and edge filter function
- * 4) extract subgraph based on vertex and edge filter function without verification (no joins)
+ * <ol>
+ * <li>extract vertex-induced subgraph</li>
+ * <li>extract edge-induced subgraph via join + union strategy</li>
+ * <li>extract edge-induced subgraph via project + union + join strategy</li>
+ * <li>extract subgraph based on vertex and edge filter function without verification
+ * (no joins, use {@link Verify} to verify the subgraph)</li>
+ * </ol>
  *
  * @param <G> type of the graph head
  * @param <V> the vertex type
@@ -69,17 +66,17 @@ public class Subgraph<
   /**
    * Used to filter vertices from the logical graph.
    */
-  private final FilterFunction<V> vertexFilterFunction;
+  protected final FilterFunction<V> vertexFilterFunction;
 
   /**
    * Used to filter edges from the logical graph.
    */
-  private final FilterFunction<E> edgeFilterFunction;
+  protected final FilterFunction<E> edgeFilterFunction;
 
   /**
    * Execution strategy for the operator.
    */
-  private final Strategy strategy;
+  protected final Strategy strategy;
 
   /**
    * Available execution strategies.
@@ -89,12 +86,6 @@ public class Subgraph<
      * Applies both filter functions on the input vertex and edge data set.
      */
     BOTH,
-    /**
-     * Applies both filter functions on the input vertex and edge data set. In addition, this
-     * strategy verifies the consistency of the output graph by triplifying it projecting the
-     * vertices and edges.
-     */
-    BOTH_VERIFIED,
     /**
      * Only applies the vertex filter function and adds the incident edges connecting those
      * vertices via a join.
@@ -124,16 +115,16 @@ public class Subgraph<
    * If the {@code vertexFilterFunction} is {@code null}, the operator returns
    * the edge-induced subgraph.
    *
-   * @param vertexFilterFunction  vertex filter function
-   * @param edgeFilterFunction    edge filter function
-   * @param strategy              sets the execution strategy for the operator
+   * @param vertexFilterFunction vertex filter function
+   * @param edgeFilterFunction   edge filter function
+   * @param strategy             sets the execution strategy for the operator
    */
   public Subgraph(FilterFunction<V> vertexFilterFunction,
     FilterFunction<E> edgeFilterFunction, Strategy strategy) {
 
-    if ((strategy == BOTH || strategy == BOTH_VERIFIED) &&
-      vertexFilterFunction == null && edgeFilterFunction == null) {
-      throw new IllegalArgumentException("No filter functions was given.");
+    if (strategy == BOTH &&
+      (vertexFilterFunction == null || edgeFilterFunction == null)) {
+      throw new IllegalArgumentException("No vertex or no edge filter function was given.");
     }
 
     if (strategy == VERTEX_INDUCED && vertexFilterFunction == null) {
@@ -158,9 +149,6 @@ public class Subgraph<
     switch (strategy) {
     case BOTH:
       result = subgraph(superGraph);
-      break;
-    case BOTH_VERIFIED:
-      result = verify(subgraph(superGraph));
       break;
     case VERTEX_INDUCED:
       result = vertexInducedSubgraph(superGraph);
@@ -187,8 +175,7 @@ public class Subgraph<
    */
   private LG vertexInducedSubgraph(LG superGraph) {
     DataSet<V> filteredVertices = superGraph.getVertices().filter(vertexFilterFunction);
-
-    DataSet<E> newEdges = superGraph.getEdges()
+    DataSet<E> inducedEdges = superGraph.getEdges()
       .join(filteredVertices)
       .where(new SourceId<>()).equalTo(new Id<>())
       .with(new LeftSide<>())
@@ -197,7 +184,7 @@ public class Subgraph<
       .with(new LeftSide<>());
 
     return superGraph.getFactory()
-      .fromDataSets(superGraph.getGraphHead(), filteredVertices, newEdges);
+      .fromDataSets(superGraph.getGraphHead(), filteredVertices, inducedEdges);
   }
 
   /**
@@ -209,8 +196,7 @@ public class Subgraph<
    */
   private LG edgeInducedSubgraph(LG superGraph) {
     DataSet<E> filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);
-
-    DataSet<V> filteredVertices = filteredEdges
+    DataSet<V> inducedVertices = filteredEdges
       .join(superGraph.getVertices())
       .where(new SourceId<>()).equalTo(new Id<>())
       .with(new RightSide<>())
@@ -221,7 +207,7 @@ public class Subgraph<
       .distinct(new Id<>());
 
     return superGraph.getFactory()
-      .fromDataSets(superGraph.getGraphHead(), filteredVertices, filteredEdges);
+      .fromDataSets(superGraph.getGraphHead(), inducedVertices, filteredEdges);
   }
 
   /**
@@ -233,22 +219,15 @@ public class Subgraph<
    */
   private LG edgeInducedSubgraphProjectFirst(LG superGraph) {
     DataSet<E> filteredEdges = superGraph.getEdges().filter(edgeFilterFunction);
-
-    DataSet<Tuple1<GradoopId>> vertexIdentifiers = filteredEdges
-      .map(new SourceId<>())
-      .map(new ObjectTo1<>())
-      .union(filteredEdges
-        .map(new TargetId<>())
-        .map(new ObjectTo1<>()))
-      .distinct();
-
-    DataSet<V> filteredVertices = vertexIdentifiers
+    DataSet<V> inducedVertices = filteredEdges
+      .flatMap(new EdgeToSourceAndTargetId<>())
+      .distinct()
       .join(superGraph.getVertices())
-      .where(0).equalTo(new Id<>())
+      .where("*").equalTo(new Id<>())
       .with(new RightSide<>());
 
     return superGraph.getFactory()
-      .fromDataSets(superGraph.getGraphHead(), filteredVertices, filteredEdges);
+      .fromDataSets(superGraph.getGraphHead(), inducedVertices, filteredEdges);
   }
 
   /**
@@ -267,34 +246,5 @@ public class Subgraph<
       superGraph.getGraphHead(),
       superGraph.getVertices().filter(vertexFilterFunction),
       superGraph.getEdges().filter(edgeFilterFunction));
-  }
-
-  /**
-   * Verifies that the given graph is consistent, contains only edges that connect to vertices
-   * within the subgraph.
-   *
-   * @param subgraph supergraph
-   * @return verified subgraph
-   */
-  private LG verify(LG subgraph) {
-
-    DataSet<Tuple2<Tuple2<E, V>, V>> verifiedTriples = subgraph.getEdges()
-      .join(subgraph.getVertices())
-      .where(new SourceId<>()).equalTo(new Id<>())
-      .join(subgraph.getVertices())
-      .where("0.targetId").equalTo(new Id<>());
-
-    DataSet<E> verifiedEdges = verifiedTriples
-      .map(new Value0Of2<>())
-      .map(new Value0Of2<>());
-
-    DataSet<V> verifiedVertices = verifiedTriples
-      .map(new Value0Of2<>())
-      .map(new Value1Of2<>())
-      .union(verifiedTriples.map(new Value1Of2<>()))
-      .distinct(new Id<>());
-
-    return subgraph.getFactory()
-      .fromDataSets(subgraph.getGraphHead(), verifiedVertices, verifiedEdges);
   }
 }

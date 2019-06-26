@@ -23,6 +23,7 @@ import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
+import org.gradoop.flink.model.api.operators.ApplicableUnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphCollectionToValueOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryBaseGraphToBaseGraphOperator;
@@ -317,6 +318,17 @@ public interface BaseGraphCollectionOperators<
    * @return result of given operator
    */
   LG callForGraph(UnaryBaseGraphCollectionToBaseGraphOperator<GC, LG> operator);
+
+  /**
+   * Applies a given unary graph to graph operator (e.g., aggregate) on each
+   * base graph in the graph collection.
+   *
+   * @param operator applicable unary graph to graph operator
+   * @return collection with resulting logical graphs
+   */
+  default GC apply(ApplicableUnaryBaseGraphToBaseGraphOperator<GC> operator) {
+    return callForCollection(operator);
+  }
 
   /**
    * Transforms a graph collection into a base graph by applying a
