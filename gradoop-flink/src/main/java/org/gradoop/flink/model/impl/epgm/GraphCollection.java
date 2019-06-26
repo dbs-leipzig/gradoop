@@ -32,7 +32,6 @@ import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.epgm.GraphCollectionOperators;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
-import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
@@ -328,11 +327,6 @@ public class GraphCollection implements
   @Override
   public LogicalGraph callForGraph(UnaryCollectionToGraphOperator op) {
     return op.execute(this);
-  }
-
-  @Override
-  public GraphCollection apply(ApplicableUnaryGraphToGraphOperator op) {
-    return callForCollection(op);
   }
 
   @Override
