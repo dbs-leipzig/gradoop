@@ -533,7 +533,7 @@ public class VertexFusionTest extends GradoopFlinkTestBase {
       .apply(new ApplySubgraph<>(null, edge ->
         edge.getPropertyValue("difference").getInt() == 0,
         Subgraph.Strategy.EDGE_INDUCED))
-      .apply(new ApplyTransformation((gh, plain) -> {
+      .apply(new ApplyTransformation<>((gh, plain) -> {
         gh.setLabel("Combined");
         return gh;
       },

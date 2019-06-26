@@ -16,8 +16,11 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
@@ -30,36 +33,43 @@ import java.util.stream.Collectors;
 
 /**
  * Transformation map function for graph transactions.
+ *
+ * Since {@link GraphTransaction} is only implemented for EPGM, this can only be used with EPGM graphs.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
  */
-public class TransformGraphTransaction implements MapFunction<GraphTransaction, GraphTransaction> {
+public class TransformGraphTransaction<G extends GraphHead, V extends Vertex, E extends Edge>
+  implements MapFunction<GraphTransaction, GraphTransaction> {
 
   /**
    * Factory to init modified graph head.
    */
-  private final GraphHeadFactory<EPGMGraphHead> graphHeadFactory;
+  private final GraphHeadFactory<G> graphHeadFactory;
   /**
    * Graph head modification function
    */
-  private final TransformationFunction<EPGMGraphHead> graphHeadTransFunc;
+  private final TransformationFunction<G> graphHeadTransFunc;
 
   /**
    * Factory to init modified vertex.
    */
-  private final VertexFactory<EPGMVertex> vertexFactory;
+  private final VertexFactory<V> vertexFactory;
 
   /**
    * EPGMVertex modification function
    */
-  private final TransformationFunction<EPGMVertex> vertexTransFunc;
+  private final TransformationFunction<V> vertexTransFunc;
 
   /**
    * Factory to init modified edge.
    */
-  private final EdgeFactory<EPGMEdge> edgeFactory;
+  private final EdgeFactory<E> edgeFactory;
   /**
    * EPGMEdge modification function
    */
-  private final TransformationFunction<EPGMEdge> edgeTransFunc;
+  private final TransformationFunction<E> edgeTransFunc;
 
   /**
    * Constructor
@@ -71,10 +81,10 @@ public class TransformGraphTransaction implements MapFunction<GraphTransaction, 
    * @param edgeFactory edge factory
    * @param edgeTransFunc edge transformation function
    */
-  public TransformGraphTransaction(GraphHeadFactory<EPGMGraphHead> graphHeadFactory,
-    TransformationFunction<EPGMGraphHead> graphHeadTransFunc, VertexFactory<EPGMVertex> vertexFactory,
-    TransformationFunction<EPGMVertex> vertexTransFunc, EdgeFactory<EPGMEdge> edgeFactory,
-    TransformationFunction<EPGMEdge> edgeTransFunc) {
+  public TransformGraphTransaction(GraphHeadFactory<G> graphHeadFactory,
+    TransformationFunction<G> graphHeadTransFunc, VertexFactory<V> vertexFactory,
+    TransformationFunction<V> vertexTransFunc, EdgeFactory<E> edgeFactory,
+    TransformationFunction<E> edgeTransFunc) {
     this.graphHeadFactory = graphHeadFactory;
     this.graphHeadTransFunc = graphHeadTransFunc;
     this.vertexFactory = vertexFactory;
@@ -86,16 +96,16 @@ public class TransformGraphTransaction implements MapFunction<GraphTransaction, 
   @Override
   public GraphTransaction map(GraphTransaction transaction) throws Exception {
     if (graphHeadTransFunc != null) {
-      transaction.setGraphHead(graphHeadTransFunc.apply(
-        transaction.getGraphHead(),
+      transaction.setGraphHead((EPGMGraphHead) graphHeadTransFunc.apply(
+        (G) transaction.getGraphHead(),
         graphHeadFactory.initGraphHead(
           transaction.getGraphHead().getId(), GradoopConstants.DEFAULT_GRAPH_LABEL)));
     }
 
     if (vertexTransFunc != null) {
       transaction.setVertices(transaction.getVertices().stream()
-        .map(vertex -> vertexTransFunc.apply(
-          vertex,
+        .map(vertex -> (EPGMVertex) vertexTransFunc.apply(
+          (V) vertex,
           vertexFactory.initVertex(
             vertex.getId(), GradoopConstants.DEFAULT_VERTEX_LABEL, vertex.getGraphIds())))
         .collect(Collectors.toSet()));
@@ -103,8 +113,8 @@ public class TransformGraphTransaction implements MapFunction<GraphTransaction, 
 
     if (edgeTransFunc != null) {
       transaction.setEdges(transaction.getEdges().stream()
-        .map(edge -> edgeTransFunc.apply(
-          edge,
+        .map(edge -> (EPGMEdge) edgeTransFunc.apply(
+          (E) edge,
           edgeFactory.initEdge(
             edge.getId(), GradoopConstants.DEFAULT_EDGE_LABEL,
             edge.getSourceId(), edge.getTargetId(), edge.getGraphIds())))

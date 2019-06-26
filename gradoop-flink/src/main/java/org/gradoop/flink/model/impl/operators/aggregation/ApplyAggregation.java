@@ -17,14 +17,15 @@ package org.gradoop.flink.model.impl.operators.aggregation;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.ApplicableUnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.ElementsOfSelectedGraphs;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -42,12 +43,23 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Takes a collection of logical graphs and user defined aggregate functions as
- * input. The aggregate functions are applied on each logical graph contained in
+ * Takes a collection of base graphs and user defined aggregate functions as
+ * input. The aggregate functions are applied on each base graph contained in
  * the collection and the aggregate is stored as additional properties at the graphs.
+ *
+ * @param <G> type of the graph head
+ * @param <V> the vertex type
+ * @param <E> the edge type
+ * @param <LG> type of the logical graph instance
+ * @param <GC> type of the graph collection
  */
-public class ApplyAggregation
-  implements ApplicableUnaryGraphToGraphOperator {
+public class ApplyAggregation<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements ApplicableUnaryBaseGraphToBaseGraphOperator<GC> {
 
   /**
    * User-defined aggregate functions which get applied on a graph collection.
@@ -67,8 +79,8 @@ public class ApplyAggregation
   }
 
   @Override
-  public GraphCollection executeForGVELayout(GraphCollection collection) {
-    DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
+  public GC executeForGVELayout(GC collection) {
+    DataSet<G> graphHeads = collection.getGraphHeads();
     DataSet<GradoopId> graphIds = graphHeads.map(new Id<>());
 
     DataSet<Tuple2<GradoopId, Map<String, PropertyValue>>> aggregate =
@@ -80,18 +92,17 @@ public class ApplyAggregation
     graphHeads = graphHeads
       .coGroup(aggregate)
       .where(new Id<>()).equalTo(0)
-      .with(new SetAggregateProperties(aggregateFunctions));
+      .with(new SetAggregateProperties<>(aggregateFunctions));
 
-    return collection.getConfig().getGraphCollectionFactory()
-      .fromDataSets(graphHeads, collection.getVertices(), collection.getEdges());
+    return collection.getFactory().fromDataSets(graphHeads, collection.getVertices(), collection.getEdges());
   }
 
   @Override
-  public GraphCollection executeForTxLayout(GraphCollection collection) {
+  public GC executeForTxLayout(GC collection) {
     DataSet<GraphTransaction> updatedTransactions = collection.getGraphTransactions()
       .map(new AggregateTransactions(aggregateFunctions));
 
-    return collection.getConfig().getGraphCollectionFactory().fromTransactions(updatedTransactions);
+    return collection.getFactory().fromTransactions(updatedTransactions);
   }
 
   /**
@@ -102,7 +113,7 @@ public class ApplyAggregation
    * @return partition aggregate value
    */
   private DataSet<Tuple2<GradoopId, Map<String, PropertyValue>>> aggregateVertices(
-    DataSet<EPGMVertex> vertices, DataSet<GradoopId> graphIds) {
+    DataSet<V> vertices, DataSet<GradoopId> graphIds) {
     return vertices
       .flatMap(new ElementsOfSelectedGraphs<>())
       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
@@ -120,7 +131,7 @@ public class ApplyAggregation
    * @return partition aggregate value
    */
   private DataSet<Tuple2<GradoopId, Map<String, PropertyValue>>> aggregateEdges(
-    DataSet<EPGMEdge> edges, DataSet<GradoopId> graphIds) {
+    DataSet<E> edges, DataSet<GradoopId> graphIds) {
     return edges
       .flatMap(new ElementsOfSelectedGraphs<>())
       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
