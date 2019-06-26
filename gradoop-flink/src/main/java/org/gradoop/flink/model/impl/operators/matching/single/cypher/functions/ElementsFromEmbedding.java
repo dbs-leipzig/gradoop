@@ -20,18 +20,18 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
-import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
+import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ import java.util.Set;
 /**
  * Extracts EPGM elements from an {@link Embedding}.
  */
-public class ElementsFromEmbedding implements FlatMapFunction<Embedding, EPGMElement> {
+public class ElementsFromEmbedding implements FlatMapFunction<Embedding, Element> {
   /**
    * Constructs EPGM graph heads
    */
@@ -120,7 +120,7 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, EPGMEle
   }
 
   @Override
-  public void flatMap(Embedding embedding, Collector<EPGMElement> out) throws Exception {
+  public void flatMap(Embedding embedding, Collector<Element> out) throws Exception {
     // clear for each embedding
     processedIds.clear();
 
@@ -217,7 +217,7 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, EPGMEle
    * @param graphHead graph head to assign vertex to
    * @param vertexId vertex identifier
    */
-  private void initVertex(Collector<EPGMElement> out, EPGMGraphHead graphHead, GradoopId vertexId) {
+  private void initVertex(Collector<Element> out, EPGMGraphHead graphHead, GradoopId vertexId) {
     initVertexWithData(out, graphHead, vertexId, null);
   }
 
@@ -230,7 +230,7 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, EPGMEle
    * @param vertexId vertex identifier
    * @param label label associated with vertex
    */
-  private void initVertexWithData(Collector<EPGMElement> out, EPGMGraphHead graphHead, GradoopId vertexId,
+  private void initVertexWithData(Collector<Element> out, EPGMGraphHead graphHead, GradoopId vertexId,
                                   String label) {
     if (!processedIds.contains(vertexId)) {
       EPGMVertex v = vertexFactory.initVertex(vertexId);
@@ -250,7 +250,7 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, EPGMEle
    * @param sourceId source vertex identifier
    * @param targetId target vertex identifier
    */
-  private void initEdge(Collector<EPGMElement> out, EPGMGraphHead graphHead, GradoopId edgeId,
+  private void initEdge(Collector<Element> out, EPGMGraphHead graphHead, GradoopId edgeId,
     GradoopId sourceId, GradoopId targetId) {
     initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, null);
   }
@@ -266,7 +266,7 @@ public class ElementsFromEmbedding implements FlatMapFunction<Embedding, EPGMEle
    * @param targetId target vertex identifier
    * @param label label associated with edge
    */
-  private void initEdgeWithData(Collector<EPGMElement> out, EPGMGraphHead graphHead, GradoopId edgeId,
+  private void initEdgeWithData(Collector<Element> out, EPGMGraphHead graphHead, GradoopId edgeId,
                                 GradoopId sourceId, GradoopId targetId, String label) {
     if (!processedIds.contains(edgeId)) {
       EPGMEdge e = edgeFactory.initEdge(edgeId, sourceId, targetId);

@@ -52,8 +52,7 @@ public class MetaDataTest {
     Map<PropertyValue, PropertyValue> testMap = new HashMap<>();
     testMap.put(PropertyValue.create("testKey"), PropertyValue.create("testValue"));
     propValues.add(PropertyValue.create(testMap));
-    propValues.add(PropertyValue.create(
-      Collections.singletonList(PropertyValue.create("testEntry"))));
+    propValues.add(PropertyValue.create(Collections.singletonList(PropertyValue.create("testEntry"))));
     propValues.add(PropertyValue.create(LocalDate.now()));
     propValues.add(PropertyValue.create(LocalTime.now()));
     propValues.add(PropertyValue.create(LocalDateTime.now()));
@@ -87,54 +86,42 @@ public class MetaDataTest {
     Map<String, List<PropertyMetaData>> graphMetaData = new HashMap<>();
 
     List<PropertyMetaData> gPropMetaData1 = Arrays.asList(
-      new PropertyMetaData(
-        "gKey1", MetaData.getTypeString(propValues.get(5)), null), // Double
-      new PropertyMetaData(
-        "gKey2", MetaData.getTypeString(propValues.get(8)), null) // GradoopId
+      new PropertyMetaData("gKey1", MetaData.getTypeString(propValues.get(5)), null), // Double
+      new PropertyMetaData("gKey2", MetaData.getTypeString(propValues.get(8)), null) // GradoopId
     );
     graphMetaData.put("g1", gPropMetaData1);
 
     List<PropertyMetaData> gPropMetaData2 = Arrays.asList(
-      new PropertyMetaData(
-        "gKey3", MetaData.getTypeString(propValues.get(10)), null), // List
-      new PropertyMetaData(
-        "gKey4", MetaData.getTypeString(propValues.get(2)), null) // Integer
+      new PropertyMetaData("gKey3", MetaData.getTypeString(propValues.get(10)), null), // List
+      new PropertyMetaData("gKey4", MetaData.getTypeString(propValues.get(2)), null) // Integer
     );
     graphMetaData.put("g2", gPropMetaData2);
 
     Map<String, List<PropertyMetaData>> vertexMetaData = new HashMap<>();
 
     List<PropertyMetaData> vPropMetaData1 = Arrays.asList(
-      new PropertyMetaData(
-        "vKey1", MetaData.getTypeString(propValues.get(11)), null), // LocalDate
-      new PropertyMetaData(
-        "vKey2", MetaData.getTypeString(propValues.get(15)), null) // Set
+      new PropertyMetaData("vKey1", MetaData.getTypeString(propValues.get(11)), null), // LocalDate
+      new PropertyMetaData("vKey2", MetaData.getTypeString(propValues.get(15)), null) // Set
     );
     vertexMetaData.put("v1", vPropMetaData1);
 
     List<PropertyMetaData> vPropMetaData2 = Arrays.asList(
-      new PropertyMetaData(
-        "vKey3", MetaData.getTypeString(propValues.get(0)), null), // null
-      new PropertyMetaData(
-        "vKey4", MetaData.getTypeString(propValues.get(1)), null) // Boolean
+      new PropertyMetaData("vKey3", MetaData.getTypeString(propValues.get(0)), null), // null
+      new PropertyMetaData("vKey4", MetaData.getTypeString(propValues.get(1)), null) // Boolean
     );
     vertexMetaData.put("v2", vPropMetaData2);
 
     Map<String, List<PropertyMetaData>> edgeMetaData = new HashMap<>();
 
     List<PropertyMetaData> ePropMetaData1 = Arrays.asList(
-      new PropertyMetaData(
-        "eKey1", MetaData.getTypeString(propValues.get(9)), null), // Map
-      new PropertyMetaData(
-        "eKey2", MetaData.getTypeString(propValues.get(7)), null) // BigDecimal
+      new PropertyMetaData("eKey1", MetaData.getTypeString(propValues.get(9)), null), // Map
+      new PropertyMetaData("eKey2", MetaData.getTypeString(propValues.get(7)), null) // BigDecimal
     );
     edgeMetaData.put("e1", ePropMetaData1);
 
     List<PropertyMetaData> ePropMetaData2 = Arrays.asList(
-      new PropertyMetaData(
-        "eKey3", MetaData.getTypeString(propValues.get(6)), null), // String
-      new PropertyMetaData(
-        "eKey4", MetaData.getTypeString(propValues.get(3)), null) // Long
+      new PropertyMetaData("eKey3", MetaData.getTypeString(propValues.get(6)), null), // String
+      new PropertyMetaData("eKey4", MetaData.getTypeString(propValues.get(3)), null) // Long
     );
 
     edgeMetaData.put("e2", ePropMetaData2);

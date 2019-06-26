@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 
@@ -98,7 +98,7 @@ public abstract class PredicateCollection<P> implements Iterable<P>, Serializabl
    * @param element EPGMGraphElement under which the predicate will be evaluated
    * @return evaluation result
    */
-  public abstract boolean evaluate(EPGMGraphElement element);
+  public abstract boolean evaluate(GraphElement element);
 
   /**
    * Retrieves a set of all variables included in the predicate collection

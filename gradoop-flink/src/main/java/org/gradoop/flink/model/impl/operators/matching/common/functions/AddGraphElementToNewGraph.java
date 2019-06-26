@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
@@ -36,7 +36,7 @@ import java.util.HashMap;
  * @param <GE> EPGM graph element type
  */
 @FunctionAnnotation.ForwardedFields("*->f0")
-public class AddGraphElementToNewGraph<GE extends EPGMGraphElement>
+public class AddGraphElementToNewGraph<GE extends GraphElement>
   implements MapFunction<GE, Tuple2<GE, EPGMGraphHead>> {
   /**
    * EPGM graph head factory

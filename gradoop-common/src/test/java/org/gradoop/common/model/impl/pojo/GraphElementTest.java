@@ -20,9 +20,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.testng.annotations.Test;
 
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.withSettings;
+import static org.mockito.Mockito.*;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertTrue;
 
@@ -30,12 +28,16 @@ public class GraphElementTest {
 
   @Test
   public void testAddGraphIdNoGraphIds() {
-    EPGMGraphElement graphElementMock = mock(EPGMGraphElement.class, CALLS_REAL_METHODS);
+
+    EPGMVertex vertex = mock(EPGMVertex.class, CALLS_REAL_METHODS);
+    EPGMEdge edge = mock(EPGMEdge.class, CALLS_REAL_METHODS);
 
     GradoopId id = GradoopId.get();
-    graphElementMock.addGraphId(id);
+    vertex.addGraphId(id);
+    edge.addGraphId(id);
 
-    assertNotNull(graphElementMock.getGraphIds());
+    assertNotNull(vertex.getGraphIds());
+    assertNotNull(edge.getGraphIds());
   }
 
   @Test
@@ -44,12 +46,17 @@ public class GraphElementTest {
     GradoopIdSet idSet = new GradoopIdSet();
     idSet.add(GradoopId.get());
 
-    EPGMGraphElement graphElementMock = mock(EPGMGraphElement.class, withSettings()
+    EPGMVertex vertex = mock(EPGMVertex.class, withSettings()
     .useConstructor(GradoopId.get(), "someLabel", propertiesMock, idSet)
     .defaultAnswer(CALLS_REAL_METHODS));
 
-    graphElementMock.resetGraphIds();
+    EPGMEdge edge = mock(EPGMEdge.class, withSettings()
+      .useConstructor(GradoopId.get(), "someLabel", GradoopId.get(), GradoopId.get(), propertiesMock, idSet)
+      .defaultAnswer(CALLS_REAL_METHODS));
 
-    assertTrue(graphElementMock.getGraphIds().isEmpty());
+    vertex.resetGraphIds();
+    edge.resetGraphIds();
+
+    assertTrue(vertex.getGraphIds().isEmpty());
   }
 }

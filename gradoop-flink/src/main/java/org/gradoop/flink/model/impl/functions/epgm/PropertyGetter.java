@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.functions.epgm;
 
 import com.google.common.collect.Lists;
-import org.gradoop.flink.model.api.functions.Function;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.flink.model.api.functions.Function;
 
 import java.util.List;
 
@@ -32,8 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <EL> EPGM element
  */
-public class PropertyGetter<EL extends EPGMElement>
-  implements Function<EL, List<PropertyValue>> {
+public class PropertyGetter<EL extends Element> implements Function<EL, List<PropertyValue>> {
 
   /**
    * Property keys to retrieve property values

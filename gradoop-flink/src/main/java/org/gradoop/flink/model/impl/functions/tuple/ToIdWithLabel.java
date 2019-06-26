@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.functions.tuple;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.impl.tuples.IdWithLabel;
 
 /**
@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.tuples.IdWithLabel;
  * @param <EL> element type
  */
 @FunctionAnnotation.ForwardedFields("id->f0;label->f1")
-public class ToIdWithLabel<EL extends EPGMElement> implements MapFunction<EL, IdWithLabel> {
+public class ToIdWithLabel<EL extends Element> implements MapFunction<EL, IdWithLabel> {
   /**
    * Reuse tuple
    */

@@ -71,7 +71,7 @@ public class AsciiGraphLoaderTest {
   @Test
   public void testGetGraphHeadByVariable() {
     AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> asciiGraphLoader =
-      AsciiGraphLoader.fromString("g[()];h[()]", config);
+      AsciiGraphLoader.fromString("g[()],h[()]", config);
 
     validateCollections(asciiGraphLoader, 2, 2, 0);
     validateCaches(asciiGraphLoader, 2, 0, 0);

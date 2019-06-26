@@ -15,25 +15,30 @@
  */
 package org.gradoop.common.model.impl.pojo;
 
+import org.apache.flink.api.java.tuple.Tuple6;
+import org.apache.flink.util.Preconditions;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.Property;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
- * POJO Implementation of an EPGM edge.
+ * Tuple Implementation of an EPGM edge.
+ *
+ * 0: EdgeId
+ * 1: Label
+ * 2: SourceId
+ * 3: TargetId
+ * 4: Properties
+ * 5: GraphIdSet
  */
-public class EPGMEdge extends EPGMGraphElement implements Edge {
-
-  /**
-   * Vertex identifier of the source vertex.
-   */
-  private GradoopId sourceId;
-
-  /**
-   * Vertex identifier of the target vertex.
-   */
-  private GradoopId targetId;
+public class EPGMEdge extends Tuple6<GradoopId, String, GradoopId, GradoopId, Properties, GradoopIdSet>
+  implements Edge {
 
   /**
    * Default constructor is necessary to apply to POJO rules.
@@ -51,37 +56,175 @@ public class EPGMEdge extends EPGMGraphElement implements Edge {
    * @param properties  edge properties
    * @param graphIds    graphs that edge is contained in
    */
-  public EPGMEdge(final GradoopId id, final String label, final GradoopId sourceId,
-    final GradoopId targetId, final Properties properties,
+  public EPGMEdge(
+    final GradoopId id,
+    final String label,
+    final GradoopId sourceId,
+    final GradoopId targetId,
+    final Properties properties,
     GradoopIdSet graphIds) {
-    super(id, label, properties, graphIds);
-    this.sourceId = sourceId;
-    this.targetId = targetId;
+    super(id, label, sourceId, targetId, properties, graphIds);
   }
+
 
   @Override
   public GradoopId getSourceId() {
-    return sourceId;
+    return this.f2;
   }
 
   @Override
   public void setSourceId(GradoopId sourceId) {
-    this.sourceId = sourceId;
+    this.f2 = sourceId;
   }
 
   @Override
   public GradoopId getTargetId() {
-    return targetId;
+    return this.f3;
   }
 
   @Override
   public void setTargetId(GradoopId targetId) {
-    this.targetId = targetId;
+    this.f3 = targetId;
+  }
+
+  @Override
+  public GradoopIdSet getGraphIds() {
+    return this.f5;
+  }
+
+  @Override
+  public void addGraphId(GradoopId graphId) {
+    if (this.f5 == null) {
+      this.f5 = new GradoopIdSet();
+    }
+    this.f5.add(graphId);
+  }
+
+  @Override
+  public void setGraphIds(GradoopIdSet graphIds) {
+    this.f5 = graphIds;
+  }
+
+  @Override
+  public void resetGraphIds() {
+    if (this.f5 != null) {
+      this.f5.clear();
+    }
+  }
+
+  @Override
+  public int getGraphCount() {
+    return (this.f5 != null) ? this.f5.size() : 0;
+  }
+
+  @Nullable
+  @Override
+  public Properties getProperties() {
+    return this.f4;
+  }
+
+  @Override
+  public Iterable<String> getPropertyKeys() {
+    return (this.f4 != null) ? this.f4.getKeys() : null;
+  }
+
+  @Override
+  public PropertyValue getPropertyValue(String key) {
+    return (this.f4 != null) ?  this.f4.get(key) : null;
+  }
+
+  @Override
+  public void setProperties(Properties properties) {
+    this.f4 = properties;
+  }
+
+  @Override
+  public void setProperty(Property property) {
+    Preconditions.checkNotNull(property, "Property was null");
+    initProperties();
+    this.f4.set(property);
+  }
+
+  @Override
+  public void setProperty(String key, PropertyValue value) {
+    initProperties();
+    this.f4.set(key, value);
+  }
+
+  @Override
+  public void setProperty(String key, Object value) {
+    initProperties();
+    this.f4.set(key, value);
+  }
+
+  @Override
+  public PropertyValue removeProperty(String key) {
+    return (this.f4 != null) ? this.f4.remove(key) : null;
+  }
+
+  @Override
+  public int getPropertyCount() {
+    return (this.f4 != null) ? this.f4.size() : 0;
+  }
+
+  @Override
+  public boolean hasProperty(String key) {
+    return this.f4 != null && this.f4.containsKey(key);
+  }
+
+  @Override
+  public GradoopId getId() {
+    return this.f0;
+  }
+
+  @Override
+  public void setId(GradoopId id) {
+    this.f0 = id;
+  }
+
+  @Override
+  public String getLabel() {
+    return this.f1;
+  }
+
+  @Override
+  public void setLabel(String label) {
+    this.f1 = label;
   }
 
   @Override
   public String toString() {
     return String.format("(%s)-[%s]->(%s)",
-      sourceId, super.toString(), targetId);
+      this.f2, super.toString(), this.f3);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    EPGMEdge that = (EPGMEdge) o;
+
+    return Objects.equals(getId(), that.getId());
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getId().hashCode();
+    result = 31 * result + getId().hashCode();
+    return result;
+  }
+
+  /**
+   * Initializes the internal properties field if necessary.
+   */
+  private void initProperties() {
+    if (this.f4 == null) {
+      this.f4 = Properties.create();
+    }
   }
 }

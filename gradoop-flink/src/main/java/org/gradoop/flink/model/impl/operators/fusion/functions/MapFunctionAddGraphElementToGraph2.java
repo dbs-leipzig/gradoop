@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.fusion.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 
 /**
  * A variant of the AddToGraph, where we have no graph head
@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
  * @param <K> element receiving the new graph id
  *
  */
-public class MapFunctionAddGraphElementToGraph2<K extends EPGMGraphElement> implements MapFunction<K, K> {
+public class MapFunctionAddGraphElementToGraph2<K extends GraphElement> implements MapFunction<K, K> {
 
   /**
    * Graph Id that has to be added

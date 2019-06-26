@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.common.functions.MapFunction;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 
 /**
@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
  *
  * @param <GE> EPGM graph element
  */
-public class AddToGraph<GE extends EPGMGraphElement> implements MapFunction<GE, GE> {
+public class AddToGraph<GE extends GraphElement> implements MapFunction<GE, GE> {
   /**
    * Graph head identifier which gets added to the graph element.
    */

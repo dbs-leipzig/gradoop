@@ -19,14 +19,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
 
@@ -141,11 +141,11 @@ public abstract class LogicalGraphLayoutFactoryTest extends GradoopFlinkTestBase
     validateElementCollections(loadedVertices, loader.getVertices());
     validateElementCollections(loadedEdges, loader.getEdges());
 
-    Collection<EPGMGraphElement> epgmElements = new ArrayList<>();
+    Collection<GraphElement> epgmElements = new ArrayList<>();
     epgmElements.addAll(loadedVertices);
     epgmElements.addAll(loadedEdges);
 
-    for (EPGMGraphElement loadedVertex : epgmElements) {
+    for (GraphElement loadedVertex : epgmElements) {
       assertEquals("graph element has wrong graph count",
         1, loadedVertex.getGraphCount());
       assertTrue("graph element was not in new graph",

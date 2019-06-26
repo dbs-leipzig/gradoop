@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.aggregation.functions;
 import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
@@ -34,7 +34,7 @@ import java.util.Set;
  *
  * @param <T> element type
  */
-public class ApplyAggregateElements<T extends EPGMElement> implements GroupCombineFunction
+public class ApplyAggregateElements<T extends Element> implements GroupCombineFunction
   <Tuple2<GradoopId, T>, Tuple2<GradoopId, Map<String, PropertyValue>>> {
 
   /**

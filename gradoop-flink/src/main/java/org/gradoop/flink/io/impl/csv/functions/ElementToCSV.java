@@ -18,9 +18,9 @@ package org.gradoop.flink.io.impl.csv.functions;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.CSVDataSource;
@@ -36,14 +36,13 @@ import java.util.stream.Collectors;
  * @param <E> EPGM element type
  * @param <T> output tuple type
  */
-public abstract class ElementToCSV<E extends EPGMElement, T extends Tuple>
-  extends RichMapFunction<E, T> {
+public abstract class ElementToCSV<E extends Element, T extends Tuple> extends RichMapFunction<E, T> {
   /**
    * Constant for an empty string.
    */
   private static final String EMPTY_STRING = "";
   /**
-   * Meta data that provides parsers for a specific {@link EPGMElement}.
+   * Meta data that provides parsers for a specific {@link Element}.
    */
   private CSVMetaData metaData;
 

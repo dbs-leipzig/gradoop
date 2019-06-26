@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos;
 
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.List;
@@ -126,7 +126,7 @@ public class EmbeddingFactory {
    * @param propertyKeys properties that will be projected from the specified element
    * @return projected property values
    */
-  private static PropertyValue[] project(EPGMGraphElement element, List<String> propertyKeys) {
+  private static PropertyValue[] project(GraphElement element, List<String> propertyKeys) {
     PropertyValue[] propertyValues = new PropertyValue[propertyKeys.size()];
     int i = 0;
     for (String propertyKey : propertyKeys) {

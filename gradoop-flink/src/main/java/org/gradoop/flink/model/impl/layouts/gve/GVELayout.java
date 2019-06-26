@@ -19,9 +19,9 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
@@ -98,14 +98,14 @@ public class GVELayout implements LogicalGraphLayout<EPGMGraphHead, EPGMVertex, 
 
   @Override
   public DataSet<GraphTransaction> getGraphTransactions() {
-    DataSet<Tuple2<GradoopId, EPGMGraphElement>> graphVertexTuples = getVertices()
-      .map(new Cast<>(EPGMGraphElement.class))
-      .returns(TypeExtractor.getForClass(EPGMGraphElement.class))
+    DataSet<Tuple2<GradoopId, GraphElement>> graphVertexTuples = getVertices()
+      .map(new Cast<>(GraphElement.class))
+      .returns(TypeExtractor.getForClass(GraphElement.class))
       .flatMap(new GraphElementExpander<>());
 
-    DataSet<Tuple2<GradoopId, EPGMGraphElement>> graphEdgeTuples = getEdges()
-      .map(new Cast<>(EPGMGraphElement.class))
-      .returns(TypeExtractor.getForClass(EPGMGraphElement.class))
+    DataSet<Tuple2<GradoopId, GraphElement>> graphEdgeTuples = getEdges()
+      .map(new Cast<>(GraphElement.class))
+      .returns(TypeExtractor.getForClass(GraphElement.class))
       .flatMap(new GraphElementExpander<>());
 
     DataSet<Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>>> transactions = graphVertexTuples

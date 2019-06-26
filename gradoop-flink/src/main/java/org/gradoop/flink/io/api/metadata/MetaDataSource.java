@@ -20,9 +20,9 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.hadoop.conf.Configuration;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.flink.io.api.metadata.functions.ElementToPropertyMetaData;
 import org.gradoop.flink.io.api.metadata.functions.ReducePropertyMetaData;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -34,8 +34,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Base interface for factories that create metadata objects from tuples and files (distributed
- * or locally).
+ * Base interface for factories that create metadata objects from tuples and files (distributed or locally).
  *
  * @param <M> meta data type
  */
@@ -83,7 +82,7 @@ public interface MetaDataSource<M extends MetaData> {
    * @param <E>      EPGM element type
    * @return meta data information
    */
-  static <E extends EPGMElement> DataSet<Tuple3<String, String, String>> tuplesFromElements(
+  static <E extends Element> DataSet<Tuple3<String, String, String>> tuplesFromElements(
     DataSet<E> elements) {
     return elements
       .map(new ElementToPropertyMetaData<>())
@@ -117,7 +116,7 @@ public interface MetaDataSource<M extends MetaData> {
    *
    * @param path   path to metadata csv file
    * @param config gradoop configuration
-   * @return (element prefix ( g, v, e), label, metadata) tuple dataset
+   * @return (element prefix (g, v, e), label, metadata) tuple dataset
    */
   DataSet<Tuple3<String, String, String>> readDistributed(String path, GradoopFlinkConfig config);
 

@@ -18,10 +18,10 @@ package org.gradoop.flink.model.impl.operators.matching.common.functions;
 import org.apache.flink.api.common.functions.util.ListCollector;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.configuration.Configuration;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -71,7 +71,7 @@ public class ElementsFromEmbeddingTest {
     embedding.setVertexMapping(vertexMapping);
     embedding.setEdgeMapping(edgeMapping);
 
-    List<EPGMElement> result = new ArrayList<>();
+    List<Element> result = new ArrayList<>();
 
     udf.flatMap(Tuple1.of(embedding), new ListCollector<>(result));
 

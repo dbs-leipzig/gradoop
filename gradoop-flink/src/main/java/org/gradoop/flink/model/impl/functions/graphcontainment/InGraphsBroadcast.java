@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 
 /**
  * True, if an element is not contained in any of a given set of graphs.
@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
  * @param <GE> element type
  */
 @FunctionAnnotation.ReadFields("graphIds")
-public class InGraphsBroadcast<GE extends EPGMGraphElement>
+public class InGraphsBroadcast<GE extends GraphElement>
   extends GraphsContainmentFilterBroadcast<GE> {
 
   @Override

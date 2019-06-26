@@ -21,10 +21,10 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -41,7 +41,7 @@ import java.util.Set;
 @FunctionAnnotation.ForwardedFields("f0")
 public class GraphVerticesEdges implements
   GroupCombineFunction<
-    Tuple2<GradoopId, EPGMGraphElement>,
+    Tuple2<GradoopId, GraphElement>,
     Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>>>,
   GroupReduceFunction<
     Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>>,
@@ -56,20 +56,20 @@ public class GraphVerticesEdges implements
    *                   and may trigger the recovery logic.
    */
   @Override
-  public void combine(Iterable<Tuple2<GradoopId, EPGMGraphElement>> values,
+  public void combine(Iterable<Tuple2<GradoopId, GraphElement>> values,
     Collector<Tuple3<GradoopId, Set<EPGMVertex>, Set<EPGMEdge>>> out) throws Exception {
 
-    Iterator<Tuple2<GradoopId, EPGMGraphElement>> iterator = values.iterator();
+    Iterator<Tuple2<GradoopId, GraphElement>> iterator = values.iterator();
 
     GradoopId graphId    = null;
     Set<EPGMVertex> vertices = new HashSet<>();
     Set<EPGMEdge> edges      = new HashSet<>();
 
     while (iterator.hasNext()) {
-      Tuple2<GradoopId, EPGMGraphElement> next = iterator.next();
+      Tuple2<GradoopId, GraphElement> next = iterator.next();
       graphId = next.f0;
 
-      EPGMGraphElement element = next.f1;
+      GraphElement element = next.f1;
       if (element instanceof EPGMVertex) {
         vertices.add((EPGMVertex) element);
       } else {

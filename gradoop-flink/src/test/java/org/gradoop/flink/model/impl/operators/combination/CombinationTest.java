@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.combination;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
@@ -148,16 +148,16 @@ public class CombinationTest extends ReducibleBinaryOperatorsTestBase {
 
     getExecutionEnvironment().execute();
 
-    Set<EPGMGraphElement> inVertices = new HashSet<>();
+    Set<GraphElement> inVertices = new HashSet<>();
     inVertices.addAll(vertices0);
     inVertices.addAll(vertices2);
-    Set<EPGMGraphElement> inEdges = new HashSet<>();
+    Set<GraphElement> inEdges = new HashSet<>();
     inEdges.addAll(edges0);
     inEdges.addAll(edges2);
 
-    Set<EPGMGraphElement> outVertices = new HashSet<>();
+    Set<GraphElement> outVertices = new HashSet<>();
     inVertices.addAll(outVertices);
-    Set<EPGMGraphElement> outEdges = new HashSet<>();
+    Set<GraphElement> outEdges = new HashSet<>();
     inEdges.addAll(resEdges);
 
     checkElementMatches(inVertices, outVertices);

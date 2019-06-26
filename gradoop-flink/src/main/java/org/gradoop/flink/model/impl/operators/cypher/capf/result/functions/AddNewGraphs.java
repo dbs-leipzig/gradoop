@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.operators.cypher.capf.result.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 
 /**
  * Adds GradoopIds to the graph ids of a EPGMGraphElement based on a long id
@@ -31,7 +31,7 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 
 @FunctionAnnotation.ReadFieldsFirst("f1")
 @FunctionAnnotation.ReadFieldsSecond("f1")
-public class AddNewGraphs<E extends EPGMGraphElement>
+public class AddNewGraphs<E extends GraphElement>
   implements JoinFunction<Tuple2<Long, GradoopIdSet>, Tuple2<Long, E>, E> {
 
   @Override

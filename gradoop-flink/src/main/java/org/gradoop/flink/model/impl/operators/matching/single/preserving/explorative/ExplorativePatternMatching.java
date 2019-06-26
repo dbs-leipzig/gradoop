@@ -22,15 +22,15 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.log4j.Logger;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
@@ -65,9 +65,7 @@ import static org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHi
  * Algorithm detects subgraphs by traversing the search graph according to a
  * given traversal code which is derived from the query pattern.
  */
-public class ExplorativePatternMatching
-  extends PatternMatching
-  implements UnaryGraphToCollectionOperator {
+public class ExplorativePatternMatching extends PatternMatching implements UnaryGraphToCollectionOperator {
   /**
    * Name for broadcast set which contains the superstep id.
    */
@@ -211,7 +209,7 @@ public class ExplorativePatternMatching
     // Post-Processing (build Graph Collection from embeddings)
     //--------------------------------------------------------------------------
 
-    DataSet<EPGMElement> elements = embeddings
+    DataSet<Element> elements = embeddings
       .flatMap(new ElementsFromEmbedding(traversalCode,
         graph.getConfig().getGraphHeadFactory(),
         graph.getConfig().getVertexFactory(),

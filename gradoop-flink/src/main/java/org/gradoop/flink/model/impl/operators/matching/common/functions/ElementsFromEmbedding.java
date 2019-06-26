@@ -21,11 +21,11 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
@@ -41,10 +41,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Extracts {@link EPGMElement} instances from an {@link Embedding}.
+ * Extracts {@link Element} instances from an {@link Embedding}.
  */
 public class ElementsFromEmbedding
-  extends RichFlatMapFunction<Tuple1<Embedding<GradoopId>>, EPGMElement> {
+  extends RichFlatMapFunction<Tuple1<Embedding<GradoopId>>, Element> {
 
   /**
    * Maps edge candidates to the step in which they are traversed
@@ -114,7 +114,7 @@ public class ElementsFromEmbedding
   }
 
   @Override
-  public void flatMap(Tuple1<Embedding<GradoopId>> embedding, Collector<EPGMElement> out)
+  public void flatMap(Tuple1<Embedding<GradoopId>> embedding, Collector<Element> out)
       throws Exception {
 
     GradoopId[] vertexMapping = embedding.f0.getVertexMapping();

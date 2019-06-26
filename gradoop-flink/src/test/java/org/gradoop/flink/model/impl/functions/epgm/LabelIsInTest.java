@@ -15,8 +15,8 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Before;
@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
 
 /**
  * Test for the {@link LabelIsIn} filter function.
@@ -36,7 +36,7 @@ public class LabelIsInTest extends GradoopFlinkTestBase {
   /**
    * The comparator used to sort results.
    */
-  private Comparator<EPGMVertex> comparator = Comparator.comparing(EPGMElement::getId);
+  private Comparator<EPGMVertex> comparator = Comparator.comparing(Element::getId);
 
   /**
    * Some test vertices to filter.

@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.apache.log4j.Logger;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
@@ -120,7 +120,7 @@ public class CypherPatternMatching extends PatternMatching {
       log(embeddings, new PrintEmbedding(embeddingMetaData), getVertexMapping(), getEdgeMapping());
 
     // Pattern construction (if necessary)
-    DataSet<EPGMElement> finalElements = this.constructionPattern != null ?
+    DataSet<Element> finalElements = this.constructionPattern != null ?
       constructFinalElements(graph, embeddings, embeddingMetaData) :
       embeddings.flatMap(
         new ElementsFromEmbedding(
@@ -144,7 +144,7 @@ public class CypherPatternMatching extends PatternMatching {
    * @param embeddingMetaData   Meta information
    * @return                    New set of EmbeddingElements
    */
-  private DataSet<EPGMElement> constructFinalElements(LogicalGraph graph, DataSet<Embedding> embeddings,
+  private DataSet<Element> constructFinalElements(LogicalGraph graph, DataSet<Embedding> embeddings,
     EmbeddingMetaData embeddingMetaData) {
 
     QueryHandler constructionPatternHandler = new QueryHandler(this.constructionPattern);

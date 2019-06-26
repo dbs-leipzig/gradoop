@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.exclusion;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -130,7 +130,7 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
 
     getExecutionEnvironment().execute();
 
-    Set<EPGMGraphElement> inVertices = new HashSet<>();
+    Set<GraphElement> inVertices = new HashSet<>();
     for (EPGMVertex vertex : vertices2) {
       if (!vertices0.contains(vertex)) {
         inVertices.add(vertex);
@@ -142,10 +142,10 @@ public class ExclusionTest extends ReducibleBinaryOperatorsTestBase {
       }
     }
 
-    Set<EPGMGraphElement> outVertices = new HashSet<>();
+    Set<GraphElement> outVertices = new HashSet<>();
     inVertices.addAll(outVertices);
-    Set<EPGMGraphElement> outEdges = new HashSet<>();
-    Set<EPGMGraphElement> inEdges = new HashSet<>(resEdges);
+    Set<GraphElement> outEdges = new HashSet<>();
+    Set<GraphElement> inEdges = new HashSet<>(resEdges);
 
     checkElementMatches(inVertices, outVertices);
     checkElementMatches(inEdges, outEdges);

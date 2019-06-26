@@ -18,10 +18,10 @@ package org.gradoop.flink.io.api.metadata.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.flink.io.api.metadata.MetaDataSource;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
@@ -37,7 +37,7 @@ import java.util.Set;
  * @param <E> EPGM element type
  */
 @FunctionAnnotation.ForwardedFields("label->f1")
-public class ElementToPropertyMetaData<E extends EPGMElement>
+public class ElementToPropertyMetaData<E extends Element>
   implements MapFunction<E, Tuple3<String, String, Set<String>>> {
   /**
    * Reduce object instantiations.
@@ -53,7 +53,7 @@ public class ElementToPropertyMetaData<E extends EPGMElement>
 
   @Override
   public Tuple3<String, String, Set<String>> map(E e) throws Exception {
-    Class<? extends EPGMElement> type = e.getClass();
+    Class<? extends Element> type = e.getClass();
 
     if (type == EPGMEdge.class) {
       reuseTuple.f0 = MetaDataSource.EDGE_TYPE;

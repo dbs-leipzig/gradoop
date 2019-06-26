@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
-import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.ElementSelectorComparable;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables.LiteralComparable;
@@ -70,7 +70,7 @@ public abstract class QueryComparable implements Serializable {
    * @param element EPGMGraphElement under which the predicate will be evaluated
    * @return evaluation result
    */
-  public abstract PropertyValue evaluate(EPGMGraphElement element);
+  public abstract PropertyValue evaluate(GraphElement element);
 
   /**
    * Returns a set of property keys referenced by this expression for a given variable

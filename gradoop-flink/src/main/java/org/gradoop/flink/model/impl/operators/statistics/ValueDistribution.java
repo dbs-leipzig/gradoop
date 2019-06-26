@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
 import org.gradoop.flink.model.impl.functions.tuple.Tuple2ToWithCount;
 import org.gradoop.flink.model.impl.operators.count.Count;
@@ -29,7 +29,7 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
  * @param <EL> EPGM element type
  * @param <T> value type
  */
-abstract class ValueDistribution<EL extends EPGMElement, T>
+abstract class ValueDistribution<EL extends Element, T>
   implements UnaryGraphToValueOperator<DataSet<WithCount<T>>> {
 
   /**
