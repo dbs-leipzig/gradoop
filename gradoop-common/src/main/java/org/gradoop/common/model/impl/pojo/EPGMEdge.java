@@ -32,12 +32,12 @@ import java.util.Objects;
  *
  * 0: EdgeId
  * 1: Label
- * 2: SourceId
- * 3: TargetId
- * 4: Properties
- * 5: GraphIdSet
+ * 2: Properties
+ * 3: GraphIdSet
+ * 4: SourceId
+ * 5: TargetId
  */
-public class EPGMEdge extends Tuple6<GradoopId, String, GradoopId, GradoopId, Properties, GradoopIdSet>
+public class EPGMEdge extends Tuple6<GradoopId, String, Properties, GradoopIdSet, GradoopId, GradoopId>
   implements Edge {
 
   /**
@@ -63,113 +63,114 @@ public class EPGMEdge extends Tuple6<GradoopId, String, GradoopId, GradoopId, Pr
     final GradoopId targetId,
     final Properties properties,
     GradoopIdSet graphIds) {
-    super(id, label, sourceId, targetId, properties, graphIds);
+    super(id, label, properties, graphIds, sourceId, targetId);
+    initProperties();
   }
 
 
   @Override
   public GradoopId getSourceId() {
-    return this.f2;
+    return this.f4;
   }
 
   @Override
   public void setSourceId(GradoopId sourceId) {
-    this.f2 = sourceId;
+    this.f4 = sourceId;
   }
 
   @Override
   public GradoopId getTargetId() {
-    return this.f3;
-  }
-
-  @Override
-  public void setTargetId(GradoopId targetId) {
-    this.f3 = targetId;
-  }
-
-  @Override
-  public GradoopIdSet getGraphIds() {
     return this.f5;
   }
 
   @Override
+  public void setTargetId(GradoopId targetId) {
+    this.f5 = targetId;
+  }
+
+  @Override
+  public GradoopIdSet getGraphIds() {
+    return this.f3;
+  }
+
+  @Override
   public void addGraphId(GradoopId graphId) {
-    if (this.f5 == null) {
-      this.f5 = new GradoopIdSet();
+    if (this.f3 == null) {
+      this.f3 = new GradoopIdSet();
     }
-    this.f5.add(graphId);
+    this.f3.add(graphId);
   }
 
   @Override
   public void setGraphIds(GradoopIdSet graphIds) {
-    this.f5 = graphIds;
+    this.f3 = graphIds;
   }
 
   @Override
   public void resetGraphIds() {
-    if (this.f5 != null) {
-      this.f5.clear();
+    if (this.f3 != null) {
+      this.f3.clear();
     }
   }
 
   @Override
   public int getGraphCount() {
-    return (this.f5 != null) ? this.f5.size() : 0;
+    return (this.f3 != null) ? this.f3.size() : 0;
   }
 
   @Nullable
   @Override
   public Properties getProperties() {
-    return this.f4;
+    return this.f2;
   }
 
   @Override
   public Iterable<String> getPropertyKeys() {
-    return (this.f4 != null) ? this.f4.getKeys() : null;
+    return (this.f2 != null) ? this.f2.getKeys() : null;
   }
 
   @Override
   public PropertyValue getPropertyValue(String key) {
-    return (this.f4 != null) ?  this.f4.get(key) : null;
+    return (this.f2 != null) ?  this.f2.get(key) : null;
   }
 
   @Override
   public void setProperties(Properties properties) {
-    this.f4 = properties;
+    this.f2 = properties;
   }
 
   @Override
   public void setProperty(Property property) {
     Preconditions.checkNotNull(property, "Property was null");
     initProperties();
-    this.f4.set(property);
+    this.f2.set(property);
   }
 
   @Override
   public void setProperty(String key, PropertyValue value) {
     initProperties();
-    this.f4.set(key, value);
+    this.f2.set(key, value);
   }
 
   @Override
   public void setProperty(String key, Object value) {
     initProperties();
-    this.f4.set(key, value);
+    this.f2.set(key, value);
   }
 
   @Override
   public PropertyValue removeProperty(String key) {
-    return (this.f4 != null) ? this.f4.remove(key) : null;
+    return (this.f2 != null) ? this.f2.remove(key) : null;
   }
 
   @Override
   public int getPropertyCount() {
-    return (this.f4 != null) ? this.f4.size() : 0;
+    return (this.f2 != null) ? this.f2.size() : 0;
   }
 
   @Override
   public boolean hasProperty(String key) {
-    return this.f4 != null && this.f4.containsKey(key);
+    return this.f2 != null && this.f2.containsKey(key);
   }
 
   @Override
@@ -223,8 +224,8 @@ public class EPGMEdge extends Tuple6<GradoopId, String, GradoopId, GradoopId, Pr
    * Initializes the internal properties field if necessary.
    */
   private void initProperties() {
-    if (this.f4 == null) {
-      this.f4 = Properties.create();
+    if (this.f2 == null) {
+      this.f2 = Properties.create();
     }
   }
 }

@@ -27,8 +27,8 @@ import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
  * The new vertex is stored as an occurrence of the searchGraph
  *
  */
-@FunctionAnnotation.ForwardedFieldsFirst("id")
-@FunctionAnnotation.ForwardedFieldsSecond("label;properties")
+@FunctionAnnotation.ForwardedFieldsFirst("f0")
+@FunctionAnnotation.ForwardedFieldsSecond("f1;f2")
 public class CreateFusedVertex implements CrossFunction<EPGMGraphHead, EPGMGraphHead, EPGMVertex> {
 
   /**

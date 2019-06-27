@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.tuples.IdWithLabel;
  *
  * @param <EL> element type
  */
-@FunctionAnnotation.ForwardedFields("id->f0;label->f1")
+@FunctionAnnotation.ForwardedFields("f0->f0;f1->f1")
 public class ToIdWithLabel<EL extends Element> implements MapFunction<EL, IdWithLabel> {
   /**
    * Reuse tuple

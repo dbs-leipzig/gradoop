@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param <GD> graph data type
  * @param <C>  type of second element in tuple
  */
-@FunctionAnnotation.ForwardedFields("f0.id->*")
+@FunctionAnnotation.ForwardedFields("f0.f0->*")
 public class IdOf0InTuple2<GD extends EPGMGraphHead, C>
   implements KeySelector<Tuple2<GD, C>, GradoopId> {
 

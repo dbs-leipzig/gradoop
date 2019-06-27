@@ -164,11 +164,9 @@ public class ExplorativePatternMatching extends PatternMatching implements Unary
       // Pre-processing (filter candidates)
       //--------------------------------------------------------------------------
 
-      DataSet<IdWithCandidates<GradoopId>> vertices = PreProcessor.filterVertices(
-        graph, getQuery());
+      DataSet<IdWithCandidates<GradoopId>> vertices = PreProcessor.filterVertices(graph, getQuery());
 
-      DataSet<TripleWithCandidates<GradoopId>> edges = PreProcessor.filterEdges(
-        graph, getQuery());
+      DataSet<TripleWithCandidates<GradoopId>> edges = PreProcessor.filterEdges(graph, getQuery());
 
       //--------------------------------------------------------------------------
       // Exploration via Traversal

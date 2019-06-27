@@ -23,8 +23,8 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 /**
  * Maps EPGM vertex to a Gelly vertex consisting of the EPGM identifier and a {@link PropertyValue}.
  */
-@FunctionAnnotation.ForwardedFields("id->f0")
-@FunctionAnnotation.ReadFields("properties")
+@FunctionAnnotation.ForwardedFields("f0->f0")
+@FunctionAnnotation.ReadFields("f2")
 public class VertexToGellyVertexWithPropertyValue implements VertexToGellyVertex<PropertyValue> {
   /**
    * Property key to access the label value which will be propagated

@@ -31,7 +31,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
  *
  * @param <E> The edge type.
  */
-@FunctionAnnotation.ForwardedFields("f0->sourceId;f1->targetId;f2->label")
+@FunctionAnnotation.ForwardedFields("f0->f4;f1->f5;f2->f1")
 @FunctionAnnotation.ReadFields("f3;f5")
 public class ReduceEdgeGroupItems<E extends Edge> extends BuildSuperEdge
   implements GroupReduceFunction<EdgeGroupItem, E>, ResultTypeQueryable<E> {

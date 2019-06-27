@@ -29,8 +29,8 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  *
  * @param <E> EPGM edge Type
  */
-@FunctionAnnotation.ForwardedFields("f0.id->id;f0.sourceId->sourceId;" +
-  "f0.targetId->targetId;f0.label->label;f0.properties->properties")
+@FunctionAnnotation.ForwardedFields("f0.f0->f0;f0.f4->f4;" +
+  "f0.f5->f5;f0.f1->f1;f0.f2->f2")
 public class AddNewGraphsToEdge<E extends EPGMEdge>
   implements FlatMapFunction<Tuple3<E, GradoopIdSet, GradoopIdSet>, E> {
 

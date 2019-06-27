@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <G> the type of the graph head
  */
-@FunctionAnnotation.ForwardedFields("id")
+@FunctionAnnotation.ForwardedFields("f0")
 public class TransformGraphHead<G extends GraphHead> extends TransformBase<G> {
 
   /**

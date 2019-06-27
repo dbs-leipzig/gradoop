@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param <T> type of first field
  * @param <EL> element type of second field
  */
-@FunctionAnnotation.ForwardedFields("f0.id->f0;f1")
+@FunctionAnnotation.ForwardedFields("f0.f0->f0;f1")
 public class Value0Of2ToId<EL extends Element, T>
   implements
   MapFunction<Tuple2<EL, T>, Tuple2<GradoopId, T>> {

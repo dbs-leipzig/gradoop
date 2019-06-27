@@ -28,7 +28,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 /**
  * Initializes an {@link EPGMVertex} from a given {@link GradoopId}.
  */
-@FunctionAnnotation.ForwardedFields("f0->id")
+@FunctionAnnotation.ForwardedFields("f0->f0")
 public class VertexFromId implements
   MapFunction<Tuple1<GradoopId>, EPGMVertex>,
   ResultTypeQueryable<EPGMVertex> {

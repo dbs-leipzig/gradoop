@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <EL> EPGM element type
  * @param <T>  property type
  */
-@FunctionAnnotation.ForwardedFieldsFirst("id")
+@FunctionAnnotation.ForwardedFieldsFirst("f0")
 public class PropertySetter<EL extends Element, T>
   implements JoinFunction<EL, Tuple2<GradoopId, T>, EL> {
 

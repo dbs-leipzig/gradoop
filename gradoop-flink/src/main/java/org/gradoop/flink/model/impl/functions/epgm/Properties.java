@@ -25,7 +25,7 @@ import org.gradoop.common.model.api.entities.Element;
  *
  * @param <L> Element type having properties
  */
-@FunctionAnnotation.ForwardedFields("properties->*")
+@FunctionAnnotation.ForwardedFields("f2->*")
 public class Properties<L extends Element>
   implements MapFunction<L, org.gradoop.common.model.impl.properties.Properties>,
              KeySelector<L, org.gradoop.common.model.impl.properties.Properties> {

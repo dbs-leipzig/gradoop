@@ -34,8 +34,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <V> EPGM vertex type
  */
-@FunctionAnnotation.ForwardedFields("id->f0")
-@FunctionAnnotation.ReadFields("properties")
+@FunctionAnnotation.ForwardedFields("f0->f0")
+@FunctionAnnotation.ReadFields("f2")
 public class SplitValues<V extends EPGMVertex>
   implements FlatMapFunction<V, Tuple2<GradoopId, PropertyValue>> {
   /**

@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
  * Joins an EPGM vertex with the source- resp. target-id of a visited edge. Sets the vertex visited
  * property to {@code true}, if there is a join-partner.
  */
-@FunctionAnnotation.ForwardedFieldsFirst("id;label;graphIds")
+@FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f3")
 public class VertexWithVisitedSourceTargetIdJoin implements JoinFunction<EPGMVertex, GradoopId, EPGMVertex> {
 
   /**

@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
  * (edge,edge.targetId,bool-source),(target) -> (edge,bool-source,(bool)target[propertyKey])
  */
 @FunctionAnnotation.ForwardedFieldsFirst({"f0->f0", "f2->f1"})
-@FunctionAnnotation.ReadFieldsSecond("properties")
+@FunctionAnnotation.ReadFieldsSecond("f2")
 public class EdgeTargetVertexJoin implements
   JoinFunction<Tuple3<EPGMEdge, GradoopId, Boolean>, EPGMVertex, Tuple3<EPGMEdge, Boolean, Boolean>> {
 

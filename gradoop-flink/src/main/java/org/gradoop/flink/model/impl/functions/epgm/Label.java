@@ -25,7 +25,7 @@ import org.gradoop.common.model.api.entities.Labeled;
  *
  * @param <L> labeled type
  */
-@FunctionAnnotation.ForwardedFields("label->*")
+@FunctionAnnotation.ForwardedFields("f1->*")
 public class Label<L extends Labeled>
   implements MapFunction<L, String>, KeySelector<L, String> {
 

@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <GE> element type
  */
-@FunctionAnnotation.ReadFields("graphIds")
+@FunctionAnnotation.ReadFields("f3")
 public class NotInGraphsBroadcast<GE extends GraphElement>
   extends GraphsContainmentFilterBroadcast<GE> {
 

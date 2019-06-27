@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <E> any EPGMGraphElement
  */
-@FunctionAnnotation.ForwardedFields("f1.id->*")
+@FunctionAnnotation.ForwardedFields("f1.f0->*")
 public class IdOfF1<E extends Element> implements KeySelector<Tuple2<Long, E>, GradoopId> {
 
   @Override

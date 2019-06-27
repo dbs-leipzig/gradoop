@@ -28,7 +28,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  * @param <EL> epgm graph element type
  */
 @FunctionAnnotation.ReadFieldsFirst("f1")
-@FunctionAnnotation.ForwardedFieldsSecond("id;label;properties")
+@FunctionAnnotation.ForwardedFieldsSecond("f0;f1;f2")
 public class AddGraphsToElements<EL extends GraphElement>
   implements JoinFunction<Tuple2<GradoopId, GradoopIdSet>, EL, EL> {
 

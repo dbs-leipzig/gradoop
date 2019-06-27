@@ -32,7 +32,7 @@ import java.util.Set;
  *
  * @param <G> The graph head type.
  */
-@FunctionAnnotation.ForwardedFields("id")
+@FunctionAnnotation.ForwardedFields("f0")
 public class SetAggregateProperty<G extends GraphHead>
   extends RichMapFunction<G, G> {
 

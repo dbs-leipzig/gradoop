@@ -51,6 +51,7 @@ public class EPGMGraphHead extends Tuple3<GradoopId, String, Properties> impleme
   public EPGMGraphHead(final GradoopId id, final String label,
     final Properties properties) {
     super(id, label, properties);
+    initProperties();
   }
 
 

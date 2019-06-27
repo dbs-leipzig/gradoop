@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  *
  * @param <V> EPGM vertex type
  */
-@FunctionAnnotation.ReadFieldsFirst("graphIds")
+@FunctionAnnotation.ReadFieldsFirst("f3")
 @FunctionAnnotation.ReadFieldsSecond("f1")
 public class AddNewGraphsToVertex<V extends EPGMVertex>
   implements JoinFunction<V, Tuple2<GradoopId, GradoopIdSet>, V> {

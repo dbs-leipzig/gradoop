@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <EL> element type
  */
-@FunctionAnnotation.ForwardedFields("label;properties")
+@FunctionAnnotation.ForwardedFields("f1;f2")
 public class Clone<EL extends Element> implements MapFunction<EL, EL> {
 
   @Override

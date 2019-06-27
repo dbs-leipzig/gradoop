@@ -28,7 +28,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  *
  * @param <EL> EPGM element type
  */
-@FunctionAnnotation.ForwardedFields("id;label;properties")
+@FunctionAnnotation.ForwardedFields("f0;f1;f2")
 public class ElementGraphUpdater<EL extends GraphElement>
   extends RichMapFunction<EL, EL> {
 

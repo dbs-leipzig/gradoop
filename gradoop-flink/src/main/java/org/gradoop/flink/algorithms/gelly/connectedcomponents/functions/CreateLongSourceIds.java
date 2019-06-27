@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
  * Builds edge triples with long id's.
  */
 @FunctionAnnotation.ForwardedFieldsFirst({"f0->f0", "f1->f1", "f0->f2"})
-@FunctionAnnotation.ForwardedFieldsSecond("targetId->f3")
+@FunctionAnnotation.ForwardedFieldsSecond("f5->f3")
 public class CreateLongSourceIds
   implements JoinFunction<Tuple2<Long, GradoopId>, EPGMEdge, Tuple4<Long, GradoopId, Long, GradoopId>> {
 

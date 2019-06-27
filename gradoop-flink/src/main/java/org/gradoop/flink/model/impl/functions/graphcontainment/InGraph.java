@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
  *
  * @param <EL> element type
  */
-@FunctionAnnotation.ReadFields("graphIds")
+@FunctionAnnotation.ReadFields("f3")
 public class InGraph<EL extends GraphElement> implements CombinableFilter<EL> {
 
   /**

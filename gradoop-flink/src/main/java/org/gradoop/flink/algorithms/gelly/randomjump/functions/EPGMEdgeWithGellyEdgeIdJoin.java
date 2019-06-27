@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
  * property to the EPGM edge, determining if this edge was visited. The property is set to
  * {@code true} if the EPGM edge has a join partner, set to {@code false} otherwise.
  */
-@FunctionAnnotation.ForwardedFieldsFirst("id;sourceId;targetId;label;graphIds")
+@FunctionAnnotation.ForwardedFieldsFirst("f0;f1;f3;f4;f5")
 public class EPGMEdgeWithGellyEdgeIdJoin implements JoinFunction<EPGMEdge, GradoopId, EPGMEdge> {
 
   /**

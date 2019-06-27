@@ -34,13 +34,12 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
  */
 @FunctionAnnotation.ForwardedFieldsFirst(
   "f2->f0;" +           // import target vertex id
-  "f3->f1.label;" +     // edge label
-  "f4->f1.properties")  // edge properties
+  "f3->f1.f1;" +     // edge label
+  "f4->f1.f2")  // edge properties
 @FunctionAnnotation.ForwardedFieldsSecond(
-  "f1->f1.sourceId"     // EPGM source vertex id
+  "f1->f1.f4"     // EPGM source vertex id
 )
-public class InitEdge<K extends Comparable<K>>
-  extends InitElement<EPGMEdge, K>
+public class InitEdge<K extends Comparable<K>> extends InitElement<EPGMEdge, K>
   implements JoinFunction<ImportEdge<K>, Tuple2<K, GradoopId>, Tuple2<K, EPGMEdge>>,
   ResultTypeQueryable<Tuple2<K, EPGMEdge>> {
 

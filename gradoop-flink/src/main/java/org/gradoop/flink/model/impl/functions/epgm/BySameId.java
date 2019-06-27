@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
  *
  * @param <EL> element type
  */
-@FunctionAnnotation.ReadFields("id")
+@FunctionAnnotation.ReadFields("f0")
 public class BySameId<EL extends Element> implements CombinableFilter<EL> {
 
   /**

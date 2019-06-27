@@ -36,7 +36,7 @@ import java.util.Set;
  *
  * @param <E> EPGM element type
  */
-@FunctionAnnotation.ForwardedFields("label->f1")
+@FunctionAnnotation.ForwardedFields("f1->f1")
 public class ElementToPropertyMetaData<E extends Element>
   implements MapFunction<E, Tuple3<String, String, Set<String>>> {
   /**

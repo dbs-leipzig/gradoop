@@ -24,8 +24,8 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  * Maps EPGM edge to a Gelly edge consisting of EPGM source and target
  * identifier and {@link PropertyValue} as edge value.
  */
-@FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1")
-@FunctionAnnotation.ReadFields("properties")
+@FunctionAnnotation.ForwardedFields("f4->f0;f5->f1")
+@FunctionAnnotation.ReadFields("f2")
 public class EdgeToGellyEdgeWithPropertyValue implements EdgeToGellyEdge<PropertyValue> {
   /**
    * Property key to get the value for.

@@ -30,7 +30,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <E> EPGM edge type
  */
-@FunctionAnnotation.ForwardedFields("*->f0;sourceId->f1;targetId->f2")
+@FunctionAnnotation.ForwardedFields("*->f0;f4->f1;f5->f2")
 public class EdgeToTriple<E extends EPGMEdge>
   implements MapFunction<E, Tuple3<E, GradoopId, GradoopId>> {
 

@@ -168,12 +168,12 @@ public class CSVDataSinkTest extends CSVTestBase {
     EPGMVertex vertex = new EPGMVertexFactory().createVertex(string1, props);
     DataSet<EPGMVertex> vertices = env.fromElements(vertex)
       .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;label;properties");
+      .withForwardedFields("f0;f1;f2");
 
     DataSet<EPGMEdge> edges = env.fromElements(new EPGMEdgeFactory()
       .createEdge(string1, vertex.getId(), vertex.getId(), props))
       .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;label;properties");
+      .withForwardedFields("f0;f1;f2");
 
     LogicalGraph graph = getConfig().getLogicalGraphFactory()
       .fromDataSets(graphHeads, vertices, edges);

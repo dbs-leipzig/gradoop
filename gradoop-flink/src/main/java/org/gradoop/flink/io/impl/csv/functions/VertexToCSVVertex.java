@@ -28,7 +28,7 @@ import org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
  * <p>
  * label
  */
-@FunctionAnnotation.ForwardedFields("label->f2")
+@FunctionAnnotation.ForwardedFields("f1->f2")
 public class VertexToCSVVertex extends ElementToCSV<EPGMVertex, CSVVertex> {
   /**
    * Reduce object instantiations.

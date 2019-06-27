@@ -28,7 +28,7 @@ import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
  *
  * label
  */
-@FunctionAnnotation.ForwardedFields("label->f4")
+@FunctionAnnotation.ForwardedFields("f1->f4")
 public class EdgeToCSVEdge extends ElementToCSV<EPGMEdge, CSVEdge> {
   /**
    * Reduce object instantiations

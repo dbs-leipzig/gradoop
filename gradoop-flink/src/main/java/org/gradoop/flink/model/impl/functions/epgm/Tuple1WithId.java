@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <EL> element type
  */
-@FunctionAnnotation.ForwardedFields("id->f0")
+@FunctionAnnotation.ForwardedFields("f0->f0")
 public class Tuple1WithId<EL extends Element>
   implements MapFunction<EL, Tuple1<GradoopId>> {
 

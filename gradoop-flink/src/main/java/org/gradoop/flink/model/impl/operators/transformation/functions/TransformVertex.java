@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <V> the type of the EPGM vertex
  */
-@FunctionAnnotation.ForwardedFields("id;graphIds")
+@FunctionAnnotation.ForwardedFields("f0;f3")
 public class TransformVertex<V extends Vertex> extends TransformBase<V> {
 
   /**

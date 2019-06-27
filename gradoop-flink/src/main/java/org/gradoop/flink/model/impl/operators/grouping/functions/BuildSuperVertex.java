@@ -31,7 +31,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
  *
  * @param <V> The vertex type.
  */
-@FunctionAnnotation.ForwardedFields("f1->id;f2->label")
+@FunctionAnnotation.ForwardedFields("f1->f0;f2->f1")
 @FunctionAnnotation.ReadFields("f1;f2;f3;f4;f6")
 public class BuildSuperVertex<V extends Vertex> extends BuildBase
   implements MapFunction<VertexGroupItem, V>, ResultTypeQueryable<V> {

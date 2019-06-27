@@ -156,14 +156,14 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     DataSet<EPGMVertex> vertices = env.fromElements(vertex1, vertex2)
       .map(new AddToGraph<>(graphHead1))
       .map(new AddToGraph<>(graphHead2))
-      .withForwardedFields("id;label;properties");
+      .withForwardedFields("f0;f1;f2");
 
     // This results in the path "edges/c_d" because < and > are illegal filename characters.
     EPGMEdge edge1 = new EPGMEdgeFactory().createEdge("c<d", vertex1.getId(), vertex2.getId());
     EPGMEdge edge2 = new EPGMEdgeFactory().createEdge("c>d", vertex2.getId(), vertex1.getId());
     DataSet<EPGMEdge> edges = env.fromElements(edge1, edge2)
       .map(new AddToGraph<>(graphHead1))
-      .withForwardedFields("id;label;properties");
+      .withForwardedFields("f0;f1;f2");
 
     LogicalGraph graph = getConfig().getLogicalGraphFactory()
       .fromDataSets(graphHeads, vertices, edges);
@@ -217,12 +217,12 @@ public class IndexedCSVDataSinkTest extends GradoopFlinkTestBase {
     EPGMVertex vertex = new EPGMVertexFactory().createVertex(string1, props);
     DataSet<EPGMVertex> vertices = env.fromElements(vertex)
       .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;label;properties");
+      .withForwardedFields("f0;f1;f2");
 
     EPGMEdge edge = new EPGMEdgeFactory().createEdge(string1, vertex.getId(), vertex.getId(), props);
     DataSet<EPGMEdge> edges = env.fromElements(edge)
       .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;label;properties");
+      .withForwardedFields("f0;f1;f2");
 
     LogicalGraph graph = getConfig().getLogicalGraphFactory()
       .fromDataSets(graphHeads, vertices, edges);

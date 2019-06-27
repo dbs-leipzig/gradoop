@@ -33,8 +33,8 @@ import java.util.List;
  *
  * @param <V> The vertex type.
  */
-@FunctionAnnotation.ForwardedFields("id->f0")
-@FunctionAnnotation.ReadFields("label;properties")
+@FunctionAnnotation.ForwardedFields("f0->f0")
+@FunctionAnnotation.ReadFields("f1;f2")
 public class BuildVertexGroupItem<V extends Vertex> extends BuildGroupItemBase
   implements FlatMapFunction<V, VertexGroupItem> {
 

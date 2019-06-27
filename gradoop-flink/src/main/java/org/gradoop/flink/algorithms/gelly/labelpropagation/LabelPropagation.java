@@ -62,8 +62,7 @@ public abstract class LabelPropagation extends GradoopGellyAlgorithm<PropertyVal
    * @param propertyKey   Property key to access the label value
    */
   protected LabelPropagation(int maxIterations, String propertyKey) {
-    super(new VertexToGellyVertexWithPropertyValue(propertyKey),
-            new EdgeToGellyEdgeWithNullValue());
+    super(new VertexToGellyVertexWithPropertyValue(propertyKey), new EdgeToGellyEdgeWithNullValue());
     this.maxIterations = maxIterations;
     this.propertyKey = checkNotNull(propertyKey);
   }

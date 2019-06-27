@@ -37,7 +37,7 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_EDGE_LABEL;
  *
  * @param <E> EPGM edge type
  */
-@FunctionAnnotation.ForwardedFields("id->f0;sourceId->f1;targetId->f2")
+@FunctionAnnotation.ForwardedFields("f0->f0;f4->f1;f5->f2")
 public class BuildTripleWithCandidates<E extends EPGMEdge>
   extends AbstractBuilder<E, TripleWithCandidates<GradoopId>> {
   /**

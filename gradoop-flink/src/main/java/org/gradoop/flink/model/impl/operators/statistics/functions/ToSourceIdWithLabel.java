@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.tuples.IdWithLabel;
  *
  * @param <E> EPGM edge type
  */
-@FunctionAnnotation.ForwardedFields("sourceId->f0;label->f1")
+@FunctionAnnotation.ForwardedFields("f4->f0;f1->f1")
 public class ToSourceIdWithLabel<E extends EPGMEdge> implements MapFunction<E, IdWithLabel> {
   /**
    * Reuse tuple

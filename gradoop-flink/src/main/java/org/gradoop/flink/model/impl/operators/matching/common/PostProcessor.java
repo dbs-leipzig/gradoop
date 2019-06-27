@@ -99,14 +99,14 @@ public class PostProcessor {
       .rightOuterJoin(collection.getVertices())
       .where(new Id<>()).equalTo(new Id<>())
       .with(new MergedGraphIds<>())
-      .withForwardedFieldsFirst("id;label;properties;");
+      .withForwardedFieldsFirst("f0;f1;f2;");
 
 
     DataSet<EPGMEdge> newEdges = inputGraph.getEdges()
       .rightOuterJoin(collection.getEdges())
       .where(new Id<>()).equalTo(new Id<>())
       .with(new MergedGraphIds<>())
-      .withForwardedFieldsFirst("id;label;properties");
+      .withForwardedFieldsFirst("f0;f1;f2;");
 
     return config.getGraphCollectionFactory().fromDataSets(
       collection.getGraphHeads(), newVertices, newEdges);

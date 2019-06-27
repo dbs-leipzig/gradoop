@@ -34,8 +34,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
  */
 @FunctionAnnotation.ForwardedFields(
   "f0;" + // vertex id
-  "f1->f2.label;" + // vertex label
-  "f2->f2.properties" // vertex properties
+  "f1->f2.f1;" + // vertex label
+  "f2->f2.f2" // vertex properties
 )
 public class InitVertex<K extends Comparable<K>>
   extends InitElement<EPGMVertex, K>

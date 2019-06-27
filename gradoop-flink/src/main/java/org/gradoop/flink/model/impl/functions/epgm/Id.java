@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <EL> element type
  */
-@FunctionAnnotation.ForwardedFields("id->*")
+@FunctionAnnotation.ForwardedFields("f0->*")
 public class Id<EL extends Element>
   implements MapFunction<EL, GradoopId>, KeySelector<EL, GradoopId> {
 

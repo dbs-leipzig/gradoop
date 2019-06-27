@@ -31,7 +31,7 @@ import java.util.Set;
  * GraphElements
  * @param <T> graph element type
  */
-@FunctionAnnotation.ForwardedFields("label->0.0")
+@FunctionAnnotation.ForwardedFields("f1->f0.f0")
 public class ExtractPropertyValuesByLabel<T extends GraphElement>
   extends RichFlatMapFunction<T, Tuple2<Tuple2<String, String>, Set<PropertyValue>>> {
 

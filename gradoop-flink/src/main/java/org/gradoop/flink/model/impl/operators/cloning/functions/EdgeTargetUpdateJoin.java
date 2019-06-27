@@ -29,7 +29,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <E> EPGM edge type
  */
-@FunctionAnnotation.ForwardedFieldsSecond("f1->targetId")
+@FunctionAnnotation.ForwardedFieldsSecond("f1->f5")
 public class EdgeTargetUpdateJoin<E extends EPGMEdge>
   implements JoinFunction<E, Tuple2<GradoopId, GradoopId>, E> {
 

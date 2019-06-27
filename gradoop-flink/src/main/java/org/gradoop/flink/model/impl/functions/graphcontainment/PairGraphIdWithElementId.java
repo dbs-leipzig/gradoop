@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <GE> EPGM graph element type
  */
-@FunctionAnnotation.ForwardedFields("id->f1")
+@FunctionAnnotation.ForwardedFields("f0->f1")
 public class PairGraphIdWithElementId<GE extends GraphElement>
   implements FlatMapFunction<GE, Tuple2<GradoopId, GradoopId>> {
 

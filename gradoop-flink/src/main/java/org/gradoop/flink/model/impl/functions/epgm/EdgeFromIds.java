@@ -33,11 +33,11 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * Forwarded fields:
  *
- * f0->id:        edge id
- * f1->sourceId:  source vertex id
- * f2->targetId:  target vertex id
+ * f0->f0:        edge id
+ * f1->f4:  source vertex id
+ * f2->f5:  target vertex id
  */
-@FunctionAnnotation.ForwardedFields("f0->id;f1->sourceId;f2->targetId")
+@FunctionAnnotation.ForwardedFields("f0->f0;f1->f4;f2->f5")
 public class EdgeFromIds implements
   MapFunction<Tuple3<GradoopId, GradoopId, GradoopId>, EPGMEdge>,
   ResultTypeQueryable<EPGMEdge> {

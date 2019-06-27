@@ -33,11 +33,11 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
  *
  * Forwarded Fields:
  *
- * id->f0: vertex id
+ * f0->f0: vertex id
  *
  * @param <V> EPGM vertex type
  */
-@FunctionAnnotation.ForwardedFields("id->f0")
+@FunctionAnnotation.ForwardedFields("f0->f0")
 public class BuildIdWithCandidates<V extends EPGMVertex>
   extends AbstractBuilder<V, IdWithCandidates<GradoopId>> {
   /**

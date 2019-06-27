@@ -29,9 +29,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <GE> EPGM graph element (i.e. vertex / edge)
  */
-@FunctionAnnotation.ReadFields("graphIds")
-public class ExpandGraphsToIds<GE extends GraphElement>
-  implements FlatMapFunction<GE, GradoopId> {
+@FunctionAnnotation.ReadFields("f3")
+public class ExpandGraphsToIds<GE extends GraphElement> implements FlatMapFunction<GE, GradoopId> {
 
   @Override
   public void flatMap(GE ge, Collector<GradoopId> collector) {

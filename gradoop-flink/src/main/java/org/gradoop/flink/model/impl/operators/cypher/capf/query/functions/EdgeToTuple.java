@@ -29,10 +29,10 @@ import org.gradoop.common.model.impl.properties.Properties;
 
 @FunctionAnnotation.ForwardedFields(
   "f0;" +
-    "f1.sourceId->f1;" +
-    "f1.targetId->f2;" +
-    "f1.label->f3;" +
-    "f1.properties->f4")
+    "f1.f4->f1;" +
+    "f1.f5->f2;" +
+    "f1.f1->f3;" +
+    "f1.f2->f4")
 public class EdgeToTuple
   implements MapFunction<Tuple2<Long, EPGMEdge>,
   Tuple5<Long, GradoopId, GradoopId, String, Properties>> {

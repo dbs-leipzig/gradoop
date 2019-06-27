@@ -28,7 +28,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  *
  * @param <GE> EPGM graph element (i.e. vertex / edge)
  */
-@FunctionAnnotation.ForwardedFields("graphIds->*")
+@FunctionAnnotation.ForwardedFields("f3->*")
 public class ExpandGraphsToIdSet<GE extends GraphElement>
   implements MapFunction<GE, GradoopIdSet> {
 

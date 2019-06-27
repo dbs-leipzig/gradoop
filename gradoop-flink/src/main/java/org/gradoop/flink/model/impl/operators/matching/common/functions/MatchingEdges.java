@@ -29,7 +29,7 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_EDGE_LABEL;
  *
  * @param <E> EPGM edge type
  */
-@FunctionAnnotation.ReadFields("label;properties")
+@FunctionAnnotation.ReadFields("f1;f2")
 public class MatchingEdges<E extends EPGMEdge> extends AbstractFilter<E> {
   /**
    * serial version uid

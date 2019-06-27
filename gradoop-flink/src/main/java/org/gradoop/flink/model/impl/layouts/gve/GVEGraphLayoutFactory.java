@@ -52,16 +52,15 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory
       .getGraphHeadFactory()
       .createGraphHead();
 
-    DataSet<EPGMGraphHead> graphHeadSet = getConfig().getExecutionEnvironment()
-      .fromElements(graphHead);
+    DataSet<EPGMGraphHead> graphHeadSet = getConfig().getExecutionEnvironment().fromElements(graphHead);
 
     // update vertices and edges with new graph head id
     vertices = vertices
       .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;label;properties");
+      .withForwardedFields("f0;f1;f2");
     edges = edges
       .map(new AddToGraph<>(graphHead))
-      .withForwardedFields("id;sourceId;targetId;label;properties");
+      .withForwardedFields("f0;f1;f2;f4;f5");
 
     return new GVELayout(graphHeadSet, vertices, edges);
   }
@@ -90,12 +89,12 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory
     vertices = vertices.entrySet().stream()
       .collect(Collectors.toMap(
         Map.Entry::getKey, e -> e.getValue().map(new AddToGraph<>(graphHead))
-          .withForwardedFields("id;label;properties")));
+          .withForwardedFields("f0;f1;f2")));
 
     edges = edges.entrySet().stream()
       .collect(Collectors.toMap(
         Map.Entry::getKey, e -> e.getValue().map(new AddToGraph<>(graphHead))
-          .withForwardedFields("id;sourceId;targetId;label;properties")));
+          .withForwardedFields("f0;f1;f2;f4;f5")));
 
     return create(graphHeads, vertices, edges);
   }

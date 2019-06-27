@@ -29,7 +29,7 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_VERTEX_LABEL;
  *
  * @param <V> EPGM vertex type
  */
-@FunctionAnnotation.ReadFields("label;properties")
+@FunctionAnnotation.ReadFields("f1;f2")
 public class MatchingVertices<V extends EPGMVertex> extends AbstractFilter<V> {
   /**
    * serial version uid

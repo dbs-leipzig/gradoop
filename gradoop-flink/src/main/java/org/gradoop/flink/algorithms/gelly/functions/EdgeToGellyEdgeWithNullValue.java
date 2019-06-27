@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
  * Maps EPGM edge to a Gelly edge consisting of EPGM source and target
  * identifier and {@link NullValue} as edge value.
  */
-@FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1")
+@FunctionAnnotation.ForwardedFields("f4->f0;f5->f1")
 public class EdgeToGellyEdgeWithNullValue implements EdgeToGellyEdge<NullValue> {
   /**
    * Reduce object instantiations
@@ -40,8 +40,7 @@ public class EdgeToGellyEdgeWithNullValue implements EdgeToGellyEdge<NullValue> 
   }
 
   @Override
-  public org.apache.flink.graph.Edge<GradoopId, NullValue> map(EPGMEdge epgmEdge)
-      throws Exception {
+  public org.apache.flink.graph.Edge<GradoopId, NullValue> map(EPGMEdge epgmEdge) throws Exception {
     reuseEdge.setSource(epgmEdge.getSourceId());
     reuseEdge.setTarget(epgmEdge.getTargetId());
     return reuseEdge;

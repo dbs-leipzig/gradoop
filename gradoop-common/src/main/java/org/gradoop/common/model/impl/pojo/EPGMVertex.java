@@ -54,6 +54,7 @@ public class EPGMVertex extends Tuple4<GradoopId, String, Properties, GradoopIdS
   public EPGMVertex(final GradoopId id, final String label,
     final Properties properties, final GradoopIdSet graphs) {
     super(id, label, properties, graphs);
+    initProperties();
   }
 
   @Override

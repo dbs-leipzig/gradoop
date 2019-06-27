@@ -28,7 +28,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param <K> Import EPGMEdge/EPGMVertex identifier type
  */
 @FunctionAnnotation.ReadFieldsFirst("f1")
-@FunctionAnnotation.ForwardedFieldsSecond("f1->targetId")
+@FunctionAnnotation.ForwardedFieldsSecond("f1->f5")
 public class UpdateEdge<E extends EPGMEdge, K extends Comparable<K>>
   implements JoinFunction<Tuple2<K, E>, Tuple2<K, GradoopId>, E> {
 

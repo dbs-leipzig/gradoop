@@ -30,10 +30,9 @@ import java.util.List;
  *
  * @param <E> The edge type.
  */
-@FunctionAnnotation.ForwardedFields("sourceId->f0;targetId->f1;")
-@FunctionAnnotation.ReadFields("label;properties")
-public class BuildEdgeGroupItem<E extends Edge>
-  extends BuildGroupItemBase
+@FunctionAnnotation.ForwardedFields("f4->f0;f5->f1;")
+@FunctionAnnotation.ReadFields("f1;f2")
+public class BuildEdgeGroupItem<E extends Edge> extends BuildGroupItemBase
   implements FlatMapFunction<E, EdgeGroupItem> {
 
   /**

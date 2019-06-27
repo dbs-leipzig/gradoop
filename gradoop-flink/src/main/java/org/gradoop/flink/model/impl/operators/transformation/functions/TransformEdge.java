@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param <E> the type of the edge
  */
-@FunctionAnnotation.ForwardedFields("id;sourceId;targetId;graphIds")
+@FunctionAnnotation.ForwardedFields("f0;f3;f4;f5")
 public class TransformEdge<E extends Edge> extends TransformBase<E> {
 
   /**

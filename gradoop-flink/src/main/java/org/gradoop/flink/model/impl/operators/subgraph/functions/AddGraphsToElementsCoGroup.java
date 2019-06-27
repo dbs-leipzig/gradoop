@@ -31,7 +31,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  */
 
 @FunctionAnnotation.ReadFieldsFirst("f1")
-@FunctionAnnotation.ForwardedFieldsSecond("id;label;properties")
+@FunctionAnnotation.ForwardedFieldsSecond("f0;f1;f2")
 public class AddGraphsToElementsCoGroup<EL extends GraphElement>
   implements CoGroupFunction<Tuple2<GradoopId, GradoopIdSet>, EL, EL> {
 

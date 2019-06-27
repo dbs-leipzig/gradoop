@@ -30,7 +30,7 @@ import java.util.Collection;
  */
 
 @FunctionAnnotation.ForwardedFields("f0->f0")
-@FunctionAnnotation.ReadFields("f1.properties")
+@FunctionAnnotation.ReadFields("f1.f2")
 public class VertexToRow extends RichMapFunction<Tuple2<Long, EPGMVertex>, Row> {
 
   /**

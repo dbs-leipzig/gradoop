@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  *
  * @param <EL> EPGM element type
  */
-@FunctionAnnotation.ForwardedFields("id->f0")
+@FunctionAnnotation.ForwardedFields("f0->f0")
 public class PairElementWithPropertyValue<EL extends Element>
   implements MapFunction<EL, Tuple2<GradoopId, PropertyValue>> {
 

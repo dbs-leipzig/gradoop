@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  *
  * @param <EL> element type
  */
-@FunctionAnnotation.ReadFields("id")
+@FunctionAnnotation.ReadFields("f0")
 public class IdAsIdSet<EL extends Element>
   implements MapFunction<EL, GradoopIdSet> {
 

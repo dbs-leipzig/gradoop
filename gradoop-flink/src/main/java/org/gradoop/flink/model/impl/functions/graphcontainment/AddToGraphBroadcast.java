@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <GE> EPGM graph element type
  */
-@FunctionAnnotation.ForwardedFields("id;label;properties")
+@FunctionAnnotation.ForwardedFields("f0;f1;f2")
 public class AddToGraphBroadcast<GE extends GraphElement> extends RichMapFunction<GE, GE> {
 
   /**

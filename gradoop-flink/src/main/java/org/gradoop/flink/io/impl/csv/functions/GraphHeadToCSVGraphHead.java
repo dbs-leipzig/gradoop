@@ -28,7 +28,7 @@ import org.gradoop.flink.io.impl.csv.tuples.CSVGraphHead;
  *
  * label
  */
-@FunctionAnnotation.ForwardedFields("label->f1")
+@FunctionAnnotation.ForwardedFields("f1->f1")
 public class GraphHeadToCSVGraphHead extends ElementToCSV<EPGMGraphHead, CSVGraphHead> {
   /**
    * Reduce object instantiations

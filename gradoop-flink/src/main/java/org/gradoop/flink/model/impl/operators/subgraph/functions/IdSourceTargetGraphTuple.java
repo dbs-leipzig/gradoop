@@ -29,8 +29,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param <E> epgm edge type
  */
 
-@FunctionAnnotation.ReadFields("graphIds")
-@FunctionAnnotation.ForwardedFields("id->f0;sourceId->f1;targetId->f2")
+@FunctionAnnotation.ReadFields("f3")
+@FunctionAnnotation.ForwardedFields("f0->f0;f4->f1;f5->f2")
 public class IdSourceTargetGraphTuple<E extends EPGMEdge>
   implements FlatMapFunction<
   E, Tuple4<GradoopId, GradoopId, GradoopId, GradoopId>> {

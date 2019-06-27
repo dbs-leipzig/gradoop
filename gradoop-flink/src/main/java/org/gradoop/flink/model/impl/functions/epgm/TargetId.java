@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <E> edge type
  */
-@FunctionAnnotation.ForwardedFieldsFirst("targetId->*")
+@FunctionAnnotation.ForwardedFieldsFirst("f5->*")
 public class TargetId<E extends Edge>
   implements KeySelector<E, GradoopId>, MapFunction<E, GradoopId> {
 

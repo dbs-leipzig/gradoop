@@ -24,7 +24,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
 /**
  * Updates the vertex on the left side with the property value on the right side
  */
-@FunctionAnnotation.ForwardedFieldsSecond("id;label;graphIds")
+@FunctionAnnotation.ForwardedFieldsSecond("f0;f1;f3")
 @FunctionAnnotation.ReadFieldsFirst("f1")
 public class LPVertexJoin implements JoinFunction
   <org.apache.flink.graph.Vertex<GradoopId, PropertyValue>, EPGMVertex, EPGMVertex> {

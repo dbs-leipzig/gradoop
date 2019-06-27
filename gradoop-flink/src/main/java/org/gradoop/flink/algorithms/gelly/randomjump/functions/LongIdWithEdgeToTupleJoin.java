@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.pojo.EPGMEdge;
  * Takes an EPGM edge and creates a tuple, containing the edges source id as unique long id, its
  * target id as GradoopId and its own id as GradoopId.
  */
-@FunctionAnnotation.ForwardedFieldsFirst("targetId->f1;id->f2")
+@FunctionAnnotation.ForwardedFieldsFirst("f5->f1;f0->f2")
 @FunctionAnnotation.ForwardedFieldsSecond("f0")
 public class LongIdWithEdgeToTupleJoin implements
   JoinFunction<EPGMEdge, Tuple2<Long, GradoopId>, Tuple3<Long, GradoopId, GradoopId>> {

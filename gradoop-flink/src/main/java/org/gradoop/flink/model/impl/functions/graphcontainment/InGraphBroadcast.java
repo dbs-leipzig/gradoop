@@ -23,7 +23,7 @@ import org.gradoop.common.model.api.entities.GraphElement;
  *
  * @param <GE> element type
  */
-@FunctionAnnotation.ReadFields("graphIds")
+@FunctionAnnotation.ReadFields("f3")
 public class InGraphBroadcast<GE extends GraphElement>
   extends GraphContainmentFilterBroadcast<GE> {
 

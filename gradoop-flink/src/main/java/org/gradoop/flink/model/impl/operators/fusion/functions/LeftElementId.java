@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param <K> Element where the id is extracted
  *
  */
-@FunctionAnnotation.ForwardedFieldsFirst("id -> *")
+@FunctionAnnotation.ForwardedFieldsFirst("f0->*")
 public class LeftElementId<K extends Element>
   implements KeySelector<Tuple2<K, GradoopId>, GradoopId> {
   @Override

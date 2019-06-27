@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  *
  * @param <E> gradoop element
  */
-@FunctionAnnotation.ForwardedFields("id;label")
+@FunctionAnnotation.ForwardedFields("f0;f1")
 public class SetProperty<E extends Element> implements MapFunction<E, E> {
 
   /**
