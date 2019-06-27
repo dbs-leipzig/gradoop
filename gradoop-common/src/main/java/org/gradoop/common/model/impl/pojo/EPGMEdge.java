@@ -65,8 +65,8 @@ public class EPGMEdge extends Tuple6<GradoopId, String, Properties, GradoopIdSet
     GradoopIdSet graphIds) {
     super(id, label, properties, graphIds, sourceId, targetId);
     initProperties();
+    initGradoopIdSet();
   }
-
 
   @Override
   public GradoopId getSourceId() {
@@ -221,11 +221,20 @@ public class EPGMEdge extends Tuple6<GradoopId, String, Properties, GradoopIdSet
   }
 
   /**
-   * Initializes the internal properties field if necessary.
+   * Initializes the internal properties field.
    */
   private void initProperties() {
     if (this.f2 == null) {
       this.f2 = Properties.create();
+    }
+  }
+
+  /**
+   * Initializes the internal gradoop id set field.
+   */
+  private void initGradoopIdSet() {
+    if (this.f3 == null) {
+      this.f3 = new GradoopIdSet();
     }
   }
 }

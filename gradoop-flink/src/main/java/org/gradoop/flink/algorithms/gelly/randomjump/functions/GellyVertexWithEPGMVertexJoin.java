@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
  * Gelly vertex to the EPGM vertex, determining if this vertex was visited.
  */
 @FunctionAnnotation.ReadFieldsFirst("f1")
-@FunctionAnnotation.ForwardedFieldsSecond("id;label;graphIds")
+@FunctionAnnotation.ForwardedFieldsSecond("f0;f1;f3")
 public class GellyVertexWithEPGMVertexJoin implements
   JoinFunction<org.apache.flink.graph.Vertex<GradoopId, VCIVertexValue>, EPGMVertex, EPGMVertex> {
 

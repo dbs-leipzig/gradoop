@@ -28,8 +28,6 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param <EL> EPGM element type
  */
-//@FunctionAnnotation.ForwardedFieldsFirst("graphIds;f1;f2")
-//@FunctionAnnotation.ForwardedFieldsSecond("*->id")
 public class ElementIdUpdater<EL extends Element>
   implements MapFunction<Tuple2<EL, GradoopId>, EL> {
 

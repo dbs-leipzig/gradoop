@@ -128,7 +128,7 @@ public class Split implements UnaryGraphToCollectionOperator, Serializable {
         .where(new SourceId<>()).equalTo(0)
         .with(new JoinEdgeTupleWithSourceGraphs<>())
         .join(vertexIdWithGraphIds)
-        .where("f0.targetId").equalTo(0)
+        .where("f0.f5").equalTo(0)
         .with(new JoinEdgeTupleWithTargetGraphs<>());
 
     // add new graph ids to the edges iff source and target are contained in the

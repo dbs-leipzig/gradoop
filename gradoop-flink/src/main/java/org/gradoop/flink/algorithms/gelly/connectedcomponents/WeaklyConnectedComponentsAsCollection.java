@@ -67,8 +67,8 @@ public class WeaklyConnectedComponentsAsCollection implements UnaryGraphToCollec
   @Override
   public GraphCollection execute(LogicalGraph graph) {
 
-    LogicalGraph graphWithWccIds = graph.callForGraph(
-      new AnnotateWeaklyConnectedComponents(propertyKey, maxIterations));
+    LogicalGraph graphWithWccIds = graph
+      .callForGraph(new AnnotateWeaklyConnectedComponents(propertyKey, maxIterations));
 
     return graphWithWccIds.splitBy(propertyKey);
   }

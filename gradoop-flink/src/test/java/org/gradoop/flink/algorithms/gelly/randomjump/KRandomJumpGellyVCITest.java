@@ -69,16 +69,13 @@ public class KRandomJumpGellyVCITest extends GradoopFlinkTestBase {
    */
   @Test
   public void baseTest() throws Exception {
-    LogicalGraph result = new KRandomJumpGellyVCI(1, 1000, 0.15,
-      0.5).execute(socialGraph);
+    LogicalGraph result = new KRandomJumpGellyVCI(1, 1000, 0.15, 0.5).execute(socialGraph);
 
     commonValidation(socialGraph, result);
 
-    long visitedVertices = resultVertices.stream().filter(
-      vertex -> vertex.getPropertyValue(SamplingConstants.PROPERTY_KEY_SAMPLED).getBoolean())
-      .count();
-    assertTrue("Wrong number of visited vertices, should be at least 6",
-      visitedVertices >= 6L);
+    long visitedVertices = resultVertices.stream().filter(vertex ->
+      vertex.getPropertyValue(SamplingConstants.PROPERTY_KEY_SAMPLED).getBoolean()).count();
+    assertTrue("Wrong number of visited vertices, should be at least 6", visitedVertices >= 6L);
   }
 
   /**

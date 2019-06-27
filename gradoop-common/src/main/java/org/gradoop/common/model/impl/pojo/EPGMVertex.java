@@ -55,6 +55,7 @@ public class EPGMVertex extends Tuple4<GradoopId, String, Properties, GradoopIdS
     final Properties properties, final GradoopIdSet graphs) {
     super(id, label, properties, graphs);
     initProperties();
+    initGradoopIdSet();
   }
 
   @Override
@@ -193,11 +194,20 @@ public class EPGMVertex extends Tuple4<GradoopId, String, Properties, GradoopIdS
   }
 
   /**
-   * Initializes the internal properties field if necessary.
+   * Initializes the internal properties field.
    */
   private void initProperties() {
     if (this.f2 == null) {
       this.f2 = Properties.create();
+    }
+  }
+
+  /**
+   * Initializes the internal gradoop id set field.
+   */
+  private void initGradoopIdSet() {
+    if (this.f3 == null) {
+      this.f3 = new GradoopIdSet();
     }
   }
 }
