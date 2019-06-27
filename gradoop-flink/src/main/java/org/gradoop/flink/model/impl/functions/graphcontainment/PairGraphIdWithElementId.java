@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -28,7 +28,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param <GE> EPGM graph element type
  */
 @FunctionAnnotation.ForwardedFields("id->f1")
-public class PairGraphIdWithElementId<GE extends GraphElement>
+public class PairGraphIdWithElementId<GE extends EPGMGraphElement>
   implements FlatMapFunction<GE, Tuple2<GradoopId, GradoopId>> {
 
   /**

@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
@@ -39,12 +39,12 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
   public void testFilterWithNoPredicates() throws Exception {
     CNF predicates = predicateFromQuery("MATCH ()-[a]->()");
 
-    EdgeFactory edgeFactory = new EdgeFactory();
+    EPGMEdgeFactory edgeFactory = new EPGMEdgeFactory();
     Properties properties = Properties.create();
     properties.set("name", "Anton");
-    Edge e1 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get(), properties);
+    EPGMEdge e1 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get(), properties);
 
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1);
+    DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(e1);
 
     List<Embedding> result = new FilterAndProjectEdges(edges, predicates, new ArrayList<>(), false)
       .evaluate()
@@ -58,16 +58,16 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
   public void testFilterEdgesByProperties() throws Exception {
     CNF predicates = predicateFromQuery("MATCH ()-[a]->() WHERE a.since > 2013");
 
-    EdgeFactory edgeFactory = new EdgeFactory();
+    EPGMEdgeFactory edgeFactory = new EPGMEdgeFactory();
     Properties properties = Properties.create();
     properties.set("since", 2014);
-    Edge e1 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get(), properties);
+    EPGMEdge e1 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get(), properties);
 
     properties = Properties.create();
     properties.set("since", 2013);
-    Edge e2 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get(), properties);
+    EPGMEdge e2 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get(), properties);
 
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1, e2);
+    DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
     List<Embedding> result = new FilterAndProjectEdges(edges, predicates, new ArrayList<>(), false)
       .evaluate()
@@ -81,10 +81,10 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
   public void testFilterEdgesByLabel() throws Exception {
     CNF predicates = predicateFromQuery("MATCH ()-[a:likes]->()");
 
-    EdgeFactory edgeFactory = new EdgeFactory();
-    Edge e1 = edgeFactory.createEdge("likes", GradoopId.get(), GradoopId.get());
-    Edge e2 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get());
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(e1, e2);
+    EPGMEdgeFactory edgeFactory = new EPGMEdgeFactory();
+    EPGMEdge e1 = edgeFactory.createEdge("likes", GradoopId.get(), GradoopId.get());
+    EPGMEdge e2 = edgeFactory.createEdge("knows", GradoopId.get(), GradoopId.get());
+    DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(e1, e2);
 
     List<Embedding> result = new FilterAndProjectEdges(edges, predicates, new ArrayList<>(), false)
       .evaluate()
@@ -100,9 +100,10 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
-    Edge edge = new EdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties);
+    EPGMEdge
+      edge = new EPGMEdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties);
 
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
+    DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(edge);
 
     List<Embedding> result = new FilterAndProjectEdges(edges, predicates, new ArrayList<>(), false)
       .evaluate()
@@ -119,9 +120,10 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
-    Edge edge = new EdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties);
+    EPGMEdge
+      edge = new EPGMEdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties);
 
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
+    DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(edge);
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name");
 
@@ -137,9 +139,10 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
 
     Properties properties = Properties.create();
     properties.set("name", "Alice");
-    Edge edge = new EdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties);
+    EPGMEdge
+      edge = new EPGMEdgeFactory().createEdge("Label", GradoopId.get(), GradoopId.get(), properties);
 
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
+    DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(edge);
 
     List<String> projectionPropertyKeys = Lists.newArrayList("name", "since");
 
@@ -155,9 +158,9 @@ public class FilterAndProjectEdgesTest extends PhysicalOperatorTest {
     CNF predicates = predicateFromQuery("MATCH (a)-[b]->(a)");
 
     GradoopId a = GradoopId.get();
-    Edge edge = new EdgeFactory().createEdge(a, a);
+    EPGMEdge edge = new EPGMEdgeFactory().createEdge(a, a);
 
-    DataSet<Edge> edges = getExecutionEnvironment().fromElements(edge);
+    DataSet<EPGMEdge> edges = getExecutionEnvironment().fromElements(edge);
 
     Embedding result = new FilterAndProjectEdges(edges, predicates, Collections.emptyList(), true)
       .evaluate().collect().get(0);

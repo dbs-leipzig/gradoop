@@ -15,9 +15,9 @@
  */
 package org.gradoop.storage.common.api;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 
 import javax.annotation.Nonnull;
 import java.io.Closeable;
@@ -33,25 +33,25 @@ public interface EPGMGraphInput extends Closeable {
    * Writes the given graph data into the graph store.
    *
    * @param graphData graph data to write
-   * @throws IOException if writing the {@link EPGMGraphHead} fails
+   * @throws IOException if writing the {@link GraphHead} fails
    */
-  void writeGraphHead(@Nonnull EPGMGraphHead graphData) throws IOException;
+  void writeGraphHead(@Nonnull GraphHead graphData) throws IOException;
 
   /**
    * Writes the given vertex data into the graph store.
    *
    * @param vertexData vertex data to write
-   * @throws IOException if writing the {@link EPGMVertex} fails
+   * @throws IOException if writing the {@link Vertex} fails
    */
-  void writeVertex(@Nonnull EPGMVertex vertexData) throws IOException;
+  void writeVertex(@Nonnull Vertex vertexData) throws IOException;
 
   /**
    * Writes the given edge data into the graph store.
    *
    * @param edgeData edge data to write
-   * @throws IOException if writing the {@link EPGMEdge} fails
+   * @throws IOException if writing the {@link Edge} fails
    */
-  void writeEdge(@Nonnull EPGMEdge edgeData) throws IOException;
+  void writeEdge(@Nonnull Edge edgeData) throws IOException;
 
   /**
    * Setting this value to true, forces the store implementation to flush the

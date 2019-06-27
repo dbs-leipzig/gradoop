@@ -17,7 +17,7 @@ package org.gradoop.common.model.impl.metadata;
 
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
-import org.junit.Test;
+import org.testng.annotations.Test;
 import org.mockito.internal.util.collections.Sets;
 
 import java.math.BigDecimal;
@@ -32,8 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.testng.AssertJUnit.*;
 
 public class MetaDataTest {
 

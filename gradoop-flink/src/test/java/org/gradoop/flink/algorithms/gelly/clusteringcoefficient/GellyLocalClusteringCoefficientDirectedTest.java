@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.algorithms.gelly.clusteringcoefficient;
 
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 
 import java.util.List;
@@ -37,8 +37,8 @@ public class GellyLocalClusteringCoefficientDirectedTest
   @Override
   public void testFullyConnectedGraph() throws Exception {
     validateGraphProperties(fullGraph);
-    List<Vertex> vertices = fullGraph.getVertices().collect();
-    for (Vertex v : vertices) {
+    List<EPGMVertex> vertices = fullGraph.getVertices().collect();
+    for (EPGMVertex v : vertices) {
       assertEquals(
         "Wrong local value for clique-vertex '" + v.getId().toString() + "', should be 1",
         1d,
@@ -49,8 +49,8 @@ public class GellyLocalClusteringCoefficientDirectedTest
   @Override
   public void testNonConnectedGraph() throws Exception {
     validateGraphProperties(nonConnectedGraph);
-    List<Vertex> vertices = nonConnectedGraph.getVertices().collect();
-    for (Vertex v : vertices) {
+    List<EPGMVertex> vertices = nonConnectedGraph.getVertices().collect();
+    for (EPGMVertex v : vertices) {
       assertEquals(
         "Wrong local value for not connected vertex: " + v.getId().toString() + ", should be 0",
         0d,
@@ -78,8 +78,8 @@ public class GellyLocalClusteringCoefficientDirectedTest
 
     validateGraphProperties(result);
 
-    List<Vertex> vertices = result.getVertices().collect();
-    for (Vertex v : vertices) {
+    List<EPGMVertex> vertices = result.getVertices().collect();
+    for (EPGMVertex v : vertices) {
       if (v.getPropertyValue("id").getInt() == 0) {
         assertEquals("vertex with id 0 has wrong local value, should be 0.1666", 1d / 6d,
           v.getPropertyValue(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL).getDouble(), 0.00001);
@@ -101,8 +101,8 @@ public class GellyLocalClusteringCoefficientDirectedTest
 
   @Override
   public void validateGraphProperties(LogicalGraph graph) throws Exception {
-    List<Vertex> vertices = graph.getVertices().collect();
-    for (Vertex v : vertices) {
+    List<EPGMVertex> vertices = graph.getVertices().collect();
+    for (EPGMVertex v : vertices) {
       assertTrue("No local value stored in vertex: " + v.getId().toString(),
         v.hasProperty(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL));
     }

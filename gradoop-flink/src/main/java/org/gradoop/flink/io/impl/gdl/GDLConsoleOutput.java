@@ -16,9 +16,9 @@
 package org.gradoop.flink.io.impl.gdl;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
@@ -42,11 +42,11 @@ public class GDLConsoleOutput {
    * @throws Exception Forwarded from flink execute.
    */
   public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge,
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
     LG extends BaseGraph<G, V, E, LG, GC>,
-    GC extends BaseGraphCollection<G, V, E, GC>> void print(BaseGraph<G, V, E, LG, GC> graph)
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> void print(BaseGraph<G, V, E, LG, GC> graph)
     throws Exception {
 
     print(graph.getCollectionFactory().fromGraph(graph));
@@ -59,15 +59,17 @@ public class GDLConsoleOutput {
    * @param <G>        the graph head type
    * @param <V>        the vertex type
    * @param <E>        the edge type
+   * @param <LG>       the type of the logical graph
    * @param <GC>       the type of the graph collection
    * @throws Exception Forwarded from flink execute.
    */
   public static <
-    G extends EPGMGraphHead,
-    V extends EPGMVertex,
-    E extends EPGMEdge,
-    GC extends BaseGraphCollection<G, V, E, GC>> void print(
-      BaseGraphCollection<G, V, E, GC> collection) throws Exception {
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> void print(
+      BaseGraphCollection<G, V, E, LG, GC> collection) throws Exception {
 
     List<G> graphHeads = new ArrayList<>();
     collection.getGraphHeads().output(new LocalCollectionOutputFormat<>(graphHeads));

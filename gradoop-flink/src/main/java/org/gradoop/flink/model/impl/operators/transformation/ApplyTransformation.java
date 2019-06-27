@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.transformation;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -32,7 +32,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
  * collection.
  */
 public class ApplyTransformation
-  extends Transformation<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>
+  extends Transformation<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
   implements ApplicableUnaryGraphToGraphOperator {
 
   /**
@@ -42,9 +42,9 @@ public class ApplyTransformation
    * @param vertexModFunc    vertex transformation function
    * @param edgeModFunc      edge transformation function
    */
-  public ApplyTransformation(TransformationFunction<GraphHead> graphHeadModFunc,
-    TransformationFunction<Vertex> vertexModFunc,
-    TransformationFunction<Edge> edgeModFunc) {
+  public ApplyTransformation(TransformationFunction<EPGMGraphHead> graphHeadModFunc,
+    TransformationFunction<EPGMVertex> vertexModFunc,
+    TransformationFunction<EPGMEdge> edgeModFunc) {
     super(graphHeadModFunc, vertexModFunc, edgeModFunc);
   }
 

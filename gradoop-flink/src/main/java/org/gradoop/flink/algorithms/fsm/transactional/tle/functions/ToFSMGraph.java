@@ -17,8 +17,8 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 
 import com.google.common.collect.Maps;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -44,7 +44,7 @@ public abstract class ToFSMGraph {
       Maps.newHashMapWithExpectedSize(graph.getVertices().size());
 
     int vertexId = 0;
-    for (Vertex vertex : graph.getVertices()) {
+    for (EPGMVertex vertex : graph.getVertices()) {
       vertexIdMap.put(vertex.getId(), vertexId);
       fsmVertices.put(vertexId, vertex.getLabel());
       vertexId++;
@@ -65,7 +65,7 @@ public abstract class ToFSMGraph {
       Maps.newHashMapWithExpectedSize(graph.getEdges().size());
 
     int edgeId = 0;
-    for (Edge edge : graph.getEdges()) {
+    for (EPGMEdge edge : graph.getEdges()) {
 
       int sourceId = vertexIdMap.get(edge.getSourceId());
       int targetId = vertexIdMap.get(edge.getTargetId());

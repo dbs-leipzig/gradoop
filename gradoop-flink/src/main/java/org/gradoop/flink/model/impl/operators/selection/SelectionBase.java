@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.operators.selection;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -45,17 +45,17 @@ public abstract class SelectionBase implements UnaryCollectionToCollectionOperat
    * @return selection result
    */
   protected GraphCollection selectVerticesAndEdges(
-    GraphCollection collection, DataSet<GraphHead> graphHeads) {
+    GraphCollection collection, DataSet<EPGMGraphHead> graphHeads) {
 
     // get the identifiers of these logical graphs
-    DataSet<GradoopId> graphIds = graphHeads.map(new Id<GraphHead>());
+    DataSet<GradoopId> graphIds = graphHeads.map(new Id<EPGMGraphHead>());
 
     // use graph ids to filter vertices from the actual graph structure
-    DataSet<Vertex> vertices = collection.getVertices()
+    DataSet<EPGMVertex> vertices = collection.getVertices()
       .filter(new InAnyGraphBroadcast<>())
       .withBroadcastSet(graphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 
-    DataSet<Edge> edges = collection.getEdges()
+    DataSet<EPGMEdge> edges = collection.getEdges()
       .filter(new InAnyGraphBroadcast<>())
       .withBroadcastSet(graphIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 

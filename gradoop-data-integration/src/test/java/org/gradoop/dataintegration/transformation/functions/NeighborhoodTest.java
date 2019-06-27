@@ -17,7 +17,7 @@ package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.dataintegration.transformation.impl.Neighborhood;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -97,11 +97,11 @@ public class NeighborhoodTest extends GradoopFlinkTestBase {
   @Test
   public void testNeighborhood() throws Exception {
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
-    Vertex center = loader.getVertexByVariable(centerVertex);
-    Collection<Vertex> neighborhoodVertices = loader.getVerticesByGraphVariables(neighborhood);
-    DataSet<Vertex> centers = center == null ? getEmptyDataSet(new Vertex()) :
+    EPGMVertex center = loader.getVertexByVariable(centerVertex);
+    Collection<EPGMVertex> neighborhoodVertices = loader.getVerticesByGraphVariables(neighborhood);
+    DataSet<EPGMVertex> centers = center == null ? getEmptyDataSet(new EPGMVertex()) :
       getExecutionEnvironment().fromElements(center);
-    List<Tuple2<Vertex, List<NeighborhoodVertex>>> neighborhoods =
+    List<Tuple2<EPGMVertex, List<NeighborhoodVertex>>> neighborhoods =
       Neighborhood.getPerVertex(input, centers, direction).collect();
     // Make sure we only have 1 center vertex.
     long centerCount = neighborhoods.stream().map(h -> h.f0.getId()).distinct().count();
@@ -112,7 +112,7 @@ public class NeighborhoodTest extends GradoopFlinkTestBase {
       .map(NeighborhoodVertex::getNeighborId)
       .sorted()
       .toArray();
-    Object[] neighborIdsExpected = neighborhoodVertices.stream().map(Vertex::getId).sorted()
+    Object[] neighborIdsExpected = neighborhoodVertices.stream().map(EPGMVertex::getId).sorted()
         .toArray();
     assertArrayEquals(neighborIdsExpected, neighbors);
   }

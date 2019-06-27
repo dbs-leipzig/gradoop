@@ -20,7 +20,7 @@ import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.RegexStringComparator;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.junit.Test;
 
 import static org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.PATTERN_VERTEX;
@@ -39,7 +39,7 @@ public class HBaseLabelRegTest {
   @Test
   public void testToHBaseFilter() {
 
-    HBaseLabelReg<Vertex> vertexFilter = new HBaseLabelReg<>(PATTERN_VERTEX);
+    HBaseLabelReg<EPGMVertex> vertexFilter = new HBaseLabelReg<>(PATTERN_VERTEX);
 
     Filter expectedFilter = new SingleColumnValueFilter(
       Bytes.toBytesBinary(CF_META),

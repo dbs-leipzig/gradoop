@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
@@ -28,15 +28,15 @@ import java.util.List;
 /**
  * Alternative FilterAndProjectVertices using Filter + Map operators
  *
- * Filters a set of EPGM {@link Vertex} objects based on a specified predicate. Additionally, the
+ * Filters a set of {@link EPGMVertex} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
  *
- * Vertex -> Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])
+ * EPGMVertex -> Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])
  *
  * Example:
  *
- * Given a Vertex(0, "Person", {name:"Alice", age:23}), a predicate "age = 23" and
+ * Given a EPGMVertex(0, "Person", {name:"Alice", age:23}), a predicate "age = 23" and
  * projection property keys [name, location] the operator creates an
  * {@link Embedding}:
  *
@@ -46,7 +46,7 @@ public class FilterAndProjectVerticesAlt implements PhysicalOperator {
   /**
    * Input vertices
    */
-  private final DataSet<Vertex> input;
+  private final DataSet<EPGMVertex> input;
   /**
    * Predicates in conjunctive normal form
    */
@@ -68,7 +68,7 @@ public class FilterAndProjectVerticesAlt implements PhysicalOperator {
    * @param predicates Predicates used to filter vertices
    * @param projectionPropertyKeys Property keys used for projection
    */
-  public FilterAndProjectVerticesAlt(DataSet<Vertex> input, CNF predicates,
+  public FilterAndProjectVerticesAlt(DataSet<EPGMVertex> input, CNF predicates,
     List<String> projectionPropertyKeys) {
     this.input = input;
     this.predicates = predicates;

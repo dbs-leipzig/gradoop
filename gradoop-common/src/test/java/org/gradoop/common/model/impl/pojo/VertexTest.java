@@ -15,13 +15,13 @@
  */
 package org.gradoop.common.model.impl.pojo;
 
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.util.GradoopConstants;
 import org.hamcrest.core.Is;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -31,7 +31,7 @@ public class VertexTest {
   @Test
   public void createWithIDTest() {
     GradoopId vertexID = GradoopId.get();
-    EPGMVertex v = new VertexFactory().initVertex(vertexID);
+    Vertex v = new EPGMVertexFactory().initVertex(vertexID);
     assertThat(v.getId(), is(vertexID));
     assertThat(v.getPropertyCount(), is(0));
     assertThat(v.getGraphCount(), is(0));
@@ -52,7 +52,7 @@ public class VertexTest {
     graphIds.add(graphId1);
     graphIds.add(graphId2);
 
-    EPGMVertex vertex = new VertexFactory()
+    Vertex vertex = new EPGMVertexFactory()
       .initVertex(vertexID, label, props, graphIds);
 
     assertThat(vertex.getId(), is(vertexID));
@@ -68,18 +68,18 @@ public class VertexTest {
   @Test
   public void createWithMissingLabelTest() {
     GradoopId vertexID = GradoopId.get();
-    EPGMVertex v = new VertexFactory().initVertex(vertexID);
+    Vertex v = new EPGMVertexFactory().initVertex(vertexID);
     assertThat(v.getLabel(), is(GradoopConstants.DEFAULT_VERTEX_LABEL));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullIDTest() {
-    new VertexFactory().initVertex(null);
+    new EPGMVertexFactory().initVertex(null);
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test(expectedExceptions = NullPointerException.class)
   public void createWithNullLabelTest() {
     GradoopId vertexID = GradoopId.get();
-    new VertexFactory().initVertex(vertexID, null);
+    new EPGMVertexFactory().initVertex(vertexID, null);
   }
 }

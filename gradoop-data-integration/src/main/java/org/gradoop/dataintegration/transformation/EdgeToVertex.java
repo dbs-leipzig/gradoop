@@ -18,8 +18,8 @@ package org.gradoop.dataintegration.transformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.dataintegration.transformation.functions.CreateEdgesFromTriple;
 import org.gradoop.dataintegration.transformation.functions.CreateVertexFromEdges;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
@@ -82,20 +82,20 @@ public class EdgeToVertex implements UnaryGraphToGraphOperator {
 
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
-    DataSet<Edge> relevantEdges = graph.getEdgesByLabel(edgeLabel);
+    DataSet<EPGMEdge> relevantEdges = graph.getEdgesByLabel(edgeLabel);
 
     // create new vertices
-    DataSet<Tuple3<Vertex, GradoopId, GradoopId>> newVerticesAndOriginIds = relevantEdges
+    DataSet<Tuple3<EPGMVertex, GradoopId, GradoopId>> newVerticesAndOriginIds = relevantEdges
       .map(new CreateVertexFromEdges<>(newVertexLabel, graph.getFactory().getVertexFactory()));
 
-    DataSet<Vertex> newVertices = newVerticesAndOriginIds
+    DataSet<EPGMVertex> newVertices = newVerticesAndOriginIds
       .map(new Value0Of3<>())
       .map(new AddToGraphBroadcast<>())
       .withBroadcastSet(graph.getGraphHead().map(new Id<>()), AddToGraphBroadcast.GRAPH_ID)
       .union(graph.getVertices());
 
     // create edges to the newly created vertex
-    DataSet<Edge> newEdges = newVerticesAndOriginIds
+    DataSet<EPGMEdge> newEdges = newVerticesAndOriginIds
       .flatMap(new CreateEdgesFromTriple<>(graph.getFactory().getEdgeFactory(),
         edgeLabelSourceToNew, edgeLabelNewToTarget))
       .map(new AddToGraphBroadcast<>())

@@ -19,11 +19,11 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.apache.accumulo.core.util.Pair;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.storage.utils.KryoUtils;
@@ -37,18 +37,18 @@ import java.util.Objects;
 /**
  * Accumulo gradoop edges iterator
  */
-public class GradoopEdgeIterator extends BaseElementIterator<EPGMEdge> {
+public class GradoopEdgeIterator extends BaseElementIterator<Edge> {
 
   /**
-   * Edge factory
+   * EPGMEdge factory
    */
-  private final EdgeFactory factory = new EdgeFactory();
+  private final EPGMEdgeFactory factory = new EPGMEdgeFactory();
 
   @Nonnull
   @Override
-  public Edge fromRow(@Nonnull Map.Entry<Key, Value> pair) throws IOException {
+  public EPGMEdge fromRow(@Nonnull Map.Entry<Key, Value> pair) throws IOException {
     //map from serialize content
-    Edge content = KryoUtils.loads(pair.getValue().get(), Edge.class);
+    EPGMEdge content = KryoUtils.loads(pair.getValue().get(), EPGMEdge.class);
     content.setId(GradoopId.fromString(pair.getKey().getRow().toString()));
     //read from content
     return content;
@@ -56,7 +56,7 @@ public class GradoopEdgeIterator extends BaseElementIterator<EPGMEdge> {
 
   @Nonnull
   @Override
-  public Pair<Key, Value> toRow(@Nonnull EPGMEdge record) throws IOException {
+  public Pair<Key, Value> toRow(@Nonnull Edge record) throws IOException {
     //write to content
     return new Pair<>(new Key(record.getId().toString()),
       new Value(KryoUtils.dumps(factory.initEdge(
@@ -77,10 +77,10 @@ public class GradoopEdgeIterator extends BaseElementIterator<EPGMEdge> {
    * @throws IOException on failure
    */
   @Nullable
-  public Edge readLine(
+  public EPGMEdge readLine(
     @Nonnull SortedKeyValueIterator<Key, Value> source
   ) throws IOException {
-    Edge row = new Edge();
+    EPGMEdge row = new EPGMEdge();
     if (!source.hasTop()) {
       return null;
     }
