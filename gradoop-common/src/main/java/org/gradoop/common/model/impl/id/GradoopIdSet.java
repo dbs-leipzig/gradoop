@@ -129,6 +129,15 @@ public class GradoopIdSet extends AbstractSet<GradoopId> implements Value {
   }
 
   /**
+   * Creates a new instance of this object
+   *
+   * @return gradoop id set
+   */
+  public static GradoopIdSet create() {
+    return new GradoopIdSet();
+  }
+
+  /**
    * Adds the given gradoop id to the set.
    *
    * @param id the id to add

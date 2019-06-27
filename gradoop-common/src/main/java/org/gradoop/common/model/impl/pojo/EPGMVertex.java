@@ -41,6 +41,8 @@ public class EPGMVertex extends Tuple4<GradoopId, String, Properties, GradoopIdS
    * Default constructor.
    */
   public EPGMVertex() {
+    initProperties();
+    initGradoopIdSet();
   }
 
   /**
@@ -207,7 +209,7 @@ public class EPGMVertex extends Tuple4<GradoopId, String, Properties, GradoopIdS
    */
   private void initGradoopIdSet() {
     if (this.f3 == null) {
-      this.f3 = new GradoopIdSet();
+      this.f3 = GradoopIdSet.create();
     }
   }
 }

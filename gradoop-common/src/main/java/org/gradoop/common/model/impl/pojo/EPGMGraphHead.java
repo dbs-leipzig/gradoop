@@ -39,6 +39,7 @@ public class EPGMGraphHead extends Tuple3<GradoopId, String, Properties> impleme
    * Default constructor.
    */
   public EPGMGraphHead() {
+    initProperties();
   }
 
   /**

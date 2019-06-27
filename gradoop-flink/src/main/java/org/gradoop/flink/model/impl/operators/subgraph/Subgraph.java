@@ -282,7 +282,7 @@ public class Subgraph<
       .join(subgraph.getVertices())
       .where(new SourceId<>()).equalTo(new Id<>())
       .join(subgraph.getVertices())
-      .where("0.targetId").equalTo(new Id<>());
+      .where("0.f5").equalTo(new Id<>());
 
     DataSet<E> verifiedEdges = verifiedTriples
       .map(new Value0Of2<>())

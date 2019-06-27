@@ -44,6 +44,8 @@ public class EPGMEdge extends Tuple6<GradoopId, String, Properties, GradoopIdSet
    * Default constructor is necessary to apply to POJO rules.
    */
   public EPGMEdge() {
+    initProperties();
+    initGradoopIdSet();
   }
 
   /**
@@ -234,7 +236,7 @@ public class EPGMEdge extends Tuple6<GradoopId, String, Properties, GradoopIdSet
    */
   private void initGradoopIdSet() {
     if (this.f3 == null) {
-      this.f3 = new GradoopIdSet();
+      this.f3 = GradoopIdSet.create();
     }
   }
 }
