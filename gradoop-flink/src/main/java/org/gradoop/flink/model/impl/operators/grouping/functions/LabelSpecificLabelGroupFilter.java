@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 /**
@@ -23,7 +23,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
  *
  * @param <V> vertex type.
  */
-public class LabelSpecificLabelGroupFilter<V extends EPGMVertex> extends LabelGroupFilter<V> {
+public class LabelSpecificLabelGroupFilter<V extends Vertex> extends LabelGroupFilter<V> {
 
   /**
    * LabelGroup to check

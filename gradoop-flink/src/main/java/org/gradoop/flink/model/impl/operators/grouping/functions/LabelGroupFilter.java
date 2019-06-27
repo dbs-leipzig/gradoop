@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 
 /**
@@ -24,7 +24,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
  *
  * @param <V> The vertex type.
  */
-public abstract class LabelGroupFilter<V extends EPGMVertex> implements FilterFunction<V> {
+public abstract class LabelGroupFilter<V extends Vertex> implements FilterFunction<V> {
 
   /**
    * Check whether a vertex exhibits all properties of a {@link LabelGroup}.

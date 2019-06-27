@@ -384,7 +384,7 @@ public abstract class Grouping<
     LG filtered = new Subgraph<G, V, E, LG, GC>(vertexInNoGroupFilter, new True<>(),
       Subgraph.Strategy.VERTEX_INDUCED)
       .execute(graph);
-    // TODO after next update: is verify still necesarry?
+    // TODO after next update: is verify still necessary?
 
     return new Verify<G, V, E, LG, GC>().execute(filtered);
   }

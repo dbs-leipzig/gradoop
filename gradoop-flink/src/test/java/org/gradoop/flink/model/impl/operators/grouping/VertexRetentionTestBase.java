@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -75,7 +75,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -108,7 +108,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -140,7 +140,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .addVertexGroupingKey("c")
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -180,7 +180,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
       .addEdgeAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -224,7 +224,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
       .addEdgeAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -264,7 +264,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
       .addEdgeAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -308,7 +308,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
       .addEdgeAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -345,7 +345,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -385,7 +385,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
       .addEdgeAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -429,7 +429,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
       .addEdgeAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -460,7 +460,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .setStrategy(getStrategy())
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -501,7 +501,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -544,7 +544,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .useVertexLabel(true)
       .addVertexGroupingKey("c")
       .addVertexAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -589,7 +589,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(true)
       .addVertexAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -641,7 +641,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .useVertexLabel(true)
       .addVertexGroupingKey("a")
       .addVertexAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -687,7 +687,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .useVertexLabel(true)
       .addVertexGroupingKeys(Arrays.asList("a", "b"))
       .addVertexAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -738,7 +738,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .useVertexLabel(false)
       .addVertexGroupingKey("a")
       .addVertexAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -783,7 +783,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .useVertexLabel(false)
       .addVertexGroupingKeys(Arrays.asList("a", "b"))
       .addVertexAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -828,7 +828,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .setRetainVerticesWithoutGroups(true)
       .useVertexLabel(false)
       .addVertexAggregateFunction(new Count())
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -875,7 +875,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .useVertexLabel(true)
       .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
       .addVertexLabelGroup("B", "SuperB", Collections.singletonList("b"))
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -937,7 +937,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .useVertexLabel(false)
       .addVertexLabelGroup("A", "A", Arrays.asList("a", "b"),
         Collections.singletonList(new Count()))
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -991,7 +991,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .addVertexGroupingKey("f")
       .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
       .addVertexLabelGroup("B", "SuperB", Collections.singletonList("b"))
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(
@@ -1042,7 +1042,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
       .useVertexLabel(false)
       .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
       .addVertexLabelGroup("B", "SuperB", Collections.singletonList("b"))
-      .<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>build()
+      .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
 
     collectAndAssertTrue(

@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
 
 /**
@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVer
  *
  * @param <V> vertex type
  */
-public class VertexSuperVertexIdentity<V extends EPGMVertex> implements
+public class VertexSuperVertexIdentity<V extends Vertex> implements
   MapFunction<V, VertexWithSuperVertex> {
 
   /**
