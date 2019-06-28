@@ -174,8 +174,7 @@ public class TxCollectionLayoutFactory extends BaseFactory
     DataSet<GraphTransaction> graphTransactionSet;
     if (transactions.isEmpty()) {
       graphTransactionSet = env.fromCollection(Lists.newArrayList(new GraphTransaction()),
-        new TypeHint<GraphTransaction>() { }.getTypeInfo())
-        .filter(new False<>());
+        new TypeHint<GraphTransaction>() { }.getTypeInfo()).filter(new False<>());
     } else {
       graphTransactionSet = env.fromCollection(transactions);
     }

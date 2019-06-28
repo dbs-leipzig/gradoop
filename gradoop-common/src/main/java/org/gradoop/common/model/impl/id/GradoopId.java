@@ -54,8 +54,7 @@ public class GradoopId implements NormalizableKey<GradoopId>, CopyableValue<Grad
   /**
    * Represents a null id.
    */
-  public static final GradoopId NULL_VALUE =
-    new GradoopId(0, 0, (short) 0, 0);
+  public static final GradoopId NULL_VALUE = new GradoopId(0, 0, (short) 0, 0);
 
   /**
    * Integer containing a unique identifier of the machine

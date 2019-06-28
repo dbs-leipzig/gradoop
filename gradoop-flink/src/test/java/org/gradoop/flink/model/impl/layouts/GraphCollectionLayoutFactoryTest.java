@@ -54,12 +54,9 @@ public abstract class GraphCollectionLayoutFactoryTest extends GradoopFlinkTestB
     Collection<EPGMVertex> vertices = loader.getVertices();
     Collection<EPGMEdge> edges = loader.getEdges();
 
-    DataSet<EPGMGraphHead> graphHeadDataSet = getExecutionEnvironment()
-      .fromCollection(graphHeads);
-    DataSet<EPGMVertex> vertexDataSet = getExecutionEnvironment()
-      .fromCollection(vertices);
-    DataSet<EPGMEdge> edgeDataSet = getExecutionEnvironment()
-      .fromCollection(edges);
+    DataSet<EPGMGraphHead> graphHeadDataSet = getExecutionEnvironment().fromCollection(graphHeads);
+    DataSet<EPGMVertex> vertexDataSet = getExecutionEnvironment().fromCollection(vertices);
+    DataSet<EPGMEdge> edgeDataSet = getExecutionEnvironment().fromCollection(edges);
 
     GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> collectionLayout = getFactory()
       .fromDataSets(graphHeadDataSet, vertexDataSet, edgeDataSet);

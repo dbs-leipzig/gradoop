@@ -39,6 +39,7 @@ public class EPGMGraphHead extends Tuple3<GradoopId, String, Properties> impleme
    * Default constructor.
    */
   public EPGMGraphHead() {
+    initId();
     initProperties();
   }
 
@@ -150,6 +151,15 @@ public class EPGMGraphHead extends Tuple3<GradoopId, String, Properties> impleme
     int result = getId().hashCode();
     result = 31 * result + getId().hashCode();
     return result;
+  }
+
+  /**
+   * Initializes the graph head id
+   */
+  private void initId() {
+    if (this.f0 == null) {
+      this.f0 = GradoopId.NULL_VALUE;
+    }
   }
 
   /**

@@ -19,8 +19,6 @@ import org.apache.flink.api.common.operators.base.JoinOperatorBase;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.log4j.Logger;
 import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
@@ -140,10 +138,7 @@ public class ExplorativePatternMatching extends PatternMatching implements Unary
     }
 
     DataSet<Tuple2<EPGMVertex, EPGMGraphHead>> pairs = matchingVertices
-      .map(new AddGraphElementToNewGraph<>(graphHeadFactory, variable))
-      .returns(new TupleTypeInfo<>(
-        TypeExtractor.getForClass(vertexFactory.getType()),
-        TypeExtractor.getForClass(graphHeadFactory.getType())));
+      .map(new AddGraphElementToNewGraph<>(graphHeadFactory, variable));
 
     return config.getGraphCollectionFactory().fromDataSets(
       pairs.map(new Value1Of2<>()),

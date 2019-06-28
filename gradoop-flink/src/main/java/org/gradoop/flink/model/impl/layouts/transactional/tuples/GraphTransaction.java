@@ -16,11 +16,11 @@
 package org.gradoop.flink.model.impl.layouts.transactional.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -31,6 +31,9 @@ public class GraphTransaction extends Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set
    * Default constructor
    */
   public GraphTransaction() {
+    initGraphHead();
+    initVertexSet();
+    initEdgeSet();
   }
 
   /**
@@ -70,22 +73,33 @@ public class GraphTransaction extends Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set
     this.f2 = edges;
   }
 
+
   /**
-   * Returns a vertex matching a given identifier.
-   *
-   * @param id identifier.
-   * @return vertex
+   * Initializes field graph head
    */
-  public EPGMVertex getVertexById(GradoopId id) {
-    EPGMVertex match = null;
-
-    for (EPGMVertex vertex : getVertices()) {
-      if (vertex.getId().equals(id)) {
-        match = vertex;
-        break;
-      }
+  private void initGraphHead() {
+    if (this.f0 == null) {
+      this.f0 = new EPGMGraphHead();
     }
+  }
 
-    return match;
+  /**
+   * Initializes vertex set
+   */
+  private void initVertexSet() {
+    if (this.f1 == null) {
+      this.f1 = new HashSet<>();
+      this.f1.add(new EPGMVertex());
+    }
+  }
+
+  /**
+   * Initializes edge set
+   */
+  private void initEdgeSet() {
+    if (this.f2 == null) {
+      this.f2 = new HashSet<>();
+      this.f2.add(new EPGMEdge());
+    }
   }
 }
