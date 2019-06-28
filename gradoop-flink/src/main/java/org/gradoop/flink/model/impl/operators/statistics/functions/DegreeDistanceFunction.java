@@ -22,10 +22,8 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
 /**
- * Mapping function converting degree of vertex
- * to distance of max degree and degree of vertex
- *
- * {@inheritDoc}
+ * A mapping function that converts the vertex degree to the distance of max degree and vertex
+ * degree.
  */
 public class DegreeDistanceFunction extends RichMapFunction<WithCount<GradoopId>, Tuple1<Long>> {
 

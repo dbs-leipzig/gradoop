@@ -40,6 +40,13 @@ public class AddSumDegreesToGraphHeadCrossFunction
     this.propertyKey = propertyKey;
   }
 
+  /**
+   * Writes the sum of vertex degrees as property to the graphHead
+   *
+   * @param gradoopIdWithCount The {@code WithCount}-Object containing the sum-value
+   * @param graphHead The graphHead the sum-value is written to
+   * @return The graphHead with the sum-value as property
+   */
   @Override
   public EPGMGraphHead cross(WithCount<GradoopId> gradoopIdWithCount, EPGMGraphHead graphHead) {
     graphHead.setProperty(propertyKey, gradoopIdWithCount.getCount());
