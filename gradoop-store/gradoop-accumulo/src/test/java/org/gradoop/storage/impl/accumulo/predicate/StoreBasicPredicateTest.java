@@ -15,17 +15,17 @@
  */
 package org.gradoop.storage.impl.accumulo.predicate;
 
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.common.GradoopTestUtils;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
+import org.gradoop.storage.common.predicate.query.Query;
+import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 import org.gradoop.storage.impl.accumulo.predicate.filter.calculate.Or;
 import org.gradoop.storage.utils.AccumuloFilters;
-import org.gradoop.storage.common.predicate.query.Query;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -122,7 +122,7 @@ public class StoreBasicPredicateTest extends AccumuloStoreTestBase {
       List<EPGMGraphHead> samples = sample(new ArrayList<>(loader.getGraphHeads()), 3);
 
       GradoopIdSet sampleRange = GradoopIdSet.fromExisting(samples.stream()
-        .map(EPGMElement::getId)
+        .map(Element::getId)
         .collect(Collectors.toList()));
 
       List<EPGMGraphHead> inputGraph = samples.stream()

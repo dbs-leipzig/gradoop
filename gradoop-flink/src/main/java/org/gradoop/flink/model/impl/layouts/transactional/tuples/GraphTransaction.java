@@ -89,7 +89,6 @@ public class GraphTransaction extends Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set
   private void initVertexSet() {
     if (this.f1 == null) {
       this.f1 = new HashSet<>();
-      this.f1.add(new EPGMVertex());
     }
   }
 
@@ -99,7 +98,6 @@ public class GraphTransaction extends Tuple3<EPGMGraphHead, Set<EPGMVertex>, Set
   private void initEdgeSet() {
     if (this.f2 == null) {
       this.f2 = new HashSet<>();
-      this.f2.add(new EPGMEdge());
     }
   }
 }

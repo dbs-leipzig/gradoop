@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.util.GradoopConstants;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -45,6 +46,7 @@ public class EPGMEdge extends Tuple6<GradoopId, String, Properties, GradoopIdSet
    */
   public EPGMEdge() {
     initIDs();
+    initLabel();
     initProperties();
     initGradoopIdSet();
   }
@@ -237,6 +239,15 @@ public class EPGMEdge extends Tuple6<GradoopId, String, Properties, GradoopIdSet
 
     if (this.f5 == null) {
       this.f5 = GradoopId.NULL_VALUE;
+    }
+  }
+
+  /**
+   * Initializes the edge label
+   */
+  private void initLabel() {
+    if (this.f1 == null) {
+      this.f1 = GradoopConstants.DEFAULT_EDGE_LABEL;
     }
   }
 

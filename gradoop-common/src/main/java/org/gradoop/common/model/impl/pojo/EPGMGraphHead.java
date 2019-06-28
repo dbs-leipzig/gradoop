@@ -22,6 +22,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.util.GradoopConstants;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -40,6 +41,7 @@ public class EPGMGraphHead extends Tuple3<GradoopId, String, Properties> impleme
    */
   public EPGMGraphHead() {
     initId();
+    initLabel();
     initProperties();
   }
 
@@ -159,6 +161,15 @@ public class EPGMGraphHead extends Tuple3<GradoopId, String, Properties> impleme
   private void initId() {
     if (this.f0 == null) {
       this.f0 = GradoopId.NULL_VALUE;
+    }
+  }
+
+  /**
+   * Initializes the graph head label
+   */
+  private void initLabel() {
+    if (this.f1 == null) {
+      this.f1 = GradoopConstants.DEFAULT_GRAPH_LABEL;
     }
   }
 

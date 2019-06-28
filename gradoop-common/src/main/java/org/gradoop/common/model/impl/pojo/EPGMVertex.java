@@ -23,6 +23,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
+import org.gradoop.common.util.GradoopConstants;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -42,6 +43,7 @@ public class EPGMVertex extends Tuple4<GradoopId, String, Properties, GradoopIdS
    */
   public EPGMVertex() {
     initId();
+    initLabel();
     initProperties();
     initGradoopIdSet();
   }
@@ -202,6 +204,15 @@ public class EPGMVertex extends Tuple4<GradoopId, String, Properties, GradoopIdS
   private void initId() {
     if (this.f0 == null) {
       this.f0 = GradoopId.NULL_VALUE;
+    }
+  }
+
+  /**
+   * Initializes the vertex label
+   */
+  private void initLabel() {
+    if (this.f1 == null) {
+      this.f1 = GradoopConstants.DEFAULT_VERTEX_LABEL;
     }
   }
 

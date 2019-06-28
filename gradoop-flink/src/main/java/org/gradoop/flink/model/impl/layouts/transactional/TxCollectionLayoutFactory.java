@@ -17,7 +17,6 @@ package org.gradoop.flink.model.impl.layouts.transactional;
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
-import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -173,8 +172,8 @@ public class TxCollectionLayoutFactory extends BaseFactory
 
     DataSet<GraphTransaction> graphTransactionSet;
     if (transactions.isEmpty()) {
-      graphTransactionSet = env.fromCollection(Lists.newArrayList(new GraphTransaction()),
-        new TypeHint<GraphTransaction>() { }.getTypeInfo()).filter(new False<>());
+      graphTransactionSet = env.fromCollection(Lists.newArrayList(new GraphTransaction()))
+        .filter(new False<>());
     } else {
       graphTransactionSet = env.fromCollection(transactions);
     }

@@ -96,15 +96,20 @@ public class NeighborhoodTest extends GradoopFlinkTestBase {
    */
   @Test
   public void testNeighborhood() throws Exception {
+
     LogicalGraph input = loader.getLogicalGraphByVariable("input");
     EPGMVertex center = loader.getVertexByVariable(centerVertex);
     Collection<EPGMVertex> neighborhoodVertices = loader.getVerticesByGraphVariables(neighborhood);
-    DataSet<EPGMVertex> centers = center == null ? getEmptyDataSet(new EPGMVertex()) :
+
+    DataSet<EPGMVertex> centers = center == null ?
+      createEmptyVertexDataSet() :
       getExecutionEnvironment().fromElements(center);
+
     List<Tuple2<EPGMVertex, List<NeighborhoodVertex>>> neighborhoods =
       Neighborhood.getPerVertex(input, centers, direction).collect();
     // Make sure we only have 1 center vertex.
     long centerCount = neighborhoods.stream().map(h -> h.f0.getId()).distinct().count();
+
     assertEquals(center != null ? 1 : 0, centerCount);
 
     // Get all neighbor ids of that vertex.
@@ -112,8 +117,7 @@ public class NeighborhoodTest extends GradoopFlinkTestBase {
       .map(NeighborhoodVertex::getNeighborId)
       .sorted()
       .toArray();
-    Object[] neighborIdsExpected = neighborhoodVertices.stream().map(EPGMVertex::getId).sorted()
-        .toArray();
+    Object[] neighborIdsExpected = neighborhoodVertices.stream().map(EPGMVertex::getId).sorted().toArray();
     assertArrayEquals(neighborIdsExpected, neighbors);
   }
 }

@@ -17,17 +17,18 @@ package org.gradoop.dataintegration.transformation.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.impl.factories.EPGMVertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.factories.EPGMVertexFactory;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Test for the {@link CreateEdgesFromTriple} function used by
@@ -58,7 +59,7 @@ public class CreateEdgesFromTripleTest extends GradoopFlinkTestBase {
     // Check if the correct number of edges were created and if they are distinct.
     assertEquals(4, result.size());
     // By id.
-    assertEquals(4, result.stream().map(EPGMElement::getId).count());
+    assertEquals(4, result.stream().map(Element::getId).count());
     // By source and target id.
     assertEquals(4,
       result.stream().map(e -> Tuple2.of(e.getSourceId(), e.getTargetId())).distinct().count());

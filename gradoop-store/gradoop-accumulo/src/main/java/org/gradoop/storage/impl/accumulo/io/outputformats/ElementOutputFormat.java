@@ -20,11 +20,11 @@ import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.flink.api.common.io.OutputFormat;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.config.GradoopAccumuloConfig;
@@ -38,7 +38,7 @@ import java.io.IOException;
  *
  * @param <E> gradoop element
  */
-public class ElementOutputFormat<E extends EPGMElement> implements OutputFormat<E> {
+public class ElementOutputFormat<E extends Element> implements OutputFormat<E> {
 
   /**
    * serialize id

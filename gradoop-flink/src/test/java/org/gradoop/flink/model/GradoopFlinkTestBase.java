@@ -15,13 +15,13 @@
  */
 package org.gradoop.flink.model;
 
+import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.minicluster.LocalFlinkMiniCluster;
 import org.apache.flink.test.util.TestEnvironment;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
@@ -228,9 +228,9 @@ public abstract class GradoopFlinkTestBase {
     assertFalse("expected false", result.collect().get(0));
   }
 
-  protected <T extends Element> DataSet<T> getEmptyDataSet(T dummy) {
+  protected DataSet<EPGMVertex> createEmptyVertexDataSet() {
     return getExecutionEnvironment()
-      .fromElements(dummy)
+      .fromCollection(Lists.newArrayList(new EPGMVertex()))
       .filter(new False<>());
   }
 
