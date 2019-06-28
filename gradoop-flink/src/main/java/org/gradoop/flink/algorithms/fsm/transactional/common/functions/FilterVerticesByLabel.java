@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -54,10 +54,10 @@ public class FilterVerticesByLabel extends RichMapFunction<GraphTransaction, Gra
 
     // drop vertices with infrequent labels
 
-    Iterator<Vertex> vertexIterator = transaction.getVertices().iterator();
+    Iterator<EPGMVertex> vertexIterator = transaction.getVertices().iterator();
 
     while (vertexIterator.hasNext()) {
-      Vertex next = vertexIterator.next();
+      EPGMVertex next = vertexIterator.next();
 
       if (frequentVertexLabels.contains(next.getLabel())) {
         keptVertexIds.add(next.getId());

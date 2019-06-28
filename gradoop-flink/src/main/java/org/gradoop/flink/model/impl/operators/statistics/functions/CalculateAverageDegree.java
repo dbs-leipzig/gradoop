@@ -16,14 +16,14 @@
 package org.gradoop.flink.model.impl.operators.statistics.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 
 /**
  * Calculates the average degree, depending on the sum-value of the degree type
  * (degree, incomingDegree, outgoingDegree) stored as property in the graph head.
  */
-public class CalculateAverageDegree implements MapFunction<GraphHead, GraphHead> {
+public class CalculateAverageDegree implements MapFunction<EPGMGraphHead, EPGMGraphHead> {
 
   /**
    * The used average degree-type property key
@@ -40,7 +40,7 @@ public class CalculateAverageDegree implements MapFunction<GraphHead, GraphHead>
   }
 
   @Override
-  public GraphHead map(GraphHead graphHead) {
+  public EPGMGraphHead map(EPGMGraphHead graphHead) {
     long numVertices = graphHead.getPropertyValue("vertexCount").getLong();
     long sumDegrees = graphHead.getPropertyValue(
       SamplingEvaluationConstants.PROPERTY_KEY_SUM_DEGREES).getLong();

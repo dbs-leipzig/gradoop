@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -126,12 +126,12 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
     LogicalGraph g2 = loader.getLogicalGraphByVariable("g2");
 
     // use collections as data sink
-    Collection<Vertex> vertices0 = new HashSet<>();
-    Collection<Edge> edges0 = new HashSet<>();
-    Collection<Vertex> vertices2 = new HashSet<>();
-    Collection<Edge> edges2 = new HashSet<>();
-    Collection<Vertex> resVertices = new HashSet<>();
-    Collection<Edge> resEdges = new HashSet<>();
+    Collection<EPGMVertex> vertices0 = new HashSet<>();
+    Collection<EPGMEdge> edges0 = new HashSet<>();
+    Collection<EPGMVertex> vertices2 = new HashSet<>();
+    Collection<EPGMEdge> edges2 = new HashSet<>();
+    Collection<EPGMVertex> resVertices = new HashSet<>();
+    Collection<EPGMEdge> resEdges = new HashSet<>();
 
     LogicalGraph res = g0.overlap(g2);
 
@@ -144,23 +144,22 @@ public class OverlapTest extends ReducibleBinaryOperatorsTestBase {
 
     getExecutionEnvironment().execute();
 
-    Set<GraphElement> inVertices = new HashSet<>();
-    for (Vertex vertex : vertices0) {
+    Set<EPGMGraphElement> inVertices = new HashSet<>();
+    for (EPGMVertex vertex : vertices0) {
       if (vertices2.contains(vertex)) {
         inVertices.add(vertex);
       }
     }
-    Set<GraphElement> inEdges = new HashSet<>();
-    for (Edge edge : edges0) {
+    for (EPGMEdge edge : edges0) {
       if (edges2.contains(edge)) {
         inVertices.add(edge);
       }
     }
 
-    Set<GraphElement> outVertices = new HashSet<>();
+    Set<EPGMGraphElement> outVertices = new HashSet<>();
     inVertices.addAll(outVertices);
-    Set<GraphElement> outEdges = new HashSet<>();
-    inEdges.addAll(resEdges);
+    Set<EPGMGraphElement> outEdges = new HashSet<>();
+    Set<EPGMGraphElement> inEdges = new HashSet<>(resEdges);
 
     checkElementMatches(inVertices, outVertices);
     checkElementMatches(inEdges, outEdges);

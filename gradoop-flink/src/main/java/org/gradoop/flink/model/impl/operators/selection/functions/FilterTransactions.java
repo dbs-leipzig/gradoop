@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.selection.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
@@ -28,13 +28,13 @@ public class FilterTransactions implements FilterFunction<GraphTransaction> {
   /**
    * Filter function
    */
-  private final FilterFunction<GraphHead> filterFunction;
+  private final FilterFunction<EPGMGraphHead> filterFunction;
   /**
    * Constructor
    *
    * @param filterFunction filter function for graph heads
    */
-  public FilterTransactions(FilterFunction<GraphHead> filterFunction) {
+  public FilterTransactions(FilterFunction<EPGMGraphHead> filterFunction) {
     this.filterFunction = filterFunction;
   }
 

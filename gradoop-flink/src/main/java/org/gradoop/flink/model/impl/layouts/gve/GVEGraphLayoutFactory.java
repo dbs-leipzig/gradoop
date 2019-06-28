@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.layouts.gve;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
@@ -36,23 +36,23 @@ import java.util.stream.Collectors;
  * Responsible for creating a {@link GVELayout} from given data.
  */
 public class GVEGraphLayoutFactory extends GVEBaseFactory
-  implements LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> {
+  implements LogicalGraphLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> {
 
   @Override
-  public GVELayout fromDataSets(DataSet<Vertex> vertices) {
-    return fromDataSets(vertices,
-      createEdgeDataSet(Lists.newArrayListWithCapacity(0)));
+  public GVELayout fromDataSets(DataSet<EPGMVertex> vertices) {
+    return fromDataSets(vertices, createEdgeDataSet(Lists.newArrayListWithCapacity(0)));
   }
 
   @Override
-  public GVELayout fromDataSets(DataSet<Vertex> vertices, DataSet<Edge> edges) {
-    Objects.requireNonNull(vertices, "Vertex DataSet was null");
-    Objects.requireNonNull(edges, "Edge DataSet was null");
-    GraphHead graphHead = getConfig()
+  public GVELayout fromDataSets(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
+
+    Objects.requireNonNull(vertices, "EPGMVertex DataSet was null");
+    Objects.requireNonNull(edges, "EPGMEdge DataSet was null");
+    EPGMGraphHead graphHead = getConfig()
       .getGraphHeadFactory()
       .createGraphHead();
 
-    DataSet<GraphHead> graphHeadSet = getConfig().getExecutionEnvironment()
+    DataSet<EPGMGraphHead> graphHeadSet = getConfig().getExecutionEnvironment()
       .fromElements(graphHead);
 
     // update vertices and edges with new graph head id
@@ -67,23 +67,23 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory
   }
 
   @Override
-  public LogicalGraphLayout<GraphHead, Vertex, Edge> fromDataSets(DataSet<GraphHead> graphHead,
-    DataSet<Vertex> vertices, DataSet<Edge> edges) {
+  public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromDataSets(
+    DataSet<EPGMGraphHead> graphHead, DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
     return create(graphHead, vertices, edges);
   }
 
   @Override
-  public LogicalGraphLayout<GraphHead, Vertex, Edge> fromIndexedDataSets(
-    Map<String, DataSet<Vertex>> vertices,
-    Map<String, DataSet<Edge>> edges) {
-    GraphHead graphHead = getConfig()
+  public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromIndexedDataSets(
+    Map<String, DataSet<EPGMVertex>> vertices, Map<String, DataSet<EPGMEdge>> edges) {
+
+    EPGMGraphHead graphHead = getConfig()
       .getGraphHeadFactory()
       .createGraphHead();
 
-    DataSet<GraphHead> graphHeadSet = getConfig().getExecutionEnvironment()
+    DataSet<EPGMGraphHead> graphHeadSet = getConfig().getExecutionEnvironment()
       .fromElements(graphHead);
 
-    Map<String, DataSet<GraphHead>> graphHeads = Maps.newHashMap();
+    Map<String, DataSet<EPGMGraphHead>> graphHeads = Maps.newHashMap();
     graphHeads.put(graphHead.getLabel(), graphHeadSet);
 
     // update vertices and edges with new graph head id
@@ -101,21 +101,22 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory
   }
 
   @Override
-  public LogicalGraphLayout<GraphHead, Vertex, Edge> fromIndexedDataSets(
-    Map<String, DataSet<GraphHead>> graphHeads,
-    Map<String, DataSet<Vertex>> vertices,
-    Map<String, DataSet<Edge>> edges) {
+  public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromIndexedDataSets(
+    Map<String, DataSet<EPGMGraphHead>> graphHeads,
+    Map<String, DataSet<EPGMVertex>> vertices,
+    Map<String, DataSet<EPGMEdge>> edges) {
     return create(graphHeads, vertices, edges);
   }
 
   @Override
-  public LogicalGraphLayout<GraphHead, Vertex, Edge> fromCollections(GraphHead graphHead,
-    Collection<Vertex> vertices,
-    Collection<Edge> edges) {
+  public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromCollections(
+    EPGMGraphHead graphHead,
+    Collection<EPGMVertex> vertices,
+    Collection<EPGMEdge> edges) {
 
-    Objects.requireNonNull(vertices, "Vertex collection was null");
+    Objects.requireNonNull(vertices, "EPGMVertex collection was null");
 
-    List<GraphHead> graphHeads;
+    List<EPGMGraphHead> graphHeads;
     if (graphHead == null) {
       graphHeads = Lists.newArrayListWithCapacity(0);
     } else {
@@ -132,17 +133,17 @@ public class GVEGraphLayoutFactory extends GVEBaseFactory
   }
 
   @Override
-  public LogicalGraphLayout<GraphHead, Vertex, Edge> fromCollections(Collection<Vertex> vertices,
-    Collection<Edge> edges) {
-    Objects.requireNonNull(vertices, "Vertex collection was null");
-    Objects.requireNonNull(edges, "Edge collection was null");
+  public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> fromCollections(
+    Collection<EPGMVertex> vertices, Collection<EPGMEdge> edges) {
+    Objects.requireNonNull(vertices, "EPGMVertex collection was null");
+    Objects.requireNonNull(edges, "EPGMEdge collection was null");
     return fromDataSets(createVertexDataSet(vertices), createEdgeDataSet(edges));
   }
 
   @Override
-  public LogicalGraphLayout<GraphHead, Vertex, Edge> createEmptyGraph() {
-    Collection<Vertex> vertices = new ArrayList<>(0);
-    Collection<Edge> edges = new ArrayList<>(0);
+  public LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> createEmptyGraph() {
+    Collection<EPGMVertex> vertices = new ArrayList<>(0);
+    Collection<EPGMEdge> edges = new ArrayList<>(0);
     return fromCollections(null, vertices, edges);
   }
 }

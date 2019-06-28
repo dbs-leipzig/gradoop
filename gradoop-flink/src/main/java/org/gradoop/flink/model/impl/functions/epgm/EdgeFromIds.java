@@ -21,14 +21,14 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Initializes an {@link Vertex} from a given {@link GradoopId} triple.
- * The triple consists of {@code edge id}, {@code source vertex id} and
+ * Initializes an {@link EPGMEdge} from a given {@link GradoopId} triple.
+ * The triple contains (in that order) {@code edge id}, {@code source vertex id} and
  * {@code target vertex id}
  * <p>
  * Forwarded fields:
@@ -41,31 +41,31 @@ import org.gradoop.common.model.impl.id.GradoopId;
  */
 @FunctionAnnotation.ForwardedFields("f0->id;f1->sourceId;f2->targetId")
 public class EdgeFromIds implements
-  MapFunction<Tuple3<GradoopId, GradoopId, GradoopId>, Edge>,
-  ResultTypeQueryable<Edge> {
+  MapFunction<Tuple3<GradoopId, GradoopId, GradoopId>, EPGMEdge>,
+  ResultTypeQueryable<EPGMEdge> {
 
   /**
    * EPGM edge factory
    */
-  private final EPGMEdgeFactory<Edge> edgeFactory;
+  private final EdgeFactory<EPGMEdge> edgeFactory;
 
   /**
    * Constructor
    *
    * @param epgmEdgeFactory EPGM edge factory
    */
-  public EdgeFromIds(EPGMEdgeFactory<Edge> epgmEdgeFactory) {
+  public EdgeFromIds(EdgeFactory<EPGMEdge> epgmEdgeFactory) {
     this.edgeFactory = epgmEdgeFactory;
   }
 
   @Override
-  public Edge map(Tuple3<GradoopId, GradoopId, GradoopId> idTriple) throws
+  public EPGMEdge map(Tuple3<GradoopId, GradoopId, GradoopId> idTriple) throws
     Exception {
     return edgeFactory.initEdge(idTriple.f0, idTriple.f1, idTriple.f2);
   }
 
   @Override
-  public TypeInformation<Edge> getProducedType() {
+  public TypeInformation<EPGMEdge> getProducedType() {
     return TypeExtractor.createTypeInfo(edgeFactory.getType());
   }
 }

@@ -18,14 +18,14 @@ package org.gradoop.storage.impl.hbase.io.inputformats;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
 
 /**
  * Reads vertex data from HBase.
  */
-public class VertexTableInputFormat extends BaseTableInputFormat<Vertex> {
+public class VertexTableInputFormat extends BaseTableInputFormat<EPGMVertex> {
 
   /**
    * Handles reading of persistent vertex data.
@@ -72,7 +72,7 @@ public class VertexTableInputFormat extends BaseTableInputFormat<Vertex> {
   }
 
   @Override
-  protected Tuple1<Vertex> mapResultToTuple(Result result) {
+  protected Tuple1<EPGMVertex> mapResultToTuple(Result result) {
     return new Tuple1<>(vertexHandler.readVertex(result));
   }
 }

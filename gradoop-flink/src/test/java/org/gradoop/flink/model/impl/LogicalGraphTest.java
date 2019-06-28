@@ -15,9 +15,9 @@
  */
 package org.gradoop.flink.model.impl;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -25,8 +25,8 @@ import org.junit.Test;
 import java.util.Collection;
 import java.util.List;
 
-import static org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
-import static org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateElementCollections;
+import static org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
 import static org.junit.Assert.assertEquals;
 
 public class LogicalGraphTest extends GradoopFlinkTestBase {
@@ -36,9 +36,9 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader =
       getSocialNetworkLoader();
 
-    GraphHead inputGraphHead = loader.getGraphHeadByVariable("g0");
+    EPGMGraphHead inputGraphHead = loader.getGraphHeadByVariable("g0");
 
-    GraphHead outputGraphHead = loader.getLogicalGraphByVariable("g0")
+    EPGMGraphHead outputGraphHead = loader.getLogicalGraphByVariable("g0")
       .getGraphHead().collect().get(0);
 
     assertEquals("GraphHeads were not equal", inputGraphHead, outputGraphHead);
@@ -49,12 +49,12 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader =
       getSocialNetworkLoader();
 
-    Collection<Vertex> inputVertices = loader.getVertices();
+    Collection<EPGMVertex> inputVertices = loader.getVertices();
 
-    List<Vertex> outputVertices = loader.getLogicalGraph(false).getVertices().collect();
+    List<EPGMVertex> outputVertices = loader.getLogicalGraph(false).getVertices().collect();
 
-    validateEPGMElementCollections(inputVertices, outputVertices);
-    validateEPGMGraphElementCollections(inputVertices, outputVertices);
+    validateElementCollections(inputVertices, outputVertices);
+    validateGraphElementCollections(inputVertices, outputVertices);
   }
 
   @Test
@@ -62,11 +62,11 @@ public class LogicalGraphTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader =
       getSocialNetworkLoader();
 
-    Collection<Edge> inputEdges = loader.getEdges();
+    Collection<EPGMEdge> inputEdges = loader.getEdges();
 
-    List<Edge> outputEdges = loader.getLogicalGraph(false).getEdges().collect();
+    List<EPGMEdge> outputEdges = loader.getLogicalGraph(false).getEdges().collect();
 
-    validateEPGMElementCollections(inputEdges, outputEdges);
-    validateEPGMGraphElementCollections(inputEdges, outputEdges);
+    validateElementCollections(inputEdges, outputEdges);
+    validateGraphElementCollections(inputEdges, outputEdges);
   }
 }

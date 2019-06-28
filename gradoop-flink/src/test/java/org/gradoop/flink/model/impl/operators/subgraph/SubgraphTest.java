@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -75,7 +75,7 @@ public class SubgraphTest extends GradoopFlinkTestBase {
       .subgraph(
         v -> v.getLabel().equals("Person"),
         e -> e.getLabel().equals("knows"),
-        Subgraph.Strategy.BOTH_VERIFIED);
+        Subgraph.Strategy.BOTH).verify();
 
     collectAndAssertTrue(output.equalsByData(expected));
   }
@@ -159,7 +159,6 @@ public class SubgraphTest extends GradoopFlinkTestBase {
 
     LogicalGraph output = input.edgeInducedSubgraph(
       e -> e.getLabel().equals("hasTag"));
-
     collectAndAssertTrue(output.equalsByData(expected));
   }
 
@@ -189,46 +188,44 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString(
       "(jay:Person {" +
         "name : \"Jay\", age : 45, gender : \"f\", city : \"Leipzig\"})" +
-      "g4:Community[" +
+        "g4:Community [" +
         "(jay)-[jkb:knows {since : 2016}]->(bob)" +
         "(bob)-[blj:likes]->(jay)" +
         "]");
 
     loader.appendToDatabaseFromString(
-      "expected0[" +
+      "expected0:Community {interest : \"Databases\", vertexCount : 3} [" +
         "(alice)" +
         "(bob)" +
         "]"
     );
 
     loader.appendToDatabaseFromString(
-      "expected1[]"
+      "expected1:Community {interest : \"Hadoop\", vertexCount : 3} []"
     );
 
     loader.appendToDatabaseFromString(
-      "expected4[" +
+      "expected4:Community [" +
         "(jay)-[jkb]->(bob)" +
         "]"
     );
 
     GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1", "g4");
 
-    FilterFunction<Vertex> vertexFilterFunction = v -> {
+    FilterFunction<EPGMVertex> vertexFilterFunction = v -> {
       PropertyValue city = v.getPropertyValue("city");
       return city != null && city.toString().equals("Leipzig");
     };
 
-    FilterFunction<Edge> edgeFilterFunction = e -> {
+    FilterFunction<EPGMEdge> edgeFilterFunction = e -> {
       if (e.getLabel().equals("knows")) {
-        if (e.getPropertyValue("since").getInt() == 2016) {
-          return true;
-        }
+        return e.getPropertyValue("since").getInt() == 2016;
       }
       return false;
     };
 
     GraphCollection result = input
-      .apply(new ApplySubgraph(vertexFilterFunction, edgeFilterFunction));
+      .apply(new ApplySubgraph<>(vertexFilterFunction, edgeFilterFunction, Subgraph.Strategy.BOTH));
 
     collectAndAssertTrue(result.equalsByGraphElementIds(
       loader.getGraphCollectionByVariables(
@@ -245,43 +242,44 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     loader.appendToDatabaseFromString(
       "(jay:Person {" +
         "name : \"Jay\", age : 45, gender : \"f\", city : \"Leipzig\"})" +
-      "g4:Community[" +
+        "g4:Community [" +
         "(jay)-[jkb:knows]->(bob)" +
         "(bob)-[blj:likes]->(jay)" +
         "]");
 
     loader.appendToDatabaseFromString(
-      "expected0[" +
+      "expected0:Community {interest : \"Databases\", vertexCount : 3} [" +
         "(alice)-[akb]->(bob)-[bka]->(alice)" +
         "]"
     );
 
     loader.appendToDatabaseFromString(
-      "expected1[]"
+      "expected1:Community {interest : \"Hadoop\", vertexCount : 3} []"
     );
 
     loader.appendToDatabaseFromString(
-      "expected4[" +
+      "expected4:Community [" +
         "(jay)-[jkb]->(bob)-[blj]->(jay)" +
         "]"
     );
 
+    GraphCollection expected = loader
+      .getGraphCollectionByVariables("expected0", "expected1", "expected4");
+
     GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1", "g4");
 
-    FilterFunction<Vertex> vertexFilterFunction = v -> {
+    FilterFunction<EPGMVertex> vertexFilterFunction = v -> {
       PropertyValue city = v.getPropertyValue("city");
       return city != null && city.toString().equals("Leipzig");
     };
 
     GraphCollection result = input
-      .apply(new ApplySubgraph(vertexFilterFunction, null));
+      .apply(new ApplySubgraph<>(vertexFilterFunction,
+        null,
+        Subgraph.Strategy.VERTEX_INDUCED));
 
-    collectAndAssertTrue(result.equalsByGraphElementIds(
-      loader.getGraphCollectionByVariables(
-        "expected0", "expected1", "expected4")));
-    collectAndAssertTrue(result.equalsByGraphData(
-      loader.getGraphCollectionByVariables(
-        "expected0", "expected1", "expected4")));
+    collectAndAssertTrue(result.equalsByGraphElementIds(expected));
+    collectAndAssertTrue(result.equalsByGraphData(expected));
   }
 
   @Test
@@ -289,52 +287,88 @@ public class SubgraphTest extends GradoopFlinkTestBase {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 
     loader.appendToDatabaseFromString(
-      "expected0[" +
+      "expected0:Community {interest: \"Databases\", vertexCount: 3} [" +
         "(eve)-[ekb]->(bob)" +
         "]"
     );
 
     loader.appendToDatabaseFromString(
-      "expected1[" +
+      "expected1:Community {interest: \"Hadoop\", vertexCount: 3} [" +
         "(frank)-[fkc]->(carol)" +
         "(frank)-[fkd]->(dave)" +
         "]"
     );
 
     loader.appendToDatabaseFromString(
-      "expected2[]"
+      "expected2:Community {interest: \"Graphs\", vertexCount: 4} []"
     );
+
+    GraphCollection expected = loader
+      .getGraphCollectionByVariables("expected0", "expected1", "expected2");
 
     GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1", "g2");
 
-    GraphCollection result = input
-      .apply(new ApplySubgraph(null, e -> e.getPropertyValue("since").getInt() == 2015));
+    GraphCollection result = input.apply(new ApplySubgraph<>(null, e ->
+      e.getPropertyValue("since").getInt() == 2015,
+      Subgraph.Strategy.EDGE_INDUCED));
 
-    collectAndAssertTrue(result.equalsByGraphElementIds(
-      loader.getGraphCollectionByVariables(
-        "expected0", "expected1", "expected2")));
-    collectAndAssertTrue(result.equalsByGraphData(
-      loader.getGraphCollectionByVariables(
-        "expected0", "expected1", "expected2")));
+    collectAndAssertTrue(result.equalsByGraphElementIds(expected));
+    collectAndAssertTrue(result.equalsByGraphData(expected));
+  }
+
+  @Test
+  public void testCollectionEdgeInducedSubgraphProjectFirst() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+
+    loader.appendToDatabaseFromString(
+      "expected0:Community {interest: \"Databases\", vertexCount: 3} [" +
+        "(eve)-[ekb]->(bob)" +
+        "]"
+    );
+
+    loader.appendToDatabaseFromString(
+      "expected1:Community {interest: \"Hadoop\", vertexCount: 3} [" +
+        "(frank)-[fkc]->(carol)" +
+        "(frank)-[fkd]->(dave)" +
+        "]"
+    );
+
+    loader.appendToDatabaseFromString(
+      "expected2:Community {interest: \"Graphs\", vertexCount: 4} []"
+    );
+
+    GraphCollection expected = loader
+      .getGraphCollectionByVariables("expected0", "expected1", "expected2");
+
+    GraphCollection input = loader.getGraphCollectionByVariables("g0", "g1", "g2");
+
+    GraphCollection result = input.apply(new ApplySubgraph<>(null, e ->
+      e.getPropertyValue("since").getInt() == 2015,
+      Subgraph.Strategy.EDGE_INDUCED_PROJECT_FIRST));
+
+    collectAndAssertTrue(result.equalsByGraphElementIds(expected));
+    collectAndAssertTrue(result.equalsByGraphData(expected));
   }
 
   @Test
   public void testKeepOnlyRelevantVertices() throws Exception {
     FlinkAsciiGraphLoader loader = getLoaderFromString("source:G {source : \"graph\"}[" +
-        "      (a:Patent {author : \"asdf\", year: 2000, title: \"P1\"})-[:cite {difference : 0}]->(b:Patent {author : \"asdf\", year: 2000, title: \"P2\"})" +
-        "      (a)-[:cite {difference : 0}]->(c:Patent {author : \"asdf\", year: 2000, title: \"P3\"})" +
-        "      (b)-[:cite {difference : 0}]->(c)\n" +
-        "      (a)-[:cite {difference : 5}]->(d:Patent {author : \"zxcv\", year: 1995, title: \"Earlier...\"})" +
-        "      (b)-[:cite {difference : 5}]->(d)" +
-        "      (e:Patent {author : \"kdkdkd\", year: 1997, title: \"Once upon a time\"})-[e_d:cite {difference : 2}]->(d)" +
-        "]");
+      "(a:Patent {author : \"asdf\", year: 2000, title: \"P1\"})-[:cite {difference : 0}]->(b:Patent {author : \"asdf\", year: 2000, title: \"P2\"})" +
+      "(a)-[:cite {difference : 0}]->(c:Patent {author : \"asdf\", year: 2000, title: \"P3\"})" +
+      "(b)-[:cite {difference : 0}]->(c)\n" +
+      "(a)-[:cite {difference : 5}]->(d:Patent {author : \"zxcv\", year: 1995, title: \"Earlier...\"})" +
+      "(b)-[:cite {difference : 5}]->(d)" +
+      "(e:Patent {author : \"kdkdkd\", year: 1997, title: \"Once upon a time\"})-[e_d:cite {difference : 2}]->(d)" +
+      "]");
     GraphCollection sourceGraph = loader.getGraphCollectionByVariables("source");
     // Caution: We can't use result.equalsByGraphElementIds because it internally uses a cross join
     // with equality of elements, which means, it ignores elements that are not within the other dataset
     // This means, the test would succeed even though we have too many vertices as a result of the
     // subgraph operator.
     org.junit.Assert.assertEquals(3, sourceGraph
-        .apply(new ApplySubgraph(null, edge -> edge.getPropertyValue("difference").getInt() == 0))
+        .apply(new ApplySubgraph<>(null, edge ->
+          edge.getPropertyValue("difference").getInt() == 0,
+          Subgraph.Strategy.EDGE_INDUCED))
         .getVertices()
         .collect().size());
   }

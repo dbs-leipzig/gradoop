@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 
@@ -27,13 +27,13 @@ import org.gradoop.flink.model.impl.tuples.WithCount;
  *
  * @param <T> value type
  */
-public class EdgeValueDistribution<T> extends ValueDistribution<Edge, T> {
+public class EdgeValueDistribution<T> extends ValueDistribution<EPGMEdge, T> {
   /**
    * Constructor
    *
    * @param valueFunction extracts a value from a edge
    */
-  public EdgeValueDistribution(MapFunction<Edge, T> valueFunction) {
+  public EdgeValueDistribution(MapFunction<EPGMEdge, T> valueFunction) {
     super(valueFunction);
   }
 

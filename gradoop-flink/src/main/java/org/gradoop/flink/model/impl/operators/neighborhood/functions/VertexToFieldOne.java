@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Puts the vertex to the second field of the tuple.
@@ -26,15 +26,15 @@ import org.gradoop.common.model.impl.pojo.Vertex;
  * @param <V> type of the second field of the tuple
  */
 public class VertexToFieldOne<K, V>
-  implements JoinFunction<Tuple2<K, V>, Vertex, Tuple2<K, Vertex>> {
+  implements JoinFunction<Tuple2<K, V>, EPGMVertex, Tuple2<K, EPGMVertex>> {
 
   /**
    * Avoid object instantiation.
    */
-  private Tuple2<K, Vertex> reuseTuple = new Tuple2<K, Vertex>();
+  private Tuple2<K, EPGMVertex> reuseTuple = new Tuple2<>();
 
   @Override
-  public Tuple2<K, Vertex> join(Tuple2<K, V> tuple, Vertex vertex) throws Exception {
+  public Tuple2<K, EPGMVertex> join(Tuple2<K, V> tuple, EPGMVertex vertex) throws Exception {
     reuseTuple.setFields(tuple.f0, vertex);
     return reuseTuple;
   }

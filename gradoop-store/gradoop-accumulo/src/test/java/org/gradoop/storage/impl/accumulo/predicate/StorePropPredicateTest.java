@@ -16,9 +16,9 @@
 package org.gradoop.storage.impl.accumulo.predicate;
 
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 import org.gradoop.storage.utils.AccumuloFilters;
@@ -51,7 +51,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
   @Test
   public void vertexPropEquals() throws Throwable {
     doTest(TEST01, (loader, store, config) -> {
-      List<Vertex> inputVertices = loader.getVertices().stream()
+      List<EPGMVertex> inputVertices = loader.getVertices().stream()
         .filter(it -> {
           assert it.getProperties() != null;
           return it.getProperties().get("gender") != null &&
@@ -61,14 +61,14 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
         })
         .collect(Collectors.toList());
 
-      List<Vertex> query = store
+      List<EPGMVertex> query = store
         .getVertexSpace(
           Query.elements()
             .fromAll()
             .where(AccumuloFilters.propEquals("gender", "f")))
         .readRemainsAndClose();
 
-      GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+      GradoopTestUtils.validateElementCollections(inputVertices, query);
     });
   }
 
@@ -80,7 +80,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
   @Test
   public void edgePropEquals() throws Throwable {
     doTest(TEST02, (loader, store, config) -> {
-      List<Edge> inputVertices = loader.getEdges().stream()
+      List<EPGMEdge> inputVertices = loader.getEdges().stream()
         .filter(it -> {
           assert it.getProperties() != null;
           return it.getProperties().get("since") != null &&
@@ -90,14 +90,14 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
         })
         .collect(Collectors.toList());
 
-      List<Edge> query = store
+      List<EPGMEdge> query = store
         .getEdgeSpace(
           Query.elements()
             .fromAll()
             .where(AccumuloFilters.propEquals("since", 2014)))
         .readRemainsAndClose();
 
-      GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+      GradoopTestUtils.validateElementCollections(inputVertices, query);
     });
   }
 
@@ -111,7 +111,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
     doTest(TEST03, (loader, store, config) -> {
       Pattern queryFormula = Pattern.compile("(Leipzig|Dresden)");
 
-      List<Vertex> inputVertices = loader.getVertices().stream()
+      List<EPGMVertex> inputVertices = loader.getVertices().stream()
         .filter(it -> {
           assert it.getProperties() != null;
           return it.getProperties().get("city") != null &&
@@ -122,14 +122,14 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
         })
         .collect(Collectors.toList());
 
-      List<Vertex> query = store
+      List<EPGMVertex> query = store
         .getVertexSpace(
           Query.elements()
             .fromAll()
             .where(AccumuloFilters.propReg("city", queryFormula)))
         .readRemainsAndClose();
 
-      GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+      GradoopTestUtils.validateElementCollections(inputVertices, query);
     });
   }
 
@@ -141,7 +141,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
   @Test
   public void propLargerThan() throws Throwable {
     doTest(TEST04, (loader, store, config) -> {
-      List<Edge> inputVertices = loader.getEdges().stream()
+      List<EPGMEdge> inputVertices = loader.getEdges().stream()
         .filter(it -> {
           assert it.getProperties() != null;
           return it.getProperties().get("since") != null &&
@@ -152,7 +152,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
         })
         .collect(Collectors.toList());
 
-      List<Edge> query = store
+      List<EPGMEdge> query = store
         .getEdgeSpace(
           Query.elements()
             .fromAll()
@@ -160,7 +160,7 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
               .propLargerThan("since", 2014, true)))
         .readRemainsAndClose();
 
-      GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+      GradoopTestUtils.validateElementCollections(inputVertices, query);
     });
   }
 
@@ -172,21 +172,21 @@ public class StorePropPredicateTest extends AccumuloStoreTestBase {
   @Test
   public void propSmallerThan() throws Throwable {
     doTest(TEST05, (loader, store, config) -> {
-      List<GraphHead> inputVertices = loader.getGraphHeads()
+      List<EPGMGraphHead> inputVertices = loader.getGraphHeads()
         .stream()
         .filter(it -> it.getPropertyValue("vertexCount") != null)
         .filter(it -> it.getPropertyValue("vertexCount").getInt() >= 4)
         .collect(Collectors.toList());
 
-      List<GraphHead> query = store
+      List<EPGMGraphHead> query = store
         .getGraphSpace(
           Query.elements()
             .fromAll()
             .where(AccumuloFilters
-              .<GraphHead>propLargerThan("vertexCount", 4, true)))
+              .propLargerThan("vertexCount", 4, true)))
         .readRemainsAndClose();
 
-      GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+      GradoopTestUtils.validateElementCollections(inputVertices, query);
     });
   }
 

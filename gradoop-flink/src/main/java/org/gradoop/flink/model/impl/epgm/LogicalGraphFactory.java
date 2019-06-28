@@ -16,12 +16,12 @@
 package org.gradoop.flink.model.impl.epgm;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -35,11 +35,11 @@ import java.util.Objects;
  * {@link org.gradoop.flink.model.api.layouts.LogicalGraphLayout}.
  */
 public class LogicalGraphFactory
-  implements BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph> {
+  implements BaseGraphFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> {
   /**
    * Creates the layout from given data.
    */
-  private LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> layoutFactory;
+  private LogicalGraphLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> layoutFactory;
   /**
    * The Gradoop Flink configuration.
    */
@@ -55,7 +55,7 @@ public class LogicalGraphFactory
   }
 
   @Override
-  public void setLayoutFactory(LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> layoutFactory) {
+  public void setLayoutFactory(LogicalGraphLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> layoutFactory) {
     Objects.requireNonNull(layoutFactory);
     this.layoutFactory = layoutFactory;
     this.layoutFactory.setGradoopFlinkConfig(config);
@@ -67,7 +67,7 @@ public class LogicalGraphFactory
    * The factory is passed from {@link GradoopFlinkConfig} at the moment.
    */
   @Override
-  public EPGMGraphHeadFactory<GraphHead> getGraphHeadFactory() {
+  public GraphHeadFactory<EPGMGraphHead> getGraphHeadFactory() {
     return config.getGraphHeadFactory();
   }
 
@@ -77,7 +77,7 @@ public class LogicalGraphFactory
    * The factory is passed from {@link GradoopFlinkConfig} at the moment.
    */
   @Override
-  public EPGMVertexFactory<Vertex> getVertexFactory() {
+  public VertexFactory<EPGMVertex> getVertexFactory() {
     return config.getVertexFactory();
   }
 
@@ -87,46 +87,46 @@ public class LogicalGraphFactory
    * The factory is passed from {@link GradoopFlinkConfig} at the moment.
    */
   @Override
-  public EPGMEdgeFactory<Edge> getEdgeFactory() {
+  public EdgeFactory<EPGMEdge> getEdgeFactory() {
     return config.getEdgeFactory();
   }
 
   @Override
-  public LogicalGraph fromDataSets(DataSet<Vertex> vertices) {
+  public LogicalGraph fromDataSets(DataSet<EPGMVertex> vertices) {
     return new LogicalGraph(layoutFactory.fromDataSets(vertices), config);
   }
 
   @Override
-  public LogicalGraph fromDataSets(DataSet<Vertex> vertices, DataSet<Edge> edges) {
+  public LogicalGraph fromDataSets(DataSet<EPGMVertex> vertices, DataSet<EPGMEdge> edges) {
     return new LogicalGraph(layoutFactory.fromDataSets(vertices, edges), config);
   }
 
   @Override
-  public LogicalGraph fromDataSets(DataSet<GraphHead> graphHead, DataSet<Vertex> vertices,
-    DataSet<Edge> edges) {
+  public LogicalGraph fromDataSets(DataSet<EPGMGraphHead> graphHead, DataSet<EPGMVertex> vertices,
+    DataSet<EPGMEdge> edges) {
     return new LogicalGraph(layoutFactory.fromDataSets(graphHead, vertices, edges), config);
   }
 
   @Override
-  public LogicalGraph fromIndexedDataSets(Map<String, DataSet<Vertex>> vertices,
-    Map<String, DataSet<Edge>> edges) {
+  public LogicalGraph fromIndexedDataSets(Map<String, DataSet<EPGMVertex>> vertices,
+    Map<String, DataSet<EPGMEdge>> edges) {
     return new LogicalGraph(layoutFactory.fromIndexedDataSets(vertices, edges), config);
   }
 
   @Override
-  public LogicalGraph fromIndexedDataSets(Map<String, DataSet<GraphHead>> graphHead,
-    Map<String, DataSet<Vertex>> vertices, Map<String, DataSet<Edge>> edges) {
+  public LogicalGraph fromIndexedDataSets(Map<String, DataSet<EPGMGraphHead>> graphHead,
+    Map<String, DataSet<EPGMVertex>> vertices, Map<String, DataSet<EPGMEdge>> edges) {
     return new LogicalGraph(layoutFactory.fromIndexedDataSets(graphHead, vertices, edges), config);
   }
 
   @Override
-  public LogicalGraph fromCollections(GraphHead graphHead, Collection<Vertex> vertices,
-    Collection<Edge> edges) {
+  public LogicalGraph fromCollections(EPGMGraphHead graphHead, Collection<EPGMVertex> vertices,
+    Collection<EPGMEdge> edges) {
     return new LogicalGraph(layoutFactory.fromCollections(graphHead, vertices, edges), config);
   }
 
   @Override
-  public LogicalGraph fromCollections(Collection<Vertex> vertices, Collection<Edge> edges) {
+  public LogicalGraph fromCollections(Collection<EPGMVertex> vertices, Collection<EPGMEdge> edges) {
     return new LogicalGraph(layoutFactory.fromCollections(vertices, edges), config);
   }
 

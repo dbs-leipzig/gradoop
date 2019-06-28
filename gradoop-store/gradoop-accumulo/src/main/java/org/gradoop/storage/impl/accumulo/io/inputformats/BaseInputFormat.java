@@ -35,7 +35,7 @@ import org.apache.flink.api.common.io.InputFormat;
 import org.apache.flink.core.io.GenericInputSplit;
 import org.apache.hadoop.mapred.InputSplit;
 import org.apache.hadoop.mapred.JobConf;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.storage.config.GradoopAccumuloConfig;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloDefault;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
@@ -43,7 +43,7 @@ import org.gradoop.storage.impl.accumulo.predicate.query.AccumuloQueryHolder;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -57,7 +57,7 @@ import java.util.stream.Stream;
  *
  * @param <T> element define in gradoop
  */
-public abstract class BaseInputFormat<T extends Element> extends GenericInputFormat<T> {
+public abstract class BaseInputFormat<T extends EPGMElement> extends GenericInputFormat<T> {
 
   /**
    * serialize id
@@ -176,7 +176,7 @@ public abstract class BaseInputFormat<T extends Element> extends GenericInputFor
       }
       if (split.getSplitNumber() + 1 > ranges.size()) {
         scanner = null;
-        iterator = new ArrayList<Map.Entry<Key, Value>>().iterator();
+        iterator = Collections.emptyIterator();
       } else {
         scanner = conn.createBatchScanner(tableName, auth, batchSize);
         attachIterator(scanner, iteratorPriority, options);

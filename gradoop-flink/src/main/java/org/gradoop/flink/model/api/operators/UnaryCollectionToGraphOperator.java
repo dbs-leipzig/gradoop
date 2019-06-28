@@ -21,12 +21,6 @@ import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 /**
  * Creates a {@link LogicalGraph} from one input collection.
  */
-public interface UnaryCollectionToGraphOperator extends Operator {
-  /**
-   * Executes the operator.
-   *
-   * @param collection input collection
-   * @return operator result
-   */
-  LogicalGraph execute(GraphCollection collection);
+public interface UnaryCollectionToGraphOperator
+  extends UnaryBaseGraphCollectionToBaseGraphOperator<GraphCollection, LogicalGraph> {
 }

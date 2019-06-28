@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.combination;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -34,13 +34,13 @@ public class Combination implements BinaryGraphToGraphOperator {
   public LogicalGraph execute(LogicalGraph firstGraph,
     LogicalGraph secondGraph) {
 
-    DataSet<Vertex> newVertexSet = firstGraph.getVertices()
+    DataSet<EPGMVertex> newVertexSet = firstGraph.getVertices()
       .union(secondGraph.getVertices())
-      .distinct(new Id<Vertex>());
+      .distinct(new Id<>());
 
-    DataSet<Edge> newEdgeSet = firstGraph.getEdges()
+    DataSet<EPGMEdge> newEdgeSet = firstGraph.getEdges()
       .union(secondGraph.getEdges())
-      .distinct(new Id<Edge>());
+      .distinct(new Id<>());
 
     return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertexSet, newEdgeSet);
   }

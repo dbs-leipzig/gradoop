@@ -42,7 +42,7 @@ public class AggregateGraphs<T>
 
   @Override
   public void reduce(Iterable<Tuple2<T, GradoopId>> iterable,
-                     Collector<Tuple2<T, GradoopIdSet>> collector) throws Exception {
+                     Collector<Tuple2<T, GradoopIdSet>> collector) {
 
     if (returnTuple.f1 == null) {
       returnTuple.f1 = new GradoopIdSet();

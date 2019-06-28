@@ -16,18 +16,18 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.CrossFunction;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 
 /**
  * Writes the PageRank-scores stored in the graphHead to all vertices.
  */
 public class AddPageRankScoresToVertexCrossFunction
-  implements CrossFunction<Vertex, GraphHead, Vertex> {
+  implements CrossFunction<EPGMVertex, EPGMGraphHead, EPGMVertex> {
 
   @Override
-  public Vertex cross(Vertex vertex, GraphHead graphHead) {
+  public EPGMVertex cross(EPGMVertex vertex, EPGMGraphHead graphHead) {
     double min = graphHead.getPropertyValue(
       SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
     double max = graphHead.getPropertyValue(

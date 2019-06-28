@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.pagerank.PageRank;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
@@ -110,7 +110,7 @@ public class PageRankSampling extends SamplingAlgorithm {
         new SumVertexProperty(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
         new VertexCount());
 
-    DataSet<Vertex> scaledVertices = graph.getVertices()
+    DataSet<EPGMVertex> scaledVertices = graph.getVertices()
       .crossWithTiny(graph.getGraphHead().first(1))
       .with(new AddPageRankScoresToVertexCrossFunction())
       .filter(new PageRankResultVertexFilter(

@@ -18,17 +18,17 @@ package org.gradoop.dataintegration.transformation.impl.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Creates a new {@link Vertex} containing the given attribute {@link PropertyValue} and its origin.
+ * Creates a new {@link EPGMVertex} containing the given attribute {@link PropertyValue} and its origin.
  */
-public class CreateNewVertex implements MapFunction<Tuple2<PropertyValue, GradoopId>, Tuple2<Vertex, List<GradoopId>>> {
+public class CreateNewVertex implements MapFunction<Tuple2<PropertyValue, GradoopId>, Tuple2<EPGMVertex, List<GradoopId>>> {
   /**
    * The new vertex label.
    */
@@ -42,12 +42,12 @@ public class CreateNewVertex implements MapFunction<Tuple2<PropertyValue, Gradoo
   /**
    * The Factory the vertices are created with.
    */
-  private final VertexFactory vertexFactory;
+  private final EPGMVertexFactory vertexFactory;
 
   /**
    * Reduce object instantiation.
    */
-  private final Tuple2<Vertex, List<GradoopId>> reuseTuple;
+  private final Tuple2<EPGMVertex, List<GradoopId>> reuseTuple;
 
   /**
    * The constructor for creating new vertices with their origin Ids.
@@ -56,7 +56,7 @@ public class CreateNewVertex implements MapFunction<Tuple2<PropertyValue, Gradoo
    * @param newVertexLabel  The new vertex Label.
    * @param newPropertyName The new property key.
    */
-  public CreateNewVertex(VertexFactory factory, String newVertexLabel, String newPropertyName) {
+  public CreateNewVertex(EPGMVertexFactory factory, String newVertexLabel, String newPropertyName) {
     this.vertexFactory = factory;
     this.newVertexLabel = newVertexLabel;
     this.newPropertyName = newPropertyName;
@@ -65,8 +65,8 @@ public class CreateNewVertex implements MapFunction<Tuple2<PropertyValue, Gradoo
   }
 
   @Override
-  public Tuple2<Vertex, List<GradoopId>> map(Tuple2<PropertyValue, GradoopId> tuple) {
-    Vertex vertex = vertexFactory.createVertex(newVertexLabel);
+  public Tuple2<EPGMVertex, List<GradoopId>> map(Tuple2<PropertyValue, GradoopId> tuple) {
+    EPGMVertex vertex = vertexFactory.createVertex(newVertexLabel);
     vertex.setProperty(newPropertyName, tuple.f0);
 
     reuseTuple.f0 = vertex;

@@ -18,6 +18,8 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.p
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
@@ -165,7 +167,7 @@ public class GreedyPlanner {
       CNF vertexPredicates = allPredicates.removeSubCNF(vertexVariable);
       Set<String> projectionKeys = allPredicates.getPropertyKeys(vertexVariable);
 
-      DataSet<org.gradoop.common.model.impl.pojo.Vertex> vertices =
+      DataSet<EPGMVertex> vertices =
         vertex.getLabel().equals(GradoopConstants.DEFAULT_VERTEX_LABEL) ?
           graph.getVertices() : graph.getVerticesByLabel(vertex.getLabel());
 
@@ -197,7 +199,7 @@ public class GreedyPlanner {
 
       boolean isPath = edge.getUpperBound() != 1;
 
-      DataSet<org.gradoop.common.model.impl.pojo.Edge> edges =
+      DataSet<EPGMEdge> edges =
         edge.getLabel().equals(GradoopConstants.DEFAULT_EDGE_LABEL) ?
           graph.getEdges() : graph.getEdgesByLabel(edge.getLabel());
 

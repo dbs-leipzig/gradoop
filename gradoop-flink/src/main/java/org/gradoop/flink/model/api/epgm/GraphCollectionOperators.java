@@ -19,14 +19,12 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
-import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -78,7 +76,7 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    * @param predicateFunction predicate function for graph head
    * @return collection with logical graphs that fulfil the predicate
    */
-  GraphCollection select(FilterFunction<GraphHead> predicateFunction);
+  GraphCollection select(FilterFunction<EPGMGraphHead> predicateFunction);
 
   /**
    * Returns a graph collection that is sorted by a given graph property key.
@@ -224,15 +222,6 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
   //----------------------------------------------------------------------------
 
   /**
-   * Calls the given unary collection to collection operator for the collection.
-   *
-   * @param op unary collection to collection operator
-   * @return result of given operator
-   */
-  GraphCollection callForCollection(
-    UnaryCollectionToCollectionOperator op);
-
-  /**
    * Calls the given binary collection to collection operator using that
    * graph and the input graph.
    *
@@ -252,16 +241,6 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
    */
   LogicalGraph callForGraph(
     UnaryCollectionToGraphOperator op);
-
-  /**
-   * Applies a given unary graph to graph operator (e.g., aggregate) on each
-   * logical graph in the graph collection.
-   *
-   * @param op applicable unary graph to graph operator
-   * @return collection with resulting logical graphs
-   */
-  GraphCollection apply(
-    ApplicableUnaryGraphToGraphOperator op);
 
   /**
    * Transforms a graph collection into a logical graph by applying a

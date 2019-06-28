@@ -15,13 +15,14 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
 
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.stream.Collectors.joining;
@@ -92,12 +93,12 @@ public abstract class PredicateCollection<P> implements Iterable<P>, Serializabl
   public abstract boolean evaluate(Embedding embedding, EmbeddingMetaData metaData);
 
   /**
-   * Evaluates the predicate collection with respect to the given GraphElement
+   * Evaluates the predicate collection with respect to the given EPGMGraphElement
    *
-   * @param element GraphElement under which the predicate will be evaluated
+   * @param element EPGMGraphElement under which the predicate will be evaluated
    * @return evaluation result
    */
-  public abstract boolean evaluate(GraphElement element);
+  public abstract boolean evaluate(EPGMGraphElement element);
 
   /**
    * Retrieves a set of all variables included in the predicate collection
@@ -142,8 +143,7 @@ public abstract class PredicateCollection<P> implements Iterable<P>, Serializabl
 
     PredicateCollection predicateCollection = (PredicateCollection) o;
 
-    return predicates != null ?
-      predicates.equals(predicateCollection.predicates) : predicateCollection.predicates == null;
+    return Objects.equals(predicates, predicateCollection.predicates);
   }
 
   @Override

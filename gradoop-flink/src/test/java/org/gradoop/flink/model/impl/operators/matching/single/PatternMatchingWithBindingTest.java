@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single;
 
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.TestData;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -48,10 +48,10 @@ public abstract class PatternMatchingWithBindingTest extends PatternMatchingTest
     loader.appendToDatabaseFromString(expectedCollection);
 
     // execute and validate
-    List<GraphHead> graphHeads = getImplementation(queryGraph, false).execute(db).
+    List<EPGMGraphHead> graphHeads = getImplementation(queryGraph, false).execute(db).
       getGraphHeads().collect();
 
-    for (GraphHead graphHead : graphHeads) {
+    for (EPGMGraphHead graphHead : graphHeads) {
       assertTrue(graphHead.hasProperty(PatternMatching.VARIABLE_MAPPING_KEY));
     }
 

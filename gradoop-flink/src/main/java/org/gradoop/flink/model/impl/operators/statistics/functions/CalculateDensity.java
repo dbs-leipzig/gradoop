@@ -16,12 +16,12 @@
 package org.gradoop.flink.model.impl.operators.statistics.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 
 /**
  * Calculates the graph density and safes the value as property to the corresponding graphHead.
  */
-public class CalculateDensity implements MapFunction<GraphHead, GraphHead> {
+public class CalculateDensity implements MapFunction<EPGMGraphHead, EPGMGraphHead> {
 
   /**
    * Used property key
@@ -38,7 +38,7 @@ public class CalculateDensity implements MapFunction<GraphHead, GraphHead> {
   }
 
   @Override
-  public GraphHead map(GraphHead graphHead) {
+  public EPGMGraphHead map(EPGMGraphHead graphHead) {
     double vc1 = (double) graphHead.getPropertyValue("vertexCount").getLong();
     double ec1 = (double) graphHead.getPropertyValue("edgeCount").getLong();
     double density = ec1 / (vc1 * (vc1 - 1.));

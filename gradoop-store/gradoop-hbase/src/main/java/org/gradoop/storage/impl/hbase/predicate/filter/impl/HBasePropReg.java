@@ -16,7 +16,7 @@
 package org.gradoop.storage.impl.hbase.predicate.filter.impl;
 
 import org.apache.hadoop.hbase.filter.Filter;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.common.predicate.filter.impl.PropReg;
 import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
 import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
@@ -27,9 +27,9 @@ import java.util.regex.Pattern;
 /**
  * HBase property regex filter implementation
  *
- * @param <T> EPGM element type
+ * @param <T> element type
  */
-public class HBasePropReg<T extends EPGMElement> extends PropReg<HBaseElementFilter<T>>
+public class HBasePropReg<T extends Element> extends PropReg<HBaseElementFilter<T>>
   implements HBaseElementFilter<T> {
 
   /**

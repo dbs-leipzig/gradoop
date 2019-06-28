@@ -17,8 +17,8 @@ package org.gradoop.storage.impl.hbase.api;
 
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 
@@ -34,7 +34,7 @@ public interface VertexHandler extends GraphElementHandler {
    * @param vertexData vertex data to be written
    * @return put with vertex data
    */
-  Put writeVertex(final Put put, final EPGMVertex vertexData);
+  Put writeVertex(final Put put, final Vertex vertexData);
 
   /**
    * Reads the vertex data from the given {@link Result}.
@@ -42,7 +42,7 @@ public interface VertexHandler extends GraphElementHandler {
    * @param res HBase row
    * @return vertex data contained in the given result.
    */
-  Vertex readVertex(final Result res);
+  EPGMVertex readVertex(final Result res);
 
   /**
    * Applies the given ElementQuery to the handler.
@@ -50,12 +50,12 @@ public interface VertexHandler extends GraphElementHandler {
    * @param query the element query to apply
    * @return the VertexHandler instance with the query applied
    */
-  VertexHandler applyQuery(ElementQuery<HBaseElementFilter<Vertex>> query);
+  VertexHandler applyQuery(ElementQuery<HBaseElementFilter<EPGMVertex>> query);
 
   /**
    * Returns the element query or {@code null}, if no query was applied before.
    *
    * @return the element query or {@code null}, if no query was applied before
    */
-  ElementQuery<HBaseElementFilter<Vertex>> getQuery();
+  ElementQuery<HBaseElementFilter<EPGMVertex>> getQuery();
 }

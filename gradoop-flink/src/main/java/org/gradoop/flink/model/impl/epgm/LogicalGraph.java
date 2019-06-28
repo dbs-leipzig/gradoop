@@ -19,12 +19,13 @@ import com.google.common.collect.Lists;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.metadata.MetaData;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.epgm.LogicalGraphOperators;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -69,6 +70,7 @@ import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToDataStr
 import org.gradoop.flink.model.impl.operators.tostring.functions.VertexToIdString;
 import org.gradoop.flink.model.impl.operators.transformation.Transformation;
 import org.gradoop.flink.model.impl.operators.verify.Verify;
+import org.gradoop.flink.model.impl.operators.verify.VerifyGraphContainment;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -90,12 +92,12 @@ import java.util.Objects;
  * represented in Apache Flink. Note that the LogicalGraph also implements that interface and
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
-public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalGraph>,
-  LogicalGraphOperators {
+public class LogicalGraph implements
+  BaseGraph<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>, LogicalGraphOperators {
   /**
    * Layout for that logical graph.
    */
-  private final LogicalGraphLayout<GraphHead, Vertex, Edge> layout;
+  private final LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> layout;
   /**
    * Configuration
    */
@@ -107,7 +109,8 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
    * @param layout representation of the logical graph
    * @param config the Gradoop Flink configuration
    */
-  LogicalGraph(LogicalGraphLayout<GraphHead, Vertex, Edge> layout, GradoopFlinkConfig config) {
+  LogicalGraph(LogicalGraphLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> layout,
+    GradoopFlinkConfig config) {
     Objects.requireNonNull(layout);
     Objects.requireNonNull(config);
     this.layout = layout;
@@ -124,8 +127,15 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   }
 
   @Override
-  public BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph> getFactory() {
+  public BaseGraphFactory<
+    EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> getFactory() {
     return config.getLogicalGraphFactory();
+  }
+
+  @Override
+  public BaseGraphCollectionFactory<
+    EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> getCollectionFactory() {
+    return config.getGraphCollectionFactory();
   }
 
   @Override
@@ -139,27 +149,27 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   }
 
   @Override
-  public DataSet<GraphHead> getGraphHead() {
+  public DataSet<EPGMGraphHead> getGraphHead() {
     return layout.getGraphHead();
   }
 
   @Override
-  public DataSet<Vertex> getVertices() {
+  public DataSet<EPGMVertex> getVertices() {
     return layout.getVertices();
   }
 
   @Override
-  public DataSet<Vertex> getVerticesByLabel(String label) {
+  public DataSet<EPGMVertex> getVerticesByLabel(String label) {
     return layout.getVerticesByLabel(label);
   }
 
   @Override
-  public DataSet<Edge> getEdges() {
+  public DataSet<EPGMEdge> getEdges() {
     return layout.getEdges();
   }
 
   @Override
-  public DataSet<Edge> getEdgesByLabel(String label) {
+  public DataSet<EPGMEdge> getEdgesByLabel(String label) {
     return layout.getEdgesByLabel(label);
   }
 
@@ -226,9 +236,9 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
 
   @Override
   public LogicalGraph transform(
-    TransformationFunction<GraphHead> graphHeadTransformationFunction,
-    TransformationFunction<Vertex> vertexTransformationFunction,
-    TransformationFunction<Edge> edgeTransformationFunction) {
+    TransformationFunction<EPGMGraphHead> graphHeadTransformationFunction,
+    TransformationFunction<EPGMVertex> vertexTransformationFunction,
+    TransformationFunction<EPGMEdge> edgeTransformationFunction) {
     return callForGraph(new Transformation<>(
       graphHeadTransformationFunction,
       vertexTransformationFunction,
@@ -237,25 +247,25 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
 
   @Override
   public LogicalGraph transformGraphHead(
-    TransformationFunction<GraphHead> graphHeadTransformationFunction) {
+    TransformationFunction<EPGMGraphHead> graphHeadTransformationFunction) {
     return transform(graphHeadTransformationFunction, null, null);
   }
 
   @Override
   public LogicalGraph transformVertices(
-    TransformationFunction<Vertex> vertexTransformationFunction) {
+    TransformationFunction<EPGMVertex> vertexTransformationFunction) {
     return transform(null, vertexTransformationFunction, null);
   }
 
   @Override
   public LogicalGraph transformEdges(
-    TransformationFunction<Edge> edgeTransformationFunction) {
+    TransformationFunction<EPGMEdge> edgeTransformationFunction) {
     return transform(null, null, edgeTransformationFunction);
   }
 
   @Override
   public LogicalGraph vertexInducedSubgraph(
-    FilterFunction<Vertex> vertexFilterFunction) {
+    FilterFunction<EPGMVertex> vertexFilterFunction) {
     Objects.requireNonNull(vertexFilterFunction);
     return callForGraph(
       new Subgraph<>(vertexFilterFunction, null, Subgraph.Strategy.VERTEX_INDUCED));
@@ -263,15 +273,15 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
 
   @Override
   public LogicalGraph edgeInducedSubgraph(
-    FilterFunction<Edge> edgeFilterFunction) {
+    FilterFunction<EPGMEdge> edgeFilterFunction) {
     Objects.requireNonNull(edgeFilterFunction);
     return callForGraph(new Subgraph<>(null, edgeFilterFunction, Subgraph.Strategy.EDGE_INDUCED));
   }
 
   @Override
   public LogicalGraph subgraph(
-    FilterFunction<Vertex> vertexFilterFunction,
-    FilterFunction<Edge> edgeFilterFunction, Subgraph.Strategy strategy) {
+    FilterFunction<EPGMVertex> vertexFilterFunction,
+    FilterFunction<EPGMEdge> edgeFilterFunction, Subgraph.Strategy strategy) {
 
     return callForGraph(
       new Subgraph<>(vertexFilterFunction, edgeFilterFunction, strategy));
@@ -362,6 +372,11 @@ public class LogicalGraph implements BaseGraph<GraphHead, Vertex, Edge, LogicalG
   @Override
   public LogicalGraph verify() {
     return callForGraph(new Verify<>());
+  }
+
+  @Override
+  public LogicalGraph verifyGraphContainment() {
+    return callForGraph(new VerifyGraphContainment<>());
   }
 
   //----------------------------------------------------------------------------

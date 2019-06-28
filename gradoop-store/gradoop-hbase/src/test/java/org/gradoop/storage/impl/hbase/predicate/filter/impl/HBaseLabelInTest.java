@@ -19,7 +19,7 @@ import org.apache.hadoop.hbase.filter.CompareFilter;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -41,7 +41,7 @@ public class HBaseLabelInTest {
     String testLabel1 = "test1";
     String testLabel2 = "test2";
 
-    HBaseLabelIn<Edge> edgeFilter = new HBaseLabelIn<>(testLabel1, testLabel2);
+    HBaseLabelIn<EPGMEdge> edgeFilter = new HBaseLabelIn<>(testLabel1, testLabel2);
 
     FilterList expectedFilterList = new FilterList(FilterList.Operator.MUST_PASS_ONE);
 

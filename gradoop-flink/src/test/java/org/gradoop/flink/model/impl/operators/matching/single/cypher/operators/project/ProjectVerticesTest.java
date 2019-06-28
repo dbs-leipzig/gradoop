@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import com.google.common.collect.Lists;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperatorTest;
@@ -32,7 +32,7 @@ public class ProjectVerticesTest extends PhysicalOperatorTest {
 
   @Test
   public void returnsEmbeddingWithOneProjection() throws Exception {
-    DataSet<Vertex> edgeDataSet = createVerticesWithProperties(
+    DataSet<EPGMVertex> edgeDataSet = createVerticesWithProperties(
       Lists.newArrayList("foo", "bar", "baz")
     );
 

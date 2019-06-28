@@ -17,11 +17,12 @@ package org.gradoop.flink.model.api.epgm;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.ElementFactoryProvider;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
+import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -35,13 +36,15 @@ import java.util.Map;
  * @param <G> type of the graph head
  * @param <V> the vertex type
  * @param <E> the edge type
+ * @param <LG> the type of the logical graph
  * @param <GC> the type of the graph collection that will be created with this factory
  */
 public interface BaseGraphCollectionFactory<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
-  GC extends BaseGraphCollection<G, V, E, GC>> extends ElementFactoryProvider<G, V, E> {
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>> extends ElementFactoryProvider<G, V, E> {
 
   /**
    * Sets the layout factory that is responsible for creating a graph collection layout.
@@ -97,7 +100,7 @@ public interface BaseGraphCollectionFactory<
    * @param logicalGraphLayout  input graph
    * @return 1-element graph collection
    */
-  GC fromGraph(LogicalGraph logicalGraphLayout);
+  GC fromGraph(LogicalGraphLayout<G, V, E> logicalGraphLayout);
 
   /**
    * Creates a graph collection from multiple given logical graphs.

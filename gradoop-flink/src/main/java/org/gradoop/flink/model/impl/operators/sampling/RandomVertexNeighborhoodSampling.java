@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -104,10 +104,10 @@ public class RandomVertexNeighborhoodSampling extends SamplingAlgorithm {
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
-    DataSet<Vertex> sampledVertices = graph.getVertices()
+    DataSet<EPGMVertex> sampledVertices = graph.getVertices()
       .map(new RandomVertex(sampleSize, randomSeed, SamplingConstants.PROPERTY_KEY_SAMPLED));
 
-    DataSet<Edge> newEdges = graph.getEdges()
+    DataSet<EPGMEdge> newEdges = graph.getEdges()
       .join(sampledVertices)
       .where(new SourceId<>()).equalTo(new Id<>())
       .with(new EdgeSourceVertexJoin(SamplingConstants.PROPERTY_KEY_SAMPLED))

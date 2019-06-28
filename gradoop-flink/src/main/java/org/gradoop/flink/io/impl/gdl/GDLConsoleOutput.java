@@ -16,12 +16,11 @@
 package org.gradoop.flink.io.impl.gdl;
 
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,35 +33,56 @@ public class GDLConsoleOutput {
   /**
    * Prints the logical graph to the standard output.
    *
-   * @param logicalGraph The logical graph that is supposed to be printed.
+   * @param graph The logical graph that is supposed to be printed.
+   * @param <G>   the graph head type
+   * @param <V>   the vertex type
+   * @param <E>   the edge type
+   * @param <LG>  the type of the logical graph instance
+   * @param <GC>  the type of the according graph collection
    * @throws Exception Forwarded from flink execute.
    */
-  public static void print(LogicalGraph logicalGraph) throws Exception {
-    GraphCollectionFactory collectionFactory = logicalGraph.getConfig().getGraphCollectionFactory();
-    GraphCollection graphCollection = collectionFactory.fromGraph(logicalGraph);
+  public static <
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> void print(BaseGraph<G, V, E, LG, GC> graph)
+    throws Exception {
 
-    print(graphCollection);
+    print(graph.getCollectionFactory().fromGraph(graph));
   }
 
   /**
    * Prints the graph collection to the standard output.
    *
-   * @param graphCollection The graph collection that is supposed to be printed.
+   * @param collection The graph collection that is supposed to be printed.
+   * @param <G>        the graph head type
+   * @param <V>        the vertex type
+   * @param <E>        the edge type
+   * @param <LG>       the type of the logical graph
+   * @param <GC>       the type of the graph collection
    * @throws Exception Forwarded from flink execute.
    */
-  public static void print(GraphCollection graphCollection) throws Exception {
-    List<GraphHead> graphHeads = new ArrayList<>();
-    graphCollection.getGraphHeads().output(new LocalCollectionOutputFormat<>(graphHeads));
+  public static <
+    G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> void print(
+      BaseGraphCollection<G, V, E, LG, GC> collection) throws Exception {
 
-    List<Vertex> vertices = new ArrayList<>();
-    graphCollection.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
+    List<G> graphHeads = new ArrayList<>();
+    collection.getGraphHeads().output(new LocalCollectionOutputFormat<>(graphHeads));
 
-    List<Edge> edges = new ArrayList<>();
-    graphCollection.getEdges().output(new LocalCollectionOutputFormat<>(edges));
+    List<V> vertices = new ArrayList<>();
+    collection.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
 
-    graphCollection.getConfig().getExecutionEnvironment().execute();
+    List<E> edges = new ArrayList<>();
+    collection.getEdges().output(new LocalCollectionOutputFormat<>(edges));
 
-    GDLEncoder encoder = new GDLEncoder(graphHeads, vertices, edges);
+    collection.getConfig().getExecutionEnvironment().execute();
+
+    GDLEncoder encoder = new GDLEncoder<>(graphHeads, vertices, edges);
     String graphString = encoder.getGDLString();
 
     System.out.println(graphString);

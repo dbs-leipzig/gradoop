@@ -15,15 +15,20 @@
  */
 package org.gradoop.flink.model.impl.operators.verify;
 
+import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.epgm.ByProperty;
+import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 import org.gradoop.flink.util.FlinkAsciiGraphLoader;
 import org.junit.Test;
@@ -35,8 +40,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * Test for the {@link Verify} operator.
@@ -49,7 +53,7 @@ public class VerifyTest extends GradoopFlinkTestBase {
    * @throws Exception when the execution in Flink fails.
    */
   @Test
-  public void testWithSubgraph() throws Exception {
+  public void testVerifyWithSubgraph() throws Exception {
     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
     loader.appendToDatabaseFromString("expected[" +
       "(eve)-[ekb:knows {since : 2015}]->(bob)" +
@@ -57,13 +61,13 @@ public class VerifyTest extends GradoopFlinkTestBase {
     LogicalGraph input = loader.getLogicalGraphByVariable("g0");
     // Apply a subgraph operator that would result in dangling edges.
     LogicalGraph subgraph = input.subgraph(
-      new ByProperty<Vertex>("name", PropertyValue.create("Alice")).negate(),
+      new ByProperty<EPGMVertex>("name", PropertyValue.create("Alice")).negate(),
       new True<>(), Subgraph.Strategy.BOTH);
     // Make sure that the graph contains dangling edges.
-    List<Edge> danglingEdges = getDanglingEdges(subgraph);
-    List<Edge> expectedDanglingEdges = Arrays.asList(loader.getEdgeByVariable("eka"),
+    List<EPGMEdge> danglingEdges = getDanglingEdges(subgraph);
+    List<EPGMEdge> expectedDanglingEdges = Arrays.asList(loader.getEdgeByVariable("eka"),
       loader.getEdgeByVariable("akb"), loader.getEdgeByVariable("bka"));
-    Comparator<Edge> comparator = Comparator.comparing(Edge::getId);
+    Comparator<EPGMEdge> comparator = Comparator.comparing(EPGMEdge::getId);
     danglingEdges.sort(comparator);
     expectedDanglingEdges.sort(comparator);
     assertArrayEquals(expectedDanglingEdges.toArray(), danglingEdges.toArray());
@@ -81,15 +85,69 @@ public class VerifyTest extends GradoopFlinkTestBase {
    *
    * @throws Exception when the execution in Flink fails.
    */
-  private List<Edge> getDanglingEdges(LogicalGraph graph) throws Exception {
-    List<Vertex> vertices = new ArrayList<>();
-    List<Edge> edges = new ArrayList<>();
+  private List<EPGMEdge> getDanglingEdges(LogicalGraph graph) throws Exception {
+    List<EPGMVertex> vertices = new ArrayList<>();
+    List<EPGMEdge> edges = new ArrayList<>();
     graph.getVertices().output(new LocalCollectionOutputFormat<>(vertices));
     graph.getEdges().output(new LocalCollectionOutputFormat<>(edges));
     getExecutionEnvironment().execute();
-    Set<GradoopId> ids = vertices.stream().map(Vertex::getId).collect(Collectors.toSet());
+    Set<GradoopId> ids = vertices.stream().map(EPGMVertex::getId).collect(Collectors.toSet());
     return edges.stream()
       .filter(e -> !ids.contains(e.getSourceId()) || !ids.contains(e.getTargetId()))
       .collect(Collectors.toList());
+  }
+
+  /**
+   * Test {@link VerifyGraphContainment} on a logical graph.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testVerifyGraphContainment() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+
+    LogicalGraph graph = loader.getLogicalGraphByVariable("g1");
+    graph = graph.verifyGraphContainment();
+
+    GradoopIdSet idSet = GradoopIdSet.fromExisting(graph.getGraphHead().map(new Id<>()).collect());
+
+    assertGraphContainment(idSet, graph.getVertices());
+    assertGraphContainment(idSet, graph.getEdges());
+  }
+
+  /**
+   * Test {@link VerifyGraphsContainment} on a graph collection.
+   *
+   * @throws Exception when the execution in Flink fails.
+   */
+  @Test
+  public void testVerifyGraphsContainment() throws Exception {
+    FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
+
+    GraphCollection collection = loader.getGraphCollectionByVariables("g1", "g2");
+    collection = collection.verifyGraphsContainment();
+
+    GradoopIdSet idSet = GradoopIdSet.fromExisting(collection.getGraphHeads().map(new Id<>()).collect());
+
+    assertGraphContainment(idSet, collection.getVertices());
+    assertGraphContainment(idSet, collection.getEdges());
+  }
+
+  /**
+   * Function to test graph element datasets for dangling graph ids.
+   *
+   * @param idSet ids of the corresponding graph or graph collection.
+   * @param elements element dataset to test for dangling grahp ids.
+   * @param <E> element type.
+   * @throws Exception when the execution in Flink fails.
+   */
+  private <E extends GraphElement> void assertGraphContainment(GradoopIdSet idSet, DataSet<E> elements)
+    throws Exception {
+    for (E element : elements.collect()) {
+      GradoopIdSet ids = element.getGraphIds();
+      assertFalse("EPGMElement has no graph ids", ids.isEmpty());
+      ids.removeAll(idSet);
+      assertTrue("EPGMElement has dangling graph ids", ids.isEmpty());
+    }
   }
 }

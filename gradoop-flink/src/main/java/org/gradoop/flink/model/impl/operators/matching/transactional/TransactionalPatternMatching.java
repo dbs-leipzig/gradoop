@@ -20,9 +20,9 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -45,7 +45,7 @@ import org.gradoop.flink.model.impl.operators.matching.transactional.function.In
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.Project4To0And2AndSwitch;
 import org.gradoop.flink.model.impl.operators.matching.transactional.function.Project4To0And3AndSwitch;
 import org.gradoop.flink.model.impl.operators.matching.transactional.tuples.GraphWithCandidates;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
+import org.gradoop.flink.model.impl.operators.matching.transactional.function.AddGraphsToElements;
 
 /**
  * Operator to match a given pattern on a graph collection
@@ -151,7 +151,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     // join matches to graph heads
     //--------------------------------------------------------------------------
-    DataSet<GraphHead> newHeads = collection.getGraphHeads()
+    DataSet<EPGMGraphHead> newHeads = collection.getGraphHeads()
       .coGroup(matches)
       .where(new Id<>()).equalTo(0)
       .with(new AddMatchesToProperties());
@@ -183,7 +183,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     // create new graph heads
     //--------------------------------------------------------------------------
-    DataSet<GraphHead> newHeads = embeddings
+    DataSet<EPGMGraphHead> newHeads = embeddings
       .map(new Project4To0And1<>())
       .map(new InitGraphHeadWithLineage(collection.getConfig().getGraphHeadFactory()));
 
@@ -195,7 +195,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
       .flatMap(new ExpandFirstField<>()).groupBy(0)
       .reduceGroup(new MergeSecondField<>());
 
-    DataSet<Vertex> newVertices = verticesWithGraphs
+    DataSet<EPGMVertex> newVertices = verticesWithGraphs
       .join(collection.getVertices())
       .where(0).equalTo(new Id<>())
       .with(new AddGraphsToElements<>());
@@ -208,7 +208,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
       .flatMap(new ExpandFirstField<>()).groupBy(0)
       .reduceGroup(new MergeSecondField<>());
 
-    DataSet<Edge> newEdges = edgesWithGraphs
+    DataSet<EPGMEdge> newEdges = edgesWithGraphs
       .join(collection.getEdges())
       .where(0).equalTo(new Id<>())
       .with(new AddGraphsToElements<>());

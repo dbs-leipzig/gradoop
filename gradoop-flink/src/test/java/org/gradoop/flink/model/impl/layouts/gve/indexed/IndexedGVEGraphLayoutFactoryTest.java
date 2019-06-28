@@ -15,16 +15,16 @@
  */
 package org.gradoop.flink.model.impl.layouts.gve.indexed;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.layouts.LogicalGraphLayoutFactoryTest;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 public class IndexedGVEGraphLayoutFactoryTest extends LogicalGraphLayoutFactoryTest {
   @Override
-  protected LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> getFactory() {
+  protected LogicalGraphLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> getFactory() {
     IndexedGVEGraphLayoutFactory logicalGraphLayoutFactory = new IndexedGVEGraphLayoutFactory();
     GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
     config.setLogicalGraphLayoutFactory(logicalGraphLayoutFactory);

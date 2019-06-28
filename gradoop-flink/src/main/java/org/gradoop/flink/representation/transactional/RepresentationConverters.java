@@ -18,12 +18,12 @@ package org.gradoop.flink.representation.transactional;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
@@ -53,12 +53,12 @@ public class RepresentationConverters {
    */
   public static <ED, VD> AdjacencyList<GradoopId, String, ED, VD> getAdjacencyList(
     GraphTransaction transaction,
-    MapFunction<Edge, ED> edgeDataFactory,
-    MapFunction<Vertex, VD> vertexDataFactory
+    MapFunction<EPGMEdge, ED> edgeDataFactory,
+    MapFunction<EPGMVertex, VD> vertexDataFactory
   ) throws Exception {
 
-    Set<Vertex> vertices = transaction.getVertices();
-    Set<Edge> edges = transaction.getEdges();
+    Set<EPGMVertex> vertices = transaction.getVertices();
+    Set<EPGMEdge> edges = transaction.getEdges();
 
     int vertexCount = vertices.size();
 
@@ -74,26 +74,26 @@ public class RepresentationConverters {
     Map<GradoopId, AdjacencyListRow<ED, VD>> incomingRows =
       Maps.newHashMapWithExpectedSize(vertexCount);
 
-    Map<GradoopId, Vertex> vertexIndex = Maps.newHashMapWithExpectedSize(vertexCount);
+    Map<GradoopId, EPGMVertex> vertexIndex = Maps.newHashMapWithExpectedSize(vertexCount);
 
     // VERTICES
-    for (Vertex vertex : vertices) {
+    for (EPGMVertex vertex : vertices) {
       addLabelsAndProperties(vertex, labels, properties);
       vertexIndex.put(vertex.getId(), vertex);
     }
 
     // EDGES
 
-    for (Edge edge : edges) {
+    for (EPGMEdge edge : edges) {
       addLabelsAndProperties(edge, labels, properties);
 
-      Vertex source = vertexIndex.get(edge.getSourceId());
+      EPGMVertex source = vertexIndex.get(edge.getSourceId());
       AdjacencyListRow<ED, VD> outgoingRow =
         outgoingRows.computeIfAbsent(source.getId(), k -> new AdjacencyListRow<>());
 
       VD sourceData = vertexDataFactory.map(source);
 
-      Vertex target = vertexIndex.get(edge.getTargetId());
+      EPGMVertex target = vertexIndex.get(edge.getTargetId());
       AdjacencyListRow<ED, VD> incomingRow =
         incomingRows.computeIfAbsent(target.getId(), k -> new AdjacencyListRow<>());
       VD targetData = vertexDataFactory.map(target);
@@ -116,7 +116,7 @@ public class RepresentationConverters {
    * @param properties id-properties map
    */
   private static void addLabelsAndProperties(
-    EPGMElement element,
+    Element element,
     Map<GradoopId, String> labels,
     Map<GradoopId, Properties> properties
   ) {
@@ -138,12 +138,12 @@ public class RepresentationConverters {
     GradoopId> adjacencyList) {
 
     // GRAPH HEAD
-    GraphHead graphHead = adjacencyList.getGraphHead();
+    EPGMGraphHead graphHead = adjacencyList.getGraphHead();
 
     GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
 
-    Set<Vertex> vertices = Sets.newHashSet();
-    Set<Edge> edges = Sets.newHashSet();
+    Set<EPGMVertex> vertices = Sets.newHashSet();
+    Set<EPGMEdge> edges = Sets.newHashSet();
 
     // VERTICES
     for (Map.Entry<GradoopId, AdjacencyListRow<GradoopId, GradoopId>> entry :
@@ -152,7 +152,7 @@ public class RepresentationConverters {
       GradoopId sourceId = entry.getKey();
       Properties properties = adjacencyList.getProperties(sourceId);
       String label = adjacencyList.getLabel(sourceId);
-      vertices.add(new Vertex(sourceId, label, properties, graphIds));
+      vertices.add(new EPGMVertex(sourceId, label, properties, graphIds));
 
       // EDGES
       for (AdjacencyListCell<GradoopId, GradoopId> cell : entry.getValue().getCells()) {
@@ -161,7 +161,7 @@ public class RepresentationConverters {
         properties = adjacencyList.getProperties(edgeId);
         GradoopId targetId = cell.getVertexData();
 
-        edges.add(new Edge(edgeId, label, sourceId, targetId, properties, graphIds));
+        edges.add(new EPGMEdge(edgeId, label, sourceId, targetId, properties, graphIds));
       }
     }
 
