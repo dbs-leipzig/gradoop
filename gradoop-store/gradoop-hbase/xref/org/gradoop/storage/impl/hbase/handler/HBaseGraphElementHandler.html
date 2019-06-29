@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Put;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Result;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.util.Bytes;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphElement;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphElement;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.hbase.api.GraphElementHandler;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.hbase.constants.HBaseConstants;
@@ -44,7 +44,7 @@
 <a name="34" href="#34">34</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> byte[] COL_GRAPHS_BYTES = Bytes.toBytes(HBaseConstants.COL_GRAPHS);
 <a name="35" href="#35">35</a>  
 <a name="36" href="#36">36</a>    @Override
-<a name="37" href="#37">37</a>    <strong class="jxr_keyword">public</strong> Put writeGraphIds(Put put, EPGMGraphElement graphElement) {
+<a name="37" href="#37">37</a>    <strong class="jxr_keyword">public</strong> Put writeGraphIds(Put put, GraphElement graphElement) {
 <a name="38" href="#38">38</a>      <strong class="jxr_keyword">if</strong> (graphElement.getGraphCount() &gt; 0) {
 <a name="39" href="#39">39</a>        put = put.addColumn(
 <a name="40" href="#40">40</a>          CF_META_BYTES,

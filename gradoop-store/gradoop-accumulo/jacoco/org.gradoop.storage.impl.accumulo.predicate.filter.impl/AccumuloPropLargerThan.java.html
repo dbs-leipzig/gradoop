@@ -15,7 +15,7 @@
  */
 package org.gradoop.storage.impl.accumulo.predicate.filter.impl;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.storage.common.predicate.filter.impl.PropLargerThan;
 import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
@@ -23,9 +23,9 @@ import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFil
 /**
  * Accumulo property value compare predicate implement
  *
- * @param &lt;T&gt; EPGM element type
+ * @param &lt;T&gt; element type
  */
-public class AccumuloPropLargerThan&lt;T extends EPGMElement&gt;
+public class AccumuloPropLargerThan&lt;T extends Element&gt;
   extends PropLargerThan&lt;AccumuloElementFilter&lt;T&gt;&gt;
   implements AccumuloElementFilter&lt;T&gt; {
 

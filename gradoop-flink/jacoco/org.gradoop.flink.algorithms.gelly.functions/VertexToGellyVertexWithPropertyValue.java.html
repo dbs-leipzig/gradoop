@@ -17,7 +17,7 @@ package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
@@ -34,25 +34,23 @@ public class VertexToGellyVertexWithPropertyValue implements VertexToGellyVertex
   /**
    * Reduce object instantiations
    */
-  private final org.apache.flink.graph.Vertex&lt;GradoopId, PropertyValue&gt;
-  reuseVertex;
+  private final org.apache.flink.graph.Vertex&lt;GradoopId, PropertyValue&gt; reuseVertex;
 
   /**
    * Constructor
    *
    * @param propertyKey property key for get property value
    */
-<span class="fc" id="L45">  public VertexToGellyVertexWithPropertyValue(String propertyKey) {</span>
-<span class="fc" id="L46">    this.propertyKey = propertyKey;</span>
-<span class="fc" id="L47">    this.reuseVertex = new org.apache.flink.graph.Vertex&lt;&gt;();</span>
-<span class="fc" id="L48">  }</span>
+<span class="fc" id="L44">  public VertexToGellyVertexWithPropertyValue(String propertyKey) {</span>
+<span class="fc" id="L45">    this.propertyKey = propertyKey;</span>
+<span class="fc" id="L46">    this.reuseVertex = new org.apache.flink.graph.Vertex&lt;&gt;();</span>
+<span class="fc" id="L47">  }</span>
 
   @Override
-  public org.apache.flink.graph.Vertex&lt;GradoopId, PropertyValue&gt; map(
-    Vertex epgmVertex) throws Exception {
-<span class="fc" id="L53">    reuseVertex.setId(epgmVertex.getId());</span>
-<span class="fc" id="L54">    reuseVertex.setValue(epgmVertex.getPropertyValue(propertyKey));</span>
-<span class="fc" id="L55">    return reuseVertex;</span>
+  public org.apache.flink.graph.Vertex&lt;GradoopId, PropertyValue&gt; map(EPGMVertex epgmVertex) throws Exception {
+<span class="fc" id="L51">    reuseVertex.setId(epgmVertex.getId());</span>
+<span class="fc" id="L52">    reuseVertex.setValue(epgmVertex.getPropertyValue(propertyKey));</span>
+<span class="fc" id="L53">    return reuseVertex;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

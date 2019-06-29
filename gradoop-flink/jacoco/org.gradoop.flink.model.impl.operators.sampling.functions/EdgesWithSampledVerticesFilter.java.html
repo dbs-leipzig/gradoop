@@ -18,14 +18,14 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * Filters the edges with sampled vertices. If any vertices of the edge does not have any related
  * property for sampling, we consider that vertex as not sampled.
  */
 public class EdgesWithSampledVerticesFilter
-  implements FilterFunction&lt;Tuple3&lt;Edge, Boolean, Boolean&gt;&gt; {
+  implements FilterFunction&lt;Tuple3&lt;EPGMEdge, Boolean, Boolean&gt;&gt; {
 
   /**
    * Type of neighborhood
@@ -42,7 +42,7 @@ public class EdgesWithSampledVerticesFilter
 <span class="fc" id="L42">  }</span>
 
   @Override
-  public boolean filter(Tuple3&lt;Edge, Boolean, Boolean&gt; tuple) {
+  public boolean filter(Tuple3&lt;EPGMEdge, Boolean, Boolean&gt; tuple) {
 
 <span class="fc" id="L47">    boolean isSourceVertexMarked = tuple.f1;</span>
 <span class="fc" id="L48">    boolean isTargetVertexMarked = tuple.f2;</span>

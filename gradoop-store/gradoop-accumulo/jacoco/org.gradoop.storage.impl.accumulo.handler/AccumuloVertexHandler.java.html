@@ -17,35 +17,35 @@ package org.gradoop.storage.impl.accumulo.handler;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 
 /**
  * Accumulo vertex handler for row's read/write operator
  */
-public class AccumuloVertexHandler implements AccumuloRowHandler&lt;Vertex, EPGMVertex&gt; {
+public class AccumuloVertexHandler implements AccumuloRowHandler&lt;EPGMVertex, Vertex&gt; {
 
   /**
    * vertex factory
    */
-  private final EPGMVertexFactory&lt;Vertex&gt; factory;
+  private final VertexFactory&lt;EPGMVertex&gt; factory;
 
   /**
    * vertex handler factory constructor
    *
    * @param factory vertex factory
    */
-<span class="fc" id="L41">  public AccumuloVertexHandler(EPGMVertexFactory&lt;Vertex&gt; factory) {</span>
+<span class="fc" id="L41">  public AccumuloVertexHandler(VertexFactory&lt;EPGMVertex&gt; factory) {</span>
 <span class="fc" id="L42">    this.factory = factory;</span>
 <span class="fc" id="L43">  }</span>
 
   @Override
   public Mutation writeRow(
     Mutation mutation,
-    EPGMVertex record
+    Vertex record
   ) {
 <span class="fc" id="L50">    mutation.put(AccumuloTables.KEY.LABEL, AccumuloTables.KEY.NONE, record.getLabel());</span>
 
@@ -68,7 +68,7 @@ public class AccumuloVertexHandler implements AccumuloRowHandler&lt;Vertex, EPGM
   }
 
   @Override
-  public Vertex readRow(EPGMVertex origin) {
+  public EPGMVertex readRow(Vertex origin) {
 <span class="fc" id="L72">    return factory.initVertex(</span>
 <span class="fc" id="L73">      origin.getId(),</span>
 <span class="fc" id="L74">      origin.getLabel(),</span>

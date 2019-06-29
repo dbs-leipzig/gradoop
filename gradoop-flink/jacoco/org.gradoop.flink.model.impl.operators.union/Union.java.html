@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.union;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
 
@@ -29,25 +29,25 @@ import org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
 <span class="fc" id="L29">public class Union extends SetOperatorBase {</span>
 
   @Override
-  protected DataSet&lt;Vertex&gt; computeNewVertices(
-    DataSet&lt;GraphHead&gt; newGraphHeads) {
+  protected DataSet&lt;EPGMVertex&gt; computeNewVertices(
+    DataSet&lt;EPGMGraphHead&gt; newGraphHeads) {
 <span class="fc" id="L34">    return firstCollection.getVertices()</span>
 <span class="fc" id="L35">      .union(secondCollection.getVertices())</span>
-<span class="fc" id="L36">      .distinct(new Id&lt;Vertex&gt;());</span>
+<span class="fc" id="L36">      .distinct(new Id&lt;EPGMVertex&gt;());</span>
   }
 
   @Override
-  protected DataSet&lt;GraphHead&gt; computeNewGraphHeads() {
+  protected DataSet&lt;EPGMGraphHead&gt; computeNewGraphHeads() {
 <span class="fc" id="L41">    return firstCollection.getGraphHeads()</span>
 <span class="fc" id="L42">      .union(secondCollection.getGraphHeads())</span>
-<span class="fc" id="L43">      .distinct(new Id&lt;GraphHead&gt;());</span>
+<span class="fc" id="L43">      .distinct(new Id&lt;EPGMGraphHead&gt;());</span>
   }
 
   @Override
-  protected DataSet&lt;Edge&gt; computeNewEdges(DataSet&lt;Vertex&gt; newVertices) {
+  protected DataSet&lt;EPGMEdge&gt; computeNewEdges(DataSet&lt;EPGMVertex&gt; newVertices) {
 <span class="fc" id="L48">    return firstCollection.getEdges()</span>
 <span class="fc" id="L49">      .union(secondCollection.getEdges())</span>
-<span class="fc" id="L50">      .distinct(new Id&lt;Edge&gt;());</span>
+<span class="fc" id="L50">      .distinct(new Id&lt;EPGMEdge&gt;());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

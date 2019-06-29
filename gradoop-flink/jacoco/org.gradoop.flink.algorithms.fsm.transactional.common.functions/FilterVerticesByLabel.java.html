@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -54,10 +54,10 @@ import java.util.Set;
 
     // drop vertices with infrequent labels
 
-<span class="fc" id="L57">    Iterator&lt;Vertex&gt; vertexIterator = transaction.getVertices().iterator();</span>
+<span class="fc" id="L57">    Iterator&lt;EPGMVertex&gt; vertexIterator = transaction.getVertices().iterator();</span>
 
 <span class="fc bfc" id="L59" title="All 2 branches covered.">    while (vertexIterator.hasNext()) {</span>
-<span class="fc" id="L60">      Vertex next = vertexIterator.next();</span>
+<span class="fc" id="L60">      EPGMVertex next = vertexIterator.next();</span>
 
 <span class="fc bfc" id="L62" title="All 2 branches covered.">      if (frequentVertexLabels.contains(next.getLabel())) {</span>
 <span class="fc" id="L63">        keptVertexIds.add(next.getId());</span>

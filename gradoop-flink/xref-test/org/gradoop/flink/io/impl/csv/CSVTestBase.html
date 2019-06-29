@@ -27,12 +27,12 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.GradoopTestUtils;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMElement;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Element;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -129,17 +129,17 @@
 <a name="119" href="#119">119</a>     GradoopIdSet heads = GradoopIdSet.fromExisting(idForum);
 <a name="120" href="#120">120</a>     Properties properties = Properties.createFromMap(PROPERTY_MAP);
 <a name="121" href="#121">121</a> 
-<a name="122" href="#122">122</a>     DataSet&lt;GraphHead&gt; graphHead = getExecutionEnvironment().fromElements(
-<a name="123" href="#123">123</a>       <strong class="jxr_keyword">new</strong> GraphHead(idForum, <span class="jxr_string">"Forum"</span>, properties)
+<a name="122" href="#122">122</a>     DataSet&lt;EPGMGraphHead&gt; graphHead = getExecutionEnvironment().fromElements(
+<a name="123" href="#123">123</a>       <strong class="jxr_keyword">new</strong> EPGMGraphHead(idForum, <span class="jxr_string">"Forum"</span>, properties)
 <a name="124" href="#124">124</a>     );
 <a name="125" href="#125">125</a> 
-<a name="126" href="#126">126</a>     DataSet&lt;Vertex&gt; vertices = getExecutionEnvironment().fromElements(
-<a name="127" href="#127">127</a>       <strong class="jxr_keyword">new</strong> Vertex(idUser, <span class="jxr_string">"User"</span>, properties, heads),
-<a name="128" href="#128">128</a>       <strong class="jxr_keyword">new</strong> Vertex(idPost, <span class="jxr_string">"Post"</span>, properties, heads)
+<a name="126" href="#126">126</a>     DataSet&lt;EPGMVertex&gt; vertices = getExecutionEnvironment().fromElements(
+<a name="127" href="#127">127</a>       <strong class="jxr_keyword">new</strong> EPGMVertex(idUser, <span class="jxr_string">"User"</span>, properties, heads),
+<a name="128" href="#128">128</a>       <strong class="jxr_keyword">new</strong> EPGMVertex(idPost, <span class="jxr_string">"Post"</span>, properties, heads)
 <a name="129" href="#129">129</a>     );
 <a name="130" href="#130">130</a> 
-<a name="131" href="#131">131</a>     DataSet&lt;Edge&gt; edges = getExecutionEnvironment().fromElements(
-<a name="132" href="#132">132</a>       <strong class="jxr_keyword">new</strong> Edge(GradoopId.get(), <span class="jxr_string">"creatorOf"</span>, idUser, idPost, properties, heads)
+<a name="131" href="#131">131</a>     DataSet&lt;EPGMEdge&gt; edges = getExecutionEnvironment().fromElements(
+<a name="132" href="#132">132</a>       <strong class="jxr_keyword">new</strong> EPGMEdge(GradoopId.get(), <span class="jxr_string">"creatorOf"</span>, idUser, idPost, properties, heads)
 <a name="133" href="#133">133</a>     );
 <a name="134" href="#134">134</a> 
 <a name="135" href="#135">135</a>     <strong class="jxr_keyword">return</strong> getConfig().getLogicalGraphFactory().fromDataSets(graphHead, vertices, edges);
@@ -148,89 +148,89 @@
 <a name="138" href="#138">138</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="139" href="#139">139</a> <em class="jxr_javadoccomment">   * Check all time properties of an epgm element</em>
 <a name="140" href="#140">140</a> <em class="jxr_javadoccomment">   *</em>
-<a name="141" href="#141">141</a> <em class="jxr_javadoccomment">   * @param epgmElement the element to check</em>
+<a name="141" href="#141">141</a> <em class="jxr_javadoccomment">   * @param element the element to check</em>
 <a name="142" href="#142">142</a> <em class="jxr_javadoccomment">   */</em>
-<a name="143" href="#143">143</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> checkProperties(EPGMElement epgmElement) {
+<a name="143" href="#143">143</a>   <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> checkProperties(Element element) {
 <a name="144" href="#144">144</a>     <em class="jxr_comment">// assert that the element has properties</em>
-<a name="145" href="#145">145</a>     assertNotNull(epgmElement.getProperties());
+<a name="145" href="#145">145</a>     assertNotNull(element.getProperties());
 <a name="146" href="#146">146</a>     <em class="jxr_comment">// assert that there are 3 properties</em>
-<a name="147" href="#147">147</a>     assertEquals(PROPERTY_MAP.size(), epgmElement.getPropertyCount());
+<a name="147" href="#147">147</a>     assertEquals(PROPERTY_MAP.size(), element.getPropertyCount());
 <a name="148" href="#148">148</a>     <em class="jxr_comment">// assert that there are properties with keys "h", "i" and "j"</em>
-<a name="149" href="#149">149</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_0));
-<a name="150" href="#150">150</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_1));
-<a name="151" href="#151">151</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_2));
-<a name="152" href="#152">152</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_3));
-<a name="153" href="#153">153</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_4));
-<a name="154" href="#154">154</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_5));
-<a name="155" href="#155">155</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_6));
-<a name="156" href="#156">156</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_7));
-<a name="157" href="#157">157</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_8));
-<a name="158" href="#158">158</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_9));
-<a name="159" href="#159">159</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_a));
-<a name="160" href="#160">160</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_b));
-<a name="161" href="#161">161</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_c));
-<a name="162" href="#162">162</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_d));
-<a name="163" href="#163">163</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_e));
-<a name="164" href="#164">164</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_f));
-<a name="165" href="#165">165</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_g));
-<a name="166" href="#166">166</a>     assertTrue(epgmElement.hasProperty(GradoopTestUtils.KEY_h));
+<a name="149" href="#149">149</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_0));
+<a name="150" href="#150">150</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_1));
+<a name="151" href="#151">151</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_2));
+<a name="152" href="#152">152</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_3));
+<a name="153" href="#153">153</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_4));
+<a name="154" href="#154">154</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_5));
+<a name="155" href="#155">155</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_6));
+<a name="156" href="#156">156</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_7));
+<a name="157" href="#157">157</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_8));
+<a name="158" href="#158">158</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_9));
+<a name="159" href="#159">159</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_a));
+<a name="160" href="#160">160</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_b));
+<a name="161" href="#161">161</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_c));
+<a name="162" href="#162">162</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_d));
+<a name="163" href="#163">163</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_e));
+<a name="164" href="#164">164</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_f));
+<a name="165" href="#165">165</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_g));
+<a name="166" href="#166">166</a>     assertTrue(element.hasProperty(GradoopTestUtils.KEY_h));
 <a name="167" href="#167">167</a> 
 <a name="168" href="#168">168</a>     <em class="jxr_comment">// assert that the properties have valid data types</em>
-<a name="169" href="#169">169</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_0).isBoolean());
-<a name="170" href="#170">170</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_1).isInt());
-<a name="171" href="#171">171</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_2).isLong());
-<a name="172" href="#172">172</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_3).isFloat());
-<a name="173" href="#173">173</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_4).isDouble());
-<a name="174" href="#174">174</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_5).isString());
-<a name="175" href="#175">175</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_6).isGradoopId());
-<a name="176" href="#176">176</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_7).isDate());
-<a name="177" href="#177">177</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_8).isTime());
-<a name="178" href="#178">178</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_9).isDateTime());
-<a name="179" href="#179">179</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_a).isBigDecimal());
-<a name="180" href="#180">180</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_b).isMap());
-<a name="181" href="#181">181</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_c).isList());
-<a name="182" href="#182">182</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_d).isList());
-<a name="183" href="#183">183</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_e).isShort());
-<a name="184" href="#184">184</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_f).isNull());
-<a name="185" href="#185">185</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_g).isSet());
-<a name="186" href="#186">186</a>     assertTrue(epgmElement.getPropertyValue(GradoopTestUtils.KEY_h).isSet());
+<a name="169" href="#169">169</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_0).isBoolean());
+<a name="170" href="#170">170</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_1).isInt());
+<a name="171" href="#171">171</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_2).isLong());
+<a name="172" href="#172">172</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_3).isFloat());
+<a name="173" href="#173">173</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_4).isDouble());
+<a name="174" href="#174">174</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_5).isString());
+<a name="175" href="#175">175</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_6).isGradoopId());
+<a name="176" href="#176">176</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_7).isDate());
+<a name="177" href="#177">177</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_8).isTime());
+<a name="178" href="#178">178</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_9).isDateTime());
+<a name="179" href="#179">179</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_a).isBigDecimal());
+<a name="180" href="#180">180</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_b).isMap());
+<a name="181" href="#181">181</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_c).isList());
+<a name="182" href="#182">182</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_d).isList());
+<a name="183" href="#183">183</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_e).isShort());
+<a name="184" href="#184">184</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_f).isNull());
+<a name="185" href="#185">185</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_g).isSet());
+<a name="186" href="#186">186</a>     assertTrue(element.getPropertyValue(GradoopTestUtils.KEY_h).isSet());
 <a name="187" href="#187">187</a> 
 <a name="188" href="#188">188</a>     <em class="jxr_comment">// assert that the properties have valid values</em>
-<a name="189" href="#189">189</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_0).getBoolean(),
+<a name="189" href="#189">189</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_0).getBoolean(),
 <a name="190" href="#190">190</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_0));
-<a name="191" href="#191">191</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_1).getInt(),
+<a name="191" href="#191">191</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_1).getInt(),
 <a name="192" href="#192">192</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_1));
-<a name="193" href="#193">193</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_2).getLong(),
+<a name="193" href="#193">193</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_2).getLong(),
 <a name="194" href="#194">194</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_2));
-<a name="195" href="#195">195</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_3).getFloat(),
+<a name="195" href="#195">195</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_3).getFloat(),
 <a name="196" href="#196">196</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_3));
-<a name="197" href="#197">197</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_4).getDouble(),
+<a name="197" href="#197">197</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_4).getDouble(),
 <a name="198" href="#198">198</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_4));
-<a name="199" href="#199">199</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_5).getString(),
+<a name="199" href="#199">199</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_5).getString(),
 <a name="200" href="#200">200</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_5));
-<a name="201" href="#201">201</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_6).getGradoopId(),
+<a name="201" href="#201">201</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_6).getGradoopId(),
 <a name="202" href="#202">202</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_6));
-<a name="203" href="#203">203</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_7).getDate(),
+<a name="203" href="#203">203</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_7).getDate(),
 <a name="204" href="#204">204</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_7));
-<a name="205" href="#205">205</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_8).getTime(),
+<a name="205" href="#205">205</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_8).getTime(),
 <a name="206" href="#206">206</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_8));
-<a name="207" href="#207">207</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_9).getDateTime(),
+<a name="207" href="#207">207</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_9).getDateTime(),
 <a name="208" href="#208">208</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_9));
-<a name="209" href="#209">209</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_a).getBigDecimal(),
+<a name="209" href="#209">209</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_a).getBigDecimal(),
 <a name="210" href="#210">210</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_a));
-<a name="211" href="#211">211</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_b).getMap(),
+<a name="211" href="#211">211</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_b).getMap(),
 <a name="212" href="#212">212</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_b));
-<a name="213" href="#213">213</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_c).getList(),
+<a name="213" href="#213">213</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_c).getList(),
 <a name="214" href="#214">214</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_c));
-<a name="215" href="#215">215</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_d).getList(),
+<a name="215" href="#215">215</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_d).getList(),
 <a name="216" href="#216">216</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_d));
-<a name="217" href="#217">217</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_e).getShort(),
+<a name="217" href="#217">217</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_e).getShort(),
 <a name="218" href="#218">218</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_e));
-<a name="219" href="#219">219</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_f).getObject(),
+<a name="219" href="#219">219</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_f).getObject(),
 <a name="220" href="#220">220</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_f));
-<a name="221" href="#221">221</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_g).getSet(),
+<a name="221" href="#221">221</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_g).getSet(),
 <a name="222" href="#222">222</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_g));
-<a name="223" href="#223">223</a>     assertEquals(epgmElement.getPropertyValue(GradoopTestUtils.KEY_h).getSet(),
+<a name="223" href="#223">223</a>     assertEquals(element.getPropertyValue(GradoopTestUtils.KEY_h).getSet(),
 <a name="224" href="#224">224</a>       PROPERTY_MAP.get(GradoopTestUtils.KEY_h));
 <a name="225" href="#225">225</a>   }
 <a name="226" href="#226">226</a> 

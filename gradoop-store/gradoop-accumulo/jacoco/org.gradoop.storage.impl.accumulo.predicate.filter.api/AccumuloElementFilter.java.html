@@ -15,7 +15,7 @@
  */
 package org.gradoop.storage.impl.accumulo.predicate.filter.api;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.common.predicate.filter.api.ElementFilter;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopEdgeIterator;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopGraphHeadIterator;
@@ -38,16 +38,16 @@ import java.util.function.Predicate;
 /**
  * Accumulo Element Filter
  *
- * @param &lt;T&gt; epgm element type
+ * @param &lt;T&gt; element type
  * @see GradoopEdgeIterator
  * @see GradoopGraphHeadIterator
  * @see GradoopVertexIterator
  */
-public interface AccumuloElementFilter&lt;T extends EPGMElement&gt;
+public interface AccumuloElementFilter&lt;T extends Element&gt;
   extends Predicate&lt;T&gt;, ElementFilter&lt;AccumuloElementFilter&lt;T&gt;&gt;, Serializable {
 
   /**
-   * anti-serialize reducer from base64 encoded string
+   * Deserialize reducer from base64 encoded string
    * this action will be execute by tserver
    *
    * @param encoded encoded string
@@ -55,7 +55,7 @@ public interface AccumuloElementFilter&lt;T extends EPGMElement&gt;
    * @return filter instance
    */
   @Nonnull
-  static &lt;T extends EPGMElement&gt; AccumuloElementFilter&lt;T&gt; decode(String encoded) {
+  static &lt;T extends Element&gt; AccumuloElementFilter&lt;T&gt; decode(String encoded) {
 <span class="nc" id="L59">    byte[] content = Base64.getDecoder().decode(encoded);</span>
 <span class="nc" id="L60">    try (</span>
 <span class="nc" id="L61">      ByteArrayInputStream arr = new ByteArrayInputStream(content);</span>
@@ -68,7 +68,7 @@ public interface AccumuloElementFilter&lt;T extends EPGMElement&gt;
   }
 
   /**
-   * serialize reducer as base64 encoded string
+   * Serialize reducer as base64 encoded string
    * this action will be execute by client
    *
    * @return encoded string
@@ -85,7 +85,7 @@ public interface AccumuloElementFilter&lt;T extends EPGMElement&gt;
   }
 
   /**
-   * disjunctive operator
+   * Disjunctive operator
    *
    * @param another another reduce filter
    * @return conjunctive logic filter
@@ -96,7 +96,7 @@ public interface AccumuloElementFilter&lt;T extends EPGMElement&gt;
   }
 
   /**
-   * conjunctive operator
+   * Conjunctive operator
    *
    * @param another another reduce filter
    * @return conjunctive logic filter
@@ -107,7 +107,7 @@ public interface AccumuloElementFilter&lt;T extends EPGMElement&gt;
   }
 
   /**
-   * negative operator
+   * Negative operator
    * @return negative logic for current filter
    */
   @Nonnull

@@ -19,9 +19,9 @@ import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.IteratorSetting;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.storage.impl.accumulo.handler.AccumuloGraphHandler;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopGraphHeadIterator;
@@ -36,7 +36,7 @@ import java.util.Properties;
 /**
  * gradoop accumulo graph head input format
  */
-public class GraphHeadInputFormat extends BaseInputFormat&lt;GraphHead&gt; {
+public class GraphHeadInputFormat extends BaseInputFormat&lt;EPGMGraphHead&gt; {
 
   /**
    * serialize id
@@ -61,7 +61,7 @@ public class GraphHeadInputFormat extends BaseInputFormat&lt;GraphHead&gt; {
    */
   public GraphHeadInputFormat(
     @Nonnull Properties properties,
-    @Nullable AccumuloQueryHolder&lt;GraphHead&gt; predicate
+    @Nullable AccumuloQueryHolder&lt;EPGMGraphHead&gt; predicate
   ) {
 <span class="fc" id="L66">    super(properties, predicate);</span>
 <span class="fc" id="L67">  }</span>
@@ -69,7 +69,7 @@ public class GraphHeadInputFormat extends BaseInputFormat&lt;GraphHead&gt; {
   @Override
   protected void initiate() {
 <span class="fc" id="L71">    iterator = new GradoopGraphHeadIterator();</span>
-<span class="fc" id="L72">    handler = new AccumuloGraphHandler(new GraphHeadFactory());</span>
+<span class="fc" id="L72">    handler = new AccumuloGraphHandler(new EPGMGraphHeadFactory());</span>
 <span class="fc" id="L73">  }</span>
 
   @Override
@@ -88,8 +88,8 @@ public class GraphHeadInputFormat extends BaseInputFormat&lt;GraphHead&gt; {
 <span class="fc" id="L88">  }</span>
 
   @Override
-  protected GraphHead mapRow(Map.Entry&lt;Key, Value&gt; row) throws IOException {
-<span class="fc" id="L92">    EPGMGraphHead decoded = iterator.fromRow(row);</span>
+  protected EPGMGraphHead mapRow(Map.Entry&lt;Key, Value&gt; row) throws IOException {
+<span class="fc" id="L92">    GraphHead decoded = iterator.fromRow(row);</span>
 <span class="fc" id="L93">    return handler.readRow(decoded);</span>
   }
 

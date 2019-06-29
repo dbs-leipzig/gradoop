@@ -17,7 +17,7 @@ package org.gradoop.flink.algorithms.btgs.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  * Associates a (master) vertex with business transaction graphs.
  * @param &lt;V&gt; vertex type
  */
-<span class="fc" id="L28">public class SetBtgIds&lt;V extends EPGMVertex&gt;</span>
+<span class="fc" id="L28">public class SetBtgIds&lt;V extends Vertex&gt;</span>
   implements JoinFunction&lt;V, Tuple2&lt;GradoopId, GradoopIdSet&gt;, V&gt; {
 
   @Override

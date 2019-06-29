@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -94,9 +94,9 @@ public abstract class RollUp implements UnaryGraphToCollectionOperator {
    */
   @Override
   public GraphCollection execute(LogicalGraph graph) {
-<span class="fc" id="L97">    DataSet&lt;GraphHead&gt; graphHeads = null;</span>
-<span class="fc" id="L98">    DataSet&lt;Vertex&gt; vertices = null;</span>
-<span class="fc" id="L99">    DataSet&lt;Edge&gt; edges = null;</span>
+<span class="fc" id="L97">    DataSet&lt;EPGMGraphHead&gt; graphHeads = null;</span>
+<span class="fc" id="L98">    DataSet&lt;EPGMVertex&gt; vertices = null;</span>
+<span class="fc" id="L99">    DataSet&lt;EPGMEdge&gt; edges = null;</span>
 <span class="fc" id="L100">    List&lt;List&lt;String&gt;&gt; groupingKeyCombinations = getGroupingKeyCombinations();</span>
 
     // for each permutation execute a grouping
@@ -106,7 +106,7 @@ public abstract class RollUp implements UnaryGraphToCollectionOperator {
 
       // add a property to the grouped graph's head to specify the used keys
 <span class="fc" id="L108">      PropertyValue groupingKeys = PropertyValue.create(String.join(&quot;,&quot;, combination));</span>
-<span class="fc" id="L109">      DataSet&lt;GraphHead&gt; newGraphHead =</span>
+<span class="fc" id="L109">      DataSet&lt;EPGMGraphHead&gt; newGraphHead =</span>
 <span class="fc" id="L110">        groupedGraph.getGraphHead().map(new SetProperty&lt;&gt;(getGraphPropertyKey(), groupingKeys));</span>
 
 <span class="pc bpc" id="L112" title="2 of 6 branches missed.">      if (graphHeads != null &amp;&amp; vertices != null &amp;&amp; edges != null) {</span>

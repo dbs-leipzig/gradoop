@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.bool.Equals;
@@ -47,8 +47,8 @@ public class CollectionEquality
    * @param edgeToString string representation of edges
    * @param directed sets mode for directed or undirected graphs
    */
-  public CollectionEquality(GraphHeadToString&lt;GraphHead&gt; graphHeadToString,
-    VertexToString&lt;Vertex&gt; vertexToString, EdgeToString&lt;Edge&gt; edgeToString,
+  public CollectionEquality(GraphHeadToString&lt;EPGMGraphHead&gt; graphHeadToString,
+    VertexToString&lt;EPGMVertex&gt; vertexToString, EdgeToString&lt;EPGMEdge&gt; edgeToString,
 <span class="fc" id="L52">    boolean directed) {</span>
     /*
     sets mode for directed or undirected graphs

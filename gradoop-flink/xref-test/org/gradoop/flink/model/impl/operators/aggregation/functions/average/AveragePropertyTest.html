@@ -26,8 +26,8 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.average;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -69,14 +69,14 @@
 <a name="59" href="#59">59</a>        .setStrategy(GroupingStrategy.GROUP_COMBINE).build());
 <a name="60" href="#60">60</a>      <em class="jxr_comment">// We have to collect the graph here, since results are doubles which can not be checked using</em>
 <a name="61" href="#61">61</a>      <em class="jxr_comment">// equals.</em>
-<a name="62" href="#62">62</a>      List&lt;Vertex&gt; vertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
-<a name="63" href="#63">63</a>      List&lt;Edge&gt; edges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="62" href="#62">62</a>      List&lt;EPGMVertex&gt; vertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="63" href="#63">63</a>      List&lt;EPGMEdge&gt; edges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a name="64" href="#64">64</a>      result.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(vertices));
 <a name="65" href="#65">65</a>      result.getEdges().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(edges));
 <a name="66" href="#66">66</a>      getExecutionEnvironment().execute();
 <a name="67" href="#67">67</a>      assertEquals(0, edges.size());
 <a name="68" href="#68">68</a>      assertEquals(2, vertices.size());
-<a name="69" href="#69">69</a>      <strong class="jxr_keyword">for</strong> (Vertex vertex : vertices) {
+<a name="69" href="#69">69</a>      <strong class="jxr_keyword">for</strong> (EPGMVertex vertex : vertices) {
 <a name="70" href="#70">70</a>        PropertyValue valueA = vertex.getPropertyValue(<span class="jxr_string">"avg_a"</span>);
 <a name="71" href="#71">71</a>        PropertyValue valueB = vertex.getPropertyValue(<span class="jxr_string">"avg_b"</span>);
 <a name="72" href="#72">72</a>        assertNotNull(<span class="jxr_string">"Aggregate property a was not set."</span>, valueA);

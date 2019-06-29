@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
 import java.util.Map;
@@ -23,16 +23,13 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A serializable function that is applied on an EPGM element (i.e. graph head,
+ * A serializable function that is applied on an element (i.e. graph head,
  * vertex and edge) to rename property keys. If the new property key is already in use
  * the value will also be overwritten
  *
- *  @param &lt;T&gt; the {@link EPGMElement} which is target of change, e.g.
- *  {@link org.gradoop.common.model.impl.pojo.Vertex},
- *  {@link org.gradoop.common.model.impl.pojo.Edge} or
- *  {@link org.gradoop.common.model.impl.pojo.GraphHead}
+ *  @param &lt;T&gt; the {@link Element} which is target of change.
  */
-public class RenamePropertyKeys&lt;T extends EPGMElement&gt; implements TransformationFunction&lt;T&gt; {
+public class RenamePropertyKeys&lt;T extends Element&gt; implements TransformationFunction&lt;T&gt; {
 
   /**
    * a map containing the mappings from old property key names to the new ones
@@ -44,25 +41,25 @@ public class RenamePropertyKeys&lt;T extends EPGMElement&gt; implements Transfor
    *
    * @param keyMappings the map consists of &lt;old Key , new Key&gt;
    */
-<span class="fc" id="L47">  public RenamePropertyKeys(Map&lt;String, String&gt; keyMappings) {</span>
-<span class="fc" id="L48">    this.keyMappings = checkNotNull(keyMappings);</span>
-<span class="fc bfc" id="L49" title="All 2 branches covered.">    for (Map.Entry mapping : keyMappings.entrySet()) {</span>
-<span class="fc" id="L50">      checkNotNull(mapping.getKey());</span>
-<span class="fc" id="L51">      checkNotNull(mapping.getValue());</span>
-<span class="fc" id="L52">    }</span>
-<span class="fc" id="L53">  }</span>
+<span class="fc" id="L44">  public RenamePropertyKeys(Map&lt;String, String&gt; keyMappings) {</span>
+<span class="fc" id="L45">    this.keyMappings = checkNotNull(keyMappings);</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">    for (Map.Entry mapping : keyMappings.entrySet()) {</span>
+<span class="fc" id="L47">      checkNotNull(mapping.getKey());</span>
+<span class="fc" id="L48">      checkNotNull(mapping.getValue());</span>
+<span class="fc" id="L49">    }</span>
+<span class="fc" id="L50">  }</span>
 
   @Override
   public T apply(T current, T transformed) {
 
-<span class="fc bfc" id="L58" title="All 2 branches covered.">    for (Map.Entry&lt;String, String&gt; mapping : keyMappings.entrySet()) {</span>
-<span class="pc bpc" id="L59" title="1 of 2 branches missed.">      if (current.getPropertyValue(mapping.getKey()) != null) {</span>
-<span class="fc" id="L60">        current.setProperty(mapping.getValue(), current.getPropertyValue(mapping.getKey()));</span>
-<span class="fc" id="L61">        current.removeProperty(mapping.getKey());</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">    for (Map.Entry&lt;String, String&gt; mapping : keyMappings.entrySet()) {</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">      if (current.getPropertyValue(mapping.getKey()) != null) {</span>
+<span class="fc" id="L57">        current.setProperty(mapping.getValue(), current.getPropertyValue(mapping.getKey()));</span>
+<span class="fc" id="L58">        current.removeProperty(mapping.getKey());</span>
       }
-<span class="fc" id="L63">    }</span>
+<span class="fc" id="L60">    }</span>
 
-<span class="fc" id="L65">    return current;</span>
+<span class="fc" id="L62">    return current;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

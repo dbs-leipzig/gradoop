@@ -29,15 +29,15 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * Function updating the edges' sources or destination</em>
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * for each newly created hypervertex</em>
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/fusion/functions/FlatJoinSourceEdgeReference.html">FlatJoinSourceEdgeReference</a>
-<a name="30" href="#30">30</a>    implements FlatJoinFunction&lt;Edge, Tuple2&lt;Vertex, GradoopId&gt;, Edge&gt; {
+<a name="30" href="#30">30</a>    implements FlatJoinFunction&lt;EPGMEdge, Tuple2&lt;EPGMVertex, GradoopId&gt;, EPGMEdge&gt; {
 <a name="31" href="#31">31</a>  
 <a name="32" href="#32">32</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   * Checking if the stuff is actually updating the sources.</em>
@@ -55,7 +55,7 @@
 <a name="45" href="#45">45</a>    }
 <a name="46" href="#46">46</a>  
 <a name="47" href="#47">47</a>    @Override
-<a name="48" href="#48">48</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> join(Edge first, Tuple2&lt;Vertex, GradoopId&gt; second, Collector&lt;Edge&gt; out)
+<a name="48" href="#48">48</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> join(EPGMEdge first, Tuple2&lt;EPGMVertex, GradoopId&gt; second, Collector&lt;EPGMEdge&gt; out)
 <a name="49" href="#49">49</a>        <strong class="jxr_keyword">throws</strong> Exception {
 <a name="50" href="#50">50</a>      <strong class="jxr_keyword">if</strong> (second != <strong class="jxr_keyword">null</strong> &amp;&amp; !(second.f1.equals(GradoopId.NULL_VALUE))) {
 <a name="51" href="#51">51</a>        <strong class="jxr_keyword">if</strong> (isItSourceDoingNow) {

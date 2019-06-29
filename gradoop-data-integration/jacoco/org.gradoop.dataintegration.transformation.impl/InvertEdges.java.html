@@ -17,14 +17,14 @@ package org.gradoop.dataintegration.transformation.impl;
 
 import org.apache.flink.util.Preconditions;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
 /**
  * An edge transformation that swaps the source and target of an edge with a given label and
  * renames it.
  */
-public class InvertEdges implements TransformationFunction&lt;Edge&gt; {
+public class InvertEdges implements TransformationFunction&lt;EPGMEdge&gt; {
 
   /**
    * The label of the edges that should be inverted.
@@ -48,7 +48,7 @@ public class InvertEdges implements TransformationFunction&lt;Edge&gt; {
 <span class="fc" id="L48">  }</span>
 
   @Override
-  public Edge apply(Edge current, Edge transformed) {
+  public EPGMEdge apply(EPGMEdge current, EPGMEdge transformed) {
 <span class="fc bfc" id="L52" title="All 2 branches covered.">    if (current.getLabel().equals(forEdgeLabel)) {</span>
 <span class="fc" id="L53">      GradoopId source = current.getSourceId();</span>
 <span class="fc" id="L54">      GradoopId target = current.getTargetId();</span>

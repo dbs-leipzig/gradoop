@@ -15,7 +15,7 @@
  */
 package org.gradoop.storage.impl.accumulo.predicate.filter.impl;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.common.predicate.filter.impl.PropEquals;
 import org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 
@@ -24,9 +24,9 @@ import javax.annotation.Nonnull;
 /**
  * Accumulo property equality implement
  *
- * @param &lt;T&gt; EPGM element type
+ * @param &lt;T&gt; element type
  */
-public class AccumuloPropEquals&lt;T extends EPGMElement&gt;
+public class AccumuloPropEquals&lt;T extends Element&gt;
   extends PropEquals&lt;AccumuloElementFilter&lt;T&gt;&gt;
   implements AccumuloElementFilter&lt;T&gt; {
 

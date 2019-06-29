@@ -17,8 +17,8 @@ package org.gradoop.flink.io.impl.deprecated.json.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.properties.Properties;
@@ -40,19 +40,19 @@ import org.gradoop.common.model.impl.properties.Properties;
  * }
  */
 public class JSONToVertex extends JSONToEntity
-  implements MapFunction&lt;String, Vertex&gt; {
+  implements MapFunction&lt;String, EPGMVertex&gt; {
 
   /**
    * Creates vertex data objects.
    */
-  private final EPGMVertexFactory&lt;Vertex&gt; vertexFactory;
+  private final VertexFactory&lt;EPGMVertex&gt; vertexFactory;
 
   /**
    * Creates map function
    *
    * @param epgmVertexFactory vertex data factory
    */
-<span class="fc" id="L55">  public JSONToVertex(EPGMVertexFactory&lt;Vertex&gt; epgmVertexFactory) {</span>
+<span class="fc" id="L55">  public JSONToVertex(VertexFactory&lt;EPGMVertex&gt; epgmVertexFactory) {</span>
 <span class="fc" id="L56">    this.vertexFactory = epgmVertexFactory;</span>
 <span class="fc" id="L57">  }</span>
 
@@ -64,7 +64,7 @@ public class JSONToVertex extends JSONToEntity
    * @throws Exception on failure
    */
   @Override
-  public Vertex map(String s) throws Exception {
+  public EPGMVertex map(String s) throws Exception {
 <span class="fc" id="L68">    JSONObject jsonVertex = new JSONObject(s);</span>
 <span class="fc" id="L69">    GradoopId vertexID = getID(jsonVertex);</span>
 <span class="fc" id="L70">    String label = getLabel(jsonVertex);</span>

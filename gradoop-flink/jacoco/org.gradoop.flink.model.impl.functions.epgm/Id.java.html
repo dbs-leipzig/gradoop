@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param &lt;EL&gt; element type
  */
 @FunctionAnnotation.ForwardedFields(&quot;id-&gt;*&quot;)
-<span class="fc" id="L30">public class Id&lt;EL extends EPGMElement&gt;</span>
+<span class="fc" id="L30">public class Id&lt;EL extends Element&gt;</span>
   implements MapFunction&lt;EL, GradoopId&gt;, KeySelector&lt;EL, GradoopId&gt; {
 
   @Override

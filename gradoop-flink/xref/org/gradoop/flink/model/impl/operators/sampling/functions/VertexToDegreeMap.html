@@ -27,12 +27,12 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple1;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  
 <a name="22" href="#22">22</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment"> * A map from a vertex to its degree</em>
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/VertexToDegreeMap.html">VertexToDegreeMap</a> implements MapFunction&lt;Vertex, Tuple1&lt;Long&gt;&gt; {
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/VertexToDegreeMap.html">VertexToDegreeMap</a> implements MapFunction&lt;EPGMVertex, Tuple1&lt;Long&gt;&gt; {
 <a name="26" href="#26">26</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment">   * The property name for degree</em>
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment">   */</em>
@@ -52,7 +52,7 @@
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment">   * @return the degree of that vertex</em>
 <a name="43" href="#43">43</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="44" href="#44">44</a>    @Override
-<a name="45" href="#45">45</a>    <strong class="jxr_keyword">public</strong> Tuple1&lt;Long&gt; map(Vertex vertex) {
+<a name="45" href="#45">45</a>    <strong class="jxr_keyword">public</strong> Tuple1&lt;Long&gt; map(EPGMVertex vertex) {
 <a name="46" href="#46">46</a>      <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> Tuple1&lt;&gt;(Long.parseLong(vertex.getPropertyValue(nameOfDegreeProperty).toString()));
 <a name="47" href="#47">47</a>    }
 <a name="48" href="#48">48</a>  }

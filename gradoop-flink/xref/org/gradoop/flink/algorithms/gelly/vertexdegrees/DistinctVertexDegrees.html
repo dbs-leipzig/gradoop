@@ -29,7 +29,7 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.graph.Graph;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.types.NullValue;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
@@ -65,7 +65,7 @@
 <a name="55" href="#55">55</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">boolean</strong> includeZeroDegreeVertices;
 <a name="56" href="#56">56</a>  
 <a name="57" href="#57">57</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * Constructor for Vertex Degree with in- and out-degree and total of degrees of a graph.</em>
+<a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * Constructor for vertex degree with in- and out-degree and total of degrees of a graph.</em>
 <a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   * @param propertyKey Property key to store the sum of in- and out-degrees in.</em>
 <a name="61" href="#61">61</a>  <em class="jxr_javadoccomment">   * @param propertyKeyIn Property key to store the in-degree in.</em>
@@ -76,7 +76,7 @@
 <a name="66" href="#66">66</a>    }
 <a name="67" href="#67">67</a>  
 <a name="68" href="#68">68</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="69" href="#69">69</a>  <em class="jxr_javadoccomment">   * Constructor for Vertex Degree with fixed set of whether to output</em>
+<a name="69" href="#69">69</a>  <em class="jxr_javadoccomment">   * Constructor for vertex degree with fixed set of whether to output</em>
 <a name="70" href="#70">70</a>  <em class="jxr_javadoccomment">   * vertices with an in-degree of zero.</em>
 <a name="71" href="#71">71</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="72" href="#72">72</a>  <em class="jxr_javadoccomment">   * @param propertyKey Property key to store the sum of in- and out-degrees in.</em>
@@ -97,7 +97,7 @@
 <a name="87" href="#87">87</a>    @Override
 <a name="88" href="#88">88</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> executeInGelly(Graph&lt;GradoopId, NullValue, NullValue&gt; graph)
 <a name="89" href="#89">89</a>      <strong class="jxr_keyword">throws</strong> Exception {
-<a name="90" href="#90">90</a>      DataSet&lt;Vertex&gt; newVertices =
+<a name="90" href="#90">90</a>      DataSet&lt;EPGMVertex&gt; newVertices =
 <a name="91" href="#91">91</a>        <strong class="jxr_keyword">new</strong> org.apache.flink.graph.asm.degree.annotate.directed.VertexDegrees&lt;GradoopId, NullValue,
 <a name="92" href="#92">92</a>        NullValue&gt;()
 <a name="93" href="#93">93</a>        .setIncludeZeroDegreeVertices(includeZeroDegreeVertices)

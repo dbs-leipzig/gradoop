@@ -49,7 +49,7 @@
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> * Given a Triple</em>
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment"> * (</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment"> *   p1: SourceVertex(0, "Person", {name:"Alice", age:23, location: "Sweden"}),</em>
-<a name="42" href="#42">42</a>  <em class="jxr_javadoccomment"> *   e1: Edge(1, "knows", {}),</em>
+<a name="42" href="#42">42</a>  <em class="jxr_javadoccomment"> *   e1: EPGMEdge(1, "knows", {}),</em>
 <a name="43" href="#43">43</a>  <em class="jxr_javadoccomment"> *   p2: TargetVertex(2, "Person", {name:"Bob", age:23})</em>
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment"> * ),</em>
 <a name="45" href="#45">45</a>  <em class="jxr_javadoccomment"> * a predicate "p1.name = "Alice" AND p1.age &lt;= p2.age" and</em>
@@ -103,7 +103,7 @@
 <a name="93" href="#93">93</a>  <em class="jxr_javadoccomment">   * @param targetVariable Variable assigned to the vertex</em>
 <a name="94" href="#94">94</a>  <em class="jxr_javadoccomment">   * @param predicates Predicates used to filter vertices</em>
 <a name="95" href="#95">95</a>  <em class="jxr_javadoccomment">   * @param projectionPropertyKeys Property keys used for projection</em>
-<a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   * @param vertexMatchStrategy Vertex match strategy</em>
+<a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   * @param vertexMatchStrategy EPGMVertex match strategy</em>
 <a name="97" href="#97">97</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="98" href="#98">98</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/filter/FilterAndProjectTriples.html">FilterAndProjectTriples</a>(DataSet&lt;Triple&gt; input, String sourceVariable, String edgeVariable,
 <a name="99" href="#99">99</a>      String targetVariable, <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> predicates, Map&lt;String, List&lt;String&gt;&gt; projectionPropertyKeys,

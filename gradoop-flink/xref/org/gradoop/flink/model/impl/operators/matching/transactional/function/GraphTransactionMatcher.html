@@ -28,8 +28,8 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.RichMapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.configuration.Configuration;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
@@ -84,11 +84,11 @@
 <a name="74" href="#74">74</a>      <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/transactional/tuples/GraphWithCandidates.html">GraphWithCandidates</a> graph = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/transactional/tuples/GraphWithCandidates.html">GraphWithCandidates</a>(
 <a name="75" href="#75">75</a>        graphTransaction.getGraphHead().getId());
 <a name="76" href="#76">76</a>  
-<a name="77" href="#77">77</a>      Set&lt;Vertex&gt; vertices = graphTransaction.getVertices();
+<a name="77" href="#77">77</a>      Set&lt;EPGMVertex&gt; vertices = graphTransaction.getVertices();
 <a name="78" href="#78">78</a>      List&lt;IdWithCandidates&lt;GradoopId&gt;&gt; vertexCandidates
 <a name="79" href="#79">79</a>        = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(vertices.size());
 <a name="80" href="#80">80</a>  
-<a name="81" href="#81">81</a>      <strong class="jxr_keyword">for</strong> (Vertex vertex : vertices) {
+<a name="81" href="#81">81</a>      <strong class="jxr_keyword">for</strong> (EPGMVertex vertex : vertices) {
 <a name="82" href="#82">82</a>        IdWithCandidates&lt;GradoopId&gt; candidates = <strong class="jxr_keyword">new</strong> IdWithCandidates&lt;&gt;();
 <a name="83" href="#83">83</a>        candidates.setId(vertex.getId());
 <a name="84" href="#84">84</a>        candidates.setCandidates(
@@ -102,11 +102,11 @@
 <a name="92" href="#92">92</a>        vertexCandidates.add(candidates);
 <a name="93" href="#93">93</a>      }
 <a name="94" href="#94">94</a>  
-<a name="95" href="#95">95</a>      Set&lt;Edge&gt; edges = graphTransaction.getEdges();
+<a name="95" href="#95">95</a>      Set&lt;EPGMEdge&gt; edges = graphTransaction.getEdges();
 <a name="96" href="#96">96</a>      List&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; edgeCandidates =
 <a name="97" href="#97">97</a>      <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(edges.size());
 <a name="98" href="#98">98</a>  
-<a name="99" href="#99">99</a>      <strong class="jxr_keyword">for</strong> (Edge edge : edges) {
+<a name="99" href="#99">99</a>      <strong class="jxr_keyword">for</strong> (EPGMEdge edge : edges) {
 <a name="100" href="#100">100</a>       TripleWithCandidates&lt;GradoopId&gt; candidates = <strong class="jxr_keyword">new</strong> TripleWithCandidates&lt;&gt;();
 <a name="101" href="#101">101</a>       candidates.setEdgeId(edge.getId());
 <a name="102" href="#102">102</a>       candidates.setSourceId(edge.getSourceId());

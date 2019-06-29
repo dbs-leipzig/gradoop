@@ -16,7 +16,7 @@
 package org.gradoop.storage.impl.hbase.predicate.filter.impl;
 
 import org.apache.hadoop.hbase.filter.Filter;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.common.predicate.filter.impl.PropEquals;
 import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
 import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
@@ -26,9 +26,9 @@ import javax.annotation.Nonnull;
 /**
  * HBase property equality implementation
  *
- * @param &lt;T&gt; EPGM element type
+ * @param &lt;T&gt; element type
  */
-public class HBasePropEquals&lt;T extends EPGMElement&gt; extends PropEquals&lt;HBaseElementFilter&lt;T&gt;&gt;
+public class HBasePropEquals&lt;T extends Element&gt; extends PropEquals&lt;HBaseElementFilter&lt;T&gt;&gt;
   implements HBaseElementFilter&lt;T&gt; {
 
   /**

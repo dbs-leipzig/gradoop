@@ -23,7 +23,7 @@ import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 public class NeighborVertexFunction implements NeighborFunction {
 
   /**
-   * Vertex aggregation function.
+   * EPGMVertex aggregation function.
    */
   private VertexAggregateFunction function;
 

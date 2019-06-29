@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.JoinFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.functions.FunctionAnnotation;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="23" href="#23">23</a>  
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment">/**</em>
@@ -37,7 +37,7 @@
 <a name="27" href="#27">27</a>  @FunctionAnnotation.ForwardedFieldsSecond(<span class="jxr_string">"id;label;graphIds"</span>)
 <a name="28" href="#28">28</a>  @FunctionAnnotation.ReadFieldsFirst(<span class="jxr_string">"f1"</span>)
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/algorithms/gelly/labelpropagation/functions/LPVertexJoin.html">LPVertexJoin</a> implements JoinFunction
-<a name="30" href="#30">30</a>    &lt;org.apache.flink.graph.Vertex&lt;GradoopId, PropertyValue&gt;, Vertex, Vertex&gt; {
+<a name="30" href="#30">30</a>    &lt;org.apache.flink.graph.Vertex&lt;GradoopId, PropertyValue&gt;, EPGMVertex, EPGMVertex&gt; {
 <a name="31" href="#31">31</a>  
 <a name="32" href="#32">32</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   * Property key to access the value which will be propagated</em>
@@ -54,9 +54,9 @@
 <a name="44" href="#44">44</a>    }
 <a name="45" href="#45">45</a>  
 <a name="46" href="#46">46</a>    @Override
-<a name="47" href="#47">47</a>    <strong class="jxr_keyword">public</strong> Vertex join(
+<a name="47" href="#47">47</a>    <strong class="jxr_keyword">public</strong> EPGMVertex join(
 <a name="48" href="#48">48</a>      org.apache.flink.graph.Vertex&lt;GradoopId, PropertyValue&gt; gellyVertex,
-<a name="49" href="#49">49</a>      Vertex epgmVertex) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="49" href="#49">49</a>      EPGMVertex epgmVertex) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="50" href="#50">50</a>      epgmVertex.setProperty(propertyKey, gellyVertex.getValue());
 <a name="51" href="#51">51</a>      <strong class="jxr_keyword">return</strong> epgmVertex;
 <a name="52" href="#52">52</a>    }

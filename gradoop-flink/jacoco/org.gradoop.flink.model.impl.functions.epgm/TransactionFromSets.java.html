@@ -19,9 +19,9 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 import java.util.HashSet;
@@ -41,24 +41,24 @@ import java.util.Set;
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;*-&gt;f0&quot;)
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;f1;f2&quot;)
-<span class="fc" id="L44">public class TransactionFromSets</span>
-  implements JoinFunction&lt;GraphHead, Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt;, GraphTransaction&gt; {
+<span class="fc" id="L44">public class TransactionFromSets implements</span>
+  JoinFunction&lt;EPGMGraphHead, Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt;, GraphTransaction&gt; {
   /**
    * Used if right hand side is empty
    */
-<span class="fc" id="L49">  private static final Set&lt;Vertex&gt; EMPTY_VERTEX_SET = new HashSet&lt;&gt;(0);</span>
+<span class="fc" id="L49">  private static final Set&lt;EPGMVertex&gt; EMPTY_VERTEX_SET = new HashSet&lt;&gt;(0);</span>
   /**
    * Used if right hand side is empty
    */
-<span class="fc" id="L53">  private static final Set&lt;Edge&gt; EMPTY_EDGE_SET = new HashSet&lt;&gt;(0);</span>
+<span class="fc" id="L53">  private static final Set&lt;EPGMEdge&gt; EMPTY_EDGE_SET = new HashSet&lt;&gt;(0);</span>
   /**
    * Reduce object instantiations
    */
 <span class="fc" id="L57">  private final GraphTransaction reuseTransaction = new GraphTransaction();</span>
 
   @Override
-  public GraphTransaction join(GraphHead graphHead, Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt; sets)
-    throws Exception {
+  public GraphTransaction join(EPGMGraphHead graphHead, Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;,
+    Set&lt;EPGMEdge&gt;&gt; sets) throws Exception {
 
 <span class="fc" id="L63">    reuseTransaction.setGraphHead(graphHead);</span>
 <span class="fc bfc" id="L64" title="All 2 branches covered.">    reuseTransaction.setVertices(sets == null ? EMPTY_VERTEX_SET : sets.f1);</span>

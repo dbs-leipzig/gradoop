@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
@@ -25,10 +25,10 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embed
 import java.util.List;
 
 /**
- * Applies a given predicate on a {@link Edge} and projects specified property values to the
+ * Applies a given predicate on a {@link EPGMEdge} and projects specified property values to the
  * output embedding.
  */
-public class FilterAndProjectEdge extends RichFlatMapFunction&lt;Edge, Embedding&gt; {
+public class FilterAndProjectEdge extends RichFlatMapFunction&lt;EPGMEdge, Embedding&gt; {
   /**
    * Predicates used for filtering
    */
@@ -56,7 +56,7 @@ public class FilterAndProjectEdge extends RichFlatMapFunction&lt;Edge, Embedding
 <span class="fc" id="L56">  }</span>
 
   @Override
-  public void flatMap(Edge edge, Collector&lt;Embedding&gt; out) throws Exception {
+  public void flatMap(EPGMEdge edge, Collector&lt;Embedding&gt; out) throws Exception {
 <span class="fc bfc" id="L60" title="All 2 branches covered.">    if (predicates.evaluate(edge)) {</span>
 <span class="fc" id="L61">      out.collect(EmbeddingFactory.fromEdge(edge, projectionPropertyKeys, isLoop));</span>
     }

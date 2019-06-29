@@ -17,34 +17,34 @@ package org.gradoop.storage.impl.accumulo.handler;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 
 /**
  * accumulo graph head handler for row's read/write operator
  */
-public class AccumuloGraphHandler implements AccumuloRowHandler&lt;GraphHead, EPGMGraphHead&gt; {
+public class AccumuloGraphHandler implements AccumuloRowHandler&lt;EPGMGraphHead, GraphHead&gt; {
 
   /**
    * graph head factory
    */
-  private final EPGMGraphHeadFactory&lt;GraphHead&gt; factory;
+  private final GraphHeadFactory&lt;EPGMGraphHead&gt; factory;
 
   /**
    * graph head handler constructor
    *
    * @param factory graph head factory
    */
-<span class="fc" id="L40">  public AccumuloGraphHandler(EPGMGraphHeadFactory&lt;GraphHead&gt; factory) {</span>
+<span class="fc" id="L40">  public AccumuloGraphHandler(GraphHeadFactory&lt;EPGMGraphHead&gt; factory) {</span>
 <span class="fc" id="L41">    this.factory = factory;</span>
 <span class="fc" id="L42">  }</span>
 
   @Override
   public Mutation writeRow(
     Mutation mutation,
-    EPGMGraphHead record
+    GraphHead record
   ) {
 <span class="fc" id="L49">    mutation.put(AccumuloTables.KEY.LABEL, AccumuloTables.KEY.NONE, record.getLabel());</span>
 
@@ -59,7 +59,7 @@ public class AccumuloGraphHandler implements AccumuloRowHandler&lt;GraphHead, EP
   }
 
   @Override
-  public GraphHead readRow(EPGMGraphHead origin) {
+  public EPGMGraphHead readRow(GraphHead origin) {
 <span class="fc" id="L63">    return factory.initGraphHead(</span>
 <span class="fc" id="L64">      /*edge id*/origin.getId(),</span>
 <span class="fc" id="L65">      /*label*/origin.getLabel(),</span>

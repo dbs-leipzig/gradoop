@@ -28,8 +28,8 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Lists;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.operators.DataSource;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
@@ -50,8 +50,8 @@
 <a name="40" href="#40">40</a>  
 <a name="41" href="#41">41</a>      Properties properties = Properties.create();
 <a name="42" href="#42">42</a>      properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Anton"</span>);
-<a name="43" href="#43">43</a>      DataSet&lt;Vertex&gt; vertices = getExecutionEnvironment()
-<a name="44" href="#44">44</a>        .fromElements(<strong class="jxr_keyword">new</strong> VertexFactory().createVertex(<span class="jxr_string">"Person"</span>, properties));
+<a name="43" href="#43">43</a>      DataSet&lt;EPGMVertex&gt; vertices = getExecutionEnvironment()
+<a name="44" href="#44">44</a>        .fromElements(<strong class="jxr_keyword">new</strong> EPGMVertexFactory().createVertex(<span class="jxr_string">"Person"</span>, properties));
 <a name="45" href="#45">45</a>  
 <a name="46" href="#46">46</a>      FilterAndProjectVertices filter =
 <a name="47" href="#47">47</a>        <strong class="jxr_keyword">new</strong> FilterAndProjectVertices(vertices, predicates, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;());
@@ -63,15 +63,15 @@
 <a name="53" href="#53">53</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFilterVerticesByProperties() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="54" href="#54">54</a>      CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH (a) WHERE a.name = \&quot;Alice\&quot;"</span>);
 <a name="55" href="#55">55</a>  
-<a name="56" href="#56">56</a>      VertexFactory vertexFactory = <strong class="jxr_keyword">new</strong> VertexFactory();
+<a name="56" href="#56">56</a>      EPGMVertexFactory vertexFactory = <strong class="jxr_keyword">new</strong> EPGMVertexFactory();
 <a name="57" href="#57">57</a>      Properties properties = Properties.create();
 <a name="58" href="#58">58</a>      properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Alice"</span>);
-<a name="59" href="#59">59</a>      Vertex v1 = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
+<a name="59" href="#59">59</a>      EPGMVertex v1 = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
 <a name="60" href="#60">60</a>      properties = Properties.create();
 <a name="61" href="#61">61</a>      properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Bob"</span>);
-<a name="62" href="#62">62</a>      Vertex v2 = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
+<a name="62" href="#62">62</a>      EPGMVertex v2 = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
 <a name="63" href="#63">63</a>  
-<a name="64" href="#64">64</a>      DataSet&lt;Vertex&gt; vertices = getExecutionEnvironment().fromElements(v1, v2);
+<a name="64" href="#64">64</a>      DataSet&lt;EPGMVertex&gt; vertices = getExecutionEnvironment().fromElements(v1, v2);
 <a name="65" href="#65">65</a>  
 <a name="66" href="#66">66</a>  
 <a name="67" href="#67">67</a>      List&lt;Embedding&gt; result =
@@ -87,10 +87,10 @@
 <a name="77" href="#77">77</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFilterVerticesByLabel() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="78" href="#78">78</a>      CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH (a:Person)"</span>);
 <a name="79" href="#79">79</a>  
-<a name="80" href="#80">80</a>      VertexFactory vertexFactory = <strong class="jxr_keyword">new</strong> VertexFactory();
-<a name="81" href="#81">81</a>      Vertex v1 = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="82" href="#82">82</a>      Vertex v2 = vertexFactory.createVertex(<span class="jxr_string">"Forum"</span>);
-<a name="83" href="#83">83</a>      DataSet&lt;Vertex&gt; vertices = getExecutionEnvironment().fromElements(v1, v2);
+<a name="80" href="#80">80</a>      EPGMVertexFactory vertexFactory = <strong class="jxr_keyword">new</strong> EPGMVertexFactory();
+<a name="81" href="#81">81</a>      EPGMVertex v1 = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="82" href="#82">82</a>      EPGMVertex v2 = vertexFactory.createVertex(<span class="jxr_string">"Forum"</span>);
+<a name="83" href="#83">83</a>      DataSet&lt;EPGMVertex&gt; vertices = getExecutionEnvironment().fromElements(v1, v2);
 <a name="84" href="#84">84</a>  
 <a name="85" href="#85">85</a>      List&lt;Embedding&gt; result =
 <a name="86" href="#86">86</a>        <strong class="jxr_keyword">new</strong> FilterAndProjectVertices(vertices, predicates, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;())
@@ -107,8 +107,8 @@
 <a name="97" href="#97">97</a>  
 <a name="98" href="#98">98</a>      Properties properties = Properties.create();
 <a name="99" href="#99">99</a>      properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Alice"</span>);
-<a name="100" href="#100">100</a>     Vertex person = <strong class="jxr_keyword">new</strong> VertexFactory().createVertex(<span class="jxr_string">"Person"</span>, properties);
-<a name="101" href="#101">101</a>     DataSet&lt;Vertex&gt; vertices = getExecutionEnvironment().fromElements(person);
+<a name="100" href="#100">100</a>     EPGMVertex person = <strong class="jxr_keyword">new</strong> EPGMVertexFactory().createVertex(<span class="jxr_string">"Person"</span>, properties);
+<a name="101" href="#101">101</a>     DataSet&lt;EPGMVertex&gt; vertices = getExecutionEnvironment().fromElements(person);
 <a name="102" href="#102">102</a> 
 <a name="103" href="#103">103</a>     List&lt;String&gt; projectionPropertyKeys = Lists.newArrayList(<span class="jxr_string">"name"</span>);
 <a name="104" href="#104">104</a> 
@@ -129,8 +129,8 @@
 <a name="119" href="#119">119</a> 
 <a name="120" href="#120">120</a>     Properties properties = Properties.create();
 <a name="121" href="#121">121</a>     properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Alice"</span>);
-<a name="122" href="#122">122</a>     Vertex person = <strong class="jxr_keyword">new</strong> VertexFactory().createVertex(<span class="jxr_string">"Person"</span>, properties);
-<a name="123" href="#123">123</a>     DataSource&lt;Vertex&gt; vertices = getExecutionEnvironment().fromElements(person);
+<a name="122" href="#122">122</a>     EPGMVertex person = <strong class="jxr_keyword">new</strong> EPGMVertexFactory().createVertex(<span class="jxr_string">"Person"</span>, properties);
+<a name="123" href="#123">123</a>     DataSource&lt;EPGMVertex&gt; vertices = getExecutionEnvironment().fromElements(person);
 <a name="124" href="#124">124</a> 
 <a name="125" href="#125">125</a>     List&lt;String&gt; projectionPropertyKeys = Lists.newArrayList(<span class="jxr_string">"name"</span>, <span class="jxr_string">"age"</span>);
 <a name="126" href="#126">126</a> 

@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.sampling;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.pagerank.PageRank;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
@@ -133,7 +133,7 @@
 <a name="123" href="#123">123</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/sum/SumVertexProperty.html">SumVertexProperty</a>(SamplingConstants.PAGE_RANK_SCORE_PROPERTY_KEY),
 <a name="124" href="#124">124</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/count/VertexCount.html">VertexCount</a>());
 <a name="125" href="#125">125</a> 
-<a name="126" href="#126">126</a>     DataSet&lt;Vertex&gt; scaledVertices = graph.getVertices()
+<a name="126" href="#126">126</a>     DataSet&lt;EPGMVertex&gt; scaledVertices = graph.getVertices()
 <a name="127" href="#127">127</a>       .crossWithTiny(graph.getGraphHead().first(1))
 <a name="128" href="#128">128</a>       .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/AddPageRankScoresToVertexCrossFunction.html">AddPageRankScoresToVertexCrossFunction</a>())
 <a name="129" href="#129">129</a>       .filter(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/PageRankResultVertexFilter.html">PageRankResultVertexFilter</a>(

@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.functions.FunctionAnnotation;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.functions.KeySelector;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="23" href="#23">23</a>  
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment">/**</em>
@@ -38,7 +38,7 @@
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * @param &lt;C&gt;  type of second element in tuple</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="30" href="#30">30</a>  @FunctionAnnotation.ForwardedFields(<span class="jxr_string">"f0.id-&gt;*"</span>)
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> IdOf0InTuple2&lt;GD <strong class="jxr_keyword">extends</strong> GraphHead, C&gt;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> IdOf0InTuple2&lt;GD <strong class="jxr_keyword">extends</strong> EPGMGraphHead, C&gt;
 <a name="32" href="#32">32</a>    implements KeySelector&lt;Tuple2&lt;GD, C&gt;, GradoopId&gt; {
 <a name="33" href="#33">33</a>  
 <a name="34" href="#34">34</a>    @Override

@@ -27,11 +27,11 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphElement;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphElement;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -71,13 +71,13 @@
 <a name="61" href="#61">61</a>      LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>);
 <a name="62" href="#62">62</a>      <em class="jxr_comment">// Apply a subgraph operator that would result in dangling edges.</em>
 <a name="63" href="#63">63</a>      LogicalGraph subgraph = input.subgraph(
-<a name="64" href="#64">64</a>        <strong class="jxr_keyword">new</strong> ByProperty&lt;Vertex&gt;(<span class="jxr_string">"name"</span>, PropertyValue.create(<span class="jxr_string">"Alice"</span>)).negate(),
+<a name="64" href="#64">64</a>        <strong class="jxr_keyword">new</strong> ByProperty&lt;EPGMVertex&gt;(<span class="jxr_string">"name"</span>, PropertyValue.create(<span class="jxr_string">"Alice"</span>)).negate(),
 <a name="65" href="#65">65</a>        <strong class="jxr_keyword">new</strong> True&lt;&gt;(), Subgraph.Strategy.BOTH);
 <a name="66" href="#66">66</a>      <em class="jxr_comment">// Make sure that the graph contains dangling edges.</em>
-<a name="67" href="#67">67</a>      List&lt;Edge&gt; danglingEdges = getDanglingEdges(subgraph);
-<a name="68" href="#68">68</a>      List&lt;Edge&gt; expectedDanglingEdges = Arrays.asList(loader.getEdgeByVariable(<span class="jxr_string">"eka"</span>),
+<a name="67" href="#67">67</a>      List&lt;EPGMEdge&gt; danglingEdges = getDanglingEdges(subgraph);
+<a name="68" href="#68">68</a>      List&lt;EPGMEdge&gt; expectedDanglingEdges = Arrays.asList(loader.getEdgeByVariable(<span class="jxr_string">"eka"</span>),
 <a name="69" href="#69">69</a>        loader.getEdgeByVariable(<span class="jxr_string">"akb"</span>), loader.getEdgeByVariable(<span class="jxr_string">"bka"</span>));
-<a name="70" href="#70">70</a>      Comparator&lt;Edge&gt; comparator = Comparator.comparing(Edge::getId);
+<a name="70" href="#70">70</a>      Comparator&lt;EPGMEdge&gt; comparator = Comparator.comparing(EPGMEdge::getId);
 <a name="71" href="#71">71</a>      danglingEdges.sort(comparator);
 <a name="72" href="#72">72</a>      expectedDanglingEdges.sort(comparator);
 <a name="73" href="#73">73</a>      assertArrayEquals(expectedDanglingEdges.toArray(), danglingEdges.toArray());
@@ -95,13 +95,13 @@
 <a name="85" href="#85">85</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="86" href="#86">86</a>  <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails.</em>
 <a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="88" href="#88">88</a>    <strong class="jxr_keyword">private</strong> List&lt;Edge&gt; getDanglingEdges(LogicalGraph graph) <strong class="jxr_keyword">throws</strong> Exception {
-<a name="89" href="#89">89</a>      List&lt;Vertex&gt; vertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
-<a name="90" href="#90">90</a>      List&lt;Edge&gt; edges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="88" href="#88">88</a>    <strong class="jxr_keyword">private</strong> List&lt;EPGMEdge&gt; getDanglingEdges(LogicalGraph graph) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="89" href="#89">89</a>      List&lt;EPGMVertex&gt; vertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="90" href="#90">90</a>      List&lt;EPGMEdge&gt; edges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a name="91" href="#91">91</a>      graph.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(vertices));
 <a name="92" href="#92">92</a>      graph.getEdges().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(edges));
 <a name="93" href="#93">93</a>      getExecutionEnvironment().execute();
-<a name="94" href="#94">94</a>      Set&lt;GradoopId&gt; ids = vertices.stream().map(Vertex::getId).collect(Collectors.toSet());
+<a name="94" href="#94">94</a>      Set&lt;GradoopId&gt; ids = vertices.stream().map(EPGMVertex::getId).collect(Collectors.toSet());
 <a name="95" href="#95">95</a>      <strong class="jxr_keyword">return</strong> edges.stream()
 <a name="96" href="#96">96</a>        .filter(e -&gt; !ids.contains(e.getSourceId()) || !ids.contains(e.getTargetId()))
 <a name="97" href="#97">97</a>        .collect(Collectors.toList());
@@ -151,13 +151,13 @@
 <a name="141" href="#141">141</a> <em class="jxr_javadoccomment">   * @param &lt;E&gt; element type.</em>
 <a name="142" href="#142">142</a> <em class="jxr_javadoccomment">   * @throws Exception when the execution in Flink fails.</em>
 <a name="143" href="#143">143</a> <em class="jxr_javadoccomment">   */</em>
-<a name="144" href="#144">144</a>   <strong class="jxr_keyword">private</strong> &lt;E <strong class="jxr_keyword">extends</strong> EPGMGraphElement&gt; <strong class="jxr_keyword">void</strong> assertGraphContainment(GradoopIdSet idSet, DataSet&lt;E&gt; elements)
+<a name="144" href="#144">144</a>   <strong class="jxr_keyword">private</strong> &lt;E <strong class="jxr_keyword">extends</strong> GraphElement&gt; <strong class="jxr_keyword">void</strong> assertGraphContainment(GradoopIdSet idSet, DataSet&lt;E&gt; elements)
 <a name="145" href="#145">145</a>     <strong class="jxr_keyword">throws</strong> Exception {
 <a name="146" href="#146">146</a>     <strong class="jxr_keyword">for</strong> (E element : elements.collect()) {
 <a name="147" href="#147">147</a>       GradoopIdSet ids = element.getGraphIds();
-<a name="148" href="#148">148</a>       assertFalse(<span class="jxr_string">"Element has no graph ids"</span>, ids.isEmpty());
+<a name="148" href="#148">148</a>       assertFalse(<span class="jxr_string">"EPGMElement has no graph ids"</span>, ids.isEmpty());
 <a name="149" href="#149">149</a>       ids.removeAll(idSet);
-<a name="150" href="#150">150</a>       assertTrue(<span class="jxr_string">"Element has dangling graph ids"</span>, ids.isEmpty());
+<a name="150" href="#150">150</a>       assertTrue(<span class="jxr_string">"EPGMElement has dangling graph ids"</span>, ids.isEmpty());
 <a name="151" href="#151">151</a>     }
 <a name="152" href="#152">152</a>   }
 <a name="153" href="#153">153</a> }

@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.api.functions;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.Aggregation;
 
@@ -49,7 +49,7 @@ public interface AggregateFunction extends Serializable {
    * @param element element used to get the increment
    * @return increment, may be NULL, which is handled in the operator
    */
-  PropertyValue getIncrement(EPGMElement element);
+  PropertyValue getIncrement(Element element);
 
   /**
    * Returns whether this function aggregates vertices.

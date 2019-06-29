@@ -26,27 +26,27 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.io.impl.csv.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.functions.FunctionAnnotation;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.metadata.MetaDataSource;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.csv.CSVConstants;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.csv.tuples.CSVVertex;
 <a name="23" href="#23">23</a>  
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * Converts an {@link Vertex} into a CSV representation.</em>
+<a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * Converts an {@link EPGMVertex} into a CSV representation.</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * &lt;p&gt;</em>
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * Forwarded fields:</em>
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * &lt;p&gt;</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * label</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="31" href="#31">31</a>  @FunctionAnnotation.ForwardedFields(<span class="jxr_string">"label-&gt;f2"</span>)
-<a name="32" href="#32">32</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/functions/VertexToCSVVertex.html">VertexToCSVVertex</a> <strong class="jxr_keyword">extends</strong> ElementToCSV&lt;Vertex, CSVVertex&gt; {
+<a name="32" href="#32">32</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/functions/VertexToCSVVertex.html">VertexToCSVVertex</a> <strong class="jxr_keyword">extends</strong> ElementToCSV&lt;EPGMVertex, CSVVertex&gt; {
 <a name="33" href="#33">33</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   * Reduce object instantiations.</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="36" href="#36">36</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/tuples/CSVVertex.html">CSVVertex</a> csvVertex = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/tuples/CSVVertex.html">CSVVertex</a>();
 <a name="37" href="#37">37</a>  
 <a name="38" href="#38">38</a>    @Override
-<a name="39" href="#39">39</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/tuples/CSVVertex.html">CSVVertex</a> map(Vertex vertex) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="39" href="#39">39</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/tuples/CSVVertex.html">CSVVertex</a> map(EPGMVertex vertex) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="40" href="#40">40</a>      csvVertex.setId(vertex.getId().toString());
 <a name="41" href="#41">41</a>      csvVertex.setGradoopIds(collectionToCsvString(vertex.getGraphIds()));
 <a name="42" href="#42">42</a>      csvVertex.setLabel(StringEscaper.escape(vertex.getLabel(), CSVConstants.ESCAPED_CHARACTERS));

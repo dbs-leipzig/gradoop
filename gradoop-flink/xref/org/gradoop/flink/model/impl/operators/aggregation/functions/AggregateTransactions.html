@@ -26,8 +26,8 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.aggregation.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.AggregateFunction;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -108,7 +108,7 @@
 <a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="99" href="#99">99</a>    <strong class="jxr_keyword">private</strong> Map&lt;String, PropertyValue&gt; aggregateVertices(Map&lt;String, PropertyValue&gt; aggregate,
 <a name="100" href="#100">100</a>                                                        <a href="../../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a> graphTransaction) {
-<a name="101" href="#101">101</a>     <strong class="jxr_keyword">for</strong> (Vertex vertex : graphTransaction.getVertices()) {
+<a name="101" href="#101">101</a>     <strong class="jxr_keyword">for</strong> (EPGMVertex vertex : graphTransaction.getVertices()) {
 <a name="102" href="#102">102</a>       aggregate = AggregateUtil.increment(aggregate, vertex, vertexAggregateFunctions);
 <a name="103" href="#103">103</a>     }
 <a name="104" href="#104">104</a>     <strong class="jxr_keyword">return</strong> aggregate;
@@ -123,7 +123,7 @@
 <a name="113" href="#113">113</a> <em class="jxr_javadoccomment">   */</em>
 <a name="114" href="#114">114</a>   <strong class="jxr_keyword">private</strong> Map&lt;String, PropertyValue&gt; aggregateEdges(Map&lt;String, PropertyValue&gt; aggregate,
 <a name="115" href="#115">115</a>                                                     <a href="../../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a> graphTransaction) {
-<a name="116" href="#116">116</a>     <strong class="jxr_keyword">for</strong> (Edge edge : graphTransaction.getEdges()) {
+<a name="116" href="#116">116</a>     <strong class="jxr_keyword">for</strong> (EPGMEdge edge : graphTransaction.getEdges()) {
 <a name="117" href="#117">117</a>       aggregate = AggregateUtil.increment(aggregate, edge, edgeAggregateFunctions);
 <a name="118" href="#118">118</a>     }
 <a name="119" href="#119">119</a>     <strong class="jxr_keyword">return</strong> aggregate;

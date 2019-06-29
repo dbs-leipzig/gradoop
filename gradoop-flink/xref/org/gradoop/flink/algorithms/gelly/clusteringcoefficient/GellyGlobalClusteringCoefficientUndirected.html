@@ -30,7 +30,7 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.graph.library.clustering.undirected.GlobalClusteringCoefficient;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.types.NullValue;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.functions.WritePropertyToGraphHeadMap;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -68,7 +68,7 @@
 <a name="58" href="#58">58</a>  
 <a name="59" href="#59">59</a>      <strong class="jxr_keyword">double</strong> globalValue = global.getResult().getGlobalClusteringCoefficientScore();
 <a name="60" href="#60">60</a>  
-<a name="61" href="#61">61</a>      DataSet&lt;GraphHead&gt; resultHead = currentGraph.getGraphHead()
+<a name="61" href="#61">61</a>      DataSet&lt;EPGMGraphHead&gt; resultHead = currentGraph.getGraphHead()
 <a name="62" href="#62">62</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/functions/WritePropertyToGraphHeadMap.html">WritePropertyToGraphHeadMap</a>(ClusteringCoefficientBase.PROPERTY_KEY_GLOBAL,
 <a name="63" href="#63">63</a>          PropertyValue.create(globalValue)));
 <a name="64" href="#64">64</a>  

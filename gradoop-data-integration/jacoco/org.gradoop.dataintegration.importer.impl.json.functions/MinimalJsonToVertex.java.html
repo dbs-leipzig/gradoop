@@ -18,8 +18,8 @@ package org.gradoop.dataintegration.importer.impl.json.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
@@ -42,7 +42,7 @@ import java.util.Objects;
  * &quot;name&quot;:&quot;Alice&quot;,&quot;gender&quot;:&quot;female&quot;,&quot;age&quot;:42
  * }}&lt;/pre&gt;
  */
-public class MinimalJsonToVertex implements MapFunction&lt;String, Vertex&gt; {
+public class MinimalJsonToVertex implements MapFunction&lt;String, EPGMVertex&gt; {
 
   /**
    * The default label used for the newly created vertices.
@@ -52,14 +52,14 @@ public class MinimalJsonToVertex implements MapFunction&lt;String, Vertex&gt; {
   /**
    * Reduce object instantiations.
    */
-  private final Vertex reuse;
+  private final EPGMVertex reuse;
 
   /**
    * Creates a new instance of this JSON string to vertex converting function.
    *
    * @param vertexFactory The vertex factory used to create new vertices.
    */
-<span class="fc" id="L62">  public MinimalJsonToVertex(EPGMVertexFactory&lt;Vertex&gt; vertexFactory) {</span>
+<span class="fc" id="L62">  public MinimalJsonToVertex(VertexFactory&lt;EPGMVertex&gt; vertexFactory) {</span>
 <span class="fc" id="L63">    this.reuse = Objects.requireNonNull(vertexFactory).createVertex(JSON_VERTEX_LABEL);</span>
 <span class="fc" id="L64">    this.reuse.setProperties(Properties.create());</span>
 <span class="fc" id="L65">  }</span>
@@ -72,7 +72,7 @@ public class MinimalJsonToVertex implements MapFunction&lt;String, Vertex&gt; {
    * @throws Exception on failure
    */
   @Override
-  public Vertex map(String jsonString) throws Exception {
+  public EPGMVertex map(String jsonString) throws Exception {
 <span class="fc" id="L76">    JSONObject jsonVertex = new JSONObject(jsonString);</span>
 
 <span class="fc" id="L78">    Properties properties = reuse.getProperties();</span>

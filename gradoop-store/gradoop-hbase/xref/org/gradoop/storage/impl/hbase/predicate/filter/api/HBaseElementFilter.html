@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.storage.impl.hbase.predicate.filter.api;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.filter.Filter;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMElement;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Element;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.common.predicate.filter.api.ElementFilter;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.hbase.predicate.filter.calculate.And;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.hbase.predicate.filter.calculate.Not;
@@ -38,9 +38,9 @@
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * HBase Element Filter interface to chain predicates</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> *</em>
-<a name="31" href="#31">31</a>  <em class="jxr_javadoccomment"> * @param &lt;T&gt; EPGM element type</em>
+<a name="31" href="#31">31</a>  <em class="jxr_javadoccomment"> * @param &lt;T&gt; element type</em>
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="33" href="#33">33</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">interface</strong> HBaseElementFilter&lt;T <strong class="jxr_keyword">extends</strong> EPGMElement&gt;
+<a name="33" href="#33">33</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">interface</strong> HBaseElementFilter&lt;T <strong class="jxr_keyword">extends</strong> Element&gt;
 <a name="34" href="#34">34</a>    <strong class="jxr_keyword">extends</strong> ElementFilter&lt;HBaseElementFilter&lt;T&gt;&gt;, Serializable {
 <a name="35" href="#35">35</a>  
 <a name="36" href="#36">36</a>    @Nonnull

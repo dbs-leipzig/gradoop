@@ -27,12 +27,12 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="21" href="#21">21</a>  
 <a name="22" href="#22">22</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment"> * Creates a new head and sets a new graph id</em>
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/fusion/functions/MapGraphHeadForNewGraph.html">MapGraphHeadForNewGraph</a> implements MapFunction&lt;GraphHead, GraphHead&gt; {
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/fusion/functions/MapGraphHeadForNewGraph.html">MapGraphHeadForNewGraph</a> implements MapFunction&lt;EPGMGraphHead, EPGMGraphHead&gt; {
 <a name="26" href="#26">26</a>  
 <a name="27" href="#27">27</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment">   * Id to be setted</em>
@@ -48,7 +48,7 @@
 <a name="38" href="#38">38</a>    }
 <a name="39" href="#39">39</a>  
 <a name="40" href="#40">40</a>    @Override
-<a name="41" href="#41">41</a>    <strong class="jxr_keyword">public</strong> GraphHead map(GraphHead value) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="41" href="#41">41</a>    <strong class="jxr_keyword">public</strong> EPGMGraphHead map(EPGMGraphHead value) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="42" href="#42">42</a>      value.setId(graphId);
 <a name="43" href="#43">43</a>      <strong class="jxr_keyword">return</strong> value;
 <a name="44" href="#44">44</a>    }

@@ -26,8 +26,8 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.dataintegration.importer.impl.csv.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertexFactory;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.VertexFactory;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment">/**</em>
@@ -35,7 +35,7 @@
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt; the vertex type</em>
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> PropertiesToVertex&lt;V <strong class="jxr_keyword">extends</strong> EPGMVertex&gt; implements MapFunction&lt;Properties, V&gt; {
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> PropertiesToVertex&lt;V <strong class="jxr_keyword">extends</strong> Vertex&gt; implements MapFunction&lt;Properties, V&gt; {
 <a name="29" href="#29">29</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment">   * Reduce object instantiations.</em>
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   */</em>
@@ -46,7 +46,7 @@
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   * @param vertexFactory the factory that is responsible for creating a vertex</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="39" href="#39">39</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/dataintegration/importer/impl/csv/functions/PropertiesToVertex.html">PropertiesToVertex</a>(EPGMVertexFactory&lt;V&gt; vertexFactory) {
+<a name="39" href="#39">39</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/dataintegration/importer/impl/csv/functions/PropertiesToVertex.html">PropertiesToVertex</a>(VertexFactory&lt;V&gt; vertexFactory) {
 <a name="40" href="#40">40</a>      <strong class="jxr_keyword">this</strong>.vertex = vertexFactory.createVertex();
 <a name="41" href="#41">41</a>    }
 <a name="42" href="#42">42</a>  

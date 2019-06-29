@@ -18,31 +18,31 @@ package org.gradoop.flink.model.impl.operators.fusion.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Associate each graph id in teh hypervertices' heads
  * to the merged vertices
  */
 public class CoGroupGraphHeadToVertex
-  implements MapFunction&lt;GraphHead, Tuple2&lt;Vertex, GradoopId&gt;&gt; {
+  implements MapFunction&lt;EPGMGraphHead, Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; {
 
   /**
    * Reusable tuple to be returned as a result
    */
-  private final Tuple2&lt;Vertex, GradoopId&gt; reusable;
+  private final Tuple2&lt;EPGMVertex, GradoopId&gt; reusable;
 
   /**
    * Default constructor
    */
 <span class="fc" id="L39">  public CoGroupGraphHeadToVertex() {</span>
 <span class="fc" id="L40">    reusable = new Tuple2&lt;&gt;();</span>
-<span class="fc" id="L41">    reusable.f0 = new Vertex();</span>
+<span class="fc" id="L41">    reusable.f0 = new EPGMVertex();</span>
 <span class="fc" id="L42">  }</span>
 
   @Override
-  public Tuple2&lt;Vertex, GradoopId&gt; map(GraphHead hid) throws Exception {
+  public Tuple2&lt;EPGMVertex, GradoopId&gt; map(EPGMGraphHead hid) throws Exception {
 <span class="fc" id="L46">    reusable.f0.setId(GradoopId.get());</span>
 <span class="fc" id="L47">    reusable.f0.setLabel(hid.getLabel());</span>
 <span class="fc" id="L48">    reusable.f0.setProperties(hid.getProperties());</span>

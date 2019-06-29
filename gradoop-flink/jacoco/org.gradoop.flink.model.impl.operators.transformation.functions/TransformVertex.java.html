@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
@@ -29,12 +29,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param &lt;V&gt; the type of the EPGM vertex
  */
 @FunctionAnnotation.ForwardedFields(&quot;id;graphIds&quot;)
-public class TransformVertex&lt;V extends EPGMVertex&gt; extends TransformBase&lt;V&gt; {
+public class TransformVertex&lt;V extends Vertex&gt; extends TransformBase&lt;V&gt; {
 
   /**
    * Factory to init modified vertex.
    */
-  private final EPGMVertexFactory&lt;V&gt; vertexFactory;
+  private final VertexFactory&lt;V&gt; vertexFactory;
 
   /**
    * Constructor
@@ -43,7 +43,7 @@ public class TransformVertex&lt;V extends EPGMVertex&gt; extends TransformBase&l
    * @param epgmVertexFactory         vertex factory
    */
   public TransformVertex(TransformationFunction&lt;V&gt; transformationFunction,
-    EPGMVertexFactory&lt;V&gt; epgmVertexFactory) {
+    VertexFactory&lt;V&gt; epgmVertexFactory) {
 <span class="fc" id="L47">    super(transformationFunction);</span>
 <span class="fc" id="L48">    this.vertexFactory = checkNotNull(epgmVertexFactory);</span>
 <span class="fc" id="L49">  }</span>

@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
@@ -70,7 +70,7 @@ public abstract class LabelPropagation extends GradoopGellyAlgorithm&lt;Property
 
   @Override
   public LogicalGraph executeInGelly(Graph&lt;GradoopId, PropertyValue, NullValue&gt; graph) {
-<span class="fc" id="L73">    DataSet&lt;Vertex&gt; labeledVertices = executeInternal(graph)</span>
+<span class="fc" id="L73">    DataSet&lt;EPGMVertex&gt; labeledVertices = executeInternal(graph)</span>
 <span class="fc" id="L74">      .join(currentGraph.getVertices())</span>
 <span class="fc" id="L75">      .where(0).equalTo(new Id&lt;&gt;())</span>
 <span class="fc" id="L76">      .with(new LPVertexJoin(propertyKey));</span>

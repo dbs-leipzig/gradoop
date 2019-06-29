@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.algorithms.gelly.shortestpaths;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -97,7 +97,7 @@
 <a name="87" href="#87">87</a>      <em class="jxr_comment">//test a graph with double values as input</em>
 <a name="88" href="#88">88</a>      FlinkAsciiGraphLoader loaderDouble = getLoaderFromString(graphsDouble);
 <a name="89" href="#89">89</a>      LogicalGraph inputDouble = loaderDouble.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
-<a name="90" href="#90">90</a>      Vertex srcVertexDouble = loaderDouble.getVertexByVariable(<span class="jxr_string">"v0"</span>);
+<a name="90" href="#90">90</a>      EPGMVertex srcVertexDouble = loaderDouble.getVertexByVariable(<span class="jxr_string">"v0"</span>);
 <a name="91" href="#91">91</a>      GradoopId srcVertexIdDouble = srcVertexDouble.getId();
 <a name="92" href="#92">92</a>  
 <a name="93" href="#93">93</a>      LogicalGraph outputGraphDouble = inputDouble.callForGraph(<strong class="jxr_keyword">new</strong> SingleSourceShortestPaths(srcVertexIdDouble,
@@ -109,7 +109,7 @@
 <a name="99" href="#99">99</a>    <em class="jxr_comment">//test a graph with float values as input</em>
 <a name="100" href="#100">100</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(graphs);
 <a name="101" href="#101">101</a>     LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
-<a name="102" href="#102">102</a>     Vertex srcVertex = loader.getVertexByVariable(<span class="jxr_string">"v0"</span>);
+<a name="102" href="#102">102</a>     EPGMVertex srcVertex = loader.getVertexByVariable(<span class="jxr_string">"v0"</span>);
 <a name="103" href="#103">103</a>     GradoopId srcVertexId = srcVertex.getId();
 <a name="104" href="#104">104</a> 
 <a name="105" href="#105">105</a>     LogicalGraph outputGraph = input.callForGraph(<strong class="jxr_keyword">new</strong> SingleSourceShortestPaths(srcVertexId,

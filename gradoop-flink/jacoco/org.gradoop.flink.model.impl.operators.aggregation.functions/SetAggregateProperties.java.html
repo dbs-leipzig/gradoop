@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 
@@ -32,7 +32,7 @@ import java.util.Set;
  * Sets aggregate values of graph heads.
  */
 public class SetAggregateProperties implements
-  CoGroupFunction&lt;GraphHead, Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt;, GraphHead&gt; {
+  CoGroupFunction&lt;EPGMGraphHead, Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt;, EPGMGraphHead&gt; {
 
   /**
    * default values used to replace aggregate values in case of NULL.
@@ -61,10 +61,10 @@ public class SetAggregateProperties implements
 <span class="fc" id="L61">  }</span>
 
   @Override
-  public void coGroup(Iterable&lt;GraphHead&gt; left,
-    Iterable&lt;Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt;&gt; right, Collector&lt;GraphHead&gt; out) {
+  public void coGroup(Iterable&lt;EPGMGraphHead&gt; left,
+    Iterable&lt;Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt;&gt; right, Collector&lt;EPGMGraphHead&gt; out) {
 
-<span class="fc bfc" id="L67" title="All 2 branches covered.">    for (GraphHead leftElem : left) {</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">    for (EPGMGraphHead leftElem : left) {</span>
 <span class="fc" id="L68">      boolean rightEmpty = true;</span>
 <span class="fc bfc" id="L69" title="All 2 branches covered.">      for (Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt; rightElem : right) {</span>
 <span class="fc" id="L70">        Map&lt;String, PropertyValue&gt; values = rightElem.f1;</span>

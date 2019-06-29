@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates.comparables;
 
 import com.google.common.collect.Sets;
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.QueryComparable;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
@@ -78,7 +78,7 @@ public class PropertySelectorComparable extends QueryComparable {
   }
 
   @Override
-  public PropertyValue evaluate(GraphElement element) {
+  public PropertyValue evaluate(EPGMGraphElement element) {
 <span class="fc bfc" id="L82" title="All 2 branches covered.">    if (propertySelector.getPropertyName().equals(&quot;__label__&quot;)) {</span>
 <span class="fc" id="L83">      return PropertyValue.create(element.getLabel());</span>
     }

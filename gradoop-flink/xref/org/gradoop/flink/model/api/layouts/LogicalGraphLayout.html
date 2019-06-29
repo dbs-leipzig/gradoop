@@ -26,9 +26,9 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.api.layouts;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMEdge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHead;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> * A logical graph layout defines the Flink internal (DataSet) representation of a logical graph</em>
@@ -39,9 +39,9 @@
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; the edge type</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">interface</strong> LogicalGraphLayout&lt;
-<a name="32" href="#32">32</a>    G <strong class="jxr_keyword">extends</strong> EPGMGraphHead,
-<a name="33" href="#33">33</a>    V <strong class="jxr_keyword">extends</strong> EPGMVertex,
-<a name="34" href="#34">34</a>    E <strong class="jxr_keyword">extends</strong> EPGMEdge&gt; <strong class="jxr_keyword">extends</strong> Layout&lt;V, E&gt; {
+<a name="32" href="#32">32</a>    G <strong class="jxr_keyword">extends</strong> GraphHead,
+<a name="33" href="#33">33</a>    V <strong class="jxr_keyword">extends</strong> Vertex,
+<a name="34" href="#34">34</a>    E <strong class="jxr_keyword">extends</strong> Edge&gt; <strong class="jxr_keyword">extends</strong> Layout&lt;V, E&gt; {
 <a name="35" href="#35">35</a>  
 <a name="36" href="#36">36</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   * True, if the layout is based on three separate datasets.</em>

@@ -28,9 +28,9 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Sets;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.ExecutionEnvironment;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.GradoopTestUtils;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.GradoopFlinkConfig;
@@ -45,15 +45,15 @@
 <a name="35" href="#35">35</a>  
 <a name="36" href="#36">36</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/gve/GVELayoutTest.html">GVELayoutTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
 <a name="37" href="#37">37</a>  
-<a name="38" href="#38">38</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> GraphHead g0;
-<a name="39" href="#39">39</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> GraphHead g1;
+<a name="38" href="#38">38</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> EPGMGraphHead g0;
+<a name="39" href="#39">39</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> EPGMGraphHead g1;
 <a name="40" href="#40">40</a>  
-<a name="41" href="#41">41</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> Vertex v0;
-<a name="42" href="#42">42</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> Vertex v1;
-<a name="43" href="#43">43</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> Vertex v2;
+<a name="41" href="#41">41</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> EPGMVertex v0;
+<a name="42" href="#42">42</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> EPGMVertex v1;
+<a name="43" href="#43">43</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> EPGMVertex v2;
 <a name="44" href="#44">44</a>  
-<a name="45" href="#45">45</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> Edge e0;
-<a name="46" href="#46">46</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> Edge e1;
+<a name="45" href="#45">45</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> EPGMEdge e0;
+<a name="46" href="#46">46</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> EPGMEdge e1;
 <a name="47" href="#47">47</a>  
 <a name="48" href="#48">48</a>    @BeforeClass
 <a name="49" href="#49">49</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> setup() {
@@ -79,8 +79,8 @@
 <a name="69" href="#69">69</a>      e1.addGraphId(g1.getId());
 <a name="70" href="#70">70</a>    }
 <a name="71" href="#71">71</a>  
-<a name="72" href="#72">72</a>    <strong class="jxr_keyword">protected</strong> GVELayout from(Collection&lt;GraphHead&gt; graphHeads, Collection&lt;Vertex&gt; vertices,
-<a name="73" href="#73">73</a>      Collection&lt;Edge&gt; edges) {
+<a name="72" href="#72">72</a>    <strong class="jxr_keyword">protected</strong> GVELayout from(Collection&lt;EPGMGraphHead&gt; graphHeads, Collection&lt;EPGMVertex&gt; vertices,
+<a name="73" href="#73">73</a>      Collection&lt;EPGMEdge&gt; edges) {
 <a name="74" href="#74">74</a>      <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> GVELayout(
 <a name="75" href="#75">75</a>        getExecutionEnvironment().fromCollection(graphHeads),
 <a name="76" href="#76">76</a>        getExecutionEnvironment().fromCollection(vertices),
@@ -112,43 +112,43 @@
 <a name="102" href="#102">102</a> 
 <a name="103" href="#103">103</a>   @Test
 <a name="104" href="#104">104</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getGraphHead() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="105" href="#105">105</a>     GradoopTestUtils.validateEPGMElementCollections(Sets.newHashSet(g0),
+<a name="105" href="#105">105</a>     GradoopTestUtils.validateElementCollections(Sets.newHashSet(g0),
 <a name="106" href="#106">106</a>       from(singletonList(g0), asList(v0, v1), singletonList(e0)).getGraphHead().collect());
 <a name="107" href="#107">107</a>   }
 <a name="108" href="#108">108</a> 
 <a name="109" href="#109">109</a>   @Test
 <a name="110" href="#110">110</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getGraphHeads() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="111" href="#111">111</a>     GradoopTestUtils.validateEPGMElementCollections(Sets.newHashSet(g0, g1),
+<a name="111" href="#111">111</a>     GradoopTestUtils.validateElementCollections(Sets.newHashSet(g0, g1),
 <a name="112" href="#112">112</a>       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getGraphHeads().collect());
 <a name="113" href="#113">113</a>   }
 <a name="114" href="#114">114</a> 
 <a name="115" href="#115">115</a>   @Test
 <a name="116" href="#116">116</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getGraphHeadsByLabel() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="117" href="#117">117</a>     GradoopTestUtils.validateEPGMElementCollections(Sets.newHashSet(g0),
+<a name="117" href="#117">117</a>     GradoopTestUtils.validateElementCollections(Sets.newHashSet(g0),
 <a name="118" href="#118">118</a>       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getGraphHeadsByLabel(<span class="jxr_string">"A"</span>).collect());
 <a name="119" href="#119">119</a>   }
 <a name="120" href="#120">120</a> 
 <a name="121" href="#121">121</a>   @Test
 <a name="122" href="#122">122</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getVertices() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="123" href="#123">123</a>     GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(v0, v1, v2),
+<a name="123" href="#123">123</a>     GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(v0, v1, v2),
 <a name="124" href="#124">124</a>       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getVertices().collect());
 <a name="125" href="#125">125</a>   }
 <a name="126" href="#126">126</a> 
 <a name="127" href="#127">127</a>   @Test
 <a name="128" href="#128">128</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getVerticesByLabel() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="129" href="#129">129</a>     GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(v0),
+<a name="129" href="#129">129</a>     GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(v0),
 <a name="130" href="#130">130</a>       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getVerticesByLabel(<span class="jxr_string">"A"</span>).collect());
 <a name="131" href="#131">131</a>   }
 <a name="132" href="#132">132</a> 
 <a name="133" href="#133">133</a>   @Test
 <a name="134" href="#134">134</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getEdges() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="135" href="#135">135</a>     GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(e0, e1),
+<a name="135" href="#135">135</a>     GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(e0, e1),
 <a name="136" href="#136">136</a>       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getEdges().collect());
 <a name="137" href="#137">137</a>   }
 <a name="138" href="#138">138</a> 
 <a name="139" href="#139">139</a>   @Test
 <a name="140" href="#140">140</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> getEdgesByLabel() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="141" href="#141">141</a>     GradoopTestUtils.validateEPGMGraphElementCollections(Sets.newHashSet(e0),
+<a name="141" href="#141">141</a>     GradoopTestUtils.validateGraphElementCollections(Sets.newHashSet(e0),
 <a name="142" href="#142">142</a>       from(asList(g0, g1), asList(v0, v1, v2), asList(e0, e1)).getEdgesByLabel(<span class="jxr_string">"a"</span>).collect());
 <a name="143" href="#143">143</a>   }
 <a name="144" href="#144">144</a> }

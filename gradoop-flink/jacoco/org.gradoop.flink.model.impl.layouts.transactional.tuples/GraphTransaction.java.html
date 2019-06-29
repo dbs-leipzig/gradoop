@@ -17,56 +17,56 @@ package org.gradoop.flink.model.impl.layouts.transactional.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 import java.util.Set;
 
 /**
  * An encapsulated representation of a logical graph with duplicated elements.
  */
-public class GraphTransaction extends Tuple3&lt;GraphHead, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt; {
-
+public class GraphTransaction extends Tuple3&lt;EPGMGraphHead, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt; {
   /**
-   * default constructor
+   * Default constructor
    */
-<span class="fc" id="L34">  public GraphTransaction() {</span>
-<span class="fc" id="L35">  }</span>
+<span class="fc" id="L33">  public GraphTransaction() {</span>
+<span class="fc" id="L34">  }</span>
 
   /**
-   * valued constructor
+   * Valued constructor
+   *
    * @param graphHead graph head
    * @param vertices set of vertices
    * @param edges set of edges
    */
-<span class="fc" id="L43">  public GraphTransaction(GraphHead graphHead, Set&lt;Vertex&gt; vertices, Set&lt;Edge&gt; edges) {</span>
+<span class="fc" id="L43">  public GraphTransaction(EPGMGraphHead graphHead, Set&lt;EPGMVertex&gt; vertices, Set&lt;EPGMEdge&gt; edges) {</span>
 <span class="fc" id="L44">    setGraphHead(graphHead);</span>
 <span class="fc" id="L45">    setVertices(vertices);</span>
 <span class="fc" id="L46">    setEdges(edges);</span>
 <span class="fc" id="L47">  }</span>
 
-  public GraphHead getGraphHead() {
+  public EPGMGraphHead getGraphHead() {
 <span class="fc" id="L50">    return this.f0;</span>
   }
 
-  public void setGraphHead(GraphHead graphHead) {
+  public void setGraphHead(EPGMGraphHead graphHead) {
 <span class="fc" id="L54">    this.f0 = graphHead;</span>
 <span class="fc" id="L55">  }</span>
 
-  public Set&lt;Vertex&gt; getVertices() {
+  public Set&lt;EPGMVertex&gt; getVertices() {
 <span class="fc" id="L58">    return this.f1;</span>
   }
 
-  public void setVertices(Set&lt;Vertex&gt; vertices) {
+  public void setVertices(Set&lt;EPGMVertex&gt; vertices) {
 <span class="fc" id="L62">    this.f1 = vertices;</span>
 <span class="fc" id="L63">  }</span>
 
-  public Set&lt;Edge&gt; getEdges() {
+  public Set&lt;EPGMEdge&gt; getEdges() {
 <span class="fc" id="L66">    return this.f2;</span>
   }
 
-  public void  setEdges(Set&lt;Edge&gt; edges) {
+  public void  setEdges(Set&lt;EPGMEdge&gt; edges) {
 <span class="fc" id="L70">    this.f2 = edges;</span>
 <span class="fc" id="L71">  }</span>
 
@@ -76,10 +76,10 @@ public class GraphTransaction extends Tuple3&lt;GraphHead, Set&lt;Vertex&gt;, Se
    * @param id identifier.
    * @return vertex
    */
-  public Vertex getVertexById(GradoopId id) {
-<span class="nc" id="L80">    Vertex match = null;</span>
+  public EPGMVertex getVertexById(GradoopId id) {
+<span class="nc" id="L80">    EPGMVertex match = null;</span>
 
-<span class="nc bnc" id="L82" title="All 2 branches missed.">    for (Vertex vertex : getVertices()) {</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">    for (EPGMVertex vertex : getVertices()) {</span>
 <span class="nc bnc" id="L83" title="All 2 branches missed.">      if (vertex.getId().equals(id)) {</span>
 <span class="nc" id="L84">        match = vertex;</span>
 <span class="nc" id="L85">        break;</span>

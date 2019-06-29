@@ -17,12 +17,12 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.CrossFunction;
 import org.apache.flink.api.java.tuple.Tuple1;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Add the max degree to all vertices
  */
-public class AddMaxDegreeCrossFunction implements CrossFunction&lt;Tuple1&lt;Long&gt;, Vertex, Vertex&gt; {
+public class AddMaxDegreeCrossFunction implements CrossFunction&lt;Tuple1&lt;Long&gt;, EPGMVertex, EPGMVertex&gt; {
 
   /**
    * Name of the property for maximum degree
@@ -39,7 +39,7 @@ public class AddMaxDegreeCrossFunction implements CrossFunction&lt;Tuple1&lt;Lon
 <span class="fc" id="L39">  }</span>
 
   @Override
-  public Vertex cross(Tuple1&lt;Long&gt; longTuple1, Vertex vertex) {
+  public EPGMVertex cross(Tuple1&lt;Long&gt; longTuple1, EPGMVertex vertex) {
 <span class="fc" id="L43">    vertex.setProperty(nameOfMaxDegreeProperty, longTuple1.f0);</span>
 <span class="fc" id="L44">    return vertex;</span>
   }

@@ -25,7 +25,7 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.aggregation.functions;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMElement;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Element;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.AggregateDefaultValue;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -47,7 +47,7 @@
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   * @return incremented aggregate map</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="39" href="#39">39</a>    <strong class="jxr_keyword">static</strong> Map&lt;String, PropertyValue&gt; increment(Map&lt;String, PropertyValue&gt; aggregate,
-<a name="40" href="#40">40</a>                                                EPGMElement element,
+<a name="40" href="#40">40</a>                                                Element element,
 <a name="41" href="#41">41</a>                                                Set&lt;AggregateFunction&gt; aggregateFunctions) {
 <a name="42" href="#42">42</a>      <strong class="jxr_keyword">for</strong> (AggregateFunction aggFunc : aggregateFunctions) {
 <a name="43" href="#43">43</a>        PropertyValue increment = aggFunc.getIncrement(element);

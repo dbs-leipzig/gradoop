@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.distinction.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 
 import java.util.Iterator;
@@ -42,11 +42,11 @@ public class CountGraphHeads implements GraphHeadReduceFunction {
 <span class="fc" id="L42">  }</span>
 
   @Override
-  public void reduce(Iterable&lt;Tuple2&lt;String, GraphHead&gt;&gt; iterable,
-    Collector&lt;GraphHead&gt; collector) throws Exception {
-<span class="fc" id="L47">    Iterator&lt;Tuple2&lt;String, GraphHead&gt;&gt; iterator = iterable.iterator();</span>
+  public void reduce(Iterable&lt;Tuple2&lt;String, EPGMGraphHead&gt;&gt; iterable,
+    Collector&lt;EPGMGraphHead&gt; collector) throws Exception {
+<span class="fc" id="L47">    Iterator&lt;Tuple2&lt;String, EPGMGraphHead&gt;&gt; iterator = iterable.iterator();</span>
 
-<span class="fc" id="L49">    GraphHead graphHead = iterator.next().f1;</span>
+<span class="fc" id="L49">    EPGMGraphHead graphHead = iterator.next().f1;</span>
 <span class="fc" id="L50">    int count = 1;</span>
 
 <span class="fc bfc" id="L52" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>

@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * Takes an EPGM edge and creates a tuple, containing the edges source id as unique long id, its
@@ -29,7 +29,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;targetId-&gt;f1;id-&gt;f2&quot;)
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;f0&quot;)
 public class LongIdWithEdgeToTupleJoin implements
-  JoinFunction&lt;Edge, Tuple2&lt;Long, GradoopId&gt;, Tuple3&lt;Long, GradoopId, GradoopId&gt;&gt; {
+  JoinFunction&lt;EPGMEdge, Tuple2&lt;Long, GradoopId&gt;, Tuple3&lt;Long, GradoopId, GradoopId&gt;&gt; {
 
   /**
    * Reduce object instantiation.
@@ -45,7 +45,7 @@ public class LongIdWithEdgeToTupleJoin implements
 
   @Override
   public Tuple3&lt;Long, GradoopId, GradoopId&gt; join(
-    Edge epgmEdge,
+    EPGMEdge epgmEdge,
     Tuple2&lt;Long, GradoopId&gt; uniqueLongToVertexId) throws Exception {
 <span class="fc" id="L50">    reuseTuple.f0 = uniqueLongToVertexId.f0;</span>
 <span class="fc" id="L51">    reuseTuple.f1 = epgmEdge.getTargetId();</span>

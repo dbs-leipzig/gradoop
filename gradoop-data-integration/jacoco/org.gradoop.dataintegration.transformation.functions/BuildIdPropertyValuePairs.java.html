@@ -18,7 +18,7 @@ package org.gradoop.dataintegration.transformation.functions;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
@@ -30,7 +30,7 @@ import java.util.Objects;
  *
  * @param &lt;E&gt; The element type.
  */
-public class BuildIdPropertyValuePairs&lt;E extends EPGMElement&gt;
+public class BuildIdPropertyValuePairs&lt;E extends Element&gt;
   implements FlatMapFunction&lt;E, Tuple2&lt;GradoopId, PropertyValue&gt;&gt; {
 
   /**

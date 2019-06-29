@@ -26,8 +26,8 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.io.impl.dot.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.commons.lang3.StringUtils;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMElement;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Element;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Property;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -70,7 +70,7 @@
 <a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="61" href="#61">61</a>    @Override
 <a name="62" href="#62">62</a>    <strong class="jxr_keyword">void</strong> writeVertices(<a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a> transaction, StringBuilder builder, String suffix) {
-<a name="63" href="#63">63</a>      <strong class="jxr_keyword">for</strong> (Vertex vertex: transaction.getVertices()) {
+<a name="63" href="#63">63</a>      <strong class="jxr_keyword">for</strong> (EPGMVertex vertex: transaction.getVertices()) {
 <a name="64" href="#64">64</a>        builder.append(VERTEX_ID_PREFIX)
 <a name="65" href="#65">65</a>          .append(vertex.getId())
 <a name="66" href="#66">66</a>          .append(suffix)
@@ -83,7 +83,7 @@
 <a name="73" href="#73">73</a>    }
 <a name="74" href="#74">74</a>  
 <a name="75" href="#75">75</a>    @Override
-<a name="76" href="#76">76</a>    <strong class="jxr_keyword">void</strong> writeLabel(StringBuilder builder, EPGMElement element) {
+<a name="76" href="#76">76</a>    <strong class="jxr_keyword">void</strong> writeLabel(StringBuilder builder, Element element) {
 <a name="77" href="#77">77</a>      String label = StringUtils.isEmpty(element.getLabel()) ? element.getId().toString() :
 <a name="78" href="#78">78</a>        element.getLabel();
 <a name="79" href="#79">79</a>      Properties properties = element.getProperties();

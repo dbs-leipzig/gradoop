@@ -31,9 +31,9 @@
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMEdge;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EdgeFactory;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 <a name="29" href="#29">29</a>  
@@ -48,7 +48,7 @@
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> * @see org.gradoop.dataintegration.transformation.ConnectNeighbors</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="40" href="#40">40</a>  @FunctionAnnotation.ReadFields({<span class="jxr_string">"f1"</span>})
-<a name="41" href="#41">41</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> CreateCartesianNeighborhoodEdges&lt;V <strong class="jxr_keyword">extends</strong> EPGMVertex, E <strong class="jxr_keyword">extends</strong> EPGMEdge&gt;
+<a name="41" href="#41">41</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> CreateCartesianNeighborhoodEdges&lt;V <strong class="jxr_keyword">extends</strong> Vertex, E <strong class="jxr_keyword">extends</strong> Edge&gt;
 <a name="42" href="#42">42</a>    implements FlatMapFunction&lt;Tuple2&lt;V, List&lt;NeighborhoodVertex&gt;&gt;, E&gt;, ResultTypeQueryable&lt;E&gt; {
 <a name="43" href="#43">43</a>  
 <a name="44" href="#44">44</a>    <em class="jxr_javadoccomment">/**</em>
@@ -67,7 +67,7 @@
 <a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   * @param factory      The factory the edges are created with.</em>
 <a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * @param newEdgeLabel The label of the created edge between the neighbors.</em>
 <a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="60" href="#60">60</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../org/gradoop/dataintegration/transformation/functions/CreateCartesianNeighborhoodEdges.html">CreateCartesianNeighborhoodEdges</a>(EPGMEdgeFactory&lt;E&gt; factory, String newEdgeLabel) {
+<a name="60" href="#60">60</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../org/gradoop/dataintegration/transformation/functions/CreateCartesianNeighborhoodEdges.html">CreateCartesianNeighborhoodEdges</a>(EdgeFactory&lt;E&gt; factory, String newEdgeLabel) {
 <a name="61" href="#61">61</a>      <strong class="jxr_keyword">this</strong>.edgeType = Objects.requireNonNull(factory).getType();
 <a name="62" href="#62">62</a>      <strong class="jxr_keyword">this</strong>.reuseEdge = factory.createEdge(Objects.requireNonNull(newEdgeLabel),
 <a name="63" href="#63">63</a>        GradoopId.NULL_VALUE, GradoopId.NULL_VALUE);

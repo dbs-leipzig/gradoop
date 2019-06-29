@@ -26,13 +26,13 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.FilterFunction;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 <a name="21" href="#21">21</a>  
 <a name="22" href="#22">22</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="23" href="#23">23</a>  <em class="jxr_javadoccomment"> * Filters an Edge by a given predicate</em>
+<a name="23" href="#23">23</a>  <em class="jxr_javadoccomment"> * Filters an EPGMEdge by a given predicate</em>
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/filter/functions/FilterEdge.html">FilterEdge</a> implements FilterFunction&lt;Edge&gt; {
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/filter/functions/FilterEdge.html">FilterEdge</a> implements FilterFunction&lt;EPGMEdge&gt; {
 <a name="26" href="#26">26</a>  
 <a name="27" href="#27">27</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment">   * Filter predicate</em>
@@ -49,7 +49,7 @@
 <a name="39" href="#39">39</a>    }
 <a name="40" href="#40">40</a>  
 <a name="41" href="#41">41</a>    @Override
-<a name="42" href="#42">42</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> filter(Edge edge) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="42" href="#42">42</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> filter(EPGMEdge edge) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="43" href="#43">43</a>      <strong class="jxr_keyword">return</strong> predicates.evaluate(edge);
 <a name="44" href="#44">44</a>    }
 <a name="45" href="#45">45</a>  }

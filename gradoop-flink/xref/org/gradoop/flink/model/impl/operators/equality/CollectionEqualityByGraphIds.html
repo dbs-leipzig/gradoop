@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple1;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.bool.Not;
@@ -49,13 +49,13 @@
 <a name="39" href="#39">39</a>  
 <a name="40" href="#40">40</a>      DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; distinctFirstGraphIds = firstCollection
 <a name="41" href="#41">41</a>        .getGraphHeads()
-<a name="42" href="#42">42</a>        .map(<strong class="jxr_keyword">new</strong> Id&lt;GraphHead&gt;())
+<a name="42" href="#42">42</a>        .map(<strong class="jxr_keyword">new</strong> Id&lt;EPGMGraphHead&gt;())
 <a name="43" href="#43">43</a>        .distinct()
 <a name="44" href="#44">44</a>        .map(<strong class="jxr_keyword">new</strong> ObjectTo1&lt;&gt;());
 <a name="45" href="#45">45</a>  
 <a name="46" href="#46">46</a>      DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; distinctSecondGraphIds = secondCollection
 <a name="47" href="#47">47</a>        .getGraphHeads()
-<a name="48" href="#48">48</a>        .map(<strong class="jxr_keyword">new</strong> Id&lt;GraphHead&gt;())
+<a name="48" href="#48">48</a>        .map(<strong class="jxr_keyword">new</strong> Id&lt;EPGMGraphHead&gt;())
 <a name="49" href="#49">49</a>        .distinct()
 <a name="50" href="#50">50</a>        .map(<strong class="jxr_keyword">new</strong> ObjectTo1&lt;&gt;());
 <a name="51" href="#51">51</a>  

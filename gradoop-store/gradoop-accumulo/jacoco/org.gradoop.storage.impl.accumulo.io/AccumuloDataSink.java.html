@@ -15,9 +15,9 @@
  */
 package org.gradoop.storage.impl.accumulo.io;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -67,11 +67,11 @@ public class AccumuloDataSink extends AccumuloBase implements DataSink {
 <span class="nc" id="L67">      getStore().truncateTables();</span>
     }
 <span class="fc" id="L69">    graphCollection.getGraphHeads()</span>
-<span class="fc" id="L70">      .output(new ElementOutputFormat&lt;&gt;(GraphHead.class, getAccumuloConfig()));</span>
+<span class="fc" id="L70">      .output(new ElementOutputFormat&lt;&gt;(EPGMGraphHead.class, getAccumuloConfig()));</span>
 <span class="fc" id="L71">    graphCollection.getVertices()</span>
-<span class="fc" id="L72">      .output(new ElementOutputFormat&lt;&gt;(Vertex.class, getAccumuloConfig()));</span>
+<span class="fc" id="L72">      .output(new ElementOutputFormat&lt;&gt;(EPGMVertex.class, getAccumuloConfig()));</span>
 <span class="fc" id="L73">    graphCollection.getEdges()</span>
-<span class="fc" id="L74">      .output(new ElementOutputFormat&lt;&gt;(Edge.class, getAccumuloConfig()));</span>
+<span class="fc" id="L74">      .output(new ElementOutputFormat&lt;&gt;(EPGMEdge.class, getAccumuloConfig()));</span>
 <span class="fc" id="L75">  }</span>
 
 }

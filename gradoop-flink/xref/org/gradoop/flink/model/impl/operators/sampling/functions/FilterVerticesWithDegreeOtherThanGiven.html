@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.sampling.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -61,7 +61,7 @@
 <a name="51" href="#51">51</a>        SamplingConstants.OUT_DEGREE_PROPERTY_KEY,
 <a name="52" href="#52">52</a>        <strong class="jxr_keyword">true</strong>);
 <a name="53" href="#53">53</a>  
-<a name="54" href="#54">54</a>      DataSet&lt;Vertex&gt; newVertices = distinctVertexDegrees.execute(graph).getVertices()
+<a name="54" href="#54">54</a>      DataSet&lt;EPGMVertex&gt; newVertices = distinctVertexDegrees.execute(graph).getVertices()
 <a name="55" href="#55">55</a>        .filter(<strong class="jxr_keyword">new</strong> VertexWithDegreeFilter&lt;&gt;(degree, SamplingConstants.DEGREE_PROPERTY_KEY))
 <a name="56" href="#56">56</a>        .map(<strong class="jxr_keyword">new</strong> PropertyRemover&lt;&gt;(SamplingConstants.DEGREE_PROPERTY_KEY))
 <a name="57" href="#57">57</a>        .map(<strong class="jxr_keyword">new</strong> PropertyRemover&lt;&gt;(SamplingConstants.IN_DEGREE_PROPERTY_KEY))

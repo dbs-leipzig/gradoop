@@ -26,8 +26,8 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.algorithms.gelly.randomjump;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
@@ -57,7 +57,7 @@
 <a name="47" href="#47">47</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * List for result vertices</em>
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="50" href="#50">50</a>    <strong class="jxr_keyword">private</strong> List&lt;Vertex&gt; resultVertices;
+<a name="50" href="#50">50</a>    <strong class="jxr_keyword">private</strong> List&lt;EPGMVertex&gt; resultVertices;
 <a name="51" href="#51">51</a>  
 <a name="52" href="#52">52</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   * Initialize graphs for testing</em>
@@ -162,7 +162,7 @@
 <a name="152" href="#152">152</a> <em class="jxr_javadoccomment">   */</em>
 <a name="153" href="#153">153</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> commonValidation(LogicalGraph graph, LogicalGraph resultGraph) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="154" href="#154">154</a>     resultVertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
-<a name="155" href="#155">155</a>     List&lt;Edge&gt; resultEdges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="155" href="#155">155</a>     List&lt;EPGMEdge&gt; resultEdges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a name="156" href="#156">156</a>     resultGraph.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(resultVertices));
 <a name="157" href="#157">157</a>     resultGraph.getEdges().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(resultEdges));
 <a name="158" href="#158">158</a>     getExecutionEnvironment().execute();
@@ -176,7 +176,7 @@
 <a name="166" href="#166">166</a>     resultEdges.forEach(edge -&gt; assertTrue(<span class="jxr_string">"edge "</span> + edge.getId() + <span class="jxr_string">" is not annotated"</span>,
 <a name="167" href="#167">167</a>       edge.hasProperty(SamplingConstants.PROPERTY_KEY_SAMPLED)));
 <a name="168" href="#168">168</a> 
-<a name="169" href="#169">169</a>     <strong class="jxr_keyword">for</strong> (Edge edge : resultEdges) {
+<a name="169" href="#169">169</a>     <strong class="jxr_keyword">for</strong> (EPGMEdge edge : resultEdges) {
 <a name="170" href="#170">170</a>       <strong class="jxr_keyword">if</strong> (edge.getPropertyValue(SamplingConstants.PROPERTY_KEY_SAMPLED).getBoolean()) {
 <a name="171" href="#171">171</a>         resultVertices.stream().filter(vertex -&gt; vertex.getId().equals(edge.getSourceId())).forEach(
 <a name="172" href="#172">172</a>           sourceVertex -&gt; assertTrue(<span class="jxr_string">"source of visited edge is not visited"</span>,

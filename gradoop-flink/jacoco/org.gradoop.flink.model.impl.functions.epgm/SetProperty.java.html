@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  * @param &lt;E&gt; gradoop element
  */
 @FunctionAnnotation.ForwardedFields(&quot;id;label&quot;)
-public class SetProperty&lt;E extends Element&gt; implements MapFunction&lt;E, E&gt; {
+public class SetProperty&lt;E extends EPGMElement&gt; implements MapFunction&lt;E, E&gt; {
 
   /**
    * serialVersionUID

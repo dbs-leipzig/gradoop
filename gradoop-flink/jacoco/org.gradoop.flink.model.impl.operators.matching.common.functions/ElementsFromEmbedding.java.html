@@ -20,14 +20,14 @@ import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.query.Step;
@@ -41,10 +41,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Extracts {@link Element} instances from an {@link Embedding}.
+ * Extracts {@link EPGMElement} instances from an {@link Embedding}.
  */
 public class ElementsFromEmbedding
-  extends RichFlatMapFunction&lt;Tuple1&lt;Embedding&lt;GradoopId&gt;&gt;, Element&gt; {
+  extends RichFlatMapFunction&lt;Tuple1&lt;Embedding&lt;GradoopId&gt;&gt;, EPGMElement&gt; {
 
   /**
    * Maps edge candidates to the step in which they are traversed
@@ -53,15 +53,15 @@ public class ElementsFromEmbedding
   /**
    * Constructs EPGM graph heads
    */
-  private final EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory;
+  private final GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
   /**
    * Constructs EPGM vertices
    */
-  private final EPGMVertexFactory&lt;Vertex&gt; vertexFactory;
+  private final VertexFactory&lt;EPGMVertex&gt; vertexFactory;
   /**
    * Constructs EPGM edges
    */
-  private final EPGMEdgeFactory&lt;Edge&gt; edgeFactory;
+  private final EdgeFactory&lt;EPGMEdge&gt; edgeFactory;
   /**
    * Maps query vertex ids to variables
    */
@@ -84,9 +84,9 @@ public class ElementsFromEmbedding
    * @param query             query handler
    */
   public ElementsFromEmbedding(TraversalCode traversalCode,
-    EPGMGraphHeadFactory&lt;GraphHead&gt; epgmGraphHeadFactory,
-    EPGMVertexFactory&lt;Vertex&gt; epgmVertexFactory,
-    EPGMEdgeFactory&lt;Edge&gt; epgmEdgeFactory,
+    GraphHeadFactory&lt;EPGMGraphHead&gt; epgmGraphHeadFactory,
+    VertexFactory&lt;EPGMVertex&gt; epgmVertexFactory,
+    EdgeFactory&lt;EPGMEdge&gt; epgmEdgeFactory,
 <span class="fc" id="L90">    QueryHandler query) {</span>
 <span class="fc" id="L91">    this.graphHeadFactory = epgmGraphHeadFactory;</span>
 <span class="fc" id="L92">    this.vertexFactory = epgmVertexFactory;</span>
@@ -114,7 +114,7 @@ public class ElementsFromEmbedding
 <span class="fc" id="L114">  }</span>
 
   @Override
-  public void flatMap(Tuple1&lt;Embedding&lt;GradoopId&gt;&gt; embedding, Collector&lt;Element&gt; out)
+  public void flatMap(Tuple1&lt;Embedding&lt;GradoopId&gt;&gt; embedding, Collector&lt;EPGMElement&gt; out)
       throws Exception {
 
 <span class="fc" id="L120">    GradoopId[] vertexMapping = embedding.f0.getVertexMapping();</span>
@@ -122,12 +122,12 @@ public class ElementsFromEmbedding
 
 
     // create graph head for this embedding
-<span class="fc" id="L125">    GraphHead graphHead = graphHeadFactory.createGraphHead();</span>
+<span class="fc" id="L125">    EPGMGraphHead graphHead = graphHeadFactory.createGraphHead();</span>
 
     // collect vertices (and assign to graph head)
 <span class="fc bfc" id="L128" title="All 2 branches covered.">    for (int i = 0; i &lt; vertexMapping.length; i++) {</span>
 <span class="fc bfc" id="L129" title="All 2 branches covered.">      if (!isProcessed(vertexMapping, i)) {</span>
-<span class="fc" id="L130">        Vertex v = vertexFactory.initVertex(vertexMapping[i]);</span>
+<span class="fc" id="L130">        EPGMVertex v = vertexFactory.initVertex(vertexMapping[i]);</span>
 <span class="fc" id="L131">        v.addGraphId(graphHead.getId());</span>
 <span class="fc" id="L132">        out.collect(v);</span>
       }
@@ -147,7 +147,7 @@ public class ElementsFromEmbedding
 <span class="fc" id="L147">          vertexMapping[(int) s.getFrom()] : vertexMapping[(int) s.getTo()];</span>
 <span class="fc bfc" id="L148" title="All 2 branches covered.">        GradoopId targetId = s.isOutgoing() ?</span>
 <span class="fc" id="L149">          vertexMapping[(int) s.getTo()] : vertexMapping[(int) s.getFrom()];</span>
-<span class="fc" id="L150">        Edge e = edgeFactory.initEdge(edgeMapping[i], sourceId, targetId);</span>
+<span class="fc" id="L150">        EPGMEdge e = edgeFactory.initEdge(edgeMapping[i], sourceId, targetId);</span>
 <span class="fc" id="L151">        e.addGraphId(graphHead.getId());</span>
 <span class="fc" id="L152">        out.collect(e);</span>
       }

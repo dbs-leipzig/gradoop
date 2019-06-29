@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
@@ -35,15 +35,15 @@
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> java.util.List;
 <a name="26" href="#26">26</a>  
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * Filters a set of EPGM {@link Vertex} objects based on a specified predicate. Additionally, the</em>
+<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * Filters a set of {@link EPGMVertex} objects based on a specified predicate. Additionally, the</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * operator projects all property values to the output {@link Embedding} that are specified in the</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> * given {@code projectionPropertyKeys}.</em>
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment"> *</em>
-<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment"> * Vertex -&gt; Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])</em>
+<a name="32" href="#32">32</a>  <em class="jxr_javadoccomment"> * EPGMVertex -&gt; Embedding( [IdEntry(VertexId)], [PropertyEntry(v1),PropertyEntry(v2)])</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> * Example:</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment"> *</em>
-<a name="36" href="#36">36</a>  <em class="jxr_javadoccomment"> * Given a Vertex(0, "Person", {name:"Alice", age:23}), a predicate "age = 23" and</em>
+<a name="36" href="#36">36</a>  <em class="jxr_javadoccomment"> * Given a EPGMVertex(0, "Person", {name:"Alice", age:23}), a predicate "age = 23" and</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> * projection property keys [name, location] the operator creates an</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> * {@link Embedding}:</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> *</em>
@@ -53,7 +53,7 @@
 <a name="43" href="#43">43</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   * Input vertices</em>
 <a name="45" href="#45">45</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="46" href="#46">46</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> DataSet&lt;Vertex&gt; input;
+<a name="46" href="#46">46</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> DataSet&lt;EPGMVertex&gt; input;
 <a name="47" href="#47">47</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * Predicates in conjunctive normal form</em>
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   */</em>
@@ -75,7 +75,7 @@
 <a name="65" href="#65">65</a>  <em class="jxr_javadoccomment">   * @param predicates Predicates used to filter vertices</em>
 <a name="66" href="#66">66</a>  <em class="jxr_javadoccomment">   * @param projectionPropertyKeys Property keys used for projection</em>
 <a name="67" href="#67">67</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="68" href="#68">68</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/filter/FilterAndProjectVertices.html">FilterAndProjectVertices</a>(DataSet&lt;Vertex&gt; input, <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> predicates,
+<a name="68" href="#68">68</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/filter/FilterAndProjectVertices.html">FilterAndProjectVertices</a>(DataSet&lt;EPGMVertex&gt; input, <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> predicates,
 <a name="69" href="#69">69</a>      List&lt;String&gt; projectionPropertyKeys) {
 <a name="70" href="#70">70</a>      <strong class="jxr_keyword">this</strong>.input = input;
 <a name="71" href="#71">71</a>      <strong class="jxr_keyword">this</strong>.predicates = predicates;

@@ -18,14 +18,14 @@ package org.gradoop.storage.impl.hbase.io.inputformats;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
 
 /**
  * Reads graph data from HBase.
  */
-public class GraphHeadTableInputFormat extends BaseTableInputFormat&lt;GraphHead&gt; {
+public class GraphHeadTableInputFormat extends BaseTableInputFormat&lt;EPGMGraphHead&gt; {
 
   /**
    * Handles reading of persistent graph data.
@@ -73,7 +73,7 @@ public class GraphHeadTableInputFormat extends BaseTableInputFormat&lt;GraphHead
   }
 
   @Override
-  protected Tuple1&lt;GraphHead&gt; mapResultToTuple(Result result) {
+  protected Tuple1&lt;EPGMGraphHead&gt; mapResultToTuple(Result result) {
 <span class="fc" id="L77">    return new Tuple1&lt;&gt;(graphHeadHandler.readGraphHead(result));</span>
   }
 }

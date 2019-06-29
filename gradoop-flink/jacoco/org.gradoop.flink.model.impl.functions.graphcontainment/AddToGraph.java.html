@@ -17,17 +17,15 @@ package org.gradoop.flink.model.impl.functions.graphcontainment;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 
 /**
  * Adds the given graph head identifier to the graph element.
  *
  * @param &lt;GE&gt; EPGM graph element
  */
-public class AddToGraph&lt;GE extends GraphElement&gt; implements
-  MapFunction&lt;GE, GE&gt; {
-
+public class AddToGraph&lt;GE extends EPGMGraphElement&gt; implements MapFunction&lt;GE, GE&gt; {
   /**
    * Graph head identifier which gets added to the graph element.
    */
@@ -38,14 +36,14 @@ public class AddToGraph&lt;GE extends GraphElement&gt; implements
    *
    * @param graphHead graph head used for updating
    */
-<span class="fc" id="L41">  public AddToGraph(GraphHead graphHead) {</span>
-<span class="fc" id="L42">    this.graphHeadId = graphHead.getId();</span>
-<span class="fc" id="L43">  }</span>
+<span class="fc" id="L39">  public AddToGraph(EPGMGraphHead graphHead) {</span>
+<span class="fc" id="L40">    this.graphHeadId = graphHead.getId();</span>
+<span class="fc" id="L41">  }</span>
 
   @Override
   public GE map(GE graphElement) {
-<span class="fc" id="L47">    graphElement.addGraphId(graphHeadId);</span>
-<span class="fc" id="L48">    return graphElement;</span>
+<span class="fc" id="L45">    graphElement.addGraphId(graphHeadId);</span>
+<span class="fc" id="L46">    return graphElement;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

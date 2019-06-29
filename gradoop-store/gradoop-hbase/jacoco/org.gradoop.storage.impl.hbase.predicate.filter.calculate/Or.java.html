@@ -17,7 +17,7 @@ package org.gradoop.storage.impl.hbase.predicate.filter.calculate;
 
 import org.apache.hadoop.hbase.filter.Filter;
 import org.apache.hadoop.hbase.filter.FilterList;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 
 import javax.annotation.Nonnull;
@@ -31,7 +31,7 @@ import java.util.StringJoiner;
  *
  * @param &lt;T&gt; element type
  */
-public final class Or&lt;T extends EPGMElement&gt; implements HBaseElementFilter&lt;T&gt; {
+public final class Or&lt;T extends Element&gt; implements HBaseElementFilter&lt;T&gt; {
 
   /**
    * Predicate list
@@ -59,7 +59,7 @@ public final class Or&lt;T extends EPGMElement&gt; implements HBaseElementFilter
    * @return Disjunctive filter instance
    */
   @SafeVarargs
-  public static &lt;T extends EPGMElement&gt; Or&lt;T&gt; create(HBaseElementFilter&lt;T&gt;... predicates) {
+  public static &lt;T extends Element&gt; Or&lt;T&gt; create(HBaseElementFilter&lt;T&gt;... predicates) {
 <span class="fc" id="L63">    List&lt;HBaseElementFilter&lt;T&gt;&gt; formula = new ArrayList&lt;&gt;();</span>
 <span class="fc" id="L64">    Collections.addAll(formula, predicates);</span>
 <span class="fc" id="L65">    return new Or&lt;&gt;(formula);</span>

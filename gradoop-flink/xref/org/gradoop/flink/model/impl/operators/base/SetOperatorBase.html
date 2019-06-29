@@ -27,9 +27,9 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.Id;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.SourceId;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.TargetId;
@@ -62,10 +62,10 @@
 <a name="52" href="#52">52</a>  <em class="jxr_javadoccomment">   * @return vertex set of the resulting graph collection</em>
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="54" href="#54">54</a>    @Override
-<a name="55" href="#55">55</a>    <strong class="jxr_keyword">protected</strong> DataSet&lt;Vertex&gt; computeNewVertices(
-<a name="56" href="#56">56</a>      DataSet&lt;GraphHead&gt; newGraphHeads) {
+<a name="55" href="#55">55</a>    <strong class="jxr_keyword">protected</strong> DataSet&lt;EPGMVertex&gt; computeNewVertices(
+<a name="56" href="#56">56</a>      DataSet&lt;EPGMGraphHead&gt; newGraphHeads) {
 <a name="57" href="#57">57</a>  
-<a name="58" href="#58">58</a>      DataSet&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; verticesWithGraphs =
+<a name="58" href="#58">58</a>      DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; verticesWithGraphs =
 <a name="59" href="#59">59</a>        firstCollection.getVertices().flatMap(<strong class="jxr_keyword">new</strong> PairVertexWithGraphs&lt;&gt;());
 <a name="60" href="#60">60</a>  
 <a name="61" href="#61">61</a>      <strong class="jxr_keyword">return</strong> verticesWithGraphs
@@ -87,7 +87,7 @@
 <a name="77" href="#77">77</a>  <em class="jxr_javadoccomment">   * @see Intersection</em>
 <a name="78" href="#78">78</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="79" href="#79">79</a>    @Override
-<a name="80" href="#80">80</a>    <strong class="jxr_keyword">protected</strong> DataSet&lt;Edge&gt; computeNewEdges(DataSet&lt;Vertex&gt; newVertices) {
+<a name="80" href="#80">80</a>    <strong class="jxr_keyword">protected</strong> DataSet&lt;EPGMEdge&gt; computeNewEdges(DataSet&lt;EPGMVertex&gt; newVertices) {
 <a name="81" href="#81">81</a>      <strong class="jxr_keyword">return</strong> firstCollection.getEdges().join(newVertices)
 <a name="82" href="#82">82</a>        .where(<strong class="jxr_keyword">new</strong> SourceId&lt;&gt;())
 <a name="83" href="#83">83</a>        .equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())

@@ -28,14 +28,14 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Maps;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Sets;
 <a name="20" href="#20">20</a>  
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertexFactory;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EdgeFactory;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHeadFactory;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.VertexFactory;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
@@ -57,15 +57,15 @@
 <a name="47" href="#47">47</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * graph Head Factory</em>
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="50" href="#50">50</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory;
+<a name="50" href="#50">50</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
 <a name="51" href="#51">51</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="52" href="#52">52</a>  <em class="jxr_javadoccomment">   * vertex Factory</em>
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="54" href="#54">54</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> EPGMVertexFactory&lt;Vertex&gt; vertexFactory;
+<a name="54" href="#54">54</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> VertexFactory&lt;EPGMVertex&gt; vertexFactory;
 <a name="55" href="#55">55</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="56" href="#56">56</a>  <em class="jxr_javadoccomment">   * edge Factory</em>
 <a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="58" href="#58">58</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> EPGMEdgeFactory&lt;Edge&gt; edgeFactory;
+<a name="58" href="#58">58</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">final</strong> EdgeFactory&lt;EPGMEdge&gt; edgeFactory;
 <a name="59" href="#59">59</a>  
 <a name="60" href="#60">60</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="61" href="#61">61</a>  <em class="jxr_javadoccomment">   * Constructor.</em>
@@ -95,7 +95,7 @@
 <a name="85" href="#85">85</a>      properties.set(TFSMConstants.SUPPORT_KEY, subgraph.getCount());
 <a name="86" href="#86">86</a>      properties.set(TFSMConstants.CANONICAL_LABEL_KEY, subgraph.getCanonicalLabel());
 <a name="87" href="#87">87</a>  
-<a name="88" href="#88">88</a>      GraphHead epgmGraphHead = graphHeadFactory
+<a name="88" href="#88">88</a>      EPGMGraphHead epgmGraphHead = graphHeadFactory
 <a name="89" href="#89">89</a>        .createGraphHead(canonicalLabel, properties);
 <a name="90" href="#90">90</a>  
 <a name="91" href="#91">91</a>      GradoopIdSet graphIds = GradoopIdSet.fromExisting(epgmGraphHead.getId());
@@ -103,12 +103,12 @@
 <a name="93" href="#93">93</a>      <em class="jxr_comment">// VERTICES</em>
 <a name="94" href="#94">94</a>  
 <a name="95" href="#95">95</a>      Map&lt;Integer, String&gt; vertices = subgraph.getEmbedding().getVertices();
-<a name="96" href="#96">96</a>      Set&lt;Vertex&gt; epgmVertices = Sets.newHashSetWithExpectedSize(vertices.size());
+<a name="96" href="#96">96</a>      Set&lt;EPGMVertex&gt; epgmVertices = Sets.newHashSetWithExpectedSize(vertices.size());
 <a name="97" href="#97">97</a>      Map&lt;Integer, GradoopId&gt; vertexIdMap =
 <a name="98" href="#98">98</a>        Maps.newHashMapWithExpectedSize(vertices.size());
 <a name="99" href="#99">99</a>  
 <a name="100" href="#100">100</a>     <strong class="jxr_keyword">for</strong> (Map.Entry&lt;Integer, String&gt; vertex : vertices.entrySet()) {
-<a name="101" href="#101">101</a>       Vertex epgmVertex = vertexFactory
+<a name="101" href="#101">101</a>       EPGMVertex epgmVertex = vertexFactory
 <a name="102" href="#102">102</a>         .createVertex(vertex.getValue(), graphIds);
 <a name="103" href="#103">103</a> 
 <a name="104" href="#104">104</a>       vertexIdMap.put(vertex.getKey(), epgmVertex.getId());
@@ -118,7 +118,7 @@
 <a name="108" href="#108">108</a>     <em class="jxr_comment">// EDGES</em>
 <a name="109" href="#109">109</a> 
 <a name="110" href="#110">110</a>     Collection&lt;FSMEdge&gt; edges = subgraph.getEmbedding().getEdges().values();
-<a name="111" href="#111">111</a>     Set&lt;Edge&gt; epgmEdges = Sets.newHashSetWithExpectedSize(edges.size());
+<a name="111" href="#111">111</a>     Set&lt;EPGMEdge&gt; epgmEdges = Sets.newHashSetWithExpectedSize(edges.size());
 <a name="112" href="#112">112</a> 
 <a name="113" href="#113">113</a>     <strong class="jxr_keyword">for</strong> (FSMEdge edge : edges) {
 <a name="114" href="#114">114</a>       epgmEdges.add(edgeFactory.createEdge(

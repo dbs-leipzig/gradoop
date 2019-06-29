@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.distinction.functions;
 
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 
 /**
@@ -26,8 +26,8 @@ import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 <span class="fc" id="L26">public class FirstGraphHead implements GraphHeadReduceFunction {</span>
 
   @Override
-  public void reduce(Iterable&lt;Tuple2&lt;String, GraphHead&gt;&gt; iterable,
-    Collector&lt;GraphHead&gt; collector) throws Exception {
+  public void reduce(Iterable&lt;Tuple2&lt;String, EPGMGraphHead&gt;&gt; iterable,
+    Collector&lt;EPGMGraphHead&gt; collector) throws Exception {
 <span class="nc" id="L31">    collector.collect(iterable.iterator().next().f1);</span>
 <span class="nc" id="L32">  }</span>
 }

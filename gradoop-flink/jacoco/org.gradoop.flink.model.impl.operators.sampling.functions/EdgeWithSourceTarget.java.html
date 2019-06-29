@@ -18,16 +18,16 @@ package org.gradoop.flink.model.impl.operators.sampling.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
- * Maps an Edge to Edge with its source and targets
+ * Maps an EPGMEdge to EPGMEdge with its source and targets
  */
-public class EdgeWithSourceTarget implements MapFunction&lt;Edge, Tuple3&lt;Edge, GradoopId, GradoopId&gt;&gt; {
+public class EdgeWithSourceTarget implements MapFunction&lt;EPGMEdge, Tuple3&lt;EPGMEdge, GradoopId, GradoopId&gt;&gt; {
   /**
    *  Reduce object instantiations
    */
-  private Tuple3&lt;Edge, GradoopId, GradoopId&gt; reuse;
+  private Tuple3&lt;EPGMEdge, GradoopId, GradoopId&gt; reuse;
 
   /**
    * Constructor
@@ -37,7 +37,7 @@ public class EdgeWithSourceTarget implements MapFunction&lt;Edge, Tuple3&lt;Edge
 <span class="nc" id="L37">  }</span>
 
   @Override
-  public Tuple3&lt;Edge, GradoopId, GradoopId&gt; map(Edge edge) throws Exception {
+  public Tuple3&lt;EPGMEdge, GradoopId, GradoopId&gt; map(EPGMEdge edge) throws Exception {
 <span class="nc" id="L41">    reuse.f0 = edge;</span>
 <span class="nc" id="L42">    reuse.f1 = edge.getSourceId();</span>
 <span class="nc" id="L43">    reuse.f2 = edge.getTargetId();</span>

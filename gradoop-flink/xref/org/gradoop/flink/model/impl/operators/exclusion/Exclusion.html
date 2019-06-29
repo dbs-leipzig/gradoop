@@ -43,8 +43,8 @@
 <a name="33" href="#33">33</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.exclusion;
 <a name="34" href="#34">34</a>  
 <a name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="36" href="#36">36</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="37" href="#37">37</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="36" href="#36">36</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="37" href="#37">37</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="38" href="#38">38</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="39" href="#39">39</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 <a name="40" href="#40">40</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -64,13 +64,13 @@
 <a name="54" href="#54">54</a>    @Override
 <a name="55" href="#55">55</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> execute(
 <a name="56" href="#56">56</a>      <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> firstGraph, <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> secondGraph) {
-<a name="57" href="#57">57</a>      DataSet&lt;Vertex&gt; newVertexSet = firstGraph.getVertices()
+<a name="57" href="#57">57</a>      DataSet&lt;EPGMVertex&gt; newVertexSet = firstGraph.getVertices()
 <a name="58" href="#58">58</a>        .leftOuterJoin(secondGraph.getVertices())
 <a name="59" href="#59">59</a>        .where(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
 <a name="60" href="#60">60</a>        .equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
 <a name="61" href="#61">61</a>        .with(<strong class="jxr_keyword">new</strong> LeftWhenRightIsNull&lt;&gt;());
 <a name="62" href="#62">62</a>  
-<a name="63" href="#63">63</a>      DataSet&lt;Edge&gt; newEdgeSet = firstGraph.getEdges()
+<a name="63" href="#63">63</a>      DataSet&lt;EPGMEdge&gt; newEdgeSet = firstGraph.getEdges()
 <a name="64" href="#64">64</a>        .join(newVertexSet)
 <a name="65" href="#65">65</a>        .where(<strong class="jxr_keyword">new</strong> SourceId&lt;&gt;())
 <a name="66" href="#66">66</a>        .equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())

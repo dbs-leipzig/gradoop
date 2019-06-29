@@ -26,21 +26,21 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.sampling.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.CrossFunction;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> * Writes the PageRank-scores stored in the graphHead to all vertices.</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/AddPageRankScoresToVertexCrossFunction.html">AddPageRankScoresToVertexCrossFunction</a>
-<a name="27" href="#27">27</a>    implements CrossFunction&lt;Vertex, GraphHead, Vertex&gt; {
+<a name="27" href="#27">27</a>    implements CrossFunction&lt;EPGMVertex, EPGMGraphHead, EPGMVertex&gt; {
 <a name="28" href="#28">28</a>  
 <a name="29" href="#29">29</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment">   * Writes the PageRank-scores stored in the graphHead to all vertices.</em>
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="32" href="#32">32</a>    @Override
-<a name="33" href="#33">33</a>    <strong class="jxr_keyword">public</strong> Vertex cross(Vertex vertex, GraphHead graphHead) {
+<a name="33" href="#33">33</a>    <strong class="jxr_keyword">public</strong> EPGMVertex cross(EPGMVertex vertex, EPGMGraphHead graphHead) {
 <a name="34" href="#34">34</a>      <strong class="jxr_keyword">double</strong> min = graphHead.getPropertyValue(
 <a name="35" href="#35">35</a>        SamplingConstants.MIN_PAGE_RANK_SCORE_PROPERTY_KEY).getDouble();
 <a name="36" href="#36">36</a>      <strong class="jxr_keyword">double</strong> max = graphHead.getPropertyValue(

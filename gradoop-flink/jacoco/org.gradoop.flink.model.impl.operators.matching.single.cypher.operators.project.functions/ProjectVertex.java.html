@@ -16,17 +16,17 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 
 import java.util.List;
 
 /**
- * Projects a Vertex by a set of properties.
- * Vertex -&gt; Embedding(GraphElementEmbedding(Vertex))
+ * Projects a EPGMVertex by a set of properties.
+ * EPGMVertex -&gt; Embedding(GraphElementEmbedding(EPGMVertex))
  */
-public class ProjectVertex extends RichMapFunction&lt;Vertex, Embedding&gt; {
+public class ProjectVertex extends RichMapFunction&lt;EPGMVertex, Embedding&gt; {
   /**
    * Names of the properties that will be kept in the projection
    */
@@ -41,7 +41,7 @@ public class ProjectVertex extends RichMapFunction&lt;Vertex, Embedding&gt; {
 <span class="fc" id="L41">  }</span>
 
   @Override
-  public Embedding map(Vertex vertex) {
+  public Embedding map(EPGMVertex vertex) {
 <span class="fc" id="L45">    return EmbeddingFactory.fromVertex(vertex, propertyKeys);</span>
   }
 }

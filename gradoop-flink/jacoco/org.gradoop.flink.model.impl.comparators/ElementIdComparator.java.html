@@ -15,18 +15,18 @@
  */
 package org.gradoop.flink.model.impl.comparators;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 
 import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * Id based EPGM element comparator.
+ * Id based element comparator.
  */
-<span class="nc" id="L26">public class ElementIdComparator implements Comparator&lt;EPGMElement&gt;, Serializable {</span>
+<span class="nc" id="L26">public class ElementIdComparator implements Comparator&lt;Element&gt;, Serializable {</span>
 
   @Override
-  public int compare(EPGMElement a, EPGMElement b) {
+  public int compare(Element a, Element b) {
 <span class="nc" id="L30">    return a.getId().compareTo(b.getId());</span>
   }
 }

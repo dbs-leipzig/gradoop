@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAllGraphsBroadcast;
 import org.gradoop.common.model.impl.id.GradoopId;
 
@@ -36,10 +36,10 @@ import org.gradoop.common.model.impl.id.GradoopId;
    * @param ids       graph identifiers
    * @return filtered vertices
    */
-  protected DataSet&lt;Vertex&gt; getVertices(DataSet&lt;Vertex&gt; vertices,
+  protected DataSet&lt;EPGMVertex&gt; getVertices(DataSet&lt;EPGMVertex&gt; vertices,
     DataSet&lt;GradoopId&gt; ids) {
 <span class="fc" id="L41">    return vertices</span>
-<span class="fc" id="L42">      .filter(new InAllGraphsBroadcast&lt;Vertex&gt;())</span>
+<span class="fc" id="L42">      .filter(new InAllGraphsBroadcast&lt;EPGMVertex&gt;())</span>
 <span class="fc" id="L43">      .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);</span>
   }
 
@@ -50,10 +50,10 @@ import org.gradoop.common.model.impl.id.GradoopId;
    * @param ids   graph identifiers
    * @return filtered edges
    */
-  protected DataSet&lt;Edge&gt; getEdges(DataSet&lt;Edge&gt; edges,
+  protected DataSet&lt;EPGMEdge&gt; getEdges(DataSet&lt;EPGMEdge&gt; edges,
     DataSet&lt;GradoopId&gt; ids) {
 <span class="fc" id="L55">    return edges</span>
-<span class="fc" id="L56">      .filter(new InAllGraphsBroadcast&lt;Edge&gt;())</span>
+<span class="fc" id="L56">      .filter(new InAllGraphsBroadcast&lt;EPGMEdge&gt;())</span>
 <span class="fc" id="L57">      .withBroadcastSet(ids, InAllGraphsBroadcast.GRAPH_IDS);</span>
   }
 }

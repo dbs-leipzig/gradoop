@@ -20,11 +20,11 @@ import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.Iterator;
@@ -40,28 +40,28 @@ import java.util.Set;
  */
 @FunctionAnnotation.ReadFieldsFirst(&quot;f1&quot;)
 <span class="nc" id="L42">public class GraphElementsHeadsToTransaction implements CoGroupFunction</span>
-  &lt;Tuple2&lt;GradoopId, GraphElement&gt;, GraphHead, GraphTransaction&gt; {
+  &lt;Tuple2&lt;GradoopId, EPGMGraphElement&gt;, EPGMGraphHead, GraphTransaction&gt; {
 
   @Override
   public void coGroup(
-    Iterable&lt;Tuple2&lt;GradoopId, GraphElement&gt;&gt; graphElements,
-    Iterable&lt;GraphHead&gt; graphHeads,
+    Iterable&lt;Tuple2&lt;GradoopId, EPGMGraphElement&gt;&gt; graphElements,
+    Iterable&lt;EPGMGraphHead&gt; graphHeads,
     Collector&lt;GraphTransaction&gt; out) throws Exception {
 
-<span class="nc" id="L51">    Iterator&lt;GraphHead&gt; graphHeadIter = graphHeads.iterator();</span>
+<span class="nc" id="L51">    Iterator&lt;EPGMGraphHead&gt; graphHeadIter = graphHeads.iterator();</span>
 
 <span class="nc bnc" id="L53" title="All 2 branches missed.">    if (graphHeadIter.hasNext()) {</span>
-<span class="nc" id="L54">      Set&lt;Vertex&gt; vertices = Sets.newHashSet();</span>
-<span class="nc" id="L55">      Set&lt;Edge&gt; edges = Sets.newHashSet();</span>
-<span class="nc" id="L56">      GraphHead graphHead = graphHeadIter.next();</span>
+<span class="nc" id="L54">      Set&lt;EPGMVertex&gt; vertices = Sets.newHashSet();</span>
+<span class="nc" id="L55">      Set&lt;EPGMEdge&gt; edges = Sets.newHashSet();</span>
+<span class="nc" id="L56">      EPGMGraphHead graphHead = graphHeadIter.next();</span>
 
-<span class="nc bnc" id="L58" title="All 2 branches missed.">      for (Tuple2&lt;GradoopId, GraphElement&gt; graphElement : graphElements) {</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">      for (Tuple2&lt;GradoopId, EPGMGraphElement&gt; graphElement : graphElements) {</span>
 
-<span class="nc" id="L60">        GraphElement el = graphElement.f1;</span>
-<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (el instanceof Vertex) {</span>
-<span class="nc" id="L62">          vertices.add((Vertex) el);</span>
-<span class="nc bnc" id="L63" title="All 2 branches missed.">        } else if (el instanceof Edge) {</span>
-<span class="nc" id="L64">          edges.add((Edge) el);</span>
+<span class="nc" id="L60">        EPGMGraphElement el = graphElement.f1;</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (el instanceof EPGMVertex) {</span>
+<span class="nc" id="L62">          vertices.add((EPGMVertex) el);</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        } else if (el instanceof EPGMEdge) {</span>
+<span class="nc" id="L64">          edges.add((EPGMEdge) el);</span>
         }
 <span class="nc" id="L66">      }</span>
 

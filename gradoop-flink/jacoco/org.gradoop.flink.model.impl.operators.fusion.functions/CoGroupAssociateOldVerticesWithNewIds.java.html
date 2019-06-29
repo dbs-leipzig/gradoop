@@ -21,7 +21,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 import java.util.Collection;
 
@@ -32,12 +32,13 @@ import java.util.Collection;
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;f0-&gt;f0&quot;)
 @FunctionAnnotation.ReadFieldsSecond(&quot;f0&quot;)
 public class CoGroupAssociateOldVerticesWithNewIds implements
-  CoGroupFunction&lt;Tuple2&lt;Vertex, GradoopId&gt;, Tuple2&lt;Vertex, GradoopId&gt;, Tuple2&lt;Vertex, GradoopId&gt;&gt; {
+  CoGroupFunction&lt;
+    Tuple2&lt;EPGMVertex, GradoopId&gt;, Tuple2&lt;EPGMVertex, GradoopId&gt;, Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; {
 
   /**
    * Reusable element
    */
-  private final Tuple2&lt;Vertex, GradoopId&gt; reusable;
+  private final Tuple2&lt;EPGMVertex, GradoopId&gt; reusable;
 
   /**
    * Reusable collection for traversing the second operand
@@ -47,24 +48,24 @@ public class CoGroupAssociateOldVerticesWithNewIds implements
   /**
    * Default constructor
    */
-<span class="fc" id="L50">  public CoGroupAssociateOldVerticesWithNewIds() {</span>
-<span class="fc" id="L51">    reusable = new Tuple2&lt;&gt;();</span>
-<span class="fc" id="L52">    reusableList = Lists.newArrayList();</span>
-<span class="fc" id="L53">  }</span>
+<span class="fc" id="L51">  public CoGroupAssociateOldVerticesWithNewIds() {</span>
+<span class="fc" id="L52">    reusable = new Tuple2&lt;&gt;();</span>
+<span class="fc" id="L53">    reusableList = Lists.newArrayList();</span>
+<span class="fc" id="L54">  }</span>
 
   @Override
-  public void coGroup(Iterable&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; first,
-    Iterable&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; second, Collector&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; out)
+  public void coGroup(Iterable&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; first,
+    Iterable&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; second, Collector&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; out)
       throws Exception {
-<span class="fc" id="L59">    reusableList.clear();</span>
-<span class="fc" id="L60">    second.forEach(x -&gt; reusableList.add(x.f0.getId()));</span>
-<span class="fc bfc" id="L61" title="All 2 branches covered.">    for (Tuple2&lt;Vertex, GradoopId&gt; x : first) {</span>
-<span class="fc bfc" id="L62" title="All 2 branches covered.">      for (GradoopId y : reusableList) {</span>
-<span class="fc" id="L63">        reusable.f0 = x.f0;</span>
-<span class="fc" id="L64">        reusable.f1 = y;</span>
-<span class="fc" id="L65">        out.collect(reusable);</span>
-<span class="fc" id="L66">      }</span>
-<span class="fc" id="L67">    }</span>
-<span class="fc" id="L68">  }</span>
+<span class="fc" id="L60">    reusableList.clear();</span>
+<span class="fc" id="L61">    second.forEach(x -&gt; reusableList.add(x.f0.getId()));</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">    for (Tuple2&lt;EPGMVertex, GradoopId&gt; x : first) {</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">      for (GradoopId y : reusableList) {</span>
+<span class="fc" id="L64">        reusable.f0 = x.f0;</span>
+<span class="fc" id="L65">        reusable.f1 = y;</span>
+<span class="fc" id="L66">        out.collect(reusable);</span>
+<span class="fc" id="L67">      }</span>
+<span class="fc" id="L68">    }</span>
+<span class="fc" id="L69">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

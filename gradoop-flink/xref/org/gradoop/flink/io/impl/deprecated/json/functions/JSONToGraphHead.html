@@ -27,8 +27,8 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.codehaus.jettison.json.JSONObject;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHeadFactory;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="24" href="#24">24</a>  
@@ -48,19 +48,19 @@
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> * }</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="40" href="#40">40</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/io/impl/deprecated/json/functions/JSONToGraphHead.html">JSONToGraphHead</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../../org/gradoop/flink/io/impl/deprecated/json/functions/JSONToEntity.html">JSONToEntity</a>
-<a name="41" href="#41">41</a>    implements MapFunction&lt;String, GraphHead&gt; {
+<a name="41" href="#41">41</a>    implements MapFunction&lt;String, EPGMGraphHead&gt; {
 <a name="42" href="#42">42</a>  
 <a name="43" href="#43">43</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   * Creates graph data objects</em>
 <a name="45" href="#45">45</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="46" href="#46">46</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory;
+<a name="46" href="#46">46</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
 <a name="47" href="#47">47</a>  
 <a name="48" href="#48">48</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   * Creates map function</em>
 <a name="50" href="#50">50</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="51" href="#51">51</a>  <em class="jxr_javadoccomment">   * @param epgmGraphHeadFactory graph data factory</em>
 <a name="52" href="#52">52</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="53" href="#53">53</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/flink/io/impl/deprecated/json/functions/JSONToGraphHead.html">JSONToGraphHead</a>(EPGMGraphHeadFactory&lt;GraphHead&gt; epgmGraphHeadFactory) {
+<a name="53" href="#53">53</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/flink/io/impl/deprecated/json/functions/JSONToGraphHead.html">JSONToGraphHead</a>(GraphHeadFactory&lt;EPGMGraphHead&gt; epgmGraphHeadFactory) {
 <a name="54" href="#54">54</a>      <strong class="jxr_keyword">this</strong>.graphHeadFactory = epgmGraphHeadFactory;
 <a name="55" href="#55">55</a>    }
 <a name="56" href="#56">56</a>  
@@ -72,7 +72,7 @@
 <a name="62" href="#62">62</a>  <em class="jxr_javadoccomment">   * @throws Exception on failure</em>
 <a name="63" href="#63">63</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="64" href="#64">64</a>    @Override
-<a name="65" href="#65">65</a>    <strong class="jxr_keyword">public</strong> GraphHead map(String s) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="65" href="#65">65</a>    <strong class="jxr_keyword">public</strong> EPGMGraphHead map(String s) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="66" href="#66">66</a>      JSONObject jsonGraph = <strong class="jxr_keyword">new</strong> JSONObject(s);
 <a name="67" href="#67">67</a>      GradoopId graphID = getID(jsonGraph);
 <a name="68" href="#68">68</a>      String label = getLabel(jsonGraph);

@@ -27,9 +27,9 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.GroupReduceFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMEdge;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHead;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.ElementFactoryProvider;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
@@ -50,9 +50,9 @@
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment"> * @param &lt;GC&gt; the type of the graph collection that will be created with this factory</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="42" href="#42">42</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">interface</strong> BaseGraphCollectionFactory&lt;
-<a name="43" href="#43">43</a>    G <strong class="jxr_keyword">extends</strong> EPGMGraphHead,
-<a name="44" href="#44">44</a>    V <strong class="jxr_keyword">extends</strong> EPGMVertex,
-<a name="45" href="#45">45</a>    E <strong class="jxr_keyword">extends</strong> EPGMEdge,
+<a name="43" href="#43">43</a>    G <strong class="jxr_keyword">extends</strong> GraphHead,
+<a name="44" href="#44">44</a>    V <strong class="jxr_keyword">extends</strong> Vertex,
+<a name="45" href="#45">45</a>    E <strong class="jxr_keyword">extends</strong> Edge,
 <a name="46" href="#46">46</a>    LG <strong class="jxr_keyword">extends</strong> BaseGraph&lt;G, V, E, LG, GC&gt;,
 <a name="47" href="#47">47</a>    GC <strong class="jxr_keyword">extends</strong> BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; <strong class="jxr_keyword">extends</strong> ElementFactoryProvider&lt;G, V, E&gt; {
 <a name="48" href="#48">48</a>  

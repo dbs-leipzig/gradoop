@@ -27,7 +27,7 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.IdInBroadcast;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.distinction.functions.FirstGraphHead;
@@ -53,7 +53,7 @@
 <a name="43" href="#43">43</a>        .distinct(1)
 <a name="44" href="#44">44</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/distinction/functions/IdFromGraphHeadString.html">IdFromGraphHeadString</a>());
 <a name="45" href="#45">45</a>  
-<a name="46" href="#46">46</a>      DataSet&lt;GraphHead&gt; graphHeads = collection.getGraphHeads()
+<a name="46" href="#46">46</a>      DataSet&lt;EPGMGraphHead&gt; graphHeads = collection.getGraphHeads()
 <a name="47" href="#47">47</a>        .filter(<strong class="jxr_keyword">new</strong> IdInBroadcast&lt;&gt;())
 <a name="48" href="#48">48</a>        .withBroadcastSet(graphIds, IdInBroadcast.IDS);
 <a name="49" href="#49">49</a>  

@@ -25,8 +25,8 @@ import org.apache.flink.table.api.Table;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 import org.gradoop.flink.model.api.operators.Operator;
@@ -96,12 +96,12 @@ public class CAPFQuery implements Operator {
   /**
    * Mapping between the long ids and the original vertices.
    */
-  private DataSet&lt;Tuple2&lt;Long, Vertex&gt;&gt; verticesWithIds;
+  private DataSet&lt;Tuple2&lt;Long, EPGMVertex&gt;&gt; verticesWithIds;
 
   /**
    * Mapping between the long ids and the original edges.
    */
-  private DataSet&lt;Tuple2&lt;Long, Edge&gt;&gt; edgesWithIds;
+  private DataSet&lt;Tuple2&lt;Long, EPGMEdge&gt;&gt; edgesWithIds;
 
   /**
    * Constructor
@@ -191,9 +191,9 @@ public class CAPFQuery implements Operator {
    * @return a graph with transformed vertex and edge properties
    */
   private LogicalGraph transformGraphProperties(LogicalGraph graph) {
-<span class="fc" id="L194">    DataSet&lt;Vertex&gt; transformedVertices = graph.getVertices()</span>
+<span class="fc" id="L194">    DataSet&lt;EPGMVertex&gt; transformedVertices = graph.getVertices()</span>
 <span class="fc" id="L195">      .map(new PropertyEncoder&lt;&gt;());</span>
-<span class="fc" id="L196">    DataSet&lt;Edge&gt; transformedEdges = graph.getEdges()</span>
+<span class="fc" id="L196">    DataSet&lt;EPGMEdge&gt; transformedEdges = graph.getEdges()</span>
 <span class="fc" id="L197">      .map(new PropertyEncoder&lt;&gt;());</span>
 
 <span class="fc" id="L199">    return graph.getFactory().fromDataSets(transformedVertices, transformedEdges);</span>
@@ -233,7 +233,7 @@ public class CAPFQuery implements Operator {
 <span class="fc" id="L233">      RowTypeInfo info = new RowTypeInfo(types);</span>
 
       // zip all vertices of one label with a globally unique id
-<span class="fc" id="L236">      DataSet&lt;Tuple2&lt;Long, Vertex&gt;&gt; verticesByLabelWithIds =</span>
+<span class="fc" id="L236">      DataSet&lt;Tuple2&lt;Long, EPGMVertex&gt;&gt; verticesByLabelWithIds =</span>
 <span class="fc" id="L237">        verticesWithIds.filter(new VertexLabelFilter(label));</span>
 
       // map vertices to row and wrap in scala DataSet

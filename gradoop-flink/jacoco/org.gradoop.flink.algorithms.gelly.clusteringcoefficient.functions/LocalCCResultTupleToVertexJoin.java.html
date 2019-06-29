@@ -18,7 +18,7 @@ package org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoefficientBase;
 
 /**
@@ -26,10 +26,10 @@ import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.ClusteringCoeffi
  * corresponding epgm vertex as property.
  */
 <span class="fc" id="L28">public class LocalCCResultTupleToVertexJoin implements</span>
-  JoinFunction&lt;Tuple2&lt;GradoopId, Double&gt;, Vertex, Vertex&gt; {
+  JoinFunction&lt;Tuple2&lt;GradoopId, Double&gt;, EPGMVertex, EPGMVertex&gt; {
 
   @Override
-  public Vertex join(Tuple2&lt;GradoopId, Double&gt; resultTuple, Vertex vertex) throws Exception {
+  public EPGMVertex join(Tuple2&lt;GradoopId, Double&gt; resultTuple, EPGMVertex vertex) throws Exception {
 <span class="fc" id="L33">    vertex.setProperty(ClusteringCoefficientBase.PROPERTY_KEY_LOCAL, resultTuple.f1);</span>
 <span class="fc" id="L34">    return vertex;</span>
   }

@@ -28,9 +28,9 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Sets;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.GradoopFlinkTestUtils;
@@ -64,26 +64,26 @@
 <a name="54" href="#54">54</a>    }
 <a name="55" href="#55">55</a>  
 <a name="56" href="#56">56</a>    <strong class="jxr_keyword">private</strong> GraphTransaction getGraphTransaction() {
-<a name="57" href="#57">57</a>      GraphHead graphHead = <strong class="jxr_keyword">new</strong> GraphHead(GradoopId.get(), <span class="jxr_string">"Test"</span>, <strong class="jxr_keyword">null</strong>);
+<a name="57" href="#57">57</a>      EPGMGraphHead graphHead = <strong class="jxr_keyword">new</strong> EPGMGraphHead(GradoopId.get(), <span class="jxr_string">"Test"</span>, <strong class="jxr_keyword">null</strong>);
 <a name="58" href="#58">58</a>  
 <a name="59" href="#59">59</a>      GradoopIdSet graphIds = GradoopIdSet.fromExisting(graphHead.getId());
-<a name="60" href="#60">60</a>      Set&lt;Vertex&gt; vertices = Sets.newHashSet();
-<a name="61" href="#61">61</a>      Set&lt;Edge&gt; edges = Sets.newHashSet();
+<a name="60" href="#60">60</a>      Set&lt;EPGMVertex&gt; vertices = Sets.newHashSet();
+<a name="61" href="#61">61</a>      Set&lt;EPGMEdge&gt; edges = Sets.newHashSet();
 <a name="62" href="#62">62</a>  
 <a name="63" href="#63">63</a>      Properties aProperties = <strong class="jxr_keyword">new</strong> Properties();
 <a name="64" href="#64">64</a>      aProperties.set(<span class="jxr_string">"x"</span>, 1);
-<a name="65" href="#65">65</a>      Vertex v1 = <strong class="jxr_keyword">new</strong> Vertex(GradoopId.get(), <span class="jxr_string">"A"</span>, aProperties, graphIds);
-<a name="66" href="#66">66</a>      Vertex v2 = <strong class="jxr_keyword">new</strong> Vertex(GradoopId.get(), <span class="jxr_string">"B"</span>, <strong class="jxr_keyword">null</strong>, graphIds);
+<a name="65" href="#65">65</a>      EPGMVertex v1 = <strong class="jxr_keyword">new</strong> EPGMVertex(GradoopId.get(), <span class="jxr_string">"A"</span>, aProperties, graphIds);
+<a name="66" href="#66">66</a>      EPGMVertex v2 = <strong class="jxr_keyword">new</strong> EPGMVertex(GradoopId.get(), <span class="jxr_string">"B"</span>, <strong class="jxr_keyword">null</strong>, graphIds);
 <a name="67" href="#67">67</a>  
 <a name="68" href="#68">68</a>      vertices.add(v1);
 <a name="69" href="#69">69</a>      vertices.add(v2);
 <a name="70" href="#70">70</a>  
 <a name="71" href="#71">71</a>      Properties loopProperties = <strong class="jxr_keyword">new</strong> Properties();
 <a name="72" href="#72">72</a>  
-<a name="73" href="#73">73</a>      edges.add(<strong class="jxr_keyword">new</strong> Edge(GradoopId.get(), <span class="jxr_string">"loop"</span>, v1.getId(), v1.getId(), loopProperties, graphIds));
-<a name="74" href="#74">74</a>      edges.add(<strong class="jxr_keyword">new</strong> Edge(GradoopId.get(), <span class="jxr_string">"m"</span>, v1.getId(), v2.getId(), <strong class="jxr_keyword">null</strong>, graphIds));
-<a name="75" href="#75">75</a>      edges.add(<strong class="jxr_keyword">new</strong> Edge(GradoopId.get(), <span class="jxr_string">"m"</span>, v1.getId(), v2.getId(), <strong class="jxr_keyword">null</strong>, graphIds));
-<a name="76" href="#76">76</a>      edges.add(<strong class="jxr_keyword">new</strong> Edge(GradoopId.get(), <span class="jxr_string">"m"</span>, v2.getId(), v1.getId(), <strong class="jxr_keyword">null</strong>, graphIds));
+<a name="73" href="#73">73</a>      edges.add(<strong class="jxr_keyword">new</strong> EPGMEdge(GradoopId.get(), <span class="jxr_string">"loop"</span>, v1.getId(), v1.getId(), loopProperties, graphIds));
+<a name="74" href="#74">74</a>      edges.add(<strong class="jxr_keyword">new</strong> EPGMEdge(GradoopId.get(), <span class="jxr_string">"m"</span>, v1.getId(), v2.getId(), <strong class="jxr_keyword">null</strong>, graphIds));
+<a name="75" href="#75">75</a>      edges.add(<strong class="jxr_keyword">new</strong> EPGMEdge(GradoopId.get(), <span class="jxr_string">"m"</span>, v1.getId(), v2.getId(), <strong class="jxr_keyword">null</strong>, graphIds));
+<a name="76" href="#76">76</a>      edges.add(<strong class="jxr_keyword">new</strong> EPGMEdge(GradoopId.get(), <span class="jxr_string">"m"</span>, v2.getId(), v1.getId(), <strong class="jxr_keyword">null</strong>, graphIds));
 <a name="77" href="#77">77</a>  
 <a name="78" href="#78">78</a>      <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> GraphTransaction(graphHead, vertices, edges);
 <a name="79" href="#79">79</a>    }

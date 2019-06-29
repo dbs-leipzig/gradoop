@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.intersection;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
 import org.gradoop.flink.model.impl.operators.intersection.functions.GroupCountEquals;
@@ -37,11 +37,11 @@ import org.gradoop.flink.model.impl.operators.intersection.functions.GroupCountE
    * @return subgraph dataset of the resulting collection
    */
   @Override
-  protected DataSet&lt;GraphHead&gt; computeNewGraphHeads() {
+  protected DataSet&lt;EPGMGraphHead&gt; computeNewGraphHeads() {
 <span class="fc" id="L41">    return firstCollection.getGraphHeads()</span>
 <span class="fc" id="L42">      .union(secondCollection.getGraphHeads())</span>
-<span class="fc" id="L43">      .groupBy(new Id&lt;GraphHead&gt;())</span>
-<span class="fc" id="L44">      .reduceGroup(new GroupCountEquals&lt;GraphHead&gt;(2));</span>
+<span class="fc" id="L43">      .groupBy(new Id&lt;EPGMGraphHead&gt;())</span>
+<span class="fc" id="L44">      .reduceGroup(new GroupCountEquals&lt;EPGMGraphHead&gt;(2));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

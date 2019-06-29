@@ -31,8 +31,8 @@
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple3;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.typeutils.TupleTypeInfo;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.DataSource;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.graph.functions.InitEdge;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.graph.functions.InitVertex;
@@ -125,24 +125,24 @@
 <a name="115" href="#115">115</a>     TypeInformation&lt;K&gt; externalIdType = ((TupleTypeInfo&lt;?&gt;) importVertices
 <a name="116" href="#116">116</a>       .getType()).getTypeAt(0);
 <a name="117" href="#117">117</a> 
-<a name="118" href="#118">118</a>     DataSet&lt;Tuple3&lt;K, GradoopId, Vertex&gt;&gt; vertexTriples = importVertices
+<a name="118" href="#118">118</a>     DataSet&lt;Tuple3&lt;K, GradoopId, EPGMVertex&gt;&gt; vertexTriples = importVertices
 <a name="119" href="#119">119</a>       .map(<strong class="jxr_keyword">new</strong> InitVertex&lt;K&gt;(
 <a name="120" href="#120">120</a>         config.getVertexFactory(), lineagePropertyKey, externalIdType));
 <a name="121" href="#121">121</a> 
-<a name="122" href="#122">122</a>     DataSet&lt;Vertex&gt; epgmVertices = vertexTriples
-<a name="123" href="#123">123</a>       .map(<strong class="jxr_keyword">new</strong> Value2Of3&lt;K, GradoopId, Vertex&gt;());
+<a name="122" href="#122">122</a>     DataSet&lt;EPGMVertex&gt; epgmVertices = vertexTriples
+<a name="123" href="#123">123</a>       .map(<strong class="jxr_keyword">new</strong> Value2Of3&lt;K, GradoopId, EPGMVertex&gt;());
 <a name="124" href="#124">124</a> 
 <a name="125" href="#125">125</a>     DataSet&lt;Tuple2&lt;K, GradoopId&gt;&gt; vertexIdPair = vertexTriples
-<a name="126" href="#126">126</a>       .map(<strong class="jxr_keyword">new</strong> Project3To0And1&lt;K, GradoopId, Vertex&gt;());
+<a name="126" href="#126">126</a>       .map(<strong class="jxr_keyword">new</strong> Project3To0And1&lt;K, GradoopId, EPGMVertex&gt;());
 <a name="127" href="#127">127</a> 
-<a name="128" href="#128">128</a>     DataSet&lt;Edge&gt; epgmEdges = importEdges
+<a name="128" href="#128">128</a>     DataSet&lt;EPGMEdge&gt; epgmEdges = importEdges
 <a name="129" href="#129">129</a>       .join(vertexIdPair)
 <a name="130" href="#130">130</a>       .where(1).equalTo(0)
 <a name="131" href="#131">131</a>       .with(<strong class="jxr_keyword">new</strong> InitEdge&lt;K&gt;(
 <a name="132" href="#132">132</a>         config.getEdgeFactory(), lineagePropertyKey, externalIdType))
 <a name="133" href="#133">133</a>       .join(vertexIdPair)
 <a name="134" href="#134">134</a>       .where(0).equalTo(0)
-<a name="135" href="#135">135</a>       .with(<strong class="jxr_keyword">new</strong> UpdateEdge&lt;Edge, K&gt;());
+<a name="135" href="#135">135</a>       .with(<strong class="jxr_keyword">new</strong> UpdateEdge&lt;EPGMEdge, K&gt;());
 <a name="136" href="#136">136</a> 
 <a name="137" href="#137">137</a>     <strong class="jxr_keyword">return</strong> config.getLogicalGraphFactory().fromDataSets(epgmVertices, epgmEdges);
 <a name="138" href="#138">138</a>   }

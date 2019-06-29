@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.layouts.common;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.api.layouts.BaseLayoutFactory;
 import org.gradoop.flink.model.impl.functions.bool.False;
 import org.gradoop.flink.util.GradoopFlinkConfig;
@@ -52,14 +52,14 @@ import java.util.Objects;
    * Creates a graph head dataset from a given collection.
    * Encapsulates the workaround for dataset creation from an empty collection.
    *
-   * @param graphHeads  graph heads
+   * @param graphHeads graph heads
    * @return graph head dataset
    */
-  protected DataSet&lt;GraphHead&gt; createGraphHeadDataSet(Collection&lt;GraphHead&gt; graphHeads) {
+  protected DataSet&lt;EPGMGraphHead&gt; createGraphHeadDataSet(Collection&lt;EPGMGraphHead&gt; graphHeads) {
 
 <span class="fc" id="L60">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
 
-    DataSet&lt;GraphHead&gt; graphHeadSet;
+    DataSet&lt;EPGMGraphHead&gt; graphHeadSet;
 <span class="fc bfc" id="L63" title="All 2 branches covered.">    if (graphHeads.isEmpty()) {</span>
 <span class="fc" id="L64">      graphHeadSet = env</span>
 <span class="fc" id="L65">        .fromElements(getConfig().getGraphHeadFactory().createGraphHead())</span>
@@ -77,11 +77,11 @@ import java.util.Objects;
    * @param vertices  vertex collection
    * @return vertex dataset
    */
-  protected DataSet&lt;Vertex&gt; createVertexDataSet(Collection&lt;Vertex&gt; vertices) {
+  protected DataSet&lt;EPGMVertex&gt; createVertexDataSet(Collection&lt;EPGMVertex&gt; vertices) {
 
 <span class="fc" id="L82">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
 
-    DataSet&lt;Vertex&gt; vertexSet;
+    DataSet&lt;EPGMVertex&gt; vertexSet;
 <span class="fc bfc" id="L85" title="All 2 branches covered.">    if (vertices.isEmpty()) {</span>
 <span class="fc" id="L86">      vertexSet = env</span>
 <span class="fc" id="L87">        .fromElements(getConfig().getVertexFactory().createVertex())</span>
@@ -99,10 +99,10 @@ import java.util.Objects;
    * @param edges edge collection
    * @return edge dataset
    */
-  protected DataSet&lt;Edge&gt; createEdgeDataSet(Collection&lt;Edge&gt; edges) {
+  protected DataSet&lt;EPGMEdge&gt; createEdgeDataSet(Collection&lt;EPGMEdge&gt; edges) {
 <span class="fc" id="L103">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
 
-    DataSet&lt;Edge&gt; edgeSet;
+    DataSet&lt;EPGMEdge&gt; edgeSet;
 <span class="fc bfc" id="L106" title="All 2 branches covered.">    if (edges.isEmpty()) {</span>
 <span class="fc" id="L107">      GradoopId dummyId = GradoopId.get();</span>
 <span class="fc" id="L108">      edgeSet = env</span>

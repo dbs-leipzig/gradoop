@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.functions.graphcontainment;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  * @param &lt;V&gt; epgm vertex type
  */
-<span class="fc" id="L30">public class PairVertexWithGraphs&lt;V extends Vertex&gt;</span>
+<span class="fc" id="L30">public class PairVertexWithGraphs&lt;V extends EPGMVertex&gt;</span>
   implements FlatMapFunction&lt;V, Tuple2&lt;V, GradoopId&gt;&gt; {
 
   @Override

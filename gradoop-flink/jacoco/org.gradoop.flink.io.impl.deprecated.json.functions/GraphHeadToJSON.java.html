@@ -19,7 +19,7 @@ import org.apache.flink.api.java.io.TextOutputFormat;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.gradoop.flink.io.impl.deprecated.json.JSONConstants;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 
 /**
  * Converts a graph into the following format:
@@ -32,7 +32,7 @@ import org.gradoop.common.model.impl.pojo.GraphHead;
  *
  * @param &lt;G&gt; EPGM graph head type
  */
-<span class="fc" id="L35">public class GraphHeadToJSON&lt;G extends GraphHead&gt;</span>
+<span class="fc" id="L35">public class GraphHeadToJSON&lt;G extends EPGMGraphHead&gt;</span>
   extends EntityToJSON
   implements TextOutputFormat.TextFormatter&lt;G&gt; {
 

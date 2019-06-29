@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -54,10 +54,10 @@ import java.util.Set;
 
     // drop edges with infrequent labels
 
-<span class="fc" id="L57">    Iterator&lt;Edge&gt; edgeIterator = transaction.getEdges().iterator();</span>
+<span class="fc" id="L57">    Iterator&lt;EPGMEdge&gt; edgeIterator = transaction.getEdges().iterator();</span>
 
 <span class="fc bfc" id="L59" title="All 2 branches covered.">    while (edgeIterator.hasNext()) {</span>
-<span class="fc" id="L60">      Edge next = edgeIterator.next();</span>
+<span class="fc" id="L60">      EPGMEdge next = edgeIterator.next();</span>
 
 <span class="fc bfc" id="L62" title="All 2 branches covered.">      if (frequentEdgeLabels.contains(next.getLabel())) {</span>
 <span class="fc" id="L63">        referenceEdgeIds.add(next.getSourceId());</span>

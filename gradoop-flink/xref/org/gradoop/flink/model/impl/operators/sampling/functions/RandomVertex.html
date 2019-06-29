@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.sampling.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="20" href="#20">20</a>  
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> java.util.Random;
 <a name="22" href="#22">22</a>  
@@ -34,7 +34,7 @@
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> * Creates a random value for each vertex and marks those that are below a</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * given threshold.</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/RandomVertex.html">RandomVertex</a> implements MapFunction&lt;Vertex, Vertex&gt; {
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/RandomVertex.html">RandomVertex</a> implements MapFunction&lt;EPGMVertex, EPGMVertex&gt; {
 <a name="28" href="#28">28</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment">   * Threshold to decide if a vertex needs to be filtered.</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment">   */</em>
@@ -62,7 +62,7 @@
 <a name="52" href="#52">52</a>    }
 <a name="53" href="#53">53</a>  
 <a name="54" href="#54">54</a>    @Override
-<a name="55" href="#55">55</a>    <strong class="jxr_keyword">public</strong> Vertex map(Vertex vertex) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="55" href="#55">55</a>    <strong class="jxr_keyword">public</strong> EPGMVertex map(EPGMVertex vertex) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="56" href="#56">56</a>      <strong class="jxr_keyword">if</strong> (randomGenerator.nextFloat() &lt;= sampleSize) {
 <a name="57" href="#57">57</a>        vertex.setProperty(samplingKey, <strong class="jxr_keyword">true</strong>);
 <a name="58" href="#58">58</a>      } <strong class="jxr_keyword">else</strong> {

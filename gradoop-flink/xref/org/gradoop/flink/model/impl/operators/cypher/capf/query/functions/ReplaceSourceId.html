@@ -30,7 +30,7 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple5;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="25" href="#25">25</a>  
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment">/**</em>
@@ -41,7 +41,7 @@
 <a name="31" href="#31">31</a>  @FunctionAnnotation.ForwardedFieldsSecond(<span class="jxr_string">"f0-&gt;f1"</span>)
 <a name="32" href="#32">32</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/functions/ReplaceSourceId.html">ReplaceSourceId</a> implements JoinFunction&lt;
 <a name="33" href="#33">33</a>    Tuple5&lt;Long, GradoopId, GradoopId, String, Properties&gt;,
-<a name="34" href="#34">34</a>    Tuple2&lt;Long, Vertex&gt;,
+<a name="34" href="#34">34</a>    Tuple2&lt;Long, EPGMVertex&gt;,
 <a name="35" href="#35">35</a>    Tuple5&lt;Long, Long, GradoopId, String, Properties&gt;&gt; {
 <a name="36" href="#36">36</a>  
 <a name="37" href="#37">37</a>    <em class="jxr_javadoccomment">/**</em>
@@ -52,7 +52,7 @@
 <a name="42" href="#42">42</a>    @Override
 <a name="43" href="#43">43</a>    <strong class="jxr_keyword">public</strong> Tuple5&lt;Long, Long, GradoopId, String, Properties&gt; join(
 <a name="44" href="#44">44</a>      Tuple5&lt;Long, GradoopId, GradoopId, String, Properties&gt; inputTuple,
-<a name="45" href="#45">45</a>      Tuple2&lt;Long, Vertex&gt; vertexTuple
+<a name="45" href="#45">45</a>      Tuple2&lt;Long, EPGMVertex&gt; vertexTuple
 <a name="46" href="#46">46</a>    ) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="47" href="#47">47</a>      returnTuple.f0 = inputTuple.f0;
 <a name="48" href="#48">48</a>      returnTuple.f1 = vertexTuple.f0;

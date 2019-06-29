@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.tlf.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.impl.tlf.TLFConstants;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -50,7 +50,7 @@ import java.util.Map;
   public GraphTransaction map(GraphTransaction graphTransaction)
       throws Exception {
     String label;
-<span class="fc bfc" id="L53" title="All 2 branches covered.">    for (Vertex vertex : graphTransaction.getVertices()) {</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">    for (EPGMVertex vertex : graphTransaction.getVertices()) {</span>
 <span class="fc" id="L54">      label = vertexDictionary.get(Integer.parseInt(vertex.getLabel()));</span>
 <span class="pc bpc" id="L55" title="1 of 2 branches missed.">      if (label != null) {</span>
 <span class="fc" id="L56">        vertex.setLabel(label);</span>

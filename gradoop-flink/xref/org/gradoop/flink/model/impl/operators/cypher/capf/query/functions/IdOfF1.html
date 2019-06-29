@@ -29,15 +29,15 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.functions.KeySelector;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Element;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMElement;
 <a name="23" href="#23">23</a>  
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * KeySelector that returns the id of a {@link Element} in the second field of a tuple.</em>
+<a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * KeySelector that returns the id of a {@link EPGMElement} in the second field of a tuple.</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> *</em>
-<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; any GraphElement</em>
+<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; any EPGMGraphElement</em>
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="29" href="#29">29</a>  @FunctionAnnotation.ForwardedFields(<span class="jxr_string">"f1.id-&gt;*"</span>)
-<a name="30" href="#30">30</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> IdOfF1&lt;E <strong class="jxr_keyword">extends</strong> Element&gt; implements KeySelector&lt;Tuple2&lt;Long, E&gt;, GradoopId&gt; {
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> IdOfF1&lt;E <strong class="jxr_keyword">extends</strong> EPGMElement&gt; implements KeySelector&lt;Tuple2&lt;Long, E&gt;, GradoopId&gt; {
 <a name="31" href="#31">31</a>  
 <a name="32" href="#32">32</a>    @Override
 <a name="33" href="#33">33</a>    <strong class="jxr_keyword">public</strong> GradoopId getKey(Tuple2&lt;Long, E&gt; tuple) {

@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.FlatMapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple3;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="23" href="#23">23</a>  
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> java.util.ArrayList;
@@ -43,7 +43,7 @@
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment"> * vertices and edges over this components.</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="35" href="#35">35</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/statistics/functions/GetConnectedComponentDistributionFlatMap.html">GetConnectedComponentDistributionFlatMap</a> implements
-<a name="36" href="#36">36</a>    FlatMapFunction&lt;GraphHead, Tuple3&lt;String, Long, Long&gt;&gt; {
+<a name="36" href="#36">36</a>    FlatMapFunction&lt;EPGMGraphHead, Tuple3&lt;String, Long, Long&gt;&gt; {
 <a name="37" href="#37">37</a>  
 <a name="38" href="#38">38</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   * Property key to store the component id.</em>
@@ -74,7 +74,7 @@
 <a name="64" href="#64">64</a>  <em class="jxr_javadoccomment">   * @param out The connected component distribution as {@code Tuple3&lt;String, Long, Long&gt;}</em>
 <a name="65" href="#65">65</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="66" href="#66">66</a>    @Override
-<a name="67" href="#67">67</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(GraphHead graphHead, Collector&lt;Tuple3&lt;String, Long, Long&gt;&gt; out) {
+<a name="67" href="#67">67</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(EPGMGraphHead graphHead, Collector&lt;Tuple3&lt;String, Long, Long&gt;&gt; out) {
 <a name="68" href="#68">68</a>      List&lt;String&gt; vertexWcc = graphHead.getPropertyValue(
 <a name="69" href="#69">69</a>        <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/statistics/functions/AggregateListOfWccVertices.html">AggregateListOfWccVertices</a>(propertyKey).getAggregatePropertyKey()).getList()
 <a name="70" href="#70">70</a>        .stream().map(PropertyValue::getString)

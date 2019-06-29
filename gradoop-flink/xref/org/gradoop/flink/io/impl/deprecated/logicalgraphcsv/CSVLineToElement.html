@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.RichMapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.configuration.Configuration;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.metadata.PropertyMetaData;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Element;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMElement;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.csv.CSVConstants;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.csv.CSVDataSource;
@@ -37,14 +37,14 @@
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> java.util.regex.Pattern;
 <a name="28" href="#28">28</a>  
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> * Base class for reading an {@link Element} from CSV. Handles the {@link MetaData} which is</em>
+<a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> * Base class for reading an {@link EPGMElement} from CSV. Handles the {@link MetaData} which is</em>
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment"> * required to parse the property values.</em>
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; EPGM element type</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="35" href="#35">35</a>  <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">class</strong> CSVLineToElement&lt;E <strong class="jxr_keyword">extends</strong> Element&gt; <strong class="jxr_keyword">extends</strong> RichMapFunction&lt;String, E&gt; {
+<a name="35" href="#35">35</a>  <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">class</strong> CSVLineToElement&lt;E <strong class="jxr_keyword">extends</strong> EPGMElement&gt; <strong class="jxr_keyword">extends</strong> RichMapFunction&lt;String, E&gt; {
 <a name="36" href="#36">36</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   * Stores the properties for the {@link Element} to be parsed.</em>
+<a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   * Stores the properties for the {@link EPGMElement} to be parsed.</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="39" href="#39">39</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Properties properties;
 <a name="40" href="#40">40</a>    <em class="jxr_javadoccomment">/**</em>
@@ -52,7 +52,7 @@
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="43" href="#43">43</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> String valueDelimiter = Pattern.quote(CSVConstants.VALUE_DELIMITER);
 <a name="44" href="#44">44</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="45" href="#45">45</a>  <em class="jxr_javadoccomment">   * Meta data that provides parsers for a specific {@link Element}.</em>
+<a name="45" href="#45">45</a>  <em class="jxr_javadoccomment">   * Meta data that provides parsers for a specific {@link EPGMElement}.</em>
 <a name="46" href="#46">46</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="47" href="#47">47</a>    <strong class="jxr_keyword">private</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/deprecated/logicalgraphcsv/MetaData.html">MetaData</a> metaData;
 <a name="48" href="#48">48</a>  

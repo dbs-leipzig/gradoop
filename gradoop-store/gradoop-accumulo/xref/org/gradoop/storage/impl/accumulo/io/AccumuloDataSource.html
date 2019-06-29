@@ -26,9 +26,9 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.storage.impl.accumulo.io;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.ExecutionEnvironment;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -50,24 +50,24 @@
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment"> * Read logic graph or graph collection from accumulo store</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="42" href="#42">42</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../org/gradoop/storage/impl/accumulo/io/AccumuloDataSource.html">AccumuloDataSource</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../org/gradoop/storage/impl/accumulo/io/AccumuloBase.html">AccumuloBase</a> implements FilterableDataSource&lt;
-<a name="43" href="#43">43</a>    ElementQuery&lt;AccumuloElementFilter&lt;GraphHead&gt;&gt;,
-<a name="44" href="#44">44</a>    ElementQuery&lt;AccumuloElementFilter&lt;Vertex&gt;&gt;,
-<a name="45" href="#45">45</a>    ElementQuery&lt;AccumuloElementFilter&lt;Edge&gt;&gt;&gt; {
+<a name="43" href="#43">43</a>    ElementQuery&lt;AccumuloElementFilter&lt;EPGMGraphHead&gt;&gt;,
+<a name="44" href="#44">44</a>    ElementQuery&lt;AccumuloElementFilter&lt;EPGMVertex&gt;&gt;,
+<a name="45" href="#45">45</a>    ElementQuery&lt;AccumuloElementFilter&lt;EPGMEdge&gt;&gt;&gt; {
 <a name="46" href="#46">46</a>  
 <a name="47" href="#47">47</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * graph head filter</em>
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="50" href="#50">50</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> AccumuloQueryHolder&lt;GraphHead&gt; graphHeadQuery;
+<a name="50" href="#50">50</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> AccumuloQueryHolder&lt;EPGMGraphHead&gt; graphHeadQuery;
 <a name="51" href="#51">51</a>  
 <a name="52" href="#52">52</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   * vertex filter</em>
 <a name="54" href="#54">54</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="55" href="#55">55</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> AccumuloQueryHolder&lt;Vertex&gt; vertexQuery;
+<a name="55" href="#55">55</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> AccumuloQueryHolder&lt;EPGMVertex&gt; vertexQuery;
 <a name="56" href="#56">56</a>  
 <a name="57" href="#57">57</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * edge filter</em>
 <a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="60" href="#60">60</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> AccumuloQueryHolder&lt;Edge&gt; edgeQuery;
+<a name="60" href="#60">60</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> AccumuloQueryHolder&lt;EPGMEdge&gt; edgeQuery;
 <a name="61" href="#61">61</a>  
 <a name="62" href="#62">62</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="63" href="#63">63</a>  <em class="jxr_javadoccomment">   * Creates a new Accumulo data source.</em>
@@ -94,9 +94,9 @@
 <a name="84" href="#84">84</a>    <strong class="jxr_keyword">private</strong> <a href="../../../../../../org/gradoop/storage/impl/accumulo/io/AccumuloDataSource.html">AccumuloDataSource</a>(
 <a name="85" href="#85">85</a>      @Nonnull <a href="../../../../../../org/gradoop/storage/impl/accumulo/AccumuloEPGMStore.html">AccumuloEPGMStore</a> store,
 <a name="86" href="#86">86</a>      @Nonnull GradoopFlinkConfig config,
-<a name="87" href="#87">87</a>      @Nullable AccumuloQueryHolder&lt;GraphHead&gt; graphQuery,
-<a name="88" href="#88">88</a>      @Nullable AccumuloQueryHolder&lt;Vertex&gt; vertexQuery,
-<a name="89" href="#89">89</a>      @Nullable AccumuloQueryHolder&lt;Edge&gt; edgeQuery
+<a name="87" href="#87">87</a>      @Nullable AccumuloQueryHolder&lt;EPGMGraphHead&gt; graphQuery,
+<a name="88" href="#88">88</a>      @Nullable AccumuloQueryHolder&lt;EPGMVertex&gt; vertexQuery,
+<a name="89" href="#89">89</a>      @Nullable AccumuloQueryHolder&lt;EPGMEdge&gt; edgeQuery
 <a name="90" href="#90">90</a>    ) {
 <a name="91" href="#91">91</a>      <strong class="jxr_keyword">super</strong>(store, config);
 <a name="92" href="#92">92</a>      <strong class="jxr_keyword">this</strong>.graphHeadQuery = graphQuery;
@@ -129,9 +129,9 @@
 <a name="119" href="#119">119</a>   @Nonnull
 <a name="120" href="#120">120</a>   @Override
 <a name="121" href="#121">121</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/accumulo/io/AccumuloDataSource.html">AccumuloDataSource</a> applyGraphPredicate(
-<a name="122" href="#122">122</a>     @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;GraphHead&gt;&gt; query
+<a name="122" href="#122">122</a>     @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;EPGMGraphHead&gt;&gt; query
 <a name="123" href="#123">123</a>   ) {
-<a name="124" href="#124">124</a>     AccumuloQueryHolder&lt;GraphHead&gt; newGraphQuery = AccumuloQueryHolder.create(query);
+<a name="124" href="#124">124</a>     AccumuloQueryHolder&lt;EPGMGraphHead&gt; newGraphQuery = AccumuloQueryHolder.create(query);
 <a name="125" href="#125">125</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/storage/impl/accumulo/io/AccumuloDataSource.html">AccumuloDataSource</a>(
 <a name="126" href="#126">126</a>       getStore(),
 <a name="127" href="#127">127</a>       getFlinkConfig(),
@@ -144,9 +144,9 @@
 <a name="134" href="#134">134</a>   @Nonnull
 <a name="135" href="#135">135</a>   @Override
 <a name="136" href="#136">136</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/accumulo/io/AccumuloDataSource.html">AccumuloDataSource</a> applyVertexPredicate(
-<a name="137" href="#137">137</a>     @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;Vertex&gt;&gt; query
+<a name="137" href="#137">137</a>     @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;EPGMVertex&gt;&gt; query
 <a name="138" href="#138">138</a>   ) {
-<a name="139" href="#139">139</a>     AccumuloQueryHolder&lt;Vertex&gt; newVertexQuery = AccumuloQueryHolder.create(query);
+<a name="139" href="#139">139</a>     AccumuloQueryHolder&lt;EPGMVertex&gt; newVertexQuery = AccumuloQueryHolder.create(query);
 <a name="140" href="#140">140</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/storage/impl/accumulo/io/AccumuloDataSource.html">AccumuloDataSource</a>(
 <a name="141" href="#141">141</a>       getStore(),
 <a name="142" href="#142">142</a>       getFlinkConfig(),
@@ -159,9 +159,9 @@
 <a name="149" href="#149">149</a>   @Nonnull
 <a name="150" href="#150">150</a>   @Override
 <a name="151" href="#151">151</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/accumulo/io/AccumuloDataSource.html">AccumuloDataSource</a> applyEdgePredicate(
-<a name="152" href="#152">152</a>     @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;Edge&gt;&gt; query
+<a name="152" href="#152">152</a>     @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;EPGMEdge&gt;&gt; query
 <a name="153" href="#153">153</a>   ) {
-<a name="154" href="#154">154</a>     AccumuloQueryHolder&lt;Edge&gt; newEdgeQuery = AccumuloQueryHolder.create(query);
+<a name="154" href="#154">154</a>     AccumuloQueryHolder&lt;EPGMEdge&gt; newEdgeQuery = AccumuloQueryHolder.create(query);
 <a name="155" href="#155">155</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/storage/impl/accumulo/io/AccumuloDataSource.html">AccumuloDataSource</a>(
 <a name="156" href="#156">156</a>       getStore(),
 <a name="157" href="#157">157</a>       getFlinkConfig(),

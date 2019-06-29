@@ -27,7 +27,7 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.JoinFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
 <a name="23" href="#23">23</a>  
@@ -35,7 +35,7 @@
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * Associates a (master) vertex with business transaction graphs.</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt; vertex type</em>
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> SetBtgIds&lt;V <strong class="jxr_keyword">extends</strong> EPGMVertex&gt;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> SetBtgIds&lt;V <strong class="jxr_keyword">extends</strong> Vertex&gt;
 <a name="29" href="#29">29</a>    implements JoinFunction&lt;V, Tuple2&lt;GradoopId, GradoopIdSet&gt;, V&gt; {
 <a name="30" href="#30">30</a>  
 <a name="31" href="#31">31</a>    @Override

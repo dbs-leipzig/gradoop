@@ -27,9 +27,9 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.ExecutionEnvironment;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.util.AsciiGraphLoader;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.util.GradoopConstants;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -56,7 +56,7 @@
 <a name="46" href="#46">46</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="47" href="#47">47</a>  <em class="jxr_javadoccomment">   * AsciiGraphLoader to create graph, vertex and edge collections.</em>
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="49" href="#49">49</a>    <strong class="jxr_keyword">private</strong> AsciiGraphLoader&lt;GraphHead, Vertex, Edge&gt; loader;
+<a name="49" href="#49">49</a>    <strong class="jxr_keyword">private</strong> AsciiGraphLoader&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; loader;
 <a name="50" href="#50">50</a>  
 <a name="51" href="#51">51</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="52" href="#52">52</a>  <em class="jxr_javadoccomment">   * Creates a new FlinkAsciiGraphLoader instance.</em>
@@ -152,7 +152,7 @@
 <a name="142" href="#142">142</a>         .transformGraphHead(<strong class="jxr_keyword">new</strong> RenameLabel&lt;&gt;(GradoopConstants.DEFAULT_GRAPH_LABEL,
 <a name="143" href="#143">143</a>           GradoopConstants.DB_GRAPH_LABEL));
 <a name="144" href="#144">144</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="145" href="#145">145</a>       GraphHead graphHead = config.getGraphHeadFactory()
+<a name="145" href="#145">145</a>       EPGMGraphHead graphHead = config.getGraphHeadFactory()
 <a name="146" href="#146">146</a>         .createGraphHead(GradoopConstants.DB_GRAPH_LABEL);
 <a name="147" href="#147">147</a>       <strong class="jxr_keyword">return</strong> config.getLogicalGraphFactory().fromCollections(graphHead, getVertices(), getEdges());
 <a name="148" href="#148">148</a>     }
@@ -166,9 +166,9 @@
 <a name="156" href="#156">156</a> <em class="jxr_javadoccomment">   * @return LogicalGraph</em>
 <a name="157" href="#157">157</a> <em class="jxr_javadoccomment">   */</em>
 <a name="158" href="#158">158</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> getLogicalGraphByVariable(String variable) {
-<a name="159" href="#159">159</a>     GraphHead graphHead = getGraphHeadByVariable(variable);
-<a name="160" href="#160">160</a>     Collection&lt;Vertex&gt; vertices = getVerticesByGraphVariables(variable);
-<a name="161" href="#161">161</a>     Collection&lt;Edge&gt; edges = getEdgesByGraphVariables(variable);
+<a name="159" href="#159">159</a>     EPGMGraphHead graphHead = getGraphHeadByVariable(variable);
+<a name="160" href="#160">160</a>     Collection&lt;EPGMVertex&gt; vertices = getVerticesByGraphVariables(variable);
+<a name="161" href="#161">161</a>     Collection&lt;EPGMEdge&gt; edges = getEdgesByGraphVariables(variable);
 <a name="162" href="#162">162</a> 
 <a name="163" href="#163">163</a>     <strong class="jxr_keyword">return</strong> config.getLogicalGraphFactory().fromCollections(graphHead, vertices, edges);
 <a name="164" href="#164">164</a>   }
@@ -181,9 +181,9 @@
 <a name="171" href="#171">171</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> getGraphCollection() {
 <a name="172" href="#172">172</a>     ExecutionEnvironment env = config.getExecutionEnvironment();
 <a name="173" href="#173">173</a> 
-<a name="174" href="#174">174</a>     DataSet&lt;Vertex&gt; newVertices = env.fromCollection(getVertices())
+<a name="174" href="#174">174</a>     DataSet&lt;EPGMVertex&gt; newVertices = env.fromCollection(getVertices())
 <a name="175" href="#175">175</a>       .filter(vertex -&gt; vertex.getGraphCount() &gt; 0);
-<a name="176" href="#176">176</a>     DataSet&lt;Edge&gt; newEdges = env.fromCollection(getEdges())
+<a name="176" href="#176">176</a>     DataSet&lt;EPGMEdge&gt; newEdges = env.fromCollection(getEdges())
 <a name="177" href="#177">177</a>       .filter(edge -&gt; edge.getGraphCount() &gt; 0);
 <a name="178" href="#178">178</a> 
 <a name="179" href="#179">179</a>     <strong class="jxr_keyword">return</strong> config.getGraphCollectionFactory()
@@ -198,9 +198,9 @@
 <a name="188" href="#188">188</a> <em class="jxr_javadoccomment">   * @return GraphCollection</em>
 <a name="189" href="#189">189</a> <em class="jxr_javadoccomment">   */</em>
 <a name="190" href="#190">190</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> getGraphCollectionByVariables(String... variables) {
-<a name="191" href="#191">191</a>     Collection&lt;GraphHead&gt; graphHeads = getGraphHeadsByVariables(variables);
-<a name="192" href="#192">192</a>     Collection&lt;Vertex&gt; vertices = getVerticesByGraphVariables(variables);
-<a name="193" href="#193">193</a>     Collection&lt;Edge&gt; edges = getEdgesByGraphVariables(variables);
+<a name="191" href="#191">191</a>     Collection&lt;EPGMGraphHead&gt; graphHeads = getGraphHeadsByVariables(variables);
+<a name="192" href="#192">192</a>     Collection&lt;EPGMVertex&gt; vertices = getVerticesByGraphVariables(variables);
+<a name="193" href="#193">193</a>     Collection&lt;EPGMEdge&gt; edges = getEdgesByGraphVariables(variables);
 <a name="194" href="#194">194</a> 
 <a name="195" href="#195">195</a>     <strong class="jxr_keyword">return</strong> config.getGraphCollectionFactory().fromCollections(graphHeads, vertices, edges);
 <a name="196" href="#196">196</a>   }
@@ -210,17 +210,17 @@
 <a name="200" href="#200">200</a> <em class="jxr_javadoccomment">   *</em>
 <a name="201" href="#201">201</a> <em class="jxr_javadoccomment">   * @return graphHeads</em>
 <a name="202" href="#202">202</a> <em class="jxr_javadoccomment">   */</em>
-<a name="203" href="#203">203</a>   <strong class="jxr_keyword">public</strong> Collection&lt;GraphHead&gt; getGraphHeads() {
+<a name="203" href="#203">203</a>   <strong class="jxr_keyword">public</strong> Collection&lt;EPGMGraphHead&gt; getGraphHeads() {
 <a name="204" href="#204">204</a>     <strong class="jxr_keyword">return</strong> loader.getGraphHeads();
 <a name="205" href="#205">205</a>   }
 <a name="206" href="#206">206</a> 
 <a name="207" href="#207">207</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="208" href="#208">208</a> <em class="jxr_javadoccomment">   * Returns EPGMGraphHead by given variable.</em>
+<a name="208" href="#208">208</a> <em class="jxr_javadoccomment">   * Returns GraphHead by given variable.</em>
 <a name="209" href="#209">209</a> <em class="jxr_javadoccomment">   *</em>
 <a name="210" href="#210">210</a> <em class="jxr_javadoccomment">   * @param variable variable used in GDL script</em>
 <a name="211" href="#211">211</a> <em class="jxr_javadoccomment">   * @return graphHead or {@code null} if graph is not cached</em>
 <a name="212" href="#212">212</a> <em class="jxr_javadoccomment">   */</em>
-<a name="213" href="#213">213</a>   <strong class="jxr_keyword">public</strong> GraphHead getGraphHeadByVariable(String variable) {
+<a name="213" href="#213">213</a>   <strong class="jxr_keyword">public</strong> EPGMGraphHead getGraphHeadByVariable(String variable) {
 <a name="214" href="#214">214</a>     <strong class="jxr_keyword">return</strong> loader.getGraphHeadByVariable(variable);
 <a name="215" href="#215">215</a>   }
 <a name="216" href="#216">216</a> 
@@ -230,7 +230,7 @@
 <a name="220" href="#220">220</a> <em class="jxr_javadoccomment">   * @param variables variables used in the GDL script</em>
 <a name="221" href="#221">221</a> <em class="jxr_javadoccomment">   * @return graphHeads assigned to the variables</em>
 <a name="222" href="#222">222</a> <em class="jxr_javadoccomment">   */</em>
-<a name="223" href="#223">223</a>   <strong class="jxr_keyword">public</strong> Collection&lt;GraphHead&gt; getGraphHeadsByVariables(String... variables) {
+<a name="223" href="#223">223</a>   <strong class="jxr_keyword">public</strong> Collection&lt;EPGMGraphHead&gt; getGraphHeadsByVariables(String... variables) {
 <a name="224" href="#224">224</a>     <strong class="jxr_keyword">return</strong> loader.getGraphHeadsByVariables(variables);
 <a name="225" href="#225">225</a>   }
 <a name="226" href="#226">226</a> 
@@ -239,7 +239,7 @@
 <a name="229" href="#229">229</a> <em class="jxr_javadoccomment">   *</em>
 <a name="230" href="#230">230</a> <em class="jxr_javadoccomment">   * @return vertices</em>
 <a name="231" href="#231">231</a> <em class="jxr_javadoccomment">   */</em>
-<a name="232" href="#232">232</a>   <strong class="jxr_keyword">public</strong> Collection&lt;Vertex&gt; getVertices() {
+<a name="232" href="#232">232</a>   <strong class="jxr_keyword">public</strong> Collection&lt;EPGMVertex&gt; getVertices() {
 <a name="233" href="#233">233</a>     <strong class="jxr_keyword">return</strong> loader.getVertices();
 <a name="234" href="#234">234</a>   }
 <a name="235" href="#235">235</a> 
@@ -249,7 +249,7 @@
 <a name="239" href="#239">239</a> <em class="jxr_javadoccomment">   * @param variables graph variables used in the GDL script</em>
 <a name="240" href="#240">240</a> <em class="jxr_javadoccomment">   * @return vertices that are contained in the graphs</em>
 <a name="241" href="#241">241</a> <em class="jxr_javadoccomment">   */</em>
-<a name="242" href="#242">242</a>   <strong class="jxr_keyword">public</strong> Collection&lt;Vertex&gt; getVerticesByGraphVariables(String... variables) {
+<a name="242" href="#242">242</a>   <strong class="jxr_keyword">public</strong> Collection&lt;EPGMVertex&gt; getVerticesByGraphVariables(String... variables) {
 <a name="243" href="#243">243</a>     <strong class="jxr_keyword">return</strong> loader.getVerticesByGraphVariables(variables);
 <a name="244" href="#244">244</a>   }
 <a name="245" href="#245">245</a> 
@@ -260,7 +260,7 @@
 <a name="250" href="#250">250</a> <em class="jxr_javadoccomment">   * @param variable vertex variable</em>
 <a name="251" href="#251">251</a> <em class="jxr_javadoccomment">   * @return vertex or {@code null} if variable is not used</em>
 <a name="252" href="#252">252</a> <em class="jxr_javadoccomment">   */</em>
-<a name="253" href="#253">253</a>   <strong class="jxr_keyword">public</strong> Vertex getVertexByVariable(String variable) {
+<a name="253" href="#253">253</a>   <strong class="jxr_keyword">public</strong> EPGMVertex getVertexByVariable(String variable) {
 <a name="254" href="#254">254</a>     <strong class="jxr_keyword">return</strong> loader.getVertexByVariable(variable);
 <a name="255" href="#255">255</a>   }
 <a name="256" href="#256">256</a> 
@@ -269,7 +269,7 @@
 <a name="259" href="#259">259</a> <em class="jxr_javadoccomment">   *</em>
 <a name="260" href="#260">260</a> <em class="jxr_javadoccomment">   * @return edges</em>
 <a name="261" href="#261">261</a> <em class="jxr_javadoccomment">   */</em>
-<a name="262" href="#262">262</a>   <strong class="jxr_keyword">public</strong> Collection&lt;Edge&gt; getEdges() {
+<a name="262" href="#262">262</a>   <strong class="jxr_keyword">public</strong> Collection&lt;EPGMEdge&gt; getEdges() {
 <a name="263" href="#263">263</a>     <strong class="jxr_keyword">return</strong> loader.getEdges();
 <a name="264" href="#264">264</a>   }
 <a name="265" href="#265">265</a> 
@@ -279,7 +279,7 @@
 <a name="269" href="#269">269</a> <em class="jxr_javadoccomment">   * @param variables graph variables used in the GDL script</em>
 <a name="270" href="#270">270</a> <em class="jxr_javadoccomment">   * @return edges</em>
 <a name="271" href="#271">271</a> <em class="jxr_javadoccomment">   */</em>
-<a name="272" href="#272">272</a>   <strong class="jxr_keyword">public</strong> Collection&lt;Edge&gt; getEdgesByGraphVariables(String... variables) {
+<a name="272" href="#272">272</a>   <strong class="jxr_keyword">public</strong> Collection&lt;EPGMEdge&gt; getEdgesByGraphVariables(String... variables) {
 <a name="273" href="#273">273</a>     <strong class="jxr_keyword">return</strong> loader.getEdgesByGraphVariables(variables);
 <a name="274" href="#274">274</a>   }
 <a name="275" href="#275">275</a> 
@@ -290,7 +290,7 @@
 <a name="280" href="#280">280</a> <em class="jxr_javadoccomment">   * @param variable edge variable</em>
 <a name="281" href="#281">281</a> <em class="jxr_javadoccomment">   * @return edge or {@code null} if variable is not used</em>
 <a name="282" href="#282">282</a> <em class="jxr_javadoccomment">   */</em>
-<a name="283" href="#283">283</a>   <strong class="jxr_keyword">public</strong> Edge getEdgeByVariable(String variable) {
+<a name="283" href="#283">283</a>   <strong class="jxr_keyword">public</strong> EPGMEdge getEdgeByVariable(String variable) {
 <a name="284" href="#284">284</a>     <strong class="jxr_keyword">return</strong> loader.getEdgeByVariable(variable);
 <a name="285" href="#285">285</a>   }
 <a name="286" href="#286">286</a> }

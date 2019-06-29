@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 import org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
@@ -105,7 +105,7 @@ public class HITS extends GradoopGellyAlgorithm&lt;NullValue, NullValue&gt; {
   public LogicalGraph executeInGelly(Graph&lt;GradoopId, NullValue, NullValue&gt; graph)
     throws Exception {
 
-<span class="fc" id="L108">    DataSet&lt;Vertex&gt; newVertices = hits.runInternal(graph)</span>
+<span class="fc" id="L108">    DataSet&lt;EPGMVertex&gt; newVertices = hits.runInternal(graph)</span>
 <span class="fc" id="L109">      .join(currentGraph.getVertices())</span>
 <span class="fc" id="L110">      .where(new HitsResultKeySelector()).equalTo(new Id&lt;&gt;())</span>
 <span class="fc" id="L111">      .with(new HITSToAttributes(authorityPropertyKey, hubPropertyKey));</span>

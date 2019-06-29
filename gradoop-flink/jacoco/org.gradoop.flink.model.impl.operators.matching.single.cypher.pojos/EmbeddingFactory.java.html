@@ -15,21 +15,21 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 import java.util.List;
 
 /**
- * Utility class to convert an EPGM element ({@link Vertex} and {@link Edge} into an
+ * Utility class to convert an EPGM element ({@link EPGMVertex} and {@link EPGMEdge} into an
  * {@link Embedding}.
  */
 <span class="nc" id="L29">public class EmbeddingFactory {</span>
 
   /**
-   * Converts a {@link Vertex} into an {@link Embedding}.
+   * Converts a {@link EPGMVertex} into an {@link Embedding}.
    *
    * The resulting embedding has one entry containing the vertex id and one entry for each property
    * value associated with the specified property keys (ordered by list order). Note that missing
@@ -39,7 +39,7 @@ import java.util.List;
    * @param propertyKeys properties that will be stored in the embedding
    * @return Embedding
    */
-  public static Embedding fromVertex(Vertex vertex, List&lt;String&gt; propertyKeys) {
+  public static Embedding fromVertex(EPGMVertex vertex, List&lt;String&gt; propertyKeys) {
 <span class="fc" id="L43">    Embedding embedding = new Embedding();</span>
 <span class="fc" id="L44">    embedding.add(vertex.getId(), project(vertex, propertyKeys));</span>
 
@@ -47,7 +47,7 @@ import java.util.List;
   }
 
   /**
-   * Converts an {@link Edge} into an {@link Embedding}.
+   * Converts an {@link EPGMEdge} into an {@link Embedding}.
    *
    * The resulting embedding has three entries containing the source vertex id, the edge id and the
    * target vertex id. Furthermore, the embedding has one entry for each property value associated
@@ -59,7 +59,7 @@ import java.util.List;
    * @param isLoop indicates if the edges is a loop
    * @return Embedding
    */
-  public static Embedding fromEdge(Edge edge, List&lt;String&gt; propertyKeys, boolean isLoop) {
+  public static Embedding fromEdge(EPGMEdge edge, List&lt;String&gt; propertyKeys, boolean isLoop) {
 <span class="fc" id="L63">    Embedding embedding = new Embedding();</span>
 
 <span class="fc bfc" id="L65" title="All 2 branches covered.">    if (isLoop) {</span>
@@ -126,7 +126,7 @@ import java.util.List;
    * @param propertyKeys properties that will be projected from the specified element
    * @return projected property values
    */
-  private static PropertyValue[] project(GraphElement element, List&lt;String&gt; propertyKeys) {
+  private static PropertyValue[] project(EPGMGraphElement element, List&lt;String&gt; propertyKeys) {
 <span class="fc" id="L130">    PropertyValue[] propertyValues = new PropertyValue[propertyKeys.size()];</span>
 <span class="fc" id="L131">    int i = 0;</span>
 <span class="fc bfc" id="L132" title="All 2 branches covered.">    for (String propertyKey : propertyKeys) {</span>

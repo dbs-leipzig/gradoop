@@ -26,9 +26,9 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.layouts.gve.indexed;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
 <a name="24" href="#24">24</a>  
@@ -41,10 +41,10 @@
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/layouts/gve/indexed/IndexedGVECollectionLayoutFactory.html">IndexedGVECollectionLayoutFactory</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/layouts/gve/GVECollectionLayoutFactory.html">GVECollectionLayoutFactory</a> {
 <a name="32" href="#32">32</a>  
 <a name="33" href="#33">33</a>    @Override
-<a name="34" href="#34">34</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromIndexedDataSets(
-<a name="35" href="#35">35</a>      Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads,
-<a name="36" href="#36">36</a>      Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
-<a name="37" href="#37">37</a>      Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
+<a name="34" href="#34">34</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromIndexedDataSets(
+<a name="35" href="#35">35</a>      Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads,
+<a name="36" href="#36">36</a>      Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices,
+<a name="37" href="#37">37</a>      Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges) {
 <a name="38" href="#38">38</a>      Objects.requireNonNull(graphHeads);
 <a name="39" href="#39">39</a>      Objects.requireNonNull(vertices);
 <a name="40" href="#40">40</a>      Objects.requireNonNull(edges);

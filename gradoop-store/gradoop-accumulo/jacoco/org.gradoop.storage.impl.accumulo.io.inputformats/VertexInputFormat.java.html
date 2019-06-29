@@ -21,9 +21,9 @@ import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.IteratorSetting;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.storage.impl.accumulo.handler.AccumuloVertexHandler;
 import org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopVertexIterator;
@@ -36,7 +36,7 @@ import java.util.Properties;
 /**
  * gradoop accumulo vertex input format
  */
-public class VertexInputFormat extends BaseInputFormat&lt;Vertex&gt; {
+public class VertexInputFormat extends BaseInputFormat&lt;EPGMVertex&gt; {
 
   /**
    * serialize id
@@ -61,7 +61,7 @@ public class VertexInputFormat extends BaseInputFormat&lt;Vertex&gt; {
    */
   public VertexInputFormat(
     @NonNull Properties properties,
-    @Nullable AccumuloQueryHolder&lt;Vertex&gt; predicate
+    @Nullable AccumuloQueryHolder&lt;EPGMVertex&gt; predicate
   ) {
 <span class="fc" id="L66">    super(properties, predicate);</span>
 <span class="fc" id="L67">  }</span>
@@ -69,7 +69,7 @@ public class VertexInputFormat extends BaseInputFormat&lt;Vertex&gt; {
   @Override
   protected void initiate() {
 <span class="fc" id="L71">    iterator = new GradoopVertexIterator();</span>
-<span class="fc" id="L72">    handler = new AccumuloVertexHandler(new VertexFactory());</span>
+<span class="fc" id="L72">    handler = new AccumuloVertexHandler(new EPGMVertexFactory());</span>
 <span class="fc" id="L73">  }</span>
 
   @Override
@@ -88,8 +88,8 @@ public class VertexInputFormat extends BaseInputFormat&lt;Vertex&gt; {
 <span class="fc" id="L88">  }</span>
 
   @Override
-  protected Vertex mapRow(Map.Entry&lt;Key, Value&gt; row) throws IOException {
-<span class="fc" id="L92">    EPGMVertex decoded = iterator.fromRow(row);</span>
+  protected EPGMVertex mapRow(Map.Entry&lt;Key, Value&gt; row) throws IOException {
+<span class="fc" id="L92">    Vertex decoded = iterator.fromRow(row);</span>
 <span class="fc" id="L93">    return handler.readRow(decoded);</span>
   }
 

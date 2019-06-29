@@ -17,7 +17,7 @@ package org.gradoop.flink.algorithms.gelly.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
@@ -49,7 +49,7 @@ public class EdgeToGellyEdgeWithPropertyValue implements EdgeToGellyEdge&lt;Prop
 <span class="nc" id="L49">  }</span>
 
   @Override
-  public org.apache.flink.graph.Edge&lt;GradoopId, PropertyValue&gt; map(Edge epgmEdge) {
+  public org.apache.flink.graph.Edge&lt;GradoopId, PropertyValue&gt; map(EPGMEdge epgmEdge) {
 <span class="nc" id="L53">    reuseEdge.setSource(epgmEdge.getSourceId());</span>
 <span class="nc" id="L54">    reuseEdge.setTarget(epgmEdge.getTargetId());</span>
 <span class="nc" id="L55">    reuseEdge.setValue(epgmEdge.getPropertyValue(propertyKey));</span>

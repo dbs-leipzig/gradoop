@@ -16,8 +16,8 @@
 package org.gradoop.flink.algorithms.gelly.connectedcomponents.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.properties.PropertyValue;
  * If the edge already has this property, compare the edge value to the vertex value and store the
  * smaller property value.
  */
-public class VertexPropertyToEdgePropertyJoin implements JoinFunction&lt;Edge, Vertex, Edge&gt; {
+public class VertexPropertyToEdgePropertyJoin implements JoinFunction&lt;EPGMEdge, EPGMVertex, EPGMEdge&gt; {
 
   /**
    * Property key to store the property.
@@ -42,7 +42,7 @@ public class VertexPropertyToEdgePropertyJoin implements JoinFunction&lt;Edge, V
 <span class="fc" id="L42">  }</span>
 
   @Override
-  public Edge join(Edge edge, Vertex vertex) throws Exception {
+  public EPGMEdge join(EPGMEdge edge, EPGMVertex vertex) throws Exception {
 <span class="fc" id="L46">    PropertyValue newEdgeValue = vertex.getPropertyValue(propertyKey);</span>
 <span class="fc bfc" id="L47" title="All 2 branches covered.">    if (edge.hasProperty(propertyKey)) {</span>
 <span class="pc bpc" id="L48" title="1 of 2 branches missed.">      if (edge.getPropertyValue(propertyKey).compareTo(newEdgeValue) &lt; 0) {</span>

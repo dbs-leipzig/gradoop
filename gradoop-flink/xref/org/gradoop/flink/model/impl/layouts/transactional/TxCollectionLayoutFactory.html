@@ -34,10 +34,10 @@
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple3;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.typeutils.TypeExtractor;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphElement;
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.util.GradoopConstants;
 <a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 <a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
@@ -60,137 +60,138 @@
 <a name="50" href="#50">50</a>  <em class="jxr_javadoccomment"> * Responsible for producing instances of {@link TxCollectionLayout}.</em>
 <a name="51" href="#51">51</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="52" href="#52">52</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/TxCollectionLayoutFactory.html">TxCollectionLayoutFactory</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/common/BaseFactory.html">BaseFactory</a>
-<a name="53" href="#53">53</a>    implements GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; {
+<a name="53" href="#53">53</a>    implements GraphCollectionLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; {
 <a name="54" href="#54">54</a>  
 <a name="55" href="#55">55</a>    @Override
-<a name="56" href="#56">56</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromDataSets(DataSet&lt;GraphHead&gt; graphHeads,
-<a name="57" href="#57">57</a>      DataSet&lt;Vertex&gt; vertices) {
-<a name="58" href="#58">58</a>      Objects.requireNonNull(graphHeads);
-<a name="59" href="#59">59</a>      Objects.requireNonNull(vertices);
-<a name="60" href="#60">60</a>  
-<a name="61" href="#61">61</a>      <strong class="jxr_keyword">return</strong> fromDataSets(graphHeads, vertices,
-<a name="62" href="#62">62</a>        createEdgeDataSet(Lists.newArrayListWithCapacity(0)));
-<a name="63" href="#63">63</a>    }
-<a name="64" href="#64">64</a>  
-<a name="65" href="#65">65</a>    @Override
-<a name="66" href="#66">66</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromDataSets(
-<a name="67" href="#67">67</a>      DataSet&lt;GraphHead&gt; inGraphHeads,
-<a name="68" href="#68">68</a>      DataSet&lt;Vertex&gt; inVertices,
-<a name="69" href="#69">69</a>      DataSet&lt;Edge&gt; inEdges) {
-<a name="70" href="#70">70</a>      Objects.requireNonNull(inGraphHeads);
-<a name="71" href="#71">71</a>      Objects.requireNonNull(inVertices);
-<a name="72" href="#72">72</a>      Objects.requireNonNull(inEdges);
-<a name="73" href="#73">73</a>  
-<a name="74" href="#74">74</a>      <em class="jxr_comment">// Add a dummy graph head for entities which have no assigned graph</em>
-<a name="75" href="#75">75</a>      DataSet&lt;GraphHead&gt; dbGraphHead = getConfig().getExecutionEnvironment().fromElements(
-<a name="76" href="#76">76</a>        getConfig().getGraphHeadFactory()
-<a name="77" href="#77">77</a>          .initGraphHead(GradoopConstants.DB_GRAPH_ID, GradoopConstants.DB_GRAPH_LABEL)
-<a name="78" href="#78">78</a>      );
-<a name="79" href="#79">79</a>      inGraphHeads = inGraphHeads.union(dbGraphHead);
-<a name="80" href="#80">80</a>  
-<a name="81" href="#81">81</a>      DataSet&lt;Tuple2&lt;GradoopId, GraphElement&gt;&gt; vertices = inVertices
-<a name="82" href="#82">82</a>        .map(<strong class="jxr_keyword">new</strong> Cast&lt;&gt;(GraphElement.<strong class="jxr_keyword">class</strong>))
-<a name="83" href="#83">83</a>        .returns(TypeExtractor.getForClass(GraphElement.<strong class="jxr_keyword">class</strong>))
-<a name="84" href="#84">84</a>        .flatMap(<strong class="jxr_keyword">new</strong> GraphElementExpander&lt;&gt;());
-<a name="85" href="#85">85</a>  
-<a name="86" href="#86">86</a>      DataSet&lt;Tuple2&lt;GradoopId, GraphElement&gt;&gt; edges = inEdges
-<a name="87" href="#87">87</a>        .map(<strong class="jxr_keyword">new</strong> Cast&lt;&gt;(GraphElement.<strong class="jxr_keyword">class</strong>))
-<a name="88" href="#88">88</a>        .returns(TypeExtractor.getForClass(GraphElement.<strong class="jxr_keyword">class</strong>))
-<a name="89" href="#89">89</a>        .flatMap(<strong class="jxr_keyword">new</strong> GraphElementExpander&lt;&gt;());
-<a name="90" href="#90">90</a>  
-<a name="91" href="#91">91</a>      DataSet&lt;Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt;&gt; transactions = vertices
-<a name="92" href="#92">92</a>        .union(edges)
-<a name="93" href="#93">93</a>        .groupBy(0)
-<a name="94" href="#94">94</a>        .combineGroup(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/functions/epgm/GraphVerticesEdges.html">GraphVerticesEdges</a>())
-<a name="95" href="#95">95</a>        .groupBy(0)
-<a name="96" href="#96">96</a>        .reduceGroup(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/functions/epgm/GraphVerticesEdges.html">GraphVerticesEdges</a>());
-<a name="97" href="#97">97</a>  
-<a name="98" href="#98">98</a>      DataSet&lt;GraphTransaction&gt; graphTransactions = inGraphHeads
-<a name="99" href="#99">99</a>        .leftOuterJoin(transactions)
-<a name="100" href="#100">100</a>       .where(<strong class="jxr_keyword">new</strong> Id&lt;&gt;()).equalTo(0)
-<a name="101" href="#101">101</a>       .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/functions/epgm/TransactionFromSets.html">TransactionFromSets</a>());
-<a name="102" href="#102">102</a> 
-<a name="103" href="#103">103</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/TxCollectionLayout.html">TxCollectionLayout</a>(graphTransactions);
-<a name="104" href="#104">104</a>   }
-<a name="105" href="#105">105</a> 
-<a name="106" href="#106">106</a>   @Override
-<a name="107" href="#107">107</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromIndexedDataSets(
-<a name="108" href="#108">108</a>     Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads,
-<a name="109" href="#109">109</a>     Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
-<a name="110" href="#110">110</a>     Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
-<a name="111" href="#111">111</a>     Objects.requireNonNull(graphHeads);
-<a name="112" href="#112">112</a>     Objects.requireNonNull(vertices);
-<a name="113" href="#113">113</a>     Objects.requireNonNull(edges);
-<a name="114" href="#114">114</a>     <strong class="jxr_keyword">return</strong> fromDataSets(
-<a name="115" href="#115">115</a>       graphHeads.values().stream().reduce(DataSet::union)
-<a name="116" href="#116">116</a>         .orElseThrow(() -&gt; <strong class="jxr_keyword">new</strong> RuntimeException(<span class="jxr_string">"Error during graph head union"</span>)),
-<a name="117" href="#117">117</a>       vertices.values().stream().reduce(DataSet::union)
-<a name="118" href="#118">118</a>         .orElseThrow(() -&gt; <strong class="jxr_keyword">new</strong> RuntimeException(<span class="jxr_string">"Error during vertex union"</span>)),
-<a name="119" href="#119">119</a>       edges.values().stream().reduce(DataSet::union)
-<a name="120" href="#120">120</a>         .orElseThrow(() -&gt; <strong class="jxr_keyword">new</strong> RuntimeException(<span class="jxr_string">"Error during edge union"</span>))
-<a name="121" href="#121">121</a>     );
-<a name="122" href="#122">122</a>   }
-<a name="123" href="#123">123</a> 
-<a name="124" href="#124">124</a>   @Override
-<a name="125" href="#125">125</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromCollections(
-<a name="126" href="#126">126</a>     Collection&lt;GraphHead&gt; graphHeads,
-<a name="127" href="#127">127</a>     Collection&lt;Vertex&gt; vertices,
-<a name="128" href="#128">128</a>     Collection&lt;Edge&gt; edges) {
-<a name="129" href="#129">129</a>     <strong class="jxr_keyword">return</strong> fromDataSets(
-<a name="130" href="#130">130</a>       createGraphHeadDataSet(graphHeads),
-<a name="131" href="#131">131</a>       createVertexDataSet(vertices),
-<a name="132" href="#132">132</a>       createEdgeDataSet(edges)
-<a name="133" href="#133">133</a>     );
-<a name="134" href="#134">134</a>   }
-<a name="135" href="#135">135</a> 
-<a name="136" href="#136">136</a>   @Override
-<a name="137" href="#137">137</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromGraphLayout(
-<a name="138" href="#138">138</a>     LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; logicalGraphLayout) {
-<a name="139" href="#139">139</a>     <strong class="jxr_keyword">return</strong> fromDataSets(logicalGraphLayout.getGraphHead(),
-<a name="140" href="#140">140</a>       logicalGraphLayout.getVertices(),
-<a name="141" href="#141">141</a>       logicalGraphLayout.getEdges());
-<a name="142" href="#142">142</a>   }
-<a name="143" href="#143">143</a> 
-<a name="144" href="#144">144</a>   @Override
-<a name="145" href="#145">145</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromTransactions(
-<a name="146" href="#146">146</a>     DataSet&lt;GraphTransaction&gt; transactions) {
-<a name="147" href="#147">147</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/TxCollectionLayout.html">TxCollectionLayout</a>(transactions);
-<a name="148" href="#148">148</a>   }
-<a name="149" href="#149">149</a> 
-<a name="150" href="#150">150</a>   @Override
-<a name="151" href="#151">151</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromTransactions(
-<a name="152" href="#152">152</a>     DataSet&lt;GraphTransaction&gt; transactions,
-<a name="153" href="#153">153</a>     GroupReduceFunction&lt;Vertex, Vertex&gt; vertexMergeReducer,
-<a name="154" href="#154">154</a>     GroupReduceFunction&lt;Edge, Edge&gt; edgeMergeReducer) {
-<a name="155" href="#155">155</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/TxCollectionLayout.html">TxCollectionLayout</a>(transactions);
-<a name="156" href="#156">156</a>   }
-<a name="157" href="#157">157</a> 
-<a name="158" href="#158">158</a>   @Override
-<a name="159" href="#159">159</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; createEmptyCollection() {
-<a name="160" href="#160">160</a>     <strong class="jxr_keyword">return</strong> fromTransactions(createGraphTransactionDataSet(Lists.newArrayListWithCapacity(0)));
-<a name="161" href="#161">161</a>   }
-<a name="162" href="#162">162</a> 
-<a name="163" href="#163">163</a>   <em class="jxr_javadoccomment">/**</em>
-<a name="164" href="#164">164</a> <em class="jxr_javadoccomment">   * Creates a dataset from a given (possibly empty) collection of graph transactions.</em>
-<a name="165" href="#165">165</a> <em class="jxr_javadoccomment">   *</em>
-<a name="166" href="#166">166</a> <em class="jxr_javadoccomment">   * @param transactions graph transactions</em>
-<a name="167" href="#167">167</a> <em class="jxr_javadoccomment">   * @return a dataset containing the given transactions</em>
-<a name="168" href="#168">168</a> <em class="jxr_javadoccomment">   */</em>
-<a name="169" href="#169">169</a>   <strong class="jxr_keyword">private</strong> DataSet&lt;GraphTransaction&gt; createGraphTransactionDataSet(
-<a name="170" href="#170">170</a>     Collection&lt;GraphTransaction&gt; transactions) {
-<a name="171" href="#171">171</a>     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-<a name="172" href="#172">172</a> 
-<a name="173" href="#173">173</a>     DataSet&lt;GraphTransaction&gt; graphTransactionSet;
-<a name="174" href="#174">174</a>     <strong class="jxr_keyword">if</strong> (transactions.isEmpty()) {
-<a name="175" href="#175">175</a>       graphTransactionSet = env.fromCollection(Lists.newArrayList(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a>()),
-<a name="176" href="#176">176</a>         <strong class="jxr_keyword">new</strong> TypeHint&lt;GraphTransaction&gt;() { }.getTypeInfo())
-<a name="177" href="#177">177</a>         .filter(<strong class="jxr_keyword">new</strong> False&lt;&gt;());
-<a name="178" href="#178">178</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="179" href="#179">179</a>       graphTransactionSet = env.fromCollection(transactions);
-<a name="180" href="#180">180</a>     }
-<a name="181" href="#181">181</a>     <strong class="jxr_keyword">return</strong> graphTransactionSet;
-<a name="182" href="#182">182</a>   }
-<a name="183" href="#183">183</a> }
+<a name="56" href="#56">56</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromDataSets(
+<a name="57" href="#57">57</a>      DataSet&lt;EPGMGraphHead&gt; graphHeads, DataSet&lt;EPGMVertex&gt; vertices) {
+<a name="58" href="#58">58</a>  
+<a name="59" href="#59">59</a>      Objects.requireNonNull(graphHeads);
+<a name="60" href="#60">60</a>      Objects.requireNonNull(vertices);
+<a name="61" href="#61">61</a>  
+<a name="62" href="#62">62</a>      <strong class="jxr_keyword">return</strong> fromDataSets(graphHeads, vertices,
+<a name="63" href="#63">63</a>        createEdgeDataSet(Lists.newArrayListWithCapacity(0)));
+<a name="64" href="#64">64</a>    }
+<a name="65" href="#65">65</a>  
+<a name="66" href="#66">66</a>    @Override
+<a name="67" href="#67">67</a>    <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromDataSets(
+<a name="68" href="#68">68</a>      DataSet&lt;EPGMGraphHead&gt; inGraphHeads,
+<a name="69" href="#69">69</a>      DataSet&lt;EPGMVertex&gt; inVertices,
+<a name="70" href="#70">70</a>      DataSet&lt;EPGMEdge&gt; inEdges) {
+<a name="71" href="#71">71</a>      Objects.requireNonNull(inGraphHeads);
+<a name="72" href="#72">72</a>      Objects.requireNonNull(inVertices);
+<a name="73" href="#73">73</a>      Objects.requireNonNull(inEdges);
+<a name="74" href="#74">74</a>  
+<a name="75" href="#75">75</a>      <em class="jxr_comment">// Add a dummy graph head for entities which have no assigned graph</em>
+<a name="76" href="#76">76</a>      DataSet&lt;EPGMGraphHead&gt; dbGraphHead = getConfig().getExecutionEnvironment().fromElements(
+<a name="77" href="#77">77</a>        getConfig().getGraphHeadFactory()
+<a name="78" href="#78">78</a>          .initGraphHead(GradoopConstants.DB_GRAPH_ID, GradoopConstants.DB_GRAPH_LABEL)
+<a name="79" href="#79">79</a>      );
+<a name="80" href="#80">80</a>      inGraphHeads = inGraphHeads.union(dbGraphHead);
+<a name="81" href="#81">81</a>  
+<a name="82" href="#82">82</a>      DataSet&lt;Tuple2&lt;GradoopId, EPGMGraphElement&gt;&gt; vertices = inVertices
+<a name="83" href="#83">83</a>        .map(<strong class="jxr_keyword">new</strong> Cast&lt;&gt;(EPGMGraphElement.<strong class="jxr_keyword">class</strong>))
+<a name="84" href="#84">84</a>        .returns(TypeExtractor.getForClass(EPGMGraphElement.<strong class="jxr_keyword">class</strong>))
+<a name="85" href="#85">85</a>        .flatMap(<strong class="jxr_keyword">new</strong> GraphElementExpander&lt;&gt;());
+<a name="86" href="#86">86</a>  
+<a name="87" href="#87">87</a>      DataSet&lt;Tuple2&lt;GradoopId, EPGMGraphElement&gt;&gt; edges = inEdges
+<a name="88" href="#88">88</a>        .map(<strong class="jxr_keyword">new</strong> Cast&lt;&gt;(EPGMGraphElement.<strong class="jxr_keyword">class</strong>))
+<a name="89" href="#89">89</a>        .returns(TypeExtractor.getForClass(EPGMGraphElement.<strong class="jxr_keyword">class</strong>))
+<a name="90" href="#90">90</a>        .flatMap(<strong class="jxr_keyword">new</strong> GraphElementExpander&lt;&gt;());
+<a name="91" href="#91">91</a>  
+<a name="92" href="#92">92</a>      DataSet&lt;Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt;&gt; transactions = vertices
+<a name="93" href="#93">93</a>        .union(edges)
+<a name="94" href="#94">94</a>        .groupBy(0)
+<a name="95" href="#95">95</a>        .combineGroup(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/functions/epgm/GraphVerticesEdges.html">GraphVerticesEdges</a>())
+<a name="96" href="#96">96</a>        .groupBy(0)
+<a name="97" href="#97">97</a>        .reduceGroup(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/functions/epgm/GraphVerticesEdges.html">GraphVerticesEdges</a>());
+<a name="98" href="#98">98</a>  
+<a name="99" href="#99">99</a>      DataSet&lt;GraphTransaction&gt; graphTransactions = inGraphHeads
+<a name="100" href="#100">100</a>       .leftOuterJoin(transactions)
+<a name="101" href="#101">101</a>       .where(<strong class="jxr_keyword">new</strong> Id&lt;&gt;()).equalTo(0)
+<a name="102" href="#102">102</a>       .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/functions/epgm/TransactionFromSets.html">TransactionFromSets</a>());
+<a name="103" href="#103">103</a> 
+<a name="104" href="#104">104</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/TxCollectionLayout.html">TxCollectionLayout</a>(graphTransactions);
+<a name="105" href="#105">105</a>   }
+<a name="106" href="#106">106</a> 
+<a name="107" href="#107">107</a>   @Override
+<a name="108" href="#108">108</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromIndexedDataSets(
+<a name="109" href="#109">109</a>     Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads,
+<a name="110" href="#110">110</a>     Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices,
+<a name="111" href="#111">111</a>     Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges) {
+<a name="112" href="#112">112</a>     Objects.requireNonNull(graphHeads);
+<a name="113" href="#113">113</a>     Objects.requireNonNull(vertices);
+<a name="114" href="#114">114</a>     Objects.requireNonNull(edges);
+<a name="115" href="#115">115</a>     <strong class="jxr_keyword">return</strong> fromDataSets(
+<a name="116" href="#116">116</a>       graphHeads.values().stream().reduce(DataSet::union)
+<a name="117" href="#117">117</a>         .orElseThrow(() -&gt; <strong class="jxr_keyword">new</strong> RuntimeException(<span class="jxr_string">"Error during graph head union"</span>)),
+<a name="118" href="#118">118</a>       vertices.values().stream().reduce(DataSet::union)
+<a name="119" href="#119">119</a>         .orElseThrow(() -&gt; <strong class="jxr_keyword">new</strong> RuntimeException(<span class="jxr_string">"Error during vertex union"</span>)),
+<a name="120" href="#120">120</a>       edges.values().stream().reduce(DataSet::union)
+<a name="121" href="#121">121</a>         .orElseThrow(() -&gt; <strong class="jxr_keyword">new</strong> RuntimeException(<span class="jxr_string">"Error during edge union"</span>))
+<a name="122" href="#122">122</a>     );
+<a name="123" href="#123">123</a>   }
+<a name="124" href="#124">124</a> 
+<a name="125" href="#125">125</a>   @Override
+<a name="126" href="#126">126</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromCollections(
+<a name="127" href="#127">127</a>     Collection&lt;EPGMGraphHead&gt; graphHeads,
+<a name="128" href="#128">128</a>     Collection&lt;EPGMVertex&gt; vertices,
+<a name="129" href="#129">129</a>     Collection&lt;EPGMEdge&gt; edges) {
+<a name="130" href="#130">130</a>     <strong class="jxr_keyword">return</strong> fromDataSets(
+<a name="131" href="#131">131</a>       createGraphHeadDataSet(graphHeads),
+<a name="132" href="#132">132</a>       createVertexDataSet(vertices),
+<a name="133" href="#133">133</a>       createEdgeDataSet(edges)
+<a name="134" href="#134">134</a>     );
+<a name="135" href="#135">135</a>   }
+<a name="136" href="#136">136</a> 
+<a name="137" href="#137">137</a>   @Override
+<a name="138" href="#138">138</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromGraphLayout(
+<a name="139" href="#139">139</a>     LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; logicalGraphLayout) {
+<a name="140" href="#140">140</a>     <strong class="jxr_keyword">return</strong> fromDataSets(logicalGraphLayout.getGraphHead(),
+<a name="141" href="#141">141</a>       logicalGraphLayout.getVertices(),
+<a name="142" href="#142">142</a>       logicalGraphLayout.getEdges());
+<a name="143" href="#143">143</a>   }
+<a name="144" href="#144">144</a> 
+<a name="145" href="#145">145</a>   @Override
+<a name="146" href="#146">146</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromTransactions(
+<a name="147" href="#147">147</a>     DataSet&lt;GraphTransaction&gt; transactions) {
+<a name="148" href="#148">148</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/TxCollectionLayout.html">TxCollectionLayout</a>(transactions);
+<a name="149" href="#149">149</a>   }
+<a name="150" href="#150">150</a> 
+<a name="151" href="#151">151</a>   @Override
+<a name="152" href="#152">152</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromTransactions(
+<a name="153" href="#153">153</a>     DataSet&lt;GraphTransaction&gt; transactions,
+<a name="154" href="#154">154</a>     GroupReduceFunction&lt;EPGMVertex, EPGMVertex&gt; vertexMergeReducer,
+<a name="155" href="#155">155</a>     GroupReduceFunction&lt;EPGMEdge, EPGMEdge&gt; edgeMergeReducer) {
+<a name="156" href="#156">156</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/TxCollectionLayout.html">TxCollectionLayout</a>(transactions);
+<a name="157" href="#157">157</a>   }
+<a name="158" href="#158">158</a> 
+<a name="159" href="#159">159</a>   @Override
+<a name="160" href="#160">160</a>   <strong class="jxr_keyword">public</strong> GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; createEmptyCollection() {
+<a name="161" href="#161">161</a>     <strong class="jxr_keyword">return</strong> fromTransactions(createGraphTransactionDataSet(Lists.newArrayListWithCapacity(0)));
+<a name="162" href="#162">162</a>   }
+<a name="163" href="#163">163</a> 
+<a name="164" href="#164">164</a>   <em class="jxr_javadoccomment">/**</em>
+<a name="165" href="#165">165</a> <em class="jxr_javadoccomment">   * Creates a dataset from a given (possibly empty) collection of graph transactions.</em>
+<a name="166" href="#166">166</a> <em class="jxr_javadoccomment">   *</em>
+<a name="167" href="#167">167</a> <em class="jxr_javadoccomment">   * @param transactions graph transactions</em>
+<a name="168" href="#168">168</a> <em class="jxr_javadoccomment">   * @return a dataset containing the given transactions</em>
+<a name="169" href="#169">169</a> <em class="jxr_javadoccomment">   */</em>
+<a name="170" href="#170">170</a>   <strong class="jxr_keyword">private</strong> DataSet&lt;GraphTransaction&gt; createGraphTransactionDataSet(
+<a name="171" href="#171">171</a>     Collection&lt;GraphTransaction&gt; transactions) {
+<a name="172" href="#172">172</a>     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
+<a name="173" href="#173">173</a> 
+<a name="174" href="#174">174</a>     DataSet&lt;GraphTransaction&gt; graphTransactionSet;
+<a name="175" href="#175">175</a>     <strong class="jxr_keyword">if</strong> (transactions.isEmpty()) {
+<a name="176" href="#176">176</a>       graphTransactionSet = env.fromCollection(Lists.newArrayList(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a>()),
+<a name="177" href="#177">177</a>         <strong class="jxr_keyword">new</strong> TypeHint&lt;GraphTransaction&gt;() { }.getTypeInfo())
+<a name="178" href="#178">178</a>         .filter(<strong class="jxr_keyword">new</strong> False&lt;&gt;());
+<a name="179" href="#179">179</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="180" href="#180">180</a>       graphTransactionSet = env.fromCollection(transactions);
+<a name="181" href="#181">181</a>     }
+<a name="182" href="#182">182</a>     <strong class="jxr_keyword">return</strong> graphTransactionSet;
+<a name="183" href="#183">183</a>   }
+<a name="184" href="#184">184</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

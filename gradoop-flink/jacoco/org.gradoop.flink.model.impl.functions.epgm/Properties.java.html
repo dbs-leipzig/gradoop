@@ -18,25 +18,26 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
+
 /**
- * EPGMElement with properties =&gt; properties
+ * Element with properties =&gt; properties
  *
- * @param &lt;L&gt; EPGMElement type having properties
+ * @param &lt;L&gt; Element type having properties
  */
 @FunctionAnnotation.ForwardedFields(&quot;properties-&gt;*&quot;)
-<span class="nc" id="L28">public class Properties&lt;L extends EPGMElement&gt;</span>
+<span class="nc" id="L29">public class Properties&lt;L extends Element&gt;</span>
   implements MapFunction&lt;L, org.gradoop.common.model.impl.properties.Properties&gt;,
              KeySelector&lt;L, org.gradoop.common.model.impl.properties.Properties&gt; {
 
   @Override
   public org.gradoop.common.model.impl.properties.Properties map(L l) throws Exception {
-<span class="nc" id="L34">    return l.getProperties();</span>
+<span class="nc" id="L35">    return l.getProperties();</span>
   }
 
   @Override
   public org.gradoop.common.model.impl.properties.Properties getKey(L l) {
-<span class="nc" id="L39">    return l.getProperties();</span>
+<span class="nc" id="L40">    return l.getProperties();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

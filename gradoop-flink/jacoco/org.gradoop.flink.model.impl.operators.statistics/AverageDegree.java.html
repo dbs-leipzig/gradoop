@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
@@ -39,7 +39,7 @@ import org.gradoop.flink.model.impl.operators.statistics.functions.CalculateAver
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
 <span class="fc" id="L41">    graph = graph.aggregate(new VertexCount());</span>
-<span class="fc" id="L42">    DataSet&lt;GraphHead&gt; newGraphHead = new VertexDegrees().execute(graph)</span>
+<span class="fc" id="L42">    DataSet&lt;EPGMGraphHead&gt; newGraphHead = new VertexDegrees().execute(graph)</span>
 <span class="fc" id="L43">      .sum(1)</span>
 <span class="fc" id="L44">      .crossWithTiny(graph.getGraphHead().first(1))</span>
 <span class="fc" id="L45">      .with(new AddSumDegreesToGraphHeadCrossFunction(</span>

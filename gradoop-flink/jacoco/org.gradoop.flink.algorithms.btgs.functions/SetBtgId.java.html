@@ -17,7 +17,7 @@ package org.gradoop.flink.algorithms.btgs.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  * Associates an edge with an business transaction graph.
  * @param &lt;E&gt; edge type
  */
-<span class="fc" id="L28">public class SetBtgId&lt;E extends EPGMGraphElement&gt;</span>
+<span class="fc" id="L28">public class SetBtgId&lt;E extends GraphElement&gt;</span>
   implements JoinFunction&lt;E, Tuple2&lt;GradoopId, GradoopId&gt;, E&gt; {
 
   @Override

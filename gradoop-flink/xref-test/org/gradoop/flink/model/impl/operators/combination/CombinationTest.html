@@ -26,9 +26,9 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.combination;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphElement;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphElement;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.base.ReducibleBinaryOperatorsTestBase;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -140,12 +140,12 @@
 <a name="130" href="#130">130</a>     LogicalGraph g2 = loader.getLogicalGraphByVariable(<span class="jxr_string">"g2"</span>);
 <a name="131" href="#131">131</a> 
 <a name="132" href="#132">132</a>     <em class="jxr_comment">// use collections as data sink</em>
-<a name="133" href="#133">133</a>     Collection&lt;Vertex&gt; vertices0 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="134" href="#134">134</a>     Collection&lt;Edge&gt; edges0 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="135" href="#135">135</a>     Collection&lt;Vertex&gt; vertices2 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="136" href="#136">136</a>     Collection&lt;Edge&gt; edges2 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="137" href="#137">137</a>     Collection&lt;Vertex&gt; resVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="138" href="#138">138</a>     Collection&lt;Edge&gt; resEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="133" href="#133">133</a>     Collection&lt;EPGMVertex&gt; vertices0 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="134" href="#134">134</a>     Collection&lt;EPGMEdge&gt; edges0 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="135" href="#135">135</a>     Collection&lt;EPGMVertex&gt; vertices2 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="136" href="#136">136</a>     Collection&lt;EPGMEdge&gt; edges2 = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="137" href="#137">137</a>     Collection&lt;EPGMVertex&gt; resVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="138" href="#138">138</a>     Collection&lt;EPGMEdge&gt; resEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
 <a name="139" href="#139">139</a> 
 <a name="140" href="#140">140</a>     LogicalGraph expected = g0.combine(g2);
 <a name="141" href="#141">141</a> 
@@ -158,16 +158,16 @@
 <a name="148" href="#148">148</a> 
 <a name="149" href="#149">149</a>     getExecutionEnvironment().execute();
 <a name="150" href="#150">150</a> 
-<a name="151" href="#151">151</a>     Set&lt;GraphElement&gt; inVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="151" href="#151">151</a>     Set&lt;EPGMGraphElement&gt; inVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
 <a name="152" href="#152">152</a>     inVertices.addAll(vertices0);
 <a name="153" href="#153">153</a>     inVertices.addAll(vertices2);
-<a name="154" href="#154">154</a>     Set&lt;GraphElement&gt; inEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="154" href="#154">154</a>     Set&lt;EPGMGraphElement&gt; inEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
 <a name="155" href="#155">155</a>     inEdges.addAll(edges0);
 <a name="156" href="#156">156</a>     inEdges.addAll(edges2);
 <a name="157" href="#157">157</a> 
-<a name="158" href="#158">158</a>     Set&lt;GraphElement&gt; outVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="158" href="#158">158</a>     Set&lt;EPGMGraphElement&gt; outVertices = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
 <a name="159" href="#159">159</a>     inVertices.addAll(outVertices);
-<a name="160" href="#160">160</a>     Set&lt;GraphElement&gt; outEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
+<a name="160" href="#160">160</a>     Set&lt;EPGMGraphElement&gt; outEdges = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
 <a name="161" href="#161">161</a>     inEdges.addAll(resEdges);
 <a name="162" href="#162">162</a> 
 <a name="163" href="#163">163</a>     checkElementMatches(inVertices, outVertices);

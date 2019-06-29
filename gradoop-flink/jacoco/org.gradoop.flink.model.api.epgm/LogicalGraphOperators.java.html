@@ -18,9 +18,9 @@ package org.gradoop.flink.model.api.epgm;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.metadata.MetaData;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -206,9 +206,9 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return transformed logical graph
    */
   LogicalGraph transform(
-    TransformationFunction&lt;GraphHead&gt; graphHeadTransformationFunction,
-    TransformationFunction&lt;Vertex&gt; vertexTransformationFunction,
-    TransformationFunction&lt;Edge&gt; edgeTransformationFunction);
+    TransformationFunction&lt;EPGMGraphHead&gt; graphHeadTransformationFunction,
+    TransformationFunction&lt;EPGMVertex&gt; vertexTransformationFunction,
+    TransformationFunction&lt;EPGMEdge&gt; edgeTransformationFunction);
 
   /**
    * Transforms the graph head of the logical graph using the given
@@ -218,7 +218,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return transformed logical graph
    */
   LogicalGraph transformGraphHead(
-    TransformationFunction&lt;GraphHead&gt; graphHeadTransformationFunction);
+    TransformationFunction&lt;EPGMGraphHead&gt; graphHeadTransformationFunction);
 
   /**
    * Transforms the vertices of the logical graph using the given transformation
@@ -227,7 +227,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param vertexTransformationFunction vertex transformation function
    * @return transformed logical graph
    */
-  LogicalGraph transformVertices(TransformationFunction&lt;Vertex&gt; vertexTransformationFunction);
+  LogicalGraph transformVertices(TransformationFunction&lt;EPGMVertex&gt; vertexTransformationFunction);
 
   /**
    * Transforms the edges of the logical graph using the given transformation
@@ -236,7 +236,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param edgeTransformationFunction edge transformation function
    * @return transformed logical graph
    */
-  LogicalGraph transformEdges(TransformationFunction&lt;Edge&gt; edgeTransformationFunction);
+  LogicalGraph transformEdges(TransformationFunction&lt;EPGMEdge&gt; edgeTransformationFunction);
 
   /**
    * Returns the subgraph that is induced by the vertices which fulfill the
@@ -245,7 +245,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param vertexFilterFunction vertex filter function
    * @return vertex-induced subgraph as a new logical graph
    */
-  LogicalGraph vertexInducedSubgraph(FilterFunction&lt;Vertex&gt; vertexFilterFunction);
+  LogicalGraph vertexInducedSubgraph(FilterFunction&lt;EPGMVertex&gt; vertexFilterFunction);
 
   /**
    * Returns the subgraph that is induced by the edges which fulfill the given
@@ -254,7 +254,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @param edgeFilterFunction edge filter function
    * @return edge-induced subgraph as a new logical graph
    */
-  LogicalGraph edgeInducedSubgraph(FilterFunction&lt;Edge&gt; edgeFilterFunction);
+  LogicalGraph edgeInducedSubgraph(FilterFunction&lt;EPGMEdge&gt; edgeFilterFunction);
 
   /**
    * Returns a subgraph of the logical graph which contains only those vertices
@@ -269,8 +269,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return logical graph which fulfils the given predicates and is a subgraph
    * of that graph
    */
-  default LogicalGraph subgraph(FilterFunction&lt;Vertex&gt; vertexFilterFunction,
-    FilterFunction&lt;Edge&gt; edgeFilterFunction) {
+  default LogicalGraph subgraph(FilterFunction&lt;EPGMVertex&gt; vertexFilterFunction,
+    FilterFunction&lt;EPGMEdge&gt; edgeFilterFunction) {
 <span class="fc" id="L274">    Objects.requireNonNull(vertexFilterFunction);</span>
 <span class="fc" id="L275">    Objects.requireNonNull(edgeFilterFunction);</span>
 <span class="fc" id="L276">    return subgraph(vertexFilterFunction, edgeFilterFunction, Subgraph.Strategy.BOTH);</span>
@@ -290,8 +290,8 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return logical graph which fulfils the given predicates and is a subgraph
    * of that graph
    */
-  LogicalGraph subgraph(FilterFunction&lt;Vertex&gt; vertexFilterFunction,
-    FilterFunction&lt;Edge&gt; edgeFilterFunction, Subgraph.Strategy strategy);
+  LogicalGraph subgraph(FilterFunction&lt;EPGMVertex&gt; vertexFilterFunction,
+    FilterFunction&lt;EPGMEdge&gt; edgeFilterFunction, Subgraph.Strategy strategy);
 
   /**
    * Applies the given aggregate functions to the logical graph and stores the

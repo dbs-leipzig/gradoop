@@ -22,7 +22,7 @@ import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.hadoop.conf.Configuration;
 import org.gradoop.common.model.impl.metadata.MetaData;
 import org.gradoop.common.model.impl.metadata.PropertyMetaData;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.flink.io.api.metadata.functions.ElementToPropertyMetaData;
 import org.gradoop.flink.io.api.metadata.functions.ReducePropertyMetaData;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -83,7 +83,7 @@ public interface MetaDataSource&lt;M extends MetaData&gt; {
    * @param &lt;E&gt;      EPGM element type
    * @return meta data information
    */
-  static &lt;E extends Element&gt; DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; tuplesFromElements(
+  static &lt;E extends EPGMElement&gt; DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; tuplesFromElements(
     DataSet&lt;E&gt; elements) {
 <span class="fc" id="L88">    return elements</span>
 <span class="fc" id="L89">      .map(new ElementToPropertyMetaData&lt;&gt;())</span>

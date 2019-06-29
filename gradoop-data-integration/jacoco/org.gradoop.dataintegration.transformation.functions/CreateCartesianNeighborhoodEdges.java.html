@@ -21,9 +21,9 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 
@@ -38,7 +38,7 @@ import java.util.Objects;
  * @see org.gradoop.dataintegration.transformation.ConnectNeighbors
  */
 @FunctionAnnotation.ReadFields({&quot;f1&quot;})
-public class CreateCartesianNeighborhoodEdges&lt;V extends EPGMVertex, E extends EPGMEdge&gt;
+public class CreateCartesianNeighborhoodEdges&lt;V extends Vertex, E extends Edge&gt;
   implements FlatMapFunction&lt;Tuple2&lt;V, List&lt;NeighborhoodVertex&gt;&gt;, E&gt;, ResultTypeQueryable&lt;E&gt; {
 
   /**
@@ -57,7 +57,7 @@ public class CreateCartesianNeighborhoodEdges&lt;V extends EPGMVertex, E extends
    * @param factory      The factory the edges are created with.
    * @param newEdgeLabel The label of the created edge between the neighbors.
    */
-<span class="fc" id="L60">  public CreateCartesianNeighborhoodEdges(EPGMEdgeFactory&lt;E&gt; factory, String newEdgeLabel) {</span>
+<span class="fc" id="L60">  public CreateCartesianNeighborhoodEdges(EdgeFactory&lt;E&gt; factory, String newEdgeLabel) {</span>
 <span class="fc" id="L61">    this.edgeType = Objects.requireNonNull(factory).getType();</span>
 <span class="fc" id="L62">    this.reuseEdge = factory.createEdge(Objects.requireNonNull(newEdgeLabel),</span>
       GradoopId.NULL_VALUE, GradoopId.NULL_VALUE);

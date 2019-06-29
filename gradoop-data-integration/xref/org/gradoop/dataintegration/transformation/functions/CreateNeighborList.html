@@ -29,8 +29,8 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.dataintegration.transformation.impl.Neighborhood;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 <a name="26" href="#26">26</a>  
@@ -43,7 +43,7 @@
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment"> * This CoGroup operation creates a list of neighbors for each vertex.</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="35" href="#35">35</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../org/gradoop/dataintegration/transformation/functions/CreateNeighborList.html">CreateNeighborList</a>
-<a name="36" href="#36">36</a>    implements CoGroupFunction&lt;Edge, Vertex, Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; {
+<a name="36" href="#36">36</a>    implements CoGroupFunction&lt;EPGMEdge, EPGMVertex, Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; {
 <a name="37" href="#37">37</a>  
 <a name="38" href="#38">38</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   * The edge direction to consider.</em>
@@ -53,7 +53,7 @@
 <a name="43" href="#43">43</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   * Reduce object instantiations.</em>
 <a name="45" href="#45">45</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="46" href="#46">46</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt; reuse;
+<a name="46" href="#46">46</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt; reuse;
 <a name="47" href="#47">47</a>  
 <a name="48" href="#48">48</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   * The constructor for the creation of neighbor lists.</em>
@@ -66,15 +66,15 @@
 <a name="56" href="#56">56</a>    }
 <a name="57" href="#57">57</a>  
 <a name="58" href="#58">58</a>    @Override
-<a name="59" href="#59">59</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> coGroup(Iterable&lt;Edge&gt; edges, Iterable&lt;Vertex&gt; vertex,
-<a name="60" href="#60">60</a>                        Collector&lt;Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; out) {
+<a name="59" href="#59">59</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> coGroup(Iterable&lt;EPGMEdge&gt; edges, Iterable&lt;EPGMVertex&gt; vertex,
+<a name="60" href="#60">60</a>                        Collector&lt;Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; out) {
 <a name="61" href="#61">61</a>      <em class="jxr_comment">// should only contain one or no vertex</em>
-<a name="62" href="#62">62</a>      Iterator&lt;Vertex&gt; vertexIterator = vertex.iterator();
+<a name="62" href="#62">62</a>      Iterator&lt;EPGMVertex&gt; vertexIterator = vertex.iterator();
 <a name="63" href="#63">63</a>      <strong class="jxr_keyword">if</strong> (vertexIterator.hasNext()) {
-<a name="64" href="#64">64</a>        Vertex v = vertexIterator.next();
+<a name="64" href="#64">64</a>        EPGMVertex v = vertexIterator.next();
 <a name="65" href="#65">65</a>  
 <a name="66" href="#66">66</a>        List&lt;NeighborhoodVertex&gt; neighbors = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
-<a name="67" href="#67">67</a>        <strong class="jxr_keyword">for</strong> (Edge e : edges) {
+<a name="67" href="#67">67</a>        <strong class="jxr_keyword">for</strong> (EPGMEdge e : edges) {
 <a name="68" href="#68">68</a>          neighbors.add(<strong class="jxr_keyword">new</strong> <a href="../../../../../org/gradoop/dataintegration/transformation/impl/NeighborhoodVertex.html">NeighborhoodVertex</a>(getNeighborId(v.getId(), e), e.getLabel()));
 <a name="69" href="#69">69</a>        }
 <a name="70" href="#70">70</a>  
@@ -91,7 +91,7 @@
 <a name="81" href="#81">81</a>  <em class="jxr_javadoccomment">   * @param edge     The edge the neighbor id is taken from.</em>
 <a name="82" href="#82">82</a>  <em class="jxr_javadoccomment">   * @return The GradoopId of the neighbor vertex.</em>
 <a name="83" href="#83">83</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="84" href="#84">84</a>    <strong class="jxr_keyword">private</strong> GradoopId getNeighborId(GradoopId vertexId, Edge edge) {
+<a name="84" href="#84">84</a>    <strong class="jxr_keyword">private</strong> GradoopId getNeighborId(GradoopId vertexId, EPGMEdge edge) {
 <a name="85" href="#85">85</a>      <strong class="jxr_keyword">switch</strong> (edgeDirection) {
 <a name="86" href="#86">86</a>      <strong class="jxr_keyword">case</strong> INCOMING:
 <a name="87" href="#87">87</a>        <strong class="jxr_keyword">return</strong> edge.getSourceId();

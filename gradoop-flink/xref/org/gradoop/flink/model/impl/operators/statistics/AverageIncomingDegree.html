@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.statistics;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.count.VertexCount;
@@ -49,7 +49,7 @@
 <a name="39" href="#39">39</a>    @Override
 <a name="40" href="#40">40</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> execute(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph) {
 <a name="41" href="#41">41</a>      graph = graph.aggregate(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/count/VertexCount.html">VertexCount</a>());
-<a name="42" href="#42">42</a>      DataSet&lt;GraphHead&gt; newGraphHead = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/statistics/IncomingVertexDegrees.html">IncomingVertexDegrees</a>().execute(graph)
+<a name="42" href="#42">42</a>      DataSet&lt;EPGMGraphHead&gt; newGraphHead = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/statistics/IncomingVertexDegrees.html">IncomingVertexDegrees</a>().execute(graph)
 <a name="43" href="#43">43</a>        .sum(1)
 <a name="44" href="#44">44</a>        .crossWithTiny(graph.getGraphHead().first(1))
 <a name="45" href="#45">45</a>        .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/statistics/functions/AddSumDegreesToGraphHeadCrossFunction.html">AddSumDegreesToGraphHeadCrossFunction</a>(

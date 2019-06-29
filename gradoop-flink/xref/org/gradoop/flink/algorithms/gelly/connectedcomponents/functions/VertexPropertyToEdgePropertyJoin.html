@@ -26,8 +26,8 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.algorithms.gelly.connectedcomponents.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.JoinFunction;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment">/**</em>
@@ -35,7 +35,7 @@
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * If the edge already has this property, compare the edge value to the vertex value and store the</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * smaller property value.</em>
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/algorithms/gelly/connectedcomponents/functions/VertexPropertyToEdgePropertyJoin.html">VertexPropertyToEdgePropertyJoin</a> implements JoinFunction&lt;Edge, Vertex, Edge&gt; {
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/algorithms/gelly/connectedcomponents/functions/VertexPropertyToEdgePropertyJoin.html">VertexPropertyToEdgePropertyJoin</a> implements JoinFunction&lt;EPGMEdge, EPGMVertex, EPGMEdge&gt; {
 <a name="29" href="#29">29</a>  
 <a name="30" href="#30">30</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   * Property key to store the property.</em>
@@ -52,7 +52,7 @@
 <a name="42" href="#42">42</a>    }
 <a name="43" href="#43">43</a>  
 <a name="44" href="#44">44</a>    @Override
-<a name="45" href="#45">45</a>    <strong class="jxr_keyword">public</strong> Edge join(Edge edge, Vertex vertex) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="45" href="#45">45</a>    <strong class="jxr_keyword">public</strong> EPGMEdge join(EPGMEdge edge, EPGMVertex vertex) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="46" href="#46">46</a>      PropertyValue newEdgeValue = vertex.getPropertyValue(propertyKey);
 <a name="47" href="#47">47</a>      <strong class="jxr_keyword">if</strong> (edge.hasProperty(propertyKey)) {
 <a name="48" href="#48">48</a>        <strong class="jxr_keyword">if</strong> (edge.getPropertyValue(propertyKey).compareTo(newEdgeValue) &lt; 0) {

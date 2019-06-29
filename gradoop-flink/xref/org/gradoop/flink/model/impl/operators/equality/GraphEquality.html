@@ -26,9 +26,9 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.equality;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.BinaryGraphToValueOperator;
@@ -59,22 +59,23 @@
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   * @param edgeToString string representation of edges</em>
 <a name="50" href="#50">50</a>  <em class="jxr_javadoccomment">   * @param directed sets mode for directed or undirected graphs</em>
 <a name="51" href="#51">51</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="52" href="#52">52</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/equality/GraphEquality.html">GraphEquality</a>(GraphHeadToString&lt;GraphHead&gt; graphHeadToString,
-<a name="53" href="#53">53</a>      VertexToString&lt;Vertex&gt; vertexToString, EdgeToString&lt;Edge&gt; edgeToString, <strong class="jxr_keyword">boolean</strong> directed) {
-<a name="54" href="#54">54</a>      <strong class="jxr_keyword">this</strong>.directed = directed;
-<a name="55" href="#55">55</a>  
-<a name="56" href="#56">56</a>      <strong class="jxr_keyword">this</strong>.collectionEquality =
-<a name="57" href="#57">57</a>        <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/equality/CollectionEquality.html">CollectionEquality</a>(graphHeadToString, vertexToString, edgeToString, <strong class="jxr_keyword">this</strong>.directed);
-<a name="58" href="#58">58</a>    }
-<a name="59" href="#59">59</a>  
-<a name="60" href="#60">60</a>    @Override
-<a name="61" href="#61">61</a>    <strong class="jxr_keyword">public</strong> DataSet&lt;Boolean&gt; execute(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> firstGraph, <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> secondGraph) {
-<a name="62" href="#62">62</a>      <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollectionFactory.html">GraphCollectionFactory</a> collectionFactory = firstGraph.getConfig()
-<a name="63" href="#63">63</a>        .getGraphCollectionFactory();
-<a name="64" href="#64">64</a>      <strong class="jxr_keyword">return</strong> collectionEquality
-<a name="65" href="#65">65</a>        .execute(collectionFactory.fromGraph(firstGraph), collectionFactory.fromGraph(secondGraph));
-<a name="66" href="#66">66</a>    }
-<a name="67" href="#67">67</a>  }
+<a name="52" href="#52">52</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/equality/GraphEquality.html">GraphEquality</a>(GraphHeadToString&lt;EPGMGraphHead&gt; graphHeadToString,
+<a name="53" href="#53">53</a>      VertexToString&lt;EPGMVertex&gt; vertexToString, EdgeToString&lt;EPGMEdge&gt; edgeToString,
+<a name="54" href="#54">54</a>      <strong class="jxr_keyword">boolean</strong> directed) {
+<a name="55" href="#55">55</a>      <strong class="jxr_keyword">this</strong>.directed = directed;
+<a name="56" href="#56">56</a>  
+<a name="57" href="#57">57</a>      <strong class="jxr_keyword">this</strong>.collectionEquality =
+<a name="58" href="#58">58</a>        <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/equality/CollectionEquality.html">CollectionEquality</a>(graphHeadToString, vertexToString, edgeToString, <strong class="jxr_keyword">this</strong>.directed);
+<a name="59" href="#59">59</a>    }
+<a name="60" href="#60">60</a>  
+<a name="61" href="#61">61</a>    @Override
+<a name="62" href="#62">62</a>    <strong class="jxr_keyword">public</strong> DataSet&lt;Boolean&gt; execute(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> firstGraph, <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> secondGraph) {
+<a name="63" href="#63">63</a>      <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollectionFactory.html">GraphCollectionFactory</a> collectionFactory = firstGraph.getConfig()
+<a name="64" href="#64">64</a>        .getGraphCollectionFactory();
+<a name="65" href="#65">65</a>      <strong class="jxr_keyword">return</strong> collectionEquality
+<a name="66" href="#66">66</a>        .execute(collectionFactory.fromGraph(firstGraph), collectionFactory.fromGraph(secondGraph));
+<a name="67" href="#67">67</a>    }
+<a name="68" href="#68">68</a>  }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

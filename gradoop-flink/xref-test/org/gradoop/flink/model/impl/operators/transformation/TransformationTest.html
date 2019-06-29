@@ -28,9 +28,9 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Lists;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -59,13 +59,13 @@
 <a name="49" href="#49">49</a>      <span class="jxr_string">"g04:A { a : 1 } [(:A { a : 1, b : 2 })--&gt;(:B { c : 2 })]"</span> +
 <a name="50" href="#50">50</a>      <span class="jxr_string">"g14:B { a : 2 } [(:A { a : 2, b : 2 })--&gt;(:B { c : 3 })]"</span>;
 <a name="51" href="#51">51</a>  
-<a name="52" href="#52">52</a>    <strong class="jxr_keyword">static</strong> GraphHead transformGraphHead(GraphHead current, GraphHead transformed) {
+<a name="52" href="#52">52</a>    <strong class="jxr_keyword">static</strong> EPGMGraphHead transformGraphHead(EPGMGraphHead current, EPGMGraphHead transformed) {
 <a name="53" href="#53">53</a>      transformed.setLabel(current.getLabel());
 <a name="54" href="#54">54</a>      transformed.setProperty(<span class="jxr_string">"a"</span>, current.getPropertyValue(<span class="jxr_string">"a"</span>).getInt() + 1);
 <a name="55" href="#55">55</a>      <strong class="jxr_keyword">return</strong> transformed;
 <a name="56" href="#56">56</a>    }
 <a name="57" href="#57">57</a>  
-<a name="58" href="#58">58</a>    <strong class="jxr_keyword">static</strong> Vertex transformVertex(Vertex current, Vertex transformed) {
+<a name="58" href="#58">58</a>    <strong class="jxr_keyword">static</strong> EPGMVertex transformVertex(EPGMVertex current, EPGMVertex transformed) {
 <a name="59" href="#59">59</a>      transformed.setLabel(current.getLabel());
 <a name="60" href="#60">60</a>      <strong class="jxr_keyword">if</strong> (current.getLabel().equals(<span class="jxr_string">"A"</span>)) {
 <a name="61" href="#61">61</a>        transformed.setProperty(<span class="jxr_string">"a"</span>, current.getPropertyValue(<span class="jxr_string">"a"</span>).getInt() + 1);
@@ -76,7 +76,7 @@
 <a name="66" href="#66">66</a>      <strong class="jxr_keyword">return</strong> transformed;
 <a name="67" href="#67">67</a>    }
 <a name="68" href="#68">68</a>  
-<a name="69" href="#69">69</a>    <strong class="jxr_keyword">static</strong> Edge transformEdge(Edge current, Edge transformed) {
+<a name="69" href="#69">69</a>    <strong class="jxr_keyword">static</strong> EPGMEdge transformEdge(EPGMEdge current, EPGMEdge transformed) {
 <a name="70" href="#70">70</a>      <strong class="jxr_keyword">return</strong> transformed;
 <a name="71" href="#71">71</a>    }
 <a name="72" href="#72">72</a>  

@@ -16,8 +16,8 @@
 package org.gradoop.dataintegration.transformation;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.dataintegration.transformation.functions.AccumulatePropagatedValues;
 import org.gradoop.dataintegration.transformation.functions.BuildIdPropertyValuePairs;
 import org.gradoop.dataintegration.transformation.functions.BuildTargetVertexIdPropertyValuePairs;
@@ -111,12 +111,12 @@ public class PropagatePropertyToNeighbor implements UnaryGraphToGraphOperator {
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     // prepare the edge set, EdgeFilter if propagating edges are given
-<span class="fc" id="L114">    DataSet&lt;Edge&gt; propagateAlong = graph.getEdges();</span>
+<span class="fc" id="L114">    DataSet&lt;EPGMEdge&gt; propagateAlong = graph.getEdges();</span>
 <span class="fc bfc" id="L115" title="All 2 branches covered.">    if (propagatingEdgeLabels != null) {</span>
 <span class="fc" id="L116">      propagateAlong = propagateAlong.filter(new LabelIsIn&lt;&gt;(propagatingEdgeLabels));</span>
     }
 
-<span class="fc" id="L119">    DataSet&lt;Vertex&gt; newVertices = graph.getVertices()</span>
+<span class="fc" id="L119">    DataSet&lt;EPGMVertex&gt; newVertices = graph.getVertices()</span>
       // Extract properties to propagate
 <span class="fc" id="L121">      .flatMap(new BuildIdPropertyValuePairs&lt;&gt;(vertexLabel, propertyKey))</span>
       // Propagate along edges.

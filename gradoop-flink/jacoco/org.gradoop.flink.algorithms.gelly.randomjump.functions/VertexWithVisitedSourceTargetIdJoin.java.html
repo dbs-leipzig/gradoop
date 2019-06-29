@@ -18,14 +18,14 @@ package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Joins an EPGM vertex with the source- resp. target-id of a visited edge. Sets the vertex visited
  * property to {@code true}, if there is a join-partner.
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;id;label;graphIds&quot;)
-public class VertexWithVisitedSourceTargetIdJoin implements JoinFunction&lt;Vertex, GradoopId, Vertex&gt; {
+public class VertexWithVisitedSourceTargetIdJoin implements JoinFunction&lt;EPGMVertex, GradoopId, EPGMVertex&gt; {
 
   /**
    * Key for the boolean property of the edge.
@@ -42,7 +42,7 @@ public class VertexWithVisitedSourceTargetIdJoin implements JoinFunction&lt;Vert
 <span class="fc" id="L42">  }</span>
 
   @Override
-  public Vertex join(Vertex vertex, GradoopId visitedId) throws Exception {
+  public EPGMVertex join(EPGMVertex vertex, GradoopId visitedId) throws Exception {
 <span class="fc bfc" id="L46" title="All 2 branches covered.">    if (visitedId != null) {</span>
 <span class="fc" id="L47">      vertex.setProperty(propertyKey, true);</span>
     }

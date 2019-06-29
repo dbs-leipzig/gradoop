@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -25,7 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @param &lt;E&gt; EPGM element type.
  */
-public class PropertyRemover&lt;E extends Element&gt; implements MapFunction&lt;E, E&gt; {
+public class PropertyRemover&lt;E extends EPGMElement&gt; implements MapFunction&lt;E, E&gt; {
 
   /**
    * Property key to remove.

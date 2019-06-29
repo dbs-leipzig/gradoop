@@ -30,12 +30,12 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple3;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.conf.Configuration;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EdgeFactory;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.DataSource;
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.csv.CSVBase;
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.csv.functions.CSVLineToEdge;
@@ -107,25 +107,25 @@
 <a name="97" href="#97">97</a>        source.readDistributed(getMetaDataPath(), getConfig());
 <a name="98" href="#98">98</a>  
 <a name="99" href="#99">99</a>      ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-<a name="100" href="#100">100</a>     GraphHeadFactory graphHeadFactory = getConfig().getGraphHeadFactory();
-<a name="101" href="#101">101</a>     VertexFactory vertexFactory = getConfig().getVertexFactory();
-<a name="102" href="#102">102</a>     EdgeFactory edgeFactory = getConfig().getEdgeFactory();
+<a name="100" href="#100">100</a>     EPGMGraphHeadFactory graphHeadFactory = getConfig().getGraphHeadFactory();
+<a name="101" href="#101">101</a>     EPGMVertexFactory vertexFactory = getConfig().getVertexFactory();
+<a name="102" href="#102">102</a>     EPGMEdgeFactory edgeFactory = getConfig().getEdgeFactory();
 <a name="103" href="#103">103</a> 
-<a name="104" href="#104">104</a>     Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads = metaData.getGraphLabels().stream()
+<a name="104" href="#104">104</a>     Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads = metaData.getGraphLabels().stream()
 <a name="105" href="#105">105</a>       .map(label -&gt; Tuple2.of(label, env.readTextFile(getGraphHeadCSVPath(label))
 <a name="106" href="#106">106</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/functions/CSVLineToGraphHead.html">CSVLineToGraphHead</a>(graphHeadFactory))
 <a name="107" href="#107">107</a>         .withBroadcastSet(metaDataBroadcast, BC_METADATA)
 <a name="108" href="#108">108</a>         .filter(graphHead -&gt; graphHead.getLabel().equals(label))))
 <a name="109" href="#109">109</a>       .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));
 <a name="110" href="#110">110</a> 
-<a name="111" href="#111">111</a>     Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices = metaData.getVertexLabels().stream()
+<a name="111" href="#111">111</a>     Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices = metaData.getVertexLabels().stream()
 <a name="112" href="#112">112</a>       .map(label -&gt; Tuple2.of(label, env.readTextFile(getVertexCSVPath(label))
 <a name="113" href="#113">113</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/functions/CSVLineToVertex.html">CSVLineToVertex</a>(vertexFactory))
 <a name="114" href="#114">114</a>         .withBroadcastSet(metaDataBroadcast, BC_METADATA)
 <a name="115" href="#115">115</a>         .filter(vertex -&gt; vertex.getLabel().equals(label))))
 <a name="116" href="#116">116</a>       .collect(Collectors.toMap(t -&gt; t.f0, t -&gt; t.f1));
 <a name="117" href="#117">117</a> 
-<a name="118" href="#118">118</a>     Map&lt;String, DataSet&lt;Edge&gt;&gt; edges = metaData.getEdgeLabels().stream()
+<a name="118" href="#118">118</a>     Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges = metaData.getEdgeLabels().stream()
 <a name="119" href="#119">119</a>       .map(label -&gt; Tuple2.of(label, env.readTextFile(getEdgeCSVPath(label))
 <a name="120" href="#120">120</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/csv/functions/CSVLineToEdge.html">CSVLineToEdge</a>(edgeFactory))
 <a name="121" href="#121">121</a>         .withBroadcastSet(metaDataBroadcast, BC_METADATA)

@@ -15,9 +15,10 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.operators.ApplicableUnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
 
@@ -31,9 +32,9 @@ import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
  * @param &lt;GC&gt; the type of the graph collection
  */
 public interface BaseGraphCollectionOperators&lt;
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
   GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; {
 
@@ -50,7 +51,7 @@ public interface BaseGraphCollectionOperators&lt;
    * @return this graph collection with all dangling graph ids removed.
    */
   default GC verifyGraphsContainment() {
-<span class="fc" id="L53">    return callForCollection(new VerifyGraphsContainment&lt;&gt;());</span>
+<span class="fc" id="L54">    return callForCollection(new VerifyGraphsContainment&lt;&gt;());</span>
   }
 
   //----------------------------------------------------------------------------
@@ -64,5 +65,16 @@ public interface BaseGraphCollectionOperators&lt;
    * @return result of given operator
    */
   GC callForCollection(UnaryBaseGraphCollectionToBaseGraphCollectionOperator&lt;GC&gt; operator);
+
+  /**
+   * Applies a given unary graph to graph operator (e.g., aggregate) on each
+   * base graph in the graph collection.
+   *
+   * @param operator applicable unary graph to graph operator
+   * @return collection with resulting logical graphs
+   */
+  default GC apply(ApplicableUnaryBaseGraphToBaseGraphOperator&lt;GC&gt; operator) {
+<span class="fc" id="L77">    return callForCollection(operator);</span>
+  }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

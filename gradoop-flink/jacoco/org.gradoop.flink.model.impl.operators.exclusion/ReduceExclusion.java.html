@@ -17,8 +17,8 @@ package org.gradoop.flink.model.impl.operators.exclusion;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
@@ -58,12 +58,12 @@ public class ReduceExclusion implements ReducibleBinaryGraphToGraphOperator {
 <span class="fc" id="L58">      .filter(new ByDifferentId&lt;&gt;(startId))</span>
 <span class="fc" id="L59">      .map(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L61">    DataSet&lt;Vertex&gt; vertices = collection.getVertices()</span>
+<span class="fc" id="L61">    DataSet&lt;EPGMVertex&gt; vertices = collection.getVertices()</span>
 <span class="fc" id="L62">      .filter(new InGraph&lt;&gt;(startId))</span>
 <span class="fc" id="L63">      .filter(new NotInGraphsBroadcast&lt;&gt;())</span>
 <span class="fc" id="L64">      .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);</span>
 
-<span class="fc" id="L66">    DataSet&lt;Edge&gt; edges = collection.getEdges()</span>
+<span class="fc" id="L66">    DataSet&lt;EPGMEdge&gt; edges = collection.getEdges()</span>
 <span class="fc" id="L67">      .filter(new InGraph&lt;&gt;(startId))</span>
 <span class="fc" id="L68">      .filter(new NotInGraphsBroadcast&lt;&gt;())</span>
 <span class="fc" id="L69">      .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);</span>

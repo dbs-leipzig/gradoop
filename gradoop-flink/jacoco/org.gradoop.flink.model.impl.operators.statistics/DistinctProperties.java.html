@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToValueOperator;
@@ -33,7 +33,7 @@ import java.util.Set;
  * @param &lt;T&gt; element type
  * @param &lt;K&gt; grouping key
  */
-<span class="fc" id="L36">public abstract class DistinctProperties&lt;T extends GraphElement, K&gt;</span>
+<span class="fc" id="L36">public abstract class DistinctProperties&lt;T extends EPGMGraphElement, K&gt;</span>
   implements UnaryGraphToValueOperator&lt;DataSet&lt;WithCount&lt;K&gt;&gt;&gt; {
 
 

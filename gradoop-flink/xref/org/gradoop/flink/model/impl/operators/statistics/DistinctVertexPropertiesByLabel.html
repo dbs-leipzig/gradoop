@@ -27,7 +27,7 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.statistics.functions.ExtractPropertyValuesByLabel;
@@ -38,7 +38,7 @@
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * Computes the number of distinct vertex property values for label - property name pairs</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/statistics/DistinctVertexPropertiesByLabel.html">DistinctVertexPropertiesByLabel</a>
-<a name="31" href="#31">31</a>    <strong class="jxr_keyword">extends</strong> DistinctProperties&lt;Vertex, Tuple2&lt;String, String&gt;&gt; {
+<a name="31" href="#31">31</a>    <strong class="jxr_keyword">extends</strong> DistinctProperties&lt;EPGMVertex, Tuple2&lt;String, String&gt;&gt; {
 <a name="32" href="#32">32</a>  
 <a name="33" href="#33">33</a>    @Override
 <a name="34" href="#34">34</a>    <strong class="jxr_keyword">protected</strong> DataSet&lt;Tuple2&lt;Tuple2&lt;String, String&gt;, Set&lt;PropertyValue&gt;&gt;&gt; extractValuePairs(

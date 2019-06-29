@@ -17,8 +17,8 @@ package org.gradoop.flink.algorithms.fsm.transactional.tle.functions;
 
 import com.google.common.collect.Maps;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.fsm.transactional.tle.pojos.FSMEdge;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -44,7 +44,7 @@ import java.util.Map;
 <span class="fc" id="L44">      Maps.newHashMapWithExpectedSize(graph.getVertices().size());</span>
 
 <span class="fc" id="L46">    int vertexId = 0;</span>
-<span class="fc bfc" id="L47" title="All 2 branches covered.">    for (Vertex vertex : graph.getVertices()) {</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">    for (EPGMVertex vertex : graph.getVertices()) {</span>
 <span class="fc" id="L48">      vertexIdMap.put(vertex.getId(), vertexId);</span>
 <span class="fc" id="L49">      fsmVertices.put(vertexId, vertex.getLabel());</span>
 <span class="fc" id="L50">      vertexId++;</span>
@@ -65,7 +65,7 @@ import java.util.Map;
 <span class="fc" id="L65">      Maps.newHashMapWithExpectedSize(graph.getEdges().size());</span>
 
 <span class="fc" id="L67">    int edgeId = 0;</span>
-<span class="fc bfc" id="L68" title="All 2 branches covered.">    for (Edge edge : graph.getEdges()) {</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    for (EPGMEdge edge : graph.getEdges()) {</span>
 
 <span class="fc" id="L70">      int sourceId = vertexIdMap.get(edge.getSourceId());</span>
 <span class="fc" id="L71">      int targetId = vertexIdMap.get(edge.getTargetId());</span>

@@ -17,9 +17,9 @@ package org.gradoop.flink.io.impl.gdl.functions;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.impl.gdl.GDLEncoder;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -34,9 +34,9 @@ import java.util.List;
   @Override
   public void reduce(Iterable&lt;GraphTransaction&gt; graphTransactions, Collector&lt;String&gt; out)
     throws Exception {
-<span class="fc" id="L37">    List&lt;GraphHead&gt; graphHeads = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L38">    List&lt;Vertex&gt; vertices = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L39">    List&lt;Edge&gt; edges = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L37">    List&lt;EPGMGraphHead&gt; graphHeads = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L38">    List&lt;EPGMVertex&gt; vertices = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L39">    List&lt;EPGMEdge&gt; edges = new ArrayList&lt;&gt;();</span>
 
 <span class="fc bfc" id="L41" title="All 2 branches covered.">    for (GraphTransaction gt : graphTransactions) {</span>
 <span class="fc" id="L42">      graphHeads.add(gt.getGraphHead());</span>

@@ -28,17 +28,17 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> java.util.Collections;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> java.util.List;
 <a name="27" href="#27">27</a>  
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * Creates a new {@link Vertex} containing the given attribute {@link PropertyValue} and its origin.</em>
+<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * Creates a new {@link EPGMVertex} containing the given attribute {@link PropertyValue} and its origin.</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../org/gradoop/dataintegration/transformation/impl/functions/CreateNewVertex.html">CreateNewVertex</a> implements MapFunction&lt;Tuple2&lt;PropertyValue, GradoopId&gt;, Tuple2&lt;Vertex, List&lt;GradoopId&gt;&gt;&gt; {
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../org/gradoop/dataintegration/transformation/impl/functions/CreateNewVertex.html">CreateNewVertex</a> implements MapFunction&lt;Tuple2&lt;PropertyValue, GradoopId&gt;, Tuple2&lt;EPGMVertex, List&lt;GradoopId&gt;&gt;&gt; {
 <a name="32" href="#32">32</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   * The new vertex label.</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   */</em>
@@ -52,12 +52,12 @@
 <a name="42" href="#42">42</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="43" href="#43">43</a>  <em class="jxr_javadoccomment">   * The Factory the vertices are created with.</em>
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="45" href="#45">45</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> VertexFactory vertexFactory;
+<a name="45" href="#45">45</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> EPGMVertexFactory vertexFactory;
 <a name="46" href="#46">46</a>  
 <a name="47" href="#47">47</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * Reduce object instantiation.</em>
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="50" href="#50">50</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Tuple2&lt;Vertex, List&lt;GradoopId&gt;&gt; reuseTuple;
+<a name="50" href="#50">50</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Tuple2&lt;EPGMVertex, List&lt;GradoopId&gt;&gt; reuseTuple;
 <a name="51" href="#51">51</a>  
 <a name="52" href="#52">52</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   * The constructor for creating new vertices with their origin Ids.</em>
@@ -66,7 +66,7 @@
 <a name="56" href="#56">56</a>  <em class="jxr_javadoccomment">   * @param newVertexLabel  The new vertex Label.</em>
 <a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   * @param newPropertyName The new property key.</em>
 <a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="59" href="#59">59</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/dataintegration/transformation/impl/functions/CreateNewVertex.html">CreateNewVertex</a>(VertexFactory factory, String newVertexLabel, String newPropertyName) {
+<a name="59" href="#59">59</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/dataintegration/transformation/impl/functions/CreateNewVertex.html">CreateNewVertex</a>(EPGMVertexFactory factory, String newVertexLabel, String newPropertyName) {
 <a name="60" href="#60">60</a>      <strong class="jxr_keyword">this</strong>.vertexFactory = factory;
 <a name="61" href="#61">61</a>      <strong class="jxr_keyword">this</strong>.newVertexLabel = newVertexLabel;
 <a name="62" href="#62">62</a>      <strong class="jxr_keyword">this</strong>.newPropertyName = newPropertyName;
@@ -75,8 +75,8 @@
 <a name="65" href="#65">65</a>    }
 <a name="66" href="#66">66</a>  
 <a name="67" href="#67">67</a>    @Override
-<a name="68" href="#68">68</a>    <strong class="jxr_keyword">public</strong> Tuple2&lt;Vertex, List&lt;GradoopId&gt;&gt; map(Tuple2&lt;PropertyValue, GradoopId&gt; tuple) {
-<a name="69" href="#69">69</a>      Vertex vertex = vertexFactory.createVertex(newVertexLabel);
+<a name="68" href="#68">68</a>    <strong class="jxr_keyword">public</strong> Tuple2&lt;EPGMVertex, List&lt;GradoopId&gt;&gt; map(Tuple2&lt;PropertyValue, GradoopId&gt; tuple) {
+<a name="69" href="#69">69</a>      EPGMVertex vertex = vertexFactory.createVertex(newVertexLabel);
 <a name="70" href="#70">70</a>      vertex.setProperty(newPropertyName, tuple.f0);
 <a name="71" href="#71">71</a>  
 <a name="72" href="#72">72</a>      reuseTuple.f0 = vertex;

@@ -17,9 +17,9 @@ package org.gradoop.storage.config;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hbase.TableName;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.storage.common.config.GradoopStoreConfig;
 import org.gradoop.storage.impl.hbase.api.EdgeHandler;
 import org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
@@ -50,12 +50,12 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
   private final String graphTableName;
 
   /**
-   * EPGMVertex table name.
+   * Vertex table name.
    */
   private final String vertexTableName;
 
   /**
-   * EPGMEdge table name.
+   * Edge table name.
    */
   private final String edgeTableName;
 
@@ -65,12 +65,12 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
   private final GraphHeadHandler graphHeadHandler;
 
   /**
-   * EPGMVertex handler.
+   * Vertex handler.
    */
   private final VertexHandler vertexHandler;
 
   /**
-   * EPGMEdge handler.
+   * Edge handler.
    */
   private final EdgeHandler edgeHandler;
 
@@ -95,9 +95,9 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
 <span class="pc bpc" id="L95" title="1 of 2 branches missed.">    checkArgument(!StringUtils.isEmpty(graphTableName),</span>
       &quot;Graph table name was null or empty&quot;);
 <span class="pc bpc" id="L97" title="1 of 2 branches missed.">    checkArgument(!StringUtils.isEmpty(vertexTableName),</span>
-      &quot;EPGMVertex table name was null or empty&quot;);
+      &quot;Vertex table name was null or empty&quot;);
 <span class="pc bpc" id="L99" title="1 of 2 branches missed.">    checkArgument(!StringUtils.isEmpty(edgeTableName),</span>
-      &quot;EPGMEdge table name was null or empty&quot;);
+      &quot;Edge table name was null or empty&quot;);
 
 <span class="fc" id="L102">    this.graphTableName = graphTableName;</span>
 <span class="fc" id="L103">    this.vertexTableName = vertexTableName;</span>
@@ -137,9 +137,9 @@ public class GradoopHBaseConfig implements GradoopStoreConfig {
    * @return Default Gradoop HBase configuration.
    */
   public static GradoopHBaseConfig getDefaultConfig() {
-<span class="fc" id="L140">    GraphHeadHandler graphHeadHandler = new HBaseGraphHeadHandler(new GraphHeadFactory());</span>
-<span class="fc" id="L141">    VertexHandler vertexHandler = new HBaseVertexHandler(new VertexFactory());</span>
-<span class="fc" id="L142">    EdgeHandler edgeHandler = new HBaseEdgeHandler(new EdgeFactory());</span>
+<span class="fc" id="L140">    GraphHeadHandler graphHeadHandler = new HBaseGraphHeadHandler(new EPGMGraphHeadFactory());</span>
+<span class="fc" id="L141">    VertexHandler vertexHandler = new HBaseVertexHandler(new EPGMVertexFactory());</span>
+<span class="fc" id="L142">    EdgeHandler edgeHandler = new HBaseEdgeHandler(new EPGMEdgeFactory());</span>
 
 <span class="fc" id="L144">    return new GradoopHBaseConfig(</span>
       graphHeadHandler,

@@ -28,9 +28,9 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Sets;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.ExecutionEnvironment;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.GradoopTestUtils;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.GradoopFlinkConfig;
@@ -53,15 +53,15 @@
 <a name="43" href="#43">43</a>      ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 <a name="44" href="#44">44</a>      GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(env);
 <a name="45" href="#45">45</a>  
-<a name="46" href="#46">46</a>      GraphHead g0 = config.getGraphHeadFactory().createGraphHead(<span class="jxr_string">"A"</span>);
-<a name="47" href="#47">47</a>      GraphHead g1 = config.getGraphHeadFactory().createGraphHead(<span class="jxr_string">"B"</span>);
+<a name="46" href="#46">46</a>      EPGMGraphHead g0 = config.getGraphHeadFactory().createGraphHead(<span class="jxr_string">"A"</span>);
+<a name="47" href="#47">47</a>      EPGMGraphHead g1 = config.getGraphHeadFactory().createGraphHead(<span class="jxr_string">"B"</span>);
 <a name="48" href="#48">48</a>  
-<a name="49" href="#49">49</a>      Vertex v0 = config.getVertexFactory().createVertex(<span class="jxr_string">"A"</span>);
-<a name="50" href="#50">50</a>      Vertex v1 = config.getVertexFactory().createVertex(<span class="jxr_string">"B"</span>);
-<a name="51" href="#51">51</a>      Vertex v2 = config.getVertexFactory().createVertex(<span class="jxr_string">"C"</span>);
+<a name="49" href="#49">49</a>      EPGMVertex v0 = config.getVertexFactory().createVertex(<span class="jxr_string">"A"</span>);
+<a name="50" href="#50">50</a>      EPGMVertex v1 = config.getVertexFactory().createVertex(<span class="jxr_string">"B"</span>);
+<a name="51" href="#51">51</a>      EPGMVertex v2 = config.getVertexFactory().createVertex(<span class="jxr_string">"C"</span>);
 <a name="52" href="#52">52</a>  
-<a name="53" href="#53">53</a>      Edge e0 = config.getEdgeFactory().createEdge(<span class="jxr_string">"a"</span>, v0.getId(), v1.getId());
-<a name="54" href="#54">54</a>      Edge e1 = config.getEdgeFactory().createEdge(<span class="jxr_string">"b"</span>, v1.getId(), v2.getId());
+<a name="53" href="#53">53</a>      EPGMEdge e0 = config.getEdgeFactory().createEdge(<span class="jxr_string">"a"</span>, v0.getId(), v1.getId());
+<a name="54" href="#54">54</a>      EPGMEdge e1 = config.getEdgeFactory().createEdge(<span class="jxr_string">"b"</span>, v1.getId(), v2.getId());
 <a name="55" href="#55">55</a>  
 <a name="56" href="#56">56</a>      v0.addGraphId(g0.getId());
 <a name="57" href="#57">57</a>      v1.addGraphId(g0.getId());
@@ -98,7 +98,7 @@
 <a name="88" href="#88">88</a>      TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
 <a name="89" href="#89">89</a>        getExecutionEnvironment().fromElements(tx0, tx1));
 <a name="90" href="#90">90</a>  
-<a name="91" href="#91">91</a>      GradoopTestUtils.validateEPGMElementCollections(
+<a name="91" href="#91">91</a>      GradoopTestUtils.validateElementCollections(
 <a name="92" href="#92">92</a>        Sets.newHashSet(tx0.getGraphHead(), tx1.getGraphHead()),
 <a name="93" href="#93">93</a>        layout.getGraphHeads().collect());
 <a name="94" href="#94">94</a>    }
@@ -108,7 +108,7 @@
 <a name="98" href="#98">98</a>      TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
 <a name="99" href="#99">99</a>        getExecutionEnvironment().fromElements(tx0, tx1));
 <a name="100" href="#100">100</a> 
-<a name="101" href="#101">101</a>     GradoopTestUtils.validateEPGMElementCollections(
+<a name="101" href="#101">101</a>     GradoopTestUtils.validateElementCollections(
 <a name="102" href="#102">102</a>       Sets.newHashSet(tx0.getGraphHead()),
 <a name="103" href="#103">103</a>       layout.getGraphHeadsByLabel(<span class="jxr_string">"A"</span>).collect());
 <a name="104" href="#104">104</a>   }
@@ -118,10 +118,10 @@
 <a name="108" href="#108">108</a>     TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
 <a name="109" href="#109">109</a>       getExecutionEnvironment().fromElements(tx0, tx1));
 <a name="110" href="#110">110</a> 
-<a name="111" href="#111">111</a>     Set&lt;Vertex&gt; expected = Sets.newHashSet(tx0.getVertices());
+<a name="111" href="#111">111</a>     Set&lt;EPGMVertex&gt; expected = Sets.newHashSet(tx0.getVertices());
 <a name="112" href="#112">112</a>     expected.addAll(tx1.getVertices());
 <a name="113" href="#113">113</a> 
-<a name="114" href="#114">114</a>     GradoopTestUtils.validateEPGMGraphElementCollections(expected, layout.getVertices().collect());
+<a name="114" href="#114">114</a>     GradoopTestUtils.validateGraphElementCollections(expected, layout.getVertices().collect());
 <a name="115" href="#115">115</a>   }
 <a name="116" href="#116">116</a> 
 <a name="117" href="#117">117</a>   @Test
@@ -130,7 +130,7 @@
 <a name="120" href="#120">120</a>       getExecutionEnvironment().fromElements(tx0, tx1));
 <a name="121" href="#121">121</a> 
 <a name="122" href="#122">122</a> 
-<a name="123" href="#123">123</a>     GradoopTestUtils.validateEPGMGraphElementCollections(
+<a name="123" href="#123">123</a>     GradoopTestUtils.validateGraphElementCollections(
 <a name="124" href="#124">124</a>       tx0.getVertices().stream().filter(v -&gt; v.getLabel().equals(<span class="jxr_string">"A"</span>)).collect(Collectors.toList()),
 <a name="125" href="#125">125</a>       layout.getVerticesByLabel(<span class="jxr_string">"A"</span>).collect());
 <a name="126" href="#126">126</a>   }
@@ -140,10 +140,10 @@
 <a name="130" href="#130">130</a>     TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
 <a name="131" href="#131">131</a>       getExecutionEnvironment().fromElements(tx0, tx1));
 <a name="132" href="#132">132</a> 
-<a name="133" href="#133">133</a>     Set&lt;Edge&gt; expected = Sets.newHashSet(tx0.getEdges());
+<a name="133" href="#133">133</a>     Set&lt;EPGMEdge&gt; expected = Sets.newHashSet(tx0.getEdges());
 <a name="134" href="#134">134</a>     expected.addAll(tx1.getEdges());
 <a name="135" href="#135">135</a> 
-<a name="136" href="#136">136</a>     GradoopTestUtils.validateEPGMGraphElementCollections(expected, layout.getEdges().collect());
+<a name="136" href="#136">136</a>     GradoopTestUtils.validateGraphElementCollections(expected, layout.getEdges().collect());
 <a name="137" href="#137">137</a>   }
 <a name="138" href="#138">138</a> 
 <a name="139" href="#139">139</a>   @Test
@@ -151,7 +151,7 @@
 <a name="141" href="#141">141</a>     TxCollectionLayout layout = <strong class="jxr_keyword">new</strong> TxCollectionLayout(
 <a name="142" href="#142">142</a>       getExecutionEnvironment().fromElements(tx0, tx1));
 <a name="143" href="#143">143</a> 
-<a name="144" href="#144">144</a>     GradoopTestUtils.validateEPGMGraphElementCollections(
+<a name="144" href="#144">144</a>     GradoopTestUtils.validateGraphElementCollections(
 <a name="145" href="#145">145</a>       tx0.getEdges().stream().filter(e -&gt; e.getLabel().equals(<span class="jxr_string">"a"</span>)).collect(Collectors.toList()),
 <a name="146" href="#146">146</a>       layout.getEdgesByLabel(<span class="jxr_string">"a"</span>).collect());
 <a name="147" href="#147">147</a>   }

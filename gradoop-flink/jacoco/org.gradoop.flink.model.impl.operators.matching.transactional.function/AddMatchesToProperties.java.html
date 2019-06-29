@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 
 import java.util.Iterator;
 
@@ -27,7 +27,7 @@ import java.util.Iterator;
  * Adds a property to a graph that states if the graph contained the embedding.
  */
 public class AddMatchesToProperties
-  implements CoGroupFunction&lt;GraphHead, Tuple2&lt;GradoopId, Boolean&gt;, GraphHead&gt; {
+  implements CoGroupFunction&lt;EPGMGraphHead, Tuple2&lt;GradoopId, Boolean&gt;, EPGMGraphHead&gt; {
 
   /**
    * default property key
@@ -55,10 +55,10 @@ public class AddMatchesToProperties
 <span class="nc" id="L55">  }</span>
 
   @Override
-  public void coGroup(Iterable&lt;GraphHead&gt; heads,
+  public void coGroup(Iterable&lt;EPGMGraphHead&gt; heads,
     Iterable&lt;Tuple2&lt;GradoopId, Boolean&gt;&gt; matches,
-    Collector&lt;GraphHead&gt; collector) {
-<span class="nc" id="L61">    GraphHead graphHead = heads.iterator().next();</span>
+    Collector&lt;EPGMGraphHead&gt; collector) {
+<span class="nc" id="L61">    EPGMGraphHead graphHead = heads.iterator().next();</span>
 <span class="nc" id="L62">    Iterator&lt;Tuple2&lt;GradoopId, Boolean&gt;&gt; it = matches.iterator();</span>
 <span class="nc bnc" id="L63" title="All 2 branches missed.">    if (!it.hasNext()) {</span>
 <span class="nc" id="L64">      graphHead.setProperty(propertyKey, false);</span>

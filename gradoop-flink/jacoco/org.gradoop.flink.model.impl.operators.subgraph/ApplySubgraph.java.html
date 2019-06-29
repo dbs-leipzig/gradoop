@@ -17,49 +17,47 @@ package org.gradoop.flink.model.impl.operators.subgraph;
 
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple4;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.ApplicableUnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
-import org.gradoop.flink.model.impl.functions.epgm.InitGraphHead;
-import org.gradoop.flink.model.impl.functions.epgm.PairElementWithNewId;
-import org.gradoop.flink.model.impl.functions.tuple.Project2To1;
-import org.gradoop.flink.model.impl.functions.tuple.Value0Of4;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElementsCoGroup;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgesWithNewGraphsTuple;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.ElementIdGraphIdTuple;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.FilterEdgeGraphs;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.IdSourceTargetGraphTuple;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinTuplesWithNewGraphs;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinWithSourceGraphIdSet;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.JoinWithTargetGraphIdSet;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeEdgeGraphs;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.MergeTupleGraphs;
-import org.gradoop.flink.model.impl.operators.subgraph.functions.SourceTargetIdGraphsTuple;
+import org.gradoop.flink.model.impl.functions.epgm.SourceId;
+import org.gradoop.flink.model.impl.functions.epgm.TargetId;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgeToSourceAndTargetIdWithGraphIds;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.LeftSideWithRightGraphs;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.RightSideWithLeftGraphs;
+import org.gradoop.flink.model.impl.operators.subgraph.functions.RightSideWithLeftGraphs2To1;
+import org.gradoop.flink.model.impl.operators.verify.Verify;
 
 /**
- * Takes a collection of logical graphs and a user defined aggregate function as
- * input. The aggregate function is applied on each logical graph contained in
- * the collection and the aggregate is stored as an additional property at the
- * graphs.
+ * Extracts a subgraph from each base graph in a graph collection using
+ * the given filter functions. The graph head stays unchanged for the subgraph.
+ * &lt;p/&gt;
+ * The operator is able to:
+ * &lt;ol&gt;
+ * &lt;li&gt;extract vertex-induced subgraph&lt;/li&gt;
+ * &lt;li&gt;extract edge-induced subgraph via join + union strategy&lt;/li&gt;
+ * &lt;li&gt;extract edge-induced subgraph via project + union + join strategy&lt;/li&gt;
+ * &lt;li&gt;extract subgraph based on vertex and edge filter function without verification
+ * (no joins, use {@link Verify} to verify the subgraph)&lt;/li&gt;
+ * &lt;/ol&gt;
+ *
+ * @param &lt;G&gt; type of the graph head
+ * @param &lt;V&gt; the vertex type
+ * @param &lt;E&gt; the edge type
+ * @param &lt;LG&gt; type of the logical graph instance
+ * @param &lt;GC&gt; type of the graph collection
  */
-public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
-  /**
-   * Used to filter vertices from the logical graph.
-   */
-  private final FilterFunction&lt;Vertex&gt; vertexFilterFunction;
-  /**
-   * Used to filter edges from the logical graph.
-   */
-  private final FilterFunction&lt;Edge&gt; edgeFilterFunction;
+public class ApplySubgraph&lt;
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
+  GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt; extends Subgraph&lt;G, V, E, LG, GC&gt;
+  implements ApplicableUnaryBaseGraphToBaseGraphOperator&lt;GC&gt; {
 
   /**
    * Creates a new sub graph operator instance.
@@ -75,200 +73,104 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
    *
    * @param vertexFilterFunction vertex filter function
    * @param edgeFilterFunction   edge filter function
+   * @param strategy             sets the execution strategy for the operator
    */
-  public ApplySubgraph(FilterFunction&lt;Vertex&gt; vertexFilterFunction,
-<span class="fc" id="L80">    FilterFunction&lt;Edge&gt; edgeFilterFunction) {</span>
-<span class="pc bpc" id="L81" title="1 of 4 branches missed.">    if (vertexFilterFunction == null &amp;&amp; edgeFilterFunction == null) {</span>
-<span class="nc" id="L82">      throw new IllegalArgumentException(&quot;No filter functions was given.&quot;);</span>
-    }
-<span class="fc" id="L84">    this.vertexFilterFunction = vertexFilterFunction;</span>
-<span class="fc" id="L85">    this.edgeFilterFunction = edgeFilterFunction;</span>
-<span class="fc" id="L86">  }</span>
+  public ApplySubgraph(FilterFunction&lt;V&gt; vertexFilterFunction,
+    FilterFunction&lt;E&gt; edgeFilterFunction, Strategy strategy) {
+<span class="fc" id="L80">    super(vertexFilterFunction, edgeFilterFunction, strategy);</span>
+<span class="fc" id="L81">  }</span>
 
   @Override
-  public GraphCollection executeForGVELayout(GraphCollection collection) {
-<span class="fc bfc" id="L90" title="All 4 branches covered.">    return vertexFilterFunction != null &amp;&amp; edgeFilterFunction != null ?</span>
-<span class="fc bfc" id="L91" title="All 2 branches covered.">      subgraph(collection) :</span>
-<span class="fc" id="L92">      vertexFilterFunction != null ? vertexInducedSubgraph(collection) :</span>
-<span class="fc" id="L93">        edgeInducedSubgraph(collection);</span>
+  public GC executeForGVELayout(GC collection) {
+
+    GC result;
+<span class="pc bpc" id="L87" title="1 of 5 branches missed.">    switch (strategy) {</span>
+    case BOTH:
+<span class="fc" id="L89">      result = subgraph(collection);</span>
+<span class="fc" id="L90">      break;</span>
+    case VERTEX_INDUCED:
+<span class="fc" id="L92">      result = vertexInducedSubgraph(collection);</span>
+<span class="fc" id="L93">      break;</span>
+    case EDGE_INDUCED:
+<span class="fc" id="L95">      result = edgeInducedSubgraph(collection);</span>
+<span class="fc" id="L96">      break;</span>
+    case EDGE_INDUCED_PROJECT_FIRST:
+<span class="fc" id="L98">      result = edgeInducedSubgraphProjectFirst(collection);</span>
+<span class="fc" id="L99">      break;</span>
+    default:
+<span class="nc" id="L101">      throw new IllegalArgumentException(&quot;Strategy &quot; + strategy + &quot; is not supported&quot;);</span>
+    }
+
+<span class="fc" id="L104">    return result;</span>
   }
 
   @Override
-  public GraphCollection executeForTxLayout(GraphCollection collection) {
-<span class="nc" id="L98">    return executeForGVELayout(collection);</span>
+  public GC executeForTxLayout(GC collection) {
+<span class="nc" id="L109">    return executeForGVELayout(collection);</span>
   }
 
   /**
    * Returns one subgraph for each of the given super graphs.
-   * The subgraphs are defined by the vertices that fulfil the vertex filter
-   * function.
+   * The subgraphs are defined by the vertices that fulfil the vertex filter function.
    *
    * @param collection collection of supergraphs
    * @return collection of vertex-induced subgraphs
    */
-  private GraphCollection vertexInducedSubgraph(
-    GraphCollection collection) {
-    //--------------------------------------------------------------------------
-    // compute a dictionary that maps the old graph ids to new ones
-    //--------------------------------------------------------------------------
+  private GC vertexInducedSubgraph(GC collection) {
+<span class="fc" id="L120">    DataSet&lt;V&gt; filteredVertices = collection.getVertices().filter(vertexFilterFunction);</span>
+<span class="fc" id="L121">    DataSet&lt;E&gt; inducedEdges = collection.getEdges()</span>
+<span class="fc" id="L122">      .join(filteredVertices)</span>
+<span class="fc" id="L123">      .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L124">      .with(new LeftSideWithRightGraphs&lt;&gt;())</span>
+<span class="fc" id="L125">      .join(filteredVertices)</span>
+<span class="fc" id="L126">      .where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L127">      .with(new LeftSideWithRightGraphs&lt;&gt;());</span>
 
-<span class="fc" id="L115">    DataSet&lt;Tuple2&lt;GradoopId, GradoopId&gt;&gt; graphIdDictionary = collection</span>
-<span class="fc" id="L116">      .getGraphHeads()</span>
-<span class="fc" id="L117">      .map(new Id&lt;&gt;())</span>
-<span class="fc" id="L118">      .map(new PairElementWithNewId&lt;&gt;());</span>
-
-    //--------------------------------------------------------------------------
-    // compute new graphs
-    //--------------------------------------------------------------------------
-
-<span class="fc" id="L124">    EPGMGraphHeadFactory&lt;GraphHead&gt; graphFactory = collection.getFactory().getGraphHeadFactory();</span>
-
-<span class="fc" id="L126">    DataSet&lt;GraphHead&gt; newGraphHeads = graphIdDictionary</span>
-<span class="fc" id="L127">      .map(new Project2To1&lt;&gt;())</span>
-<span class="fc" id="L128">      .map(new InitGraphHead(graphFactory));</span>
-
-    //--------------------------------------------------------------------------
-    // compute pairs of a vertex id and the set of new graphs this vertex is
-    // contained in
-    // filter function is applied first to improve performance
-    //--------------------------------------------------------------------------
-
-<span class="fc" id="L136">    DataSet&lt;Tuple2&lt;GradoopId, GradoopIdSet&gt;&gt; vertexIdsWithNewGraphs =</span>
-<span class="fc" id="L137">      collection.getVertices()</span>
-<span class="fc" id="L138">        .filter(vertexFilterFunction)</span>
-<span class="fc" id="L139">        .flatMap(new ElementIdGraphIdTuple&lt;&gt;())</span>
-<span class="fc" id="L140">        .join(graphIdDictionary)</span>
-<span class="fc" id="L141">        .where(1)</span>
-<span class="fc" id="L142">        .equalTo(0)</span>
-<span class="fc" id="L143">        .with(new JoinTuplesWithNewGraphs())</span>
-<span class="fc" id="L144">        .groupBy(0)</span>
-<span class="fc" id="L145">        .reduceGroup(new MergeTupleGraphs());</span>
-
-    //--------------------------------------------------------------------------
-    // compute new vertices
-    //--------------------------------------------------------------------------
-
-<span class="fc" id="L151">    DataSet&lt;Vertex&gt; newVertices = vertexIdsWithNewGraphs</span>
-<span class="fc" id="L152">        .join(collection.getVertices())</span>
-<span class="fc" id="L153">        .where(0)</span>
-<span class="fc" id="L154">        .equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L155">        .with(new AddGraphsToElements&lt;&gt;());</span>
-
-    //--------------------------------------------------------------------------
-    // build tuples4 for each edge, containing
-    // edge id, source id, target id, set of new graph ids
-    //--------------------------------------------------------------------------
-
-<span class="fc" id="L162">    DataSet&lt;Tuple4&lt;GradoopId, GradoopId, GradoopId, GradoopIdSet&gt;&gt; edgeTuple =</span>
-<span class="fc" id="L163">      collection.getEdges()</span>
-<span class="fc" id="L164">        .flatMap(new IdSourceTargetGraphTuple&lt;&gt;())</span>
-<span class="fc" id="L165">        .join(graphIdDictionary)</span>
-<span class="fc" id="L166">        .where(3).equalTo(0)</span>
-<span class="fc" id="L167">        .with(new EdgesWithNewGraphsTuple())</span>
-<span class="fc" id="L168">        .groupBy(new Value0Of4&lt;&gt;())</span>
-<span class="fc" id="L169">        .reduceGroup(new MergeEdgeGraphs());</span>
-
-    //--------------------------------------------------------------------------
-    // join the tuple4 with vertex tuples, keeping the graph sets
-    // apply a &quot;filter&quot; by using a flat map function to check for each edge
-    // if a graph exists that this edge, its source and its target are contained
-    // in
-    // the result tuple consists of
-    // edge id, new edge graphs
-    //--------------------------------------------------------------------------
-
-<span class="fc" id="L180">    DataSet&lt;Tuple2&lt;GradoopId, GradoopIdSet&gt;&gt; edgeIdsWithNewGraphs =</span>
-      edgeTuple
-<span class="fc" id="L182">        .join(vertexIdsWithNewGraphs)</span>
-<span class="fc" id="L183">        .where(1).equalTo(0)</span>
-<span class="fc" id="L184">        .with(new JoinWithSourceGraphIdSet())</span>
-<span class="fc" id="L185">        .join(vertexIdsWithNewGraphs)</span>
-<span class="fc" id="L186">        .where(2).equalTo(0)</span>
-<span class="fc" id="L187">        .with(new JoinWithTargetGraphIdSet())</span>
-<span class="fc" id="L188">        .flatMap(new FilterEdgeGraphs());</span>
-
-    //--------------------------------------------------------------------------
-    // compute the new edges
-    //--------------------------------------------------------------------------
-
-<span class="fc" id="L194">    DataSet&lt;Edge&gt; newEdges = edgeIdsWithNewGraphs</span>
-<span class="fc" id="L195">      .join(collection.getEdges())</span>
-<span class="fc" id="L196">      .where(0)</span>
-<span class="fc" id="L197">      .equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L198">      .with(new AddGraphsToElements&lt;&gt;());</span>
-
-<span class="fc" id="L200">    return collection.getConfig().getGraphCollectionFactory()</span>
-<span class="fc" id="L201">      .fromDataSets(newGraphHeads, newVertices, newEdges);</span>
+<span class="fc" id="L129">    return collection.getFactory()</span>
+<span class="fc" id="L130">      .fromDataSets(collection.getGraphHeads(), filteredVertices, inducedEdges);</span>
   }
 
   /**
    * Returns one subgraph for each of the given supergraphs.
-   * The subgraphs are defined by the edges that fulfil the vertex filter
-   * function.
+   * The subgraphs are defined by the edges that fulfil the vertex filter function.
    *
    * @param collection collection of supergraphs
    * @return collection of edge-induced subgraphs
    */
-  private GraphCollection edgeInducedSubgraph(
-    GraphCollection collection) {
-    //--------------------------------------------------------------------------
-    // compute a dictionary that maps the old graph ids to new ones
-    //--------------------------------------------------------------------------
+  private GC edgeInducedSubgraph(GC collection) {
+<span class="fc" id="L141">    DataSet&lt;E&gt; filteredEdges = collection.getEdges().filter(edgeFilterFunction);</span>
+<span class="fc" id="L142">    DataSet&lt;V&gt; inducedVertices = filteredEdges</span>
+<span class="fc" id="L143">      .join(collection.getVertices())</span>
+<span class="fc" id="L144">      .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L145">      .with(new RightSideWithLeftGraphs&lt;&gt;())</span>
+<span class="fc" id="L146">      .union(filteredEdges</span>
+<span class="fc" id="L147">        .join(collection.getVertices())</span>
+<span class="fc" id="L148">        .where(new TargetId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L149">        .with(new RightSideWithLeftGraphs&lt;&gt;()))</span>
+<span class="fc" id="L150">      .distinct(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L218">    DataSet&lt;Tuple2&lt;GradoopId, GradoopId&gt;&gt; graphIdDictionary = collection</span>
-<span class="fc" id="L219">      .getGraphHeads()</span>
-<span class="fc" id="L220">      .map(new Id&lt;&gt;())</span>
-<span class="fc" id="L221">      .map(new PairElementWithNewId&lt;&gt;());</span>
+<span class="fc" id="L152">    return collection.getFactory()</span>
+<span class="fc" id="L153">      .fromDataSets(collection.getGraphHeads(), inducedVertices, filteredEdges);</span>
+  }
 
-    //--------------------------------------------------------------------------
-    // compute new graphs
-    //--------------------------------------------------------------------------
+  /**
+   * Returns one subgraph for each of the given supergraphs.
+   * The subgraphs are defined by the edges that fulfil the vertex filter function.
+   *
+   * @param collection collection of supergraph
+   * @return collection of edge-induced subgraph
+   */
+  private GC edgeInducedSubgraphProjectFirst(GC collection) {
+<span class="fc" id="L164">    DataSet&lt;E&gt; filteredEdges = collection.getEdges().filter(edgeFilterFunction);</span>
+<span class="fc" id="L165">    DataSet&lt;V&gt; inducedVertices = filteredEdges</span>
+<span class="fc" id="L166">      .flatMap(new EdgeToSourceAndTargetIdWithGraphIds&lt;&gt;())</span>
+<span class="fc" id="L167">      .distinct(0)</span>
+<span class="fc" id="L168">      .join(collection.getVertices())</span>
+<span class="fc" id="L169">      .where(0).equalTo(new Id&lt;&gt;())</span>
+<span class="fc" id="L170">      .with(new RightSideWithLeftGraphs2To1&lt;&gt;());</span>
 
-<span class="fc" id="L227">    EPGMGraphHeadFactory&lt;GraphHead&gt; graphFactory = collection.getFactory().getGraphHeadFactory();</span>
-
-<span class="fc" id="L229">    DataSet&lt;GraphHead&gt; newGraphHeads = graphIdDictionary</span>
-<span class="fc" id="L230">      .map(new Project2To1&lt;&gt;())</span>
-<span class="fc" id="L231">      .map(new InitGraphHead(graphFactory));</span>
-
-    //--------------------------------------------------------------------------
-    // compute new edges by applying the filter function,
-    // building tuples containing the edge id and the new graphs this edge is
-    // contained in and finally adding the new graphs to the edges
-    //--------------------------------------------------------------------------
-
-<span class="fc" id="L239">    DataSet&lt;Edge&gt; newEdges = collection</span>
-<span class="fc" id="L240">      .getEdges()</span>
-<span class="fc" id="L241">      .filter(edgeFilterFunction)</span>
-<span class="fc" id="L242">      .flatMap(new ElementIdGraphIdTuple&lt;&gt;())</span>
-<span class="fc" id="L243">      .join(graphIdDictionary)</span>
-<span class="fc" id="L244">      .where(1)</span>
-<span class="fc" id="L245">      .equalTo(0)</span>
-<span class="fc" id="L246">      .with(new JoinTuplesWithNewGraphs())</span>
-<span class="fc" id="L247">      .groupBy(0)</span>
-<span class="fc" id="L248">      .reduceGroup(new MergeTupleGraphs())</span>
-<span class="fc" id="L249">      .join(collection.getEdges())</span>
-<span class="fc" id="L250">      .where(0)</span>
-<span class="fc" id="L251">      .equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L252">      .with(new AddGraphsToElements&lt;&gt;());</span>
-
-    //--------------------------------------------------------------------------
-    // compute the new vertices
-    // first, tuples 2 containing the sources and targets of all new edges in
-    // the first field and the new graphs this edge is contained in is created
-    // this is then joined with the input vertices and the new graphs
-    // are added to the vertices
-    //--------------------------------------------------------------------------
-
-<span class="fc" id="L262">    DataSet&lt;Vertex&gt; newVertices = newEdges</span>
-<span class="fc" id="L263">      .flatMap(new SourceTargetIdGraphsTuple&lt;&gt;())</span>
-<span class="fc" id="L264">      .distinct(0)</span>
-<span class="fc" id="L265">      .coGroup(collection.getVertices())</span>
-<span class="fc" id="L266">      .where(0)</span>
-<span class="fc" id="L267">      .equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L268">      .with(new AddGraphsToElementsCoGroup&lt;&gt;());</span>
-
-<span class="fc" id="L270">    return collection.getConfig().getGraphCollectionFactory()</span>
-<span class="fc" id="L271">      .fromDataSets(newGraphHeads, newVertices, newEdges);</span>
+<span class="fc" id="L172">    return collection.getFactory()</span>
+<span class="fc" id="L173">      .fromDataSets(collection.getGraphHeads(), inducedVertices, filteredEdges);</span>
   }
 
   /**
@@ -276,76 +178,17 @@ public class ApplySubgraph implements ApplicableUnaryGraphToGraphOperator {
    * The subgraphs are defined by the vertices that fulfil the vertex filter
    * function and edges that fulfill the edge filter function.
    *
-   * Note, that the operator does not verify the consistency of the resulting
-   * graph.
+   * Note, that the operator does not verify the consistency of the resulting graph.
    *
    * @param collection collection of supergraphs
    * @return collection of subgraphs
    */
-  private GraphCollection subgraph(
-    GraphCollection collection) {
+  private GC subgraph(GC collection) {
+<span class="fc" id="L187">    DataSet&lt;V&gt; newVertices = collection.getVertices().filter(vertexFilterFunction);</span>
+<span class="fc" id="L188">    DataSet&lt;E&gt; newEdges = collection.getEdges().filter(edgeFilterFunction);</span>
 
-    //--------------------------------------------------------------------------
-    // compute a dictionary that maps the old graph ids to new ones
-    //--------------------------------------------------------------------------
-
-<span class="fc" id="L292">    DataSet&lt;Tuple2&lt;GradoopId, GradoopId&gt;&gt; graphIdDictionary = collection</span>
-<span class="fc" id="L293">      .getGraphHeads()</span>
-<span class="fc" id="L294">      .map(new Id&lt;&gt;())</span>
-<span class="fc" id="L295">      .map(new PairElementWithNewId&lt;&gt;());</span>
-
-    //--------------------------------------------------------------------------
-    // compute new graphs
-    //--------------------------------------------------------------------------
-
-<span class="fc" id="L301">    EPGMGraphHeadFactory&lt;GraphHead&gt; graphFactory = collection.getFactory().getGraphHeadFactory();</span>
-
-<span class="fc" id="L303">    DataSet&lt;GraphHead&gt; newGraphHeads = graphIdDictionary</span>
-<span class="fc" id="L304">      .map(new Project2To1&lt;&gt;())</span>
-<span class="fc" id="L305">      .map(new InitGraphHead(graphFactory));</span>
-
-    //--------------------------------------------------------------------------
-    // compute pairs of a vertex and the set of new graphs this vertex is
-    // contained in
-    // filter function is applied first to improve performance
-    //--------------------------------------------------------------------------
-
-<span class="fc" id="L313">    DataSet&lt;Vertex&gt; newVertices =</span>
-<span class="fc" id="L314">      collection.getVertices()</span>
-<span class="fc" id="L315">        .filter(vertexFilterFunction)</span>
-<span class="fc" id="L316">        .flatMap(new ElementIdGraphIdTuple&lt;&gt;())</span>
-<span class="fc" id="L317">        .join(graphIdDictionary)</span>
-<span class="fc" id="L318">        .where(1).equalTo(0)</span>
-<span class="fc" id="L319">        .with(new JoinTuplesWithNewGraphs())</span>
-<span class="fc" id="L320">        .groupBy(0)</span>
-<span class="fc" id="L321">        .reduceGroup(new MergeTupleGraphs())</span>
-<span class="fc" id="L322">        .join(collection.getVertices())</span>
-<span class="fc" id="L323">        .where(0)</span>
-<span class="fc" id="L324">        .equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L325">        .with(new AddGraphsToElements&lt;&gt;());</span>
-
-    //--------------------------------------------------------------------------
-    // compute pairs of an edge and the set of new graphs this edge is
-    // contained in
-    // filter function is applied first to improve performance
-    //--------------------------------------------------------------------------
-
-<span class="fc" id="L333">    DataSet&lt;Edge&gt; newEdges = collection.getEdges()</span>
-<span class="fc" id="L334">      .filter(edgeFilterFunction)</span>
-<span class="fc" id="L335">      .flatMap(new ElementIdGraphIdTuple&lt;&gt;())</span>
-<span class="fc" id="L336">      .join(graphIdDictionary)</span>
-<span class="fc" id="L337">      .where(1)</span>
-<span class="fc" id="L338">      .equalTo(0)</span>
-<span class="fc" id="L339">      .with(new JoinTuplesWithNewGraphs())</span>
-<span class="fc" id="L340">      .groupBy(0)</span>
-<span class="fc" id="L341">      .reduceGroup(new MergeTupleGraphs())</span>
-<span class="fc" id="L342">      .join(collection.getEdges())</span>
-<span class="fc" id="L343">      .where(0)</span>
-<span class="fc" id="L344">      .equalTo(new Id&lt;&gt;())</span>
-<span class="fc" id="L345">      .with(new AddGraphsToElements&lt;&gt;());</span>
-
-<span class="fc" id="L347">    return collection.getConfig().getGraphCollectionFactory()</span>
-<span class="fc" id="L348">      .fromDataSets(newGraphHeads, newVertices, newEdges);</span>
+<span class="fc" id="L190">    return collection.getFactory()</span>
+<span class="fc" id="L191">      .fromDataSets(collection.getGraphHeads(), newVertices, newEdges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

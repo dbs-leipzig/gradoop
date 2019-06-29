@@ -18,7 +18,7 @@ package org.gradoop.dataintegration.transformation.functions;
 import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
@@ -34,7 +34,7 @@ import java.util.Set;
  *
  * @param &lt;V&gt; The vertex type.
  */
-public class AccumulatePropagatedValues&lt;V extends EPGMVertex&gt;
+public class AccumulatePropagatedValues&lt;V extends Vertex&gt;
   implements CoGroupFunction&lt;Tuple2&lt;GradoopId, PropertyValue&gt;, V, V&gt; {
 
   /**

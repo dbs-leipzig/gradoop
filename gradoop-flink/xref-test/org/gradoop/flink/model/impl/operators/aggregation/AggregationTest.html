@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.aggregation;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.runtime.client.JobExecutionException;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHead;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.exceptions.UnsupportedTypeException;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -98,7 +98,7 @@
 <a name="88" href="#88">88</a>        .aggregate(minEdgeProperty)
 <a name="89" href="#89">89</a>        .aggregate(minProperty);
 <a name="90" href="#90">90</a>  
-<a name="91" href="#91">91</a>      EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="91" href="#91">91</a>      GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="92" href="#92">92</a>  
 <a name="93" href="#93">93</a>      assertTrue(<span class="jxr_string">"edge minimum not set"</span>,
 <a name="94" href="#94">94</a>        graphHead.hasProperty(minEdgeProperty.getAggregatePropertyKey()));
@@ -144,7 +144,7 @@
 <a name="134" href="#134">134</a>       .aggregate(maxEdgeProperty)
 <a name="135" href="#135">135</a>       .aggregate(maxProperty);
 <a name="136" href="#136">136</a> 
-<a name="137" href="#137">137</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="137" href="#137">137</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="138" href="#138">138</a> 
 <a name="139" href="#139">139</a>     assertTrue(<span class="jxr_string">"vertex maximum not set"</span>,
 <a name="140" href="#140">140</a>       graphHead.hasProperty(maxEdgeProperty.getAggregatePropertyKey()));
@@ -190,7 +190,7 @@
 <a name="180" href="#180">180</a>       .aggregate(sumEdgeProperty)
 <a name="181" href="#181">181</a>       .aggregate(sumProperty);
 <a name="182" href="#182">182</a> 
-<a name="183" href="#183">183</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="183" href="#183">183</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="184" href="#184">184</a> 
 <a name="185" href="#185">185</a>     assertTrue(<span class="jxr_string">"edge sum not set"</span>,
 <a name="186" href="#186">186</a>       graphHead.hasProperty(sumEdgeProperty.getAggregatePropertyKey()));
@@ -258,7 +258,7 @@
 <a name="248" href="#248">248</a>       .aggregate(sumEdgeProperty)
 <a name="249" href="#249">249</a>       .aggregate(sumProperty);
 <a name="250" href="#250">250</a> 
-<a name="251" href="#251">251</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="251" href="#251">251</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="252" href="#252">252</a> 
 <a name="253" href="#253">253</a>     assertTrue(<span class="jxr_string">"edge sum not set"</span>, graphHead.hasProperty(
 <a name="254" href="#254">254</a>       sumEdgeProperty.getAggregatePropertyKey()));
@@ -293,7 +293,7 @@
 <a name="283" href="#283">283</a>       .aggregate(edgeCount)
 <a name="284" href="#284">284</a>       .aggregate(count);
 <a name="285" href="#285">285</a> 
-<a name="286" href="#286">286</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="286" href="#286">286</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="287" href="#287">287</a> 
 <a name="288" href="#288">288</a>     assertTrue(<span class="jxr_string">"vertex count not set"</span>,
 <a name="289" href="#289">289</a>       graphHead.hasProperty(vertexCount.getAggregatePropertyKey()));
@@ -313,7 +313,7 @@
 <a name="303" href="#303">303</a> <em class="jxr_javadoccomment">   * @param expectedVertexCount expected vertex count</em>
 <a name="304" href="#304">304</a> <em class="jxr_javadoccomment">   * @param expectedEdgeCount expected edge count</em>
 <a name="305" href="#305">305</a> <em class="jxr_javadoccomment">   */</em>
-<a name="306" href="#306">306</a>   <strong class="jxr_keyword">void</strong> assertCounts(EPGMGraphHead graphHead, <strong class="jxr_keyword">long</strong> expectedVertexCount, <strong class="jxr_keyword">long</strong> expectedEdgeCount) {
+<a name="306" href="#306">306</a>   <strong class="jxr_keyword">void</strong> assertCounts(GraphHead graphHead, <strong class="jxr_keyword">long</strong> expectedVertexCount, <strong class="jxr_keyword">long</strong> expectedEdgeCount) {
 <a name="307" href="#307">307</a>     assertEquals(<span class="jxr_string">"wrong vertex count"</span>, expectedVertexCount,
 <a name="308" href="#308">308</a>       graphHead.getPropertyValue(<strong class="jxr_keyword">new</strong> VertexCount().getAggregatePropertyKey()).getLong());
 <a name="309" href="#309">309</a>     assertEquals(<span class="jxr_string">"wrong edge count"</span>, expectedEdgeCount,
@@ -332,7 +332,7 @@
 <a name="322" href="#322">322</a>     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable(<span class="jxr_string">"g2"</span>);
 <a name="323" href="#323">323</a>     HasVertexLabel hasPerson = <strong class="jxr_keyword">new</strong> HasVertexLabel(<span class="jxr_string">"Person"</span>);
 <a name="324" href="#324">324</a>     graph = graph.aggregate(hasPerson);
-<a name="325" href="#325">325</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="325" href="#325">325</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="326" href="#326">326</a> 
 <a name="327" href="#327">327</a>     assertTrue(<span class="jxr_string">"Property hasVertexLabel_Person not set"</span>,
 <a name="328" href="#328">328</a>       graphHead.hasProperty(hasPerson.getAggregatePropertyKey()));
@@ -350,7 +350,7 @@
 <a name="340" href="#340">340</a>     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable(<span class="jxr_string">"g2"</span>);
 <a name="341" href="#341">341</a>     HasVertexLabel hasNotExistent = <strong class="jxr_keyword">new</strong> HasVertexLabel(<span class="jxr_string">"LabelDoesNotExist"</span>);
 <a name="342" href="#342">342</a>     graph = graph.aggregate(hasNotExistent);
-<a name="343" href="#343">343</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="343" href="#343">343</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="344" href="#344">344</a> 
 <a name="345" href="#345">345</a>     assertTrue(<span class="jxr_string">"Property hasVertexLabel_LabelDoesNotExist not set"</span>,
 <a name="346" href="#346">346</a>       graphHead.hasProperty(hasNotExistent.getAggregatePropertyKey()));
@@ -368,7 +368,7 @@
 <a name="358" href="#358">358</a>     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable(<span class="jxr_string">"g2"</span>);
 <a name="359" href="#359">359</a>     HasEdgeLabel hasKnows = <strong class="jxr_keyword">new</strong> HasEdgeLabel(<span class="jxr_string">"knows"</span>);
 <a name="360" href="#360">360</a>     graph = graph.aggregate(hasKnows);
-<a name="361" href="#361">361</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="361" href="#361">361</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="362" href="#362">362</a> 
 <a name="363" href="#363">363</a>     assertTrue(<span class="jxr_string">"Property hasEdgeLabel_knows not set"</span>,
 <a name="364" href="#364">364</a>       graphHead.hasProperty(hasKnows.getAggregatePropertyKey()));
@@ -386,7 +386,7 @@
 <a name="376" href="#376">376</a>     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable(<span class="jxr_string">"g2"</span>);
 <a name="377" href="#377">377</a>     HasEdgeLabel hasNotExistent = <strong class="jxr_keyword">new</strong> HasEdgeLabel(<span class="jxr_string">"LabelDoesNotExist"</span>);
 <a name="378" href="#378">378</a>     graph = graph.aggregate(hasNotExistent);
-<a name="379" href="#379">379</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="379" href="#379">379</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="380" href="#380">380</a> 
 <a name="381" href="#381">381</a>     assertTrue(<span class="jxr_string">"Property hasEdgeLabel_LabelDoesNotExist not set"</span>,
 <a name="382" href="#382">382</a>       graphHead.hasProperty(hasNotExistent.getAggregatePropertyKey()));
@@ -405,7 +405,7 @@
 <a name="395" href="#395">395</a>       .getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>);
 <a name="396" href="#396">396</a>     HasEdgeLabel hasLabel = <strong class="jxr_keyword">new</strong> HasEdgeLabel(<span class="jxr_string">"anyLabel"</span>);
 <a name="397" href="#397">397</a>     graph = graph.aggregate(hasLabel);
-<a name="398" href="#398">398</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="398" href="#398">398</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="399" href="#399">399</a> 
 <a name="400" href="#400">400</a>     assertTrue(<span class="jxr_string">"Property hasEdgeLabel_anyLabel not set"</span>,
 <a name="401" href="#401">401</a>       graphHead.hasProperty(hasLabel.getAggregatePropertyKey()));
@@ -424,7 +424,7 @@
 <a name="414" href="#414">414</a>       .getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>);
 <a name="415" href="#415">415</a>     HasVertexLabel hasLabel = <strong class="jxr_keyword">new</strong> HasVertexLabel(<span class="jxr_string">""</span>);
 <a name="416" href="#416">416</a>     graph = graph.aggregate(hasLabel);
-<a name="417" href="#417">417</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="417" href="#417">417</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="418" href="#418">418</a> 
 <a name="419" href="#419">419</a>     assertTrue(<span class="jxr_string">"Property hasVertexLabel_ not set"</span>,
 <a name="420" href="#420">420</a>       graphHead.hasProperty(hasLabel.getAggregatePropertyKey()));
@@ -442,7 +442,7 @@
 <a name="432" href="#432">432</a>     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable(<span class="jxr_string">"g2"</span>);
 <a name="433" href="#433">433</a>     HasLabel hasPerson = <strong class="jxr_keyword">new</strong> HasLabel(<span class="jxr_string">"Person"</span>);
 <a name="434" href="#434">434</a>     graph = graph.aggregate(hasPerson);
-<a name="435" href="#435">435</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="435" href="#435">435</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="436" href="#436">436</a> 
 <a name="437" href="#437">437</a>     assertTrue(<span class="jxr_string">"Property hasLabel_Person not set"</span>,
 <a name="438" href="#438">438</a>       graphHead.hasProperty(hasPerson.getAggregatePropertyKey()));
@@ -460,7 +460,7 @@
 <a name="450" href="#450">450</a>     LogicalGraph graph = getSocialNetworkLoader().getLogicalGraphByVariable(<span class="jxr_string">"g2"</span>);
 <a name="451" href="#451">451</a>     HasLabel hasNotExistent = <strong class="jxr_keyword">new</strong> HasLabel(<span class="jxr_string">"LabelDoesNotExist"</span>);
 <a name="452" href="#452">452</a>     graph = graph.aggregate(hasNotExistent);
-<a name="453" href="#453">453</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="453" href="#453">453</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="454" href="#454">454</a> 
 <a name="455" href="#455">455</a>     assertTrue(<span class="jxr_string">"Property hasLabel_LabelDoesNotExist not set"</span>,
 <a name="456" href="#456">456</a>       graphHead.hasProperty(hasNotExistent.getAggregatePropertyKey()));
@@ -479,7 +479,7 @@
 <a name="469" href="#469">469</a>       .getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>);
 <a name="470" href="#470">470</a>     HasLabel hasLabel = <strong class="jxr_keyword">new</strong> HasLabel(<span class="jxr_string">"anyLabel"</span>);
 <a name="471" href="#471">471</a>     graph = graph.aggregate(hasLabel);
-<a name="472" href="#472">472</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="472" href="#472">472</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="473" href="#473">473</a> 
 <a name="474" href="#474">474</a>     assertTrue(<span class="jxr_string">"Property hasLabel_anyLabel not set"</span>,
 <a name="475" href="#475">475</a>       graphHead.hasProperty(hasLabel.getAggregatePropertyKey()));
@@ -498,7 +498,7 @@
 <a name="488" href="#488">488</a>       .getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>);
 <a name="489" href="#489">489</a>     HasLabel hasLabel = <strong class="jxr_keyword">new</strong> HasLabel(<span class="jxr_string">""</span>);
 <a name="490" href="#490">490</a>     graph = graph.aggregate(hasLabel);
-<a name="491" href="#491">491</a>     EPGMGraphHead graphHead = graph.getGraphHead().collect().get(0);
+<a name="491" href="#491">491</a>     GraphHead graphHead = graph.getGraphHead().collect().get(0);
 <a name="492" href="#492">492</a> 
 <a name="493" href="#493">493</a>     assertTrue(<span class="jxr_string">"Property hasLabel_ not set"</span>,
 <a name="494" href="#494">494</a>       graphHead.hasProperty(hasLabel.getAggregatePropertyKey()));

@@ -21,8 +21,8 @@ import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.log4j.Logger;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -54,7 +54,7 @@ import org.gradoop.flink.util.GradoopFlinkConfig;
 import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
 /**
- * Vertex-centric Dual-Simulation.
+ * EPGMVertex-centric Dual-Simulation.
  */
 public class DualSimulation extends PatternMatching {
 
@@ -283,11 +283,11 @@ public class DualSimulation extends PatternMatching {
     DataSet&lt;FatVertex&gt; vertices) {
 <span class="fc" id="L284">    GradoopFlinkConfig config = graph.getConfig();</span>
 
-<span class="fc bfc" id="L286" title="All 2 branches covered.">    DataSet&lt;Vertex&gt; matchVertices = doAttachData() ?</span>
+<span class="fc bfc" id="L286" title="All 2 branches covered.">    DataSet&lt;EPGMVertex&gt; matchVertices = doAttachData() ?</span>
 <span class="fc" id="L287">      PostProcessor.extractVerticesWithData(vertices, graph.getVertices()) :</span>
 <span class="fc" id="L288">      PostProcessor.extractVertices(vertices, config.getVertexFactory());</span>
 
-<span class="fc bfc" id="L290" title="All 2 branches covered.">    DataSet&lt;Edge&gt; matchEdges = doAttachData() ?</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">    DataSet&lt;EPGMEdge&gt; matchEdges = doAttachData() ?</span>
 <span class="fc" id="L291">      PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :</span>
 <span class="fc" id="L292">      PostProcessor.extractEdges(vertices, config.getEdgeFactory());</span>
 

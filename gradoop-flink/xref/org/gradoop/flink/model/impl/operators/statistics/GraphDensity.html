@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.statistics;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.count.EdgeCount;
@@ -42,7 +42,7 @@
 <a name="32" href="#32">32</a>  
 <a name="33" href="#33">33</a>    @Override
 <a name="34" href="#34">34</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> execute(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph) {
-<a name="35" href="#35">35</a>      DataSet&lt;GraphHead&gt; newGraphHead = graph
+<a name="35" href="#35">35</a>      DataSet&lt;EPGMGraphHead&gt; newGraphHead = graph
 <a name="36" href="#36">36</a>        .aggregate(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/aggregation/functions/count/VertexCount.html">VertexCount</a>(), <strong class="jxr_keyword">new</strong> EdgeCount())
 <a name="37" href="#37">37</a>        .getGraphHead()
 <a name="38" href="#38">38</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/statistics/functions/CalculateDensity.html">CalculateDensity</a>(SamplingEvaluationConstants.PROPERTY_KEY_DENSITY));

@@ -18,14 +18,14 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos;
 
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * This class represents a Triple.
  * A Triple represents an edge extended with information about the source and target vertex.
  */
-public class Triple extends Tuple3&lt;Vertex, Edge, Vertex&gt; {
+public class Triple extends Tuple3&lt;EPGMVertex, EPGMEdge, EPGMVertex&gt; {
 
   /**
    * Default Constructor
@@ -40,7 +40,7 @@ public class Triple extends Tuple3&lt;Vertex, Edge, Vertex&gt; {
    * @param edge edge
    * @param targetVertex target vertex
    */
-  public Triple(Vertex sourceVertex, Edge edge, Vertex targetVertex) {
+  public Triple(EPGMVertex sourceVertex, EPGMEdge edge, EPGMVertex targetVertex) {
 <span class="fc" id="L44">    super(sourceVertex, edge, targetVertex);</span>
 <span class="fc" id="L45">    requireValidTriple(sourceVertex, edge, targetVertex);</span>
 <span class="fc" id="L46">  }</span>
@@ -49,7 +49,7 @@ public class Triple extends Tuple3&lt;Vertex, Edge, Vertex&gt; {
    * Returns the source vertex.
    * @return source vertex
    */
-  public Vertex getSourceVertex() {
+  public EPGMVertex getSourceVertex() {
 <span class="fc" id="L53">    return f0;</span>
   }
 
@@ -57,7 +57,7 @@ public class Triple extends Tuple3&lt;Vertex, Edge, Vertex&gt; {
    * returns the edge
    * @return edge
    */
-  public Edge getEdge() {
+  public EPGMEdge getEdge() {
 <span class="fc" id="L61">    return f1;</span>
   }
 
@@ -65,7 +65,7 @@ public class Triple extends Tuple3&lt;Vertex, Edge, Vertex&gt; {
    * Returns the target vertex
    * @return target vertex
    */
-  public Vertex getTargetVertex() {
+  public EPGMVertex getTargetVertex() {
 <span class="fc" id="L69">    return f2;</span>
   }
 
@@ -100,14 +100,15 @@ public class Triple extends Tuple3&lt;Vertex, Edge, Vertex&gt; {
    * @param edge edge
    * @param targetVertex target vertex
    */
-  private static void requireValidTriple(Vertex sourceVertex, Edge edge, Vertex targetVertex) {
-<span class="pc bpc" id="L104" title="1 of 2 branches missed.">    if (sourceVertex.getId() != edge.getSourceId()) {</span>
-<span class="nc" id="L105">      throw new IllegalArgumentException(&quot;Source IDs do not match&quot;);</span>
+  private static void requireValidTriple(
+    EPGMVertex sourceVertex, EPGMEdge edge, EPGMVertex targetVertex) {
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">    if (sourceVertex.getId() != edge.getSourceId()) {</span>
+<span class="nc" id="L106">      throw new IllegalArgumentException(&quot;Source IDs do not match&quot;);</span>
     }
 
-<span class="pc bpc" id="L108" title="1 of 2 branches missed.">    if (targetVertex.getId() != edge.getTargetId()) {</span>
-<span class="nc" id="L109">      throw new IllegalArgumentException(&quot;Target IDs do not match&quot;);</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">    if (targetVertex.getId() != edge.getTargetId()) {</span>
+<span class="nc" id="L110">      throw new IllegalArgumentException(&quot;Target IDs do not match&quot;);</span>
     }
-<span class="fc" id="L111">  }</span>
+<span class="fc" id="L112">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

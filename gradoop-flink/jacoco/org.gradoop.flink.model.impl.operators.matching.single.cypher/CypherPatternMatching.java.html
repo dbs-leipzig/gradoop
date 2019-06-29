@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.java.DataSet;
 import org.apache.log4j.Logger;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
@@ -120,7 +120,7 @@ public class CypherPatternMatching extends PatternMatching {
 <span class="fc" id="L120">      log(embeddings, new PrintEmbedding(embeddingMetaData), getVertexMapping(), getEdgeMapping());</span>
 
     // Pattern construction (if necessary)
-<span class="fc bfc" id="L123" title="All 2 branches covered.">    DataSet&lt;Element&gt; finalElements = this.constructionPattern != null ?</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">    DataSet&lt;EPGMElement&gt; finalElements = this.constructionPattern != null ?</span>
 <span class="fc" id="L124">      constructFinalElements(graph, embeddings, embeddingMetaData) :</span>
 <span class="fc" id="L125">      embeddings.flatMap(</span>
         new ElementsFromEmbedding(
@@ -144,7 +144,7 @@ public class CypherPatternMatching extends PatternMatching {
    * @param embeddingMetaData   Meta information
    * @return                    New set of EmbeddingElements
    */
-  private DataSet&lt;Element&gt; constructFinalElements(LogicalGraph graph, DataSet&lt;Embedding&gt; embeddings,
+  private DataSet&lt;EPGMElement&gt; constructFinalElements(LogicalGraph graph, DataSet&lt;Embedding&gt; embeddings,
     EmbeddingMetaData embeddingMetaData) {
 
 <span class="fc" id="L150">    QueryHandler constructionPatternHandler = new QueryHandler(this.constructionPattern);</span>

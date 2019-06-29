@@ -30,9 +30,9 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Admin;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Put;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Result;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHead;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHeadFactory;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.common.predicate.query.ElementQuery;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.hbase.constants.HBaseConstants;
@@ -63,19 +63,19 @@
 <a name="53" href="#53">53</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="54" href="#54">54</a>  <em class="jxr_javadoccomment">   * Creates graph data objects from the rows.</em>
 <a name="55" href="#55">55</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="56" href="#56">56</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory;
+<a name="56" href="#56">56</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
 <a name="57" href="#57">57</a>  
 <a name="58" href="#58">58</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   * An optional query to define predicates for the graph store.</em>
 <a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="61" href="#61">61</a>    <strong class="jxr_keyword">private</strong> ElementQuery&lt;HBaseElementFilter&lt;GraphHead&gt;&gt; graphQuery;
+<a name="61" href="#61">61</a>    <strong class="jxr_keyword">private</strong> ElementQuery&lt;HBaseElementFilter&lt;EPGMGraphHead&gt;&gt; graphQuery;
 <a name="62" href="#62">62</a>  
 <a name="63" href="#63">63</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="64" href="#64">64</a>  <em class="jxr_javadoccomment">   * Creates a graph handler.</em>
 <a name="65" href="#65">65</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="66" href="#66">66</a>  <em class="jxr_javadoccomment">   * @param graphHeadFactory used to create runtime graph data objects</em>
 <a name="67" href="#67">67</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="68" href="#68">68</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/handler/HBaseGraphHeadHandler.html">HBaseGraphHeadHandler</a>(EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory) {
+<a name="68" href="#68">68</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/handler/HBaseGraphHeadHandler.html">HBaseGraphHeadHandler</a>(GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory) {
 <a name="69" href="#69">69</a>      <strong class="jxr_keyword">this</strong>.graphHeadFactory = graphHeadFactory;
 <a name="70" href="#70">70</a>    }
 <a name="71" href="#71">71</a>  
@@ -89,25 +89,25 @@
 <a name="79" href="#79">79</a>    }
 <a name="80" href="#80">80</a>  
 <a name="81" href="#81">81</a>    @Override
-<a name="82" href="#82">82</a>    <strong class="jxr_keyword">public</strong> Put writeGraphHead(<strong class="jxr_keyword">final</strong> Put put, <strong class="jxr_keyword">final</strong> EPGMGraphHead graphData) {
+<a name="82" href="#82">82</a>    <strong class="jxr_keyword">public</strong> Put writeGraphHead(<strong class="jxr_keyword">final</strong> Put put, <strong class="jxr_keyword">final</strong> GraphHead graphData) {
 <a name="83" href="#83">83</a>      writeLabel(put, graphData);
 <a name="84" href="#84">84</a>      writeProperties(put, graphData);
 <a name="85" href="#85">85</a>      <strong class="jxr_keyword">return</strong> put;
 <a name="86" href="#86">86</a>    }
 <a name="87" href="#87">87</a>  
 <a name="88" href="#88">88</a>    @Override
-<a name="89" href="#89">89</a>    <strong class="jxr_keyword">public</strong> GraphHead readGraphHead(<strong class="jxr_keyword">final</strong> Result res) {
+<a name="89" href="#89">89</a>    <strong class="jxr_keyword">public</strong> EPGMGraphHead readGraphHead(<strong class="jxr_keyword">final</strong> Result res) {
 <a name="90" href="#90">90</a>      <strong class="jxr_keyword">return</strong> graphHeadFactory.initGraphHead(readId(res), readLabel(res), readProperties(res));
 <a name="91" href="#91">91</a>    }
 <a name="92" href="#92">92</a>  
 <a name="93" href="#93">93</a>    @Override
-<a name="94" href="#94">94</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/api/GraphHeadHandler.html">GraphHeadHandler</a> applyQuery(ElementQuery&lt;HBaseElementFilter&lt;GraphHead&gt;&gt; query) {
+<a name="94" href="#94">94</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/api/GraphHeadHandler.html">GraphHeadHandler</a> applyQuery(ElementQuery&lt;HBaseElementFilter&lt;EPGMGraphHead&gt;&gt; query) {
 <a name="95" href="#95">95</a>      <strong class="jxr_keyword">this</strong>.graphQuery = query;
 <a name="96" href="#96">96</a>      <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
 <a name="97" href="#97">97</a>    }
 <a name="98" href="#98">98</a>  
 <a name="99" href="#99">99</a>    @Override
-<a name="100" href="#100">100</a>   <strong class="jxr_keyword">public</strong> ElementQuery&lt;HBaseElementFilter&lt;GraphHead&gt;&gt; getQuery() {
+<a name="100" href="#100">100</a>   <strong class="jxr_keyword">public</strong> ElementQuery&lt;HBaseElementFilter&lt;EPGMGraphHead&gt;&gt; getQuery() {
 <a name="101" href="#101">101</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>.graphQuery;
 <a name="102" href="#102">102</a>   }
 <a name="103" href="#103">103</a> }

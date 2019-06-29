@@ -29,7 +29,7 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.configuration.Configuration;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.functions.AbstractBuilder;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
@@ -46,7 +46,7 @@
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt; EPGM vertex type</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="39" href="#39">39</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> BuildIdWithCandidatesAndGraphs&lt;V <strong class="jxr_keyword">extends</strong> Vertex&gt;
+<a name="39" href="#39">39</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> BuildIdWithCandidatesAndGraphs&lt;V <strong class="jxr_keyword">extends</strong> EPGMVertex&gt;
 <a name="40" href="#40">40</a>    <strong class="jxr_keyword">extends</strong> AbstractBuilder&lt;V, Tuple2&lt;GradoopIdSet, IdWithCandidates&lt;GradoopId&gt;&gt;&gt; {
 <a name="41" href="#41">41</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment">   * serial version uid</em>

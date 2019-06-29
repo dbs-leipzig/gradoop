@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.fusion.functions;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -27,7 +27,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  *
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;id -&gt; *&quot;)
-<span class="fc" id="L30">public class LeftElementId&lt;K extends EPGMElement&gt;</span>
+<span class="fc" id="L30">public class LeftElementId&lt;K extends Element&gt;</span>
   implements KeySelector&lt;Tuple2&lt;K, GradoopId&gt;, GradoopId&gt; {
   @Override
   public GradoopId getKey(Tuple2&lt;K, GradoopId&gt; value) throws Exception {

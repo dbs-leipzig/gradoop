@@ -27,7 +27,7 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment">/**</em>
@@ -36,8 +36,8 @@
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/distinction/functions/FirstGraphHead.html">FirstGraphHead</a> implements <a href="../../../../../../../../org/gradoop/flink/model/api/functions/GraphHeadReduceFunction.html">GraphHeadReduceFunction</a> {
 <a name="27" href="#27">27</a>  
 <a name="28" href="#28">28</a>    @Override
-<a name="29" href="#29">29</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> reduce(Iterable&lt;Tuple2&lt;String, GraphHead&gt;&gt; iterable,
-<a name="30" href="#30">30</a>      Collector&lt;GraphHead&gt; collector) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="29" href="#29">29</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> reduce(Iterable&lt;Tuple2&lt;String, EPGMGraphHead&gt;&gt; iterable,
+<a name="30" href="#30">30</a>      Collector&lt;EPGMGraphHead&gt; collector) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="31" href="#31">31</a>      collector.collect(iterable.iterator().next().f1);
 <a name="32" href="#32">32</a>    }
 <a name="33" href="#33">33</a>  }

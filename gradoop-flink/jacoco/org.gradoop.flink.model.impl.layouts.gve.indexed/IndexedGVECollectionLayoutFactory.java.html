@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.layouts.gve.indexed;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.impl.layouts.gve.GVECollectionLayoutFactory;
 
@@ -31,10 +31,10 @@ import java.util.Objects;
 <span class="fc" id="L31">public class IndexedGVECollectionLayoutFactory extends GVECollectionLayoutFactory {</span>
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromIndexedDataSets(
-    Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads,
-    Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
-    Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromIndexedDataSets(
+    Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads,
+    Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices,
+    Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges) {
 <span class="fc" id="L38">    Objects.requireNonNull(graphHeads);</span>
 <span class="fc" id="L39">    Objects.requireNonNull(vertices);</span>
 <span class="fc" id="L40">    Objects.requireNonNull(edges);</span>

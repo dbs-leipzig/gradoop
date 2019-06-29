@@ -27,8 +27,8 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.base.Preconditions;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.commons.lang3.StringUtils;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMElement;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Element;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Property;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -80,7 +80,7 @@
 <a name="70" href="#70">70</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="71" href="#71">71</a>    @Override
 <a name="72" href="#72">72</a>    <strong class="jxr_keyword">void</strong> writeVertices(<a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a> transaction, StringBuilder builder, String suffix) {
-<a name="73" href="#73">73</a>      <strong class="jxr_keyword">for</strong> (Vertex vertex: transaction.getVertices()) {
+<a name="73" href="#73">73</a>      <strong class="jxr_keyword">for</strong> (EPGMVertex vertex: transaction.getVertices()) {
 <a name="74" href="#74">74</a>        <em class="jxr_comment">// writes for each vertex:</em>
 <a name="75" href="#75">75</a>        <em class="jxr_comment">// "v1234",</em>
 <a name="76" href="#76">76</a>        builder.append(VERTEX_ID_PREFIX)
@@ -105,7 +105,7 @@
 <a name="95" href="#95">95</a>  <em class="jxr_javadoccomment">   * @param elem graph element with id, label and properties</em>
 <a name="96" href="#96">96</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="97" href="#97">97</a>    @Override
-<a name="98" href="#98">98</a>    <strong class="jxr_keyword">void</strong> writeLabel(StringBuilder builder, EPGMElement elem) {
+<a name="98" href="#98">98</a>    <strong class="jxr_keyword">void</strong> writeLabel(StringBuilder builder, Element elem) {
 <a name="99" href="#99">99</a>      String label = elem.getLabel();
 <a name="100" href="#100">100</a>     String id = elem.getId().toString();
 <a name="101" href="#101">101</a>     Properties properties = elem.getProperties();

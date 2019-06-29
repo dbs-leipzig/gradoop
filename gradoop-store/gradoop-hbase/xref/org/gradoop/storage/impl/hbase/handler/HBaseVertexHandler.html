@@ -30,9 +30,9 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Admin;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Put;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Result;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertexFactory;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.VertexFactory;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.common.predicate.query.ElementQuery;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.hbase.api.VertexHandler;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.hbase.constants.HBaseConstants;
@@ -44,7 +44,7 @@
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment"> * Used to read/write EPGM vertex data from/to a HBase table.</em>
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment"> * &lt;p&gt;</em>
-<a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> * EPGMVertex data in HBase:</em>
+<a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> * Vertex data in HBase:</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> * &lt;p&gt;</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> * |---------|--------------------|---------|</em>
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment"> * | row-key | meta               | data    |</em>
@@ -64,19 +64,19 @@
 <a name="54" href="#54">54</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="55" href="#55">55</a>  <em class="jxr_javadoccomment">   * Creates vertex data objects from the rows.</em>
 <a name="56" href="#56">56</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="57" href="#57">57</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> EPGMVertexFactory&lt;Vertex&gt; vertexFactory;
+<a name="57" href="#57">57</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> VertexFactory&lt;EPGMVertex&gt; vertexFactory;
 <a name="58" href="#58">58</a>  
 <a name="59" href="#59">59</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   * An optional query to define predicates for the graph store.</em>
 <a name="61" href="#61">61</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="62" href="#62">62</a>    <strong class="jxr_keyword">private</strong> ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; vertexQuery;
+<a name="62" href="#62">62</a>    <strong class="jxr_keyword">private</strong> ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; vertexQuery;
 <a name="63" href="#63">63</a>  
 <a name="64" href="#64">64</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="65" href="#65">65</a>  <em class="jxr_javadoccomment">   * Creates a vertex handler.</em>
 <a name="66" href="#66">66</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="67" href="#67">67</a>  <em class="jxr_javadoccomment">   * @param vertexFactory used to create runtime vertex data objects</em>
 <a name="68" href="#68">68</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="69" href="#69">69</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/handler/HBaseVertexHandler.html">HBaseVertexHandler</a>(EPGMVertexFactory&lt;Vertex&gt; vertexFactory) {
+<a name="69" href="#69">69</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/handler/HBaseVertexHandler.html">HBaseVertexHandler</a>(VertexFactory&lt;EPGMVertex&gt; vertexFactory) {
 <a name="70" href="#70">70</a>      <strong class="jxr_keyword">this</strong>.vertexFactory = vertexFactory;
 <a name="71" href="#71">71</a>    }
 <a name="72" href="#72">72</a>  
@@ -98,7 +98,7 @@
 <a name="88" href="#88">88</a>    }
 <a name="89" href="#89">89</a>  
 <a name="90" href="#90">90</a>    @Override
-<a name="91" href="#91">91</a>    <strong class="jxr_keyword">public</strong> Put writeVertex(Put put, EPGMVertex vertexData) {
+<a name="91" href="#91">91</a>    <strong class="jxr_keyword">public</strong> Put writeVertex(Put put, Vertex vertexData) {
 <a name="92" href="#92">92</a>      writeLabel(put, vertexData);
 <a name="93" href="#93">93</a>      writeProperties(put, vertexData);
 <a name="94" href="#94">94</a>      writeGraphIds(put, vertexData);
@@ -106,19 +106,19 @@
 <a name="96" href="#96">96</a>    }
 <a name="97" href="#97">97</a>  
 <a name="98" href="#98">98</a>    @Override
-<a name="99" href="#99">99</a>    <strong class="jxr_keyword">public</strong> Vertex readVertex(<strong class="jxr_keyword">final</strong> Result res) {
+<a name="99" href="#99">99</a>    <strong class="jxr_keyword">public</strong> EPGMVertex readVertex(<strong class="jxr_keyword">final</strong> Result res) {
 <a name="100" href="#100">100</a>     <strong class="jxr_keyword">return</strong> vertexFactory.initVertex(readId(res), readLabel(res), readProperties(res),
 <a name="101" href="#101">101</a>       readGraphIds(res));
 <a name="102" href="#102">102</a>   }
 <a name="103" href="#103">103</a> 
 <a name="104" href="#104">104</a>   @Override
-<a name="105" href="#105">105</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/api/VertexHandler.html">VertexHandler</a> applyQuery(ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; query) {
+<a name="105" href="#105">105</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/api/VertexHandler.html">VertexHandler</a> applyQuery(ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; query) {
 <a name="106" href="#106">106</a>     <strong class="jxr_keyword">this</strong>.vertexQuery = query;
 <a name="107" href="#107">107</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
 <a name="108" href="#108">108</a>   }
 <a name="109" href="#109">109</a> 
 <a name="110" href="#110">110</a>   @Override
-<a name="111" href="#111">111</a>   <strong class="jxr_keyword">public</strong> ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; getQuery() {
+<a name="111" href="#111">111</a>   <strong class="jxr_keyword">public</strong> ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; getQuery() {
 <a name="112" href="#112">112</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>.vertexQuery;
 <a name="113" href="#113">113</a>   }
 <a name="114" href="#114">114</a> }

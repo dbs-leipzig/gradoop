@@ -30,12 +30,12 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple3;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.conf.Configuration;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.GradoopTestUtils;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EdgeFactory;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.DataSink;
@@ -172,15 +172,15 @@
 <a name="162" href="#162">162</a>     props.set(GradoopTestUtils.KEY_5, map2);
 <a name="163" href="#163">163</a>     props.set(GradoopTestUtils.KEY_6, map3);
 <a name="164" href="#164">164</a> 
-<a name="165" href="#165">165</a>     GraphHead graphHead = <strong class="jxr_keyword">new</strong> GraphHeadFactory().createGraphHead(string1, props);
-<a name="166" href="#166">166</a>     DataSet&lt;GraphHead&gt; graphHeads = env.fromElements(graphHead);
+<a name="165" href="#165">165</a>     EPGMGraphHead graphHead = <strong class="jxr_keyword">new</strong> EPGMGraphHeadFactory().createGraphHead(string1, props);
+<a name="166" href="#166">166</a>     DataSet&lt;EPGMGraphHead&gt; graphHeads = env.fromElements(graphHead);
 <a name="167" href="#167">167</a> 
-<a name="168" href="#168">168</a>     Vertex vertex = <strong class="jxr_keyword">new</strong> VertexFactory().createVertex(string1, props);
-<a name="169" href="#169">169</a>     DataSet&lt;Vertex&gt; vertices = env.fromElements(vertex)
+<a name="168" href="#168">168</a>     EPGMVertex vertex = <strong class="jxr_keyword">new</strong> EPGMVertexFactory().createVertex(string1, props);
+<a name="169" href="#169">169</a>     DataSet&lt;EPGMVertex&gt; vertices = env.fromElements(vertex)
 <a name="170" href="#170">170</a>       .map(<strong class="jxr_keyword">new</strong> AddToGraph&lt;&gt;(graphHead))
 <a name="171" href="#171">171</a>       .withForwardedFields(<span class="jxr_string">"id;label;properties"</span>);
 <a name="172" href="#172">172</a> 
-<a name="173" href="#173">173</a>     DataSet&lt;Edge&gt; edges = env.fromElements(<strong class="jxr_keyword">new</strong> EdgeFactory()
+<a name="173" href="#173">173</a>     DataSet&lt;EPGMEdge&gt; edges = env.fromElements(<strong class="jxr_keyword">new</strong> EPGMEdgeFactory()
 <a name="174" href="#174">174</a>       .createEdge(string1, vertex.getId(), vertex.getId(), props))
 <a name="175" href="#175">175</a>       .map(<strong class="jxr_keyword">new</strong> AddToGraph&lt;&gt;(graphHead))
 <a name="176" href="#176">176</a>       .withForwardedFields(<span class="jxr_string">"id;label;properties"</span>);

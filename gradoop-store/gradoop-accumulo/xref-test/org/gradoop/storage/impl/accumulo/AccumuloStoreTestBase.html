@@ -26,9 +26,9 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.storage.impl.accumulo;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.GradoopTestUtils;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.util.AsciiGraphLoader;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.GradoopFlinkConfig;
@@ -55,15 +55,15 @@
 <a name="45" href="#45">45</a>      AccumuloEPGMStore graphStore = <strong class="jxr_keyword">new</strong> AccumuloEPGMStore(config);
 <a name="46" href="#46">46</a>  
 <a name="47" href="#47">47</a>      <em class="jxr_comment">//read vertices by label</em>
-<a name="48" href="#48">48</a>      AsciiGraphLoader&lt;GraphHead, Vertex, Edge&gt; loader = GradoopTestUtils.getSocialNetworkLoader();
+<a name="48" href="#48">48</a>      AsciiGraphLoader&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; loader = GradoopTestUtils.getSocialNetworkLoader();
 <a name="49" href="#49">49</a>      <em class="jxr_comment">// write social graph to Accumulo</em>
-<a name="50" href="#50">50</a>      <strong class="jxr_keyword">for</strong> (GraphHead g : loader.getGraphHeads()) {
+<a name="50" href="#50">50</a>      <strong class="jxr_keyword">for</strong> (EPGMGraphHead g : loader.getGraphHeads()) {
 <a name="51" href="#51">51</a>        graphStore.writeGraphHead(g);
 <a name="52" href="#52">52</a>      }
-<a name="53" href="#53">53</a>      <strong class="jxr_keyword">for</strong> (Vertex v : loader.getVertices()) {
+<a name="53" href="#53">53</a>      <strong class="jxr_keyword">for</strong> (EPGMVertex v : loader.getVertices()) {
 <a name="54" href="#54">54</a>        graphStore.writeVertex(v);
 <a name="55" href="#55">55</a>      }
-<a name="56" href="#56">56</a>      <strong class="jxr_keyword">for</strong> (Edge e : loader.getEdges()) {
+<a name="56" href="#56">56</a>      <strong class="jxr_keyword">for</strong> (EPGMEdge e : loader.getEdges()) {
 <a name="57" href="#57">57</a>        graphStore.writeEdge(e);
 <a name="58" href="#58">58</a>      }
 <a name="59" href="#59">59</a>      graphStore.flush();
@@ -120,7 +120,7 @@
 <a name="110" href="#110">110</a> <em class="jxr_javadoccomment">     * @throws Throwable an Exception thrown by the test.</em>
 <a name="111" href="#111">111</a> <em class="jxr_javadoccomment">     */</em>
 <a name="112" href="#112">112</a>     <strong class="jxr_keyword">void</strong> test(
-<a name="113" href="#113">113</a>       AsciiGraphLoader&lt;GraphHead, Vertex, Edge&gt; loader,
+<a name="113" href="#113">113</a>       AsciiGraphLoader&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; loader,
 <a name="114" href="#114">114</a>       AccumuloEPGMStore store,
 <a name="115" href="#115">115</a>       GradoopFlinkConfig config
 <a name="116" href="#116">116</a>     ) <strong class="jxr_keyword">throws</strong> Throwable;

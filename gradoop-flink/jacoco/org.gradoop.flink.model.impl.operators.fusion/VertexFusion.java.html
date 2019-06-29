@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.operators.fusion;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
@@ -92,7 +92,7 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
     // Missing in the theoric definition: creating a new header
 <span class="fc" id="L93">    GradoopId newGraphid = GradoopId.get();</span>
 
-<span class="fc" id="L95">    DataSet&lt;GraphHead&gt; gh = searchGraph.getGraphHead()</span>
+<span class="fc" id="L95">    DataSet&lt;EPGMGraphHead&gt; gh = searchGraph.getGraphHead()</span>
 <span class="fc" id="L96">      .map(new MapGraphHeadForNewGraph(newGraphid));</span>
 
 <span class="fc" id="L98">    DataSet&lt;GradoopId&gt; patternVertexIds = graphPatterns.getVertices()</span>
@@ -102,7 +102,7 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
 
     // PHASE 1: Induced Subgraphs
     // Associate each vertex to its graph id
-<span class="fc" id="L105">    DataSet&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; patternVerticesWithGraphIDs =</span>
+<span class="fc" id="L105">    DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; patternVerticesWithGraphIDs =</span>
 <span class="fc" id="L106">        graphPatterns.getVertices()</span>
 <span class="fc" id="L107">        .coGroup(searchGraph.getVertices())</span>
 <span class="fc" id="L108">        .where(new Id&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
@@ -110,22 +110,22 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
 <span class="fc" id="L110">        .flatMap(new MapVertexToPairWithGraphId());</span>
 
     // Associate each gid in hypervertices.H to the merged vertices
-<span class="fc" id="L113">    DataSet&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; mergedVertices =</span>
+<span class="fc" id="L113">    DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; mergedVertices =</span>
 <span class="fc" id="L114">        graphPatterns.getGraphHeads()</span>
 <span class="fc" id="L115">        .map(new CoGroupGraphHeadToVertex());</span>
 
     // PHASE 2: Recreating the vertices
-<span class="fc" id="L118">    DataSet&lt;Vertex&gt; vi = searchGraph.getVertices()</span>
+<span class="fc" id="L118">    DataSet&lt;EPGMVertex&gt; vi = searchGraph.getVertices()</span>
 <span class="fc" id="L119">      .filter(new IdNotInBroadcast&lt;&gt;())</span>
 <span class="fc" id="L120">      .withBroadcastSet(patternVertexIds, IdNotInBroadcast.IDS);</span>
 
-<span class="fc" id="L122">    DataSet&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; idJoin = patternVerticesWithGraphIDs</span>
+<span class="fc" id="L122">    DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; idJoin = patternVerticesWithGraphIDs</span>
 <span class="fc" id="L123">      .coGroup(mergedVertices)</span>
 <span class="fc" id="L124">      .where(new Value1Of2&lt;&gt;()).equalTo(new Value1Of2&lt;&gt;())</span>
 <span class="fc" id="L125">      .with(new CoGroupAssociateOldVerticesWithNewIds())</span>
 <span class="fc" id="L126">      .union(vi.map(new MapVerticesAsTuplesWithNullId()));</span>
 
-<span class="fc" id="L128">    DataSet&lt;Vertex&gt; vToRet = mergedVertices</span>
+<span class="fc" id="L128">    DataSet&lt;EPGMVertex&gt; vToRet = mergedVertices</span>
 <span class="fc" id="L129">      .coGroup(patternVerticesWithGraphIDs)</span>
 <span class="fc" id="L130">      .where(new Value1Of2&lt;&gt;()).equalTo(new Value1Of2&lt;&gt;())</span>
 <span class="fc" id="L131">      .with(new LeftSide&lt;&gt;())</span>
@@ -134,7 +134,7 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
 <span class="fc" id="L134">      .map(new MapFunctionAddGraphElementToGraph2&lt;&gt;(newGraphid));</span>
 
     // PHASE 3: Recreating the edges
-<span class="fc" id="L137">    DataSet&lt;Edge&gt; edges = searchGraph.getEdges()</span>
+<span class="fc" id="L137">    DataSet&lt;EPGMEdge&gt; edges = searchGraph.getEdges()</span>
 <span class="fc" id="L138">      .filter(new IdNotInBroadcast&lt;&gt;())</span>
 <span class="fc" id="L139">      .withBroadcastSet(patternEdgeIds, IdNotInBroadcast.IDS)</span>
 <span class="fc" id="L140">      .leftOuterJoin(idJoin)</span>

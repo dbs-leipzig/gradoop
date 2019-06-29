@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
@@ -25,18 +25,18 @@ import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.f
 import java.util.List;
 
 /**
- * Filters a set of EPGM {@link Edge} objects based on a specified predicate. Additionally, the
+ * Filters a set of {@link EPGMEdge} objects based on a specified predicate. Additionally, the
  * operator projects all property values to the output {@link Embedding} that are specified in the
  * given {@code projectionPropertyKeys}.
  *
- * Edge -&gt; Embedding(
+ * EPGMEdge -&gt; Embedding(
  *  [IdEntry(SourceId),IdEntry(EdgeId),IdEntry(TargetId)],
  *  [PropertyEntry(v1),PropertyEntry(v2)]
  * )
  *
  * Example:
  *
- * Given an Edge(0, 1, 2, &quot;friendOf&quot;, {since:2017, weight:23}), a predicate &quot;weight = 23&quot; and
+ * Given an EPGMEdge(0, 1, 2, &quot;friendOf&quot;, {since:2017, weight:23}), a predicate &quot;weight = 23&quot; and
  * list of projection property keys [since,isValid] the operator creates
  * an {@link Embedding}:
  *
@@ -46,7 +46,7 @@ public class FilterAndProjectEdges implements PhysicalOperator {
   /**
    * Input graph elements
    */
-  private final DataSet&lt;Edge&gt; input;
+  private final DataSet&lt;EPGMEdge&gt; input;
   /**
    * Predicates in conjunctive normal form
    */
@@ -73,7 +73,7 @@ public class FilterAndProjectEdges implements PhysicalOperator {
    * @param projectionPropertyKeys Property keys used for projection
    * @param isLoop is the edge a loop
    */
-  public FilterAndProjectEdges(DataSet&lt;Edge&gt; input, CNF predicates,
+  public FilterAndProjectEdges(DataSet&lt;EPGMEdge&gt; input, CNF predicates,
 <span class="fc" id="L77">    List&lt;String&gt; projectionPropertyKeys, boolean isLoop) {</span>
 <span class="fc" id="L78">    this.input = input;</span>
 <span class="fc" id="L79">    this.predicates = predicates;</span>

@@ -18,8 +18,8 @@ package org.gradoop.flink.algorithms.fsm.dimspan.functions.conversion;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.fsm.dimspan.tuples.LabeledGraphStringString;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -39,13 +39,13 @@ import java.util.Map;
 <span class="fc" id="L39">    Map&lt;String, Integer&gt; labelMap = Maps.newHashMap();</span>
 <span class="fc" id="L40">    Map&lt;GradoopId, Integer&gt; vertexIdMap = Maps.newHashMap();</span>
 
-<span class="fc bfc" id="L42" title="All 2 branches covered.">    for (Vertex vertex : transaction.getVertices()) {</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">    for (EPGMVertex vertex : transaction.getVertices()) {</span>
 <span class="fc" id="L43">      vertexIdMap.put(vertex.getId(), outGraph.addVertex(vertex.getLabel()));</span>
 <span class="fc" id="L44">    }</span>
 
 <span class="fc" id="L46">    labelMap.clear();</span>
 
-<span class="fc bfc" id="L48" title="All 2 branches covered.">    for (Edge edge : transaction.getEdges()) {</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">    for (EPGMEdge edge : transaction.getEdges()) {</span>
 <span class="fc" id="L49">      int sourceId = vertexIdMap.get(edge.getSourceId());</span>
 <span class="fc" id="L50">      int targetId = vertexIdMap.get(edge.getTargetId());</span>
 <span class="fc" id="L51">      outGraph.addEdge(sourceId, edge.getLabel(), targetId);</span>

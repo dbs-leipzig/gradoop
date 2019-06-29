@@ -21,7 +21,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.AbstractBuilder;
 import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.TripleWithCandidates;
 
 import java.util.Collection;
@@ -34,7 +34,7 @@ import static org.gradoop.common.util.GradoopConstants.DEFAULT_EDGE_LABEL;
  *
  * @param &lt;E&gt; EPGM edge type
  */
-public class BuildTripleWithCandidatesAndGraphs&lt;E extends Edge&gt;
+public class BuildTripleWithCandidatesAndGraphs&lt;E extends EPGMEdge&gt;
   extends AbstractBuilder&lt;E, Tuple2&lt;GradoopIdSet, TripleWithCandidates&lt;GradoopId&gt;&gt;&gt; {
 
   /**

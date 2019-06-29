@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.RichFilterFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.configuration.Configuration;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphElement;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> * Superclass of multi graph containment filters using broadcast variables.</em>
@@ -36,7 +36,7 @@
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * @param &lt;GE&gt; graph element type</em>
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/functions/graphcontainment/GraphsContainmentFilterBroadcast.html">GraphsContainmentFilterBroadcast</a>
-<a name="29" href="#29">29</a>    &lt;GE <strong class="jxr_keyword">extends</strong> GraphElement&gt; <strong class="jxr_keyword">extends</strong> RichFilterFunction&lt;GE&gt; {
+<a name="29" href="#29">29</a>    &lt;GE <strong class="jxr_keyword">extends</strong> EPGMGraphElement&gt; <strong class="jxr_keyword">extends</strong> RichFilterFunction&lt;GE&gt; {
 <a name="30" href="#30">30</a>  
 <a name="31" href="#31">31</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * constant string for "graph ids"</em>

@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.tlf.functions;
 
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.io.impl.tlf.TLFConstants;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -51,7 +51,7 @@ import java.util.Map;
   public GraphTransaction map(GraphTransaction graphTransaction)
       throws Exception {
     String label;
-<span class="fc bfc" id="L54" title="All 2 branches covered.">    for (Edge edge : graphTransaction.getEdges()) {</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">    for (EPGMEdge edge : graphTransaction.getEdges()) {</span>
 <span class="fc" id="L55">      label = edgeDictionary.get(Integer.parseInt(edge.getLabel()));</span>
 <span class="pc bpc" id="L56" title="1 of 2 branches missed.">      if (label != null) {</span>
 <span class="fc" id="L57">        edge.setLabel(label);</span>

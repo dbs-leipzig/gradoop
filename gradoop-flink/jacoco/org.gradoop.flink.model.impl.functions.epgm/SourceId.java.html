@@ -18,16 +18,16 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Used to select the source vertex id of an edge.
  *
- * @param &lt;E&gt; EPGM edge type
+ * @param &lt;E&gt; edge type
  */
 @FunctionAnnotation.ForwardedFields(&quot;sourceId-&gt;*&quot;)
-<span class="fc" id="L30">public class SourceId&lt;E extends EPGMEdge&gt;</span>
+<span class="fc" id="L30">public class SourceId&lt;E extends Edge&gt;</span>
   implements KeySelector&lt;E, GradoopId&gt;, MapFunction&lt;E, GradoopId&gt; {
 
   @Override

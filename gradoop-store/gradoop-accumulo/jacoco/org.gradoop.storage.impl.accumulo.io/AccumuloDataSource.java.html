@@ -16,9 +16,9 @@
 package org.gradoop.storage.impl.accumulo.io;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -40,24 +40,24 @@ import javax.annotation.Nullable;
  * Read logic graph or graph collection from accumulo store
  */
 public class AccumuloDataSource extends AccumuloBase implements FilterableDataSource&lt;
-  ElementQuery&lt;AccumuloElementFilter&lt;GraphHead&gt;&gt;,
-  ElementQuery&lt;AccumuloElementFilter&lt;Vertex&gt;&gt;,
-  ElementQuery&lt;AccumuloElementFilter&lt;Edge&gt;&gt;&gt; {
+  ElementQuery&lt;AccumuloElementFilter&lt;EPGMGraphHead&gt;&gt;,
+  ElementQuery&lt;AccumuloElementFilter&lt;EPGMVertex&gt;&gt;,
+  ElementQuery&lt;AccumuloElementFilter&lt;EPGMEdge&gt;&gt;&gt; {
 
   /**
    * graph head filter
    */
-  private final AccumuloQueryHolder&lt;GraphHead&gt; graphHeadQuery;
+  private final AccumuloQueryHolder&lt;EPGMGraphHead&gt; graphHeadQuery;
 
   /**
    * vertex filter
    */
-  private final AccumuloQueryHolder&lt;Vertex&gt; vertexQuery;
+  private final AccumuloQueryHolder&lt;EPGMVertex&gt; vertexQuery;
 
   /**
    * edge filter
    */
-  private final AccumuloQueryHolder&lt;Edge&gt; edgeQuery;
+  private final AccumuloQueryHolder&lt;EPGMEdge&gt; edgeQuery;
 
   /**
    * Creates a new Accumulo data source.
@@ -84,9 +84,9 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
   private AccumuloDataSource(
     @Nonnull AccumuloEPGMStore store,
     @Nonnull GradoopFlinkConfig config,
-    @Nullable AccumuloQueryHolder&lt;GraphHead&gt; graphQuery,
-    @Nullable AccumuloQueryHolder&lt;Vertex&gt; vertexQuery,
-    @Nullable AccumuloQueryHolder&lt;Edge&gt; edgeQuery
+    @Nullable AccumuloQueryHolder&lt;EPGMGraphHead&gt; graphQuery,
+    @Nullable AccumuloQueryHolder&lt;EPGMVertex&gt; vertexQuery,
+    @Nullable AccumuloQueryHolder&lt;EPGMEdge&gt; edgeQuery
   ) {
 <span class="fc" id="L91">    super(store, config);</span>
 <span class="fc" id="L92">    this.graphHeadQuery = graphQuery;</span>
@@ -119,9 +119,9 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
   @Nonnull
   @Override
   public AccumuloDataSource applyGraphPredicate(
-    @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;GraphHead&gt;&gt; query
+    @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;EPGMGraphHead&gt;&gt; query
   ) {
-<span class="fc" id="L124">    AccumuloQueryHolder&lt;GraphHead&gt; newGraphQuery = AccumuloQueryHolder.create(query);</span>
+<span class="fc" id="L124">    AccumuloQueryHolder&lt;EPGMGraphHead&gt; newGraphQuery = AccumuloQueryHolder.create(query);</span>
 <span class="fc" id="L125">    return new AccumuloDataSource(</span>
 <span class="fc" id="L126">      getStore(),</span>
 <span class="fc" id="L127">      getFlinkConfig(),</span>
@@ -134,9 +134,9 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
   @Nonnull
   @Override
   public AccumuloDataSource applyVertexPredicate(
-    @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;Vertex&gt;&gt; query
+    @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;EPGMVertex&gt;&gt; query
   ) {
-<span class="fc" id="L139">    AccumuloQueryHolder&lt;Vertex&gt; newVertexQuery = AccumuloQueryHolder.create(query);</span>
+<span class="fc" id="L139">    AccumuloQueryHolder&lt;EPGMVertex&gt; newVertexQuery = AccumuloQueryHolder.create(query);</span>
 <span class="fc" id="L140">    return new AccumuloDataSource(</span>
 <span class="fc" id="L141">      getStore(),</span>
 <span class="fc" id="L142">      getFlinkConfig(),</span>
@@ -149,9 +149,9 @@ public class AccumuloDataSource extends AccumuloBase implements FilterableDataSo
   @Nonnull
   @Override
   public AccumuloDataSource applyEdgePredicate(
-    @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;Edge&gt;&gt; query
+    @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;EPGMEdge&gt;&gt; query
   ) {
-<span class="fc" id="L154">    AccumuloQueryHolder&lt;Edge&gt; newEdgeQuery = AccumuloQueryHolder.create(query);</span>
+<span class="fc" id="L154">    AccumuloQueryHolder&lt;EPGMEdge&gt; newEdgeQuery = AccumuloQueryHolder.create(query);</span>
 <span class="fc" id="L155">    return new AccumuloDataSource(</span>
 <span class="fc" id="L156">      getStore(),</span>
 <span class="fc" id="L157">      getFlinkConfig(),</span>

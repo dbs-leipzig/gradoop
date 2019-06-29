@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.functions.epgm;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Element;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMElement;
 <a name="20" href="#20">20</a>  
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> com.google.common.base.Preconditions.checkNotNull;
 <a name="22" href="#22">22</a>  
@@ -35,7 +35,7 @@
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; EPGM element type.</em>
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> PropertyRemover&lt;E <strong class="jxr_keyword">extends</strong> Element&gt; implements MapFunction&lt;E, E&gt; {
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> PropertyRemover&lt;E <strong class="jxr_keyword">extends</strong> EPGMElement&gt; implements MapFunction&lt;E, E&gt; {
 <a name="29" href="#29">29</a>  
 <a name="30" href="#30">30</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   * Property key to remove.</em>

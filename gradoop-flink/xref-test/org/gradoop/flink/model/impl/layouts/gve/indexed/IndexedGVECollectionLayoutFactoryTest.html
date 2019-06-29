@@ -25,9 +25,9 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.layouts.gve.indexed;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.GraphCollectionLayoutFactoryTest;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.GradoopFlinkConfig;
@@ -37,7 +37,7 @@
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/layouts/gve/indexed/IndexedGVECollectionLayoutFactoryTest.html">IndexedGVECollectionLayoutFactoryTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/layouts/GraphCollectionLayoutFactoryTest.html">GraphCollectionLayoutFactoryTest</a> {
 <a name="29" href="#29">29</a>    @Override
-<a name="30" href="#30">30</a>    <strong class="jxr_keyword">protected</strong> GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; getFactory() {
+<a name="30" href="#30">30</a>    <strong class="jxr_keyword">protected</strong> GraphCollectionLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; getFactory() {
 <a name="31" href="#31">31</a>      <em class="jxr_comment">// create the factory to test</em>
 <a name="32" href="#32">32</a>      IndexedGVECollectionLayoutFactory factory = <strong class="jxr_keyword">new</strong> IndexedGVECollectionLayoutFactory();
 <a name="33" href="#33">33</a>      <em class="jxr_comment">// create a default gradoop flink config and set it to the layout</em>

@@ -28,8 +28,8 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple3;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.dataintegration.transformation.functions.CreateEdgesFromTriple;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.dataintegration.transformation.functions.CreateVertexFromEdges;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
@@ -92,20 +92,20 @@
 <a name="82" href="#82">82</a>  
 <a name="83" href="#83">83</a>    @Override
 <a name="84" href="#84">84</a>    <strong class="jxr_keyword">public</strong> LogicalGraph execute(LogicalGraph graph) {
-<a name="85" href="#85">85</a>      DataSet&lt;Edge&gt; relevantEdges = graph.getEdgesByLabel(edgeLabel);
+<a name="85" href="#85">85</a>      DataSet&lt;EPGMEdge&gt; relevantEdges = graph.getEdgesByLabel(edgeLabel);
 <a name="86" href="#86">86</a>  
 <a name="87" href="#87">87</a>      <em class="jxr_comment">// create new vertices</em>
-<a name="88" href="#88">88</a>      DataSet&lt;Tuple3&lt;Vertex, GradoopId, GradoopId&gt;&gt; newVerticesAndOriginIds = relevantEdges
+<a name="88" href="#88">88</a>      DataSet&lt;Tuple3&lt;EPGMVertex, GradoopId, GradoopId&gt;&gt; newVerticesAndOriginIds = relevantEdges
 <a name="89" href="#89">89</a>        .map(<strong class="jxr_keyword">new</strong> CreateVertexFromEdges&lt;&gt;(newVertexLabel, graph.getFactory().getVertexFactory()));
 <a name="90" href="#90">90</a>  
-<a name="91" href="#91">91</a>      DataSet&lt;Vertex&gt; newVertices = newVerticesAndOriginIds
+<a name="91" href="#91">91</a>      DataSet&lt;EPGMVertex&gt; newVertices = newVerticesAndOriginIds
 <a name="92" href="#92">92</a>        .map(<strong class="jxr_keyword">new</strong> Value0Of3&lt;&gt;())
 <a name="93" href="#93">93</a>        .map(<strong class="jxr_keyword">new</strong> AddToGraphBroadcast&lt;&gt;())
 <a name="94" href="#94">94</a>        .withBroadcastSet(graph.getGraphHead().map(<strong class="jxr_keyword">new</strong> Id&lt;&gt;()), AddToGraphBroadcast.GRAPH_ID)
 <a name="95" href="#95">95</a>        .union(graph.getVertices());
 <a name="96" href="#96">96</a>  
 <a name="97" href="#97">97</a>      <em class="jxr_comment">// create edges to the newly created vertex</em>
-<a name="98" href="#98">98</a>      DataSet&lt;Edge&gt; newEdges = newVerticesAndOriginIds
+<a name="98" href="#98">98</a>      DataSet&lt;EPGMEdge&gt; newEdges = newVerticesAndOriginIds
 <a name="99" href="#99">99</a>        .flatMap(<strong class="jxr_keyword">new</strong> CreateEdgesFromTriple&lt;&gt;(graph.getFactory().getEdgeFactory(),
 <a name="100" href="#100">100</a>         edgeLabelSourceToNew, edgeLabelNewToTarget))
 <a name="101" href="#101">101</a>       .map(<strong class="jxr_keyword">new</strong> AddToGraphBroadcast&lt;&gt;())

@@ -26,9 +26,9 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.grouping.tuples;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple5;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMEdge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMElement;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Element;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValueList;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -263,7 +263,7 @@
 <a name="253" href="#253">253</a> <em class="jxr_javadoccomment">   * @return property values for aggregation</em>
 <a name="254" href="#254">254</a> <em class="jxr_javadoccomment">   * @throws IOException on failure</em>
 <a name="255" href="#255">255</a> <em class="jxr_javadoccomment">   */</em>
-<a name="256" href="#256">256</a>   <strong class="jxr_keyword">public</strong> PropertyValueList getIncrementValues(EPGMElement element) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="256" href="#256">256</a>   <strong class="jxr_keyword">public</strong> PropertyValueList getIncrementValues(Element element) <strong class="jxr_keyword">throws</strong> IOException {
 <a name="257" href="#257">257</a>     <strong class="jxr_keyword">if</strong> (f3.isEmpty()) {
 <a name="258" href="#258">258</a>       <strong class="jxr_keyword">return</strong> PropertyValueList.createEmptyList();
 <a name="259" href="#259">259</a>     }
@@ -281,10 +281,10 @@
 <a name="271" href="#271">271</a> <em class="jxr_javadoccomment">   * @return increment value</em>
 <a name="272" href="#272">272</a> <em class="jxr_javadoccomment">   */</em>
 <a name="273" href="#273">273</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> PropertyValue getIncrement(<a href="../../../../../../../../org/gradoop/flink/model/api/functions/AggregateFunction.html">AggregateFunction</a> aggregateFunction,
-<a name="274" href="#274">274</a>                                             EPGMElement element) {
+<a name="274" href="#274">274</a>                                             Element element) {
 <a name="275" href="#275">275</a>     PropertyValue increment = <strong class="jxr_keyword">null</strong>;
-<a name="276" href="#276">276</a>     <strong class="jxr_keyword">if</strong> ((element instanceof EPGMVertex &amp;&amp; aggregateFunction.isVertexAggregation()) ||
-<a name="277" href="#277">277</a>       (element instanceof EPGMEdge &amp;&amp; aggregateFunction.isEdgeAggregation())) {
+<a name="276" href="#276">276</a>     <strong class="jxr_keyword">if</strong> ((element instanceof Vertex &amp;&amp; aggregateFunction.isVertexAggregation()) ||
+<a name="277" href="#277">277</a>       (element instanceof Edge &amp;&amp; aggregateFunction.isEdgeAggregation())) {
 <a name="278" href="#278">278</a>       increment = aggregateFunction.getIncrement(element);
 <a name="279" href="#279">279</a>     }
 <a name="280" href="#280">280</a>     <strong class="jxr_keyword">return</strong> increment == <strong class="jxr_keyword">null</strong> ? AggregateUtil.getDefaultAggregate(aggregateFunction) : increment;

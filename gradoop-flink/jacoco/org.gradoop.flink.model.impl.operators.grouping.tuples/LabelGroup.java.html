@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.grouping.tuples;
 
 import org.apache.flink.api.java.tuple.Tuple5;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -253,7 +253,7 @@ public class LabelGroup
    * @return property values for aggregation
    * @throws IOException on failure
    */
-  public PropertyValueList getIncrementValues(EPGMElement element) throws IOException {
+  public PropertyValueList getIncrementValues(Element element) throws IOException {
 <span class="fc bfc" id="L257" title="All 2 branches covered.">    if (f3.isEmpty()) {</span>
 <span class="fc" id="L258">      return PropertyValueList.createEmptyList();</span>
     }
@@ -271,10 +271,10 @@ public class LabelGroup
    * @return increment value
    */
   private static PropertyValue getIncrement(AggregateFunction aggregateFunction,
-                                            EPGMElement element) {
+                                            Element element) {
 <span class="fc" id="L275">    PropertyValue increment = null;</span>
-<span class="pc bpc" id="L276" title="2 of 6 branches missed.">    if ((element instanceof EPGMVertex &amp;&amp; aggregateFunction.isVertexAggregation()) ||</span>
-<span class="pc bpc" id="L277" title="1 of 2 branches missed.">      (element instanceof EPGMEdge &amp;&amp; aggregateFunction.isEdgeAggregation())) {</span>
+<span class="pc bpc" id="L276" title="2 of 6 branches missed.">    if ((element instanceof Vertex &amp;&amp; aggregateFunction.isVertexAggregation()) ||</span>
+<span class="pc bpc" id="L277" title="1 of 2 branches missed.">      (element instanceof Edge &amp;&amp; aggregateFunction.isEdgeAggregation())) {</span>
 <span class="fc" id="L278">      increment = aggregateFunction.getIncrement(element);</span>
     }
 <span class="fc bfc" id="L280" title="All 2 branches covered.">    return increment == null ? AggregateUtil.getDefaultAggregate(aggregateFunction) : increment;</span>

@@ -26,14 +26,14 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.sampling.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.FilterFunction;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 <a name="21" href="#21">21</a>  
 <a name="22" href="#22">22</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment"> * Retains all vertices with a PageRank-score greater or equal/smaller than a given</em>
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> * sampling threshold - depending on the Boolean set in {@code sampleGreaterThanThreshold}.</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/PageRankResultVertexFilter.html">PageRankResultVertexFilter</a> implements FilterFunction&lt;Vertex&gt; {
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/PageRankResultVertexFilter.html">PageRankResultVertexFilter</a> implements FilterFunction&lt;EPGMVertex&gt; {
 <a name="27" href="#27">27</a>  
 <a name="28" href="#28">28</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment">   * Sampling threshold for PageRankScore</em>
@@ -68,7 +68,7 @@
 <a name="58" href="#58">58</a>    }
 <a name="59" href="#59">59</a>  
 <a name="60" href="#60">60</a>    @Override
-<a name="61" href="#61">61</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> filter(Vertex v) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="61" href="#61">61</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> filter(EPGMVertex v) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="62" href="#62">62</a>      <strong class="jxr_keyword">if</strong> (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
 <a name="63" href="#63">63</a>        <strong class="jxr_keyword">double</strong> pr = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
 <a name="64" href="#64">64</a>          .getDouble();

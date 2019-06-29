@@ -19,15 +19,15 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 
 /**
- * KeySelector that returns the id of a {@link Element} in the second field of a tuple.
+ * KeySelector that returns the id of a {@link EPGMElement} in the second field of a tuple.
  *
- * @param &lt;E&gt; any GraphElement
+ * @param &lt;E&gt; any EPGMGraphElement
  */
 @FunctionAnnotation.ForwardedFields(&quot;f1.id-&gt;*&quot;)
-<span class="fc" id="L30">public class IdOfF1&lt;E extends Element&gt; implements KeySelector&lt;Tuple2&lt;Long, E&gt;, GradoopId&gt; {</span>
+<span class="fc" id="L30">public class IdOfF1&lt;E extends EPGMElement&gt; implements KeySelector&lt;Tuple2&lt;Long, E&gt;, GradoopId&gt; {</span>
 
   @Override
   public GradoopId getKey(Tuple2&lt;Long, E&gt; tuple) {

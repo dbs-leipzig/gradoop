@@ -17,14 +17,14 @@ package org.gradoop.flink.algorithms.gelly.connectedcomponents.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Stores the gelly vertex value (a {@link GradoopId}) as property with the given property key in
  * the gradoop vertex.
  */
 public class GellyVertexValueToVertexPropertyJoin
-  implements JoinFunction&lt;org.apache.flink.graph.Vertex&lt;GradoopId, GradoopId&gt;, Vertex, Vertex&gt; {
+  implements JoinFunction&lt;org.apache.flink.graph.Vertex&lt;GradoopId, GradoopId&gt;, EPGMVertex, EPGMVertex&gt; {
 
   /**
    * Property key to store the gelly vertex value.
@@ -41,8 +41,8 @@ public class GellyVertexValueToVertexPropertyJoin
 <span class="fc" id="L41">  }</span>
 
   @Override
-  public Vertex join(org.apache.flink.graph.Vertex&lt;GradoopId, GradoopId&gt; gellyVertex,
-    Vertex gradoopVertex) {
+  public EPGMVertex join(org.apache.flink.graph.Vertex&lt;GradoopId, GradoopId&gt; gellyVertex,
+    EPGMVertex gradoopVertex) {
 <span class="fc" id="L46">    gradoopVertex.setProperty(propertyKey, gellyVertex.getValue());</span>
 <span class="fc" id="L47">    return gradoopVertex;</span>
   }

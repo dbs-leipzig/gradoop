@@ -32,7 +32,7 @@
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.accumulo.core.iterators.IteratorEnvironment;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.apache.accumulo.core.util.Pair;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMElement;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Element;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 <a name="28" href="#28">28</a>  
@@ -47,7 +47,7 @@
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> * Accumulo Tablet Server Iterator</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> * This Iterator will be created in accumulo tablet server runtime, when executing a partition</em>
-<a name="40" href="#40">40</a>  <em class="jxr_javadoccomment"> * range query. A Gradoop Element iterator will decode query options as query filter, transform</em>
+<a name="40" href="#40">40</a>  <em class="jxr_javadoccomment"> * range query. A Gradoop element iterator will decode query options as query filter, transform</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment"> * multi-rows into epgm element and check if this element should be return by predicate. Each</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment"> * element that fulfill the predicate will be serialized into one row.</em>
 <a name="43" href="#43">43</a>  <em class="jxr_javadoccomment"> *</em>
@@ -55,7 +55,7 @@
 <a name="45" href="#45">45</a>  <em class="jxr_javadoccomment"> * @see &lt;a href="https://accumulo.apache.org/1.9/accumulo_user_manual.html#_iterator_design"&gt;</em>
 <a name="46" href="#46">46</a>  <em class="jxr_javadoccomment"> *   accumulo iterator design&lt;/a&gt;</em>
 <a name="47" href="#47">47</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="48" href="#48">48</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">class</strong> BaseElementIterator&lt;E <strong class="jxr_keyword">extends</strong> EPGMElement&gt; implements
+<a name="48" href="#48">48</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">class</strong> BaseElementIterator&lt;E <strong class="jxr_keyword">extends</strong> Element&gt; implements
 <a name="49" href="#49">49</a>    SortedKeyValueIterator&lt;Key, Value&gt; {
 <a name="50" href="#50">50</a>  
 <a name="51" href="#51">51</a>    <em class="jxr_javadoccomment">/**</em>
@@ -74,7 +74,7 @@
 <a name="64" href="#64">64</a>    <strong class="jxr_keyword">private</strong> Pair&lt;Key, Value&gt; top;
 <a name="65" href="#65">65</a>  
 <a name="66" href="#66">66</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="67" href="#67">67</a>  <em class="jxr_javadoccomment">   * Element filter predicate</em>
+<a name="67" href="#67">67</a>  <em class="jxr_javadoccomment">   * EPGMElement filter predicate</em>
 <a name="68" href="#68">68</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="69" href="#69">69</a>    <strong class="jxr_keyword">private</strong> AccumuloElementFilter&lt;E&gt; filter;
 <a name="70" href="#70">70</a>  

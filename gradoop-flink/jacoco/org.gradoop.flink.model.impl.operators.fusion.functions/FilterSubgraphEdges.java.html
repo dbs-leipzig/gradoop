@@ -18,14 +18,14 @@ package org.gradoop.flink.model.impl.operators.fusion.functions;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * Checks whether the edge contains a given graphId, which means that belongs to a given graph
  */
-<span class="fc" id="L26">public class FilterSubgraphEdges implements FilterFunction&lt;Tuple2&lt;GradoopId, Edge&gt;&gt; {</span>
+<span class="fc" id="L26">public class FilterSubgraphEdges implements FilterFunction&lt;Tuple2&lt;GradoopId, EPGMEdge&gt;&gt; {</span>
   @Override
-  public boolean filter(Tuple2&lt;GradoopId, Edge&gt; value) throws Exception {
+  public boolean filter(Tuple2&lt;GradoopId, EPGMEdge&gt; value) throws Exception {
 <span class="fc" id="L29">    return value.f1.getGraphIds().contains(value.f0);</span>
   }
 }

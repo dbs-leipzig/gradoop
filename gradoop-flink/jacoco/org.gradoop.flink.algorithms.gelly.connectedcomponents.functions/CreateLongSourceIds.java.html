@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * Join function to receive structural information of the graph.
@@ -29,7 +29,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
 @FunctionAnnotation.ForwardedFieldsFirst({&quot;f0-&gt;f0&quot;, &quot;f1-&gt;f1&quot;, &quot;f0-&gt;f2&quot;})
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;targetId-&gt;f3&quot;)
 public class CreateLongSourceIds
-  implements JoinFunction&lt;Tuple2&lt;Long, GradoopId&gt;, Edge, Tuple4&lt;Long, GradoopId, Long, GradoopId&gt;&gt; {
+  implements JoinFunction&lt;Tuple2&lt;Long, GradoopId&gt;, EPGMEdge, Tuple4&lt;Long, GradoopId, Long, GradoopId&gt;&gt; {
 
   /**
    * Reuse object.
@@ -51,7 +51,7 @@ public class CreateLongSourceIds
    * @return tuple &lt;vertexID&lt;Long&gt;&gt;,vertexID&lt;GradoopID&gt;&gt;,sourceID&lt;Long&gt;&gt;,targetID&lt;GradoopID&gt;&gt;
    */
   @Override
-  public Tuple4&lt;Long, GradoopId, Long, GradoopId&gt; join(Tuple2&lt;Long, GradoopId&gt; tuple, Edge edge) {
+  public Tuple4&lt;Long, GradoopId, Long, GradoopId&gt; join(Tuple2&lt;Long, GradoopId&gt; tuple, EPGMEdge edge) {
 <span class="fc" id="L55">    reuse.f0 = tuple.f0;</span>
 <span class="fc" id="L56">    reuse.f1 = tuple.f1;</span>
 <span class="fc" id="L57">    reuse.f2 = tuple.f0;</span>

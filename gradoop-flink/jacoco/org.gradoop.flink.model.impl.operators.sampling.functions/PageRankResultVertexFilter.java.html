@@ -16,14 +16,14 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 
 /**
  * Retains all vertices with a PageRank-score greater or equal/smaller than a given
  * sampling threshold - depending on the Boolean set in {@code sampleGreaterThanThreshold}.
  */
-public class PageRankResultVertexFilter implements FilterFunction&lt;Vertex&gt; {
+public class PageRankResultVertexFilter implements FilterFunction&lt;EPGMVertex&gt; {
 
   /**
    * Sampling threshold for PageRankScore
@@ -58,7 +58,7 @@ public class PageRankResultVertexFilter implements FilterFunction&lt;Vertex&gt; 
 <span class="fc" id="L58">  }</span>
 
   @Override
-  public boolean filter(Vertex v) throws Exception {
+  public boolean filter(EPGMVertex v) throws Exception {
 <span class="fc bfc" id="L62" title="All 2 branches covered.">    if (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {</span>
 <span class="fc" id="L63">      double pr = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)</span>
 <span class="fc" id="L64">        .getDouble();</span>

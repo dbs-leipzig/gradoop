@@ -29,10 +29,10 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Maps;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphElement;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
@@ -51,26 +51,26 @@
 <a name="41" href="#41">41</a>  
 <a name="42" href="#42">42</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">abstract</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../org/gradoop/flink/model/impl/layouts/LogicalGraphLayoutFactoryTest.html">LogicalGraphLayoutFactoryTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
 <a name="43" href="#43">43</a>  
-<a name="44" href="#44">44</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">abstract</strong> LogicalGraphLayoutFactory&lt;GraphHead, Vertex, Edge&gt; getFactory();
+<a name="44" href="#44">44</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">abstract</strong> LogicalGraphLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; getFactory();
 <a name="45" href="#45">45</a>  
 <a name="46" href="#46">46</a>    @Test
 <a name="47" href="#47">47</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFromDataSets() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="48" href="#48">48</a>      FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 <a name="49" href="#49">49</a>  
-<a name="50" href="#50">50</a>      GraphHead graphHead = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>);
-<a name="51" href="#51">51</a>      Collection&lt;Vertex&gt; vertices = loader.getVerticesByGraphVariables(<span class="jxr_string">"g0"</span>);
-<a name="52" href="#52">52</a>      Collection&lt;Edge&gt; edges = loader.getEdgesByGraphVariables(<span class="jxr_string">"g0"</span>);
+<a name="50" href="#50">50</a>      EPGMGraphHead graphHead = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>);
+<a name="51" href="#51">51</a>      Collection&lt;EPGMVertex&gt; vertices = loader.getVerticesByGraphVariables(<span class="jxr_string">"g0"</span>);
+<a name="52" href="#52">52</a>      Collection&lt;EPGMEdge&gt; edges = loader.getEdgesByGraphVariables(<span class="jxr_string">"g0"</span>);
 <a name="53" href="#53">53</a>  
-<a name="54" href="#54">54</a>      DataSet&lt;GraphHead&gt; graphHeadDataSet = getExecutionEnvironment().fromElements(graphHead);
-<a name="55" href="#55">55</a>      DataSet&lt;Vertex&gt; vertexDataSet = getExecutionEnvironment().fromCollection(vertices);
-<a name="56" href="#56">56</a>      DataSet&lt;Edge&gt; edgeDataSet = getExecutionEnvironment().fromCollection(edges);
+<a name="54" href="#54">54</a>      DataSet&lt;EPGMGraphHead&gt; graphHeadDataSet = getExecutionEnvironment().fromElements(graphHead);
+<a name="55" href="#55">55</a>      DataSet&lt;EPGMVertex&gt; vertexDataSet = getExecutionEnvironment().fromCollection(vertices);
+<a name="56" href="#56">56</a>      DataSet&lt;EPGMEdge&gt; edgeDataSet = getExecutionEnvironment().fromCollection(edges);
 <a name="57" href="#57">57</a>  
-<a name="58" href="#58">58</a>      LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; logicalGraphLayout = getFactory()
+<a name="58" href="#58">58</a>      LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; logicalGraphLayout = getFactory()
 <a name="59" href="#59">59</a>        .fromDataSets(graphHeadDataSet, vertexDataSet, edgeDataSet);
 <a name="60" href="#60">60</a>  
-<a name="61" href="#61">61</a>      Collection&lt;GraphHead&gt; loadedGraphHeads = Lists.newArrayList();
-<a name="62" href="#62">62</a>      Collection&lt;Vertex&gt; loadedVertices = Lists.newArrayList();
-<a name="63" href="#63">63</a>      Collection&lt;Edge&gt; loadedEdges = Lists.newArrayList();
+<a name="61" href="#61">61</a>      Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = Lists.newArrayList();
+<a name="62" href="#62">62</a>      Collection&lt;EPGMVertex&gt; loadedVertices = Lists.newArrayList();
+<a name="63" href="#63">63</a>      Collection&lt;EPGMEdge&gt; loadedEdges = Lists.newArrayList();
 <a name="64" href="#64">64</a>  
 <a name="65" href="#65">65</a>      logicalGraphLayout.getGraphHead().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(
 <a name="66" href="#66">66</a>        loadedGraphHeads));
@@ -81,35 +81,35 @@
 <a name="71" href="#71">71</a>  
 <a name="72" href="#72">72</a>      getExecutionEnvironment().execute();
 <a name="73" href="#73">73</a>  
-<a name="74" href="#74">74</a>      validateEPGMElements(graphHead, loadedGraphHeads.iterator().next());
-<a name="75" href="#75">75</a>      validateEPGMElementCollections(vertices, loadedVertices);
-<a name="76" href="#76">76</a>      validateEPGMElementCollections(edges, loadedEdges);
-<a name="77" href="#77">77</a>      validateEPGMGraphElementCollections(vertices, loadedVertices);
-<a name="78" href="#78">78</a>      validateEPGMGraphElementCollections(edges, loadedEdges);
+<a name="74" href="#74">74</a>      validateElements(graphHead, loadedGraphHeads.iterator().next());
+<a name="75" href="#75">75</a>      validateElementCollections(vertices, loadedVertices);
+<a name="76" href="#76">76</a>      validateElementCollections(edges, loadedEdges);
+<a name="77" href="#77">77</a>      validateGraphElementCollections(vertices, loadedVertices);
+<a name="78" href="#78">78</a>      validateGraphElementCollections(edges, loadedEdges);
 <a name="79" href="#79">79</a>    }
 <a name="80" href="#80">80</a>  
 <a name="81" href="#81">81</a>    @Test
 <a name="82" href="#82">82</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFromIndexedDataSets() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="83" href="#83">83</a>      FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 <a name="84" href="#84">84</a>  
-<a name="85" href="#85">85</a>      GraphHead g0 = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>);
-<a name="86" href="#86">86</a>      Map&lt;String, DataSet&lt;GraphHead&gt;&gt; indexedGraphHead = Maps.newHashMap();
+<a name="85" href="#85">85</a>      EPGMGraphHead g0 = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>);
+<a name="86" href="#86">86</a>      Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; indexedGraphHead = Maps.newHashMap();
 <a name="87" href="#87">87</a>      indexedGraphHead.put(g0.getLabel(), getExecutionEnvironment().fromElements(g0));
 <a name="88" href="#88">88</a>  
-<a name="89" href="#89">89</a>      Map&lt;String, DataSet&lt;Vertex&gt;&gt; indexedVertices = loader.getVerticesByGraphVariables(<span class="jxr_string">"g0"</span>).stream()
-<a name="90" href="#90">90</a>        .collect(Collectors.groupingBy(Vertex::getLabel)).entrySet().stream()
+<a name="89" href="#89">89</a>      Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; indexedVertices = loader.getVerticesByGraphVariables(<span class="jxr_string">"g0"</span>).stream()
+<a name="90" href="#90">90</a>        .collect(Collectors.groupingBy(EPGMVertex::getLabel)).entrySet().stream()
 <a name="91" href="#91">91</a>        .collect(Collectors.toMap(Map.Entry::getKey, e -&gt; getExecutionEnvironment().fromCollection(e.getValue())));
 <a name="92" href="#92">92</a>  
-<a name="93" href="#93">93</a>      Map&lt;String, DataSet&lt;Edge&gt;&gt; indexedEdges = loader.getEdgesByGraphVariables(<span class="jxr_string">"g0"</span>).stream()
-<a name="94" href="#94">94</a>        .collect(Collectors.groupingBy(Edge::getLabel)).entrySet().stream()
+<a name="93" href="#93">93</a>      Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; indexedEdges = loader.getEdgesByGraphVariables(<span class="jxr_string">"g0"</span>).stream()
+<a name="94" href="#94">94</a>        .collect(Collectors.groupingBy(EPGMEdge::getLabel)).entrySet().stream()
 <a name="95" href="#95">95</a>        .collect(Collectors.toMap(Map.Entry::getKey, e -&gt; getExecutionEnvironment().fromCollection(e.getValue())));
 <a name="96" href="#96">96</a>  
-<a name="97" href="#97">97</a>      LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; logicalGraphLayout = getFactory()
+<a name="97" href="#97">97</a>      LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; logicalGraphLayout = getFactory()
 <a name="98" href="#98">98</a>        .fromIndexedDataSets(indexedGraphHead, indexedVertices, indexedEdges);
 <a name="99" href="#99">99</a>  
-<a name="100" href="#100">100</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = Lists.newArrayList();
-<a name="101" href="#101">101</a>     Collection&lt;Vertex&gt; loadedVertices = Lists.newArrayList();
-<a name="102" href="#102">102</a>     Collection&lt;Edge&gt; loadedEdges = Lists.newArrayList();
+<a name="100" href="#100">100</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = Lists.newArrayList();
+<a name="101" href="#101">101</a>     Collection&lt;EPGMVertex&gt; loadedVertices = Lists.newArrayList();
+<a name="102" href="#102">102</a>     Collection&lt;EPGMEdge&gt; loadedEdges = Lists.newArrayList();
 <a name="103" href="#103">103</a> 
 <a name="104" href="#104">104</a>     logicalGraphLayout.getGraphHead().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(
 <a name="105" href="#105">105</a>       loadedGraphHeads));
@@ -120,25 +120,25 @@
 <a name="110" href="#110">110</a> 
 <a name="111" href="#111">111</a>     getExecutionEnvironment().execute();
 <a name="112" href="#112">112</a> 
-<a name="113" href="#113">113</a>     validateEPGMElements(g0, loadedGraphHeads.iterator().next());
-<a name="114" href="#114">114</a>     validateEPGMElementCollections(loader.getVerticesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedVertices);
-<a name="115" href="#115">115</a>     validateEPGMElementCollections(loader.getEdgesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedEdges);
-<a name="116" href="#116">116</a>     validateEPGMGraphElementCollections(loader.getVerticesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedVertices);
-<a name="117" href="#117">117</a>     validateEPGMGraphElementCollections(loader.getEdgesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedEdges);
+<a name="113" href="#113">113</a>     validateElements(g0, loadedGraphHeads.iterator().next());
+<a name="114" href="#114">114</a>     validateElementCollections(loader.getVerticesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedVertices);
+<a name="115" href="#115">115</a>     validateElementCollections(loader.getEdgesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedEdges);
+<a name="116" href="#116">116</a>     validateGraphElementCollections(loader.getVerticesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedVertices);
+<a name="117" href="#117">117</a>     validateGraphElementCollections(loader.getEdgesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedEdges);
 <a name="118" href="#118">118</a>   }
 <a name="119" href="#119">119</a> 
 <a name="120" href="#120">120</a>   @Test
 <a name="121" href="#121">121</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFromDataSetsWithoutGraphHead() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="122" href="#122">122</a>     FlinkAsciiGraphLoader loader = getLoaderFromString(<span class="jxr_string">"()--&gt;()&lt;--()--&gt;()"</span>);
 <a name="123" href="#123">123</a> 
-<a name="124" href="#124">124</a>     LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; logicalGraphLayout = getFactory()
+<a name="124" href="#124">124</a>     LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; logicalGraphLayout = getFactory()
 <a name="125" href="#125">125</a>       .fromDataSets(
 <a name="126" href="#126">126</a>         getExecutionEnvironment().fromCollection(loader.getVertices()),
 <a name="127" href="#127">127</a>         getExecutionEnvironment().fromCollection(loader.getEdges()));
 <a name="128" href="#128">128</a> 
-<a name="129" href="#129">129</a>     Collection&lt;GraphHead&gt; loadedGraphHead = Lists.newArrayList();
-<a name="130" href="#130">130</a>     Collection&lt;Vertex&gt; loadedVertices = Lists.newArrayList();
-<a name="131" href="#131">131</a>     Collection&lt;Edge&gt; loadedEdges = Lists.newArrayList();
+<a name="129" href="#129">129</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHead = Lists.newArrayList();
+<a name="130" href="#130">130</a>     Collection&lt;EPGMVertex&gt; loadedVertices = Lists.newArrayList();
+<a name="131" href="#131">131</a>     Collection&lt;EPGMEdge&gt; loadedEdges = Lists.newArrayList();
 <a name="132" href="#132">132</a> 
 <a name="133" href="#133">133</a>     logicalGraphLayout.getGraphHead().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(loadedGraphHead));
 <a name="134" href="#134">134</a>     logicalGraphLayout.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(loadedVertices));
@@ -146,16 +146,16 @@
 <a name="136" href="#136">136</a> 
 <a name="137" href="#137">137</a>     getExecutionEnvironment().execute();
 <a name="138" href="#138">138</a> 
-<a name="139" href="#139">139</a>     GraphHead newGraphHead = loadedGraphHead.iterator().next();
+<a name="139" href="#139">139</a>     EPGMGraphHead newGraphHead = loadedGraphHead.iterator().next();
 <a name="140" href="#140">140</a> 
-<a name="141" href="#141">141</a>     validateEPGMElementCollections(loadedVertices, loader.getVertices());
-<a name="142" href="#142">142</a>     validateEPGMElementCollections(loadedEdges, loader.getEdges());
+<a name="141" href="#141">141</a>     validateElementCollections(loadedVertices, loader.getVertices());
+<a name="142" href="#142">142</a>     validateElementCollections(loadedEdges, loader.getEdges());
 <a name="143" href="#143">143</a> 
-<a name="144" href="#144">144</a>     Collection&lt;GraphElement&gt; epgmElements = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="144" href="#144">144</a>     Collection&lt;EPGMGraphElement&gt; epgmElements = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a name="145" href="#145">145</a>     epgmElements.addAll(loadedVertices);
 <a name="146" href="#146">146</a>     epgmElements.addAll(loadedEdges);
 <a name="147" href="#147">147</a> 
-<a name="148" href="#148">148</a>     <strong class="jxr_keyword">for</strong> (GraphElement loadedVertex : epgmElements) {
+<a name="148" href="#148">148</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphElement loadedVertex : epgmElements) {
 <a name="149" href="#149">149</a>       assertEquals(<span class="jxr_string">"graph element has wrong graph count"</span>,
 <a name="150" href="#150">150</a>         1, loadedVertex.getGraphCount());
 <a name="151" href="#151">151</a>       assertTrue(<span class="jxr_string">"graph element was not in new graph"</span>,
@@ -167,16 +167,16 @@
 <a name="157" href="#157">157</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFromCollectionsWithGraphHead() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="158" href="#158">158</a>     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 <a name="159" href="#159">159</a> 
-<a name="160" href="#160">160</a>     GraphHead graphHead = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>);
+<a name="160" href="#160">160</a>     EPGMGraphHead graphHead = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>);
 <a name="161" href="#161">161</a> 
-<a name="162" href="#162">162</a>     LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; logicalGraphLayout = getFactory()
+<a name="162" href="#162">162</a>     LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; logicalGraphLayout = getFactory()
 <a name="163" href="#163">163</a>       .fromCollections(graphHead,
 <a name="164" href="#164">164</a>         loader.getVerticesByGraphVariables(<span class="jxr_string">"g0"</span>),
 <a name="165" href="#165">165</a>         loader.getEdgesByGraphVariables(<span class="jxr_string">"g0"</span>));
 <a name="166" href="#166">166</a> 
-<a name="167" href="#167">167</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = Lists.newArrayList();
-<a name="168" href="#168">168</a>     Collection&lt;Vertex&gt; loadedVertices = Lists.newArrayList();
-<a name="169" href="#169">169</a>     Collection&lt;Edge&gt; loadedEdges = Lists.newArrayList();
+<a name="167" href="#167">167</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = Lists.newArrayList();
+<a name="168" href="#168">168</a>     Collection&lt;EPGMVertex&gt; loadedVertices = Lists.newArrayList();
+<a name="169" href="#169">169</a>     Collection&lt;EPGMEdge&gt; loadedEdges = Lists.newArrayList();
 <a name="170" href="#170">170</a> 
 <a name="171" href="#171">171</a>     logicalGraphLayout.getGraphHead().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(loadedGraphHeads));
 <a name="172" href="#172">172</a>     logicalGraphLayout.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(loadedVertices));
@@ -184,11 +184,11 @@
 <a name="174" href="#174">174</a> 
 <a name="175" href="#175">175</a>     getExecutionEnvironment().execute();
 <a name="176" href="#176">176</a> 
-<a name="177" href="#177">177</a>     validateEPGMElements(graphHead, loadedGraphHeads.iterator().next());
-<a name="178" href="#178">178</a>     validateEPGMElementCollections(loader.getVerticesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedVertices);
-<a name="179" href="#179">179</a>     validateEPGMElementCollections(loader.getEdgesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedEdges);
-<a name="180" href="#180">180</a>     validateEPGMGraphElementCollections(loader.getVerticesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedVertices);
-<a name="181" href="#181">181</a>     validateEPGMGraphElementCollections(loader.getEdgesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedEdges);
+<a name="177" href="#177">177</a>     validateElements(graphHead, loadedGraphHeads.iterator().next());
+<a name="178" href="#178">178</a>     validateElementCollections(loader.getVerticesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedVertices);
+<a name="179" href="#179">179</a>     validateElementCollections(loader.getEdgesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedEdges);
+<a name="180" href="#180">180</a>     validateGraphElementCollections(loader.getVerticesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedVertices);
+<a name="181" href="#181">181</a>     validateGraphElementCollections(loader.getEdgesByGraphVariables(<span class="jxr_string">"g0"</span>), loadedEdges);
 <a name="182" href="#182">182</a>   }
 <a name="183" href="#183">183</a> 
 <a name="184" href="#184">184</a>   <em class="jxr_javadoccomment">/**</em>
@@ -203,14 +203,14 @@
 <a name="193" href="#193">193</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFromCollectionsWithoutGraphHead() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="194" href="#194">194</a>     FlinkAsciiGraphLoader loader = getSocialNetworkLoader();
 <a name="195" href="#195">195</a> 
-<a name="196" href="#196">196</a>     Collection&lt;Vertex&gt; vertices = loader.getVertices();
-<a name="197" href="#197">197</a>     Collection&lt;Edge&gt; edges = loader.getEdges();
-<a name="198" href="#198">198</a>     LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromCollections = getFactory()
+<a name="196" href="#196">196</a>     Collection&lt;EPGMVertex&gt; vertices = loader.getVertices();
+<a name="197" href="#197">197</a>     Collection&lt;EPGMEdge&gt; edges = loader.getEdges();
+<a name="198" href="#198">198</a>     LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromCollections = getFactory()
 <a name="199" href="#199">199</a>       .fromCollections(vertices, edges);
 <a name="200" href="#200">200</a> 
-<a name="201" href="#201">201</a>     DataSet&lt;Vertex&gt; vertexDataSet = getExecutionEnvironment().fromCollection(vertices);
-<a name="202" href="#202">202</a>     DataSet&lt;Edge&gt; edgeDataSet = getExecutionEnvironment().fromCollection(edges);
-<a name="203" href="#203">203</a>     LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromDataSets = getFactory()
+<a name="201" href="#201">201</a>     DataSet&lt;EPGMVertex&gt; vertexDataSet = getExecutionEnvironment().fromCollection(vertices);
+<a name="202" href="#202">202</a>     DataSet&lt;EPGMEdge&gt; edgeDataSet = getExecutionEnvironment().fromCollection(edges);
+<a name="203" href="#203">203</a>     LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromDataSets = getFactory()
 <a name="204" href="#204">204</a>       .fromDataSets(vertexDataSet, edgeDataSet);
 <a name="205" href="#205">205</a> 
 <a name="206" href="#206">206</a>     LogicalGraph graphFromCollections = getConfig().getLogicalGraphFactory()
@@ -224,12 +224,12 @@
 <a name="214" href="#214">214</a> 
 <a name="215" href="#215">215</a>   @Test
 <a name="216" href="#216">216</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCreateEmptyGraph() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="217" href="#217">217</a>     LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; logicalGraphLayout = getFactory()
+<a name="217" href="#217">217</a>     LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; logicalGraphLayout = getFactory()
 <a name="218" href="#218">218</a>       .createEmptyGraph();
 <a name="219" href="#219">219</a> 
-<a name="220" href="#220">220</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = Lists.newArrayList();
-<a name="221" href="#221">221</a>     Collection&lt;Vertex&gt; loadedVertices = Lists.newArrayList();
-<a name="222" href="#222">222</a>     Collection&lt;Edge&gt; loadedEdges = Lists.newArrayList();
+<a name="220" href="#220">220</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = Lists.newArrayList();
+<a name="221" href="#221">221</a>     Collection&lt;EPGMVertex&gt; loadedVertices = Lists.newArrayList();
+<a name="222" href="#222">222</a>     Collection&lt;EPGMEdge&gt; loadedEdges = Lists.newArrayList();
 <a name="223" href="#223">223</a> 
 <a name="224" href="#224">224</a>     logicalGraphLayout.getGraphHead().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(loadedGraphHeads));
 <a name="225" href="#225">225</a>     logicalGraphLayout.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(loadedVertices));

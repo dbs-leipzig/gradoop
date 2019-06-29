@@ -28,8 +28,8 @@
 <a name="18" href="#18">18</a>  
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple3;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.DataSource;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -64,12 +64,12 @@
 <a name="54" href="#54">54</a>      DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; metaData =
 <a name="55" href="#55">55</a>        MetaData.fromFile(getMetaDataPath(), getConfig());
 <a name="56" href="#56">56</a>  
-<a name="57" href="#57">57</a>      DataSet&lt;Vertex&gt; vertices = getConfig().getExecutionEnvironment()
+<a name="57" href="#57">57</a>      DataSet&lt;EPGMVertex&gt; vertices = getConfig().getExecutionEnvironment()
 <a name="58" href="#58">58</a>        .readTextFile(getVertexCSVPath())
 <a name="59" href="#59">59</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/deprecated/logicalgraphcsv/CSVLineToVertex.html">CSVLineToVertex</a>(getConfig().getVertexFactory()))
 <a name="60" href="#60">60</a>        .withBroadcastSet(metaData, BC_METADATA);
 <a name="61" href="#61">61</a>  
-<a name="62" href="#62">62</a>      DataSet&lt;Edge&gt; edges = getConfig().getExecutionEnvironment()
+<a name="62" href="#62">62</a>      DataSet&lt;EPGMEdge&gt; edges = getConfig().getExecutionEnvironment()
 <a name="63" href="#63">63</a>        .readTextFile(getEdgeCSVPath())
 <a name="64" href="#64">64</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/deprecated/logicalgraphcsv/CSVLineToEdge.html">CSVLineToEdge</a>(getConfig().getEdgeFactory()))
 <a name="65" href="#65">65</a>        .withBroadcastSet(metaData, BC_METADATA);

@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.transformation.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 import org.gradoop.common.util.GradoopConstants;
 
@@ -26,15 +26,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Transformation map function for edges.
  *
- * @param &lt;E&gt; the type of the EPGM edge
+ * @param &lt;E&gt; the type of the edge
  */
 @FunctionAnnotation.ForwardedFields(&quot;id;sourceId;targetId;graphIds&quot;)
-public class TransformEdge&lt;E extends EPGMEdge&gt; extends TransformBase&lt;E&gt; {
+public class TransformEdge&lt;E extends Edge&gt; extends TransformBase&lt;E&gt; {
 
   /**
    * Factory to init modified edge.
    */
-  private final EPGMEdgeFactory&lt;E&gt; edgeFactory;
+  private final EdgeFactory&lt;E&gt; edgeFactory;
 
   /**
    * Constructor
@@ -44,7 +44,7 @@ public class TransformEdge&lt;E extends EPGMEdge&gt; extends TransformBase&lt;E&
    */
   public TransformEdge(
     TransformationFunction&lt;E&gt; transformationFunction,
-    EPGMEdgeFactory&lt;E&gt; epgmEdgeFactory) {
+    EdgeFactory&lt;E&gt; epgmEdgeFactory) {
 <span class="fc" id="L48">    super(transformationFunction);</span>
 <span class="fc" id="L49">    this.edgeFactory = checkNotNull(epgmEdgeFactory);</span>
 <span class="fc" id="L50">  }</span>

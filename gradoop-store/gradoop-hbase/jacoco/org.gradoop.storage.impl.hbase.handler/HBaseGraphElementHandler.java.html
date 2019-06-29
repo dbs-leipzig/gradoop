@@ -18,7 +18,7 @@ package org.gradoop.storage.impl.hbase.handler;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.gradoop.common.model.api.entities.EPGMGraphElement;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.storage.impl.hbase.api.GraphElementHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
@@ -34,7 +34,7 @@ import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
 <span class="fc" id="L34">  private static final byte[] COL_GRAPHS_BYTES = Bytes.toBytes(HBaseConstants.COL_GRAPHS);</span>
 
   @Override
-  public Put writeGraphIds(Put put, EPGMGraphElement graphElement) {
+  public Put writeGraphIds(Put put, GraphElement graphElement) {
 <span class="fc bfc" id="L38" title="All 2 branches covered.">    if (graphElement.getGraphCount() &gt; 0) {</span>
 <span class="fc" id="L39">      put = put.addColumn(</span>
         CF_META_BYTES,

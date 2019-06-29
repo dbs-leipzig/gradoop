@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.common.model.api.entities.EPGMAttributed;
+import org.gradoop.common.model.api.entities.Attributed;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
@@ -73,7 +73,7 @@ abstract class BuildBase implements Serializable {
    * @param groupPropertyValues group property values
    * @param vertexLabelGroup vertex label group
    */
-  protected void setGroupProperties(EPGMAttributed attributed,
+  protected void setGroupProperties(Attributed attributed,
     PropertyValueList groupPropertyValues, LabelGroup vertexLabelGroup) {
 
 <span class="fc" id="L79">    Iterator&lt;PropertyValue&gt; valueIterator = groupPropertyValues.iterator();</span>
@@ -93,7 +93,7 @@ abstract class BuildBase implements Serializable {
    * @param values aggregate values
    * @param valueAggregators aggregate functions
    */
-  protected void setAggregateProperties(EPGMAttributed element, PropertyValueList values,
+  protected void setAggregateProperties(Attributed element, PropertyValueList values,
                                         List&lt;AggregateFunction&gt; valueAggregators) {
 <span class="fc bfc" id="L98" title="All 2 branches covered.">    if (!valueAggregators.isEmpty()) {</span>
 <span class="fc" id="L99">      Iterator&lt;PropertyValue&gt; valueIt = values.iterator();</span>

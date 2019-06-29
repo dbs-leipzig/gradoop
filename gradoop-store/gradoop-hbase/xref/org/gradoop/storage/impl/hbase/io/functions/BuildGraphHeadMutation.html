@@ -31,7 +31,7 @@
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Mutation;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Put;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.hbase.api.GraphHeadHandler;
 <a name="26" href="#26">26</a>  
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment">/**</em>
@@ -39,7 +39,7 @@
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * data handler.</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/storage/impl/hbase/io/functions/BuildGraphHeadMutation.html">BuildGraphHeadMutation</a> <strong class="jxr_keyword">extends</strong>
-<a name="32" href="#32">32</a>    RichMapFunction&lt;GraphHead, Tuple2&lt;GradoopId, Mutation&gt;&gt; {
+<a name="32" href="#32">32</a>    RichMapFunction&lt;EPGMGraphHead, Tuple2&lt;GradoopId, Mutation&gt;&gt; {
 <a name="33" href="#33">33</a>  
 <a name="34" href="#34">34</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment">   * Serial version uid.</em>
@@ -72,7 +72,7 @@
 <a name="62" href="#62">62</a>    }
 <a name="63" href="#63">63</a>  
 <a name="64" href="#64">64</a>    @Override
-<a name="65" href="#65">65</a>    <strong class="jxr_keyword">public</strong> Tuple2&lt;GradoopId, Mutation&gt; map(GraphHead graphHead) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="65" href="#65">65</a>    <strong class="jxr_keyword">public</strong> Tuple2&lt;GradoopId, Mutation&gt; map(EPGMGraphHead graphHead) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="66" href="#66">66</a>      GradoopId key = graphHead.getId();
 <a name="67" href="#67">67</a>      Put put = <strong class="jxr_keyword">new</strong> Put(graphHeadHandler.getRowKey(graphHead.getId()));
 <a name="68" href="#68">68</a>      put = graphHeadHandler.writeGraphHead(put, graphHead);

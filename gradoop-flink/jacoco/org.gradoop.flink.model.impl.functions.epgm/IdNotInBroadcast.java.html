@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.functions.epgm;
 
 import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
  *
  * @param &lt;EL&gt; element type
  */
-<span class="fc" id="L29">public class IdNotInBroadcast&lt;EL extends EPGMElement&gt; extends RichFilterFunction&lt;EL&gt;</span>
+<span class="fc" id="L29">public class IdNotInBroadcast&lt;EL extends Element&gt; extends RichFilterFunction&lt;EL&gt;</span>
   implements CombinableFilter&lt;EL&gt; {
 
   /**

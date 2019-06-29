@@ -27,7 +27,7 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.RichMapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.configuration.Configuration;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.tlf.TLFConstants;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 <a name="23" href="#23">23</a>  
@@ -60,7 +60,7 @@
 <a name="50" href="#50">50</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a> map(<a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a> graphTransaction)
 <a name="51" href="#51">51</a>        <strong class="jxr_keyword">throws</strong> Exception {
 <a name="52" href="#52">52</a>      String label;
-<a name="53" href="#53">53</a>      <strong class="jxr_keyword">for</strong> (Vertex vertex : graphTransaction.getVertices()) {
+<a name="53" href="#53">53</a>      <strong class="jxr_keyword">for</strong> (EPGMVertex vertex : graphTransaction.getVertices()) {
 <a name="54" href="#54">54</a>        label = vertexDictionary.get(Integer.parseInt(vertex.getLabel()));
 <a name="55" href="#55">55</a>        <strong class="jxr_keyword">if</strong> (label != <strong class="jxr_keyword">null</strong>) {
 <a name="56" href="#56">56</a>          vertex.setLabel(label);

@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.equality;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.BinaryGraphToValueOperator;
@@ -49,20 +49,21 @@ public class GraphEquality implements BinaryGraphToValueOperator&lt;Boolean&gt; 
    * @param edgeToString string representation of edges
    * @param directed sets mode for directed or undirected graphs
    */
-  public GraphEquality(GraphHeadToString&lt;GraphHead&gt; graphHeadToString,
-<span class="fc" id="L53">    VertexToString&lt;Vertex&gt; vertexToString, EdgeToString&lt;Edge&gt; edgeToString, boolean directed) {</span>
-<span class="fc" id="L54">    this.directed = directed;</span>
+  public GraphEquality(GraphHeadToString&lt;EPGMGraphHead&gt; graphHeadToString,
+    VertexToString&lt;EPGMVertex&gt; vertexToString, EdgeToString&lt;EPGMEdge&gt; edgeToString,
+<span class="fc" id="L54">    boolean directed) {</span>
+<span class="fc" id="L55">    this.directed = directed;</span>
 
-<span class="fc" id="L56">    this.collectionEquality =</span>
+<span class="fc" id="L57">    this.collectionEquality =</span>
       new CollectionEquality(graphHeadToString, vertexToString, edgeToString, this.directed);
-<span class="fc" id="L58">  }</span>
+<span class="fc" id="L59">  }</span>
 
   @Override
   public DataSet&lt;Boolean&gt; execute(LogicalGraph firstGraph, LogicalGraph secondGraph) {
-<span class="fc" id="L62">    GraphCollectionFactory collectionFactory = firstGraph.getConfig()</span>
-<span class="fc" id="L63">      .getGraphCollectionFactory();</span>
-<span class="fc" id="L64">    return collectionEquality</span>
-<span class="fc" id="L65">      .execute(collectionFactory.fromGraph(firstGraph), collectionFactory.fromGraph(secondGraph));</span>
+<span class="fc" id="L63">    GraphCollectionFactory collectionFactory = firstGraph.getConfig()</span>
+<span class="fc" id="L64">      .getGraphCollectionFactory();</span>
+<span class="fc" id="L65">    return collectionEquality</span>
+<span class="fc" id="L66">      .execute(collectionFactory.fromGraph(firstGraph), collectionFactory.fromGraph(secondGraph));</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -26,10 +26,10 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.matching.common.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
@@ -41,11 +41,11 @@
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/functions/AddGraphElementToNewGraphTest.html">AddGraphElementToNewGraphTest</a> {
 <a name="32" href="#32">32</a>    @Test
 <a name="33" href="#33">33</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testVariableMappingCreation() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="34" href="#34">34</a>      AddGraphElementToNewGraph&lt;Vertex&gt; udf =
-<a name="35" href="#35">35</a>        <strong class="jxr_keyword">new</strong> AddGraphElementToNewGraph&lt;&gt;(<strong class="jxr_keyword">new</strong> GraphHeadFactory(), <span class="jxr_string">"a"</span>);
+<a name="34" href="#34">34</a>      AddGraphElementToNewGraph&lt;EPGMVertex&gt; udf =
+<a name="35" href="#35">35</a>        <strong class="jxr_keyword">new</strong> AddGraphElementToNewGraph&lt;&gt;(<strong class="jxr_keyword">new</strong> EPGMGraphHeadFactory(), <span class="jxr_string">"a"</span>);
 <a name="36" href="#36">36</a>  
-<a name="37" href="#37">37</a>      Vertex vertex = <strong class="jxr_keyword">new</strong> VertexFactory().createVertex();
-<a name="38" href="#38">38</a>      Tuple2&lt;Vertex, GraphHead&gt; result = udf.map(vertex);
+<a name="37" href="#37">37</a>      EPGMVertex vertex = <strong class="jxr_keyword">new</strong> EPGMVertexFactory().createVertex();
+<a name="38" href="#38">38</a>      Tuple2&lt;EPGMVertex, EPGMGraphHead&gt; result = udf.map(vertex);
 <a name="39" href="#39">39</a>  
 <a name="40" href="#40">40</a>      assertTrue(result.f1.hasProperty(PatternMatching.VARIABLE_MAPPING_KEY));
 <a name="41" href="#41">41</a>      Map&lt;PropertyValue, PropertyValue&gt; variableMapping =

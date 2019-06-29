@@ -27,9 +27,9 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -61,15 +61,15 @@
 <a name="51" href="#51">51</a>    @Override
 <a name="52" href="#52">52</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> execute(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> collection) {
 <a name="53" href="#53">53</a>  
-<a name="54" href="#54">54</a>      DataSet&lt;GraphHead&gt; graphHeads = collection.getGraphHeads().first(limit);
+<a name="54" href="#54">54</a>      DataSet&lt;EPGMGraphHead&gt; graphHeads = collection.getGraphHeads().first(limit);
 <a name="55" href="#55">55</a>  
 <a name="56" href="#56">56</a>      DataSet&lt;GradoopId&gt; firstIds = graphHeads.map(<strong class="jxr_keyword">new</strong> Id&lt;&gt;());
 <a name="57" href="#57">57</a>  
-<a name="58" href="#58">58</a>      DataSet&lt;Vertex&gt; filteredVertices = collection.getVertices()
+<a name="58" href="#58">58</a>      DataSet&lt;EPGMVertex&gt; filteredVertices = collection.getVertices()
 <a name="59" href="#59">59</a>        .filter(<strong class="jxr_keyword">new</strong> InAnyGraphBroadcast&lt;&gt;())
 <a name="60" href="#60">60</a>        .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 <a name="61" href="#61">61</a>  
-<a name="62" href="#62">62</a>      DataSet&lt;Edge&gt; filteredEdges = collection.getEdges()
+<a name="62" href="#62">62</a>      DataSet&lt;EPGMEdge&gt; filteredEdges = collection.getEdges()
 <a name="63" href="#63">63</a>        .filter(<strong class="jxr_keyword">new</strong> InAnyGraphBroadcast&lt;&gt;())
 <a name="64" href="#64">64</a>        .withBroadcastSet(firstIds, GraphsContainmentFilterBroadcast.GRAPH_IDS);
 <a name="65" href="#65">65</a>  

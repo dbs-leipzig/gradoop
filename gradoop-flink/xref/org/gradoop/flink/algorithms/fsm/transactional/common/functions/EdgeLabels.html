@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Sets;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.FlatMapFunction;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.tuples.WithCount;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 <a name="24" href="#24">24</a>  
@@ -51,7 +51,7 @@
 <a name="41" href="#41">41</a>  
 <a name="42" href="#42">42</a>      Set&lt;String&gt; edgeLabels = Sets.newHashSet();
 <a name="43" href="#43">43</a>  
-<a name="44" href="#44">44</a>      <strong class="jxr_keyword">for</strong> (Edge edge : graph.getEdges()) {
+<a name="44" href="#44">44</a>      <strong class="jxr_keyword">for</strong> (EPGMEdge edge : graph.getEdges()) {
 <a name="45" href="#45">45</a>        edgeLabels.add(edge.getLabel());
 <a name="46" href="#46">46</a>      }
 <a name="47" href="#47">47</a>  

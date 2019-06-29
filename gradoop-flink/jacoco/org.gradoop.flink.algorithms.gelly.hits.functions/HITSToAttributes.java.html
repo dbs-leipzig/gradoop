@@ -18,13 +18,13 @@ package org.gradoop.flink.algorithms.gelly.hits.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.graph.library.linkanalysis.HITS;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
- * Stores HITS Results as Properties of a Vertex
+ * Stores HITS Results as Properties of a EPGMVertex
  */
-public class HITSToAttributes implements JoinFunction&lt;HITS.Result&lt;GradoopId&gt;, Vertex, Vertex&gt; {
+public class HITSToAttributes implements JoinFunction&lt;HITS.Result&lt;GradoopId&gt;, EPGMVertex, EPGMVertex&gt; {
 
   /**
    * Property Key to store the authority score
@@ -45,7 +45,7 @@ public class HITSToAttributes implements JoinFunction&lt;HITS.Result&lt;GradoopI
 <span class="fc" id="L45">  }</span>
 
   @Override
-  public Vertex join(HITS.Result&lt;GradoopId&gt; result, Vertex vertex) throws Exception {
+  public EPGMVertex join(HITS.Result&lt;GradoopId&gt; result, EPGMVertex vertex) throws Exception {
 <span class="fc" id="L49">    vertex.setProperty(authorityPropertyKey,</span>
 <span class="fc" id="L50">      PropertyValue.create(result.getAuthorityScore().getValue()));</span>
 <span class="fc" id="L51">    vertex.setProperty(hubPropertyKey, PropertyValue.create(result.getHubScore().getValue()));</span>

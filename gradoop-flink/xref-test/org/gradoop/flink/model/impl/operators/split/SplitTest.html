@@ -25,7 +25,7 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.split;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -38,7 +38,7 @@
 <a name="28" href="#28">28</a>  
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/split/SplitTest.html">SplitTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
 <a name="30" href="#30">30</a>  
-<a name="31" href="#31">31</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> List&lt;PropertyValue&gt; getSplitValues(Vertex v) {
+<a name="31" href="#31">31</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> List&lt;PropertyValue&gt; getSplitValues(EPGMVertex v) {
 <a name="32" href="#32">32</a>      String key1 = <span class="jxr_string">"key1"</span>;
 <a name="33" href="#33">33</a>      String key2 = <span class="jxr_string">"key2"</span>;
 <a name="34" href="#34">34</a>      List&lt;PropertyValue&gt; valueList = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();

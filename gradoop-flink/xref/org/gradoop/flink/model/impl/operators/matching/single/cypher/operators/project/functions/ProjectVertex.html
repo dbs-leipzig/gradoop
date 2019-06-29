@@ -26,17 +26,17 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.RichMapFunction;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> java.util.List;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * Projects a Vertex by a set of properties.</em>
-<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * Vertex -&gt; Embedding(GraphElementEmbedding(Vertex))</em>
+<a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * Projects a EPGMVertex by a set of properties.</em>
+<a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> * EPGMVertex -&gt; Embedding(GraphElementEmbedding(EPGMVertex))</em>
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/project/functions/ProjectVertex.html">ProjectVertex</a> <strong class="jxr_keyword">extends</strong> RichMapFunction&lt;Vertex, Embedding&gt; {
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/project/functions/ProjectVertex.html">ProjectVertex</a> <strong class="jxr_keyword">extends</strong> RichMapFunction&lt;EPGMVertex, Embedding&gt; {
 <a name="30" href="#30">30</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   * Names of the properties that will be kept in the projection</em>
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   */</em>
@@ -51,7 +51,7 @@
 <a name="41" href="#41">41</a>    }
 <a name="42" href="#42">42</a>  
 <a name="43" href="#43">43</a>    @Override
-<a name="44" href="#44">44</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/Embedding.html">Embedding</a> map(Vertex vertex) {
+<a name="44" href="#44">44</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/Embedding.html">Embedding</a> map(EPGMVertex vertex) {
 <a name="45" href="#45">45</a>      <strong class="jxr_keyword">return</strong> EmbeddingFactory.fromVertex(vertex, propertyKeys);
 <a name="46" href="#46">46</a>    }
 <a name="47" href="#47">47</a>  }

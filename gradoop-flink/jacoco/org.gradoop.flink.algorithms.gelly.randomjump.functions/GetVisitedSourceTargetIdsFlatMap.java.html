@@ -19,14 +19,14 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * Retrieves the source- and target-id from an edge, if this edge was visited, determined by the
  * boolean property.
  */
 @FunctionAnnotation.ReadFields(&quot;properties&quot;)
-public class GetVisitedSourceTargetIdsFlatMap implements FlatMapFunction&lt;Edge, GradoopId&gt; {
+public class GetVisitedSourceTargetIdsFlatMap implements FlatMapFunction&lt;EPGMEdge, GradoopId&gt; {
 
   /**
    * Key for the boolean property value to determine, if the edge was visited.
@@ -43,7 +43,7 @@ public class GetVisitedSourceTargetIdsFlatMap implements FlatMapFunction&lt;Edge
 <span class="fc" id="L43">  }</span>
 
   @Override
-  public void flatMap(Edge edge, Collector&lt;GradoopId&gt; out) throws Exception {
+  public void flatMap(EPGMEdge edge, Collector&lt;GradoopId&gt; out) throws Exception {
 <span class="fc bfc" id="L47" title="All 2 branches covered.">    if (edge.getPropertyValue(propertyKey).getBoolean()) {</span>
 <span class="fc" id="L48">      out.collect(edge.getSourceId());</span>
 <span class="fc" id="L49">      out.collect(edge.getTargetId());</span>

@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.layouts.gve;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.layouts.common.BaseFactory;
 
 import java.util.Collections;
@@ -33,16 +33,16 @@ import java.util.Objects;
   /**
    * Creates a collection layout from the given datasets.
    *
-   * @param graphHeads GraphHead DataSet
-   * @param vertices Vertex DataSet
-   * @param edges Edge DataSet
+   * @param graphHeads EPGMGraphHead DataSet
+   * @param vertices EPGMVertex DataSet
+   * @param edges EPGMEdge DataSet
    * @return GVE layout
    */
-  GVELayout create(DataSet&lt;GraphHead&gt; graphHeads, DataSet&lt;Vertex&gt; vertices,
-    DataSet&lt;Edge&gt; edges) {
-<span class="fc" id="L43">    Objects.requireNonNull(graphHeads, &quot;GraphHead DataSet was null&quot;);</span>
-<span class="fc" id="L44">    Objects.requireNonNull(vertices, &quot;Vertex DataSet was null&quot;);</span>
-<span class="fc" id="L45">    Objects.requireNonNull(edges, &quot;Edge DataSet was null&quot;);</span>
+  GVELayout create(DataSet&lt;EPGMGraphHead&gt; graphHeads, DataSet&lt;EPGMVertex&gt; vertices,
+    DataSet&lt;EPGMEdge&gt; edges) {
+<span class="fc" id="L43">    Objects.requireNonNull(graphHeads, &quot;EPGMGraphHead DataSet was null&quot;);</span>
+<span class="fc" id="L44">    Objects.requireNonNull(vertices, &quot;EPGMVertex DataSet was null&quot;);</span>
+<span class="fc" id="L45">    Objects.requireNonNull(edges, &quot;EPGMEdge DataSet was null&quot;);</span>
 <span class="fc" id="L46">    return new GVELayout(graphHeads, vertices, edges);</span>
   }
 
@@ -54,8 +54,8 @@ import java.util.Objects;
    * @param edges Mapping from label to edge dataset
    * @return GVE layout
    */
-  GVELayout create(Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads,
-    Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
+  GVELayout create(Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads,
+    Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges) {
 <span class="fc" id="L59">    Objects.requireNonNull(graphHeads);</span>
 <span class="fc" id="L60">    Objects.requireNonNull(vertices);</span>
 <span class="fc" id="L61">    Objects.requireNonNull(edges);</span>

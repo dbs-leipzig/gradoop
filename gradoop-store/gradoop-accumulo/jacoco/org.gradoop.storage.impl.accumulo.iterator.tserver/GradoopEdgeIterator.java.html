@@ -19,11 +19,11 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
 import org.apache.accumulo.core.util.Pair;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 import org.gradoop.storage.utils.KryoUtils;
@@ -37,18 +37,18 @@ import java.util.Objects;
 /**
  * Accumulo gradoop edges iterator
  */
-<span class="fc" id="L40">public class GradoopEdgeIterator extends BaseElementIterator&lt;EPGMEdge&gt; {</span>
+<span class="fc" id="L40">public class GradoopEdgeIterator extends BaseElementIterator&lt;Edge&gt; {</span>
 
   /**
-   * Edge factory
+   * EPGMEdge factory
    */
-<span class="fc" id="L45">  private final EdgeFactory factory = new EdgeFactory();</span>
+<span class="fc" id="L45">  private final EPGMEdgeFactory factory = new EPGMEdgeFactory();</span>
 
   @Nonnull
   @Override
-  public Edge fromRow(@Nonnull Map.Entry&lt;Key, Value&gt; pair) throws IOException {
+  public EPGMEdge fromRow(@Nonnull Map.Entry&lt;Key, Value&gt; pair) throws IOException {
     //map from serialize content
-<span class="fc" id="L51">    Edge content = KryoUtils.loads(pair.getValue().get(), Edge.class);</span>
+<span class="fc" id="L51">    EPGMEdge content = KryoUtils.loads(pair.getValue().get(), EPGMEdge.class);</span>
 <span class="fc" id="L52">    content.setId(GradoopId.fromString(pair.getKey().getRow().toString()));</span>
     //read from content
 <span class="fc" id="L54">    return content;</span>
@@ -56,7 +56,7 @@ import java.util.Objects;
 
   @Nonnull
   @Override
-  public Pair&lt;Key, Value&gt; toRow(@Nonnull EPGMEdge record) throws IOException {
+  public Pair&lt;Key, Value&gt; toRow(@Nonnull Edge record) throws IOException {
     //write to content
 <span class="nc" id="L61">    return new Pair&lt;&gt;(new Key(record.getId().toString()),</span>
 <span class="nc" id="L62">      new Value(KryoUtils.dumps(factory.initEdge(</span>
@@ -77,10 +77,10 @@ import java.util.Objects;
    * @throws IOException on failure
    */
   @Nullable
-  public Edge readLine(
+  public EPGMEdge readLine(
     @Nonnull SortedKeyValueIterator&lt;Key, Value&gt; source
   ) throws IOException {
-<span class="nc" id="L83">    Edge row = new Edge();</span>
+<span class="nc" id="L83">    EPGMEdge row = new EPGMEdge();</span>
 <span class="nc bnc" id="L84" title="All 2 branches missed.">    if (!source.hasTop()) {</span>
 <span class="nc" id="L85">      return null;</span>
     }

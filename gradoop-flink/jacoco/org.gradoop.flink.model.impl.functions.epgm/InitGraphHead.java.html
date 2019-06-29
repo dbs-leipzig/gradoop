@@ -20,36 +20,36 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Initializes a new graph head from a given GradoopId.
  */
-public class InitGraphHead implements MapFunction&lt;Tuple1&lt;GradoopId&gt;, GraphHead&gt;,
-  ResultTypeQueryable&lt;GraphHead&gt; {
+public class InitGraphHead implements MapFunction&lt;Tuple1&lt;GradoopId&gt;, EPGMGraphHead&gt;,
+  ResultTypeQueryable&lt;EPGMGraphHead&gt; {
   /**
-   * GraphHeadFactory
+   * EPGMGraphHeadFactory
    */
-  private final EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory;
+  private final GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
 
   /**
    * Constructor
    *
    * @param epgmGraphHeadFactory graph head factory
    */
-<span class="fc" id="L42">  public InitGraphHead(EPGMGraphHeadFactory&lt;GraphHead&gt; epgmGraphHeadFactory) {</span>
+<span class="fc" id="L42">  public InitGraphHead(GraphHeadFactory&lt;EPGMGraphHead&gt; epgmGraphHeadFactory) {</span>
 <span class="fc" id="L43">    this.graphHeadFactory = epgmGraphHeadFactory;</span>
 <span class="fc" id="L44">  }</span>
 
   @Override
-  public GraphHead map(Tuple1&lt;GradoopId&gt; idTuple) {
+  public EPGMGraphHead map(Tuple1&lt;GradoopId&gt; idTuple) {
 <span class="fc" id="L48">    return graphHeadFactory.initGraphHead(idTuple.f0);</span>
   }
 
   @Override
-  public TypeInformation&lt;GraphHead&gt; getProducedType() {
+  public TypeInformation&lt;EPGMGraphHead&gt; getProducedType() {
 <span class="fc" id="L53">    return TypeExtractor.createTypeInfo(graphHeadFactory.getType());</span>
   }
 }

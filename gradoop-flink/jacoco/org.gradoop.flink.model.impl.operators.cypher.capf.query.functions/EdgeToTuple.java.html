@@ -20,7 +20,7 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -34,7 +34,7 @@ import org.gradoop.common.model.impl.properties.Properties;
     &quot;f1.label-&gt;f3;&quot; +
     &quot;f1.properties-&gt;f4&quot;)
 <span class="fc" id="L36">public class EdgeToTuple</span>
-  implements MapFunction&lt;Tuple2&lt;Long, Edge&gt;,
+  implements MapFunction&lt;Tuple2&lt;Long, EPGMEdge&gt;,
   Tuple5&lt;Long, GradoopId, GradoopId, String, Properties&gt;&gt; {
 
   /**
@@ -44,9 +44,9 @@ import org.gradoop.common.model.impl.properties.Properties;
 
   @Override
   public Tuple5&lt;Long, GradoopId, GradoopId, String, Properties&gt; map(
-    Tuple2&lt;Long, Edge&gt; tuple) throws Exception {
+    Tuple2&lt;Long, EPGMEdge&gt; tuple) throws Exception {
 
-<span class="fc" id="L49">    Edge edge = tuple.f1;</span>
+<span class="fc" id="L49">    EPGMEdge edge = tuple.f1;</span>
 
 <span class="fc" id="L51">    returnTuple.f0 = tuple.f0;</span>
 <span class="fc" id="L52">    returnTuple.f1 = edge.getSourceId();</span>

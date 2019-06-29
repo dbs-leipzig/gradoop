@@ -21,8 +21,8 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 
 /**
@@ -33,56 +33,54 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0-&gt;sourceId;f1-&gt;targetId;f2-&gt;label&quot;)
 @FunctionAnnotation.ReadFields(&quot;f3;f5&quot;)
-public class ReduceEdgeGroupItems&lt;E extends EPGMEdge&gt; extends BuildSuperEdge
+public class ReduceEdgeGroupItems&lt;E extends Edge&gt; extends BuildSuperEdge
   implements GroupReduceFunction&lt;EdgeGroupItem, E&gt;, ResultTypeQueryable&lt;E&gt; {
 
   /**
    * Edge factory.
    */
-  private final EPGMEdgeFactory&lt;E&gt; edgeFactory;
+  private final EdgeFactory&lt;E&gt; edgeFactory;
 
   /**
    * Creates group reducer
    *
    * @param useLabel use edge label
-   * @param epgmEdgeFactory edge factory
+   * @param edgeFactory edge factory
    */
-  public ReduceEdgeGroupItems(boolean useLabel, EPGMEdgeFactory&lt;E&gt; epgmEdgeFactory) {
+  public ReduceEdgeGroupItems(boolean useLabel, EdgeFactory&lt;E&gt; edgeFactory) {
 <span class="fc" id="L51">    super(useLabel);</span>
-<span class="fc" id="L52">    this.edgeFactory = epgmEdgeFactory;</span>
+<span class="fc" id="L52">    this.edgeFactory = edgeFactory;</span>
 <span class="fc" id="L53">  }</span>
 
   /**
    * Reduces edge group items to a single edge group item, creates a new
-   * super EPGM edge and collects it.
+   * super edge and collects it.
    *
    * @param edgeGroupItems  edge group items
    * @param collector       output collector
    * @throws Exception on failure
    */
   @Override
-  public void reduce(Iterable&lt;EdgeGroupItem&gt; edgeGroupItems,
-    Collector&lt;E&gt; collector) throws Exception {
+  public void reduce(Iterable&lt;EdgeGroupItem&gt; edgeGroupItems, Collector&lt;E&gt; collector) throws Exception {
 
-<span class="fc" id="L67">    EdgeGroupItem edgeGroupItem = reduceInternal(edgeGroupItems);</span>
+<span class="fc" id="L66">    EdgeGroupItem edgeGroupItem = reduceInternal(edgeGroupItems);</span>
 
-<span class="fc" id="L69">    E superEdge = edgeFactory.createEdge(</span>
-<span class="fc" id="L70">      edgeGroupItem.getGroupLabel(),</span>
-<span class="fc" id="L71">      edgeGroupItem.getSourceId(),</span>
-<span class="fc" id="L72">      edgeGroupItem.getTargetId());</span>
+<span class="fc" id="L68">    E superEdge = edgeFactory.createEdge(</span>
+<span class="fc" id="L69">      edgeGroupItem.getGroupLabel(),</span>
+<span class="fc" id="L70">      edgeGroupItem.getSourceId(),</span>
+<span class="fc" id="L71">      edgeGroupItem.getTargetId());</span>
 
-<span class="fc" id="L74">    setGroupProperties(</span>
-<span class="fc" id="L75">      superEdge, edgeGroupItem.getGroupingValues(), edgeGroupItem.getLabelGroup());</span>
-<span class="fc" id="L76">    setAggregateProperties(superEdge, edgeGroupItem.getLabelGroup().getAggregateValueList(),</span>
-<span class="fc" id="L77">      edgeGroupItem.getLabelGroup().getAggregateFunctions());</span>
-<span class="fc" id="L78">    edgeGroupItem.getLabelGroup().resetAggregateValues();</span>
+<span class="fc" id="L73">    setGroupProperties(superEdge, edgeGroupItem.getGroupingValues(), edgeGroupItem.getLabelGroup());</span>
+<span class="fc" id="L74">    setAggregateProperties(superEdge, edgeGroupItem.getLabelGroup().getAggregateValueList(),</span>
+<span class="fc" id="L75">      edgeGroupItem.getLabelGroup().getAggregateFunctions());</span>
+<span class="fc" id="L76">    edgeGroupItem.getLabelGroup().resetAggregateValues();</span>
 
-<span class="fc" id="L80">    collector.collect(superEdge);</span>
-<span class="fc" id="L81">  }</span>
+<span class="fc" id="L78">    collector.collect(superEdge);</span>
+<span class="fc" id="L79">  }</span>
 
   @Override
   public TypeInformation&lt;E&gt; getProducedType() {
-<span class="fc" id="L85">    return TypeExtractor.createTypeInfo(edgeFactory.getType());</span>
+<span class="fc" id="L83">    return TypeExtractor.createTypeInfo(edgeFactory.getType());</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

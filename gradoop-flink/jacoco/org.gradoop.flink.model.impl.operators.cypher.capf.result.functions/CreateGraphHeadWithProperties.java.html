@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.cypher.capf.result.functions;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.types.Row;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.List;
  * and end are expected to be the properties in order of the property names, the last field of the
  * row is expected to be a {@link GradoopId}.
  */
-public class CreateGraphHeadWithProperties implements MapFunction&lt;Row, GraphHead&gt; {
+public class CreateGraphHeadWithProperties implements MapFunction&lt;Row, EPGMGraphHead&gt; {
 
   /**
    * The start index of fields that will be set as properties of the graph heads.
@@ -44,7 +44,7 @@ public class CreateGraphHeadWithProperties implements MapFunction&lt;Row, GraphH
   /**
    * The factory used to create the graph heads.
    */
-  private GraphHeadFactory headFactory;
+  private EPGMGraphHeadFactory headFactory;
 
   /**
    * List containing names for the properties to be set.
@@ -62,7 +62,7 @@ public class CreateGraphHeadWithProperties implements MapFunction&lt;Row, GraphH
   public CreateGraphHeadWithProperties(
     int start,
     int end,
-    GraphHeadFactory headFactory,
+    EPGMGraphHeadFactory headFactory,
 <span class="fc" id="L66">    List&lt;String&gt; propertyNames) {</span>
 
 <span class="fc" id="L68">    this.start = start;</span>
@@ -72,9 +72,9 @@ public class CreateGraphHeadWithProperties implements MapFunction&lt;Row, GraphH
 <span class="fc" id="L72">  }</span>
 
   @Override
-  public GraphHead map(Row row) {
+  public EPGMGraphHead map(Row row) {
 
-<span class="fc" id="L77">    GraphHead head = headFactory.initGraphHead((GradoopId) row.getField(row.getArity() - 1));</span>
+<span class="fc" id="L77">    EPGMGraphHead head = headFactory.initGraphHead((GradoopId) row.getField(row.getArity() - 1));</span>
 <span class="fc" id="L78">    Properties props = new Properties();</span>
 
 <span class="pc bpc" id="L80" title="1 of 2 branches missed.">    for (int i = start; i &lt; end; i++) {</span>

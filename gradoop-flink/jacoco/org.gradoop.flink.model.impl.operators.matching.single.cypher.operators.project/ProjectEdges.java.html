@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions.ProjectEdge;
@@ -25,15 +25,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Projects an Edge by a set of properties.
- * Edge -&gt; Embedding(IdEntry(SrcID), GraphElementEntry(Edge), IdEntry(TargetID))
+ * Projects an EPGMEdge by a set of properties.
+ * EPGMEdge -&gt; Embedding(IdEntry(SrcID), GraphElementEntry(EPGMEdge), IdEntry(TargetID))
  */
 public class ProjectEdges implements PhysicalOperator {
 
   /**
    * Input edge
    */
-  private final DataSet&lt;Edge&gt; input;
+  private final DataSet&lt;EPGMEdge&gt; input;
   /**
    * Names of the properties that will be kept in the projection
    */
@@ -54,7 +54,7 @@ public class ProjectEdges implements PhysicalOperator {
    * @param propertyKeys List of property names that will be kept in the projection
    * @param isLoop indicates if the edges is a loop
    */
-<span class="fc" id="L57">  public ProjectEdges(DataSet&lt;Edge&gt; input, List&lt;String&gt; propertyKeys, boolean isLoop) {</span>
+<span class="fc" id="L57">  public ProjectEdges(DataSet&lt;EPGMEdge&gt; input, List&lt;String&gt; propertyKeys, boolean isLoop) {</span>
 <span class="fc" id="L58">    this.input = input;</span>
 <span class="fc" id="L59">    this.propertyKeys = propertyKeys;</span>
 <span class="fc" id="L60">    this.name = &quot;ProjectEdges&quot;;</span>
@@ -68,7 +68,7 @@ public class ProjectEdges implements PhysicalOperator {
    * @param input vertices that will be projected
    * @param isLoop indicates if the edges is a loop
    */
-  public ProjectEdges(DataSet&lt;Edge&gt; input, boolean isLoop) {
+  public ProjectEdges(DataSet&lt;EPGMEdge&gt; input, boolean isLoop) {
 <span class="nc" id="L72">    this(input, new ArrayList&lt;&gt;(), isLoop);</span>
 <span class="nc" id="L73">  }</span>
 

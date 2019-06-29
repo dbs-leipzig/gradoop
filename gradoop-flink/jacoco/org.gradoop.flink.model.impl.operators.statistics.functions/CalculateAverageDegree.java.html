@@ -16,14 +16,14 @@
 package org.gradoop.flink.model.impl.operators.statistics.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingEvaluationConstants;
 
 /**
  * Calculates the average degree, depending on the sum-value of the degree type
  * (degree, incomingDegree, outgoingDegree) stored as property in the graph head.
  */
-public class CalculateAverageDegree implements MapFunction&lt;GraphHead, GraphHead&gt; {
+public class CalculateAverageDegree implements MapFunction&lt;EPGMGraphHead, EPGMGraphHead&gt; {
 
   /**
    * The used average degree-type property key
@@ -43,10 +43,10 @@ public class CalculateAverageDegree implements MapFunction&lt;GraphHead, GraphHe
    * Calculates the average degree and safes the value as property to the graphHead.
    *
    * @param graphHead The graphHead the average degree property shall be written to
-   * @return GraphHead The graphHead the average degree property is written to
+   * @return EPGMGraphHead The graphHead the average degree property is written to
    */
   @Override
-  public GraphHead map(GraphHead graphHead) {
+  public EPGMGraphHead map(EPGMGraphHead graphHead) {
 <span class="fc" id="L50">    long numVertices = graphHead.getPropertyValue(&quot;vertexCount&quot;).getLong();</span>
 <span class="fc" id="L51">    long sumDegrees = graphHead.getPropertyValue(</span>
 <span class="fc" id="L52">      SamplingEvaluationConstants.PROPERTY_KEY_SUM_DEGREES).getLong();</span>

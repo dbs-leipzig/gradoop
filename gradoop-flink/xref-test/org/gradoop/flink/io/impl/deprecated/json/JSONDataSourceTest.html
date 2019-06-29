@@ -27,9 +27,9 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Lists;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.DataSource;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -51,9 +51,9 @@
 <a name="41" href="#41">41</a>  
 <a name="42" href="#42">42</a>      GraphCollection collection = dataSource.getGraphCollection();
 <a name="43" href="#43">43</a>  
-<a name="44" href="#44">44</a>      Collection&lt;GraphHead&gt; graphHeads = Lists.newArrayList();
-<a name="45" href="#45">45</a>      Collection&lt;Vertex&gt; vertices = Lists.newArrayList();
-<a name="46" href="#46">46</a>      Collection&lt;Edge&gt; edges = Lists.newArrayList();
+<a name="44" href="#44">44</a>      Collection&lt;EPGMGraphHead&gt; graphHeads = Lists.newArrayList();
+<a name="45" href="#45">45</a>      Collection&lt;EPGMVertex&gt; vertices = Lists.newArrayList();
+<a name="46" href="#46">46</a>      Collection&lt;EPGMEdge&gt; edges = Lists.newArrayList();
 <a name="47" href="#47">47</a>  
 <a name="48" href="#48">48</a>      collection.getGraphHeads().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(graphHeads));
 <a name="49" href="#49">49</a>      collection.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(vertices));

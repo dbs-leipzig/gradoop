@@ -18,7 +18,7 @@ package org.gradoop.flink.algorithms.gelly.randomjump.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * Joins an EPGM edge with a GradoopId of an visited edge from the VCI run. Assigns a boolean
@@ -26,7 +26,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
  * {@code true} if the EPGM edge has a join partner, set to {@code false} otherwise.
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;id;sourceId;targetId;label;graphIds&quot;)
-public class EPGMEdgeWithGellyEdgeIdJoin implements JoinFunction&lt;Edge, GradoopId, Edge&gt; {
+public class EPGMEdgeWithGellyEdgeIdJoin implements JoinFunction&lt;EPGMEdge, GradoopId, EPGMEdge&gt; {
 
   /**
    * Key for the boolean property of the edge.
@@ -44,7 +44,7 @@ public class EPGMEdgeWithGellyEdgeIdJoin implements JoinFunction&lt;Edge, Gradoo
 <span class="fc" id="L44">  }</span>
 
   @Override
-  public Edge join(Edge edge, GradoopId visitedEdgeId) throws Exception {
+  public EPGMEdge join(EPGMEdge edge, GradoopId visitedEdgeId) throws Exception {
 <span class="fc" id="L48">    boolean visited = false;</span>
 <span class="fc bfc" id="L49" title="All 2 branches covered.">    if (visitedEdgeId != null) {</span>
 <span class="fc" id="L50">      visited = true;</span>

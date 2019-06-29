@@ -16,12 +16,12 @@
 package org.gradoop.flink.model.impl.operators.intersection;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.graphcontainment
   .GraphsContainmentFilterBroadcast;
 import org.gradoop.flink.model.impl.functions.graphcontainment.InAnyGraphBroadcast;
-import org.gradoop.common.model.impl.pojo.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -34,14 +34,14 @@ import org.gradoop.common.model.impl.id.GradoopId;
 <span class="fc" id="L34">public class IntersectionBroadcast extends Intersection {</span>
 
   @Override
-  protected DataSet&lt;Vertex&gt; computeNewVertices(
-    DataSet&lt;GraphHead&gt; newSubgraphs) {
+  protected DataSet&lt;EPGMVertex&gt; computeNewVertices(
+    DataSet&lt;EPGMGraphHead&gt; newSubgraphs) {
 
 <span class="fc" id="L40">    DataSet&lt;GradoopId&gt; ids = secondCollection.getGraphHeads()</span>
-<span class="fc" id="L41">      .map(new Id&lt;GraphHead&gt;());</span>
+<span class="fc" id="L41">      .map(new Id&lt;EPGMGraphHead&gt;());</span>
 
 <span class="fc" id="L43">    return firstCollection.getVertices()</span>
-<span class="fc" id="L44">      .filter(new InAnyGraphBroadcast&lt;Vertex&gt;())</span>
+<span class="fc" id="L44">      .filter(new InAnyGraphBroadcast&lt;EPGMVertex&gt;())</span>
 <span class="fc" id="L45">      .withBroadcastSet(ids, GraphsContainmentFilterBroadcast.GRAPH_IDS);</span>
   }
 }

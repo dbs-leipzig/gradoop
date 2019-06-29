@@ -19,7 +19,7 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions.LocalCCResultTupleToVertexJoin;
 import org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions.LocalUndirectedCCResultToTupleMap;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -51,7 +51,7 @@ public class GellyLocalClusteringCoefficientUndirected extends ClusteringCoeffic
   protected LogicalGraph executeInternal(Graph&lt;GradoopId, NullValue, NullValue&gt; gellyGraph)
     throws Exception {
 
-<span class="fc" id="L54">    DataSet&lt;Vertex&gt; resultVertices = new org.apache.flink.graph.library.clustering.undirected</span>
+<span class="fc" id="L54">    DataSet&lt;EPGMVertex&gt; resultVertices = new org.apache.flink.graph.library.clustering.undirected</span>
 <span class="fc" id="L55">      .LocalClusteringCoefficient&lt;GradoopId, NullValue, NullValue&gt;().run(gellyGraph)</span>
 <span class="fc" id="L56">      .map(new LocalUndirectedCCResultToTupleMap())</span>
 <span class="fc" id="L57">      .join(currentGraph.getVertices())</span>

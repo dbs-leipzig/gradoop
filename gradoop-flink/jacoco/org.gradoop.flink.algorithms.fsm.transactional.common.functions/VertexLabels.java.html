@@ -18,7 +18,7 @@ package org.gradoop.flink.algorithms.fsm.transactional.common.functions;
 import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.tuples.WithCount;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -41,7 +41,7 @@ import java.util.Set;
 
 <span class="fc" id="L42">    Set&lt;String&gt; vertexLabels = Sets.newHashSet();</span>
 
-<span class="fc bfc" id="L44" title="All 2 branches covered.">    for (Vertex vertex : graph.getVertices()) {</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">    for (EPGMVertex vertex : graph.getVertices()) {</span>
 <span class="fc" id="L45">      vertexLabels.add(vertex.getLabel());</span>
 <span class="fc" id="L46">    }</span>
 

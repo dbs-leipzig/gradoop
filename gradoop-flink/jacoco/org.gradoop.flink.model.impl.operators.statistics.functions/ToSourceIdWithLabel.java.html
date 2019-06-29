@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.statistics.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.tuples.IdWithLabel;
 
 /**
@@ -26,7 +26,7 @@ import org.gradoop.flink.model.impl.tuples.IdWithLabel;
  * @param &lt;E&gt; EPGM edge type
  */
 @FunctionAnnotation.ForwardedFields(&quot;sourceId-&gt;f0;label-&gt;f1&quot;)
-<span class="fc" id="L29">public class ToSourceIdWithLabel&lt;E extends Edge&gt; implements MapFunction&lt;E, IdWithLabel&gt; {</span>
+<span class="fc" id="L29">public class ToSourceIdWithLabel&lt;E extends EPGMEdge&gt; implements MapFunction&lt;E, IdWithLabel&gt; {</span>
   /**
    * Reuse tuple
    */

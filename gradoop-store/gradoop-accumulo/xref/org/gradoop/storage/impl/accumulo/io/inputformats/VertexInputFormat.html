@@ -31,9 +31,9 @@
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.accumulo.core.client.IteratorSetting;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.accumulo.core.data.Key;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.apache.accumulo.core.data.Value;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.accumulo.handler.AccumuloVertexHandler;
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.accumulo.iterator.tserver.GradoopVertexIterator;
@@ -46,7 +46,7 @@
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> * gradoop accumulo vertex input format</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="39" href="#39">39</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/storage/impl/accumulo/io/inputformats/VertexInputFormat.html">VertexInputFormat</a> <strong class="jxr_keyword">extends</strong> BaseInputFormat&lt;Vertex&gt; {
+<a name="39" href="#39">39</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/storage/impl/accumulo/io/inputformats/VertexInputFormat.html">VertexInputFormat</a> <strong class="jxr_keyword">extends</strong> BaseInputFormat&lt;EPGMVertex&gt; {
 <a name="40" href="#40">40</a>  
 <a name="41" href="#41">41</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment">   * serialize id</em>
@@ -71,7 +71,7 @@
 <a name="61" href="#61">61</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="62" href="#62">62</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/storage/impl/accumulo/io/inputformats/VertexInputFormat.html">VertexInputFormat</a>(
 <a name="63" href="#63">63</a>      @NonNull Properties properties,
-<a name="64" href="#64">64</a>      @Nullable AccumuloQueryHolder&lt;Vertex&gt; predicate
+<a name="64" href="#64">64</a>      @Nullable AccumuloQueryHolder&lt;EPGMVertex&gt; predicate
 <a name="65" href="#65">65</a>    ) {
 <a name="66" href="#66">66</a>      <strong class="jxr_keyword">super</strong>(properties, predicate);
 <a name="67" href="#67">67</a>    }
@@ -79,7 +79,7 @@
 <a name="69" href="#69">69</a>    @Override
 <a name="70" href="#70">70</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> initiate() {
 <a name="71" href="#71">71</a>      iterator = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/storage/impl/accumulo/iterator/tserver/GradoopVertexIterator.html">GradoopVertexIterator</a>();
-<a name="72" href="#72">72</a>      handler = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/storage/impl/accumulo/handler/AccumuloVertexHandler.html">AccumuloVertexHandler</a>(<strong class="jxr_keyword">new</strong> VertexFactory());
+<a name="72" href="#72">72</a>      handler = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/storage/impl/accumulo/handler/AccumuloVertexHandler.html">AccumuloVertexHandler</a>(<strong class="jxr_keyword">new</strong> EPGMVertexFactory());
 <a name="73" href="#73">73</a>    }
 <a name="74" href="#74">74</a>  
 <a name="75" href="#75">75</a>    @Override
@@ -98,8 +98,8 @@
 <a name="88" href="#88">88</a>    }
 <a name="89" href="#89">89</a>  
 <a name="90" href="#90">90</a>    @Override
-<a name="91" href="#91">91</a>    <strong class="jxr_keyword">protected</strong> Vertex mapRow(Map.Entry&lt;Key, Value&gt; row) <strong class="jxr_keyword">throws</strong> IOException {
-<a name="92" href="#92">92</a>      EPGMVertex decoded = iterator.fromRow(row);
+<a name="91" href="#91">91</a>    <strong class="jxr_keyword">protected</strong> EPGMVertex mapRow(Map.Entry&lt;Key, Value&gt; row) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="92" href="#92">92</a>      Vertex decoded = iterator.fromRow(row);
 <a name="93" href="#93">93</a>      <strong class="jxr_keyword">return</strong> handler.readRow(decoded);
 <a name="94" href="#94">94</a>    }
 <a name="95" href="#95">95</a>  

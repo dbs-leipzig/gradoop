@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.aggregation.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -98,7 +98,7 @@ public class AggregateTransactions implements MapFunction&lt;GraphTransaction, G
    */
   private Map&lt;String, PropertyValue&gt; aggregateVertices(Map&lt;String, PropertyValue&gt; aggregate,
                                                        GraphTransaction graphTransaction) {
-<span class="fc bfc" id="L101" title="All 2 branches covered.">    for (Vertex vertex : graphTransaction.getVertices()) {</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">    for (EPGMVertex vertex : graphTransaction.getVertices()) {</span>
 <span class="fc" id="L102">      aggregate = AggregateUtil.increment(aggregate, vertex, vertexAggregateFunctions);</span>
 <span class="fc" id="L103">    }</span>
 <span class="fc" id="L104">    return aggregate;</span>
@@ -113,7 +113,7 @@ public class AggregateTransactions implements MapFunction&lt;GraphTransaction, G
    */
   private Map&lt;String, PropertyValue&gt; aggregateEdges(Map&lt;String, PropertyValue&gt; aggregate,
                                                     GraphTransaction graphTransaction) {
-<span class="fc bfc" id="L116" title="All 2 branches covered.">    for (Edge edge : graphTransaction.getEdges()) {</span>
+<span class="fc bfc" id="L116" title="All 2 branches covered.">    for (EPGMEdge edge : graphTransaction.getEdges()) {</span>
 <span class="fc" id="L117">      aggregate = AggregateUtil.increment(aggregate, edge, edgeAggregateFunctions);</span>
 <span class="fc" id="L118">    }</span>
 <span class="fc" id="L119">    return aggregate;</span>

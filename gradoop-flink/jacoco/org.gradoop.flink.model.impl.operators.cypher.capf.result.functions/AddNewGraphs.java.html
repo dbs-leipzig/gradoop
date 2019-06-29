@@ -20,18 +20,18 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 
 /**
- * Adds GradoopIds to the graph ids of a GraphElement based on a long id
+ * Adds GradoopIds to the graph ids of a EPGMGraphElement based on a long id
  * that is defined on both datasets.
  *
- * @param &lt;E&gt; a type extending GraphElement, e.g. Vertex or Edge
+ * @param &lt;E&gt; a type extending EPGMGraphElement, e.g. EPGMVertex or EPGMEdge
  */
 
 @FunctionAnnotation.ReadFieldsFirst(&quot;f1&quot;)
 @FunctionAnnotation.ReadFieldsSecond(&quot;f1&quot;)
-<span class="fc" id="L34">public class AddNewGraphs&lt;E extends GraphElement&gt;</span>
+<span class="fc" id="L34">public class AddNewGraphs&lt;E extends EPGMGraphElement&gt;</span>
   implements JoinFunction&lt;Tuple2&lt;Long, GradoopIdSet&gt;, Tuple2&lt;Long, E&gt;, E&gt; {
 
   @Override

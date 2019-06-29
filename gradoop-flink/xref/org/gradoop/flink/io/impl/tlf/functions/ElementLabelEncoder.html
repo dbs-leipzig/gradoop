@@ -29,8 +29,8 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.configuration.Configuration;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.tlf.TLFConstants;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> java.util.HashMap;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> java.util.Map;
@@ -105,12 +105,12 @@
 <a name="95" href="#95">95</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a> map(<a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a> graphTransaction)
 <a name="96" href="#96">96</a>        <strong class="jxr_keyword">throws</strong> Exception {
 <a name="97" href="#97">97</a>      <strong class="jxr_keyword">if</strong> (vertexDictionary != <strong class="jxr_keyword">null</strong>) {
-<a name="98" href="#98">98</a>        <strong class="jxr_keyword">for</strong> (Vertex vertex : graphTransaction.getVertices()) {
+<a name="98" href="#98">98</a>        <strong class="jxr_keyword">for</strong> (EPGMVertex vertex : graphTransaction.getVertices()) {
 <a name="99" href="#99">99</a>          vertex.setLabel(vertexDictionary.get(vertex.getLabel()).toString());
 <a name="100" href="#100">100</a>       }
 <a name="101" href="#101">101</a>     }
 <a name="102" href="#102">102</a>     <strong class="jxr_keyword">if</strong> (edgeDictionary != <strong class="jxr_keyword">null</strong>) {
-<a name="103" href="#103">103</a>       <strong class="jxr_keyword">for</strong> (Edge edge : graphTransaction.getEdges()) {
+<a name="103" href="#103">103</a>       <strong class="jxr_keyword">for</strong> (EPGMEdge edge : graphTransaction.getEdges()) {
 <a name="104" href="#104">104</a>         edge.setLabel(edgeDictionary.get(edge.getLabel()).toString());
 <a name="105" href="#105">105</a>       }
 <a name="106" href="#106">106</a>     }

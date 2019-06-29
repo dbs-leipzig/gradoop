@@ -28,8 +28,8 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Lists;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EdgeFactory;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
@@ -49,12 +49,12 @@
 <a name="39" href="#39">39</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFilterWithNoPredicates() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="40" href="#40">40</a>      CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH ()-[a]-&gt;()"</span>);
 <a name="41" href="#41">41</a>  
-<a name="42" href="#42">42</a>      EdgeFactory edgeFactory = <strong class="jxr_keyword">new</strong> EdgeFactory();
+<a name="42" href="#42">42</a>      EPGMEdgeFactory edgeFactory = <strong class="jxr_keyword">new</strong> EPGMEdgeFactory();
 <a name="43" href="#43">43</a>      Properties properties = Properties.create();
 <a name="44" href="#44">44</a>      properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Anton"</span>);
-<a name="45" href="#45">45</a>      Edge e1 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, GradoopId.get(), GradoopId.get(), properties);
+<a name="45" href="#45">45</a>      EPGMEdge e1 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, GradoopId.get(), GradoopId.get(), properties);
 <a name="46" href="#46">46</a>  
-<a name="47" href="#47">47</a>      DataSet&lt;Edge&gt; edges = getExecutionEnvironment().fromElements(e1);
+<a name="47" href="#47">47</a>      DataSet&lt;EPGMEdge&gt; edges = getExecutionEnvironment().fromElements(e1);
 <a name="48" href="#48">48</a>  
 <a name="49" href="#49">49</a>      List&lt;Embedding&gt; result = <strong class="jxr_keyword">new</strong> FilterAndProjectEdges(edges, predicates, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(), false)
 <a name="50" href="#50">50</a>        .evaluate()
@@ -68,16 +68,16 @@
 <a name="58" href="#58">58</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFilterEdgesByProperties() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="59" href="#59">59</a>      CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH ()-[a]-&gt;() WHERE a.since &gt; 2013"</span>);
 <a name="60" href="#60">60</a>  
-<a name="61" href="#61">61</a>      EdgeFactory edgeFactory = <strong class="jxr_keyword">new</strong> EdgeFactory();
+<a name="61" href="#61">61</a>      EPGMEdgeFactory edgeFactory = <strong class="jxr_keyword">new</strong> EPGMEdgeFactory();
 <a name="62" href="#62">62</a>      Properties properties = Properties.create();
 <a name="63" href="#63">63</a>      properties.set(<span class="jxr_string">"since"</span>, 2014);
-<a name="64" href="#64">64</a>      Edge e1 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, GradoopId.get(), GradoopId.get(), properties);
+<a name="64" href="#64">64</a>      EPGMEdge e1 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, GradoopId.get(), GradoopId.get(), properties);
 <a name="65" href="#65">65</a>  
 <a name="66" href="#66">66</a>      properties = Properties.create();
 <a name="67" href="#67">67</a>      properties.set(<span class="jxr_string">"since"</span>, 2013);
-<a name="68" href="#68">68</a>      Edge e2 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, GradoopId.get(), GradoopId.get(), properties);
+<a name="68" href="#68">68</a>      EPGMEdge e2 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, GradoopId.get(), GradoopId.get(), properties);
 <a name="69" href="#69">69</a>  
-<a name="70" href="#70">70</a>      DataSet&lt;Edge&gt; edges = getExecutionEnvironment().fromElements(e1, e2);
+<a name="70" href="#70">70</a>      DataSet&lt;EPGMEdge&gt; edges = getExecutionEnvironment().fromElements(e1, e2);
 <a name="71" href="#71">71</a>  
 <a name="72" href="#72">72</a>      List&lt;Embedding&gt; result = <strong class="jxr_keyword">new</strong> FilterAndProjectEdges(edges, predicates, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(), false)
 <a name="73" href="#73">73</a>        .evaluate()
@@ -91,10 +91,10 @@
 <a name="81" href="#81">81</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFilterEdgesByLabel() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="82" href="#82">82</a>      CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH ()-[a:likes]-&gt;()"</span>);
 <a name="83" href="#83">83</a>  
-<a name="84" href="#84">84</a>      EdgeFactory edgeFactory = <strong class="jxr_keyword">new</strong> EdgeFactory();
-<a name="85" href="#85">85</a>      Edge e1 = edgeFactory.createEdge(<span class="jxr_string">"likes"</span>, GradoopId.get(), GradoopId.get());
-<a name="86" href="#86">86</a>      Edge e2 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, GradoopId.get(), GradoopId.get());
-<a name="87" href="#87">87</a>      DataSet&lt;Edge&gt; edges = getExecutionEnvironment().fromElements(e1, e2);
+<a name="84" href="#84">84</a>      EPGMEdgeFactory edgeFactory = <strong class="jxr_keyword">new</strong> EPGMEdgeFactory();
+<a name="85" href="#85">85</a>      EPGMEdge e1 = edgeFactory.createEdge(<span class="jxr_string">"likes"</span>, GradoopId.get(), GradoopId.get());
+<a name="86" href="#86">86</a>      EPGMEdge e2 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, GradoopId.get(), GradoopId.get());
+<a name="87" href="#87">87</a>      DataSet&lt;EPGMEdge&gt; edges = getExecutionEnvironment().fromElements(e1, e2);
 <a name="88" href="#88">88</a>  
 <a name="89" href="#89">89</a>      List&lt;Embedding&gt; result = <strong class="jxr_keyword">new</strong> FilterAndProjectEdges(edges, predicates, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(), false)
 <a name="90" href="#90">90</a>        .evaluate()
@@ -110,73 +110,76 @@
 <a name="100" href="#100">100</a> 
 <a name="101" href="#101">101</a>     Properties properties = Properties.create();
 <a name="102" href="#102">102</a>     properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Alice"</span>);
-<a name="103" href="#103">103</a>     Edge edge = <strong class="jxr_keyword">new</strong> EdgeFactory().createEdge(<span class="jxr_string">"Label"</span>, GradoopId.get(), GradoopId.get(), properties);
-<a name="104" href="#104">104</a> 
-<a name="105" href="#105">105</a>     DataSet&lt;Edge&gt; edges = getExecutionEnvironment().fromElements(edge);
-<a name="106" href="#106">106</a> 
-<a name="107" href="#107">107</a>     List&lt;Embedding&gt; result = <strong class="jxr_keyword">new</strong> FilterAndProjectEdges(edges, predicates, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(), false)
-<a name="108" href="#108">108</a>       .evaluate()
-<a name="109" href="#109">109</a>       .collect();
-<a name="110" href="#110">110</a> 
-<a name="111" href="#111">111</a>     assertEquals(edge.getSourceId(), result.get(0).getId(0));
-<a name="112" href="#112">112</a>     assertEquals(edge.getId(),       result.get(0).getId(1));
-<a name="113" href="#113">113</a>     assertEquals(edge.getTargetId(), result.get(0).getId(2));
-<a name="114" href="#114">114</a>   }
-<a name="115" href="#115">115</a> 
-<a name="116" href="#116">116</a>   @Test
-<a name="117" href="#117">117</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testProjectionOfAvailableValues() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="118" href="#118">118</a>     CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH ()-[a]-&gt;() WHERE a.name = \&quot;Alice\&quot;"</span>);
-<a name="119" href="#119">119</a> 
-<a name="120" href="#120">120</a>     Properties properties = Properties.create();
-<a name="121" href="#121">121</a>     properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Alice"</span>);
-<a name="122" href="#122">122</a>     Edge edge = <strong class="jxr_keyword">new</strong> EdgeFactory().createEdge(<span class="jxr_string">"Label"</span>, GradoopId.get(), GradoopId.get(), properties);
-<a name="123" href="#123">123</a> 
-<a name="124" href="#124">124</a>     DataSet&lt;Edge&gt; edges = getExecutionEnvironment().fromElements(edge);
+<a name="103" href="#103">103</a>     EPGMEdge
+<a name="104" href="#104">104</a>       edge = <strong class="jxr_keyword">new</strong> EPGMEdgeFactory().createEdge(<span class="jxr_string">"Label"</span>, GradoopId.get(), GradoopId.get(), properties);
+<a name="105" href="#105">105</a> 
+<a name="106" href="#106">106</a>     DataSet&lt;EPGMEdge&gt; edges = getExecutionEnvironment().fromElements(edge);
+<a name="107" href="#107">107</a> 
+<a name="108" href="#108">108</a>     List&lt;Embedding&gt; result = <strong class="jxr_keyword">new</strong> FilterAndProjectEdges(edges, predicates, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(), false)
+<a name="109" href="#109">109</a>       .evaluate()
+<a name="110" href="#110">110</a>       .collect();
+<a name="111" href="#111">111</a> 
+<a name="112" href="#112">112</a>     assertEquals(edge.getSourceId(), result.get(0).getId(0));
+<a name="113" href="#113">113</a>     assertEquals(edge.getId(),       result.get(0).getId(1));
+<a name="114" href="#114">114</a>     assertEquals(edge.getTargetId(), result.get(0).getId(2));
+<a name="115" href="#115">115</a>   }
+<a name="116" href="#116">116</a> 
+<a name="117" href="#117">117</a>   @Test
+<a name="118" href="#118">118</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testProjectionOfAvailableValues() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="119" href="#119">119</a>     CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH ()-[a]-&gt;() WHERE a.name = \&quot;Alice\&quot;"</span>);
+<a name="120" href="#120">120</a> 
+<a name="121" href="#121">121</a>     Properties properties = Properties.create();
+<a name="122" href="#122">122</a>     properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Alice"</span>);
+<a name="123" href="#123">123</a>     EPGMEdge
+<a name="124" href="#124">124</a>       edge = <strong class="jxr_keyword">new</strong> EPGMEdgeFactory().createEdge(<span class="jxr_string">"Label"</span>, GradoopId.get(), GradoopId.get(), properties);
 <a name="125" href="#125">125</a> 
-<a name="126" href="#126">126</a>     List&lt;String&gt; projectionPropertyKeys = Lists.newArrayList(<span class="jxr_string">"name"</span>);
+<a name="126" href="#126">126</a>     DataSet&lt;EPGMEdge&gt; edges = getExecutionEnvironment().fromElements(edge);
 <a name="127" href="#127">127</a> 
-<a name="128" href="#128">128</a>     Embedding result = <strong class="jxr_keyword">new</strong> FilterAndProjectEdges(edges, predicates, projectionPropertyKeys, false)
-<a name="129" href="#129">129</a>       .evaluate().collect().get(0);
-<a name="130" href="#130">130</a> 
-<a name="131" href="#131">131</a>     assertEquals(result.getProperty(0), PropertyValue.create(<span class="jxr_string">"Alice"</span>));
-<a name="132" href="#132">132</a>   }
-<a name="133" href="#133">133</a> 
-<a name="134" href="#134">134</a>   @Test
-<a name="135" href="#135">135</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testProjectionOfMissingValues() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="136" href="#136">136</a>     CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH ()-[a]-&gt;() WHERE a.name = \&quot;Alice\&quot;"</span>);
-<a name="137" href="#137">137</a> 
-<a name="138" href="#138">138</a>     Properties properties = Properties.create();
-<a name="139" href="#139">139</a>     properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Alice"</span>);
-<a name="140" href="#140">140</a>     Edge edge = <strong class="jxr_keyword">new</strong> EdgeFactory().createEdge(<span class="jxr_string">"Label"</span>, GradoopId.get(), GradoopId.get(), properties);
-<a name="141" href="#141">141</a> 
-<a name="142" href="#142">142</a>     DataSet&lt;Edge&gt; edges = getExecutionEnvironment().fromElements(edge);
-<a name="143" href="#143">143</a> 
-<a name="144" href="#144">144</a>     List&lt;String&gt; projectionPropertyKeys = Lists.newArrayList(<span class="jxr_string">"name"</span>, <span class="jxr_string">"since"</span>);
-<a name="145" href="#145">145</a> 
-<a name="146" href="#146">146</a>     Embedding result = <strong class="jxr_keyword">new</strong> FilterAndProjectEdges(edges, predicates, projectionPropertyKeys, false)
-<a name="147" href="#147">147</a>       .evaluate().collect().get(0);
+<a name="128" href="#128">128</a>     List&lt;String&gt; projectionPropertyKeys = Lists.newArrayList(<span class="jxr_string">"name"</span>);
+<a name="129" href="#129">129</a> 
+<a name="130" href="#130">130</a>     Embedding result = <strong class="jxr_keyword">new</strong> FilterAndProjectEdges(edges, predicates, projectionPropertyKeys, false)
+<a name="131" href="#131">131</a>       .evaluate().collect().get(0);
+<a name="132" href="#132">132</a> 
+<a name="133" href="#133">133</a>     assertEquals(result.getProperty(0), PropertyValue.create(<span class="jxr_string">"Alice"</span>));
+<a name="134" href="#134">134</a>   }
+<a name="135" href="#135">135</a> 
+<a name="136" href="#136">136</a>   @Test
+<a name="137" href="#137">137</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testProjectionOfMissingValues() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="138" href="#138">138</a>     CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH ()-[a]-&gt;() WHERE a.name = \&quot;Alice\&quot;"</span>);
+<a name="139" href="#139">139</a> 
+<a name="140" href="#140">140</a>     Properties properties = Properties.create();
+<a name="141" href="#141">141</a>     properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Alice"</span>);
+<a name="142" href="#142">142</a>     EPGMEdge
+<a name="143" href="#143">143</a>       edge = <strong class="jxr_keyword">new</strong> EPGMEdgeFactory().createEdge(<span class="jxr_string">"Label"</span>, GradoopId.get(), GradoopId.get(), properties);
+<a name="144" href="#144">144</a> 
+<a name="145" href="#145">145</a>     DataSet&lt;EPGMEdge&gt; edges = getExecutionEnvironment().fromElements(edge);
+<a name="146" href="#146">146</a> 
+<a name="147" href="#147">147</a>     List&lt;String&gt; projectionPropertyKeys = Lists.newArrayList(<span class="jxr_string">"name"</span>, <span class="jxr_string">"since"</span>);
 <a name="148" href="#148">148</a> 
-<a name="149" href="#149">149</a>     assertEquals(result.getProperty(0), PropertyValue.create(<span class="jxr_string">"Alice"</span>));
-<a name="150" href="#150">150</a>     assertEquals(result.getProperty(1), PropertyValue.NULL_VALUE);
-<a name="151" href="#151">151</a>   }
-<a name="152" href="#152">152</a> 
-<a name="153" href="#153">153</a>   @Test
-<a name="154" href="#154">154</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testProjectLoop() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="155" href="#155">155</a>     CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH (a)-[b]-&gt;(a)"</span>);
-<a name="156" href="#156">156</a> 
-<a name="157" href="#157">157</a>     GradoopId a = GradoopId.get();
-<a name="158" href="#158">158</a>     Edge edge = <strong class="jxr_keyword">new</strong> EdgeFactory().createEdge(a, a);
+<a name="149" href="#149">149</a>     Embedding result = <strong class="jxr_keyword">new</strong> FilterAndProjectEdges(edges, predicates, projectionPropertyKeys, false)
+<a name="150" href="#150">150</a>       .evaluate().collect().get(0);
+<a name="151" href="#151">151</a> 
+<a name="152" href="#152">152</a>     assertEquals(result.getProperty(0), PropertyValue.create(<span class="jxr_string">"Alice"</span>));
+<a name="153" href="#153">153</a>     assertEquals(result.getProperty(1), PropertyValue.NULL_VALUE);
+<a name="154" href="#154">154</a>   }
+<a name="155" href="#155">155</a> 
+<a name="156" href="#156">156</a>   @Test
+<a name="157" href="#157">157</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testProjectLoop() <strong class="jxr_keyword">throws</strong> Exception {
+<a name="158" href="#158">158</a>     CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH (a)-[b]-&gt;(a)"</span>);
 <a name="159" href="#159">159</a> 
-<a name="160" href="#160">160</a>     DataSet&lt;Edge&gt; edges = getExecutionEnvironment().fromElements(edge);
-<a name="161" href="#161">161</a> 
-<a name="162" href="#162">162</a>     Embedding result = <strong class="jxr_keyword">new</strong> FilterAndProjectEdges(edges, predicates, Collections.emptyList(), <strong class="jxr_keyword">true</strong>)
-<a name="163" href="#163">163</a>       .evaluate().collect().get(0);
+<a name="160" href="#160">160</a>     GradoopId a = GradoopId.get();
+<a name="161" href="#161">161</a>     EPGMEdge edge = <strong class="jxr_keyword">new</strong> EPGMEdgeFactory().createEdge(a, a);
+<a name="162" href="#162">162</a> 
+<a name="163" href="#163">163</a>     DataSet&lt;EPGMEdge&gt; edges = getExecutionEnvironment().fromElements(edge);
 <a name="164" href="#164">164</a> 
-<a name="165" href="#165">165</a>     assertEquals(result.size(), 2);
-<a name="166" href="#166">166</a>     assertEquals(a, result.getId(0));
-<a name="167" href="#167">167</a>     assertEquals(edge.getId(), result.getId(1));
-<a name="168" href="#168">168</a>   }
-<a name="169" href="#169">169</a> }
+<a name="165" href="#165">165</a>     Embedding result = <strong class="jxr_keyword">new</strong> FilterAndProjectEdges(edges, predicates, Collections.emptyList(), <strong class="jxr_keyword">true</strong>)
+<a name="166" href="#166">166</a>       .evaluate().collect().get(0);
+<a name="167" href="#167">167</a> 
+<a name="168" href="#168">168</a>     assertEquals(result.size(), 2);
+<a name="169" href="#169">169</a>     assertEquals(a, result.getId(0));
+<a name="170" href="#170">170</a>     assertEquals(edge.getId(), result.getId(1));
+<a name="171" href="#171">171</a>   }
+<a name="172" href="#172">172</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

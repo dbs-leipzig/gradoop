@@ -29,28 +29,28 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.typeinfo.TypeInformation;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.typeutils.TypeExtractor;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHead;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHeadFactory;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="26" href="#26">26</a>  
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * Creates an EPGM graph head representing a business transaction graphs.</em>
+<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * Creates an graph head representing a business transaction graphs.</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * @param &lt;G&gt; graph head type</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> NewBtgGraphHead&lt;G <strong class="jxr_keyword">extends</strong> EPGMGraphHead&gt;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> NewBtgGraphHead&lt;G <strong class="jxr_keyword">extends</strong> GraphHead&gt;
 <a name="32" href="#32">32</a>    implements MapFunction&lt;GradoopId, G&gt;, ResultTypeQueryable&lt;G&gt; {
 <a name="33" href="#33">33</a>  
 <a name="34" href="#34">34</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment">   * graph head factory</em>
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="37" href="#37">37</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> EPGMGraphHeadFactory&lt;G&gt; graphHeadFactory;
+<a name="37" href="#37">37</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> GraphHeadFactory&lt;G&gt; graphHeadFactory;
 <a name="38" href="#38">38</a>  
 <a name="39" href="#39">39</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment">   * Constructor</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   * @param graphHeadFactory graph head factory</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="43" href="#43">43</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/algorithms/btgs/functions/NewBtgGraphHead.html">NewBtgGraphHead</a>(EPGMGraphHeadFactory&lt;G&gt; graphHeadFactory) {
+<a name="43" href="#43">43</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/algorithms/btgs/functions/NewBtgGraphHead.html">NewBtgGraphHead</a>(GraphHeadFactory&lt;G&gt; graphHeadFactory) {
 <a name="44" href="#44">44</a>      <strong class="jxr_keyword">this</strong>.graphHeadFactory = graphHeadFactory;
 <a name="45" href="#45">45</a>    }
 <a name="46" href="#46">46</a>  

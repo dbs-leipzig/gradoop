@@ -17,35 +17,35 @@ package org.gradoop.storage.impl.accumulo.handler;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 
 /**
- * accumulo edge handler for row's read/write operator
+ * Accumulo edge handler for row's read/write operator
  */
-public class AccumuloEdgeHandler implements AccumuloRowHandler&lt;Edge, EPGMEdge&gt; {
+public class AccumuloEdgeHandler implements AccumuloRowHandler&lt;EPGMEdge, Edge&gt; {
 
   /**
-   * edge factory
+   * Edge factory
    */
-  private final EPGMEdgeFactory&lt;Edge&gt; factory;
+  private final EdgeFactory&lt;EPGMEdge&gt; factory;
 
   /**
-   * accumulo edge handler constructor
+   * Accumulo edge handler constructor
    *
    * @param factory edge factory
    */
-<span class="fc" id="L41">  public AccumuloEdgeHandler(EPGMEdgeFactory&lt;Edge&gt; factory) {</span>
+<span class="fc" id="L41">  public AccumuloEdgeHandler(EdgeFactory&lt;EPGMEdge&gt; factory) {</span>
 <span class="fc" id="L42">    this.factory = factory;</span>
 <span class="fc" id="L43">  }</span>
 
   @Override
   public Mutation writeRow(
     Mutation mutation,
-    EPGMEdge record
+    Edge record
   ) {
 <span class="fc" id="L50">    mutation.put(AccumuloTables.KEY.LABEL, AccumuloTables.KEY.NONE, record.getLabel());</span>
 <span class="fc" id="L51">    mutation.put(AccumuloTables.KEY.SOURCE, AccumuloTables.KEY.NONE,</span>
@@ -72,7 +72,7 @@ public class AccumuloEdgeHandler implements AccumuloRowHandler&lt;Edge, EPGMEdge
   }
 
   @Override
-  public Edge readRow(EPGMEdge origin) {
+  public EPGMEdge readRow(Edge origin) {
 <span class="fc" id="L76">    return factory.initEdge(</span>
 <span class="fc" id="L77">      origin.getId(),</span>
 <span class="fc" id="L78">      origin.getLabel(),</span>

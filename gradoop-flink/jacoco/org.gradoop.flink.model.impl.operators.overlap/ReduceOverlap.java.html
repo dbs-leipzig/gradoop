@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.overlap;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -31,7 +31,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
 
   /**
    * Creates a new logical graph containing the overlapping vertex and edge sets
-   * of the graphs contained in the given collection. Vertex and edge equality
+   * of the graphs contained in the given collection. EPGMVertex and edge equality
    * is based on their respective identifiers.
    *
    * @param collection input collection
@@ -39,9 +39,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
    */
   @Override
   public LogicalGraph execute(GraphCollection collection) {
-<span class="fc" id="L42">    DataSet&lt;GraphHead&gt; graphHeads = collection.getGraphHeads();</span>
+<span class="fc" id="L42">    DataSet&lt;EPGMGraphHead&gt; graphHeads = collection.getGraphHeads();</span>
 
-<span class="fc" id="L44">    DataSet&lt;GradoopId&gt; graphIDs = graphHeads.map(new Id&lt;GraphHead&gt;());</span>
+<span class="fc" id="L44">    DataSet&lt;GradoopId&gt; graphIDs = graphHeads.map(new Id&lt;EPGMGraphHead&gt;());</span>
 
 <span class="fc" id="L46">    return collection.getConfig().getLogicalGraphFactory().fromDataSets(</span>
 <span class="fc" id="L47">      getVertices(collection.getVertices(), graphIDs),</span>

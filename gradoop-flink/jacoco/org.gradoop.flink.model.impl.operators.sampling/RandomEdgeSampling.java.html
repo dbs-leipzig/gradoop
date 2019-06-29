@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -64,21 +64,21 @@ public class RandomEdgeSampling extends SamplingAlgorithm {
 
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
-<span class="fc" id="L67">    DataSet&lt;Edge&gt; newEdges = graph.getEdges().filter(new RandomFilter&lt;&gt;(sampleSize, randomSeed));</span>
+<span class="fc" id="L67">    DataSet&lt;EPGMEdge&gt; newEdges = graph.getEdges().filter(new RandomFilter&lt;&gt;(sampleSize, randomSeed));</span>
 
-<span class="fc" id="L69">    DataSet&lt;Vertex&gt; newSourceVertices = graph.getVertices()</span>
+<span class="fc" id="L69">    DataSet&lt;EPGMVertex&gt; newSourceVertices = graph.getVertices()</span>
 <span class="fc" id="L70">      .join(newEdges)</span>
 <span class="fc" id="L71">      .where(new Id&lt;&gt;()).equalTo(new SourceId&lt;&gt;())</span>
 <span class="fc" id="L72">      .with(new LeftSide&lt;&gt;())</span>
 <span class="fc" id="L73">      .distinct(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L75">    DataSet&lt;Vertex&gt; newTargetVertices = graph.getVertices()</span>
+<span class="fc" id="L75">    DataSet&lt;EPGMVertex&gt; newTargetVertices = graph.getVertices()</span>
 <span class="fc" id="L76">      .join(newEdges)</span>
 <span class="fc" id="L77">      .where(new Id&lt;&gt;()).equalTo(new TargetId&lt;&gt;())</span>
 <span class="fc" id="L78">      .with(new LeftSide&lt;&gt;())</span>
 <span class="fc" id="L79">      .distinct(new Id&lt;&gt;());</span>
 
-<span class="fc" id="L81">    DataSet&lt;Vertex&gt; newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id&lt;&gt;());</span>
+<span class="fc" id="L81">    DataSet&lt;EPGMVertex&gt; newVertices = newSourceVertices.union(newTargetVertices).distinct(new Id&lt;&gt;());</span>
 
 <span class="fc" id="L83">    return graph.getFactory().fromDataSets(newVertices, newEdges);</span>
   }

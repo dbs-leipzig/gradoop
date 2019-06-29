@@ -19,13 +19,13 @@ import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.flink.api.common.io.OutputFormat;
 import org.apache.flink.configuration.Configuration;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.config.GradoopAccumuloConfig;
 import org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
@@ -38,7 +38,7 @@ import java.io.IOException;
  *
  * @param &lt;E&gt; gradoop element
  */
-public class ElementOutputFormat&lt;E extends Element&gt; implements OutputFormat&lt;E&gt; {
+public class ElementOutputFormat&lt;E extends EPGMElement&gt; implements OutputFormat&lt;E&gt; {
 
   /**
    * serialize id
@@ -51,7 +51,7 @@ public class ElementOutputFormat&lt;E extends Element&gt; implements OutputForma
   private final GradoopAccumuloConfig config;
 
   /**
-   * Element type
+   * EPGMElement type
    */
   private final Class&lt;E&gt; elementType;
 
@@ -95,12 +95,12 @@ public class ElementOutputFormat&lt;E extends Element&gt; implements OutputForma
 
   @Override
   public final void writeRecord(E record) {
-<span class="fc bfc" id="L98" title="All 2 branches covered.">    if (elementType == Edge.class) {</span>
-<span class="fc" id="L99">      this.store.writeEdge((EPGMEdge) record);</span>
-<span class="fc bfc" id="L100" title="All 2 branches covered.">    } else if (elementType == Vertex.class) {</span>
-<span class="fc" id="L101">      this.store.writeVertex((EPGMVertex) record);</span>
-<span class="pc bpc" id="L102" title="1 of 2 branches missed.">    } else if (elementType == GraphHead.class) {</span>
-<span class="fc" id="L103">      this.store.writeGraphHead((EPGMGraphHead) record);</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">    if (elementType == EPGMEdge.class) {</span>
+<span class="fc" id="L99">      this.store.writeEdge((Edge) record);</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">    } else if (elementType == EPGMVertex.class) {</span>
+<span class="fc" id="L101">      this.store.writeVertex((Vertex) record);</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">    } else if (elementType == EPGMGraphHead.class) {</span>
+<span class="fc" id="L103">      this.store.writeGraphHead((GraphHead) record);</span>
     } else {
 <span class="nc" id="L105">      throw new IllegalArgumentException(String.format(&quot;illegal element type %s&quot;, elementType));</span>
     }

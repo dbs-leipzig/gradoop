@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EPGMElement.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Gradoop Common</a> &gt; <a href="index.source.html" class="el_package">org.gradoop.common.model.impl.pojo</a> &gt; <span class="el_source">EPGMElement.java</span></div><h1>EPGMElement.java</h1><pre class="source lang-java linenums">/*
+ * Copyright © 2014 - 2019 Leipzig University (Database Research Group)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.gradoop.common.model.impl.pojo;
+
+import com.google.common.base.Preconditions;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.properties.Properties;
+import org.gradoop.common.model.impl.properties.Property;
+import org.gradoop.common.model.impl.properties.PropertyValue;
+
+import javax.annotation.Nullable;
+import java.util.Objects;
+
+/**
+ * Abstract base class for EPGM elements.
+ */
+public abstract class EPGMElement implements Element {
+  /**
+   * Entity identifier.
+   */
+  protected GradoopId id;
+
+  /**
+   * Label of that entity.
+   */
+  protected String label;
+
+  /**
+   * Internal property storage
+   */
+  protected Properties properties;
+
+  /**
+   * Default constructor.
+   */
+<span class="nc" id="L50">  protected EPGMElement() {</span>
+<span class="nc" id="L51">  }</span>
+
+  /**
+   * Creates an object from the given parameters. Can only be called by
+   * inheriting classes.
+   *
+   * @param id         entity identifier
+   * @param label      entity label
+   * @param properties key-value properties
+   */
+  protected EPGMElement(
+<span class="fc" id="L62">    GradoopId id, String label, Properties properties) {</span>
+<span class="fc" id="L63">    this.id = id;</span>
+<span class="fc" id="L64">    this.label = label;</span>
+<span class="fc" id="L65">    this.properties = properties;</span>
+<span class="fc" id="L66">  }</span>
+
+  @Override
+  public GradoopId getId() {
+<span class="fc" id="L70">    return id;</span>
+  }
+
+  @Override
+  public void setId(GradoopId id) {
+<span class="fc" id="L75">    this.id = id;</span>
+<span class="fc" id="L76">  }</span>
+
+  @Override
+  public String getLabel() {
+<span class="fc" id="L80">    return label;</span>
+  }
+
+  @Override
+  public void setLabel(String label) {
+<span class="nc" id="L85">    this.label = label;</span>
+<span class="nc" id="L86">  }</span>
+
+  @Override
+  @Nullable
+  public Properties getProperties() {
+<span class="fc" id="L91">    return properties;</span>
+  }
+
+  @Override
+  public Iterable&lt;String&gt; getPropertyKeys() {
+<span class="fc bfc" id="L96" title="All 2 branches covered.">    return (properties != null) ? properties.getKeys() : null;</span>
+  }
+
+  @Override
+  public PropertyValue getPropertyValue(String key) {
+    // TODO: return PropertyValue.NULL_VALUE instead?
+<span class="fc bfc" id="L102" title="All 2 branches covered.">    return (properties != null) ? properties.get(key) : null;</span>
+  }
+
+  @Override
+  public void setProperties(Properties properties) {
+<span class="nc" id="L107">    this.properties = properties;</span>
+<span class="nc" id="L108">  }</span>
+
+  @Override
+  public void setProperty(Property property) {
+<span class="nc" id="L112">    Preconditions.checkNotNull(property, &quot;Property was null&quot;);</span>
+<span class="nc" id="L113">    initProperties();</span>
+<span class="nc" id="L114">    this.properties.set(property);</span>
+<span class="nc" id="L115">  }</span>
+
+  @Override
+  public void setProperty(String key, Object value) {
+<span class="fc" id="L119">    initProperties();</span>
+<span class="fc" id="L120">    this.properties.set(key, value);</span>
+<span class="fc" id="L121">  }</span>
+
+  @Override
+  public void setProperty(String key, PropertyValue value) {
+<span class="nc" id="L125">    initProperties();</span>
+<span class="nc" id="L126">    this.properties.set(key, value);</span>
+<span class="nc" id="L127">  }</span>
+
+  @Override
+  public PropertyValue removeProperty(String key) {
+<span class="fc bfc" id="L131" title="All 2 branches covered.">    return this.properties != null ? properties.remove(key) : null;</span>
+  }
+
+  @Override
+  public int getPropertyCount() {
+<span class="fc bfc" id="L136" title="All 2 branches covered.">    return (this.properties != null) ? this.properties.size() : 0;</span>
+  }
+
+  @Override
+  public boolean hasProperty(String key) {
+<span class="pc bpc" id="L141" title="1 of 4 branches missed.">    return this.properties != null &amp;&amp; this.properties.containsKey(key);</span>
+  }
+
+  @Override
+  public boolean equals(Object o) {
+<span class="fc bfc" id="L146" title="All 2 branches covered.">    if (this == o) {</span>
+<span class="fc" id="L147">      return true;</span>
+    }
+<span class="pc bpc" id="L149" title="2 of 4 branches missed.">    if (o == null || getClass() != o.getClass()) {</span>
+<span class="nc" id="L150">      return false;</span>
+    }
+
+<span class="fc" id="L153">    EPGMElement that = (EPGMElement) o;</span>
+
+<span class="fc" id="L155">    return Objects.equals(id, that.id);</span>
+  }
+
+  @Override
+  public int hashCode() {
+<span class="fc" id="L160">    int result = id.hashCode();</span>
+<span class="fc" id="L161">    result = 31 * result + id.hashCode();</span>
+<span class="fc" id="L162">    return result;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">    return String.format(&quot;%s%s%s{%s}&quot;,</span>
+      id,
+<span class="pc bpc" id="L169" title="1 of 4 branches missed.">      label == null || label.equals(&quot;&quot;) ? &quot;&quot; : &quot;:&quot;,</span>
+      label,
+      properties == null ? &quot;&quot; : properties);
+  }
+
+  /**
+   * Initializes the internal properties field if necessary.
+   */
+  private void initProperties() {
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">    if (this.properties == null) {</span>
+<span class="fc" id="L179">      this.properties = Properties.create();</span>
+    }
+<span class="fc" id="L181">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

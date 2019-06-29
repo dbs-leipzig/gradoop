@@ -27,8 +27,8 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
@@ -68,12 +68,12 @@
 <a name="58" href="#58">58</a>        .filter(<strong class="jxr_keyword">new</strong> ByDifferentId&lt;&gt;(startId))
 <a name="59" href="#59">59</a>        .map(<strong class="jxr_keyword">new</strong> Id&lt;&gt;());
 <a name="60" href="#60">60</a>  
-<a name="61" href="#61">61</a>      DataSet&lt;Vertex&gt; vertices = collection.getVertices()
+<a name="61" href="#61">61</a>      DataSet&lt;EPGMVertex&gt; vertices = collection.getVertices()
 <a name="62" href="#62">62</a>        .filter(<strong class="jxr_keyword">new</strong> InGraph&lt;&gt;(startId))
 <a name="63" href="#63">63</a>        .filter(<strong class="jxr_keyword">new</strong> NotInGraphsBroadcast&lt;&gt;())
 <a name="64" href="#64">64</a>        .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);
 <a name="65" href="#65">65</a>  
-<a name="66" href="#66">66</a>      DataSet&lt;Edge&gt; edges = collection.getEdges()
+<a name="66" href="#66">66</a>      DataSet&lt;EPGMEdge&gt; edges = collection.getEdges()
 <a name="67" href="#67">67</a>        .filter(<strong class="jxr_keyword">new</strong> InGraph&lt;&gt;(startId))
 <a name="68" href="#68">68</a>        .filter(<strong class="jxr_keyword">new</strong> NotInGraphsBroadcast&lt;&gt;())
 <a name="69" href="#69">69</a>        .withBroadcastSet(excludedGraphIds, NotInGraphsBroadcast.GRAPH_IDS);

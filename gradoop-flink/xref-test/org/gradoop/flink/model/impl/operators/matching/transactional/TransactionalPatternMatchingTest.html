@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Lists;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.TestData;
@@ -132,8 +132,8 @@
 <a name="122" href="#122">122</a> 
 <a name="123" href="#123">123</a>       GraphCollection result = coll.match(testPattern, <strong class="jxr_keyword">new</strong> DepthSearchMatching(), <strong class="jxr_keyword">true</strong>);
 <a name="124" href="#124">124</a> 
-<a name="125" href="#125">125</a>       Collection&lt;GraphHead&gt; originalHeads = Lists.newArrayList();
-<a name="126" href="#126">126</a>       Collection&lt;GraphHead&gt; resultHeads = Lists.newArrayList();
+<a name="125" href="#125">125</a>       Collection&lt;EPGMGraphHead&gt; originalHeads = Lists.newArrayList();
+<a name="126" href="#126">126</a>       Collection&lt;EPGMGraphHead&gt; resultHeads = Lists.newArrayList();
 <a name="127" href="#127">127</a> 
 <a name="128" href="#128">128</a>       coll.getGraphHeads().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(
 <a name="129" href="#129">129</a>         originalHeads));
@@ -145,7 +145,7 @@
 <a name="135" href="#135">135</a> 
 <a name="136" href="#136">136</a>       Map&lt;GradoopId, String&gt; lineageIdMap = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
 <a name="137" href="#137">137</a> 
-<a name="138" href="#138">138</a>       <strong class="jxr_keyword">for</strong> (GraphHead original : originalHeads) {
+<a name="138" href="#138">138</a>       <strong class="jxr_keyword">for</strong> (EPGMGraphHead original : originalHeads) {
 <a name="139" href="#139">139</a>         lineageIdMap.put(original.getId(), original.getLabel());
 <a name="140" href="#140">140</a>       }
 <a name="141" href="#141">141</a> 
@@ -154,7 +154,7 @@
 <a name="144" href="#144">144</a>       <strong class="jxr_keyword">int</strong> cCount = 0;
 <a name="145" href="#145">145</a>       <strong class="jxr_keyword">int</strong> dCount = 0;
 <a name="146" href="#146">146</a>       <strong class="jxr_keyword">int</strong> eCount = 0;
-<a name="147" href="#147">147</a>       <strong class="jxr_keyword">for</strong> (GraphHead head : resultHeads) {
+<a name="147" href="#147">147</a>       <strong class="jxr_keyword">for</strong> (EPGMGraphHead head : resultHeads) {
 <a name="148" href="#148">148</a>         GradoopId id = head.getPropertyValue(<span class="jxr_string">"lineage"</span>).getGradoopId();
 <a name="149" href="#149">149</a>         <strong class="jxr_keyword">if</strong> (lineageIdMap.get(id).equals(<span class="jxr_string">"A"</span>)) {
 <a name="150" href="#150">150</a>           aCount++;

@@ -16,10 +16,10 @@
 package org.gradoop.flink.io.impl.dot.functions;
 
 import org.apache.flink.api.java.io.TextOutputFormat;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
@@ -89,7 +89,7 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
    * @param builder string builder to append
    */
   private void writeGraphHead(GraphTransaction transaction, StringBuilder builder) {
-<span class="fc" id="L92">    GraphHead graphHead = transaction.getGraphHead();</span>
+<span class="fc" id="L92">    EPGMGraphHead graphHead = transaction.getGraphHead();</span>
 
 <span class="fc" id="L94">    writeLabel(builder, graphHead);</span>
 
@@ -117,7 +117,7 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
    * @param suffix id suffix specific for the current {@link GraphTransaction}
    */
   private void writeEdges(GraphTransaction transaction, StringBuilder builder, String suffix) {
-<span class="fc bfc" id="L120" title="All 2 branches covered.">    for (Edge edge: transaction.getEdges()) {</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">    for (EPGMEdge edge: transaction.getEdges()) {</span>
 
 <span class="fc" id="L122">      builder.append(VERTEX_ID_PREFIX)</span>
 <span class="fc" id="L123">        .append(edge.getSourceId())</span>
@@ -139,7 +139,7 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
    * @param builder string builder to append
    * @param element graph element with id, label and properties
    */
-  abstract void writeLabel(StringBuilder builder, EPGMElement element);
+  abstract void writeLabel(StringBuilder builder, Element element);
 
   void setPrintGraphHead(boolean printGraphHead) {
 <span class="fc" id="L145">    this.printGraphHead = printGraphHead;</span>

@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.operators.tostring;
 
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.UnaryGraphCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.epgm.LabelCombiner;
@@ -49,15 +49,15 @@ public class CanonicalAdjacencyMatrixBuilder implements
   /**
    * function describing string representation of graph heads
    */
-  private final GraphHeadToString&lt;GraphHead&gt; graphHeadToString;
+  private final GraphHeadToString&lt;EPGMGraphHead&gt; graphHeadToString;
   /**
    * function describing string representation of vertices
    */
-  private final VertexToString&lt;Vertex&gt; vertexToString;
+  private final VertexToString&lt;EPGMVertex&gt; vertexToString;
   /**
    * function describing string representation of edges
    */
-  private final EdgeToString&lt;Edge&gt; egeLabelingFunction;
+  private final EdgeToString&lt;EPGMEdge&gt; egeLabelingFunction;
   /**
    * sets mode for either directed or undirected graph
    */
@@ -71,9 +71,9 @@ public class CanonicalAdjacencyMatrixBuilder implements
    * @param directed sets mode for either directed or undirected graph
    */
   public CanonicalAdjacencyMatrixBuilder(
-    GraphHeadToString&lt;GraphHead&gt; graphHeadToString,
-    VertexToString&lt;Vertex&gt; vertexToString,
-    EdgeToString&lt;Edge&gt; edgeLabelingFunction,
+    GraphHeadToString&lt;EPGMGraphHead&gt; graphHeadToString,
+    VertexToString&lt;EPGMVertex&gt; vertexToString,
+    EdgeToString&lt;EPGMEdge&gt; edgeLabelingFunction,
     boolean directed
 <span class="fc" id="L78">  ) {</span>
 <span class="fc" id="L79">    this.graphHeadToString = graphHeadToString;</span>

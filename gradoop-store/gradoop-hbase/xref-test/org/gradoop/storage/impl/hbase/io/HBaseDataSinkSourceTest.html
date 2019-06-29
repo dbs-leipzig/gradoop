@@ -28,11 +28,11 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Lists;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.GradoopTestUtils;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMIdentifiable;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Identifiable;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -64,8 +64,8 @@
 <a name="54" href="#54">54</a>  <strong class="jxr_keyword">import</strong> java.util.List;
 <a name="55" href="#55">55</a>  <strong class="jxr_keyword">import</strong> java.util.stream.Collectors;
 <a name="56" href="#56">56</a>  
-<a name="57" href="#57">57</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
-<a name="58" href="#58">58</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
+<a name="57" href="#57">57</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.common.GradoopTestUtils.validateElementCollections;
+<a name="58" href="#58">58</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
 <a name="59" href="#59">59</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.storage.impl.hbase.GradoopHBaseTestBase.*;
 <a name="60" href="#60">60</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertEquals;
 <a name="61" href="#61">61</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertFalse;
@@ -192,9 +192,9 @@
 <a name="182" href="#182">182</a>     GraphCollection collection = <strong class="jxr_keyword">new</strong> HBaseDataSource(epgmStores[storeIndex], getConfig())
 <a name="183" href="#183">183</a>       .getGraphCollection();
 <a name="184" href="#184">184</a> 
-<a name="185" href="#185">185</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = Lists.newArrayList();
-<a name="186" href="#186">186</a>     Collection&lt;Vertex&gt; loadedVertices = Lists.newArrayList();
-<a name="187" href="#187">187</a>     Collection&lt;Edge&gt; loadedEdges = Lists.newArrayList();
+<a name="185" href="#185">185</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = Lists.newArrayList();
+<a name="186" href="#186">186</a>     Collection&lt;EPGMVertex&gt; loadedVertices = Lists.newArrayList();
+<a name="187" href="#187">187</a>     Collection&lt;EPGMEdge&gt; loadedEdges = Lists.newArrayList();
 <a name="188" href="#188">188</a> 
 <a name="189" href="#189">189</a>     collection.getGraphHeads().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(loadedGraphHeads));
 <a name="190" href="#190">190</a>     collection.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(loadedVertices));
@@ -202,11 +202,11 @@
 <a name="192" href="#192">192</a> 
 <a name="193" href="#193">193</a>     getExecutionEnvironment().execute();
 <a name="194" href="#194">194</a> 
-<a name="195" href="#195">195</a>     validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
-<a name="196" href="#196">196</a>     validateEPGMElementCollections(getSocialVertices(), loadedVertices);
-<a name="197" href="#197">197</a>     validateEPGMGraphElementCollections(getSocialVertices(), loadedVertices);
-<a name="198" href="#198">198</a>     validateEPGMElementCollections(getSocialEdges(), loadedEdges);
-<a name="199" href="#199">199</a>     validateEPGMGraphElementCollections(getSocialEdges(), loadedEdges);
+<a name="195" href="#195">195</a>     validateElementCollections(getSocialGraphHeads(), loadedGraphHeads);
+<a name="196" href="#196">196</a>     validateElementCollections(getSocialVertices(), loadedVertices);
+<a name="197" href="#197">197</a>     validateGraphElementCollections(getSocialVertices(), loadedVertices);
+<a name="198" href="#198">198</a>     validateElementCollections(getSocialEdges(), loadedEdges);
+<a name="199" href="#199">199</a>     validateGraphElementCollections(getSocialEdges(), loadedEdges);
 <a name="200" href="#200">200</a>   }
 <a name="201" href="#201">201</a> 
 <a name="202" href="#202">202</a>   <em class="jxr_javadoccomment">/**</em>
@@ -232,9 +232,9 @@
 <a name="222" href="#222">222</a> 
 <a name="223" href="#223">223</a>     GraphCollection collection = hBaseDataSource.getGraphCollection();
 <a name="224" href="#224">224</a> 
-<a name="225" href="#225">225</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = Lists.newArrayList();
-<a name="226" href="#226">226</a>     Collection&lt;Vertex&gt; loadedVertices = Lists.newArrayList();
-<a name="227" href="#227">227</a>     Collection&lt;Edge&gt; loadedEdges = Lists.newArrayList();
+<a name="225" href="#225">225</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = Lists.newArrayList();
+<a name="226" href="#226">226</a>     Collection&lt;EPGMVertex&gt; loadedVertices = Lists.newArrayList();
+<a name="227" href="#227">227</a>     Collection&lt;EPGMEdge&gt; loadedEdges = Lists.newArrayList();
 <a name="228" href="#228">228</a> 
 <a name="229" href="#229">229</a>     collection.getGraphHeads().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(loadedGraphHeads));
 <a name="230" href="#230">230</a>     collection.getVertices().output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(loadedVertices));
@@ -242,11 +242,11 @@
 <a name="232" href="#232">232</a> 
 <a name="233" href="#233">233</a>     getExecutionEnvironment().execute();
 <a name="234" href="#234">234</a> 
-<a name="235" href="#235">235</a>     validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
-<a name="236" href="#236">236</a>     validateEPGMElementCollections(getSocialVertices(), loadedVertices);
-<a name="237" href="#237">237</a>     validateEPGMGraphElementCollections(getSocialVertices(), loadedVertices);
-<a name="238" href="#238">238</a>     validateEPGMElementCollections(getSocialEdges(), loadedEdges);
-<a name="239" href="#239">239</a>     validateEPGMGraphElementCollections(getSocialEdges(), loadedEdges);
+<a name="235" href="#235">235</a>     validateElementCollections(getSocialGraphHeads(), loadedGraphHeads);
+<a name="236" href="#236">236</a>     validateElementCollections(getSocialVertices(), loadedVertices);
+<a name="237" href="#237">237</a>     validateGraphElementCollections(getSocialVertices(), loadedVertices);
+<a name="238" href="#238">238</a>     validateElementCollections(getSocialEdges(), loadedEdges);
+<a name="239" href="#239">239</a>     validateGraphElementCollections(getSocialEdges(), loadedEdges);
 <a name="240" href="#240">240</a> 
 <a name="241" href="#241">241</a>   }
 <a name="242" href="#242">242</a> 
@@ -255,11 +255,11 @@
 <a name="245" href="#245">245</a> <em class="jxr_javadoccomment">   */</em>
 <a name="246" href="#246">246</a>   @Test
 <a name="247" href="#247">247</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testReadWithGraphIdPredicate() <strong class="jxr_keyword">throws</strong> Throwable {
-<a name="248" href="#248">248</a>     List&lt;GraphHead&gt; testGraphs = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(getSocialGraphHeads())
+<a name="248" href="#248">248</a>     List&lt;EPGMGraphHead&gt; testGraphs = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(getSocialGraphHeads())
 <a name="249" href="#249">249</a>       .subList(1, 3);
 <a name="250" href="#250">250</a> 
 <a name="251" href="#251">251</a>     GradoopIdSet ids = GradoopIdSet.fromExisting(
-<a name="252" href="#252">252</a>       testGraphs.stream().map(EPGMIdentifiable::getId).collect(Collectors.toList())
+<a name="252" href="#252">252</a>       testGraphs.stream().map(Identifiable::getId).collect(Collectors.toList())
 <a name="253" href="#253">253</a>     );
 <a name="254" href="#254">254</a> 
 <a name="255" href="#255">255</a>     HBaseDataSource source = <strong class="jxr_keyword">new</strong> HBaseDataSource(epgmStores[storeIndex], getConfig());
@@ -273,15 +273,15 @@
 <a name="263" href="#263">263</a> 
 <a name="264" href="#264">264</a>     GraphCollection graphCollection = source.getGraphCollection();
 <a name="265" href="#265">265</a> 
-<a name="266" href="#266">266</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
-<a name="267" href="#267">267</a>     Collection&lt;Vertex&gt; loadedVertices = graphCollection.getVertices().collect();
-<a name="268" href="#268">268</a>     Collection&lt;Edge&gt; loadedEdges = graphCollection.getEdges().collect();
+<a name="266" href="#266">266</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
+<a name="267" href="#267">267</a>     Collection&lt;EPGMVertex&gt; loadedVertices = graphCollection.getVertices().collect();
+<a name="268" href="#268">268</a>     Collection&lt;EPGMEdge&gt; loadedEdges = graphCollection.getEdges().collect();
 <a name="269" href="#269">269</a> 
-<a name="270" href="#270">270</a>     validateEPGMElementCollections(testGraphs, loadedGraphHeads);
-<a name="271" href="#271">271</a>     validateEPGMElementCollections(getSocialVertices(), loadedVertices);
-<a name="272" href="#272">272</a>     validateEPGMGraphElementCollections(getSocialVertices(), loadedVertices);
-<a name="273" href="#273">273</a>     validateEPGMElementCollections(getSocialEdges(), loadedEdges);
-<a name="274" href="#274">274</a>     validateEPGMGraphElementCollections(getSocialEdges(), loadedEdges);
+<a name="270" href="#270">270</a>     validateElementCollections(testGraphs, loadedGraphHeads);
+<a name="271" href="#271">271</a>     validateElementCollections(getSocialVertices(), loadedVertices);
+<a name="272" href="#272">272</a>     validateGraphElementCollections(getSocialVertices(), loadedVertices);
+<a name="273" href="#273">273</a>     validateElementCollections(getSocialEdges(), loadedEdges);
+<a name="274" href="#274">274</a>     validateGraphElementCollections(getSocialEdges(), loadedEdges);
 <a name="275" href="#275">275</a>   }
 <a name="276" href="#276">276</a> 
 <a name="277" href="#277">277</a>   <em class="jxr_javadoccomment">/**</em>
@@ -289,16 +289,16 @@
 <a name="279" href="#279">279</a> <em class="jxr_javadoccomment">   */</em>
 <a name="280" href="#280">280</a>   @Test
 <a name="281" href="#281">281</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testReadWithVertexIdPredicate() <strong class="jxr_keyword">throws</strong> Throwable {
-<a name="282" href="#282">282</a>     List&lt;Vertex&gt; testVertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(getSocialVertices())
+<a name="282" href="#282">282</a>     List&lt;EPGMVertex&gt; testVertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(getSocialVertices())
 <a name="283" href="#283">283</a>       .subList(0, 3);
 <a name="284" href="#284">284</a> 
 <a name="285" href="#285">285</a>     GradoopIdSet ids = GradoopIdSet.fromExisting(
-<a name="286" href="#286">286</a>       testVertices.stream().map(EPGMIdentifiable::getId).collect(Collectors.toList())
+<a name="286" href="#286">286</a>       testVertices.stream().map(Identifiable::getId).collect(Collectors.toList())
 <a name="287" href="#287">287</a>     );
 <a name="288" href="#288">288</a> 
 <a name="289" href="#289">289</a>     HBaseDataSource source = <strong class="jxr_keyword">new</strong> HBaseDataSource(epgmStores[storeIndex], getConfig());
 <a name="290" href="#290">290</a> 
-<a name="291" href="#291">291</a>     <em class="jxr_comment">// Apply Vertex-Id predicate</em>
+<a name="291" href="#291">291</a>     <em class="jxr_comment">// Apply EPGMVertex-Id predicate</em>
 <a name="292" href="#292">292</a>     source = source.applyVertexPredicate(
 <a name="293" href="#293">293</a>       Query.elements()
 <a name="294" href="#294">294</a>         .fromSets(ids)
@@ -308,15 +308,15 @@
 <a name="298" href="#298">298</a> 
 <a name="299" href="#299">299</a>     GraphCollection graphCollection = source.getGraphCollection();
 <a name="300" href="#300">300</a> 
-<a name="301" href="#301">301</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
-<a name="302" href="#302">302</a>     Collection&lt;Vertex&gt; loadedVertices = graphCollection.getVertices().collect();
-<a name="303" href="#303">303</a>     Collection&lt;Edge&gt; loadedEdges = graphCollection.getEdges().collect();
+<a name="301" href="#301">301</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
+<a name="302" href="#302">302</a>     Collection&lt;EPGMVertex&gt; loadedVertices = graphCollection.getVertices().collect();
+<a name="303" href="#303">303</a>     Collection&lt;EPGMEdge&gt; loadedEdges = graphCollection.getEdges().collect();
 <a name="304" href="#304">304</a> 
-<a name="305" href="#305">305</a>     validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
-<a name="306" href="#306">306</a>     validateEPGMElementCollections(testVertices, loadedVertices);
-<a name="307" href="#307">307</a>     validateEPGMGraphElementCollections(testVertices, loadedVertices);
-<a name="308" href="#308">308</a>     validateEPGMElementCollections(getSocialEdges(), loadedEdges);
-<a name="309" href="#309">309</a>     validateEPGMGraphElementCollections(getSocialEdges(), loadedEdges);
+<a name="305" href="#305">305</a>     validateElementCollections(getSocialGraphHeads(), loadedGraphHeads);
+<a name="306" href="#306">306</a>     validateElementCollections(testVertices, loadedVertices);
+<a name="307" href="#307">307</a>     validateGraphElementCollections(testVertices, loadedVertices);
+<a name="308" href="#308">308</a>     validateElementCollections(getSocialEdges(), loadedEdges);
+<a name="309" href="#309">309</a>     validateGraphElementCollections(getSocialEdges(), loadedEdges);
 <a name="310" href="#310">310</a>   }
 <a name="311" href="#311">311</a> 
 <a name="312" href="#312">312</a>   <em class="jxr_javadoccomment">/**</em>
@@ -324,16 +324,16 @@
 <a name="314" href="#314">314</a> <em class="jxr_javadoccomment">   */</em>
 <a name="315" href="#315">315</a>   @Test
 <a name="316" href="#316">316</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testReadWithEdgeIdPredicate() <strong class="jxr_keyword">throws</strong> Throwable {
-<a name="317" href="#317">317</a>     List&lt;Edge&gt; testEdges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(getSocialEdges())
+<a name="317" href="#317">317</a>     List&lt;EPGMEdge&gt; testEdges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(getSocialEdges())
 <a name="318" href="#318">318</a>       .subList(0, 3);
 <a name="319" href="#319">319</a> 
 <a name="320" href="#320">320</a>     GradoopIdSet ids = GradoopIdSet.fromExisting(
-<a name="321" href="#321">321</a>       testEdges.stream().map(EPGMIdentifiable::getId).collect(Collectors.toList())
+<a name="321" href="#321">321</a>       testEdges.stream().map(Identifiable::getId).collect(Collectors.toList())
 <a name="322" href="#322">322</a>     );
 <a name="323" href="#323">323</a> 
 <a name="324" href="#324">324</a>     HBaseDataSource source = <strong class="jxr_keyword">new</strong> HBaseDataSource(epgmStores[storeIndex], getConfig());
 <a name="325" href="#325">325</a> 
-<a name="326" href="#326">326</a>     <em class="jxr_comment">// Apply Edge-Id predicate</em>
+<a name="326" href="#326">326</a>     <em class="jxr_comment">// Apply EPGMEdge-Id predicate</em>
 <a name="327" href="#327">327</a>     source = source.applyEdgePredicate(
 <a name="328" href="#328">328</a>       Query.elements()
 <a name="329" href="#329">329</a>         .fromSets(ids)
@@ -343,15 +343,15 @@
 <a name="333" href="#333">333</a> 
 <a name="334" href="#334">334</a>     GraphCollection graphCollection = source.getGraphCollection();
 <a name="335" href="#335">335</a> 
-<a name="336" href="#336">336</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
-<a name="337" href="#337">337</a>     Collection&lt;Vertex&gt; loadedVertices = graphCollection.getVertices().collect();
-<a name="338" href="#338">338</a>     Collection&lt;Edge&gt; loadedEdges = graphCollection.getEdges().collect();
+<a name="336" href="#336">336</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
+<a name="337" href="#337">337</a>     Collection&lt;EPGMVertex&gt; loadedVertices = graphCollection.getVertices().collect();
+<a name="338" href="#338">338</a>     Collection&lt;EPGMEdge&gt; loadedEdges = graphCollection.getEdges().collect();
 <a name="339" href="#339">339</a> 
-<a name="340" href="#340">340</a>     validateEPGMElementCollections(getSocialGraphHeads(), loadedGraphHeads);
-<a name="341" href="#341">341</a>     validateEPGMElementCollections(getSocialVertices(), loadedVertices);
-<a name="342" href="#342">342</a>     validateEPGMGraphElementCollections(getSocialVertices(), loadedVertices);
-<a name="343" href="#343">343</a>     validateEPGMElementCollections(testEdges, loadedEdges);
-<a name="344" href="#344">344</a>     validateEPGMGraphElementCollections(testEdges, loadedEdges);
+<a name="340" href="#340">340</a>     validateElementCollections(getSocialGraphHeads(), loadedGraphHeads);
+<a name="341" href="#341">341</a>     validateElementCollections(getSocialVertices(), loadedVertices);
+<a name="342" href="#342">342</a>     validateGraphElementCollections(getSocialVertices(), loadedVertices);
+<a name="343" href="#343">343</a>     validateElementCollections(testEdges, loadedEdges);
+<a name="344" href="#344">344</a>     validateGraphElementCollections(testEdges, loadedEdges);
 <a name="345" href="#345">345</a>   }
 <a name="346" href="#346">346</a> 
 <a name="347" href="#347">347</a>   <em class="jxr_javadoccomment">/**</em>
@@ -363,18 +363,18 @@
 <a name="353" href="#353">353</a>   @Test
 <a name="354" href="#354">354</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testReadWithLabelInPredicate() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="355" href="#355">355</a>     <em class="jxr_comment">// Extract parts of social graph to filter for</em>
-<a name="356" href="#356">356</a>     List&lt;GraphHead&gt; graphHeads = Lists.newArrayList(getSocialGraphHeads())
+<a name="356" href="#356">356</a>     List&lt;EPGMGraphHead&gt; graphHeads = Lists.newArrayList(getSocialGraphHeads())
 <a name="357" href="#357">357</a>       .stream()
 <a name="358" href="#358">358</a>       .filter(e -&gt; e.getLabel().equals(LABEL_FORUM))
 <a name="359" href="#359">359</a>       .collect(Collectors.toList());
 <a name="360" href="#360">360</a> 
-<a name="361" href="#361">361</a>     List&lt;Edge&gt; edges = Lists.newArrayList(getSocialEdges())
+<a name="361" href="#361">361</a>     List&lt;EPGMEdge&gt; edges = Lists.newArrayList(getSocialEdges())
 <a name="362" href="#362">362</a>       .stream()
 <a name="363" href="#363">363</a>       .filter(e -&gt; e.getLabel().equals(LABEL_HAS_MODERATOR) ||
 <a name="364" href="#364">364</a>         e.getLabel().equals(LABEL_HAS_MEMBER))
 <a name="365" href="#365">365</a>       .collect(Collectors.toList());
 <a name="366" href="#366">366</a> 
-<a name="367" href="#367">367</a>     List&lt;Vertex&gt; vertices = Lists.newArrayList(getSocialVertices())
+<a name="367" href="#367">367</a>     List&lt;EPGMVertex&gt; vertices = Lists.newArrayList(getSocialVertices())
 <a name="368" href="#368">368</a>       .stream()
 <a name="369" href="#369">369</a>       .filter(e -&gt; e.getLabel().equals(LABEL_TAG) || e.getLabel().equals(LABEL_FORUM))
 <a name="370" href="#370">370</a>       .collect(Collectors.toList());
@@ -401,15 +401,15 @@
 <a name="391" href="#391">391</a> 
 <a name="392" href="#392">392</a>     GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
 <a name="393" href="#393">393</a> 
-<a name="394" href="#394">394</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
-<a name="395" href="#395">395</a>     Collection&lt;Vertex&gt; loadedVertices = graphCollection.getVertices().collect();
-<a name="396" href="#396">396</a>     Collection&lt;Edge&gt; loadedEdges = graphCollection.getEdges().collect();
+<a name="394" href="#394">394</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
+<a name="395" href="#395">395</a>     Collection&lt;EPGMVertex&gt; loadedVertices = graphCollection.getVertices().collect();
+<a name="396" href="#396">396</a>     Collection&lt;EPGMEdge&gt; loadedEdges = graphCollection.getEdges().collect();
 <a name="397" href="#397">397</a> 
-<a name="398" href="#398">398</a>     validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-<a name="399" href="#399">399</a>     validateEPGMElementCollections(vertices, loadedVertices);
-<a name="400" href="#400">400</a>     validateEPGMGraphElementCollections(vertices, loadedVertices);
-<a name="401" href="#401">401</a>     validateEPGMElementCollections(edges, loadedEdges);
-<a name="402" href="#402">402</a>     validateEPGMGraphElementCollections(edges, loadedEdges);
+<a name="398" href="#398">398</a>     validateElementCollections(graphHeads, loadedGraphHeads);
+<a name="399" href="#399">399</a>     validateElementCollections(vertices, loadedVertices);
+<a name="400" href="#400">400</a>     validateGraphElementCollections(vertices, loadedVertices);
+<a name="401" href="#401">401</a>     validateElementCollections(edges, loadedEdges);
+<a name="402" href="#402">402</a>     validateGraphElementCollections(edges, loadedEdges);
 <a name="403" href="#403">403</a>   }
 <a name="404" href="#404">404</a> 
 <a name="405" href="#405">405</a>   <em class="jxr_javadoccomment">/**</em>
@@ -421,17 +421,17 @@
 <a name="411" href="#411">411</a>   @Test
 <a name="412" href="#412">412</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testReadWithLabelRegPredicate() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="413" href="#413">413</a>     <em class="jxr_comment">// Extract parts of social graph to filter for</em>
-<a name="414" href="#414">414</a>     List&lt;GraphHead&gt; graphHeads = Lists.newArrayList(getSocialGraphHeads())
+<a name="414" href="#414">414</a>     List&lt;EPGMGraphHead&gt; graphHeads = Lists.newArrayList(getSocialGraphHeads())
 <a name="415" href="#415">415</a>       .stream()
 <a name="416" href="#416">416</a>       .filter(g -&gt; PATTERN_GRAPH.matcher(g.getLabel()).matches())
 <a name="417" href="#417">417</a>       .collect(Collectors.toList());
 <a name="418" href="#418">418</a> 
-<a name="419" href="#419">419</a>     List&lt;Edge&gt; edges = Lists.newArrayList(getSocialEdges())
+<a name="419" href="#419">419</a>     List&lt;EPGMEdge&gt; edges = Lists.newArrayList(getSocialEdges())
 <a name="420" href="#420">420</a>       .stream()
 <a name="421" href="#421">421</a>       .filter(e -&gt; PATTERN_EDGE.matcher(e.getLabel()).matches())
 <a name="422" href="#422">422</a>       .collect(Collectors.toList());
 <a name="423" href="#423">423</a> 
-<a name="424" href="#424">424</a>     List&lt;Vertex&gt; vertices = Lists.newArrayList(getSocialVertices())
+<a name="424" href="#424">424</a>     List&lt;EPGMVertex&gt; vertices = Lists.newArrayList(getSocialVertices())
 <a name="425" href="#425">425</a>       .stream()
 <a name="426" href="#426">426</a>       .filter(v -&gt; PATTERN_VERTEX.matcher(v.getLabel()).matches())
 <a name="427" href="#427">427</a>       .collect(Collectors.toList());
@@ -455,15 +455,15 @@
 <a name="445" href="#445">445</a> 
 <a name="446" href="#446">446</a>     GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
 <a name="447" href="#447">447</a> 
-<a name="448" href="#448">448</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
-<a name="449" href="#449">449</a>     Collection&lt;Vertex&gt; loadedVertices = graphCollection.getVertices().collect();
-<a name="450" href="#450">450</a>     Collection&lt;Edge&gt; loadedEdges = graphCollection.getEdges().collect();
+<a name="448" href="#448">448</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
+<a name="449" href="#449">449</a>     Collection&lt;EPGMVertex&gt; loadedVertices = graphCollection.getVertices().collect();
+<a name="450" href="#450">450</a>     Collection&lt;EPGMEdge&gt; loadedEdges = graphCollection.getEdges().collect();
 <a name="451" href="#451">451</a> 
-<a name="452" href="#452">452</a>     validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-<a name="453" href="#453">453</a>     validateEPGMElementCollections(vertices, loadedVertices);
-<a name="454" href="#454">454</a>     validateEPGMGraphElementCollections(vertices, loadedVertices);
-<a name="455" href="#455">455</a>     validateEPGMElementCollections(edges, loadedEdges);
-<a name="456" href="#456">456</a>     validateEPGMGraphElementCollections(edges, loadedEdges);
+<a name="452" href="#452">452</a>     validateElementCollections(graphHeads, loadedGraphHeads);
+<a name="453" href="#453">453</a>     validateElementCollections(vertices, loadedVertices);
+<a name="454" href="#454">454</a>     validateGraphElementCollections(vertices, loadedVertices);
+<a name="455" href="#455">455</a>     validateElementCollections(edges, loadedEdges);
+<a name="456" href="#456">456</a>     validateGraphElementCollections(edges, loadedEdges);
 <a name="457" href="#457">457</a>   }
 <a name="458" href="#458">458</a> 
 <a name="459" href="#459">459</a>   <em class="jxr_javadoccomment">/**</em>
@@ -479,19 +479,19 @@
 <a name="469" href="#469">469</a>     PropertyValue propertyValueCity = PropertyValue.create(<span class="jxr_string">"Leipzig"</span>);
 <a name="470" href="#470">470</a> 
 <a name="471" href="#471">471</a>     <em class="jxr_comment">// Extract parts of social graph to filter for</em>
-<a name="472" href="#472">472</a>     List&lt;GraphHead&gt; graphHeads = Lists.newArrayList(getSocialGraphHeads())
+<a name="472" href="#472">472</a>     List&lt;EPGMGraphHead&gt; graphHeads = Lists.newArrayList(getSocialGraphHeads())
 <a name="473" href="#473">473</a>       .stream()
 <a name="474" href="#474">474</a>       .filter(g -&gt; g.hasProperty(PROP_VERTEX_COUNT))
 <a name="475" href="#475">475</a>       .filter(g -&gt; g.getPropertyValue(PROP_VERTEX_COUNT).equals(propertyValueVertexCount))
 <a name="476" href="#476">476</a>       .collect(Collectors.toList());
 <a name="477" href="#477">477</a> 
-<a name="478" href="#478">478</a>     List&lt;Edge&gt; edges = Lists.newArrayList(getSocialEdges())
+<a name="478" href="#478">478</a>     List&lt;EPGMEdge&gt; edges = Lists.newArrayList(getSocialEdges())
 <a name="479" href="#479">479</a>       .stream()
 <a name="480" href="#480">480</a>       .filter(e -&gt; e.hasProperty(PROP_SINCE))
 <a name="481" href="#481">481</a>       .filter(e -&gt; e.getPropertyValue(PROP_SINCE).equals(propertyValueSince))
 <a name="482" href="#482">482</a>       .collect(Collectors.toList());
 <a name="483" href="#483">483</a> 
-<a name="484" href="#484">484</a>     List&lt;Vertex&gt; vertices = Lists.newArrayList(getSocialVertices())
+<a name="484" href="#484">484</a>     List&lt;EPGMVertex&gt; vertices = Lists.newArrayList(getSocialVertices())
 <a name="485" href="#485">485</a>       .stream()
 <a name="486" href="#486">486</a>       .filter(v -&gt; v.hasProperty(PROP_CITY))
 <a name="487" href="#487">487</a>       .filter(v -&gt; v.getPropertyValue(PROP_CITY).equals(propertyValueCity))
@@ -517,15 +517,15 @@
 <a name="507" href="#507">507</a> 
 <a name="508" href="#508">508</a>     GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
 <a name="509" href="#509">509</a> 
-<a name="510" href="#510">510</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
-<a name="511" href="#511">511</a>     Collection&lt;Vertex&gt; loadedVertices = graphCollection.getVertices().collect();
-<a name="512" href="#512">512</a>     Collection&lt;Edge&gt; loadedEdges = graphCollection.getEdges().collect();
+<a name="510" href="#510">510</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
+<a name="511" href="#511">511</a>     Collection&lt;EPGMVertex&gt; loadedVertices = graphCollection.getVertices().collect();
+<a name="512" href="#512">512</a>     Collection&lt;EPGMEdge&gt; loadedEdges = graphCollection.getEdges().collect();
 <a name="513" href="#513">513</a> 
-<a name="514" href="#514">514</a>     validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-<a name="515" href="#515">515</a>     validateEPGMElementCollections(vertices, loadedVertices);
-<a name="516" href="#516">516</a>     validateEPGMGraphElementCollections(vertices, loadedVertices);
-<a name="517" href="#517">517</a>     validateEPGMElementCollections(edges, loadedEdges);
-<a name="518" href="#518">518</a>     validateEPGMGraphElementCollections(edges, loadedEdges);
+<a name="514" href="#514">514</a>     validateElementCollections(graphHeads, loadedGraphHeads);
+<a name="515" href="#515">515</a>     validateElementCollections(vertices, loadedVertices);
+<a name="516" href="#516">516</a>     validateGraphElementCollections(vertices, loadedVertices);
+<a name="517" href="#517">517</a>     validateElementCollections(edges, loadedEdges);
+<a name="518" href="#518">518</a>     validateGraphElementCollections(edges, loadedEdges);
 <a name="519" href="#519">519</a>   }
 <a name="520" href="#520">520</a> 
 <a name="521" href="#521">521</a>   <em class="jxr_javadoccomment">/**</em>
@@ -541,21 +541,21 @@
 <a name="531" href="#531">531</a>     PropertyValue propertyValueAge = PropertyValue.create(30);
 <a name="532" href="#532">532</a> 
 <a name="533" href="#533">533</a>     <em class="jxr_comment">// Extract parts of social graph to filter for</em>
-<a name="534" href="#534">534</a>     List&lt;GraphHead&gt; graphHeads = Lists.newArrayList(getSocialGraphHeads())
+<a name="534" href="#534">534</a>     List&lt;EPGMGraphHead&gt; graphHeads = Lists.newArrayList(getSocialGraphHeads())
 <a name="535" href="#535">535</a>       .stream()
 <a name="536" href="#536">536</a>       <em class="jxr_comment">// graph with property "vertexCount" and value &gt;= 3</em>
 <a name="537" href="#537">537</a>       .filter(g -&gt; g.hasProperty(PROP_VERTEX_COUNT))
 <a name="538" href="#538">538</a>       .filter(g -&gt; g.getPropertyValue(PROP_VERTEX_COUNT).compareTo(propertyValueVertexCount) &gt;= 0)
 <a name="539" href="#539">539</a>       .collect(Collectors.toList());
 <a name="540" href="#540">540</a> 
-<a name="541" href="#541">541</a>     List&lt;Edge&gt; edges = Lists.newArrayList(getSocialEdges())
+<a name="541" href="#541">541</a>     List&lt;EPGMEdge&gt; edges = Lists.newArrayList(getSocialEdges())
 <a name="542" href="#542">542</a>       .stream()
 <a name="543" href="#543">543</a>       <em class="jxr_comment">// edge with property "since" and value &gt; 2014</em>
 <a name="544" href="#544">544</a>       .filter(e -&gt; e.hasProperty(PROP_SINCE))
 <a name="545" href="#545">545</a>       .filter(e -&gt; e.getPropertyValue(PROP_SINCE).compareTo(propertyValueSince) &gt; 0)
 <a name="546" href="#546">546</a>       .collect(Collectors.toList());
 <a name="547" href="#547">547</a> 
-<a name="548" href="#548">548</a>     List&lt;Vertex&gt; vertices = Lists.newArrayList(getSocialVertices())
+<a name="548" href="#548">548</a>     List&lt;EPGMVertex&gt; vertices = Lists.newArrayList(getSocialVertices())
 <a name="549" href="#549">549</a>       .stream()
 <a name="550" href="#550">550</a>       <em class="jxr_comment">// vertex with property "age" and value &gt; 30</em>
 <a name="551" href="#551">551</a>       .filter(v -&gt; v.hasProperty(PROP_AGE))
@@ -585,15 +585,15 @@
 <a name="575" href="#575">575</a> 
 <a name="576" href="#576">576</a>     GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
 <a name="577" href="#577">577</a> 
-<a name="578" href="#578">578</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
-<a name="579" href="#579">579</a>     Collection&lt;Vertex&gt; loadedVertices = graphCollection.getVertices().collect();
-<a name="580" href="#580">580</a>     Collection&lt;Edge&gt; loadedEdges = graphCollection.getEdges().collect();
+<a name="578" href="#578">578</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
+<a name="579" href="#579">579</a>     Collection&lt;EPGMVertex&gt; loadedVertices = graphCollection.getVertices().collect();
+<a name="580" href="#580">580</a>     Collection&lt;EPGMEdge&gt; loadedEdges = graphCollection.getEdges().collect();
 <a name="581" href="#581">581</a> 
-<a name="582" href="#582">582</a>     validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-<a name="583" href="#583">583</a>     validateEPGMElementCollections(vertices, loadedVertices);
-<a name="584" href="#584">584</a>     validateEPGMGraphElementCollections(vertices, loadedVertices);
-<a name="585" href="#585">585</a>     validateEPGMElementCollections(edges, loadedEdges);
-<a name="586" href="#586">586</a>     validateEPGMGraphElementCollections(edges, loadedEdges);
+<a name="582" href="#582">582</a>     validateElementCollections(graphHeads, loadedGraphHeads);
+<a name="583" href="#583">583</a>     validateElementCollections(vertices, loadedVertices);
+<a name="584" href="#584">584</a>     validateGraphElementCollections(vertices, loadedVertices);
+<a name="585" href="#585">585</a>     validateElementCollections(edges, loadedEdges);
+<a name="586" href="#586">586</a>     validateGraphElementCollections(edges, loadedEdges);
 <a name="587" href="#587">587</a>   }
 <a name="588" href="#588">588</a> 
 <a name="589" href="#589">589</a>   <em class="jxr_javadoccomment">/**</em>
@@ -605,7 +605,7 @@
 <a name="595" href="#595">595</a>   @Test
 <a name="596" href="#596">596</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testReadWithPropRegPredicate() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="597" href="#597">597</a>     <em class="jxr_comment">// Extract parts of social graph to filter for</em>
-<a name="598" href="#598">598</a>     List&lt;GraphHead&gt; graphHeads = Lists.newArrayList(getSocialGraphHeads())
+<a name="598" href="#598">598</a>     List&lt;EPGMGraphHead&gt; graphHeads = Lists.newArrayList(getSocialGraphHeads())
 <a name="599" href="#599">599</a>       .stream()
 <a name="600" href="#600">600</a>       <em class="jxr_comment">// graph with property "name" and value matches regex ".*doop$"</em>
 <a name="601" href="#601">601</a>       .filter(g -&gt; g.hasProperty(PROP_INTEREST))
@@ -613,14 +613,14 @@
 <a name="603" href="#603">603</a>         .matches(PATTERN_GRAPH_PROP.pattern()))
 <a name="604" href="#604">604</a>       .collect(Collectors.toList());
 <a name="605" href="#605">605</a> 
-<a name="606" href="#606">606</a>     List&lt;Edge&gt; edges = Lists.newArrayList(getSocialEdges())
+<a name="606" href="#606">606</a>     List&lt;EPGMEdge&gt; edges = Lists.newArrayList(getSocialEdges())
 <a name="607" href="#607">607</a>       .stream()
 <a name="608" href="#608">608</a>       <em class="jxr_comment">// edge with property "status" and value matches regex "^start..$"</em>
 <a name="609" href="#609">609</a>       .filter(e -&gt; e.hasProperty(PROP_STATUS))
 <a name="610" href="#610">610</a>       .filter(e -&gt; e.getPropertyValue(PROP_STATUS).getString().matches(PATTERN_EDGE_PROP.pattern()))
 <a name="611" href="#611">611</a>       .collect(Collectors.toList());
 <a name="612" href="#612">612</a> 
-<a name="613" href="#613">613</a>     List&lt;Vertex&gt; vertices = Lists.newArrayList(getSocialVertices())
+<a name="613" href="#613">613</a>     List&lt;EPGMVertex&gt; vertices = Lists.newArrayList(getSocialVertices())
 <a name="614" href="#614">614</a>       .stream()
 <a name="615" href="#615">615</a>       <em class="jxr_comment">// vertex with property "name" and value matches regex ".*ve$"</em>
 <a name="616" href="#616">616</a>       .filter(v -&gt; v.hasProperty(PROP_NAME))
@@ -649,19 +649,19 @@
 <a name="639" href="#639">639</a> 
 <a name="640" href="#640">640</a>     GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
 <a name="641" href="#641">641</a> 
-<a name="642" href="#642">642</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
-<a name="643" href="#643">643</a>     Collection&lt;Vertex&gt; loadedVertices = graphCollection.getVertices().collect();
-<a name="644" href="#644">644</a>     Collection&lt;Edge&gt; loadedEdges = graphCollection.getEdges().collect();
+<a name="642" href="#642">642</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
+<a name="643" href="#643">643</a>     Collection&lt;EPGMVertex&gt; loadedVertices = graphCollection.getVertices().collect();
+<a name="644" href="#644">644</a>     Collection&lt;EPGMEdge&gt; loadedEdges = graphCollection.getEdges().collect();
 <a name="645" href="#645">645</a> 
 <a name="646" href="#646">646</a>     assertEquals(1, loadedGraphHeads.size());
 <a name="647" href="#647">647</a>     assertEquals(2, loadedEdges.size());
 <a name="648" href="#648">648</a>     assertEquals(2, loadedVertices.size());
 <a name="649" href="#649">649</a> 
-<a name="650" href="#650">650</a>     validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-<a name="651" href="#651">651</a>     validateEPGMElementCollections(vertices, loadedVertices);
-<a name="652" href="#652">652</a>     validateEPGMGraphElementCollections(vertices, loadedVertices);
-<a name="653" href="#653">653</a>     validateEPGMElementCollections(edges, loadedEdges);
-<a name="654" href="#654">654</a>     validateEPGMGraphElementCollections(edges, loadedEdges);
+<a name="650" href="#650">650</a>     validateElementCollections(graphHeads, loadedGraphHeads);
+<a name="651" href="#651">651</a>     validateElementCollections(vertices, loadedVertices);
+<a name="652" href="#652">652</a>     validateGraphElementCollections(vertices, loadedVertices);
+<a name="653" href="#653">653</a>     validateElementCollections(edges, loadedEdges);
+<a name="654" href="#654">654</a>     validateGraphElementCollections(edges, loadedEdges);
 <a name="655" href="#655">655</a>   }
 <a name="656" href="#656">656</a> 
 <a name="657" href="#657">657</a>   <em class="jxr_javadoccomment">/**</em>
@@ -673,20 +673,20 @@
 <a name="663" href="#663">663</a>   @Test
 <a name="664" href="#664">664</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testReadWithChainedPredicates() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="665" href="#665">665</a>     <em class="jxr_comment">// Extract parts of social graph to filter for</em>
-<a name="666" href="#666">666</a>     List&lt;GraphHead&gt; graphHeads = getSocialGraphHeads()
+<a name="666" href="#666">666</a>     List&lt;EPGMGraphHead&gt; graphHeads = getSocialGraphHeads()
 <a name="667" href="#667">667</a>       .stream()
 <a name="668" href="#668">668</a>       .filter(g -&gt; g.getLabel().equals(<span class="jxr_string">"Community"</span>))
 <a name="669" href="#669">669</a>       .filter(g -&gt; !g.getPropertyValue(PROP_INTEREST).getString().equals(<span class="jxr_string">"Hadoop"</span>) &amp;&amp;
 <a name="670" href="#670">670</a>         !g.getPropertyValue(PROP_INTEREST).getString().equals(<span class="jxr_string">"Graphs"</span>))
 <a name="671" href="#671">671</a>       .collect(Collectors.toList());
 <a name="672" href="#672">672</a> 
-<a name="673" href="#673">673</a>     List&lt;Edge&gt; edges = getSocialEdges()
+<a name="673" href="#673">673</a>     List&lt;EPGMEdge&gt; edges = getSocialEdges()
 <a name="674" href="#674">674</a>       .stream()
 <a name="675" href="#675">675</a>       .filter(e -&gt; e.getLabel().matches(PATTERN_EDGE.pattern()) ||
 <a name="676" href="#676">676</a>         (e.hasProperty(PROP_SINCE) &amp;&amp; e.getPropertyValue(PROP_SINCE).getInt() &lt; 2015))
 <a name="677" href="#677">677</a>       .collect(Collectors.toList());
 <a name="678" href="#678">678</a> 
-<a name="679" href="#679">679</a>     List&lt;Vertex&gt; vertices = getSocialVertices()
+<a name="679" href="#679">679</a>     List&lt;EPGMVertex&gt; vertices = getSocialVertices()
 <a name="680" href="#680">680</a>       .stream()
 <a name="681" href="#681">681</a>       .filter(v -&gt; v.getLabel().equals(<span class="jxr_string">"Person"</span>))
 <a name="682" href="#682">682</a>       .collect(Collectors.toList())
@@ -699,21 +699,21 @@
 <a name="689" href="#689">689</a>     hBaseDataSource = hBaseDataSource.applyGraphPredicate(
 <a name="690" href="#690">690</a>       Query.elements().fromAll()
 <a name="691" href="#691">691</a>         <em class="jxr_comment">// WHERE gh.label = "Community" AND NOT(gh.interest = "Hadoop" OR gh.interest = "Graphs")</em>
-<a name="692" href="#692">692</a>         .where(HBaseFilters.&lt;GraphHead&gt;labelIn(<span class="jxr_string">"Community"</span>)
-<a name="693" href="#693">693</a>           .and(HBaseFilters.&lt;GraphHead&gt;propEquals(PROP_INTEREST, <span class="jxr_string">"Hadoop"</span>)
+<a name="692" href="#692">692</a>         .where(HBaseFilters.&lt;EPGMGraphHead&gt;labelIn(<span class="jxr_string">"Community"</span>)
+<a name="693" href="#693">693</a>           .and(HBaseFilters.&lt;EPGMGraphHead&gt;propEquals(PROP_INTEREST, <span class="jxr_string">"Hadoop"</span>)
 <a name="694" href="#694">694</a>             .or(HBaseFilters.propEquals(PROP_INTEREST, <span class="jxr_string">"Graphs"</span>)).negate())));
 <a name="695" href="#695">695</a> 
 <a name="696" href="#696">696</a>     <em class="jxr_comment">// Apply edge predicate</em>
 <a name="697" href="#697">697</a>     hBaseDataSource = hBaseDataSource.applyEdgePredicate(
 <a name="698" href="#698">698</a>       Query.elements().fromAll()
 <a name="699" href="#699">699</a>         <em class="jxr_comment">// WHERE edge.label LIKE '^has.*$' OR edge.since &lt; 2015</em>
-<a name="700" href="#700">700</a>         .where(HBaseFilters.&lt;Edge&gt;labelReg(PATTERN_EDGE)
-<a name="701" href="#701">701</a>           .or(HBaseFilters.&lt;Edge&gt;propLargerThan(PROP_SINCE, 2015, <strong class="jxr_keyword">true</strong>).negate())));
+<a name="700" href="#700">700</a>         .where(HBaseFilters.&lt;EPGMEdge&gt;labelReg(PATTERN_EDGE)
+<a name="701" href="#701">701</a>           .or(HBaseFilters.&lt;EPGMEdge&gt;propLargerThan(PROP_SINCE, 2015, <strong class="jxr_keyword">true</strong>).negate())));
 <a name="702" href="#702">702</a> 
 <a name="703" href="#703">703</a>     <em class="jxr_comment">// Apply vertex predicate</em>
-<a name="704" href="#704">704</a>     <strong class="jxr_keyword">final</strong> HBaseElementFilter&lt;Vertex&gt; vertexFilter = HBaseFilters.&lt;Vertex&gt;labelIn(<span class="jxr_string">"Person"</span>)
-<a name="705" href="#705">705</a>       .and(HBaseFilters.&lt;Vertex&gt;propEquals(PROP_NAME, vertices.get(0).getPropertyValue(<span class="jxr_string">"name"</span>))
-<a name="706" href="#706">706</a>         .or(HBaseFilters.&lt;Vertex&gt;propEquals(PROP_NAME, vertices.get(1).getPropertyValue(<span class="jxr_string">"name"</span>))
+<a name="704" href="#704">704</a>     <strong class="jxr_keyword">final</strong> HBaseElementFilter&lt;EPGMVertex&gt; vertexFilter = HBaseFilters.&lt;EPGMVertex&gt;labelIn(<span class="jxr_string">"Person"</span>)
+<a name="705" href="#705">705</a>       .and(HBaseFilters.&lt;EPGMVertex&gt;propEquals(PROP_NAME, vertices.get(0).getPropertyValue(<span class="jxr_string">"name"</span>))
+<a name="706" href="#706">706</a>         .or(HBaseFilters.&lt;EPGMVertex&gt;propEquals(PROP_NAME, vertices.get(1).getPropertyValue(<span class="jxr_string">"name"</span>))
 <a name="707" href="#707">707</a>           .or(HBaseFilters.propEquals(PROP_NAME, vertices.get(2).getPropertyValue(<span class="jxr_string">"name"</span>)))));
 <a name="708" href="#708">708</a> 
 <a name="709" href="#709">709</a>     hBaseDataSource = hBaseDataSource.applyVertexPredicate(
@@ -724,19 +724,19 @@
 <a name="714" href="#714">714</a> 
 <a name="715" href="#715">715</a>     GraphCollection graphCollection = hBaseDataSource.getGraphCollection();
 <a name="716" href="#716">716</a> 
-<a name="717" href="#717">717</a>     Collection&lt;GraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
-<a name="718" href="#718">718</a>     Collection&lt;Vertex&gt; loadedVertices = graphCollection.getVertices().collect();
-<a name="719" href="#719">719</a>     Collection&lt;Edge&gt; loadedEdges = graphCollection.getEdges().collect();
+<a name="717" href="#717">717</a>     Collection&lt;EPGMGraphHead&gt; loadedGraphHeads = graphCollection.getGraphHeads().collect();
+<a name="718" href="#718">718</a>     Collection&lt;EPGMVertex&gt; loadedVertices = graphCollection.getVertices().collect();
+<a name="719" href="#719">719</a>     Collection&lt;EPGMEdge&gt; loadedEdges = graphCollection.getEdges().collect();
 <a name="720" href="#720">720</a> 
 <a name="721" href="#721">721</a>     assertEquals(1, loadedGraphHeads.size());
 <a name="722" href="#722">722</a>     assertEquals(21, loadedEdges.size());
 <a name="723" href="#723">723</a>     assertEquals(3, loadedVertices.size());
 <a name="724" href="#724">724</a> 
-<a name="725" href="#725">725</a>     validateEPGMElementCollections(graphHeads, loadedGraphHeads);
-<a name="726" href="#726">726</a>     validateEPGMElementCollections(vertices, loadedVertices);
-<a name="727" href="#727">727</a>     validateEPGMGraphElementCollections(vertices, loadedVertices);
-<a name="728" href="#728">728</a>     validateEPGMElementCollections(edges, loadedEdges);
-<a name="729" href="#729">729</a>     validateEPGMGraphElementCollections(edges, loadedEdges);
+<a name="725" href="#725">725</a>     validateElementCollections(graphHeads, loadedGraphHeads);
+<a name="726" href="#726">726</a>     validateElementCollections(vertices, loadedVertices);
+<a name="727" href="#727">727</a>     validateGraphElementCollections(vertices, loadedVertices);
+<a name="728" href="#728">728</a>     validateElementCollections(edges, loadedEdges);
+<a name="729" href="#729">729</a>     validateGraphElementCollections(edges, loadedEdges);
 <a name="730" href="#730">730</a>   }
 <a name="731" href="#731">731</a> 
 <a name="732" href="#732">732</a>   <em class="jxr_javadoccomment">/**</em>
@@ -785,25 +785,25 @@
 <a name="775" href="#775">775</a>     <em class="jxr_comment">// read social network from HBase</em>
 <a name="776" href="#776">776</a> 
 <a name="777" href="#777">777</a>     <em class="jxr_comment">// graph heads</em>
-<a name="778" href="#778">778</a>     validateEPGMElementCollections(
+<a name="778" href="#778">778</a>     validateElementCollections(
 <a name="779" href="#779">779</a>       loader.getGraphHeads(),
 <a name="780" href="#780">780</a>       newStore.getGraphSpace().readRemainsAndClose()
 <a name="781" href="#781">781</a>     );
 <a name="782" href="#782">782</a>     <em class="jxr_comment">// vertices</em>
-<a name="783" href="#783">783</a>     validateEPGMElementCollections(
+<a name="783" href="#783">783</a>     validateElementCollections(
 <a name="784" href="#784">784</a>       loader.getVertices(),
 <a name="785" href="#785">785</a>       newStore.getVertexSpace().readRemainsAndClose()
 <a name="786" href="#786">786</a>     );
-<a name="787" href="#787">787</a>     validateEPGMGraphElementCollections(
+<a name="787" href="#787">787</a>     validateGraphElementCollections(
 <a name="788" href="#788">788</a>       loader.getVertices(),
 <a name="789" href="#789">789</a>       newStore.getVertexSpace().readRemainsAndClose()
 <a name="790" href="#790">790</a>     );
 <a name="791" href="#791">791</a>     <em class="jxr_comment">// edges</em>
-<a name="792" href="#792">792</a>     validateEPGMElementCollections(
+<a name="792" href="#792">792</a>     validateElementCollections(
 <a name="793" href="#793">793</a>       loader.getEdges(),
 <a name="794" href="#794">794</a>       newStore.getEdgeSpace().readRemainsAndClose()
 <a name="795" href="#795">795</a>     );
-<a name="796" href="#796">796</a>     validateEPGMGraphElementCollections(
+<a name="796" href="#796">796</a>     validateGraphElementCollections(
 <a name="797" href="#797">797</a>       loader.getEdges(),
 <a name="798" href="#798">798</a>       newStore.getEdgeSpace().readRemainsAndClose()
 <a name="799" href="#799">799</a>     );

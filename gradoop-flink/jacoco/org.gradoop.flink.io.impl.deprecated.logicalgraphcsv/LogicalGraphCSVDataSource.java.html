@@ -18,8 +18,8 @@ package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -54,12 +54,12 @@ public class LogicalGraphCSVDataSource extends LogicalGraphCSVBase implements Da
 <span class="fc" id="L54">    DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; metaData =</span>
 <span class="fc" id="L55">      MetaData.fromFile(getMetaDataPath(), getConfig());</span>
 
-<span class="fc" id="L57">    DataSet&lt;Vertex&gt; vertices = getConfig().getExecutionEnvironment()</span>
+<span class="fc" id="L57">    DataSet&lt;EPGMVertex&gt; vertices = getConfig().getExecutionEnvironment()</span>
 <span class="fc" id="L58">      .readTextFile(getVertexCSVPath())</span>
 <span class="fc" id="L59">      .map(new CSVLineToVertex(getConfig().getVertexFactory()))</span>
 <span class="fc" id="L60">      .withBroadcastSet(metaData, BC_METADATA);</span>
 
-<span class="fc" id="L62">    DataSet&lt;Edge&gt; edges = getConfig().getExecutionEnvironment()</span>
+<span class="fc" id="L62">    DataSet&lt;EPGMEdge&gt; edges = getConfig().getExecutionEnvironment()</span>
 <span class="fc" id="L63">      .readTextFile(getEdgeCSVPath())</span>
 <span class="fc" id="L64">      .map(new CSVLineToEdge(getConfig().getEdgeFactory()))</span>
 <span class="fc" id="L65">      .withBroadcastSet(metaData, BC_METADATA);</span>

@@ -27,7 +27,7 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.FilterFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.selection.functions.FilterTransactions;
@@ -43,14 +43,14 @@
 <a name="33" href="#33">33</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   * User-defined predicate function</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="36" href="#36">36</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> FilterFunction&lt;GraphHead&gt; predicate;
+<a name="36" href="#36">36</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> FilterFunction&lt;EPGMGraphHead&gt; predicate;
 <a name="37" href="#37">37</a>  
 <a name="38" href="#38">38</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   * Creates a new Selection operator.</em>
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   * @param predicate user-defined predicate function</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="43" href="#43">43</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/selection/Selection.html">Selection</a>(FilterFunction&lt;GraphHead&gt; predicate) {
+<a name="43" href="#43">43</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/selection/Selection.html">Selection</a>(FilterFunction&lt;EPGMGraphHead&gt; predicate) {
 <a name="44" href="#44">44</a>      <strong class="jxr_keyword">this</strong>.predicate = checkNotNull(predicate, <span class="jxr_string">"Predicate function was null"</span>);
 <a name="45" href="#45">45</a>    }
 <a name="46" href="#46">46</a>  
@@ -69,7 +69,7 @@
 <a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   * @return result graph collection</em>
 <a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="61" href="#61">61</a>    <strong class="jxr_keyword">private</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> executeForGVELayout(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> collection) {
-<a name="62" href="#62">62</a>      DataSet&lt;GraphHead&gt; graphHeads = collection.getGraphHeads()
+<a name="62" href="#62">62</a>      DataSet&lt;EPGMGraphHead&gt; graphHeads = collection.getGraphHeads()
 <a name="63" href="#63">63</a>        .filter(predicate);
 <a name="64" href="#64">64</a>      <strong class="jxr_keyword">return</strong> selectVerticesAndEdges(collection, graphHeads);
 <a name="65" href="#65">65</a>    }

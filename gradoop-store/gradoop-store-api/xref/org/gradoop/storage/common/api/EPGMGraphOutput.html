@@ -27,9 +27,9 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> edu.umd.cs.findbugs.annotations.NonNull;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.common.iterator.ClosableIterator;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> javax.annotation.Nonnull;
@@ -58,7 +58,7 @@
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * @throws IOException if error occur on IO error (timeout, conn disconnected)</em>
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="50" href="#50">50</a>    @Nullable
-<a name="51" href="#51">51</a>    GraphHead readGraph(@Nonnull GradoopId graphId) <strong class="jxr_keyword">throws</strong> IOException;
+<a name="51" href="#51">51</a>    EPGMGraphHead readGraph(@Nonnull GradoopId graphId) <strong class="jxr_keyword">throws</strong> IOException;
 <a name="52" href="#52">52</a>  
 <a name="53" href="#53">53</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="54" href="#54">54</a>  <em class="jxr_javadoccomment">   * Reads all graphs from the EPGMGraphOutput.</em>
@@ -67,7 +67,7 @@
 <a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   * @throws IOException unexpected IO error (timeout, conn disconnected)</em>
 <a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="59" href="#59">59</a>    @NonNull
-<a name="60" href="#60">60</a>    <strong class="jxr_keyword">default</strong> ClosableIterator&lt;GraphHead&gt; getGraphSpace() <strong class="jxr_keyword">throws</strong> IOException {
+<a name="60" href="#60">60</a>    <strong class="jxr_keyword">default</strong> ClosableIterator&lt;EPGMGraphHead&gt; getGraphSpace() <strong class="jxr_keyword">throws</strong> IOException {
 <a name="61" href="#61">61</a>      <strong class="jxr_keyword">return</strong> getGraphSpace(DEFAULT_CACHE_SIZE);
 <a name="62" href="#62">62</a>    }
 <a name="63" href="#63">63</a>  
@@ -79,7 +79,7 @@
 <a name="69" href="#69">69</a>  <em class="jxr_javadoccomment">   * @throws IOException if error occur on IO error (timeout, conn disconnected)</em>
 <a name="70" href="#70">70</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="71" href="#71">71</a>    @Nonnull
-<a name="72" href="#72">72</a>    ClosableIterator&lt;GraphHead&gt; getGraphSpace(<strong class="jxr_keyword">int</strong> cacheSize) <strong class="jxr_keyword">throws</strong> IOException;
+<a name="72" href="#72">72</a>    ClosableIterator&lt;EPGMGraphHead&gt; getGraphSpace(<strong class="jxr_keyword">int</strong> cacheSize) <strong class="jxr_keyword">throws</strong> IOException;
 <a name="73" href="#73">73</a>  
 <a name="74" href="#74">74</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="75" href="#75">75</a>  <em class="jxr_javadoccomment">   * Reads a vertex data entity from the EPGMGraphOutput using the given vertex</em>
@@ -91,7 +91,7 @@
 <a name="81" href="#81">81</a>  <em class="jxr_javadoccomment">   * @throws IOException if error occur on IO error (timeout, conn disconnected)</em>
 <a name="82" href="#82">82</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="83" href="#83">83</a>    @Nullable
-<a name="84" href="#84">84</a>    Vertex readVertex(@Nonnull GradoopId vertexId) <strong class="jxr_keyword">throws</strong> IOException;
+<a name="84" href="#84">84</a>    EPGMVertex readVertex(@Nonnull GradoopId vertexId) <strong class="jxr_keyword">throws</strong> IOException;
 <a name="85" href="#85">85</a>  
 <a name="86" href="#86">86</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   * Reads all vertices from the EPGMGraphOutput.</em>
@@ -100,7 +100,7 @@
 <a name="90" href="#90">90</a>  <em class="jxr_javadoccomment">   * @throws IOException if error occur on IO error (timeout, conn disconnected)</em>
 <a name="91" href="#91">91</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="92" href="#92">92</a>    @Nonnull
-<a name="93" href="#93">93</a>    <strong class="jxr_keyword">default</strong> ClosableIterator&lt;Vertex&gt; getVertexSpace() <strong class="jxr_keyword">throws</strong> IOException {
+<a name="93" href="#93">93</a>    <strong class="jxr_keyword">default</strong> ClosableIterator&lt;EPGMVertex&gt; getVertexSpace() <strong class="jxr_keyword">throws</strong> IOException {
 <a name="94" href="#94">94</a>      <strong class="jxr_keyword">return</strong> getVertexSpace(DEFAULT_CACHE_SIZE);
 <a name="95" href="#95">95</a>    }
 <a name="96" href="#96">96</a>  
@@ -112,7 +112,7 @@
 <a name="102" href="#102">102</a> <em class="jxr_javadoccomment">   * @throws IOException if error occur on IO error (timeout, conn disconnected)</em>
 <a name="103" href="#103">103</a> <em class="jxr_javadoccomment">   */</em>
 <a name="104" href="#104">104</a>   @Nonnull
-<a name="105" href="#105">105</a>   ClosableIterator&lt;Vertex&gt; getVertexSpace(<strong class="jxr_keyword">int</strong> cacheSize) <strong class="jxr_keyword">throws</strong> IOException;
+<a name="105" href="#105">105</a>   ClosableIterator&lt;EPGMVertex&gt; getVertexSpace(<strong class="jxr_keyword">int</strong> cacheSize) <strong class="jxr_keyword">throws</strong> IOException;
 <a name="106" href="#106">106</a> 
 <a name="107" href="#107">107</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="108" href="#108">108</a> <em class="jxr_javadoccomment">   * Reads an edge data entity from the EPGMGraphOutput using the given edge</em>
@@ -124,7 +124,7 @@
 <a name="114" href="#114">114</a> <em class="jxr_javadoccomment">   * @throws IOException if error occur on IO error (timeout, conn disconnected)</em>
 <a name="115" href="#115">115</a> <em class="jxr_javadoccomment">   */</em>
 <a name="116" href="#116">116</a>   @Nullable
-<a name="117" href="#117">117</a>   Edge readEdge(@Nonnull GradoopId edgeId) <strong class="jxr_keyword">throws</strong> IOException;
+<a name="117" href="#117">117</a>   EPGMEdge readEdge(@Nonnull GradoopId edgeId) <strong class="jxr_keyword">throws</strong> IOException;
 <a name="118" href="#118">118</a> 
 <a name="119" href="#119">119</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="120" href="#120">120</a> <em class="jxr_javadoccomment">   * Reads all edges from the EPGMGraphOutput.</em>
@@ -133,7 +133,7 @@
 <a name="123" href="#123">123</a> <em class="jxr_javadoccomment">   * @throws IOException if error occur on IO error (timeout, conn disconnected)</em>
 <a name="124" href="#124">124</a> <em class="jxr_javadoccomment">   */</em>
 <a name="125" href="#125">125</a>   @Nonnull
-<a name="126" href="#126">126</a>   <strong class="jxr_keyword">default</strong> ClosableIterator&lt;Edge&gt; getEdgeSpace() <strong class="jxr_keyword">throws</strong> IOException {
+<a name="126" href="#126">126</a>   <strong class="jxr_keyword">default</strong> ClosableIterator&lt;EPGMEdge&gt; getEdgeSpace() <strong class="jxr_keyword">throws</strong> IOException {
 <a name="127" href="#127">127</a>     <strong class="jxr_keyword">return</strong> getEdgeSpace(DEFAULT_CACHE_SIZE);
 <a name="128" href="#128">128</a>   }
 <a name="129" href="#129">129</a> 
@@ -145,7 +145,7 @@
 <a name="135" href="#135">135</a> <em class="jxr_javadoccomment">   * @throws IOException if error occur on IO error (timeout, conn disconnected)</em>
 <a name="136" href="#136">136</a> <em class="jxr_javadoccomment">   */</em>
 <a name="137" href="#137">137</a>   @Nonnull
-<a name="138" href="#138">138</a>   ClosableIterator&lt;Edge&gt; getEdgeSpace(<strong class="jxr_keyword">int</strong> cacheSize) <strong class="jxr_keyword">throws</strong> IOException;
+<a name="138" href="#138">138</a>   ClosableIterator&lt;EPGMEdge&gt; getEdgeSpace(<strong class="jxr_keyword">int</strong> cacheSize) <strong class="jxr_keyword">throws</strong> IOException;
 <a name="139" href="#139">139</a> 
 <a name="140" href="#140">140</a> }
 </pre>

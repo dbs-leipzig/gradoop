@@ -25,9 +25,9 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.FlinkAsciiGraphLoader;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
@@ -35,8 +35,8 @@
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> java.util.Collection;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> java.util.List;
 <a name="27" href="#27">27</a>  
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.common.GradoopTestUtils.validateEPGMElementCollections;
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.common.GradoopTestUtils.validateEPGMGraphElementCollections;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.common.GradoopTestUtils.validateElementCollections;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.gradoop.common.GradoopTestUtils.validateGraphElementCollections;
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertEquals;
 <a name="31" href="#31">31</a>  
 <a name="32" href="#32">32</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../org/gradoop/flink/model/impl/LogicalGraphTest.html">LogicalGraphTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../org/gradoop/flink/model/GradoopFlinkTestBase.html">GradoopFlinkTestBase</a> {
@@ -46,9 +46,9 @@
 <a name="36" href="#36">36</a>      FlinkAsciiGraphLoader loader =
 <a name="37" href="#37">37</a>        getSocialNetworkLoader();
 <a name="38" href="#38">38</a>  
-<a name="39" href="#39">39</a>      GraphHead inputGraphHead = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>);
+<a name="39" href="#39">39</a>      EPGMGraphHead inputGraphHead = loader.getGraphHeadByVariable(<span class="jxr_string">"g0"</span>);
 <a name="40" href="#40">40</a>  
-<a name="41" href="#41">41</a>      GraphHead outputGraphHead = loader.getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>)
+<a name="41" href="#41">41</a>      EPGMGraphHead outputGraphHead = loader.getLogicalGraphByVariable(<span class="jxr_string">"g0"</span>)
 <a name="42" href="#42">42</a>        .getGraphHead().collect().get(0);
 <a name="43" href="#43">43</a>  
 <a name="44" href="#44">44</a>      assertEquals(<span class="jxr_string">"GraphHeads were not equal"</span>, inputGraphHead, outputGraphHead);
@@ -59,12 +59,12 @@
 <a name="49" href="#49">49</a>      FlinkAsciiGraphLoader loader =
 <a name="50" href="#50">50</a>        getSocialNetworkLoader();
 <a name="51" href="#51">51</a>  
-<a name="52" href="#52">52</a>      Collection&lt;Vertex&gt; inputVertices = loader.getVertices();
+<a name="52" href="#52">52</a>      Collection&lt;EPGMVertex&gt; inputVertices = loader.getVertices();
 <a name="53" href="#53">53</a>  
-<a name="54" href="#54">54</a>      List&lt;Vertex&gt; outputVertices = loader.getLogicalGraph(false).getVertices().collect();
+<a name="54" href="#54">54</a>      List&lt;EPGMVertex&gt; outputVertices = loader.getLogicalGraph(false).getVertices().collect();
 <a name="55" href="#55">55</a>  
-<a name="56" href="#56">56</a>      validateEPGMElementCollections(inputVertices, outputVertices);
-<a name="57" href="#57">57</a>      validateEPGMGraphElementCollections(inputVertices, outputVertices);
+<a name="56" href="#56">56</a>      validateElementCollections(inputVertices, outputVertices);
+<a name="57" href="#57">57</a>      validateGraphElementCollections(inputVertices, outputVertices);
 <a name="58" href="#58">58</a>    }
 <a name="59" href="#59">59</a>  
 <a name="60" href="#60">60</a>    @Test
@@ -72,12 +72,12 @@
 <a name="62" href="#62">62</a>      FlinkAsciiGraphLoader loader =
 <a name="63" href="#63">63</a>        getSocialNetworkLoader();
 <a name="64" href="#64">64</a>  
-<a name="65" href="#65">65</a>      Collection&lt;Edge&gt; inputEdges = loader.getEdges();
+<a name="65" href="#65">65</a>      Collection&lt;EPGMEdge&gt; inputEdges = loader.getEdges();
 <a name="66" href="#66">66</a>  
-<a name="67" href="#67">67</a>      List&lt;Edge&gt; outputEdges = loader.getLogicalGraph(false).getEdges().collect();
+<a name="67" href="#67">67</a>      List&lt;EPGMEdge&gt; outputEdges = loader.getLogicalGraph(false).getEdges().collect();
 <a name="68" href="#68">68</a>  
-<a name="69" href="#69">69</a>      validateEPGMElementCollections(inputEdges, outputEdges);
-<a name="70" href="#70">70</a>      validateEPGMGraphElementCollections(inputEdges, outputEdges);
+<a name="69" href="#69">69</a>      validateElementCollections(inputEdges, outputEdges);
+<a name="70" href="#70">70</a>      validateGraphElementCollections(inputEdges, outputEdges);
 <a name="71" href="#71">71</a>    }
 <a name="72" href="#72">72</a>  }
 </pre>

@@ -15,37 +15,37 @@
  */
 package org.gradoop.flink.io.impl.csv.functions;
 
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.metadata.MetaData;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.io.api.metadata.MetaDataSource;
 
 /**
- * Creates a {@link GraphHead} from a CSV string. The function uses a
+ * Creates a {@link EPGMGraphHead} from a CSV string. The function uses a
  * {@link MetaData} object to correctly parse the property values.
  *
  * The string needs to be encoded in the following format:
  *
  * {@code graph-id;graph-label;value_1|value_2|...|value_n}
  */
-public class CSVLineToGraphHead extends CSVLineToElement&lt;GraphHead&gt; {
+public class CSVLineToGraphHead extends CSVLineToElement&lt;EPGMGraphHead&gt; {
   /**
    * Used to create the graph head.
    */
-  private final EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory;
+  private final GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
 
   /**
    * Creates a CSVLineToGraphHead converter
    *
    * @param graphHeadFactory The factory class that is used to create the graph heads.
    */
-<span class="fc" id="L43">  public CSVLineToGraphHead(EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory) {</span>
+<span class="fc" id="L43">  public CSVLineToGraphHead(GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory) {</span>
 <span class="fc" id="L44">    this.graphHeadFactory = graphHeadFactory;</span>
 <span class="fc" id="L45">  }</span>
 
   @Override
-  public GraphHead map(String csvLine) throws Exception {
+  public EPGMGraphHead map(String csvLine) throws Exception {
 <span class="fc" id="L49">    String[] tokens = split(csvLine, 3);</span>
 <span class="fc" id="L50">    String label = StringEscaper.unescape(tokens[1]);</span>
 <span class="fc" id="L51">    return graphHeadFactory.initGraphHead(</span>

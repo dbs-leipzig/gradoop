@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.functions.epgm;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 <a name="21" href="#21">21</a>  
 <a name="22" href="#22">22</a>  <em class="jxr_javadoccomment">/**</em>
@@ -34,9 +34,9 @@
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; EPGM edge type</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> ByTargetId&lt;E <strong class="jxr_keyword">extends</strong> Edge&gt; implements CombinableFilter&lt;E&gt; {
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> ByTargetId&lt;E <strong class="jxr_keyword">extends</strong> EPGMEdge&gt; implements CombinableFilter&lt;E&gt; {
 <a name="28" href="#28">28</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment">   * Vertex id to filter on</em>
+<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment">   * EPGMVertex id to filter on</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="31" href="#31">31</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> GradoopId targetId;
 <a name="32" href="#32">32</a>  

@@ -19,14 +19,14 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
@@ -43,19 +43,19 @@ import java.util.Set;
 /**
  * Extracts EPGM elements from an {@link Embedding}.
  */
-public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, Element&gt; {
+public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, EPGMElement&gt; {
   /**
    * Constructs EPGM graph heads
    */
-  private final EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory;
+  private final GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
   /**
    * Constructs EPGM vertices
    */
-  private final EPGMVertexFactory&lt;Vertex&gt; vertexFactory;
+  private final VertexFactory&lt;EPGMVertex&gt; vertexFactory;
   /**
    * Constructs EPGM edges
    */
-  private final EPGMEdgeFactory&lt;Edge&gt; edgeFactory;
+  private final EdgeFactory&lt;EPGMEdge&gt; edgeFactory;
   /**
    * Describes the embedding content
    */
@@ -87,9 +87,9 @@ public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, Elem
    * @param embeddingMetaData meta data for the embedding
 *    @param sourceTargetVariables source and target vertex variables by edge variable
    */
-  public ElementsFromEmbedding(EPGMGraphHeadFactory&lt;GraphHead&gt; epgmGraphHeadFactory,
-    EPGMVertexFactory&lt;Vertex&gt; epgmVertexFactory,
-    EPGMEdgeFactory&lt;Edge&gt; epgmEdgeFactory, EmbeddingMetaData embeddingMetaData,
+  public ElementsFromEmbedding(GraphHeadFactory&lt;EPGMGraphHead&gt; epgmGraphHeadFactory,
+    VertexFactory&lt;EPGMVertex&gt; epgmVertexFactory,
+    EdgeFactory&lt;EPGMEdge&gt; epgmEdgeFactory, EmbeddingMetaData embeddingMetaData,
     Map&lt;String, Pair&lt;String, String&gt;&gt; sourceTargetVariables) {
 <span class="fc" id="L94">    this(epgmGraphHeadFactory, epgmVertexFactory, epgmEdgeFactory, embeddingMetaData,</span>
 <span class="fc" id="L95">      sourceTargetVariables, Maps.newHashMapWithExpectedSize(0));</span>
@@ -104,9 +104,9 @@ public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, Elem
    * @param sourceTargetVariables source and target vertex variables by edge variable
    * @param labelMapping mapping between newElementVariables and its labels
    */
-  public ElementsFromEmbedding(EPGMGraphHeadFactory&lt;GraphHead&gt; epgmGraphHeadFactory,
-    EPGMVertexFactory&lt;Vertex&gt; epgmVertexFactory,
-    EPGMEdgeFactory&lt;Edge&gt; epgmEdgeFactory, EmbeddingMetaData embeddingMetaData,
+  public ElementsFromEmbedding(GraphHeadFactory&lt;EPGMGraphHead&gt; epgmGraphHeadFactory,
+    VertexFactory&lt;EPGMVertex&gt; epgmVertexFactory,
+    EdgeFactory&lt;EPGMEdge&gt; epgmEdgeFactory, EmbeddingMetaData embeddingMetaData,
     Map&lt;String, Pair&lt;String, String&gt;&gt; sourceTargetVariables,
 <span class="fc" id="L111">    Map&lt;String, String&gt; labelMapping) {</span>
 <span class="fc" id="L112">    this.graphHeadFactory = epgmGraphHeadFactory;</span>
@@ -120,12 +120,12 @@ public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, Elem
 <span class="fc" id="L120">  }</span>
 
   @Override
-  public void flatMap(Embedding embedding, Collector&lt;Element&gt; out) throws Exception {
+  public void flatMap(Embedding embedding, Collector&lt;EPGMElement&gt; out) throws Exception {
     // clear for each embedding
 <span class="fc" id="L125">    processedIds.clear();</span>
 
     // create graph head for this embedding
-<span class="fc" id="L128">    GraphHead graphHead = graphHeadFactory.createGraphHead();</span>
+<span class="fc" id="L128">    EPGMGraphHead graphHead = graphHeadFactory.createGraphHead();</span>
 
     // vertices
 <span class="fc bfc" id="L131" title="All 2 branches covered.">    for (String vertexVariable : metaData.getVertexVariables()) {</span>
@@ -217,7 +217,7 @@ public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, Elem
    * @param graphHead graph head to assign vertex to
    * @param vertexId vertex identifier
    */
-  private void initVertex(Collector&lt;Element&gt; out, GraphHead graphHead, GradoopId vertexId) {
+  private void initVertex(Collector&lt;EPGMElement&gt; out, EPGMGraphHead graphHead, GradoopId vertexId) {
 <span class="fc" id="L221">    initVertexWithData(out, graphHead, vertexId, null);</span>
 <span class="fc" id="L222">  }</span>
 
@@ -230,10 +230,10 @@ public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, Elem
    * @param vertexId vertex identifier
    * @param label label associated with vertex
    */
-  private void initVertexWithData(Collector&lt;Element&gt; out, GraphHead graphHead, GradoopId vertexId,
+  private void initVertexWithData(Collector&lt;EPGMElement&gt; out, EPGMGraphHead graphHead, GradoopId vertexId,
                                   String label) {
 <span class="fc bfc" id="L235" title="All 2 branches covered.">    if (!processedIds.contains(vertexId)) {</span>
-<span class="fc" id="L236">      Vertex v = vertexFactory.initVertex(vertexId);</span>
+<span class="fc" id="L236">      EPGMVertex v = vertexFactory.initVertex(vertexId);</span>
 <span class="fc" id="L237">      v.addGraphId(graphHead.getId());</span>
 <span class="fc" id="L238">      v.setLabel(label);</span>
 <span class="fc" id="L239">      out.collect(v);</span>
@@ -250,7 +250,7 @@ public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, Elem
    * @param sourceId source vertex identifier
    * @param targetId target vertex identifier
    */
-  private void initEdge(Collector&lt;Element&gt; out, GraphHead graphHead, GradoopId edgeId,
+  private void initEdge(Collector&lt;EPGMElement&gt; out, EPGMGraphHead graphHead, GradoopId edgeId,
     GradoopId sourceId, GradoopId targetId) {
 <span class="fc" id="L255">    initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, null);</span>
 <span class="fc" id="L256">  }</span>
@@ -266,10 +266,10 @@ public class ElementsFromEmbedding implements FlatMapFunction&lt;Embedding, Elem
    * @param targetId target vertex identifier
    * @param label label associated with edge
    */
-  private void initEdgeWithData(Collector&lt;Element&gt; out, GraphHead graphHead, GradoopId edgeId,
+  private void initEdgeWithData(Collector&lt;EPGMElement&gt; out, EPGMGraphHead graphHead, GradoopId edgeId,
                                 GradoopId sourceId, GradoopId targetId, String label) {
 <span class="fc bfc" id="L271" title="All 2 branches covered.">    if (!processedIds.contains(edgeId)) {</span>
-<span class="fc" id="L272">      Edge e = edgeFactory.initEdge(edgeId, sourceId, targetId);</span>
+<span class="fc" id="L272">      EPGMEdge e = edgeFactory.initEdge(edgeId, sourceId, targetId);</span>
 <span class="fc" id="L273">      e.addGraphId(graphHead.getId());</span>
 <span class="fc" id="L274">      e.setLabel(label);</span>
 <span class="fc" id="L275">      out.collect(e);</span>

@@ -17,9 +17,9 @@ package org.gradoop.flink.io.impl.tlf.functions;
 
 import com.google.common.collect.Maps;
 import org.apache.flink.api.java.io.TextOutputFormat;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.io.impl.tlf.TLFConstants;
-import org.gradoop.common.model.impl.pojo.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
@@ -114,9 +114,9 @@ import java.util.Set;
    * @return builder with appended vertex representations
    */
   private StringBuilder writeVertices(StringBuilder builder,
-    Set&lt;Vertex&gt; vertices) {
+    Set&lt;EPGMVertex&gt; vertices) {
 <span class="fc" id="L118">    long vertexId = 0;</span>
-<span class="fc bfc" id="L119" title="All 2 branches covered.">    for (Vertex vertex : vertices) {</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">    for (EPGMVertex vertex : vertices) {</span>
 <span class="fc" id="L120">      vertexIdMap.put(vertex.getId(), vertexId);</span>
 <span class="fc" id="L121">      builder.append(String.format(&quot;%s %s %s%n&quot;,</span>
         TLFConstants.VERTEX_SYMBOL,
@@ -140,8 +140,8 @@ import java.util.Set;
    * @param edges set of edges
    * @return builder with appended edge representations
    */
-  private StringBuilder writeEdges(StringBuilder builder, Set&lt;Edge&gt; edges) {
-<span class="fc bfc" id="L144" title="All 2 branches covered.">    for (Edge edge : edges) {</span>
+  private StringBuilder writeEdges(StringBuilder builder, Set&lt;EPGMEdge&gt; edges) {
+<span class="fc bfc" id="L144" title="All 2 branches covered.">    for (EPGMEdge edge : edges) {</span>
 <span class="fc" id="L145">      Long sourceId = vertexIdMap.get(edge.getSourceId());</span>
 <span class="fc" id="L146">      Long targetId = vertexIdMap.get(edge.getTargetId());</span>
 

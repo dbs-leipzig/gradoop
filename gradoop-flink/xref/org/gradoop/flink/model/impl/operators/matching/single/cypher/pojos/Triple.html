@@ -28,14 +28,14 @@
 <a name="18" href="#18">18</a>  
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple3;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * This class represents a Triple.</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * A Triple represents an edge extended with information about the source and target vertex.</em>
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/Triple.html">Triple</a> <strong class="jxr_keyword">extends</strong> Tuple3&lt;Vertex, Edge, Vertex&gt; {
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/Triple.html">Triple</a> <strong class="jxr_keyword">extends</strong> Tuple3&lt;EPGMVertex, EPGMEdge, EPGMVertex&gt; {
 <a name="29" href="#29">29</a>  
 <a name="30" href="#30">30</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   * Default Constructor</em>
@@ -50,7 +50,7 @@
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment">   * @param edge edge</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   * @param targetVertex target vertex</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="43" href="#43">43</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/Triple.html">Triple</a>(Vertex sourceVertex, Edge edge, Vertex targetVertex) {
+<a name="43" href="#43">43</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/Triple.html">Triple</a>(EPGMVertex sourceVertex, EPGMEdge edge, EPGMVertex targetVertex) {
 <a name="44" href="#44">44</a>      <strong class="jxr_keyword">super</strong>(sourceVertex, edge, targetVertex);
 <a name="45" href="#45">45</a>      requireValidTriple(sourceVertex, edge, targetVertex);
 <a name="46" href="#46">46</a>    }
@@ -59,7 +59,7 @@
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   * Returns the source vertex.</em>
 <a name="50" href="#50">50</a>  <em class="jxr_javadoccomment">   * @return source vertex</em>
 <a name="51" href="#51">51</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="52" href="#52">52</a>    <strong class="jxr_keyword">public</strong> Vertex getSourceVertex() {
+<a name="52" href="#52">52</a>    <strong class="jxr_keyword">public</strong> EPGMVertex getSourceVertex() {
 <a name="53" href="#53">53</a>      <strong class="jxr_keyword">return</strong> f0;
 <a name="54" href="#54">54</a>    }
 <a name="55" href="#55">55</a>  
@@ -67,7 +67,7 @@
 <a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   * returns the edge</em>
 <a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * @return edge</em>
 <a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="60" href="#60">60</a>    <strong class="jxr_keyword">public</strong> Edge getEdge() {
+<a name="60" href="#60">60</a>    <strong class="jxr_keyword">public</strong> EPGMEdge getEdge() {
 <a name="61" href="#61">61</a>      <strong class="jxr_keyword">return</strong> f1;
 <a name="62" href="#62">62</a>    }
 <a name="63" href="#63">63</a>  
@@ -75,7 +75,7 @@
 <a name="65" href="#65">65</a>  <em class="jxr_javadoccomment">   * Returns the target vertex</em>
 <a name="66" href="#66">66</a>  <em class="jxr_javadoccomment">   * @return target vertex</em>
 <a name="67" href="#67">67</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="68" href="#68">68</a>    <strong class="jxr_keyword">public</strong> Vertex getTargetVertex() {
+<a name="68" href="#68">68</a>    <strong class="jxr_keyword">public</strong> EPGMVertex getTargetVertex() {
 <a name="69" href="#69">69</a>      <strong class="jxr_keyword">return</strong> f2;
 <a name="70" href="#70">70</a>    }
 <a name="71" href="#71">71</a>  
@@ -110,16 +110,17 @@
 <a name="100" href="#100">100</a> <em class="jxr_javadoccomment">   * @param edge edge</em>
 <a name="101" href="#101">101</a> <em class="jxr_javadoccomment">   * @param targetVertex target vertex</em>
 <a name="102" href="#102">102</a> <em class="jxr_javadoccomment">   */</em>
-<a name="103" href="#103">103</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> requireValidTriple(Vertex sourceVertex, Edge edge, Vertex targetVertex) {
-<a name="104" href="#104">104</a>     <strong class="jxr_keyword">if</strong> (sourceVertex.getId() != edge.getSourceId()) {
-<a name="105" href="#105">105</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IllegalArgumentException(<span class="jxr_string">"Source IDs do not match"</span>);
-<a name="106" href="#106">106</a>     }
-<a name="107" href="#107">107</a> 
-<a name="108" href="#108">108</a>     <strong class="jxr_keyword">if</strong> (targetVertex.getId() != edge.getTargetId()) {
-<a name="109" href="#109">109</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IllegalArgumentException(<span class="jxr_string">"Target IDs do not match"</span>);
-<a name="110" href="#110">110</a>     }
-<a name="111" href="#111">111</a>   }
-<a name="112" href="#112">112</a> }
+<a name="103" href="#103">103</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> requireValidTriple(
+<a name="104" href="#104">104</a>     EPGMVertex sourceVertex, EPGMEdge edge, EPGMVertex targetVertex) {
+<a name="105" href="#105">105</a>     <strong class="jxr_keyword">if</strong> (sourceVertex.getId() != edge.getSourceId()) {
+<a name="106" href="#106">106</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IllegalArgumentException(<span class="jxr_string">"Source IDs do not match"</span>);
+<a name="107" href="#107">107</a>     }
+<a name="108" href="#108">108</a> 
+<a name="109" href="#109">109</a>     <strong class="jxr_keyword">if</strong> (targetVertex.getId() != edge.getTargetId()) {
+<a name="110" href="#110">110</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IllegalArgumentException(<span class="jxr_string">"Target IDs do not match"</span>);
+<a name="111" href="#111">111</a>     }
+<a name="112" href="#112">112</a>   }
+<a name="113" href="#113">113</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

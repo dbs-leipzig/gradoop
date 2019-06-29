@@ -27,9 +27,9 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Maps;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.TextOutputFormat;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.tlf.TLFConstants;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.tlf.TLFConstants;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 <a name="25" href="#25">25</a>  
@@ -124,9 +124,9 @@
 <a name="114" href="#114">114</a> <em class="jxr_javadoccomment">   * @return builder with appended vertex representations</em>
 <a name="115" href="#115">115</a> <em class="jxr_javadoccomment">   */</em>
 <a name="116" href="#116">116</a>   <strong class="jxr_keyword">private</strong> StringBuilder writeVertices(StringBuilder builder,
-<a name="117" href="#117">117</a>     Set&lt;Vertex&gt; vertices) {
+<a name="117" href="#117">117</a>     Set&lt;EPGMVertex&gt; vertices) {
 <a name="118" href="#118">118</a>     <strong class="jxr_keyword">long</strong> vertexId = 0;
-<a name="119" href="#119">119</a>     <strong class="jxr_keyword">for</strong> (Vertex vertex : vertices) {
+<a name="119" href="#119">119</a>     <strong class="jxr_keyword">for</strong> (EPGMVertex vertex : vertices) {
 <a name="120" href="#120">120</a>       vertexIdMap.put(vertex.getId(), vertexId);
 <a name="121" href="#121">121</a>       builder.append(String.format(<span class="jxr_string">"%s %s %s%n"</span>,
 <a name="122" href="#122">122</a>         TLFConstants.VERTEX_SYMBOL,
@@ -150,8 +150,8 @@
 <a name="140" href="#140">140</a> <em class="jxr_javadoccomment">   * @param edges set of edges</em>
 <a name="141" href="#141">141</a> <em class="jxr_javadoccomment">   * @return builder with appended edge representations</em>
 <a name="142" href="#142">142</a> <em class="jxr_javadoccomment">   */</em>
-<a name="143" href="#143">143</a>   <strong class="jxr_keyword">private</strong> StringBuilder writeEdges(StringBuilder builder, Set&lt;Edge&gt; edges) {
-<a name="144" href="#144">144</a>     <strong class="jxr_keyword">for</strong> (Edge edge : edges) {
+<a name="143" href="#143">143</a>   <strong class="jxr_keyword">private</strong> StringBuilder writeEdges(StringBuilder builder, Set&lt;EPGMEdge&gt; edges) {
+<a name="144" href="#144">144</a>     <strong class="jxr_keyword">for</strong> (EPGMEdge edge : edges) {
 <a name="145" href="#145">145</a>       Long sourceId = vertexIdMap.get(edge.getSourceId());
 <a name="146" href="#146">146</a>       Long targetId = vertexIdMap.get(edge.getTargetId());
 <a name="147" href="#147">147</a> 

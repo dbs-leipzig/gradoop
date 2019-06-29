@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.project.functions.ProjectEdge;
@@ -35,15 +35,15 @@
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> java.util.List;
 <a name="26" href="#26">26</a>  
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * Projects an Edge by a set of properties.</em>
-<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * Edge -&gt; Embedding(IdEntry(SrcID), GraphElementEntry(Edge), IdEntry(TargetID))</em>
+<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * Projects an EPGMEdge by a set of properties.</em>
+<a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * EPGMEdge -&gt; Embedding(IdEntry(SrcID), GraphElementEntry(EPGMEdge), IdEntry(TargetID))</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/project/ProjectEdges.html">ProjectEdges</a> implements <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/PhysicalOperator.html">PhysicalOperator</a> {
 <a name="32" href="#32">32</a>  
 <a name="33" href="#33">33</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   * Input edge</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="36" href="#36">36</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> DataSet&lt;Edge&gt; input;
+<a name="36" href="#36">36</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> DataSet&lt;EPGMEdge&gt; input;
 <a name="37" href="#37">37</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   * Names of the properties that will be kept in the projection</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   */</em>
@@ -64,7 +64,7 @@
 <a name="54" href="#54">54</a>  <em class="jxr_javadoccomment">   * @param propertyKeys List of property names that will be kept in the projection</em>
 <a name="55" href="#55">55</a>  <em class="jxr_javadoccomment">   * @param isLoop indicates if the edges is a loop</em>
 <a name="56" href="#56">56</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="57" href="#57">57</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/project/ProjectEdges.html">ProjectEdges</a>(DataSet&lt;Edge&gt; input, List&lt;String&gt; propertyKeys, <strong class="jxr_keyword">boolean</strong> isLoop) {
+<a name="57" href="#57">57</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/project/ProjectEdges.html">ProjectEdges</a>(DataSet&lt;EPGMEdge&gt; input, List&lt;String&gt; propertyKeys, <strong class="jxr_keyword">boolean</strong> isLoop) {
 <a name="58" href="#58">58</a>      <strong class="jxr_keyword">this</strong>.input = input;
 <a name="59" href="#59">59</a>      <strong class="jxr_keyword">this</strong>.propertyKeys = propertyKeys;
 <a name="60" href="#60">60</a>      <strong class="jxr_keyword">this</strong>.name = <span class="jxr_string">"ProjectEdges"</span>;
@@ -78,7 +78,7 @@
 <a name="68" href="#68">68</a>  <em class="jxr_javadoccomment">   * @param input vertices that will be projected</em>
 <a name="69" href="#69">69</a>  <em class="jxr_javadoccomment">   * @param isLoop indicates if the edges is a loop</em>
 <a name="70" href="#70">70</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="71" href="#71">71</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/project/ProjectEdges.html">ProjectEdges</a>(DataSet&lt;Edge&gt; input, <strong class="jxr_keyword">boolean</strong> isLoop) {
+<a name="71" href="#71">71</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/project/ProjectEdges.html">ProjectEdges</a>(DataSet&lt;EPGMEdge&gt; input, <strong class="jxr_keyword">boolean</strong> isLoop) {
 <a name="72" href="#72">72</a>      <strong class="jxr_keyword">this</strong>(input, <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(), isLoop);
 <a name="73" href="#73">73</a>    }
 <a name="74" href="#74">74</a>  

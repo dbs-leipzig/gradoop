@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.functions.epgm;
 
 import com.google.common.collect.Sets;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.impl.functions.filters.CombinableFilter;
 
 import java.util.Collection;
@@ -28,7 +28,7 @@ import java.util.Objects;
  *
  * @param &lt;EL&gt; The element type to filter.
  */
-public class LabelIsIn&lt;EL extends EPGMElement&gt; implements CombinableFilter&lt;EL&gt; {
+public class LabelIsIn&lt;EL extends Element&gt; implements CombinableFilter&lt;EL&gt; {
 
   /**
    * White list of labels.

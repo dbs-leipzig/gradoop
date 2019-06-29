@@ -28,9 +28,9 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Lists;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Maps;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
@@ -46,23 +46,23 @@
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment"> * Responsible for creating a {@link GVELayout} from given data.</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="38" href="#38">38</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/gve/GVEGraphLayoutFactory.html">GVEGraphLayoutFactory</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/gve/GVEBaseFactory.html">GVEBaseFactory</a>
-<a name="39" href="#39">39</a>    implements LogicalGraphLayoutFactory&lt;GraphHead, Vertex, Edge&gt; {
+<a name="39" href="#39">39</a>    implements LogicalGraphLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; {
 <a name="40" href="#40">40</a>  
 <a name="41" href="#41">41</a>    @Override
-<a name="42" href="#42">42</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/gve/GVELayout.html">GVELayout</a> fromDataSets(DataSet&lt;Vertex&gt; vertices) {
-<a name="43" href="#43">43</a>      <strong class="jxr_keyword">return</strong> fromDataSets(vertices,
-<a name="44" href="#44">44</a>        createEdgeDataSet(Lists.newArrayListWithCapacity(0)));
-<a name="45" href="#45">45</a>    }
-<a name="46" href="#46">46</a>  
-<a name="47" href="#47">47</a>    @Override
-<a name="48" href="#48">48</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/gve/GVELayout.html">GVELayout</a> fromDataSets(DataSet&lt;Vertex&gt; vertices, DataSet&lt;Edge&gt; edges) {
-<a name="49" href="#49">49</a>      Objects.requireNonNull(vertices, <span class="jxr_string">"Vertex DataSet was null"</span>);
-<a name="50" href="#50">50</a>      Objects.requireNonNull(edges, <span class="jxr_string">"Edge DataSet was null"</span>);
-<a name="51" href="#51">51</a>      GraphHead graphHead = getConfig()
+<a name="42" href="#42">42</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/gve/GVELayout.html">GVELayout</a> fromDataSets(DataSet&lt;EPGMVertex&gt; vertices) {
+<a name="43" href="#43">43</a>      <strong class="jxr_keyword">return</strong> fromDataSets(vertices, createEdgeDataSet(Lists.newArrayListWithCapacity(0)));
+<a name="44" href="#44">44</a>    }
+<a name="45" href="#45">45</a>  
+<a name="46" href="#46">46</a>    @Override
+<a name="47" href="#47">47</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/gve/GVELayout.html">GVELayout</a> fromDataSets(DataSet&lt;EPGMVertex&gt; vertices, DataSet&lt;EPGMEdge&gt; edges) {
+<a name="48" href="#48">48</a>  
+<a name="49" href="#49">49</a>      Objects.requireNonNull(vertices, <span class="jxr_string">"EPGMVertex DataSet was null"</span>);
+<a name="50" href="#50">50</a>      Objects.requireNonNull(edges, <span class="jxr_string">"EPGMEdge DataSet was null"</span>);
+<a name="51" href="#51">51</a>      EPGMGraphHead graphHead = getConfig()
 <a name="52" href="#52">52</a>        .getGraphHeadFactory()
 <a name="53" href="#53">53</a>        .createGraphHead();
 <a name="54" href="#54">54</a>  
-<a name="55" href="#55">55</a>      DataSet&lt;GraphHead&gt; graphHeadSet = getConfig().getExecutionEnvironment()
+<a name="55" href="#55">55</a>      DataSet&lt;EPGMGraphHead&gt; graphHeadSet = getConfig().getExecutionEnvironment()
 <a name="56" href="#56">56</a>        .fromElements(graphHead);
 <a name="57" href="#57">57</a>  
 <a name="58" href="#58">58</a>      <em class="jxr_comment">// update vertices and edges with new graph head id</em>
@@ -77,23 +77,23 @@
 <a name="67" href="#67">67</a>    }
 <a name="68" href="#68">68</a>  
 <a name="69" href="#69">69</a>    @Override
-<a name="70" href="#70">70</a>    <strong class="jxr_keyword">public</strong> LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromDataSets(DataSet&lt;GraphHead&gt; graphHead,
-<a name="71" href="#71">71</a>      DataSet&lt;Vertex&gt; vertices, DataSet&lt;Edge&gt; edges) {
+<a name="70" href="#70">70</a>    <strong class="jxr_keyword">public</strong> LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromDataSets(
+<a name="71" href="#71">71</a>      DataSet&lt;EPGMGraphHead&gt; graphHead, DataSet&lt;EPGMVertex&gt; vertices, DataSet&lt;EPGMEdge&gt; edges) {
 <a name="72" href="#72">72</a>      <strong class="jxr_keyword">return</strong> create(graphHead, vertices, edges);
 <a name="73" href="#73">73</a>    }
 <a name="74" href="#74">74</a>  
 <a name="75" href="#75">75</a>    @Override
-<a name="76" href="#76">76</a>    <strong class="jxr_keyword">public</strong> LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromIndexedDataSets(
-<a name="77" href="#77">77</a>      Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
-<a name="78" href="#78">78</a>      Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
-<a name="79" href="#79">79</a>      GraphHead graphHead = getConfig()
+<a name="76" href="#76">76</a>    <strong class="jxr_keyword">public</strong> LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromIndexedDataSets(
+<a name="77" href="#77">77</a>      Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges) {
+<a name="78" href="#78">78</a>  
+<a name="79" href="#79">79</a>      EPGMGraphHead graphHead = getConfig()
 <a name="80" href="#80">80</a>        .getGraphHeadFactory()
 <a name="81" href="#81">81</a>        .createGraphHead();
 <a name="82" href="#82">82</a>  
-<a name="83" href="#83">83</a>      DataSet&lt;GraphHead&gt; graphHeadSet = getConfig().getExecutionEnvironment()
+<a name="83" href="#83">83</a>      DataSet&lt;EPGMGraphHead&gt; graphHeadSet = getConfig().getExecutionEnvironment()
 <a name="84" href="#84">84</a>        .fromElements(graphHead);
 <a name="85" href="#85">85</a>  
-<a name="86" href="#86">86</a>      Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads = Maps.newHashMap();
+<a name="86" href="#86">86</a>      Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads = Maps.newHashMap();
 <a name="87" href="#87">87</a>      graphHeads.put(graphHead.getLabel(), graphHeadSet);
 <a name="88" href="#88">88</a>  
 <a name="89" href="#89">89</a>      <em class="jxr_comment">// update vertices and edges with new graph head id</em>
@@ -111,51 +111,52 @@
 <a name="101" href="#101">101</a>   }
 <a name="102" href="#102">102</a> 
 <a name="103" href="#103">103</a>   @Override
-<a name="104" href="#104">104</a>   <strong class="jxr_keyword">public</strong> LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromIndexedDataSets(
-<a name="105" href="#105">105</a>     Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads,
-<a name="106" href="#106">106</a>     Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
-<a name="107" href="#107">107</a>     Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
+<a name="104" href="#104">104</a>   <strong class="jxr_keyword">public</strong> LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromIndexedDataSets(
+<a name="105" href="#105">105</a>     Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads,
+<a name="106" href="#106">106</a>     Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices,
+<a name="107" href="#107">107</a>     Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges) {
 <a name="108" href="#108">108</a>     <strong class="jxr_keyword">return</strong> create(graphHeads, vertices, edges);
 <a name="109" href="#109">109</a>   }
 <a name="110" href="#110">110</a> 
 <a name="111" href="#111">111</a>   @Override
-<a name="112" href="#112">112</a>   <strong class="jxr_keyword">public</strong> LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromCollections(GraphHead graphHead,
-<a name="113" href="#113">113</a>     Collection&lt;Vertex&gt; vertices,
-<a name="114" href="#114">114</a>     Collection&lt;Edge&gt; edges) {
-<a name="115" href="#115">115</a> 
-<a name="116" href="#116">116</a>     Objects.requireNonNull(vertices, <span class="jxr_string">"Vertex collection was null"</span>);
-<a name="117" href="#117">117</a> 
-<a name="118" href="#118">118</a>     List&lt;GraphHead&gt; graphHeads;
-<a name="119" href="#119">119</a>     <strong class="jxr_keyword">if</strong> (graphHead == <strong class="jxr_keyword">null</strong>) {
-<a name="120" href="#120">120</a>       graphHeads = Lists.newArrayListWithCapacity(0);
-<a name="121" href="#121">121</a>     } <strong class="jxr_keyword">else</strong> {
-<a name="122" href="#122">122</a>       graphHeads = Lists.newArrayList(graphHead);
-<a name="123" href="#123">123</a>     }
-<a name="124" href="#124">124</a>     <strong class="jxr_keyword">if</strong> (edges == <strong class="jxr_keyword">null</strong>) {
-<a name="125" href="#125">125</a>       edges = Lists.newArrayListWithCapacity(0);
-<a name="126" href="#126">126</a>     }
-<a name="127" href="#127">127</a> 
-<a name="128" href="#128">128</a>     <strong class="jxr_keyword">return</strong> fromDataSets(
-<a name="129" href="#129">129</a>       createGraphHeadDataSet(graphHeads),
-<a name="130" href="#130">130</a>       createVertexDataSet(vertices),
-<a name="131" href="#131">131</a>       createEdgeDataSet(edges));
-<a name="132" href="#132">132</a>   }
-<a name="133" href="#133">133</a> 
-<a name="134" href="#134">134</a>   @Override
-<a name="135" href="#135">135</a>   <strong class="jxr_keyword">public</strong> LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromCollections(Collection&lt;Vertex&gt; vertices,
-<a name="136" href="#136">136</a>     Collection&lt;Edge&gt; edges) {
-<a name="137" href="#137">137</a>     Objects.requireNonNull(vertices, <span class="jxr_string">"Vertex collection was null"</span>);
-<a name="138" href="#138">138</a>     Objects.requireNonNull(edges, <span class="jxr_string">"Edge collection was null"</span>);
-<a name="139" href="#139">139</a>     <strong class="jxr_keyword">return</strong> fromDataSets(createVertexDataSet(vertices), createEdgeDataSet(edges));
-<a name="140" href="#140">140</a>   }
-<a name="141" href="#141">141</a> 
-<a name="142" href="#142">142</a>   @Override
-<a name="143" href="#143">143</a>   <strong class="jxr_keyword">public</strong> LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; createEmptyGraph() {
-<a name="144" href="#144">144</a>     Collection&lt;Vertex&gt; vertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(0);
-<a name="145" href="#145">145</a>     Collection&lt;Edge&gt; edges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(0);
-<a name="146" href="#146">146</a>     <strong class="jxr_keyword">return</strong> fromCollections(<strong class="jxr_keyword">null</strong>, vertices, edges);
-<a name="147" href="#147">147</a>   }
-<a name="148" href="#148">148</a> }
+<a name="112" href="#112">112</a>   <strong class="jxr_keyword">public</strong> LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromCollections(
+<a name="113" href="#113">113</a>     EPGMGraphHead graphHead,
+<a name="114" href="#114">114</a>     Collection&lt;EPGMVertex&gt; vertices,
+<a name="115" href="#115">115</a>     Collection&lt;EPGMEdge&gt; edges) {
+<a name="116" href="#116">116</a> 
+<a name="117" href="#117">117</a>     Objects.requireNonNull(vertices, <span class="jxr_string">"EPGMVertex collection was null"</span>);
+<a name="118" href="#118">118</a> 
+<a name="119" href="#119">119</a>     List&lt;EPGMGraphHead&gt; graphHeads;
+<a name="120" href="#120">120</a>     <strong class="jxr_keyword">if</strong> (graphHead == <strong class="jxr_keyword">null</strong>) {
+<a name="121" href="#121">121</a>       graphHeads = Lists.newArrayListWithCapacity(0);
+<a name="122" href="#122">122</a>     } <strong class="jxr_keyword">else</strong> {
+<a name="123" href="#123">123</a>       graphHeads = Lists.newArrayList(graphHead);
+<a name="124" href="#124">124</a>     }
+<a name="125" href="#125">125</a>     <strong class="jxr_keyword">if</strong> (edges == <strong class="jxr_keyword">null</strong>) {
+<a name="126" href="#126">126</a>       edges = Lists.newArrayListWithCapacity(0);
+<a name="127" href="#127">127</a>     }
+<a name="128" href="#128">128</a> 
+<a name="129" href="#129">129</a>     <strong class="jxr_keyword">return</strong> fromDataSets(
+<a name="130" href="#130">130</a>       createGraphHeadDataSet(graphHeads),
+<a name="131" href="#131">131</a>       createVertexDataSet(vertices),
+<a name="132" href="#132">132</a>       createEdgeDataSet(edges));
+<a name="133" href="#133">133</a>   }
+<a name="134" href="#134">134</a> 
+<a name="135" href="#135">135</a>   @Override
+<a name="136" href="#136">136</a>   <strong class="jxr_keyword">public</strong> LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromCollections(
+<a name="137" href="#137">137</a>     Collection&lt;EPGMVertex&gt; vertices, Collection&lt;EPGMEdge&gt; edges) {
+<a name="138" href="#138">138</a>     Objects.requireNonNull(vertices, <span class="jxr_string">"EPGMVertex collection was null"</span>);
+<a name="139" href="#139">139</a>     Objects.requireNonNull(edges, <span class="jxr_string">"EPGMEdge collection was null"</span>);
+<a name="140" href="#140">140</a>     <strong class="jxr_keyword">return</strong> fromDataSets(createVertexDataSet(vertices), createEdgeDataSet(edges));
+<a name="141" href="#141">141</a>   }
+<a name="142" href="#142">142</a> 
+<a name="143" href="#143">143</a>   @Override
+<a name="144" href="#144">144</a>   <strong class="jxr_keyword">public</strong> LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; createEmptyGraph() {
+<a name="145" href="#145">145</a>     Collection&lt;EPGMVertex&gt; vertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(0);
+<a name="146" href="#146">146</a>     Collection&lt;EPGMEdge&gt; edges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;(0);
+<a name="147" href="#147">147</a>     <strong class="jxr_keyword">return</strong> fromCollections(<strong class="jxr_keyword">null</strong>, vertices, edges);
+<a name="148" href="#148">148</a>   }
+<a name="149" href="#149">149</a> }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

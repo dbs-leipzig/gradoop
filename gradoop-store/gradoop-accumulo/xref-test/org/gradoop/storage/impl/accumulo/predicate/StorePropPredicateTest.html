@@ -26,9 +26,9 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.storage.impl.accumulo.predicate;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.GradoopTestUtils;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.common.predicate.query.Query;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.utils.AccumuloFilters;
@@ -61,7 +61,7 @@
 <a name="51" href="#51">51</a>    @Test
 <a name="52" href="#52">52</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> vertexPropEquals() <strong class="jxr_keyword">throws</strong> Throwable {
 <a name="53" href="#53">53</a>      doTest(TEST01, (loader, store, config) -&gt; {
-<a name="54" href="#54">54</a>        List&lt;Vertex&gt; inputVertices = loader.getVertices().stream()
+<a name="54" href="#54">54</a>        List&lt;EPGMVertex&gt; inputVertices = loader.getVertices().stream()
 <a name="55" href="#55">55</a>          .filter(it -&gt; {
 <a name="56" href="#56">56</a>            assert it.getProperties() != <strong class="jxr_keyword">null</strong>;
 <a name="57" href="#57">57</a>            <strong class="jxr_keyword">return</strong> it.getProperties().get(<span class="jxr_string">"gender"</span>) != <strong class="jxr_keyword">null</strong> &amp;&amp;
@@ -71,14 +71,14 @@
 <a name="61" href="#61">61</a>          })
 <a name="62" href="#62">62</a>          .collect(Collectors.toList());
 <a name="63" href="#63">63</a>  
-<a name="64" href="#64">64</a>        List&lt;Vertex&gt; query = store
+<a name="64" href="#64">64</a>        List&lt;EPGMVertex&gt; query = store
 <a name="65" href="#65">65</a>          .getVertexSpace(
 <a name="66" href="#66">66</a>            Query.elements()
 <a name="67" href="#67">67</a>              .fromAll()
 <a name="68" href="#68">68</a>              .where(AccumuloFilters.propEquals(<span class="jxr_string">"gender"</span>, <span class="jxr_string">"f"</span>)))
 <a name="69" href="#69">69</a>          .readRemainsAndClose();
 <a name="70" href="#70">70</a>  
-<a name="71" href="#71">71</a>        GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+<a name="71" href="#71">71</a>        GradoopTestUtils.validateElementCollections(inputVertices, query);
 <a name="72" href="#72">72</a>      });
 <a name="73" href="#73">73</a>    }
 <a name="74" href="#74">74</a>  
@@ -90,7 +90,7 @@
 <a name="80" href="#80">80</a>    @Test
 <a name="81" href="#81">81</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> edgePropEquals() <strong class="jxr_keyword">throws</strong> Throwable {
 <a name="82" href="#82">82</a>      doTest(TEST02, (loader, store, config) -&gt; {
-<a name="83" href="#83">83</a>        List&lt;Edge&gt; inputVertices = loader.getEdges().stream()
+<a name="83" href="#83">83</a>        List&lt;EPGMEdge&gt; inputVertices = loader.getEdges().stream()
 <a name="84" href="#84">84</a>          .filter(it -&gt; {
 <a name="85" href="#85">85</a>            assert it.getProperties() != <strong class="jxr_keyword">null</strong>;
 <a name="86" href="#86">86</a>            <strong class="jxr_keyword">return</strong> it.getProperties().get(<span class="jxr_string">"since"</span>) != <strong class="jxr_keyword">null</strong> &amp;&amp;
@@ -100,14 +100,14 @@
 <a name="90" href="#90">90</a>          })
 <a name="91" href="#91">91</a>          .collect(Collectors.toList());
 <a name="92" href="#92">92</a>  
-<a name="93" href="#93">93</a>        List&lt;Edge&gt; query = store
+<a name="93" href="#93">93</a>        List&lt;EPGMEdge&gt; query = store
 <a name="94" href="#94">94</a>          .getEdgeSpace(
 <a name="95" href="#95">95</a>            Query.elements()
 <a name="96" href="#96">96</a>              .fromAll()
 <a name="97" href="#97">97</a>              .where(AccumuloFilters.propEquals(<span class="jxr_string">"since"</span>, 2014)))
 <a name="98" href="#98">98</a>          .readRemainsAndClose();
 <a name="99" href="#99">99</a>  
-<a name="100" href="#100">100</a>       GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+<a name="100" href="#100">100</a>       GradoopTestUtils.validateElementCollections(inputVertices, query);
 <a name="101" href="#101">101</a>     });
 <a name="102" href="#102">102</a>   }
 <a name="103" href="#103">103</a> 
@@ -121,7 +121,7 @@
 <a name="111" href="#111">111</a>     doTest(TEST03, (loader, store, config) -&gt; {
 <a name="112" href="#112">112</a>       Pattern queryFormula = Pattern.compile(<span class="jxr_string">"(Leipzig|Dresden)"</span>);
 <a name="113" href="#113">113</a> 
-<a name="114" href="#114">114</a>       List&lt;Vertex&gt; inputVertices = loader.getVertices().stream()
+<a name="114" href="#114">114</a>       List&lt;EPGMVertex&gt; inputVertices = loader.getVertices().stream()
 <a name="115" href="#115">115</a>         .filter(it -&gt; {
 <a name="116" href="#116">116</a>           assert it.getProperties() != <strong class="jxr_keyword">null</strong>;
 <a name="117" href="#117">117</a>           <strong class="jxr_keyword">return</strong> it.getProperties().get(<span class="jxr_string">"city"</span>) != <strong class="jxr_keyword">null</strong> &amp;&amp;
@@ -132,14 +132,14 @@
 <a name="122" href="#122">122</a>         })
 <a name="123" href="#123">123</a>         .collect(Collectors.toList());
 <a name="124" href="#124">124</a> 
-<a name="125" href="#125">125</a>       List&lt;Vertex&gt; query = store
+<a name="125" href="#125">125</a>       List&lt;EPGMVertex&gt; query = store
 <a name="126" href="#126">126</a>         .getVertexSpace(
 <a name="127" href="#127">127</a>           Query.elements()
 <a name="128" href="#128">128</a>             .fromAll()
 <a name="129" href="#129">129</a>             .where(AccumuloFilters.propReg(<span class="jxr_string">"city"</span>, queryFormula)))
 <a name="130" href="#130">130</a>         .readRemainsAndClose();
 <a name="131" href="#131">131</a> 
-<a name="132" href="#132">132</a>       GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+<a name="132" href="#132">132</a>       GradoopTestUtils.validateElementCollections(inputVertices, query);
 <a name="133" href="#133">133</a>     });
 <a name="134" href="#134">134</a>   }
 <a name="135" href="#135">135</a> 
@@ -151,7 +151,7 @@
 <a name="141" href="#141">141</a>   @Test
 <a name="142" href="#142">142</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> propLargerThan() <strong class="jxr_keyword">throws</strong> Throwable {
 <a name="143" href="#143">143</a>     doTest(TEST04, (loader, store, config) -&gt; {
-<a name="144" href="#144">144</a>       List&lt;Edge&gt; inputVertices = loader.getEdges().stream()
+<a name="144" href="#144">144</a>       List&lt;EPGMEdge&gt; inputVertices = loader.getEdges().stream()
 <a name="145" href="#145">145</a>         .filter(it -&gt; {
 <a name="146" href="#146">146</a>           assert it.getProperties() != <strong class="jxr_keyword">null</strong>;
 <a name="147" href="#147">147</a>           <strong class="jxr_keyword">return</strong> it.getProperties().get(<span class="jxr_string">"since"</span>) != <strong class="jxr_keyword">null</strong> &amp;&amp;
@@ -162,7 +162,7 @@
 <a name="152" href="#152">152</a>         })
 <a name="153" href="#153">153</a>         .collect(Collectors.toList());
 <a name="154" href="#154">154</a> 
-<a name="155" href="#155">155</a>       List&lt;Edge&gt; query = store
+<a name="155" href="#155">155</a>       List&lt;EPGMEdge&gt; query = store
 <a name="156" href="#156">156</a>         .getEdgeSpace(
 <a name="157" href="#157">157</a>           Query.elements()
 <a name="158" href="#158">158</a>             .fromAll()
@@ -170,7 +170,7 @@
 <a name="160" href="#160">160</a>               .propLargerThan(<span class="jxr_string">"since"</span>, 2014, <strong class="jxr_keyword">true</strong>)))
 <a name="161" href="#161">161</a>         .readRemainsAndClose();
 <a name="162" href="#162">162</a> 
-<a name="163" href="#163">163</a>       GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+<a name="163" href="#163">163</a>       GradoopTestUtils.validateElementCollections(inputVertices, query);
 <a name="164" href="#164">164</a>     });
 <a name="165" href="#165">165</a>   }
 <a name="166" href="#166">166</a> 
@@ -182,13 +182,13 @@
 <a name="172" href="#172">172</a>   @Test
 <a name="173" href="#173">173</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> propSmallerThan() <strong class="jxr_keyword">throws</strong> Throwable {
 <a name="174" href="#174">174</a>     doTest(TEST05, (loader, store, config) -&gt; {
-<a name="175" href="#175">175</a>       List&lt;GraphHead&gt; inputVertices = loader.getGraphHeads()
+<a name="175" href="#175">175</a>       List&lt;EPGMGraphHead&gt; inputVertices = loader.getGraphHeads()
 <a name="176" href="#176">176</a>         .stream()
 <a name="177" href="#177">177</a>         .filter(it -&gt; it.getPropertyValue(<span class="jxr_string">"vertexCount"</span>) != <strong class="jxr_keyword">null</strong>)
 <a name="178" href="#178">178</a>         .filter(it -&gt; it.getPropertyValue(<span class="jxr_string">"vertexCount"</span>).getInt() &gt;= 4)
 <a name="179" href="#179">179</a>         .collect(Collectors.toList());
 <a name="180" href="#180">180</a> 
-<a name="181" href="#181">181</a>       List&lt;GraphHead&gt; query = store
+<a name="181" href="#181">181</a>       List&lt;EPGMGraphHead&gt; query = store
 <a name="182" href="#182">182</a>         .getGraphSpace(
 <a name="183" href="#183">183</a>           Query.elements()
 <a name="184" href="#184">184</a>             .fromAll()
@@ -196,7 +196,7 @@
 <a name="186" href="#186">186</a>               .propLargerThan(<span class="jxr_string">"vertexCount"</span>, 4, <strong class="jxr_keyword">true</strong>)))
 <a name="187" href="#187">187</a>         .readRemainsAndClose();
 <a name="188" href="#188">188</a> 
-<a name="189" href="#189">189</a>       GradoopTestUtils.validateEPGMElementCollections(inputVertices, query);
+<a name="189" href="#189">189</a>       GradoopTestUtils.validateElementCollections(inputVertices, query);
 <a name="190" href="#190">190</a>     });
 <a name="191" href="#191">191</a>   }
 <a name="192" href="#192">192</a> 

@@ -18,9 +18,9 @@ package org.gradoop.storage.impl.hbase.io;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
@@ -44,24 +44,24 @@ import javax.annotation.Nullable;
  */
 public class HBaseDataSource extends HBaseBase
   implements FilterableDataSource&lt;
-  ElementQuery&lt;HBaseElementFilter&lt;GraphHead&gt;&gt;,
-  ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt;,
-  ElementQuery&lt;HBaseElementFilter&lt;Edge&gt;&gt;&gt; {
+  ElementQuery&lt;HBaseElementFilter&lt;EPGMGraphHead&gt;&gt;,
+  ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt;,
+  ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt;&gt; {
 
   /**
    * Query definition for graph head elements
    */
-  private final ElementQuery&lt;HBaseElementFilter&lt;GraphHead&gt;&gt; graphHeadQuery;
+  private final ElementQuery&lt;HBaseElementFilter&lt;EPGMGraphHead&gt;&gt; graphHeadQuery;
 
   /**
    * Query definition for vertices
    */
-  private final ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; vertexQuery;
+  private final ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; vertexQuery;
 
   /**
    * Query definition for edges
    */
-  private final ElementQuery&lt;HBaseElementFilter&lt;Edge&gt;&gt; edgeQuery;
+  private final ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; edgeQuery;
 
   /**
    * Creates a new HBase data source.
@@ -88,9 +88,9 @@ public class HBaseDataSource extends HBaseBase
   private HBaseDataSource(
     @Nonnull HBaseEPGMStore epgmStore,
     @Nonnull GradoopFlinkConfig flinkConfig,
-    @Nullable ElementQuery&lt;HBaseElementFilter&lt;GraphHead&gt;&gt; graphHeadQuery,
-    @Nullable ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; vertexQuery,
-    @Nullable ElementQuery&lt;HBaseElementFilter&lt;Edge&gt;&gt; edgeQuery
+    @Nullable ElementQuery&lt;HBaseElementFilter&lt;EPGMGraphHead&gt;&gt; graphHeadQuery,
+    @Nullable ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; vertexQuery,
+    @Nullable ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; edgeQuery
   ) {
 <span class="fc" id="L95">    super(epgmStore, flinkConfig);</span>
 <span class="fc" id="L96">    this.graphHeadQuery = graphHeadQuery;</span>
@@ -108,21 +108,21 @@ public class HBaseDataSource extends HBaseBase
 <span class="fc" id="L108">    GradoopFlinkConfig config = getFlinkConfig();</span>
 <span class="fc" id="L109">    HBaseEPGMStore store = getStore();</span>
 
-<span class="fc" id="L111">    DataSet&lt;GraphHead&gt; graphHeads = config.getExecutionEnvironment()</span>
+<span class="fc" id="L111">    DataSet&lt;EPGMGraphHead&gt; graphHeads = config.getExecutionEnvironment()</span>
 <span class="fc" id="L112">      .createInput(new GraphHeadTableInputFormat(</span>
 <span class="fc" id="L113">          getHBaseConfig().getGraphHeadHandler().applyQuery(graphHeadQuery),</span>
 <span class="fc" id="L114">          store.getGraphHeadName()),</span>
 <span class="fc" id="L115">        new TupleTypeInfo&lt;&gt;(TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType())))</span>
 <span class="fc" id="L116">      .map(new ValueOf1&lt;&gt;());</span>
 
-<span class="fc" id="L118">    DataSet&lt;Vertex&gt; vertices = config.getExecutionEnvironment()</span>
+<span class="fc" id="L118">    DataSet&lt;EPGMVertex&gt; vertices = config.getExecutionEnvironment()</span>
 <span class="fc" id="L119">      .createInput(new VertexTableInputFormat(</span>
 <span class="fc" id="L120">          getHBaseConfig().getVertexHandler().applyQuery(vertexQuery),</span>
 <span class="fc" id="L121">          store.getVertexTableName()),</span>
 <span class="fc" id="L122">        new TupleTypeInfo&lt;&gt;(TypeExtractor.createTypeInfo(config.getVertexFactory().getType())))</span>
 <span class="fc" id="L123">      .map(new ValueOf1&lt;&gt;());</span>
 
-<span class="fc" id="L125">    DataSet&lt;Edge&gt; edges = config.getExecutionEnvironment()</span>
+<span class="fc" id="L125">    DataSet&lt;EPGMEdge&gt; edges = config.getExecutionEnvironment()</span>
 <span class="fc" id="L126">      .createInput(new EdgeTableInputFormat(</span>
 <span class="fc" id="L127">          getHBaseConfig().getEdgeHandler().applyQuery(edgeQuery),</span>
 <span class="fc" id="L128">          store.getEdgeTableName()),</span>
@@ -135,7 +135,7 @@ public class HBaseDataSource extends HBaseBase
   @Nonnull
   @Override
   public HBaseDataSource applyGraphPredicate(
-    @Nonnull ElementQuery&lt;HBaseElementFilter&lt;GraphHead&gt;&gt; query
+    @Nonnull ElementQuery&lt;HBaseElementFilter&lt;EPGMGraphHead&gt;&gt; query
   ) {
 <span class="fc" id="L140">    return new HBaseDataSource(getStore(), getFlinkConfig(), query, vertexQuery, edgeQuery);</span>
   }
@@ -143,7 +143,7 @@ public class HBaseDataSource extends HBaseBase
   @Nonnull
   @Override
   public HBaseDataSource applyVertexPredicate(
-    @Nonnull ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; query
+    @Nonnull ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; query
   ) {
 <span class="fc" id="L148">    return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, query, edgeQuery);</span>
   }
@@ -151,7 +151,7 @@ public class HBaseDataSource extends HBaseBase
   @Nonnull
   @Override
   public HBaseDataSource applyEdgePredicate(
-    @Nonnull ElementQuery&lt;HBaseElementFilter&lt;Edge&gt;&gt; query
+    @Nonnull ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; query
   ) {
 <span class="fc" id="L156">    return new HBaseDataSource(getStore(), getFlinkConfig(), graphHeadQuery, vertexQuery, query);</span>
   }

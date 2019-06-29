@@ -29,8 +29,8 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Preconditions;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.dataintegration.transformation.impl.config.EdgeDirection;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.dataintegration.transformation.impl.functions.CreateNewEdges;
@@ -141,7 +141,7 @@
 <a name="131" href="#131">131</a>   @Override
 <a name="132" href="#132">132</a>   <strong class="jxr_keyword">public</strong> LogicalGraph execute(LogicalGraph logicalGraph) {
 <a name="133" href="#133">133</a>     <em class="jxr_comment">// filter the vertices by the given label</em>
-<a name="134" href="#134">134</a>     DataSet&lt;Vertex&gt; filteredVertices = logicalGraph
+<a name="134" href="#134">134</a>     DataSet&lt;EPGMVertex&gt; filteredVertices = logicalGraph
 <a name="135" href="#135">135</a>       .getVertices()
 <a name="136" href="#136">136</a>       .filter(<strong class="jxr_keyword">new</strong> ByLabel&lt;&gt;(forVerticesOfLabel));
 <a name="137" href="#137">137</a> 
@@ -150,7 +150,7 @@
 <a name="140" href="#140">140</a>       .flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../org/gradoop/dataintegration/transformation/impl/functions/ExtractPropertyWithOriginId.html">ExtractPropertyWithOriginId</a>(originalPropertyName));
 <a name="141" href="#141">141</a> 
 <a name="142" href="#142">142</a>     <em class="jxr_comment">// extract the new vertices</em>
-<a name="143" href="#143">143</a>     DataSet&lt;Tuple2&lt;Vertex, List&lt;GradoopId&gt;&gt;&gt; newVerticesAndOriginIds;
+<a name="143" href="#143">143</a>     DataSet&lt;Tuple2&lt;EPGMVertex, List&lt;GradoopId&gt;&gt;&gt; newVerticesAndOriginIds;
 <a name="144" href="#144">144</a>     <strong class="jxr_keyword">if</strong> (condense) {
 <a name="145" href="#145">145</a>       newVerticesAndOriginIds = candidates
 <a name="146" href="#146">146</a>         .groupBy(0)
@@ -162,12 +162,12 @@
 <a name="152" href="#152">152</a>           newPropertyName));
 <a name="153" href="#153">153</a>     }
 <a name="154" href="#154">154</a> 
-<a name="155" href="#155">155</a>     DataSet&lt;Vertex&gt; vertices = newVerticesAndOriginIds
+<a name="155" href="#155">155</a>     DataSet&lt;EPGMVertex&gt; vertices = newVerticesAndOriginIds
 <a name="156" href="#156">156</a>       .map(<strong class="jxr_keyword">new</strong> Value0Of2&lt;&gt;())
 <a name="157" href="#157">157</a>       .union(logicalGraph.getVertices());
 <a name="158" href="#158">158</a> 
 <a name="159" href="#159">159</a>     <em class="jxr_comment">// the newly created vertices should be linked to the original vertices</em>
-<a name="160" href="#160">160</a>     DataSet&lt;Edge&gt; edges = logicalGraph.getEdges();
+<a name="160" href="#160">160</a>     DataSet&lt;EPGMEdge&gt; edges = logicalGraph.getEdges();
 <a name="161" href="#161">161</a>     <strong class="jxr_keyword">if</strong> (!edgeDirection.equals(EdgeDirection.NONE)) {
 <a name="162" href="#162">162</a>       edges = newVerticesAndOriginIds
 <a name="163" href="#163">163</a>         .flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../org/gradoop/dataintegration/transformation/impl/functions/CreateNewEdges.html">CreateNewEdges</a>(logicalGraph.getConfig().getEdgeFactory(), edgeDirection,

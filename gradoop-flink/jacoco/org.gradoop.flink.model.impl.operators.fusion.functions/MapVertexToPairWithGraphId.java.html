@@ -20,19 +20,19 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Demultiplexes a vertex by associating its graphId
  */
 @FunctionAnnotation.ForwardedFields(&quot;*-&gt;f0&quot;)
 public class MapVertexToPairWithGraphId
-  implements FlatMapFunction&lt;Vertex, Tuple2&lt;Vertex, GradoopId&gt;&gt; {
+  implements FlatMapFunction&lt;EPGMVertex, Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; {
 
   /**
    * Reusable element ot be returned
    */
-  private final Tuple2&lt;Vertex,   GradoopId&gt; reusableTuple;
+  private final Tuple2&lt;EPGMVertex,   GradoopId&gt; reusableTuple;
 
   /**
    * Default constructor
@@ -42,7 +42,7 @@ public class MapVertexToPairWithGraphId
 <span class="fc" id="L42">  }</span>
 
   @Override
-  public void flatMap(Vertex value, Collector&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; out)
+  public void flatMap(EPGMVertex value, Collector&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; out)
       throws Exception {
 <span class="pc bpc" id="L47" title="1 of 2 branches missed.">    if (value != null) {</span>
 <span class="fc bfc" id="L48" title="All 2 branches covered.">      for (GradoopId id : value.getGraphIds()) {</span>

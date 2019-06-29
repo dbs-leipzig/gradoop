@@ -20,9 +20,9 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -30,24 +30,24 @@ import org.gradoop.common.model.impl.properties.Properties;
  * source graph this one was created from.
  */
 public class InitGraphHeadWithLineage
-  implements MapFunction&lt;Tuple2&lt;GradoopId, GradoopId&gt;, GraphHead&gt;, ResultTypeQueryable&lt;GraphHead&gt; {
+  implements MapFunction&lt;Tuple2&lt;GradoopId, GradoopId&gt;, EPGMGraphHead&gt;, ResultTypeQueryable&lt;EPGMGraphHead&gt; {
   /**
-   * GraphHeadFactory
+   * EPGMGraphHeadFactory
    */
-  private final EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory;
+  private final GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
 
   /**
    * Constructor
    *
    * @param epgmGraphHeadFactory graph head factory
    */
-<span class="fc" id="L44">  public InitGraphHeadWithLineage(EPGMGraphHeadFactory&lt;GraphHead&gt; epgmGraphHeadFactory) {</span>
+<span class="fc" id="L44">  public InitGraphHeadWithLineage(GraphHeadFactory&lt;EPGMGraphHead&gt; epgmGraphHeadFactory) {</span>
 <span class="fc" id="L45">    this.graphHeadFactory = epgmGraphHeadFactory;</span>
 <span class="fc" id="L46">  }</span>
 
   @Override
-  public GraphHead map(Tuple2&lt;GradoopId, GradoopId&gt; idTuple) {
-<span class="fc" id="L50">    GraphHead head = graphHeadFactory.initGraphHead(idTuple.f0);</span>
+  public EPGMGraphHead map(Tuple2&lt;GradoopId, GradoopId&gt; idTuple) {
+<span class="fc" id="L50">    EPGMGraphHead head = graphHeadFactory.initGraphHead(idTuple.f0);</span>
 <span class="fc" id="L51">    Properties properties = Properties.createWithCapacity(1);</span>
 <span class="fc" id="L52">    properties.set(&quot;lineage&quot;, idTuple.f1);</span>
 <span class="fc" id="L53">    head.setProperties(properties);</span>
@@ -55,7 +55,7 @@ public class InitGraphHeadWithLineage
   }
 
   @Override
-  public TypeInformation&lt;GraphHead&gt; getProducedType() {
+  public TypeInformation&lt;EPGMGraphHead&gt; getProducedType() {
 <span class="fc" id="L59">    return TypeExtractor.createTypeInfo(graphHeadFactory.getType());</span>
   }
 }

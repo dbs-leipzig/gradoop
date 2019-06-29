@@ -31,13 +31,13 @@
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Mutation;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Put;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.hbase.api.VertexHandler;
 <a name="26" href="#26">26</a>  
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * Creates HBase {@link Mutation} from vertex data using vertex data handler.</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="30" href="#30">30</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/storage/impl/hbase/io/functions/BuildVertexMutation.html">BuildVertexMutation</a> <strong class="jxr_keyword">extends</strong> RichMapFunction&lt;Vertex, Tuple2&lt;GradoopId, Mutation&gt;&gt; {
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/storage/impl/hbase/io/functions/BuildVertexMutation.html">BuildVertexMutation</a> <strong class="jxr_keyword">extends</strong> RichMapFunction&lt;EPGMVertex, Tuple2&lt;GradoopId, Mutation&gt;&gt; {
 <a name="31" href="#31">31</a>  
 <a name="32" href="#32">32</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   * Serial version uid.</em>
@@ -50,7 +50,7 @@
 <a name="40" href="#40">40</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">transient</strong> Tuple2&lt;GradoopId, Mutation&gt; reuseTuple;
 <a name="41" href="#41">41</a>  
 <a name="42" href="#42">42</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="43" href="#43">43</a>  <em class="jxr_javadoccomment">   * Vertex data handler to create Mutations.</em>
+<a name="43" href="#43">43</a>  <em class="jxr_javadoccomment">   * EPGMVertex data handler to create Mutations.</em>
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="45" href="#45">45</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../org/gradoop/storage/impl/hbase/api/VertexHandler.html">VertexHandler</a> vertexHandler;
 <a name="46" href="#46">46</a>  
@@ -70,7 +70,7 @@
 <a name="60" href="#60">60</a>    }
 <a name="61" href="#61">61</a>  
 <a name="62" href="#62">62</a>    @Override
-<a name="63" href="#63">63</a>    <strong class="jxr_keyword">public</strong> Tuple2&lt;GradoopId, Mutation&gt; map(Vertex vertex) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="63" href="#63">63</a>    <strong class="jxr_keyword">public</strong> Tuple2&lt;GradoopId, Mutation&gt; map(EPGMVertex vertex) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="64" href="#64">64</a>      GradoopId key = vertex.getId();
 <a name="65" href="#65">65</a>      Put put = <strong class="jxr_keyword">new</strong> Put(vertexHandler.getRowKey(vertex.getId()));
 <a name="66" href="#66">66</a>      put = vertexHandler.writeVertex(put, vertex);

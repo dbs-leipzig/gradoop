@@ -19,8 +19,8 @@ import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 /**
  * Joins to get the edge target:
@@ -29,12 +29,12 @@ import org.gradoop.common.model.impl.pojo.Vertex;
 @FunctionAnnotation.ForwardedFieldsFirst({&quot;f0-&gt;f0&quot;, &quot;f2-&gt;f1&quot;})
 @FunctionAnnotation.ReadFieldsSecond(&quot;properties&quot;)
 public class EdgeTargetVertexJoin implements
-  JoinFunction&lt;Tuple3&lt;Edge, GradoopId, Boolean&gt;, Vertex, Tuple3&lt;Edge, Boolean, Boolean&gt;&gt; {
+  JoinFunction&lt;Tuple3&lt;EPGMEdge, GradoopId, Boolean&gt;, EPGMVertex, Tuple3&lt;EPGMEdge, Boolean, Boolean&gt;&gt; {
 
   /**
    *  Reduce object instantiations
    */
-  private Tuple3&lt;Edge, Boolean, Boolean&gt; reuse;
+  private Tuple3&lt;EPGMEdge, Boolean, Boolean&gt; reuse;
 
   /**
    * Property key of vertex value
@@ -52,8 +52,8 @@ public class EdgeTargetVertexJoin implements
 <span class="fc" id="L52">  }</span>
 
   @Override
-  public Tuple3&lt;Edge, Boolean, Boolean&gt; join(Tuple3&lt;Edge, GradoopId, Boolean&gt; interim,
-    Vertex vertex) {
+  public Tuple3&lt;EPGMEdge, Boolean, Boolean&gt; join(Tuple3&lt;EPGMEdge, GradoopId, Boolean&gt; interim,
+    EPGMVertex vertex) {
 <span class="fc" id="L57">    reuse.f0 = interim.f0;</span>
 <span class="fc" id="L58">    reuse.f1 = interim.f2;</span>
 <span class="fc" id="L59">    reuse.f2 = vertex.getPropertyValue(propertyKey).getBoolean();</span>

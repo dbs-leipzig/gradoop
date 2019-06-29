@@ -19,8 +19,8 @@ import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.dataintegration.transformation.impl.Neighborhood;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 
@@ -33,7 +33,7 @@ import java.util.Objects;
  * This CoGroup operation creates a list of neighbors for each vertex.
  */
 public class CreateNeighborList
-  implements CoGroupFunction&lt;Edge, Vertex, Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; {
+  implements CoGroupFunction&lt;EPGMEdge, EPGMVertex, Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; {
 
   /**
    * The edge direction to consider.
@@ -43,7 +43,7 @@ public class CreateNeighborList
   /**
    * Reduce object instantiations.
    */
-  private final Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt; reuse;
+  private final Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt; reuse;
 
   /**
    * The constructor for the creation of neighbor lists.
@@ -56,15 +56,15 @@ public class CreateNeighborList
 <span class="fc" id="L56">  }</span>
 
   @Override
-  public void coGroup(Iterable&lt;Edge&gt; edges, Iterable&lt;Vertex&gt; vertex,
-                      Collector&lt;Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; out) {
+  public void coGroup(Iterable&lt;EPGMEdge&gt; edges, Iterable&lt;EPGMVertex&gt; vertex,
+                      Collector&lt;Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; out) {
     // should only contain one or no vertex
-<span class="fc" id="L62">    Iterator&lt;Vertex&gt; vertexIterator = vertex.iterator();</span>
+<span class="fc" id="L62">    Iterator&lt;EPGMVertex&gt; vertexIterator = vertex.iterator();</span>
 <span class="fc bfc" id="L63" title="All 2 branches covered.">    if (vertexIterator.hasNext()) {</span>
-<span class="fc" id="L64">      Vertex v = vertexIterator.next();</span>
+<span class="fc" id="L64">      EPGMVertex v = vertexIterator.next();</span>
 
 <span class="fc" id="L66">      List&lt;NeighborhoodVertex&gt; neighbors = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L67" title="All 2 branches covered.">      for (Edge e : edges) {</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">      for (EPGMEdge e : edges) {</span>
 <span class="fc" id="L68">        neighbors.add(new NeighborhoodVertex(getNeighborId(v.getId(), e), e.getLabel()));</span>
 <span class="fc" id="L69">      }</span>
 
@@ -81,7 +81,7 @@ public class CreateNeighborList
    * @param edge     The edge the neighbor id is taken from.
    * @return The GradoopId of the neighbor vertex.
    */
-  private GradoopId getNeighborId(GradoopId vertexId, Edge edge) {
+  private GradoopId getNeighborId(GradoopId vertexId, EPGMEdge edge) {
 <span class="pc bfc" id="L85" title="All 3 branches covered.">    switch (edgeDirection) {</span>
     case INCOMING:
 <span class="fc" id="L87">      return edge.getSourceId();</span>

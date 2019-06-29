@@ -25,7 +25,7 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.grouping.functions;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMElement;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Element;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValueList;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.grouping.Grouping;
@@ -90,7 +90,7 @@
 <a name="80" href="#80">80</a>  <em class="jxr_javadoccomment">   * @param labelGroup label group to be assigned</em>
 <a name="81" href="#81">81</a>  <em class="jxr_javadoccomment">   * @throws IOException on failure</em>
 <a name="82" href="#82">82</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="83" href="#83">83</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> setGroupItem(<a href="../../../../../../../../org/gradoop/flink/model/impl/operators/grouping/tuples/GroupItem.html">GroupItem</a> groupItem, EPGMElement element, <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/grouping/tuples/LabelGroup.html">LabelGroup</a> labelGroup)
+<a name="83" href="#83">83</a>    <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">void</strong> setGroupItem(<a href="../../../../../../../../org/gradoop/flink/model/impl/operators/grouping/tuples/GroupItem.html">GroupItem</a> groupItem, Element element, <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/grouping/tuples/LabelGroup.html">LabelGroup</a> labelGroup)
 <a name="84" href="#84">84</a>      <strong class="jxr_keyword">throws</strong> IOException {
 <a name="85" href="#85">85</a>      <em class="jxr_comment">// stores all, in the label group specified, grouping values of the element, if the element</em>
 <a name="86" href="#86">86</a>      <em class="jxr_comment">// does not have a property a null property value is stored</em>

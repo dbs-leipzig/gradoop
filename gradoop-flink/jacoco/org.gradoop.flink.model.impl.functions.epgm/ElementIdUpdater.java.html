@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 
 
 /**
@@ -30,7 +30,7 @@ import org.gradoop.common.model.impl.pojo.Element;
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;graphIds;label;properties&quot;)
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;*-&gt;id&quot;)
-<span class="fc" id="L33">public class ElementIdUpdater&lt;EL extends Element&gt;</span>
+<span class="fc" id="L33">public class ElementIdUpdater&lt;EL extends EPGMElement&gt;</span>
   implements MapFunction&lt;Tuple2&lt;EL, GradoopId&gt;, EL&gt; {
 
   @Override

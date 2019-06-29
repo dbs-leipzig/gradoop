@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.average;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueUtils;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -42,7 +42,7 @@ public interface Average extends AggregateFunction {
 
   /**
    * The default value used internally in this aggregation.
-   * Implementations of {@link #getIncrement(EPGMElement)} should return this value when the
+   * Implementations of {@link #getIncrement(Element)} should return this value when the
    * element is ignored, i.e. when it does not have the attribute aggregated by this function.
    */
 <span class="fc" id="L48">  PropertyValue IGNORED_VALUE = PropertyValue.create(</span>

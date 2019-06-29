@@ -22,15 +22,15 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
 
 /**
  * Initializes an EPGM edge from the given {@link ImportEdge}.
  *
- * @param &lt;K&gt; Import Edge/Vertex identifier type
+ * @param &lt;K&gt; Import EPGMEdge/EPGMVertex identifier type
  */
 @FunctionAnnotation.ForwardedFieldsFirst(
   &quot;f2-&gt;f0;&quot; +           // import target vertex id
@@ -40,19 +40,19 @@ import org.gradoop.flink.io.impl.graph.tuples.ImportEdge;
   &quot;f1-&gt;f1.sourceId&quot;     // EPGM source vertex id
 )
 public class InitEdge&lt;K extends Comparable&lt;K&gt;&gt;
-  extends InitElement&lt;Edge, K&gt;
-  implements JoinFunction&lt;ImportEdge&lt;K&gt;, Tuple2&lt;K, GradoopId&gt;, Tuple2&lt;K, Edge&gt;&gt;,
-  ResultTypeQueryable&lt;Tuple2&lt;K, Edge&gt;&gt; {
+  extends InitElement&lt;EPGMEdge, K&gt;
+  implements JoinFunction&lt;ImportEdge&lt;K&gt;, Tuple2&lt;K, GradoopId&gt;, Tuple2&lt;K, EPGMEdge&gt;&gt;,
+  ResultTypeQueryable&lt;Tuple2&lt;K, EPGMEdge&gt;&gt; {
 
   /**
    * Used to create new EPGM edge.
    */
-  private final EPGMEdgeFactory&lt;Edge&gt; edgeFactory;
+  private final EdgeFactory&lt;EPGMEdge&gt; edgeFactory;
 
   /**
    * Reduce object instantiation.
    */
-  private final Tuple2&lt;K, Edge&gt; reuseTuple;
+  private final Tuple2&lt;K, EPGMEdge&gt; reuseTuple;
 
   /**
    * Creates a new join function.
@@ -62,7 +62,7 @@ public class InitEdge&lt;K extends Comparable&lt;K&gt;&gt;
    *                            (can be {@code null})
    * @param keyTypeInfo         type info for the import edge identifier
    */
-  public InitEdge(EPGMEdgeFactory&lt;Edge&gt; epgmEdgeFactory, String lineagePropertyKey,
+  public InitEdge(EdgeFactory&lt;EPGMEdge&gt; epgmEdgeFactory, String lineagePropertyKey,
     TypeInformation&lt;K&gt; keyTypeInfo) {
 <span class="fc" id="L67">    super(lineagePropertyKey, keyTypeInfo);</span>
 <span class="fc" id="L68">    this.edgeFactory        = epgmEdgeFactory;</span>
@@ -79,11 +79,11 @@ public class InitEdge&lt;K extends Comparable&lt;K&gt;&gt;
    * @throws Exception on failure
    */
   @Override
-  public Tuple2&lt;K, Edge&gt; join(ImportEdge&lt;K&gt; importEdge,
+  public Tuple2&lt;K, EPGMEdge&gt; join(ImportEdge&lt;K&gt; importEdge,
     Tuple2&lt;K, GradoopId&gt; vertexIdPair) throws Exception {
 <span class="fc" id="L84">    reuseTuple.f0 = importEdge.getTargetId();</span>
 
-<span class="fc" id="L86">    Edge edge = edgeFactory.createEdge(importEdge.getLabel(),</span>
+<span class="fc" id="L86">    EPGMEdge edge = edgeFactory.createEdge(importEdge.getLabel(),</span>
 <span class="fc" id="L87">      vertexIdPair.f1, GradoopId.get(), importEdge.getProperties());</span>
 
 <span class="fc" id="L89">    reuseTuple.f1 = updateLineage(edge, importEdge.getId());</span>
@@ -92,7 +92,7 @@ public class InitEdge&lt;K extends Comparable&lt;K&gt;&gt;
   }
 
   @Override
-  public TypeInformation&lt;Tuple2&lt;K, Edge&gt;&gt; getProducedType() {
+  public TypeInformation&lt;Tuple2&lt;K, EPGMEdge&gt;&gt; getProducedType() {
 <span class="fc" id="L96">    return new TupleTypeInfo&lt;&gt;(getKeyTypeInfo(),</span>
 <span class="fc" id="L97">      TypeExtractor.createTypeInfo(edgeFactory.getType()));</span>
   }

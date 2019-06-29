@@ -27,9 +27,9 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.junit.Before;
@@ -57,12 +57,12 @@
 <a name="47" href="#47">47</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * The function to test.</em>
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="50" href="#50">50</a>    <strong class="jxr_keyword">private</strong> CreateCartesianNeighborhoodEdges&lt;Vertex, Edge&gt; toTest;
+<a name="50" href="#50">50</a>    <strong class="jxr_keyword">private</strong> CreateCartesianNeighborhoodEdges&lt;EPGMVertex, EPGMEdge&gt; toTest;
 <a name="51" href="#51">51</a>  
 <a name="52" href="#52">52</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   * The factory used to create new vertices.</em>
 <a name="54" href="#54">54</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="55" href="#55">55</a>    <strong class="jxr_keyword">private</strong> VertexFactory vertexFactory;
+<a name="55" href="#55">55</a>    <strong class="jxr_keyword">private</strong> EPGMVertexFactory vertexFactory;
 <a name="56" href="#56">56</a>  
 <a name="57" href="#57">57</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * Set this test up, creating the function to test.</em>
@@ -80,10 +80,10 @@
 <a name="70" href="#70">70</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="71" href="#71">71</a>    @Test
 <a name="72" href="#72">72</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testWithEmptyNeighborhood() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="73" href="#73">73</a>      Vertex someVertex = vertexFactory.createVertex();
-<a name="74" href="#74">74</a>      Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt; inputEmpty = <strong class="jxr_keyword">new</strong> Tuple2&lt;&gt;(someVertex,
+<a name="73" href="#73">73</a>      EPGMVertex someVertex = vertexFactory.createVertex();
+<a name="74" href="#74">74</a>      Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt; inputEmpty = <strong class="jxr_keyword">new</strong> Tuple2&lt;&gt;(someVertex,
 <a name="75" href="#75">75</a>        Collections.emptyList());
-<a name="76" href="#76">76</a>      List&lt;Edge&gt; result = getExecutionEnvironment().fromElements(inputEmpty)
+<a name="76" href="#76">76</a>      List&lt;EPGMEdge&gt; result = getExecutionEnvironment().fromElements(inputEmpty)
 <a name="77" href="#77">77</a>        .flatMap(toTest).collect();
 <a name="78" href="#78">78</a>      assertEquals(0, result.size());
 <a name="79" href="#79">79</a>    }
@@ -95,21 +95,21 @@
 <a name="85" href="#85">85</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="86" href="#86">86</a>    @Test
 <a name="87" href="#87">87</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testWithNonEmptyNeighborhood() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="88" href="#88">88</a>      Vertex someVertex = vertexFactory.createVertex();
+<a name="88" href="#88">88</a>      EPGMVertex someVertex = vertexFactory.createVertex();
 <a name="89" href="#89">89</a>      <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">int</strong> count = 10;
 <a name="90" href="#90">90</a>      List&lt;GradoopId&gt; ids = Stream.generate(GradoopId::get).limit(count).collect(Collectors.toList());
 <a name="91" href="#91">91</a>      <em class="jxr_comment">// Create some dummy neighborhood vertex pojos.</em>
 <a name="92" href="#92">92</a>      List&lt;NeighborhoodVertex&gt; vertexPojos = ids.stream()
 <a name="93" href="#93">93</a>        .map(id -&gt; <strong class="jxr_keyword">new</strong> NeighborhoodVertex(id, <span class="jxr_string">""</span>))
 <a name="94" href="#94">94</a>        .collect(Collectors.toList());
-<a name="95" href="#95">95</a>      Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt; inputNonEmpty = <strong class="jxr_keyword">new</strong> Tuple2&lt;&gt;(someVertex,
+<a name="95" href="#95">95</a>      Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt; inputNonEmpty = <strong class="jxr_keyword">new</strong> Tuple2&lt;&gt;(someVertex,
 <a name="96" href="#96">96</a>        vertexPojos);
-<a name="97" href="#97">97</a>      List&lt;Edge&gt; result = getExecutionEnvironment().fromElements(inputNonEmpty)
+<a name="97" href="#97">97</a>      List&lt;EPGMEdge&gt; result = getExecutionEnvironment().fromElements(inputNonEmpty)
 <a name="98" href="#98">98</a>        .flatMap(toTest).collect();
 <a name="99" href="#99">99</a>      <em class="jxr_comment">// Connect each neighbor with another neighbor, except for itself.</em>
 <a name="100" href="#100">100</a>     assertEquals(count * (count - 1), result.size());
 <a name="101" href="#101">101</a>     <em class="jxr_comment">// The result should not contain loops</em>
-<a name="102" href="#102">102</a>     <strong class="jxr_keyword">for</strong> (Edge edge : result) {
+<a name="102" href="#102">102</a>     <strong class="jxr_keyword">for</strong> (EPGMEdge edge : result) {
 <a name="103" href="#103">103</a>       assertNotEquals(edge.getSourceId(), edge.getTargetId());
 <a name="104" href="#104">104</a>     }
 <a name="105" href="#105">105</a>     <em class="jxr_comment">// or duplicate edges.</em>

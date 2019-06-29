@@ -29,7 +29,7 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.GroupReduceFunction;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphElement;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> java.util.Set;
@@ -38,7 +38,7 @@
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * (graphId, element),.. =&gt; (graphId, {element,..})</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * @param &lt;EL&gt; graph element type</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> GraphElementSet&lt;EL <strong class="jxr_keyword">extends</strong> GraphElement&gt; implements
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> GraphElementSet&lt;EL <strong class="jxr_keyword">extends</strong> EPGMGraphElement&gt; implements
 <a name="32" href="#32">32</a>    GroupReduceFunction&lt;Tuple2&lt;GradoopId, EL&gt;, Tuple2&lt;GradoopId, Set&lt;EL&gt;&gt;&gt; {
 <a name="33" href="#33">33</a>  
 <a name="34" href="#34">34</a>    @Override

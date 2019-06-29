@@ -28,9 +28,9 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
@@ -102,7 +102,7 @@
 <a name="92" href="#92">92</a>      <em class="jxr_comment">// Missing in the theoric definition: creating a new header</em>
 <a name="93" href="#93">93</a>      GradoopId newGraphid = GradoopId.get();
 <a name="94" href="#94">94</a>  
-<a name="95" href="#95">95</a>      DataSet&lt;GraphHead&gt; gh = searchGraph.getGraphHead()
+<a name="95" href="#95">95</a>      DataSet&lt;EPGMGraphHead&gt; gh = searchGraph.getGraphHead()
 <a name="96" href="#96">96</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/fusion/functions/MapGraphHeadForNewGraph.html">MapGraphHeadForNewGraph</a>(newGraphid));
 <a name="97" href="#97">97</a>  
 <a name="98" href="#98">98</a>      DataSet&lt;GradoopId&gt; patternVertexIds = graphPatterns.getVertices()
@@ -112,7 +112,7 @@
 <a name="102" href="#102">102</a> 
 <a name="103" href="#103">103</a>     <em class="jxr_comment">// PHASE 1: Induced Subgraphs</em>
 <a name="104" href="#104">104</a>     <em class="jxr_comment">// Associate each vertex to its graph id</em>
-<a name="105" href="#105">105</a>     DataSet&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; patternVerticesWithGraphIDs =
+<a name="105" href="#105">105</a>     DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; patternVerticesWithGraphIDs =
 <a name="106" href="#106">106</a>         graphPatterns.getVertices()
 <a name="107" href="#107">107</a>         .coGroup(searchGraph.getVertices())
 <a name="108" href="#108">108</a>         .where(<strong class="jxr_keyword">new</strong> Id&lt;&gt;()).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
@@ -120,22 +120,22 @@
 <a name="110" href="#110">110</a>         .flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/fusion/functions/MapVertexToPairWithGraphId.html">MapVertexToPairWithGraphId</a>());
 <a name="111" href="#111">111</a> 
 <a name="112" href="#112">112</a>     <em class="jxr_comment">// Associate each gid in hypervertices.H to the merged vertices</em>
-<a name="113" href="#113">113</a>     DataSet&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; mergedVertices =
+<a name="113" href="#113">113</a>     DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; mergedVertices =
 <a name="114" href="#114">114</a>         graphPatterns.getGraphHeads()
 <a name="115" href="#115">115</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/fusion/functions/CoGroupGraphHeadToVertex.html">CoGroupGraphHeadToVertex</a>());
 <a name="116" href="#116">116</a> 
 <a name="117" href="#117">117</a>     <em class="jxr_comment">// PHASE 2: Recreating the vertices</em>
-<a name="118" href="#118">118</a>     DataSet&lt;Vertex&gt; vi = searchGraph.getVertices()
+<a name="118" href="#118">118</a>     DataSet&lt;EPGMVertex&gt; vi = searchGraph.getVertices()
 <a name="119" href="#119">119</a>       .filter(<strong class="jxr_keyword">new</strong> IdNotInBroadcast&lt;&gt;())
 <a name="120" href="#120">120</a>       .withBroadcastSet(patternVertexIds, IdNotInBroadcast.IDS);
 <a name="121" href="#121">121</a> 
-<a name="122" href="#122">122</a>     DataSet&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; idJoin = patternVerticesWithGraphIDs
+<a name="122" href="#122">122</a>     DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; idJoin = patternVerticesWithGraphIDs
 <a name="123" href="#123">123</a>       .coGroup(mergedVertices)
 <a name="124" href="#124">124</a>       .where(<strong class="jxr_keyword">new</strong> Value1Of2&lt;&gt;()).equalTo(<strong class="jxr_keyword">new</strong> Value1Of2&lt;&gt;())
 <a name="125" href="#125">125</a>       .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/fusion/functions/CoGroupAssociateOldVerticesWithNewIds.html">CoGroupAssociateOldVerticesWithNewIds</a>())
 <a name="126" href="#126">126</a>       .union(vi.map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/operators/fusion/functions/MapVerticesAsTuplesWithNullId.html">MapVerticesAsTuplesWithNullId</a>()));
 <a name="127" href="#127">127</a> 
-<a name="128" href="#128">128</a>     DataSet&lt;Vertex&gt; vToRet = mergedVertices
+<a name="128" href="#128">128</a>     DataSet&lt;EPGMVertex&gt; vToRet = mergedVertices
 <a name="129" href="#129">129</a>       .coGroup(patternVerticesWithGraphIDs)
 <a name="130" href="#130">130</a>       .where(<strong class="jxr_keyword">new</strong> Value1Of2&lt;&gt;()).equalTo(<strong class="jxr_keyword">new</strong> Value1Of2&lt;&gt;())
 <a name="131" href="#131">131</a>       .with(<strong class="jxr_keyword">new</strong> LeftSide&lt;&gt;())
@@ -144,7 +144,7 @@
 <a name="134" href="#134">134</a>       .map(<strong class="jxr_keyword">new</strong> MapFunctionAddGraphElementToGraph2&lt;&gt;(newGraphid));
 <a name="135" href="#135">135</a> 
 <a name="136" href="#136">136</a>     <em class="jxr_comment">// PHASE 3: Recreating the edges</em>
-<a name="137" href="#137">137</a>     DataSet&lt;Edge&gt; edges = searchGraph.getEdges()
+<a name="137" href="#137">137</a>     DataSet&lt;EPGMEdge&gt; edges = searchGraph.getEdges()
 <a name="138" href="#138">138</a>       .filter(<strong class="jxr_keyword">new</strong> IdNotInBroadcast&lt;&gt;())
 <a name="139" href="#139">139</a>       .withBroadcastSet(patternEdgeIds, IdNotInBroadcast.IDS)
 <a name="140" href="#140">140</a>       .leftOuterJoin(idJoin)

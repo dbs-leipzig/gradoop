@@ -35,8 +35,8 @@
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.types.Row;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.metadata.MetaData;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.metadata.PropertyMetaData;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.csv.metadata.CSVMetaDataSource;
 <a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.Operator;
@@ -106,12 +106,12 @@
 <a name="96" href="#96">96</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="97" href="#97">97</a>  <em class="jxr_javadoccomment">   * Mapping between the long ids and the original vertices.</em>
 <a name="98" href="#98">98</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="99" href="#99">99</a>    <strong class="jxr_keyword">private</strong> DataSet&lt;Tuple2&lt;Long, Vertex&gt;&gt; verticesWithIds;
+<a name="99" href="#99">99</a>    <strong class="jxr_keyword">private</strong> DataSet&lt;Tuple2&lt;Long, EPGMVertex&gt;&gt; verticesWithIds;
 <a name="100" href="#100">100</a> 
 <a name="101" href="#101">101</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="102" href="#102">102</a> <em class="jxr_javadoccomment">   * Mapping between the long ids and the original edges.</em>
 <a name="103" href="#103">103</a> <em class="jxr_javadoccomment">   */</em>
-<a name="104" href="#104">104</a>   <strong class="jxr_keyword">private</strong> DataSet&lt;Tuple2&lt;Long, Edge&gt;&gt; edgesWithIds;
+<a name="104" href="#104">104</a>   <strong class="jxr_keyword">private</strong> DataSet&lt;Tuple2&lt;Long, EPGMEdge&gt;&gt; edgesWithIds;
 <a name="105" href="#105">105</a> 
 <a name="106" href="#106">106</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="107" href="#107">107</a> <em class="jxr_javadoccomment">   * Constructor</em>
@@ -201,9 +201,9 @@
 <a name="191" href="#191">191</a> <em class="jxr_javadoccomment">   * @return a graph with transformed vertex and edge properties</em>
 <a name="192" href="#192">192</a> <em class="jxr_javadoccomment">   */</em>
 <a name="193" href="#193">193</a>   <strong class="jxr_keyword">private</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> transformGraphProperties(<a href="../../../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph) {
-<a name="194" href="#194">194</a>     DataSet&lt;Vertex&gt; transformedVertices = graph.getVertices()
+<a name="194" href="#194">194</a>     DataSet&lt;EPGMVertex&gt; transformedVertices = graph.getVertices()
 <a name="195" href="#195">195</a>       .map(<strong class="jxr_keyword">new</strong> PropertyEncoder&lt;&gt;());
-<a name="196" href="#196">196</a>     DataSet&lt;Edge&gt; transformedEdges = graph.getEdges()
+<a name="196" href="#196">196</a>     DataSet&lt;EPGMEdge&gt; transformedEdges = graph.getEdges()
 <a name="197" href="#197">197</a>       .map(<strong class="jxr_keyword">new</strong> PropertyEncoder&lt;&gt;());
 <a name="198" href="#198">198</a> 
 <a name="199" href="#199">199</a>     <strong class="jxr_keyword">return</strong> graph.getFactory().fromDataSets(transformedVertices, transformedEdges);
@@ -243,7 +243,7 @@
 <a name="233" href="#233">233</a>       RowTypeInfo info = <strong class="jxr_keyword">new</strong> RowTypeInfo(types);
 <a name="234" href="#234">234</a> 
 <a name="235" href="#235">235</a>       <em class="jxr_comment">// zip all vertices of one label with a globally unique id</em>
-<a name="236" href="#236">236</a>       DataSet&lt;Tuple2&lt;Long, Vertex&gt;&gt; verticesByLabelWithIds =
+<a name="236" href="#236">236</a>       DataSet&lt;Tuple2&lt;Long, EPGMVertex&gt;&gt; verticesByLabelWithIds =
 <a name="237" href="#237">237</a>         verticesWithIds.filter(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/functions/VertexLabelFilter.html">VertexLabelFilter</a>(label));
 <a name="238" href="#238">238</a> 
 <a name="239" href="#239">239</a>       <em class="jxr_comment">// map vertices to row and wrap in scala DataSet</em>

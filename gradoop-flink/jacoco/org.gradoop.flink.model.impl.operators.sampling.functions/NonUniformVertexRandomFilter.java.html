@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 import java.util.Random;
 
@@ -27,7 +27,7 @@ import java.util.Random;
  *
  * @param &lt;V&gt; EPGM vertex type
  */
-public class NonUniformVertexRandomFilter&lt;V extends Vertex&gt;
+public class NonUniformVertexRandomFilter&lt;V extends EPGMVertex&gt;
 implements FilterFunction&lt;V&gt; {
   /**
    * Threshold to decide if a vertex needs to be filtered.

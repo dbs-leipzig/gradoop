@@ -25,9 +25,9 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.io.impl.gdl;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMEdge;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHead;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Property;
@@ -47,7 +47,7 @@
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt; vertex type</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; edge type</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="40" href="#40">40</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> GDLEncoder&lt;G <strong class="jxr_keyword">extends</strong> EPGMGraphHead, V <strong class="jxr_keyword">extends</strong> EPGMVertex, E <strong class="jxr_keyword">extends</strong> EPGMEdge&gt; {
+<a name="40" href="#40">40</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> GDLEncoder&lt;G <strong class="jxr_keyword">extends</strong> GraphHead, V <strong class="jxr_keyword">extends</strong> Vertex, E <strong class="jxr_keyword">extends</strong> Edge&gt; {
 <a name="41" href="#41">41</a>  
 <a name="42" href="#42">42</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="43" href="#43">43</a>  <em class="jxr_javadoccomment">   * Marks the beginning of the definition of vertices and edges.</em>

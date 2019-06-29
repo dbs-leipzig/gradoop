@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.sampling.functions;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -51,7 +51,7 @@ public class FilterVerticesWithDegreeOtherThanGiven implements UnaryGraphToGraph
       SamplingConstants.OUT_DEGREE_PROPERTY_KEY,
       true);
 
-<span class="fc" id="L54">    DataSet&lt;Vertex&gt; newVertices = distinctVertexDegrees.execute(graph).getVertices()</span>
+<span class="fc" id="L54">    DataSet&lt;EPGMVertex&gt; newVertices = distinctVertexDegrees.execute(graph).getVertices()</span>
 <span class="fc" id="L55">      .filter(new VertexWithDegreeFilter&lt;&gt;(degree, SamplingConstants.DEGREE_PROPERTY_KEY))</span>
 <span class="fc" id="L56">      .map(new PropertyRemover&lt;&gt;(SamplingConstants.DEGREE_PROPERTY_KEY))</span>
 <span class="fc" id="L57">      .map(new PropertyRemover&lt;&gt;(SamplingConstants.IN_DEGREE_PROPERTY_KEY))</span>

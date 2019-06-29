@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.average;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 
@@ -59,7 +59,7 @@ public class AverageProperty extends BaseAggregateFunction implements Average {
 <span class="fc" id="L59">  }</span>
 
   @Override
-  public PropertyValue getIncrement(EPGMElement element) {
+  public PropertyValue getIncrement(Element element) {
 <span class="fc" id="L63">    PropertyValue value = element.getPropertyValue(propertyKey);</span>
 <span class="fc bfc" id="L64" title="All 2 branches covered.">    if (value == null) {</span>
 <span class="fc" id="L65">      return Average.IGNORED_VALUE;</span>

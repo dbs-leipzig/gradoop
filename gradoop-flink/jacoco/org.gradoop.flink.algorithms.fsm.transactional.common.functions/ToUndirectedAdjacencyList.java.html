@@ -18,8 +18,8 @@ package org.gradoop.flink.algorithms.fsm.transactional.common.functions;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.tuples.IdWithLabel;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListCell;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
@@ -40,8 +40,8 @@ import java.util.Set;
   public AdjacencyList&lt;GradoopId, String, IdWithLabel, IdWithLabel&gt; map(
     GraphTransaction transaction) throws Exception {
 
-<span class="nc" id="L43">    Set&lt;Vertex&gt; vertices = transaction.getVertices();</span>
-<span class="nc" id="L44">    Set&lt;Edge&gt; edges = transaction.getEdges();</span>
+<span class="nc" id="L43">    Set&lt;EPGMVertex&gt; vertices = transaction.getVertices();</span>
+<span class="nc" id="L44">    Set&lt;EPGMEdge&gt; edges = transaction.getEdges();</span>
 
 <span class="nc" id="L46">    int vertexCount = vertices.size();</span>
 
@@ -51,13 +51,13 @@ import java.util.Set;
 <span class="nc" id="L51">    Map&lt;GradoopId, String&gt; labels = Maps.newHashMapWithExpectedSize(vertexCount);</span>
 
     // VERTICES
-<span class="nc bnc" id="L54" title="All 2 branches missed.">    for (Vertex vertex : vertices) {</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">    for (EPGMVertex vertex : vertices) {</span>
 <span class="nc" id="L55">      labels.put(vertex.getId(), vertex.getLabel());</span>
 <span class="nc" id="L56">    }</span>
 
     // EDGES
 
-<span class="nc bnc" id="L60" title="All 2 branches missed.">    for (Edge edge : edges) {</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">    for (EPGMEdge edge : edges) {</span>
 <span class="nc" id="L61">      GradoopId sourceId = edge.getSourceId();</span>
 <span class="nc" id="L62">      GradoopId targetId = edge.getTargetId();</span>
 

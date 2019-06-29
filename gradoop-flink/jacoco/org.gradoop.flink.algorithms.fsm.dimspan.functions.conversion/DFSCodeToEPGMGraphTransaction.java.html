@@ -20,9 +20,9 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 import org.gradoop.flink.algorithms.fsm.dimspan.config.DataflowStep;
@@ -103,7 +103,7 @@ public class DFSCodeToEPGMGraphTransaction
 
 
     // GRAPH HEAD
-<span class="fc" id="L106">    GraphHead graphHead = new GraphHead(GradoopId.get(), &quot;&quot;, null);</span>
+<span class="fc" id="L106">    EPGMGraphHead graphHead = new EPGMGraphHead(GradoopId.get(), &quot;&quot;, null);</span>
 <span class="fc" id="L107">    graphHead.setLabel(DIMSpanConstants.FREQUENT_PATTERN_LABEL);</span>
 <span class="fc" id="L108">    graphHead.setProperty(DIMSpanConstants.SUPPORT_KEY, (float) frequency / graphCount);</span>
 
@@ -114,21 +114,21 @@ public class DFSCodeToEPGMGraphTransaction
 
 <span class="fc" id="L115">    GradoopId[] vertexIds = new GradoopId[vertexLabels.length];</span>
 
-<span class="fc" id="L117">    Set&lt;Vertex&gt; vertices = Sets.newHashSetWithExpectedSize(vertexLabels.length);</span>
+<span class="fc" id="L117">    Set&lt;EPGMVertex&gt; vertices = Sets.newHashSetWithExpectedSize(vertexLabels.length);</span>
 
 <span class="fc" id="L119">    int intId = 0;</span>
 <span class="fc bfc" id="L120" title="All 2 branches covered.">    for (int intLabel : vertexLabels) {</span>
 <span class="fc" id="L121">      String label = vertexDictionary[intLabel];</span>
 
 <span class="fc" id="L123">      GradoopId gradoopId = GradoopId.get();</span>
-<span class="fc" id="L124">      vertices.add(new Vertex(gradoopId, label, null, graphIds));</span>
+<span class="fc" id="L124">      vertices.add(new EPGMVertex(gradoopId, label, null, graphIds));</span>
 
 <span class="fc" id="L126">      vertexIds[intId] = gradoopId;</span>
 <span class="fc" id="L127">      intId++;</span>
     }
 
     // EDGES
-<span class="fc" id="L131">    Set&lt;Edge&gt; edges = Sets.newHashSet();</span>
+<span class="fc" id="L131">    Set&lt;EPGMEdge&gt; edges = Sets.newHashSet();</span>
 
 <span class="fc bfc" id="L133" title="All 2 branches covered.">    for (int edgeId = 0; edgeId &lt; graphUtils.getEdgeCount(pattern); edgeId++) {</span>
 <span class="fc" id="L134">      String label = edgeDictionary[graphUtils.getEdgeLabel(pattern, edgeId)];</span>
@@ -144,7 +144,7 @@ public class DFSCodeToEPGMGraphTransaction
 <span class="fc" id="L144">        targetId = vertexIds[graphUtils.getFromId(pattern, edgeId)];</span>
       }
 
-<span class="fc" id="L147">      edges.add(new Edge(GradoopId.get(), label, sourceId, targetId, null, graphIds));</span>
+<span class="fc" id="L147">      edges.add(new EPGMEdge(GradoopId.get(), label, sourceId, targetId, null, graphIds));</span>
     }
 
 <span class="fc" id="L150">    return new GraphTransaction(graphHead, vertices, edges);</span>

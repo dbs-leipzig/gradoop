@@ -15,9 +15,9 @@
  */
 package org.gradoop.dataintegration.transformation.impl;
 
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.dataintegration.transformation.api.PropertyTransformationFunction;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
@@ -37,9 +37,9 @@ import org.gradoop.flink.model.impl.operators.transformation.Transformation;
  * @param &lt;GC&gt; type of the graph collection instance
  */
 public class PropertyTransformation&lt;
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph&lt;G, V, E, LG, GC&gt;,
   GC extends BaseGraphCollection&lt;G, V, E, LG, GC&gt;&gt;
   implements UnaryBaseGraphToBaseGraphOperator&lt;LG&gt; {

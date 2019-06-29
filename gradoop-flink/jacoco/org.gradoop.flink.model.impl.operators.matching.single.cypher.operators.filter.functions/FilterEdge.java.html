@@ -16,13 +16,13 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter.functions;
 
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 
 /**
- * Filters an Edge by a given predicate
+ * Filters an EPGMEdge by a given predicate
  */
-public class FilterEdge implements FilterFunction&lt;Edge&gt; {
+public class FilterEdge implements FilterFunction&lt;EPGMEdge&gt; {
 
   /**
    * Filter predicate
@@ -39,7 +39,7 @@ public class FilterEdge implements FilterFunction&lt;Edge&gt; {
 <span class="nc" id="L39">  }</span>
 
   @Override
-  public boolean filter(Edge edge) throws Exception {
+  public boolean filter(EPGMEdge edge) throws Exception {
 <span class="nc" id="L43">    return predicates.evaluate(edge);</span>
   }
 }

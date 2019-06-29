@@ -31,10 +31,10 @@
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Put;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.client.Result;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.util.Bytes;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMEdge;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EdgeFactory;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.common.predicate.query.ElementQuery;
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.hbase.api.EdgeHandler;
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.hbase.constants.HBaseConstants;
@@ -46,7 +46,7 @@
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> * Used to read/write EPGM edge data from/to a HBase table.</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> * &lt;p&gt;</em>
-<a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> * EPGMEdge data in HBase:</em>
+<a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> * Edge data in HBase:</em>
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment"> * &lt;p&gt;</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment"> * |---------|---------------------------------------------|-------|</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment"> * | row-key | meta                                        | data  |</em>
@@ -75,19 +75,19 @@
 <a name="65" href="#65">65</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="66" href="#66">66</a>  <em class="jxr_javadoccomment">   * Creates edge data objects from the rows.</em>
 <a name="67" href="#67">67</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="68" href="#68">68</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> EPGMEdgeFactory&lt;Edge&gt; edgeFactory;
+<a name="68" href="#68">68</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> EdgeFactory&lt;EPGMEdge&gt; edgeFactory;
 <a name="69" href="#69">69</a>  
 <a name="70" href="#70">70</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="71" href="#71">71</a>  <em class="jxr_javadoccomment">   * An optional query to define predicates for the graph store.</em>
 <a name="72" href="#72">72</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="73" href="#73">73</a>    <strong class="jxr_keyword">private</strong> ElementQuery&lt;HBaseElementFilter&lt;Edge&gt;&gt; edgeQuery;
+<a name="73" href="#73">73</a>    <strong class="jxr_keyword">private</strong> ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; edgeQuery;
 <a name="74" href="#74">74</a>  
 <a name="75" href="#75">75</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="76" href="#76">76</a>  <em class="jxr_javadoccomment">   * Creates an edge data handler.</em>
 <a name="77" href="#77">77</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="78" href="#78">78</a>  <em class="jxr_javadoccomment">   * @param edgeFactory edge data factory</em>
 <a name="79" href="#79">79</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="80" href="#80">80</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/handler/HBaseEdgeHandler.html">HBaseEdgeHandler</a>(EPGMEdgeFactory&lt;Edge&gt; edgeFactory) {
+<a name="80" href="#80">80</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/handler/HBaseEdgeHandler.html">HBaseEdgeHandler</a>(EdgeFactory&lt;EPGMEdge&gt; edgeFactory) {
 <a name="81" href="#81">81</a>      <strong class="jxr_keyword">this</strong>.edgeFactory = edgeFactory;
 <a name="82" href="#82">82</a>    }
 <a name="83" href="#83">83</a>  
@@ -129,7 +129,7 @@
 <a name="119" href="#119">119</a>   }
 <a name="120" href="#120">120</a> 
 <a name="121" href="#121">121</a>   @Override
-<a name="122" href="#122">122</a>   <strong class="jxr_keyword">public</strong> Put writeEdge(Put put, EPGMEdge edgeData) {
+<a name="122" href="#122">122</a>   <strong class="jxr_keyword">public</strong> Put writeEdge(Put put, Edge edgeData) {
 <a name="123" href="#123">123</a>     writeLabel(put, edgeData);
 <a name="124" href="#124">124</a>     writeSource(put, edgeData.getSourceId());
 <a name="125" href="#125">125</a>     writeTarget(put, edgeData.getTargetId());
@@ -139,19 +139,19 @@
 <a name="129" href="#129">129</a>   }
 <a name="130" href="#130">130</a> 
 <a name="131" href="#131">131</a>   @Override
-<a name="132" href="#132">132</a>   <strong class="jxr_keyword">public</strong> Edge readEdge(Result res) {
+<a name="132" href="#132">132</a>   <strong class="jxr_keyword">public</strong> EPGMEdge readEdge(Result res) {
 <a name="133" href="#133">133</a>     <strong class="jxr_keyword">return</strong> edgeFactory.initEdge(readId(res), readLabel(res), readSourceId(res), readTargetId(res),
 <a name="134" href="#134">134</a>         readProperties(res), readGraphIds(res));
 <a name="135" href="#135">135</a>   }
 <a name="136" href="#136">136</a> 
 <a name="137" href="#137">137</a>   @Override
-<a name="138" href="#138">138</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/api/EdgeHandler.html">EdgeHandler</a> applyQuery(ElementQuery&lt;HBaseElementFilter&lt;Edge&gt;&gt; query) {
+<a name="138" href="#138">138</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/api/EdgeHandler.html">EdgeHandler</a> applyQuery(ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; query) {
 <a name="139" href="#139">139</a>     <strong class="jxr_keyword">this</strong>.edgeQuery = query;
 <a name="140" href="#140">140</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>;
 <a name="141" href="#141">141</a>   }
 <a name="142" href="#142">142</a> 
 <a name="143" href="#143">143</a>   @Override
-<a name="144" href="#144">144</a>   <strong class="jxr_keyword">public</strong> ElementQuery&lt;HBaseElementFilter&lt;Edge&gt;&gt; getQuery() {
+<a name="144" href="#144">144</a>   <strong class="jxr_keyword">public</strong> ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; getQuery() {
 <a name="145" href="#145">145</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">this</strong>.edgeQuery;
 <a name="146" href="#146">146</a>   }
 <a name="147" href="#147">147</a> }

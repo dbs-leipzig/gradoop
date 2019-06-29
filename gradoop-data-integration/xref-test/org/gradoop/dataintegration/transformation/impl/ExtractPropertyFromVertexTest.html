@@ -27,9 +27,9 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.LocalCollectionOutputFormat;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.dataintegration.transformation.impl.config.EdgeDirection;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -69,9 +69,9 @@
 <a name="59" href="#59">59</a>        <span class="jxr_string">"City"</span>, <span class="jxr_string">"name"</span>);
 <a name="60" href="#60">60</a>  
 <a name="61" href="#61">61</a>      LogicalGraph extOneGraph = social.callForGraph(extOne);
-<a name="62" href="#62">62</a>      List&lt;Vertex&gt; city = extOneGraph.getVerticesByLabel(<span class="jxr_string">"City"</span>).collect();
+<a name="62" href="#62">62</a>      List&lt;EPGMVertex&gt; city = extOneGraph.getVerticesByLabel(<span class="jxr_string">"City"</span>).collect();
 <a name="63" href="#63">63</a>      Set&lt;String&gt; cityNames = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;();
-<a name="64" href="#64">64</a>      <strong class="jxr_keyword">for</strong> (Vertex v : city) {
+<a name="64" href="#64">64</a>      <strong class="jxr_keyword">for</strong> (EPGMVertex v : city) {
 <a name="65" href="#65">65</a>        String cityName = v.getPropertyValue(<span class="jxr_string">"name"</span>).getString();
 <a name="66" href="#66">66</a>        Assert.assertTrue(cityName.equals(<span class="jxr_string">"Dresden"</span>) ||
 <a name="67" href="#67">67</a>          cityName.equals(<span class="jxr_string">"Berlin"</span>) ||
@@ -85,7 +85,7 @@
 <a name="75" href="#75">75</a>    }
 <a name="76" href="#76">76</a>  
 <a name="77" href="#77">77</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="78" href="#78">78</a>  <em class="jxr_javadoccomment">   * Tests whether edges are created properly according to Origin to New Vertex direction.</em>
+<a name="78" href="#78">78</a>  <em class="jxr_javadoccomment">   * Tests whether edges are created properly according to Origin to New EPGMVertex direction.</em>
 <a name="79" href="#79">79</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="80" href="#80">80</a>  <em class="jxr_javadoccomment">   * @throws Exception If the data could not be loaded or collected properly.</em>
 <a name="81" href="#81">81</a>  <em class="jxr_javadoccomment">   */</em>
@@ -96,7 +96,7 @@
 <a name="86" href="#86">86</a>    }
 <a name="87" href="#87">87</a>  
 <a name="88" href="#88">88</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="89" href="#89">89</a>  <em class="jxr_javadoccomment">   * Tests whether edges are created properly according to New Vertex to Origin direction.</em>
+<a name="89" href="#89">89</a>  <em class="jxr_javadoccomment">   * Tests whether edges are created properly according to New EPGMVertex to Origin direction.</em>
 <a name="90" href="#90">90</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="91" href="#91">91</a>  <em class="jxr_javadoccomment">   * @throws Exception If the data could not be loaded or collected properly.</em>
 <a name="92" href="#92">92</a>  <em class="jxr_javadoccomment">   */</em>
@@ -135,12 +135,12 @@
 <a name="125" href="#125">125</a>     <strong class="jxr_keyword">long</strong> expectedEdgeCount = direction.equals(EdgeDirection.BIDIRECTIONAL) ? 12 : 6;
 <a name="126" href="#126">126</a>     Assert.assertEquals(expectedEdgeCount, extractedGraph.getEdgesByLabel(<span class="jxr_string">"newLabel"</span>).count());
 <a name="127" href="#127">127</a> 
-<a name="128" href="#128">128</a>     List&lt;Vertex&gt; vertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="128" href="#128">128</a>     List&lt;EPGMVertex&gt; vertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a name="129" href="#129">129</a>     extractedGraph.getVertices()
 <a name="130" href="#130">130</a>       .filter(<strong class="jxr_keyword">new</strong> LabelIsIn&lt;&gt;(<span class="jxr_string">"Person"</span>, <span class="jxr_string">"City"</span>))
 <a name="131" href="#131">131</a>       .output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(vertices));
 <a name="132" href="#132">132</a> 
-<a name="133" href="#133">133</a>     List&lt;Edge&gt; newEdges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="133" href="#133">133</a>     List&lt;EPGMEdge&gt; newEdges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a name="134" href="#134">134</a>     extractedGraph
 <a name="135" href="#135">135</a>       .getEdgesByLabel(<span class="jxr_string">"newLabel"</span>)
 <a name="136" href="#136">136</a>       .output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(newEdges));
@@ -150,7 +150,7 @@
 <a name="140" href="#140">140</a>     Map&lt;GradoopId, String&gt; idMap = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
 <a name="141" href="#141">141</a>     vertices.forEach(v -&gt; idMap.put(v.getId(), v.getPropertyValue(<span class="jxr_string">"name"</span>).getString()));
 <a name="142" href="#142">142</a> 
-<a name="143" href="#143">143</a>     <strong class="jxr_keyword">for</strong> (Edge e : newEdges) {
+<a name="143" href="#143">143</a>     <strong class="jxr_keyword">for</strong> (EPGMEdge e : newEdges) {
 <a name="144" href="#144">144</a>       String sourceName = idMap.get(e.getSourceId());
 <a name="145" href="#145">145</a>       String targetName = idMap.get(e.getTargetId());
 <a name="146" href="#146">146</a> 
@@ -189,7 +189,7 @@
 <a name="179" href="#179">179</a> 
 <a name="180" href="#180">180</a>     LogicalGraph extractedGraph = social.callForGraph(extract);
 <a name="181" href="#181">181</a> 
-<a name="182" href="#182">182</a>     List&lt;Vertex&gt; vertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="182" href="#182">182</a>     List&lt;EPGMVertex&gt; vertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a name="183" href="#183">183</a>     extractedGraph
 <a name="184" href="#184">184</a>       .getVerticesByLabel(<span class="jxr_string">"City"</span>)
 <a name="185" href="#185">185</a>       .output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(vertices));
@@ -212,12 +212,12 @@
 <a name="202" href="#202">202</a> <em class="jxr_javadoccomment">   */</em>
 <a name="203" href="#203">203</a>   @Test
 <a name="204" href="#204">204</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> listPropertyTest() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="205" href="#205">205</a>     VertexFactory vf = getConfig().getVertexFactory();
-<a name="206" href="#206">206</a>     Vertex v1 = vf.createVertex(<span class="jxr_string">"foo"</span>);
+<a name="205" href="#205">205</a>     EPGMVertexFactory vf = getConfig().getVertexFactory();
+<a name="206" href="#206">206</a>     EPGMVertex v1 = vf.createVertex(<span class="jxr_string">"foo"</span>);
 <a name="207" href="#207">207</a>     v1.setProperty(<span class="jxr_string">"a"</span>, PropertyValue.create(Arrays.asList(PropertyValue.create(<span class="jxr_string">"m"</span>),
 <a name="208" href="#208">208</a>       PropertyValue.create(<span class="jxr_string">"n"</span>))));
 <a name="209" href="#209">209</a> 
-<a name="210" href="#210">210</a>     Vertex v2 = vf.createVertex(<span class="jxr_string">"foo"</span>);
+<a name="210" href="#210">210</a>     EPGMVertex v2 = vf.createVertex(<span class="jxr_string">"foo"</span>);
 <a name="211" href="#211">211</a>     v2.setProperty(<span class="jxr_string">"a"</span>, PropertyValue.create(Arrays.asList(PropertyValue.create(<span class="jxr_string">"x"</span>),
 <a name="212" href="#212">212</a>       PropertyValue.create(<span class="jxr_string">"y"</span>), PropertyValue.create(<span class="jxr_string">"z"</span>))));
 <a name="213" href="#213">213</a> 
@@ -227,7 +227,7 @@
 <a name="217" href="#217">217</a>     ExtractPropertyFromVertex ext = <strong class="jxr_keyword">new</strong> ExtractPropertyFromVertex(<span class="jxr_string">"foo"</span>, <span class="jxr_string">"a"</span>, <span class="jxr_string">"A"</span>, <span class="jxr_string">"key"</span>);
 <a name="218" href="#218">218</a>     LogicalGraph output = input.callForGraph(ext);
 <a name="219" href="#219">219</a> 
-<a name="220" href="#220">220</a>     List&lt;Vertex&gt; createdVertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="220" href="#220">220</a>     List&lt;EPGMVertex&gt; createdVertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a name="221" href="#221">221</a>     output.getVertices()
 <a name="222" href="#222">222</a>       .filter(<strong class="jxr_keyword">new</strong> ByLabel&lt;&gt;(<span class="jxr_string">"A"</span>))
 <a name="223" href="#223">223</a>       .output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(createdVertices));

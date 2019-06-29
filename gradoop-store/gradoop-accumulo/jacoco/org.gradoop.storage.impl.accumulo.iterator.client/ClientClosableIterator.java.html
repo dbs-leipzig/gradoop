@@ -18,8 +18,8 @@ package org.gradoop.storage.impl.accumulo.iterator.client;
 import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.storage.common.api.EPGMGraphOutput;
 import org.gradoop.storage.common.api.EPGMGraphPredictableOutput;
 import org.gradoop.storage.common.iterator.ClosableIterator;
@@ -40,12 +40,12 @@ import java.util.Map;
  * query result will always be fetch block by block for better performance. And the
  * block size for result is called cache size.
  *
- * @param &lt;R&gt; EPGM Element type for reading result
- * @param &lt;E&gt; EPGM Element type for reading source (remote definition)
+ * @param &lt;R&gt; EPGMElement type for reading result
+ * @param &lt;E&gt; EPGMElement type for reading source (remote definition)
  * @see EPGMGraphOutput
  * @see EPGMGraphPredictableOutput
  */
-public class ClientClosableIterator&lt;R extends Element, E extends EPGMElement&gt;
+public class ClientClosableIterator&lt;R extends EPGMElement, E extends Element&gt;
   implements ClosableIterator&lt;R&gt; {
 
   /**

@@ -15,21 +15,18 @@
  */
 package org.gradoop.flink.model.impl.functions.epgm;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.flink.model.api.functions.TransformationFunction;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A serializable function that is applied on an EPGM element (i.e. graph head,
+ * A serializable function that is applied on an element (i.e. graph head,
  * vertex and edge) to rename a label
  *
- * @param &lt;T&gt; the {@link EPGMElement} which is target of change, e.g.
- * {@link org.gradoop.common.model.impl.pojo.Vertex},
- * {@link org.gradoop.common.model.impl.pojo.Edge} or
- * {@link org.gradoop.common.model.impl.pojo.GraphHead}
+ * @param &lt;T&gt; the {@link Element} which is target of change.
  */
-public class RenameLabel&lt;T extends EPGMElement&gt; implements TransformationFunction&lt;T&gt; {
+public class RenameLabel&lt;T extends Element&gt; implements TransformationFunction&lt;T&gt; {
 
   /**
    * the old label which will be renamed by the process
@@ -47,19 +44,19 @@ public class RenameLabel&lt;T extends EPGMElement&gt; implements TransformationF
    * @param oldLabel the label to be renamed
    * @param newLabel the new label replacing the old one
    */
-<span class="fc" id="L50">  public RenameLabel(String oldLabel, String newLabel) {</span>
-<span class="fc" id="L51">    this.oldLabel = checkNotNull(oldLabel);</span>
-<span class="fc" id="L52">    this.newLabel = checkNotNull(newLabel);</span>
-<span class="fc" id="L53">  }</span>
+<span class="fc" id="L47">  public RenameLabel(String oldLabel, String newLabel) {</span>
+<span class="fc" id="L48">    this.oldLabel = checkNotNull(oldLabel);</span>
+<span class="fc" id="L49">    this.newLabel = checkNotNull(newLabel);</span>
+<span class="fc" id="L50">  }</span>
 
   @Override
   public T apply(T current, T transformed) {
 
-<span class="pc bpc" id="L58" title="1 of 2 branches missed.">    if (current.getLabel().equals(oldLabel)) {</span>
-<span class="fc" id="L59">      current.setLabel(newLabel);</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">    if (current.getLabel().equals(oldLabel)) {</span>
+<span class="fc" id="L56">      current.setLabel(newLabel);</span>
     }
 
-<span class="fc" id="L62">    return current;</span>
+<span class="fc" id="L59">    return current;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

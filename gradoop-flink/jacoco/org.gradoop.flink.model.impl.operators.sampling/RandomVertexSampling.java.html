@@ -16,8 +16,8 @@
 package org.gradoop.flink.model.impl.operators.sampling;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -65,10 +65,10 @@ public class RandomVertexSampling extends SamplingAlgorithm {
   @Override
   public LogicalGraph sample(LogicalGraph graph) {
 
-<span class="fc" id="L68">    DataSet&lt;Vertex&gt; newVertices = graph.getVertices()</span>
+<span class="fc" id="L68">    DataSet&lt;EPGMVertex&gt; newVertices = graph.getVertices()</span>
 <span class="fc" id="L69">      .filter(new RandomFilter&lt;&gt;(sampleSize, randomSeed));</span>
 
-<span class="fc" id="L71">    DataSet&lt;Edge&gt; newEdges = graph.getEdges()</span>
+<span class="fc" id="L71">    DataSet&lt;EPGMEdge&gt; newEdges = graph.getEdges()</span>
 <span class="fc" id="L72">      .join(newVertices)</span>
 <span class="fc" id="L73">      .where(new SourceId&lt;&gt;()).equalTo(new Id&lt;&gt;())</span>
 <span class="fc" id="L74">      .with(new LeftSide&lt;&gt;())</span>

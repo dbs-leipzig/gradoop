@@ -29,9 +29,9 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.ExecutionEnvironment;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.typeutils.TypeExtractor;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.DataSource;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.deprecated.json.functions.JSONToEdge;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.deprecated.json.functions.JSONToGraphHead;
@@ -88,23 +88,23 @@
 <a name="78" href="#78">78</a>      ExecutionEnvironment env = getConfig().getExecutionEnvironment();
 <a name="79" href="#79">79</a>  
 <a name="80" href="#80">80</a>      <em class="jxr_comment">// used for type hinting when loading vertex data</em>
-<a name="81" href="#81">81</a>      TypeInformation&lt;Vertex&gt; vertexTypeInfo = TypeExtractor
+<a name="81" href="#81">81</a>      TypeInformation&lt;EPGMVertex&gt; vertexTypeInfo = TypeExtractor
 <a name="82" href="#82">82</a>        .createTypeInfo(getConfig().getVertexFactory().getType());
 <a name="83" href="#83">83</a>      <em class="jxr_comment">// used for type hinting when loading edge data</em>
-<a name="84" href="#84">84</a>      TypeInformation&lt;Edge&gt; edgeTypeInfo = TypeExtractor
+<a name="84" href="#84">84</a>      TypeInformation&lt;EPGMEdge&gt; edgeTypeInfo = TypeExtractor
 <a name="85" href="#85">85</a>        .createTypeInfo(getConfig().getEdgeFactory().getType());
 <a name="86" href="#86">86</a>      <em class="jxr_comment">// used for type hinting when loading graph data</em>
-<a name="87" href="#87">87</a>      TypeInformation&lt;GraphHead&gt; graphTypeInfo = TypeExtractor
+<a name="87" href="#87">87</a>      TypeInformation&lt;EPGMGraphHead&gt; graphTypeInfo = TypeExtractor
 <a name="88" href="#88">88</a>        .createTypeInfo(getConfig().getGraphHeadFactory().getType());
 <a name="89" href="#89">89</a>  
 <a name="90" href="#90">90</a>      <em class="jxr_comment">// read vertex, edge and graph data</em>
-<a name="91" href="#91">91</a>      DataSet&lt;Vertex&gt; vertices = env.readTextFile(getVertexPath())
+<a name="91" href="#91">91</a>      DataSet&lt;EPGMVertex&gt; vertices = env.readTextFile(getVertexPath())
 <a name="92" href="#92">92</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/deprecated/json/functions/JSONToVertex.html">JSONToVertex</a>(getConfig().getVertexFactory()))
 <a name="93" href="#93">93</a>        .returns(vertexTypeInfo);
-<a name="94" href="#94">94</a>      DataSet&lt;Edge&gt; edges = env.readTextFile(getEdgePath())
+<a name="94" href="#94">94</a>      DataSet&lt;EPGMEdge&gt; edges = env.readTextFile(getEdgePath())
 <a name="95" href="#95">95</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/deprecated/json/functions/JSONToEdge.html">JSONToEdge</a>(getConfig().getEdgeFactory()))
 <a name="96" href="#96">96</a>        .returns(edgeTypeInfo);
-<a name="97" href="#97">97</a>      DataSet&lt;GraphHead&gt; graphHeads;
+<a name="97" href="#97">97</a>      DataSet&lt;EPGMGraphHead&gt; graphHeads;
 <a name="98" href="#98">98</a>      <strong class="jxr_keyword">if</strong> (getGraphHeadPath() != <strong class="jxr_keyword">null</strong>) {
 <a name="99" href="#99">99</a>        graphHeads = env.readTextFile(getGraphHeadPath())
 <a name="100" href="#100">100</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../org/gradoop/flink/io/impl/deprecated/json/functions/JSONToGraphHead.html">JSONToGraphHead</a>(getConfig().getGraphHeadFactory()))

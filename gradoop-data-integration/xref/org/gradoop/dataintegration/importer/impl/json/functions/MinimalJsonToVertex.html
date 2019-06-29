@@ -28,8 +28,8 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.codehaus.jettison.json.JSONArray;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.codehaus.jettison.json.JSONObject;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertexFactory;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.VertexFactory;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="25" href="#25">25</a>  
@@ -52,7 +52,7 @@
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment"> * "name":"Alice","gender":"female","age":42</em>
 <a name="43" href="#43">43</a>  <em class="jxr_javadoccomment"> * }}&lt;/pre&gt;</em>
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="45" href="#45">45</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/dataintegration/importer/impl/json/functions/MinimalJsonToVertex.html">MinimalJsonToVertex</a> implements MapFunction&lt;String, Vertex&gt; {
+<a name="45" href="#45">45</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/dataintegration/importer/impl/json/functions/MinimalJsonToVertex.html">MinimalJsonToVertex</a> implements MapFunction&lt;String, EPGMVertex&gt; {
 <a name="46" href="#46">46</a>  
 <a name="47" href="#47">47</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * The default label used for the newly created vertices.</em>
@@ -62,14 +62,14 @@
 <a name="52" href="#52">52</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   * Reduce object instantiations.</em>
 <a name="54" href="#54">54</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="55" href="#55">55</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Vertex reuse;
+<a name="55" href="#55">55</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> EPGMVertex reuse;
 <a name="56" href="#56">56</a>  
 <a name="57" href="#57">57</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * Creates a new instance of this JSON string to vertex converting function.</em>
 <a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   * @param vertexFactory The vertex factory used to create new vertices.</em>
 <a name="61" href="#61">61</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="62" href="#62">62</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/dataintegration/importer/impl/json/functions/MinimalJsonToVertex.html">MinimalJsonToVertex</a>(EPGMVertexFactory&lt;Vertex&gt; vertexFactory) {
+<a name="62" href="#62">62</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/dataintegration/importer/impl/json/functions/MinimalJsonToVertex.html">MinimalJsonToVertex</a>(VertexFactory&lt;EPGMVertex&gt; vertexFactory) {
 <a name="63" href="#63">63</a>      <strong class="jxr_keyword">this</strong>.reuse = Objects.requireNonNull(vertexFactory).createVertex(JSON_VERTEX_LABEL);
 <a name="64" href="#64">64</a>      <strong class="jxr_keyword">this</strong>.reuse.setProperties(Properties.create());
 <a name="65" href="#65">65</a>    }
@@ -82,7 +82,7 @@
 <a name="72" href="#72">72</a>  <em class="jxr_javadoccomment">   * @throws Exception on failure</em>
 <a name="73" href="#73">73</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="74" href="#74">74</a>    @Override
-<a name="75" href="#75">75</a>    <strong class="jxr_keyword">public</strong> Vertex map(String jsonString) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="75" href="#75">75</a>    <strong class="jxr_keyword">public</strong> EPGMVertex map(String jsonString) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="76" href="#76">76</a>      JSONObject jsonVertex = <strong class="jxr_keyword">new</strong> JSONObject(jsonString);
 <a name="77" href="#77">77</a>  
 <a name="78" href="#78">78</a>      Properties properties = reuse.getProperties();

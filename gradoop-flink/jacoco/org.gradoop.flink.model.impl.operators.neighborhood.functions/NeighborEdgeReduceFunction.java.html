@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.neighborhood.functions;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
@@ -29,7 +29,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
  */
 public class NeighborEdgeReduceFunction
   extends NeighborEdgeFunction
-  implements GroupReduceFunction&lt;Tuple2&lt;Edge, Vertex&gt;, Vertex&gt; {
+  implements GroupReduceFunction&lt;Tuple2&lt;EPGMEdge, EPGMVertex&gt;, EPGMVertex&gt; {
 
   /**
    * Valued constructor.
@@ -41,15 +41,15 @@ public class NeighborEdgeReduceFunction
 <span class="fc" id="L41">  }</span>
 
   @Override
-  public void reduce(Iterable&lt;Tuple2&lt;Edge, Vertex&gt;&gt; tuples, Collector&lt;Vertex&gt; collector) throws
+  public void reduce(Iterable&lt;Tuple2&lt;EPGMEdge, EPGMVertex&gt;&gt; tuples, Collector&lt;EPGMVertex&gt; collector) throws
     Exception {
 
 <span class="fc" id="L47">    PropertyValue propertyValue = PropertyValue.NULL_VALUE;</span>
-<span class="fc" id="L48">    Vertex vertex = null;</span>
-    Edge edge;
+<span class="fc" id="L48">    EPGMVertex vertex = null;</span>
+    EPGMEdge edge;
 <span class="fc" id="L50">    boolean isFirst = true;</span>
 
-<span class="fc bfc" id="L52" title="All 2 branches covered.">    for (Tuple2&lt;Edge, Vertex&gt; tuple: tuples) {</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">    for (Tuple2&lt;EPGMEdge, EPGMVertex&gt; tuple: tuples) {</span>
 <span class="fc" id="L53">      edge = tuple.f0;</span>
 <span class="fc bfc" id="L54" title="All 2 branches covered.">      if (isFirst) {</span>
         //each tuple contains the same vertex

@@ -25,7 +25,7 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.sum;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMElement;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Element;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 <a name="21" href="#21">21</a>  
@@ -63,7 +63,7 @@
 <a name="53" href="#53">53</a>    }
 <a name="54" href="#54">54</a>  
 <a name="55" href="#55">55</a>    @Override
-<a name="56" href="#56">56</a>    <strong class="jxr_keyword">public</strong> PropertyValue getIncrement(EPGMElement element) {
+<a name="56" href="#56">56</a>    <strong class="jxr_keyword">public</strong> PropertyValue getIncrement(Element element) {
 <a name="57" href="#57">57</a>      <strong class="jxr_keyword">return</strong> element.getPropertyValue(propertyKey);
 <a name="58" href="#58">58</a>    }
 <a name="59" href="#59">59</a>  }

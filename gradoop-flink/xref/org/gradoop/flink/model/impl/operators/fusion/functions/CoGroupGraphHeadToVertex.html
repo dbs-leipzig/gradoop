@@ -28,31 +28,31 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * Associate each graph id in teh hypervertices' heads</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * to the merged vertices</em>
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/fusion/functions/CoGroupGraphHeadToVertex.html">CoGroupGraphHeadToVertex</a>
-<a name="29" href="#29">29</a>    implements MapFunction&lt;GraphHead, Tuple2&lt;Vertex, GradoopId&gt;&gt; {
+<a name="29" href="#29">29</a>    implements MapFunction&lt;EPGMGraphHead, Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; {
 <a name="30" href="#30">30</a>  
 <a name="31" href="#31">31</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * Reusable tuple to be returned as a result</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="34" href="#34">34</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Tuple2&lt;Vertex, GradoopId&gt; reusable;
+<a name="34" href="#34">34</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Tuple2&lt;EPGMVertex, GradoopId&gt; reusable;
 <a name="35" href="#35">35</a>  
 <a name="36" href="#36">36</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   * Default constructor</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="39" href="#39">39</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/fusion/functions/CoGroupGraphHeadToVertex.html">CoGroupGraphHeadToVertex</a>() {
 <a name="40" href="#40">40</a>      reusable = <strong class="jxr_keyword">new</strong> Tuple2&lt;&gt;();
-<a name="41" href="#41">41</a>      reusable.f0 = <strong class="jxr_keyword">new</strong> Vertex();
+<a name="41" href="#41">41</a>      reusable.f0 = <strong class="jxr_keyword">new</strong> EPGMVertex();
 <a name="42" href="#42">42</a>    }
 <a name="43" href="#43">43</a>  
 <a name="44" href="#44">44</a>    @Override
-<a name="45" href="#45">45</a>    <strong class="jxr_keyword">public</strong> Tuple2&lt;Vertex, GradoopId&gt; map(GraphHead hid) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="45" href="#45">45</a>    <strong class="jxr_keyword">public</strong> Tuple2&lt;EPGMVertex, GradoopId&gt; map(EPGMGraphHead hid) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="46" href="#46">46</a>      reusable.f0.setId(GradoopId.get());
 <a name="47" href="#47">47</a>      reusable.f0.setLabel(hid.getLabel());
 <a name="48" href="#48">48</a>      reusable.f0.setProperties(hid.getProperties());

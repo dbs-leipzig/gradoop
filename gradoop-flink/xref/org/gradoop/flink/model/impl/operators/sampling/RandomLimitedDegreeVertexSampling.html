@@ -26,8 +26,8 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.sampling;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.vertexdegrees.DistinctVertexDegrees;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -132,14 +132,14 @@
 <a name="122" href="#122">122</a>       SamplingConstants.OUT_DEGREE_PROPERTY_KEY,
 <a name="123" href="#123">123</a>       <strong class="jxr_keyword">true</strong>).execute(graph);
 <a name="124" href="#124">124</a> 
-<a name="125" href="#125">125</a>     DataSet&lt;Vertex&gt; newVertices = graph.getVertices()
+<a name="125" href="#125">125</a>     DataSet&lt;EPGMVertex&gt; newVertices = graph.getVertices()
 <a name="126" href="#126">126</a>       .filter(<strong class="jxr_keyword">new</strong> LimitedDegreeVertexRandomFilter&lt;&gt;(
 <a name="127" href="#127">127</a>         sampleSize, randomSeed, degreeThreshold, degreeType))
 <a name="128" href="#128">128</a>       .map(<strong class="jxr_keyword">new</strong> PropertyRemover&lt;&gt;(SamplingConstants.DEGREE_PROPERTY_KEY))
 <a name="129" href="#129">129</a>       .map(<strong class="jxr_keyword">new</strong> PropertyRemover&lt;&gt;(SamplingConstants.IN_DEGREE_PROPERTY_KEY))
 <a name="130" href="#130">130</a>       .map(<strong class="jxr_keyword">new</strong> PropertyRemover&lt;&gt;(SamplingConstants.OUT_DEGREE_PROPERTY_KEY));
 <a name="131" href="#131">131</a> 
-<a name="132" href="#132">132</a>     DataSet&lt;Edge&gt; newEdges = graph.getEdges()
+<a name="132" href="#132">132</a>     DataSet&lt;EPGMEdge&gt; newEdges = graph.getEdges()
 <a name="133" href="#133">133</a>       .join(newVertices)
 <a name="134" href="#134">134</a>       .where(<strong class="jxr_keyword">new</strong> SourceId&lt;&gt;()).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
 <a name="135" href="#135">135</a>       .with(<strong class="jxr_keyword">new</strong> LeftSide&lt;&gt;())

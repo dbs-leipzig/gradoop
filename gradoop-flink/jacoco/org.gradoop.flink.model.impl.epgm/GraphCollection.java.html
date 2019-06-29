@@ -20,18 +20,18 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.epgm.GraphCollectionOperators;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
-import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
@@ -86,12 +86,12 @@ import java.util.Objects;
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class GraphCollection implements
-  BaseGraphCollection&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;,
+  BaseGraphCollection&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;,
   GraphCollectionOperators {
   /**
    * Layout for that graph collection
    */
-  private final GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; layout;
+  private final GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; layout;
   /**
    * Configuration
    */
@@ -103,7 +103,7 @@ public class GraphCollection implements
    * @param layout the graph collection layout
    * @param config the Gradoop Flink configuration
    */
-  GraphCollection(GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; layout,
+  GraphCollection(GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; layout,
 <span class="fc" id="L107">    GradoopFlinkConfig config) {</span>
 <span class="fc" id="L108">    this.layout = Objects.requireNonNull(layout);</span>
 <span class="fc" id="L109">    this.config = Objects.requireNonNull(config);</span>
@@ -129,32 +129,32 @@ public class GraphCollection implements
   }
 
   @Override
-  public DataSet&lt;Vertex&gt; getVertices() {
+  public DataSet&lt;EPGMVertex&gt; getVertices() {
 <span class="fc" id="L133">    return layout.getVertices();</span>
   }
 
   @Override
-  public DataSet&lt;Vertex&gt; getVerticesByLabel(String label) {
+  public DataSet&lt;EPGMVertex&gt; getVerticesByLabel(String label) {
 <span class="nc" id="L138">    return layout.getVerticesByLabel(label);</span>
   }
 
   @Override
-  public DataSet&lt;Edge&gt; getEdges() {
+  public DataSet&lt;EPGMEdge&gt; getEdges() {
 <span class="fc" id="L143">    return layout.getEdges();</span>
   }
 
   @Override
-  public DataSet&lt;Edge&gt; getEdgesByLabel(String label) {
+  public DataSet&lt;EPGMEdge&gt; getEdgesByLabel(String label) {
 <span class="nc" id="L148">    return layout.getEdgesByLabel(label);</span>
   }
 
   @Override
-  public DataSet&lt;GraphHead&gt; getGraphHeads() {
+  public DataSet&lt;EPGMGraphHead&gt; getGraphHeads() {
 <span class="fc" id="L153">    return layout.getGraphHeads();</span>
   }
 
   @Override
-  public DataSet&lt;GraphHead&gt; getGraphHeadsByLabel(String label) {
+  public DataSet&lt;EPGMGraphHead&gt; getGraphHeadsByLabel(String label) {
 <span class="nc" id="L158">    return layout.getGraphHeadsByLabel(label);</span>
   }
 
@@ -170,11 +170,11 @@ public class GraphCollection implements
   @Override
   public LogicalGraph getGraph(final GradoopId graphID) {
     // filter vertices and edges based on given graph id
-<span class="fc" id="L173">    DataSet&lt;GraphHead&gt; graphHead = getGraphHeads()</span>
+<span class="fc" id="L173">    DataSet&lt;EPGMGraphHead&gt; graphHead = getGraphHeads()</span>
 <span class="fc" id="L174">      .filter(new BySameId&lt;&gt;(graphID));</span>
-<span class="fc" id="L175">    DataSet&lt;Vertex&gt; vertices = getVertices()</span>
+<span class="fc" id="L175">    DataSet&lt;EPGMVertex&gt; vertices = getVertices()</span>
 <span class="fc" id="L176">      .filter(new InGraph&lt;&gt;(graphID));</span>
-<span class="fc" id="L177">    DataSet&lt;Edge&gt; edges = getEdges()</span>
+<span class="fc" id="L177">    DataSet&lt;EPGMEdge&gt; edges = getEdges()</span>
 <span class="fc" id="L178">      .filter(new InGraph&lt;&gt;(graphID));</span>
 
 <span class="fc" id="L180">    return new LogicalGraph(</span>
@@ -195,20 +195,20 @@ public class GraphCollection implements
   @Override
   public GraphCollection getGraphs(final GradoopIdSet identifiers) {
 
-<span class="fc" id="L198">    DataSet&lt;GraphHead&gt; newGraphHeads = this.getGraphHeads()</span>
-<span class="fc" id="L199">      .filter(new FilterFunction&lt;GraphHead&gt;() {</span>
+<span class="fc" id="L198">    DataSet&lt;EPGMGraphHead&gt; newGraphHeads = this.getGraphHeads()</span>
+<span class="fc" id="L199">      .filter(new FilterFunction&lt;EPGMGraphHead&gt;() {</span>
         @Override
-        public boolean filter(GraphHead graphHead) {
+        public boolean filter(EPGMGraphHead graphHead) {
 <span class="fc" id="L202">          return identifiers.contains(graphHead.getId());</span>
         }
       });
 
     // build new vertex set
-<span class="fc" id="L207">    DataSet&lt;Vertex&gt; vertices = getVertices()</span>
+<span class="fc" id="L207">    DataSet&lt;EPGMVertex&gt; vertices = getVertices()</span>
 <span class="fc" id="L208">      .filter(new InAnyGraph&lt;&gt;(identifiers));</span>
 
     // build new edge set
-<span class="fc" id="L211">    DataSet&lt;Edge&gt; edges = getEdges()</span>
+<span class="fc" id="L211">    DataSet&lt;EPGMEdge&gt; edges = getEdges()</span>
 <span class="fc" id="L212">      .filter(new InAnyGraph&lt;&gt;(identifiers));</span>
 
 <span class="fc" id="L214">    return new GraphCollection(getFactory().fromDataSets(newGraphHeads, vertices, edges),</span>
@@ -220,7 +220,7 @@ public class GraphCollection implements
   //----------------------------------------------------------------------------
 
   @Override
-  public GraphCollection select(final FilterFunction&lt;GraphHead&gt; predicate) {
+  public GraphCollection select(final FilterFunction&lt;EPGMGraphHead&gt; predicate) {
 <span class="fc" id="L224">    return callForCollection(new Selection(predicate));</span>
   }
 
@@ -330,13 +330,8 @@ public class GraphCollection implements
   }
 
   @Override
-  public GraphCollection apply(ApplicableUnaryGraphToGraphOperator op) {
-<span class="fc" id="L334">    return callForCollection(op);</span>
-  }
-
-  @Override
   public LogicalGraph reduce(ReducibleBinaryGraphToGraphOperator op) {
-<span class="fc" id="L339">    return callForGraph(op);</span>
+<span class="fc" id="L334">    return callForGraph(op);</span>
   }
 
   //----------------------------------------------------------------------------
@@ -345,49 +340,55 @@ public class GraphCollection implements
 
   @Override
   public GradoopFlinkConfig getConfig() {
-<span class="fc" id="L348">    return config;</span>
+<span class="fc" id="L343">    return config;</span>
   }
 
   @Override
-  public BaseGraphCollectionFactory&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;
-  getFactory() {
-<span class="fc" id="L354">    return config.getGraphCollectionFactory();</span>
+  public BaseGraphCollectionFactory&lt;
+    EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt; getFactory() {
+<span class="fc" id="L349">    return config.getGraphCollectionFactory();</span>
+  }
+
+  @Override
+  public BaseGraphFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;
+  getGraphFactory() {
+<span class="nc" id="L355">    return config.getLogicalGraphFactory();</span>
   }
 
   @Override
   public DataSet&lt;Boolean&gt; isEmpty() {
-<span class="fc" id="L359">    return getGraphHeads()</span>
-<span class="fc" id="L360">      .map(new True&lt;&gt;())</span>
-<span class="fc" id="L361">      .distinct()</span>
-<span class="fc" id="L362">      .union(getConfig().getExecutionEnvironment().fromElements(false))</span>
-<span class="fc" id="L363">      .reduce(new Or())</span>
-<span class="fc" id="L364">      .map(new Not());</span>
+<span class="fc" id="L360">    return getGraphHeads()</span>
+<span class="fc" id="L361">      .map(new True&lt;&gt;())</span>
+<span class="fc" id="L362">      .distinct()</span>
+<span class="fc" id="L363">      .union(getConfig().getExecutionEnvironment().fromElements(false))</span>
+<span class="fc" id="L364">      .reduce(new Or())</span>
+<span class="fc" id="L365">      .map(new Not());</span>
   }
 
   @Override
   public GraphCollection distinctById() {
-<span class="fc" id="L369">    return callForCollection(new DistinctById());</span>
+<span class="fc" id="L370">    return callForCollection(new DistinctById());</span>
   }
 
   @Override
   public GraphCollection distinctByIsomorphism() {
-<span class="fc" id="L374">    return callForCollection(new DistinctByIsomorphism());</span>
+<span class="fc" id="L375">    return callForCollection(new DistinctByIsomorphism());</span>
   }
 
   @Override
   public GraphCollection groupByIsomorphism(GraphHeadReduceFunction func) {
-<span class="fc" id="L379">    return callForCollection(new GroupByIsomorphism(func));</span>
+<span class="fc" id="L380">    return callForCollection(new GroupByIsomorphism(func));</span>
   }
 
   @Override
   public void writeTo(DataSink dataSink) throws IOException {
-<span class="fc" id="L384">    dataSink.write(this);</span>
-<span class="fc" id="L385">  }</span>
+<span class="fc" id="L385">    dataSink.write(this);</span>
+<span class="fc" id="L386">  }</span>
 
   @Override
   public void writeTo(DataSink dataSink, boolean overWrite) throws IOException {
-<span class="nc" id="L389">    dataSink.write(this, overWrite);</span>
-<span class="nc" id="L390">  }</span>
+<span class="nc" id="L390">    dataSink.write(this, overWrite);</span>
+<span class="nc" id="L391">  }</span>
 
   /**
    * Prints this graph collection to the console.
@@ -395,7 +396,7 @@ public class GraphCollection implements
    * @throws Exception forwarded DataSet print() Exception.
    */
   public void print() throws Exception {
-<span class="nc" id="L398">    GDLConsoleOutput.print(this);</span>
-<span class="nc" id="L399">  }</span>
+<span class="nc" id="L399">    GDLConsoleOutput.print(this);</span>
+<span class="nc" id="L400">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

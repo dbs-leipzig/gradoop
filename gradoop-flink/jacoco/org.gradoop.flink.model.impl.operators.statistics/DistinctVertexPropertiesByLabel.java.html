@@ -17,7 +17,7 @@ package org.gradoop.flink.model.impl.operators.statistics;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.statistics.functions.ExtractPropertyValuesByLabel;
@@ -28,7 +28,7 @@ import java.util.Set;
  * Computes the number of distinct vertex property values for label - property name pairs
  */
 <span class="fc" id="L30">public class DistinctVertexPropertiesByLabel</span>
-  extends DistinctProperties&lt;Vertex, Tuple2&lt;String, String&gt;&gt; {
+  extends DistinctProperties&lt;EPGMVertex, Tuple2&lt;String, String&gt;&gt; {
 
   @Override
   protected DataSet&lt;Tuple2&lt;Tuple2&lt;String, String&gt;, Set&lt;PropertyValue&gt;&gt;&gt; extractValuePairs(

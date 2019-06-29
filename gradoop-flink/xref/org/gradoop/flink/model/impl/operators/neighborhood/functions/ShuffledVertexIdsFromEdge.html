@@ -29,14 +29,14 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="23" href="#23">23</a>  
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * Returns a tuple which contains the source id and target id of an edge and a tuple which contains</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * the target id and the source id of the same edge.</em>
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/neighborhood/functions/ShuffledVertexIdsFromEdge.html">ShuffledVertexIdsFromEdge</a>
-<a name="29" href="#29">29</a>    implements FlatMapFunction&lt;Edge, Tuple2&lt;GradoopId, GradoopId&gt;&gt; {
+<a name="29" href="#29">29</a>    implements FlatMapFunction&lt;EPGMEdge, Tuple2&lt;GradoopId, GradoopId&gt;&gt; {
 <a name="30" href="#30">30</a>  
 <a name="31" href="#31">31</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * Reuse tuple to avoid instantiations.</em>
@@ -51,7 +51,7 @@
 <a name="41" href="#41">41</a>    }
 <a name="42" href="#42">42</a>  
 <a name="43" href="#43">43</a>    @Override
-<a name="44" href="#44">44</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(Edge edge, Collector&lt;Tuple2&lt;GradoopId, GradoopId&gt;&gt; collector)
+<a name="44" href="#44">44</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(EPGMEdge edge, Collector&lt;Tuple2&lt;GradoopId, GradoopId&gt;&gt; collector)
 <a name="45" href="#45">45</a>      <strong class="jxr_keyword">throws</strong> Exception {
 <a name="46" href="#46">46</a>      reuseTuple.setFields(edge.getSourceId(), edge.getTargetId());
 <a name="47" href="#47">47</a>      collector.collect(reuseTuple);

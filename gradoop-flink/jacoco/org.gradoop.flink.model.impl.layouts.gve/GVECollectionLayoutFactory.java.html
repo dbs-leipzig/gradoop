@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.layouts.gve;
 
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
@@ -39,71 +39,71 @@ import java.util.Objects;
  * Responsible for creating a {@link GVELayout} from given data.
  */
 <span class="fc" id="L41">public class GVECollectionLayoutFactory extends GVEBaseFactory</span>
-  implements GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; {
+  implements GraphCollectionLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; {
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromDataSets(DataSet&lt;GraphHead&gt; graphHeads,
-    DataSet&lt;Vertex&gt; vertices) {
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromDataSets(
+    DataSet&lt;EPGMGraphHead&gt; graphHeads, DataSet&lt;EPGMVertex&gt; vertices) {
 <span class="fc" id="L47">    return fromDataSets(graphHeads, vertices,</span>
 <span class="fc" id="L48">      createEdgeDataSet(new ArrayList&lt;&gt;(0)));</span>
   }
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromDataSets(
-    DataSet&lt;GraphHead&gt; graphHeads,
-    DataSet&lt;Vertex&gt; vertices,
-    DataSet&lt;Edge&gt; edges) {
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromDataSets(
+    DataSet&lt;EPGMGraphHead&gt; graphHeads,
+    DataSet&lt;EPGMVertex&gt; vertices,
+    DataSet&lt;EPGMEdge&gt; edges) {
 <span class="fc" id="L56">    return create(graphHeads, vertices, edges);</span>
   }
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromIndexedDataSets(
-    Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads,
-    Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
-    Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromIndexedDataSets(
+    Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads,
+    Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices,
+    Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges) {
 <span class="fc" id="L64">    return create(graphHeads, vertices, edges);</span>
   }
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromCollections(
-    Collection&lt;GraphHead&gt; graphHeads,
-    Collection&lt;Vertex&gt; vertices,
-    Collection&lt;Edge&gt; edges) {
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromCollections(
+    Collection&lt;EPGMGraphHead&gt; graphHeads,
+    Collection&lt;EPGMVertex&gt; vertices,
+    Collection&lt;EPGMEdge&gt; edges) {
 <span class="fc" id="L72">    return fromDataSets(</span>
-<span class="fc" id="L73">      createGraphHeadDataSet(Objects.requireNonNull(graphHeads, &quot;GraphHead collection was null&quot;)),</span>
-<span class="fc" id="L74">      createVertexDataSet(Objects.requireNonNull(vertices, &quot;Vertex collection was null&quot;)),</span>
-<span class="fc" id="L75">      createEdgeDataSet(Objects.requireNonNull(edges, &quot;Edge collection was null&quot;)));</span>
+<span class="fc" id="L73">      createGraphHeadDataSet(Objects.requireNonNull(graphHeads, &quot;EPGMGraphHead collection was null&quot;)),</span>
+<span class="fc" id="L74">      createVertexDataSet(Objects.requireNonNull(vertices, &quot;EPGMVertex collection was null&quot;)),</span>
+<span class="fc" id="L75">      createEdgeDataSet(Objects.requireNonNull(edges, &quot;EPGMEdge collection was null&quot;)));</span>
   }
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromGraphLayout(
-    LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; graph) {
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromGraphLayout(
+    LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; graph) {
 <span class="fc" id="L81">    return fromDataSets(graph.getGraphHead(), graph.getVertices(), graph.getEdges());</span>
   }
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromTransactions(
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromTransactions(
     DataSet&lt;GraphTransaction&gt; transactions) {
-<span class="fc" id="L87">    GroupReduceFunction&lt;Vertex, Vertex&gt; vertexReducer = new First&lt;&gt;();</span>
-<span class="fc" id="L88">    GroupReduceFunction&lt;Edge, Edge&gt; edgeReducer = new First&lt;&gt;();</span>
+<span class="fc" id="L87">    GroupReduceFunction&lt;EPGMVertex, EPGMVertex&gt; vertexReducer = new First&lt;&gt;();</span>
+<span class="fc" id="L88">    GroupReduceFunction&lt;EPGMEdge, EPGMEdge&gt; edgeReducer = new First&lt;&gt;();</span>
 
 <span class="fc" id="L90">    return fromTransactions(transactions, vertexReducer, edgeReducer);</span>
   }
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromTransactions(
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromTransactions(
     DataSet&lt;GraphTransaction&gt; transactions,
-    GroupReduceFunction&lt;Vertex, Vertex&gt; vertexMergeReducer,
-    GroupReduceFunction&lt;Edge, Edge&gt; edgeMergeReducer) {
+    GroupReduceFunction&lt;EPGMVertex, EPGMVertex&gt; vertexMergeReducer,
+    GroupReduceFunction&lt;EPGMEdge, EPGMEdge&gt; edgeMergeReducer) {
 
-<span class="fc" id="L99">    DataSet&lt;GraphHead&gt; graphHeads = transactions.map(new TransactionGraphHead&lt;&gt;());</span>
+<span class="fc" id="L99">    DataSet&lt;EPGMGraphHead&gt; graphHeads = transactions.map(new TransactionGraphHead&lt;&gt;());</span>
 
-<span class="fc" id="L101">    DataSet&lt;Vertex&gt; vertices = transactions</span>
+<span class="fc" id="L101">    DataSet&lt;EPGMVertex&gt; vertices = transactions</span>
 <span class="fc" id="L102">      .flatMap(new TransactionVertices&lt;&gt;())</span>
 <span class="fc" id="L103">      .groupBy(new Id&lt;&gt;())</span>
 <span class="fc" id="L104">      .reduceGroup(vertexMergeReducer);</span>
 
-<span class="fc" id="L106">    DataSet&lt;Edge&gt; edges = transactions</span>
+<span class="fc" id="L106">    DataSet&lt;EPGMEdge&gt; edges = transactions</span>
 <span class="fc" id="L107">      .flatMap(new TransactionEdges&lt;&gt;())</span>
 <span class="fc" id="L108">      .groupBy(new Id&lt;&gt;())</span>
 <span class="fc" id="L109">      .reduceGroup(edgeMergeReducer);</span>
@@ -112,10 +112,10 @@ import java.util.Objects;
   }
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; createEmptyCollection() {
-<span class="fc" id="L116">    Collection&lt;GraphHead&gt; graphHeads = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L117">    Collection&lt;Vertex&gt; vertices = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L118">    Collection&lt;Edge&gt; edges = new ArrayList&lt;&gt;();</span>
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; createEmptyCollection() {
+<span class="fc" id="L116">    Collection&lt;EPGMGraphHead&gt; graphHeads = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L117">    Collection&lt;EPGMVertex&gt; vertices = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L118">    Collection&lt;EPGMEdge&gt; edges = new ArrayList&lt;&gt;();</span>
 
 <span class="fc" id="L120">    return fromCollections(graphHeads, vertices, edges);</span>
   }

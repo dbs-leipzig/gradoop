@@ -18,18 +18,18 @@ package org.gradoop.flink.io.impl.graph.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * Updates an EPGM edge with the given target vertex identifier.
  *
  * @param &lt;E&gt; EPGM edge type
- * @param &lt;K&gt; Import Edge/Vertex identifier type
+ * @param &lt;K&gt; Import EPGMEdge/EPGMVertex identifier type
  */
 @FunctionAnnotation.ReadFieldsFirst(&quot;f1&quot;)
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;f1-&gt;targetId&quot;)
-<span class="fc" id="L32">public class UpdateEdge&lt;E extends Edge, K extends Comparable&lt;K&gt;&gt;</span>
+<span class="fc" id="L32">public class UpdateEdge&lt;E extends EPGMEdge, K extends Comparable&lt;K&gt;&gt;</span>
   implements JoinFunction&lt;Tuple2&lt;K, E&gt;, Tuple2&lt;K, GradoopId&gt;, E&gt; {
 
   /**

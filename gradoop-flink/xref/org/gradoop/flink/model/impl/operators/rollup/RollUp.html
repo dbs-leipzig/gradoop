@@ -29,9 +29,9 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> java.util.List;
 <a name="20" href="#20">20</a>  
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.AggregateFunction;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -104,9 +104,9 @@
 <a name="94" href="#94">94</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="95" href="#95">95</a>    @Override
 <a name="96" href="#96">96</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> execute(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph) {
-<a name="97" href="#97">97</a>      DataSet&lt;GraphHead&gt; graphHeads = <strong class="jxr_keyword">null</strong>;
-<a name="98" href="#98">98</a>      DataSet&lt;Vertex&gt; vertices = <strong class="jxr_keyword">null</strong>;
-<a name="99" href="#99">99</a>      DataSet&lt;Edge&gt; edges = <strong class="jxr_keyword">null</strong>;
+<a name="97" href="#97">97</a>      DataSet&lt;EPGMGraphHead&gt; graphHeads = <strong class="jxr_keyword">null</strong>;
+<a name="98" href="#98">98</a>      DataSet&lt;EPGMVertex&gt; vertices = <strong class="jxr_keyword">null</strong>;
+<a name="99" href="#99">99</a>      DataSet&lt;EPGMEdge&gt; edges = <strong class="jxr_keyword">null</strong>;
 <a name="100" href="#100">100</a>     List&lt;List&lt;String&gt;&gt; groupingKeyCombinations = getGroupingKeyCombinations();
 <a name="101" href="#101">101</a> 
 <a name="102" href="#102">102</a>     <em class="jxr_comment">// for each permutation execute a grouping</em>
@@ -116,7 +116,7 @@
 <a name="106" href="#106">106</a> 
 <a name="107" href="#107">107</a>       <em class="jxr_comment">// add a property to the grouped graph's head to specify the used keys</em>
 <a name="108" href="#108">108</a>       PropertyValue groupingKeys = PropertyValue.create(String.join(<span class="jxr_string">","</span>, combination));
-<a name="109" href="#109">109</a>       DataSet&lt;GraphHead&gt; newGraphHead =
+<a name="109" href="#109">109</a>       DataSet&lt;EPGMGraphHead&gt; newGraphHead =
 <a name="110" href="#110">110</a>         groupedGraph.getGraphHead().map(<strong class="jxr_keyword">new</strong> SetProperty&lt;&gt;(getGraphPropertyKey(), groupingKeys));
 <a name="111" href="#111">111</a> 
 <a name="112" href="#112">112</a>       <strong class="jxr_keyword">if</strong> (graphHeads != <strong class="jxr_keyword">null</strong> &amp;&amp; vertices != <strong class="jxr_keyword">null</strong> &amp;&amp; edges != <strong class="jxr_keyword">null</strong>) {

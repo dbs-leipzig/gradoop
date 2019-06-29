@@ -15,36 +15,36 @@
  */
 package org.gradoop.flink.io.impl.deprecated.logicalgraphcsv;
 
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.io.api.metadata.MetaDataSource;
 
 /**
- * Creates an {@link Edge} from a CSV string. The function uses a
+ * Creates an {@link EPGMEdge} from a CSV string. The function uses a
  * {@link MetaData} object to correctly parse the property values.
  *
  * The string needs to be encoded in the following format:
  *
  * {@code edge-id;source-id;target-id;edge-label;value_1|value_2|...|value_n}
  */
-public class CSVLineToEdge extends CSVLineToElement&lt;Edge&gt; {
+public class CSVLineToEdge extends CSVLineToElement&lt;EPGMEdge&gt; {
   /**
    * Used to instantiate the edge.
    */
-  private final EPGMEdgeFactory&lt;Edge&gt; edgeFactory;
+  private final EdgeFactory&lt;EPGMEdge&gt; edgeFactory;
 
   /**
    * Constructor.
    *
    * @param epgmEdgeFactory EPGM edge factory
    */
-<span class="fc" id="L42">  public CSVLineToEdge(EPGMEdgeFactory&lt;Edge&gt; epgmEdgeFactory) {</span>
+<span class="fc" id="L42">  public CSVLineToEdge(EdgeFactory&lt;EPGMEdge&gt; epgmEdgeFactory) {</span>
 <span class="fc" id="L43">    this.edgeFactory = epgmEdgeFactory;</span>
 <span class="fc" id="L44">  }</span>
 
   @Override
-  public Edge map(String csvLine) {
+  public EPGMEdge map(String csvLine) {
 <span class="fc" id="L48">    String[] tokens = split(csvLine, 5);</span>
 <span class="fc" id="L49">    return edgeFactory.initEdge(GradoopId.fromString(tokens[0]),</span>
       tokens[3],

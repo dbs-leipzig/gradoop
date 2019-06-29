@@ -29,7 +29,7 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.graph.Graph;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.types.NullValue;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions.LocalCCResultTupleToVertexJoin;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.clusteringcoefficient.functions.LocalUndirectedCCResultToTupleMap;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -61,7 +61,7 @@
 <a name="51" href="#51">51</a>    <strong class="jxr_keyword">protected</strong> <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> executeInternal(Graph&lt;GradoopId, NullValue, NullValue&gt; gellyGraph)
 <a name="52" href="#52">52</a>      <strong class="jxr_keyword">throws</strong> Exception {
 <a name="53" href="#53">53</a>  
-<a name="54" href="#54">54</a>      DataSet&lt;Vertex&gt; resultVertices = <strong class="jxr_keyword">new</strong> org.apache.flink.graph.library.clustering.undirected
+<a name="54" href="#54">54</a>      DataSet&lt;EPGMVertex&gt; resultVertices = <strong class="jxr_keyword">new</strong> org.apache.flink.graph.library.clustering.undirected
 <a name="55" href="#55">55</a>        .LocalClusteringCoefficient&lt;GradoopId, NullValue, NullValue&gt;().run(gellyGraph)
 <a name="56" href="#56">56</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/clusteringcoefficient/functions/LocalUndirectedCCResultToTupleMap.html">LocalUndirectedCCResultToTupleMap</a>())
 <a name="57" href="#57">57</a>        .join(currentGraph.getVertices())

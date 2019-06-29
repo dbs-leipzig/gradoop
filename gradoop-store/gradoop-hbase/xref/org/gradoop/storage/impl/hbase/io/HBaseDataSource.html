@@ -28,9 +28,9 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.typeutils.TupleTypeInfo;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.typeutils.TypeExtractor;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.tuple.ValueOf1;
@@ -54,24 +54,24 @@
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="45" href="#45">45</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/io/HBaseDataSource.html">HBaseDataSource</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/io/HBaseBase.html">HBaseBase</a>
 <a name="46" href="#46">46</a>    implements FilterableDataSource&lt;
-<a name="47" href="#47">47</a>    ElementQuery&lt;HBaseElementFilter&lt;GraphHead&gt;&gt;,
-<a name="48" href="#48">48</a>    ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt;,
-<a name="49" href="#49">49</a>    ElementQuery&lt;HBaseElementFilter&lt;Edge&gt;&gt;&gt; {
+<a name="47" href="#47">47</a>    ElementQuery&lt;HBaseElementFilter&lt;EPGMGraphHead&gt;&gt;,
+<a name="48" href="#48">48</a>    ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt;,
+<a name="49" href="#49">49</a>    ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt;&gt; {
 <a name="50" href="#50">50</a>  
 <a name="51" href="#51">51</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="52" href="#52">52</a>  <em class="jxr_javadoccomment">   * Query definition for graph head elements</em>
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="54" href="#54">54</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> ElementQuery&lt;HBaseElementFilter&lt;GraphHead&gt;&gt; graphHeadQuery;
+<a name="54" href="#54">54</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> ElementQuery&lt;HBaseElementFilter&lt;EPGMGraphHead&gt;&gt; graphHeadQuery;
 <a name="55" href="#55">55</a>  
 <a name="56" href="#56">56</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   * Query definition for vertices</em>
 <a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="59" href="#59">59</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; vertexQuery;
+<a name="59" href="#59">59</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; vertexQuery;
 <a name="60" href="#60">60</a>  
 <a name="61" href="#61">61</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="62" href="#62">62</a>  <em class="jxr_javadoccomment">   * Query definition for edges</em>
 <a name="63" href="#63">63</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="64" href="#64">64</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> ElementQuery&lt;HBaseElementFilter&lt;Edge&gt;&gt; edgeQuery;
+<a name="64" href="#64">64</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; edgeQuery;
 <a name="65" href="#65">65</a>  
 <a name="66" href="#66">66</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="67" href="#67">67</a>  <em class="jxr_javadoccomment">   * Creates a new HBase data source.</em>
@@ -98,9 +98,9 @@
 <a name="88" href="#88">88</a>    <strong class="jxr_keyword">private</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/io/HBaseDataSource.html">HBaseDataSource</a>(
 <a name="89" href="#89">89</a>      @Nonnull <a href="../../../../../../org/gradoop/storage/impl/hbase/HBaseEPGMStore.html">HBaseEPGMStore</a> epgmStore,
 <a name="90" href="#90">90</a>      @Nonnull GradoopFlinkConfig flinkConfig,
-<a name="91" href="#91">91</a>      @Nullable ElementQuery&lt;HBaseElementFilter&lt;GraphHead&gt;&gt; graphHeadQuery,
-<a name="92" href="#92">92</a>      @Nullable ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; vertexQuery,
-<a name="93" href="#93">93</a>      @Nullable ElementQuery&lt;HBaseElementFilter&lt;Edge&gt;&gt; edgeQuery
+<a name="91" href="#91">91</a>      @Nullable ElementQuery&lt;HBaseElementFilter&lt;EPGMGraphHead&gt;&gt; graphHeadQuery,
+<a name="92" href="#92">92</a>      @Nullable ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; vertexQuery,
+<a name="93" href="#93">93</a>      @Nullable ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; edgeQuery
 <a name="94" href="#94">94</a>    ) {
 <a name="95" href="#95">95</a>      <strong class="jxr_keyword">super</strong>(epgmStore, flinkConfig);
 <a name="96" href="#96">96</a>      <strong class="jxr_keyword">this</strong>.graphHeadQuery = graphHeadQuery;
@@ -118,21 +118,21 @@
 <a name="108" href="#108">108</a>     GradoopFlinkConfig config = getFlinkConfig();
 <a name="109" href="#109">109</a>     <a href="../../../../../../org/gradoop/storage/impl/hbase/HBaseEPGMStore.html">HBaseEPGMStore</a> store = getStore();
 <a name="110" href="#110">110</a> 
-<a name="111" href="#111">111</a>     DataSet&lt;GraphHead&gt; graphHeads = config.getExecutionEnvironment()
+<a name="111" href="#111">111</a>     DataSet&lt;EPGMGraphHead&gt; graphHeads = config.getExecutionEnvironment()
 <a name="112" href="#112">112</a>       .createInput(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/io/inputformats/GraphHeadTableInputFormat.html">GraphHeadTableInputFormat</a>(
 <a name="113" href="#113">113</a>           getHBaseConfig().getGraphHeadHandler().applyQuery(graphHeadQuery),
 <a name="114" href="#114">114</a>           store.getGraphHeadName()),
 <a name="115" href="#115">115</a>         <strong class="jxr_keyword">new</strong> TupleTypeInfo&lt;&gt;(TypeExtractor.createTypeInfo(config.getGraphHeadFactory().getType())))
 <a name="116" href="#116">116</a>       .map(<strong class="jxr_keyword">new</strong> ValueOf1&lt;&gt;());
 <a name="117" href="#117">117</a> 
-<a name="118" href="#118">118</a>     DataSet&lt;Vertex&gt; vertices = config.getExecutionEnvironment()
+<a name="118" href="#118">118</a>     DataSet&lt;EPGMVertex&gt; vertices = config.getExecutionEnvironment()
 <a name="119" href="#119">119</a>       .createInput(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/io/inputformats/VertexTableInputFormat.html">VertexTableInputFormat</a>(
 <a name="120" href="#120">120</a>           getHBaseConfig().getVertexHandler().applyQuery(vertexQuery),
 <a name="121" href="#121">121</a>           store.getVertexTableName()),
 <a name="122" href="#122">122</a>         <strong class="jxr_keyword">new</strong> TupleTypeInfo&lt;&gt;(TypeExtractor.createTypeInfo(config.getVertexFactory().getType())))
 <a name="123" href="#123">123</a>       .map(<strong class="jxr_keyword">new</strong> ValueOf1&lt;&gt;());
 <a name="124" href="#124">124</a> 
-<a name="125" href="#125">125</a>     DataSet&lt;Edge&gt; edges = config.getExecutionEnvironment()
+<a name="125" href="#125">125</a>     DataSet&lt;EPGMEdge&gt; edges = config.getExecutionEnvironment()
 <a name="126" href="#126">126</a>       .createInput(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/io/inputformats/EdgeTableInputFormat.html">EdgeTableInputFormat</a>(
 <a name="127" href="#127">127</a>           getHBaseConfig().getEdgeHandler().applyQuery(edgeQuery),
 <a name="128" href="#128">128</a>           store.getEdgeTableName()),
@@ -145,7 +145,7 @@
 <a name="135" href="#135">135</a>   @Nonnull
 <a name="136" href="#136">136</a>   @Override
 <a name="137" href="#137">137</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/io/HBaseDataSource.html">HBaseDataSource</a> applyGraphPredicate(
-<a name="138" href="#138">138</a>     @Nonnull ElementQuery&lt;HBaseElementFilter&lt;GraphHead&gt;&gt; query
+<a name="138" href="#138">138</a>     @Nonnull ElementQuery&lt;HBaseElementFilter&lt;EPGMGraphHead&gt;&gt; query
 <a name="139" href="#139">139</a>   ) {
 <a name="140" href="#140">140</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/io/HBaseDataSource.html">HBaseDataSource</a>(getStore(), getFlinkConfig(), query, vertexQuery, edgeQuery);
 <a name="141" href="#141">141</a>   }
@@ -153,7 +153,7 @@
 <a name="143" href="#143">143</a>   @Nonnull
 <a name="144" href="#144">144</a>   @Override
 <a name="145" href="#145">145</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/io/HBaseDataSource.html">HBaseDataSource</a> applyVertexPredicate(
-<a name="146" href="#146">146</a>     @Nonnull ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; query
+<a name="146" href="#146">146</a>     @Nonnull ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; query
 <a name="147" href="#147">147</a>   ) {
 <a name="148" href="#148">148</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/io/HBaseDataSource.html">HBaseDataSource</a>(getStore(), getFlinkConfig(), graphHeadQuery, query, edgeQuery);
 <a name="149" href="#149">149</a>   }
@@ -161,7 +161,7 @@
 <a name="151" href="#151">151</a>   @Nonnull
 <a name="152" href="#152">152</a>   @Override
 <a name="153" href="#153">153</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/io/HBaseDataSource.html">HBaseDataSource</a> applyEdgePredicate(
-<a name="154" href="#154">154</a>     @Nonnull ElementQuery&lt;HBaseElementFilter&lt;Edge&gt;&gt; query
+<a name="154" href="#154">154</a>     @Nonnull ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; query
 <a name="155" href="#155">155</a>   ) {
 <a name="156" href="#156">156</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/storage/impl/hbase/io/HBaseDataSource.html">HBaseDataSource</a>(getStore(), getFlinkConfig(), graphHeadQuery, vertexQuery, query);
 <a name="157" href="#157">157</a>   }

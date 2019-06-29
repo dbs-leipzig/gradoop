@@ -27,10 +27,10 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Lists;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EdgeFactory;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
@@ -47,13 +47,13 @@
 <a name="37" href="#37">37</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> org.junit.Assert.assertEquals;
 <a name="38" href="#38">38</a>  
 <a name="39" href="#39">39</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/filter/FilterAndProjectTriplesTest.html">FilterAndProjectTriplesTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/PhysicalOperatorTest.html">PhysicalOperatorTest</a> {
-<a name="40" href="#40">40</a>    <strong class="jxr_keyword">private</strong> VertexFactory vertexFactory;
-<a name="41" href="#41">41</a>    <strong class="jxr_keyword">private</strong> EdgeFactory edgeFactory;
+<a name="40" href="#40">40</a>    <strong class="jxr_keyword">private</strong> EPGMVertexFactory vertexFactory;
+<a name="41" href="#41">41</a>    <strong class="jxr_keyword">private</strong> EPGMEdgeFactory edgeFactory;
 <a name="42" href="#42">42</a>  
 <a name="43" href="#43">43</a>    @Before
 <a name="44" href="#44">44</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> setUp() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="45" href="#45">45</a>      <strong class="jxr_keyword">this</strong>.vertexFactory = <strong class="jxr_keyword">new</strong> VertexFactory();
-<a name="46" href="#46">46</a>      <strong class="jxr_keyword">this</strong>.edgeFactory = <strong class="jxr_keyword">new</strong> EdgeFactory();
+<a name="45" href="#45">45</a>      <strong class="jxr_keyword">this</strong>.vertexFactory = <strong class="jxr_keyword">new</strong> EPGMVertexFactory();
+<a name="46" href="#46">46</a>      <strong class="jxr_keyword">this</strong>.edgeFactory = <strong class="jxr_keyword">new</strong> EPGMEdgeFactory();
 <a name="47" href="#47">47</a>    }
 <a name="48" href="#48">48</a>  
 <a name="49" href="#49">49</a>    @Test
@@ -62,15 +62,15 @@
 <a name="52" href="#52">52</a>  
 <a name="53" href="#53">53</a>      Properties properties = Properties.create();
 <a name="54" href="#54">54</a>      properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Alice"</span>);
-<a name="55" href="#55">55</a>      Vertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
+<a name="55" href="#55">55</a>      EPGMVertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
 <a name="56" href="#56">56</a>  
 <a name="57" href="#57">57</a>      properties = Properties.create();
 <a name="58" href="#58">58</a>      properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Bob"</span>);
-<a name="59" href="#59">59</a>      Vertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
+<a name="59" href="#59">59</a>      EPGMVertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
 <a name="60" href="#60">60</a>  
 <a name="61" href="#61">61</a>      properties = Properties.create();
 <a name="62" href="#62">62</a>      properties.set(<span class="jxr_string">"since"</span>, <span class="jxr_string">"2013"</span>);
-<a name="63" href="#63">63</a>      Edge e = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, a.getId(), b.getId(), properties);
+<a name="63" href="#63">63</a>      EPGMEdge e = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, a.getId(), b.getId(), properties);
 <a name="64" href="#64">64</a>  
 <a name="65" href="#65">65</a>      DataSet&lt;Triple&gt; triples = getExecutionEnvironment().fromElements(<strong class="jxr_keyword">new</strong> Triple(a, e, b));
 <a name="66" href="#66">66</a>  
@@ -95,24 +95,24 @@
 <a name="85" href="#85">85</a>      Properties properties = Properties.create();
 <a name="86" href="#86">86</a>      properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Alice"</span>);
 <a name="87" href="#87">87</a>      properties.set(<span class="jxr_string">"age"</span>, <span class="jxr_string">"25"</span>);
-<a name="88" href="#88">88</a>      Vertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
+<a name="88" href="#88">88</a>      EPGMVertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
 <a name="89" href="#89">89</a>  
 <a name="90" href="#90">90</a>      properties = Properties.create();
 <a name="91" href="#91">91</a>      properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Bob"</span>);
 <a name="92" href="#92">92</a>      properties.set(<span class="jxr_string">"age"</span>, <span class="jxr_string">"24"</span>);
-<a name="93" href="#93">93</a>      Vertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
+<a name="93" href="#93">93</a>      EPGMVertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
 <a name="94" href="#94">94</a>  
 <a name="95" href="#95">95</a>      properties = Properties.create();
 <a name="96" href="#96">96</a>      properties.set(<span class="jxr_string">"since"</span>, 2013);
-<a name="97" href="#97">97</a>      Edge e1 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, a.getId(), b.getId(), properties);
+<a name="97" href="#97">97</a>      EPGMEdge e1 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, a.getId(), b.getId(), properties);
 <a name="98" href="#98">98</a>  
 <a name="99" href="#99">99</a>      properties = Properties.create();
 <a name="100" href="#100">100</a>     properties.set(<span class="jxr_string">"since"</span>, 2013);
-<a name="101" href="#101">101</a>     Edge e2 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, b.getId(), a.getId(), properties);
+<a name="101" href="#101">101</a>     EPGMEdge e2 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, b.getId(), a.getId(), properties);
 <a name="102" href="#102">102</a> 
 <a name="103" href="#103">103</a>     properties = Properties.create();
 <a name="104" href="#104">104</a>     properties.set(<span class="jxr_string">"since"</span>, 2014);
-<a name="105" href="#105">105</a>     Edge e3 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, a.getId(), b.getId(), properties);
+<a name="105" href="#105">105</a>     EPGMEdge e3 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, a.getId(), b.getId(), properties);
 <a name="106" href="#106">106</a> 
 <a name="107" href="#107">107</a> 
 <a name="108" href="#108">108</a>     DataSet&lt;Triple&gt; triples = getExecutionEnvironment().fromElements(
@@ -136,12 +136,12 @@
 <a name="126" href="#126">126</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFilterByLabel() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="127" href="#127">127</a>     CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH (a:Person)-[e:likes]-&gt;(b)"</span>);
 <a name="128" href="#128">128</a> 
-<a name="129" href="#129">129</a>     Vertex a1 = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="130" href="#130">130</a>     Vertex a2 = vertexFactory.createVertex(<span class="jxr_string">"Orc"</span>);
-<a name="131" href="#131">131</a>     Vertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="132" href="#132">132</a>     Edge e1 = edgeFactory.createEdge(<span class="jxr_string">"likes"</span>, a1.getId(), b.getId());
-<a name="133" href="#133">133</a>     Edge e2 = edgeFactory.createEdge(<span class="jxr_string">"likes"</span>, a2.getId(), b.getId());
-<a name="134" href="#134">134</a>     Edge e3 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, a1.getId(), b.getId());
+<a name="129" href="#129">129</a>     EPGMVertex a1 = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="130" href="#130">130</a>     EPGMVertex a2 = vertexFactory.createVertex(<span class="jxr_string">"Orc"</span>);
+<a name="131" href="#131">131</a>     EPGMVertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="132" href="#132">132</a>     EPGMEdge e1 = edgeFactory.createEdge(<span class="jxr_string">"likes"</span>, a1.getId(), b.getId());
+<a name="133" href="#133">133</a>     EPGMEdge e2 = edgeFactory.createEdge(<span class="jxr_string">"likes"</span>, a2.getId(), b.getId());
+<a name="134" href="#134">134</a>     EPGMEdge e3 = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, a1.getId(), b.getId());
 <a name="135" href="#135">135</a> 
 <a name="136" href="#136">136</a>     DataSet&lt;Triple&gt; triples = getExecutionEnvironment().fromElements(
 <a name="137" href="#137">137</a>       <strong class="jxr_keyword">new</strong> Triple(a1, e1, b),
@@ -165,10 +165,10 @@
 <a name="155" href="#155">155</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFilterBySelfLoop() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="156" href="#156">156</a>     CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH (a)-[e]-&gt;(a)"</span>);
 <a name="157" href="#157">157</a> 
-<a name="158" href="#158">158</a>     Vertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="159" href="#159">159</a>     Vertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="160" href="#160">160</a>     Edge e1 = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), a.getId());
-<a name="161" href="#161">161</a>     Edge e2 = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), b.getId());
+<a name="158" href="#158">158</a>     EPGMVertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="159" href="#159">159</a>     EPGMVertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="160" href="#160">160</a>     EPGMEdge e1 = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), a.getId());
+<a name="161" href="#161">161</a>     EPGMEdge e2 = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), b.getId());
 <a name="162" href="#162">162</a> 
 <a name="163" href="#163">163</a>     DataSet&lt;Triple&gt; triples = getExecutionEnvironment().fromElements(
 <a name="164" href="#164">164</a>       <strong class="jxr_keyword">new</strong> Triple(a, e1, a),
@@ -189,10 +189,10 @@
 <a name="179" href="#179">179</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFilterByIsomorphism() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="180" href="#180">180</a>     CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH (a)-[e]-&gt;(b)"</span>);
 <a name="181" href="#181">181</a> 
-<a name="182" href="#182">182</a>     Vertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="183" href="#183">183</a>     Vertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="184" href="#184">184</a>     Edge e1 = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), a.getId());
-<a name="185" href="#185">185</a>     Edge e2 = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), b.getId());
+<a name="182" href="#182">182</a>     EPGMVertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="183" href="#183">183</a>     EPGMVertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="184" href="#184">184</a>     EPGMEdge e1 = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), a.getId());
+<a name="185" href="#185">185</a>     EPGMEdge e2 = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), b.getId());
 <a name="186" href="#186">186</a> 
 <a name="187" href="#187">187</a>     DataSet&lt;Triple&gt; triples = getExecutionEnvironment().fromElements(
 <a name="188" href="#188">188</a>       <strong class="jxr_keyword">new</strong> Triple(a, e1, a),
@@ -214,10 +214,10 @@
 <a name="204" href="#204">204</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFilterByHomomorphism() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="205" href="#205">205</a>     CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH (a)-[e]-&gt;(b)"</span>);
 <a name="206" href="#206">206</a> 
-<a name="207" href="#207">207</a>     Vertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="208" href="#208">208</a>     Vertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="209" href="#209">209</a>     Edge e1 = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), a.getId());
-<a name="210" href="#210">210</a>     Edge e2 = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), b.getId());
+<a name="207" href="#207">207</a>     EPGMVertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="208" href="#208">208</a>     EPGMVertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="209" href="#209">209</a>     EPGMEdge e1 = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), a.getId());
+<a name="210" href="#210">210</a>     EPGMEdge e2 = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), b.getId());
 <a name="211" href="#211">211</a> 
 <a name="212" href="#212">212</a>     DataSet&lt;Triple&gt; triples = getExecutionEnvironment().fromElements(
 <a name="213" href="#213">213</a>       <strong class="jxr_keyword">new</strong> Triple(a, e1, a),
@@ -236,9 +236,9 @@
 <a name="226" href="#226">226</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testResultingEntryList() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="227" href="#227">227</a>     CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH (a)-[e]-&gt;(b)"</span>);
 <a name="228" href="#228">228</a> 
-<a name="229" href="#229">229</a>     Vertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="230" href="#230">230</a>     Vertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="231" href="#231">231</a>     Edge e = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), b.getId());
+<a name="229" href="#229">229</a>     EPGMVertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="230" href="#230">230</a>     EPGMVertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="231" href="#231">231</a>     EPGMEdge e = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), b.getId());
 <a name="232" href="#232">232</a> 
 <a name="233" href="#233">233</a>     DataSet&lt;Triple&gt; triples = getExecutionEnvironment().fromElements(<strong class="jxr_keyword">new</strong> Triple(a, e, b));
 <a name="234" href="#234">234</a> 
@@ -258,8 +258,8 @@
 <a name="248" href="#248">248</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testResultingEntryForSelfLoops() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="249" href="#249">249</a>     CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH (a)-[e]-&gt;(a)"</span>);
 <a name="250" href="#250">250</a> 
-<a name="251" href="#251">251</a>     Vertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="252" href="#252">252</a>     Edge e = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), a.getId());
+<a name="251" href="#251">251</a>     EPGMVertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="252" href="#252">252</a>     EPGMEdge e = edgeFactory.createEdge(<span class="jxr_string">"loves"</span>, a.getId(), a.getId());
 <a name="253" href="#253">253</a> 
 <a name="254" href="#254">254</a>     DataSet&lt;Triple&gt; triples = getExecutionEnvironment().fromElements(<strong class="jxr_keyword">new</strong> Triple(a, e, a));
 <a name="255" href="#255">255</a> 
@@ -281,17 +281,17 @@
 <a name="271" href="#271">271</a>     Properties properties = Properties.create();
 <a name="272" href="#272">272</a>     properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Alice"</span>);
 <a name="273" href="#273">273</a>     properties.set(<span class="jxr_string">"age"</span>, 25);
-<a name="274" href="#274">274</a>     Vertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
+<a name="274" href="#274">274</a>     EPGMVertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
 <a name="275" href="#275">275</a> 
 <a name="276" href="#276">276</a>     properties = Properties.create();
 <a name="277" href="#277">277</a>     properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Bob"</span>);
 <a name="278" href="#278">278</a>     properties.set(<span class="jxr_string">"age"</span>, 24);
-<a name="279" href="#279">279</a>     Vertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
+<a name="279" href="#279">279</a>     EPGMVertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>, properties);
 <a name="280" href="#280">280</a> 
 <a name="281" href="#281">281</a>     properties = Properties.create();
 <a name="282" href="#282">282</a>     properties.set(<span class="jxr_string">"since"</span>, 2013);
 <a name="283" href="#283">283</a>     properties.set(<span class="jxr_string">"active"</span>, <strong class="jxr_keyword">true</strong>);
-<a name="284" href="#284">284</a>     Edge e = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, a.getId(), b.getId(), properties);
+<a name="284" href="#284">284</a>     EPGMEdge e = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, a.getId(), b.getId(), properties);
 <a name="285" href="#285">285</a> 
 <a name="286" href="#286">286</a> 
 <a name="287" href="#287">287</a>     DataSet&lt;Triple&gt; triples = getExecutionEnvironment().fromElements(<strong class="jxr_keyword">new</strong> Triple(a, e, b));
@@ -316,9 +316,9 @@
 <a name="306" href="#306">306</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testProjectionOfMissingValues() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="307" href="#307">307</a>     CNF predicates = predicateFromQuery(<span class="jxr_string">"MATCH (a)-[e]-&gt;(b)"</span>);
 <a name="308" href="#308">308</a> 
-<a name="309" href="#309">309</a>     Vertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="310" href="#310">310</a>     Vertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
-<a name="311" href="#311">311</a>     Edge e = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, a.getId(), b.getId());
+<a name="309" href="#309">309</a>     EPGMVertex a = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="310" href="#310">310</a>     EPGMVertex b = vertexFactory.createVertex(<span class="jxr_string">"Person"</span>);
+<a name="311" href="#311">311</a>     EPGMEdge e = edgeFactory.createEdge(<span class="jxr_string">"knows"</span>, a.getId(), b.getId());
 <a name="312" href="#312">312</a> 
 <a name="313" href="#313">313</a> 
 <a name="314" href="#314">314</a>     DataSet&lt;Triple&gt; triples = getExecutionEnvironment().fromElements(<strong class="jxr_keyword">new</strong> Triple(a, e, b));

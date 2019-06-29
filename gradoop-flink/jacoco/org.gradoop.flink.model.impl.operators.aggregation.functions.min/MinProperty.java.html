@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.aggregation.functions.min;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.operators.aggregation.functions.BaseAggregateFunction;
 
@@ -53,7 +53,7 @@ public class MinProperty extends BaseAggregateFunction implements Min {
 <span class="fc" id="L53">  }</span>
 
   @Override
-  public PropertyValue getIncrement(EPGMElement element) {
+  public PropertyValue getIncrement(Element element) {
 <span class="fc" id="L57">    return element.getPropertyValue(propertyKey);</span>
   }
 }

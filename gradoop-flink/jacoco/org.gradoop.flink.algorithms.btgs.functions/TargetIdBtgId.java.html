@@ -17,14 +17,14 @@ package org.gradoop.flink.algorithms.btgs.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.EPGMEdge;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
  * edge -&gt; (targetId, firstGraphId)
  * @param &lt;E&gt; edge type
  */
-<span class="fc" id="L27">public class TargetIdBtgId&lt;E extends EPGMEdge&gt; implements</span>
+<span class="fc" id="L27">public class TargetIdBtgId&lt;E extends Edge&gt; implements</span>
   MapFunction&lt;E, Tuple2&lt;GradoopId, GradoopId&gt;&gt; {
 
   @Override

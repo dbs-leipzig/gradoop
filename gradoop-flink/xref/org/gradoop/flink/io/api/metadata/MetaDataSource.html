@@ -32,7 +32,7 @@
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.conf.Configuration;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.metadata.MetaData;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.metadata.PropertyMetaData;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Element;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMElement;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.metadata.functions.ElementToPropertyMetaData;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.metadata.functions.ReducePropertyMetaData;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -93,7 +93,7 @@
 <a name="83" href="#83">83</a>  <em class="jxr_javadoccomment">   * @param &lt;E&gt;      EPGM element type</em>
 <a name="84" href="#84">84</a>  <em class="jxr_javadoccomment">   * @return meta data information</em>
 <a name="85" href="#85">85</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="86" href="#86">86</a>    <strong class="jxr_keyword">static</strong> &lt;E <strong class="jxr_keyword">extends</strong> Element&gt; DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; tuplesFromElements(
+<a name="86" href="#86">86</a>    <strong class="jxr_keyword">static</strong> &lt;E <strong class="jxr_keyword">extends</strong> EPGMElement&gt; DataSet&lt;Tuple3&lt;String, String, String&gt;&gt; tuplesFromElements(
 <a name="87" href="#87">87</a>      DataSet&lt;E&gt; elements) {
 <a name="88" href="#88">88</a>      <strong class="jxr_keyword">return</strong> elements
 <a name="89" href="#89">89</a>        .map(<strong class="jxr_keyword">new</strong> ElementToPropertyMetaData&lt;&gt;())

@@ -29,9 +29,9 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.HBaseConfiguration;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.HBaseTestingUtility;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.GradoopTestUtils;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.config.GradoopHBaseConfig;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.hbase.factory.HBaseEPGMStoreFactory;
 <a name="27" href="#27">27</a>  
@@ -64,9 +64,9 @@
 <a name="54" href="#54">54</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String PROP_STATUS = <span class="jxr_string">"status"</span>;
 <a name="55" href="#55">55</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> String PROP_VERTEX_COUNT = <span class="jxr_string">"vertexCount"</span>;
 <a name="56" href="#56">56</a>  
-<a name="57" href="#57">57</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> Collection&lt;GraphHead&gt; socialGraphHeads;
-<a name="58" href="#58">58</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> Collection&lt;Vertex&gt; socialVertices;
-<a name="59" href="#59">59</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> Collection&lt;Edge&gt; socialEdges;
+<a name="57" href="#57">57</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> Collection&lt;EPGMGraphHead&gt; socialGraphHeads;
+<a name="58" href="#58">58</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> Collection&lt;EPGMVertex&gt; socialVertices;
+<a name="59" href="#59">59</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> Collection&lt;EPGMEdge&gt; socialEdges;
 <a name="60" href="#60">60</a>  
 <a name="61" href="#61">61</a>    <em class="jxr_comment">//----------------------------------------------------------------------------</em>
 <a name="62" href="#62">62</a>    <em class="jxr_comment">// Cluster related</em>
@@ -188,7 +188,7 @@
 <a name="178" href="#178">178</a> <em class="jxr_javadoccomment">   * @return collection of graph heads</em>
 <a name="179" href="#179">179</a> <em class="jxr_javadoccomment">   * @throws IOException if fetching graph elements failed</em>
 <a name="180" href="#180">180</a> <em class="jxr_javadoccomment">   */</em>
-<a name="181" href="#181">181</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Collection&lt;GraphHead&gt; getSocialGraphHeads() <strong class="jxr_keyword">throws</strong> IOException {
+<a name="181" href="#181">181</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Collection&lt;EPGMGraphHead&gt; getSocialGraphHeads() <strong class="jxr_keyword">throws</strong> IOException {
 <a name="182" href="#182">182</a>     <strong class="jxr_keyword">if</strong> (socialGraphHeads == <strong class="jxr_keyword">null</strong>) {
 <a name="183" href="#183">183</a>       socialGraphHeads = GradoopTestUtils.getSocialNetworkLoader().getGraphHeads();
 <a name="184" href="#184">184</a>     }
@@ -202,7 +202,7 @@
 <a name="192" href="#192">192</a> <em class="jxr_javadoccomment">   * @return collection of vertices</em>
 <a name="193" href="#193">193</a> <em class="jxr_javadoccomment">   * @throws IOException if fetching graph elements failed</em>
 <a name="194" href="#194">194</a> <em class="jxr_javadoccomment">   */</em>
-<a name="195" href="#195">195</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Collection&lt;Vertex&gt; getSocialVertices() <strong class="jxr_keyword">throws</strong> IOException {
+<a name="195" href="#195">195</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Collection&lt;EPGMVertex&gt; getSocialVertices() <strong class="jxr_keyword">throws</strong> IOException {
 <a name="196" href="#196">196</a>     <strong class="jxr_keyword">if</strong> (socialVertices == <strong class="jxr_keyword">null</strong>) {
 <a name="197" href="#197">197</a>       socialVertices = GradoopTestUtils.getSocialNetworkLoader().getVertices();
 <a name="198" href="#198">198</a>     }
@@ -216,7 +216,7 @@
 <a name="206" href="#206">206</a> <em class="jxr_javadoccomment">   * @return collection of edges</em>
 <a name="207" href="#207">207</a> <em class="jxr_javadoccomment">   * @throws IOException if fetching graph elements failed</em>
 <a name="208" href="#208">208</a> <em class="jxr_javadoccomment">   */</em>
-<a name="209" href="#209">209</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Collection&lt;Edge&gt; getSocialEdges() <strong class="jxr_keyword">throws</strong> IOException {
+<a name="209" href="#209">209</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> Collection&lt;EPGMEdge&gt; getSocialEdges() <strong class="jxr_keyword">throws</strong> IOException {
 <a name="210" href="#210">210</a>     <strong class="jxr_keyword">if</strong> (socialEdges == <strong class="jxr_keyword">null</strong>) {
 <a name="211" href="#211">211</a>       socialEdges = GradoopTestUtils.getSocialNetworkLoader().getEdges();
 <a name="212" href="#212">212</a>     }
@@ -231,13 +231,13 @@
 <a name="221" href="#221">221</a> <em class="jxr_javadoccomment">   */</em>
 <a name="222" href="#222">222</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">void</strong> writeSocialGraphToStore(HBaseEPGMStore epgmStore) <strong class="jxr_keyword">throws</strong> IOException {
 <a name="223" href="#223">223</a>     <em class="jxr_comment">// write social graph to HBase</em>
-<a name="224" href="#224">224</a>     <strong class="jxr_keyword">for</strong> (GraphHead g : getSocialGraphHeads()) {
+<a name="224" href="#224">224</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead g : getSocialGraphHeads()) {
 <a name="225" href="#225">225</a>       epgmStore.writeGraphHead(g);
 <a name="226" href="#226">226</a>     }
-<a name="227" href="#227">227</a>     <strong class="jxr_keyword">for</strong> (Vertex v : getSocialVertices()) {
+<a name="227" href="#227">227</a>     <strong class="jxr_keyword">for</strong> (EPGMVertex v : getSocialVertices()) {
 <a name="228" href="#228">228</a>       epgmStore.writeVertex(v);
 <a name="229" href="#229">229</a>     }
-<a name="230" href="#230">230</a>     <strong class="jxr_keyword">for</strong> (Edge e : getSocialEdges()) {
+<a name="230" href="#230">230</a>     <strong class="jxr_keyword">for</strong> (EPGMEdge e : getSocialEdges()) {
 <a name="231" href="#231">231</a>       epgmStore.writeEdge(e);
 <a name="232" href="#232">232</a>     }
 <a name="233" href="#233">233</a>     epgmStore.flush();

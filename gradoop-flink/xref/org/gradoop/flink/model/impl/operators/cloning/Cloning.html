@@ -28,9 +28,9 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.Clone;
@@ -57,33 +57,33 @@
 <a name="47" href="#47">47</a>      <em class="jxr_comment">// compute new graphs</em>
 <a name="48" href="#48">48</a>      <em class="jxr_comment">//--------------------------------------------------------------------------</em>
 <a name="49" href="#49">49</a>  
-<a name="50" href="#50">50</a>      DataSet&lt;GraphHead&gt; graphHead = graph.getGraphHead()
-<a name="51" href="#51">51</a>        .map(<strong class="jxr_keyword">new</strong> Clone&lt;GraphHead&gt;());
+<a name="50" href="#50">50</a>      DataSet&lt;EPGMGraphHead&gt; graphHead = graph.getGraphHead()
+<a name="51" href="#51">51</a>        .map(<strong class="jxr_keyword">new</strong> Clone&lt;EPGMGraphHead&gt;());
 <a name="52" href="#52">52</a>  
-<a name="53" href="#53">53</a>      DataSet&lt;GradoopId&gt; graphId = graphHead.map(<strong class="jxr_keyword">new</strong> Id&lt;GraphHead&gt;());
+<a name="53" href="#53">53</a>      DataSet&lt;GradoopId&gt; graphId = graphHead.map(<strong class="jxr_keyword">new</strong> Id&lt;EPGMGraphHead&gt;());
 <a name="54" href="#54">54</a>  
 <a name="55" href="#55">55</a>      <em class="jxr_comment">//--------------------------------------------------------------------------</em>
 <a name="56" href="#56">56</a>      <em class="jxr_comment">// compute new vertices</em>
 <a name="57" href="#57">57</a>      <em class="jxr_comment">//--------------------------------------------------------------------------</em>
 <a name="58" href="#58">58</a>  
-<a name="59" href="#59">59</a>      DataSet&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; vertexTuple = graph.getVertices()
-<a name="60" href="#60">60</a>          .map(<strong class="jxr_keyword">new</strong> PairElementWithNewId&lt;Vertex&gt;());
+<a name="59" href="#59">59</a>      DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; vertexTuple = graph.getVertices()
+<a name="60" href="#60">60</a>          .map(<strong class="jxr_keyword">new</strong> PairElementWithNewId&lt;EPGMVertex&gt;());
 <a name="61" href="#61">61</a>  
 <a name="62" href="#62">62</a>      DataSet&lt;Tuple2&lt;GradoopId, GradoopId&gt;&gt; vertexIdTuple = vertexTuple
-<a name="63" href="#63">63</a>        .map(<strong class="jxr_keyword">new</strong> Value0Of2ToId&lt;Vertex, GradoopId&gt;());
+<a name="63" href="#63">63</a>        .map(<strong class="jxr_keyword">new</strong> Value0Of2ToId&lt;EPGMVertex, GradoopId&gt;());
 <a name="64" href="#64">64</a>  
-<a name="65" href="#65">65</a>      DataSet&lt;Vertex&gt; vertices = vertexTuple
-<a name="66" href="#66">66</a>        .map(<strong class="jxr_keyword">new</strong> ElementIdUpdater&lt;Vertex&gt;())
+<a name="65" href="#65">65</a>      DataSet&lt;EPGMVertex&gt; vertices = vertexTuple
+<a name="66" href="#66">66</a>        .map(<strong class="jxr_keyword">new</strong> ElementIdUpdater&lt;EPGMVertex&gt;())
 <a name="67" href="#67">67</a>        <em class="jxr_comment">//update graph ids</em>
-<a name="68" href="#68">68</a>        .map(<strong class="jxr_keyword">new</strong> ElementGraphUpdater&lt;Vertex&gt;())
+<a name="68" href="#68">68</a>        .map(<strong class="jxr_keyword">new</strong> ElementGraphUpdater&lt;EPGMVertex&gt;())
 <a name="69" href="#69">69</a>        .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);
 <a name="70" href="#70">70</a>  
 <a name="71" href="#71">71</a>      <em class="jxr_comment">//--------------------------------------------------------------------------</em>
 <a name="72" href="#72">72</a>      <em class="jxr_comment">// compute new edges</em>
 <a name="73" href="#73">73</a>      <em class="jxr_comment">//--------------------------------------------------------------------------</em>
 <a name="74" href="#74">74</a>  
-<a name="75" href="#75">75</a>      DataSet&lt;Edge&gt; edges = graph.getEdges()
-<a name="76" href="#76">76</a>        .map(<strong class="jxr_keyword">new</strong> Clone&lt;Edge&gt;())
+<a name="75" href="#75">75</a>      DataSet&lt;EPGMEdge&gt; edges = graph.getEdges()
+<a name="76" href="#76">76</a>        .map(<strong class="jxr_keyword">new</strong> Clone&lt;EPGMEdge&gt;())
 <a name="77" href="#77">77</a>        <em class="jxr_comment">//update source vertex ids</em>
 <a name="78" href="#78">78</a>        .join(vertexIdTuple)
 <a name="79" href="#79">79</a>        .where(<strong class="jxr_keyword">new</strong> SourceId&lt;&gt;()).equalTo(0)
@@ -93,7 +93,7 @@
 <a name="83" href="#83">83</a>        .where(<strong class="jxr_keyword">new</strong> TargetId&lt;&gt;()).equalTo(0)
 <a name="84" href="#84">84</a>        .with(<strong class="jxr_keyword">new</strong> EdgeTargetUpdateJoin&lt;&gt;())
 <a name="85" href="#85">85</a>        <em class="jxr_comment">//update graph ids</em>
-<a name="86" href="#86">86</a>        .map(<strong class="jxr_keyword">new</strong> ElementGraphUpdater&lt;Edge&gt;())
+<a name="86" href="#86">86</a>        .map(<strong class="jxr_keyword">new</strong> ElementGraphUpdater&lt;EPGMEdge&gt;())
 <a name="87" href="#87">87</a>        .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);
 <a name="88" href="#88">88</a>  
 <a name="89" href="#89">89</a>      <strong class="jxr_keyword">return</strong> graph.getConfig().getLogicalGraphFactory()

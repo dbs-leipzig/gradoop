@@ -19,8 +19,8 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Preconditions;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.dataintegration.transformation.impl.config.EdgeDirection;
 import org.gradoop.dataintegration.transformation.impl.functions.CreateNewEdges;
@@ -131,7 +131,7 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
   @Override
   public LogicalGraph execute(LogicalGraph logicalGraph) {
     // filter the vertices by the given label
-<span class="fc" id="L134">    DataSet&lt;Vertex&gt; filteredVertices = logicalGraph</span>
+<span class="fc" id="L134">    DataSet&lt;EPGMVertex&gt; filteredVertices = logicalGraph</span>
 <span class="fc" id="L135">      .getVertices()</span>
 <span class="fc" id="L136">      .filter(new ByLabel&lt;&gt;(forVerticesOfLabel));</span>
 
@@ -140,7 +140,7 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
 <span class="fc" id="L140">      .flatMap(new ExtractPropertyWithOriginId(originalPropertyName));</span>
 
     // extract the new vertices
-    DataSet&lt;Tuple2&lt;Vertex, List&lt;GradoopId&gt;&gt;&gt; newVerticesAndOriginIds;
+    DataSet&lt;Tuple2&lt;EPGMVertex, List&lt;GradoopId&gt;&gt;&gt; newVerticesAndOriginIds;
 <span class="fc bfc" id="L144" title="All 2 branches covered.">    if (condense) {</span>
 <span class="fc" id="L145">      newVerticesAndOriginIds = candidates</span>
 <span class="fc" id="L146">        .groupBy(0)</span>
@@ -152,12 +152,12 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
           newPropertyName));
     }
 
-<span class="fc" id="L155">    DataSet&lt;Vertex&gt; vertices = newVerticesAndOriginIds</span>
+<span class="fc" id="L155">    DataSet&lt;EPGMVertex&gt; vertices = newVerticesAndOriginIds</span>
 <span class="fc" id="L156">      .map(new Value0Of2&lt;&gt;())</span>
 <span class="fc" id="L157">      .union(logicalGraph.getVertices());</span>
 
     // the newly created vertices should be linked to the original vertices
-<span class="fc" id="L160">    DataSet&lt;Edge&gt; edges = logicalGraph.getEdges();</span>
+<span class="fc" id="L160">    DataSet&lt;EPGMEdge&gt; edges = logicalGraph.getEdges();</span>
 <span class="fc bfc" id="L161" title="All 2 branches covered.">    if (!edgeDirection.equals(EdgeDirection.NONE)) {</span>
 <span class="fc" id="L162">      edges = newVerticesAndOriginIds</span>
 <span class="fc" id="L163">        .flatMap(new CreateNewEdges(logicalGraph.getConfig().getEdgeFactory(), edgeDirection,</span>

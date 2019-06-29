@@ -17,7 +17,7 @@ package org.gradoop.dataintegration.transformation.impl;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.dataintegration.transformation.functions.CreateNeighborList;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -44,13 +44,13 @@ import java.util.Objects;
    * @return A Dataset of tuples containing vertices and their neighborhood.
    * @throws NullPointerException if any of the parameters is null.
    */
-  public static DataSet&lt;Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; getPerVertex(LogicalGraph graph,
-                 DataSet&lt;Vertex&gt; centralVertices, EdgeDirection edgeDirection) {
+  public static DataSet&lt;Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; getPerVertex(LogicalGraph graph,
+                 DataSet&lt;EPGMVertex&gt; centralVertices, EdgeDirection edgeDirection) {
 <span class="fc" id="L49">    Objects.requireNonNull(graph);</span>
 <span class="fc" id="L50">    Objects.requireNonNull(centralVertices);</span>
 <span class="fc" id="L51">    Objects.requireNonNull(edgeDirection);</span>
-<span class="fc" id="L52">    DataSet&lt;Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; incoming = null;</span>
-<span class="fc" id="L53">    DataSet&lt;Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; outgoing = null;</span>
+<span class="fc" id="L52">    DataSet&lt;Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; incoming = null;</span>
+<span class="fc" id="L53">    DataSet&lt;Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; outgoing = null;</span>
 
     // get incoming
 <span class="fc bfc" id="L56" title="All 2 branches covered.">    if (edgeDirection.equals(EdgeDirection.INCOMING) ||</span>

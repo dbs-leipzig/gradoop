@@ -29,7 +29,7 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -69,24 +69,26 @@
 <a name="59" href="#59">59</a>      Map&lt;String, Object&gt; vertex2Props = <strong class="jxr_keyword">new</strong> HashMap&lt;&gt;();
 <a name="60" href="#60">60</a>      vertex2Props.put(<span class="jxr_string">"foo"</span>, 42);
 <a name="61" href="#61">61</a>  
-<a name="62" href="#62">62</a>      Vertex vertex1 = <strong class="jxr_keyword">new</strong> Vertex(vertex1Id, <span class="jxr_string">"A"</span>, Properties.createFromMap(vertex1Props), <strong class="jxr_keyword">new</strong> GradoopIdSet());
-<a name="63" href="#63">63</a>      Vertex vertex2 = <strong class="jxr_keyword">new</strong> Vertex(vertex2Id, <span class="jxr_string">"B"</span>, Properties.createFromMap(vertex2Props), <strong class="jxr_keyword">new</strong> GradoopIdSet());
-<a name="64" href="#64">64</a>  
-<a name="65" href="#65">65</a>      DataSet&lt;Vertex&gt; vertices = getExecutionEnvironment().fromElements(vertex1, vertex2);
+<a name="62" href="#62">62</a>      EPGMVertex
+<a name="63" href="#63">63</a>        vertex1 = <strong class="jxr_keyword">new</strong> EPGMVertex(vertex1Id, <span class="jxr_string">"A"</span>, Properties.createFromMap(vertex1Props), <strong class="jxr_keyword">new</strong> GradoopIdSet());
+<a name="64" href="#64">64</a>      EPGMVertex
+<a name="65" href="#65">65</a>        vertex2 = <strong class="jxr_keyword">new</strong> EPGMVertex(vertex2Id, <span class="jxr_string">"B"</span>, Properties.createFromMap(vertex2Props), <strong class="jxr_keyword">new</strong> GradoopIdSet());
 <a name="66" href="#66">66</a>  
-<a name="67" href="#67">67</a>      String query = <span class="jxr_string">"MATCH (n) WHERE n.foo = 23"</span>;
-<a name="68" href="#68">68</a>      QueryHandler queryHandler = <strong class="jxr_keyword">new</strong> QueryHandler(query);
-<a name="69" href="#69">69</a>      CNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet(<span class="jxr_string">"n"</span>));
-<a name="70" href="#70">70</a>      Set&lt;String&gt; projectionKeys = queryHandler.getPredicates().getPropertyKeys(<span class="jxr_string">"n"</span>);
-<a name="71" href="#71">71</a>  
-<a name="72" href="#72">72</a>      FilterAndProjectVerticesNode node = <strong class="jxr_keyword">new</strong> FilterAndProjectVerticesNode(
-<a name="73" href="#73">73</a>        vertices, <span class="jxr_string">"n"</span>, filterPredicate, projectionKeys);
-<a name="74" href="#74">74</a>      List&lt;Embedding&gt; filteredVertices = node.execute().collect();
-<a name="75" href="#75">75</a>  
-<a name="76" href="#76">76</a>      assertThat(filteredVertices.size(), is(1));
-<a name="77" href="#77">77</a>      assertThat(filteredVertices.get(0).getId(0).equals(vertex1Id), is(<strong class="jxr_keyword">true</strong>));
-<a name="78" href="#78">78</a>    }
-<a name="79" href="#79">79</a>  }
+<a name="67" href="#67">67</a>      DataSet&lt;EPGMVertex&gt; vertices = getExecutionEnvironment().fromElements(vertex1, vertex2);
+<a name="68" href="#68">68</a>  
+<a name="69" href="#69">69</a>      String query = <span class="jxr_string">"MATCH (n) WHERE n.foo = 23"</span>;
+<a name="70" href="#70">70</a>      QueryHandler queryHandler = <strong class="jxr_keyword">new</strong> QueryHandler(query);
+<a name="71" href="#71">71</a>      CNF filterPredicate = queryHandler.getPredicates().getSubCNF(Sets.newHashSet(<span class="jxr_string">"n"</span>));
+<a name="72" href="#72">72</a>      Set&lt;String&gt; projectionKeys = queryHandler.getPredicates().getPropertyKeys(<span class="jxr_string">"n"</span>);
+<a name="73" href="#73">73</a>  
+<a name="74" href="#74">74</a>      FilterAndProjectVerticesNode node = <strong class="jxr_keyword">new</strong> FilterAndProjectVerticesNode(
+<a name="75" href="#75">75</a>        vertices, <span class="jxr_string">"n"</span>, filterPredicate, projectionKeys);
+<a name="76" href="#76">76</a>      List&lt;Embedding&gt; filteredVertices = node.execute().collect();
+<a name="77" href="#77">77</a>  
+<a name="78" href="#78">78</a>      assertThat(filteredVertices.size(), is(1));
+<a name="79" href="#79">79</a>      assertThat(filteredVertices.get(0).getId(0).equals(vertex1Id), is(<strong class="jxr_keyword">true</strong>));
+<a name="80" href="#80">80</a>    }
+<a name="81" href="#81">81</a>  }
 </pre>
 <hr/><div id="footer">This page was automatically generated by <a href="http://maven.apache.org/">Maven</a></div></body>
 </html>

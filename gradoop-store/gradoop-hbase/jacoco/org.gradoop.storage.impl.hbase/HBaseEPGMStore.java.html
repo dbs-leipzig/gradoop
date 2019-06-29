@@ -23,14 +23,14 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.filter.FilterList;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.api.EPGMConfigProvider;
 import org.gradoop.storage.common.api.EPGMGraphInput;
 import org.gradoop.storage.common.api.EPGMGraphPredictableOutput;
@@ -62,9 +62,9 @@ public class HBaseEPGMStore implements
   EPGMConfigProvider&lt;GradoopHBaseConfig&gt;,
   EPGMGraphInput,
   EPGMGraphPredictableOutput&lt;
-    HBaseElementFilter&lt;GraphHead&gt;,
-    HBaseElementFilter&lt;Vertex&gt;,
-    HBaseElementFilter&lt;Edge&gt;&gt; {
+    HBaseElementFilter&lt;EPGMGraphHead&gt;,
+    HBaseElementFilter&lt;EPGMVertex&gt;,
+    HBaseElementFilter&lt;EPGMEdge&gt;&gt; {
 
   /**
    * Gradoop configuration.
@@ -136,7 +136,7 @@ public class HBaseEPGMStore implements
   }
 
   @Override
-  public void writeGraphHead(@Nonnull final EPGMGraphHead graphHead) throws IOException {
+  public void writeGraphHead(@Nonnull final GraphHead graphHead) throws IOException {
 <span class="fc" id="L140">    GraphHeadHandler graphHeadHandler = config.getGraphHeadHandler();</span>
     // graph id
 <span class="fc" id="L142">    Put put = new Put(graphHeadHandler.getRowKey(graphHead.getId()));</span>
@@ -150,7 +150,7 @@ public class HBaseEPGMStore implements
 <span class="fc" id="L150">  }</span>
 
   @Override
-  public void writeVertex(@Nonnull final EPGMVertex vertexData) throws IOException {
+  public void writeVertex(@Nonnull final Vertex vertexData) throws IOException {
 <span class="fc" id="L154">    VertexHandler vertexHandler = config.getVertexHandler();</span>
     // vertex id
 <span class="fc" id="L156">    Put put = new Put(vertexHandler.getRowKey(vertexData.getId()));</span>
@@ -164,7 +164,7 @@ public class HBaseEPGMStore implements
 <span class="fc" id="L164">  }</span>
 
   @Override
-  public void writeEdge(@Nonnull final EPGMEdge edgeData) throws IOException {
+  public void writeEdge(@Nonnull final Edge edgeData) throws IOException {
     // write to table
 <span class="fc" id="L169">    EdgeHandler edgeHandler = config.getEdgeHandler();</span>
     // edge id
@@ -178,8 +178,8 @@ public class HBaseEPGMStore implements
 <span class="fc" id="L178">  }</span>
 
   @Override
-  public GraphHead readGraph(@Nonnull final GradoopId graphId) throws IOException {
-<span class="fc" id="L182">    GraphHead graphData = null;</span>
+  public EPGMGraphHead readGraph(@Nonnull final GradoopId graphId) throws IOException {
+<span class="fc" id="L182">    EPGMGraphHead graphData = null;</span>
 <span class="fc" id="L183">    GraphHeadHandler graphHeadHandler = config.getGraphHeadHandler();</span>
 <span class="fc" id="L184">    List&lt;Get&gt; getList = new ArrayList&lt;&gt;();</span>
 
@@ -201,8 +201,8 @@ public class HBaseEPGMStore implements
   }
 
   @Override
-  public Vertex readVertex(@Nonnull final GradoopId vertexId) throws IOException {
-<span class="fc" id="L205">    Vertex vertexData = null;</span>
+  public EPGMVertex readVertex(@Nonnull final GradoopId vertexId) throws IOException {
+<span class="fc" id="L205">    EPGMVertex vertexData = null;</span>
 <span class="fc" id="L206">    VertexHandler vertexHandler = config.getVertexHandler();</span>
 <span class="fc" id="L207">    List&lt;Get&gt; getList = new ArrayList&lt;&gt;();</span>
 
@@ -226,8 +226,8 @@ public class HBaseEPGMStore implements
   }
 
   @Override
-  public Edge readEdge(@Nonnull final GradoopId edgeId) throws IOException {
-<span class="fc" id="L230">    Edge edgeData = null;</span>
+  public EPGMEdge readEdge(@Nonnull final GradoopId edgeId) throws IOException {
+<span class="fc" id="L230">    EPGMEdge edgeData = null;</span>
 <span class="fc" id="L231">    EdgeHandler edgeHandler = config.getEdgeHandler();</span>
 <span class="fc" id="L232">    List&lt;Get&gt; getList = new ArrayList&lt;&gt;();</span>
 
@@ -252,8 +252,8 @@ public class HBaseEPGMStore implements
 
   @Nonnull
   @Override
-  public ClosableIterator&lt;GraphHead&gt; getGraphSpace(
-    @Nullable ElementQuery&lt;HBaseElementFilter&lt;GraphHead&gt;&gt; query,
+  public ClosableIterator&lt;EPGMGraphHead&gt; getGraphSpace(
+    @Nullable ElementQuery&lt;HBaseElementFilter&lt;EPGMGraphHead&gt;&gt; query,
     int cacheSize
   ) throws IOException {
 <span class="fc" id="L259">    Scan scan = new Scan();</span>
@@ -269,8 +269,8 @@ public class HBaseEPGMStore implements
 
   @Nonnull
   @Override
-  public ClosableIterator&lt;Vertex&gt; getVertexSpace(
-    @Nullable ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; query,
+  public ClosableIterator&lt;EPGMVertex&gt; getVertexSpace(
+    @Nullable ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; query,
     int cacheSize
   ) throws IOException {
 <span class="fc" id="L276">    Scan scan = new Scan();</span>
@@ -286,8 +286,8 @@ public class HBaseEPGMStore implements
 
   @Nonnull
   @Override
-  public ClosableIterator&lt;Edge&gt; getEdgeSpace(
-    @Nullable ElementQuery&lt;HBaseElementFilter&lt;Edge&gt;&gt; query,
+  public ClosableIterator&lt;EPGMEdge&gt; getEdgeSpace(
+    @Nullable ElementQuery&lt;HBaseElementFilter&lt;EPGMEdge&gt;&gt; query,
     int cacheSize
   ) throws IOException {
 <span class="fc" id="L293">    Scan scan = new Scan();</span>
@@ -358,7 +358,7 @@ public class HBaseEPGMStore implements
    * @param isSpreadingByteUsed indicates whether a spreading byte is used as row key prefix or not
    * @param &lt;T&gt; the type of the EPGM element
    */
-  private &lt;T extends EPGMElement&gt; void attachFilter(
+  private &lt;T extends Element&gt; void attachFilter(
     @Nonnull ElementQuery&lt;HBaseElementFilter&lt;T&gt;&gt; query,
     @Nonnull Scan scan,
     boolean isSpreadingByteUsed) {

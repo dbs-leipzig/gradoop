@@ -28,9 +28,9 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.FilterFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.metadata.MetaData;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.AggregateFunction;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.TransformationFunction;
@@ -216,9 +216,9 @@
 <a name="206" href="#206">206</a> <em class="jxr_javadoccomment">   * @return transformed logical graph</em>
 <a name="207" href="#207">207</a> <em class="jxr_javadoccomment">   */</em>
 <a name="208" href="#208">208</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> transform(
-<a name="209" href="#209">209</a>     TransformationFunction&lt;GraphHead&gt; graphHeadTransformationFunction,
-<a name="210" href="#210">210</a>     TransformationFunction&lt;Vertex&gt; vertexTransformationFunction,
-<a name="211" href="#211">211</a>     TransformationFunction&lt;Edge&gt; edgeTransformationFunction);
+<a name="209" href="#209">209</a>     TransformationFunction&lt;EPGMGraphHead&gt; graphHeadTransformationFunction,
+<a name="210" href="#210">210</a>     TransformationFunction&lt;EPGMVertex&gt; vertexTransformationFunction,
+<a name="211" href="#211">211</a>     TransformationFunction&lt;EPGMEdge&gt; edgeTransformationFunction);
 <a name="212" href="#212">212</a> 
 <a name="213" href="#213">213</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="214" href="#214">214</a> <em class="jxr_javadoccomment">   * Transforms the graph head of the logical graph using the given</em>
@@ -228,7 +228,7 @@
 <a name="218" href="#218">218</a> <em class="jxr_javadoccomment">   * @return transformed logical graph</em>
 <a name="219" href="#219">219</a> <em class="jxr_javadoccomment">   */</em>
 <a name="220" href="#220">220</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> transformGraphHead(
-<a name="221" href="#221">221</a>     TransformationFunction&lt;GraphHead&gt; graphHeadTransformationFunction);
+<a name="221" href="#221">221</a>     TransformationFunction&lt;EPGMGraphHead&gt; graphHeadTransformationFunction);
 <a name="222" href="#222">222</a> 
 <a name="223" href="#223">223</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="224" href="#224">224</a> <em class="jxr_javadoccomment">   * Transforms the vertices of the logical graph using the given transformation</em>
@@ -237,7 +237,7 @@
 <a name="227" href="#227">227</a> <em class="jxr_javadoccomment">   * @param vertexTransformationFunction vertex transformation function</em>
 <a name="228" href="#228">228</a> <em class="jxr_javadoccomment">   * @return transformed logical graph</em>
 <a name="229" href="#229">229</a> <em class="jxr_javadoccomment">   */</em>
-<a name="230" href="#230">230</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> transformVertices(TransformationFunction&lt;Vertex&gt; vertexTransformationFunction);
+<a name="230" href="#230">230</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> transformVertices(TransformationFunction&lt;EPGMVertex&gt; vertexTransformationFunction);
 <a name="231" href="#231">231</a> 
 <a name="232" href="#232">232</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="233" href="#233">233</a> <em class="jxr_javadoccomment">   * Transforms the edges of the logical graph using the given transformation</em>
@@ -246,7 +246,7 @@
 <a name="236" href="#236">236</a> <em class="jxr_javadoccomment">   * @param edgeTransformationFunction edge transformation function</em>
 <a name="237" href="#237">237</a> <em class="jxr_javadoccomment">   * @return transformed logical graph</em>
 <a name="238" href="#238">238</a> <em class="jxr_javadoccomment">   */</em>
-<a name="239" href="#239">239</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> transformEdges(TransformationFunction&lt;Edge&gt; edgeTransformationFunction);
+<a name="239" href="#239">239</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> transformEdges(TransformationFunction&lt;EPGMEdge&gt; edgeTransformationFunction);
 <a name="240" href="#240">240</a> 
 <a name="241" href="#241">241</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="242" href="#242">242</a> <em class="jxr_javadoccomment">   * Returns the subgraph that is induced by the vertices which fulfill the</em>
@@ -255,7 +255,7 @@
 <a name="245" href="#245">245</a> <em class="jxr_javadoccomment">   * @param vertexFilterFunction vertex filter function</em>
 <a name="246" href="#246">246</a> <em class="jxr_javadoccomment">   * @return vertex-induced subgraph as a new logical graph</em>
 <a name="247" href="#247">247</a> <em class="jxr_javadoccomment">   */</em>
-<a name="248" href="#248">248</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> vertexInducedSubgraph(FilterFunction&lt;Vertex&gt; vertexFilterFunction);
+<a name="248" href="#248">248</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> vertexInducedSubgraph(FilterFunction&lt;EPGMVertex&gt; vertexFilterFunction);
 <a name="249" href="#249">249</a> 
 <a name="250" href="#250">250</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="251" href="#251">251</a> <em class="jxr_javadoccomment">   * Returns the subgraph that is induced by the edges which fulfill the given</em>
@@ -264,7 +264,7 @@
 <a name="254" href="#254">254</a> <em class="jxr_javadoccomment">   * @param edgeFilterFunction edge filter function</em>
 <a name="255" href="#255">255</a> <em class="jxr_javadoccomment">   * @return edge-induced subgraph as a new logical graph</em>
 <a name="256" href="#256">256</a> <em class="jxr_javadoccomment">   */</em>
-<a name="257" href="#257">257</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> edgeInducedSubgraph(FilterFunction&lt;Edge&gt; edgeFilterFunction);
+<a name="257" href="#257">257</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> edgeInducedSubgraph(FilterFunction&lt;EPGMEdge&gt; edgeFilterFunction);
 <a name="258" href="#258">258</a> 
 <a name="259" href="#259">259</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="260" href="#260">260</a> <em class="jxr_javadoccomment">   * Returns a subgraph of the logical graph which contains only those vertices</em>
@@ -279,8 +279,8 @@
 <a name="269" href="#269">269</a> <em class="jxr_javadoccomment">   * @return logical graph which fulfils the given predicates and is a subgraph</em>
 <a name="270" href="#270">270</a> <em class="jxr_javadoccomment">   * of that graph</em>
 <a name="271" href="#271">271</a> <em class="jxr_javadoccomment">   */</em>
-<a name="272" href="#272">272</a>   <strong class="jxr_keyword">default</strong> <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> subgraph(FilterFunction&lt;Vertex&gt; vertexFilterFunction,
-<a name="273" href="#273">273</a>     FilterFunction&lt;Edge&gt; edgeFilterFunction) {
+<a name="272" href="#272">272</a>   <strong class="jxr_keyword">default</strong> <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> subgraph(FilterFunction&lt;EPGMVertex&gt; vertexFilterFunction,
+<a name="273" href="#273">273</a>     FilterFunction&lt;EPGMEdge&gt; edgeFilterFunction) {
 <a name="274" href="#274">274</a>     Objects.requireNonNull(vertexFilterFunction);
 <a name="275" href="#275">275</a>     Objects.requireNonNull(edgeFilterFunction);
 <a name="276" href="#276">276</a>     <strong class="jxr_keyword">return</strong> subgraph(vertexFilterFunction, edgeFilterFunction, Subgraph.Strategy.BOTH);
@@ -300,8 +300,8 @@
 <a name="290" href="#290">290</a> <em class="jxr_javadoccomment">   * @return logical graph which fulfils the given predicates and is a subgraph</em>
 <a name="291" href="#291">291</a> <em class="jxr_javadoccomment">   * of that graph</em>
 <a name="292" href="#292">292</a> <em class="jxr_javadoccomment">   */</em>
-<a name="293" href="#293">293</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> subgraph(FilterFunction&lt;Vertex&gt; vertexFilterFunction,
-<a name="294" href="#294">294</a>     FilterFunction&lt;Edge&gt; edgeFilterFunction, Subgraph.Strategy strategy);
+<a name="293" href="#293">293</a>   <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> subgraph(FilterFunction&lt;EPGMVertex&gt; vertexFilterFunction,
+<a name="294" href="#294">294</a>     FilterFunction&lt;EPGMEdge&gt; edgeFilterFunction, Subgraph.Strategy strategy);
 <a name="295" href="#295">295</a> 
 <a name="296" href="#296">296</a>   <em class="jxr_javadoccomment">/**</em>
 <a name="297" href="#297">297</a> <em class="jxr_javadoccomment">   * Applies the given aggregate functions to the logical graph and stores the</em>

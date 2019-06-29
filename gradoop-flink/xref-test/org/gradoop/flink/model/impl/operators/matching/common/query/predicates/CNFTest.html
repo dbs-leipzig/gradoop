@@ -27,8 +27,8 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Sets;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
@@ -196,7 +196,7 @@
 <a name="186" href="#186">186</a> 
 <a name="187" href="#187">187</a>     Properties properties = <strong class="jxr_keyword">new</strong> Properties();
 <a name="188" href="#188">188</a>     properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Alice"</span>);
-<a name="189" href="#189">189</a>     Vertex vertex = <strong class="jxr_keyword">new</strong> VertexFactory().createVertex(<span class="jxr_string">"Person"</span>, properties);
+<a name="189" href="#189">189</a>     EPGMVertex vertex = <strong class="jxr_keyword">new</strong> EPGMVertexFactory().createVertex(<span class="jxr_string">"Person"</span>, properties);
 <a name="190" href="#190">190</a>     assertTrue(cnf.evaluate(vertex));
 <a name="191" href="#191">191</a> 
 <a name="192" href="#192">192</a>     properties.set(<span class="jxr_string">"name"</span>, <span class="jxr_string">"Bob"</span>);
@@ -210,7 +210,7 @@
 <a name="200" href="#200">200</a> 
 <a name="201" href="#201">201</a>     Properties properties = <strong class="jxr_keyword">new</strong> Properties();
 <a name="202" href="#202">202</a>     properties.set(<span class="jxr_string">"age"</span>, 42);
-<a name="203" href="#203">203</a>     Vertex vertex = <strong class="jxr_keyword">new</strong> VertexFactory().createVertex(<span class="jxr_string">"Person"</span>, properties);
+<a name="203" href="#203">203</a>     EPGMVertex vertex = <strong class="jxr_keyword">new</strong> EPGMVertexFactory().createVertex(<span class="jxr_string">"Person"</span>, properties);
 <a name="204" href="#204">204</a>     assertFalse(cnf.evaluate(vertex));
 <a name="205" href="#205">205</a>   }
 <a name="206" href="#206">206</a> 

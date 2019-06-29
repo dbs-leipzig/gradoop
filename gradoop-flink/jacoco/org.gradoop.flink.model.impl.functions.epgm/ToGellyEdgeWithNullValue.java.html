@@ -18,13 +18,13 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * turns an EPGM edge into a Gelly edge without data.
  */
 public class ToGellyEdgeWithNullValue implements
-  MapFunction&lt;Edge, org.apache.flink.graph.Edge&lt;GradoopId, NullValue&gt;&gt; {
+  MapFunction&lt;EPGMEdge, org.apache.flink.graph.Edge&lt;GradoopId, NullValue&gt;&gt; {
 
   /**
    * Reduce instantiations
@@ -40,7 +40,7 @@ public class ToGellyEdgeWithNullValue implements
 <span class="fc" id="L40">  }</span>
 
   @Override
-  public org.apache.flink.graph.Edge&lt;GradoopId, NullValue&gt; map(Edge e)
+  public org.apache.flink.graph.Edge&lt;GradoopId, NullValue&gt; map(EPGMEdge e)
       throws Exception {
 <span class="fc" id="L45">    reuse.setSource(e.getSourceId());</span>
 <span class="fc" id="L46">    reuse.setTarget(e.getTargetId());</span>

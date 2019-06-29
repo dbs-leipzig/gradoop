@@ -15,8 +15,8 @@
  */
 package org.gradoop.flink.model.api.functions;
 
-import org.gradoop.common.model.api.entities.EPGMAttributed;
-import org.gradoop.common.model.api.entities.EPGMLabeled;
+import org.gradoop.common.model.api.entities.Attributed;
+import org.gradoop.common.model.api.entities.Labeled;
 
 import java.io.Serializable;
 
@@ -24,9 +24,9 @@ import java.io.Serializable;
  * A serializable function that is applied on an EPGM element (i.e. graph head,
  * vertex and edge) to transform its data, but not its identity.
  *
- * @param &lt;EL&gt; EPGM attributed / labeled element
+ * @param &lt;EL&gt; attributed / labeled element
  */
-public interface TransformationFunction&lt;EL extends EPGMAttributed &amp; EPGMLabeled&gt;
+public interface TransformationFunction&lt;EL extends Attributed &amp; Labeled&gt;
   extends Serializable {
 
   /**
@@ -46,10 +46,10 @@ public interface TransformationFunction&lt;EL extends EPGMAttributed &amp; EPGML
   /**
    * Returns the unmodified element.
    *
-   * @param &lt;EL&gt; EPGM attributed / labeled element
+   * @param &lt;EL&gt; attributed / labeled element
    * @return a function that always returns the current element
    */
-  static &lt;EL extends EPGMAttributed &amp; EPGMLabeled&gt; TransformationFunction&lt;EL&gt;
+  static &lt;EL extends Attributed &amp; Labeled&gt; TransformationFunction&lt;EL&gt;
   keep() {
 <span class="nc" id="L54">    return (c, t) -&gt; c;</span>
   }

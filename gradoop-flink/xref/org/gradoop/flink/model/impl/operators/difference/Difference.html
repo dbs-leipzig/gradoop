@@ -27,7 +27,7 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.base.SetOperatorBase;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.difference.functions.CreateTuple2WithLong;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.difference.functions.IdOf0InTuple2;
@@ -48,22 +48,22 @@
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   * @return logical graph dataset of the resulting collection</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="40" href="#40">40</a>    @Override
-<a name="41" href="#41">41</a>    <strong class="jxr_keyword">protected</strong> DataSet&lt;GraphHead&gt; computeNewGraphHeads() {
+<a name="41" href="#41">41</a>    <strong class="jxr_keyword">protected</strong> DataSet&lt;EPGMGraphHead&gt; computeNewGraphHeads() {
 <a name="42" href="#42">42</a>      <em class="jxr_comment">// assign 1L to each logical graph in the first collection</em>
-<a name="43" href="#43">43</a>      DataSet&lt;Tuple2&lt;GraphHead, Long&gt;&gt; thisGraphs = firstCollection
+<a name="43" href="#43">43</a>      DataSet&lt;Tuple2&lt;EPGMGraphHead, Long&gt;&gt; thisGraphs = firstCollection
 <a name="44" href="#44">44</a>        .getGraphHeads()
-<a name="45" href="#45">45</a>        .map(<strong class="jxr_keyword">new</strong> CreateTuple2WithLong&lt;GraphHead&gt;(1L));
+<a name="45" href="#45">45</a>        .map(<strong class="jxr_keyword">new</strong> CreateTuple2WithLong&lt;EPGMGraphHead&gt;(1L));
 <a name="46" href="#46">46</a>      <em class="jxr_comment">// assign 2L to each logical graph in the second collection</em>
-<a name="47" href="#47">47</a>      DataSet&lt;Tuple2&lt;GraphHead, Long&gt;&gt; otherGraphs = secondCollection
+<a name="47" href="#47">47</a>      DataSet&lt;Tuple2&lt;EPGMGraphHead, Long&gt;&gt; otherGraphs = secondCollection
 <a name="48" href="#48">48</a>        .getGraphHeads()
-<a name="49" href="#49">49</a>        .map(<strong class="jxr_keyword">new</strong> CreateTuple2WithLong&lt;GraphHead&gt;(2L));
+<a name="49" href="#49">49</a>        .map(<strong class="jxr_keyword">new</strong> CreateTuple2WithLong&lt;EPGMGraphHead&gt;(2L));
 <a name="50" href="#50">50</a>  
 <a name="51" href="#51">51</a>      <em class="jxr_comment">// union the logical graphs, group them by their identifier and check that</em>
 <a name="52" href="#52">52</a>      <em class="jxr_comment">// there is no graph in the group that belongs to the second collection</em>
 <a name="53" href="#53">53</a>      <strong class="jxr_keyword">return</strong> thisGraphs
 <a name="54" href="#54">54</a>        .union(otherGraphs)
-<a name="55" href="#55">55</a>        .groupBy(<strong class="jxr_keyword">new</strong> IdOf0InTuple2&lt;GraphHead, Long&gt;())
-<a name="56" href="#56">56</a>        .reduceGroup(<strong class="jxr_keyword">new</strong> RemoveCut&lt;GraphHead&gt;());
+<a name="55" href="#55">55</a>        .groupBy(<strong class="jxr_keyword">new</strong> IdOf0InTuple2&lt;EPGMGraphHead, Long&gt;())
+<a name="56" href="#56">56</a>        .reduceGroup(<strong class="jxr_keyword">new</strong> RemoveCut&lt;EPGMGraphHead&gt;());
 <a name="57" href="#57">57</a>    }
 <a name="58" href="#58">58</a>  }
 </pre>

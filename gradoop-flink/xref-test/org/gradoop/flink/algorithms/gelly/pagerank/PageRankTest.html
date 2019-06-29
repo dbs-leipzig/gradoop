@@ -25,7 +25,7 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.algorithms.gelly.pagerank;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.FlinkAsciiGraphLoader;
@@ -104,8 +104,8 @@
 <a name="94" href="#94">94</a>  <em class="jxr_javadoccomment">   * @param graph The result graph</em>
 <a name="95" href="#95">95</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="96" href="#96">96</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> checkPageRankProperty(LogicalGraph graph) <strong class="jxr_keyword">throws</strong> Exception {
-<a name="97" href="#97">97</a>      List&lt;Vertex&gt; vertices = graph.getVertices().collect();
-<a name="98" href="#98">98</a>      <strong class="jxr_keyword">for</strong> (Vertex vertex : vertices) {
+<a name="97" href="#97">97</a>      List&lt;EPGMVertex&gt; vertices = graph.getVertices().collect();
+<a name="98" href="#98">98</a>      <strong class="jxr_keyword">for</strong> (EPGMVertex vertex : vertices) {
 <a name="99" href="#99">99</a>        assertTrue(vertex.hasProperty(propertyKey));
 <a name="100" href="#100">100</a>       assertTrue(vertex.getPropertyValue(propertyKey).getDouble() &gt; 0d);
 <a name="101" href="#101">101</a>     }

@@ -21,47 +21,47 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.impl.pojo.Vertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Initializes an {@link Vertex} from a given {@link GradoopId}.
+ * Initializes an {@link EPGMVertex} from a given {@link GradoopId}.
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0-&gt;id&quot;)
 public class VertexFromId implements
-  MapFunction&lt;Tuple1&lt;GradoopId&gt;, Vertex&gt;,
-  ResultTypeQueryable&lt;Vertex&gt; {
+  MapFunction&lt;Tuple1&lt;GradoopId&gt;, EPGMVertex&gt;,
+  ResultTypeQueryable&lt;EPGMVertex&gt; {
 
   /**
    * EPGM vertex factory
    */
-  private final EPGMVertexFactory&lt;Vertex&gt; vertexFactory;
+  private final VertexFactory&lt;EPGMVertex&gt; vertexFactory;
 
   /**
    * Create new function.
    *
    * @param vertexFactory EPGM vertex factory
    */
-<span class="fc" id="L46">  public VertexFromId(EPGMVertexFactory&lt;Vertex&gt; vertexFactory) {</span>
+<span class="fc" id="L46">  public VertexFromId(VertexFactory&lt;EPGMVertex&gt; vertexFactory) {</span>
 <span class="fc" id="L47">    this.vertexFactory = vertexFactory;</span>
 <span class="fc" id="L48">  }</span>
 
   /**
-   * Initializes an {@link Vertex} from a given {@link GradoopId}.
+   * Initializes an {@link EPGMVertex} from a given {@link GradoopId}.
    *
    * @param gradoopId Gradoop identifier
    * @return EPGM vertex
    * @throws Exception on failure
    */
   @Override
-  public Vertex map(Tuple1&lt;GradoopId&gt; gradoopId) throws Exception {
+  public EPGMVertex map(Tuple1&lt;GradoopId&gt; gradoopId) throws Exception {
 <span class="fc" id="L59">    return vertexFactory.initVertex(gradoopId.f0);</span>
   }
 
 
   @Override
-  public TypeInformation&lt;Vertex&gt; getProducedType() {
+  public TypeInformation&lt;EPGMVertex&gt; getProducedType() {
 <span class="fc" id="L65">    return TypeExtractor.createTypeInfo(vertexFactory.getType());</span>
   }
 }

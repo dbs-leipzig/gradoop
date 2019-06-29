@@ -27,9 +27,9 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.ExecutionEnvironment;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.config.GradoopConfig;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -46,7 +46,7 @@
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> * Configuration for Gradoop running on Flink.</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="39" href="#39">39</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a> <strong class="jxr_keyword">extends</strong> GradoopConfig&lt;GraphHead, Vertex, Edge&gt; {
+<a name="39" href="#39">39</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a> <strong class="jxr_keyword">extends</strong> GradoopConfig&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; {
 <a name="40" href="#40">40</a>  
 <a name="41" href="#41">41</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment">   * Flink execution environment.</em>
@@ -56,14 +56,14 @@
 <a name="46" href="#46">46</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="47" href="#47">47</a>  <em class="jxr_javadoccomment">   * Creates instances of {@link LogicalGraph}</em>
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="49" href="#49">49</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> BaseGraphFactory&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;
-<a name="50" href="#50">50</a>      graphFactory;
+<a name="49" href="#49">49</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> BaseGraphFactory&lt;
+<a name="50" href="#50">50</a>      EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt; graphFactory;
 <a name="51" href="#51">51</a>  
 <a name="52" href="#52">52</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   * Creates instances of {@link GraphCollection}</em>
 <a name="54" href="#54">54</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="55" href="#55">55</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> BaseGraphCollectionFactory&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;
-<a name="56" href="#56">56</a>      graphCollectionFactory;
+<a name="55" href="#55">55</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> BaseGraphCollectionFactory&lt;
+<a name="56" href="#56">56</a>      EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt; graphCollectionFactory;
 <a name="57" href="#57">57</a>  
 <a name="58" href="#58">58</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   * Creates a new Configuration.</em>
@@ -74,8 +74,8 @@
 <a name="64" href="#64">64</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="65" href="#65">65</a>    <strong class="jxr_keyword">protected</strong> <a href="../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a>(
 <a name="66" href="#66">66</a>      ExecutionEnvironment executionEnvironment,
-<a name="67" href="#67">67</a>      LogicalGraphLayoutFactory&lt;GraphHead, Vertex, Edge&gt; logicalGraphLayoutFactory,
-<a name="68" href="#68">68</a>      GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; graphCollectionLayoutFactory) {
+<a name="67" href="#67">67</a>      LogicalGraphLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; logicalGraphLayoutFactory,
+<a name="68" href="#68">68</a>      GraphCollectionLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; graphCollectionLayoutFactory) {
 <a name="69" href="#69">69</a>      <strong class="jxr_keyword">super</strong>();
 <a name="70" href="#70">70</a>  
 <a name="71" href="#71">71</a>      Objects.requireNonNull(executionEnvironment);
@@ -113,8 +113,8 @@
 <a name="103" href="#103">103</a> <em class="jxr_javadoccomment">   * @return Gradoop Flink configuration</em>
 <a name="104" href="#104">104</a> <em class="jxr_javadoccomment">   */</em>
 <a name="105" href="#105">105</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> <a href="../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a> createConfig(ExecutionEnvironment env,
-<a name="106" href="#106">106</a>     LogicalGraphLayoutFactory&lt;GraphHead, Vertex, Edge&gt; logicalGraphLayoutFactory,
-<a name="107" href="#107">107</a>     GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; graphCollectionLayoutFactory) {
+<a name="106" href="#106">106</a>     LogicalGraphLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; logicalGraphLayoutFactory,
+<a name="107" href="#107">107</a>     GraphCollectionLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; graphCollectionLayoutFactory) {
 <a name="108" href="#108">108</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a>(env, logicalGraphLayoutFactory, graphCollectionLayoutFactory);
 <a name="109" href="#109">109</a>   }
 <a name="110" href="#110">110</a> 
@@ -152,7 +152,7 @@
 <a name="142" href="#142">142</a> <em class="jxr_javadoccomment">   * @param factory logical graph layout factor</em>
 <a name="143" href="#143">143</a> <em class="jxr_javadoccomment">   */</em>
 <a name="144" href="#144">144</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> setLogicalGraphLayoutFactory(
-<a name="145" href="#145">145</a>     LogicalGraphLayoutFactory&lt;GraphHead, Vertex, Edge&gt; factory) {
+<a name="145" href="#145">145</a>     LogicalGraphLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; factory) {
 <a name="146" href="#146">146</a>     Objects.requireNonNull(factory);
 <a name="147" href="#147">147</a>     factory.setGradoopFlinkConfig(<strong class="jxr_keyword">this</strong>);
 <a name="148" href="#148">148</a>     graphFactory.setLayoutFactory(factory);
@@ -165,7 +165,7 @@
 <a name="155" href="#155">155</a> <em class="jxr_javadoccomment">   * @param factory graph collection layout factory</em>
 <a name="156" href="#156">156</a> <em class="jxr_javadoccomment">   */</em>
 <a name="157" href="#157">157</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> setGraphCollectionLayoutFactory(
-<a name="158" href="#158">158</a>     GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; factory) {
+<a name="158" href="#158">158</a>     GraphCollectionLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; factory) {
 <a name="159" href="#159">159</a>     Objects.requireNonNull(factory);
 <a name="160" href="#160">160</a>     factory.setGradoopFlinkConfig(<strong class="jxr_keyword">this</strong>);
 <a name="161" href="#161">161</a>     graphCollectionFactory.setLayoutFactory(factory);

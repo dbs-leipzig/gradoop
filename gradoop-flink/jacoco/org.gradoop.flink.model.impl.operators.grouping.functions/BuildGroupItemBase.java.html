@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping.functions;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.model.impl.properties.PropertyValueList;
 import org.gradoop.flink.model.impl.operators.grouping.Grouping;
@@ -80,7 +80,7 @@ public class BuildGroupItemBase extends BuildBase {
    * @param labelGroup label group to be assigned
    * @throws IOException on failure
    */
-  protected void setGroupItem(GroupItem groupItem, EPGMElement element, LabelGroup labelGroup)
+  protected void setGroupItem(GroupItem groupItem, Element element, LabelGroup labelGroup)
     throws IOException {
     // stores all, in the label group specified, grouping values of the element, if the element
     // does not have a property a null property value is stored

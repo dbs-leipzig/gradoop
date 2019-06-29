@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.JoinFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.functions.FunctionAnnotation;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> * Joins an EPGM edge with a GradoopId of an visited edge from the VCI run. Assigns a boolean</em>
@@ -36,7 +36,7 @@
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * {@code true} if the EPGM edge has a join partner, set to {@code false} otherwise.</em>
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="28" href="#28">28</a>  @FunctionAnnotation.ForwardedFieldsFirst(<span class="jxr_string">"id;sourceId;targetId;label;graphIds"</span>)
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/algorithms/gelly/randomjump/functions/EPGMEdgeWithGellyEdgeIdJoin.html">EPGMEdgeWithGellyEdgeIdJoin</a> implements JoinFunction&lt;Edge, GradoopId, Edge&gt; {
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/algorithms/gelly/randomjump/functions/EPGMEdgeWithGellyEdgeIdJoin.html">EPGMEdgeWithGellyEdgeIdJoin</a> implements JoinFunction&lt;EPGMEdge, GradoopId, EPGMEdge&gt; {
 <a name="30" href="#30">30</a>  
 <a name="31" href="#31">31</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * Key for the boolean property of the edge.</em>
@@ -54,7 +54,7 @@
 <a name="44" href="#44">44</a>    }
 <a name="45" href="#45">45</a>  
 <a name="46" href="#46">46</a>    @Override
-<a name="47" href="#47">47</a>    <strong class="jxr_keyword">public</strong> Edge join(Edge edge, GradoopId visitedEdgeId) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="47" href="#47">47</a>    <strong class="jxr_keyword">public</strong> EPGMEdge join(EPGMEdge edge, GradoopId visitedEdgeId) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="48" href="#48">48</a>      <strong class="jxr_keyword">boolean</strong> visited = false;
 <a name="49" href="#49">49</a>      <strong class="jxr_keyword">if</strong> (visitedEdgeId != <strong class="jxr_keyword">null</strong>) {
 <a name="50" href="#50">50</a>        visited = <strong class="jxr_keyword">true</strong>;

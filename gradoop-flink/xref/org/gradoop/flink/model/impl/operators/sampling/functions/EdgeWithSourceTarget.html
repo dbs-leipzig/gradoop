@@ -28,16 +28,16 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple3;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> * Maps an Edge to Edge with its source and targets</em>
+<a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> * Maps an EPGMEdge to EPGMEdge with its source and targets</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/EdgeWithSourceTarget.html">EdgeWithSourceTarget</a> implements MapFunction&lt;Edge, Tuple3&lt;Edge, GradoopId, GradoopId&gt;&gt; {
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/sampling/functions/EdgeWithSourceTarget.html">EdgeWithSourceTarget</a> implements MapFunction&lt;EPGMEdge, Tuple3&lt;EPGMEdge, GradoopId, GradoopId&gt;&gt; {
 <a name="27" href="#27">27</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment">   *  Reduce object instantiations</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="30" href="#30">30</a>    <strong class="jxr_keyword">private</strong> Tuple3&lt;Edge, GradoopId, GradoopId&gt; reuse;
+<a name="30" href="#30">30</a>    <strong class="jxr_keyword">private</strong> Tuple3&lt;EPGMEdge, GradoopId, GradoopId&gt; reuse;
 <a name="31" href="#31">31</a>  
 <a name="32" href="#32">32</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   * Constructor</em>
@@ -47,7 +47,7 @@
 <a name="37" href="#37">37</a>    }
 <a name="38" href="#38">38</a>  
 <a name="39" href="#39">39</a>    @Override
-<a name="40" href="#40">40</a>    <strong class="jxr_keyword">public</strong> Tuple3&lt;Edge, GradoopId, GradoopId&gt; map(Edge edge) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="40" href="#40">40</a>    <strong class="jxr_keyword">public</strong> Tuple3&lt;EPGMEdge, GradoopId, GradoopId&gt; map(EPGMEdge edge) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="41" href="#41">41</a>      reuse.f0 = edge;
 <a name="42" href="#42">42</a>      reuse.f1 = edge.getSourceId();
 <a name="43" href="#43">43</a>      reuse.f2 = edge.getTargetId();

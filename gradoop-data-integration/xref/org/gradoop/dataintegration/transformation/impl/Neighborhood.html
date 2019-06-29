@@ -27,7 +27,7 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.dataintegration.transformation.functions.CreateNeighborList;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -54,13 +54,13 @@
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   * @return A Dataset of tuples containing vertices and their neighborhood.</em>
 <a name="45" href="#45">45</a>  <em class="jxr_javadoccomment">   * @throws NullPointerException if any of the parameters is null.</em>
 <a name="46" href="#46">46</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="47" href="#47">47</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; getPerVertex(LogicalGraph graph,
-<a name="48" href="#48">48</a>                   DataSet&lt;Vertex&gt; centralVertices, <a href="../../../../../org/gradoop/dataintegration/transformation/impl/Neighborhood.html">EdgeDirection</a> edgeDirection) {
+<a name="47" href="#47">47</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> DataSet&lt;Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; getPerVertex(LogicalGraph graph,
+<a name="48" href="#48">48</a>                   DataSet&lt;EPGMVertex&gt; centralVertices, <a href="../../../../../org/gradoop/dataintegration/transformation/impl/Neighborhood.html">EdgeDirection</a> edgeDirection) {
 <a name="49" href="#49">49</a>      Objects.requireNonNull(graph);
 <a name="50" href="#50">50</a>      Objects.requireNonNull(centralVertices);
 <a name="51" href="#51">51</a>      Objects.requireNonNull(edgeDirection);
-<a name="52" href="#52">52</a>      DataSet&lt;Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; incoming = <strong class="jxr_keyword">null</strong>;
-<a name="53" href="#53">53</a>      DataSet&lt;Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; outgoing = <strong class="jxr_keyword">null</strong>;
+<a name="52" href="#52">52</a>      DataSet&lt;Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; incoming = <strong class="jxr_keyword">null</strong>;
+<a name="53" href="#53">53</a>      DataSet&lt;Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; outgoing = <strong class="jxr_keyword">null</strong>;
 <a name="54" href="#54">54</a>  
 <a name="55" href="#55">55</a>      <em class="jxr_comment">// get incoming</em>
 <a name="56" href="#56">56</a>      <strong class="jxr_keyword">if</strong> (edgeDirection.equals(EdgeDirection.INCOMING) ||

@@ -26,8 +26,8 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.io.impl.tlf;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMLabeled;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Labeled;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.DataSink;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.DataSource;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -140,12 +140,12 @@
 <a name="130" href="#130">130</a>     <em class="jxr_comment">// get first transaction which contains one complete graph</em>
 <a name="131" href="#131">131</a>     GraphTransaction graphTransaction = graphTransactions.collect().get(0);
 <a name="132" href="#132">132</a>     <em class="jxr_comment">// get vertices of the first transaction/graph</em>
-<a name="133" href="#133">133</a>     EPGMVertex[] vertexArray = graphTransaction.getVertices().toArray(
-<a name="134" href="#134">134</a>       <strong class="jxr_keyword">new</strong> EPGMVertex[graphTransaction.getVertices().size()]);
+<a name="133" href="#133">133</a>     Vertex[] vertexArray = graphTransaction.getVertices().toArray(
+<a name="134" href="#134">134</a>       <strong class="jxr_keyword">new</strong> Vertex[graphTransaction.getVertices().size()]);
 <a name="135" href="#135">135</a>     <em class="jxr_comment">// sort vertices by label(alphabetically)</em>
-<a name="136" href="#136">136</a>     Arrays.sort(vertexArray, <strong class="jxr_keyword">new</strong> Comparator&lt;EPGMVertex&gt;() {
+<a name="136" href="#136">136</a>     Arrays.sort(vertexArray, <strong class="jxr_keyword">new</strong> Comparator&lt;Vertex&gt;() {
 <a name="137" href="#137">137</a>       @Override
-<a name="138" href="#138">138</a>       <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">int</strong> compare(EPGMVertex vertex1, EPGMVertex vertex2) {
+<a name="138" href="#138">138</a>       <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">int</strong> compare(Vertex vertex1, Vertex vertex2) {
 <a name="139" href="#139">139</a>         <strong class="jxr_keyword">return</strong> vertex1.getLabel().compareTo(vertex2.getLabel());
 <a name="140" href="#140">140</a>       }
 <a name="141" href="#141">141</a>     });
@@ -179,9 +179,9 @@
 <a name="169" href="#169">169</a>     <em class="jxr_comment">//get first transaction which contains one complete graph</em>
 <a name="170" href="#170">170</a>     GraphTransaction graphTransaction = graphTransactions.collect().get(0);
 <a name="171" href="#171">171</a>     <em class="jxr_comment">//get vertices of the first transaction/graph</em>
-<a name="172" href="#172">172</a>     EPGMVertex[] vertexArray = graphTransaction.getVertices().toArray(<strong class="jxr_keyword">new</strong> EPGMVertex[0]);
+<a name="172" href="#172">172</a>     Vertex[] vertexArray = graphTransaction.getVertices().toArray(<strong class="jxr_keyword">new</strong> Vertex[0]);
 <a name="173" href="#173">173</a>     <em class="jxr_comment">//sort vertices by label(alphabetically)</em>
-<a name="174" href="#174">174</a>     Arrays.sort(vertexArray, Comparator.comparing(EPGMLabeled::getLabel));
+<a name="174" href="#174">174</a>     Arrays.sort(vertexArray, Comparator.comparing(Labeled::getLabel));
 <a name="175" href="#175">175</a> 
 <a name="176" href="#176">176</a>     assertEquals(<span class="jxr_string">"Wrong vertex label"</span>, <span class="jxr_string">"0"</span>, vertexArray[0].getLabel());
 <a name="177" href="#177">177</a>     assertEquals(<span class="jxr_string">"Wrong vertex label"</span>, <span class="jxr_string">"1"</span>, vertexArray[1].getLabel());

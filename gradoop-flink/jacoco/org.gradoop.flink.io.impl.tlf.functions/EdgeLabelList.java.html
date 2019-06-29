@@ -17,7 +17,7 @@ package org.gradoop.flink.io.impl.tlf.functions;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
@@ -29,7 +29,7 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
   @Override
   public void flatMap(GraphTransaction graphTransaction, Collector&lt;String&gt; collector)
     throws Exception {
-<span class="fc bfc" id="L32" title="All 2 branches covered.">    for (Edge edge : graphTransaction.getEdges()) {</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">    for (EPGMEdge edge : graphTransaction.getEdges()) {</span>
 <span class="fc" id="L33">      collector.collect(edge.getLabel());</span>
 <span class="fc" id="L34">    }</span>
 <span class="fc" id="L35">  }</span>

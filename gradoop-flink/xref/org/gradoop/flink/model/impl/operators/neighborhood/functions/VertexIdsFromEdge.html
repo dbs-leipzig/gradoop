@@ -28,14 +28,14 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.MapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> * Returns a tuple which contains the source id and target id of an edge or a tuple which contains</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * the target id and the source id of the same edge.</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/neighborhood/functions/VertexIdsFromEdge.html">VertexIdsFromEdge</a>
-<a name="28" href="#28">28</a>    implements MapFunction&lt;Edge, Tuple2&lt;GradoopId, GradoopId&gt;&gt; {
+<a name="28" href="#28">28</a>    implements MapFunction&lt;EPGMEdge, Tuple2&lt;GradoopId, GradoopId&gt;&gt; {
 <a name="29" href="#29">29</a>  
 <a name="30" href="#30">30</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="31" href="#31">31</a>  <em class="jxr_javadoccomment">   * False, if tuple contains of source id and target id. True if tuple contains of target id and</em>
@@ -65,7 +65,7 @@
 <a name="55" href="#55">55</a>    }
 <a name="56" href="#56">56</a>  
 <a name="57" href="#57">57</a>    @Override
-<a name="58" href="#58">58</a>    <strong class="jxr_keyword">public</strong> Tuple2&lt;GradoopId, GradoopId&gt; map(Edge edge) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="58" href="#58">58</a>    <strong class="jxr_keyword">public</strong> Tuple2&lt;GradoopId, GradoopId&gt; map(EPGMEdge edge) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="59" href="#59">59</a>      <strong class="jxr_keyword">if</strong> (switched) {
 <a name="60" href="#60">60</a>        reuseTuple.setFields(edge.getTargetId(), edge.getSourceId());
 <a name="61" href="#61">61</a>      } <strong class="jxr_keyword">else</strong> {

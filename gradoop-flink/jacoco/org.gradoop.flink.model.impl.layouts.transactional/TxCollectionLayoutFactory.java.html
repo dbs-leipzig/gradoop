@@ -24,10 +24,10 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
@@ -50,114 +50,115 @@ import java.util.Set;
  * Responsible for producing instances of {@link TxCollectionLayout}.
  */
 <span class="fc" id="L52">public class TxCollectionLayoutFactory extends BaseFactory</span>
-  implements GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; {
+  implements GraphCollectionLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; {
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromDataSets(DataSet&lt;GraphHead&gt; graphHeads,
-    DataSet&lt;Vertex&gt; vertices) {
-<span class="nc" id="L58">    Objects.requireNonNull(graphHeads);</span>
-<span class="nc" id="L59">    Objects.requireNonNull(vertices);</span>
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromDataSets(
+    DataSet&lt;EPGMGraphHead&gt; graphHeads, DataSet&lt;EPGMVertex&gt; vertices) {
 
-<span class="nc" id="L61">    return fromDataSets(graphHeads, vertices,</span>
-<span class="nc" id="L62">      createEdgeDataSet(Lists.newArrayListWithCapacity(0)));</span>
+<span class="nc" id="L59">    Objects.requireNonNull(graphHeads);</span>
+<span class="nc" id="L60">    Objects.requireNonNull(vertices);</span>
+
+<span class="nc" id="L62">    return fromDataSets(graphHeads, vertices,</span>
+<span class="nc" id="L63">      createEdgeDataSet(Lists.newArrayListWithCapacity(0)));</span>
   }
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromDataSets(
-    DataSet&lt;GraphHead&gt; inGraphHeads,
-    DataSet&lt;Vertex&gt; inVertices,
-    DataSet&lt;Edge&gt; inEdges) {
-<span class="fc" id="L70">    Objects.requireNonNull(inGraphHeads);</span>
-<span class="fc" id="L71">    Objects.requireNonNull(inVertices);</span>
-<span class="fc" id="L72">    Objects.requireNonNull(inEdges);</span>
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromDataSets(
+    DataSet&lt;EPGMGraphHead&gt; inGraphHeads,
+    DataSet&lt;EPGMVertex&gt; inVertices,
+    DataSet&lt;EPGMEdge&gt; inEdges) {
+<span class="fc" id="L71">    Objects.requireNonNull(inGraphHeads);</span>
+<span class="fc" id="L72">    Objects.requireNonNull(inVertices);</span>
+<span class="fc" id="L73">    Objects.requireNonNull(inEdges);</span>
 
     // Add a dummy graph head for entities which have no assigned graph
-<span class="fc" id="L75">    DataSet&lt;GraphHead&gt; dbGraphHead = getConfig().getExecutionEnvironment().fromElements(</span>
-<span class="fc" id="L76">      getConfig().getGraphHeadFactory()</span>
-<span class="fc" id="L77">        .initGraphHead(GradoopConstants.DB_GRAPH_ID, GradoopConstants.DB_GRAPH_LABEL)</span>
+<span class="fc" id="L76">    DataSet&lt;EPGMGraphHead&gt; dbGraphHead = getConfig().getExecutionEnvironment().fromElements(</span>
+<span class="fc" id="L77">      getConfig().getGraphHeadFactory()</span>
+<span class="fc" id="L78">        .initGraphHead(GradoopConstants.DB_GRAPH_ID, GradoopConstants.DB_GRAPH_LABEL)</span>
     );
-<span class="fc" id="L79">    inGraphHeads = inGraphHeads.union(dbGraphHead);</span>
+<span class="fc" id="L80">    inGraphHeads = inGraphHeads.union(dbGraphHead);</span>
 
-<span class="fc" id="L81">    DataSet&lt;Tuple2&lt;GradoopId, GraphElement&gt;&gt; vertices = inVertices</span>
-<span class="fc" id="L82">      .map(new Cast&lt;&gt;(GraphElement.class))</span>
-<span class="fc" id="L83">      .returns(TypeExtractor.getForClass(GraphElement.class))</span>
-<span class="fc" id="L84">      .flatMap(new GraphElementExpander&lt;&gt;());</span>
+<span class="fc" id="L82">    DataSet&lt;Tuple2&lt;GradoopId, EPGMGraphElement&gt;&gt; vertices = inVertices</span>
+<span class="fc" id="L83">      .map(new Cast&lt;&gt;(EPGMGraphElement.class))</span>
+<span class="fc" id="L84">      .returns(TypeExtractor.getForClass(EPGMGraphElement.class))</span>
+<span class="fc" id="L85">      .flatMap(new GraphElementExpander&lt;&gt;());</span>
 
-<span class="fc" id="L86">    DataSet&lt;Tuple2&lt;GradoopId, GraphElement&gt;&gt; edges = inEdges</span>
-<span class="fc" id="L87">      .map(new Cast&lt;&gt;(GraphElement.class))</span>
-<span class="fc" id="L88">      .returns(TypeExtractor.getForClass(GraphElement.class))</span>
-<span class="fc" id="L89">      .flatMap(new GraphElementExpander&lt;&gt;());</span>
+<span class="fc" id="L87">    DataSet&lt;Tuple2&lt;GradoopId, EPGMGraphElement&gt;&gt; edges = inEdges</span>
+<span class="fc" id="L88">      .map(new Cast&lt;&gt;(EPGMGraphElement.class))</span>
+<span class="fc" id="L89">      .returns(TypeExtractor.getForClass(EPGMGraphElement.class))</span>
+<span class="fc" id="L90">      .flatMap(new GraphElementExpander&lt;&gt;());</span>
 
-<span class="fc" id="L91">    DataSet&lt;Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt;&gt; transactions = vertices</span>
-<span class="fc" id="L92">      .union(edges)</span>
-<span class="fc" id="L93">      .groupBy(0)</span>
-<span class="fc" id="L94">      .combineGroup(new GraphVerticesEdges())</span>
-<span class="fc" id="L95">      .groupBy(0)</span>
-<span class="fc" id="L96">      .reduceGroup(new GraphVerticesEdges());</span>
+<span class="fc" id="L92">    DataSet&lt;Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt;&gt; transactions = vertices</span>
+<span class="fc" id="L93">      .union(edges)</span>
+<span class="fc" id="L94">      .groupBy(0)</span>
+<span class="fc" id="L95">      .combineGroup(new GraphVerticesEdges())</span>
+<span class="fc" id="L96">      .groupBy(0)</span>
+<span class="fc" id="L97">      .reduceGroup(new GraphVerticesEdges());</span>
 
-<span class="fc" id="L98">    DataSet&lt;GraphTransaction&gt; graphTransactions = inGraphHeads</span>
-<span class="fc" id="L99">      .leftOuterJoin(transactions)</span>
-<span class="fc" id="L100">      .where(new Id&lt;&gt;()).equalTo(0)</span>
-<span class="fc" id="L101">      .with(new TransactionFromSets());</span>
+<span class="fc" id="L99">    DataSet&lt;GraphTransaction&gt; graphTransactions = inGraphHeads</span>
+<span class="fc" id="L100">      .leftOuterJoin(transactions)</span>
+<span class="fc" id="L101">      .where(new Id&lt;&gt;()).equalTo(0)</span>
+<span class="fc" id="L102">      .with(new TransactionFromSets());</span>
 
-<span class="fc" id="L103">    return new TxCollectionLayout(graphTransactions);</span>
+<span class="fc" id="L104">    return new TxCollectionLayout(graphTransactions);</span>
   }
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromIndexedDataSets(
-    Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads,
-    Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
-    Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
-<span class="fc" id="L111">    Objects.requireNonNull(graphHeads);</span>
-<span class="fc" id="L112">    Objects.requireNonNull(vertices);</span>
-<span class="fc" id="L113">    Objects.requireNonNull(edges);</span>
-<span class="fc" id="L114">    return fromDataSets(</span>
-<span class="fc" id="L115">      graphHeads.values().stream().reduce(DataSet::union)</span>
-<span class="pc" id="L116">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during graph head union&quot;)),</span>
-<span class="fc" id="L117">      vertices.values().stream().reduce(DataSet::union)</span>
-<span class="pc" id="L118">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during vertex union&quot;)),</span>
-<span class="fc" id="L119">      edges.values().stream().reduce(DataSet::union)</span>
-<span class="pc" id="L120">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during edge union&quot;))</span>
-    );
-  }
-
-  @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromCollections(
-    Collection&lt;GraphHead&gt; graphHeads,
-    Collection&lt;Vertex&gt; vertices,
-    Collection&lt;Edge&gt; edges) {
-<span class="fc" id="L129">    return fromDataSets(</span>
-<span class="fc" id="L130">      createGraphHeadDataSet(graphHeads),</span>
-<span class="fc" id="L131">      createVertexDataSet(vertices),</span>
-<span class="fc" id="L132">      createEdgeDataSet(edges)</span>
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromIndexedDataSets(
+    Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads,
+    Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices,
+    Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges) {
+<span class="fc" id="L112">    Objects.requireNonNull(graphHeads);</span>
+<span class="fc" id="L113">    Objects.requireNonNull(vertices);</span>
+<span class="fc" id="L114">    Objects.requireNonNull(edges);</span>
+<span class="fc" id="L115">    return fromDataSets(</span>
+<span class="fc" id="L116">      graphHeads.values().stream().reduce(DataSet::union)</span>
+<span class="pc" id="L117">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during graph head union&quot;)),</span>
+<span class="fc" id="L118">      vertices.values().stream().reduce(DataSet::union)</span>
+<span class="pc" id="L119">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during vertex union&quot;)),</span>
+<span class="fc" id="L120">      edges.values().stream().reduce(DataSet::union)</span>
+<span class="pc" id="L121">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during edge union&quot;))</span>
     );
   }
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromGraphLayout(
-    LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; logicalGraphLayout) {
-<span class="fc" id="L139">    return fromDataSets(logicalGraphLayout.getGraphHead(),</span>
-<span class="fc" id="L140">      logicalGraphLayout.getVertices(),</span>
-<span class="fc" id="L141">      logicalGraphLayout.getEdges());</span>
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromCollections(
+    Collection&lt;EPGMGraphHead&gt; graphHeads,
+    Collection&lt;EPGMVertex&gt; vertices,
+    Collection&lt;EPGMEdge&gt; edges) {
+<span class="fc" id="L130">    return fromDataSets(</span>
+<span class="fc" id="L131">      createGraphHeadDataSet(graphHeads),</span>
+<span class="fc" id="L132">      createVertexDataSet(vertices),</span>
+<span class="fc" id="L133">      createEdgeDataSet(edges)</span>
+    );
   }
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromTransactions(
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromGraphLayout(
+    LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; logicalGraphLayout) {
+<span class="fc" id="L140">    return fromDataSets(logicalGraphLayout.getGraphHead(),</span>
+<span class="fc" id="L141">      logicalGraphLayout.getVertices(),</span>
+<span class="fc" id="L142">      logicalGraphLayout.getEdges());</span>
+  }
+
+  @Override
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromTransactions(
     DataSet&lt;GraphTransaction&gt; transactions) {
-<span class="fc" id="L147">    return new TxCollectionLayout(transactions);</span>
+<span class="fc" id="L148">    return new TxCollectionLayout(transactions);</span>
   }
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; fromTransactions(
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromTransactions(
     DataSet&lt;GraphTransaction&gt; transactions,
-    GroupReduceFunction&lt;Vertex, Vertex&gt; vertexMergeReducer,
-    GroupReduceFunction&lt;Edge, Edge&gt; edgeMergeReducer) {
-<span class="nc" id="L155">    return new TxCollectionLayout(transactions);</span>
+    GroupReduceFunction&lt;EPGMVertex, EPGMVertex&gt; vertexMergeReducer,
+    GroupReduceFunction&lt;EPGMEdge, EPGMEdge&gt; edgeMergeReducer) {
+<span class="nc" id="L156">    return new TxCollectionLayout(transactions);</span>
   }
 
   @Override
-  public GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; createEmptyCollection() {
-<span class="fc" id="L160">    return fromTransactions(createGraphTransactionDataSet(Lists.newArrayListWithCapacity(0)));</span>
+  public GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; createEmptyCollection() {
+<span class="fc" id="L161">    return fromTransactions(createGraphTransactionDataSet(Lists.newArrayListWithCapacity(0)));</span>
   }
 
   /**
@@ -168,17 +169,17 @@ import java.util.Set;
    */
   private DataSet&lt;GraphTransaction&gt; createGraphTransactionDataSet(
     Collection&lt;GraphTransaction&gt; transactions) {
-<span class="fc" id="L171">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
+<span class="fc" id="L172">    ExecutionEnvironment env = getConfig().getExecutionEnvironment();</span>
 
     DataSet&lt;GraphTransaction&gt; graphTransactionSet;
-<span class="pc bpc" id="L174" title="1 of 2 branches missed.">    if (transactions.isEmpty()) {</span>
-<span class="fc" id="L175">      graphTransactionSet = env.fromCollection(Lists.newArrayList(new GraphTransaction()),</span>
-<span class="fc" id="L176">        new TypeHint&lt;GraphTransaction&gt;() { }.getTypeInfo())</span>
-<span class="fc" id="L177">        .filter(new False&lt;&gt;());</span>
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">    if (transactions.isEmpty()) {</span>
+<span class="fc" id="L176">      graphTransactionSet = env.fromCollection(Lists.newArrayList(new GraphTransaction()),</span>
+<span class="fc" id="L177">        new TypeHint&lt;GraphTransaction&gt;() { }.getTypeInfo())</span>
+<span class="fc" id="L178">        .filter(new False&lt;&gt;());</span>
     } else {
-<span class="nc" id="L179">      graphTransactionSet = env.fromCollection(transactions);</span>
+<span class="nc" id="L180">      graphTransactionSet = env.fromCollection(transactions);</span>
     }
-<span class="fc" id="L181">    return graphTransactionSet;</span>
+<span class="fc" id="L182">    return graphTransactionSet;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -17,8 +17,8 @@ package org.gradoop.flink.io.impl.dot.functions;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
@@ -70,7 +70,7 @@ public class DotFileFormatHtml extends AbstractDotFileFormat {
    */
   @Override
   void writeVertices(GraphTransaction transaction, StringBuilder builder, String suffix) {
-<span class="fc bfc" id="L73" title="All 2 branches covered.">    for (Vertex vertex: transaction.getVertices()) {</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">    for (EPGMVertex vertex: transaction.getVertices()) {</span>
       // writes for each vertex:
       // &quot;v1234&quot;,
 <span class="fc" id="L76">      builder.append(VERTEX_ID_PREFIX)</span>
@@ -95,7 +95,7 @@ public class DotFileFormatHtml extends AbstractDotFileFormat {
    * @param elem graph element with id, label and properties
    */
   @Override
-  void writeLabel(StringBuilder builder, EPGMElement elem) {
+  void writeLabel(StringBuilder builder, Element elem) {
 <span class="fc" id="L99">    String label = elem.getLabel();</span>
 <span class="fc" id="L100">    String id = elem.getId().toString();</span>
 <span class="fc" id="L101">    Properties properties = elem.getProperties();</span>

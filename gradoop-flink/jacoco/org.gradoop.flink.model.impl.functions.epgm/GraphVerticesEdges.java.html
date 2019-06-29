@@ -21,9 +21,9 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.HashSet;
@@ -41,9 +41,11 @@ import java.util.Set;
 @FunctionAnnotation.ForwardedFields(&quot;f0&quot;)
 <span class="fc" id="L42">public class GraphVerticesEdges implements</span>
   GroupCombineFunction&lt;
-    Tuple2&lt;GradoopId, GraphElement&gt;, Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt;&gt;,
+    Tuple2&lt;GradoopId, EPGMGraphElement&gt;,
+    Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt;&gt;,
   GroupReduceFunction&lt;
-    Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt;, Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt;&gt; {
+    Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt;,
+    Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt;&gt; {
 
   /**
    * Creates vertex and edge sets for each transaction.
@@ -54,29 +56,29 @@ import java.util.Set;
    *                   and may trigger the recovery logic.
    */
   @Override
-  public void combine(Iterable&lt;Tuple2&lt;GradoopId, GraphElement&gt;&gt; values,
-    Collector&lt;Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt;&gt; out) throws Exception {
+  public void combine(Iterable&lt;Tuple2&lt;GradoopId, EPGMGraphElement&gt;&gt; values,
+    Collector&lt;Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt;&gt; out) throws Exception {
 
-<span class="fc" id="L60">    Iterator&lt;Tuple2&lt;GradoopId, GraphElement&gt;&gt; iterator = values.iterator();</span>
+<span class="fc" id="L62">    Iterator&lt;Tuple2&lt;GradoopId, EPGMGraphElement&gt;&gt; iterator = values.iterator();</span>
 
-<span class="fc" id="L62">    GradoopId graphId    = null;</span>
-<span class="fc" id="L63">    Set&lt;Vertex&gt; vertices = new HashSet&lt;&gt;();</span>
-<span class="fc" id="L64">    Set&lt;Edge&gt; edges      = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L64">    GradoopId graphId    = null;</span>
+<span class="fc" id="L65">    Set&lt;EPGMVertex&gt; vertices = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L66">    Set&lt;EPGMEdge&gt; edges      = new HashSet&lt;&gt;();</span>
 
-<span class="fc bfc" id="L66" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
-<span class="fc" id="L67">      Tuple2&lt;GradoopId, GraphElement&gt; next = iterator.next();</span>
-<span class="fc" id="L68">      graphId = next.f0;</span>
+<span class="fc bfc" id="L68" title="All 2 branches covered.">    while (iterator.hasNext()) {</span>
+<span class="fc" id="L69">      Tuple2&lt;GradoopId, EPGMGraphElement&gt; next = iterator.next();</span>
+<span class="fc" id="L70">      graphId = next.f0;</span>
 
-<span class="fc" id="L70">      GraphElement element = next.f1;</span>
-<span class="fc bfc" id="L71" title="All 2 branches covered.">      if (element instanceof Vertex) {</span>
-<span class="fc" id="L72">        vertices.add((Vertex) element);</span>
+<span class="fc" id="L72">      EPGMGraphElement element = next.f1;</span>
+<span class="fc bfc" id="L73" title="All 2 branches covered.">      if (element instanceof EPGMVertex) {</span>
+<span class="fc" id="L74">        vertices.add((EPGMVertex) element);</span>
       } else {
-<span class="fc" id="L74">        edges.add((Edge) element);</span>
+<span class="fc" id="L76">        edges.add((EPGMEdge) element);</span>
       }
-<span class="fc" id="L76">    }</span>
+<span class="fc" id="L78">    }</span>
 
-<span class="fc" id="L78">    out.collect(Tuple3.of(graphId, vertices, edges));</span>
-<span class="fc" id="L79">  }</span>
+<span class="fc" id="L80">    out.collect(Tuple3.of(graphId, vertices, edges));</span>
+<span class="fc" id="L81">  }</span>
 
   /**
    * Merges sets created by the combiners.
@@ -87,23 +89,23 @@ import java.util.Set;
    *                   and may trigger the recovery logic.
    */
   @Override
-  public void reduce(Iterable&lt;Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt;&gt; values,
-    Collector&lt;Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt;&gt; out) throws Exception {
+  public void reduce(Iterable&lt;Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt;&gt; values,
+    Collector&lt;Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt;&gt; out) throws Exception {
 
-<span class="fc" id="L93">    Iterator&lt;Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt;&gt; iterator = values.iterator();</span>
-<span class="fc" id="L94">    Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt; first = iterator.next();</span>
+<span class="fc" id="L95">    Iterator&lt;Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt;&gt; iterator = values.iterator();</span>
+<span class="fc" id="L96">    Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt; first = iterator.next();</span>
 
-<span class="fc" id="L96">    GradoopId graphId    = first.f0;</span>
-<span class="fc" id="L97">    Set&lt;Vertex&gt; vertices = first.f1;</span>
-<span class="fc" id="L98">    Set&lt;Edge&gt; edges      = first.f2;</span>
+<span class="fc" id="L98">    GradoopId graphId    = first.f0;</span>
+<span class="fc" id="L99">    Set&lt;EPGMVertex&gt; vertices = first.f1;</span>
+<span class="fc" id="L100">    Set&lt;EPGMEdge&gt; edges      = first.f2;</span>
 
-<span class="pc bpc" id="L100" title="1 of 2 branches missed.">    while (iterator.hasNext()) {</span>
-<span class="nc" id="L101">      Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt; next = iterator.next();</span>
-<span class="nc" id="L102">      vertices.addAll(next.f1);</span>
-<span class="nc" id="L103">      edges.addAll(next.f2);</span>
-<span class="nc" id="L104">    }</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">    while (iterator.hasNext()) {</span>
+<span class="nc" id="L103">      Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt; next = iterator.next();</span>
+<span class="nc" id="L104">      vertices.addAll(next.f1);</span>
+<span class="nc" id="L105">      edges.addAll(next.f2);</span>
+<span class="nc" id="L106">    }</span>
 
-<span class="fc" id="L106">    out.collect(Tuple3.of(graphId, vertices, edges));</span>
-<span class="fc" id="L107">  }</span>
+<span class="fc" id="L108">    out.collect(Tuple3.of(graphId, vertices, edges));</span>
+<span class="fc" id="L109">  }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -20,9 +20,9 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.Objects;
@@ -34,14 +34,14 @@ import java.util.Objects;
  * @param &lt;V&gt; The vertex type.
  * @param &lt;E&gt; The edge type.
  */
-public class CreateVertexFromEdges&lt;V extends EPGMVertex, E extends EPGMEdge&gt;
+public class CreateVertexFromEdges&lt;V extends Vertex, E extends Edge&gt;
   implements MapFunction&lt;E, Tuple3&lt;V, GradoopId, GradoopId&gt;&gt;,
   ResultTypeQueryable&lt;Tuple3&lt;V, GradoopId, GradoopId&gt;&gt; {
 
   /**
    * The factory vertices are created with.
    */
-  private final EPGMVertexFactory&lt;V&gt; factory;
+  private final VertexFactory&lt;V&gt; factory;
 
   /**
    * Reduce object instantiations.
@@ -54,7 +54,7 @@ public class CreateVertexFromEdges&lt;V extends EPGMVertex, E extends EPGMEdge&g
    * @param newVertexLabel The label of the newly created vertex.
    * @param factory        The factory for creating new vertices.
    */
-<span class="fc" id="L57">  public CreateVertexFromEdges(String newVertexLabel, EPGMVertexFactory&lt;V&gt; factory) {</span>
+<span class="fc" id="L57">  public CreateVertexFromEdges(String newVertexLabel, VertexFactory&lt;V&gt; factory) {</span>
 <span class="fc" id="L58">    this.factory = Objects.requireNonNull(factory);</span>
 <span class="fc" id="L59">    this.reuse = new Tuple3&lt;&gt;(factory.createVertex(newVertexLabel), null, null);</span>
 <span class="fc" id="L60">  }</span>

@@ -27,7 +27,7 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> java.util.Iterator;
@@ -52,11 +52,11 @@
 <a name="42" href="#42">42</a>    }
 <a name="43" href="#43">43</a>  
 <a name="44" href="#44">44</a>    @Override
-<a name="45" href="#45">45</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> reduce(Iterable&lt;Tuple2&lt;String, GraphHead&gt;&gt; iterable,
-<a name="46" href="#46">46</a>      Collector&lt;GraphHead&gt; collector) <strong class="jxr_keyword">throws</strong> Exception {
-<a name="47" href="#47">47</a>      Iterator&lt;Tuple2&lt;String, GraphHead&gt;&gt; iterator = iterable.iterator();
+<a name="45" href="#45">45</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> reduce(Iterable&lt;Tuple2&lt;String, EPGMGraphHead&gt;&gt; iterable,
+<a name="46" href="#46">46</a>      Collector&lt;EPGMGraphHead&gt; collector) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="47" href="#47">47</a>      Iterator&lt;Tuple2&lt;String, EPGMGraphHead&gt;&gt; iterator = iterable.iterator();
 <a name="48" href="#48">48</a>  
-<a name="49" href="#49">49</a>      GraphHead graphHead = iterator.next().f1;
+<a name="49" href="#49">49</a>      EPGMGraphHead graphHead = iterator.next().f1;
 <a name="50" href="#50">50</a>      <strong class="jxr_keyword">int</strong> count = 1;
 <a name="51" href="#51">51</a>  
 <a name="52" href="#52">52</a>      <strong class="jxr_keyword">while</strong> (iterator.hasNext()) {

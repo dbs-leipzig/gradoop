@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.CoGroupFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="24" href="#24">24</a>  
@@ -44,7 +44,7 @@
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt; The vertex type.</em>
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="37" href="#37">37</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> AccumulatePropagatedValues&lt;V <strong class="jxr_keyword">extends</strong> EPGMVertex&gt;
+<a name="37" href="#37">37</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> AccumulatePropagatedValues&lt;V <strong class="jxr_keyword">extends</strong> Vertex&gt;
 <a name="38" href="#38">38</a>    implements CoGroupFunction&lt;Tuple2&lt;GradoopId, PropertyValue&gt;, V, V&gt; {
 <a name="39" href="#39">39</a>  
 <a name="40" href="#40">40</a>    <em class="jxr_javadoccomment">/**</em>

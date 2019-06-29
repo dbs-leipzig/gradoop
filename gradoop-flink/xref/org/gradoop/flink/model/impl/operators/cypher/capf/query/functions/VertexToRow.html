@@ -29,7 +29,7 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.functions.FunctionAnnotation;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.types.Row;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> java.util.Collection;
 <a name="25" href="#25">25</a>  
@@ -41,7 +41,7 @@
 <a name="31" href="#31">31</a>  
 <a name="32" href="#32">32</a>  @FunctionAnnotation.ForwardedFields(<span class="jxr_string">"f0-&gt;f0"</span>)
 <a name="33" href="#33">33</a>  @FunctionAnnotation.ReadFields(<span class="jxr_string">"f1.properties"</span>)
-<a name="34" href="#34">34</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/functions/VertexToRow.html">VertexToRow</a> <strong class="jxr_keyword">extends</strong> RichMapFunction&lt;Tuple2&lt;Long, Vertex&gt;, Row&gt; {
+<a name="34" href="#34">34</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/cypher/capf/query/functions/VertexToRow.html">VertexToRow</a> <strong class="jxr_keyword">extends</strong> RichMapFunction&lt;Tuple2&lt;Long, EPGMVertex&gt;, Row&gt; {
 <a name="35" href="#35">35</a>  
 <a name="36" href="#36">36</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   * List of all property keys the edges with this label have.</em>
@@ -64,7 +64,7 @@
 <a name="54" href="#54">54</a>    }
 <a name="55" href="#55">55</a>  
 <a name="56" href="#56">56</a>    @Override
-<a name="57" href="#57">57</a>    <strong class="jxr_keyword">public</strong> Row map(Tuple2&lt;Long, Vertex&gt; tuple) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="57" href="#57">57</a>    <strong class="jxr_keyword">public</strong> Row map(Tuple2&lt;Long, EPGMVertex&gt; tuple) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="58" href="#58">58</a>      returnRow.setField(0, tuple.f0);
 <a name="59" href="#59">59</a>  
 <a name="60" href="#60">60</a>      <strong class="jxr_keyword">int</strong> i = 1;

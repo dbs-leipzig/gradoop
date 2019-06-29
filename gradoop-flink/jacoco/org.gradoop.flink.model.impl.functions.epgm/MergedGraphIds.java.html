@@ -19,7 +19,7 @@ import org.apache.flink.api.common.functions.GroupCombineFunction;
 import org.apache.flink.api.common.functions.GroupReduceFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 import java.util.Iterator;
@@ -28,11 +28,11 @@ import java.util.Iterator;
  * Creates a single graph element which is contained in all graphs that the
  * input elements are contained in.
  *
- * GraphElement* -&gt; GraphElement
+ * EPGMGraphElement* -&gt; EPGMGraphElement
  *
  * @param &lt;GE&gt; EPGM graph element type
  */
-<span class="fc" id="L35">public class MergedGraphIds&lt;GE extends GraphElement&gt;</span>
+<span class="fc" id="L35">public class MergedGraphIds&lt;GE extends EPGMGraphElement&gt;</span>
   implements GroupCombineFunction&lt;GE, GE&gt;, GroupReduceFunction&lt;GE, GE&gt;,
   JoinFunction&lt;GE, GE, GE&gt; {
 

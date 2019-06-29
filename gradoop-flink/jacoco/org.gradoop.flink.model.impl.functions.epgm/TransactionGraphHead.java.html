@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.functions.epgm;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 
 import java.util.Set;
 
@@ -31,11 +31,11 @@ import java.util.Set;
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0-&gt;*&quot;)
 @FunctionAnnotation.ReadFields(&quot;f0&quot;)
-<span class="fc" id="L34">public class TransactionGraphHead&lt;T extends Tuple3&lt;GraphHead, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt;&gt; implements</span>
-  MapFunction&lt;T, GraphHead&gt; {
+<span class="fc" id="L34">public class TransactionGraphHead&lt;T extends Tuple3&lt;EPGMGraphHead, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt;&gt; implements</span>
+  MapFunction&lt;T, EPGMGraphHead&gt; {
 
   @Override
-  public GraphHead map(T triple) throws Exception {
+  public EPGMGraphHead map(T triple) throws Exception {
 <span class="fc" id="L39">    return triple.f0;</span>
   }
 }

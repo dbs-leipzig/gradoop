@@ -27,13 +27,13 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.FilterFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
 <a name="21" href="#21">21</a>  
 <a name="22" href="#22">22</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment"> * Filters transactional vertices.</em>
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment"> * @param &lt;V&gt; vertex type.</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> TransactionalData&lt;V <strong class="jxr_keyword">extends</strong> EPGMVertex&gt;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> TransactionalData&lt;V <strong class="jxr_keyword">extends</strong> Vertex&gt;
 <a name="27" href="#27">27</a>    implements FilterFunction&lt;V&gt; {
 <a name="28" href="#28">28</a>  
 <a name="29" href="#29">29</a>    @Override

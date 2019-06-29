@@ -29,7 +29,7 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.RichMapFunction;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.configuration.Configuration;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.fsm.transactional.common.TFSMConstants;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 <a name="25" href="#25">25</a>  
@@ -64,10 +64,10 @@
 <a name="54" href="#54">54</a>  
 <a name="55" href="#55">55</a>      <em class="jxr_comment">// drop edges with infrequent labels</em>
 <a name="56" href="#56">56</a>  
-<a name="57" href="#57">57</a>      Iterator&lt;Edge&gt; edgeIterator = transaction.getEdges().iterator();
+<a name="57" href="#57">57</a>      Iterator&lt;EPGMEdge&gt; edgeIterator = transaction.getEdges().iterator();
 <a name="58" href="#58">58</a>  
 <a name="59" href="#59">59</a>      <strong class="jxr_keyword">while</strong> (edgeIterator.hasNext()) {
-<a name="60" href="#60">60</a>        Edge next = edgeIterator.next();
+<a name="60" href="#60">60</a>        EPGMEdge next = edgeIterator.next();
 <a name="61" href="#61">61</a>  
 <a name="62" href="#62">62</a>        <strong class="jxr_keyword">if</strong> (frequentEdgeLabels.contains(next.getLabel())) {
 <a name="63" href="#63">63</a>          referenceEdgeIds.add(next.getSourceId());

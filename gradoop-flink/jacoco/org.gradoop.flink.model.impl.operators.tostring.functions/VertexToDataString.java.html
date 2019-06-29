@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.tostring.functions;
 
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.tostring.api.VertexToString;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
@@ -25,11 +25,11 @@ import org.gradoop.flink.model.impl.operators.tostring.tuples.VertexString;
  * represents a vertex by a data string (label and properties)
  */
 <span class="fc" id="L27">public class VertexToDataString</span>
-  extends ElementToDataString&lt;Vertex&gt;
-  implements VertexToString&lt;Vertex&gt; {
+  extends ElementToDataString&lt;EPGMVertex&gt;
+  implements VertexToString&lt;EPGMVertex&gt; {
 
   @Override
-  public void flatMap(Vertex vertex, Collector&lt;VertexString&gt; collector) throws Exception {
+  public void flatMap(EPGMVertex vertex, Collector&lt;VertexString&gt; collector) throws Exception {
 <span class="fc" id="L33">    GradoopId vertexId = vertex.getId();</span>
 <span class="fc" id="L34">    String vertexLabel = &quot;(&quot; + label(vertex) + &quot;)&quot;;</span>
 

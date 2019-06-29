@@ -27,7 +27,7 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.FilterFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.functions.FunctionAnnotation;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <em class="jxr_javadoccomment">/**</em>
@@ -38,13 +38,13 @@
 <a name="28" href="#28">28</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment">   * Filter function</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="31" href="#31">31</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> FilterFunction&lt;GraphHead&gt; filterFunction;
+<a name="31" href="#31">31</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> FilterFunction&lt;EPGMGraphHead&gt; filterFunction;
 <a name="32" href="#32">32</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   * Constructor</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   *</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment">   * @param filterFunction filter function for graph heads</em>
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="37" href="#37">37</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/selection/functions/FilterTransactions.html">FilterTransactions</a>(FilterFunction&lt;GraphHead&gt; filterFunction) {
+<a name="37" href="#37">37</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/selection/functions/FilterTransactions.html">FilterTransactions</a>(FilterFunction&lt;EPGMGraphHead&gt; filterFunction) {
 <a name="38" href="#38">38</a>      <strong class="jxr_keyword">this</strong>.filterFunction = filterFunction;
 <a name="39" href="#39">39</a>    }
 <a name="40" href="#40">40</a>  

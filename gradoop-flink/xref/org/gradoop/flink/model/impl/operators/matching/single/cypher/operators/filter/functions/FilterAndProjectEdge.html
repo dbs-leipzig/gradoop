@@ -27,7 +27,7 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.RichFlatMapFunction;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
@@ -35,10 +35,10 @@
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> java.util.List;
 <a name="26" href="#26">26</a>  
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment">/**</em>
-<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * Applies a given predicate on a {@link Edge} and projects specified property values to the</em>
+<a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> * Applies a given predicate on a {@link EPGMEdge} and projects specified property values to the</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * output embedding.</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/filter/functions/FilterAndProjectEdge.html">FilterAndProjectEdge</a> <strong class="jxr_keyword">extends</strong> RichFlatMapFunction&lt;Edge, Embedding&gt; {
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/operators/filter/functions/FilterAndProjectEdge.html">FilterAndProjectEdge</a> <strong class="jxr_keyword">extends</strong> RichFlatMapFunction&lt;EPGMEdge, Embedding&gt; {
 <a name="32" href="#32">32</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment">   * Predicates used for filtering</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   */</em>
@@ -66,7 +66,7 @@
 <a name="56" href="#56">56</a>    }
 <a name="57" href="#57">57</a>  
 <a name="58" href="#58">58</a>    @Override
-<a name="59" href="#59">59</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(Edge edge, Collector&lt;Embedding&gt; out) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="59" href="#59">59</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(EPGMEdge edge, Collector&lt;Embedding&gt; out) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="60" href="#60">60</a>      <strong class="jxr_keyword">if</strong> (predicates.evaluate(edge)) {
 <a name="61" href="#61">61</a>        out.collect(EmbeddingFactory.fromEdge(edge, projectionPropertyKeys, isLoop));
 <a name="62" href="#62">62</a>      }

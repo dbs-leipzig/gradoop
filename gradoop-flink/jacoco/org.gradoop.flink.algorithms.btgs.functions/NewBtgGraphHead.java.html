@@ -19,28 +19,28 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.flink.algorithms.btgs.BusinessTransactionGraphs;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Creates an EPGM graph head representing a business transaction graphs.
+ * Creates an graph head representing a business transaction graphs.
  * @param &lt;G&gt; graph head type
  */
-public class NewBtgGraphHead&lt;G extends EPGMGraphHead&gt;
+public class NewBtgGraphHead&lt;G extends GraphHead&gt;
   implements MapFunction&lt;GradoopId, G&gt;, ResultTypeQueryable&lt;G&gt; {
 
   /**
    * graph head factory
    */
-  private final EPGMGraphHeadFactory&lt;G&gt; graphHeadFactory;
+  private final GraphHeadFactory&lt;G&gt; graphHeadFactory;
 
   /**
    * Constructor
    * @param graphHeadFactory graph head factory
    */
-<span class="fc" id="L43">  public NewBtgGraphHead(EPGMGraphHeadFactory&lt;G&gt; graphHeadFactory) {</span>
+<span class="fc" id="L43">  public NewBtgGraphHead(GraphHeadFactory&lt;G&gt; graphHeadFactory) {</span>
 <span class="fc" id="L44">    this.graphHeadFactory = graphHeadFactory;</span>
 <span class="fc" id="L45">  }</span>
 

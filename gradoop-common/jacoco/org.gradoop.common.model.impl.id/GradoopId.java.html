@@ -21,7 +21,7 @@ import org.apache.flink.core.memory.DataOutputView;
 import org.apache.flink.core.memory.MemorySegment;
 import org.apache.flink.types.CopyableValue;
 import org.apache.flink.types.NormalizableKey;
-import org.gradoop.common.model.api.entities.EPGMIdentifiable;
+import org.gradoop.common.model.api.entities.Identifiable;
 
 import java.io.IOException;
 import java.net.NetworkInterface;
@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * (org.bson.types.ObjectId) to guarantee uniqueness. Much of the code is copied directly or
  * has only small changes.
  *
- * @see EPGMIdentifiable
+ * @see Identifiable
  * &lt;p&gt;
  * references to: org.bson.types.ObjectId
  */

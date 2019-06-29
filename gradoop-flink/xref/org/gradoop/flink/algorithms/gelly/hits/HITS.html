@@ -29,7 +29,7 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.graph.Graph;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.types.NullValue;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.functions.VertexToGellyVertexWithNullValue;
@@ -115,7 +115,7 @@
 <a name="105" href="#105">105</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> executeInGelly(Graph&lt;GradoopId, NullValue, NullValue&gt; graph)
 <a name="106" href="#106">106</a>     <strong class="jxr_keyword">throws</strong> Exception {
 <a name="107" href="#107">107</a> 
-<a name="108" href="#108">108</a>     DataSet&lt;Vertex&gt; newVertices = hits.runInternal(graph)
+<a name="108" href="#108">108</a>     DataSet&lt;EPGMVertex&gt; newVertices = hits.runInternal(graph)
 <a name="109" href="#109">109</a>       .join(currentGraph.getVertices())
 <a name="110" href="#110">110</a>       .where(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/hits/functions/HitsResultKeySelector.html">HitsResultKeySelector</a>()).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
 <a name="111" href="#111">111</a>       .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/hits/functions/HITSToAttributes.html">HITSToAttributes</a>(authorityPropertyKey, hubPropertyKey));

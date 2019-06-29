@@ -20,10 +20,10 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphElement;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.functions.epgm.ByLabel;
@@ -42,20 +42,20 @@ import java.util.Set;
  * - the second dataset contains the vertices contained in all graphs of the collection
  * - the third dataset contains the edges contained in all graphs of the collection
  */
-public class GVELayout implements LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt;,
-  GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; {
+public class GVELayout implements LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt;,
+  GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; {
   /**
    * Graph data associated with the logical graphs in that collection.
    */
-  private final DataSet&lt;GraphHead&gt; graphHeads;
+  private final DataSet&lt;EPGMGraphHead&gt; graphHeads;
   /**
    * DataSet containing vertices associated with that graph.
    */
-  private final DataSet&lt;Vertex&gt; vertices;
+  private final DataSet&lt;EPGMVertex&gt; vertices;
   /**
    * DataSet containing edges associated with that graph.
    */
-  private final DataSet&lt;Edge&gt; edges;
+  private final DataSet&lt;EPGMEdge&gt; edges;
 
   /**
    * Constructor
@@ -64,8 +64,8 @@ public class GVELayout implements LogicalGraphLayout&lt;GraphHead, Vertex, Edge&
    * @param vertices vertex dataset
    * @param edges edge dataset
    */
-  protected GVELayout(DataSet&lt;GraphHead&gt; graphHeads, DataSet&lt;Vertex&gt; vertices,
-<span class="fc" id="L68">    DataSet&lt;Edge&gt; edges) {</span>
+  protected GVELayout(DataSet&lt;EPGMGraphHead&gt; graphHeads, DataSet&lt;EPGMVertex&gt; vertices,
+<span class="fc" id="L68">    DataSet&lt;EPGMEdge&gt; edges) {</span>
 <span class="fc" id="L69">    this.graphHeads = graphHeads;</span>
 <span class="fc" id="L70">    this.vertices = vertices;</span>
 <span class="fc" id="L71">    this.edges = edges;</span>
@@ -87,28 +87,28 @@ public class GVELayout implements LogicalGraphLayout&lt;GraphHead, Vertex, Edge&
   }
 
   @Override
-  public DataSet&lt;GraphHead&gt; getGraphHeads() {
+  public DataSet&lt;EPGMGraphHead&gt; getGraphHeads() {
 <span class="fc" id="L91">    return graphHeads;</span>
   }
 
   @Override
-  public DataSet&lt;GraphHead&gt; getGraphHeadsByLabel(String label) {
+  public DataSet&lt;EPGMGraphHead&gt; getGraphHeadsByLabel(String label) {
 <span class="fc" id="L96">    return graphHeads.filter(new ByLabel&lt;&gt;(label));</span>
   }
 
   @Override
   public DataSet&lt;GraphTransaction&gt; getGraphTransactions() {
-<span class="fc" id="L101">    DataSet&lt;Tuple2&lt;GradoopId, GraphElement&gt;&gt; graphVertexTuples = getVertices()</span>
-<span class="fc" id="L102">      .map(new Cast&lt;&gt;(GraphElement.class))</span>
-<span class="fc" id="L103">      .returns(TypeExtractor.getForClass(GraphElement.class))</span>
+<span class="fc" id="L101">    DataSet&lt;Tuple2&lt;GradoopId, EPGMGraphElement&gt;&gt; graphVertexTuples = getVertices()</span>
+<span class="fc" id="L102">      .map(new Cast&lt;&gt;(EPGMGraphElement.class))</span>
+<span class="fc" id="L103">      .returns(TypeExtractor.getForClass(EPGMGraphElement.class))</span>
 <span class="fc" id="L104">      .flatMap(new GraphElementExpander&lt;&gt;());</span>
 
-<span class="fc" id="L106">    DataSet&lt;Tuple2&lt;GradoopId, GraphElement&gt;&gt; graphEdgeTuples = getEdges()</span>
-<span class="fc" id="L107">      .map(new Cast&lt;&gt;(GraphElement.class))</span>
-<span class="fc" id="L108">      .returns(TypeExtractor.getForClass(GraphElement.class))</span>
+<span class="fc" id="L106">    DataSet&lt;Tuple2&lt;GradoopId, EPGMGraphElement&gt;&gt; graphEdgeTuples = getEdges()</span>
+<span class="fc" id="L107">      .map(new Cast&lt;&gt;(EPGMGraphElement.class))</span>
+<span class="fc" id="L108">      .returns(TypeExtractor.getForClass(EPGMGraphElement.class))</span>
 <span class="fc" id="L109">      .flatMap(new GraphElementExpander&lt;&gt;());</span>
 
-<span class="fc" id="L111">    DataSet&lt;Tuple3&lt;GradoopId, Set&lt;Vertex&gt;, Set&lt;Edge&gt;&gt;&gt; transactions = graphVertexTuples</span>
+<span class="fc" id="L111">    DataSet&lt;Tuple3&lt;GradoopId, Set&lt;EPGMVertex&gt;, Set&lt;EPGMEdge&gt;&gt;&gt; transactions = graphVertexTuples</span>
 <span class="fc" id="L112">      .union(graphEdgeTuples)</span>
 <span class="fc" id="L113">      .groupBy(0)</span>
 <span class="fc" id="L114">      .combineGroup(new GraphVerticesEdges())</span>
@@ -122,27 +122,27 @@ public class GVELayout implements LogicalGraphLayout&lt;GraphHead, Vertex, Edge&
   }
 
   @Override
-  public DataSet&lt;GraphHead&gt; getGraphHead() {
+  public DataSet&lt;EPGMGraphHead&gt; getGraphHead() {
 <span class="fc" id="L126">    return graphHeads;</span>
   }
 
   @Override
-  public DataSet&lt;Vertex&gt; getVertices() {
+  public DataSet&lt;EPGMVertex&gt; getVertices() {
 <span class="fc" id="L131">    return vertices;</span>
   }
 
   @Override
-  public DataSet&lt;Vertex&gt; getVerticesByLabel(String label) {
+  public DataSet&lt;EPGMVertex&gt; getVerticesByLabel(String label) {
 <span class="fc" id="L136">    return vertices.filter(new ByLabel&lt;&gt;(label));</span>
   }
 
   @Override
-  public DataSet&lt;Edge&gt; getEdges() {
+  public DataSet&lt;EPGMEdge&gt; getEdges() {
 <span class="fc" id="L141">    return edges;</span>
   }
 
   @Override
-  public DataSet&lt;Edge&gt; getEdgesByLabel(String label) {
+  public DataSet&lt;EPGMEdge&gt; getEdgesByLabel(String label) {
 <span class="fc" id="L146">    return edges.filter(new ByLabel&lt;&gt;(label));</span>
   }
 }

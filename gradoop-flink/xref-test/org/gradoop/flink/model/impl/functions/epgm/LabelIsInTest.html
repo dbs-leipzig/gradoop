@@ -25,9 +25,9 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.functions.epgm;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Element;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMElement;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.junit.Before;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
@@ -46,28 +46,28 @@
 <a name="36" href="#36">36</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   * The comparator used to sort results.</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="39" href="#39">39</a>    <strong class="jxr_keyword">private</strong> Comparator&lt;Vertex&gt; comparator = Comparator.comparing(Element::getId);
+<a name="39" href="#39">39</a>    <strong class="jxr_keyword">private</strong> Comparator&lt;EPGMVertex&gt; comparator = Comparator.comparing(EPGMElement::getId);
 <a name="40" href="#40">40</a>  
 <a name="41" href="#41">41</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment">   * Some test vertices to filter.</em>
 <a name="43" href="#43">43</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="44" href="#44">44</a>    <strong class="jxr_keyword">private</strong> List&lt;Vertex&gt; inputVertices;
+<a name="44" href="#44">44</a>    <strong class="jxr_keyword">private</strong> List&lt;EPGMVertex&gt; inputVertices;
 <a name="45" href="#45">45</a>  
 <a name="46" href="#46">46</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="47" href="#47">47</a>  <em class="jxr_javadoccomment">   * The expected vertices after the filter.</em>
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="49" href="#49">49</a>    <strong class="jxr_keyword">private</strong> List&lt;Vertex&gt; expected;
+<a name="49" href="#49">49</a>    <strong class="jxr_keyword">private</strong> List&lt;EPGMVertex&gt; expected;
 <a name="50" href="#50">50</a>  
 <a name="51" href="#51">51</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="52" href="#52">52</a>  <em class="jxr_javadoccomment">   * Initialize input vertices and expected result.</em>
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="54" href="#54">54</a>    @Before
 <a name="55" href="#55">55</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> setUp() {
-<a name="56" href="#56">56</a>      VertexFactory vertexFactory = getConfig().getVertexFactory();
-<a name="57" href="#57">57</a>      Vertex v1 = vertexFactory.createVertex();
-<a name="58" href="#58">58</a>      Vertex v2 = vertexFactory.createVertex(<span class="jxr_string">"a"</span>);
-<a name="59" href="#59">59</a>      Vertex v3 = vertexFactory.createVertex(<span class="jxr_string">"b"</span>);
-<a name="60" href="#60">60</a>      Vertex v4 = vertexFactory.createVertex(<span class="jxr_string">"c"</span>);
+<a name="56" href="#56">56</a>      EPGMVertexFactory vertexFactory = getConfig().getVertexFactory();
+<a name="57" href="#57">57</a>      EPGMVertex v1 = vertexFactory.createVertex();
+<a name="58" href="#58">58</a>      EPGMVertex v2 = vertexFactory.createVertex(<span class="jxr_string">"a"</span>);
+<a name="59" href="#59">59</a>      EPGMVertex v3 = vertexFactory.createVertex(<span class="jxr_string">"b"</span>);
+<a name="60" href="#60">60</a>      EPGMVertex v4 = vertexFactory.createVertex(<span class="jxr_string">"c"</span>);
 <a name="61" href="#61">61</a>      inputVertices = Arrays.asList(v1, v2, v3, v4);
 <a name="62" href="#62">62</a>      expected = Arrays.asList(v2, v3);
 <a name="63" href="#63">63</a>      expected.sort(comparator);
@@ -81,7 +81,7 @@
 <a name="71" href="#71">71</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="72" href="#72">72</a>    @Test
 <a name="73" href="#73">73</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFilterVarargs() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="74" href="#74">74</a>      List&lt;Vertex&gt; result = getExecutionEnvironment().fromCollection(inputVertices)
+<a name="74" href="#74">74</a>      List&lt;EPGMVertex&gt; result = getExecutionEnvironment().fromCollection(inputVertices)
 <a name="75" href="#75">75</a>        .filter(<strong class="jxr_keyword">new</strong> LabelIsIn&lt;&gt;(<span class="jxr_string">"a"</span>, <span class="jxr_string">"b"</span>, <span class="jxr_string">"a"</span>, <strong class="jxr_keyword">null</strong>)).collect();
 <a name="76" href="#76">76</a>      result.sort(comparator);
 <a name="77" href="#77">77</a>      assertArrayEquals(expected.toArray(), result.toArray());
@@ -95,7 +95,7 @@
 <a name="85" href="#85">85</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="86" href="#86">86</a>    @Test
 <a name="87" href="#87">87</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testFilterCollection() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="88" href="#88">88</a>      List&lt;Vertex&gt; result = getExecutionEnvironment().fromCollection(inputVertices)
+<a name="88" href="#88">88</a>      List&lt;EPGMVertex&gt; result = getExecutionEnvironment().fromCollection(inputVertices)
 <a name="89" href="#89">89</a>        .filter(<strong class="jxr_keyword">new</strong> LabelIsIn&lt;&gt;(Arrays.asList(<span class="jxr_string">"a"</span>, <span class="jxr_string">"b"</span>, <span class="jxr_string">"a"</span>, <strong class="jxr_keyword">null</strong>))).collect();
 <a name="90" href="#90">90</a>      result.sort(comparator);
 <a name="91" href="#91">91</a>      assertArrayEquals(expected.toArray(), result.toArray());

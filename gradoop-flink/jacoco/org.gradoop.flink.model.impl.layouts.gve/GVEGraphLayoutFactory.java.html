@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.layouts.gve;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayoutFactory;
 import org.gradoop.flink.model.impl.functions.graphcontainment.AddToGraph;
@@ -36,23 +36,23 @@ import java.util.stream.Collectors;
  * Responsible for creating a {@link GVELayout} from given data.
  */
 <span class="fc" id="L38">public class GVEGraphLayoutFactory extends GVEBaseFactory</span>
-  implements LogicalGraphLayoutFactory&lt;GraphHead, Vertex, Edge&gt; {
+  implements LogicalGraphLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; {
 
   @Override
-  public GVELayout fromDataSets(DataSet&lt;Vertex&gt; vertices) {
-<span class="fc" id="L43">    return fromDataSets(vertices,</span>
-<span class="fc" id="L44">      createEdgeDataSet(Lists.newArrayListWithCapacity(0)));</span>
+  public GVELayout fromDataSets(DataSet&lt;EPGMVertex&gt; vertices) {
+<span class="fc" id="L43">    return fromDataSets(vertices, createEdgeDataSet(Lists.newArrayListWithCapacity(0)));</span>
   }
 
   @Override
-  public GVELayout fromDataSets(DataSet&lt;Vertex&gt; vertices, DataSet&lt;Edge&gt; edges) {
-<span class="fc" id="L49">    Objects.requireNonNull(vertices, &quot;Vertex DataSet was null&quot;);</span>
-<span class="fc" id="L50">    Objects.requireNonNull(edges, &quot;Edge DataSet was null&quot;);</span>
-<span class="fc" id="L51">    GraphHead graphHead = getConfig()</span>
+  public GVELayout fromDataSets(DataSet&lt;EPGMVertex&gt; vertices, DataSet&lt;EPGMEdge&gt; edges) {
+
+<span class="fc" id="L49">    Objects.requireNonNull(vertices, &quot;EPGMVertex DataSet was null&quot;);</span>
+<span class="fc" id="L50">    Objects.requireNonNull(edges, &quot;EPGMEdge DataSet was null&quot;);</span>
+<span class="fc" id="L51">    EPGMGraphHead graphHead = getConfig()</span>
 <span class="fc" id="L52">      .getGraphHeadFactory()</span>
 <span class="fc" id="L53">      .createGraphHead();</span>
 
-<span class="fc" id="L55">    DataSet&lt;GraphHead&gt; graphHeadSet = getConfig().getExecutionEnvironment()</span>
+<span class="fc" id="L55">    DataSet&lt;EPGMGraphHead&gt; graphHeadSet = getConfig().getExecutionEnvironment()</span>
 <span class="fc" id="L56">      .fromElements(graphHead);</span>
 
     // update vertices and edges with new graph head id
@@ -67,23 +67,23 @@ import java.util.stream.Collectors;
   }
 
   @Override
-  public LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromDataSets(DataSet&lt;GraphHead&gt; graphHead,
-    DataSet&lt;Vertex&gt; vertices, DataSet&lt;Edge&gt; edges) {
+  public LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromDataSets(
+    DataSet&lt;EPGMGraphHead&gt; graphHead, DataSet&lt;EPGMVertex&gt; vertices, DataSet&lt;EPGMEdge&gt; edges) {
 <span class="fc" id="L72">    return create(graphHead, vertices, edges);</span>
   }
 
   @Override
-  public LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromIndexedDataSets(
-    Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
-    Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
-<span class="fc" id="L79">    GraphHead graphHead = getConfig()</span>
+  public LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromIndexedDataSets(
+    Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices, Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges) {
+
+<span class="fc" id="L79">    EPGMGraphHead graphHead = getConfig()</span>
 <span class="fc" id="L80">      .getGraphHeadFactory()</span>
 <span class="fc" id="L81">      .createGraphHead();</span>
 
-<span class="fc" id="L83">    DataSet&lt;GraphHead&gt; graphHeadSet = getConfig().getExecutionEnvironment()</span>
+<span class="fc" id="L83">    DataSet&lt;EPGMGraphHead&gt; graphHeadSet = getConfig().getExecutionEnvironment()</span>
 <span class="fc" id="L84">      .fromElements(graphHead);</span>
 
-<span class="fc" id="L86">    Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads = Maps.newHashMap();</span>
+<span class="fc" id="L86">    Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads = Maps.newHashMap();</span>
 <span class="fc" id="L87">    graphHeads.put(graphHead.getLabel(), graphHeadSet);</span>
 
     // update vertices and edges with new graph head id
@@ -101,49 +101,50 @@ import java.util.stream.Collectors;
   }
 
   @Override
-  public LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromIndexedDataSets(
-    Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads,
-    Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
-    Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
+  public LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromIndexedDataSets(
+    Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads,
+    Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices,
+    Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges) {
 <span class="fc" id="L108">    return create(graphHeads, vertices, edges);</span>
   }
 
   @Override
-  public LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromCollections(GraphHead graphHead,
-    Collection&lt;Vertex&gt; vertices,
-    Collection&lt;Edge&gt; edges) {
+  public LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromCollections(
+    EPGMGraphHead graphHead,
+    Collection&lt;EPGMVertex&gt; vertices,
+    Collection&lt;EPGMEdge&gt; edges) {
 
-<span class="fc" id="L116">    Objects.requireNonNull(vertices, &quot;Vertex collection was null&quot;);</span>
+<span class="fc" id="L117">    Objects.requireNonNull(vertices, &quot;EPGMVertex collection was null&quot;);</span>
 
-    List&lt;GraphHead&gt; graphHeads;
-<span class="fc bfc" id="L119" title="All 2 branches covered.">    if (graphHead == null) {</span>
-<span class="fc" id="L120">      graphHeads = Lists.newArrayListWithCapacity(0);</span>
+    List&lt;EPGMGraphHead&gt; graphHeads;
+<span class="fc bfc" id="L120" title="All 2 branches covered.">    if (graphHead == null) {</span>
+<span class="fc" id="L121">      graphHeads = Lists.newArrayListWithCapacity(0);</span>
     } else {
-<span class="fc" id="L122">      graphHeads = Lists.newArrayList(graphHead);</span>
+<span class="fc" id="L123">      graphHeads = Lists.newArrayList(graphHead);</span>
     }
-<span class="pc bpc" id="L124" title="1 of 2 branches missed.">    if (edges == null) {</span>
-<span class="nc" id="L125">      edges = Lists.newArrayListWithCapacity(0);</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">    if (edges == null) {</span>
+<span class="nc" id="L126">      edges = Lists.newArrayListWithCapacity(0);</span>
     }
 
-<span class="fc" id="L128">    return fromDataSets(</span>
-<span class="fc" id="L129">      createGraphHeadDataSet(graphHeads),</span>
-<span class="fc" id="L130">      createVertexDataSet(vertices),</span>
-<span class="fc" id="L131">      createEdgeDataSet(edges));</span>
+<span class="fc" id="L129">    return fromDataSets(</span>
+<span class="fc" id="L130">      createGraphHeadDataSet(graphHeads),</span>
+<span class="fc" id="L131">      createVertexDataSet(vertices),</span>
+<span class="fc" id="L132">      createEdgeDataSet(edges));</span>
   }
 
   @Override
-  public LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; fromCollections(Collection&lt;Vertex&gt; vertices,
-    Collection&lt;Edge&gt; edges) {
-<span class="fc" id="L137">    Objects.requireNonNull(vertices, &quot;Vertex collection was null&quot;);</span>
-<span class="fc" id="L138">    Objects.requireNonNull(edges, &quot;Edge collection was null&quot;);</span>
-<span class="fc" id="L139">    return fromDataSets(createVertexDataSet(vertices), createEdgeDataSet(edges));</span>
+  public LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; fromCollections(
+    Collection&lt;EPGMVertex&gt; vertices, Collection&lt;EPGMEdge&gt; edges) {
+<span class="fc" id="L138">    Objects.requireNonNull(vertices, &quot;EPGMVertex collection was null&quot;);</span>
+<span class="fc" id="L139">    Objects.requireNonNull(edges, &quot;EPGMEdge collection was null&quot;);</span>
+<span class="fc" id="L140">    return fromDataSets(createVertexDataSet(vertices), createEdgeDataSet(edges));</span>
   }
 
   @Override
-  public LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt; createEmptyGraph() {
-<span class="fc" id="L144">    Collection&lt;Vertex&gt; vertices = new ArrayList&lt;&gt;(0);</span>
-<span class="fc" id="L145">    Collection&lt;Edge&gt; edges = new ArrayList&lt;&gt;(0);</span>
-<span class="fc" id="L146">    return fromCollections(null, vertices, edges);</span>
+  public LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; createEmptyGraph() {
+<span class="fc" id="L145">    Collection&lt;EPGMVertex&gt; vertices = new ArrayList&lt;&gt;(0);</span>
+<span class="fc" id="L146">    Collection&lt;EPGMEdge&gt; edges = new ArrayList&lt;&gt;(0);</span>
+<span class="fc" id="L147">    return fromCollections(null, vertices, edges);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

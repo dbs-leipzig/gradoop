@@ -16,7 +16,7 @@
 package org.gradoop.storage.impl.hbase.predicate.filter.api;
 
 import org.apache.hadoop.hbase.filter.Filter;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.common.predicate.filter.api.ElementFilter;
 import org.gradoop.storage.impl.hbase.predicate.filter.calculate.And;
 import org.gradoop.storage.impl.hbase.predicate.filter.calculate.Not;
@@ -28,9 +28,9 @@ import java.io.Serializable;
 /**
  * HBase Element Filter interface to chain predicates
  *
- * @param &lt;T&gt; EPGM element type
+ * @param &lt;T&gt; element type
  */
-public interface HBaseElementFilter&lt;T extends EPGMElement&gt;
+public interface HBaseElementFilter&lt;T extends Element&gt;
   extends ElementFilter&lt;HBaseElementFilter&lt;T&gt;&gt;, Serializable {
 
   @Nonnull

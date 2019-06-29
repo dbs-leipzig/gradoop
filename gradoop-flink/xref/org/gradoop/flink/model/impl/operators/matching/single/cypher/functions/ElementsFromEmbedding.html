@@ -29,14 +29,14 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.commons.lang3.tuple.Pair;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.FlatMapFunction;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertexFactory;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EdgeFactory;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHeadFactory;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.VertexFactory;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Element;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMElement;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.PatternMatching;
 <a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.utils.ExpandDirection;
@@ -53,19 +53,19 @@
 <a name="43" href="#43">43</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment"> * Extracts EPGM elements from an {@link Embedding}.</em>
 <a name="45" href="#45">45</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="46" href="#46">46</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/functions/ElementsFromEmbedding.html">ElementsFromEmbedding</a> implements FlatMapFunction&lt;Embedding, Element&gt; {
+<a name="46" href="#46">46</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/functions/ElementsFromEmbedding.html">ElementsFromEmbedding</a> implements FlatMapFunction&lt;Embedding, EPGMElement&gt; {
 <a name="47" href="#47">47</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="48" href="#48">48</a>  <em class="jxr_javadoccomment">   * Constructs EPGM graph heads</em>
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="50" href="#50">50</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory;
+<a name="50" href="#50">50</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory;
 <a name="51" href="#51">51</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="52" href="#52">52</a>  <em class="jxr_javadoccomment">   * Constructs EPGM vertices</em>
 <a name="53" href="#53">53</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="54" href="#54">54</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> EPGMVertexFactory&lt;Vertex&gt; vertexFactory;
+<a name="54" href="#54">54</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> VertexFactory&lt;EPGMVertex&gt; vertexFactory;
 <a name="55" href="#55">55</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="56" href="#56">56</a>  <em class="jxr_javadoccomment">   * Constructs EPGM edges</em>
 <a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="58" href="#58">58</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> EPGMEdgeFactory&lt;Edge&gt; edgeFactory;
+<a name="58" href="#58">58</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> EdgeFactory&lt;EPGMEdge&gt; edgeFactory;
 <a name="59" href="#59">59</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   * Describes the embedding content</em>
 <a name="61" href="#61">61</a>  <em class="jxr_javadoccomment">   */</em>
@@ -97,9 +97,9 @@
 <a name="87" href="#87">87</a>  <em class="jxr_javadoccomment">   * @param embeddingMetaData meta data for the embedding</em>
 <a name="88" href="#88">88</a>  <em class="jxr_javadoccomment">*    @param sourceTargetVariables source and target vertex variables by edge variable</em>
 <a name="89" href="#89">89</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="90" href="#90">90</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/functions/ElementsFromEmbedding.html">ElementsFromEmbedding</a>(EPGMGraphHeadFactory&lt;GraphHead&gt; epgmGraphHeadFactory,
-<a name="91" href="#91">91</a>      EPGMVertexFactory&lt;Vertex&gt; epgmVertexFactory,
-<a name="92" href="#92">92</a>      EPGMEdgeFactory&lt;Edge&gt; epgmEdgeFactory, <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/EmbeddingMetaData.html">EmbeddingMetaData</a> embeddingMetaData,
+<a name="90" href="#90">90</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/functions/ElementsFromEmbedding.html">ElementsFromEmbedding</a>(GraphHeadFactory&lt;EPGMGraphHead&gt; epgmGraphHeadFactory,
+<a name="91" href="#91">91</a>      VertexFactory&lt;EPGMVertex&gt; epgmVertexFactory,
+<a name="92" href="#92">92</a>      EdgeFactory&lt;EPGMEdge&gt; epgmEdgeFactory, <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/EmbeddingMetaData.html">EmbeddingMetaData</a> embeddingMetaData,
 <a name="93" href="#93">93</a>      Map&lt;String, Pair&lt;String, String&gt;&gt; sourceTargetVariables) {
 <a name="94" href="#94">94</a>      <strong class="jxr_keyword">this</strong>(epgmGraphHeadFactory, epgmVertexFactory, epgmEdgeFactory, embeddingMetaData,
 <a name="95" href="#95">95</a>        sourceTargetVariables, Maps.newHashMapWithExpectedSize(0));
@@ -114,9 +114,9 @@
 <a name="104" href="#104">104</a> <em class="jxr_javadoccomment">   * @param sourceTargetVariables source and target vertex variables by edge variable</em>
 <a name="105" href="#105">105</a> <em class="jxr_javadoccomment">   * @param labelMapping mapping between newElementVariables and its labels</em>
 <a name="106" href="#106">106</a> <em class="jxr_javadoccomment">   */</em>
-<a name="107" href="#107">107</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/functions/ElementsFromEmbedding.html">ElementsFromEmbedding</a>(EPGMGraphHeadFactory&lt;GraphHead&gt; epgmGraphHeadFactory,
-<a name="108" href="#108">108</a>     EPGMVertexFactory&lt;Vertex&gt; epgmVertexFactory,
-<a name="109" href="#109">109</a>     EPGMEdgeFactory&lt;Edge&gt; epgmEdgeFactory, <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/EmbeddingMetaData.html">EmbeddingMetaData</a> embeddingMetaData,
+<a name="107" href="#107">107</a>   <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/functions/ElementsFromEmbedding.html">ElementsFromEmbedding</a>(GraphHeadFactory&lt;EPGMGraphHead&gt; epgmGraphHeadFactory,
+<a name="108" href="#108">108</a>     VertexFactory&lt;EPGMVertex&gt; epgmVertexFactory,
+<a name="109" href="#109">109</a>     EdgeFactory&lt;EPGMEdge&gt; epgmEdgeFactory, <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/EmbeddingMetaData.html">EmbeddingMetaData</a> embeddingMetaData,
 <a name="110" href="#110">110</a>     Map&lt;String, Pair&lt;String, String&gt;&gt; sourceTargetVariables,
 <a name="111" href="#111">111</a>     Map&lt;String, String&gt; labelMapping) {
 <a name="112" href="#112">112</a>     <strong class="jxr_keyword">this</strong>.graphHeadFactory = epgmGraphHeadFactory;
@@ -130,12 +130,12 @@
 <a name="120" href="#120">120</a>   }
 <a name="121" href="#121">121</a> 
 <a name="122" href="#122">122</a>   @Override
-<a name="123" href="#123">123</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(<a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/Embedding.html">Embedding</a> embedding, Collector&lt;Element&gt; out) <strong class="jxr_keyword">throws</strong> Exception {
+<a name="123" href="#123">123</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(<a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/Embedding.html">Embedding</a> embedding, Collector&lt;EPGMElement&gt; out) <strong class="jxr_keyword">throws</strong> Exception {
 <a name="124" href="#124">124</a>     <em class="jxr_comment">// clear for each embedding</em>
 <a name="125" href="#125">125</a>     processedIds.clear();
 <a name="126" href="#126">126</a> 
 <a name="127" href="#127">127</a>     <em class="jxr_comment">// create graph head for this embedding</em>
-<a name="128" href="#128">128</a>     GraphHead graphHead = graphHeadFactory.createGraphHead();
+<a name="128" href="#128">128</a>     EPGMGraphHead graphHead = graphHeadFactory.createGraphHead();
 <a name="129" href="#129">129</a> 
 <a name="130" href="#130">130</a>     <em class="jxr_comment">// vertices</em>
 <a name="131" href="#131">131</a>     <strong class="jxr_keyword">for</strong> (String vertexVariable : metaData.getVertexVariables()) {
@@ -227,7 +227,7 @@
 <a name="217" href="#217">217</a> <em class="jxr_javadoccomment">   * @param graphHead graph head to assign vertex to</em>
 <a name="218" href="#218">218</a> <em class="jxr_javadoccomment">   * @param vertexId vertex identifier</em>
 <a name="219" href="#219">219</a> <em class="jxr_javadoccomment">   */</em>
-<a name="220" href="#220">220</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initVertex(Collector&lt;Element&gt; out, GraphHead graphHead, GradoopId vertexId) {
+<a name="220" href="#220">220</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initVertex(Collector&lt;EPGMElement&gt; out, EPGMGraphHead graphHead, GradoopId vertexId) {
 <a name="221" href="#221">221</a>     initVertexWithData(out, graphHead, vertexId, <strong class="jxr_keyword">null</strong>);
 <a name="222" href="#222">222</a>   }
 <a name="223" href="#223">223</a> 
@@ -240,10 +240,10 @@
 <a name="230" href="#230">230</a> <em class="jxr_javadoccomment">   * @param vertexId vertex identifier</em>
 <a name="231" href="#231">231</a> <em class="jxr_javadoccomment">   * @param label label associated with vertex</em>
 <a name="232" href="#232">232</a> <em class="jxr_javadoccomment">   */</em>
-<a name="233" href="#233">233</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initVertexWithData(Collector&lt;Element&gt; out, GraphHead graphHead, GradoopId vertexId,
+<a name="233" href="#233">233</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initVertexWithData(Collector&lt;EPGMElement&gt; out, EPGMGraphHead graphHead, GradoopId vertexId,
 <a name="234" href="#234">234</a>                                   String label) {
 <a name="235" href="#235">235</a>     <strong class="jxr_keyword">if</strong> (!processedIds.contains(vertexId)) {
-<a name="236" href="#236">236</a>       Vertex v = vertexFactory.initVertex(vertexId);
+<a name="236" href="#236">236</a>       EPGMVertex v = vertexFactory.initVertex(vertexId);
 <a name="237" href="#237">237</a>       v.addGraphId(graphHead.getId());
 <a name="238" href="#238">238</a>       v.setLabel(label);
 <a name="239" href="#239">239</a>       out.collect(v);
@@ -260,7 +260,7 @@
 <a name="250" href="#250">250</a> <em class="jxr_javadoccomment">   * @param sourceId source vertex identifier</em>
 <a name="251" href="#251">251</a> <em class="jxr_javadoccomment">   * @param targetId target vertex identifier</em>
 <a name="252" href="#252">252</a> <em class="jxr_javadoccomment">   */</em>
-<a name="253" href="#253">253</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initEdge(Collector&lt;Element&gt; out, GraphHead graphHead, GradoopId edgeId,
+<a name="253" href="#253">253</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initEdge(Collector&lt;EPGMElement&gt; out, EPGMGraphHead graphHead, GradoopId edgeId,
 <a name="254" href="#254">254</a>     GradoopId sourceId, GradoopId targetId) {
 <a name="255" href="#255">255</a>     initEdgeWithData(out, graphHead, edgeId, sourceId, targetId, <strong class="jxr_keyword">null</strong>);
 <a name="256" href="#256">256</a>   }
@@ -276,10 +276,10 @@
 <a name="266" href="#266">266</a> <em class="jxr_javadoccomment">   * @param targetId target vertex identifier</em>
 <a name="267" href="#267">267</a> <em class="jxr_javadoccomment">   * @param label label associated with edge</em>
 <a name="268" href="#268">268</a> <em class="jxr_javadoccomment">   */</em>
-<a name="269" href="#269">269</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initEdgeWithData(Collector&lt;Element&gt; out, GraphHead graphHead, GradoopId edgeId,
+<a name="269" href="#269">269</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> initEdgeWithData(Collector&lt;EPGMElement&gt; out, EPGMGraphHead graphHead, GradoopId edgeId,
 <a name="270" href="#270">270</a>                                 GradoopId sourceId, GradoopId targetId, String label) {
 <a name="271" href="#271">271</a>     <strong class="jxr_keyword">if</strong> (!processedIds.contains(edgeId)) {
-<a name="272" href="#272">272</a>       Edge e = edgeFactory.initEdge(edgeId, sourceId, targetId);
+<a name="272" href="#272">272</a>       EPGMEdge e = edgeFactory.initEdge(edgeId, sourceId, targetId);
 <a name="273" href="#273">273</a>       e.addGraphId(graphHead.getId());
 <a name="274" href="#274">274</a>       e.setLabel(label);
 <a name="275" href="#275">275</a>       out.collect(e);

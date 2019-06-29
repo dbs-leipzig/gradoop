@@ -25,7 +25,7 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.storage.impl.accumulo.predicate.filter.calculate;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMElement;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Element;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.accumulo.predicate.filter.api.AccumuloElementFilter;
 <a name="20" href="#20">20</a>  
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> java.util.ArrayList;
@@ -38,7 +38,7 @@
 <a name="28" href="#28">28</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="29" href="#29">29</a>  <em class="jxr_javadoccomment"> * @param &lt;T&gt; element type</em>
 <a name="30" href="#30">30</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">class</strong> And&lt;T <strong class="jxr_keyword">extends</strong> EPGMElement&gt; implements AccumuloElementFilter&lt;T&gt; {
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">class</strong> And&lt;T <strong class="jxr_keyword">extends</strong> Element&gt; implements AccumuloElementFilter&lt;T&gt; {
 <a name="32" href="#32">32</a>  
 <a name="33" href="#33">33</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment">   * Predicate list</em>
@@ -66,7 +66,7 @@
 <a name="56" href="#56">56</a>  <em class="jxr_javadoccomment">   * @return Conjunctive filter instance</em>
 <a name="57" href="#57">57</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="58" href="#58">58</a>    @SafeVarargs
-<a name="59" href="#59">59</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> &lt;T <strong class="jxr_keyword">extends</strong> EPGMElement&gt; And&lt;T&gt; create(AccumuloElementFilter&lt;T&gt;... predicates) {
+<a name="59" href="#59">59</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> &lt;T <strong class="jxr_keyword">extends</strong> Element&gt; And&lt;T&gt; create(AccumuloElementFilter&lt;T&gt;... predicates) {
 <a name="60" href="#60">60</a>      List&lt;AccumuloElementFilter&lt;T&gt;&gt; formula = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a name="61" href="#61">61</a>      Collections.addAll(formula, predicates);
 <a name="62" href="#62">62</a>      <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> And&lt;&gt;(formula);

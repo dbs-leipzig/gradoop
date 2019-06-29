@@ -29,14 +29,14 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.JoinFunction;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.graph.library.linkanalysis.PageRank;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> * Stores the page rank result from the left as a Property in in the right.</em>
 <a name="27" href="#27">27</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/algorithms/gelly/pagerank/functions/PageRankToAttribute.html">PageRankToAttribute</a>
-<a name="29" href="#29">29</a>    implements JoinFunction&lt;PageRank.Result&lt;GradoopId&gt;, Vertex, Vertex&gt; {
+<a name="29" href="#29">29</a>    implements JoinFunction&lt;PageRank.Result&lt;GradoopId&gt;, EPGMVertex, EPGMVertex&gt; {
 <a name="30" href="#30">30</a>  
 <a name="31" href="#31">31</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment">   * Property to store the page rank in.</em>
@@ -53,7 +53,7 @@
 <a name="43" href="#43">43</a>    }
 <a name="44" href="#44">44</a>  
 <a name="45" href="#45">45</a>    @Override
-<a name="46" href="#46">46</a>    <strong class="jxr_keyword">public</strong> Vertex join(PageRank.Result result, Vertex vertex) {
+<a name="46" href="#46">46</a>    <strong class="jxr_keyword">public</strong> EPGMVertex join(PageRank.Result result, EPGMVertex vertex) {
 <a name="47" href="#47">47</a>      vertex.setProperty(pageRankPropery, PropertyValue.create(result.getPageRankScore().getValue()));
 <a name="48" href="#48">48</a>      <strong class="jxr_keyword">return</strong> vertex;
 <a name="49" href="#49">49</a>    }

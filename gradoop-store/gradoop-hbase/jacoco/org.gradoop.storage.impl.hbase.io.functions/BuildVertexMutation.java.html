@@ -21,13 +21,13 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
 
 /**
  * Creates HBase {@link Mutation} from vertex data using vertex data handler.
  */
-public class BuildVertexMutation extends RichMapFunction&lt;Vertex, Tuple2&lt;GradoopId, Mutation&gt;&gt; {
+public class BuildVertexMutation extends RichMapFunction&lt;EPGMVertex, Tuple2&lt;GradoopId, Mutation&gt;&gt; {
 
   /**
    * Serial version uid.
@@ -40,7 +40,7 @@ public class BuildVertexMutation extends RichMapFunction&lt;Vertex, Tuple2&lt;Gr
   private transient Tuple2&lt;GradoopId, Mutation&gt; reuseTuple;
 
   /**
-   * Vertex data handler to create Mutations.
+   * EPGMVertex data handler to create Mutations.
    */
   private final VertexHandler vertexHandler;
 
@@ -60,7 +60,7 @@ public class BuildVertexMutation extends RichMapFunction&lt;Vertex, Tuple2&lt;Gr
 <span class="fc" id="L60">  }</span>
 
   @Override
-  public Tuple2&lt;GradoopId, Mutation&gt; map(Vertex vertex) throws Exception {
+  public Tuple2&lt;GradoopId, Mutation&gt; map(EPGMVertex vertex) throws Exception {
 <span class="fc" id="L64">    GradoopId key = vertex.getId();</span>
 <span class="fc" id="L65">    Put put = new Put(vertexHandler.getRowKey(vertex.getId()));</span>
 <span class="fc" id="L66">    put = vertexHandler.writeVertex(put, vertex);</span>

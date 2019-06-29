@@ -29,13 +29,13 @@
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.accumulo.core.client.AccumuloSecurityException;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.io.OutputFormat;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.configuration.Configuration;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMEdge;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHead;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Element;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMElement;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.common.api.EPGMGraphOutput;
 <a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.config.GradoopAccumuloConfig;
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.impl.accumulo.AccumuloEPGMStore;
@@ -48,7 +48,7 @@
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="39" href="#39">39</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; gradoop element</em>
 <a name="40" href="#40">40</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="41" href="#41">41</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> ElementOutputFormat&lt;E <strong class="jxr_keyword">extends</strong> Element&gt; implements OutputFormat&lt;E&gt; {
+<a name="41" href="#41">41</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> ElementOutputFormat&lt;E <strong class="jxr_keyword">extends</strong> EPGMElement&gt; implements OutputFormat&lt;E&gt; {
 <a name="42" href="#42">42</a>  
 <a name="43" href="#43">43</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   * serialize id</em>
@@ -61,7 +61,7 @@
 <a name="51" href="#51">51</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> <a href="../../../../../../../org/gradoop/storage/config/GradoopAccumuloConfig.html">GradoopAccumuloConfig</a> config;
 <a name="52" href="#52">52</a>  
 <a name="53" href="#53">53</a>    <em class="jxr_javadoccomment">/**</em>
-<a name="54" href="#54">54</a>  <em class="jxr_javadoccomment">   * Element type</em>
+<a name="54" href="#54">54</a>  <em class="jxr_javadoccomment">   * EPGMElement type</em>
 <a name="55" href="#55">55</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="56" href="#56">56</a>    <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">final</strong> Class&lt;E&gt; elementType;
 <a name="57" href="#57">57</a>  
@@ -105,12 +105,12 @@
 <a name="95" href="#95">95</a>  
 <a name="96" href="#96">96</a>    @Override
 <a name="97" href="#97">97</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">final</strong> <strong class="jxr_keyword">void</strong> writeRecord(E record) {
-<a name="98" href="#98">98</a>      <strong class="jxr_keyword">if</strong> (elementType == Edge.<strong class="jxr_keyword">class</strong>) {
-<a name="99" href="#99">99</a>        <strong class="jxr_keyword">this</strong>.store.writeEdge((EPGMEdge) record);
-<a name="100" href="#100">100</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (elementType == Vertex.<strong class="jxr_keyword">class</strong>) {
-<a name="101" href="#101">101</a>       <strong class="jxr_keyword">this</strong>.store.writeVertex((EPGMVertex) record);
-<a name="102" href="#102">102</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (elementType == GraphHead.<strong class="jxr_keyword">class</strong>) {
-<a name="103" href="#103">103</a>       <strong class="jxr_keyword">this</strong>.store.writeGraphHead((EPGMGraphHead) record);
+<a name="98" href="#98">98</a>      <strong class="jxr_keyword">if</strong> (elementType == EPGMEdge.<strong class="jxr_keyword">class</strong>) {
+<a name="99" href="#99">99</a>        <strong class="jxr_keyword">this</strong>.store.writeEdge((Edge) record);
+<a name="100" href="#100">100</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (elementType == EPGMVertex.<strong class="jxr_keyword">class</strong>) {
+<a name="101" href="#101">101</a>       <strong class="jxr_keyword">this</strong>.store.writeVertex((Vertex) record);
+<a name="102" href="#102">102</a>     } <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> (elementType == EPGMGraphHead.<strong class="jxr_keyword">class</strong>) {
+<a name="103" href="#103">103</a>       <strong class="jxr_keyword">this</strong>.store.writeGraphHead((GraphHead) record);
 <a name="104" href="#104">104</a>     } <strong class="jxr_keyword">else</strong> {
 <a name="105" href="#105">105</a>       <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> IllegalArgumentException(String.format(<span class="jxr_string">"illegal element type %s"</span>, elementType));
 <a name="106" href="#106">106</a>     }

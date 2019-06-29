@@ -30,9 +30,9 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple4;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryCollectionToCollectionOperator;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -55,7 +55,7 @@
 <a name="45" href="#45">45</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.transactional.function.Project4To0And2AndSwitch;
 <a name="46" href="#46">46</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.transactional.function.Project4To0And3AndSwitch;
 <a name="47" href="#47">47</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.transactional.tuples.GraphWithCandidates;
-<a name="48" href="#48">48</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.subgraph.functions.AddGraphsToElements;
+<a name="48" href="#48">48</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.transactional.function.AddGraphsToElements;
 <a name="49" href="#49">49</a>  
 <a name="50" href="#50">50</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="51" href="#51">51</a>  <em class="jxr_javadoccomment"> * Operator to match a given pattern on a graph collection</em>
@@ -161,7 +161,7 @@
 <a name="151" href="#151">151</a>     <em class="jxr_comment">//--------------------------------------------------------------------------</em>
 <a name="152" href="#152">152</a>     <em class="jxr_comment">// join matches to graph heads</em>
 <a name="153" href="#153">153</a>     <em class="jxr_comment">//--------------------------------------------------------------------------</em>
-<a name="154" href="#154">154</a>     DataSet&lt;GraphHead&gt; newHeads = collection.getGraphHeads()
+<a name="154" href="#154">154</a>     DataSet&lt;EPGMGraphHead&gt; newHeads = collection.getGraphHeads()
 <a name="155" href="#155">155</a>       .coGroup(matches)
 <a name="156" href="#156">156</a>       .where(<strong class="jxr_keyword">new</strong> Id&lt;&gt;()).equalTo(0)
 <a name="157" href="#157">157</a>       .with(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/matching/transactional/function/AddMatchesToProperties.html">AddMatchesToProperties</a>());
@@ -193,7 +193,7 @@
 <a name="183" href="#183">183</a>     <em class="jxr_comment">//--------------------------------------------------------------------------</em>
 <a name="184" href="#184">184</a>     <em class="jxr_comment">// create new graph heads</em>
 <a name="185" href="#185">185</a>     <em class="jxr_comment">//--------------------------------------------------------------------------</em>
-<a name="186" href="#186">186</a>     DataSet&lt;GraphHead&gt; newHeads = embeddings
+<a name="186" href="#186">186</a>     DataSet&lt;EPGMGraphHead&gt; newHeads = embeddings
 <a name="187" href="#187">187</a>       .map(<strong class="jxr_keyword">new</strong> Project4To0And1&lt;&gt;())
 <a name="188" href="#188">188</a>       .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/matching/transactional/function/InitGraphHeadWithLineage.html">InitGraphHeadWithLineage</a>(collection.getConfig().getGraphHeadFactory()));
 <a name="189" href="#189">189</a> 
@@ -205,7 +205,7 @@
 <a name="195" href="#195">195</a>       .flatMap(<strong class="jxr_keyword">new</strong> ExpandFirstField&lt;&gt;()).groupBy(0)
 <a name="196" href="#196">196</a>       .reduceGroup(<strong class="jxr_keyword">new</strong> MergeSecondField&lt;&gt;());
 <a name="197" href="#197">197</a> 
-<a name="198" href="#198">198</a>     DataSet&lt;Vertex&gt; newVertices = verticesWithGraphs
+<a name="198" href="#198">198</a>     DataSet&lt;EPGMVertex&gt; newVertices = verticesWithGraphs
 <a name="199" href="#199">199</a>       .join(collection.getVertices())
 <a name="200" href="#200">200</a>       .where(0).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
 <a name="201" href="#201">201</a>       .with(<strong class="jxr_keyword">new</strong> AddGraphsToElements&lt;&gt;());
@@ -218,7 +218,7 @@
 <a name="208" href="#208">208</a>       .flatMap(<strong class="jxr_keyword">new</strong> ExpandFirstField&lt;&gt;()).groupBy(0)
 <a name="209" href="#209">209</a>       .reduceGroup(<strong class="jxr_keyword">new</strong> MergeSecondField&lt;&gt;());
 <a name="210" href="#210">210</a> 
-<a name="211" href="#211">211</a>     DataSet&lt;Edge&gt; newEdges = edgesWithGraphs
+<a name="211" href="#211">211</a>     DataSet&lt;EPGMEdge&gt; newEdges = edgesWithGraphs
 <a name="212" href="#212">212</a>       .join(collection.getEdges())
 <a name="213" href="#213">213</a>       .where(0).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
 <a name="214" href="#214">214</a>       .with(<strong class="jxr_keyword">new</strong> AddGraphsToElements&lt;&gt;());

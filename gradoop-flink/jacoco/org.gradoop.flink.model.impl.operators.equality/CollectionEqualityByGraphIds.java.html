@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.equality;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToValueOperator;
 import org.gradoop.flink.model.impl.functions.bool.Not;
@@ -39,13 +39,13 @@ import org.gradoop.flink.model.impl.functions.utils.OneSideEmpty;
 
 <span class="fc" id="L40">    DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; distinctFirstGraphIds = firstCollection</span>
 <span class="fc" id="L41">      .getGraphHeads()</span>
-<span class="fc" id="L42">      .map(new Id&lt;GraphHead&gt;())</span>
+<span class="fc" id="L42">      .map(new Id&lt;EPGMGraphHead&gt;())</span>
 <span class="fc" id="L43">      .distinct()</span>
 <span class="fc" id="L44">      .map(new ObjectTo1&lt;&gt;());</span>
 
 <span class="fc" id="L46">    DataSet&lt;Tuple1&lt;GradoopId&gt;&gt; distinctSecondGraphIds = secondCollection</span>
 <span class="fc" id="L47">      .getGraphHeads()</span>
-<span class="fc" id="L48">      .map(new Id&lt;GraphHead&gt;())</span>
+<span class="fc" id="L48">      .map(new Id&lt;EPGMGraphHead&gt;())</span>
 <span class="fc" id="L49">      .distinct()</span>
 <span class="fc" id="L50">      .map(new ObjectTo1&lt;&gt;());</span>
 

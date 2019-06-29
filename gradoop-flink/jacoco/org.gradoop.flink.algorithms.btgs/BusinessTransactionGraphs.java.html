@@ -21,9 +21,9 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.btgs.functions.BtgMessenger;
 import org.gradoop.flink.algorithms.btgs.functions.BtgUpdater;
 import org.gradoop.flink.algorithms.btgs.functions.CollectGradoopIds;
@@ -48,7 +48,7 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 /**
  * Part of the BIIIG approach.
- * EPGMVertex-centric implementation to isolate business transaction graphs.
+ * Vertex-centric implementation to isolate business transaction graphs.
  */
 <span class="fc" id="L53">public class BusinessTransactionGraphs implements</span>
   UnaryGraphToCollectionOperator {
@@ -77,13 +77,13 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
   @Override
   public GraphCollection execute(LogicalGraph iig) {
 
-<span class="fc" id="L80">    DataSet&lt;Vertex&gt; masterVertices = iig.getVertices()</span>
+<span class="fc" id="L80">    DataSet&lt;EPGMVertex&gt; masterVertices = iig.getVertices()</span>
 <span class="fc" id="L81">      .filter(new MasterData&lt;&gt;());</span>
 
 <span class="fc" id="L83">    LogicalGraph transGraph = iig</span>
 <span class="fc" id="L84">      .vertexInducedSubgraph(new TransactionalData&lt;&gt;());</span>
 
-<span class="fc" id="L86">    DataSet&lt;Vertex&gt; transVertices = transGraph</span>
+<span class="fc" id="L86">    DataSet&lt;EPGMVertex&gt; transVertices = transGraph</span>
 <span class="fc" id="L87">      .getVertices();</span>
 
 <span class="fc" id="L89">    DataSet&lt;org.apache.flink.graph.Edge&lt;GradoopId, NullValue&gt;&gt; transEdges =</span>
@@ -111,12 +111,12 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 <span class="fc" id="L111">      .flatMap(new ExpandGradoopIds&lt;&gt;())</span>
 <span class="fc" id="L112">      .map(new SwitchPair&lt;&gt;());</span>
 
-<span class="fc" id="L114">    DataSet&lt;GraphHead&gt; graphHeads = btgVerticesMap</span>
+<span class="fc" id="L114">    DataSet&lt;EPGMGraphHead&gt; graphHeads = btgVerticesMap</span>
 <span class="fc" id="L115">      .map(new Value0Of2&lt;&gt;())</span>
 <span class="fc" id="L116">      .map(new NewBtgGraphHead&lt;&gt;(iig.getConfig().getGraphHeadFactory()));</span>
 
     // filter and update edges
-<span class="fc" id="L119">    DataSet&lt;Edge&gt; btgEdges = iig.getEdges()</span>
+<span class="fc" id="L119">    DataSet&lt;EPGMEdge&gt; btgEdges = iig.getEdges()</span>
 <span class="fc" id="L120">      .join(vertexBtgMap)</span>
 <span class="fc" id="L121">      .where(new SourceId&lt;&gt;()).equalTo(0)</span>
 <span class="fc" id="L122">      .with(new SetBtgId&lt;&gt;());</span>

@@ -28,8 +28,8 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.TextOutputFormat;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.codehaus.jettison.json.JSONException;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.codehaus.jettison.json.JSONObject;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.deprecated.json.JSONConstants;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.deprecated.json.JSONConstants;
 <a name="23" href="#23">23</a>  
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * Converts an edge into the following format:</em>
@@ -44,7 +44,7 @@
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment"> * @param &lt;E&gt; EPGM edge type</em>
 <a name="36" href="#36">36</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="37" href="#37">37</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> EdgeToJSON&lt;E <strong class="jxr_keyword">extends</strong> Edge&gt;
+<a name="37" href="#37">37</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> EdgeToJSON&lt;E <strong class="jxr_keyword">extends</strong> EPGMEdge&gt;
 <a name="38" href="#38">38</a>    <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../../org/gradoop/flink/io/impl/deprecated/json/functions/EntityToJSON.html">EntityToJSON</a>
 <a name="39" href="#39">39</a>    implements TextOutputFormat.TextFormatter&lt;E&gt; {
 <a name="40" href="#40">40</a>  

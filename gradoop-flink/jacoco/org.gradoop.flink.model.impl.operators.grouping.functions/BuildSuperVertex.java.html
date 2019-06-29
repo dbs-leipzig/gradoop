@@ -20,9 +20,9 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 
 /**
@@ -33,13 +33,13 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
  */
 @FunctionAnnotation.ForwardedFields(&quot;f1-&gt;id;f2-&gt;label&quot;)
 @FunctionAnnotation.ReadFields(&quot;f1;f2;f3;f4;f6&quot;)
-public class BuildSuperVertex&lt;V extends EPGMVertex&gt; extends BuildBase
+public class BuildSuperVertex&lt;V extends Vertex&gt; extends BuildBase
   implements MapFunction&lt;VertexGroupItem, V&gt;, ResultTypeQueryable&lt;V&gt; {
 
   /**
-   * Vertex vertexFactory.
+   * EPGMVertex vertexFactory.
    */
-  private final EPGMVertexFactory&lt;V&gt; vertexFactory;
+  private final VertexFactory&lt;V&gt; vertexFactory;
 
   /**
    * Creates map function.
@@ -47,13 +47,13 @@ public class BuildSuperVertex&lt;V extends EPGMVertex&gt; extends BuildBase
    * @param useLabel true, if vertex label shall be considered
    * @param epgmVertexFactory vertex factory
    */
-  public BuildSuperVertex(boolean useLabel, EPGMVertexFactory&lt;V&gt; epgmVertexFactory) {
+  public BuildSuperVertex(boolean useLabel, VertexFactory&lt;V&gt; epgmVertexFactory) {
 <span class="fc" id="L51">    super(useLabel);</span>
 <span class="fc" id="L52">    this.vertexFactory = epgmVertexFactory;</span>
 <span class="fc" id="L53">  }</span>
 
   /**
-   * Creates a {@link Vertex} object from the given {@link VertexGroupItem}
+   * Creates a {@link EPGMVertex} object from the given {@link VertexGroupItem}
    * and returns a new {@link org.apache.flink.graph.Vertex}.
    *
    * @param groupItem vertex group item

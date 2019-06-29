@@ -28,9 +28,9 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -78,7 +78,7 @@
 <a name="68" href="#68">68</a>  
 <a name="69" href="#69">69</a>    @Override
 <a name="70" href="#70">70</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> executeForGVELayout(<a href="../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> collection) {
-<a name="71" href="#71">71</a>      DataSet&lt;GraphHead&gt; graphHeads = collection.getGraphHeads();
+<a name="71" href="#71">71</a>      DataSet&lt;EPGMGraphHead&gt; graphHeads = collection.getGraphHeads();
 <a name="72" href="#72">72</a>      DataSet&lt;GradoopId&gt; graphIds = graphHeads.map(<strong class="jxr_keyword">new</strong> Id&lt;&gt;());
 <a name="73" href="#73">73</a>  
 <a name="74" href="#74">74</a>      DataSet&lt;Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt;&gt; aggregate =
@@ -112,7 +112,7 @@
 <a name="102" href="#102">102</a> <em class="jxr_javadoccomment">   * @return partition aggregate value</em>
 <a name="103" href="#103">103</a> <em class="jxr_javadoccomment">   */</em>
 <a name="104" href="#104">104</a>   <strong class="jxr_keyword">private</strong> DataSet&lt;Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt;&gt; aggregateVertices(
-<a name="105" href="#105">105</a>     DataSet&lt;Vertex&gt; vertices, DataSet&lt;GradoopId&gt; graphIds) {
+<a name="105" href="#105">105</a>     DataSet&lt;EPGMVertex&gt; vertices, DataSet&lt;GradoopId&gt; graphIds) {
 <a name="106" href="#106">106</a>     <strong class="jxr_keyword">return</strong> vertices
 <a name="107" href="#107">107</a>       .flatMap(<strong class="jxr_keyword">new</strong> ElementsOfSelectedGraphs&lt;&gt;())
 <a name="108" href="#108">108</a>       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
@@ -130,7 +130,7 @@
 <a name="120" href="#120">120</a> <em class="jxr_javadoccomment">   * @return partition aggregate value</em>
 <a name="121" href="#121">121</a> <em class="jxr_javadoccomment">   */</em>
 <a name="122" href="#122">122</a>   <strong class="jxr_keyword">private</strong> DataSet&lt;Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt;&gt; aggregateEdges(
-<a name="123" href="#123">123</a>     DataSet&lt;Edge&gt; edges, DataSet&lt;GradoopId&gt; graphIds) {
+<a name="123" href="#123">123</a>     DataSet&lt;EPGMEdge&gt; edges, DataSet&lt;GradoopId&gt; graphIds) {
 <a name="124" href="#124">124</a>     <strong class="jxr_keyword">return</strong> edges
 <a name="125" href="#125">125</a>       .flatMap(<strong class="jxr_keyword">new</strong> ElementsOfSelectedGraphs&lt;&gt;())
 <a name="126" href="#126">126</a>       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)

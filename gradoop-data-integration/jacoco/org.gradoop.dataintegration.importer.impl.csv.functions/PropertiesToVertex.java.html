@@ -16,8 +16,8 @@
 package org.gradoop.dataintegration.importer.impl.csv.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.properties.Properties;
 
 /**
@@ -25,7 +25,7 @@ import org.gradoop.common.model.impl.properties.Properties;
  *
  * @param &lt;V&gt; the vertex type
  */
-public class PropertiesToVertex&lt;V extends EPGMVertex&gt; implements MapFunction&lt;Properties, V&gt; {
+public class PropertiesToVertex&lt;V extends Vertex&gt; implements MapFunction&lt;Properties, V&gt; {
   /**
    * Reduce object instantiations.
    */
@@ -36,7 +36,7 @@ public class PropertiesToVertex&lt;V extends EPGMVertex&gt; implements MapFuncti
    *
    * @param vertexFactory the factory that is responsible for creating a vertex
    */
-<span class="fc" id="L39">  public PropertiesToVertex(EPGMVertexFactory&lt;V&gt; vertexFactory) {</span>
+<span class="fc" id="L39">  public PropertiesToVertex(VertexFactory&lt;V&gt; vertexFactory) {</span>
 <span class="fc" id="L40">    this.vertex = vertexFactory.createVertex();</span>
 <span class="fc" id="L41">  }</span>
 

@@ -19,14 +19,14 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
  * This {@link FlatMapFunction} extracts a {@link PropertyValue} and the origin Id of a vertex into
  * a Tuple.
  */
-public class ExtractPropertyWithOriginId implements FlatMapFunction&lt;Vertex, Tuple2&lt;PropertyValue, GradoopId&gt;&gt; {
+public class ExtractPropertyWithOriginId implements FlatMapFunction&lt;EPGMVertex, Tuple2&lt;PropertyValue, GradoopId&gt;&gt; {
 
   /**
    * The property key of the property value.
@@ -49,7 +49,7 @@ public class ExtractPropertyWithOriginId implements FlatMapFunction&lt;Vertex, T
 <span class="fc" id="L49">  }</span>
 
   @Override
-  public void flatMap(Vertex vertex, Collector&lt;Tuple2&lt;PropertyValue, GradoopId&gt;&gt; out) {
+  public void flatMap(EPGMVertex vertex, Collector&lt;Tuple2&lt;PropertyValue, GradoopId&gt;&gt; out) {
 <span class="pc bpc" id="L53" title="1 of 2 branches missed.">    if (vertex.getProperties() != null &amp;&amp;</span>
 <span class="pc bpc" id="L54" title="1 of 2 branches missed.">      vertex.getProperties().containsKey(originalPropertyName)) {</span>
 <span class="fc" id="L55">      PropertyValue pv = vertex.getPropertyValue(originalPropertyName);</span>

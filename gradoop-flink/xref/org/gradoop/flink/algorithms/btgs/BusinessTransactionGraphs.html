@@ -31,9 +31,9 @@
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.types.NullValue;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.btgs.functions.BtgMessenger;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.btgs.functions.BtgUpdater;
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.btgs.functions.CollectGradoopIds;
@@ -58,7 +58,7 @@
 <a name="48" href="#48">48</a>  
 <a name="49" href="#49">49</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="50" href="#50">50</a>  <em class="jxr_javadoccomment"> * Part of the BIIIG approach.</em>
-<a name="51" href="#51">51</a>  <em class="jxr_javadoccomment"> * EPGMVertex-centric implementation to isolate business transaction graphs.</em>
+<a name="51" href="#51">51</a>  <em class="jxr_javadoccomment"> * Vertex-centric implementation to isolate business transaction graphs.</em>
 <a name="52" href="#52">52</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="53" href="#53">53</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../org/gradoop/flink/algorithms/btgs/BusinessTransactionGraphs.html">BusinessTransactionGraphs</a> implements
 <a name="54" href="#54">54</a>    <a href="../../../../../org/gradoop/flink/model/api/operators/UnaryGraphToCollectionOperator.html">UnaryGraphToCollectionOperator</a> {
@@ -87,13 +87,13 @@
 <a name="77" href="#77">77</a>    @Override
 <a name="78" href="#78">78</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> execute(<a href="../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> iig) {
 <a name="79" href="#79">79</a>  
-<a name="80" href="#80">80</a>      DataSet&lt;Vertex&gt; masterVertices = iig.getVertices()
+<a name="80" href="#80">80</a>      DataSet&lt;EPGMVertex&gt; masterVertices = iig.getVertices()
 <a name="81" href="#81">81</a>        .filter(<strong class="jxr_keyword">new</strong> MasterData&lt;&gt;());
 <a name="82" href="#82">82</a>  
 <a name="83" href="#83">83</a>      <a href="../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> transGraph = iig
 <a name="84" href="#84">84</a>        .vertexInducedSubgraph(<strong class="jxr_keyword">new</strong> TransactionalData&lt;&gt;());
 <a name="85" href="#85">85</a>  
-<a name="86" href="#86">86</a>      DataSet&lt;Vertex&gt; transVertices = transGraph
+<a name="86" href="#86">86</a>      DataSet&lt;EPGMVertex&gt; transVertices = transGraph
 <a name="87" href="#87">87</a>        .getVertices();
 <a name="88" href="#88">88</a>  
 <a name="89" href="#89">89</a>      DataSet&lt;org.apache.flink.graph.Edge&lt;GradoopId, NullValue&gt;&gt; transEdges =
@@ -121,12 +121,12 @@
 <a name="111" href="#111">111</a>       .flatMap(<strong class="jxr_keyword">new</strong> ExpandGradoopIds&lt;&gt;())
 <a name="112" href="#112">112</a>       .map(<strong class="jxr_keyword">new</strong> SwitchPair&lt;&gt;());
 <a name="113" href="#113">113</a> 
-<a name="114" href="#114">114</a>     DataSet&lt;GraphHead&gt; graphHeads = btgVerticesMap
+<a name="114" href="#114">114</a>     DataSet&lt;EPGMGraphHead&gt; graphHeads = btgVerticesMap
 <a name="115" href="#115">115</a>       .map(<strong class="jxr_keyword">new</strong> Value0Of2&lt;&gt;())
 <a name="116" href="#116">116</a>       .map(<strong class="jxr_keyword">new</strong> NewBtgGraphHead&lt;&gt;(iig.getConfig().getGraphHeadFactory()));
 <a name="117" href="#117">117</a> 
 <a name="118" href="#118">118</a>     <em class="jxr_comment">// filter and update edges</em>
-<a name="119" href="#119">119</a>     DataSet&lt;Edge&gt; btgEdges = iig.getEdges()
+<a name="119" href="#119">119</a>     DataSet&lt;EPGMEdge&gt; btgEdges = iig.getEdges()
 <a name="120" href="#120">120</a>       .join(vertexBtgMap)
 <a name="121" href="#121">121</a>       .where(<strong class="jxr_keyword">new</strong> SourceId&lt;&gt;()).equalTo(0)
 <a name="122" href="#122">122</a>       .with(<strong class="jxr_keyword">new</strong> SetBtgId&lt;&gt;());

@@ -27,7 +27,7 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.dataintegration.transformation.impl.Neighborhood;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -107,11 +107,11 @@
 <a name="97" href="#97">97</a>    @Test
 <a name="98" href="#98">98</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testNeighborhood() <strong class="jxr_keyword">throws</strong> Exception {
 <a name="99" href="#99">99</a>      LogicalGraph input = loader.getLogicalGraphByVariable(<span class="jxr_string">"input"</span>);
-<a name="100" href="#100">100</a>     Vertex center = loader.getVertexByVariable(centerVertex);
-<a name="101" href="#101">101</a>     Collection&lt;Vertex&gt; neighborhoodVertices = loader.getVerticesByGraphVariables(neighborhood);
-<a name="102" href="#102">102</a>     DataSet&lt;Vertex&gt; centers = center == <strong class="jxr_keyword">null</strong> ? getEmptyDataSet(<strong class="jxr_keyword">new</strong> Vertex()) :
+<a name="100" href="#100">100</a>     EPGMVertex center = loader.getVertexByVariable(centerVertex);
+<a name="101" href="#101">101</a>     Collection&lt;EPGMVertex&gt; neighborhoodVertices = loader.getVerticesByGraphVariables(neighborhood);
+<a name="102" href="#102">102</a>     DataSet&lt;EPGMVertex&gt; centers = center == <strong class="jxr_keyword">null</strong> ? getEmptyDataSet(<strong class="jxr_keyword">new</strong> EPGMVertex()) :
 <a name="103" href="#103">103</a>       getExecutionEnvironment().fromElements(center);
-<a name="104" href="#104">104</a>     List&lt;Tuple2&lt;Vertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; neighborhoods =
+<a name="104" href="#104">104</a>     List&lt;Tuple2&lt;EPGMVertex, List&lt;NeighborhoodVertex&gt;&gt;&gt; neighborhoods =
 <a name="105" href="#105">105</a>       Neighborhood.getPerVertex(input, centers, direction).collect();
 <a name="106" href="#106">106</a>     <em class="jxr_comment">// Make sure we only have 1 center vertex.</em>
 <a name="107" href="#107">107</a>     <strong class="jxr_keyword">long</strong> centerCount = neighborhoods.stream().map(h -&gt; h.f0.getId()).distinct().count();
@@ -122,7 +122,7 @@
 <a name="112" href="#112">112</a>       .map(NeighborhoodVertex::getNeighborId)
 <a name="113" href="#113">113</a>       .sorted()
 <a name="114" href="#114">114</a>       .toArray();
-<a name="115" href="#115">115</a>     Object[] neighborIdsExpected = neighborhoodVertices.stream().map(Vertex::getId).sorted()
+<a name="115" href="#115">115</a>     Object[] neighborIdsExpected = neighborhoodVertices.stream().map(EPGMVertex::getId).sorted()
 <a name="116" href="#116">116</a>         .toArray();
 <a name="117" href="#117">117</a>     assertArrayEquals(neighborIdsExpected, neighbors);
 <a name="118" href="#118">118</a>   }

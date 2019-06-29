@@ -16,27 +16,27 @@
 package org.gradoop.flink.io.impl.csv.functions;
 
 import org.apache.flink.api.java.functions.FunctionAnnotation;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.io.api.metadata.MetaDataSource;
 import org.gradoop.flink.io.impl.csv.CSVConstants;
 import org.gradoop.flink.io.impl.csv.tuples.CSVEdge;
 
 /**
- * Converts an {@link Edge} into a CSV representation.
+ * Converts an {@link EPGMEdge} into a CSV representation.
  *
  * Forwarded fields:
  *
  * label
  */
 @FunctionAnnotation.ForwardedFields(&quot;label-&gt;f4&quot;)
-<span class="fc" id="L32">public class EdgeToCSVEdge extends ElementToCSV&lt;Edge, CSVEdge&gt; {</span>
+<span class="fc" id="L32">public class EdgeToCSVEdge extends ElementToCSV&lt;EPGMEdge, CSVEdge&gt; {</span>
   /**
    * Reduce object instantiations
    */
 <span class="fc" id="L36">  private final CSVEdge csvEdge = new CSVEdge();</span>
 
   @Override
-  public CSVEdge map(Edge edge) throws Exception {
+  public CSVEdge map(EPGMEdge edge) throws Exception {
 <span class="fc" id="L40">    csvEdge.setId(edge.getId().toString());</span>
 <span class="fc" id="L41">    csvEdge.setGradoopIds(collectionToCsvString(edge.getGraphIds()));</span>
 <span class="fc" id="L42">    csvEdge.setSourceId(edge.getSourceId().toString());</span>

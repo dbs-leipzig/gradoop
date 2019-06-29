@@ -32,12 +32,12 @@
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.typeutils.TupleTypeInfo;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.typeutils.TypeExtractor;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.apache.log4j.Logger;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertexFactory;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHeadFactory;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.VertexFactory;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Element;
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMElement;
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
@@ -137,11 +137,11 @@
 <a name="127" href="#127">127</a>   @Override
 <a name="128" href="#128">128</a>   <strong class="jxr_keyword">protected</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/epgm/GraphCollection.html">GraphCollection</a> executeForVertex(<a href="../../../../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph) {
 <a name="129" href="#129">129</a>     <a href="../../../../../../../../../../org/gradoop/flink/util/GradoopFlinkConfig.html">GradoopFlinkConfig</a> config = graph.getConfig();
-<a name="130" href="#130">130</a>     EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory = config.getGraphHeadFactory();
-<a name="131" href="#131">131</a>     EPGMVertexFactory&lt;Vertex&gt; vertexFactory = config.getVertexFactory();
+<a name="130" href="#130">130</a>     GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory = config.getGraphHeadFactory();
+<a name="131" href="#131">131</a>     VertexFactory&lt;EPGMVertex&gt; vertexFactory = config.getVertexFactory();
 <a name="132" href="#132">132</a>     String variable = getQueryHandler().getVertices().iterator().next().getVariable();
 <a name="133" href="#133">133</a> 
-<a name="134" href="#134">134</a>     DataSet&lt;Vertex&gt; matchingVertices = graph.getVertices()
+<a name="134" href="#134">134</a>     DataSet&lt;EPGMVertex&gt; matchingVertices = graph.getVertices()
 <a name="135" href="#135">135</a>       .filter(<strong class="jxr_keyword">new</strong> MatchingVertices&lt;&gt;(getQuery()));
 <a name="136" href="#136">136</a> 
 <a name="137" href="#137">137</a>     <strong class="jxr_keyword">if</strong> (!doAttachData()) {
@@ -151,7 +151,7 @@
 <a name="141" href="#141">141</a>         .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/functions/epgm/VertexFromId.html">VertexFromId</a>(vertexFactory));
 <a name="142" href="#142">142</a>     }
 <a name="143" href="#143">143</a> 
-<a name="144" href="#144">144</a>     DataSet&lt;Tuple2&lt;Vertex, GraphHead&gt;&gt; pairs = matchingVertices
+<a name="144" href="#144">144</a>     DataSet&lt;Tuple2&lt;EPGMVertex, EPGMGraphHead&gt;&gt; pairs = matchingVertices
 <a name="145" href="#145">145</a>       .map(<strong class="jxr_keyword">new</strong> AddGraphElementToNewGraph&lt;&gt;(graphHeadFactory, variable))
 <a name="146" href="#146">146</a>       .returns(<strong class="jxr_keyword">new</strong> TupleTypeInfo&lt;&gt;(
 <a name="147" href="#147">147</a>         TypeExtractor.getForClass(vertexFactory.getType()),
@@ -221,7 +221,7 @@
 <a name="211" href="#211">211</a>     <em class="jxr_comment">// Post-Processing (build Graph Collection from embeddings)</em>
 <a name="212" href="#212">212</a>     <em class="jxr_comment">//--------------------------------------------------------------------------</em>
 <a name="213" href="#213">213</a> 
-<a name="214" href="#214">214</a>     DataSet&lt;Element&gt; elements = embeddings
+<a name="214" href="#214">214</a>     DataSet&lt;EPGMElement&gt; elements = embeddings
 <a name="215" href="#215">215</a>       .flatMap(<strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/functions/ElementsFromEmbedding.html">ElementsFromEmbedding</a>(traversalCode,
 <a name="216" href="#216">216</a>         graph.getConfig().getGraphHeadFactory(),
 <a name="217" href="#217">217</a>         graph.getConfig().getVertexFactory(),

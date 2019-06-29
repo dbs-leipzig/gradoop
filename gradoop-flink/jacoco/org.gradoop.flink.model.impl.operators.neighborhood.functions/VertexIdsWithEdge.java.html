@@ -19,18 +19,18 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * Returns a tuple which contains the source id and the edge and a tuple which contains the
  * target id and same edge.
  */
-public class VertexIdsWithEdge implements FlatMapFunction&lt;Edge, Tuple2&lt;GradoopId, Edge&gt;&gt; {
+public class VertexIdsWithEdge implements FlatMapFunction&lt;EPGMEdge, Tuple2&lt;GradoopId, EPGMEdge&gt;&gt; {
 
   /**
    * Reuse tuple to avoid instantiations.
    */
-  private Tuple2&lt;GradoopId, Edge&gt; reuseTuple;
+  private Tuple2&lt;GradoopId, EPGMEdge&gt; reuseTuple;
 
   /**
    * Constructor which instantiates the reuse tuple.
@@ -40,7 +40,7 @@ public class VertexIdsWithEdge implements FlatMapFunction&lt;Edge, Tuple2&lt;Gra
 <span class="fc" id="L40">  }</span>
 
   @Override
-  public void flatMap(Edge edge, Collector&lt;Tuple2&lt;GradoopId, Edge&gt;&gt; collector) throws Exception {
+  public void flatMap(EPGMEdge edge, Collector&lt;Tuple2&lt;GradoopId, EPGMEdge&gt;&gt; collector) throws Exception {
 <span class="fc" id="L44">    reuseTuple.setFields(edge.getSourceId(), edge);</span>
 <span class="fc" id="L45">    collector.collect(reuseTuple);</span>
 <span class="fc" id="L46">    reuseTuple.setFields(edge.getTargetId(), edge);</span>

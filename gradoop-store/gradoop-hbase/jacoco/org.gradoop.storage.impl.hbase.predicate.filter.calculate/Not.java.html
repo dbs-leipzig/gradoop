@@ -16,7 +16,7 @@
 package org.gradoop.storage.impl.hbase.predicate.filter.calculate;
 
 import org.apache.hadoop.hbase.filter.Filter;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 
 import javax.annotation.Nonnull;
@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
  *
  * @param &lt;T&gt; input type
  */
-public final class Not&lt;T extends EPGMElement&gt; implements HBaseElementFilter&lt;T&gt; {
+public final class Not&lt;T extends Element&gt; implements HBaseElementFilter&lt;T&gt; {
 
   /**
    * The predicate to negate
@@ -49,7 +49,7 @@ public final class Not&lt;T extends EPGMElement&gt; implements HBaseElementFilte
    * @param &lt;T&gt; input type
    * @return negated filter instance
    */
-  public static &lt;T extends EPGMElement&gt; Not&lt;T&gt; of(HBaseElementFilter&lt;T&gt; predicate) {
+  public static &lt;T extends Element&gt; Not&lt;T&gt; of(HBaseElementFilter&lt;T&gt; predicate) {
 <span class="fc" id="L53">    return new Not&lt;&gt;(predicate);</span>
   }
 

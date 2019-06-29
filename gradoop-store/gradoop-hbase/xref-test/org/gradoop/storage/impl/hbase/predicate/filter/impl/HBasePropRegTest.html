@@ -30,7 +30,7 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.filter.RegexStringComparator;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.hadoop.hbase.util.Bytes;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Type;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
 <a name="26" href="#26">26</a>  
@@ -52,7 +52,7 @@
 <a name="42" href="#42">42</a>      String key = <span class="jxr_string">"key"</span>;
 <a name="43" href="#43">43</a>      Pattern pattern = Pattern.compile(<span class="jxr_string">"^FooBar.*$"</span>);
 <a name="44" href="#44">44</a>  
-<a name="45" href="#45">45</a>      HBasePropReg&lt;Vertex&gt; vertexFilter = <strong class="jxr_keyword">new</strong> HBasePropReg&lt;&gt;(key, pattern);
+<a name="45" href="#45">45</a>      HBasePropReg&lt;EPGMVertex&gt; vertexFilter = <strong class="jxr_keyword">new</strong> HBasePropReg&lt;&gt;(key, pattern);
 <a name="46" href="#46">46</a>  
 <a name="47" href="#47">47</a>      FilterList expectedFilter = <strong class="jxr_keyword">new</strong> FilterList(FilterList.Operator.MUST_PASS_ALL);
 <a name="48" href="#48">48</a>  

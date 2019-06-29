@@ -27,7 +27,7 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Lists;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.functions.Function;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Element;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMElement;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="22" href="#22">22</a>  
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> java.util.List;
@@ -42,7 +42,7 @@
 <a name="32" href="#32">32</a>  <em class="jxr_javadoccomment"> *</em>
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment"> * @param &lt;EL&gt; EPGM element</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="35" href="#35">35</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> PropertyGetter&lt;EL <strong class="jxr_keyword">extends</strong> Element&gt;
+<a name="35" href="#35">35</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> PropertyGetter&lt;EL <strong class="jxr_keyword">extends</strong> EPGMElement&gt;
 <a name="36" href="#36">36</a>    implements Function&lt;EL, List&lt;PropertyValue&gt;&gt; {
 <a name="37" href="#37">37</a>  
 <a name="38" href="#38">38</a>    <em class="jxr_javadoccomment">/**</em>

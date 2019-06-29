@@ -28,12 +28,12 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.ExecutionEnvironment;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.GradoopTestUtils;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EdgeFactory;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHeadFactory;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHeadFactory;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.api.DataSink;
@@ -156,22 +156,22 @@
 <a name="146" href="#146">146</a>     ExecutionEnvironment env = getExecutionEnvironment();
 <a name="147" href="#147">147</a> 
 <a name="148" href="#148">148</a>     <em class="jxr_comment">// This results in the path "graphs/a_b" because &lt; and &gt; are illegal filename characters.</em>
-<a name="149" href="#149">149</a>     GraphHead graphHead1 = <strong class="jxr_keyword">new</strong> GraphHeadFactory().createGraphHead(<span class="jxr_string">"a&lt;b"</span>);
-<a name="150" href="#150">150</a>     GraphHead graphHead2 = <strong class="jxr_keyword">new</strong> GraphHeadFactory().createGraphHead(<span class="jxr_string">"a&gt;b"</span>);
-<a name="151" href="#151">151</a>     DataSet&lt;GraphHead&gt; graphHeads = env.fromElements(graphHead1, graphHead2);
+<a name="149" href="#149">149</a>     EPGMGraphHead graphHead1 = <strong class="jxr_keyword">new</strong> EPGMGraphHeadFactory().createGraphHead(<span class="jxr_string">"a&lt;b"</span>);
+<a name="150" href="#150">150</a>     EPGMGraphHead graphHead2 = <strong class="jxr_keyword">new</strong> EPGMGraphHeadFactory().createGraphHead(<span class="jxr_string">"a&gt;b"</span>);
+<a name="151" href="#151">151</a>     DataSet&lt;EPGMGraphHead&gt; graphHeads = env.fromElements(graphHead1, graphHead2);
 <a name="152" href="#152">152</a> 
 <a name="153" href="#153">153</a>     <em class="jxr_comment">// This results in the path "vertices/b_c" because &lt; and &gt; are illegal filename characters.</em>
-<a name="154" href="#154">154</a>     Vertex vertex1 = <strong class="jxr_keyword">new</strong> VertexFactory().createVertex(<span class="jxr_string">"B&lt;C"</span>);
-<a name="155" href="#155">155</a>     Vertex vertex2 = <strong class="jxr_keyword">new</strong> VertexFactory().createVertex(<span class="jxr_string">"B&gt;C"</span>);
-<a name="156" href="#156">156</a>     DataSet&lt;Vertex&gt; vertices = env.fromElements(vertex1, vertex2)
+<a name="154" href="#154">154</a>     EPGMVertex vertex1 = <strong class="jxr_keyword">new</strong> EPGMVertexFactory().createVertex(<span class="jxr_string">"B&lt;C"</span>);
+<a name="155" href="#155">155</a>     EPGMVertex vertex2 = <strong class="jxr_keyword">new</strong> EPGMVertexFactory().createVertex(<span class="jxr_string">"B&gt;C"</span>);
+<a name="156" href="#156">156</a>     DataSet&lt;EPGMVertex&gt; vertices = env.fromElements(vertex1, vertex2)
 <a name="157" href="#157">157</a>       .map(<strong class="jxr_keyword">new</strong> AddToGraph&lt;&gt;(graphHead1))
 <a name="158" href="#158">158</a>       .map(<strong class="jxr_keyword">new</strong> AddToGraph&lt;&gt;(graphHead2))
 <a name="159" href="#159">159</a>       .withForwardedFields(<span class="jxr_string">"id;label;properties"</span>);
 <a name="160" href="#160">160</a> 
 <a name="161" href="#161">161</a>     <em class="jxr_comment">// This results in the path "edges/c_d" because &lt; and &gt; are illegal filename characters.</em>
-<a name="162" href="#162">162</a>     Edge edge1 = <strong class="jxr_keyword">new</strong> EdgeFactory().createEdge(<span class="jxr_string">"c&lt;d"</span>, vertex1.getId(), vertex2.getId());
-<a name="163" href="#163">163</a>     Edge edge2 = <strong class="jxr_keyword">new</strong> EdgeFactory().createEdge(<span class="jxr_string">"c&gt;d"</span>, vertex2.getId(), vertex1.getId());
-<a name="164" href="#164">164</a>     DataSet&lt;Edge&gt; edges = env.fromElements(edge1, edge2)
+<a name="162" href="#162">162</a>     EPGMEdge edge1 = <strong class="jxr_keyword">new</strong> EPGMEdgeFactory().createEdge(<span class="jxr_string">"c&lt;d"</span>, vertex1.getId(), vertex2.getId());
+<a name="163" href="#163">163</a>     EPGMEdge edge2 = <strong class="jxr_keyword">new</strong> EPGMEdgeFactory().createEdge(<span class="jxr_string">"c&gt;d"</span>, vertex2.getId(), vertex1.getId());
+<a name="164" href="#164">164</a>     DataSet&lt;EPGMEdge&gt; edges = env.fromElements(edge1, edge2)
 <a name="165" href="#165">165</a>       .map(<strong class="jxr_keyword">new</strong> AddToGraph&lt;&gt;(graphHead1))
 <a name="166" href="#166">166</a>       .withForwardedFields(<span class="jxr_string">"id;label;properties"</span>);
 <a name="167" href="#167">167</a> 
@@ -221,16 +221,16 @@
 <a name="211" href="#211">211</a>     props.set(GradoopTestUtils.KEY_5, map2);
 <a name="212" href="#212">212</a>     props.set(GradoopTestUtils.KEY_6, map3);
 <a name="213" href="#213">213</a> 
-<a name="214" href="#214">214</a>     GraphHead graphHead = <strong class="jxr_keyword">new</strong> GraphHeadFactory().createGraphHead(string1, props);
-<a name="215" href="#215">215</a>     DataSet&lt;GraphHead&gt; graphHeads = env.fromElements(graphHead);
+<a name="214" href="#214">214</a>     EPGMGraphHead graphHead = <strong class="jxr_keyword">new</strong> EPGMGraphHeadFactory().createGraphHead(string1, props);
+<a name="215" href="#215">215</a>     DataSet&lt;EPGMGraphHead&gt; graphHeads = env.fromElements(graphHead);
 <a name="216" href="#216">216</a> 
-<a name="217" href="#217">217</a>     Vertex vertex = <strong class="jxr_keyword">new</strong> VertexFactory().createVertex(string1, props);
-<a name="218" href="#218">218</a>     DataSet&lt;Vertex&gt; vertices = env.fromElements(vertex)
+<a name="217" href="#217">217</a>     EPGMVertex vertex = <strong class="jxr_keyword">new</strong> EPGMVertexFactory().createVertex(string1, props);
+<a name="218" href="#218">218</a>     DataSet&lt;EPGMVertex&gt; vertices = env.fromElements(vertex)
 <a name="219" href="#219">219</a>       .map(<strong class="jxr_keyword">new</strong> AddToGraph&lt;&gt;(graphHead))
 <a name="220" href="#220">220</a>       .withForwardedFields(<span class="jxr_string">"id;label;properties"</span>);
 <a name="221" href="#221">221</a> 
-<a name="222" href="#222">222</a>     Edge edge = <strong class="jxr_keyword">new</strong> EdgeFactory().createEdge(string1, vertex.getId(), vertex.getId(), props);
-<a name="223" href="#223">223</a>     DataSet&lt;Edge&gt; edges = env.fromElements(edge)
+<a name="222" href="#222">222</a>     EPGMEdge edge = <strong class="jxr_keyword">new</strong> EPGMEdgeFactory().createEdge(string1, vertex.getId(), vertex.getId(), props);
+<a name="223" href="#223">223</a>     DataSet&lt;EPGMEdge&gt; edges = env.fromElements(edge)
 <a name="224" href="#224">224</a>       .map(<strong class="jxr_keyword">new</strong> AddToGraph&lt;&gt;(graphHead))
 <a name="225" href="#225">225</a>       .withForwardedFields(<span class="jxr_string">"id;label;properties"</span>);
 <a name="226" href="#226">226</a> 

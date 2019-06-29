@@ -20,11 +20,11 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EdgeFactory;
+import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.dataintegration.transformation.impl.NeighborhoodVertex;
 
 import java.util.Iterator;
@@ -40,7 +40,7 @@ import java.util.Objects;
  * @param &lt;V&gt; The vertex type.
  * @param &lt;E&gt; The edge type.
  */
-public class EdgesFromLocalTransitiveClosure&lt;V extends EPGMVertex, E extends EPGMEdge&gt;
+public class EdgesFromLocalTransitiveClosure&lt;V extends Vertex, E extends Edge&gt;
   implements CoGroupFunction&lt;Tuple2&lt;V, List&lt;NeighborhoodVertex&gt;&gt;,
     Tuple2&lt;V, List&lt;NeighborhoodVertex&gt;&gt;, E&gt;, ResultTypeQueryable&lt;E&gt; {
 
@@ -73,9 +73,9 @@ public class EdgesFromLocalTransitiveClosure&lt;V extends EPGMVertex, E extends 
    * The constructor of the CoGroup function to created new edges based on transitivity.
    *
    * @param newEdgeLabel The edge label of the newly created edge.
-   * @param factory The {@link EdgeFactory} new edges are created with.
+   * @param factory The {@link EPGMEdgeFactory} new edges are created with.
    */
-<span class="fc" id="L78">  public EdgesFromLocalTransitiveClosure(String newEdgeLabel, EPGMEdgeFactory&lt;E&gt; factory) {</span>
+<span class="fc" id="L78">  public EdgesFromLocalTransitiveClosure(String newEdgeLabel, EdgeFactory&lt;E&gt; factory) {</span>
 <span class="fc" id="L79">    this.edgeType = Objects.requireNonNull(factory).getType();</span>
 <span class="fc" id="L80">    this.reuse = factory.createEdge(Objects.requireNonNull(newEdgeLabel), GradoopId.NULL_VALUE,</span>
       GradoopId.NULL_VALUE);

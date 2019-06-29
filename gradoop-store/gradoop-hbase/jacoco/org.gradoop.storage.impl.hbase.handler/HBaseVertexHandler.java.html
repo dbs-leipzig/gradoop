@@ -20,9 +20,9 @@ import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.gradoop.common.model.api.entities.EPGMVertex;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 import org.gradoop.storage.impl.hbase.api.VertexHandler;
 import org.gradoop.storage.impl.hbase.constants.HBaseConstants;
@@ -34,7 +34,7 @@ import java.io.IOException;
 /**
  * Used to read/write EPGM vertex data from/to a HBase table.
  * &lt;p&gt;
- * EPGMVertex data in HBase:
+ * Vertex data in HBase:
  * &lt;p&gt;
  * |---------|--------------------|---------|
  * | row-key | meta               | data    |
@@ -54,19 +54,19 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
   /**
    * Creates vertex data objects from the rows.
    */
-  private final EPGMVertexFactory&lt;Vertex&gt; vertexFactory;
+  private final VertexFactory&lt;EPGMVertex&gt; vertexFactory;
 
   /**
    * An optional query to define predicates for the graph store.
    */
-  private ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; vertexQuery;
+  private ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; vertexQuery;
 
   /**
    * Creates a vertex handler.
    *
    * @param vertexFactory used to create runtime vertex data objects
    */
-<span class="fc" id="L69">  public HBaseVertexHandler(EPGMVertexFactory&lt;Vertex&gt; vertexFactory) {</span>
+<span class="fc" id="L69">  public HBaseVertexHandler(VertexFactory&lt;EPGMVertex&gt; vertexFactory) {</span>
 <span class="fc" id="L70">    this.vertexFactory = vertexFactory;</span>
 <span class="fc" id="L71">  }</span>
 
@@ -88,7 +88,7 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
 <span class="fc" id="L88">  }</span>
 
   @Override
-  public Put writeVertex(Put put, EPGMVertex vertexData) {
+  public Put writeVertex(Put put, Vertex vertexData) {
 <span class="fc" id="L92">    writeLabel(put, vertexData);</span>
 <span class="fc" id="L93">    writeProperties(put, vertexData);</span>
 <span class="fc" id="L94">    writeGraphIds(put, vertexData);</span>
@@ -96,19 +96,19 @@ public class HBaseVertexHandler extends HBaseGraphElementHandler implements Vert
   }
 
   @Override
-  public Vertex readVertex(final Result res) {
+  public EPGMVertex readVertex(final Result res) {
 <span class="fc" id="L100">    return vertexFactory.initVertex(readId(res), readLabel(res), readProperties(res),</span>
 <span class="fc" id="L101">      readGraphIds(res));</span>
   }
 
   @Override
-  public VertexHandler applyQuery(ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; query) {
+  public VertexHandler applyQuery(ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; query) {
 <span class="fc" id="L106">    this.vertexQuery = query;</span>
 <span class="fc" id="L107">    return this;</span>
   }
 
   @Override
-  public ElementQuery&lt;HBaseElementFilter&lt;Vertex&gt;&gt; getQuery() {
+  public ElementQuery&lt;HBaseElementFilter&lt;EPGMVertex&gt;&gt; getQuery() {
 <span class="fc" id="L112">    return this.vertexQuery;</span>
   }
 }

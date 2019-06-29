@@ -16,7 +16,7 @@
 package org.gradoop.flink.representation.transactional;
 
 import org.apache.flink.api.java.tuple.Tuple5;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.Properties;
 import org.gradoop.flink.representation.common.adjacencylist.AdjacencyListRow;
 
@@ -37,8 +37,7 @@ import java.util.Map;
  * @param &lt;VD&gt; vertex data type
  */
 public class AdjacencyList&lt;ID extends Comparable&lt;ID&gt;, L extends Comparable&lt;L&gt;, ED, VD&gt; extends
-  Tuple5&lt;
-    GraphHead,
+  Tuple5&lt;EPGMGraphHead,
     Map&lt;ID, L&gt;,
     Map&lt;ID, Properties&gt;,
     Map&lt;ID, AdjacencyListRow&lt;ED, VD&gt;&gt;,
@@ -48,8 +47,8 @@ public class AdjacencyList&lt;ID extends Comparable&lt;ID&gt;, L extends Compara
   /**
    * Default constructor.
    */
-<span class="nc" id="L51">  public AdjacencyList() {</span>
-<span class="nc" id="L52">  }</span>
+<span class="nc" id="L50">  public AdjacencyList() {</span>
+<span class="nc" id="L51">  }</span>
 
   /**
    * Constructor.
@@ -60,13 +59,13 @@ public class AdjacencyList&lt;ID extends Comparable&lt;ID&gt;, L extends Compara
    * @param incomingRows incoming adjacency list rows
    */
   public AdjacencyList(
-    GraphHead graphHead,
+    EPGMGraphHead graphHead,
     Map&lt;ID, L&gt; labels,
     Map&lt;ID, Properties&gt; properties,
     Map&lt;ID, AdjacencyListRow&lt;ED, VD&gt;&gt; outgoingRows,
     Map&lt;ID, AdjacencyListRow&lt;ED, VD&gt;&gt; incomingRows) {
-<span class="fc" id="L68">    super(graphHead, labels, properties, outgoingRows, incomingRows);</span>
-<span class="fc" id="L69">  }</span>
+<span class="fc" id="L67">    super(graphHead, labels, properties, outgoingRows, incomingRows);</span>
+<span class="fc" id="L68">  }</span>
 
   /**
    * Label accessor.
@@ -76,7 +75,7 @@ public class AdjacencyList&lt;ID extends Comparable&lt;ID&gt;, L extends Compara
    * @return label
    */
   public L getLabel(ID elementId) {
-<span class="fc" id="L79">    return f1.get(elementId);</span>
+<span class="fc" id="L78">    return f1.get(elementId);</span>
   }
 
   /**
@@ -86,23 +85,23 @@ public class AdjacencyList&lt;ID extends Comparable&lt;ID&gt;, L extends Compara
    * @return property list
    */
   public Properties getProperties(ID elementId) {
-<span class="fc" id="L89">    return f2.get(elementId);</span>
+<span class="fc" id="L88">    return f2.get(elementId);</span>
   }
 
-  public GraphHead getGraphHead() {
-<span class="fc" id="L93">    return f0;</span>
+  public EPGMGraphHead getGraphHead() {
+<span class="fc" id="L92">    return f0;</span>
   }
 
-  public void setGraphHead(GraphHead graphId) {
-<span class="nc" id="L97">    this.f0 = graphId;</span>
-<span class="nc" id="L98">  }</span>
+  public void setGraphHead(EPGMGraphHead graphId) {
+<span class="nc" id="L96">    this.f0 = graphId;</span>
+<span class="nc" id="L97">  }</span>
 
   public Map&lt;ID, AdjacencyListRow&lt;ED, VD&gt;&gt; getOutgoingRows() {
-<span class="fc" id="L101">    return f3;</span>
+<span class="fc" id="L100">    return f3;</span>
   }
 
   public Map&lt;ID, AdjacencyListRow&lt;ED, VD&gt;&gt; getIncomingRows() {
-<span class="nc" id="L105">    return f4;</span>
+<span class="nc" id="L104">    return f4;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

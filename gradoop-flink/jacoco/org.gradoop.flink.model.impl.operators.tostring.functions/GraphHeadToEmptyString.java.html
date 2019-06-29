@@ -15,17 +15,17 @@
  */
 package org.gradoop.flink.model.impl.operators.tostring.functions;
 
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
 import org.gradoop.flink.model.impl.operators.tostring.tuples.GraphHeadString;
 
 /**
  * represents a graph head by an empty string
  */
-<span class="fc" id="L25">public class GraphHeadToEmptyString implements GraphHeadToString&lt;GraphHead&gt; {</span>
+<span class="fc" id="L25">public class GraphHeadToEmptyString implements GraphHeadToString&lt;EPGMGraphHead&gt; {</span>
 
   @Override
-  public GraphHeadString map(GraphHead graphHead) throws Exception {
+  public GraphHeadString map(EPGMGraphHead graphHead) throws Exception {
 <span class="fc" id="L29">    return new GraphHeadString(graphHead.getId(), &quot;&quot;);</span>
   }
 }

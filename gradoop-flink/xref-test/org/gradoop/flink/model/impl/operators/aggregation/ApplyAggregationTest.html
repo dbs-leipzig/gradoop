@@ -26,9 +26,9 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.aggregation;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.runtime.client.JobExecutionException;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHead;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.exceptions.UnsupportedTypeException;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -99,7 +99,7 @@
 <a name="89" href="#89">89</a>      GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
 <a name="90" href="#90">90</a>      GradoopId g2Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g2"</span>).getId();
 <a name="91" href="#91">91</a>  
-<a name="92" href="#92">92</a>      <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+<a name="92" href="#92">92</a>      <strong class="jxr_keyword">for</strong> (GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
 <a name="93" href="#93">93</a>        assertTrue(<span class="jxr_string">"edge minimum not set"</span>, graphHead.hasProperty
 <a name="94" href="#94">94</a>          (minEdgeProperty.getAggregatePropertyKey()));
 <a name="95" href="#95">95</a>        assertTrue(<span class="jxr_string">"vertex minimum not set"</span>, graphHead.hasProperty
@@ -169,7 +169,7 @@
 <a name="159" href="#159">159</a>     GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
 <a name="160" href="#160">160</a>     GradoopId g2Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g2"</span>).getId();
 <a name="161" href="#161">161</a> 
-<a name="162" href="#162">162</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+<a name="162" href="#162">162</a>     <strong class="jxr_keyword">for</strong> (GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
 <a name="163" href="#163">163</a>       assertTrue(<span class="jxr_string">"edge maximum not set"</span>,
 <a name="164" href="#164">164</a>         graphHead.hasProperty(maxEdgeProperty.getAggregatePropertyKey()));
 <a name="165" href="#165">165</a>       assertTrue(<span class="jxr_string">"vertex maximum not set"</span>,
@@ -239,7 +239,7 @@
 <a name="229" href="#229">229</a>     GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
 <a name="230" href="#230">230</a>     GradoopId g2Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g2"</span>).getId();
 <a name="231" href="#231">231</a> 
-<a name="232" href="#232">232</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+<a name="232" href="#232">232</a>     <strong class="jxr_keyword">for</strong> (GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
 <a name="233" href="#233">233</a>       assertTrue(<span class="jxr_string">"vertex sum not set"</span>, graphHead.hasProperty(
 <a name="234" href="#234">234</a>         sumVertexProperty.getAggregatePropertyKey()));
 <a name="235" href="#235">235</a>       assertTrue(<span class="jxr_string">"edge sum not set"</span>, graphHead.hasProperty(
@@ -309,9 +309,9 @@
 <a name="299" href="#299">299</a>     GradoopId g1Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g1"</span>).getId();
 <a name="300" href="#300">300</a>     GradoopId g2Id = loader.getGraphHeadByVariable(<span class="jxr_string">"g2"</span>).getId();
 <a name="301" href="#301">301</a> 
-<a name="302" href="#302">302</a>     List&lt;GraphHead&gt; graphHeads = outputCollection.getGraphHeads().collect();
+<a name="302" href="#302">302</a>     List&lt;EPGMGraphHead&gt; graphHeads = outputCollection.getGraphHeads().collect();
 <a name="303" href="#303">303</a> 
-<a name="304" href="#304">304</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : graphHeads) {
+<a name="304" href="#304">304</a>     <strong class="jxr_keyword">for</strong> (GraphHead graphHead : graphHeads) {
 <a name="305" href="#305">305</a>       assertTrue(<span class="jxr_string">"edge sum not set"</span>, graphHead.hasProperty(
 <a name="306" href="#306">306</a>         sumEdgeProperty.getAggregatePropertyKey()));
 <a name="307" href="#307">307</a>       assertTrue(<span class="jxr_string">"vertex sum not set"</span>, graphHead.hasProperty(
@@ -398,9 +398,9 @@
 <a name="388" href="#388">388</a> 
 <a name="389" href="#389">389</a>     <strong class="jxr_keyword">int</strong> graphHeadCount = 0;
 <a name="390" href="#390">390</a> 
-<a name="391" href="#391">391</a>     List&lt;GraphHead&gt; graphHeads = outputCollection.getGraphHeads().collect();
+<a name="391" href="#391">391</a>     List&lt;EPGMGraphHead&gt; graphHeads = outputCollection.getGraphHeads().collect();
 <a name="392" href="#392">392</a> 
-<a name="393" href="#393">393</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : graphHeads) {
+<a name="393" href="#393">393</a>     <strong class="jxr_keyword">for</strong> (GraphHead graphHead : graphHeads) {
 <a name="394" href="#394">394</a>       graphHeadCount++;
 <a name="395" href="#395">395</a>       assertTrue(<span class="jxr_string">"vertex count not set"</span>, graphHead.hasProperty(
 <a name="396" href="#396">396</a>         vertexCount.getAggregatePropertyKey()));
@@ -445,9 +445,9 @@
 <a name="435" href="#435">435</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasKnowsElement))
 <a name="436" href="#436">436</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasPerson));
 <a name="437" href="#437">437</a> 
-<a name="438" href="#438">438</a>     List&lt;GraphHead&gt; graphHeads = collection.getGraphHeads().collect();
+<a name="438" href="#438">438</a>     List&lt;EPGMGraphHead&gt; graphHeads = collection.getGraphHeads().collect();
 <a name="439" href="#439">439</a> 
-<a name="440" href="#440">440</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : graphHeads) {
+<a name="440" href="#440">440</a>     <strong class="jxr_keyword">for</strong> (GraphHead graphHead : graphHeads) {
 <a name="441" href="#441">441</a>       <em class="jxr_comment">// check vertex label</em>
 <a name="442" href="#442">442</a>       assertTrue(<span class="jxr_string">"Property hasVertexLabel_Person not set"</span>,
 <a name="443" href="#443">443</a>         graphHead.hasProperty(hasPerson.getAggregatePropertyKey()));
@@ -485,9 +485,9 @@
 <a name="475" href="#475">475</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasOtherLabel))
 <a name="476" href="#476">476</a>       .apply(<strong class="jxr_keyword">new</strong> ApplyAggregation(hasThirdLabel));
 <a name="477" href="#477">477</a> 
-<a name="478" href="#478">478</a>     List&lt;GraphHead&gt; graphHeads = collection.getGraphHeads().collect();
+<a name="478" href="#478">478</a>     List&lt;EPGMGraphHead&gt; graphHeads = collection.getGraphHeads().collect();
 <a name="479" href="#479">479</a> 
-<a name="480" href="#480">480</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead graphHead : graphHeads) {
+<a name="480" href="#480">480</a>     <strong class="jxr_keyword">for</strong> (GraphHead graphHead : graphHeads) {
 <a name="481" href="#481">481</a>       <em class="jxr_comment">// check edge label</em>
 <a name="482" href="#482">482</a>       assertTrue(<span class="jxr_string">"Property hasEdgeLabel_otherLabel not set"</span>,
 <a name="483" href="#483">483</a>         graphHead.hasProperty(hasOtherLabel.getAggregatePropertyKey()));

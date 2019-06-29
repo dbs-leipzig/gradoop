@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.split.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 
@@ -29,7 +29,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
  */
 @FunctionAnnotation.ForwardedFieldsFirst(&quot;*-&gt;f0&quot;)
 @FunctionAnnotation.ForwardedFieldsSecond(&quot;f1-&gt;f1&quot;)
-<span class="fc" id="L32">public class JoinEdgeTupleWithSourceGraphs&lt;E extends Edge&gt;</span>
+<span class="fc" id="L32">public class JoinEdgeTupleWithSourceGraphs&lt;E extends EPGMEdge&gt;</span>
   implements JoinFunction&lt;E, Tuple2&lt;GradoopId, GradoopIdSet&gt;,
   Tuple2&lt;E, GradoopIdSet&gt;&gt; {
 

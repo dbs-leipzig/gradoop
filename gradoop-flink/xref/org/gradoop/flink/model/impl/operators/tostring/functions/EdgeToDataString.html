@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.tostring.functions;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.util.Collector;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.tostring.tuples.EdgeString;
@@ -34,11 +34,11 @@
 <a name="24" href="#24">24</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="25" href="#25">25</a>  <em class="jxr_javadoccomment"> * represents an edge by a data string (label and properties)</em>
 <a name="26" href="#26">26</a>  <em class="jxr_javadoccomment"> */</em>
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/tostring/functions/EdgeToDataString.html">EdgeToDataString</a> <strong class="jxr_keyword">extends</strong> ElementToDataString&lt;Edge&gt; implements
-<a name="28" href="#28">28</a>    EdgeToString&lt;Edge&gt; {
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/operators/tostring/functions/EdgeToDataString.html">EdgeToDataString</a> <strong class="jxr_keyword">extends</strong> ElementToDataString&lt;EPGMEdge&gt; implements
+<a name="28" href="#28">28</a>    EdgeToString&lt;EPGMEdge&gt; {
 <a name="29" href="#29">29</a>  
 <a name="30" href="#30">30</a>    @Override
-<a name="31" href="#31">31</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(Edge edge, Collector&lt;EdgeString&gt; collector)
+<a name="31" href="#31">31</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> flatMap(EPGMEdge edge, Collector&lt;EdgeString&gt; collector)
 <a name="32" href="#32">32</a>        <strong class="jxr_keyword">throws</strong> Exception {
 <a name="33" href="#33">33</a>  
 <a name="34" href="#34">34</a>      GradoopId sourceId = edge.getSourceId();

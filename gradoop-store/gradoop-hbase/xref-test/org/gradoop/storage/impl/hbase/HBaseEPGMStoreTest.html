@@ -28,16 +28,16 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Lists;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.config.GradoopConfig;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.exceptions.UnsupportedTypeException;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMEdge;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMGraphHead;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertex;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.EPGMVertexFactory;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Edge;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.GraphHead;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.Vertex;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.api.entities.VertexFactory;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Properties;
 <a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.util.AsciiGraphLoader;
 <a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> org.gradoop.storage.common.iterator.ClosableIterator;
@@ -69,11 +69,11 @@
 <a name="59" href="#59">59</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> writeCloseOpenReadTest() <strong class="jxr_keyword">throws</strong> IOException {
 <a name="60" href="#60">60</a>      HBaseEPGMStore graphStore = createEmptyEPGMStore();
 <a name="61" href="#61">61</a>  
-<a name="62" href="#62">62</a>      AsciiGraphLoader&lt;GraphHead, Vertex, Edge&gt; loader = getMinimalFullFeaturedGraphLoader();
+<a name="62" href="#62">62</a>      AsciiGraphLoader&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; loader = getMinimalFullFeaturedGraphLoader();
 <a name="63" href="#63">63</a>  
-<a name="64" href="#64">64</a>      GraphHead graphHead = loader.getGraphHeads().iterator().next();
-<a name="65" href="#65">65</a>      Vertex vertex = loader.getVertices().iterator().next();
-<a name="66" href="#66">66</a>      Edge edge = loader.getEdges().iterator().next();
+<a name="64" href="#64">64</a>      EPGMGraphHead graphHead = loader.getGraphHeads().iterator().next();
+<a name="65" href="#65">65</a>      EPGMVertex vertex = loader.getVertices().iterator().next();
+<a name="66" href="#66">66</a>      EPGMEdge edge = loader.getEdges().iterator().next();
 <a name="67" href="#67">67</a>  
 <a name="68" href="#68">68</a>      graphStore.writeGraphHead(graphHead);
 <a name="69" href="#69">69</a>      graphStore.writeVertex(vertex);
@@ -101,11 +101,11 @@
 <a name="91" href="#91">91</a>      String prefix = <span class="jxr_string">"test."</span>;
 <a name="92" href="#92">92</a>      HBaseEPGMStore graphStore = createEmptyEPGMStore(prefix);
 <a name="93" href="#93">93</a>  
-<a name="94" href="#94">94</a>      AsciiGraphLoader&lt;GraphHead, Vertex, Edge&gt; loader = getMinimalFullFeaturedGraphLoader();
+<a name="94" href="#94">94</a>      AsciiGraphLoader&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; loader = getMinimalFullFeaturedGraphLoader();
 <a name="95" href="#95">95</a>  
-<a name="96" href="#96">96</a>      GraphHead graphHead = loader.getGraphHeads().iterator().next();
-<a name="97" href="#97">97</a>      Vertex vertex = loader.getVertices().iterator().next();
-<a name="98" href="#98">98</a>      Edge edge = loader.getEdges().iterator().next();
+<a name="96" href="#96">96</a>      EPGMGraphHead graphHead = loader.getGraphHeads().iterator().next();
+<a name="97" href="#97">97</a>      EPGMVertex vertex = loader.getVertices().iterator().next();
+<a name="98" href="#98">98</a>      EPGMEdge edge = loader.getEdges().iterator().next();
 <a name="99" href="#99">99</a>  
 <a name="100" href="#100">100</a>     graphStore.writeGraphHead(graphHead);
 <a name="101" href="#101">101</a>     graphStore.writeVertex(vertex);
@@ -133,11 +133,11 @@
 <a name="123" href="#123">123</a>     HBaseEPGMStore graphStore = createEmptyEPGMStore();
 <a name="124" href="#124">124</a>     graphStore.setAutoFlush(false);
 <a name="125" href="#125">125</a> 
-<a name="126" href="#126">126</a>     AsciiGraphLoader&lt;GraphHead, Vertex, Edge&gt; loader = getMinimalFullFeaturedGraphLoader();
+<a name="126" href="#126">126</a>     AsciiGraphLoader&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; loader = getMinimalFullFeaturedGraphLoader();
 <a name="127" href="#127">127</a> 
-<a name="128" href="#128">128</a>     GraphHead graphHead = loader.getGraphHeads().iterator().next();
-<a name="129" href="#129">129</a>     Vertex vertex = loader.getVertices().iterator().next();
-<a name="130" href="#130">130</a>     Edge edge = loader.getEdges().iterator().next();
+<a name="128" href="#128">128</a>     EPGMGraphHead graphHead = loader.getGraphHeads().iterator().next();
+<a name="129" href="#129">129</a>     EPGMVertex vertex = loader.getVertices().iterator().next();
+<a name="130" href="#130">130</a>     EPGMEdge edge = loader.getEdges().iterator().next();
 <a name="131" href="#131">131</a> 
 <a name="132" href="#132">132</a>     graphStore.writeGraphHead(graphHead);
 <a name="133" href="#133">133</a>     graphStore.writeVertex(vertex);
@@ -164,43 +164,43 @@
 <a name="154" href="#154">154</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> iteratorTest() <strong class="jxr_keyword">throws</strong> IOException {
 <a name="155" href="#155">155</a>     HBaseEPGMStore graphStore = createEmptyEPGMStore();
 <a name="156" href="#156">156</a> 
-<a name="157" href="#157">157</a>     List&lt;Vertex&gt; vertices = Lists.newArrayList(getSocialVertices());
-<a name="158" href="#158">158</a>     List&lt;Edge&gt; edges = Lists.newArrayList(getSocialEdges());
-<a name="159" href="#159">159</a>     List&lt;GraphHead&gt; graphHeads = Lists.newArrayList(getSocialGraphHeads());
+<a name="157" href="#157">157</a>     List&lt;EPGMVertex&gt; vertices = Lists.newArrayList(getSocialVertices());
+<a name="158" href="#158">158</a>     List&lt;EPGMEdge&gt; edges = Lists.newArrayList(getSocialEdges());
+<a name="159" href="#159">159</a>     List&lt;EPGMGraphHead&gt; graphHeads = Lists.newArrayList(getSocialGraphHeads());
 <a name="160" href="#160">160</a> 
 <a name="161" href="#161">161</a>     <em class="jxr_comment">// write social graph to HBase</em>
-<a name="162" href="#162">162</a>     <strong class="jxr_keyword">for</strong> (GraphHead g : graphHeads) {
+<a name="162" href="#162">162</a>     <strong class="jxr_keyword">for</strong> (EPGMGraphHead g : graphHeads) {
 <a name="163" href="#163">163</a>       graphStore.writeGraphHead(g);
 <a name="164" href="#164">164</a>     }
-<a name="165" href="#165">165</a>     <strong class="jxr_keyword">for</strong> (Vertex v : vertices) {
+<a name="165" href="#165">165</a>     <strong class="jxr_keyword">for</strong> (EPGMVertex v : vertices) {
 <a name="166" href="#166">166</a>       graphStore.writeVertex(v);
 <a name="167" href="#167">167</a>     }
-<a name="168" href="#168">168</a>     <strong class="jxr_keyword">for</strong> (Edge e : edges) {
+<a name="168" href="#168">168</a>     <strong class="jxr_keyword">for</strong> (EPGMEdge e : edges) {
 <a name="169" href="#169">169</a>       graphStore.writeEdge(e);
 <a name="170" href="#170">170</a>     }
 <a name="171" href="#171">171</a> 
 <a name="172" href="#172">172</a>     graphStore.flush();
 <a name="173" href="#173">173</a> 
 <a name="174" href="#174">174</a>     <em class="jxr_comment">// graph heads</em>
-<a name="175" href="#175">175</a>     validateEPGMElementCollections(
+<a name="175" href="#175">175</a>     validateElementCollections(
 <a name="176" href="#176">176</a>       graphHeads,
 <a name="177" href="#177">177</a>       graphStore.getGraphSpace().readRemainsAndClose()
 <a name="178" href="#178">178</a>     );
 <a name="179" href="#179">179</a>     <em class="jxr_comment">// vertices</em>
-<a name="180" href="#180">180</a>     validateEPGMElementCollections(
+<a name="180" href="#180">180</a>     validateElementCollections(
 <a name="181" href="#181">181</a>       vertices,
 <a name="182" href="#182">182</a>       graphStore.getVertexSpace().readRemainsAndClose()
 <a name="183" href="#183">183</a>     );
-<a name="184" href="#184">184</a>     validateEPGMGraphElementCollections(
+<a name="184" href="#184">184</a>     validateGraphElementCollections(
 <a name="185" href="#185">185</a>       vertices,
 <a name="186" href="#186">186</a>       graphStore.getVertexSpace().readRemainsAndClose()
 <a name="187" href="#187">187</a>     );
 <a name="188" href="#188">188</a>     <em class="jxr_comment">// edges</em>
-<a name="189" href="#189">189</a>     validateEPGMElementCollections(
+<a name="189" href="#189">189</a>     validateElementCollections(
 <a name="190" href="#190">190</a>       edges,
 <a name="191" href="#191">191</a>       graphStore.getEdgeSpace().readRemainsAndClose()
 <a name="192" href="#192">192</a>     );
-<a name="193" href="#193">193</a>     validateEPGMGraphElementCollections(
+<a name="193" href="#193">193</a>     validateGraphElementCollections(
 <a name="194" href="#194">194</a>       edges,
 <a name="195" href="#195">195</a>       graphStore.getEdgeSpace().readRemainsAndClose()
 <a name="196" href="#196">196</a>     );
@@ -217,7 +217,7 @@
 <a name="207" href="#207">207</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> wrongPropertyTypeTest() <strong class="jxr_keyword">throws</strong> IOException {
 <a name="208" href="#208">208</a>     HBaseEPGMStore graphStore = createEmptyEPGMStore();
 <a name="209" href="#209">209</a> 
-<a name="210" href="#210">210</a>     EPGMVertexFactory&lt;Vertex&gt; vertexFactory = <strong class="jxr_keyword">new</strong> VertexFactory();
+<a name="210" href="#210">210</a>     VertexFactory&lt;EPGMVertex&gt; vertexFactory = <strong class="jxr_keyword">new</strong> EPGMVertexFactory();
 <a name="211" href="#211">211</a> 
 <a name="212" href="#212">212</a>     <em class="jxr_comment">// Queue is not supported by</em>
 <a name="213" href="#213">213</a>     <strong class="jxr_keyword">final</strong> Queue&lt;String&gt; value = <strong class="jxr_keyword">new</strong> PriorityQueue&lt;&gt;();
@@ -229,7 +229,7 @@
 <a name="219" href="#219">219</a> 
 <a name="220" href="#220">220</a>     <strong class="jxr_keyword">final</strong> GradoopIdSet graphs = <strong class="jxr_keyword">new</strong> GradoopIdSet();
 <a name="221" href="#221">221</a> 
-<a name="222" href="#222">222</a>     Vertex vertex = vertexFactory.initVertex(vertexID, label, props, graphs);
+<a name="222" href="#222">222</a>     EPGMVertex vertex = vertexFactory.initVertex(vertexID, label, props, graphs);
 <a name="223" href="#223">223</a> 
 <a name="224" href="#224">224</a>     graphStore.writeVertex(vertex);
 <a name="225" href="#225">225</a>   }
@@ -243,7 +243,7 @@
 <a name="233" href="#233">233</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> propertyTypeTest() <strong class="jxr_keyword">throws</strong> IOException {
 <a name="234" href="#234">234</a>     HBaseEPGMStore graphStore = createEmptyEPGMStore();
 <a name="235" href="#235">235</a> 
-<a name="236" href="#236">236</a>     EPGMVertexFactory&lt;Vertex&gt; vertexFactory = <strong class="jxr_keyword">new</strong> VertexFactory();
+<a name="236" href="#236">236</a>     VertexFactory&lt;EPGMVertex&gt; vertexFactory = <strong class="jxr_keyword">new</strong> EPGMVertexFactory();
 <a name="237" href="#237">237</a> 
 <a name="238" href="#238">238</a>     <strong class="jxr_keyword">final</strong> GradoopId vertexID = GradoopId.get();
 <a name="239" href="#239">239</a>     <strong class="jxr_keyword">final</strong> String label = <span class="jxr_string">"A"</span>;
@@ -257,7 +257,7 @@
 <a name="247" href="#247">247</a>     graphStore.flush();
 <a name="248" href="#248">248</a> 
 <a name="249" href="#249">249</a>     <em class="jxr_comment">// read from store</em>
-<a name="250" href="#250">250</a>     Vertex v = graphStore.readVertex(vertexID);
+<a name="250" href="#250">250</a>     EPGMVertex v = graphStore.readVertex(vertexID);
 <a name="251" href="#251">251</a>     assert v != <strong class="jxr_keyword">null</strong>;
 <a name="252" href="#252">252</a>     List&lt;String&gt; propertyKeys = Lists.newArrayList(v.getPropertyKeys());
 <a name="253" href="#253">253</a>     assertEquals(properties.size(), propertyKeys.size());
@@ -341,12 +341,12 @@
 <a name="331" href="#331">331</a>   @Test
 <a name="332" href="#332">332</a>   <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> truncateTablesTest() <strong class="jxr_keyword">throws</strong> IOException {
 <a name="333" href="#333">333</a>     HBaseEPGMStore store = createEmptyEPGMStore(<span class="jxr_string">"truncateTest"</span>);
-<a name="334" href="#334">334</a>     AsciiGraphLoader&lt;GraphHead, Vertex, Edge&gt; loader = getMinimalFullFeaturedGraphLoader();
+<a name="334" href="#334">334</a>     AsciiGraphLoader&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; loader = getMinimalFullFeaturedGraphLoader();
 <a name="335" href="#335">335</a>     checkIfStoreIsEmpty(<span class="jxr_string">"Store was not empty before writing anything."</span>, store);
 <a name="336" href="#336">336</a>     <em class="jxr_comment">// Now write something to the store, check if it was written (i.e. the store is not empty).</em>
-<a name="337" href="#337">337</a>     GraphHead graphHead = loader.getGraphHeads().iterator().next();
-<a name="338" href="#338">338</a>     Vertex vertex = loader.getVertices().iterator().next();
-<a name="339" href="#339">339</a>     Edge edge = loader.getEdges().iterator().next();
+<a name="337" href="#337">337</a>     EPGMGraphHead graphHead = loader.getGraphHeads().iterator().next();
+<a name="338" href="#338">338</a>     EPGMVertex vertex = loader.getVertices().iterator().next();
+<a name="339" href="#339">339</a>     EPGMEdge edge = loader.getEdges().iterator().next();
 <a name="340" href="#340">340</a>     store.writeGraphHead(graphHead);
 <a name="341" href="#341">341</a>     store.writeVertex(vertex);
 <a name="342" href="#342">342</a>     store.writeEdge(edge);
@@ -381,33 +381,33 @@
 <a name="371" href="#371">371</a>     }
 <a name="372" href="#372">372</a>   }
 <a name="373" href="#373">373</a> 
-<a name="374" href="#374">374</a>   <strong class="jxr_keyword">private</strong> AsciiGraphLoader&lt;GraphHead, Vertex, Edge&gt; getMinimalFullFeaturedGraphLoader() {
+<a name="374" href="#374">374</a>   <strong class="jxr_keyword">private</strong> AsciiGraphLoader&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; getMinimalFullFeaturedGraphLoader() {
 <a name="375" href="#375">375</a>     String asciiGraph = <span class="jxr_string">":G{k:\&quot;v\&quot;}[(v:V{k:\&quot;v\&quot;}),(v)-[:e{k:\&quot;v\&quot;}]-&gt;(v)]"</span>;
 <a name="376" href="#376">376</a>     <strong class="jxr_keyword">return</strong> AsciiGraphLoader.fromString(asciiGraph, GradoopConfig.getDefaultConfig());
 <a name="377" href="#377">377</a>   }
 <a name="378" href="#378">378</a> 
-<a name="379" href="#379">379</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> validateGraphHead(HBaseEPGMStore graphStore, GraphHead originalGraphHead)
+<a name="379" href="#379">379</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> validateGraphHead(HBaseEPGMStore graphStore, EPGMGraphHead originalGraphHead)
 <a name="380" href="#380">380</a>     <strong class="jxr_keyword">throws</strong> IOException {
 <a name="381" href="#381">381</a> 
-<a name="382" href="#382">382</a>     EPGMGraphHead loadedGraphHead = graphStore.readGraph(originalGraphHead.getId());
+<a name="382" href="#382">382</a>     GraphHead loadedGraphHead = graphStore.readGraph(originalGraphHead.getId());
 <a name="383" href="#383">383</a> 
-<a name="384" href="#384">384</a>     validateEPGMElements(originalGraphHead, loadedGraphHead);
+<a name="384" href="#384">384</a>     validateElements(originalGraphHead, loadedGraphHead);
 <a name="385" href="#385">385</a>   }
 <a name="386" href="#386">386</a> 
-<a name="387" href="#387">387</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> validateVertex(HBaseEPGMStore graphStore, Vertex originalVertex) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="387" href="#387">387</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> validateVertex(HBaseEPGMStore graphStore, EPGMVertex originalVertex) <strong class="jxr_keyword">throws</strong> IOException {
 <a name="388" href="#388">388</a> 
-<a name="389" href="#389">389</a>     EPGMVertex loadedVertex = graphStore.readVertex(originalVertex.getId());
+<a name="389" href="#389">389</a>     Vertex loadedVertex = graphStore.readVertex(originalVertex.getId());
 <a name="390" href="#390">390</a> 
-<a name="391" href="#391">391</a>     validateEPGMElements(originalVertex, loadedVertex);
-<a name="392" href="#392">392</a>     validateEPGMGraphElements(originalVertex, loadedVertex);
+<a name="391" href="#391">391</a>     validateElements(originalVertex, loadedVertex);
+<a name="392" href="#392">392</a>     validateGraphElements(originalVertex, loadedVertex);
 <a name="393" href="#393">393</a>   }
 <a name="394" href="#394">394</a> 
-<a name="395" href="#395">395</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> validateEdge(HBaseEPGMStore graphStore, Edge originalEdge) <strong class="jxr_keyword">throws</strong> IOException {
+<a name="395" href="#395">395</a>   <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> validateEdge(HBaseEPGMStore graphStore, EPGMEdge originalEdge) <strong class="jxr_keyword">throws</strong> IOException {
 <a name="396" href="#396">396</a> 
-<a name="397" href="#397">397</a>     EPGMEdge loadedEdge = graphStore.readEdge(originalEdge.getId());
+<a name="397" href="#397">397</a>     Edge loadedEdge = graphStore.readEdge(originalEdge.getId());
 <a name="398" href="#398">398</a> 
-<a name="399" href="#399">399</a>     validateEPGMElements(originalEdge, loadedEdge);
-<a name="400" href="#400">400</a>     validateEPGMGraphElements(originalEdge, loadedEdge);
+<a name="399" href="#399">399</a>     validateElements(originalEdge, loadedEdge);
+<a name="400" href="#400">400</a>     validateGraphElements(originalEdge, loadedEdge);
 <a name="401" href="#401">401</a> 
 <a name="402" href="#402">402</a>     assert loadedEdge != <strong class="jxr_keyword">null</strong>;
 <a name="403" href="#403">403</a>     assertEquals(<span class="jxr_string">"source vertex mismatch"</span>, originalEdge.getSourceId(), loadedEdge.getSourceId());

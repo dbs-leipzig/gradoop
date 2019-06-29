@@ -27,8 +27,8 @@
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.tuple.Tuple2;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.VertexFactory;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.Id;
@@ -54,21 +54,21 @@
 <a name="44" href="#44">44</a>  <em class="jxr_javadoccomment">   */</em>
 <a name="45" href="#45">45</a>    @Test
 <a name="46" href="#46">46</a>    <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> testCoGroup() <strong class="jxr_keyword">throws</strong> Exception {
-<a name="47" href="#47">47</a>      VertexFactory vertexFactory = getConfig().getVertexFactory();
-<a name="48" href="#48">48</a>      Vertex v1 = vertexFactory.createVertex(<span class="jxr_string">"a"</span>);
+<a name="47" href="#47">47</a>      EPGMVertexFactory vertexFactory = getConfig().getVertexFactory();
+<a name="48" href="#48">48</a>      EPGMVertex v1 = vertexFactory.createVertex(<span class="jxr_string">"a"</span>);
 <a name="49" href="#49">49</a>      Tuple2&lt;GradoopId, PropertyValue&gt; property1 = Tuple2.of(v1.getId(), PropertyValue.create(1L));
-<a name="50" href="#50">50</a>      Vertex v2 = vertexFactory.createVertex(<span class="jxr_string">"a"</span>);
-<a name="51" href="#51">51</a>      Vertex v3 = vertexFactory.createVertex(<span class="jxr_string">"b"</span>);
+<a name="50" href="#50">50</a>      EPGMVertex v2 = vertexFactory.createVertex(<span class="jxr_string">"a"</span>);
+<a name="51" href="#51">51</a>      EPGMVertex v3 = vertexFactory.createVertex(<span class="jxr_string">"b"</span>);
 <a name="52" href="#52">52</a>      Tuple2&lt;GradoopId, PropertyValue&gt; property2 = Tuple2.of(v3.getId(), PropertyValue.create(1L));
-<a name="53" href="#53">53</a>      List&lt;Vertex&gt; input = Arrays.asList(v1, v2, v3);
-<a name="54" href="#54">54</a>      List&lt;Vertex&gt; result = getExecutionEnvironment().fromElements(property1, property2)
+<a name="53" href="#53">53</a>      List&lt;EPGMVertex&gt; input = Arrays.asList(v1, v2, v3);
+<a name="54" href="#54">54</a>      List&lt;EPGMVertex&gt; result = getExecutionEnvironment().fromElements(property1, property2)
 <a name="55" href="#55">55</a>        .coGroup(getExecutionEnvironment().fromCollection(input))
 <a name="56" href="#56">56</a>        .where(0).equalTo(<strong class="jxr_keyword">new</strong> Id&lt;&gt;())
 <a name="57" href="#57">57</a>        .with(<strong class="jxr_keyword">new</strong> AccumulatePropagatedValues&lt;&gt;(<span class="jxr_string">"k"</span>, Collections.singleton(<span class="jxr_string">"a"</span>)))
 <a name="58" href="#58">58</a>        .collect();
 <a name="59" href="#59">59</a>      v1.setProperty(<span class="jxr_string">"k"</span>, PropertyValue.create(Collections.singletonList(PropertyValue.create(1L))));
-<a name="60" href="#60">60</a>      List&lt;Vertex&gt; expected = Arrays.asList(v1, v2, v3);
-<a name="61" href="#61">61</a>      Comparator&lt;Vertex&gt; comparator = Comparator.comparing(Vertex::getId);
+<a name="60" href="#60">60</a>      List&lt;EPGMVertex&gt; expected = Arrays.asList(v1, v2, v3);
+<a name="61" href="#61">61</a>      Comparator&lt;EPGMVertex&gt; comparator = Comparator.comparing(EPGMVertex::getId);
 <a name="62" href="#62">62</a>      expected.sort(comparator);
 <a name="63" href="#63">63</a>      result.sort(comparator);
 <a name="64" href="#64">64</a>      assertArrayEquals(expected.toArray(), result.toArray());

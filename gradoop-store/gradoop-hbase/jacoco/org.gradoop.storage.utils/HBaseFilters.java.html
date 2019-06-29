@@ -15,7 +15,7 @@
  */
 package org.gradoop.storage.utils;
 
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBaseLabelIn;
 import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBaseLabelReg;
 import org.gradoop.storage.impl.hbase.predicate.filter.impl.HBasePropEquals;
@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
    * @return HBaseLabelIn filter instance
    */
   @Nonnull
-  public static &lt;T extends EPGMElement&gt; HBaseLabelIn&lt;T&gt; labelIn(@Nonnull String... value) {
+  public static &lt;T extends Element&gt; HBaseLabelIn&lt;T&gt; labelIn(@Nonnull String... value) {
 <span class="fc" id="L43">    return new HBaseLabelIn&lt;&gt;(value);</span>
   }
 
@@ -52,7 +52,7 @@ import java.util.regex.Pattern;
    * @return HBaseLabelReg filter instance
    */
   @Nonnull
-  public static &lt;T extends EPGMElement&gt; HBaseLabelReg&lt;T&gt; labelReg(@Nonnull Pattern reg) {
+  public static &lt;T extends Element&gt; HBaseLabelReg&lt;T&gt; labelReg(@Nonnull Pattern reg) {
 <span class="fc" id="L56">    return new HBaseLabelReg&lt;&gt;(reg);</span>
   }
 
@@ -66,7 +66,7 @@ import java.util.regex.Pattern;
    * @return HBasePropEquals filter instance
    */
   @Nonnull
-  public static &lt;T extends EPGMElement&gt; HBasePropEquals&lt;T&gt; propEquals(
+  public static &lt;T extends Element&gt; HBasePropEquals&lt;T&gt; propEquals(
     @Nonnull String key,
     @Nonnull Object value
   ) {
@@ -84,7 +84,7 @@ import java.util.regex.Pattern;
    * @return HBasePropLargerThan filter instance
    */
   @Nonnull
-  public static &lt;T extends EPGMElement&gt; HBasePropLargerThan&lt;T&gt; propLargerThan(
+  public static &lt;T extends Element&gt; HBasePropLargerThan&lt;T&gt; propLargerThan(
     @Nonnull String key,
     Object value,
     boolean include) {
@@ -101,7 +101,7 @@ import java.util.regex.Pattern;
    * @return HBasePropReg filter instance
    */
   @Nonnull
-  public static &lt;T extends EPGMElement&gt; HBasePropReg&lt;T&gt; propReg(
+  public static &lt;T extends Element&gt; HBasePropReg&lt;T&gt; propReg(
     @Nonnull String key,
     @Nonnull Pattern pattern) {
 <span class="fc" id="L107">    return new HBasePropReg&lt;&gt;(key, pattern);</span>

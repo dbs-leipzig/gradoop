@@ -18,8 +18,8 @@ package org.gradoop.flink.model.impl.operators.matching.transactional.function;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.matching.common.matching.ElementMatcher;
 import org.gradoop.flink.model.impl.operators.matching.common.query.QueryHandler;
 import org.gradoop.flink.model.impl.operators.matching.common.tuples.IdWithCandidates;
@@ -74,11 +74,11 @@ public class GraphTransactionMatcher
 <span class="nc" id="L74">    GraphWithCandidates graph = new GraphWithCandidates(</span>
 <span class="nc" id="L75">      graphTransaction.getGraphHead().getId());</span>
 
-<span class="nc" id="L77">    Set&lt;Vertex&gt; vertices = graphTransaction.getVertices();</span>
+<span class="nc" id="L77">    Set&lt;EPGMVertex&gt; vertices = graphTransaction.getVertices();</span>
 <span class="nc" id="L78">    List&lt;IdWithCandidates&lt;GradoopId&gt;&gt; vertexCandidates</span>
 <span class="nc" id="L79">      = new ArrayList&lt;&gt;(vertices.size());</span>
 
-<span class="nc bnc" id="L81" title="All 2 branches missed.">    for (Vertex vertex : vertices) {</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">    for (EPGMVertex vertex : vertices) {</span>
 <span class="nc" id="L82">      IdWithCandidates&lt;GradoopId&gt; candidates = new IdWithCandidates&lt;&gt;();</span>
 <span class="nc" id="L83">      candidates.setId(vertex.getId());</span>
 <span class="nc" id="L84">      candidates.setCandidates(</span>
@@ -92,11 +92,11 @@ public class GraphTransactionMatcher
 <span class="nc" id="L92">      vertexCandidates.add(candidates);</span>
 <span class="nc" id="L93">    }</span>
 
-<span class="nc" id="L95">    Set&lt;Edge&gt; edges = graphTransaction.getEdges();</span>
+<span class="nc" id="L95">    Set&lt;EPGMEdge&gt; edges = graphTransaction.getEdges();</span>
 <span class="nc" id="L96">    List&lt;TripleWithCandidates&lt;GradoopId&gt;&gt; edgeCandidates =</span>
 <span class="nc" id="L97">    new ArrayList&lt;&gt;(edges.size());</span>
 
-<span class="nc bnc" id="L99" title="All 2 branches missed.">    for (Edge edge : edges) {</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">    for (EPGMEdge edge : edges) {</span>
 <span class="nc" id="L100">      TripleWithCandidates&lt;GradoopId&gt; candidates = new TripleWithCandidates&lt;&gt;();</span>
 <span class="nc" id="L101">      candidates.setEdgeId(edge.getId());</span>
 <span class="nc" id="L102">      candidates.setSourceId(edge.getSourceId());</span>

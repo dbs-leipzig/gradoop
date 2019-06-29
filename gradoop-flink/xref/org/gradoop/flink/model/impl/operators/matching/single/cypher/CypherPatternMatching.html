@@ -28,7 +28,7 @@
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Sets;
 <a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.log4j.Logger;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Element;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMElement;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
@@ -130,7 +130,7 @@
 <a name="120" href="#120">120</a>       log(embeddings, <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/debug/PrintEmbedding.html">PrintEmbedding</a>(embeddingMetaData), getVertexMapping(), getEdgeMapping());
 <a name="121" href="#121">121</a> 
 <a name="122" href="#122">122</a>     <em class="jxr_comment">// Pattern construction (if necessary)</em>
-<a name="123" href="#123">123</a>     DataSet&lt;Element&gt; finalElements = <strong class="jxr_keyword">this</strong>.constructionPattern != <strong class="jxr_keyword">null</strong> ?
+<a name="123" href="#123">123</a>     DataSet&lt;EPGMElement&gt; finalElements = <strong class="jxr_keyword">this</strong>.constructionPattern != <strong class="jxr_keyword">null</strong> ?
 <a name="124" href="#124">124</a>       constructFinalElements(graph, embeddings, embeddingMetaData) :
 <a name="125" href="#125">125</a>       embeddings.flatMap(
 <a name="126" href="#126">126</a>         <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/functions/ElementsFromEmbedding.html">ElementsFromEmbedding</a>(
@@ -154,7 +154,7 @@
 <a name="144" href="#144">144</a> <em class="jxr_javadoccomment">   * @param embeddingMetaData   Meta information</em>
 <a name="145" href="#145">145</a> <em class="jxr_javadoccomment">   * @return                    New set of EmbeddingElements</em>
 <a name="146" href="#146">146</a> <em class="jxr_javadoccomment">   */</em>
-<a name="147" href="#147">147</a>   <strong class="jxr_keyword">private</strong> DataSet&lt;Element&gt; constructFinalElements(<a href="../../../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph, DataSet&lt;Embedding&gt; embeddings,
+<a name="147" href="#147">147</a>   <strong class="jxr_keyword">private</strong> DataSet&lt;EPGMElement&gt; constructFinalElements(<a href="../../../../../../../../../org/gradoop/flink/model/impl/epgm/LogicalGraph.html">LogicalGraph</a> graph, DataSet&lt;Embedding&gt; embeddings,
 <a name="148" href="#148">148</a>     <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/pojos/EmbeddingMetaData.html">EmbeddingMetaData</a> embeddingMetaData) {
 <a name="149" href="#149">149</a> 
 <a name="150" href="#150">150</a>     <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/QueryHandler.html">QueryHandler</a> constructionPatternHandler = <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/QueryHandler.html">QueryHandler</a>(<strong class="jxr_keyword">this</strong>.constructionPattern);

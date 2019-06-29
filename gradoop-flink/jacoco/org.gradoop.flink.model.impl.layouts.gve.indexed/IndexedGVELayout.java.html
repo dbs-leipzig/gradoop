@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.layouts.gve.indexed;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
 import org.gradoop.flink.model.api.layouts.LogicalGraphLayout;
 import org.gradoop.flink.model.impl.layouts.gve.GVELayout;
@@ -31,19 +31,20 @@ import java.util.Map;
  * efficient as they avoid duplicating rows during program execution.
  */
 public class IndexedGVELayout extends GVELayout implements
-  LogicalGraphLayout&lt;GraphHead, Vertex, Edge&gt;, GraphCollectionLayout&lt;GraphHead, Vertex, Edge&gt; {
+  LogicalGraphLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt;,
+  GraphCollectionLayout&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; {
   /**
    * Mapping from graph label to graph heads with that label.
    */
-  private final Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads;
+  private final Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads;
   /**
    * Mapping from vertex label to vertices with that label.
    */
-  private final Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices;
+  private final Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices;
   /**
    * Mapping from edge label to edges with that label.
    */
-  private final Map&lt;String, DataSet&lt;Edge&gt;&gt; edges;
+  private final Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges;
 
   /**
    * Creates a new Indexed GVE Layout.
@@ -52,40 +53,40 @@ public class IndexedGVELayout extends GVELayout implements
    * @param vertices mapping from label to vertices
    * @param edges mapping from label to edges
    */
-  IndexedGVELayout(Map&lt;String, DataSet&lt;GraphHead&gt;&gt; graphHeads,
-    Map&lt;String, DataSet&lt;Vertex&gt;&gt; vertices,
-    Map&lt;String, DataSet&lt;Edge&gt;&gt; edges) {
-<span class="fc" id="L58">    super(</span>
-<span class="fc" id="L59">      graphHeads.values().stream().reduce(DataSet::union)</span>
-<span class="pc" id="L60">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during graph head union&quot;)),</span>
-<span class="fc" id="L61">      vertices.values().stream().reduce(DataSet::union)</span>
-<span class="pc" id="L62">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during vertex union&quot;)),</span>
-<span class="fc" id="L63">      edges.values().stream().reduce(DataSet::union)</span>
-<span class="pc" id="L64">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during edge union&quot;))</span>
+  IndexedGVELayout(Map&lt;String, DataSet&lt;EPGMGraphHead&gt;&gt; graphHeads,
+    Map&lt;String, DataSet&lt;EPGMVertex&gt;&gt; vertices,
+    Map&lt;String, DataSet&lt;EPGMEdge&gt;&gt; edges) {
+<span class="fc" id="L59">    super(</span>
+<span class="fc" id="L60">      graphHeads.values().stream().reduce(DataSet::union)</span>
+<span class="pc" id="L61">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during graph head union&quot;)),</span>
+<span class="fc" id="L62">      vertices.values().stream().reduce(DataSet::union)</span>
+<span class="pc" id="L63">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during vertex union&quot;)),</span>
+<span class="fc" id="L64">      edges.values().stream().reduce(DataSet::union)</span>
+<span class="pc" id="L65">        .orElseThrow(() -&gt; new RuntimeException(&quot;Error during edge union&quot;))</span>
     );
-<span class="fc" id="L66">    this.graphHeads = graphHeads;</span>
-<span class="fc" id="L67">    this.vertices = vertices;</span>
-<span class="fc" id="L68">    this.edges = edges;</span>
-<span class="fc" id="L69">  }</span>
+<span class="fc" id="L67">    this.graphHeads = graphHeads;</span>
+<span class="fc" id="L68">    this.vertices = vertices;</span>
+<span class="fc" id="L69">    this.edges = edges;</span>
+<span class="fc" id="L70">  }</span>
 
   @Override
   public boolean isIndexedGVELayout() {
-<span class="fc" id="L73">    return true;</span>
+<span class="fc" id="L74">    return true;</span>
   }
 
   @Override
-  public DataSet&lt;GraphHead&gt; getGraphHeadsByLabel(String label) {
-<span class="fc" id="L78">    return graphHeads.get(label);</span>
+  public DataSet&lt;EPGMGraphHead&gt; getGraphHeadsByLabel(String label) {
+<span class="fc" id="L79">    return graphHeads.get(label);</span>
   }
 
   @Override
-  public DataSet&lt;Vertex&gt; getVerticesByLabel(String label) {
-<span class="fc" id="L83">    return vertices.get(label);</span>
+  public DataSet&lt;EPGMVertex&gt; getVerticesByLabel(String label) {
+<span class="fc" id="L84">    return vertices.get(label);</span>
   }
 
   @Override
-  public DataSet&lt;Edge&gt; getEdgesByLabel(String label) {
-<span class="fc" id="L88">    return edges.get(label);</span>
+  public DataSet&lt;EPGMEdge&gt; getEdgesByLabel(String label) {
+<span class="fc" id="L89">    return edges.get(label);</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

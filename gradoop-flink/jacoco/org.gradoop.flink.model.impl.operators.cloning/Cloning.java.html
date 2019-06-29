@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.operators.cloning;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Clone;
@@ -47,33 +47,33 @@ import org.gradoop.flink.model.impl.operators.cloning.functions.Value0Of2ToId;
     // compute new graphs
     //--------------------------------------------------------------------------
 
-<span class="fc" id="L50">    DataSet&lt;GraphHead&gt; graphHead = graph.getGraphHead()</span>
-<span class="fc" id="L51">      .map(new Clone&lt;GraphHead&gt;());</span>
+<span class="fc" id="L50">    DataSet&lt;EPGMGraphHead&gt; graphHead = graph.getGraphHead()</span>
+<span class="fc" id="L51">      .map(new Clone&lt;EPGMGraphHead&gt;());</span>
 
-<span class="fc" id="L53">    DataSet&lt;GradoopId&gt; graphId = graphHead.map(new Id&lt;GraphHead&gt;());</span>
+<span class="fc" id="L53">    DataSet&lt;GradoopId&gt; graphId = graphHead.map(new Id&lt;EPGMGraphHead&gt;());</span>
 
     //--------------------------------------------------------------------------
     // compute new vertices
     //--------------------------------------------------------------------------
 
-<span class="fc" id="L59">    DataSet&lt;Tuple2&lt;Vertex, GradoopId&gt;&gt; vertexTuple = graph.getVertices()</span>
-<span class="fc" id="L60">        .map(new PairElementWithNewId&lt;Vertex&gt;());</span>
+<span class="fc" id="L59">    DataSet&lt;Tuple2&lt;EPGMVertex, GradoopId&gt;&gt; vertexTuple = graph.getVertices()</span>
+<span class="fc" id="L60">        .map(new PairElementWithNewId&lt;EPGMVertex&gt;());</span>
 
 <span class="fc" id="L62">    DataSet&lt;Tuple2&lt;GradoopId, GradoopId&gt;&gt; vertexIdTuple = vertexTuple</span>
-<span class="fc" id="L63">      .map(new Value0Of2ToId&lt;Vertex, GradoopId&gt;());</span>
+<span class="fc" id="L63">      .map(new Value0Of2ToId&lt;EPGMVertex, GradoopId&gt;());</span>
 
-<span class="fc" id="L65">    DataSet&lt;Vertex&gt; vertices = vertexTuple</span>
-<span class="fc" id="L66">      .map(new ElementIdUpdater&lt;Vertex&gt;())</span>
+<span class="fc" id="L65">    DataSet&lt;EPGMVertex&gt; vertices = vertexTuple</span>
+<span class="fc" id="L66">      .map(new ElementIdUpdater&lt;EPGMVertex&gt;())</span>
       //update graph ids
-<span class="fc" id="L68">      .map(new ElementGraphUpdater&lt;Vertex&gt;())</span>
+<span class="fc" id="L68">      .map(new ElementGraphUpdater&lt;EPGMVertex&gt;())</span>
 <span class="fc" id="L69">      .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);</span>
 
     //--------------------------------------------------------------------------
     // compute new edges
     //--------------------------------------------------------------------------
 
-<span class="fc" id="L75">    DataSet&lt;Edge&gt; edges = graph.getEdges()</span>
-<span class="fc" id="L76">      .map(new Clone&lt;Edge&gt;())</span>
+<span class="fc" id="L75">    DataSet&lt;EPGMEdge&gt; edges = graph.getEdges()</span>
+<span class="fc" id="L76">      .map(new Clone&lt;EPGMEdge&gt;())</span>
       //update source vertex ids
 <span class="fc" id="L78">      .join(vertexIdTuple)</span>
 <span class="fc" id="L79">      .where(new SourceId&lt;&gt;()).equalTo(0)</span>
@@ -83,7 +83,7 @@ import org.gradoop.flink.model.impl.operators.cloning.functions.Value0Of2ToId;
 <span class="fc" id="L83">      .where(new TargetId&lt;&gt;()).equalTo(0)</span>
 <span class="fc" id="L84">      .with(new EdgeTargetUpdateJoin&lt;&gt;())</span>
       //update graph ids
-<span class="fc" id="L86">      .map(new ElementGraphUpdater&lt;Edge&gt;())</span>
+<span class="fc" id="L86">      .map(new ElementGraphUpdater&lt;EPGMEdge&gt;())</span>
 <span class="fc" id="L87">      .withBroadcastSet(graphId, ElementGraphUpdater.GRAPHID);</span>
 
 <span class="fc" id="L89">    return graph.getConfig().getLogicalGraphFactory()</span>

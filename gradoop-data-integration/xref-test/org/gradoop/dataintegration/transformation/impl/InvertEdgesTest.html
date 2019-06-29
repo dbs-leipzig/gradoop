@@ -25,24 +25,24 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.dataintegration.transformation.impl;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> java.util.ArrayList;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> java.util.Arrays;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> java.util.HashMap;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> java.util.HashSet;
-<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> java.util.List;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> java.util.Map;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> java.util.Set;
-<a name="25" href="#25">25</a>  
-<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.LocalCollectionOutputFormat;
-<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
-<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
-<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
-<a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.ByLabel;
-<a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.filters.Or;
-<a name="34" href="#34">34</a>  <strong class="jxr_keyword">import</strong> org.junit.Assert;
-<a name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.io.LocalCollectionOutputFormat;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
+<a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.epgm.ByLabel;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.functions.filters.Or;
+<a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.junit.Assert;
+<a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.junit.Test;
+<a name="28" href="#28">28</a>  
+<a name="29" href="#29">29</a>  <strong class="jxr_keyword">import</strong> java.util.ArrayList;
+<a name="30" href="#30">30</a>  <strong class="jxr_keyword">import</strong> java.util.Arrays;
+<a name="31" href="#31">31</a>  <strong class="jxr_keyword">import</strong> java.util.HashMap;
+<a name="32" href="#32">32</a>  <strong class="jxr_keyword">import</strong> java.util.HashSet;
+<a name="33" href="#33">33</a>  <strong class="jxr_keyword">import</strong> java.util.List;
+<a name="34" href="#34">34</a>  <strong class="jxr_keyword">import</strong> java.util.Map;
+<a name="35" href="#35">35</a>  <strong class="jxr_keyword">import</strong> java.util.Set;
 <a name="36" href="#36">36</a>  
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">/**</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment"> * Tests for the invert edge operator.</em>
@@ -100,12 +100,12 @@
 <a name="90" href="#90">90</a>  <em class="jxr_comment">     * (dave)-[:hasInterest]-&gt;(hadoop)</em>
 <a name="91" href="#91">91</a>  <em class="jxr_comment">     */</em>
 <a name="92" href="#92">92</a>  
-<a name="93" href="#93">93</a>      List&lt;Vertex&gt; vertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="93" href="#93">93</a>      List&lt;EPGMVertex&gt; vertices = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a name="94" href="#94">94</a>      invertedEdgeGraph.getVertices()
 <a name="95" href="#95">95</a>        .filter(<strong class="jxr_keyword">new</strong> Or&lt;&gt;(<strong class="jxr_keyword">new</strong> ByLabel&lt;&gt;(<span class="jxr_string">"Person"</span>), <strong class="jxr_keyword">new</strong> ByLabel&lt;&gt;(<span class="jxr_string">"Tag"</span>)))
 <a name="96" href="#96">96</a>        .output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(vertices));
 <a name="97" href="#97">97</a>  
-<a name="98" href="#98">98</a>      List&lt;Edge&gt; newEdges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
+<a name="98" href="#98">98</a>      List&lt;EPGMEdge&gt; newEdges = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a name="99" href="#99">99</a>      invertedEdgeGraph
 <a name="100" href="#100">100</a>       .getEdgesByLabel(invertedLabel)
 <a name="101" href="#101">101</a>       .output(<strong class="jxr_keyword">new</strong> LocalCollectionOutputFormat&lt;&gt;(newEdges));
@@ -118,7 +118,7 @@
 <a name="108" href="#108">108</a>     Set&lt;String&gt; tags = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;(Arrays.asList(<span class="jxr_string">"Databases"</span>, <span class="jxr_string">"Hadoop"</span>));
 <a name="109" href="#109">109</a>     Set&lt;String&gt; persons = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;(Arrays.asList(<span class="jxr_string">"Eve"</span>, <span class="jxr_string">"Alice"</span>, <span class="jxr_string">"Frank"</span>, <span class="jxr_string">"Dave"</span>));
 <a name="110" href="#110">110</a> 
-<a name="111" href="#111">111</a>     <strong class="jxr_keyword">for</strong> (Edge e : newEdges) {
+<a name="111" href="#111">111</a>     <strong class="jxr_keyword">for</strong> (EPGMEdge e : newEdges) {
 <a name="112" href="#112">112</a>       String sourceName = idMap.get(e.getSourceId());
 <a name="113" href="#113">113</a>       String targetName = idMap.get(e.getTargetId());
 <a name="114" href="#114">114</a> 

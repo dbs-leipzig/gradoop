@@ -16,7 +16,7 @@
 package org.gradoop.flink.model.impl.operators.cypher.capf.result.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
@@ -25,9 +25,9 @@ import java.nio.charset.Charset;
 /**
  * Decodes String representations of property types not yet supported by CAPF.
  *
- * @param &lt;E&gt; an EPGMElement type
+ * @param &lt;E&gt; an Element type
  */
-<span class="fc" id="L30">public class PropertyDecoder&lt;E extends EPGMElement&gt; implements MapFunction&lt;E, E&gt; {</span>
+<span class="fc" id="L30">public class PropertyDecoder&lt;E extends Element&gt; implements MapFunction&lt;E, E&gt; {</span>
 
   @Override
   public E map(E e) throws Exception {

@@ -26,8 +26,8 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.functions.filters;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.common.functions.FilterFunction;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -95,14 +95,14 @@
 <a name="85" href="#85">85</a>      LogicalGraph databaseGraph = loader.getLogicalGraph();
 <a name="86" href="#86">86</a>      <em class="jxr_comment">// Filter vertices where</em>
 <a name="87" href="#87">87</a>      <em class="jxr_comment">// (gender = 'f' AND city = 'Leipzig') OR NOT(label = 'Person' OR label = 'Forum')</em>
-<a name="88" href="#88">88</a>      FilterFunction&lt;Vertex&gt; vertexFilterFunction =
-<a name="89" href="#89">89</a>        <strong class="jxr_keyword">new</strong> ByProperty&lt;Vertex&gt;(<span class="jxr_string">"gender"</span>, PropertyValue.create(<span class="jxr_string">"f"</span>))
+<a name="88" href="#88">88</a>      FilterFunction&lt;EPGMVertex&gt; vertexFilterFunction =
+<a name="89" href="#89">89</a>        <strong class="jxr_keyword">new</strong> ByProperty&lt;EPGMVertex&gt;(<span class="jxr_string">"gender"</span>, PropertyValue.create(<span class="jxr_string">"f"</span>))
 <a name="90" href="#90">90</a>        .and(<strong class="jxr_keyword">new</strong> ByProperty&lt;&gt;(<span class="jxr_string">"city"</span>, PropertyValue.create(<span class="jxr_string">"Leipzig"</span>))).or(
 <a name="91" href="#91">91</a>          <strong class="jxr_keyword">new</strong> ByLabel&lt;&gt;(<span class="jxr_string">"Person"</span>).or(<strong class="jxr_keyword">new</strong> ByLabel&lt;&gt;(<span class="jxr_string">"Forum"</span>)).negate());
 <a name="92" href="#92">92</a>      <em class="jxr_comment">// Filter edges where</em>
 <a name="93" href="#93">93</a>      <em class="jxr_comment">// label &lt;&gt; 'hasInterest'</em>
 <a name="94" href="#94">94</a>      LogicalGraph subgraph = databaseGraph.subgraph(vertexFilterFunction,
-<a name="95" href="#95">95</a>        <strong class="jxr_keyword">new</strong> ByLabel&lt;Edge&gt;(<span class="jxr_string">"hasInterest"</span>).negate(), Subgraph.Strategy.BOTH);
+<a name="95" href="#95">95</a>        <strong class="jxr_keyword">new</strong> ByLabel&lt;EPGMEdge&gt;(<span class="jxr_string">"hasInterest"</span>).negate(), Subgraph.Strategy.BOTH);
 <a name="96" href="#96">96</a>      collectAndAssertTrue(subgraph.equalsByElementIds(loader.getLogicalGraphByVariable(<span class="jxr_string">"expected"</span>)));
 <a name="97" href="#97">97</a>    }
 <a name="98" href="#98">98</a>  }

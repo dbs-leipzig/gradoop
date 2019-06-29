@@ -34,14 +34,14 @@ import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.iterators.SortedKeyValueIterator;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMElement;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Element;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.storage.common.api.EPGMConfigProvider;
 import org.gradoop.storage.common.api.EPGMGraphInput;
 import org.gradoop.storage.common.api.EPGMGraphPredictableOutput;
@@ -80,9 +80,9 @@ public class AccumuloEPGMStore implements
   EPGMConfigProvider&lt;GradoopAccumuloConfig&gt;,
   EPGMGraphInput,
   EPGMGraphPredictableOutput&lt;
-    AccumuloElementFilter&lt;GraphHead&gt;,
-    AccumuloElementFilter&lt;Vertex&gt;,
-    AccumuloElementFilter&lt;Edge&gt;&gt; {
+    AccumuloElementFilter&lt;EPGMGraphHead&gt;,
+    AccumuloElementFilter&lt;EPGMVertex&gt;,
+    AccumuloElementFilter&lt;EPGMEdge&gt;&gt; {
 
   /**
    * accumulo epgm store logger
@@ -186,17 +186,17 @@ public class AccumuloEPGMStore implements
   }
 
   @Override
-  public void writeGraphHead(@Nonnull EPGMGraphHead record) {
+  public void writeGraphHead(@Nonnull GraphHead record) {
 <span class="fc" id="L190">    writeRecord(record, graphWriter, config.getGraphHandler());</span>
 <span class="fc" id="L191">  }</span>
 
   @Override
-  public void writeVertex(@Nonnull EPGMVertex record) {
+  public void writeVertex(@Nonnull Vertex record) {
 <span class="fc" id="L195">    writeRecord(record, vertexWriter, config.getVertexHandler());</span>
 <span class="fc" id="L196">  }</span>
 
   @Override
-  public void writeEdge(@Nonnull EPGMEdge record) {
+  public void writeEdge(@Nonnull Edge record) {
 <span class="fc" id="L200">    writeRecord(record, edgeWriter, config.getEdgeHandler());</span>
 <span class="fc" id="L201">  }</span>
 
@@ -260,44 +260,44 @@ public class AccumuloEPGMStore implements
 
   @Nullable
   @Override
-  public GraphHead readGraph(@Nonnull GradoopId graphId) throws IOException {
-    ElementQuery&lt;AccumuloElementFilter&lt;GraphHead&gt;&gt; query = Query
+  public EPGMGraphHead readGraph(@Nonnull GradoopId graphId) throws IOException {
+    ElementQuery&lt;AccumuloElementFilter&lt;EPGMGraphHead&gt;&gt; query = Query
 <span class="fc" id="L265">      .elements()</span>
 <span class="fc" id="L266">      .fromSets(graphId)</span>
 <span class="fc" id="L267">      .noFilter();</span>
-<span class="fc" id="L268">    try (ClosableIterator&lt;GraphHead&gt; it = getGraphSpace(query, 1)) {</span>
+<span class="fc" id="L268">    try (ClosableIterator&lt;EPGMGraphHead&gt; it = getGraphSpace(query, 1)) {</span>
 <span class="pc bpc" id="L269" title="1 of 2 branches missed.">      return it.hasNext() ? it.next() : null;</span>
     }
   }
 
   @Nullable
   @Override
-  public Vertex readVertex(@Nonnull GradoopId vertexId) throws IOException {
-    ElementQuery&lt;AccumuloElementFilter&lt;Vertex&gt;&gt; query = Query
+  public EPGMVertex readVertex(@Nonnull GradoopId vertexId) throws IOException {
+    ElementQuery&lt;AccumuloElementFilter&lt;EPGMVertex&gt;&gt; query = Query
 <span class="fc" id="L277">      .elements()</span>
 <span class="fc" id="L278">      .fromSets(vertexId)</span>
 <span class="fc" id="L279">      .noFilter();</span>
-<span class="fc" id="L280">    try (ClosableIterator&lt;Vertex&gt; it = getVertexSpace(query, 1)) {</span>
+<span class="fc" id="L280">    try (ClosableIterator&lt;EPGMVertex&gt; it = getVertexSpace(query, 1)) {</span>
 <span class="pc bpc" id="L281" title="1 of 2 branches missed.">      return it.hasNext() ? it.next() : null;</span>
     }
   }
 
   @Nullable
   @Override
-  public Edge readEdge(@Nonnull GradoopId edgeId) throws IOException {
-    ElementQuery&lt;AccumuloElementFilter&lt;Edge&gt;&gt; query = Query
+  public EPGMEdge readEdge(@Nonnull GradoopId edgeId) throws IOException {
+    ElementQuery&lt;AccumuloElementFilter&lt;EPGMEdge&gt;&gt; query = Query
 <span class="fc" id="L289">      .elements()</span>
 <span class="fc" id="L290">      .fromSets(edgeId)</span>
 <span class="fc" id="L291">      .noFilter();</span>
-<span class="fc" id="L292">    try (ClosableIterator&lt;Edge&gt; it = getEdgeSpace(query, 1)) {</span>
+<span class="fc" id="L292">    try (ClosableIterator&lt;EPGMEdge&gt; it = getEdgeSpace(query, 1)) {</span>
 <span class="pc bpc" id="L293" title="1 of 2 branches missed.">      return it.hasNext() ? it.next() : null;</span>
     }
   }
 
   @Nonnull
   @Override
-  public ClosableIterator&lt;GraphHead&gt; getGraphSpace(
-    @Nullable ElementQuery&lt;AccumuloElementFilter&lt;GraphHead&gt;&gt; query,
+  public ClosableIterator&lt;EPGMGraphHead&gt; getGraphSpace(
+    @Nullable ElementQuery&lt;AccumuloElementFilter&lt;EPGMGraphHead&gt;&gt; query,
     int cacheSize
   ) throws IOException {
 <span class="fc bfc" id="L303" title="All 2 branches covered.">    if (query != null &amp;&amp;</span>
@@ -327,8 +327,8 @@ public class AccumuloEPGMStore implements
 
   @Nonnull
   @Override
-  public ClosableIterator&lt;Vertex&gt; getVertexSpace(
-    @Nullable ElementQuery&lt;AccumuloElementFilter&lt;Vertex&gt;&gt; query,
+  public ClosableIterator&lt;EPGMVertex&gt; getVertexSpace(
+    @Nullable ElementQuery&lt;AccumuloElementFilter&lt;EPGMVertex&gt;&gt; query,
     int cacheSize
   ) throws IOException {
 <span class="fc bfc" id="L334" title="All 2 branches covered.">    if (query != null &amp;&amp;</span>
@@ -358,8 +358,8 @@ public class AccumuloEPGMStore implements
 
   @Nonnull
   @Override
-  public ClosableIterator&lt;Edge&gt; getEdgeSpace(
-    @Nullable ElementQuery&lt;AccumuloElementFilter&lt;Edge&gt;&gt; query,
+  public ClosableIterator&lt;EPGMEdge&gt; getEdgeSpace(
+    @Nullable ElementQuery&lt;AccumuloElementFilter&lt;EPGMEdge&gt;&gt; query,
     int cacheSize
   ) throws IOException {
 <span class="fc bfc" id="L365" title="All 2 branches covered.">    if (query != null &amp;&amp;</span>
@@ -395,7 +395,7 @@ public class AccumuloEPGMStore implements
    * @param handler accumulo row handler
    * @param &lt;T&gt;     element type
    */
-  private &lt;T extends EPGMElement&gt; void writeRecord(
+  private &lt;T extends Element&gt; void writeRecord(
     @Nonnull T record,
     @Nonnull BatchWriter writer,
     @Nonnull AccumuloRowHandler handler
@@ -423,7 +423,7 @@ public class AccumuloEPGMStore implements
    * @return batch scanner instance
    * @throws IOException if create fail
    */
-  private &lt;T extends EPGMElement&gt; BatchScanner createBatchScanner(
+  private &lt;T extends Element&gt; BatchScanner createBatchScanner(
     String table,
     Class&lt;? extends SortedKeyValueIterator&lt;Key, Value&gt;&gt; iterator,
     @Nullable ElementQuery&lt;AccumuloElementFilter&lt;T&gt;&gt; predicate

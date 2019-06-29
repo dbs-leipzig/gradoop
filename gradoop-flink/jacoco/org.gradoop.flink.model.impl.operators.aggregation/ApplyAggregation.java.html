@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.operators.aggregation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -68,7 +68,7 @@ public class ApplyAggregation
 
   @Override
   public GraphCollection executeForGVELayout(GraphCollection collection) {
-<span class="fc" id="L71">    DataSet&lt;GraphHead&gt; graphHeads = collection.getGraphHeads();</span>
+<span class="fc" id="L71">    DataSet&lt;EPGMGraphHead&gt; graphHeads = collection.getGraphHeads();</span>
 <span class="fc" id="L72">    DataSet&lt;GradoopId&gt; graphIds = graphHeads.map(new Id&lt;&gt;());</span>
 
 <span class="fc" id="L74">    DataSet&lt;Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt;&gt; aggregate =</span>
@@ -102,7 +102,7 @@ public class ApplyAggregation
    * @return partition aggregate value
    */
   private DataSet&lt;Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt;&gt; aggregateVertices(
-    DataSet&lt;Vertex&gt; vertices, DataSet&lt;GradoopId&gt; graphIds) {
+    DataSet&lt;EPGMVertex&gt; vertices, DataSet&lt;GradoopId&gt; graphIds) {
 <span class="fc" id="L106">    return vertices</span>
 <span class="fc" id="L107">      .flatMap(new ElementsOfSelectedGraphs&lt;&gt;())</span>
 <span class="fc" id="L108">      .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)</span>
@@ -120,7 +120,7 @@ public class ApplyAggregation
    * @return partition aggregate value
    */
   private DataSet&lt;Tuple2&lt;GradoopId, Map&lt;String, PropertyValue&gt;&gt;&gt; aggregateEdges(
-    DataSet&lt;Edge&gt; edges, DataSet&lt;GradoopId&gt; graphIds) {
+    DataSet&lt;EPGMEdge&gt; edges, DataSet&lt;GradoopId&gt; graphIds) {
 <span class="fc" id="L124">    return edges</span>
 <span class="fc" id="L125">      .flatMap(new ElementsOfSelectedGraphs&lt;&gt;())</span>
 <span class="fc" id="L126">      .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)</span>

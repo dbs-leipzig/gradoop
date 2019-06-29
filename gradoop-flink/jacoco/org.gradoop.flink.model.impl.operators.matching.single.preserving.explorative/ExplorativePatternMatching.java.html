@@ -22,12 +22,12 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.log4j.Logger;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.api.entities.EPGMVertexFactory;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Element;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
@@ -127,11 +127,11 @@ public class ExplorativePatternMatching
   @Override
   protected GraphCollection executeForVertex(LogicalGraph graph) {
 <span class="fc" id="L129">    GradoopFlinkConfig config = graph.getConfig();</span>
-<span class="fc" id="L130">    EPGMGraphHeadFactory&lt;GraphHead&gt; graphHeadFactory = config.getGraphHeadFactory();</span>
-<span class="fc" id="L131">    EPGMVertexFactory&lt;Vertex&gt; vertexFactory = config.getVertexFactory();</span>
+<span class="fc" id="L130">    GraphHeadFactory&lt;EPGMGraphHead&gt; graphHeadFactory = config.getGraphHeadFactory();</span>
+<span class="fc" id="L131">    VertexFactory&lt;EPGMVertex&gt; vertexFactory = config.getVertexFactory();</span>
 <span class="fc" id="L132">    String variable = getQueryHandler().getVertices().iterator().next().getVariable();</span>
 
-<span class="fc" id="L134">    DataSet&lt;Vertex&gt; matchingVertices = graph.getVertices()</span>
+<span class="fc" id="L134">    DataSet&lt;EPGMVertex&gt; matchingVertices = graph.getVertices()</span>
 <span class="fc" id="L135">      .filter(new MatchingVertices&lt;&gt;(getQuery()));</span>
 
 <span class="fc bfc" id="L137" title="All 2 branches covered.">    if (!doAttachData()) {</span>
@@ -141,7 +141,7 @@ public class ExplorativePatternMatching
 <span class="fc" id="L141">        .map(new VertexFromId(vertexFactory));</span>
     }
 
-<span class="fc" id="L144">    DataSet&lt;Tuple2&lt;Vertex, GraphHead&gt;&gt; pairs = matchingVertices</span>
+<span class="fc" id="L144">    DataSet&lt;Tuple2&lt;EPGMVertex, EPGMGraphHead&gt;&gt; pairs = matchingVertices</span>
 <span class="fc" id="L145">      .map(new AddGraphElementToNewGraph&lt;&gt;(graphHeadFactory, variable))</span>
 <span class="fc" id="L146">      .returns(new TupleTypeInfo&lt;&gt;(</span>
 <span class="fc" id="L147">        TypeExtractor.getForClass(vertexFactory.getType()),</span>
@@ -211,7 +211,7 @@ public class ExplorativePatternMatching
     // Post-Processing (build Graph Collection from embeddings)
     //--------------------------------------------------------------------------
 
-<span class="fc" id="L214">    DataSet&lt;Element&gt; elements = embeddings</span>
+<span class="fc" id="L214">    DataSet&lt;EPGMElement&gt; elements = embeddings</span>
 <span class="fc" id="L215">      .flatMap(new ElementsFromEmbedding(traversalCode,</span>
 <span class="fc" id="L216">        graph.getConfig().getGraphHeadFactory(),</span>
 <span class="fc" id="L217">        graph.getConfig().getVertexFactory(),</span>

@@ -25,16 +25,16 @@
 <a name="15" href="#15">15</a>  <em class="jxr_comment"> */</em>
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.layouts.transactional;
 <a name="17" href="#17">17</a>  
-<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.api.layouts.GraphCollectionLayoutFactory;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.layouts.GraphCollectionLayoutFactoryTest;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.util.GradoopFlinkConfig;
 <a name="24" href="#24">24</a>  
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/TxCollectionLayoutFactoryTest.html">TxCollectionLayoutFactoryTest</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../../../org/gradoop/flink/model/impl/layouts/GraphCollectionLayoutFactoryTest.html">GraphCollectionLayoutFactoryTest</a> {
 <a name="26" href="#26">26</a>    @Override
-<a name="27" href="#27">27</a>    <strong class="jxr_keyword">protected</strong> GraphCollectionLayoutFactory&lt;GraphHead, Vertex, Edge&gt; getFactory() {
+<a name="27" href="#27">27</a>    <strong class="jxr_keyword">protected</strong> GraphCollectionLayoutFactory&lt;EPGMGraphHead, EPGMVertex, EPGMEdge&gt; getFactory() {
 <a name="28" href="#28">28</a>      TxCollectionLayoutFactory txCollectionLayoutFactory = <strong class="jxr_keyword">new</strong> TxCollectionLayoutFactory();
 <a name="29" href="#29">29</a>      GradoopFlinkConfig config = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
 <a name="30" href="#30">30</a>      config.setGraphCollectionLayoutFactory(txCollectionLayoutFactory);

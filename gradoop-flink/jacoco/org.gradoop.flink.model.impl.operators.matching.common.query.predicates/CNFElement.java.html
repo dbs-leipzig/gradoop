@@ -15,7 +15,7 @@
  */
 package org.gradoop.flink.model.impl.operators.matching.common.query.predicates;
 
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.expressions.ComparisonExpression;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
@@ -58,7 +58,7 @@ public class CNFElement extends PredicateCollection&lt;ComparisonExpression&gt; 
   }
 
   @Override
-  public boolean evaluate(GraphElement element) {
+  public boolean evaluate(EPGMGraphElement element) {
 <span class="fc bfc" id="L62" title="All 2 branches covered.">    for (ComparisonExpression comparisonExpression : predicates) {</span>
 <span class="fc bfc" id="L63" title="All 2 branches covered.">      if (comparisonExpression.evaluate(element)) {</span>
 <span class="fc" id="L64">        return true;</span>

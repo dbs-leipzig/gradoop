@@ -16,7 +16,7 @@
 package org.gradoop.storage.impl.hbase.predicate.filter.impl;
 
 import org.apache.hadoop.hbase.filter.Filter;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.storage.common.predicate.filter.impl.LabelReg;
 import org.gradoop.storage.impl.hbase.predicate.filter.HBaseFilterUtils;
 import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
@@ -27,9 +27,9 @@ import java.util.regex.Pattern;
 /**
  * HBase label regex predicate implementation
  *
- * @param &lt;T&gt; EPGM element type
+ * @param &lt;T&gt; element type
  */
-public class HBaseLabelReg&lt;T extends EPGMElement&gt; extends LabelReg&lt;HBaseElementFilter&lt;T&gt;&gt;
+public class HBaseLabelReg&lt;T extends Element&gt; extends LabelReg&lt;HBaseElementFilter&lt;T&gt;&gt;
   implements HBaseElementFilter&lt;T&gt; {
 
   /**

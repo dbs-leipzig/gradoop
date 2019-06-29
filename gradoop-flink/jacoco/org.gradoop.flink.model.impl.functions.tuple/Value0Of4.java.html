@@ -29,7 +29,7 @@ import org.apache.flink.api.java.tuple.Tuple4;
  * @param &lt;T3&gt; f3 type
  */
 @FunctionAnnotation.ForwardedFields(&quot;f0-&gt;*&quot;)
-<span class="fc" id="L32">public class Value0Of4&lt;T0, T1, T2, T3&gt;</span>
+<span class="nc" id="L32">public class Value0Of4&lt;T0, T1, T2, T3&gt;</span>
   implements
   MapFunction&lt;Tuple4&lt;T0, T1, T2, T3&gt;, T0&gt;,
   KeySelector&lt;Tuple4&lt;T0, T1, T2, T3&gt;, T0&gt; {
@@ -41,7 +41,7 @@ import org.apache.flink.api.java.tuple.Tuple4;
 
   @Override
   public T0 getKey(Tuple4&lt;T0, T1, T2, T3&gt; quadruple) throws Exception {
-<span class="fc" id="L44">    return quadruple.f0;</span>
+<span class="nc" id="L44">    return quadruple.f0;</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

@@ -23,7 +23,7 @@ import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 public abstract class NeighborEdgeFunction implements NeighborFunction {
 
   /**
-   * Edge aggregation function.
+   * EPGMEdge aggregation function.
    */
   private EdgeAggregateFunction function;
 

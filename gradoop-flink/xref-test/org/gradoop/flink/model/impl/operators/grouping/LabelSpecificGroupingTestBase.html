@@ -26,9 +26,9 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.grouping;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> com.google.common.collect.Lists;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.GraphCollection;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.epgm.LogicalGraph;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.aggregation.functions.count.Count;
@@ -67,7 +67,7 @@
 <a name="57" href="#57">57</a>        .addVertexGroupingKey(<span class="jxr_string">"topic"</span>)
 <a name="58" href="#58">58</a>        .addVertexLabelGroup(<span class="jxr_string">"User"</span>, Lists.newArrayList(<span class="jxr_string">"gender"</span>))
 <a name="59" href="#59">59</a>        .setStrategy(getStrategy())
-<a name="60" href="#60">60</a>        .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="60" href="#60">60</a>        .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="61" href="#61">61</a>        .execute(input);
 <a name="62" href="#62">62</a>  
 <a name="63" href="#63">63</a>      collectAndAssertTrue(
@@ -98,7 +98,7 @@
 <a name="88" href="#88">88</a>        .addVertexGroupingKey(<span class="jxr_string">"topic"</span>)
 <a name="89" href="#89">89</a>        .addVertexLabelGroup(<span class="jxr_string">"User"</span>, <span class="jxr_string">"UserGender"</span>, Lists.newArrayList(<span class="jxr_string">"gender"</span>))
 <a name="90" href="#90">90</a>        .setStrategy(getStrategy())
-<a name="91" href="#91">91</a>        .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="91" href="#91">91</a>        .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="92" href="#92">92</a>        .execute(input);
 <a name="93" href="#93">93</a>  
 <a name="94" href="#94">94</a>      collectAndAssertTrue(
@@ -128,7 +128,7 @@
 <a name="118" href="#118">118</a>       .addVertexGroupingKey(<span class="jxr_string">"gender"</span>)
 <a name="119" href="#119">119</a>       .addVertexLabelGroup(<span class="jxr_string">"Forum"</span>, Lists.newArrayList(<span class="jxr_string">"topic"</span>))
 <a name="120" href="#120">120</a>       .setStrategy(getStrategy())
-<a name="121" href="#121">121</a>       .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="121" href="#121">121</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="122" href="#122">122</a>       .execute(input);
 <a name="123" href="#123">123</a> 
 <a name="124" href="#124">124</a>     collectAndAssertTrue(
@@ -161,7 +161,7 @@
 <a name="151" href="#151">151</a>       .addVertexLabelGroup(<span class="jxr_string">"User"</span>, Lists.newArrayList(<span class="jxr_string">"gender"</span>),
 <a name="152" href="#152">152</a>         Lists.newArrayList(<strong class="jxr_keyword">new</strong> SumProperty(<span class="jxr_string">"age"</span>, <span class="jxr_string">"sum"</span>)))
 <a name="153" href="#153">153</a>       .setStrategy(getStrategy())
-<a name="154" href="#154">154</a>       .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="154" href="#154">154</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="155" href="#155">155</a>       .execute(input);
 <a name="156" href="#156">156</a> 
 <a name="157" href="#157">157</a>     collectAndAssertTrue(
@@ -194,7 +194,7 @@
 <a name="184" href="#184">184</a>       .addVertexGroupingKey(<span class="jxr_string">"topic"</span>)
 <a name="185" href="#185">185</a>       .addVertexLabelGroup(<span class="jxr_string">"User"</span>, Lists.newArrayList(<span class="jxr_string">"gender"</span>))
 <a name="186" href="#186">186</a>       .setStrategy(getStrategy())
-<a name="187" href="#187">187</a>       .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="187" href="#187">187</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="188" href="#188">188</a>       .execute(input);
 <a name="189" href="#189">189</a> 
 <a name="190" href="#190">190</a>     collectAndAssertTrue(
@@ -238,7 +238,7 @@
 <a name="228" href="#228">228</a>       .addVertexLabelGroup(<span class="jxr_string">"User"</span>, Lists.newArrayList(<span class="jxr_string">"gender"</span>))
 <a name="229" href="#229">229</a>       .addVertexLabelGroup(<span class="jxr_string">"User"</span>, Lists.newArrayList(<span class="jxr_string">"age"</span>))
 <a name="230" href="#230">230</a>       .setStrategy(getStrategy())
-<a name="231" href="#231">231</a>       .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="231" href="#231">231</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="232" href="#232">232</a>       .execute(input);
 <a name="233" href="#233">233</a> 
 <a name="234" href="#234">234</a>     collectAndAssertTrue(
@@ -285,7 +285,7 @@
 <a name="275" href="#275">275</a>         Lists.newArrayList(<strong class="jxr_keyword">new</strong> Count(<span class="jxr_string">"count"</span>), <strong class="jxr_keyword">new</strong> SumProperty(<span class="jxr_string">"age"</span>, <span class="jxr_string">"sum"</span>)))
 <a name="276" href="#276">276</a>       .addVertexAggregateFunction(<strong class="jxr_keyword">new</strong> Count(<span class="jxr_string">"count"</span>))
 <a name="277" href="#277">277</a>       .setStrategy(getStrategy())
-<a name="278" href="#278">278</a>       .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="278" href="#278">278</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="279" href="#279">279</a>       .execute(input);
 <a name="280" href="#280">280</a> 
 <a name="281" href="#281">281</a>     collectAndAssertTrue(
@@ -313,7 +313,7 @@
 <a name="303" href="#303">303</a>       .addEdgeGroupingKey(<span class="jxr_string">"until"</span>)
 <a name="304" href="#304">304</a>       .addEdgeLabelGroup(<span class="jxr_string">"knows"</span>, Lists.newArrayList(<span class="jxr_string">"since"</span>))
 <a name="305" href="#305">305</a>       .setStrategy(getStrategy())
-<a name="306" href="#306">306</a>       .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="306" href="#306">306</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="307" href="#307">307</a>       .execute(input);
 <a name="308" href="#308">308</a> 
 <a name="309" href="#309">309</a>     collectAndAssertTrue(
@@ -341,7 +341,7 @@
 <a name="331" href="#331">331</a>       .addEdgeGroupingKey(<span class="jxr_string">"until"</span>)
 <a name="332" href="#332">332</a>       .addEdgeLabelGroup(<span class="jxr_string">"knows"</span>, <span class="jxr_string">"knowsSince"</span>, Lists.newArrayList(<span class="jxr_string">"since"</span>))
 <a name="333" href="#333">333</a>       .setStrategy(getStrategy())
-<a name="334" href="#334">334</a>       .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="334" href="#334">334</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="335" href="#335">335</a>       .execute(input);
 <a name="336" href="#336">336</a> 
 <a name="337" href="#337">337</a>     collectAndAssertTrue(
@@ -368,7 +368,7 @@
 <a name="358" href="#358">358</a>       .addEdgeGroupingKey(<span class="jxr_string">"until"</span>)
 <a name="359" href="#359">359</a>       .addEdgeLabelGroup(<span class="jxr_string">"knows"</span>, Lists.newArrayList(<span class="jxr_string">"since"</span>))
 <a name="360" href="#360">360</a>       .setStrategy(getStrategy())
-<a name="361" href="#361">361</a>       .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="361" href="#361">361</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="362" href="#362">362</a>       .execute(input);
 <a name="363" href="#363">363</a> 
 <a name="364" href="#364">364</a>     collectAndAssertTrue(
@@ -398,7 +398,7 @@
 <a name="388" href="#388">388</a>       .addEdgeLabelGroup(<span class="jxr_string">"knows"</span>, Lists.newArrayList(<span class="jxr_string">"since"</span>),
 <a name="389" href="#389">389</a>         Lists.newArrayList(<strong class="jxr_keyword">new</strong> SumProperty(<span class="jxr_string">"since"</span>, <span class="jxr_string">"sum"</span>)))
 <a name="390" href="#390">390</a>       .setStrategy(getStrategy())
-<a name="391" href="#391">391</a>       .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="391" href="#391">391</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="392" href="#392">392</a>       .execute(input);
 <a name="393" href="#393">393</a> 
 <a name="394" href="#394">394</a>     collectAndAssertTrue(
@@ -429,7 +429,7 @@
 <a name="419" href="#419">419</a>       .addEdgeLabelGroup(<span class="jxr_string">"knows"</span>, Lists.newArrayList(<span class="jxr_string">"since"</span>),
 <a name="420" href="#420">420</a>         Lists.newArrayList(<strong class="jxr_keyword">new</strong> SumProperty(<span class="jxr_string">"since"</span>, <span class="jxr_string">"sum"</span>)))
 <a name="421" href="#421">421</a>       .setStrategy(getStrategy())
-<a name="422" href="#422">422</a>       .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="422" href="#422">422</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="423" href="#423">423</a>       .execute(input);
 <a name="424" href="#424">424</a> 
 <a name="425" href="#425">425</a>     collectAndAssertTrue(
@@ -458,7 +458,7 @@
 <a name="448" href="#448">448</a>       .addEdgeLabelGroup(<span class="jxr_string">"knows"</span>, Lists.newArrayList())
 <a name="449" href="#449">449</a>       .addEdgeLabelGroup(<span class="jxr_string">"member"</span>, Lists.newArrayList(<span class="jxr_string">"until"</span>))
 <a name="450" href="#450">450</a>       .setStrategy(getStrategy())
-<a name="451" href="#451">451</a>       .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="451" href="#451">451</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="452" href="#452">452</a>       .execute(input);
 <a name="453" href="#453">453</a> 
 <a name="454" href="#454">454</a>     collectAndAssertTrue(
@@ -490,7 +490,7 @@
 <a name="480" href="#480">480</a>       .addEdgeLabelGroup(<span class="jxr_string">"member"</span>, Lists.newArrayList(<span class="jxr_string">"until"</span>),
 <a name="481" href="#481">481</a>         Lists.newArrayList(<strong class="jxr_keyword">new</strong> MinProperty(<span class="jxr_string">"until"</span>, <span class="jxr_string">"min"</span>)))
 <a name="482" href="#482">482</a>       .setStrategy(getStrategy())
-<a name="483" href="#483">483</a>       .&lt;GraphHead, Vertex, Edge, LogicalGraph, GraphCollection&gt;build()
+<a name="483" href="#483">483</a>       .&lt;EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection&gt;build()
 <a name="484" href="#484">484</a>       .execute(input);
 <a name="485" href="#485">485</a> 
 <a name="486" href="#486">486</a>     collectAndAssertTrue(

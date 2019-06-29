@@ -30,9 +30,9 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.configuration.Configuration;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopIdSet;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Edge;
-<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMEdge;
+<a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConfig;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.fsm.dimspan.config.DIMSpanConstants;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.fsm.dimspan.config.DataflowStep;
@@ -113,7 +113,7 @@
 <a name="103" href="#103">103</a> 
 <a name="104" href="#104">104</a> 
 <a name="105" href="#105">105</a>     <em class="jxr_comment">// GRAPH HEAD</em>
-<a name="106" href="#106">106</a>     GraphHead graphHead = <strong class="jxr_keyword">new</strong> GraphHead(GradoopId.get(), <span class="jxr_string">""</span>, <strong class="jxr_keyword">null</strong>);
+<a name="106" href="#106">106</a>     EPGMGraphHead graphHead = <strong class="jxr_keyword">new</strong> EPGMGraphHead(GradoopId.get(), <span class="jxr_string">""</span>, <strong class="jxr_keyword">null</strong>);
 <a name="107" href="#107">107</a>     graphHead.setLabel(DIMSpanConstants.FREQUENT_PATTERN_LABEL);
 <a name="108" href="#108">108</a>     graphHead.setProperty(DIMSpanConstants.SUPPORT_KEY, (<strong class="jxr_keyword">float</strong>) frequency / graphCount);
 <a name="109" href="#109">109</a> 
@@ -124,21 +124,21 @@
 <a name="114" href="#114">114</a> 
 <a name="115" href="#115">115</a>     GradoopId[] vertexIds = <strong class="jxr_keyword">new</strong> GradoopId[vertexLabels.length];
 <a name="116" href="#116">116</a> 
-<a name="117" href="#117">117</a>     Set&lt;Vertex&gt; vertices = Sets.newHashSetWithExpectedSize(vertexLabels.length);
+<a name="117" href="#117">117</a>     Set&lt;EPGMVertex&gt; vertices = Sets.newHashSetWithExpectedSize(vertexLabels.length);
 <a name="118" href="#118">118</a> 
 <a name="119" href="#119">119</a>     <strong class="jxr_keyword">int</strong> intId = 0;
 <a name="120" href="#120">120</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> intLabel : vertexLabels) {
 <a name="121" href="#121">121</a>       String label = vertexDictionary[intLabel];
 <a name="122" href="#122">122</a> 
 <a name="123" href="#123">123</a>       GradoopId gradoopId = GradoopId.get();
-<a name="124" href="#124">124</a>       vertices.add(<strong class="jxr_keyword">new</strong> Vertex(gradoopId, label, <strong class="jxr_keyword">null</strong>, graphIds));
+<a name="124" href="#124">124</a>       vertices.add(<strong class="jxr_keyword">new</strong> EPGMVertex(gradoopId, label, <strong class="jxr_keyword">null</strong>, graphIds));
 <a name="125" href="#125">125</a> 
 <a name="126" href="#126">126</a>       vertexIds[intId] = gradoopId;
 <a name="127" href="#127">127</a>       intId++;
 <a name="128" href="#128">128</a>     }
 <a name="129" href="#129">129</a> 
 <a name="130" href="#130">130</a>     <em class="jxr_comment">// EDGES</em>
-<a name="131" href="#131">131</a>     Set&lt;Edge&gt; edges = Sets.newHashSet();
+<a name="131" href="#131">131</a>     Set&lt;EPGMEdge&gt; edges = Sets.newHashSet();
 <a name="132" href="#132">132</a> 
 <a name="133" href="#133">133</a>     <strong class="jxr_keyword">for</strong> (<strong class="jxr_keyword">int</strong> edgeId = 0; edgeId &lt; graphUtils.getEdgeCount(pattern); edgeId++) {
 <a name="134" href="#134">134</a>       String label = edgeDictionary[graphUtils.getEdgeLabel(pattern, edgeId)];
@@ -154,7 +154,7 @@
 <a name="144" href="#144">144</a>         targetId = vertexIds[graphUtils.getFromId(pattern, edgeId)];
 <a name="145" href="#145">145</a>       }
 <a name="146" href="#146">146</a> 
-<a name="147" href="#147">147</a>       edges.add(<strong class="jxr_keyword">new</strong> Edge(GradoopId.get(), label, sourceId, targetId, <strong class="jxr_keyword">null</strong>, graphIds));
+<a name="147" href="#147">147</a>       edges.add(<strong class="jxr_keyword">new</strong> EPGMEdge(GradoopId.get(), label, sourceId, targetId, <strong class="jxr_keyword">null</strong>, graphIds));
 <a name="148" href="#148">148</a>     }
 <a name="149" href="#149">149</a> 
 <a name="150" href="#150">150</a>     <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">new</strong> <a href="../../../../../../../../org/gradoop/flink/model/impl/layouts/transactional/tuples/GraphTransaction.html">GraphTransaction</a>(graphHead, vertices, edges);

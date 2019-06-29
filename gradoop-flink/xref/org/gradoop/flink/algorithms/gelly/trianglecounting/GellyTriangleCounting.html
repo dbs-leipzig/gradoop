@@ -30,7 +30,7 @@
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.graph.Graph;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.types.NullValue;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.id.GradoopId;
-<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.GraphHead;
+<a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.PropertyValue;
 <a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.algorithms.gelly.functions.EdgeToGellyEdgeWithNullValue;
@@ -43,7 +43,7 @@
 <a name="33" href="#33">33</a>  <em class="jxr_javadoccomment"> * {@link org.apache.flink.graph.library.TriangleEnumerator}.</em>
 <a name="34" href="#34">34</a>  <em class="jxr_javadoccomment"> * Counts all triangles (closed triplets) in a graph, without taking the edge direction in account.</em>
 <a name="35" href="#35">35</a>  <em class="jxr_javadoccomment"> * Returns the initial {@code LogicalGraph} with the number of triangles written as property to the</em>
-<a name="36" href="#36">36</a>  <em class="jxr_javadoccomment"> * {@code GraphHead}. The value is accessed via the property key in {@link #PROPERTY_KEY_TRIANGLES}.</em>
+<a name="36" href="#36">36</a>  <em class="jxr_javadoccomment"> * {@code EPGMGraphHead}. The value is accessed via the property key in {@link #PROPERTY_KEY_TRIANGLES}.</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment"> */</em>
 <a name="38" href="#38">38</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/trianglecounting/GellyTriangleCounting.html">GellyTriangleCounting</a> <strong class="jxr_keyword">extends</strong> GradoopGellyAlgorithm&lt;NullValue, NullValue&gt; {
 <a name="39" href="#39">39</a>  
@@ -68,7 +68,7 @@
 <a name="58" href="#58">58</a>        <strong class="jxr_keyword">new</strong> org.apache.flink.graph.library.TriangleEnumerator&lt;GradoopId, NullValue, NullValue&gt;()
 <a name="59" href="#59">59</a>        .run(graph);
 <a name="60" href="#60">60</a>  
-<a name="61" href="#61">61</a>      DataSet&lt;GraphHead&gt; resultHead = currentGraph.getGraphHead()
+<a name="61" href="#61">61</a>      DataSet&lt;EPGMGraphHead&gt; resultHead = currentGraph.getGraphHead()
 <a name="62" href="#62">62</a>        .map(<strong class="jxr_keyword">new</strong> <a href="../../../../../../org/gradoop/flink/algorithms/gelly/functions/WritePropertyToGraphHeadMap.html">WritePropertyToGraphHeadMap</a>(
 <a name="63" href="#63">63</a>          PROPERTY_KEY_TRIANGLES, PropertyValue.create(triangles.count())));
 <a name="64" href="#64">64</a>  

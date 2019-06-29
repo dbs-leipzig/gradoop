@@ -16,7 +16,7 @@
 package org.gradoop.flink.io.impl.graph.functions;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.gradoop.common.model.impl.pojo.Element;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 
 import java.io.Serializable;
 
@@ -26,10 +26,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Abstract base class for initializing EPGM elements from import elements.
  *
  * @param &lt;EL&gt; EPGM element type
- * @param &lt;K&gt;  Import Edge/Vertex identifier type
+ * @param &lt;K&gt;  Import EPGMEdge/EPGMVertex identifier type
  */
 public abstract class InitElement
-  &lt;EL extends Element, K extends Comparable&lt;K&gt;&gt; implements Serializable {
+  &lt;EL extends EPGMElement, K extends Comparable&lt;K&gt;&gt; implements Serializable {
 
   /**
    * Decides if lineage info (original identifier) shall be stored

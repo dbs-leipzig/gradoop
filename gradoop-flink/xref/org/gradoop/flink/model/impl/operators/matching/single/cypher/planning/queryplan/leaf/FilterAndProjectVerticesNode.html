@@ -26,7 +26,7 @@
 <a name="16" href="#16">16</a>  <strong class="jxr_keyword">package</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.planning.queryplan.leaf;
 <a name="17" href="#17">17</a>  
 <a name="18" href="#18">18</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.api.java.DataSet;
-<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="19" href="#19">19</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="20" href="#20">20</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 <a name="21" href="#21">21</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.Embedding;
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingMetaData;
@@ -46,7 +46,7 @@
 <a name="36" href="#36">36</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="37" href="#37">37</a>  <em class="jxr_javadoccomment">   * Input data set</em>
 <a name="38" href="#38">38</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="39" href="#39">39</a>    <strong class="jxr_keyword">private</strong> DataSet&lt;Vertex&gt; vertices;
+<a name="39" href="#39">39</a>    <strong class="jxr_keyword">private</strong> DataSet&lt;EPGMVertex&gt; vertices;
 <a name="40" href="#40">40</a>    <em class="jxr_javadoccomment">/**</em>
 <a name="41" href="#41">41</a>  <em class="jxr_javadoccomment">   * Query variable of the vertex</em>
 <a name="42" href="#42">42</a>  <em class="jxr_javadoccomment">   */</em>
@@ -68,7 +68,7 @@
 <a name="58" href="#58">58</a>  <em class="jxr_javadoccomment">   * @param filterPredicate filter predicate to be applied on edges</em>
 <a name="59" href="#59">59</a>  <em class="jxr_javadoccomment">   * @param projectionKeys property keys whose associated values are projected to the output</em>
 <a name="60" href="#60">60</a>  <em class="jxr_javadoccomment">   */</em>
-<a name="61" href="#61">61</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/leaf/FilterAndProjectVerticesNode.html">FilterAndProjectVerticesNode</a>(DataSet&lt;Vertex&gt; vertices, String vertexVariable,
+<a name="61" href="#61">61</a>    <strong class="jxr_keyword">public</strong> <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/single/cypher/planning/queryplan/leaf/FilterAndProjectVerticesNode.html">FilterAndProjectVerticesNode</a>(DataSet&lt;EPGMVertex&gt; vertices, String vertexVariable,
 <a name="62" href="#62">62</a>      <a href="../../../../../../../../../../../../org/gradoop/flink/model/impl/operators/matching/common/query/predicates/CNF.html">CNF</a> filterPredicate, Set&lt;String&gt; projectionKeys) {
 <a name="63" href="#63">63</a>      <strong class="jxr_keyword">this</strong>.vertices = vertices;
 <a name="64" href="#64">64</a>      <strong class="jxr_keyword">this</strong>.vertexVariable = vertexVariable;

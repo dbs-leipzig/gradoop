@@ -32,7 +32,7 @@
 <a name="22" href="#22">22</a>  <strong class="jxr_keyword">import</strong> org.apache.flink.types.Row;
 <a name="23" href="#23">23</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.metadata.MetaData;
 <a name="24" href="#24">24</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.metadata.PropertyMetaData;
-<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.Vertex;
+<a name="25" href="#25">25</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.pojo.EPGMVertex;
 <a name="26" href="#26">26</a>  <strong class="jxr_keyword">import</strong> org.gradoop.common.model.impl.properties.Type;
 <a name="27" href="#27">27</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.io.impl.csv.metadata.CSVMetaData;
 <a name="28" href="#28">28</a>  <strong class="jxr_keyword">import</strong> org.gradoop.flink.model.GradoopFlinkTestBase;
@@ -129,8 +129,8 @@
 <a name="119" href="#119">119</a> 
 <a name="120" href="#120">120</a>     LogicalGraph graph = loader.getLogicalGraphByVariable(TestData.DATA_GRAPH_VARIABLE);
 <a name="121" href="#121">121</a> 
-<a name="122" href="#122">122</a>     DataSet&lt;Vertex&gt; verticesWithPayload = graph.getVertices()
-<a name="123" href="#123">123</a>       .map((MapFunction&lt;Vertex, Vertex&gt;) vertex -&gt; {
+<a name="122" href="#122">122</a>     DataSet&lt;EPGMVertex&gt; verticesWithPayload = graph.getVertices()
+<a name="123" href="#123">123</a>       .map((MapFunction&lt;EPGMVertex, EPGMVertex&gt;) vertex -&gt; {
 <a name="124" href="#124">124</a>         vertex.setProperty(<span class="jxr_string">"map"</span>, <strong class="jxr_keyword">new</strong> HashMap());
 <a name="125" href="#125">125</a>         <strong class="jxr_keyword">return</strong> vertex;
 <a name="126" href="#126">126</a>       });

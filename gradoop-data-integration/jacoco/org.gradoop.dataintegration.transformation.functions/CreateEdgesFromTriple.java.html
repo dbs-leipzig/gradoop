@@ -20,9 +20,9 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 import java.util.Objects;
@@ -34,7 +34,7 @@ import java.util.Objects;
  * @param &lt;V&gt; The vertex type.
  * @param &lt;E&gt; The edge type.
  */
-public class CreateEdgesFromTriple&lt;V extends EPGMVertex, E extends EPGMEdge&gt;
+public class CreateEdgesFromTriple&lt;V extends Vertex, E extends Edge&gt;
   implements FlatMapFunction&lt;Tuple3&lt;V, GradoopId, GradoopId&gt;, E&gt;, ResultTypeQueryable&lt;E&gt; {
 
   /**
@@ -66,7 +66,7 @@ public class CreateEdgesFromTriple&lt;V extends EPGMVertex, E extends EPGMEdge&g
    * @param edgeLabelNewToTarget The label of the newly created edge which starts at the newly
    *                             created vertex.
    */
-  public CreateEdgesFromTriple(EPGMEdgeFactory&lt;E&gt; factory, String edgeLabelSourceToNew,
+  public CreateEdgesFromTriple(EdgeFactory&lt;E&gt; factory, String edgeLabelSourceToNew,
 <span class="fc" id="L70">    String edgeLabelNewToTarget) {</span>
 <span class="fc" id="L71">    this.edgeType = Objects.requireNonNull(factory).getType();</span>
 <span class="fc" id="L72">    this.edgeLabelSourceToNew = Objects.requireNonNull(edgeLabelSourceToNew);</span>

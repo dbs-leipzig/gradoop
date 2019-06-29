@@ -16,7 +16,7 @@
 package org.gradoop.storage.impl.accumulo.predicate.query;
 
 import org.apache.accumulo.core.data.Range;
-import org.gradoop.common.model.api.entities.EPGMElement;
+import org.gradoop.common.model.api.entities.Element;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
@@ -32,26 +32,26 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * accumulo predicate filter definition, this is a internal model, should not be used outside
+ * Accumulo predicate filter definition, this is a internal model, should not be used outside
  *
- * @param &lt;T&gt; epgm element type
+ * @param &lt;T&gt; element type
  */
-public class AccumuloQueryHolder&lt;T extends EPGMElement&gt; implements Serializable {
+public class AccumuloQueryHolder&lt;T extends Element&gt; implements Serializable {
 
   /**
-   * query ranges in accumulo table, should be serializable
+   * Query ranges in accumulo table, should be serializable
    */
   private final byte[] queryRanges;
 
   /**
-   * reduce filter for epgm element
+   * Reduce filter for element
    */
   private final AccumuloElementFilter&lt;T&gt; reduceFilter;
 
   /**
-   * accumulo predicate instance, low level api for store implement
+   * Accumulo predicate instance, low level api for store implement
    *
-   * @param logicalRanges accumulo logical ranges for ele ment table,
+   * @param logicalRanges accumulo logical ranges for element table,
    * @param reduceFilter query reduce filter
    *                     only those in predicate should be return from tserver.
    *                     if null, return all in range
@@ -67,13 +67,13 @@ public class AccumuloQueryHolder&lt;T extends EPGMElement&gt; implements Seriali
 <span class="fc" id="L67">  }</span>
 
   /**
-   * create a predicate within a certain id ranges
+   * Create a predicate within a certain id ranges
    *
    * @param query element query
-   * @param &lt;T&gt;   epgm element type
+   * @param &lt;T&gt;   element type
    * @return accumulo predicate
    */
-  public static &lt;T extends EPGMElement&gt; AccumuloQueryHolder&lt;T&gt; create(
+  public static &lt;T extends Element&gt; AccumuloQueryHolder&lt;T&gt; create(
     @Nonnull ElementQuery&lt;AccumuloElementFilter&lt;T&gt;&gt; query
   ) {
 <span class="fc" id="L79">    List&lt;Range&gt; ranges = Range.mergeOverlapping(Optional.ofNullable(query.getQueryRanges())</span>
@@ -88,30 +88,29 @@ public class AccumuloQueryHolder&lt;T extends EPGMElement&gt; implements Seriali
   }
 
   /**
-   * create a predicate within a certain accumulo id ranges
+   * Create a predicate within a certain accumulo id ranges
    *
    * @param idRanges      gradoop row-id ranges for query element
    * @param reduceFilter  reducer filter logic
-   * @param &lt;T&gt;           epgm element type
+   * @param &lt;T&gt;           element type
    * @return accumulo predicate
    */
-  public static &lt;T extends EPGMElement&gt; AccumuloQueryHolder&lt;T&gt; create(
+  public static &lt;T extends Element&gt; AccumuloQueryHolder&lt;T&gt; create(
     @Nonnull List&lt;Range&gt; idRanges,
-    @Nullable AccumuloElementFilter&lt;T&gt; reduceFilter
-  ) {
-<span class="nc bnc" id="L102" title="All 2 branches missed.">    if (idRanges.isEmpty()) {</span>
-<span class="nc" id="L103">      throw new IllegalArgumentException(&quot;id range is empty&quot;);</span>
+    @Nullable AccumuloElementFilter&lt;T&gt; reduceFilter) {
+<span class="nc bnc" id="L101" title="All 2 branches missed.">    if (idRanges.isEmpty()) {</span>
+<span class="nc" id="L102">      throw new IllegalArgumentException(&quot;id range is empty&quot;);</span>
     }
-<span class="nc" id="L105">    return new AccumuloQueryHolder&lt;&gt;(idRanges, reduceFilter);</span>
+<span class="nc" id="L104">    return new AccumuloQueryHolder&lt;&gt;(idRanges, reduceFilter);</span>
   }
 
   /**
-   * get query ranges by anti-encrypt wrapper
+   * Get query ranges by anti-encrypt wrapper
    *
    * @return seek range
    */
   public List&lt;Range&gt; getQueryRanges() {
-<span class="pc bpc" id="L114" title="1 of 2 branches missed.">    return queryRanges == null ? null : RangeWrapper.decrypt(queryRanges).ranges;</span>
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">    return queryRanges == null ? null : RangeWrapper.decrypt(queryRanges).ranges;</span>
   }
 
   /**
@@ -120,54 +119,54 @@ public class AccumuloQueryHolder&lt;T extends EPGMElement&gt; implements Seriali
    * @return accumulo element filter
    */
   public AccumuloElementFilter&lt;T&gt; getReduceFilter() {
-<span class="fc" id="L123">    return reduceFilter;</span>
+<span class="fc" id="L122">    return reduceFilter;</span>
   }
 
   @Override
   public String toString() {
-<span class="nc bnc" id="L128" title="All 2 branches missed.">    List&lt;String&gt; ranges = getQueryRanges() == null ? null :</span>
-<span class="nc" id="L129">      getQueryRanges().stream()</span>
-<span class="nc bnc" id="L130" title="All 2 branches missed.">        .map(it -&gt; it == null ? null : String.format(&quot;%s:%s&quot;,</span>
-<span class="nc" id="L131">          it.getStartKey().getRow(),</span>
-<span class="nc" id="L132">          it.getEndKey().getRow()))</span>
-<span class="nc" id="L133">        .collect(Collectors.toList());</span>
-<span class="nc" id="L134">    return String.format(&quot;range=%1$s, filter=%2$s&quot;, ranges, getReduceFilter());</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">    List&lt;String&gt; ranges = getQueryRanges() == null ? null :</span>
+<span class="nc" id="L128">      getQueryRanges().stream()</span>
+<span class="nc bnc" id="L129" title="All 2 branches missed.">        .map(it -&gt; it == null ? null : String.format(&quot;%s:%s&quot;,</span>
+<span class="nc" id="L130">          it.getStartKey().getRow(),</span>
+<span class="nc" id="L131">          it.getEndKey().getRow()))</span>
+<span class="nc" id="L132">        .collect(Collectors.toList());</span>
+<span class="nc" id="L133">    return String.format(&quot;range=%1$s, filter=%2$s&quot;, ranges, getReduceFilter());</span>
   }
 
   /**
-   * range wrapper definition, just for request transport
+   * Range wrapper definition, just for request transport
    */
   private static class RangeWrapper {
 
     /**
-     * query ranges, may be null
+     * Query ranges, may be null
      */
     private List&lt;Range&gt; ranges;
 
     /**
-     * encrypt as byte array
+     * Encrypt as byte array
      *
      * @return byte array result
      */
     private byte[] encrypt() {
       try {
-<span class="fc" id="L154">        return KryoUtils.dumps(this);</span>
-<span class="nc" id="L155">      } catch (IOException e) {</span>
-<span class="nc" id="L156">        throw new RuntimeException(e);</span>
+<span class="fc" id="L153">        return KryoUtils.dumps(this);</span>
+<span class="nc" id="L154">      } catch (IOException e) {</span>
+<span class="nc" id="L155">        throw new RuntimeException(e);</span>
       }
     }
 
     /**
-     * decrypted from byte array
+     * Decrypted from byte array
      *
      * @param data encrypted data
      * @return range wrapper instance
      */
     private static RangeWrapper decrypt(byte[] data) {
       try {
-<span class="fc" id="L168">        return KryoUtils.loads(data, RangeWrapper.class);</span>
-<span class="nc" id="L169">      } catch (IOException e) {</span>
-<span class="nc" id="L170">        throw new RuntimeException(e);</span>
+<span class="fc" id="L167">        return KryoUtils.loads(data, RangeWrapper.class);</span>
+<span class="nc" id="L168">      } catch (IOException e) {</span>
+<span class="nc" id="L169">        throw new RuntimeException(e);</span>
       }
     }
   }
