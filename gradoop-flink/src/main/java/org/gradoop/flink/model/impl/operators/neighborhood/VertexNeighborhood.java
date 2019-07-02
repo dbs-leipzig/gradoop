@@ -15,12 +15,15 @@
  */
 package org.gradoop.flink.model.impl.operators.neighborhood;
 
+import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
 
 /**
  * Super class for all vertex neighborhood operators.
+ *
+ * @param <LG> graph type
  */
-public abstract class VertexNeighborhood extends Neighborhood {
+public abstract class VertexNeighborhood<LG extends BaseGraph> extends Neighborhood<LG> {
 
   /**
    * Valued constructor.
