@@ -30,12 +30,6 @@ import org.gradoop.flink.model.impl.operators.statistics.functions.CalculateAver
  */
 public class AverageDegree implements UnaryGraphToGraphOperator {
 
-  /**
-   * Calculates the average degree of the input graph and writes it to the graph head.
-   *
-   * @param graph the input graph
-   * @return LogicalGraph with the average degree value written to the graph head.
-   */
   @Override
   public LogicalGraph execute(LogicalGraph graph) {
     graph = graph.aggregate(new VertexCount());
