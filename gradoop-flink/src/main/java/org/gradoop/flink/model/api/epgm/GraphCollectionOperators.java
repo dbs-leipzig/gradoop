@@ -22,9 +22,7 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
-import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryCollectionToGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -244,18 +242,8 @@ public interface GraphCollectionOperators extends GraphBaseOperators {
     UnaryCollectionToGraphOperator op);
 
   /**
-   * Applies a given unary graph to graph operator (e.g., aggregate) on each
-   * logical graph in the graph collection.
-   *
-   * @param op applicable unary graph to graph operator
-   * @return collection with resulting logical graphs
-   */
-  GraphCollection apply(
-    ApplicableUnaryGraphToGraphOperator op);
-
-  /**
    * Transforms a graph collection into a logical graph by applying a
-   * {@link BinaryGraphToGraphOperator} pairwise on the elements of the
+   * {@link ReducibleBinaryGraphToGraphOperator} pairwise on the elements of the
    * collection.
    *
    * @param op reducible binary graph to graph operator

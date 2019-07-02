@@ -13,30 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.impl.operators.neighborhood.functions;
+package org.gradoop.flink.model.impl.operators.subgraph.functions;
 
 import org.apache.flink.api.common.functions.JoinFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.api.entities.Vertex;
+import org.apache.flink.api.java.functions.FunctionAnnotation;
+import org.gradoop.common.model.api.entities.GraphElement;
 
 /**
- * Puts the vertex to the first field of the tuple.
+ * left, right => left (retain graphIds contained in right)
  *
- * @param <P> type of the first field of the tuple
- * @param <Q> type of the second field of the tuple
- * @param <V> vertex type
+ * @param <L> left type
+ * @param <R> right type
  */
-public class VertexToFieldZero<P, Q, V extends Vertex>
-  implements JoinFunction<Tuple2<P, Q>, V, Tuple2<V, Q>> {
-
-  /**
-   * Avoid object instantiation.
-   */
-  private Tuple2<V, Q> reuseTuple = new Tuple2<>();
-
+@FunctionAnnotation.NonForwardedFieldsFirst("graphIds")
+@FunctionAnnotation.ReadFieldsSecond("graphIds")
+public class LeftSideWithRightGraphs<L extends GraphElement, R extends GraphElement>
+  implements JoinFunction<L, R, L> {
   @Override
-  public Tuple2<V, Q> join(Tuple2<P, Q> tuple, V vertex) throws Exception {
-    reuseTuple.setFields(vertex, tuple.f1);
-    return reuseTuple;
+  public L join(L left, R right) throws Exception {
+    left.getGraphIds().retainAll(right.getGraphIds());
+    return left;
   }
 }

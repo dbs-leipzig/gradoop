@@ -18,35 +18,22 @@ package org.gradoop.flink.model.impl.operators.subgraph.functions;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple4;
+import org.gradoop.common.model.api.entities.GraphElement;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.id.GradoopIdSet;
 
 /**
- * Join the edge tuples with the new graph ids.
+ * left, right => right (retain graphIds contained in left)
+ *
+ * @param <R> right type
  */
-
-@FunctionAnnotation.ForwardedFieldsFirst("f0->f0;f1->f1;f2->f2")
-@FunctionAnnotation.ForwardedFieldsSecond("f1->f3")
-public class EdgesWithNewGraphsTuple
-  implements JoinFunction<
-  Tuple4<GradoopId, GradoopId, GradoopId, GradoopId>,
-  Tuple2<GradoopId, GradoopId>,
-  Tuple4<GradoopId, GradoopId, GradoopId, GradoopId>> {
-
-  /**
-   * Reduce object instantiations
-   */
-  private Tuple4<GradoopId, GradoopId, GradoopId, GradoopId> reuseTuple =
-    new Tuple4<>();
-
+@FunctionAnnotation.NonForwardedFieldsSecond("graphIds")
+@FunctionAnnotation.ReadFieldsFirst("f1")
+public class RightSideWithLeftGraphs2To1<R extends GraphElement>
+  implements JoinFunction<Tuple2<GradoopId, GradoopIdSet>, R, R> {
   @Override
-  public Tuple4<GradoopId, GradoopId, GradoopId, GradoopId> join(
-    Tuple4<GradoopId, GradoopId, GradoopId, GradoopId> left,
-    Tuple2<GradoopId, GradoopId> right) throws Exception {
-    reuseTuple.f0 = left.f0;
-    reuseTuple.f1 = left.f1;
-    reuseTuple.f2 = left.f2;
-    reuseTuple.f3 = right.f1;
-    return reuseTuple;
+  public R join(Tuple2<GradoopId, GradoopIdSet> left, R right) throws Exception {
+    right.getGraphIds().retainAll(left.f1);
+    return right;
   }
 }

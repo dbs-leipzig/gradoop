@@ -18,6 +18,7 @@ package org.gradoop.flink.model.api.epgm;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.operators.ApplicableUnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
 import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
 
@@ -27,7 +28,7 @@ import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
  * @param <G> type of the graph head
  * @param <V> the vertex type
  * @param <E> the edge type
- * @param <LG> the type of the logical graph
+ * @param <LG> the type of the base graph
  * @param <GC> the type of the graph collection
  */
 public interface BaseGraphCollectionOperators<
@@ -64,4 +65,15 @@ public interface BaseGraphCollectionOperators<
    * @return result of given operator
    */
   GC callForCollection(UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> operator);
+
+  /**
+   * Applies a given unary graph to graph operator (e.g., aggregate) on each
+   * base graph in the graph collection.
+   *
+   * @param operator applicable unary graph to graph operator
+   * @return collection with resulting logical graphs
+   */
+  default GC apply(ApplicableUnaryBaseGraphToBaseGraphOperator<GC> operator) {
+    return callForCollection(operator);
+  }
 }
