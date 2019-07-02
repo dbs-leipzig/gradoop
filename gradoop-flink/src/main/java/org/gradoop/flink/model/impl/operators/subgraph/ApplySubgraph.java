@@ -27,7 +27,6 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
 import org.gradoop.flink.model.impl.functions.epgm.TargetId;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.EdgeToSourceAndTargetIdWithGraphIds;
-import org.gradoop.flink.model.impl.functions.utils.LeftSideWithRightGraphs;
 import org.gradoop.flink.model.impl.functions.utils.RightSideWithLeftGraphs;
 import org.gradoop.flink.model.impl.operators.subgraph.functions.RightSideWithLeftGraphs2To1;
 import org.gradoop.flink.model.impl.operators.verify.Verify;
