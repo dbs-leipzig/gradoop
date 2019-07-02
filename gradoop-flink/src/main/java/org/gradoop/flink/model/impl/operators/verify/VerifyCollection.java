@@ -46,9 +46,9 @@ public class VerifyCollection<
   implements UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GC> {
 
   @Override
-  public GC execute(GC graph) {
-    DataSet<V> vertices = graph.getVertices();
-    DataSet<E> verifiedEdges = graph.getEdges()
+  public GC execute(GC collection) {
+    DataSet<V> vertices = collection.getVertices();
+    DataSet<E> verifiedEdges = collection.getEdges()
       .join(vertices)
       .where(new SourceId<>())
       .equalTo(new Id<>())
@@ -59,6 +59,6 @@ public class VerifyCollection<
       .equalTo(new Id<>())
       .with(new LeftSideWithRightGraphs<>())
       .name("Verify Edges (2/2)");
-    return graph.getFactory().fromDataSets(graph.getGraphHeads(), vertices, verifiedEdges);
+    return collection.getFactory().fromDataSets(collection.getGraphHeads(), vertices, verifiedEdges);
   }
 }
