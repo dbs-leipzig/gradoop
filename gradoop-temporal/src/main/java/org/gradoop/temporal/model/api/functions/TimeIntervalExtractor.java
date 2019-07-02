@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.operators;
+package org.gradoop.temporal.model.api.functions;
 
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.gradoop.common.model.api.entities.Element;
 
 /**
- * Creates a {@link GraphCollection} based on one {@link LogicalGraph}.
+ * Map function to extract temporal information from an element to create a tuple of
+ * {@link Long} values as the elements validity interval.
+ *
+ * @param <E> the element type
  */
-public interface UnaryGraphToCollectionOperator
-  extends UnaryBaseGraphToBaseCollectionOperator<LogicalGraph, GraphCollection> {
-
-  /**
-   * Executes the operator.
-   *
-   * @param graph input graph
-   * @return operator result
-   */
-  @Override
-  GraphCollection execute(LogicalGraph graph);
+public interface TimeIntervalExtractor<E extends Element>
+  extends MapFunction<E, Tuple2<Long, Long>> {
 }

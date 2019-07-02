@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.operators;
+package org.gradoop.temporal.model.impl.functions;
 
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.temporal.model.api.functions.TemporalPredicate;
 
 /**
- * Creates a {@link GraphCollection} based on one {@link LogicalGraph}.
+ * A temporal predicate that matches all time intervals.
  */
-public interface UnaryGraphToCollectionOperator
-  extends UnaryBaseGraphToBaseCollectionOperator<LogicalGraph, GraphCollection> {
+public class All implements TemporalPredicate {
 
-  /**
-   * Executes the operator.
-   *
-   * @param graph input graph
-   * @return operator result
-   */
   @Override
-  GraphCollection execute(LogicalGraph graph);
+  public boolean test(long from, long to) {
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return "ALL";
+  }
 }

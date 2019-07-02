@@ -13,23 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.gradoop.flink.model.api.operators;
-
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.GraphCollection;
-
 /**
- * Creates a {@link GraphCollection} based on one {@link LogicalGraph}.
+ * Functions related to the TPGM diff operator.
  */
-public interface UnaryGraphToCollectionOperator
-  extends UnaryBaseGraphToBaseCollectionOperator<LogicalGraph, GraphCollection> {
-
-  /**
-   * Executes the operator.
-   *
-   * @param graph input graph
-   * @return operator result
-   */
-  @Override
-  GraphCollection execute(LogicalGraph graph);
-}
+package org.gradoop.temporal.model.impl.operators.diff.functions;
