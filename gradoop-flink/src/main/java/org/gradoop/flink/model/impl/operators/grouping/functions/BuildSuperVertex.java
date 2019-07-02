@@ -22,7 +22,6 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.api.entities.VertexFactory;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 
 /**
@@ -52,14 +51,6 @@ public class BuildSuperVertex<V extends Vertex> extends BuildBase
     this.vertexFactory = epgmVertexFactory;
   }
 
-  /**
-   * Creates a {@link EPGMVertex} object from the given {@link VertexGroupItem}
-   * and returns a new {@link org.apache.flink.graph.Vertex}.
-   *
-   * @param groupItem vertex group item
-   * @return vertex including new vertex data
-   * @throws Exception on failure
-   */
   @Override
   public V map(VertexGroupItem groupItem) throws Exception {
     V supVertex = vertexFactory.initVertex(groupItem.getSuperVertexId());

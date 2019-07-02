@@ -23,15 +23,10 @@ import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
 import org.gradoop.flink.model.impl.operators.statistics.DistinctTargetIds;
 
 /**
- * Computes {@link DistinctTargetIds} for a given logical graph and write it in a CSV file.
+ * Computes {@link DistinctTargetIds} for a given logical graph.
  */
 public class DistinctTargetVertexCountPreparer implements UnaryGraphToValueOperator<MapOperator<Long, Tuple1<Long>>> {
 
-  /**
-   * Prepares the statistic for a distinct target vertex count.
-   * @param graph the logical graph for the calculation.
-   * @return tuples with the containing statistics.
-   */
   @Override
   public MapOperator<Long, Tuple1<Long>> execute(final LogicalGraph graph) {
     return new DistinctTargetIds()
