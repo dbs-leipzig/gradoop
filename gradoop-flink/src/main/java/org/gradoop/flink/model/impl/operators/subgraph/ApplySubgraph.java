@@ -118,16 +118,10 @@ public class ApplySubgraph<
    */
   private GC vertexInducedSubgraph(GC collection) {
     DataSet<V> filteredVertices = collection.getVertices().filter(vertexFilterFunction);
-    DataSet<E> inducedEdges = collection.getEdges()
-      .join(filteredVertices)
-      .where(new SourceId<>()).equalTo(new Id<>())
-      .with(new LeftSideWithRightGraphs<>())
-      .join(filteredVertices)
-      .where(new TargetId<>()).equalTo(new Id<>())
-      .with(new LeftSideWithRightGraphs<>());
 
     return collection.getFactory()
-      .fromDataSets(collection.getGraphHeads(), filteredVertices, inducedEdges);
+      .fromDataSets(collection.getGraphHeads(), filteredVertices, collection.getEdges())
+      .verify();
   }
 
   /**

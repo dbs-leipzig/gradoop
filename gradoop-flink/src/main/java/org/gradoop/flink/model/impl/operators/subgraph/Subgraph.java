@@ -175,16 +175,10 @@ public class Subgraph<
    */
   private LG vertexInducedSubgraph(LG superGraph) {
     DataSet<V> filteredVertices = superGraph.getVertices().filter(vertexFilterFunction);
-    DataSet<E> inducedEdges = superGraph.getEdges()
-      .join(filteredVertices)
-      .where(new SourceId<>()).equalTo(new Id<>())
-      .with(new LeftSide<>())
-      .join(filteredVertices)
-      .where(new TargetId<>()).equalTo(new Id<>())
-      .with(new LeftSide<>());
 
     return superGraph.getFactory()
-      .fromDataSets(superGraph.getGraphHead(), filteredVertices, inducedEdges);
+      .fromDataSets(superGraph.getGraphHead(), filteredVertices, superGraph.getEdges())
+      .verify();
   }
 
   /**
