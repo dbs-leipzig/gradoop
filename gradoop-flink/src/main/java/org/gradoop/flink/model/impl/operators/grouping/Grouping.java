@@ -661,15 +661,6 @@ public abstract class Grouping<
       LG extends BaseGraph<G, V, E, LG, GC>,
       GC extends BaseGraphCollection<G, V, E, LG, GC>> Grouping<G, V, E, LG, GC> build() {
 
-      // first element of vertexLabelGroups is always the defaultVertexLabelGroup
-      boolean isGroupingByVertexProperty =
-        !defaultVertexLabelGroup.getPropertyKeys().isEmpty() || vertexLabelGroups.size() > 1;
-
-      if (!isGroupingByVertexProperty && !useVertexLabel) {
-        throw new IllegalStateException(
-          "Provide vertex key(s) and/or use vertex labels for grouping.");
-      }
-
       if (strategy == null) {
         throw new IllegalStateException("A GroupingStrategy has to be set.");
       }
