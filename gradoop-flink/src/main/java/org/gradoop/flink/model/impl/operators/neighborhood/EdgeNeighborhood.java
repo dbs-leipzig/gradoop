@@ -15,12 +15,15 @@
  */
 package org.gradoop.flink.model.impl.operators.neighborhood;
 
+import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
 
 /**
  * Super class for all edge neighborhood operators.
+ *
+ * @param <LG> graph type
  */
-public abstract class EdgeNeighborhood extends Neighborhood {
+public abstract class EdgeNeighborhood<LG extends BaseGraph> extends Neighborhood<LG> {
 
   /**
    * Valued constructor.
