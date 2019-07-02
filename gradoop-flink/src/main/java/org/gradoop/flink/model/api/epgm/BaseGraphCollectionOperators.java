@@ -20,6 +20,7 @@ import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.api.operators.ApplicableUnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
+import org.gradoop.flink.model.impl.operators.verify.VerifyCollection;
 import org.gradoop.flink.model.impl.operators.verify.VerifyGraphsContainment;
 
 /**
@@ -41,6 +42,18 @@ public interface BaseGraphCollectionOperators<
   //----------------------------------------------------------------------------
   // Unary Operators
   //----------------------------------------------------------------------------
+
+  /**
+   * Verifies each graph of this collection, removing dangling edges, i.e. edges pointing to or from
+   * a vertex not contained in the graph.<br>
+   * This operator can be applied after an operator that has not checked these graphs validity.
+   * The graph heads of these base graphs remains unchanged.
+   *
+   * @return this graph collection with all dangling edges removed.
+   */
+  default GC verify() {
+    return callForCollection(new VerifyCollection<>());
+  }
 
   /**
    * Verifies this graph collection, removing dangling graph ids from its elements,
