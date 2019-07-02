@@ -75,8 +75,8 @@ public interface BaseGraphCollectionOperators<
   //----------------------------------------------------------------------------
 
   /**
-   * Returns base graph from collection using the given identifier. If the
-   * graph does not exist, an empty base graph is returned.
+   * Returns base graph from collection using the given identifier. If the graph does not exist,
+   * an empty base graph is returned.
    *
    * @param graphID graph identifier
    * @return base graph with given id or an empty base graph
@@ -148,8 +148,7 @@ public interface BaseGraphCollectionOperators<
    * graphs with a new property ("contains pattern")
    */
   default GC match(String pattern, PatternMatchingAlgorithm algorithm, boolean returnEmbeddings) {
-    return callForCollection(
-      new TransactionalPatternMatching<>(pattern, algorithm, returnEmbeddings));
+    return callForCollection(new TransactionalPatternMatching<>(pattern, algorithm, returnEmbeddings));
   }
 
   //----------------------------------------------------------------------------
