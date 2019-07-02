@@ -16,33 +16,46 @@
 package org.gradoop.flink.model.impl.operators.combination;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 
 /**
- * Computes the combined graph from two logical graphs.
- * Creates a new logical graph by union of the vertex and edge sets of two
+ * Computes the combined graph from two base graph instances.
+ * Creates a new base graph by union of the vertex and edge sets of two
  * input graphs. Vertex and edge equality is based on their respective
  * identifiers.
+ *
+ * @param <G>  The graph head type.
+ * @param <V>  The vertex type.
+ * @param <E>  The edge type.
+ * @param <LG> The type of the graph.
+ * @param <GC> The type of the graph collection.
  */
-public class Combination implements BinaryGraphToGraphOperator {
+public class Combination<
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
+  LG extends BaseGraph<G, V, E, LG, GC>,
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements BinaryBaseGraphToBaseGraphOperator<LG> {
 
   @Override
-  public LogicalGraph execute(LogicalGraph firstGraph,
-    LogicalGraph secondGraph) {
+  public LG execute(LG firstGraph, LG secondGraph) {
 
-    DataSet<EPGMVertex> newVertexSet = firstGraph.getVertices()
+    DataSet<V> newVertexSet = firstGraph.getVertices()
       .union(secondGraph.getVertices())
       .distinct(new Id<>());
 
-    DataSet<EPGMEdge> newEdgeSet = firstGraph.getEdges()
+    DataSet<E> newEdgeSet = firstGraph.getEdges()
       .union(secondGraph.getEdges())
       .distinct(new Id<>());
 
-    return firstGraph.getConfig().getLogicalGraphFactory().fromDataSets(newVertexSet, newEdgeSet);
+    return firstGraph.getFactory().fromDataSets(newVertexSet, newEdgeSet);
   }
 
 }
