@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.api.layouts;
 
 import org.apache.flink.api.java.DataSet;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransaction;
 
 /**
@@ -30,9 +30,9 @@ import org.gradoop.flink.model.impl.layouts.transactional.tuples.GraphTransactio
  * @param <E> the edge type
  */
 public interface GraphCollectionLayout<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge> extends Layout<V, E> {
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge> extends Layout<V, E> {
 
   /**
    * True, if the layout is based on three separate datasets.

@@ -20,18 +20,18 @@ import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.id.GradoopIdSet;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.util.Order;
 import org.gradoop.flink.io.api.DataSink;
 import org.gradoop.flink.io.impl.gdl.GDLConsoleOutput;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.epgm.GraphCollectionOperators;
 import org.gradoop.flink.model.api.functions.GraphHeadReduceFunction;
 import org.gradoop.flink.model.api.layouts.GraphCollectionLayout;
-import org.gradoop.flink.model.api.operators.ApplicableUnaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.BinaryCollectionToCollectionOperator;
 import org.gradoop.flink.model.api.operators.ReducibleBinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphCollectionToBaseGraphCollectionOperator;
@@ -86,11 +86,12 @@ import java.util.Objects;
  * just forward the calls to the layout. This is just for convenience and API synchronicity.
  */
 public class GraphCollection implements
-  BaseGraphCollection<GraphHead, Vertex, Edge, GraphCollection>, GraphCollectionOperators {
+  BaseGraphCollection<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>,
+  GraphCollectionOperators {
   /**
    * Layout for that graph collection
    */
-  private final GraphCollectionLayout<GraphHead, Vertex, Edge> layout;
+  private final GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> layout;
   /**
    * Configuration
    */
@@ -102,7 +103,7 @@ public class GraphCollection implements
    * @param layout the graph collection layout
    * @param config the Gradoop Flink configuration
    */
-  GraphCollection(GraphCollectionLayout<GraphHead, Vertex, Edge> layout,
+  GraphCollection(GraphCollectionLayout<EPGMGraphHead, EPGMVertex, EPGMEdge> layout,
     GradoopFlinkConfig config) {
     this.layout = Objects.requireNonNull(layout);
     this.config = Objects.requireNonNull(config);
@@ -128,32 +129,32 @@ public class GraphCollection implements
   }
 
   @Override
-  public DataSet<Vertex> getVertices() {
+  public DataSet<EPGMVertex> getVertices() {
     return layout.getVertices();
   }
 
   @Override
-  public DataSet<Vertex> getVerticesByLabel(String label) {
+  public DataSet<EPGMVertex> getVerticesByLabel(String label) {
     return layout.getVerticesByLabel(label);
   }
 
   @Override
-  public DataSet<Edge> getEdges() {
+  public DataSet<EPGMEdge> getEdges() {
     return layout.getEdges();
   }
 
   @Override
-  public DataSet<Edge> getEdgesByLabel(String label) {
+  public DataSet<EPGMEdge> getEdgesByLabel(String label) {
     return layout.getEdgesByLabel(label);
   }
 
   @Override
-  public DataSet<GraphHead> getGraphHeads() {
+  public DataSet<EPGMGraphHead> getGraphHeads() {
     return layout.getGraphHeads();
   }
 
   @Override
-  public DataSet<GraphHead> getGraphHeadsByLabel(String label) {
+  public DataSet<EPGMGraphHead> getGraphHeadsByLabel(String label) {
     return layout.getGraphHeadsByLabel(label);
   }
 
@@ -169,11 +170,11 @@ public class GraphCollection implements
   @Override
   public LogicalGraph getGraph(final GradoopId graphID) {
     // filter vertices and edges based on given graph id
-    DataSet<GraphHead> graphHead = getGraphHeads()
+    DataSet<EPGMGraphHead> graphHead = getGraphHeads()
       .filter(new BySameId<>(graphID));
-    DataSet<Vertex> vertices = getVertices()
+    DataSet<EPGMVertex> vertices = getVertices()
       .filter(new InGraph<>(graphID));
-    DataSet<Edge> edges = getEdges()
+    DataSet<EPGMEdge> edges = getEdges()
       .filter(new InGraph<>(graphID));
 
     return new LogicalGraph(
@@ -194,20 +195,20 @@ public class GraphCollection implements
   @Override
   public GraphCollection getGraphs(final GradoopIdSet identifiers) {
 
-    DataSet<GraphHead> newGraphHeads = this.getGraphHeads()
-      .filter(new FilterFunction<GraphHead>() {
+    DataSet<EPGMGraphHead> newGraphHeads = this.getGraphHeads()
+      .filter(new FilterFunction<EPGMGraphHead>() {
         @Override
-        public boolean filter(GraphHead graphHead) {
+        public boolean filter(EPGMGraphHead graphHead) {
           return identifiers.contains(graphHead.getId());
         }
       });
 
     // build new vertex set
-    DataSet<Vertex> vertices = getVertices()
+    DataSet<EPGMVertex> vertices = getVertices()
       .filter(new InAnyGraph<>(identifiers));
 
     // build new edge set
-    DataSet<Edge> edges = getEdges()
+    DataSet<EPGMEdge> edges = getEdges()
       .filter(new InAnyGraph<>(identifiers));
 
     return new GraphCollection(getFactory().fromDataSets(newGraphHeads, vertices, edges),
@@ -219,7 +220,7 @@ public class GraphCollection implements
   //----------------------------------------------------------------------------
 
   @Override
-  public GraphCollection select(final FilterFunction<GraphHead> predicate) {
+  public GraphCollection select(final FilterFunction<EPGMGraphHead> predicate) {
     return callForCollection(new Selection(predicate));
   }
 
@@ -329,11 +330,6 @@ public class GraphCollection implements
   }
 
   @Override
-  public GraphCollection apply(ApplicableUnaryGraphToGraphOperator op) {
-    return callForCollection(op);
-  }
-
-  @Override
   public LogicalGraph reduce(ReducibleBinaryGraphToGraphOperator op) {
     return callForGraph(op);
   }
@@ -348,8 +344,15 @@ public class GraphCollection implements
   }
 
   @Override
-  public BaseGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection> getFactory() {
+  public BaseGraphCollectionFactory<
+    EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> getFactory() {
     return config.getGraphCollectionFactory();
+  }
+
+  @Override
+  public BaseGraphFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+  getGraphFactory() {
+    return config.getLogicalGraphFactory();
   }
 
   @Override

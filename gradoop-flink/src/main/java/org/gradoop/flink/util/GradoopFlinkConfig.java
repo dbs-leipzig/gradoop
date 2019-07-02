@@ -17,9 +17,9 @@ package org.gradoop.flink.util;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.gradoop.common.config.GradoopConfig;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -36,7 +36,7 @@ import java.util.Objects;
 /**
  * Configuration for Gradoop running on Flink.
  */
-public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
+public class GradoopFlinkConfig extends GradoopConfig<EPGMGraphHead, EPGMVertex, EPGMEdge> {
 
   /**
    * Flink execution environment.
@@ -46,14 +46,14 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
   /**
    * Creates instances of {@link LogicalGraph}
    */
-  private final BaseGraphFactory<GraphHead, Vertex, Edge, LogicalGraph, GraphCollection>
-    graphFactory;
+  private final BaseGraphFactory<
+    EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> graphFactory;
 
   /**
    * Creates instances of {@link GraphCollection}
    */
-  private final BaseGraphCollectionFactory<GraphHead, Vertex, Edge, GraphCollection>
-    graphCollectionFactory;
+  private final BaseGraphCollectionFactory<
+    EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> graphCollectionFactory;
 
   /**
    * Creates a new Configuration.
@@ -64,8 +64,8 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    */
   protected GradoopFlinkConfig(
     ExecutionEnvironment executionEnvironment,
-    LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> logicalGraphLayoutFactory,
-    GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> graphCollectionLayoutFactory) {
+    LogicalGraphLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> logicalGraphLayoutFactory,
+    GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> graphCollectionLayoutFactory) {
     super();
 
     Objects.requireNonNull(executionEnvironment);
@@ -103,8 +103,8 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    * @return Gradoop Flink configuration
    */
   public static GradoopFlinkConfig createConfig(ExecutionEnvironment env,
-    LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> logicalGraphLayoutFactory,
-    GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> graphCollectionLayoutFactory) {
+    LogicalGraphLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> logicalGraphLayoutFactory,
+    GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> graphCollectionLayoutFactory) {
     return new GradoopFlinkConfig(env, logicalGraphLayoutFactory, graphCollectionLayoutFactory);
   }
 
@@ -142,7 +142,7 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    * @param factory logical graph layout factor
    */
   public void setLogicalGraphLayoutFactory(
-    LogicalGraphLayoutFactory<GraphHead, Vertex, Edge> factory) {
+    LogicalGraphLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> factory) {
     Objects.requireNonNull(factory);
     factory.setGradoopFlinkConfig(this);
     graphFactory.setLayoutFactory(factory);
@@ -155,7 +155,7 @@ public class GradoopFlinkConfig extends GradoopConfig<GraphHead, Vertex, Edge> {
    * @param factory graph collection layout factory
    */
   public void setGraphCollectionLayoutFactory(
-    GraphCollectionLayoutFactory<GraphHead, Vertex, Edge> factory) {
+    GraphCollectionLayoutFactory<EPGMGraphHead, EPGMVertex, EPGMEdge> factory) {
     Objects.requireNonNull(factory);
     factory.setGradoopFlinkConfig(this);
     graphCollectionFactory.setLayoutFactory(factory);

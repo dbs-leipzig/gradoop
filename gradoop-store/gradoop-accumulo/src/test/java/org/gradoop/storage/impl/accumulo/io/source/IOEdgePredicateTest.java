@@ -16,7 +16,7 @@
 package org.gradoop.storage.impl.accumulo.io.source;
 
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.model.impl.pojo.Edge;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.gradoop.storage.common.predicate.query.Query;
 import org.gradoop.storage.impl.accumulo.AccumuloStoreTestBase;
@@ -40,7 +40,7 @@ public class IOEdgePredicateTest extends AccumuloStoreTestBase {
   @Test
   public void queryEdgeByProperty() throws Throwable {
     doTest(TEST01, (loader, store, config) -> {
-      List<Edge> storeEdges = loader.getEdges().stream()
+      List<EPGMEdge> storeEdges = loader.getEdges().stream()
         .filter(it -> {
           assert it.getProperties() != null;
           return it.getProperties().get("since") != null &&
@@ -53,7 +53,7 @@ public class IOEdgePredicateTest extends AccumuloStoreTestBase {
       AccumuloDataSource source = new AccumuloDataSource(
         store,
         GradoopFlinkConfig.createConfig(getExecutionEnvironment()));
-      List<Edge> query = source.applyEdgePredicate(
+      List<EPGMEdge> query = source.applyEdgePredicate(
         Query.elements()
           .fromAll()
           .where(AccumuloFilters.propEquals("since", 2013)))
@@ -61,7 +61,7 @@ public class IOEdgePredicateTest extends AccumuloStoreTestBase {
         .getEdges()
         .collect();
 
-      GradoopTestUtils.validateEPGMElementCollections(storeEdges, query);
+      GradoopTestUtils.validateElementCollections(storeEdges, query);
     });
   }
 
@@ -71,13 +71,13 @@ public class IOEdgePredicateTest extends AccumuloStoreTestBase {
       Pattern queryFormula = Pattern.compile("has.*+");
 
       //edge label query
-      List<Edge> storeEdges = loader.getEdges().stream()
+      List<EPGMEdge> storeEdges = loader.getEdges().stream()
         .filter(it -> queryFormula.matcher(it.getLabel()).matches())
         .collect(Collectors.toList());
 
       //edge label regex query
       AccumuloDataSource source = new AccumuloDataSource(store, config);
-      List<Edge> query = source.applyEdgePredicate(
+      List<EPGMEdge> query = source.applyEdgePredicate(
         Query.elements()
           .fromAll()
           .where(AccumuloFilters.labelReg(queryFormula)))
@@ -85,7 +85,7 @@ public class IOEdgePredicateTest extends AccumuloStoreTestBase {
         .getEdges()
         .collect();
 
-      GradoopTestUtils.validateEPGMGraphElementCollections(storeEdges, query);
+      GradoopTestUtils.validateGraphElementCollections(storeEdges, query);
     });
   }
 

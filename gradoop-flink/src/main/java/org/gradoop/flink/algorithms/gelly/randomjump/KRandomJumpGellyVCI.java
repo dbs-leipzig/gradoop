@@ -24,6 +24,8 @@ import org.apache.flink.graph.Graph;
 import org.apache.flink.graph.Vertex;
 import org.apache.flink.graph.pregel.VertexCentricConfiguration;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.BaseGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.EPGMEdgeWithGellyEdgeIdJoin;
 import org.gradoop.flink.algorithms.gelly.randomjump.functions.GellyVertexWithEPGMVertexJoin;
@@ -195,7 +197,7 @@ public class KRandomJumpGellyVCI
       .with(new VisitedGellyEdgesWithLongIdToGradoopIdJoin());
 
     // compute new visited edges
-    DataSet<org.gradoop.common.model.impl.pojo.Edge> visitedEdges = currentGraph.getEdges()
+    DataSet<EPGMEdge> visitedEdges = currentGraph.getEdges()
       .leftOuterJoin(visitedGellyEdgeIds)
       .where(new Id<>()).equalTo("*")
       .with(new EPGMEdgeWithGellyEdgeIdJoin(SamplingConstants.PROPERTY_KEY_SAMPLED));
@@ -205,7 +207,7 @@ public class KRandomJumpGellyVCI
       .distinct();
 
     // compute new visited vertices
-    DataSet<org.gradoop.common.model.impl.pojo.Vertex> visitedVertices = resultGraph.getVertices()
+    DataSet<EPGMVertex> visitedVertices = resultGraph.getVertices()
       .join(indexToVertexIdMap)
       .where(0).equalTo(0)
       .with(new GellyVertexWithLongIdToGradoopIdJoin())

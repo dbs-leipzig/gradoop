@@ -17,12 +17,12 @@ package org.gradoop.flink.model.impl.operators.fusion.functions;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 
 /**
  * Creates a new head and sets a new graph id
  */
-public class MapGraphHeadForNewGraph implements MapFunction<GraphHead, GraphHead> {
+public class MapGraphHeadForNewGraph implements MapFunction<EPGMGraphHead, EPGMGraphHead> {
 
   /**
    * Id to be setted
@@ -38,7 +38,7 @@ public class MapGraphHeadForNewGraph implements MapFunction<GraphHead, GraphHead
   }
 
   @Override
-  public GraphHead map(GraphHead value) throws Exception {
+  public EPGMGraphHead map(EPGMGraphHead value) throws Exception {
     value.setId(graphId);
     return value;
   }

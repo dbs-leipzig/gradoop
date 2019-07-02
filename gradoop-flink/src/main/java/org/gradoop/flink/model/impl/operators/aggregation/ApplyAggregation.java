@@ -18,9 +18,9 @@ package org.gradoop.flink.model.impl.operators.aggregation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.GraphHead;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
@@ -68,7 +68,7 @@ public class ApplyAggregation
 
   @Override
   public GraphCollection executeForGVELayout(GraphCollection collection) {
-    DataSet<GraphHead> graphHeads = collection.getGraphHeads();
+    DataSet<EPGMGraphHead> graphHeads = collection.getGraphHeads();
     DataSet<GradoopId> graphIds = graphHeads.map(new Id<>());
 
     DataSet<Tuple2<GradoopId, Map<String, PropertyValue>>> aggregate =
@@ -102,7 +102,7 @@ public class ApplyAggregation
    * @return partition aggregate value
    */
   private DataSet<Tuple2<GradoopId, Map<String, PropertyValue>>> aggregateVertices(
-    DataSet<Vertex> vertices, DataSet<GradoopId> graphIds) {
+    DataSet<EPGMVertex> vertices, DataSet<GradoopId> graphIds) {
     return vertices
       .flatMap(new ElementsOfSelectedGraphs<>())
       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)
@@ -120,7 +120,7 @@ public class ApplyAggregation
    * @return partition aggregate value
    */
   private DataSet<Tuple2<GradoopId, Map<String, PropertyValue>>> aggregateEdges(
-    DataSet<Edge> edges, DataSet<GradoopId> graphIds) {
+    DataSet<EPGMEdge> edges, DataSet<GradoopId> graphIds) {
     return edges
       .flatMap(new ElementsOfSelectedGraphs<>())
       .withBroadcastSet(graphIds, ElementsOfSelectedGraphs.GRAPH_IDS)

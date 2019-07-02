@@ -15,8 +15,8 @@
  */
 package org.gradoop.flink.model.impl.operators.sampling;
 
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.sampling.common.SamplingConstants;
 import org.junit.Test;
@@ -67,7 +67,7 @@ public class PageRankSamplingTest extends ParameterizedTestForGraphSampling {
     boolean allHaveScore = true;
     boolean noneHasScore = true;
 
-    for (Vertex v : newVertices) {
+    for (EPGMVertex v : newVertices) {
       if (v.hasProperty(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)) {
         noneHasScore = false;
       } else {
@@ -84,7 +84,7 @@ public class PageRankSamplingTest extends ParameterizedTestForGraphSampling {
       assertTrue("some vertices got sampled (should NOT be)",
         dbVertices.isEmpty() || !keepVerticesIfSameScore);
     } else if (allHaveScore) { // normal case
-      for (Vertex v : newVertices) {
+      for (EPGMVertex v : newVertices) {
         double score = v.getPropertyValue(SamplingConstants.SCALED_PAGE_RANK_SCORE_PROPERTY_KEY)
           .getDouble();
         if (sampleGreaterThanThreshold) {
@@ -100,7 +100,7 @@ public class PageRankSamplingTest extends ParameterizedTestForGraphSampling {
         dbVertices.size(), newVertices.size());
     }
     dbEdges.removeAll(newEdges);
-    for (Edge edge : dbEdges) {
+    for (EPGMEdge edge : dbEdges) {
       assertFalse("edge from original graph was not sampled but source and target were",
         newVertexIDs.contains(edge.getSourceId()) &&
           newVertexIDs.contains(edge.getTargetId()));

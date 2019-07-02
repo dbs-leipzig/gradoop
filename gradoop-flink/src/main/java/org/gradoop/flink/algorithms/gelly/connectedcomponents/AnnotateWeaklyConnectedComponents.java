@@ -19,8 +19,8 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.graph.Graph;
 import org.apache.flink.types.NullValue;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.algorithms.gelly.GradoopGellyAlgorithm;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.GellyVertexValueToVertexPropertyJoin;
 import org.gradoop.flink.algorithms.gelly.connectedcomponents.functions.VertexPropertyToEdgePropertyJoin;
@@ -87,13 +87,13 @@ public class AnnotateWeaklyConnectedComponents extends GradoopGellyAlgorithm<Gra
   @Override
   public LogicalGraph executeInGelly(Graph<GradoopId, GradoopId, NullValue> graph)
     throws Exception {
-    DataSet<Vertex> annotatedVertices = new org.apache.flink.graph.library.ConnectedComponents<
+    DataSet<EPGMVertex> annotatedVertices = new org.apache.flink.graph.library.ConnectedComponents<
       GradoopId, GradoopId, NullValue>(maxIterations).run(graph)
       .join(currentGraph.getVertices())
       .where(0).equalTo(new Id<>())
       .with(new GellyVertexValueToVertexPropertyJoin(propertyKey));
 
-    DataSet<Edge> edges = currentGraph.getEdges();
+    DataSet<EPGMEdge> edges = currentGraph.getEdges();
 
     if (annotateEdges) {
       edges = edges.join(annotatedVertices)

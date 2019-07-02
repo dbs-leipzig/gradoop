@@ -17,9 +17,9 @@ package org.gradoop.flink.model.impl.operators.grouping;
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMVertex;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
@@ -84,11 +84,12 @@ import java.util.Objects;
  * @param <GC> The type of the graph collection.
  */
 public abstract class Grouping<
-  G extends EPGMGraphHead,
-  V extends EPGMVertex,
-  E extends EPGMEdge,
+  G extends GraphHead,
+  V extends Vertex,
+  E extends Edge,
   LG extends BaseGraph<G, V, E, LG, GC>,
-  GC extends BaseGraphCollection<G, V, E, GC>>  implements UnaryBaseGraphToBaseGraphOperator<LG> {
+  GC extends BaseGraphCollection<G, V, E, LG, GC>>
+  implements UnaryBaseGraphToBaseGraphOperator<LG> {
   /**
    * Used as property key to declare a label based grouping.
    *
@@ -654,11 +655,11 @@ public abstract class Grouping<
      * @return grouping operator instance
      */
     public <
-      G extends EPGMGraphHead,
-      V extends EPGMVertex,
-      E extends EPGMEdge,
+      G extends GraphHead,
+      V extends Vertex,
+      E extends Edge,
       LG extends BaseGraph<G, V, E, LG, GC>,
-      GC extends BaseGraphCollection<G, V, E, GC>> Grouping<G, V, E, LG, GC> build() {
+      GC extends BaseGraphCollection<G, V, E, LG, GC>> Grouping<G, V, E, LG, GC> build() {
 
       // first element of vertexLabelGroups is always the defaultVertexLabelGroup
       boolean isGroupingByVertexProperty =

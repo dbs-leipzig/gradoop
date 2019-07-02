@@ -16,9 +16,9 @@
 package org.gradoop.flink.model.impl.operators.aggregation;
 
 import org.apache.flink.runtime.client.JobExecutionException;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
@@ -89,7 +89,7 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
-    for (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+    for (GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
       assertTrue("edge minimum not set", graphHead.hasProperty
         (minEdgeProperty.getAggregatePropertyKey()));
       assertTrue("vertex minimum not set", graphHead.hasProperty
@@ -159,7 +159,7 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
-    for (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+    for (GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
       assertTrue("edge maximum not set",
         graphHead.hasProperty(maxEdgeProperty.getAggregatePropertyKey()));
       assertTrue("vertex maximum not set",
@@ -229,7 +229,7 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
-    for (EPGMGraphHead graphHead : outputCollection.getGraphHeads().collect()) {
+    for (GraphHead graphHead : outputCollection.getGraphHeads().collect()) {
       assertTrue("vertex sum not set", graphHead.hasProperty(
         sumVertexProperty.getAggregatePropertyKey()));
       assertTrue("edge sum not set", graphHead.hasProperty(
@@ -299,9 +299,9 @@ public abstract class ApplyAggregationTest extends AggregationTest {
     GradoopId g1Id = loader.getGraphHeadByVariable("g1").getId();
     GradoopId g2Id = loader.getGraphHeadByVariable("g2").getId();
 
-    List<GraphHead> graphHeads = outputCollection.getGraphHeads().collect();
+    List<EPGMGraphHead> graphHeads = outputCollection.getGraphHeads().collect();
 
-    for (EPGMGraphHead graphHead : graphHeads) {
+    for (GraphHead graphHead : graphHeads) {
       assertTrue("edge sum not set", graphHead.hasProperty(
         sumEdgeProperty.getAggregatePropertyKey()));
       assertTrue("vertex sum not set", graphHead.hasProperty(
@@ -388,9 +388,9 @@ public abstract class ApplyAggregationTest extends AggregationTest {
 
     int graphHeadCount = 0;
 
-    List<GraphHead> graphHeads = outputCollection.getGraphHeads().collect();
+    List<EPGMGraphHead> graphHeads = outputCollection.getGraphHeads().collect();
 
-    for (EPGMGraphHead graphHead : graphHeads) {
+    for (GraphHead graphHead : graphHeads) {
       graphHeadCount++;
       assertTrue("vertex count not set", graphHead.hasProperty(
         vertexCount.getAggregatePropertyKey()));
@@ -435,9 +435,9 @@ public abstract class ApplyAggregationTest extends AggregationTest {
       .apply(new ApplyAggregation(hasKnowsElement))
       .apply(new ApplyAggregation(hasPerson));
 
-    List<GraphHead> graphHeads = collection.getGraphHeads().collect();
+    List<EPGMGraphHead> graphHeads = collection.getGraphHeads().collect();
 
-    for (EPGMGraphHead graphHead : graphHeads) {
+    for (GraphHead graphHead : graphHeads) {
       // check vertex label
       assertTrue("Property hasVertexLabel_Person not set",
         graphHead.hasProperty(hasPerson.getAggregatePropertyKey()));
@@ -475,9 +475,9 @@ public abstract class ApplyAggregationTest extends AggregationTest {
       .apply(new ApplyAggregation(hasOtherLabel))
       .apply(new ApplyAggregation(hasThirdLabel));
 
-    List<GraphHead> graphHeads = collection.getGraphHeads().collect();
+    List<EPGMGraphHead> graphHeads = collection.getGraphHeads().collect();
 
-    for (EPGMGraphHead graphHead : graphHeads) {
+    for (GraphHead graphHead : graphHeads) {
       // check edge label
       assertTrue("Property hasEdgeLabel_otherLabel not set",
         graphHead.hasProperty(hasOtherLabel.getAggregatePropertyKey()));

@@ -19,14 +19,14 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
 /**
  * This {@link FlatMapFunction} extracts a {@link PropertyValue} and the origin Id of a vertex into
  * a Tuple.
  */
-public class ExtractPropertyWithOriginId implements FlatMapFunction<Vertex, Tuple2<PropertyValue, GradoopId>> {
+public class ExtractPropertyWithOriginId implements FlatMapFunction<EPGMVertex, Tuple2<PropertyValue, GradoopId>> {
 
   /**
    * The property key of the property value.
@@ -49,7 +49,7 @@ public class ExtractPropertyWithOriginId implements FlatMapFunction<Vertex, Tupl
   }
 
   @Override
-  public void flatMap(Vertex vertex, Collector<Tuple2<PropertyValue, GradoopId>> out) {
+  public void flatMap(EPGMVertex vertex, Collector<Tuple2<PropertyValue, GradoopId>> out) {
     if (vertex.getProperties() != null &&
       vertex.getProperties().containsKey(originalPropertyName)) {
       PropertyValue pv = vertex.getPropertyValue(originalPropertyName);

@@ -18,8 +18,8 @@ package org.gradoop.flink.io.impl.deprecated.json.functions;
 import org.apache.flink.api.java.io.TextOutputFormat;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.io.impl.deprecated.json.JSONConstants;
-import org.gradoop.common.model.impl.pojo.Edge;
 
 /**
  * Converts an edge into the following format:
@@ -34,7 +34,7 @@ import org.gradoop.common.model.impl.pojo.Edge;
  *
  * @param <E> EPGM edge type
  */
-public class EdgeToJSON<E extends Edge>
+public class EdgeToJSON<E extends EPGMEdge>
   extends EntityToJSON
   implements TextOutputFormat.TextFormatter<E> {
 

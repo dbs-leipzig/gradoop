@@ -19,7 +19,7 @@ import com.google.common.collect.Sets;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.impl.pojo.GraphElement;
+import org.gradoop.common.model.impl.pojo.EPGMGraphElement;
 import org.gradoop.common.model.impl.properties.Property;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 
@@ -30,7 +30,7 @@ import java.util.Set;
  * GraphElements
  * @param <T> graph element type
  */
-public class ExtractPropertyValues<T extends GraphElement>
+public class ExtractPropertyValues<T extends EPGMGraphElement>
   implements FlatMapFunction<T, Tuple2<String, Set<PropertyValue>>> {
 
   /**

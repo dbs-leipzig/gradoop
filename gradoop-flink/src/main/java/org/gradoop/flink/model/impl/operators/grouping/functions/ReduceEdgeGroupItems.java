@@ -21,8 +21,8 @@ import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.util.Collector;
-import org.gradoop.common.model.api.entities.EPGMEdge;
-import org.gradoop.common.model.api.entities.EPGMEdgeFactory;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 
 /**
@@ -33,36 +33,35 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
  */
 @FunctionAnnotation.ForwardedFields("f0->sourceId;f1->targetId;f2->label")
 @FunctionAnnotation.ReadFields("f3;f5")
-public class ReduceEdgeGroupItems<E extends EPGMEdge> extends BuildSuperEdge
+public class ReduceEdgeGroupItems<E extends Edge> extends BuildSuperEdge
   implements GroupReduceFunction<EdgeGroupItem, E>, ResultTypeQueryable<E> {
 
   /**
    * Edge factory.
    */
-  private final EPGMEdgeFactory<E> edgeFactory;
+  private final EdgeFactory<E> edgeFactory;
 
   /**
    * Creates group reducer
    *
    * @param useLabel use edge label
-   * @param epgmEdgeFactory edge factory
+   * @param edgeFactory edge factory
    */
-  public ReduceEdgeGroupItems(boolean useLabel, EPGMEdgeFactory<E> epgmEdgeFactory) {
+  public ReduceEdgeGroupItems(boolean useLabel, EdgeFactory<E> edgeFactory) {
     super(useLabel);
-    this.edgeFactory = epgmEdgeFactory;
+    this.edgeFactory = edgeFactory;
   }
 
   /**
    * Reduces edge group items to a single edge group item, creates a new
-   * super EPGM edge and collects it.
+   * super edge and collects it.
    *
    * @param edgeGroupItems  edge group items
    * @param collector       output collector
    * @throws Exception on failure
    */
   @Override
-  public void reduce(Iterable<EdgeGroupItem> edgeGroupItems,
-    Collector<E> collector) throws Exception {
+  public void reduce(Iterable<EdgeGroupItem> edgeGroupItems, Collector<E> collector) throws Exception {
 
     EdgeGroupItem edgeGroupItem = reduceInternal(edgeGroupItems);
 
@@ -71,8 +70,7 @@ public class ReduceEdgeGroupItems<E extends EPGMEdge> extends BuildSuperEdge
       edgeGroupItem.getSourceId(),
       edgeGroupItem.getTargetId());
 
-    setGroupProperties(
-      superEdge, edgeGroupItem.getGroupingValues(), edgeGroupItem.getLabelGroup());
+    setGroupProperties(superEdge, edgeGroupItem.getGroupingValues(), edgeGroupItem.getLabelGroup());
     setAggregateProperties(superEdge, edgeGroupItem.getLabelGroup().getAggregateValueList(),
       edgeGroupItem.getLabelGroup().getAggregateFunctions());
     edgeGroupItem.getLabelGroup().resetAggregateValues();

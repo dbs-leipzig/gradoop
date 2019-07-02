@@ -17,34 +17,34 @@ package org.gradoop.storage.impl.accumulo.handler;
 
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Value;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.api.entities.EPGMGraphHeadFactory;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHeadFactory;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.storage.impl.accumulo.constants.AccumuloTables;
 
 /**
  * accumulo graph head handler for row's read/write operator
  */
-public class AccumuloGraphHandler implements AccumuloRowHandler<GraphHead, EPGMGraphHead> {
+public class AccumuloGraphHandler implements AccumuloRowHandler<EPGMGraphHead, GraphHead> {
 
   /**
    * graph head factory
    */
-  private final EPGMGraphHeadFactory<GraphHead> factory;
+  private final GraphHeadFactory<EPGMGraphHead> factory;
 
   /**
    * graph head handler constructor
    *
    * @param factory graph head factory
    */
-  public AccumuloGraphHandler(EPGMGraphHeadFactory<GraphHead> factory) {
+  public AccumuloGraphHandler(GraphHeadFactory<EPGMGraphHead> factory) {
     this.factory = factory;
   }
 
   @Override
   public Mutation writeRow(
     Mutation mutation,
-    EPGMGraphHead record
+    GraphHead record
   ) {
     mutation.put(AccumuloTables.KEY.LABEL, AccumuloTables.KEY.NONE, record.getLabel());
 
@@ -59,7 +59,7 @@ public class AccumuloGraphHandler implements AccumuloRowHandler<GraphHead, EPGMG
   }
 
   @Override
-  public GraphHead readRow(EPGMGraphHead origin) {
+  public EPGMGraphHead readRow(GraphHead origin) {
     return factory.initGraphHead(
       /*edge id*/origin.getId(),
       /*label*/origin.getLabel(),

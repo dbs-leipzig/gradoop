@@ -19,15 +19,15 @@ import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.Edge;
-import org.gradoop.common.model.impl.pojo.Vertex;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.common.model.impl.pojo.EPGMEdge;
 
 /**
  * Function updating the edges' sources or destination
  * for each newly created hypervertex
  */
 public class FlatJoinSourceEdgeReference
-  implements FlatJoinFunction<Edge, Tuple2<Vertex, GradoopId>, Edge> {
+  implements FlatJoinFunction<EPGMEdge, Tuple2<EPGMVertex, GradoopId>, EPGMEdge> {
 
   /**
    * Checking if the stuff is actually updating the sources.
@@ -45,7 +45,7 @@ public class FlatJoinSourceEdgeReference
   }
 
   @Override
-  public void join(Edge first, Tuple2<Vertex, GradoopId> second, Collector<Edge> out)
+  public void join(EPGMEdge first, Tuple2<EPGMVertex, GradoopId> second, Collector<EPGMEdge> out)
       throws Exception {
     if (second != null && !(second.f1.equals(GradoopId.NULL_VALUE))) {
       if (isItSourceDoingNow) {

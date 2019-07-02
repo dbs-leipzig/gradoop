@@ -17,8 +17,8 @@ package org.gradoop.storage.impl.hbase.api;
 
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
-import org.gradoop.common.model.api.entities.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.storage.impl.hbase.predicate.filter.api.HBaseElementFilter;
 import org.gradoop.storage.common.predicate.query.ElementQuery;
 
@@ -35,7 +35,7 @@ public interface GraphHeadHandler extends ElementHandler {
    * @param graphData graph data
    * @return put with graph data
    */
-  Put writeGraphHead(final Put put, final EPGMGraphHead graphData);
+  Put writeGraphHead(final Put put, final GraphHead graphData);
 
   /**
    * Reads the graph data from the given result.
@@ -43,7 +43,7 @@ public interface GraphHeadHandler extends ElementHandler {
    * @param res HBase row
    * @return graph entity
    */
-  GraphHead readGraphHead(final Result res);
+  EPGMGraphHead readGraphHead(final Result res);
 
   /**
    * Applies the given ElementQuery to the handler.
@@ -51,12 +51,12 @@ public interface GraphHeadHandler extends ElementHandler {
    * @param query the element query to apply
    * @return the GraphHeadHandler instance with the query applied
    */
-  GraphHeadHandler applyQuery(ElementQuery<HBaseElementFilter<GraphHead>> query);
+  GraphHeadHandler applyQuery(ElementQuery<HBaseElementFilter<EPGMGraphHead>> query);
 
   /**
    * Returns the element query or {@code null}, if no query was applied before.
    *
    * @return the element query or {@code null}, if no query was applied before
    */
-  ElementQuery<HBaseElementFilter<GraphHead>> getQuery();
+  ElementQuery<HBaseElementFilter<EPGMGraphHead>> getQuery();
 }

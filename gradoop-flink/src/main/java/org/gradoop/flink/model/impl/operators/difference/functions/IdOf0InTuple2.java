@@ -18,7 +18,7 @@ package org.gradoop.flink.model.impl.operators.difference.functions;
 import org.apache.flink.api.java.functions.FunctionAnnotation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.gradoop.common.model.impl.pojo.GraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
@@ -28,7 +28,7 @@ import org.gradoop.common.model.impl.id.GradoopId;
  * @param <C>  type of second element in tuple
  */
 @FunctionAnnotation.ForwardedFields("f0.id->*")
-public class IdOf0InTuple2<GD extends GraphHead, C>
+public class IdOf0InTuple2<GD extends EPGMGraphHead, C>
   implements KeySelector<Tuple2<GD, C>, GradoopId> {
 
   @Override
