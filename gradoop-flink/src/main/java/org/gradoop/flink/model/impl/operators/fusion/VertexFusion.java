@@ -21,9 +21,9 @@ import org.gradoop.common.model.impl.id.GradoopId;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.IdNotInBroadcast;
 import org.gradoop.flink.model.impl.functions.epgm.SourceId;
@@ -58,7 +58,7 @@ import org.gradoop.flink.model.impl.operators.fusion.functions.MapVerticesAsTupl
  *    appearing in the search graph that are not expressed in the pattern graph are
  *    rendered as hooks over the fused vertex
  */
-public class VertexFusion implements BinaryGraphToGraphOperator {
+public class VertexFusion implements BinaryBaseGraphToBaseGraphOperator<LogicalGraph> {
 
   /**
    * Fusing the already-combined sources

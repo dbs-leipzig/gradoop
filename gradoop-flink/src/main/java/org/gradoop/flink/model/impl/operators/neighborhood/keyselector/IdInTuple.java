@@ -42,7 +42,7 @@ public class IdInTuple<T extends Tuple> implements KeySelector<T, GradoopId> {
   }
 
   @Override
-  public GradoopId getKey(T tuple) throws Exception {
+  public GradoopId getKey(T tuple) {
     return ((GraphElement) tuple.getField(field)).getId();
   }
 }
