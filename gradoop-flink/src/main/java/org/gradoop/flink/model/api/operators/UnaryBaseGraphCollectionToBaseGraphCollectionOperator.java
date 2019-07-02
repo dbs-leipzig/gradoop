@@ -18,12 +18,10 @@ package org.gradoop.flink.model.api.operators;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 
 /**
- * Creates a graph collection of type {@link GC} based on one input graph collection of the
- * same type.
+ * Creates a graph collection of type {@link GC} based on one input graph collection of the same type.
  *
  * @param <GC> the type of the graph collection used as input and return value.
  */
-public interface UnaryBaseGraphCollectionToBaseGraphCollectionOperator<
-  GC extends BaseGraphCollection>
+public interface UnaryBaseGraphCollectionToBaseGraphCollectionOperator<GC extends BaseGraphCollection>
   extends UnaryBaseGraphCollectionToValueOperator<GC, GC> {
 }

@@ -23,8 +23,8 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
  * @param <GC> graph collection type
  * @param <V>  value type
  */
-public interface BinaryBaseGraphCollectionToValueOperator<
-  GC extends BaseGraphCollection, V> extends Operator {
+public interface BinaryBaseGraphCollectionToValueOperator<GC extends BaseGraphCollection, V>
+  extends Operator {
 
   /**
    * Executes the operator.

@@ -244,8 +244,7 @@ public interface BaseGraphCollectionOperators<
    * Returns a 1-element dataset containing a {@code boolean} value which
    * indicates if the graph collection is equal to the given graph collection.
    * <p>
-   * Equality is defined on the element data contained inside the collection,
-   * i.e. vertices and edges.
+   * Equality is defined on the element data contained inside the collection, i.e. vertices and edges.
    *
    * @param otherCollection graph collection to compare with
    * @return 1-element dataset containing {@code true} if the two collections
@@ -262,8 +261,7 @@ public interface BaseGraphCollectionOperators<
    * Returns a 1-element dataset containing a {@code boolean} value which
    * indicates if the graph collection is equal to the given graph collection.
    * <p>
-   * Equality is defined on the data contained inside the collection, i.e.
-   * graph heads, vertices and edges.
+   * Equality is defined on the data contained inside the collection, i.e. graph heads, vertices and edges.
    *
    * @param otherCollection graph collection to compare with
    * @return 1-element dataset containing {@code true} if the two collections
@@ -332,7 +330,8 @@ public interface BaseGraphCollectionOperators<
 
   /**
    * Transforms a graph collection into a base graph by applying a
-   * {@link BinaryBaseGraphToBaseGraphOperator} pairwise on the elements of the collection.
+   * {@link org.gradoop.flink.model.api.operators.BinaryBaseGraphToBaseGraphOperator}
+   * pairwise on the elements of the collection.
    *
    * @param operator reducible binary graph to graph operator
    * @return base graph
