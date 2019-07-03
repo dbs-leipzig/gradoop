@@ -185,7 +185,7 @@ public class TransactionalPatternMatching implements UnaryCollectionToCollection
     //--------------------------------------------------------------------------
     DataSet<EPGMGraphHead> newHeads = embeddings
       .map(new Project4To0And1<>())
-      .map(new InitGraphHeadWithLineage(collection.getConfig().getGraphHeadFactory()));
+      .map(new InitGraphHeadWithLineage(collection.getFactory().getGraphHeadFactory()));
 
     //--------------------------------------------------------------------------
     // update vertex graphs

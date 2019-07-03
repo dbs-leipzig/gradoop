@@ -56,12 +56,12 @@ public class LogicalGraphCSVDataSource extends LogicalGraphCSVBase implements Da
 
     DataSet<EPGMVertex> vertices = getConfig().getExecutionEnvironment()
       .readTextFile(getVertexCSVPath())
-      .map(new CSVLineToVertex(getConfig().getVertexFactory()))
+      .map(new CSVLineToVertex(getConfig().getLogicalGraphFactory().getVertexFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
     DataSet<EPGMEdge> edges = getConfig().getExecutionEnvironment()
       .readTextFile(getEdgeCSVPath())
-      .map(new CSVLineToEdge(getConfig().getEdgeFactory()))
+      .map(new CSVLineToEdge(getConfig().getLogicalGraphFactory().getEdgeFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
 
     return getConfig().getLogicalGraphFactory().fromDataSets(vertices, edges);

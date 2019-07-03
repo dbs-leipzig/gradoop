@@ -74,7 +74,7 @@ public class TxCollectionLayoutFactory extends BaseFactory
 
     // Add a dummy graph head for entities which have no assigned graph
     DataSet<EPGMGraphHead> dbGraphHead = getConfig().getExecutionEnvironment().fromElements(
-      getConfig().getGraphHeadFactory()
+      getGraphHeadFactory()
         .initGraphHead(GradoopConstants.DB_GRAPH_ID, GradoopConstants.DB_GRAPH_LABEL)
     );
     inGraphHeads = inGraphHeads.union(dbGraphHead);
