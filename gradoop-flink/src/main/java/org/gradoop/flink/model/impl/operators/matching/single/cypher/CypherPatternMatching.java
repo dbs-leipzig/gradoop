@@ -124,16 +124,16 @@ public class CypherPatternMatching extends PatternMatching {
       constructFinalElements(graph, embeddings, embeddingMetaData) :
       embeddings.flatMap(
         new ElementsFromEmbedding(
-          graph.getConfig().getGraphHeadFactory(),
-          graph.getConfig().getVertexFactory(),
-          graph.getConfig().getEdgeFactory(),
+          graph.getFactory().getGraphHeadFactory(),
+          graph.getFactory().getVertexFactory(),
+          graph.getFactory().getEdgeFactory(),
           embeddingMetaData,
           queryHandler.getSourceTargetVariables()));
 
     // Post processing
     return
       doAttachData() ? PostProcessor.extractGraphCollectionWithData(finalElements, graph, true) :
-      PostProcessor.extractGraphCollection(finalElements, graph.getConfig(), true);
+      PostProcessor.extractGraphCollection(finalElements, graph.getCollectionFactory(), true);
   }
 
   /**
@@ -166,9 +166,9 @@ public class CypherPatternMatching extends PatternMatching {
 
     return addEmbeddingsElements.evaluate().flatMap(
       new ElementsFromEmbedding(
-        graph.getConfig().getGraphHeadFactory(),
-        graph.getConfig().getVertexFactory(),
-        graph.getConfig().getEdgeFactory(),
+        graph.getFactory().getGraphHeadFactory(),
+        graph.getFactory().getVertexFactory(),
+        graph.getFactory().getEdgeFactory(),
         newMetaData,
         constructionPatternHandler.getSourceTargetVariables(),
         constructionPatternHandler.getLabelsForVariables(newVars)));

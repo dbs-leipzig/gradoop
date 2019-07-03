@@ -176,7 +176,7 @@ public class CAPFQuery implements Operator {
         ),
         verticesWithIds,
         edgesWithIds,
-        graph.getConfig()
+        graph.getCollectionFactory()
       );
     }
 
