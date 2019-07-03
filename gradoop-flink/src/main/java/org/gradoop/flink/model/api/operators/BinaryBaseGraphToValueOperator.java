@@ -15,25 +15,21 @@
  */
 package org.gradoop.flink.model.api.operators;
 
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.operators.combination.Combination;
-import org.gradoop.flink.model.impl.operators.exclusion.Exclusion;
-import org.gradoop.flink.model.impl.operators.overlap.Overlap;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
 
 /**
- * Creates a {@link LogicalGraph} based on two input graphs.
+ * Creates a value of type {@link V} from two input graphs of type {@link LG}.
  *
- * @see Combination
- * @see Exclusion
- * @see Overlap
+ * @param <LG> the input graphs type
+ * @param <V> the type of the return value
  */
-public interface BinaryGraphToGraphOperator extends Operator {
+public interface BinaryBaseGraphToValueOperator<LG extends BaseGraph, V> extends Operator {
   /**
-   * Executes the operator.
+   * Executes the operator on the given graphs.
    *
-   * @param firstGraph  first input graph
+   * @param firstGraph first input graph
    * @param secondGraph second input graph
    * @return operator result
    */
-  LogicalGraph execute(LogicalGraph firstGraph, LogicalGraph secondGraph);
+  V execute(LG firstGraph, LG secondGraph);
 }

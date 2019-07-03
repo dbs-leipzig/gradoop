@@ -15,33 +15,19 @@
  */
 package org.gradoop.flink.model.api.epgm;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.metadata.MetaData;
-import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
-import org.gradoop.flink.model.api.functions.EdgeAggregateFunction;
-import org.gradoop.flink.model.api.functions.TransformationFunction;
-import org.gradoop.flink.model.api.functions.VertexAggregateFunction;
-import org.gradoop.flink.model.api.operators.BinaryGraphToGraphOperator;
 import org.gradoop.flink.model.api.operators.GraphsToGraphOperator;
-import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.CAPFQueryResult;
-import org.gradoop.flink.model.impl.operators.grouping.Grouping;
-import org.gradoop.flink.model.impl.operators.grouping.GroupingStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.MatchStrategy;
 import org.gradoop.flink.model.impl.operators.matching.common.statistics.GraphStatistics;
-import org.gradoop.flink.model.impl.operators.neighborhood.Neighborhood;
 import org.gradoop.flink.model.impl.operators.sampling.SamplingAlgorithm;
-import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Defines the operators that are available on a {@link LogicalGraph}.
@@ -188,122 +174,6 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
     GraphStatistics graphStatistics);
 
   /**
-   * Creates a copy of the logical graph.
-   * <p>
-   * Note that this method creates new graph head, vertex and edge instances.
-   *
-   * @return projected logical graph
-   */
-  LogicalGraph copy();
-
-  /**
-   * Transforms the elements of the logical graph using the given transformation
-   * functions. The identity of the elements is preserved.
-   *
-   * @param graphHeadTransformationFunction graph head transformation function
-   * @param vertexTransformationFunction    vertex transformation function
-   * @param edgeTransformationFunction      edge transformation function
-   * @return transformed logical graph
-   */
-  LogicalGraph transform(
-    TransformationFunction<EPGMGraphHead> graphHeadTransformationFunction,
-    TransformationFunction<EPGMVertex> vertexTransformationFunction,
-    TransformationFunction<EPGMEdge> edgeTransformationFunction);
-
-  /**
-   * Transforms the graph head of the logical graph using the given
-   * transformation function. The identity of the graph is preserved.
-   *
-   * @param graphHeadTransformationFunction graph head transformation function
-   * @return transformed logical graph
-   */
-  LogicalGraph transformGraphHead(
-    TransformationFunction<EPGMGraphHead> graphHeadTransformationFunction);
-
-  /**
-   * Transforms the vertices of the logical graph using the given transformation
-   * function. The identity of the vertices is preserved.
-   *
-   * @param vertexTransformationFunction vertex transformation function
-   * @return transformed logical graph
-   */
-  LogicalGraph transformVertices(TransformationFunction<EPGMVertex> vertexTransformationFunction);
-
-  /**
-   * Transforms the edges of the logical graph using the given transformation
-   * function. The identity of the edges is preserved.
-   *
-   * @param edgeTransformationFunction edge transformation function
-   * @return transformed logical graph
-   */
-  LogicalGraph transformEdges(TransformationFunction<EPGMEdge> edgeTransformationFunction);
-
-  /**
-   * Returns the subgraph that is induced by the vertices which fulfill the
-   * given filter function.
-   *
-   * @param vertexFilterFunction vertex filter function
-   * @return vertex-induced subgraph as a new logical graph
-   */
-  LogicalGraph vertexInducedSubgraph(FilterFunction<EPGMVertex> vertexFilterFunction);
-
-  /**
-   * Returns the subgraph that is induced by the edges which fulfill the given
-   * filter function.
-   *
-   * @param edgeFilterFunction edge filter function
-   * @return edge-induced subgraph as a new logical graph
-   */
-  LogicalGraph edgeInducedSubgraph(FilterFunction<EPGMEdge> edgeFilterFunction);
-
-  /**
-   * Returns a subgraph of the logical graph which contains only those vertices
-   * and edges that fulfil the given vertex and edge filter function
-   * respectively.
-   * <p>
-   * Note, that the operator does not verify the consistency of the resulting
-   * graph. Use {#toGellyGraph().subgraph()} for that behaviour.
-   *
-   * @param vertexFilterFunction vertex filter function
-   * @param edgeFilterFunction   edge filter function
-   * @return logical graph which fulfils the given predicates and is a subgraph
-   * of that graph
-   */
-  default LogicalGraph subgraph(FilterFunction<EPGMVertex> vertexFilterFunction,
-    FilterFunction<EPGMEdge> edgeFilterFunction) {
-    Objects.requireNonNull(vertexFilterFunction);
-    Objects.requireNonNull(edgeFilterFunction);
-    return subgraph(vertexFilterFunction, edgeFilterFunction, Subgraph.Strategy.BOTH);
-  }
-
-  /**
-   * Returns a subgraph of the logical graph which contains only those vertices
-   * and edges that fulfil the given vertex and edge filter function
-   * respectively.
-   * <p>
-   * Note, that the operator does not verify the consistency of the resulting
-   * graph. Use {#toGellyGraph().subgraph()} for that behaviour.
-   *
-   * @param vertexFilterFunction vertex filter function
-   * @param edgeFilterFunction   edge filter function
-   * @param strategy             execution strategy for the operator
-   * @return logical graph which fulfils the given predicates and is a subgraph
-   * of that graph
-   */
-  LogicalGraph subgraph(FilterFunction<EPGMVertex> vertexFilterFunction,
-    FilterFunction<EPGMEdge> edgeFilterFunction, Subgraph.Strategy strategy);
-
-  /**
-   * Applies the given aggregate functions to the logical graph and stores the
-   * result of those functions at the resulting graph using the given property
-   * keys.
-   *
-   * @param aggregateFunctions computes aggregates on the logical graph
-   * @return logical graph with additional properties storing the aggregates
-   */
-  LogicalGraph aggregate(AggregateFunction... aggregateFunctions);
-
-  /**
    * Creates a new graph from a randomly chosen subset of nodes and their
    * associated edges.
    *
@@ -311,94 +181,6 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
    * @return logical graph with random nodes and their associated edges
    */
   LogicalGraph sample(SamplingAlgorithm algorithm);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices based on the specified
-   * property keys.
-   * <p>
-   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
-   * incident vertices.
-   * <p>
-   * Note: To group vertices by their type label, one needs to add the specific symbol
-   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
-   *
-   * @param vertexGroupingKeys property keys to group vertices
-   * @return summary graph
-   * @see Grouping
-   */
-  LogicalGraph groupBy(List<String> vertexGroupingKeys);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices and edges based on given
-   * property keys.
-   * <p>
-   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
-   * incident vertices and explicitly by the specified edge grouping keys.
-   * <p>
-   * One needs to at least specify a list of vertex grouping keys. Any other argument may be
-   * {@code null}.
-   * <p>
-   * Note: To group vertices/edges by their type label, one needs to add the specific symbol
-   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
-   *
-   * @param vertexGroupingKeys property keys to group vertices
-   * @param edgeGroupingKeys   property keys to group edges
-   * @return summary graph
-   * @see Grouping
-   */
-  LogicalGraph groupBy(List<String> vertexGroupingKeys, List<String> edgeGroupingKeys);
-
-  /**
-   * Creates a condensed version of the logical graph by grouping vertices and edges based on given
-   * property keys.
-   * <p>
-   * Vertices are grouped by the given property keys. Edges are implicitly grouped along with their
-   * incident vertices and explicitly by the specified edge grouping keys. Furthermore, one can
-   * specify sets of vertex and edge aggregate functions which are applied on vertices/edges
-   * represented by the same super vertex/edge.
-   * <p>
-   * One needs to at least specify a list of vertex grouping keys. Any other argument may be
-   * {@code null}.
-   * <p>
-   * Note: To group vertices/edges by their type label, one needs to add the specific symbol
-   * {@link Grouping#LABEL_SYMBOL} to the respective grouping keys.
-   *
-   * @param vertexGroupingKeys       property keys to group vertices
-   * @param vertexAggregateFunctions aggregate functions to apply on super vertices
-   * @param edgeGroupingKeys         property keys to group edges
-   * @param edgeAggregateFunctions   aggregate functions to apply on super edges
-   * @param groupingStrategy         execution strategy for vertex grouping
-   * @return summary graph
-   * @see Grouping
-   */
-  LogicalGraph groupBy(
-    List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
-    List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions,
-    GroupingStrategy groupingStrategy);
-
-  /**
-   * Sets the aggregation result of the given function as property for each vertex. All edges where
-   * the vertex is relevant get joined first and then grouped. The relevant edges are specified
-   * using the direction which may direct to the vertex, or from the vertex or both.
-   *
-   * @param function      aggregate function
-   * @param edgeDirection incoming, outgoing edges or both
-   * @return logical graph where vertices store aggregated information about connected edges
-   */
-  LogicalGraph reduceOnEdges(
-    EdgeAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
-
-  /**
-   * Sets the aggregation result of the given function as property for each vertex. All vertices
-   * of relevant edges get joined first and then grouped by the vertex. The relevant edges are
-   * specified using the direction which may direct to the vertex, or from the vertex or both.
-   *
-   * @param function      aggregate function
-   * @param edgeDirection incoming, outgoing edges or both
-   * @return logical graph where vertices store aggregated information about connected vertices
-   */
-  LogicalGraph reduceOnNeighbors(
-    VertexAggregateFunction function, Neighborhood.EdgeDirection edgeDirection);
 
   /**
    * Checks, if another logical graph contains exactly the same vertices and
@@ -459,63 +241,6 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
     List<String> vertexGroupingKeys, List<AggregateFunction> vertexAggregateFunctions,
     List<String> edgeGroupingKeys, List<AggregateFunction> edgeAggregateFunctions);
 
-  /**
-   * Verifies this graph, removing dangling edges, i.e. edges pointing to or from
-   * a vertex not contained in this graph.<br>
-   * This operator can be applied after an operator that has not checked the graphs validity.
-   * The graph head of this logical graph remains unchanged.
-   *
-   * @return this graph with all dangling edges removed.
-   */
-  LogicalGraph verify();
-
-  /**
-   * Verifies this graph, removing dangling graph ids from its elements,
-   * i.e. ids different from this graph heads id.<br>
-   * This operator can be applied after an operator that has not checked the graphs validity.
-   * The graph head of this logical graph remains unchanged.
-   *
-   * @return this graph with all dangling graph ids removed.
-   */
-  LogicalGraph verifyGraphContainment();
-
-  //----------------------------------------------------------------------------
-  // Binary Operators
-  //----------------------------------------------------------------------------
-
-  /**
-   * Creates a new logical graph by combining the vertex and edge sets of
-   * this graph and the given graph. Vertex and edge equality is based on their
-   * identifiers.
-   *
-   * @param otherGraph logical graph to combine this graph with
-   * @return logical graph containing all vertices and edges of the
-   * input graphs
-   */
-  LogicalGraph combine(LogicalGraph otherGraph);
-
-  /**
-   * Creates a new logical graph containing the overlapping vertex and edge
-   * sets of this graph and the given graph. Vertex and edge equality is
-   * based on their identifiers.
-   *
-   * @param otherGraph logical graph to compute overlap with
-   * @return logical graph that contains all vertices and edges that exist in
-   * both input graphs
-   */
-  LogicalGraph overlap(LogicalGraph otherGraph);
-
-  /**
-   * Creates a new logical graph containing only vertices and edges that
-   * exist in that graph but not in the other graph. Vertex and edge equality
-   * is based on their identifiers.
-   *
-   * @param otherGraph logical graph to exclude from that graph
-   * @return logical that contains only vertices and edges that are not in
-   * the other graph
-   */
-  LogicalGraph exclude(LogicalGraph otherGraph);
-
   //----------------------------------------------------------------------------
   // Auxiliary Operators
   //----------------------------------------------------------------------------
@@ -531,26 +256,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   GraphCollection splitBy(String propertyKey);
 
   /**
-   * Creates a logical graph using the given unary graph operator.
-   *
-   * @param operator unary graph to graph operator
-   * @return result of given operator
-   */
-  LogicalGraph callForGraph(UnaryBaseGraphToBaseGraphOperator<LogicalGraph> operator);
-
-  /**
-   * Creates a logical graph from that graph and the input graph using the
-   * given binary operator.
-   *
-   * @param operator   binary graph to graph operator
-   * @param otherGraph other graph
-   * @return result of given operator
-   */
-  LogicalGraph callForGraph(BinaryGraphToGraphOperator operator, LogicalGraph otherGraph);
-
-  /**
-   * Creates a logical graph from that graph and other graphs using the given
-   * operator.
+   * Creates a logical graph from that graph and other graphs using the given operator.
    *
    * @param operator    multi graph to graph operator
    * @param otherGraphs other graphs
@@ -559,8 +265,7 @@ public interface LogicalGraphOperators extends GraphBaseOperators {
   LogicalGraph callForGraph(GraphsToGraphOperator operator, LogicalGraph... otherGraphs);
 
   /**
-   * Creates a graph collection from that graph using the given unary graph
-   * operator.
+   * Creates a graph collection from that graph using the given unary graph operator.
    *
    * @param operator unary graph to collection operator
    * @return result of given operator
