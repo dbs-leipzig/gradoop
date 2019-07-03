@@ -54,6 +54,5 @@ public class CSVLineToVertex extends CSVLineToElement<EPGMVertex> {
       parseProperties(MetaDataSource.VERTEX_TYPE, label, tokens[3]),
       parseGradoopIds(tokens[1])
     );
-
   }
 }
