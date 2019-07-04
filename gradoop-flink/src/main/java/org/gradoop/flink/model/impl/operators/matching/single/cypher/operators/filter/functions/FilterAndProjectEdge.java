@@ -17,6 +17,7 @@ package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.util.Collector;
+import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.pojos.EmbeddingFactory;
@@ -27,8 +28,10 @@ import java.util.List;
 /**
  * Applies a given predicate on a {@link EPGMEdge} and projects specified property values to the
  * output embedding.
+ *
+ * @param <E> The edge type.
  */
-public class FilterAndProjectEdge extends RichFlatMapFunction<EPGMEdge, Embedding> {
+public class FilterAndProjectEdge<E extends Edge> extends RichFlatMapFunction<E, Embedding> {
   /**
    * Predicates used for filtering
    */
@@ -56,7 +59,7 @@ public class FilterAndProjectEdge extends RichFlatMapFunction<EPGMEdge, Embeddin
   }
 
   @Override
-  public void flatMap(EPGMEdge edge, Collector<Embedding> out) throws Exception {
+  public void flatMap(E edge, Collector<Embedding> out) throws Exception {
     if (predicates.evaluate(edge)) {
       out.collect(EmbeddingFactory.fromEdge(edge, projectionPropertyKeys, isLoop));
     }

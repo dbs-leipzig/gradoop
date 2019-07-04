@@ -16,8 +16,12 @@
 package org.gradoop.flink.model.impl.operators.matching.common;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.GraphHead;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraph;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.BuildIdWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.BuildTripleWithCandidates;
 import org.gradoop.flink.model.impl.operators.matching.common.functions.MatchingEdges;
@@ -41,10 +45,19 @@ public class PreProcessor {
    *
    * @param graph data graph
    * @param query query graph
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
+   * @param <LG> The graph type.
+   * @param <GC> The graph collection type.
    * @return dataset with matching vertex ids and their candidates
    */
-  public static DataSet<IdWithCandidates<GradoopId>> filterVertices(
-    LogicalGraph graph, final String query) {
+  public static <G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> DataSet<IdWithCandidates<GradoopId>> filterVertices(
+    LG graph, final String query) {
     return graph.getVertices()
       .filter(new MatchingVertices<>(query))
       .map(new BuildIdWithCandidates<>(query));
@@ -56,10 +69,19 @@ public class PreProcessor {
    *
    * @param graph data graph
    * @param query query graph
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
+   * @param <LG> The graph type.
+   * @param <GC> The graph collection type.
    * @return dataset with matching edge triples and their candidates
    */
-  public static DataSet<TripleWithCandidates<GradoopId>> filterEdges(
-    LogicalGraph graph, final String query) {
+  public static <G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> DataSet<TripleWithCandidates<GradoopId>> filterEdges(
+    LG graph, final String query) {
     return graph.getEdges()
       .filter(new MatchingEdges<>(query))
       .map(new BuildTripleWithCandidates<>(query));
@@ -72,10 +94,19 @@ public class PreProcessor {
    *
    * @param g     data graph
    * @param query query graph
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
+   * @param <LG> The graph type.
+   * @param <GC> The graph collection type.
    * @return dataset with matching vertex-edge pairs
    */
-  public static DataSet<TripleWithSourceEdgeCandidates<GradoopId>> filterPairs(
-    LogicalGraph g, final String query) {
+  public static <G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> DataSet<TripleWithSourceEdgeCandidates<GradoopId>>
+    filterPairs(LG g, final String query) {
     return filterPairs(g, query, filterVertices(g, query));
   }
 
@@ -87,11 +118,19 @@ public class PreProcessor {
    * @param graph             data graph
    * @param query             query graph
    * @param filteredVertices  used for the edge join
-
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
+   * @param <LG> The graph type.
+   * @param <GC> The graph collection type.
    * @return dataset with matching vertex-edge pairs and their candidates
    */
-  public static DataSet<TripleWithSourceEdgeCandidates<GradoopId>> filterPairs(
-    LogicalGraph graph, final String query,
+  public static <G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> DataSet<TripleWithSourceEdgeCandidates<GradoopId>>
+    filterPairs(LG graph, final String query,
     DataSet<IdWithCandidates<GradoopId>> filteredVertices) {
     return filteredVertices
       .join(filterEdges(graph, query))
@@ -106,10 +145,19 @@ public class PreProcessor {
    *
    * @param graph data graph
    * @param query query graph
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
+   * @param <LG> The graph type.
+   * @param <GC> The graph collection type.
    * @return dataset with matching triples
    */
-  public static DataSet<TripleWithCandidates<GradoopId>> filterTriplets(
-    LogicalGraph graph, final String query) {
+  public static <G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> DataSet<TripleWithCandidates<GradoopId>> filterTriplets(
+    LG graph, final String query) {
     return filterTriplets(graph, query, filterVertices(graph, query));
   }
 
@@ -121,10 +169,19 @@ public class PreProcessor {
    * @param graph             data graph
    * @param query             query graph
    * @param filteredVertices  used for the edge join
+   * @param <G> The graph head type.
+   * @param <V> The vertex type.
+   * @param <E> The edge type.
+   * @param <LG> The graph type.
+   * @param <GC> The graph collection type.
    * @return dataset with matching triples and their candidates
    */
-  public static DataSet<TripleWithCandidates<GradoopId>> filterTriplets(
-    LogicalGraph graph, final String query,
+  public static <G extends GraphHead,
+    V extends Vertex,
+    E extends Edge,
+    LG extends BaseGraph<G, V, E, LG, GC>,
+    GC extends BaseGraphCollection<G, V, E, LG, GC>> DataSet<TripleWithCandidates<GradoopId>> filterTriplets(
+    LG graph, final String query,
     DataSet<IdWithCandidates<GradoopId>> filteredVertices) {
     return filterPairs(graph, query, filteredVertices)
       .join(filteredVertices)

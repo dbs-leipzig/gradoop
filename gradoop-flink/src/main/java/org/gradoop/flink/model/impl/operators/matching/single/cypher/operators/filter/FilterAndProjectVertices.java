@@ -16,6 +16,7 @@
 package org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.filter;
 
 import org.apache.flink.api.java.DataSet;
+import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.model.impl.operators.matching.common.query.predicates.CNF;
 import org.gradoop.flink.model.impl.operators.matching.single.cypher.operators.PhysicalOperator;
@@ -38,12 +39,14 @@ import java.util.List;
  * {@link Embedding}:
  *
  * ([IdEntry(0)],[PropertyEntry(Alice),PropertyEntry(NULL)])
+ *
+ * @param <V> The vertex type.
  */
-public class FilterAndProjectVertices implements PhysicalOperator {
+public class FilterAndProjectVertices<V extends Vertex> implements PhysicalOperator {
   /**
    * Input vertices
    */
-  private final DataSet<EPGMVertex> input;
+  private final DataSet<V> input;
   /**
    * Predicates in conjunctive normal form
    */
@@ -65,7 +68,7 @@ public class FilterAndProjectVertices implements PhysicalOperator {
    * @param predicates Predicates used to filter vertices
    * @param projectionPropertyKeys Property keys used for projection
    */
-  public FilterAndProjectVertices(DataSet<EPGMVertex> input, CNF predicates,
+  public FilterAndProjectVertices(DataSet<V> input, CNF predicates,
     List<String> projectionPropertyKeys) {
     this.input = input;
     this.predicates = predicates;
@@ -76,7 +79,7 @@ public class FilterAndProjectVertices implements PhysicalOperator {
   @Override
   public DataSet<Embedding> evaluate() {
     return input
-      .flatMap(new FilterAndProjectVertex(predicates, projectionPropertyKeys))
+      .flatMap(new FilterAndProjectVertex<>(predicates, projectionPropertyKeys))
       .name(getName());
   }
 
