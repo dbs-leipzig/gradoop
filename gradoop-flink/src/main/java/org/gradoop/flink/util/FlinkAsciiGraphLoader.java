@@ -24,6 +24,7 @@ import org.gradoop.common.util.AsciiGraphLoader;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.functions.epgm.RenameLabel;
 
 import java.io.IOException;
@@ -69,7 +70,7 @@ public class FlinkAsciiGraphLoader {
     if (asciiGraphs == null) {
       throw new IllegalArgumentException("AsciiGraph must not be null");
     }
-    loader = AsciiGraphLoader.fromString(asciiGraphs, config);
+    loader = AsciiGraphLoader.fromString(asciiGraphs, config.getLogicalGraphFactory());
   }
 
   /**
@@ -82,7 +83,7 @@ public class FlinkAsciiGraphLoader {
     if (stream == null) {
       throw new IllegalArgumentException("AsciiGraph must not be null");
     }
-    loader = AsciiGraphLoader.fromStream(stream, config);
+    loader = AsciiGraphLoader.fromStream(stream, config.getLogicalGraphFactory());
   }
 
   /**
@@ -113,7 +114,7 @@ public class FlinkAsciiGraphLoader {
     if (fileName == null) {
       throw new IllegalArgumentException("FileName must not be null.");
     }
-    loader = AsciiGraphLoader.fromFile(fileName, config);
+    loader = AsciiGraphLoader.fromFile(fileName, config.getLogicalGraphFactory());
   }
 
   /**
@@ -137,14 +138,15 @@ public class FlinkAsciiGraphLoader {
    * @return logical graph of vertex and edge space
    */
   public LogicalGraph getLogicalGraph(boolean withGraphContainment) {
+    final LogicalGraphFactory factory = config.getLogicalGraphFactory();
     if (withGraphContainment) {
-      return config.getLogicalGraphFactory().fromCollections(getVertices(), getEdges())
+      return factory.fromCollections(getVertices(), getEdges())
         .transformGraphHead(new RenameLabel<>(GradoopConstants.DEFAULT_GRAPH_LABEL,
           GradoopConstants.DB_GRAPH_LABEL));
     } else {
-      EPGMGraphHead graphHead = config.getGraphHeadFactory()
+      EPGMGraphHead graphHead = factory.getGraphHeadFactory()
         .createGraphHead(GradoopConstants.DB_GRAPH_LABEL);
-      return config.getLogicalGraphFactory().fromCollections(graphHead, getVertices(), getEdges());
+      return factory.fromCollections(graphHead, getVertices(), getEdges());
     }
   }
 
