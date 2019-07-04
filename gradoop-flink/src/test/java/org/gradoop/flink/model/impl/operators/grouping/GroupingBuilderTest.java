@@ -27,6 +27,13 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
+
+/**
+ * This class tests the correct instantiation of {@link Grouping} operators using
+ * its {@link Grouping.GroupingBuilder}.
+ */
 public class GroupingBuilderTest {
 
   /**
@@ -39,6 +46,34 @@ public class GroupingBuilderTest {
     new Grouping.GroupingBuilder()
       .useVertexLabel(true)
       .build();
+  }
+
+  /**
+   * Tests {@link Grouping.GroupingBuilder#build()} with strategy set to
+   * {@link GroupingStrategy#GROUP_REDUCE}.
+   */
+  @Test
+  public void testGroupReduceStrategy() {
+    Grouping grouping = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_REDUCE)
+      .useVertexLabel(true)
+      .build();
+    assertFalse(grouping instanceof GroupingGroupCombine);
+    assertTrue(grouping instanceof GroupingGroupReduce);
+  }
+
+  /**
+   * Tests {@link Grouping.GroupingBuilder#build()} with strategy set to
+   * {@link GroupingStrategy#GROUP_COMBINE}.
+   */
+  @Test
+  public void testGroupCombineStrategy() {
+    Grouping grouping = new Grouping.GroupingBuilder()
+      .setStrategy(GroupingStrategy.GROUP_COMBINE)
+      .useVertexLabel(true)
+      .build();
+    assertFalse(grouping instanceof GroupingGroupReduce);
+    assertTrue(grouping instanceof GroupingGroupCombine);
   }
 
   /**
