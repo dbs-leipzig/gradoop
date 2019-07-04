@@ -26,6 +26,7 @@ import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
+import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.io.IOException;
@@ -81,8 +82,9 @@ public class LogicalGraphIndexedCSVDataSource extends LogicalGraphCSVBase implem
     MetaData metaData = MetaData.fromFile(getMetaDataPath(), hdfsConfig);
 
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-    VertexFactory<EPGMVertex> vertexFactory = getConfig().getLogicalGraphFactory().getVertexFactory();
-    EdgeFactory<EPGMEdge> edgeFactory = getConfig().getLogicalGraphFactory().getEdgeFactory();
+    LogicalGraphFactory factory = getConfig().getLogicalGraphFactory();
+    VertexFactory<EPGMVertex> vertexFactory = factory.getVertexFactory();
+    EdgeFactory<EPGMEdge> edgeFactory = factory.getEdgeFactory();
 
     Map<String, DataSet<EPGMVertex>> vertices = metaData.getVertexLabels().stream()
       .map(l -> Tuple2.of(l, env.readTextFile(getVertexCSVPath(l))
@@ -96,7 +98,7 @@ public class LogicalGraphIndexedCSVDataSource extends LogicalGraphCSVBase implem
         .withBroadcastSet(MetaData.fromFile(getMetaDataPath(), getConfig()), BC_METADATA)))
       .collect(Collectors.toMap(t -> t.f0, t -> t.f1));
 
-    return getConfig().getLogicalGraphFactory().fromIndexedDataSets(vertices, edges);
+    return factory.fromIndexedDataSets(vertices, edges);
   }
 
   @Override
