@@ -17,8 +17,8 @@ package org.gradoop.dataintegration.importer.impl.json.functions;
 
 import org.codehaus.jettison.json.JSONException;
 import org.gradoop.common.model.api.entities.Vertex;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.common.model.impl.properties.PropertyValue;
 import org.gradoop.flink.model.GradoopFlinkTestBase;
 import org.junit.Before;
@@ -37,7 +37,7 @@ public class MinimalJsonToVertexTest extends GradoopFlinkTestBase {
   /**
    * The factory used to create new vertices.
    */
-  private EPGMVertexFactory vertexFactory;
+  private VertexFactory<EPGMVertex> vertexFactory;
 
   /**
    * The vertex storing the expectedValue value.
@@ -54,7 +54,7 @@ public class MinimalJsonToVertexTest extends GradoopFlinkTestBase {
    */
   @Before
   public void setUp() {
-    vertexFactory = getConfig().getVertexFactory();
+    vertexFactory = getConfig().getLogicalGraphFactory().getVertexFactory();
     expectedValue = vertexFactory.createVertex(MinimalJsonToVertex.JSON_VERTEX_LABEL);
     function = new MinimalJsonToVertex(vertexFactory);
   }
