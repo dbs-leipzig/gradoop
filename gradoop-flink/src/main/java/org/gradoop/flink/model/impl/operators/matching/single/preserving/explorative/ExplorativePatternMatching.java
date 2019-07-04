@@ -127,8 +127,8 @@ public class ExplorativePatternMatching
   @Override
   protected GraphCollection executeForVertex(LogicalGraph graph) {
     GradoopFlinkConfig config = graph.getConfig();
-    GraphHeadFactory<EPGMGraphHead> graphHeadFactory = config.getGraphHeadFactory();
-    VertexFactory<EPGMVertex> vertexFactory = config.getVertexFactory();
+    GraphHeadFactory<EPGMGraphHead> graphHeadFactory = graph.getFactory().getGraphHeadFactory();
+    VertexFactory<EPGMVertex> vertexFactory = graph.getFactory().getVertexFactory();
     String variable = getQueryHandler().getVertices().iterator().next().getVariable();
 
     DataSet<EPGMVertex> matchingVertices = graph.getVertices()
@@ -213,15 +213,15 @@ public class ExplorativePatternMatching
 
     DataSet<EPGMElement> elements = embeddings
       .flatMap(new ElementsFromEmbedding(traversalCode,
-        graph.getConfig().getGraphHeadFactory(),
-        graph.getConfig().getVertexFactory(),
-        graph.getConfig().getEdgeFactory(),
+        graph.getFactory().getGraphHeadFactory(),
+        graph.getFactory().getVertexFactory(),
+        graph.getFactory().getEdgeFactory(),
         getQueryHandler()
       ));
 
     return doAttachData() ?
       PostProcessor.extractGraphCollectionWithData(elements, graph, true) :
-      PostProcessor.extractGraphCollection(elements, graph.getConfig(), true);
+      PostProcessor.extractGraphCollection(elements, graph.getCollectionFactory(), true);
   }
 
 

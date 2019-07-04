@@ -21,7 +21,6 @@ import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.accumulo.core.client.Connector;
 import org.gradoop.common.GradoopTestUtils;
-import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Edge;
@@ -287,6 +286,7 @@ public class StoreTest extends AccumuloStoreTestBase {
 
     GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
     graphStore.writeVertex(flinkConfig
+      .getLogicalGraphFactory()
       .getVertexFactory()
       .initVertex(vertexID, label, props, graphs));
   }
@@ -310,6 +310,7 @@ public class StoreTest extends AccumuloStoreTestBase {
     // write to store
     GradoopFlinkConfig flinkConfig = GradoopFlinkConfig.createConfig(getExecutionEnvironment());
     graphStore.writeVertex(flinkConfig
+      .getLogicalGraphFactory()
       .getVertexFactory()
       .initVertex(vertexID, label, properties, graphs));
 
@@ -395,7 +396,7 @@ public class StoreTest extends AccumuloStoreTestBase {
   private AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> getMinimalFullFeaturedGraphLoader() {
     String asciiGraph = ":G{k:\"v\"}[(v:V{k:\"v\"}),(v)-[:e{k:\"v\"}]->(v)]";
 
-    return AsciiGraphLoader.fromString(asciiGraph, GradoopConfig.getDefaultConfig());
+    return AsciiGraphLoader.fromString(asciiGraph, getConfig().getLogicalGraphFactory());
   }
 
   private void validateGraphHead(

@@ -28,14 +28,15 @@ import org.gradoop.common.model.impl.id.GradoopIdSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
+import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AddGradoopIdToRow;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AddNewGraphs;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.AggregateGraphs;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.CreateGraphHeadWithProperties;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.PropertyDecoder;
 import org.gradoop.flink.model.impl.operators.cypher.capf.result.functions.SplitRow;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 import org.opencypher.flink.api.CAPFSession;
 import org.opencypher.flink.impl.CAPFRecords;
 import org.opencypher.okapi.api.graph.CypherResult;
@@ -88,9 +89,10 @@ public class CAPFQueryResult {
   private DataSet<Tuple2<Long, EPGMEdge>> edgesWithIds;
 
   /**
-   * The GradoopFlinkConfig.
+   * The graph collection factory.
    */
-  private GradoopFlinkConfig config;
+  private BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+    factory;
 
   /**
    * Constructor;
@@ -98,17 +100,17 @@ public class CAPFQueryResult {
    * @param result          result of CAPF query
    * @param verticesWithIds map between long id and original vertex
    * @param edgesWithIds    map between long id and original edge
-   * @param config          the gradoop config
+   * @param factory         graph collection factory
    */
   public CAPFQueryResult(
     CypherResult result,
     DataSet<Tuple2<Long, EPGMVertex>> verticesWithIds,
     DataSet<Tuple2<Long, EPGMEdge>> edgesWithIds,
-    GradoopFlinkConfig config) {
+    BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection> factory) {
     this.records = (CAPFRecords) result.records();
     this.verticesWithIds = verticesWithIds;
     this.edgesWithIds = edgesWithIds;
-    this.config = config;
+    this.factory = factory;
 
     this.session = ((CAPFRecords) result.records()).capf();
     this.isGraph = !records.header().entityVars().isEmpty();
@@ -201,7 +203,7 @@ public class CAPFQueryResult {
       .map(new CreateGraphHeadWithProperties(
         entityFieldsCount,
         entityFieldsCount + otherFieldsCount,
-        config.getGraphHeadFactory(),
+        factory.getGraphHeadFactory(),
         otherVarNames)
       );
 
@@ -227,7 +229,7 @@ public class CAPFQueryResult {
     vertices = vertices.map(new PropertyDecoder<>());
     edges = edges.map(new PropertyDecoder<>());
 
-    return config.getGraphCollectionFactory().fromDataSets(graphHeads, vertices, edges);
+    return factory.fromDataSets(graphHeads, vertices, edges);
   }
 
   /**

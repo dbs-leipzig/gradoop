@@ -133,7 +133,7 @@ public class CypherPatternMatching extends PatternMatching {
     // Post processing
     return
       doAttachData() ? PostProcessor.extractGraphCollectionWithData(finalElements, graph, true) :
-      PostProcessor.extractGraphCollection(finalElements, graph.getConfig(), true);
+      PostProcessor.extractGraphCollection(finalElements, graph.getCollectionFactory(), true);
   }
 
   /**

@@ -113,7 +113,7 @@ public class BusinessTransactionGraphs implements
 
     DataSet<EPGMGraphHead> graphHeads = btgVerticesMap
       .map(new Value0Of2<>())
-      .map(new NewBtgGraphHead<>(iig.getConfig().getGraphHeadFactory()));
+      .map(new NewBtgGraphHead<>(iig.getFactory().getGraphHeadFactory()));
 
     // filter and update edges
     DataSet<EPGMEdge> btgEdges = iig.getEdges()

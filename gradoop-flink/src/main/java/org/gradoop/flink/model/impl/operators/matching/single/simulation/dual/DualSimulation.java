@@ -103,7 +103,7 @@ public class DualSimulation extends PatternMatching {
     } else {
       return collectionFactory.fromGraph(
         graphFactory.fromDataSets(matchingVertexIds
-            .map(new VertexFromId(graph.getConfig().getVertexFactory()))));
+            .map(new VertexFromId(graph.getFactory().getVertexFactory()))));
     }
   }
 
@@ -286,11 +286,11 @@ public class DualSimulation extends PatternMatching {
 
     DataSet<EPGMVertex> matchVertices = doAttachData() ?
       PostProcessor.extractVerticesWithData(vertices, graph.getVertices()) :
-      PostProcessor.extractVertices(vertices, config.getVertexFactory());
+      PostProcessor.extractVertices(vertices, graph.getFactory().getVertexFactory());
 
     DataSet<EPGMEdge> matchEdges = doAttachData() ?
       PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :
-      PostProcessor.extractEdges(vertices, config.getEdgeFactory());
+      PostProcessor.extractEdges(vertices, graph.getFactory().getEdgeFactory());
 
     return graph.getCollectionFactory().fromGraph(
       graph.getFactory().fromDataSets(matchVertices, matchEdges));
