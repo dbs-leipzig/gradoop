@@ -35,7 +35,7 @@ import java.util.Map;
 public interface GraphCollectionLayoutFactory<
   G extends GraphHead,
   V extends Vertex,
-  E extends Edge> extends BaseLayoutFactory {
+  E extends Edge> extends BaseLayoutFactory<G, V, E> {
   /**
    * Creates a collection layout from the given datasets.
    *

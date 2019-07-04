@@ -19,10 +19,10 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.hadoop.conf.Configuration;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
-import org.gradoop.common.model.impl.pojo.EPGMEdgeFactory;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMVertexFactory;
 import org.gradoop.flink.io.api.DataSource;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
@@ -81,8 +81,8 @@ public class LogicalGraphIndexedCSVDataSource extends LogicalGraphCSVBase implem
     MetaData metaData = MetaData.fromFile(getMetaDataPath(), hdfsConfig);
 
     ExecutionEnvironment env = getConfig().getExecutionEnvironment();
-    EPGMVertexFactory vertexFactory = getConfig().getVertexFactory();
-    EPGMEdgeFactory edgeFactory = getConfig().getEdgeFactory();
+    VertexFactory<EPGMVertex> vertexFactory = getConfig().getLogicalGraphFactory().getVertexFactory();
+    EdgeFactory<EPGMEdge> edgeFactory = getConfig().getLogicalGraphFactory().getEdgeFactory();
 
     Map<String, DataSet<EPGMVertex>> vertices = metaData.getVertexLabels().stream()
       .map(l -> Tuple2.of(l, env.readTextFile(getVertexCSVPath(l))

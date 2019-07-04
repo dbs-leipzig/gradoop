@@ -26,7 +26,10 @@ import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.common.model.impl.id.GradoopId;
 
 /**
- * Computes the overlap graph from a collection of logical graphs.
+ * Computes the overlap graph from a collection of base graphs.
+ * Creates a new logical graph containing the overlapping vertex and edge sets
+ * of the graphs contained in the given collection. Vertex and edge equality
+ * is based on their respective identifiers.
  *
  * @param <G> type of the graph head
  * @param <V> the vertex type
@@ -42,14 +45,6 @@ public class ReduceOverlap<
   GC extends BaseGraphCollection<G, V, E, LG, GC>> extends OverlapBase<V, E>
   implements ReducibleBinaryBaseGraphToBaseGraphOperator<GC, LG> {
 
-  /**
-   * Creates a new logical graph containing the overlapping vertex and edge sets
-   * of the graphs contained in the given collection. Vertex and edge equality
-   * is based on their respective identifiers.
-   *
-   * @param collection input collection
-   * @return graph with overlapping elements from the input collection
-   */
   @Override
   public LG execute(GC collection) {
     DataSet<G> graphHeads = collection.getGraphHeads();

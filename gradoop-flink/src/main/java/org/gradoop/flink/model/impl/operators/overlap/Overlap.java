@@ -27,6 +27,9 @@ import org.gradoop.flink.model.impl.functions.utils.LeftSide;
 
 /**
  * Computes the overlap graph from two base graphs.
+ * Creates a new base graph containing the overlapping vertex and edge
+ * sets of two input graphs. EPGMVertex and edge equality is based on their
+ * respective identifiers.
  *
  * @param <G>  The graph head type.
  * @param <V>  The vertex type.
@@ -42,14 +45,6 @@ public class Overlap<
   GC extends BaseGraphCollection<G, V, E, LG, GC>>
   implements BinaryBaseGraphToBaseGraphOperator<LG> {
 
-  /**
-   * Creates a new base graph containing the overlapping vertex and edge
-   * sets of two input graphs. Vertex and edge equality is based on their respective identifiers.
-   *
-   * @param firstGraph  first input graph
-   * @param secondGraph second input graph
-   * @return graph with overlapping elements from both input graphs
-   */
   @Override
   public LG execute(LG firstGraph, LG secondGraph) {
 

@@ -47,11 +47,6 @@ public class Difference<
   LG extends BaseGraph<G, V, E, LG, GC>,
   GC extends BaseGraphCollection<G, V, E, LG, GC>> extends SetOperatorBase<G, V, E, LG, GC> {
 
-  /**
-   * Computes the logical graph dataset for the resulting collection.
-   *
-   * @return logical graph dataset of the resulting collection
-   */
   @Override
   protected DataSet<G> computeNewGraphHeads() {
     // assign 1L to each graph in the first collection

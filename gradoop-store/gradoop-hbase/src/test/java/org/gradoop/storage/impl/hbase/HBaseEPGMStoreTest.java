@@ -16,7 +16,6 @@
 package org.gradoop.storage.impl.hbase;
 
 import com.google.common.collect.Lists;
-import org.gradoop.common.config.GradoopConfig;
 import org.gradoop.common.exceptions.UnsupportedTypeException;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.GraphHead;
@@ -373,7 +372,7 @@ public class HBaseEPGMStoreTest extends GradoopHBaseTestBase {
 
   private AsciiGraphLoader<EPGMGraphHead, EPGMVertex, EPGMEdge> getMinimalFullFeaturedGraphLoader() {
     String asciiGraph = ":G{k:\"v\"}[(v:V{k:\"v\"}),(v)-[:e{k:\"v\"}]->(v)]";
-    return AsciiGraphLoader.fromString(asciiGraph, GradoopConfig.getDefaultConfig());
+    return AsciiGraphLoader.fromString(asciiGraph, getEPGMElementFactoryProvider());
   }
 
   private void validateGraphHead(HBaseEPGMStore graphStore, EPGMGraphHead originalGraphHead)
