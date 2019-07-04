@@ -50,7 +50,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.fu
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Deletion;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.FatVertex;
 import org.gradoop.flink.model.impl.operators.matching.single.simulation.dual.tuples.Message;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import static org.gradoop.flink.model.impl.operators.matching.common.debug.Printer.log;
 
@@ -282,7 +281,6 @@ public class DualSimulation extends PatternMatching {
    */
   private GraphCollection postProcess(LogicalGraph graph,
     DataSet<FatVertex> vertices) {
-    GradoopFlinkConfig config = graph.getConfig();
 
     DataSet<EPGMVertex> matchVertices = doAttachData() ?
       PostProcessor.extractVerticesWithData(vertices, graph.getVertices()) :

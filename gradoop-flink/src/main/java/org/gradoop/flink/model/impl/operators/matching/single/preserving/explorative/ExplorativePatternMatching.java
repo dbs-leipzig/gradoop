@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
 import org.gradoop.common.model.api.entities.GraphHeadFactory;
 import org.gradoop.common.model.api.entities.VertexFactory;
 import org.gradoop.common.model.impl.id.GradoopId;
+import org.gradoop.common.model.impl.pojo.EPGMElement;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
-import org.gradoop.common.model.impl.pojo.EPGMElement;
+import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.api.operators.UnaryGraphToCollectionOperator;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.tuple.ObjectTo1;
@@ -55,7 +55,6 @@ import org.gradoop.flink.model.impl.operators.matching.single.preserving.explora
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TraverserStrategy;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleForLoopTraverser;
 import org.gradoop.flink.model.impl.operators.matching.single.preserving.explorative.traverser.TripleTraverser;
-import org.gradoop.flink.util.GradoopFlinkConfig;
 
 import java.util.Objects;
 
@@ -126,7 +125,6 @@ public class ExplorativePatternMatching
 
   @Override
   protected GraphCollection executeForVertex(LogicalGraph graph) {
-    GradoopFlinkConfig config = graph.getConfig();
     GraphHeadFactory<EPGMGraphHead> graphHeadFactory = graph.getFactory().getGraphHeadFactory();
     VertexFactory<EPGMVertex> vertexFactory = graph.getFactory().getVertexFactory();
     String variable = getQueryHandler().getVertices().iterator().next().getVariable();
