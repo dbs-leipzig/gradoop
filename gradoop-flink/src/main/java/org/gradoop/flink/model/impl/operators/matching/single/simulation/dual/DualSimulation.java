@@ -21,12 +21,13 @@ import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.log4j.Logger;
 import org.gradoop.common.model.impl.id.GradoopId;
-import org.gradoop.common.model.impl.pojo.EPGMVertex;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
+import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
+import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
+import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.impl.epgm.GraphCollection;
-import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.epgm.LogicalGraphFactory;
 import org.gradoop.flink.model.impl.functions.epgm.Id;
 import org.gradoop.flink.model.impl.functions.epgm.VertexFromId;
 import org.gradoop.flink.model.impl.functions.utils.RightSide;
@@ -88,10 +89,10 @@ public class DualSimulation extends PatternMatching {
       .filterVertices(graph, getQuery())
       .project(0);
 
-    LogicalGraphFactory graphFactory = graph.getConfig()
-      .getLogicalGraphFactory();
-    GraphCollectionFactory collectionFactory = graph.getConfig()
-      .getGraphCollectionFactory();
+    BaseGraphFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+      graphFactory = graph.getFactory();
+    BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+      collectionFactory = graph.getCollectionFactory();
 
     if (doAttachData()) {
       return collectionFactory.fromGraph(
@@ -291,7 +292,7 @@ public class DualSimulation extends PatternMatching {
       PostProcessor.extractEdgesWithData(vertices, graph.getEdges()) :
       PostProcessor.extractEdges(vertices, config.getEdgeFactory());
 
-    return config.getGraphCollectionFactory().fromGraph(
-      config.getLogicalGraphFactory().fromDataSets(matchVertices, matchEdges));
+    return graph.getCollectionFactory().fromGraph(
+      graph.getFactory().fromDataSets(matchVertices, matchEdges));
   }
 }

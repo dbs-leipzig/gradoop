@@ -165,8 +165,7 @@ public class ExtractPropertyFromVertex implements UnaryGraphToGraphOperator {
         .union(edges);
     }
 
-    return logicalGraph.getConfig()
-      .getLogicalGraphFactory()
+    return logicalGraph.getFactory()
       .fromDataSets(logicalGraph.getGraphHead(), vertices, edges);
   }
 }

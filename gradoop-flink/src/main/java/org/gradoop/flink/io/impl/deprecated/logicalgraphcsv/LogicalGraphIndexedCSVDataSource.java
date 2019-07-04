@@ -101,6 +101,7 @@ public class LogicalGraphIndexedCSVDataSource extends LogicalGraphCSVBase implem
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-    return getConfig().getGraphCollectionFactory().fromGraph(getLogicalGraph());
+    LogicalGraph logicalGraph = getLogicalGraph();
+    return logicalGraph.getCollectionFactory().fromGraph(logicalGraph);
   }
 }

@@ -62,7 +62,7 @@ public class CSVDataSource extends CSVBase implements DataSource {
   @Override
   public LogicalGraph getLogicalGraph() {
     GraphCollection collection = getGraphCollection();
-    return getConfig().getLogicalGraphFactory()
+    return collection.getGraphFactory()
       .fromDataSets(
         collection.getGraphHeads().first(1), collection.getVertices(), collection.getEdges());
   }
@@ -86,7 +86,6 @@ public class CSVDataSource extends CSVBase implements DataSource {
       .readTextFile(getEdgeCSVPath())
       .map(new CSVLineToEdge(getConfig().getEdgeFactory()))
       .withBroadcastSet(metaData, BC_METADATA);
-
 
     return getConfig().getGraphCollectionFactory().fromDataSets(graphHeads, vertices, edges);
   }

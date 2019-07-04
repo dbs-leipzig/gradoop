@@ -108,7 +108,7 @@ public class PostProcessor {
       .with(new MergedGraphIds<>())
       .withForwardedFieldsFirst("id;label;properties");
 
-    return config.getGraphCollectionFactory().fromDataSets(
+    return inputGraph.getCollectionFactory().fromDataSets(
       collection.getGraphHeads(), newVertices, newEdges);
   }
   /**

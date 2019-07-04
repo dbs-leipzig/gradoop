@@ -19,8 +19,9 @@ import org.apache.flink.api.java.DataSet;
 import org.gradoop.common.model.impl.pojo.EPGMEdge;
 import org.gradoop.common.model.impl.pojo.EPGMGraphHead;
 import org.gradoop.common.model.impl.pojo.EPGMVertex;
+import org.gradoop.flink.model.api.epgm.BaseGraphCollectionFactory;
 import org.gradoop.flink.model.api.operators.BinaryBaseGraphToValueOperator;
-import org.gradoop.flink.model.impl.epgm.GraphCollectionFactory;
+import org.gradoop.flink.model.impl.epgm.GraphCollection;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
 import org.gradoop.flink.model.impl.operators.tostring.api.EdgeToString;
 import org.gradoop.flink.model.impl.operators.tostring.api.GraphHeadToString;
@@ -61,8 +62,8 @@ public class GraphEquality
 
   @Override
   public DataSet<Boolean> execute(LogicalGraph firstGraph, LogicalGraph secondGraph) {
-    GraphCollectionFactory collectionFactory = firstGraph.getConfig()
-      .getGraphCollectionFactory();
+    BaseGraphCollectionFactory<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>
+      collectionFactory = firstGraph.getCollectionFactory();
     return collectionEquality
       .execute(collectionFactory.fromGraph(firstGraph), collectionFactory.fromGraph(secondGraph));
   }

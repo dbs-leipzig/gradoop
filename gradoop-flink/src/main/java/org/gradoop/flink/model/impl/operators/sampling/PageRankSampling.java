@@ -101,7 +101,7 @@ public class PageRankSampling extends SamplingAlgorithm {
       maxIteration,
       true).execute(graph);
 
-    graph = graph.getConfig().getLogicalGraphFactory().fromDataSets(
+    graph = graph.getFactory().fromDataSets(
       graph.getGraphHead(), pageRankGraph.getVertices(), pageRankGraph.getEdges());
 
     graph = graph

@@ -147,7 +147,7 @@ public class ExplorativePatternMatching
         TypeExtractor.getForClass(vertexFactory.getType()),
         TypeExtractor.getForClass(graphHeadFactory.getType())));
 
-    return config.getGraphCollectionFactory().fromDataSets(
+    return graph.getCollectionFactory().fromDataSets(
       pairs.map(new Value1Of2<>()),
       pairs.map(new Value0Of2<>()));
   }

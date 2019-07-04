@@ -147,7 +147,8 @@ public class MinimalCSVImporter implements DataSource {
 
   @Override
   public GraphCollection getGraphCollection() throws IOException {
-    return config.getGraphCollectionFactory().fromGraph(getLogicalGraph());
+    LogicalGraph logicalGraph = getLogicalGraph();
+    return logicalGraph.getCollectionFactory().fromGraph(logicalGraph);
   }
 
   /**

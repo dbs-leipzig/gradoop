@@ -27,7 +27,7 @@ public class DistinctById implements UnaryCollectionToCollectionOperator {
 
   @Override
   public GraphCollection execute(GraphCollection collection) {
-    return collection.getConfig().getGraphCollectionFactory().fromDataSets(
+    return collection.getFactory().fromDataSets(
       collection.getGraphHeads().distinct(new Id<>()),
       collection.getVertices(),
       collection.getEdges());
