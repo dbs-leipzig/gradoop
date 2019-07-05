@@ -25,7 +25,7 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVer
  *
  * @param <V> vertex type
  */
-public class VertexSuperVertexIdentity<V extends Vertex> implements
+public class SetVertexAsSuperVertex<V extends Vertex> implements
   MapFunction<V, VertexWithSuperVertex> {
 
   /**
@@ -36,7 +36,7 @@ public class VertexSuperVertexIdentity<V extends Vertex> implements
   /**
    * Constructor
    */
-  public VertexSuperVertexIdentity() {
+  public SetVertexAsSuperVertex() {
     reuseTuple = new VertexWithSuperVertex();
   }
 

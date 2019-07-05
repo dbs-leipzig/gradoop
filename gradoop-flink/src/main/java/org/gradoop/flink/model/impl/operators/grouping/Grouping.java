@@ -15,7 +15,6 @@
  */
 package org.gradoop.flink.model.impl.operators.grouping;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
 import org.apache.flink.table.runtime.MinusCoGroupFunction;
@@ -29,27 +28,21 @@ import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
 import org.gradoop.flink.model.impl.epgm.LogicalGraph;
-import org.gradoop.flink.model.impl.functions.bool.True;
 import org.gradoop.flink.model.impl.functions.filters.Not;
-import org.gradoop.flink.model.impl.functions.filters.Or;
 import org.gradoop.flink.model.impl.operators.grouping.functions.BuildEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.CombineEdgeGroupItems;
-import org.gradoop.flink.model.impl.operators.grouping.functions.DefaultLabelGroupFilter;
-import org.gradoop.flink.model.impl.operators.grouping.functions.LabelSpecificLabelGroupFilter;
+import org.gradoop.flink.model.impl.operators.grouping.functions.LabelGroupFilter;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceEdgeGroupItems;
+import org.gradoop.flink.model.impl.operators.grouping.functions.SetVertexAsSuperVertex;
 import org.gradoop.flink.model.impl.operators.grouping.functions.UpdateEdgeGroupItem;
-import org.gradoop.flink.model.impl.operators.grouping.functions.VertexSuperVertexIdentity;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVertex;
-import org.gradoop.flink.model.impl.operators.subgraph.Subgraph;
-import org.gradoop.flink.model.impl.operators.verify.Verify;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * The grouping operator determines a structural grouping of vertices and edges
@@ -135,7 +128,7 @@ public abstract class Grouping<
   private final List<LabelGroup> edgeLabelGroups;
 
   /**
-   * A flag that indicates whether vertices that are not member of any labelGroup are converted
+   * A flag that indicates whether vertices that are not member of any labelGroup are retained
    * as they are to supervertices, including their edges.
    * If set to false, said vertices will be collapsed into a single group/ supervertex.
    */
@@ -148,9 +141,8 @@ public abstract class Grouping<
    * @param useEdgeLabels               group on edge label true/false
    * @param vertexLabelGroups           stores grouping properties for vertex labels
    * @param edgeLabelGroups             stores grouping properties for edge labels
-   * @param retainVerticesWithoutGroup convert vertices without labels to supervertices (only
-   *                                    applies when
-   *                                    grouping by labels)
+   * @param retainVerticesWithoutGroup  a flag to retain vertices that are not affected by the
+   *                                    grouping
    */
   Grouping(boolean useVertexLabels, boolean useEdgeLabels, List<LabelGroup> vertexLabelGroups,
     List<LabelGroup> edgeLabelGroups, boolean retainVerticesWithoutGroup) {
@@ -328,80 +320,14 @@ public abstract class Grouping<
   protected abstract LG groupInternal(LG graph);
 
   /**
-   * Returns a {@link FilterFunction} that checks whether a vertex is not a member of any
-   * {@link LabelGroup}.
-   *
-   * @param labelGroups groups to check
-   * @return filter that returns true if a vertex is not a member of any labelGroup.
-   */
-  @SuppressWarnings("unchecked")
-  private FilterFunction<V> getVertexIsNotMemberOfAnyLabelGroupFilter(
-    List<LabelGroup> labelGroups) {
-
-    FilterFunction[] isVertexInLabelGroupFunctions = labelGroups
-      .parallelStream()
-      .map(this::getVertexIsMemberOfLabelGroupFilter)
-      .collect(Collectors.toList())
-      .toArray(new FilterFunction[getVertexLabelGroups().size()]);
-
-    return new Not<>(new Or<V>(isVertexInLabelGroupFunctions));
-  }
-
-  /**
-   * Returns a {@link FilterFunction<V>} that checks if a vertex is member of a
-   * {@link LabelGroup}.
-   *
-   * @param group to check
-   * @return function
-   */
-  private FilterFunction<V> getVertexIsMemberOfLabelGroupFilter(LabelGroup group) {
-
-    boolean groupingByLabels = useVertexLabels();
-
-    // Default case (parameter group is not label specific)
-    if (group.getGroupingLabel().equals(Grouping.DEFAULT_VERTEX_LABEL_GROUP)) {
-      return new DefaultLabelGroupFilter<>(groupingByLabels, group);
-    }
-
-    return new LabelSpecificLabelGroupFilter<>(group);
-  }
-
-  /**
    * Returns a verified subgraph that only includes vertices that are not member of any labelGroups.
    *
    * @param graph to filter
    * @return subgraph
    */
-  LG getRetainedVerticesSubgraph(LG graph) {
-
-    FilterFunction<V> vertexInNoGroupFilter =
-      getVertexIsNotMemberOfAnyLabelGroupFilter(getVertexLabelGroups());
-
-    LG filtered = new Subgraph<G, V, E, LG, GC>(vertexInNoGroupFilter, new True<>(),
-      Subgraph.Strategy.VERTEX_INDUCED)
-      .execute(graph);
-    // TODO after next update: is verify still necessary?
-
-    return new Verify<G, V, E, LG, GC>().execute(filtered);
-
-    /*return graph.vertexInducedSubgraph(
-      new Not<>(new LabelGroupFilter<>(getVertexLabelGroups(), useVertexLabels()))
-    )*/
-  }
-
-  /**
-   * Returns a {@link DataSet<V>} that contains all vertices that belong to a
-   * {@link LabelGroup}.
-   *
-   * @param vertices to check
-   * @return filtered vertices
-   */
-  DataSet<V> getVerticesToGroup(DataSet<V> vertices) {
-
-    FilterFunction<V> vertexInNoGroupFilter =
-      getVertexIsNotMemberOfAnyLabelGroupFilter(getVertexLabelGroups());
-
-    return vertices.filter(new Not<>(vertexInNoGroupFilter));
+  LG getSubgraphOfRetainedVertices(LG graph) {
+    return graph.vertexInducedSubgraph(
+      new Not<>(new LabelGroupFilter<>(getVertexLabelGroups(), useVertexLabels())));
   }
 
   /**
@@ -422,21 +348,16 @@ public abstract class Grouping<
   /**
    * Is used when {@link Grouping#retainVerticesWithoutGroup} is set.
    * To add support for grouped edges between retained vertices and supervertices,
-   * retained vertices are singleton groups and are their group representatives themself.
+   * retained vertices are singleton groups and are their group representatives themselves.
    *
    * @param vertexToRepresentativeMap vertex representative map to add to
-   * @param retainedVerticesSubgraph graph that contains only retained vertices
+   * @param retainedVertices retained vertices
    * @return updated vertexToRepresentativeMap
    */
-  DataSet<VertexWithSuperVertex> updateVertexRepresentativesWithUngroupedVertices(
-    DataSet<VertexWithSuperVertex> vertexToRepresentativeMap,
-    LG retainedVerticesSubgraph) {
-    DataSet<VertexWithSuperVertex> verticesRepresentatives =
-      retainedVerticesSubgraph.getVertices()
-        .map(new VertexSuperVertexIdentity<>());
-
-    vertexToRepresentativeMap = vertexToRepresentativeMap.union(verticesRepresentatives);
-    return vertexToRepresentativeMap;
+  DataSet<VertexWithSuperVertex> updateVertexRepresentatives(
+    DataSet<VertexWithSuperVertex> vertexToRepresentativeMap, DataSet<V> retainedVertices) {
+    return vertexToRepresentativeMap
+      .union(retainedVertices.map(new SetVertexAsSuperVertex<>()));
   }
 
   /**
@@ -488,9 +409,9 @@ public abstract class Grouping<
     private List<AggregateFunction> globalEdgeAggregateFunctions;
 
     /**
-     * True: vertices that are not member of any labelGroup are converted as is to supervertices.
-     * False: vertices that are not member of any labelGroup will be collapsed into a single group/
-     * supervertice.
+     * A flag that indicates whether vertices that are not member of any labelGroup are retained
+     * as they are to supervertices, including their edges.
+     * If set to false, said vertices will be collapsed into a single group/ supervertex.
      */
     private boolean retainVerticesWithoutGroup;
 
@@ -526,15 +447,13 @@ public abstract class Grouping<
     }
 
     /**
-     * True: vertices that are not member of any labelGroup are converted as is to supervertices.
-     * False: vertices that are not member of any labelGroup will be collapsed into a single group/
-     * supervertice.
+     * Set {@link Grouping#retainVerticesWithoutGroup} to true, vertices that are not member of any
+     * labelGroup are retained as they are to supervertices, including their edges.
      *
-     * @param retainVerticesWithoutGroup flag
      * @return this builder
      */
-    public GroupingBuilder setRetainVerticesWithoutGroup(boolean retainVerticesWithoutGroup) {
-      this.retainVerticesWithoutGroup = retainVerticesWithoutGroup;
+    public GroupingBuilder retainVerticesWithoutGroup() {
+      this.retainVerticesWithoutGroup = true;
       return this;
     }
 

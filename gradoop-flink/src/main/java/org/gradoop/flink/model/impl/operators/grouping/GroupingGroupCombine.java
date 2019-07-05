@@ -30,6 +30,7 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.BuildVertexWith
 import org.gradoop.flink.model.impl.operators.grouping.functions.CombineVertexGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterRegularVertices;
 import org.gradoop.flink.model.impl.operators.grouping.functions.FilterSuperVertices;
+import org.gradoop.flink.model.impl.operators.grouping.functions.LabelGroupFilter;
 import org.gradoop.flink.model.impl.operators.grouping.functions.TransposeVertexGroupItems;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.LabelGroup;
@@ -38,7 +39,6 @@ import org.gradoop.flink.model.impl.operators.grouping.tuples.VertexWithSuperVer
 import org.gradoop.flink.model.impl.tuples.IdWithIdSet;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Grouping implementation that uses group + groupCombine + groupReduce for
@@ -86,8 +86,8 @@ public class GroupingGroupCombine<
    * @param useEdgeLabels               group on edge label true/false
    * @param vertexLabelGroups           stores grouping properties for vertex labels
    * @param edgeLabelGroups             stores grouping properties for edge labels
-   * @param retainVerticesWithoutGroup convert vertices that are not member of a group as is to
-   *                                    supervertices
+   * @param retainVerticesWithoutGroup  a flag to retain vertices that are not affected by the
+   *                                    grouping
    */
   GroupingGroupCombine(
     boolean useVertexLabels,
@@ -102,15 +102,10 @@ public class GroupingGroupCombine<
   @Override
   protected LG groupInternal(LG graph) {
 
-    DataSet<V> vertices = graph.getVertices();
-
-    Optional<LG> optionalRetainedVerticesSubgraph =
-      isRetainingVerticesWithoutGroup() ? Optional.of(getRetainedVerticesSubgraph(graph)) :
-        Optional.empty();
-
-    if (optionalRetainedVerticesSubgraph.isPresent()) {
-      vertices = getVerticesToGroup(vertices);
-    }
+    DataSet<V> vertices = isRetainingVerticesWithoutGroup() ?
+      graph.getVertices()
+        .filter(new LabelGroupFilter<>(getVertexLabelGroups(), useVertexLabels())) :
+      graph.getVertices();
 
     // map vertex to vertex group item
     DataSet<VertexGroupItem> verticesForGrouping = vertices.flatMap(
@@ -147,14 +142,14 @@ public class GroupingGroupCombine<
 
     DataSet<E> edgesToGroup = graph.getEdges();
 
-    if (optionalRetainedVerticesSubgraph.isPresent()) {
-      LG retainedVerticesSubgraph = optionalRetainedVerticesSubgraph.get();
+    if (isRetainingVerticesWithoutGroup()) {
+      LG retainedVerticesSubgraph = getSubgraphOfRetainedVertices(graph);
 
       // To add support for grouped edges between retained vertices and supervertices,
       // vertices are their group representatives themselves
       vertexToRepresentativeMap =
-        updateVertexRepresentativesWithUngroupedVertices(vertexToRepresentativeMap,
-          retainedVerticesSubgraph);
+        updateVertexRepresentatives(vertexToRepresentativeMap,
+          retainedVerticesSubgraph.getVertices());
 
       // don't execute grouping on edges between retained vertices
       // but execute on edges between retained vertices and grouped vertices
@@ -165,9 +160,8 @@ public class GroupingGroupCombine<
     DataSet<E> superEdges =
       buildSuperEdges(graph.getFactory().getEdgeFactory(), edgesToGroup, vertexToRepresentativeMap);
 
-    if (optionalRetainedVerticesSubgraph.isPresent()) {
-
-      LG retainedVerticesSubgraph = optionalRetainedVerticesSubgraph.get();
+    if (isRetainingVerticesWithoutGroup()) {
+      LG retainedVerticesSubgraph = getSubgraphOfRetainedVertices(graph);
       superVertices = superVertices.union(retainedVerticesSubgraph.getVertices());
       superEdges = superEdges.union(retainedVerticesSubgraph.getEdges());
     }
