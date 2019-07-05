@@ -134,7 +134,7 @@ public class GroupingGroupReduce<
       // don't execute grouping on edges between retained vertices
       // but execute on edges between retained vertices and grouped vertices
       //   graph.getEdges() - retainedVerticesSubgraph.getEdges()
-      edgesToGroup = subtractRetainedEdgesFromDefaultGraph(graph, retainedVerticesSubgraph);
+      edgesToGroup = subtractEdges(graph.getEdges(), retainedVerticesSubgraph.getEdges());
     }
 
     DataSet<E> superEdges =

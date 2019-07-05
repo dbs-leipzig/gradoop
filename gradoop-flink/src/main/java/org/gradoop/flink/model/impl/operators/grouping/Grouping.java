@@ -18,6 +18,7 @@ package org.gradoop.flink.model.impl.operators.grouping;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
+import org.apache.flink.table.runtime.MinusCoGroupFunction;
 import org.gradoop.common.model.api.entities.Edge;
 import org.gradoop.common.model.api.entities.EdgeFactory;
 import org.gradoop.common.model.api.entities.GraphHead;
@@ -36,7 +37,6 @@ import org.gradoop.flink.model.impl.operators.grouping.functions.CombineEdgeGrou
 import org.gradoop.flink.model.impl.operators.grouping.functions.DefaultLabelGroupFilter;
 import org.gradoop.flink.model.impl.operators.grouping.functions.LabelSpecificLabelGroupFilter;
 import org.gradoop.flink.model.impl.operators.grouping.functions.ReduceEdgeGroupItems;
-import org.gradoop.flink.model.impl.operators.grouping.functions.SubtractCoGroupFunction;
 import org.gradoop.flink.model.impl.operators.grouping.functions.UpdateEdgeGroupItem;
 import org.gradoop.flink.model.impl.operators.grouping.functions.VertexSuperVertexIdentity;
 import org.gradoop.flink.model.impl.operators.grouping.tuples.EdgeGroupItem;
@@ -405,24 +405,18 @@ public abstract class Grouping<
   }
 
   /**
-   * Is used when {@link Grouping#retainVerticesWithoutGroup} is set.
-   * Edges between retained vertices are not grouped, but converted as they are.
-   * So set of edges to be grouped needs to be reduced accordingly.
-   * Computes: {@code graph.getEdges() - retainedVerticesSubgraph.getEdges()}
+   * Removes all edges of {@code edgesToSubtract} from {@code edges}.
    *
-   * @param graph to be grouped
-   * @param retainedVerticesSubgraph graph that contains all retained vertices
-   * @return reduced set of edges
+   * @param edges           set of edges
+   * @param edgesToSubtract set of edges to be removed
+   * @return subtracted set of edges
    */
-  DataSet<E> subtractRetainedEdgesFromDefaultGraph(LG graph,
-    LG retainedVerticesSubgraph) {
-
-    return graph.getEdges()
-      .coGroup(retainedVerticesSubgraph.getEdges())
+  DataSet<E> subtractEdges(DataSet<E> edges, DataSet<E> edgesToSubtract) {
+    return edges
+      .coGroup(edgesToSubtract)
       .where("sourceId", "targetId")
       .equalTo("sourceId", "targetId")
-      //.with(new SubtractCoGroupFunction())
-      .with(new SubtractCoGroupFunction<>());
+      .with(new MinusCoGroupFunction<>(true));
   }
 
   /**
