@@ -185,7 +185,7 @@ public class GroupingBuilderTest {
     LabelGroup group = edgeLabelGroups.get(1);
 
     assertEquals(group.getGroupLabel(), testGroupLabel);
-    Assert.assertEquals(testGroupingKeys, group.getPropertyKeys());
+    assertEquals(testGroupingKeys, group.getPropertyKeys());
   }
 
 }
