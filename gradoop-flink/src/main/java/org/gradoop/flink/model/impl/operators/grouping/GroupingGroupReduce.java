@@ -76,14 +76,14 @@ public class GroupingGroupReduce<
    * @param useEdgeLabels               group on edge label true/false
    * @param vertexLabelGroups           stores grouping properties for vertex labels
    * @param edgeLabelGroups             stores grouping properties for edge labels
-   * @param retainVerticesWithoutGroups convert vertices that are not member of a group as is to
+   * @param retainVerticesWithoutGroup convert vertices that are not member of a group as is to
    *                                    supervertices
    */
   GroupingGroupReduce(boolean useVertexLabels, boolean useEdgeLabels,
     List<LabelGroup> vertexLabelGroups, List<LabelGroup> edgeLabelGroups,
-    boolean retainVerticesWithoutGroups) {
+    boolean retainVerticesWithoutGroup) {
     super(useVertexLabels, useEdgeLabels, vertexLabelGroups, edgeLabelGroups,
-      retainVerticesWithoutGroups);
+      retainVerticesWithoutGroup);
   }
 
   @Override
@@ -92,7 +92,7 @@ public class GroupingGroupReduce<
     DataSet<V> vertices = graph.getVertices();
 
     Optional<LG> optionalRetainedVerticesSubgraph =
-      isRetainingVerticesWithoutGroups() ? Optional.of(getRetainedVerticesSubgraph(graph)) :
+      isRetainingVerticesWithoutGroup() ? Optional.of(getRetainedVerticesSubgraph(graph)) :
         Optional.empty();
 
     if (optionalRetainedVerticesSubgraph.isPresent()) {

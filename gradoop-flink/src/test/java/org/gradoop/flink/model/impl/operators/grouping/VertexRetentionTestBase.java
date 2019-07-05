@@ -36,7 +36,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
   protected abstract GroupingStrategy getStrategy();
 
   /**
-   * Tests function {@link Grouping.GroupingBuilder#setRetainVerticesWithoutGroups(boolean)}.
+   * Tests function {@link Grouping.GroupingBuilder#setRetainVerticesWithoutGroup(boolean)}.
    * Tests whether setting the flag works.
    */
   @Test
@@ -44,10 +44,10 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
     Grouping grouping = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
       .useVertexLabel(true)
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .build();
 
-    assertTrue(grouping.isRetainingVerticesWithoutGroups());
+    assertTrue(grouping.isRetainingVerticesWithoutGroup());
   }
 
   /**
@@ -73,7 +73,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
@@ -105,7 +105,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
@@ -138,7 +138,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .addVertexGroupingKey("c")
       .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
@@ -175,7 +175,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
@@ -219,7 +219,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
@@ -259,7 +259,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
@@ -303,7 +303,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
@@ -341,7 +341,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
@@ -380,7 +380,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
@@ -424,7 +424,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("b")
       .addVertexAggregateFunction(new Count())
@@ -458,7 +458,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
       .execute(input);
@@ -498,7 +498,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexAggregateFunction(new Count())
       .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
@@ -540,7 +540,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("c")
       .addVertexAggregateFunction(new Count())
@@ -586,7 +586,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexAggregateFunction(new Count())
       .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
@@ -637,7 +637,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexGroupingKey("a")
       .addVertexAggregateFunction(new Count())
@@ -683,7 +683,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexGroupingKeys(Arrays.asList("a", "b"))
       .addVertexAggregateFunction(new Count())
@@ -734,7 +734,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(false)
       .addVertexGroupingKey("a")
       .addVertexAggregateFunction(new Count())
@@ -779,7 +779,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(false)
       .addVertexGroupingKeys(Arrays.asList("a", "b"))
       .addVertexAggregateFunction(new Count())
@@ -825,7 +825,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(false)
       .addVertexAggregateFunction(new Count())
       .<EPGMGraphHead, EPGMVertex, EPGMEdge, LogicalGraph, GraphCollection>build()
@@ -871,7 +871,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(true)
       .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
       .addVertexLabelGroup("B", "SuperB", Collections.singletonList("b"))
@@ -933,7 +933,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(false)
       .addVertexLabelGroup("A", "A", Arrays.asList("a", "b"),
         Collections.singletonList(new Count()))
@@ -986,7 +986,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(false)
       .addVertexGroupingKey("f")
       .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
@@ -1038,7 +1038,7 @@ public abstract class VertexRetentionTestBase extends GradoopFlinkTestBase {
 
     LogicalGraph output = new Grouping.GroupingBuilder()
       .setStrategy(getStrategy())
-      .setRetainVerticesWithoutGroups(true)
+      .setRetainVerticesWithoutGroup(true)
       .useVertexLabel(false)
       .addVertexLabelGroup("A", "SuperA", Collections.singletonList("a"))
       .addVertexLabelGroup("B", "SuperB", Collections.singletonList("b"))

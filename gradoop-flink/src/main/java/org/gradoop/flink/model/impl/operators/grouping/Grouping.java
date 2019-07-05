@@ -153,17 +153,17 @@ public abstract class Grouping<
    * @param useEdgeLabels               group on edge label true/false
    * @param vertexLabelGroups           stores grouping properties for vertex labels
    * @param edgeLabelGroups             stores grouping properties for edge labels
-   * @param retainVerticesWithoutGroups convert vertices without labels to supervertices (only
+   * @param retainVerticesWithoutGroup convert vertices without labels to supervertices (only
    *                                    applies when
    *                                    grouping by labels)
    */
   Grouping(boolean useVertexLabels, boolean useEdgeLabels, List<LabelGroup> vertexLabelGroups,
-    List<LabelGroup> edgeLabelGroups, boolean retainVerticesWithoutGroups) {
+    List<LabelGroup> edgeLabelGroups, boolean retainVerticesWithoutGroup) {
     this.useVertexLabels = useVertexLabels;
     this.useEdgeLabels = useEdgeLabels;
     this.vertexLabelGroups = vertexLabelGroups;
     this.edgeLabelGroups = edgeLabelGroups;
-    this.retainVerticesWithoutGroups = retainVerticesWithoutGroups;
+    this.retainVerticesWithoutGroup = retainVerticesWithoutGroup;
 
     vertexInNoGroupFilter = getVertexIsNotMemberOfAnyLabelGroupFilter(getVertexLabelGroups());
   }
@@ -225,8 +225,8 @@ public abstract class Grouping<
    *
    * @return true, iff vertices will be converted
    */
-  protected boolean isRetainingVerticesWithoutGroups() {
-    return retainVerticesWithoutGroups;
+  protected boolean isRetainingVerticesWithoutGroup() {
+    return retainVerticesWithoutGroup;
   }
 
   /**
@@ -401,7 +401,7 @@ public abstract class Grouping<
   }
 
   /**
-   * Is used when {@link Grouping#retainVerticesWithoutGroups} is set.
+   * Is used when {@link Grouping#retainVerticesWithoutGroup} is set.
    * Edges between retained vertices are not grouped, but converted as they are.
    * So set of edges to be grouped needs to be reduced accordingly.
    * Computes: {@code graph.getEdges() - retainedVerticesSubgraph.getEdges()}
@@ -422,7 +422,7 @@ public abstract class Grouping<
   }
 
   /**
-   * Is used when {@link Grouping#retainVerticesWithoutGroups} is set.
+   * Is used when {@link Grouping#retainVerticesWithoutGroup} is set.
    * To add support for grouped edges between retained vertices and supervertices,
    * retained vertices are singleton groups and are their group representatives themself.
    *
@@ -494,7 +494,7 @@ public abstract class Grouping<
      * False: vertices that are not member of any labelGroup will be collapsed into a single group/
      * supervertice.
      */
-    private boolean retainVerticesWithoutGroups;
+    private boolean retainVerticesWithoutGroup;
 
     /**
      * Creates a new grouping builder
@@ -532,11 +532,11 @@ public abstract class Grouping<
      * False: vertices that are not member of any labelGroup will be collapsed into a single group/
      * supervertice.
      *
-     * @param retainVerticesWithoutGroups flag
+     * @param retainVerticesWithoutGroup flag
      * @return this builder
      */
-    public GroupingBuilder setRetainVerticesWithoutGroups(boolean retainVerticesWithoutGroups) {
-      this.retainVerticesWithoutGroups = retainVerticesWithoutGroups;
+    public GroupingBuilder setRetainVerticesWithoutGroup(boolean retainVerticesWithoutGroup) {
+      this.retainVerticesWithoutGroup = retainVerticesWithoutGroup;
       return this;
     }
 
@@ -850,12 +850,12 @@ public abstract class Grouping<
       case GROUP_REDUCE:
         groupingOperator = new GroupingGroupReduce<>(
           useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups,
-          retainVerticesWithoutGroups);
+          retainVerticesWithoutGroup);
         break;
       case GROUP_COMBINE:
         groupingOperator = new GroupingGroupCombine<>(
           useVertexLabel, useEdgeLabel, vertexLabelGroups, edgeLabelGroups,
-          retainVerticesWithoutGroups);
+          retainVerticesWithoutGroup);
         break;
       default:
         throw new IllegalArgumentException("Unsupported strategy: " + strategy);
