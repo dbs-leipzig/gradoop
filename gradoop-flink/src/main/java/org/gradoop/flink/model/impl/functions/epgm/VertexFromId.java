@@ -47,18 +47,10 @@ public class VertexFromId implements
     this.vertexFactory = vertexFactory;
   }
 
-  /**
-   * Initializes an {@link EPGMVertex} from a given {@link GradoopId}.
-   *
-   * @param gradoopId Gradoop identifier
-   * @return EPGM vertex
-   * @throws Exception on failure
-   */
   @Override
   public EPGMVertex map(Tuple1<GradoopId> gradoopId) throws Exception {
     return vertexFactory.initVertex(gradoopId.f0);
   }
-
 
   @Override
   public TypeInformation<EPGMVertex> getProducedType() {

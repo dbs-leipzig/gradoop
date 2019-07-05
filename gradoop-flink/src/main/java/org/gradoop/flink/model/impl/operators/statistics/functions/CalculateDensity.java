@@ -37,12 +37,6 @@ public class CalculateDensity implements MapFunction<EPGMGraphHead, EPGMGraphHea
     this.propertyKey = key;
   }
 
-  /**
-   * Calculates the graph density and safes the value as property to the graphHead.
-   *
-   * @param graphHead The graphHead the density shall be written to
-   * @return EPGMGraphHead The graphHead the density is written to
-   */
   @Override
   public EPGMGraphHead map(EPGMGraphHead graphHead) {
     double vc1 = (double) graphHead.getPropertyValue("vertexCount").getLong();
