@@ -139,7 +139,7 @@ public abstract class Grouping<
    * False: vertices that are not member of any labelGroup will be collapsed into a single group/
    * supervertice.
    */
-  private final boolean retainVerticesWithoutGroups;
+  private final boolean retainVerticesWithoutGroup;
 
   /**
    * Returns true, if a vertex is not a member of any labelGroup.
