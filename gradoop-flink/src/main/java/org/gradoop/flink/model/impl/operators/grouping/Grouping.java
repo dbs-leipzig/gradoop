@@ -142,11 +142,6 @@ public abstract class Grouping<
   private final boolean retainVerticesWithoutGroup;
 
   /**
-   * Returns true, if a vertex is not a member of any labelGroup.
-   */
-  private final FilterFunction<V> vertexInNoGroupFilter;
-
-  /**
    * Creates grouping operator instance.
    *
    * @param useVertexLabels             group on vertex label true/false
@@ -164,8 +159,6 @@ public abstract class Grouping<
     this.vertexLabelGroups = vertexLabelGroups;
     this.edgeLabelGroups = edgeLabelGroups;
     this.retainVerticesWithoutGroup = retainVerticesWithoutGroup;
-
-    vertexInNoGroupFilter = getVertexIsNotMemberOfAnyLabelGroupFilter(getVertexLabelGroups());
   }
 
   @Override
@@ -339,7 +332,7 @@ public abstract class Grouping<
    * {@link LabelGroup}.
    *
    * @param labelGroups groups to check
-   * @return true if a vertex is member of any labelGroup.
+   * @return filter that returns true if a vertex is not a member of any labelGroup.
    */
   @SuppressWarnings("unchecked")
   private FilterFunction<V> getVertexIsNotMemberOfAnyLabelGroupFilter(
@@ -381,6 +374,9 @@ public abstract class Grouping<
    */
   LG getRetainedVerticesSubgraph(LG graph) {
 
+    FilterFunction<V> vertexInNoGroupFilter =
+      getVertexIsNotMemberOfAnyLabelGroupFilter(getVertexLabelGroups());
+
     LG filtered = new Subgraph<G, V, E, LG, GC>(vertexInNoGroupFilter, new True<>(),
       Subgraph.Strategy.VERTEX_INDUCED)
       .execute(graph);
@@ -397,6 +393,10 @@ public abstract class Grouping<
    * @return filtered vertices
    */
   DataSet<V> getVerticesToGroup(DataSet<V> vertices) {
+
+    FilterFunction<V> vertexInNoGroupFilter =
+      getVertexIsNotMemberOfAnyLabelGroupFilter(getVertexLabelGroups());
+
     return vertices.filter(new Not<>(vertexInNoGroupFilter));
   }
 
