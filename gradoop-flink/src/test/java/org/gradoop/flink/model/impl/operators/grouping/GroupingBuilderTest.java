@@ -118,7 +118,7 @@ public class GroupingBuilderTest {
       .addVertexGroupingKey("")
       .build();
 
-    Assert.assertTrue(grouping.useVertexProperties());
+    assertTrue(grouping.useVertexProperties());
   }
 
   /**
