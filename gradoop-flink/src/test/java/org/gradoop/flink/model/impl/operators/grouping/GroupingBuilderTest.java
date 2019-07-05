@@ -133,7 +133,7 @@ public class GroupingBuilderTest {
       .addEdgeGroupingKey("")
       .build();
 
-    Assert.assertTrue(grouping.useEdgeProperties());
+    assertTrue(grouping.useEdgeProperties());
   }
 
   /**
