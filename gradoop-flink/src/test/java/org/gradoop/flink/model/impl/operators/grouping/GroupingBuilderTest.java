@@ -88,7 +88,7 @@ public class GroupingBuilderTest {
       .setStrategy(GroupingStrategy.GROUP_REDUCE)
       .build();
 
-    Assert.assertTrue(grouping.useVertexLabels());
+    assertTrue(grouping.useVertexLabels());
   }
 
   /**
