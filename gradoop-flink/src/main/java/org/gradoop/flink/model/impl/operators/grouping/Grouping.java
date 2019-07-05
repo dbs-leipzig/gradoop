@@ -18,12 +18,12 @@ package org.gradoop.flink.model.impl.operators.grouping;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.operators.UnsortedGrouping;
-import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Edge;
+import org.gradoop.common.model.api.entities.EdgeFactory;
+import org.gradoop.common.model.api.entities.GraphHead;
 import org.gradoop.common.model.api.entities.Vertex;
 import org.gradoop.common.util.GradoopConstants;
 import org.gradoop.flink.model.api.epgm.BaseGraph;
-import org.gradoop.flink.model.api.epgm.BaseGraphFactory;
 import org.gradoop.flink.model.api.epgm.BaseGraphCollection;
 import org.gradoop.flink.model.api.functions.AggregateFunction;
 import org.gradoop.flink.model.api.operators.UnaryBaseGraphToBaseGraphOperator;
@@ -135,9 +135,9 @@ public abstract class Grouping<
   private final List<LabelGroup> edgeLabelGroups;
 
   /**
-   * True: vertices that are not member of any labelGroup are converted as is to supervertices.
-   * False: vertices that are not member of any labelGroup will be collapsed into a single group/
-   * supervertice.
+   * A flag that indicates whether vertices that are not member of any labelGroup are converted
+   * as they are to supervertices, including their edges.
+   * If set to false, said vertices will be collapsed into a single group/ supervertex.
    */
   private final boolean retainVerticesWithoutGroup;
 
@@ -282,13 +282,13 @@ public abstract class Grouping<
   /**
    * Build super edges by joining them with vertices and their super vertex.
    *
-   * @param factory factory
+   * @param edgeFactory edgeFactory
    * @param edgesToGroup input edgesToGroup
    * @param vertexToRepresentativeMap dataset containing tuples of vertex id and super vertex id
    * @return super edges
    */
   protected DataSet<E> buildSuperEdges(
-    BaseGraphFactory<G, V, E, LG, GC> factory,
+    EdgeFactory<E> edgeFactory,
     DataSet<E> edgesToGroup,
     DataSet<VertexWithSuperVertex> vertexToRepresentativeMap) {
 
@@ -316,7 +316,7 @@ public abstract class Grouping<
     return groupEdges(combinedEdges)
       .reduceGroup(new ReduceEdgeGroupItems<>(
         useEdgeLabels(),
-        factory.getEdgeFactory()));
+        edgeFactory));
   }
 
   /**
@@ -383,6 +383,10 @@ public abstract class Grouping<
     // TODO after next update: is verify still necessary?
 
     return new Verify<G, V, E, LG, GC>().execute(filtered);
+
+    /*return graph.vertexInducedSubgraph(
+      new Not<>(new LabelGroupFilter<>(getVertexLabelGroups(), useVertexLabels()))
+    )*/
   }
 
   /**

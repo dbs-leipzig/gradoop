@@ -163,7 +163,7 @@ public class GroupingGroupCombine<
     }
 
     DataSet<E> superEdges =
-      buildSuperEdges(graph.getFactory(), edgesToGroup, vertexToRepresentativeMap);
+      buildSuperEdges(graph.getFactory().getEdgeFactory(), edgesToGroup, vertexToRepresentativeMap);
 
     if (optionalRetainedVerticesSubgraph.isPresent()) {
 
